@@ -1,0 +1,45 @@
+﻿@page "/bluetoothle"
+@using System.Reactive.Linq
+@using Acr.BluetoothLE.Central
+@inject ICentralManager bluetooth
+
+<button class="btn btn-primary" onclick="@Scan">@(this.bluetooth.IsScanning ? "Stop Scan" : "Start Scan")</button>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Device</th>
+            <th>RSSI</th>
+            <th>UUID</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var result in this.results)
+    {
+        <tr>
+            <td>@result.Peripheral.Name</td>
+            <td>@result.Rssi</td>
+            <td>@result.Peripheral.Uuid</td>
+            <td></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@functions
+{
+    bool scanning;
+    List<IScanResult> results = new List<IScanResult>();
+
+
+    void Scan()
+    {
+        this.bluetooth
+            .Scan()
+            .Buffer(TimeSpan.FromSeconds(2))
+            .Subscribe(x =>
+            {
+
+            });
+    }
+}

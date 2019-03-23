@@ -1,0 +1,50 @@
+<Project>
+    <PropertyGroup>
+        <Authors>aritchie</Authors>
+        <!--
+        <NullableContextOptions>enable</NullableContextOptions>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <LangVersion>8.0</LangVersion>
+        -->
+        <Company />
+        <Description>Shiny</Description>
+        <Product>Shiny for Xamarin and Windows</Product>
+        <IncludeSymbols>true</IncludeSymbols>
+        <Version>1.0.0</Version>
+        <Product>$(AssemblyName) ($(TargetFramework))</Product>
+        <PackageProjectUrl>https://github.com/shinyorg/shiny</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/shinyorg/shiny/blob/master/LICENSE.md</PackageLicenseUrl>
+        <PackageIconUrl>https://github.com/shinyorg/shiny/raw/master/icon.png</PackageIconUrl>
+        <PackageReleaseNotes>https://github.com/shinyorg/shiny/blob/master/docs/changelog.md</PackageReleaseNotes>
+        <PackageTags>xamarin uwp ios android ble geofences gps location background jobs settings environment speech sensors</PackageTags>
+
+        <NullableContextOption>enable</NullableContextOption>
+        <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <IncludeSymbols>True</IncludeSymbols>
+        <IncludeSource>True</IncludeSource>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <DebugType>full</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>pdbonly</DebugType>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
+        <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />
+    </ItemGroup>
+
+</Project>

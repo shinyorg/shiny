@@ -1,0 +1,35 @@
+resources:
+- repo: self
+
+pool:
+  vmImage: Hosted VS2017
+  demands: msbuild
+
+#Your build pipeline references an undefined variable named ‘BuildConfiguration’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+
+steps:
+- task: NuGetToolInstaller@0
+  displayName: 'Use NuGet 4.9.2'
+  inputs:
+    versionSpec: 4.9.2
+
+- task: NuGetCommand@2
+  displayName: 'NuGet restore'
+
+- task: MSBuild@1
+  displayName: Build
+  inputs:
+    solution: Libs.sln
+    msbuildArguments: '/t:restore;build;pack /p:PackageVersion=$(Build.BuildNumber) /p:PackageOutputPath=$(build.artifactstagingdirectory)/public  /p:AssemblyFileVersion=$(Build.BuildNumber) '
+    clean: true
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory) '
+  inputs:
+    SourceFolder: '$(build.sourcesdirectory)'
+    Contents: '**\bin\$(BuildConfiguration)\**\*.nupkg'
+    TargetFolder: '$(build.artifactstagingdirectory) '
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+

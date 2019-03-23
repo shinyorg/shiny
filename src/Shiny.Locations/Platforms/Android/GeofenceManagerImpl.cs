@@ -1,0 +1,115 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
+using Android.Gms.Extensions;
+using Android.Gms.Location;
+using Shiny.Infrastructure;
+using Android;
+using Android.App;
+using Android.Content;
+
+
+namespace Shiny.Locations
+{
+    public class GeofenceManagerImpl : AbstractGeofenceManager
+    {
+        readonly IAndroidContext context;
+        readonly GeofencingClient client;
+
+
+        public GeofenceManagerImpl(IAndroidContext context, IRepository repository) : base(repository)
+        {
+            this.context = context;
+            this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
+        }
+
+
+        public override AccessState Status => this.context.GetCurrentAccessState(Manifest.Permission.AccessFineLocation);
+        public override Task<AccessState> RequestAccess() => this.context.RequestAccess(Manifest.Permission.AccessFineLocation).ToTask();
+
+
+        public override async Task StartMonitoring(GeofenceRegion region)
+        {
+            var transitions = this.GetTransitions(region);
+            var geofence = new GeofenceBuilder()
+                .SetRequestId(region.Identifier)
+                .SetExpirationDuration(Geofence.NeverExpire)
+                .SetCircularRegion(
+                    region.Center.Latitude,
+                    region.Center.Longitude,
+                    Convert.ToSingle(region.Radius.TotalMeters)
+                )
+                .SetTransitionTypes(transitions)
+                .Build();
+
+            var request = new GeofencingRequest.Builder()
+                .AddGeofence(geofence)
+                .SetInitialTrigger(transitions)
+                .Build();
+
+            await this.client.AddGeofences(
+                request,
+                this.GetPendingIntent()
+            );
+            await this.Repository.Set(region.Identifier, region);
+        }
+
+
+        public override async Task StopMonitoring(GeofenceRegion region)
+        {
+            await this.Repository.Remove(region.Identifier);
+            await this.client.RemoveGeofences(new List<string> { region.Identifier });
+        }
+
+
+        public override async Task StopAllMonitoring()
+        {
+            var regions = await this.Repository.GetAll();
+            var regionIds = regions.Select(x => x.Identifier).ToArray();
+            await this.client.RemoveGeofences(regionIds);
+            await this.Repository.Clear();
+        }
+
+
+        public override async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken)
+        {
+            var client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);
+            var location = await client.GetLastLocationAsync();
+            if (location == null)
+                return GeofenceState.Unknown;
+
+            var inside = region.IsPositionInside(new Position(location.Latitude, location.Longitude));
+            var state = inside ? GeofenceState.Entered : GeofenceState.Exited;
+            return state;
+        }
+
+
+        protected virtual int GetTransitions(GeofenceRegion region)
+        {
+            var i = 0;
+            if (region.NotifyOnEntry)
+                i = 1;
+
+            if (region.NotifyOnExit)
+                i += 2;
+
+            return i;
+        }
+
+
+        protected virtual PendingIntent GetPendingIntent()
+        {
+            var intent = new Intent(this.context.AppContext, typeof(GeofenceBroadcastReceiver));
+            intent.SetAction(GeofenceBroadcastReceiver.INTENT_ACTION);
+            return PendingIntent.GetBroadcast(
+                this.context.AppContext,
+                0,
+                intent,
+                PendingIntentFlags.UpdateCurrent
+            );
+        }
+    }
+}

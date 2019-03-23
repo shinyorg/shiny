@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:acr="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
+             x:Class="Samples.BluetoothLE.AdapterPage"
+             Title="BluetoothLE Central"
+             NavigationPage.BackButtonTitle="Back">
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Command="{Binding ScanToggle}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsScanning}" Value="True">
+                        <Setter Property="Text" Value="Stop Scan" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsScanning}" Value="False">
+                        <Setter Property="Text" Value="Scan" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Text="Open Settings" Command="{Binding OpenSettings}" />
+            <Button Text="Toggle Adapter" Command="{Binding ToggleAdapterState}" />
+
+            <ListView ItemsSource="{Binding Peripherals}" RowHeight="160">
+			    <ListView.Behaviors>
+			        <acr:ItemTappedCommandBehavior Command="{Binding SelectPeripheral}" />
+			    </ListView.Behaviors>
+
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.View>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+                                        <RowDefinition Height="30" />
+										<RowDefinition Height="30" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Label Text="{Binding Name}" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" FontSize="15" />
+                                    <Label Text="{Binding Rssi, StringFormat='RSSI: {0}'}" Grid.Row="0" Grid.Column="1" TextColor="Red" />
+                                    <Label Text="{Binding Uuid, StringFormat='UUID: {0}'}" Grid.Row="1" Grid.ColumnSpan="2" FontAttributes="Italic" />
+
+                                    <Label Text="{Binding IsConnectable, StringFormat='Connectable: {0}'}" Grid.Row="2" Grid.Column="0" />
+                                    <Label Text="{Binding ServiceCount, StringFormat='{0} Services'}" Grid.Row="2" Grid.Column="1" />
+
+                                    <Label Text="{Binding ManufacturerData, StringFormat='Manufactuer Data: {0}'}" Grid.Row="3" Grid.ColumnSpan="2" />
+
+                                    <Label Text="{Binding LocalName, StringFormat='Local Name: {0}'}" Grid.Row="4" Grid.Column="0" />
+
+									<Label Text="Peripheral Connected" IsVisible="{Binding IsConnected}" BackgroundColor="Yellow" TextColor="Black"  HorizontalTextAlignment="Center" Grid.ColumnSpan="2" Grid.Row="4" />
+                                </Grid>
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <ActivityIndicator IsRunning="{Binding IsScanning}" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

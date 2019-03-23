@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Property Group for Tizen50 Project -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>tizen50</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>None</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="lib\" />
+    <Folder Include="res\" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Tizen.NET" Version="5.0.0.14562">
+      <ExcludeAssets>Runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Tizen.NET.Sdk" Version="1.0.1" />
+    <PackageReference Include="Xamarin.Forms" Version="3.5.0.169047" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Acr.Beacons\Acr.Beacons.csproj" />
+    <ProjectReference Include="..\..\src\Acr.BluetoothLE\Acr.BluetoothLE.csproj" />
+    <ProjectReference Include="..\..\src\Acr.Core\Acr.Core.csproj" />
+    <ProjectReference Include="..\..\src\Acr.Locations\Acr.Locations.csproj" />
+    <ProjectReference Include="..\..\src\Acr.Net.Http\Acr.Net.Http.csproj" />
+    <ProjectReference Include="..\..\src\Acr.Notifications\Acr.Notifications.csproj" />
+    <ProjectReference Include="..\..\src\Acr.Sensors\Acr.Sensors.csproj" />
+    <ProjectReference Include="..\..\src\Acr.SpeechRecognition\Acr.SpeechRecognition.csproj" />
+    <ProjectReference Include="..\Samples\Samples.csproj" />
+  </ItemGroup>
+</Project>

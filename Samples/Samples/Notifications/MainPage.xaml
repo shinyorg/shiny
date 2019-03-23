@@ -1,0 +1,19 @@
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Notifications.MainPage"
+             Title="Notifications">
+    <ContentPage.Content>
+        <StackLayout>
+            <!--<Label Text="Badge" />
+            <Entry Text="{Binding Badge}"
+                   Keyboard="Numeric"
+                   MaxLength="2" />
+            -->
+            <Button Text="Request Permissions (iOS only)"
+                    Command="{Binding PermissionCheck}"/>
+
+            <!--<Button Text="Vibrate" Command="{Binding Vibrate}" />-->
+            <Button Text="Send Test" Command="{Binding SendTest}" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

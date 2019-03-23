@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.BlePeripherals.MainPage"
+             Title="Server">
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Entry Placeholder="Characteristic Value"
+                   Text="{Binding CharacteristicValue}"
+                   Grid.Row="0" />
+
+            <ScrollView Orientation="Vertical"
+                        Grid.Column="0"
+                        Grid.Row="1">
+                <Label Text="{Binding Output}" />
+            </ScrollView>
+
+            <Button Text="Start GATT Server"
+                    Command="{Binding ToggleServer}"
+                    Grid.Column="0"
+                    Grid.Row="2">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsRunning}" Value="True">
+                        <Setter Property="Text" Value="Stop GATT Server" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsRunning}" Value="False">
+                        <Setter Property="Text" Value="Start GATT Server" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Text="Clear Output"
+                    Command="{Binding Clear}"
+                    Grid.Column="0"
+                    Grid.Row="3" />
+        </Grid>
+    </ContentPage.Content>
+
+</ContentPage>

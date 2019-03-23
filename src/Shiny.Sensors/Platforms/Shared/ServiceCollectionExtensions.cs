@@ -1,0 +1,125 @@
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+
+
+namespace Shiny.Sensors
+{
+    public static class ServiceCollectionExtensions
+    {
+        public static bool UseAccelerometer(this IServiceCollection builder)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<IAccelerometer, AccelerometerImpl>();
+            return true;
+#endif
+        }
+
+
+        public static bool UseAmbientLightSensor(this IServiceCollection builder)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<IAmbientLight, AmbientLightImpl>();
+            return true;
+#endif
+        }
+
+
+        public static bool UseBarometer(this IServiceCollection builder)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<IBarometer, BarometerImpl>();
+            return true;
+#endif
+        }
+
+
+        public static bool UseCompass(this IServiceCollection builder)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<ICompass, CompassImpl>();
+            return true;
+#endif
+        }
+
+
+        public static bool UseDeviceOrientationSensor(this IServiceCollection builder)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<IDeviceOrientation, DeviceOrientationImpl>();
+            return true;
+#endif
+        }
+
+        public static bool UseGyroscope(this IServiceCollection builder)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<IGyroscope, GyroscopeImpl>();
+            return true;
+#endif
+        }
+
+
+        public static bool UseMagnetometer(this IServiceCollection builder)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<IMagnetometer, MagnetometerImpl>();
+            return true;
+#endif
+        }
+
+
+        public static bool UseProximitySensor(this IServiceCollection builder)
+        {
+#if __IOS__ || __ANDROID__
+            builder.AddSingleton<IProximity, ProximityImpl>();
+            return true;
+#else
+            return false;
+#endif
+        }
+
+        public static void UsePedometer(this IServiceCollection builder)
+        {
+#if __IOS__
+            builder.AddSingleton<IPedometer, PedometerImpl>();
+#endif
+        }
+    }
+}
+//        public static CardinalDirection GetDirection(this CompassReading reading, bool useTrueHeading = false)
+//        {
+//            var r = useTrueHeading && reading.TrueHeading != null ? reading.TrueHeading.Value : reading.MagneticHeading;
+
+//            return CardinalDirection.E;
+//        }
+
+////N   - 348.75 - 11.25
+////NNE - 11.25 - 33.75
+////NE  - 33.75 - 56.25
+////ENE - 56.25 - 78.75
+////E   - 78.75 - 101.25
+////ESE - 101.25 - 123.75
+////SE  - 123.75 - 146.25
+////SSE - 146.25 - 168.75
+////S   - 168.75 - 191.25
+////SSW - 191.25 - 213.75
+////SW  - 213.75 - 236.25
+////WSW - 236.25 - 258.75
+////W   - 258.75 - 281.25
+////WNW - 281.25 - 303.75
+////NW  - 303.75 - 326.25
+////NNW - 326.25 - 348.75

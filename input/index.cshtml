@@ -1,0 +1,42 @@
+Title: A simple to use, highly modular, and extremely configurable static content generator
+NoSidebar: true
+NoContainer: true
+NoGutter: true
+---
+<div class="jumbotron jumbotron-intro">
+	<div class="container-background">
+		<div class="container">
+			<h1>Say something useful</h1>
+		</div>
+	</div>
+</div>
+<div class="jumbotron jumbotron-description jumbotron-description-1">
+    <div class="container">
+	    <p><h2><strong>Wyam is different.</strong></h2></p>
+		<p><h2>It's a <em>static content toolkit</em> and can be used to generate web sites, produce documentation, create ebooks, and much more. Since everything is configured by chaining together flexible modules (that you can even write yourself), the only limits to what it can create are your imagination.</h2></p>
+		
+		<p class="text-center">
+			<a class="github-button" href="https://github.com/aritchie/core" data-icon="octicon-star" data-style="mega" data-count-href="/Wyamio/Wyam/stargazers" data-count-api="/repos/Wyamio/Wyam#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star Wyamio/Wyam on GitHub">Star</a>
+			<a href="https://twitter.com/allanritchie911" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @@allanritchie911</a>
+			<script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+			<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+		</p>
+    </div>
+</div>
+
+<div class="container">				
+	<h1>Features</h1>
+	<hr />
+	<ul>
+		<li>Written in .NET and <a href="/docs/extensibility/writing-a-module">easily extensible</a></li>
+	</ul>
+	
+	<h1>Usage</h1>
+	<hr />
+	<p>The easiest way to get started is to install as a .NET Core global tool and use a <a href="/recipes">recipe and theme</a>.</p>
+	<p><b>1.</b> Download and install Wyam as a global tool: <pre><code>dotnet tool install -g Wyam.Tool</code></pre></p>
+	<p><b>2.</b> Scaffold a new blog: <pre><code>wyam new --recipe Blog</code></pre></p>
+	<p><b>3.</b> Edit the scaffolded files.</p>
+	<p><b>4.</b> Build the blog with a theme: <pre><code>wyam --recipe Blog --theme CleanBlog</code></pre></p>
+	<p>To go deeper, read more about the <a href="/docs/concepts">underlying concepts</a> and then read about <a href="/docs/usage/configuration">configuration files</a> and the <a href="/docs/usage/command-line">available command line arguments</a>. Then check out the full list of <a href="/modules">modules</a>.</p>
+</div>

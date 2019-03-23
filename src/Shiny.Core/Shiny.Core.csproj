@@ -1,0 +1,55 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.68">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;monoandroid90;xamarinios10;xamarintvos10</TargetFrameworks>
+        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
+        <RootNamespace>Shiny</RootNamespace>
+        <PackageVersion>1.0.0</PackageVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="**\Platforms\**\*.cs" />
+        <None Include="**\Platforms\**\*.cs" />
+        <PackageReference Include="System.Reactive" Version="4.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
+        <Compile Include="**\Platforms\*netcore*\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <Compile Include="**\Platforms\Android\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.1" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <Compile Include="**\Platforms\Uwp\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinios')) ">
+        <Compile Include="**\Platforms\*iOS*\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarintvos')) ">
+        <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinmac')) ">
+        <Compile Include="**\Platforms\*macOS*\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+</Project>

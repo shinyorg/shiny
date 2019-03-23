@@ -1,0 +1,27 @@
+﻿@page "/settings"
+@using Acr.Settings
+@inject ISettings settings
+
+<h1>Settings</h1>
+
+<p>Current Value: @this.currentValue</p>
+
+<button class="btn btn-primary" onclick="@this.IncrementCount">Increment Value</button>
+
+@functions
+{
+    int currentValue = 0;
+
+
+    protected override void OnInit()
+    {
+        this.currentValue = this.settings.Get("Value", 0);
+    }
+
+
+    void IncrementCount()
+    {
+        this.currentValue++;
+        this.settings.Set("Value", this.currentValue);
+    }
+}

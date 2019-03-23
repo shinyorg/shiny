@@ -1,0 +1,14 @@
+#recipe Docs
+#t Samson
+
+//https://github.com/Wyamio/Wyam
+//https://wyam.io/recipes/docs/
+
+Settings[Keys.Host] = "docs.allancritchie.com";
+Settings[DocsKeys.Title] = "ACR Core";
+Settings[DocsKeys.BlogTitle] = "Releases";
+Settings[DocsKeys.SourceFiles] = @"C:/dev/acr/Core/src/**/{!Platforms,!Infrastructure,!bin,!obj,!packages,!*.Tests,}/**/*.cs";
+//Settings[DocsKeys.ProjectFiles] = "**\Acr.Core.csproj"; 
+//Settings[DocsKeys.SolutionFiles] = "Libs.sln";
+//Settings[DocsKeys.IgnoreFolders] = new string[] { "Acr.Sensors", "Samples" };
+//Settings[DocsKeys.Logo] = "";

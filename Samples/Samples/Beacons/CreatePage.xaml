@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Beacons.CreatePage"
+             Title="{Binding Title}">
+    <ContentPage.Content>
+        <TableView Intent="Form">
+            <TableSection>
+                <EntryCell Label="Identifier" Text="{Binding Identifier}" />
+                <EntryCell Label="Uuid" Text="{Binding Uuid}" Keyboard="Text" />
+                <EntryCell Label="Major" Text="{Binding Major}" Keyboard="Numeric" />
+                <EntryCell Label="Minor" Text="{Binding Minor}" Keyboard="Numeric" />
+            </TableSection>
+
+            <TableSection>
+                <TextCell Text="Create" Command="{Binding Create}" />
+            </TableSection>
+
+            <TableSection>
+                <TextCell Text="Estimote Defaults" Command="{Binding EstimoteDefaults}" />
+            </TableSection>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

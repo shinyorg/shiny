@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Gps.GpsPage"
+             Title="Setup">
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}" Grid.Row="0" />
+
+            <TableView Grid.Row="1">
+                <TableRoot>
+                    <TableSection>
+                        <TextCell Text="Access" Detail="{Binding Access}" Command="{Binding RequestAccess}" />
+                    </TableSection>
+                    <TableSection>
+                        <TextCell Text="Latitude" Detail="{Binding Latitude}" />
+                        <TextCell Text="Longitude" Detail="{Binding Longitude}" />
+                        <TextCell Text="Altitude" Detail="{Binding Altitude}" />
+                        <TextCell Text="Accuracy" Detail="{Binding PositionAccuracy}" />
+                    </TableSection>
+                    <TableSection>
+                        <TextCell Text="Speed (m/s)" Detail="{Binding Speed}" />
+                        <TextCell Text="Heading" Detail="{Binding Heading}" />
+                        <TextCell Text="Accuracy" Detail="{Binding HeadingAccuracy}" />
+                    </TableSection>
+                    <TableSection>
+                        <TextCell Text="Get Current Position" Command="{Binding GetCurrentPosition}" />
+                        <TextCell Text="{Binding ListenerText}" Command="{Binding ToggleUpdates}" />
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
