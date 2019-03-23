@@ -9,7 +9,7 @@ using Xunit.Runners.UI;
 namespace Shiny.Device.Tests.Droid
 {
     [Activity(
-        Label = "Acr.Peripheral.Tests",
+        Label = "Tests",
         Icon = "@mipmap/icon",
         Theme = "@style/MainTheme",
         MainLauncher = true,
@@ -45,6 +45,6 @@ namespace Shiny.Device.Tests.Droid
 
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
-            => CoreAndroidHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
