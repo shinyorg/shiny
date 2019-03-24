@@ -10,8 +10,8 @@ Formerly the ACR Plugins
 
 Branch|Status
 ------|------
-Master|[![Build status](https://dev.azure.com/shinylib/shiny/_apis/build/status/Build?branchName=master)](https://dev.azure.com/allanritchie/ACR/_build/latest?definitionId=20)
-Dev|[![Build status](https://dev.azure.com/shinylib/shiny/_apis/build/status/Build?branchName=dev)](https://dev.azure.com/allanritchie/ACR/_build/latest?definitionId=20)|
+Master|[![Build status](https://dev.azure.com/shinylib/shiny/_apis/build/status/Build?branchName=master)](https://dev.azure.com/shinylib/shiny/_build/latest?definitionId=1)
+Dev|[![Build status](https://dev.azure.com/shinylib/shiny/_apis/build/status/Build?branchName=dev)](https://dev.azure.com/shinylib/shiny/_build/latest?definitionId=1)|
 
 
 ## NuGet Packages
