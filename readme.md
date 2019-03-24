@@ -3,8 +3,8 @@
 Formally the ACR Plugins
 
 * Beautiful Docs are in the works - for now, take a look here:
-  * [Introducing ACR Core](https://allancritchie.net/posts/acrcore)
-  * [Background Jobs using Shiny Core](https://allancritchie.net/posts/jobs)
+  * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
+  * [Background Jobs with Shiny](https://allancritchie.net/posts/shinyjobs)
 
 ## Builds
 
@@ -16,7 +16,7 @@ Dev|[![Build status](https://dev.azure.com/shinylib/shiny/_apis/build/status/Bui
 
 ## NuGet Packages
 
-Core official releases are available on NuGet. For early test builds, you can also use the beta MyGet feed.
+Shiny official releases are available on NuGet. For early test builds, you can also use the beta MyGet feed.
 
 To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.json` as a package source to Visual Studio
 
