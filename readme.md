@@ -1,6 +1,6 @@
 ﻿# Shiny for Xamarin & Windows
 
-Formally the ACR Plugins
+Formerly the ACR Plugins
 
 * Beautiful Docs are in the works - for now, take a look here:
   * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
