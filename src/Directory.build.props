@@ -6,6 +6,7 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <LangVersion>8.0</LangVersion>
         -->
+        <LangVersion>latest</LangVersion>
         <Company />
         <Description>Shiny</Description>
         <Product>Shiny for Xamarin and Windows</Product>
