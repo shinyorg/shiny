@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using UIKit;
 using Shiny.Jobs;
 using Shiny.Net;
@@ -7,7 +6,6 @@ using Shiny.Power;
 using Shiny.Infrastructure;
 using Shiny.IO;
 using Shiny.Settings;
-using Shiny.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -30,35 +28,10 @@ namespace Shiny
             });
 
 
-        public static async void OnBackgroundFetch(Action<UIBackgroundFetchResult> completionHandler)
+        public static void OnBackgroundFetch(Action<UIBackgroundFetchResult> completionHandler)
         {
-            var result = UIBackgroundFetchResult.NoData;
-            var app = UIApplication.SharedApplication;
-            var taskId = 0;
-
-            try
-            {
-                using (var cancelSrc = new CancellationTokenSource())
-                {
-                    taskId = (int)app.BeginBackgroundTask("RunAll", cancelSrc.Cancel);
-                    await Container
-                        .GetService<IJobManager>()
-                        .RunAll(cancelSrc.Token)
-                        .ConfigureAwait(false);
-
-                    result = UIBackgroundFetchResult.NewData;
-                }
-            }
-            catch (Exception ex)
-            {
-                result = UIBackgroundFetchResult.Failed;
-                Log.Write(ex);
-            }
-            finally
-            {
-                completionHandler(result);
-                app.EndBackgroundTask(taskId);
-            }
+            var processor = Resolve<IJobManager>() as IBackgroundFetchProcessor;
+            processor?.Process(completionHandler);
         }
     }
 }

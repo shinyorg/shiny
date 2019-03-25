@@ -7,6 +7,7 @@ using Shiny;
 using Xamarin.Forms;
 using Application = Windows.UI.Xaml.Application;
 using Frame = Windows.UI.Xaml.Controls.Frame;
+using Samples.ShinySetup;
 
 
 namespace Samples.UWP

@@ -2,7 +2,7 @@
 using Shiny;
 
 
-namespace Samples
+namespace Samples.ShinySetup
 {
     public class StartupTask1 : IStartupTask
     {

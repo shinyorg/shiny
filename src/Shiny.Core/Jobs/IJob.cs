@@ -10,8 +10,9 @@ namespace Shiny.Jobs
         /// <summary>
         /// Runs your code
         /// </summary>
+        /// <returns>Return true if new data is received, otherwise false (don't like about this or iOS will haunt you)</returns>
         /// <param name="jobInfo"></param>
         /// <param name="cancelToken"></param>
-        Task Run(JobInfo jobInfo, CancellationToken cancelToken);
+        Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken);
     }
 }

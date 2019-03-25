@@ -7,7 +7,7 @@ using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 
 
-namespace Samples
+namespace Samples.Loggers
 {
     public class AppCenterLogger : ILogger
     {

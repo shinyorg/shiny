@@ -6,7 +6,7 @@ using Shiny.Jobs;
 using Acr.UserDialogs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
+using Samples.ShinySetup;
 
 namespace Samples.Jobs
 {
