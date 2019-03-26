@@ -26,8 +26,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		azure-pipelines.yml = azure-pipelines.yml
 		bean_testhost.ino = bean_testhost.ino
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		CONTRIBUTING.md = CONTRIBUTING.md
 		src\Directory.build.props = src\Directory.build.props
-		ISSUE_TEMPLATE = ISSUE_TEMPLATE
+		ISSUE_TEMPLATE.md = ISSUE_TEMPLATE.md
 		LICENSE.md = LICENSE.md
 		readme.md = readme.md
 		support.xlsx = support.xlsx
@@ -52,6 +54,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Net.Http", "src\Shiny.Net.Http\Shiny.Net.Http.csproj", "{22AD683C-25C2-45C9-8FD0-74E9A43628FB}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Device.Tests.Shared", "Tests\Shiny.Device.Tests.Shared\Shiny.Device.Tests.Shared.shproj", "{923D64D4-5804-4621-8C17-A683D341BF07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1DC43C21-5765-4B46-95F9-CDECB851DF94}"
+	ProjectSection(SolutionItems) = preProject
+		.github\noresponse.yml = .github\noresponse.yml
+		.github\stale.yml = .github\stale.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
