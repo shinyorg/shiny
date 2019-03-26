@@ -57,8 +57,10 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Device.Tests.Shared",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1DC43C21-5765-4B46-95F9-CDECB851DF94}"
 	ProjectSection(SolutionItems) = preProject
+		.github\issue-close-app.yml = .github\issue-close-app.yml
 		.github\noresponse.yml = .github\noresponse.yml
 		.github\stale.yml = .github\stale.yml
+		.github\support.yaml = .github\support.yaml
 	EndProjectSection
 EndProject
 Global
