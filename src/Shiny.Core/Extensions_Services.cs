@@ -3,7 +3,8 @@ using System.ComponentModel;
 using System.Linq;
 using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
-
+using Shiny.Jobs;
+using Shiny.Infrastructure;
 
 namespace Shiny
 {
@@ -21,6 +22,15 @@ namespace Shiny
                 .GetService<ISettings>()
                 .Bind<TImpl>(prefix)
             );
+
+
+        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
+        {
+            if (!services.Any(x => x.ImplementationType == typeof(PostRegisterTask)))
+                services.AddSingleton<IStartupTask, PostRegisterTask>();
+
+            PostRegisterTask.Jobs.Add(jobInfo);
+        }
 
 
         public static void Replace<TService, TImpl>(this IServiceCollection services)
