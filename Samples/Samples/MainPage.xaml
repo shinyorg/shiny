@@ -21,11 +21,11 @@
                         <TextCell Text="Speech Recognition" Command="{Binding Navigate}" CommandParameter="Nav/SpeechRecognition"  />
                     </TableSection>
                     <TableSection>
+                        <TextCell Text="Error Logs" Command="{Binding Navigate}" CommandParameter="Nav/ErrorLogs" />
                         <TextCell Text="Access" Command="{Binding Navigate}" CommandParameter="Nav/Access" />
                         <TextCell Text="Environment" Command="{Binding Navigate}" CommandParameter="Nav/Environment" />
                         <TextCell Text="File System" Command="{Binding Navigate}" CommandParameter="Nav/FileSystem" />
                         <TextCell Text="Settings" Command="{Binding Navigate}" CommandParameter="Nav/Settings" />
-                        <TextCell Text="AppCenter" Command="{Binding Navigate}" CommandParameter="Nav/AppCenter" />
                     </TableSection>
                 </TableRoot>
             </TableView>
