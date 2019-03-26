@@ -48,5 +48,12 @@ namespace Samples
         [Reactive] public IList<CommandItem> Logs { get; private set; }
         public ReactiveCommand<Unit, Unit> Load { get; }
         public ReactiveCommand<Unit, Unit> Clear { get; }
+
+
+        public override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await this.Load.Execute();
+        }
     }
 }
