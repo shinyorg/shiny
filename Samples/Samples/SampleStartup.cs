@@ -10,6 +10,7 @@ using Shiny.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Samples.Settings;
 
+
 namespace Samples
 {
     public class SampleStartup : Startup
@@ -20,9 +21,9 @@ namespace Samples
             Log.UseDebug();
             Log.AddLogger(new AppCenterLogger(), true, false);
 
-            // create your infrastructure
+            // create your infrastructures
             // jobs, connectivity, power, filesystem, are installed automatically
-            builder.AddSingleton<SampleSqliteConnection, SampleSqliteConnection>();
+            builder.AddSingleton<SampleSqliteConnection>();
 
             // startup tasks
             builder.RegisterStartupTask<StartupTask1>();

@@ -2,7 +2,7 @@
 using System.Reactive.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-
+using Shiny;
 
 namespace Samples.Settings
 {
@@ -10,6 +10,8 @@ namespace Samples.Settings
     {
         public AppSettings()
         {
+            //this.WhenAnyProperty(x => x.IsChecked).Subscribe(_ => this.LastUpdated = DateTime.Now);
+            //this.WhenAnyProperty(x => x.YourText).Subscribe(_ => this.LastUpdated = DateTime.Now);
             this.WhenAnyValue(
                     x => x.IsChecked,
                     x => x.YourText

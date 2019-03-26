@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Android.Content;
 using Native = Android.App.DownloadManager;
+using Shiny.Net.Http.Internals;
 
 
 namespace Shiny.Net.Http
@@ -18,6 +19,7 @@ namespace Shiny.Net.Http
         {
             this.context = context;
             this.repository = repository;
+            //this.GetManager().InvokeQuery()
         }
 
 
@@ -26,7 +28,7 @@ namespace Shiny.Net.Http
             throw new NotImplementedException();
         }
 
-        public Task<IHttpTransfer> Create(HttpTransferRequest request)
+        public async Task<IHttpTransfer> Create(HttpTransferRequest request)
         {
             var native = new Native.Request(null);
             //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
@@ -42,11 +44,18 @@ namespace Shiny.Net.Http
                 native.AddRequestHeader(header.Key, header.Value);
 
             var id = this.GetManager().Enqueue(native);
+            await this.repository.Set(id.ToString(), new HttpTransferStore
+            {
+
+            });
             return null;
         }
 
-        public Task<IEnumerable<IHttpTransfer>> GetTransfers()
+
+        public async Task<IEnumerable<IHttpTransfer>> GetTransfers()
         {
+            var transfers = await this.repository.GetAll<HttpTransferStore>();
+
             throw new NotImplementedException();
         }
 
