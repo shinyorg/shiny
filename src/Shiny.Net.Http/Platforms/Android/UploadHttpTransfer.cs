@@ -8,17 +8,19 @@ using System.Threading.Tasks;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransfer : AbstractHttpTransfer
+    public class UploadHttpTransfer : AbstractHttpTransfer
     {
         readonly HttpClient httpClient;
         readonly CancellationTokenSource cancelSrc;
 
 
-        public HttpTransfer(HttpTransferRequest request, bool upload, string identifier) : base(request, upload)
+        public UploadHttpTransfer(HttpTransferRequest request) : base(request, true)
         {
             this.httpClient = new HttpClient();
             this.cancelSrc = new CancellationTokenSource();
-            this.Identifier = identifier;
+            //this.Identifier = identifier;
+
+            //this.GetManager().Remove(id);
         }
 
 

@@ -1,98 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Shiny.IO;
+using Windows.Networking.BackgroundTransfer;
+using Windows.Storage;
 
 
 namespace Shiny.Net.Http
 {
     public class DownloadManager : IDownloadManager
     {
-        public Task CancelAll()
+        readonly IFileSystem fileSystem;
+
+        public DownloadManager(IFileSystem fileSystem)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<IHttpTransfer> Create(HttpTransferRequest request)
-        {
-            //BackgroundDownloader
-            //    .GetCurrentDownloadsAsync()
-            //    .AsTask()
-            //    .ContinueWith(result =>
-            //    {
-            //        foreach (var task in result.Result)
-            //        {
-            //            var config = new HttpTransferConfiguration(task.RequestedUri.ToString())
-            //            {
-            //                HttpMethod = task.Method,
-            //                UseMeteredConnection = task.CostPolicy != BackgroundTransferCostPolicy.UnrestrictedOnly
-            //            };
-            //            this.Add(new DownloadHttpTask(config, task, true));
-            //        }
-            //    });
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<IHttpTransfer>> GetTransfers()
-        {
-            throw new NotImplementedException();
-        }
-    }
-}
-/*
-  public override IHttpTransfer Upload(HttpTransferConfiguration config)
-        {
-
-            if (String.IsNullOrWhiteSpace(config.LocalFilePath))
-                throw new ArgumentException("You must set the local file path when uploading");
-
-            if (!File.Exists(config.LocalFilePath))
-                throw new ArgumentException($"File '{config.LocalFilePath}' does not exist");
-
-            var task = new BackgroundUploader
-            {
-                Method = config.HttpMethod,
-                CostPolicy = config.UseMeteredConnection
-                    ? BackgroundTransferCostPolicy.Default
-                    : BackgroundTransferCostPolicy.UnrestrictedOnly
-            };
-
-            foreach (var header in config.Headers)
-                task.SetRequestHeader(header.Key, header.Value);
-
-            // seriously - this should not be async!
-            var file = StorageFile.GetFileFromPathAsync(config.LocalFilePath).AsTask().Result;
-            var operation = task.CreateUpload(new Uri(config.Uri), file);
-            var httpTask = new UploadHttpTransfer(config, operation, false);
-            this.Add(httpTask);
-
-            return httpTask;
+            this.fileSystem = fileSystem;
         }
 
 
-        public override IHttpTransfer Download(HttpTransferConfiguration config)
+        public async Task CancelAll()
+        {
+            var tasks = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
+            foreach (var task in tasks)
+                task.AttachAsync().Cancel();
+        }
+
+
+        public async Task<IHttpTransfer> Create(HttpTransferRequest request)
         {
             var task = new BackgroundDownloader
             {
-                Method = config.HttpMethod,
-                CostPolicy = config.UseMeteredConnection
+                Method = request.HttpMethod,
+                CostPolicy = request.UseMeteredConnection
                     ? BackgroundTransferCostPolicy.Default
                     : BackgroundTransferCostPolicy.UnrestrictedOnly
             };
-            foreach (var header in config.Headers)
+            foreach (var header in request.Headers)
                 task.SetRequestHeader(header.Key, header.Value);
 
-            var filePath = config.LocalFilePath ?? Path.Combine(ApplicationData.Current.LocalFolder.Path, Path.GetRandomFileName());
-            var fileName = Path.GetFileName(filePath);
-            var directory = Path.GetDirectoryName(filePath);
+            //var filePath = config.LocalFilePath ?? Path.Combine(ApplicationData.Current.LocalFolder.Path, Path.GetRandomFileName());
+            var winFile = await StorageFile.GetFileFromPathAsync(request.LocalFilePath.FullName).AsTask();
+            var op = task.CreateDownload(new Uri(request.Uri), winFile);
 
-            // why are these async??
-            var folder = StorageFolder.GetFolderFromPathAsync(directory).AsTask().Result;
-            var file = folder.CreateFileAsync(fileName).AsTask().Result;
-
-            var operation = task.CreateDownload(new Uri(config.Uri), file);
-            var httpTask = new DownloadHttpTask(config, operation, false);
-            this.Add(httpTask);
-
-            return httpTask;
+            //var operation = task.CreateDownload(new Uri(config.Uri), file);
+            //var httpTask = new DownloadHttpTask(config, operation, false);
+            //this.Add(httpTask);
+            return null;
         }
-     */
+
+        public async Task<IEnumerable<IHttpTransfer>> GetTransfers()
+        {
+            var downloads = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
+
+            return null;
+        }
+    }
+}

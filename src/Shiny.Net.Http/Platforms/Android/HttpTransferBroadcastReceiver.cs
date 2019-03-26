@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Subjects;
+using Android.App;
 using Android.Content;
 using Native = Android.App.DownloadManager;
 
@@ -7,6 +8,12 @@ using Native = Android.App.DownloadManager;
 namespace Shiny.Net.Http
 {
     //https://developer.android.com/reference/android/app/DownloadManager
+    [BroadcastReceiver(Enabled = true, Exported = true)]
+    [IntentFilter(new[] {
+        Native.ActionDownloadComplete,
+        Native.ActionNotificationClicked,
+        Native.ActionViewDownloads
+    })]
     public class HttpTransferBroadcastReceiver : BroadcastReceiver
     {
         public static IObservable<object> WhenReceived() => receiveSubject;

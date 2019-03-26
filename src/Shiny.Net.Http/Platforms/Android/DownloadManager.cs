@@ -19,6 +19,30 @@ namespace Shiny.Net.Http
         {
             this.context = context;
             this.repository = repository;
+            //ar reference = intent.GetLongExtra(Android.App.DownloadManager.ExtraDownloadId, -1);
+
+            //var downloadFile = CrossDownloadManager.Current.Queue.Cast<DownloadFileImplementation>().FirstOrDefault(f => f.Id == reference);
+            //if (downloadFile == null) return;
+
+            //var query = new Android.App.DownloadManager.Query();
+            //query.SetFilterById(downloadFile.Id);
+
+            //try
+            //{
+            //    using (var cursor = ((Android.App.DownloadManager)context.GetSystemService(Context.DownloadService)).InvokeQuery(query))
+            //    {
+            //        while (cursor != null && cursor.MoveToNext())
+            //        {
+            //            ((DownloadManagerImplementation)CrossDownloadManager.Current).UpdateFileProperties(cursor, downloadFile);
+            //        }
+            //        cursor?.Close();
+            //    }
+            //}
+            //catch (Android.Database.Sqlite.SQLiteException)
+            //{
+            //    // I lately got an exception that the database was unaccessible ...
+            //}
+
             //this.GetManager().InvokeQuery()
         }
 
@@ -30,7 +54,7 @@ namespace Shiny.Net.Http
 
         public async Task<IHttpTransfer> Create(HttpTransferRequest request)
         {
-            var native = new Native.Request(null);
+            var native = new Native.Request(request.LocalFilePath.ToNativeUri());
             //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
             //native.SetAllowedOverRoaming()
             //native.SetNotificationVisibility(DownloadVisibility.Visible);
@@ -44,10 +68,10 @@ namespace Shiny.Net.Http
                 native.AddRequestHeader(header.Key, header.Value);
 
             var id = this.GetManager().Enqueue(native);
-            await this.repository.Set(id.ToString(), new HttpTransferStore
-            {
+            //await this.repository.Set(id.ToString(), new HttpTransferStore
+            //{
 
-            });
+            //});
             return null;
         }
 
@@ -55,6 +79,7 @@ namespace Shiny.Net.Http
         public async Task<IEnumerable<IHttpTransfer>> GetTransfers()
         {
             var transfers = await this.repository.GetAll<HttpTransferStore>();
+            var query = new Native.Query();
 
             throw new NotImplementedException();
         }

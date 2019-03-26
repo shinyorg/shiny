@@ -35,8 +35,9 @@ namespace Shiny.Jobs
 
         protected virtual bool CheckCriteria(JobInfo job)
         {
-            var pluggedIn = this.powerManager.Status == PowerState.Charging ||
-                            this.powerManager.Status == PowerState.Charged;
+            var pluggedIn = this.powerManager.IsPluggedIn();
+            if (job.DeviceCharging && !pluggedIn)
+                return false;
 
             if (job.BatteryNotLow && !pluggedIn && this.powerManager.BatteryLevel <= 0.2)
                 return false;
@@ -44,8 +45,8 @@ namespace Shiny.Jobs
             if (job.RequiredInternetAccess == InternetAccess.None)
                 return true;
 
-            var hasInternet = this.connectivity.Reach.HasFlag(NetworkReach.Internet) || this.connectivity.Reach.HasFlag(NetworkReach.ConstrainedInternet);
-            var directConnect = this.connectivity.Access.HasFlag(NetworkAccess.WiFi) || this.connectivity.Access.HasFlag(NetworkAccess.Ethernet);
+            var hasInternet = this.connectivity.IsInternetAvailable();
+            var directConnect = this.connectivity.IsDirectConnect();
 
             switch (job.RequiredInternetAccess)
             {
