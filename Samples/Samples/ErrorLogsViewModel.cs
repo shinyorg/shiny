@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using Acr.UserDialogs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -31,6 +32,8 @@ namespace Samples
                         )
                     })
                     .ToList();
+
+                this.HasErrors = results.Any();
             });
             this.Clear = ReactiveCommand.CreateFromTask(async () =>
             {
@@ -41,6 +44,7 @@ namespace Samples
         }
 
 
+        [Reactive] public bool HasErrors { get; private set; }
         [Reactive] public IList<CommandItem> Logs { get; private set; }
         public ReactiveCommand<Unit, Unit> Load { get; }
         public ReactiveCommand<Unit, Unit> Clear { get; }

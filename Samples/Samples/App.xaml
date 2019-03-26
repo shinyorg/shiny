@@ -7,6 +7,14 @@
     <Application.Resources>
         <ResourceDictionary>
             <infrastructure:InverseBoolConverter x:Key="Not" />
+
+            <Style TargetType="Label" x:Key="NoDataLabel">
+                <Setter Property="FontSize" Value="Large" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </prism:PrismApplication>
