@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
+using Shiny.Logging;
 using Shiny.Net;
 using Shiny.Power;
 using UIKit;
@@ -10,7 +11,7 @@ using UIKit;
 
 namespace Shiny.Jobs
 {
-    public class JobManagerImpl : AbstractJobManager
+    public class JobManagerImpl : AbstractJobManager, IBackgroundFetchProcessor
     {
         /// <summary>
         /// If you don't know what this does, don't touch it :)
@@ -95,6 +96,38 @@ namespace Shiny.Jobs
             }
             finally
             {
+                app.EndBackgroundTask(taskId);
+            }
+        }
+
+
+        public virtual async void Process(Action<UIBackgroundFetchResult> completionHandler)
+        {
+            var result = UIBackgroundFetchResult.NoData;
+            var app = UIApplication.SharedApplication;
+            var taskId = 0;
+
+            try
+            {
+                using (var cancelSrc = new CancellationTokenSource())
+                {
+                    taskId = (int)app.BeginBackgroundTask("RunAll", cancelSrc.Cancel);
+                    var results = await this
+                        .RunAll(cancelSrc.Token)
+                        .ConfigureAwait(false);
+
+                    if (results.Any(x => x.HasNewData))
+                        result = UIBackgroundFetchResult.NewData;
+                }
+            }
+            catch (Exception ex)
+            {
+                result = UIBackgroundFetchResult.Failed;
+                Log.Write(ex);
+            }
+            finally
+            {
+                completionHandler(result);
                 app.EndBackgroundTask(taskId);
             }
         }

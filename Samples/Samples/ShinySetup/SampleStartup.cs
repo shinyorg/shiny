@@ -9,9 +9,9 @@ using Shiny.SpeechRecognition;
 using Shiny.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Samples.Settings;
+using Samples.Loggers;
 
-
-namespace Samples
+namespace Samples.ShinySetup
 {
     public class SampleStartup : Startup
     {
@@ -20,6 +20,7 @@ namespace Samples
             Log.UseConsole();
             Log.UseDebug();
             Log.AddLogger(new AppCenterLogger(), true, false);
+            Log.AddLogger(new DbLogger(), true, false);
 
             // create your infrastructures
             // jobs, connectivity, power, filesystem, are installed automatically

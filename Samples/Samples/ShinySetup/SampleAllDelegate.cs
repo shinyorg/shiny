@@ -11,7 +11,7 @@ using Shiny.Notifications;
 using Samples.Models;
 
 
-namespace Samples
+namespace Samples.ShinySetup
 {
     public class SampleAllDelegate : IGeofenceDelegate,
                                      IGpsDelegate,
@@ -72,7 +72,7 @@ namespace Samples
         }
 
 
-        public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
+        public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
             await this.notifications.Send(new Notification
             {
@@ -108,6 +108,9 @@ namespace Samples
                 Title = "Job Finished",
                 Message = $"{jobInfo.Identifier} Finished"
             });
+
+            // you really shouldn't lie about this on iOS as it is watching :)
+            return true;
         }
 
 

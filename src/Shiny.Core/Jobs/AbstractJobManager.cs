@@ -91,7 +91,7 @@ namespace Shiny.Jobs
             catch (Exception ex)
             {
                 Log.Write(ex);
-                result = new JobRunResult(new JobInfo
+                result = new JobRunResult(false, new JobInfo
                 {
                     Identifier = jobName
                 }, ex);
@@ -169,7 +169,7 @@ namespace Shiny.Jobs
                 this.LogJob(JobState.Start, job);
                 var jobDelegate = this.jobFactory.Resolve(job);
 
-                await jobDelegate
+                var newData = await jobDelegate
                     .Run(job, cancelToken)
                     .ConfigureAwait(false);
 
@@ -179,12 +179,12 @@ namespace Shiny.Jobs
                     cancel = true;
                 }
                 this.LogJob(JobState.Finish, job);
-                result = new JobRunResult(job, null);
+                result = new JobRunResult(newData, job, null);
             }
             catch (Exception ex)
             {
                 this.LogJob(JobState.Error, job, ex);
-                result = new JobRunResult(job, ex);
+                result = new JobRunResult(false, job, ex);
             }
             finally
             {
