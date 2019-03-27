@@ -19,8 +19,8 @@ namespace Shiny.Power
             {
                 this.dispose = this.WhenChanged().Subscribe(_ =>
                 {
-                    this.OnPropertyChanged(nameof(this.BatteryLevel));
-                    this.OnPropertyChanged(nameof(this.Status));
+                    this.RaisePropertyChanged(nameof(this.BatteryLevel));
+                    this.RaisePropertyChanged(nameof(this.Status));
                 });
             }
             else

@@ -17,10 +17,10 @@ namespace Shiny.Power
             {
                 this.dispose = new CompositeDisposable(
                     this.WhenBatteryPercentageChanged()
-                        .Subscribe(_ => this.OnPropertyChanged(nameof(this.BatteryLevel))),
+                        .Subscribe(_ => this.RaisePropertyChanged(nameof(this.BatteryLevel))),
 
                     this.WhenPowerStatusChanged()
-                        .Subscribe(_ => this.OnPropertyChanged(nameof(this.Status)))
+                        .Subscribe(_ => this.RaisePropertyChanged(nameof(this.Status)))
                 );
             }
             else

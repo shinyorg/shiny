@@ -67,8 +67,8 @@ namespace Shiny.Net
 
         void OnReachChanged(object sender, EventArgs args)
         {
-            this.OnPropertyChanged(nameof(this.Reach));
-            this.OnPropertyChanged(nameof(this.Access));
+            this.RaisePropertyChanged(nameof(this.Reach));
+            this.RaisePropertyChanged(nameof(this.Access));
         }
     }
 }

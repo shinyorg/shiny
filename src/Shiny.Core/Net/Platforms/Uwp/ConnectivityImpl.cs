@@ -80,8 +80,8 @@ namespace Shiny.Net
 
         void OnNetworkStatusChanged(object sender)
         {
-            this.OnPropertyChanged(nameof(this.Reach));
-            this.OnPropertyChanged(nameof(this.Access));
+            this.RaisePropertyChanged(nameof(this.Reach));
+            this.RaisePropertyChanged(nameof(this.Access));
         }
     }
 }

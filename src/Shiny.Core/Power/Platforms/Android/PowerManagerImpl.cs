@@ -25,8 +25,8 @@ namespace Shiny.Power
                     .WhenIntentReceived(Intent.ActionBatteryChanged)
                     .Subscribe(_ =>
                     {
-                        this.OnPropertyChanged(nameof(this.Status));
-                        this.OnPropertyChanged(nameof(this.BatteryLevel));
+                        this.RaisePropertyChanged(nameof(this.Status));
+                        this.RaisePropertyChanged(nameof(this.BatteryLevel));
                     });
             }
             else
