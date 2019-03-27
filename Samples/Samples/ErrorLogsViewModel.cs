@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Acr.UserDialogs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Models;
+using Shiny.Logging;
 
 
 namespace Samples
@@ -54,6 +56,11 @@ namespace Samples
         {
             base.OnAppearing();
             await this.Load.Execute();
+            Log
+                .WhenExceptionLogged()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .InvokeCommand(this.Load)
+                .DisposeWith(this.DeactivateWith);
         }
     }
 }
