@@ -7,7 +7,7 @@ issueConfigs:
   - "Version of OS(s) listed above with issue"
   - "Expected Behavior"
   - "Actual Behavior"
-- content:
+#- content:
 # Example 2: feature request
 #  - "Motivation / Use Case"
 #  - "Expected Behavior"
