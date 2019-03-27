@@ -6,9 +6,20 @@ namespace Shiny
 {
     public static class Extensions_String
     {
+        /// <summary>
+        /// Extension method to String.IsNullOrWhiteSpace
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static bool IsEmpty(this string s) => String.IsNullOrWhiteSpace(s);
 
 
+        /// <summary>
+        /// Safetied string length check
+        /// </summary>
+        /// <param name="string"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static bool HasMinLength(this string @string, int length)
         {
             if (@string.IsEmpty())
@@ -18,6 +29,11 @@ namespace Shiny
         }
 
 
+        /// <summary>
+        /// Converts a HEX string to a byte array
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <returns></returns>
         public static byte[] FromHex(this string hex)
         {
             hex = hex
@@ -32,6 +48,11 @@ namespace Shiny
         }
 
 
+        /// <summary>
+        /// Convert a byte array to HEX string
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
         public static string ToHex(this byte[] bytes)
             => String.Concat(bytes.Select(b => b.ToString("X2")));
     }

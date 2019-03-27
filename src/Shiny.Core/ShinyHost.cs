@@ -7,8 +7,25 @@ namespace Shiny
 {
     public abstract partial class ShinyHost
     {
+        /// <summary>
+        /// Resolve a specified service from the container
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static T Resolve<T>() => Container.GetService<T>();
+
+
+        /// <summary>
+        /// Resolve a list of registered services from the container
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public static IEnumerable<T> ResolveAll<T>() => Container.GetServices<T>();
+
+
+        /// <summary>
+        /// The configured service collection post container set
+        /// </summary>
         public static IServiceCollection Services { get; private set; }
 
 
