@@ -20,8 +20,7 @@
 ## Version of Library
 
 
-## Expected Behaviour
+## Expected Behavior
 
 
 ## Actual Behavior
-_If applicable, please include entire exception - type, message, stacktrace_
