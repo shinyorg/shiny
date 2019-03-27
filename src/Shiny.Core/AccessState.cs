@@ -5,6 +5,9 @@ namespace Shiny
 {
     public enum AccessState
     {
+        /// <summary>
+        /// The permission has not yet been checked or is in some unknown state within the OS
+        /// </summary>
         Unknown,
 
         /// <summary>
@@ -20,9 +23,24 @@ namespace Shiny
         /// </summary>
         NotSetup,
 
+        /// <summary>
+        /// The service has been disabled by the user
+        /// </summary>
         Disabled,
+
+        /// <summary>
+        /// The permission has been granted in a limited fashion (ie. Location in foreground only, when background was requested)
+        /// </summary>
         Restricted,
+
+        /// <summary>
+        /// The user denied permission to use the service
+        /// </summary>
         Denied,
+
+        /// <summary>
+        /// All necessary permissions are granted to the service
+        /// </summary>
         Available
     }
 }

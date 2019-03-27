@@ -7,6 +7,14 @@ namespace Shiny
 {
     public static class Extensions_Collections
     {
+        /// <summary>
+        /// A safe dictionary Get, will return a default value if the dictionary does not contain the key
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public static T Get<T>(this IDictionary<string, object> dict, string key, T defaultValue = default)
         {
             if (!dict.ContainsKey(key))
@@ -20,34 +28,24 @@ namespace Shiny
         }
 
 
+        /// <summary>
+        /// Safely checks an enumerable if it is null or has no elements
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="en"></param>
+        /// <returns></returns>
         public static bool IsEmpty<T>(this IEnumerable<T> en)
             => en == null || !en.Any();
 
 
-        public static void Each<T>(this IEnumerable<T> en, Action<T> action)
-        {
-            if (en == null)
-                return;
 
-            foreach (var obj in en)
-                action(obj);
-        }
-
-
-        public static void Each<T>(this IEnumerable<T> en, Action<int, T> action)
-        {
-            if (en == null)
-                return;
-
-            var i = 0;
-            foreach (var obj in en)
-            {
-                action(i, obj);
-                i++;
-            }
-        }
-
-
+        /// <summary>
+        /// Creates a new array and copies the elements from both arrays together
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
         public static T[] Expand<T>(this T[] array, params T[] items)
         {
             array = array ?? new T[0];

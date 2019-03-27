@@ -97,7 +97,7 @@ namespace Shiny.Net.Http
             {
                 this.exception = value;
                 this.Status = HttpTransferState.Error;
-                this.OnPropertyChanged();
+                this.RaisePropertyChanged();
             }
         }
 

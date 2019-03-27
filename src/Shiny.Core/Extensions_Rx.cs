@@ -25,6 +25,12 @@ namespace Shiny
 
     public static class Extensions_Rx
     {
+        /// <summary>
+        /// A handy way for replying & completing an observer - common for single valued observables
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ob"></param>
+        /// <param name="value"></param>
         public static void Respond<T>(this IObserver<T> ob, T value)
         {
             ob.OnNext(value);
@@ -65,19 +71,14 @@ namespace Shiny
         //        : Observable.Throw<T>(t.Item3));
         //}
 
-        public static IObservable<List<TOut>> SelectEach<TIn, TOut>(this IObservable<List<TIn>> observable, Func<TIn, TOut> transform) =>
-            observable.Select(data =>
-            {
-                var list = new List<TOut>();
-                foreach (var item in data)
-                {
-                    var t = transform(item);
-                    list.Add(t);
-                }
-                return list;
-            });
 
-
+        /// <summary>
+        /// This will buffer observable pings and timestamp them until the predicate check does not pass
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="thisObs"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
         public static IObservable<List<Timestamped<T>>> BufferWhile<T>(this IObservable<T> thisObs, Func<T, bool> predicate)
             => Observable.Create<List<Timestamped<T>>>(ob =>
             {
@@ -103,6 +104,12 @@ namespace Shiny
             });
 
 
+        /// <summary>
+        /// Will watch for changes in any observable item in the ObservableCollection
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public static IObservable<ItemChanged<T, string>> WhenItemChanged<T>(this ObservableCollection<T> collection)
             where T : INotifyPropertyChanged
             => Observable.Create<ItemChanged<T, string>>(ob =>
@@ -115,6 +122,14 @@ namespace Shiny
             });
 
 
+        /// <summary>
+        /// Will watch for a specific property change with any item in the ObservableCollection
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TRet"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public static IObservable<ItemChanged<T, TRet>> WhenItemValueChanged<T, TRet>(
             this ObservableCollection<T> collection,
             Expression<Func<T, TRet>> expression) where T : INotifyPropertyChanged =>
@@ -154,24 +169,24 @@ namespace Shiny
                 .Select(x => new ItemChanged<TSender, string>(This, x.EventArgs.PropertyName));
 
 
-        public static IDisposable ApplyMaxLengthConstraint<T>(this T npc, Expression<Func<T, string>> expression, int maxLength) where T : INotifyPropertyChanged
-        {
-            var property = npc.GetPropertyInfo(expression);
+        //public static IDisposable ApplyMaxLengthConstraint<T>(this T npc, Expression<Func<T, string>> expression, int maxLength) where T : INotifyPropertyChanged
+        //{
+        //    var property = npc.GetPropertyInfo(expression);
 
-            if (property.PropertyType != typeof(string))
-                throw new ArgumentException($"You can only use maxlength constraints on string based properties - {npc.GetType()}.{property.Name}");
+        //    if (property.PropertyType != typeof(string))
+        //        throw new ArgumentException($"You can only use maxlength constraints on string based properties - {npc.GetType()}.{property.Name}");
 
-            if (!property.CanWrite)
-                throw new ArgumentException($"You can only apply maxlength constraints to public setter properties - {npc.GetType()}.{property.Name}");
+        //    if (!property.CanWrite)
+        //        throw new ArgumentException($"You can only apply maxlength constraints to public setter properties - {npc.GetType()}.{property.Name}");
 
-            return npc
-                .WhenAnyProperty(expression)
-                .Where(x => x != null && x.Length > maxLength)
-                .Subscribe(x =>
-                {
-                    var value = x.Substring(0, maxLength);
-                    property.SetValue(npc, value);
-                });
-        }
+        //    return npc
+        //        .WhenAnyProperty(expression)
+        //        .Where(x => x != null && x.Length > maxLength)
+        //        .Subscribe(x =>
+        //        {
+        //            var value = x.Substring(0, maxLength);
+        //            property.SetValue(npc, value);
+        //        });
+        //}
     }
 }

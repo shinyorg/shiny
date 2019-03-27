@@ -7,6 +7,14 @@ namespace Shiny
 {
     public static class Extensions_Reflection
     {
+        /// <summary>
+        /// Reflects out property information based on the expression value
+        /// </summary>
+        /// <typeparam name="TSender"></typeparam>
+        /// <typeparam name="TRet"></typeparam>
+        /// <param name="sender"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public static PropertyInfo GetPropertyInfo<TSender, TRet>(this TSender sender, Expression<Func<TSender, TRet>> expression)
         {
             if (sender == null)
@@ -21,6 +29,11 @@ namespace Shiny
         }
 
 
+        /// <summary>
+        /// Unwraps nullable types if necessary
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static Type Unwrap(this Type type)
         {
             if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
