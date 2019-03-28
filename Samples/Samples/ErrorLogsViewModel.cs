@@ -13,7 +13,7 @@ using Shiny.Logging;
 
 namespace Samples
 {
-    public class ErrorLogsViewModel : AbstractLogViewModel
+    public class ErrorLogsViewModel : AbstractLogViewModel<CommandItem>
     {
         readonly SampleSqliteConnection conn;
         public ErrorLogsViewModel(SampleSqliteConnection conn, IUserDialogs dialogs) : base(dialogs)

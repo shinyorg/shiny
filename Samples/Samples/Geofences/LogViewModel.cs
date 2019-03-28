@@ -11,7 +11,7 @@ using Samples.Models;
 
 namespace Samples.Geofences
 {
-    public class LogViewModel : AbstractLogViewModel
+    public class LogViewModel : AbstractLogViewModel<CommandItem>
     {
         readonly SampleSqliteConnection conn;
         public LogViewModel(SampleSqliteConnection conn, IUserDialogs dialogs) : base(dialogs)

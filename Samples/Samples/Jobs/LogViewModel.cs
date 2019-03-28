@@ -1,18 +1,16 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
 using Shiny.Jobs;
 using Acr.UserDialogs;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using Samples.Models;
 using Samples.Infrastructure;
-using System.Threading.Tasks;
+
 
 namespace Samples.Jobs
 {
-    public class LogViewModel : AbstractLogViewModel
+    public class LogViewModel : AbstractLogViewModel<CommandItem>
     {
         readonly IJobManager jobManager;
         readonly SampleSqliteConnection conn;

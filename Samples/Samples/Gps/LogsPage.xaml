@@ -5,7 +5,7 @@
              Title="Logs">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Clear Logs" Command="{Binding Clear}" />
+        <ToolbarItem Text="Clear" Command="{Binding Clear}" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
@@ -17,6 +17,7 @@
             <ListView ItemsSource="{Binding Logs}"
                       RefreshCommand="{Binding Load}"
                       IsRefreshing="{Binding IsBusy}"
+                      IsVisible="{Binding HasLogs}"
                       IsPullToRefreshEnabled="true">
                 <ListView.ItemTemplate>
                     <DataTemplate>

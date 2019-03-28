@@ -7,7 +7,6 @@ using Prism;
 using Prism.Autofac;
 using Prism.Ioc;
 using Prism.Mvvm;
-using Samples.Jobs;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -18,8 +17,9 @@ namespace Samples
 {
     public partial class App : PrismApplication
     {
-        public App() : base(null) { }
-        public App(IPlatformInitializer initializer) : base(initializer) { }
+        public App() : this(null) { }
+        public App(IPlatformInitializer initializer) : base(initializer)
+            => this.InitializeComponent();
 
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
@@ -66,7 +66,11 @@ namespace Samples
         {
             var builder = new ContainerBuilder();
             builder.Populate(ShinyHost.Services);
-            builder.RegisterType<GlobalExceptionHandler>().As<IStartable>().AutoActivate().SingleInstance();
+            builder
+                .RegisterType<GlobalExceptionHandler>()
+                .As<IStartable>()
+                .AutoActivate()
+                .SingleInstance();
             return new AutofacContainerExtension(builder);
         }
     }

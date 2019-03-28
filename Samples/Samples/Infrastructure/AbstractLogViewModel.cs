@@ -11,7 +11,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Samples.Infrastructure
 {
-    public abstract class AbstractLogViewModel : ViewModel
+    public abstract class AbstractLogViewModel<TItem> : ViewModel
     {
         protected AbstractLogViewModel(IUserDialogs dialogs)
         {
@@ -30,7 +30,7 @@ namespace Samples.Infrastructure
 
         protected IUserDialogs Dialogs { get; }
         [Reactive] public bool HasLogs { get; protected set; }
-        [Reactive] public IList<CommandItem> Logs { get; protected set; }
+        [Reactive] public IList<TItem> Logs { get; protected set; }
         public ReactiveCommand<Unit, Unit> Load { get; }
         public ReactiveCommand<Unit, Unit> Clear { get; }
 
@@ -42,7 +42,7 @@ namespace Samples.Infrastructure
         }
 
 
-        protected abstract Task<IEnumerable<CommandItem>> LoadLogs();
+        protected abstract Task<IEnumerable<TItem>> LoadLogs();
         protected abstract Task ClearLogs();
 
 

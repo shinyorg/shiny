@@ -4,18 +4,6 @@
              x:Class="Samples.WelcomePage"
              Title="Shiny">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <Style TargetType="Label" x:Key="NoDataLabel">
-                <Setter Property="FontSize" Value="Large" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="VerticalTextAlignment" Value="Center" />
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
-            </Style>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <ContentPage.Content>
         <Label Text="Welcome to the Shiny Samples"
                Style="{StaticResource NoDataLabel}" />

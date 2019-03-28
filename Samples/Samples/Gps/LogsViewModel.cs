@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Reactive;
 using System.Text;
 using Acr.UserDialogs;
 using ReactiveUI;
-using Samples.Models;
 using Humanizer;
+using Samples.Models;
 using Samples.Infrastructure;
 
 
 namespace Samples.Gps
 {
-    public class LogsViewModel : AbstractLogViewModel
+    public class LogsViewModel : AbstractLogViewModel<CommandItem>
     {
         readonly SampleSqliteConnection conn;
         public LogsViewModel(SampleSqliteConnection conn, IUserDialogs dialogs) : base(dialogs)

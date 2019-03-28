@@ -14,7 +14,7 @@
                    Style="{StaticResource NoDataLabel}"
                    IsVisible="{Binding HasLogs, Converter={StaticResource Not}}" />
 
-            <ListView ItemsSource="{Binding Events}"
+            <ListView ItemsSource="{Binding Logs}"
                       IsRefreshing="{Binding IsBusy}"
                       RefreshCommand="{Binding Load}"
                       IsVisible="{Binding HasLogs}"

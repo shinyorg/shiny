@@ -4,14 +4,22 @@
              x:Class="Samples.Beacons.LogsPage"
              Title="Logs">
 
-    <ContentPage.Content>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear" Command="{Binding Clear}" />
+    </ContentPage.ToolbarItems>
 
-            <ListView ItemsSource="{Binding Pings}" RowHeight="200">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="No Beacon Events"
+                   Style="{StaticResource NoDataLabel}"
+                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}" />
+
+            <ListView ItemsSource="{Binding Logs}"
+                      RefreshCommand="{Binding Load}"
+                      IsRefreshing="{Binding IsBusy}"
+                      IsVisible="{Binding HasLogs}"
+                      IsPullToRefreshEnabled="True"
+                      RowHeight="200">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -47,11 +55,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-
-            <Button Text="Purge Logs"
-                    Command="{Binding Purge}"
-                    Grid.Row="1" />
-        </Grid>
+        </StackLayout>
     </ContentPage.Content>
 
 </ContentPage>

@@ -2,12 +2,10 @@
 <prism:PrismApplication xmlns="http://xamarin.com/schemas/2014/forms"
                         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                         xmlns:prism="clr-namespace:Prism.Autofac;assembly=Prism.Autofac.Forms"
-                        xmlns:infrastructure="clr-namespace:Samples.Infrastructure"
+                        xmlns:acr="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
                         x:Class="Samples.App">
     <Application.Resources>
         <ResourceDictionary>
-            <infrastructure:InverseBoolConverter x:Key="Not" />
-
             <Style x:Key="NoDataLabel" TargetType="Label">
                 <Setter Property="FontSize" Value="Large" />
                 <Setter Property="HorizontalTextAlignment" Value="Center" />
@@ -15,6 +13,8 @@
                 <Setter Property="VerticalTextAlignment" Value="Center" />
                 <Setter Property="VerticalOptions" Value="FillAndExpand" />
             </Style>
+
+            <acr:InverseBooleanConverter x:Key="Not" />
         </ResourceDictionary>
     </Application.Resources>
 </prism:PrismApplication>
