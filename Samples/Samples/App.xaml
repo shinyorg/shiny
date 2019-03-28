@@ -5,16 +5,14 @@
                         xmlns:acr="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
                         x:Class="Samples.App">
     <prism:PrismApplication.Resources>
-        <ResourceDictionary>
-            <Style x:Key="NoDataLabel" TargetType="Label">
-                <Setter Property="FontSize" Value="Large" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="VerticalTextAlignment" Value="Center" />
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
-            </Style>
+        <Style x:Key="NoDataLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="{DynamicResource Large}" />
+            <Setter Property="HorizontalTextAlignment" Value="Center" />
+            <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+            <Setter Property="VerticalTextAlignment" Value="Center" />
+            <Setter Property="VerticalOptions" Value="FillAndExpand" />
+        </Style>
 
-            <acr:InverseBooleanConverter x:Key="Not" />
-        </ResourceDictionary>
+        <acr:InverseBooleanConverter x:Key="Not" />
     </prism:PrismApplication.Resources>
 </prism:PrismApplication>
