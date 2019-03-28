@@ -3,18 +3,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Samples.Jobs.LogPage"
              Title="Logs">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear" Command="{Binding Clear}" />
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Content>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <StackLayout>
+            <Label Text="No Job Logs"
+                   Style="{StaticResource NoDataLabel}"
+                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}"/>
 
             <ListView ItemsSource="{Binding Logs}"
-                      IsPullToRefreshEnabled="True"
+                      IsVisible="{Binding HasLogs}"
                       IsRefreshing="{Binding IsBusy}"
                       RefreshCommand="{Binding Load}"
-                      Grid.Row="0">
+                      IsPullToRefreshEnabled="True">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextCell Text="{Binding Text}"
@@ -23,10 +27,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-
-            <Button Text="Purge All Logs"
-                    Command="{Binding Purge}"
-                    Grid.Row="1" />
-        </Grid>
+        </StackLayout>
     </ContentPage.Content>
 </ContentPage>

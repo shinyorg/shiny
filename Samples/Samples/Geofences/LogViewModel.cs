@@ -1,60 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive;
+using System.Text;
+using System.Threading.Tasks;
 using Acr.UserDialogs;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using Samples.Infrastructure;
 using Samples.Models;
 
 
 namespace Samples.Geofences
 {
-    public class LogViewModel : ViewModel
+    public class LogViewModel : AbstractLogViewModel
     {
-        public LogViewModel(SampleSqliteConnection conn, IUserDialogs dialogs)
+        readonly SampleSqliteConnection conn;
+        public LogViewModel(SampleSqliteConnection conn, IUserDialogs dialogs) : base(dialogs)
         {
-            this.Load = ReactiveCommand.CreateFromTask(async () =>
-            {
-                var events = await conn.GeofenceEvents.OrderBy(x => x.Date).ToListAsync();
-                this.Events = events
-                    .Select(x => new CommandItem
-                    {
-                        Text = x.Text,
-                        Detail = x.Detail
-                    })
-                    .ToList();
-                this.HasEvents = events.Any();
-            });
-
-            this.Clear = ReactiveCommand.CreateFromTask(async () =>
-            {
-                var confirm = await dialogs.ConfirmAsync(
-                    "Do you wish to clear the geofence logs?",
-                    "Confirm",
-                    "Yes",
-                    "No"
-                );
-                if (confirm)
-                {
-                    await conn.DeleteAllAsync<GeofenceEvent>();
-                    this.Load.Execute(Unit.Default);
-                }
-            });
-            this.BindBusyCommand(this.Load);
+            this.conn = conn;
         }
 
 
-        public ReactiveCommand<Unit, Unit> Load { get; }
-        public ReactiveCommand<Unit, Unit> Clear { get; }
-        [Reactive] public bool HasEvents { get; private set; }
-        [Reactive] public List<CommandItem> Events { get; private set; }
+        protected override Task ClearLogs() => this.conn.DeleteAllAsync<GeofenceEvent>();
 
 
-        public override void OnAppearing()
+        protected override async Task<IEnumerable<CommandItem>> LoadLogs()
         {
-            base.OnAppearing();
-            this.Load.Execute(Unit.Default);
+            var events = await conn
+                .GeofenceEvents
+                .OrderBy(x => x.Date)
+                .ToListAsync();
+
+            return events.Select(x => new CommandItem
+            {
+                Text = x.Text,
+                Detail = x.Detail
+            });
         }
     }
 }

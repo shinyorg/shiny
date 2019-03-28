@@ -5,19 +5,6 @@
              x:Class="Samples.ErrorLogPage"
              Title="Error Logs">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <acr:InverseBooleanConverter x:Key="Not" />
-            <Style TargetType="Label" x:Key="NoDataLabel">
-                <Setter Property="FontSize" Value="Large" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="VerticalTextAlignment" Value="Center" />
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
-            </Style>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Clear" Command="{Binding Clear}" />
     </ContentPage.ToolbarItems>
@@ -26,12 +13,12 @@
         <StackLayout>
             <Label Text="No Errors have been logged"
                    Style="{StaticResource NoDataLabel}"
-                   IsVisible="{Binding HasErrors, Converter=Not}" />
+                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}" />
 
             <ListView ItemsSource="{Binding Logs}"
                       RefreshCommand="{Binding Load}"
                       IsRefreshing="{Binding IsBusy}"
-                      IsVisible="{Binding HasErrors}"
+                      IsVisible="{Binding HasLogs}"
                       IsPullToRefreshEnabled="True">
                 <ListView.ItemTemplate>
                     <DataTemplate>

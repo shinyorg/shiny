@@ -2,73 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
-using System.Windows.Input;
 using Shiny.Jobs;
 using Acr.UserDialogs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Models;
-
+using Samples.Infrastructure;
+using System.Threading.Tasks;
 
 namespace Samples.Jobs
 {
-    public class LogViewModel : ViewModel
+    public class LogViewModel : AbstractLogViewModel
     {
         readonly IJobManager jobManager;
-
+        readonly SampleSqliteConnection conn;
 
         public LogViewModel(IJobManager jobManager,
                             IUserDialogs dialogs,
-                            SampleSqliteConnection conn)
+                            SampleSqliteConnection conn) : base(dialogs)
         {
             this.jobManager = jobManager;
-
-            this.Purge = ReactiveCommand.CreateFromTask(async () =>
-            {
-                var confirm = await dialogs.ConfirmAsync(
-                    "Do you wish to clear the job logs?",
-                    "Confirm",
-                    "Yes",
-                    "No"
-                );
-                if (confirm)
-                {
-                    await conn.DeleteAllAsync<JobLog>();
-                    this.Load.Execute();
-                }
-            });
-
-            this.Load = ReactiveCommand.CreateFromTask(async () =>
-            {
-                var logs = await conn.JobLogs.ToListAsync();
-                this.Logs = logs
-                    .Select(x =>
-                    {
-                        var msg = x.Started ? "Started" : "Finished";
-                        if (x.Error != null)
-                            msg = $"ERROR - {x.Error}";
-
-                        msg += $" @ {x.Timestamp:G}";
-                        return new CommandItem
-                        {
-                            Text = $"{x.JobName} ({x.JobType})",
-                            Detail = msg
-                        };
-                    })
-                    .ToList();
-            });
-            this.BindBusyCommand(this.Load);
+            this.conn = conn;
         }
-
-
-        public ReactiveCommand<Unit, Unit> Load { get; }
-        public ReactiveCommand<Unit, Unit> Purge { get; }
-        [Reactive] public List<CommandItem> Logs { get; private set; }
 
 
         public override void OnAppearing()
         {
-            this.Load.Execute();
+            base.OnAppearing();
             this.jobManager.JobStarted += this.OnJobStarted;
             this.jobManager.JobFinished += this.OnJobFinished;
         }
@@ -76,6 +36,7 @@ namespace Samples.Jobs
 
         public override void OnDisappearing()
         {
+            base.OnDisappearing();
             this.jobManager.JobStarted -= this.OnJobStarted;
             this.jobManager.JobFinished -= this.OnJobFinished;
         }
@@ -83,5 +44,25 @@ namespace Samples.Jobs
 
         void OnJobStarted(object sender, JobInfo job) => this.Load.Execute();
         void OnJobFinished(object sender, JobRunResult job) => this.Load.Execute();
+
+        protected override async Task<IEnumerable<CommandItem>> LoadLogs()
+        {
+            var logs = await this.conn.JobLogs.ToListAsync();
+            return logs.Select(x =>
+            {
+                var msg = x.Started ? "Started" : "Finished";
+                if (x.Error != null)
+                    msg = $"ERROR - {x.Error}";
+
+                msg += $" @ {x.Timestamp:G}";
+                return new CommandItem
+                {
+                    Text = $"{x.JobName} ({x.JobType})",
+                    Detail = msg
+                };
+            });
+        }
+
+        protected override Task ClearLogs() => this.conn.DeleteAllAsync<JobLog>();
     }
 }

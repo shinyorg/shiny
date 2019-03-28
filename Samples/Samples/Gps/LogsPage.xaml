@@ -1,28 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:xamforms="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
              x:Class="Samples.Gps.LogsPage"
              Title="Logs">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Clear Logs" Command="{Binding ClearLogs}" />
+        <ToolbarItem Text="Clear Logs" Command="{Binding Clear}" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <ListView ItemsSource="{Binding Logs}"
-                  IsPullToRefreshEnabled="true"
-                  RefreshCommand="{Binding LoadLogs}"
-                  IsRefreshing="{Binding IsBusy}">
-            <ListView.Behaviors>
-                <xamforms:ItemTappedCommandBehavior Command="ShowLog" />
-            </ListView.Behaviors>
+        <StackLayout>
+            <Label Text="No GPS Events"
+                   Style="{StaticResource NoDataLabel}"
+                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}" />
 
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <TextCell Text="{Binding Text}" Detail="{Binding Detail}" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+            <ListView ItemsSource="{Binding Logs}"
+                      RefreshCommand="{Binding Load}"
+                      IsRefreshing="{Binding IsBusy}"
+                      IsPullToRefreshEnabled="true">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Text}"
+                                  Detail="{Binding Detail}"
+                                  Command="{Binding PrimaryCommand}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
     </ContentPage.Content>
 </ContentPage>

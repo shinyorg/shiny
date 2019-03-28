@@ -8,7 +8,7 @@
         <ResourceDictionary>
             <infrastructure:InverseBoolConverter x:Key="Not" />
 
-            <Style TargetType="Label" x:Key="NoDataLabel">
+            <Style x:Key="NoDataLabel" TargetType="Label">
                 <Setter Property="FontSize" Value="Large" />
                 <Setter Property="HorizontalTextAlignment" Value="Center" />
                 <Setter Property="HorizontalOptions" Value="FillAndExpand" />
