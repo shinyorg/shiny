@@ -29,6 +29,7 @@ namespace Samples.ShinySetup
             // startup tasks
             builder.RegisterStartupTask<StartupTask1>();
             builder.RegisterStartupTask<StartupTask2>();
+            builder.RegisterStartupTask<JobLoggerTask>();
 
             // configuration
             builder.RegisterSettings<AppSettings>();
