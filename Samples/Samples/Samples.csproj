@@ -15,7 +15,7 @@
         <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.14.0" />
         <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.14.0" />
         <PackageReference Include="Prism.Autofac.Forms" Version="7.1.0.431" />
-        <PackageReference Include="ReactiveUI.Fody" Version="9.11.3" />
+        <PackageReference Include="ReactiveUI.Fody" Version="9.12.1" />
         <PackageReference Include="sqlite-net-pcl" Version="1.5.231" />
         <PackageReference Include="Xamarin.Forms" Version="3.6.0.264807" />
         <PackageReference Include="Acr.XamForms" Version="4.0.1" />
@@ -32,5 +32,4 @@
         <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
     </ItemGroup>
-
 </Project>

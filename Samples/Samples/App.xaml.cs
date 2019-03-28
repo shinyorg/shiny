@@ -17,7 +17,9 @@ namespace Samples
 {
     public partial class App : PrismApplication
     {
-        public App() : this(null) { }
+        public App() : this(null)
+            => this.InitializeComponent();
+
         public App(IPlatformInitializer initializer) : base(initializer)
             => this.InitializeComponent();
 

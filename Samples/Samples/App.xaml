@@ -4,7 +4,7 @@
                         xmlns:prism="clr-namespace:Prism.Autofac;assembly=Prism.Autofac.Forms"
                         xmlns:acr="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
                         x:Class="Samples.App">
-    <Application.Resources>
+    <prism:PrismApplication.Resources>
         <ResourceDictionary>
             <Style x:Key="NoDataLabel" TargetType="Label">
                 <Setter Property="FontSize" Value="Large" />
@@ -16,5 +16,5 @@
 
             <acr:InverseBooleanConverter x:Key="Not" />
         </ResourceDictionary>
-    </Application.Resources>
+    </prism:PrismApplication.Resources>
 </prism:PrismApplication>
