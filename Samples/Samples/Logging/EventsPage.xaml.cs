@@ -2,11 +2,11 @@
 using Xamarin.Forms;
 
 
-namespace Samples
+namespace Samples.Logging
 {
-    public partial class ErrorLogPage : ContentPage
+    public partial class EventsPage : ContentPage
     {
-        public ErrorLogPage()
+        public EventsPage()
         {
             this.InitializeComponent();
         }

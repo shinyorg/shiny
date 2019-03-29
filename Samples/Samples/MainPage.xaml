@@ -21,7 +21,7 @@
                         <TextCell Text="Speech Recognition" Command="{Binding Navigate}" CommandParameter="Nav/SpeechRecognition"  />
                     </TableSection>
                     <TableSection>
-                        <TextCell Text="Error Logs" Command="{Binding Navigate}" CommandParameter="Nav/ErrorLogs" />
+                        <TextCell Text="Logging" Command="{Binding Navigate}" CommandParameter="Nav/Logs" />
                         <TextCell Text="Access" Command="{Binding Navigate}" CommandParameter="Nav/Access" />
                         <TextCell Text="Environment" Command="{Binding Navigate}" CommandParameter="Nav/Environment" />
                         <TextCell Text="File System" Command="{Binding Navigate}" CommandParameter="Nav/FileSystem" />

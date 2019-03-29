@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Acr.UserDialogs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Shiny;
 
 
 namespace Samples.Infrastructure
@@ -19,8 +20,9 @@ namespace Samples.Infrastructure
 
             this.Load = ReactiveCommand.CreateFromTask(async () =>
             {
+                this.Logs.Clear();
                 var logs = await this.LoadLogs();
-                this.Logs = logs.ToList();
+                this.Logs.ReplaceAll(logs);
                 this.HasLogs = this.Logs.Any();
             });
             this.Clear = ReactiveCommand.CreateFromTask(this.DoClear);
@@ -30,7 +32,7 @@ namespace Samples.Infrastructure
 
         protected IUserDialogs Dialogs { get; }
         [Reactive] public bool HasLogs { get; protected set; }
-        [Reactive] public IList<TItem> Logs { get; protected set; }
+        public ObservableList<TItem> Logs { get; } = new ObservableList<TItem>();
         public ReactiveCommand<Unit, Unit> Load { get; }
         public ReactiveCommand<Unit, Unit> Clear { get; }
 
@@ -45,6 +47,9 @@ namespace Samples.Infrastructure
         protected abstract Task<IEnumerable<TItem>> LoadLogs();
         protected abstract Task ClearLogs();
 
+
+        protected virtual void InsertItem(TItem item)
+            => this.Logs.Insert(0, item);
 
         protected virtual async Task DoClear()
         {

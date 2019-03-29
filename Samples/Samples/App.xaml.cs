@@ -49,7 +49,7 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Speech.MainPage>("SpeechRecognition");
 
             containerRegistry.RegisterForNavigation<AccessPage>("Access");
-            containerRegistry.RegisterForNavigation<ErrorLogPage>("ErrorLogs");
+            containerRegistry.RegisterForNavigation<Logging.LoggingPage>("Logs");
             containerRegistry.RegisterForNavigation<FileSystemPage>("FileSystem");
             containerRegistry.RegisterForNavigation<EnvironmentPage>("Environment");
             containerRegistry.RegisterForNavigation<Settings.MainPage>("Settings");

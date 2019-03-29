@@ -9,7 +9,8 @@ using Shiny.SpeechRecognition;
 using Shiny.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Samples.Settings;
-using Samples.Loggers;
+using Samples.Logging;
+
 
 namespace Samples.ShinySetup
 {

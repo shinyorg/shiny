@@ -11,7 +11,7 @@ using Samples.Models;
 using Shiny.Logging;
 
 
-namespace Samples
+namespace Samples.Logging
 {
     public class ErrorLogsViewModel : AbstractLogViewModel<CommandItem>
     {
@@ -28,9 +28,23 @@ namespace Samples
             Log
                 .WhenExceptionLogged()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .InvokeCommand(this.Load)
-                .DisposeWith(this.DeactivateWith);
+                .Select(x => new CommandItem
+                {
+                    Text = DateTime.Now.ToString(),
+                    Detail = x.Exception.ToString(),
+                    PrimaryCommand = ReactiveCommand.Create(() =>
+                    {
+                        var s = $"{x.Exception}{Environment.NewLine}";
+                        foreach (var p in x.Parameters)
+                            s += $"{Environment.NewLine}{p.Key}: {p.Value}";
+
+                        this.Dialogs.Alert(s);
+                    })
+                })
+                .Subscribe(this.InsertItem)
+                .DisposeWith(this.DestroyWith);
         }
+
 
         protected override Task ClearLogs() => this.conn.DeleteAllAsync<ErrorLog>();
 

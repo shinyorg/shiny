@@ -4,7 +4,7 @@ using Shiny;
 using Shiny.Logging;
 
 
-namespace Samples.Loggers
+namespace Samples.Logging
 {
     public class DbLogger : ILogger
     {
