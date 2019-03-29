@@ -45,8 +45,14 @@ namespace Samples
 
         public virtual void OnNavigatingTo(INavigationParameters parameters)
         {
+            if (parameters.GetNavigationMode() == NavigationMode.New)
+                this.OnStart();
         }
 
+
+        protected virtual void OnStart()
+        {
+        }
 
         public virtual void OnNavigatedFrom(INavigationParameters parameters)
         {

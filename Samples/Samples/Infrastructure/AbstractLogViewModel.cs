@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
+using Prism.Navigation;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Shiny;
@@ -18,12 +19,16 @@ namespace Samples.Infrastructure
         {
             this.Dialogs = dialogs;
 
+            this.Logs = new ObservableList<TItem>();
+            this.hasLogs = this.Logs
+                .WhenCollectionChanged()
+                .Select(_ => this.Logs.Any())
+                .ToProperty(this, x => x.HasLogs);
+
             this.Load = ReactiveCommand.CreateFromTask(async () =>
             {
-                this.Logs.Clear();
                 var logs = await this.LoadLogs();
                 this.Logs.ReplaceAll(logs);
-                this.HasLogs = this.Logs.Any();
             });
             this.Clear = ReactiveCommand.CreateFromTask(this.DoClear);
             this.BindBusyCommand(this.Load);
@@ -31,15 +36,17 @@ namespace Samples.Infrastructure
 
 
         protected IUserDialogs Dialogs { get; }
-        [Reactive] public bool HasLogs { get; protected set; }
-        public ObservableList<TItem> Logs { get; } = new ObservableList<TItem>();
+        public ObservableList<TItem> Logs { get; }
         public ReactiveCommand<Unit, Unit> Load { get; }
         public ReactiveCommand<Unit, Unit> Clear { get; }
 
+        readonly ObservableAsPropertyHelper<bool> hasLogs;
+        public bool HasLogs => this.hasLogs.Value;
 
-        public override async void OnAppearing()
+
+        protected override async void OnStart()
         {
-            base.OnAppearing();
+            base.OnStart();
             await this.Load.Execute();
         }
 

@@ -16,17 +16,6 @@ namespace Samples.Logging
     {
         public EventsViewModel(IUserDialogs dialogs) : base(dialogs)
         {
-        }
-
-
-        protected override Task ClearLogs() => Task.CompletedTask;
-        protected override Task<IEnumerable<CommandItem>> LoadLogs()
-            => Task.FromResult(Enumerable.Empty<CommandItem>());
-
-
-        public override void OnAppearing()
-        {
-            base.OnAppearing();
             Log
                 .WhenEventLogged()
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -46,5 +35,10 @@ namespace Samples.Logging
                 .Subscribe(this.InsertItem)
                 .DisposeWith(this.DestroyWith);
         }
+
+
+        protected override Task ClearLogs() => Task.CompletedTask;
+        protected override Task<IEnumerable<CommandItem>> LoadLogs()
+            => Task.FromResult(Enumerable.Empty<CommandItem>());
     }
 }

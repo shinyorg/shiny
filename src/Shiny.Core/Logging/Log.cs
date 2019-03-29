@@ -23,7 +23,7 @@ namespace Shiny.Logging
             errorSubj.OnNext((exception, parameters));
             foreach (var log in Loggers)
             {
-                if (log.IsEventsEnabled)
+                if (log.IsCrashEnabled)
                     DoLog(log.Log, exception, parameters);
             }
         }

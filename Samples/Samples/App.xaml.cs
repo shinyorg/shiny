@@ -48,8 +48,8 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Sensors.MainPage>("Sensors");
             containerRegistry.RegisterForNavigation<Speech.MainPage>("SpeechRecognition");
 
-            containerRegistry.RegisterForNavigation<AccessPage>("Access");
             containerRegistry.RegisterForNavigation<Logging.LoggingPage>("Logs");
+            containerRegistry.RegisterForNavigation<AccessPage>("Access");
             containerRegistry.RegisterForNavigation<FileSystemPage>("FileSystem");
             containerRegistry.RegisterForNavigation<EnvironmentPage>("Environment");
             containerRegistry.RegisterForNavigation<Settings.MainPage>("Settings");

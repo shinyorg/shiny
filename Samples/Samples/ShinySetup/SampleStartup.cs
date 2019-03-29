@@ -20,7 +20,7 @@ namespace Samples.ShinySetup
         {
             Log.UseConsole();
             Log.UseDebug();
-            Log.AddLogger(new AppCenterLogger(), true, false);
+            Log.AddLogger(new AppCenterLogger(), true, true);
             Log.AddLogger(new DbLogger(), true, false);
 
             // create your infrastructures

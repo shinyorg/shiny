@@ -28,6 +28,7 @@ namespace Samples.Logging
                     this.IsErrorsEnabled = true;
                     this.errSub = Observable
                         .Interval(TimeSpan.FromSeconds(10))
+                        .StartWith(0)
                         .Subscribe(_ => Log.Write(
                             new Exception("TEST ERROR"),
                             ("Parameter1", "Hello"),
@@ -48,8 +49,10 @@ namespace Samples.Logging
                     this.IsEventsEnabled = true;
                     this.eventSub = Observable
                         .Interval(TimeSpan.FromSeconds(1))
+                        .StartWith(0)
                         .Subscribe(_ => Log.Write(
-                            new Exception("TEST EVENT"),
+                            "TEST EVENT",
+                            "HELLO",
                             ("Parameter1", "Event"),
                             ("Parameter2", "99")
                         ));

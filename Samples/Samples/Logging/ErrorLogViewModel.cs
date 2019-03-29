@@ -15,24 +15,19 @@ using Shiny.Logging;
 
 namespace Samples.Logging
 {
-    public class ErrorLogsViewModel : AbstractLogViewModel<CommandItem>
+    public class ErrorLogViewModel : AbstractLogViewModel<CommandItem>
     {
         readonly SampleSqliteConnection conn;
         readonly ISerializer serializer;
 
 
-        public ErrorLogsViewModel(SampleSqliteConnection conn,
+        public ErrorLogViewModel(SampleSqliteConnection conn,
                                   ISerializer serializer,
                                   IUserDialogs dialogs) : base(dialogs)
         {
             this.conn = conn;
             this.serializer = serializer;
-        }
 
-
-        public override void OnAppearing()
-        {
-            base.OnAppearing();
             Log
                 .WhenExceptionLogged()
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -73,9 +68,9 @@ namespace Samples.Logging
                     var s = $"{x.Timestamp}{Environment.NewLine}{x.Description}{Environment.NewLine}";
                     if (!x.Parameters.IsEmpty())
                     {
-                        var parameters = this.serializer.Deserialize<Dictionary<string, object>>(x.Parameters);
+                        var parameters = this.serializer.Deserialize<Tuple<string, string>[]>(x.Parameters);
                         foreach (var p in parameters)
-                            s += $"{Environment.NewLine}{p.Key}: {p.Value}";
+                            s += $"{Environment.NewLine}{p.Item1}: {p.Item2}";
                     }
                     this.Dialogs.Alert(s);
                 })

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive;
@@ -38,6 +39,12 @@ namespace Shiny
         }
 
 
+        public static IObservable<NotifyCollectionChangedEventArgs> WhenCollectionChanged(this INotifyCollectionChanged collection) => Observable.Create<NotifyCollectionChangedEventArgs>(ob =>
+        {
+            var handler = new NotifyCollectionChangedEventHandler((sender, args) => ob.OnNext(args));
+            collection.CollectionChanged += handler;
+            return () => collection.CollectionChanged -= handler;
+        });
   //      return Observable.Defer(() => MakeWebRequest())
   //.RetryWithBackoffStrategy(retryCount: 4, retryOnError: e => e is WebException)
         //[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
