@@ -11,6 +11,13 @@ namespace Shiny.Caching
         readonly object syncLock = new object();
 
 
+        public MemoryCache(TimeSpan? defaultLifeSpan = null, TimeSpan? cleanUpTimer = null)
+        {
+            this.DefaultLifeSpan = defaultLifeSpan ?? TimeSpan.FromMinutes(10);
+            this.CleanUpTime = cleanUpTimer ?? TimeSpan.FromSeconds(20);
+        }
+
+
         protected override void OnTimerElapsed()
         {
             var now = DateTime.UtcNow;
@@ -37,12 +44,12 @@ namespace Shiny.Caching
         public override T Get<T>(string key)
         {
             if (!this.Enabled)
-                return default(T);
+                return default;
 
             lock (this.syncLock)
             {
                 if (!this.cache.ContainsKey(key))
-                    return default(T);
+                    return default;
 
                 var item = (CacheItem)this.cache[key];
                 return (T)item.Object;

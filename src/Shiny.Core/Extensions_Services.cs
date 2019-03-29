@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using Shiny.Settings;
 using Shiny.Jobs;
+using Shiny.Caching;
 using Shiny.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,26 @@ namespace Shiny
 {
     public static class Extensions_Services
     {
+        /// <summary>
+        /// Adds an injectable (ICache) cache service that doesn't actually cache at all - good for testing
+        /// </summary>
+        /// <param name="services"></param>
+        public static void UseVoidCache(this IServiceCollection services)
+            => services.AddSingleton<ICache, VoidCache>();
+
+
+        /// <summary>
+        /// Adds an injectable (ICache) in-memory cache
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <param name="defaultLifespan">The default timespan for how long objects should live in cache if time is not explicitly set</param>
+        /// <param name="cleanUpTimer">The internal cleanup time interval (don't make this too big or too small)</param>
+        public static void UseMemoryCache(this IServiceCollection services,
+                                          TimeSpan? defaultLifespan = null,
+                                          TimeSpan? cleanUpTimer = null)
+            => services.AddSingleton<ICache>(_ => new MemoryCache(defaultLifespan, cleanUpTimer));
+
+
         /// <summary>
         /// Register a strongly typed application settings provider on the service container
         /// </summary>
