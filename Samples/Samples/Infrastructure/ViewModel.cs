@@ -75,6 +75,9 @@ namespace Samples
         [Reactive] public string Title { get; protected set; }
 
         protected void BindBusyCommand<T, U>(ReactiveCommand<T, U> reactiveCommand)
-            => reactiveCommand.IsExecuting.Subscribe(x => this.IsBusy = x);
+            => reactiveCommand
+                .IsExecuting
+                .Subscribe(x => this.IsBusy = x)
+                .DisposeWith(this.DeactivateWith);
     }
 }
