@@ -9,6 +9,7 @@ using Prism.Ioc;
 using Prism.Mvvm;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Samples.Infrastructure;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 
@@ -26,6 +27,9 @@ namespace Samples
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+#if DEBUG
+            Xamarin.Forms.Internals.Log.Listeners.Add(new TraceLogListener());
+#endif
             containerRegistry.RegisterInstance<IUserDialogs>(UserDialogs.Instance);
             containerRegistry.RegisterForNavigation<NavigationPage>("Nav");
             containerRegistry.RegisterForNavigation<MainPage>("Main");
