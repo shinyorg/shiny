@@ -2,6 +2,7 @@
 using Shiny.Jobs;
 using Samples.Models;
 using Shiny;
+using Shiny.Infrastructure;
 
 
 namespace Samples.ShinySetup
@@ -10,11 +11,15 @@ namespace Samples.ShinySetup
     {
         readonly IJobManager jobManager;
         readonly SampleSqliteConnection conn;
+        readonly ISerializer serializer;
 
 
-        public JobLoggerTask(IJobManager jobManager, SampleSqliteConnection conn)
+        public JobLoggerTask(IJobManager jobManager,
+                             ISerializer serializer,
+                             SampleSqliteConnection conn)
         {
             this.jobManager = jobManager;
+            this.serializer = serializer;
             this.conn = conn;
         }
 
@@ -28,7 +33,8 @@ namespace Samples.ShinySetup
                     JobName = args.Identifier,
                     JobType = args.Type.FullName,
                     Started = true,
-                    Timestamp = DateTime.Now
+                    Timestamp = DateTime.Now,
+                    Parameters = this.serializer.Serialize(args.Parameters)
                 });
             };
             this.jobManager.JobFinished += async (sender, args) =>
@@ -38,6 +44,7 @@ namespace Samples.ShinySetup
                     JobName = args.Job.Identifier,
                     JobType = args.Job.Type.FullName,
                     Error = args.Exception?.ToString(),
+                    Parameters = this.serializer.Serialize(args.Job.Parameters),
                     Timestamp = DateTime.Now
                 });
             };

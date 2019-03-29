@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Logging.TestPage"
+             Title="Tests">
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Text="Start Error Stream" Command="{Binding ToggleErrorStream}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsErrorsEnabled}" Value="True">
+                        <Setter Property="Text" Value="Stop Error Stream" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsErrorsEnabled}" Value="False">
+                        <Setter Property="Text" Value="Start Error Stream" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Text="Start Event Stream" Command="{Binding ToggleEventStream}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsEventsEnabled}" Value="True">
+                        <Setter Property="Text" Value="Stop Event Stream" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsEventsEnabled}" Value="False">
+                        <Setter Property="Text" Value="Start Event Stream" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

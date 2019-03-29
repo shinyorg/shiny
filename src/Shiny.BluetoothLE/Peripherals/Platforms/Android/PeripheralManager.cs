@@ -143,7 +143,11 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public void StopAdvertising()
         {
-            this.context.Manager.Adapter.BluetoothLeAdvertiser.StopAdvertising(this.adCallbacks);
+            this.context
+                .Manager
+                .Adapter
+                .BluetoothLeAdvertiser
+                .StopAdvertising(this.adCallbacks);
             this.adCallbacks = null;
         }
 

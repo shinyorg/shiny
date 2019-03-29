@@ -8,6 +8,8 @@ using Acr.UserDialogs;
 using ReactiveUI;
 using Samples.Infrastructure;
 using Samples.Models;
+using Shiny;
+using Shiny.Infrastructure;
 using Shiny.Logging;
 
 
@@ -16,9 +18,15 @@ namespace Samples.Logging
     public class ErrorLogsViewModel : AbstractLogViewModel<CommandItem>
     {
         readonly SampleSqliteConnection conn;
-        public ErrorLogsViewModel(SampleSqliteConnection conn, IUserDialogs dialogs) : base(dialogs)
+        readonly ISerializer serializer;
+
+
+        public ErrorLogsViewModel(SampleSqliteConnection conn,
+                                  ISerializer serializer,
+                                  IUserDialogs dialogs) : base(dialogs)
         {
             this.conn = conn;
+            this.serializer = serializer;
         }
 
 
@@ -61,8 +69,16 @@ namespace Samples.Logging
                 Text = x.Timestamp.ToString(),
                 Detail = x.Description,
                 PrimaryCommand = ReactiveCommand.Create(() =>
-                    this.Dialogs.Alert(x.Description)
-                )
+                {
+                    var s = $"{x.Timestamp}{Environment.NewLine}{x.Description}{Environment.NewLine}";
+                    if (!x.Parameters.IsEmpty())
+                    {
+                        var parameters = this.serializer.Deserialize<Dictionary<string, object>>(x.Parameters);
+                        foreach (var p in parameters)
+                            s += $"{Environment.NewLine}{p.Key}: {p.Value}";
+                    }
+                    this.Dialogs.Alert(s);
+                })
             });
         }
     }

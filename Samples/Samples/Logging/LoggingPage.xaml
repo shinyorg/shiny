@@ -8,5 +8,6 @@
     <TabbedPage.Children>
         <logging:ErrorLogPage Title="Errors" />
         <logging:EventsPage Title="Events" />
+        <logging:TestPage Title="Tests" />
     </TabbedPage.Children>
 </TabbedPage>

@@ -25,7 +25,8 @@ namespace Samples.ShinySetup
         readonly INotificationManager notifications;
 
 
-        public SampleAllDelegate(SampleSqliteConnection conn, INotificationManager notifications)
+        public SampleAllDelegate(SampleSqliteConnection conn,
+                                 INotificationManager notifications)
         {
             this.conn = conn;
             this.notifications = notifications;
@@ -79,14 +80,6 @@ namespace Samples.ShinySetup
                 Title = "Job Started",
                 Message = $"{jobInfo.Identifier} started"
             });
-            await this.conn.InsertAsync(new JobLog
-            {
-                JobName = jobInfo.Identifier,
-                JobType = this.GetType().FullName,
-                Started = true,
-                Timestamp = DateTime.Now
-            });
-
             var loops = jobInfo.Parameters.Get("Loops", 10);
             for (var i = 0; i < loops; i++)
             {
@@ -95,14 +88,6 @@ namespace Samples.ShinySetup
 
                 await Task.Delay(1000, cancelToken).ConfigureAwait(false);
             }
-            await this.conn.InsertAsync(new JobLog
-            {
-                JobName = jobInfo.Identifier,
-                JobType = this.GetType().FullName,
-                Started = false,
-                Timestamp = DateTime.Now
-            });
-
             await this.notifications.Send(new Notification
             {
                 Title = "Job Finished",

@@ -13,6 +13,7 @@ namespace Samples.Models
         public string JobName { get; set; }
         public string JobType { get; set; }
         public string Error { get; set; }
+        public string Parameters { get; set; }
         public bool Started { get; set; }
         public DateTime Timestamp { get; set; }
     }
