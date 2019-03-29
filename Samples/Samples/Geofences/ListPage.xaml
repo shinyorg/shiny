@@ -1,30 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:xamForms="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
              x:Class="Samples.Geofences.ListPage"
              Title="Geofences">
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <xamForms:InverseBooleanConverter x:Key="Not" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Stop All Geofences" Command="{Binding DropAllFences}" />
+    </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <StackLayout>
 
             <Label Text="No Geofences Configured"
-                   IsVisible="{Binding HasGeofences, Converter={StaticResource Not}}"
-                   Grid.Row="0" />
+                   Style="{StaticResource NoDataLabel}"
+                   IsVisible="{Binding HasGeofences, Converter={StaticResource Not}}" />
 
             <ListView ItemsSource="{Binding Geofences}"
-                      IsVisible="{Binding HasGeofences}"
-                      Grid.Row="0">
+                      IsVisible="{Binding HasGeofences}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextCell Text="{Binding Text}" Detail="{Binding Detail}">
@@ -40,10 +32,6 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-
-            <Button Text="Stop All Geofences"
-                    Command="{Binding DropAllFences}"
-                    Grid.Row="1" />
-        </Grid>
+        </StackLayout>
     </ContentPage.Content>
 </ContentPage>
