@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 using Shiny.Net;
@@ -13,9 +14,9 @@ namespace Shiny.Jobs
 {
     public abstract class AbstractJobManager : IJobManager
     {
+        readonly IServiceProvider container;
         readonly IPowerManager powerManager;
         readonly IConnectivity connectivity;
-        readonly IJobFactory jobFactory;
 
 
         protected AbstractJobManager(IServiceProvider container,
@@ -23,10 +24,10 @@ namespace Shiny.Jobs
                                      IPowerManager powerManager,
                                      IConnectivity connectivity)
         {
+            this.container = container;
             this.Repository = repository;
             this.powerManager = powerManager;
             this.connectivity = connectivity;
-            this.jobFactory = new DefaultJobFactory(container);
         }
 
 
@@ -120,7 +121,7 @@ namespace Shiny.Jobs
                 throw new ArgumentException("Type not set");
 
             // we do a force resolve here to ensure all is good
-            var job = this.jobFactory.Resolve(jobInfo);
+            this.ResolveJob(jobInfo);
             await this.Repository.Set(jobInfo.Identifier, jobInfo);
         }
 
@@ -168,7 +169,7 @@ namespace Shiny.Jobs
             try
             {
                 this.LogJob(JobState.Start, job);
-                var jobDelegate = this.jobFactory.Resolve(job);
+                var jobDelegate = this.ResolveJob(job);
 
                 var newData = await jobDelegate
                     .Run(job, cancelToken)
@@ -198,6 +199,10 @@ namespace Shiny.Jobs
             this.JobFinished?.Invoke(this, result);
             return result;
         }
+
+
+        protected virtual IJob ResolveJob(JobInfo jobInfo)
+            => (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, jobInfo.Type);
 
 
         protected virtual void LogJob(JobState state,
