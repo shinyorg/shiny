@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Foundation;
+using Shiny.Settings;
 using UIKit;
 using UserNotifications;
 
@@ -9,6 +10,14 @@ namespace Shiny.Notifications
 {
     public class NotificationManagerImpl : INotificationManager
     {
+        readonly ISettings settings; // this will have problems with data protection
+
+        public NotificationManagerImpl(ISettings settings)
+        {
+            this.settings = settings;
+        }
+
+
         public Task<AccessState> RequestAccess()
         {
             var tcs = new TaskCompletionSource<AccessState>();
@@ -32,19 +41,18 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task Clear()
+        public Task Clear() => this.Invoke(() =>
         {
-            await this.Invoke(() =>
-            {
-                UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
-                UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
-            });
-        }
-
+            UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
+            UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
+        });
 
 
         public async Task Send(Notification notification)
         {
+            if (notification.Id == 0)
+                notification.Id = this.settings.IncrementValue("NotificationId");
+
             //var permission = await this.RequestAccess();
             var content = new UNMutableNotificationContent
             {

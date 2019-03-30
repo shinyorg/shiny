@@ -59,10 +59,12 @@ namespace Shiny.Notifications
         //https://stackoverflow.com/questions/45462666/notificationcompat-builder-deprecated-in-android-o
         public async Task Send(Notification notification)
         {
-            notification.Id = this.GetNextId();
+            if (notification.Id == 0)
+                notification.Id = this.settings.IncrementValue("NotificationId");
 
-            var launchIntent = Application
-                .Context
+            var launchIntent = this
+                .context
+                .AppContext
                 .PackageManager
                 .GetLaunchIntentForPackage(this.context.Package.PackageName)
                 .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
@@ -130,21 +132,6 @@ namespace Shiny.Notifications
             {
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
-        }
-
-
-        const string NOTIFICATION_ID_KEY = "NotificationId";
-        readonly object syncLock = new object();
-        protected virtual int GetNextId()
-        {
-            var id = 0;
-            lock (this.syncLock)
-            {
-                id = this.settings.Get(NOTIFICATION_ID_KEY, 0);
-                id++;
-                this.settings.Set(NOTIFICATION_ID_KEY, id);
-            }
-            return id;
         }
     }
 }
