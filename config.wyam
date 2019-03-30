@@ -5,10 +5,10 @@
 //https://wyam.io/recipes/docs/
 
 Settings[Keys.Host] = "shinydocs.azurewebsites.net";
+Settings[Keys.LinksUseHttps] = true;
+Settings[DocsKeys.Logo] = "/assets/img/logo.png";
 Settings[DocsKeys.Title] = "Shiny";
 Settings[DocsKeys.BlogTitle] = "Releases";
-Settings[DocsKeys.SourceFiles] = @"src/**/{!Platforms,!Infrastructure,!bin,!obj,!packages,!*.Tests,}/**/*.cs";
-//Settings[DocsKeys.ProjectFiles] = "**\Acr.Core.csproj"; 
-//Settings[DocsKeys.SolutionFiles] = "Libs.sln";
-//Settings[DocsKeys.IgnoreFolders] = new string[] { "Acr.Sensors", "Samples" };
-//Settings[DocsKeys.Logo] = "";
+//Settings[DocsKeys.SourceFiles] = null;
+//Settings[DocsKeys.SolutionFiles] = "c:/dev/shiny/Libs.sln";
+Settings[DocsKeys.SourceFiles] = @"c:/dev/shiny/src/**/{!platforms,!infrastructure,!bin,!obj,!packages,!*.Tests,}/**/*.cs";
