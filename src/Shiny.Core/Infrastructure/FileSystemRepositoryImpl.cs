@@ -60,17 +60,25 @@ namespace Shiny.Infrastructure
         });
 
 
-        public Task Remove<T>(string key) where T : class => this.InTransaction(typeof(T), list =>
+        public Task<bool> Remove<T>(string key) where T : class
         {
-            list.Remove(key);
-            var path = this.GetPath(typeof(T), key);
-            if (File.Exists(path))
+            var tcs = new TaskCompletionSource<bool>();
+            this.InTransaction(typeof(T), list =>
             {
-                var entity = this.Get<T>(key);
-                File.Delete(path);
-                this.eventSubject.OnNext(new RepositoryEvent(RepositoryEventType.Remove, key, entity));
-            }
-        });
+                list.Remove(key);
+                var path = this.GetPath(typeof(T), key);
+                if (!File.Exists(path))
+                    tcs.SetResult(false);
+                else
+                {
+                    var entity = this.Get<T>(key);
+                    File.Delete(path);
+                    this.eventSubject.OnNext(new RepositoryEvent(RepositoryEventType.Remove, key, entity));
+                    tcs.SetResult(true);
+                }
+            });
+            return tcs.Task;
+        }
 
 
         public Task Clear<T>() where T : class => this.InTransaction(typeof(T), list =>

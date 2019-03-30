@@ -10,7 +10,7 @@ namespace Shiny.Infrastructure
         Task<T> Get<T>(string key) where T : class;
         Task<List<T>> GetAll<T>() where T : class;
         Task Set(string key, object entity);
-        Task Remove<T>(string key) where T : class;
+        Task<bool> Remove<T>(string key) where T : class;
         Task Clear<T>() where T : class;
         IObservable<RepositoryEvent> WhenEvent();
     }
