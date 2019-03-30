@@ -3,6 +3,7 @@
                         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                         xmlns:prism="clr-namespace:Prism.Autofac;assembly=Prism.Autofac.Forms"
                         xmlns:acr="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
+                        xmlns:sample="clr-namespace:Samples"
                         x:Class="Samples.App">
     <prism:PrismApplication.Resources>
         <Style x:Key="NoDataLabel" TargetType="Label">
@@ -14,5 +15,6 @@
         </Style>
 
         <acr:InverseBooleanConverter x:Key="Not" />
+        <sample:PercentToDecimalValueConverter x:Key="PercentToDecimalValueConverter" />
     </prism:PrismApplication.Resources>
 </prism:PrismApplication>

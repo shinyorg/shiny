@@ -2,15 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:acr="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
-             xmlns:sample="clr-namespace:Samples;assembly=Samples"
              x:Class="Samples.HttpTransfers.MainPage"
              Title="HTTP Transfers">
-
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <sample:PercentToDecimalValueConverter x:Key="PercentToDecimalValueConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="New Task" Command="{Binding NewTask}" />
