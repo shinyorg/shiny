@@ -27,7 +27,7 @@ namespace Samples.Geofences
         {
             var events = await conn
                 .GeofenceEvents
-                .OrderBy(x => x.Date)
+                .OrderByDescending(x => x.Date)
                 .ToListAsync();
 
             return events.Select(x => new CommandItem

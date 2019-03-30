@@ -54,7 +54,11 @@ namespace Samples.Jobs
 
         protected override async Task<IEnumerable<CommandItem>> LoadLogs()
         {
-            var logs = await this.conn.JobLogs.ToListAsync();
+            var logs = await this.conn
+                .JobLogs
+                .OrderByDescending(x => x.Timestamp)
+                .ToListAsync();
+
             return logs.Select(x =>
             {
                 var title = $"{x.JobIdentifier} ({x.JobType})";
