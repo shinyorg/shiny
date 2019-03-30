@@ -43,7 +43,7 @@ namespace Shiny.Net.Http
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
 
-            var id = this.GetManager().Enqueue(native);
+            //var id = this.GetManager().Enqueue(native);
             //await this.repository.Set(id.ToString(), new HttpTransferStore
             //{
 
