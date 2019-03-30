@@ -8,7 +8,7 @@ namespace Shiny.Caching
 {
     public class MemoryCache : AbstractTimerCache
     {
-        readonly IDictionary<string, object> cache = new Dictionary<string, object>();
+        readonly IDictionary<string, CacheItem> cache = new Dictionary<string, CacheItem>();
         readonly object syncLock = new object();
 
 
@@ -19,13 +19,17 @@ namespace Shiny.Caching
         }
 
 
+        public override Task<IEnumerable<CacheItem>> GetCachedItems()
+            => Task.FromResult<IEnumerable<CacheItem>>(this.cache.Values);
+
+
         protected override Task OnTimerElapsed()
         {
             var now = DateTime.UtcNow;
             lock (this.syncLock)
             {
                 var list = this.cache.Keys
-                    .Select(x => (CacheItem)cache[x])
+                    .Select(x => cache[x])
                     .Where(x => x.ExpiryTime < now)
                     .ToList();
 
@@ -55,8 +59,7 @@ namespace Shiny.Caching
                 if (!this.cache.ContainsKey(key))
                     return default;
 
-                var item = (CacheItem)this.cache[key];
-                return Task.FromResult((T)item.Object);
+                return Task.FromResult((T)this.cache[key].Object);
             }
         }
 

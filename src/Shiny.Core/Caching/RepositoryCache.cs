@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
+
 
 namespace Shiny.Caching
 {
@@ -32,6 +34,10 @@ namespace Shiny.Caching
 
             return (T)cache.Object;
         }
+
+
+        public override async Task<IEnumerable<CacheItem>> GetCachedItems()
+            => await this.repository.GetAll<CacheItem>();
 
 
         public override async Task Set(string key, object obj, TimeSpan? timeSpan = null)

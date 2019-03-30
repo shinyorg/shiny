@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace Shiny.Caching
 {
@@ -10,5 +13,6 @@ namespace Shiny.Caching
         public override Task Set(string key, object obj, TimeSpan? timeSpan = null) => Task.CompletedTask;
         public override Task Clear() => Task.CompletedTask;
         public override Task<bool> Remove(string key) => Task.FromResult(false);
+        public override Task<IEnumerable<CacheItem>> GetCachedItems() => Task.FromResult(Enumerable.Empty<CacheItem>())
     }
 }

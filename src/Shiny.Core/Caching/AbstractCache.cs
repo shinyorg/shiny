@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
@@ -48,6 +49,7 @@ namespace Shiny.Caching
         public bool Enabled { get; set; }
 
         public abstract Task Set(string key, object obj, TimeSpan? timeSpan = null);
+        public abstract Task<IEnumerable<CacheItem>> GetCachedItems();
         public abstract Task<T> Get<T>(string key);
         public abstract Task<bool> Remove(string key);
         public abstract Task Clear();
