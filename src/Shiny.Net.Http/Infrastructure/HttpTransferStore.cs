@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Net.Http.Internals
+namespace Shiny.Net.Http.Infrastructure
 {
     public class HttpTransferStore
     {

@@ -22,6 +22,7 @@ namespace Shiny.Net.Http
 
         public override void OnReceive(Context context, Intent intent)
         {
+            var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
             switch (intent.Action)
             {
                 case Native.ActionDownloadComplete:

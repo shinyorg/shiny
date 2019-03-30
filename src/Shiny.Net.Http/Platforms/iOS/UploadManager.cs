@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Net.Http.Internals;
+using Shiny.Net.Http.Infrastructure;
 using Foundation;
 
 

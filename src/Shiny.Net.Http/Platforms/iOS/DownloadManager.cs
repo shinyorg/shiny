@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Net.Http.Internals;
+using Shiny.Net.Http.Infrastructure;
 using Foundation;
 
 
@@ -21,6 +21,8 @@ namespace Shiny.Net.Http
             this.repository = repository;
             this.sessionDelegate = new CoreSessionDownloadDelegate();
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(NSBundle.MainBundle.BundleIdentifier + ".BackgroundTransferSession");
+            this.sessionConfig.HttpMaximumConnectionsPerHost = 1; // TODO: configurable
+
             this.session = NSUrlSession.FromConfiguration(
                 this.sessionConfig,
                 this.sessionDelegate,

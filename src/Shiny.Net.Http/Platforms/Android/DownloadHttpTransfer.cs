@@ -1,4 +1,5 @@
 ﻿using System;
+using Native = Android.App.DownloadManager;
 
 
 namespace Shiny.Net.Http
@@ -7,6 +8,10 @@ namespace Shiny.Net.Http
     {
         public DownloadHttpTransfer(HttpTransferRequest request) : base(request, false) { }
 
+
+        public void Refresh(long id)
+        {
+        }
 
         public override void Cancel()
         {

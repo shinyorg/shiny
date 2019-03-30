@@ -56,24 +56,16 @@ namespace Shiny.Net.Http
         {
             //var transfers = await this.repository.GetAll<HttpTransferStore>();
             var query = new Native.Query();
-            using (var cursor = this.GetManager().InvokeQuery(query))
-            {
-                while (cursor.MoveToNext())
-                {
+            //using (var cursor = this.GetManager().InvokeQuery(query))
+            //{
+            //    while (cursor.MoveToNext())
+            //    {
 
-                }
-            }
+            //    }
+            //}
             return null;
         }
 
 
-        Native downloadManager;
-        Native GetManager()
-        {
-            if (this.downloadManager == null || this.downloadManager.Handle == IntPtr.Zero)
-                this.downloadManager = (Native)this.context.AppContext.GetSystemService(Context.DownloadService);
-
-            return this.downloadManager;
-        }
     }
 }
