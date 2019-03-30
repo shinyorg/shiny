@@ -4,6 +4,7 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
+using Shiny.Settings;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
 
 
@@ -12,13 +13,15 @@ namespace Shiny.Notifications
     public class NotificationManagerImpl : INotificationManager
     {
         readonly IAndroidContext context;
+        readonly ISettings settings;
 
         NotificationManager newManager;
         NotificationManagerCompat compatManager;
 
 
-        public NotificationManagerImpl(IAndroidContext context)
+        public NotificationManagerImpl(IAndroidContext context, ISettings settings)
         {
+            this.settings = settings;
             this.context = context;
             if ((int) Build.VERSION.SdkInt >= 26)
             {
@@ -56,12 +59,7 @@ namespace Shiny.Notifications
         //https://stackoverflow.com/questions/45462666/notificationcompat-builder-deprecated-in-android-o
         public async Task Send(Notification notification)
         {
-            //if (notification.NextTriggerDate != null)
-            //{
-            //    // TODO: notificationID?
-            //    await this.Repository.Set(notification.Id.ToString(), notification);
-            //    return;
-            //}
+            notification.Id = this.GetNextId();
 
             var launchIntent = Application
                 .Context
@@ -75,8 +73,8 @@ namespace Shiny.Notifications
             var pendingIntent = TaskStackBuilder
                 .Create(this.context.AppContext)
                 .AddNextIntent(launchIntent)
-                .GetPendingIntent(notification.Id, PendingIntentFlags.CancelCurrent);
-            //.GetPendingIntent(notification.Id, PendingIntentFlags.OneShot | PendingIntentFlags.CancelCurrent);
+                .GetPendingIntent(notification.Id, PendingIntentFlags.OneShot);
+                //.GetPendingIntent(notification.Id, PendingIntentFlags.OneShot | PendingIntentFlags.CancelCurrent);
 
             var smallIconResourceId = this.context.GetResourceIdByName(notification.Android.SmallIconResourceName);
 
@@ -132,6 +130,21 @@ namespace Shiny.Notifications
             {
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
+        }
+
+
+        const string NOTIFICATION_ID_KEY = "NotificationId";
+        readonly object syncLock = new object();
+        protected virtual int GetNextId()
+        {
+            var id = 0;
+            lock (this.syncLock)
+            {
+                id = this.settings.Get(NOTIFICATION_ID_KEY, 0);
+                id++;
+                this.settings.Set(NOTIFICATION_ID_KEY, id);
+            }
+            return id;
         }
     }
 }
