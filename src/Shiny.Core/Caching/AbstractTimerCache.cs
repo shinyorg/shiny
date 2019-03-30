@@ -1,41 +1,59 @@
 ﻿using System;
-using System.Reactive.Linq;
+using System.Threading.Tasks;
+using System.Timers;
 
 
 namespace Shiny.Caching
 {
     public abstract class AbstractTimerCache : AbstractCache
     {
-        IDisposable timerSub;
+        readonly Timer timer;
 
-        public TimeSpan CleanUpTime { get; set; }
 
-        protected abstract void OnTimerElapsed();
+        protected AbstractTimerCache()
+        {
+            this.timer = new Timer();
+        }
+
+
+        public TimeSpan CleanUpTime
+        {
+            get => TimeSpan.FromMilliseconds(this.timer.Interval);
+            set => this.timer.Interval = value.TotalMilliseconds;
+        }
+
+
+        protected abstract Task OnTimerElapsed();
 
 
         protected override void Init()
         {
-            this.timerSub = Observable
-                .Interval(this.CleanUpTime)
-                .Synchronize()
-                .Subscribe(_ =>
-                {
-                    try
-                    {
-                        this.OnTimerElapsed();
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                });
+            this.timer.Interval = this.CleanUpTime.TotalMilliseconds;
+            this.timer.Elapsed += this.OnTimerElapsed;
+            this.timer.Start();
         }
 
+
+        async void OnTimerElapsed(object sender, ElapsedEventArgs args)
+        {
+            this.timer.Stop();
+            try
+            {
+                await this.OnTimerElapsed().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                // TODO?
+            }
+            this.timer.Start();
+        }
 
 
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            this.timerSub?.Dispose();
+            this.timer.Elapsed -= this.OnTimerElapsed;
+            this.timer.Dispose();
         }
     }
 }

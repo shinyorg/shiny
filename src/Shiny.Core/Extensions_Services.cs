@@ -33,6 +33,22 @@ namespace Shiny
 
 
         /// <summary>
+        /// Uses the built-in repository (default is file based) to store cache data
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <param name="defaultLifespan">The default timespan for how long objects should live in cache if time is not explicitly set</param>
+        /// <param name="cleanUpTimer">The internal cleanup time interval (don't make this too big or too small)</param>
+        public static void UseRepositoryCache(this IServiceCollection services,
+                                              TimeSpan? defaultLifespan = null,
+                                              TimeSpan? cleanUpTimer = null)
+            => services.AddSingleton<ICache>(sp =>
+            {
+                var repository = sp.GetRequiredService<IRepository>();
+                return new RepositoryCache(repository, defaultLifespan, cleanUpTimer);
+            });
+
+
+        /// <summary>
         /// Register a strongly typed application settings provider on the service container
         /// </summary>
         /// <typeparam name="TImpl"></typeparam>

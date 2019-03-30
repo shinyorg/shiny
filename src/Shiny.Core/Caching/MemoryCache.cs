@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace Shiny.Caching
@@ -34,17 +35,19 @@ namespace Shiny.Caching
         }
 
 
-        public override void Clear()
+        public override Task Clear()
         {
             lock (this.syncLock)
                 this.cache.Clear();
+
+            return Task.CompletedTask;
         }
 
 
-        public override T Get<T>(string key)
+        public override Task<T> Get<T>(string key)
         {
             if (!this.Enabled)
-                return default;
+                return Task.FromResult(default(T));
 
             lock (this.syncLock)
             {
@@ -52,25 +55,25 @@ namespace Shiny.Caching
                     return default;
 
                 var item = (CacheItem)this.cache[key];
-                return (T)item.Object;
+                return Task.FromResult((T)item.Object);
             }
         }
 
 
-        public override bool Remove(string key)
+        public override Task<bool> Remove(string key)
         {
             if (!this.Enabled)
-                return false;
+                return Task.FromResult(false);
 
             lock (this.syncLock)
-                return this.cache.Remove(key);
+                return Task.FromResult(this.cache.Remove(key));
         }
 
 
-        public override void Set(string key, object obj, TimeSpan? timeSpan = null)
+        public override Task Set(string key, object obj, TimeSpan? timeSpan = null)
         {
             if (!this.Enabled)
-                return;
+                return Task.CompletedTask;
 
             // I only need this call on set, since it doesn't have to clean until there is actually something there
             this.EnsureInitialized();
@@ -85,6 +88,7 @@ namespace Shiny.Caching
                 };
                 this.cache[key] = cacheObj;
             }
+            return Task.CompletedTask;
         }
     }
 }

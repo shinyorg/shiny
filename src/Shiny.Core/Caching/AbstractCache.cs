@@ -27,11 +27,11 @@ namespace Shiny.Caching
 
         public virtual async Task<T> TryGet<T>(string key, Func<Task<T>> getter, TimeSpan? timeSpan = null)
         {
-            var obj = this.Get<T>(key);
+            var obj = await this.Get<T>(key).ConfigureAwait(false);
             if (obj == null)
             {
-                obj = await getter();
-                this.Set(key, obj, timeSpan);
+                obj = await getter().ConfigureAwait(false);
+                await this.Set(key, obj, timeSpan).ConfigureAwait(false);
             }
             return obj;
         }
@@ -47,9 +47,9 @@ namespace Shiny.Caching
         public TimeSpan DefaultLifeSpan { get; set; }
         public bool Enabled { get; set; }
 
-        public abstract void Set(string key, object obj, TimeSpan? timeSpan = null);
-        public abstract T Get<T>(string key);
-        public abstract bool Remove(string key);
-        public abstract void Clear();
+        public abstract Task Set(string key, object obj, TimeSpan? timeSpan = null);
+        public abstract Task<T> Get<T>(string key);
+        public abstract Task<bool> Remove(string key);
+        public abstract Task Clear();
     }
 }
