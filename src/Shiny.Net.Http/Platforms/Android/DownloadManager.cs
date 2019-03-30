@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
-using Shiny.Net.Http.Internals;
+using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http
