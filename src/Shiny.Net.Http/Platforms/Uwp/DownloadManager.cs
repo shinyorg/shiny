@@ -30,7 +30,7 @@ namespace Shiny.Net.Http
         {
             var task = new BackgroundDownloader
             {
-                Method = request.HttpMethod,
+                Method = request.HttpMethod.Method,
                 CostPolicy = request.UseMeteredConnection
                     ? BackgroundTransferCostPolicy.Default
                     : BackgroundTransferCostPolicy.UnrestrictedOnly

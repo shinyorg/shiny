@@ -43,7 +43,6 @@ namespace Shiny.Net.Http
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
 
-            //var id = this.GetManager().Enqueue(native);
             //await this.repository.Set(id.ToString(), new HttpTransferStore
             //{
 
@@ -55,17 +54,7 @@ namespace Shiny.Net.Http
         public async Task<IEnumerable<IHttpTransfer>> GetTransfers()
         {
             //var transfers = await this.repository.GetAll<HttpTransferStore>();
-            var query = new Native.Query();
-            //using (var cursor = this.GetManager().InvokeQuery(query))
-            //{
-            //    while (cursor.MoveToNext())
-            //    {
-
-            //    }
-            //}
             return null;
         }
-
-
     }
 }

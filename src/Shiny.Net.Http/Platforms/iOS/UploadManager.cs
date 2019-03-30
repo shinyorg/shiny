@@ -55,7 +55,7 @@ namespace Shiny.Net.Http
         public Task<IHttpTransfer> Create(HttpTransferRequest request)
         {
             var task = this.session.CreateUploadTask(
-                NSUrlRequest.FromUrl(NSUrl.FromFilename(request.Uri)),
+                request.ToNative(),
                 NSUrl.FromFilename(request.LocalFilePath.FullName)
             );
             return null;
@@ -65,30 +65,6 @@ namespace Shiny.Net.Http
         {
             throw new NotImplementedException();
         }
-
-
-        //public override IHttpTransfer Upload(HttpTransferConfiguration config)
-        //{
-        //    var request = this.CreateRequest(config);
-        //    var native = this.session.CreateUploadTask(request, NSUrl.FromFilename(config.LocalFilePath));
-        //    var task = new HttpTask(config, native);
-        //    this.Add(task);
-        //    native.Resume();
-
-        //    return task;
-        //}
-
-
-        //public override IHttpTransfer Download(HttpTransferConfiguration config)
-        //{
-        //    var request = this.CreateRequest(config);
-        //    var native = this.session.CreateDownloadTask(request);
-        //    var task = new HttpTask(config, native);
-        //    this.Add(task);
-        //    native.Resume();
-
-        //    return task;
-        //}
 
 
         //protected virtual HttpTransferConfiguration ToTaskConfiguration(NSUrlSessionTask native)
@@ -104,36 +80,6 @@ namespace Shiny.Net.Http
         //    };
 
 
-        //protected override void Add(IHttpTransfer task)
-        //{
-        //    if (!(task is IIosHttpTransfer ios))
-        //        throw new ArgumentException("You must inherit from IIosHttpTask");
 
-        //    this.sessionDelegate.AddTask(ios);
-        //    base.Add(task);
-        //}
-
-
-        //protected virtual NSUrlRequest CreateRequest(HttpTransferConfiguration config)
-        //{
-        //    var url = NSUrl.FromString(config.Uri);
-        //    var request = new NSMutableUrlRequest(url)
-        //    {
-        //        HttpMethod = config.HttpMethod,
-        //        AllowsCellularAccess = config.UseMeteredConnection
-        //    };
-
-        //    if (!String.IsNullOrWhiteSpace(config.PostData))
-        //        request.Body = NSData.FromString(config.PostData);
-
-        //    foreach (var header in config.Headers)
-        //    {
-        //        request.Headers.SetValueForKey(
-        //            new NSString(header.Value),
-        //            new NSString(header.Key)
-        //        );
-        //    }
-        //    return request;
-        //}
     }
 }

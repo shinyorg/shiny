@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Net.Http;
 
 namespace Shiny.Net.Http
 {
@@ -24,7 +24,7 @@ namespace Shiny.Net.Http
         public string Uri { get; }
         public FileInfo LocalFilePath { get; set; }
         public bool UseMeteredConnection { get; set; }
-        public string HttpMethod { get; set; } = "GET";
+        public HttpMethod HttpMethod { get; set; } = HttpMethod.Get;
         public string PostData { get; set; }
         public IDictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
     }

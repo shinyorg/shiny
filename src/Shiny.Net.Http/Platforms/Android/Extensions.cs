@@ -11,5 +11,8 @@ namespace Shiny.Net.Http
             var native = new Java.IO.File(file.FullName);
             return Android.Net.Uri.FromFile(native);
         }
+
+
+
     }
 }
