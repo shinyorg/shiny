@@ -19,7 +19,7 @@ namespace Shiny.Caching
         }
 
 
-        protected override void OnTimerElapsed()
+        protected override Task OnTimerElapsed()
         {
             var now = DateTime.UtcNow;
             lock (this.syncLock)
@@ -32,6 +32,7 @@ namespace Shiny.Caching
                 foreach (var item in list)
                     this.cache.Remove(item.Key);
             }
+            return Task.CompletedTask;
         }
 
 

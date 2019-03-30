@@ -1,14 +1,14 @@
 ﻿using System;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Caching
 {
     public class VoidCache : AbstractCache
     {
         protected override void Init() { }
-        public override T Get<T>(string key) => default;
-        public override void Set(string key, object obj, TimeSpan? timeSpan = null) { }
-        public override void Clear() { }
-        public override bool Remove(string key) => false;
+        public override Task<T> Get<T>(string key) => Task.FromResult(default(T));
+        public override Task Set(string key, object obj, TimeSpan? timeSpan = null) => Task.CompletedTask;
+        public override Task Clear() => Task.CompletedTask;
+        public override Task<bool> Remove(string key) => Task.FromResult(false);
     }
 }
