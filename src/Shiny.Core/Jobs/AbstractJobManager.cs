@@ -105,6 +105,7 @@ namespace Shiny.Jobs
 
         public abstract Task<AccessState> RequestAccess();
         public virtual async Task<IEnumerable<JobInfo>> GetJobs() => await this.Repository.GetAll<JobInfo>();
+        public Task<JobInfo> GetJob(string jobName) => this.Repository.Get<JobInfo>(jobName);
         public virtual Task Cancel(string jobName) => this.Repository.Remove<JobInfo>(jobName);
         public virtual Task CancelAll() => this.Repository.Clear<JobInfo>();
         public bool IsRunning { get; protected set; }

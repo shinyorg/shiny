@@ -30,7 +30,7 @@ namespace Samples.ShinySetup
             {
                 await this.conn.InsertAsync(new JobLog
                 {
-                    JobName = args.Identifier,
+                    JobIdentifier = args.Identifier,
                     JobType = args.Type.FullName,
                     Started = true,
                     Timestamp = DateTime.Now,
@@ -41,7 +41,7 @@ namespace Samples.ShinySetup
             {
                 await this.conn.InsertAsync(new JobLog
                 {
-                    JobName = args.Job.Identifier,
+                    JobIdentifier = args.Job.Identifier,
                     JobType = args.Job.Type.FullName,
                     Error = args.Exception?.ToString(),
                     Parameters = this.serializer.Serialize(args.Job.Parameters),

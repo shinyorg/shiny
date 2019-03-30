@@ -33,7 +33,7 @@ namespace Samples.ShinySetup
             builder.RegisterStartupTask<JobLoggerTask>();
 
             // configuration
-            builder.RegisterSettings<AppSettings>();
+            builder.RegisterSettings<AppSettings>("AppSettings");
 
             // register all of the acr stuff you want to use
             builder.UseHttpTransfers<SampleAllDelegate>();

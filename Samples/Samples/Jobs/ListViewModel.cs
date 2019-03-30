@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Shiny.Jobs;
 using Acr.UserDialogs;
 using ReactiveUI;
-
+using ReactiveUI.Fody.Helpers;
 
 namespace Samples.Jobs
 {
@@ -28,7 +28,7 @@ namespace Samples.Jobs
                     .Select(x => new CommandItem
                     {
                         Text = x.Identifier,
-                        Detail = x.LastRunUtc?.ToLocalTime().ToString("R") ?? "Never Run",
+                        Detail = x.LastRunUtc?.ToLocalTime().ToString("G") ?? "Never Run",
                         PrimaryCommand = ReactiveCommand.CreateFromTask(async () =>
                         {
                             try
@@ -46,7 +46,6 @@ namespace Samples.Jobs
                         )
                     })
                     .ToList();
-                this.RaisePropertyChanged(nameof(this.Jobs));
             });
             this.BindBusyCommand(this.LoadJobs);
 
@@ -82,7 +81,7 @@ namespace Samples.Jobs
         public ReactiveCommand<Unit, Unit> LoadJobs { get; }
         public ReactiveCommand<Unit, Unit> CancelAllJobs { get; }
         public ReactiveCommand<Unit, Unit> RunAllJobs { get; }
-        public List<CommandItem> Jobs { get; private set; }
+        [Reactive] public List<CommandItem> Jobs { get; private set; }
 
 
         public override void OnAppearing()

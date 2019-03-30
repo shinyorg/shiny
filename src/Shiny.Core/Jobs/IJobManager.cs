@@ -46,16 +46,24 @@ namespace Shiny.Jobs
         /// </summary>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-        Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default(CancellationToken));
+        Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default);
 
 
         /// <summary>
         /// Run a specific job adhoc
         /// </summary>
-        /// <param name="jobName"></param>
+        /// <param name="jobIdentifier"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-        Task<JobRunResult> Run(string jobName, CancellationToken cancelToken = default(CancellationToken));
+        Task<JobRunResult> Run(string jobIdentifier, CancellationToken cancelToken = default);
+
+
+        /// <summary>
+        /// Get a job by its registered name
+        /// </summary>
+        /// <param name="jobIdentifier"></param>
+        /// <returns></returns>
+        Task<JobInfo> GetJob(string jobIdentifier);
 
 
         /// <summary>

@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using Shiny.Jobs;
 using Acr.UserDialogs;
+using ReactiveUI;
 using Samples.Models;
 using Samples.Infrastructure;
-using Shiny.Infrastructure;
-using ReactiveUI;
 using Shiny;
+using Shiny.Jobs;
+using Shiny.Infrastructure;
+
 
 namespace Samples.Jobs
 {
@@ -17,6 +19,7 @@ namespace Samples.Jobs
         readonly IJobManager jobManager;
         readonly SampleSqliteConnection conn;
         readonly ISerializer serializer;
+
 
         public LogViewModel(IJobManager jobManager,
                             IUserDialogs dialogs,
@@ -54,7 +57,7 @@ namespace Samples.Jobs
             var logs = await this.conn.JobLogs.ToListAsync();
             return logs.Select(x =>
             {
-                var title = $"{x.JobName} ({x.JobType})";
+                var title = $"{x.JobIdentifier} ({x.JobType})";
                 var msg = x.Started ? "Started" : "Finished";
                 if (x.Error != null)
                     msg = $"ERROR - {x.Error}";
@@ -65,16 +68,24 @@ namespace Samples.Jobs
                 {
                     Text = title,
                     Detail = msg,
-                    PrimaryCommand = ReactiveCommand.Create(() =>
+                    PrimaryCommand = ReactiveCommand.CreateFromTask(async () =>
                     {
-                        var s = $"{msg}{Environment.NewLine}";
+                        var job = await this.jobManager.GetJob(x.JobIdentifier);
+
+                        var sb = new StringBuilder()
+                            .AppendLine(msg)
+                            .AppendLine($"Battery: {job.BatteryNotLow}")
+                            .AppendLine($"Internet: {job.RequiredInternetAccess}")
+                            .AppendLine($"Charging: {job.DeviceCharging}")
+                            .AppendLine($"Repeat: {job.Repeat}");
+
                         if (!x.Parameters.IsEmpty())
                         {
                             var parameters = this.serializer.Deserialize<Dictionary<string, object>>(x.Parameters);
                             foreach (var p in parameters)
-                                s += $"{Environment.NewLine}{p.Key}: {p.Value}";
+                                sb.AppendLine().Append($"{p.Key}: {p.Value}");
                         }
-                        this.Dialogs.Alert(s, title);
+                        this.Dialogs.Alert(sb.ToString(), title);
                     })
                 };
             });

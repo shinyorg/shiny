@@ -22,26 +22,23 @@ namespace Samples
             this.networkReach = connectivity
                 .WhenAnyValue(x => x.Reach)
                 .Select(x => x.ToString())
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.NetworkReach);
 
             this.networkAccess = connectivity
                 .WhenAnyValue(x => x.Access)
                 .Select(x => x.ToString())
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.NetworkAccess);
 
             this.powerStatus = powerManager
                 .WhenAnyValue(x => x.Status)
                 .Select(x => x.ToString())
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.PowerStatus);
 
             this.batteryPercentage = powerManager
                 .WhenAnyValue(x => x.BatteryLevel)
-                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToProperty(this, x => x.BatteryPercentage);
         }
+
 
         public string AppIdentifier => this.environment.AppIdentifier;
         public string AppVersion => this.environment.AppVersion;

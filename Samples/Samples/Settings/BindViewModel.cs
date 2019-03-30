@@ -16,13 +16,11 @@ namespace Samples.Settings
         {
             this.settings = settings;
             this.WhenAnyValue(
-                    x => x.YourText,
-                    x => x.IsChecked
-                )
-                .Skip(1)
-                .Subscribe(_ =>
-                    this.LastUpdated = DateTime.Now
-                );
+                x => x.YourText,
+                x => x.IsChecked
+            )
+            .Skip(1)
+            .Subscribe(_ => this.LastUpdated = DateTime.Now);
         }
 
 
@@ -31,16 +29,16 @@ namespace Samples.Settings
         [Reactive] public DateTime? LastUpdated { get; set; }
 
 
-        public override void OnAppearing()
+        protected override void OnStart()
         {
-            base.OnAppearing();
-            this.settings.Bind(this);
+            base.OnStart();
+            this.settings.Bind(this, "AppSettings");
         }
 
 
-        public override void OnDisappearing()
+        public override void Destroy()
         {
-            base.OnDisappearing();
+            base.Destroy();
             this.settings.UnBind(this);
         }
     }
