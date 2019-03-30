@@ -20,6 +20,9 @@ namespace Samples.Beacons
 
         protected override Task ClearLogs() => this.conn.DeleteAllAsync<BeaconEvent>();
         protected override async Task<IEnumerable<BeaconEvent>> LoadLogs()
-            => await this.conn.BeaconEvents.OrderBy(x => x.Date).ToListAsync();
+            => await this.conn
+                .BeaconEvents
+                .OrderByDescending(x => x.Date)
+                .ToListAsync();
     }
 }
