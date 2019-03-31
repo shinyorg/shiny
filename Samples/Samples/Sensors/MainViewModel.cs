@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Shiny.Sensors;
 
 
@@ -8,13 +9,13 @@ namespace Samples.Sensors
     public class MainViewModel
     {
         public List<ISensorViewModel> Sensors { get; }
+        public bool HasSensors => this.Sensors.Any();
 
 
         public MainViewModel(IAccelerometer accelerometer = null,
                              IGyroscope gyroscope = null,
                              IMagnetometer magnetometer = null,
                              ICompass compass = null,
-                             IDeviceOrientation orientation = null,
                              IAmbientLight ambientLight = null,
                              IBarometer barometer = null,
                              IPedometer pedometer = null,
@@ -26,7 +27,6 @@ namespace Samples.Sensors
             this.AddIf(gyroscope, "G");
             this.AddIf(magnetometer, "M");
             this.AddIf(compass, "D");
-            this.AddIf(orientation, "Position");
             this.AddIf(ambientLight, "Light");
             this.AddIf(barometer, "Pressure");
             this.AddIf(pedometer, "Steps");
