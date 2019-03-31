@@ -12,4 +12,4 @@ Settings[DocsKeys.BlogTitle] = "Releases";
 //Settings[DocsKeys.SourceFiles] = null;
 //Settings[DocsKeys.SolutionFiles] = "c:/dev/shiny/Libs.sln";
 //Settings[DocsKeys.SourceFiles] = @"c:/dev/shiny/src/**/{!platforms,!infrastructure,!bin,!obj,!packages,!*.Tests,}/**/*.cs";
-Settings[DocsKeys.SourceFiles] = @"/src/**/{!platforms,!infrastructure,!bin,!obj,!packages}/**/*.cs";
+Settings[DocsKeys.SourceFiles] = @"C:/dev/shiny/src/**/{!platforms,!infrastructure,!bin,!obj,!packages,}/**/*.cs";

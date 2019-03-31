@@ -43,6 +43,7 @@ namespace Samples
 
             containerRegistry.RegisterForNavigation<Geofencing.MainPage>("Geofencing");
             containerRegistry.RegisterForNavigation<HttpTransfers.MainPage>("HttpTransfers");
+            containerRegistry.RegisterForNavigation<HttpTransfers.NewPage>("NewTask");
             containerRegistry.RegisterForNavigation<Jobs.MainPage>("Jobs");
             containerRegistry.RegisterForNavigation<Notifications.MainPage>("Notifications");
             containerRegistry.RegisterForNavigation<Sensors.MainPage>("Sensors");

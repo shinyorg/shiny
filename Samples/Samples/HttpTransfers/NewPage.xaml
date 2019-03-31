@@ -18,6 +18,9 @@
                 <Label Text="Is Upload" />
                 <Switch IsToggled="{Binding IsUpload}" />
 
+                <Label Text="Allow Metered Connections" />
+                <Switch IsToggled="{Binding UseMeteredConnection}" />
+
                 <Button Text="Save Task" Command="{Binding Save}" />
             </StackLayout>
         </ScrollView>

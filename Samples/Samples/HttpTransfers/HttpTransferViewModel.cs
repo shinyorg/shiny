@@ -1,14 +1,10 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Shiny;
-using Shiny.Net.Http;
-using Acr.UserDialogs;
 using Humanizer;
 using ReactiveUI;
-using Xamarin.Forms;
+using Shiny;
+using Shiny.Net.Http;
 
 
 namespace Samples.HttpTransfers
@@ -22,7 +18,7 @@ namespace Samples.HttpTransfers
         public HttpTaskViewModel(IHttpTransfer transfer)
         {
             this.transfer = transfer;
-            this.Cancel = new Command(transfer.Cancel);
+            this.Cancel = ReactiveCommand.Create(transfer.Cancel);
 
             this.taskSub = transfer
                 .WhenAnyProperty()

@@ -38,6 +38,18 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Update="HttpTransfers\PendingPage.xaml.cs">
+        <DependentUpon>PendingPage.xaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="HttpTransfers\LogPage.xaml">
+        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      </EmbeddedResource>
+      <EmbeddedResource Update="HttpTransfers\MainPage.xaml">
+        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      </EmbeddedResource>
       <EmbeddedResource Update="Logging\EventsPage.xaml">
         <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       </EmbeddedResource>
