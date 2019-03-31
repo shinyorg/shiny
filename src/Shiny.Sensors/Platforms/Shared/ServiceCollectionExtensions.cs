@@ -50,16 +50,6 @@ namespace Shiny.Sensors
         }
 
 
-        public static bool UseDeviceOrientationSensor(this IServiceCollection builder)
-        {
-#if NETSTANDARD
-            return false;
-#else
-            builder.AddSingleton<IDeviceOrientation, DeviceOrientationImpl>();
-            return true;
-#endif
-        }
-
         public static bool UseGyroscope(this IServiceCollection builder)
         {
 #if NETSTANDARD
