@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Shiny.Jobs;
 
 
-namespace Shiny.Testing
+namespace Shiny.Testing.Jobs
 {
     public class TestJobManager : IJobManager
     {

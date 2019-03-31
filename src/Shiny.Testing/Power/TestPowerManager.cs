@@ -2,9 +2,9 @@
 using Shiny.Power;
 
 
-namespace Shiny.Testing
+namespace Shiny.Testing.Power
 {
-    public class PowerManager : NotifyPropertyChanged, IPowerManager
+    public class TestPowerManager : NotifyPropertyChanged, IPowerManager
     {
         PowerState powerState = PowerState.Charged;
         public PowerState Status

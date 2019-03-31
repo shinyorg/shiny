@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Shiny.Notifications;
 
 
-namespace Shiny.Testing
+namespace Shiny.Testing.Notifications
 {
     public class TestNotifications : INotificationManager
     {

@@ -3,7 +3,7 @@
 
 namespace Shiny.Testing
 {
-    public class EnvironmentImpl : IEnvironment
+    public class TestEnvironment : IEnvironment
     {
         public string AppIdentifier { get; set; } = "UnitTests";
         public string AppVersion { get; set; } = "0.1";

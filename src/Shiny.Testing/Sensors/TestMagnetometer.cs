@@ -2,7 +2,7 @@
 using Shiny.Sensors;
 
 
-namespace Shiny.Testing
+namespace Shiny.Testing.Sensors
 {
     public class TestMagnetometer : AbstractTestSensor<MotionReading>, IMagnetometer
     {

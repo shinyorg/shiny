@@ -2,7 +2,8 @@
 using System.Reactive.Subjects;
 using Shiny.Sensors;
 
-namespace Shiny.Testing
+
+namespace Shiny.Testing.Sensors
 {
     public abstract class AbstractTestSensor<T> : ISensor<T>
     {
