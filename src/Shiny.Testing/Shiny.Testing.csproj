@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Description>Shiny mocks to make your unit testing life easier</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
+    </ItemGroup>
+
+</Project>
