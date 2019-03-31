@@ -5,6 +5,7 @@ namespace Shiny.Net.Http
 {
     public enum HttpTransferState
     {
+        Unknown,
         Paused,
         PausedByNoNetwork,
         PausedByCostedNetwork,

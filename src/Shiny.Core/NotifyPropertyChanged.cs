@@ -41,6 +41,12 @@ namespace Shiny
 
 
         /// <summary>
+        /// Returns true if anyone is hooked to PropertyChanged
+        /// </summary>
+        protected bool HasSubscribers => this.handler != null;
+
+
+        /// <summary>
         /// Manually raise a PropertyChanged event for the caller member name or set property name
         /// </summary>
         /// <param name="propertyName"></param>

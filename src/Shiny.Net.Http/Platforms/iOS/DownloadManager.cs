@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Net.Http.Infrastructure;
 using Foundation;
 
 
@@ -49,7 +48,7 @@ namespace Shiny.Net.Http
 
         public async Task CancelAll()
         {
-            await this.repository.GetAll<HttpTransferStore>();
+            await this.repository.GetAll<HttpTransferRequest>();
 
             throw new NotImplementedException();
         }
