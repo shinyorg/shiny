@@ -18,7 +18,7 @@ namespace Samples.HttpTransfers
         public HttpTaskViewModel(IHttpTransfer transfer)
         {
             this.transfer = transfer;
-            this.Cancel = ReactiveCommand.Create(transfer.Cancel);
+            //this.Cancel = ReactiveCommand.Create(transfer.Cancel);
 
             this.taskSub = transfer
                 .WhenAnyProperty()
@@ -35,7 +35,7 @@ namespace Samples.HttpTransfers
         public string TransferSpeed => Math.Round(this.transfer.BytesPerSecond.Bytes().Kilobytes, 2) + " Kb/s";
         public string EstimateMinsRemaining => Math.Round(this.transfer.EstimatedCompletionTime.TotalMinutes, 1) + " min(s)";
 
-        public ICommand Cancel { get; }
+        //public ICommand Cancel { get; }
         public ICommand MoreInfo { get; }
     }
 }

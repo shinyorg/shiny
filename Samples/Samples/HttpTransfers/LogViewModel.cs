@@ -9,13 +9,12 @@ using Samples.Models;
 
 namespace Samples.HttpTransfers
 {
-    public class LogViewModel : AbstractLogViewModel<CommandItem>
+    public class LogViewModel : AbstractLogViewModel<HttpEvent>
     {
         readonly SampleSqliteConnection conn;
 
 
-        public LogViewModel(IUserDialogs dialogs,
-                            SampleSqliteConnection conn) : base(dialogs)
+        public LogViewModel(IUserDialogs dialogs, SampleSqliteConnection conn) : base(dialogs)
         {
             this.conn = conn;
         }
@@ -23,14 +22,9 @@ namespace Samples.HttpTransfers
 
         protected override Task ClearLogs() => this.conn.DeleteAllAsync<HttpEvent>();
 
-        protected override async Task<IEnumerable<CommandItem>> LoadLogs()
-        {
-            var events = await this.conn
-                .HttpEvents
-                .OrderByDescending(x => x.DateCreated)
-                .ToListAsync();
-
-            return Enumerable.Empty<CommandItem>();
-        }
+        protected override async Task<IEnumerable<HttpEvent>> LoadLogs() => await this.conn
+            .HttpEvents
+            .OrderByDescending(x => x.DateCreated)
+            .ToListAsync();
     }
 }

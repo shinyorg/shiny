@@ -114,18 +114,28 @@ namespace Samples.ShinySetup
             });
         }
 
-        public void OnStatusChanged(IHttpTransfer transfer)
-        {
-        }
+
+        public async void OnStatusChanged(IHttpTransfer transfer)
+            => await this.CreateHttpTransferEvent(transfer, $"Status Changed: {transfer.Status}");
 
 
-        public void OnError(IHttpTransfer transfer, Exception ex)
-        {
-        }
+        public async void OnError(IHttpTransfer transfer, Exception ex)
+            => await this.CreateHttpTransferEvent(transfer, "ERROR: " + ex);
 
 
-        public void OnCompleted(IHttpTransfer transfer)
-        {
-        }
+        public async void OnCompleted(IHttpTransfer transfer)
+            => await this.CreateHttpTransferEvent(transfer, "COMPLETE");
+
+
+        Task CreateHttpTransferEvent(IHttpTransfer transfer, string description)
+            => this.conn.InsertAsync(new HttpEvent
+            {
+                Identifier = transfer.Identifier,
+                IsUpload = transfer.IsUpload,
+                FileSize = transfer.FileSize,
+                Uri = transfer.Request.Uri,
+                Description = description,
+                DateCreated = DateTime.Now
+            });
     }
 }
