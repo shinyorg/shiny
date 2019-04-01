@@ -98,7 +98,7 @@ namespace Shiny.Net.Http
         {
             var query = new Native.Query();
             query.SetFilterById(id);
-            using (var cursor = this.GetManager().InvokeQuery(query))
+            using (var cursor = this.context.GetManager().InvokeQuery(query))
             {
                 if (cursor.MoveToFirst())
                 {
@@ -107,9 +107,6 @@ namespace Shiny.Net.Http
             }
             return null;
         }
-
-
-
 
 
         IHttpTransfer ToLib(ICursor cursor)
