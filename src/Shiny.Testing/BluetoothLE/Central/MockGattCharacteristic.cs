@@ -4,7 +4,7 @@ using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Central;
 
 
-namespace Shiny.Devices.Tests.BluetoothLE.Mocks
+namespace Shiny.Testing.BluetoothLE.Central
 {
     public class MockGattCharacteristic : AbstractGattCharacteristic
     {
@@ -14,7 +14,7 @@ namespace Shiny.Devices.Tests.BluetoothLE.Mocks
         }
 
         private byte[] _value;
-        public override byte[] Value => this._value;
+        public override byte[] Value { get; }
 
         public override IObservable<CharacteristicGattResult> DisableNotifications()
         {

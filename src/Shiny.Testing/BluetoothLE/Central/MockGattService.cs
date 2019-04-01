@@ -2,7 +2,7 @@
 using Shiny.BluetoothLE.Central;
 
 
-namespace Shiny.Devices.Tests.BluetoothLE.Mocks
+namespace Shiny.Testing.BluetoothLE.Central
 {
     public class MockGattService : IGattService
     {

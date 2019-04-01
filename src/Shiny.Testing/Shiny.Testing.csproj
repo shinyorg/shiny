@@ -6,11 +6,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />
+        <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="BluetoothLE\Central\" />
     </ItemGroup>
 
 </Project>
