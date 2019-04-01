@@ -2,11 +2,11 @@
 <MasterDetailPage xmlns="http://xamarin.com/schemas/2014/forms"
                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                   x:Class="Samples.MainPage"
-                  Title="ACR Core"
+                  Title="Shiny"
                   IsPresented="{Binding IsPresented}">
 
     <MasterDetailPage.Master>
-        <ContentPage Title="Menu">
+        <ContentPage Title="Menu" BackgroundColor="{StaticResource PrimaryDark}">
             <TableView Intent="Menu">
                 <TableRoot>
                     <TableSection>

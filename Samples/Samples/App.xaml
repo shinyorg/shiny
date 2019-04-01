@@ -6,15 +6,74 @@
                         xmlns:sample="clr-namespace:Samples"
                         x:Class="Samples.App">
     <prism:PrismApplication.Resources>
-        <Style x:Key="NoDataLabel" TargetType="Label">
-            <Setter Property="FontSize" Value="{DynamicResource Large}" />
-            <Setter Property="HorizontalTextAlignment" Value="Center" />
-            <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-            <Setter Property="VerticalTextAlignment" Value="Center" />
-            <Setter Property="VerticalOptions" Value="FillAndExpand" />
-        </Style>
+        <ResourceDictionary>
+            <!--https://coolors.co/c2e812-91f5ad-8b9eb7-745296-632a50-->
+            <Color x:Key="Primary">#C2E812</Color>
+            <Color x:Key="PrimaryDark">#4ba677</Color>
+            <Color x:Key="Accent">#745296</Color>
+            <Color x:Key="NavigationBarTextColor">White</Color>
 
-        <acr:InverseBooleanConverter x:Key="Not" />
-        <sample:PercentToDecimalValueConverter x:Key="PercentToDecimalValueConverter" />
+            <Style TargetType="Button">
+                <Setter Property="CornerRadius" Value="23" />
+                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="Margin" Value="4" />
+                <!--
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                    <Setter Property="TextColor" Value="White" />
+                                </VisualState.Setters>
+                            </VisualState>
+
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="White" />
+                                    <Setter Property="TextColor" Value="{StaticResource Accent}" />
+                                </VisualState.Setters>
+                            </VisualState>
+
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+                -->
+                <Style.Triggers>
+                    <Trigger TargetType="Button" Property="IsEnabled" Value="True">
+                        <Setter Property="Opacity" Value="1.0" />
+                    </Trigger>
+                    <Trigger TargetType="Button" Property="IsEnabled" Value="False">
+                        <Setter Property="Opacity" Value="0.6" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="NavigationPage" ApplyToDerivedTypes="true">
+                <Setter Property="BarTextColor" Value="{StaticResource NavigationBarTextColor}" />
+                <Setter Property="BarBackgroundColor" Value="{StaticResource PrimaryDark}" />
+            </Style>
+
+            <Style TargetType="TabbedPage" ApplyToDerivedTypes="true">
+                <Setter Property="BarTextColor" Value="{StaticResource NavigationBarTextColor}" />
+                <Setter Property="BarBackgroundColor" Value="{StaticResource PrimaryDark}" />
+            </Style>
+
+            <Style TargetType="Switch" ApplyToDerivedTypes="True">
+                <Setter Property="OnColor" Value="{StaticResource Primary}" />
+            </Style>
+
+            <Style x:Key="NoDataLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="{DynamicResource Large}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+            </Style>
+
+            <acr:InverseBooleanConverter x:Key="Not" />
+            <sample:PercentToDecimalValueConverter x:Key="PercentToDecimalValueConverter" />
+        </ResourceDictionary>
     </prism:PrismApplication.Resources>
 </prism:PrismApplication>

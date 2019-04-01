@@ -18,11 +18,21 @@ namespace Samples
 {
     public partial class App : PrismApplication
     {
-        public App() : base(null)
-            => this.InitializeComponent();
+        public App() : base(null) => this.InitializeComponent();
+        public App(IPlatformInitializer initializer) : base(initializer) { }
 
-        public App(IPlatformInitializer initializer) : base(initializer)
-            => this.InitializeComponent();
+
+        protected override async void OnInitialized()
+        {
+            this.InitializeComponent();
+            ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(viewType =>
+            {
+                var viewModelTypeName = viewType.FullName.Replace("Page", "ViewModel");
+                var viewModelType = Type.GetType(viewModelTypeName);
+                return viewModelType;
+            });
+            await this.NavigationService.Navigate("Main/Nav/Welcome");
+        }
 
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
@@ -54,18 +64,6 @@ namespace Samples
             containerRegistry.RegisterForNavigation<FileSystemPage>("FileSystem");
             containerRegistry.RegisterForNavigation<EnvironmentPage>("Environment");
             containerRegistry.RegisterForNavigation<Settings.MainPage>("Settings");
-        }
-
-
-        protected override async void OnInitialized()
-        {
-            ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver(viewType =>
-            {
-                var viewModelTypeName = viewType.FullName.Replace("Page", "ViewModel");
-                var viewModelType = Type.GetType(viewModelTypeName);
-                return viewModelType;
-            });
-            await this.NavigationService.NavigateAsync("Main/Nav/Welcome");
         }
 
 
