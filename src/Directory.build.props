@@ -37,6 +37,7 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DebugType>pdbonly</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">

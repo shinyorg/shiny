@@ -84,7 +84,7 @@ namespace Shiny.Net.Http
 
         public IEnumerable<IHttpTransfer> GetAll()
         {
-            using (var cursor = this.GetManager().InvokeQuery(new Native.Query()))
+            using (var cursor = this.context.GetManager().InvokeQuery(new Native.Query()))
             {
                 while (cursor.MoveToNext())
                 {

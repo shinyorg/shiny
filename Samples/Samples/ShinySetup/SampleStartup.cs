@@ -49,7 +49,6 @@ namespace Samples.ShinySetup
             builder.UseAmbientLightSensor();
             builder.UseBarometer();
             builder.UseCompass();
-            builder.UseDeviceOrientationSensor();
             builder.UseMagnetometer();
             builder.UsePedometer();
             builder.UseProximitySensor();
