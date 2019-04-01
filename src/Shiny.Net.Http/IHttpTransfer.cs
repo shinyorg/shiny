@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.IO;
+
 
 namespace Shiny.Net.Http
 {
@@ -21,9 +21,5 @@ namespace Shiny.Net.Http
         DateTimeOffset StartTime { get; }
 
         Exception Exception { get; }
-
-        //void Start(); // or resume
-        //void Pause();
-        void Cancel();
     }
 }

@@ -43,6 +43,13 @@ namespace Shiny.Net.Http
             //});
         }
 
+
+        public Task Cancel(IHttpTransfer transfer)
+        {
+            return Task.CompletedTask;
+        }
+
+
         public async Task CancelAll()
         {
             await this.repository.GetAll<HttpTransferRequest>();
@@ -55,7 +62,7 @@ namespace Shiny.Net.Http
         {
             var task = this.session.CreateUploadTask(
                 request.ToNative(),
-                NSUrl.FromFilename(request.LocalFilePath.FullName)
+                NSUrl.FromFilename(request.LocalFile.FullName)
             );
             return null;
         }

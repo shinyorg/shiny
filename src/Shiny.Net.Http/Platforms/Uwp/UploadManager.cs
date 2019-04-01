@@ -7,6 +7,12 @@ namespace Shiny.Net.Http
 {
     public class UploadManager : IUploadManager
     {
+        public Task Cancel(IHttpTransfer transfer)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public async Task CancelAll()
         {
             var uploads = await BackgroundUploader.GetCurrentUploadsAsync();

@@ -2,39 +2,29 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
 
 namespace Shiny.Net.Http
 {
+
     public class UploadHttpTransfer : AbstractHttpTransfer
     {
         readonly HttpClient httpClient;
         readonly CancellationTokenSource cancelSrc;
 
 
-        public UploadHttpTransfer(HttpTransferRequest request) : base(request, true)
+        public UploadHttpTransfer(HttpTransferRequest request, string identifier) : base(request, false)
         {
+            this.Identifier = identifier;
+
             this.httpClient = new HttpClient();
             this.cancelSrc = new CancellationTokenSource();
-            //this.Identifier = identifier;
-
-            //this.GetManager().Remove(id);
+            this.Identifier = identifier;
+            this.DoUpload();
         }
-
-
-        //Task Run() => Task.Run(async () =>
-        //{
-        //    if (this.IsUpload)
-        //    {
-        //        await this.DoUpload().ConfigureAwait(false);
-        //    }
-        //    else
-        //    {
-        //        await this.DoDownload().ConfigureAwait(false);
-        //    }
-        //});
 
 
         //public override void Cancel()
@@ -47,12 +37,8 @@ namespace Shiny.Net.Http
 
         async Task DoUpload()
         {
-            var lfp = this.Request.LocalFile;
-            if (!lfp.Exists)
-                throw new ArgumentException($"Local '{lfp.FullName}' file does not exist");
-
-            this.FileSize = lfp.Length;
-            this.RemoteFileName = lfp.Name;
+            this.FileSize = this.Request.LocalFile.Length;
+            this.RemoteFileName = this.Request.LocalFile.Name;
 
             while (this.Status != HttpTransferState.Completed && !this.cancelSrc.IsCancellationRequested)
             {
@@ -61,7 +47,7 @@ namespace Shiny.Net.Http
                     var content = new MultipartFormDataContent();
                     content.Add(
                         new ProgressStreamContent(
-                            lfp.OpenRead(),
+                            this.Request.LocalFile.OpenRead(),
                             8192,
                             sent =>
                             {
@@ -74,10 +60,17 @@ namespace Shiny.Net.Http
                         this.RemoteFileName
                     );
 
-                    await this.httpClient.PostAsync(this.Request.Uri, content, this.cancelSrc.Token);
+                    await this.httpClient
+                        .PostAsync(this.Request.Uri, content, this.cancelSrc.Token)
+                        .ConfigureAwait(false);
+
                     this.Status = this.cancelSrc.IsCancellationRequested
                         ? HttpTransferState.Cancelled
                         : HttpTransferState.Completed;
+                }
+                catch (TimeoutException)
+                {
+                    this.Status = HttpTransferState.Retrying;
                 }
                 catch (IOException ex)
                 {
@@ -90,6 +83,21 @@ namespace Shiny.Net.Http
                         this.Exception = ex;
                     }
                 }
+                catch (WebException ex)
+                {
+                    switch (ex.Status)
+                    {
+                        case WebExceptionStatus.ConnectFailure:
+                        case WebExceptionStatus.Timeout:
+                            this.Status = HttpTransferState.Retrying;
+                            break;
+
+                        default:
+                            this.Status = HttpTransferState.Error;
+                            this.Exception = ex;
+                            break;
+                    }
+                }
                 catch (TaskCanceledException)
                 {
                     this.Status = this.cancelSrc.IsCancellationRequested
@@ -99,7 +107,6 @@ namespace Shiny.Net.Http
                 catch (Exception ex)
                 {
                     this.Exception = ex;
-                    this.Status = HttpTransferState.Error;
                 }
             }
         }

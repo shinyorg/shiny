@@ -15,11 +15,11 @@ namespace Shiny.Net.Http
         }
 
 
-        public override void Cancel()
-        {
-            this.Status = HttpTransferState.Cancelled;
-            this.task.Cancel();
-        }
+        //public override void Cancel()
+        //{
+        //    this.Status = HttpTransferState.Cancelled;
+        //    this.task.Cancel();
+        //}
 
 
         public void SetDownloadComplete(string tempLocation)

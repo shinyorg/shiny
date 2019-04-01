@@ -26,6 +26,12 @@ namespace Shiny.Net.Http
         }
 
 
+        public Task Cancel(IHttpTransfer transfer)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public Task CancelAll()
         {
             // TODO
@@ -58,7 +64,7 @@ namespace Shiny.Net.Http
 
         public async Task<IHttpTransfer> Create(HttpTransferRequest request)
         {
-            var native = new Native.Request(request.LocalFilePath.ToNativeUri());
+            var native = new Native.Request(request.LocalFile.ToNativeUri());
             //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
             //native.SetAllowedOverRoaming()
             //native.SetNotificationVisibility(DownloadVisibility.Visible);

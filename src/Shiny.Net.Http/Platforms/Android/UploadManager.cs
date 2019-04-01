@@ -18,6 +18,12 @@ namespace Shiny.Net.Http
         }
 
 
+        public Task Cancel(IHttpTransfer transfer)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public Task CancelAll()
         {
             throw new NotImplementedException();
@@ -28,6 +34,7 @@ namespace Shiny.Net.Http
         {
             throw new NotImplementedException();
         }
+
 
         public Task<IEnumerable<IHttpTransfer>> GetTransfers()
         {

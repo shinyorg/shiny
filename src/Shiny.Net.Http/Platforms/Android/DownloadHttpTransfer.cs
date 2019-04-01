@@ -51,10 +51,5 @@ namespace Shiny.Net.Http
             }
             this.RunCalculations();
         }
-
-
-        public override void Cancel()
-        {
-        }
     }
 }

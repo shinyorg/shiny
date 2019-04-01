@@ -15,10 +15,5 @@ namespace Shiny.Net.Http
         {
 
         }
-
-
-        public override void Cancel()
-        {
-        }
     }
 }

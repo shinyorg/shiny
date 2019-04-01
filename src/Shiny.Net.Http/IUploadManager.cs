@@ -9,6 +9,7 @@ namespace Shiny.Net.Http
     {
         Task<IEnumerable<IHttpTransfer>> GetTransfers();
         Task<IHttpTransfer> Create(HttpTransferRequest request);
+        Task Cancel(IHttpTransfer transfer);
         Task CancelAll();
     }
 }

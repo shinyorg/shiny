@@ -12,11 +12,5 @@ namespace Shiny.Net.Http
         {
             this.task = task;
         }
-
-
-        public override void Cancel()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

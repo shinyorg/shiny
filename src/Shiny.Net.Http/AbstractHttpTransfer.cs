@@ -28,7 +28,6 @@ namespace Shiny.Net.Http
 		}
 
 
-        public abstract void Cancel();
         public HttpTransferRequest Request { get; }
         public bool IsUpload { get; }
 

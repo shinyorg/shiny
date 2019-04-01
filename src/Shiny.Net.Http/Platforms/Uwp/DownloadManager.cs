@@ -10,11 +10,9 @@ namespace Shiny.Net.Http
 {
     public class DownloadManager : IDownloadManager
     {
-        readonly IFileSystem fileSystem;
-
-        public DownloadManager(IFileSystem fileSystem)
+        public Task Cancel(IHttpTransfer transfer)
         {
-            this.fileSystem = fileSystem;
+            throw new NotImplementedException();
         }
 
 
@@ -39,7 +37,7 @@ namespace Shiny.Net.Http
                 task.SetRequestHeader(header.Key, header.Value);
 
             //var filePath = config.LocalFilePath ?? Path.Combine(ApplicationData.Current.LocalFolder.Path, Path.GetRandomFileName());
-            var winFile = await StorageFile.GetFileFromPathAsync(request.LocalFilePath.FullName).AsTask();
+            var winFile = await StorageFile.GetFileFromPathAsync(request.LocalFile.FullName).AsTask();
             var op = task.CreateDownload(new Uri(request.Uri), winFile);
 
             //var operation = task.CreateDownload(new Uri(config.Uri), file);
@@ -50,7 +48,9 @@ namespace Shiny.Net.Http
 
         public async Task<IEnumerable<IHttpTransfer>> GetTransfers()
         {
-            var downloads = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
+            var downloads = await BackgroundDownloader
+                .GetCurrentDownloadsAsync()
+                .AsTask();
 
             return null;
         }

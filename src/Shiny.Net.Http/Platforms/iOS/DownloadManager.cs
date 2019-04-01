@@ -46,6 +46,13 @@ namespace Shiny.Net.Http
             //});
         }
 
+
+        public Task Cancel(IHttpTransfer transfer)
+        {
+            return Task.CompletedTask;
+        }
+
+
         public async Task CancelAll()
         {
             await this.repository.GetAll<HttpTransferRequest>();

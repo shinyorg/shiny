@@ -12,10 +12,18 @@ namespace Shiny.Net.Http
             throw new NotImplementedException();
         }
 
+
         public Task<IHttpTransfer> Create(HttpTransferRequest request)
         {
             throw new NotImplementedException();
         }
+
+
+        public Task Cancel(IHttpTransfer transfer)
+        {
+            return Task.CompletedTask;
+        }
+
 
         public Task<IEnumerable<IHttpTransfer>> GetTransfers()
         {

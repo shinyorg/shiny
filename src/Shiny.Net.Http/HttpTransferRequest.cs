@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 
+
 namespace Shiny.Net.Http
 {
     public class HttpTransferRequest
@@ -14,15 +15,16 @@ namespace Shiny.Net.Http
         /// For uploads, localFilePath MUST be set
         /// For downloads, localFilePath can be empty and will be given a temporary filename.  The result set will also contain the remote filename from the server.  You can move the file upon completion
         /// </param>
-        public HttpTransferRequest(string uri, string localFilePath)
+        public HttpTransferRequest(string uri, string localFilePath) : this(uri, new FileInfo(localFilePath)) { }
+        public HttpTransferRequest(string uri, FileInfo localFile)
         {
             this.Uri = uri;
-            this.LocalFilePath = new FileInfo(localFilePath);
+            this.LocalFile = localFile;
         }
 
 
         public string Uri { get; }
-        public FileInfo LocalFilePath { get; set; }
+        public FileInfo LocalFile { get; set; }
         public bool UseMeteredConnection { get; set; }
         public HttpMethod HttpMethod { get; set; } = HttpMethod.Get;
         public string PostData { get; set; }
