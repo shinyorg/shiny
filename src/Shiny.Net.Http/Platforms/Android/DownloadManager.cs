@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Database;
-using Android.Content;
 using Shiny.Infrastructure;
 using Native = Android.App.DownloadManager;
 
@@ -72,7 +71,7 @@ namespace Shiny.Net.Http
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
 
-            var id = this.GetManager().Enqueue(native);
+            var id = this.context.GetManager().Enqueue(native);
             await this.repository.Set(id.ToString(), request);
 
             var transfer = new DownloadHttpTransfer(request, id);
@@ -110,14 +109,7 @@ namespace Shiny.Net.Http
         }
 
 
-        Native downloadManager;
-        Native GetManager()
-        {
-            if (this.downloadManager == null || this.downloadManager.Handle == IntPtr.Zero)
-                this.downloadManager = (Native)this.context.AppContext.GetSystemService(Context.DownloadService);
 
-            return this.downloadManager;
-        }
 
 
         IHttpTransfer ToLib(ICursor cursor)
