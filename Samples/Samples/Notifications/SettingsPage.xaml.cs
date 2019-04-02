@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 using Xamarin.Forms;
 
 
 namespace Samples.Notifications
 {
-    public partial class MainPage : TabbedPage
+    public partial class SettingsPage : ContentPage
     {
-        public MainPage()
+        public SettingsPage()
         {
             this.InitializeComponent();
         }

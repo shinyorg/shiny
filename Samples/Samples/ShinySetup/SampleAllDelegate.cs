@@ -9,6 +9,7 @@ using Shiny.Jobs;
 using Shiny.Net.Http;
 using Shiny.Notifications;
 using Samples.Models;
+using Samples.Settings;
 
 
 namespace Samples.ShinySetup
@@ -23,12 +24,15 @@ namespace Samples.ShinySetup
         // notice you can inject anything you registered in your application here
         readonly SampleSqliteConnection conn;
         readonly INotificationManager notifications;
+        readonly AppSettings appSettings;
 
 
         public SampleAllDelegate(SampleSqliteConnection conn,
+                                 AppSettings appSettings,
                                  INotificationManager notifications)
         {
             this.conn = conn;
+            this.appSettings = appSettings;
             this.notifications = notifications;
         }
 
@@ -40,6 +44,11 @@ namespace Samples.ShinySetup
 
         public void OnConnected(IPeripheral peripheral)
         {
+            //await this.DoNotification(
+            //    "BluetoothLE Device Connected",
+            //    $"{region.Identifier} was {newStatus}",
+            //    this.appSettings.UseBleNotifications
+            //);
         }
 
 
@@ -51,11 +60,11 @@ namespace Samples.ShinySetup
                 Entered = newStatus == GeofenceState.Entered,
                 Date = DateTime.Now
             });
-            await this.notifications.Send(new Notification
-            {
-                Title = "Geofences",
-                Message = $"{region.Identifier} was {newStatus}"
-            });
+            await this.DoNotification(
+                "Geofence Event",
+                $"{region.Identifier} was {newStatus}",
+                this.appSettings.UseNotificationsGeofences
+            );
         }
 
 
@@ -70,16 +79,22 @@ namespace Samples.ShinySetup
                 Entered = newStatus == BeaconRegionState.Entered,
                 Date = DateTime.UtcNow
             });
+            await this.DoNotification
+            (
+                "Beacon Region {newStatus}",
+                $"{region.Identifier} - {region.Uuid}/{region.Major}/{region.Minor}",
+                this.appSettings.UseNotificationsBeaconMonitoring
+            );
         }
 
 
         public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            await this.notifications.Send(new Notification
-            {
-                Title = "Job Started",
-                Message = $"{jobInfo.Identifier} started"
-            });
+            await this.DoNotification(
+                "Job Started",
+                $"{jobInfo.Identifier} Started",
+                this.appSettings.UseNotificationsJobs
+            );
             var loops = jobInfo.Parameters.Get("Loops", 10);
             for (var i = 0; i < loops; i++)
             {
@@ -88,11 +103,11 @@ namespace Samples.ShinySetup
 
                 await Task.Delay(1000, cancelToken).ConfigureAwait(false);
             }
-            await this.notifications.Send(new Notification
-            {
-                Title = "Job Finished",
-                Message = $"{jobInfo.Identifier} Finished"
-            });
+            await this.DoNotification(
+                "Job Finished",
+                $"{jobInfo.Identifier} Finished",
+                this.appSettings.UseNotificationsJobs
+            );
 
             // you really shouldn't lie about this on iOS as it is watching :)
             return true;
@@ -127,8 +142,9 @@ namespace Samples.ShinySetup
             => await this.CreateHttpTransferEvent(transfer, "COMPLETE");
 
 
-        Task CreateHttpTransferEvent(IHttpTransfer transfer, string description)
-            => this.conn.InsertAsync(new HttpEvent
+        async Task CreateHttpTransferEvent(IHttpTransfer transfer, string description)
+        {
+            await this.conn.InsertAsync(new HttpEvent
             {
                 Identifier = transfer.Identifier,
                 IsUpload = transfer.IsUpload,
@@ -137,5 +153,14 @@ namespace Samples.ShinySetup
                 Description = description,
                 DateCreated = DateTime.Now
             });
+            await this.DoNotification("HTTP Transfer", description, appSettings.UseNotificationsHttpTransfers);
+        }
+
+
+        async Task DoNotification(string title, string message, bool enabled)
+        {
+            if (enabled)
+                await this.notifications.Send(new Notification { Title = title, Message = message });
+        }
     }
 }

@@ -2,7 +2,7 @@
 using System.Reactive.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Shiny;
+
 
 namespace Samples.Settings
 {
@@ -26,5 +26,11 @@ namespace Samples.Settings
         [Reactive] public bool IsChecked { get; set; }
         [Reactive] public string YourText { get; set; }
         [Reactive] public DateTime? LastUpdated { get; set; }
+
+        [Reactive] public bool UseNotificationsBle { get; set; } = true;
+        [Reactive] public bool UseNotificationsGeofences { get; set; } = true;
+        [Reactive] public bool UseNotificationsJobs { get; set; } = true;
+        [Reactive] public bool UseNotificationsHttpTransfers { get; set; } = true;
+        [Reactive] public bool UseNotificationsBeaconMonitoring { get; set; } = true;
     }
 }

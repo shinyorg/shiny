@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Notifications.SettingsPage"
+             Title="App Settings">
+    <ContentPage.Content>
+        <TableView Intent="Settings">
+            <TableRoot>
+                <TableSection>
+                    <SwitchCell Text="Toggle All" On="{Binding ToggleAll}" />
+                </TableSection>
+
+                <TableSection Title="Events">
+                    <SwitchCell Text="BluetoothLE" On="{Binding UseNotificationsBle}" />
+                    <SwitchCell Text="Geofences" On="{Binding UseNotificationsGeofences}" />
+                    <SwitchCell Text="Jobs" On="{Binding UseNotificationsJobs}" />
+                    <SwitchCell Text="HTTP Transfers" On="{Binding UseNotificationsHttpTransfers}" />
+                    <SwitchCell Text="Beacon Monitoring" On="{Binding UseNotificationsBeaconMonitoring}" />
+                </TableSection>
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>
