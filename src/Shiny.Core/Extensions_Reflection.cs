@@ -41,5 +41,43 @@ namespace Shiny
 
             return type;
         }
+
+
+        /// <summary>
+        /// Gets an objects property dynamically through reflection - will throw an exception if proper has no getter or property does not exists
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="value"></param>
+        public static object GetValue(this object obj, string propertyName)
+        {
+            var prop = obj.GetType().GetProperty(propertyName);
+            if (prop == null)
+                throw new ArgumentException($"Property {propertyName} does not exist on type {obj.GetType().FullName}");
+
+            if (!prop.CanRead)
+                throw new ArgumentException($"Property {propertyName} does not have a getter on type {obj.GetType().FullName}");
+
+            return prop.GetValue(obj);
+        }
+
+
+        /// <summary>
+        /// Sets an objects property dynamically through reflection - will throw an exception if proper has no setter, wrong type, or property does not exists
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="value"></param>
+        public static void SetValue(this object obj, string propertyName, object value)
+        {
+            var prop = obj.GetType().GetProperty(propertyName);
+            if (prop == null)
+                throw new ArgumentException($"Property {propertyName} does not exist on type {obj.GetType().FullName}");
+
+            if (!prop.CanWrite)
+                throw new ArgumentException($"Property {propertyName} does not have a setter on type {obj.GetType().FullName}");
+
+            prop.SetValue(obj, value);
+        }
     }
 }
