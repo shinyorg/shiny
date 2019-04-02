@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    public static class Extensions_Services
+    public static partial class Extensions
     {
         /// <summary>
         /// Adds an injectable (ICache) cache service that doesn't actually cache at all - good for testing

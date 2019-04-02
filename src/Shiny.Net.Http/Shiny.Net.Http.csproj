@@ -35,9 +35,4 @@
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Platforms\netstandard\DownloadHttpTransfer.cs" />
-      <None Remove="Platforms\netstandard\UploadHttpTransfer.cs" />
-    </ItemGroup>
-
 </Project>

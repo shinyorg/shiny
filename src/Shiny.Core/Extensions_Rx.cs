@@ -24,7 +24,7 @@ namespace Shiny
     }
 
 
-    public static class Extensions_Rx
+    public static partial class Extensions
     {
         /// <summary>
         /// A handy way for replying & completing an observer - common for single valued observables

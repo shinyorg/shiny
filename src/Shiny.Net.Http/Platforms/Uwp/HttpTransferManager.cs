@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shiny.IO;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
 
 
 namespace Shiny.Net.Http
 {
-    public class DownloadManager : IDownloadManager
+    public class HttpTransferManager : IHttpTransferManager
     {
         public Task Cancel(IHttpTransfer transfer)
         {
@@ -46,6 +45,11 @@ namespace Shiny.Net.Http
             return null;
         }
 
+        public Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<IHttpTransfer>> GetTransfers()
         {
             var downloads = await BackgroundDownloader
@@ -53,6 +57,11 @@ namespace Shiny.Net.Http
                 .AsTask();
 
             return null;
+        }
+
+        public IObservable<IHttpTransfer> WhenChanged()
+        {
+            throw new NotImplementedException();
         }
     }
 }

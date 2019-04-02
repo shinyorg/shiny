@@ -21,7 +21,7 @@ namespace Shiny.Net.Http
 			this.PercentComplete = Math.Round(raw, 2);
 
             var elapsedTime = DateTime.Now - this.StartTime;
-			this.BytesPerSecond = this.BytesTransferred / elapsedTime.TotalSeconds;
+			this.BytesPerSecond = Convert.ToInt64(this.BytesTransferred / elapsedTime.TotalSeconds);
 
 			var rawEta = this.FileSize / this.BytesPerSecond;
 			this.EstimatedCompletionTime = TimeSpan.FromSeconds(rawEta);
@@ -101,8 +101,8 @@ namespace Shiny.Net.Http
         }
 
 
-        double bytesPerSecond;
-        public double BytesPerSecond
+        long bytesPerSecond;
+        public long BytesPerSecond
         {
             get => this.bytesPerSecond;
             protected set => this.Set(ref this.bytesPerSecond, value);

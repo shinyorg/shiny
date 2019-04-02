@@ -7,7 +7,7 @@ using Foundation;
 
 namespace Shiny.Net.Http
 {
-    public class UploadManager : IUploadManager
+    public class HttpTransferManager : IHttpTransferManager
     {
         readonly IRepository repository;
         readonly CoreSessionDownloadDelegate sessionDelegate;
@@ -15,10 +15,13 @@ namespace Shiny.Net.Http
         readonly NSUrlSession session;
 
 
-        public UploadManager()
+        public HttpTransferManager(IRepository repository)
         {
+            this.repository = repository;
             this.sessionDelegate = new CoreSessionDownloadDelegate();
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(NSBundle.MainBundle.BundleIdentifier + ".BackgroundTransferSession");
+            this.sessionConfig.HttpMaximumConnectionsPerHost = 1; // TODO: configurable
+
             this.session = NSUrlSession.FromConfiguration(
                 this.sessionConfig,
                 this.sessionDelegate,
@@ -60,10 +63,13 @@ namespace Shiny.Net.Http
 
         public Task<IHttpTransfer> Create(HttpTransferRequest request)
         {
-            var task = this.session.CreateUploadTask(
-                request.ToNative(),
-                NSUrl.FromFilename(request.LocalFile.FullName)
-            );
+            var task = this.session.CreateDownloadTask(request.ToNative());
+            return null;
+        }
+
+        public Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
+        {
+            var task = this.session.CreateDownloadTask(request.ToNative());
             return null;
         }
 
@@ -72,6 +78,10 @@ namespace Shiny.Net.Http
             throw new NotImplementedException();
         }
 
+        public IObservable<IHttpTransfer> WhenChanged()
+        {
+            throw new NotImplementedException();
+        }
 
         //protected virtual HttpTransferConfiguration ToTaskConfiguration(NSUrlSessionTask native)
         //    => new HttpTransferConfiguration(native.OriginalRequest.ToString())

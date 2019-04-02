@@ -6,7 +6,7 @@ using Java.Util;
 
 namespace Shiny
 {
-    public static class Extensions
+    public static class AndroidExtensions
     {
         static Handler handler;
 
@@ -17,6 +17,15 @@ namespace Shiny
                 handler = new Handler(Looper.MainLooper);
 
             handler.Post(action);
+        }
+
+
+        public static long ToEpochMills(this DateTime sendTime)
+        {
+            var utc = sendTime.ToUniversalTime();
+            var epochDiff = (new DateTime(1970, 1, 1) - DateTime.MinValue).TotalSeconds;
+            var utcAlarmTimeInMillis = utc.AddSeconds(-epochDiff).Ticks / 10000;
+            return utcAlarmTimeInMillis;
         }
 
 

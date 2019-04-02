@@ -4,14 +4,19 @@ using Foundation;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTask : AbstractHttpTransfer
+    class HttpTransfer : AbstractHttpTransfer
     {
         readonly NSUrlSessionDownloadTask task;
 
 
-        public HttpTask(HttpTransferRequest request, NSUrlSessionDownloadTask task) : base(request, false)
+        public HttpTransfer(HttpTransferRequest request, NSUrlSessionDownloadTask task) : base(request, false)
         {
             this.task = task;
+        }
+
+
+        public HttpTransfer(HttpTransferRequest request, NSUrlSessionUploadTask task) : base(request, false)
+        {
         }
 
 

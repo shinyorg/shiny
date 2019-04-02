@@ -6,16 +6,15 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Net.Http
 {
-    public class DownloadManager : IDownloadManager
+    public class HttpTransferManager : IHttpTransferManager
     {
-        readonly object syncLock;
-        readonly IDictionary<string, DownloadHttpTransfer> transfers;
+        //readonly object syncLock;
         readonly IRepository repository;
 
 
-        public DownloadManager(IRepository repository)
+        public HttpTransferManager(IRepository repository)
         {
-            this.syncLock = new object();
+            //this.syncLock = new object();
             this.repository = repository;
         }
 
@@ -40,15 +39,28 @@ namespace Shiny.Net.Http
         {
             var id = Guid.NewGuid().ToString();
             await this.repository.Set(id, request);
-            var transfer = new DownloadHttpTransfer(request, id);
-            lock (this.syncLock)
-                this.transfers.Add(id, transfer);
+            //var transfer = new DownloadHttpTransfer(request, id);
+            //lock (this.syncLock)
+            //    this.transfers.Add(id, transfer);
 
-            return transfer;
+            //return transfer;
+            throw new NotImplementedException();
         }
 
+        public Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
+        {
+            throw new NotImplementedException();
+        }
 
         public Task<IEnumerable<IHttpTransfer>> GetTransfers()
-            => Task.FromResult<IEnumerable<IHttpTransfer>>(this.transfers.Values);
+        {
+            throw new NotImplementedException();
+        }
+            //=> Task.FromResult<IEnumerable<IHttpTransfer>>(this.transfers.Values);
+
+        public IObservable<IHttpTransfer> WhenChanged()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

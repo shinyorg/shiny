@@ -1,25 +1,28 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Database;
 using Shiny.Infrastructure;
+using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
 
 
 namespace Shiny.Net.Http
 {
-    public class DownloadManager : IDownloadManager
+    public class HttpTransferManager : IHttpTransferManager
     {
         readonly IAndroidContext context;
         readonly IRepository repository;
         readonly object syncLock;
-        readonly IDictionary<long, DownloadHttpTransfer> transfers;
+        readonly IDictionary<long, HttpTransfer> transfers;
 
 
-        public DownloadManager(IAndroidContext context, IRepository repository)
+        public HttpTransferManager(IAndroidContext context, IRepository repository)
         {
             this.syncLock = new object();
-            this.transfers = new Dictionary<long, DownloadHttpTransfer>();
+            this.transfers = new Dictionary<long, HttpTransfer>();
 
             this.context = context;
             this.repository = repository;
@@ -43,26 +46,7 @@ namespace Shiny.Net.Http
             => Task.FromResult(this.GetAll());
 
 
-        //public IObservable<Unit> Loop()
-        //{
-        //    var query = new Native.Query();
-        //    query.SetFilterByStatus(
-        //        DownloadStatus.Paused |
-        //        DownloadStatus.Pending |
-        //        DownloadStatus.Running
-        //    );
-
-        //    using (var cursor = this.GetManager().InvokeQuery(query))
-        //    {
-        //        while (cursor.MoveToNext())
-        //        {
-        //            // pump each var
-        //        }
-        //        cursor?.Close();
-        //    }
-        //}
-
-        public async Task<IHttpTransfer> Create(HttpTransferRequest request)
+        public async Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
         {
             var native = new Native.Request(request.LocalFile.ToNativeUri());
             //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
@@ -80,7 +64,7 @@ namespace Shiny.Net.Http
             var id = this.context.GetManager().Enqueue(native);
             await this.repository.Set(id.ToString(), request);
 
-            var transfer = new DownloadHttpTransfer(request, id);
+            var transfer = new HttpTransfer(request, id.ToString());
             lock (this.syncLock)
                 this.transfers.Add(id, transfer);
 
@@ -98,6 +82,33 @@ namespace Shiny.Net.Http
                 }
             }
         }
+
+
+        public IObservable<IHttpTransfer> WhenChanged() => Observable
+            .Interval(TimeSpan.FromSeconds(1))
+            .SelectMany(_ =>
+            {
+                // TODO: uploads too
+                var list = new List<IHttpTransfer>();
+                var query = new Native.Query().SetFilterByStatus(
+                    DownloadStatus.Paused |
+                    DownloadStatus.Pending |
+                    DownloadStatus.Running
+                );
+
+
+                // TODO: only broadcast actual changes
+                using (var cursor = this.context.GetManager().InvokeQuery(query))
+                {
+                    while (cursor.MoveToNext())
+                    {
+                        //cursor.GetColumnIndex(Native.ColumnLastModifiedTimestamp);
+
+                        list.Add(this.ToLib(cursor));
+                    }
+                }
+                return list;
+            });
 
 
         public IHttpTransfer Get(long id)
@@ -125,8 +136,8 @@ namespace Shiny.Net.Http
                     if (!this.transfers.ContainsKey(id))
                     {
                         var request = this.RebuildRequest(cursor);
-                        var transfer = new DownloadHttpTransfer(request, id);
-                        transfer.Refresh(cursor);
+                        var transfer = new HttpTransfer(request, id.ToString());
+                        //transfer.Refresh(cursor);
                         this.transfers.Add(id, transfer);
                     }
                 }

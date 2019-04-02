@@ -12,7 +12,6 @@ namespace Samples.HttpTransfers
     public class HttpTaskViewModel : ViewModel
     {
         readonly IHttpTransfer transfer;
-        IDisposable taskSub;
 
 
         public HttpTaskViewModel(IHttpTransfer transfer)
@@ -20,10 +19,10 @@ namespace Samples.HttpTransfers
             this.transfer = transfer;
             //this.Cancel = ReactiveCommand.Create(transfer.Cancel);
 
-            this.taskSub = transfer
-                .WhenAnyProperty()
-                .Sample(TimeSpan.FromSeconds(1))
-                .SubOnMainThread(_ => this.RaisePropertyChanged(String.Empty));
+            //transfer
+            //    .WhenAnyProperty()
+            //    .Sample(TimeSpan.FromSeconds(1))
+            //    .SubOnMainThread(_ => this.RaisePropertyChanged(String.Empty));
         }
 
 

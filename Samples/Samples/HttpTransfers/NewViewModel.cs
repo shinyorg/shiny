@@ -12,9 +12,8 @@ namespace Samples.HttpTransfers
 {
     public class NewViewModel : ViewModel
     {
-        public NewViewModel(IDownloadManager downloads,
-                            IUploadManager uploads,
-                            INavigationService navigationService)
+        public NewViewModel(INavigationService navigationService,
+                            IHttpTransferManager httpTransfers)
         {
             this.WhenAnyValue(x => x.IsUpload)
                 .Subscribe(upload =>
@@ -32,15 +31,11 @@ namespace Samples.HttpTransfers
             this.Save = ReactiveCommand.CreateFromTask(
                 async () =>
                 {
-                    var request = new HttpTransferRequest(this.Url, this.LocalFileName)
+                    var request = new HttpTransferRequest(this.Url, this.LocalFileName, this.IsUpload)
                     {
                         UseMeteredConnection = this.UseMeteredConnection
                     };
-                    if (this.IsUpload)
-                        await uploads.Create(request);
-                    else
-                        await downloads.Create(request);
-
+                    await httpTransfers.Enqueue(request);
 	                await navigationService.GoBackAsync();
                 },
                 this.WhenAny

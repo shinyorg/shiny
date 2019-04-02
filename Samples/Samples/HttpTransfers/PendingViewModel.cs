@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism.Navigation;
 using ReactiveUI;
@@ -16,23 +14,17 @@ namespace Samples.HttpTransfers
     public class PendingViewModel : ViewModel
     {
         public PendingViewModel(INavigationService navigation,
-                                IUploadManager uploads,
-                                IDownloadManager downloads)
+                                IHttpTransferManager httpTransfers)
         {
             this.NewTask = navigation.NavigateCommand("NewTask");
 
             this.Load = ReactiveCommand.CreateFromTask(async () =>
             {
-                await uploads.GetTransfers();
-                await downloads.GetTransfers();
-
+                await httpTransfers.GetTransfers();
             });
             this.CancelAll = ReactiveCommand.CreateFromTask(async () =>
             {
-                await Task.WhenAll(
-                    downloads.CancelAll(),
-                    uploads.CancelAll()
-                );
+                await httpTransfers.CancelAll();
                 await this.Load.Execute().ToTask();
             });
             this.BindBusyCommand(this.Load);

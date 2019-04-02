@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Shiny
 {
-    public static class Extensions_Reflection
+    public static partial class Extensions
     {
         /// <summary>
         /// Reflects out property information based on the expression value

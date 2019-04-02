@@ -5,7 +5,7 @@ using Windows.UI.Core;
 
 namespace Shiny
 {
-    public static class Extensions
+    static class UwpExtensions
     {
         public static void Dispatch(this Action action)
         {
