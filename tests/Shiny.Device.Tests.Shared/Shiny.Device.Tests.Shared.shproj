@@ -22,6 +22,6 @@
     <Compile Include="Settings\TestBind.cs" />
     <Compile Include="TestStartup.cs" />
   </ItemGroup>
-  <Import Project="Acr.Device.Tests.Shared.projitems" Label="Shared" />
+  <Import Project="Shiny.Device.Tests.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.CSharp.targets" />
 </Project>
