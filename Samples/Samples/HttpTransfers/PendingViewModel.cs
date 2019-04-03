@@ -16,7 +16,7 @@ namespace Samples.HttpTransfers
         public PendingViewModel(INavigationService navigation,
                                 IHttpTransferManager httpTransfers)
         {
-            this.NewTask = navigation.NavigateCommand("NewTask");
+            this.Create = navigation.NavigateCommand("NewTask");
 
             this.Load = ReactiveCommand.CreateFromTask(async () =>
             {
@@ -31,7 +31,7 @@ namespace Samples.HttpTransfers
         }
 
 
-        public ICommand NewTask { get; }
+        public ICommand Create { get; }
         public ReactiveCommand<Unit, Unit> Load { get; }
         public ReactiveCommand<Unit, Unit> CancelAll { get; }
         [Reactive] public IList<HttpTaskViewModel> Tasks { get; private set; }

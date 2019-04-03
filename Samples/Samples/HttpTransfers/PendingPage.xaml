@@ -6,7 +6,7 @@
              Title="Pending">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="New Task" Command="{Binding NewTask}" />
+        <ToolbarItem Text="Create" Command="{Binding Create}" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>

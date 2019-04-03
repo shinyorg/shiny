@@ -5,7 +5,7 @@
              Title="Geofences">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Stop All Geofences" Command="{Binding DropAllFences}" />
+        <ToolbarItem Text="Clear" Command="{Binding DropAllFences}" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
