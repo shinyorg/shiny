@@ -31,6 +31,24 @@ namespace Shiny.BluetoothLE
         }
 
 
+#if __IOS__
+       public static bool UseBleCentral(this IServiceCollection builder, BleAdapterConfiguration config = null)
+       {
+            builder.AddSingleton<ICentralManager>(_ => new CentralManager(config));
+            return true;
+       }
+
+
+        public static bool UseBleCentral<T>(this IServiceCollection builder, BleAdapterConfiguration config = null) where T : class, IBleStateRestoreDelegate
+        {
+            builder.AddSingleton<IBleStateRestoreDelegate, T>();
+            builder.AddSingleton<ICentralManager>(_ => new CentralManager(config));
+            return true;
+        }
+
+#endif
+
+
         public static bool UseBlePeripherals(this IServiceCollection builder)
         {
 #if NETSTANDARD
