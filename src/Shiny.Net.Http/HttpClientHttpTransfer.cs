@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Shiny.Net.Http
 {
-    public static class HttpClientObservables
+    class HttpClientHttpTransfer : AbstractHttpTransfer
     {
-        public static IObservable<IHttpTransfer> TransferRequest(HttpTransferRequest request)
+        public HttpClientHttpTransfer(HttpTransferRequest request, string id) : base(request)
         {
-            return null;
+
         }
 
         //static IObservable<IHttpTransfer> Upload(HttpTransferRequest request)

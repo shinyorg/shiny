@@ -23,7 +23,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public async Task<IHttpTransfer> Create(HttpTransferRequest request)
+        public async Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
         {
             var task = new BackgroundDownloader
             {
@@ -43,11 +43,6 @@ namespace Shiny.Net.Http
             //var httpTask = new DownloadHttpTask(config, operation, false);
             //this.Add(httpTask);
             return null;
-        }
-
-        public Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<IHttpTransfer>> GetTransfers()

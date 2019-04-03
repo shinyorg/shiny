@@ -1,9 +1,9 @@
 ﻿using System;
-
+using System.ComponentModel;
 
 namespace Shiny.Net.Http
 {
-    public interface IHttpTransfer
+    public interface IHttpTransfer : INotifyPropertyChanged
     {
         HttpTransferRequest Request { get; }
         string Identifier { get; }
@@ -17,8 +17,6 @@ namespace Shiny.Net.Http
         decimal PercentComplete { get; }
         long BytesPerSecond { get; }
         TimeSpan EstimatedCompletionTime { get; }
-        DateTimeOffset StartTime { get; }
-
         Exception Exception { get; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Shiny.Net.Http
 {
@@ -11,7 +11,5 @@ namespace Shiny.Net.Http
         Task<IEnumerable<IHttpTransfer>> GetTransfers();
         Task<IHttpTransfer> Enqueue(HttpTransferRequest request);
         Task CancelAll();
-
-        IObservable<IHttpTransfer> WhenChanged();
     }
 }

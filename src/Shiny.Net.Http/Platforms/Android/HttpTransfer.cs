@@ -1,34 +1,23 @@
 ﻿using System;
-
+using Android.Database;
 
 namespace Shiny.Net.Http
 {
-    class HttpTransfer : IHttpTransfer
+    class HttpTransfer : AbstractHttpTransfer
     {
-        public HttpTransfer(HttpTransferRequest request, string id)
+        readonly HttpTransferManager manager;
+
+
+        public HttpTransfer(HttpTransferManager manager, HttpTransferRequest request, string id) : base(request)
         {
-            this.Request = request;
+            this.manager = manager;
             this.Identifier = id;
-            if (request.IsUpload)
-            {
-                this.FileSize = request.LocalFile.Length;
-                this.RemoteFileName = request.LocalFile.Name;
-            }
         }
 
 
-        public HttpTransferRequest Request { get; }
-        public string Identifier { get; }
-        public bool IsUpload => this.Request.IsUpload;
-        public HttpTransferState Status { get; internal set; } = HttpTransferState.Unknown;
-        public string RemoteFileName { get; internal set; }
-        public long ResumeOffset { get; internal set; }
-        public long FileSize { get; internal set; }
-        public long BytesTransferred { get; internal set; }
-        public long BytesPerSecond { get; internal set; }
-        public decimal PercentComplete { get; internal set; }
-        public TimeSpan EstimatedCompletionTime { get; internal set; }
-        public DateTimeOffset StartTime { get; internal set; }
-        public Exception Exception { get; internal set; }
+        internal void Refresh(ICursor cursor)
+        {
+
+        }
     }
 }

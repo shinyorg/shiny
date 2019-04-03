@@ -5,14 +5,19 @@ namespace Shiny.Net.Http
 {
     public abstract class AbstractHttpTransfer : NotifyPropertyChanged, IHttpTransfer
     {
-        protected AbstractHttpTransfer(HttpTransferRequest request, bool upload)
+        protected AbstractHttpTransfer(HttpTransferRequest request)
         {
             this.Request = request;
-            this.IsUpload = upload;
+            if (request.IsUpload)
+            {
+                this.FileSize = request.LocalFile.Length;
+                this.RemoteFileName = request.LocalFile.Name;
+            }
         }
 
 
-        protected virtual void RunCalculations()
+        DateTime? lastTime;
+        protected internal virtual void RunCalculations()
         {
 			if (this.FileSize <= 0 || this.BytesTransferred <= 0)
 				return;
@@ -20,23 +25,27 @@ namespace Shiny.Net.Http
 			decimal raw = (this.BytesTransferred / this.FileSize) * 100;
 			this.PercentComplete = Math.Round(raw, 2);
 
-            var elapsedTime = DateTime.Now - this.StartTime;
-			this.BytesPerSecond = Convert.ToInt64(this.BytesTransferred / elapsedTime.TotalSeconds);
-
+            //var elapsedTime = DateTime.Now - this.StartTime;
+            if (this.lastTime != null)
+            {
+                var elapsedTime = DateTime.Now - this.lastTime.Value;
+                this.BytesPerSecond = Convert.ToInt64(this.BytesTransferred / elapsedTime.TotalSeconds);
+            }
+            this.lastTime = DateTime.Now;
 			var rawEta = this.FileSize / this.BytesPerSecond;
 			this.EstimatedCompletionTime = TimeSpan.FromSeconds(rawEta);
 		}
 
 
         public HttpTransferRequest Request { get; }
-        public bool IsUpload { get; }
+        public bool IsUpload => this.Request.IsUpload;
 
 
         string id;
         public string Identifier
         {
             get => this.id;
-            protected set => this.Set(ref this.id, value);
+            internal set => this.Set(ref this.id, value);
         }
 
 
@@ -44,7 +53,7 @@ namespace Shiny.Net.Http
         public HttpTransferState Status
         {
             get => this.status;
-            protected set => this.Set(ref this.status, value);
+            internal set => this.Set(ref this.status, value);
         }
 
 
@@ -52,7 +61,7 @@ namespace Shiny.Net.Http
         public string RemoteFileName
         {
             get => this.remoteFile;
-            protected set => this.Set(ref this.remoteFile, value);
+            internal set => this.Set(ref this.remoteFile, value);
         }
 
 
@@ -60,7 +69,7 @@ namespace Shiny.Net.Http
         public long ResumeOffset
         {
             get => this.resumeOffset;
-            protected set => this.Set(ref this.resumeOffset, value);
+            internal set => this.Set(ref this.resumeOffset, value);
         }
 
 
@@ -68,7 +77,7 @@ namespace Shiny.Net.Http
         public long FileSize
         {
             get => this.fileSize;
-            protected set => this.Set(ref this.fileSize, value);
+            internal set => this.Set(ref this.fileSize, value);
         }
 
 
@@ -76,7 +85,7 @@ namespace Shiny.Net.Http
         public long BytesTransferred
         {
             get => this.bytesXfer;
-            protected set => this.Set(ref this.bytesXfer, value);
+            internal set => this.Set(ref this.bytesXfer, value);
         }
 
 
@@ -84,7 +93,7 @@ namespace Shiny.Net.Http
         public decimal PercentComplete
         {
             get => this.percentComplete;
-            protected set => this.Set(ref this.percentComplete, value);
+            internal set => this.Set(ref this.percentComplete, value);
         }
 
 
@@ -105,7 +114,7 @@ namespace Shiny.Net.Http
         public long BytesPerSecond
         {
             get => this.bytesPerSecond;
-            protected set => this.Set(ref this.bytesPerSecond, value);
+            internal set => this.Set(ref this.bytesPerSecond, value);
         }
 
 
@@ -113,10 +122,7 @@ namespace Shiny.Net.Http
         public TimeSpan EstimatedCompletionTime
         {
             get => this.ctime;
-            protected set => this.Set(ref this.ctime, value);
+            internal set => this.Set(ref this.ctime, value);
         }
-
-
-        public DateTimeOffset StartTime { get; } = DateTimeOffset.UtcNow;
     }
 }

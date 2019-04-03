@@ -15,7 +15,6 @@ namespace Shiny.Net.Http
         }
 
 
-
         static Native downloadManager;
         public static Native GetManager(this IAndroidContext context)
         {

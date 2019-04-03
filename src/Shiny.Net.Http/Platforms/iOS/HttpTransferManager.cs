@@ -15,12 +15,12 @@ namespace Shiny.Net.Http
         readonly NSUrlSession session;
 
 
-        public HttpTransferManager(IRepository repository)
+        public HttpTransferManager(IRepository repository, int maxConnectionsPerHost = 1)
         {
             this.repository = repository;
             this.sessionDelegate = new CoreSessionDownloadDelegate();
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(NSBundle.MainBundle.BundleIdentifier + ".BackgroundTransferSession");
-            this.sessionConfig.HttpMaximumConnectionsPerHost = 1; // TODO: configurable
+            this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
 
             this.session = NSUrlSession.FromConfiguration(
                 this.sessionConfig,
@@ -78,10 +78,6 @@ namespace Shiny.Net.Http
             throw new NotImplementedException();
         }
 
-        public IObservable<IHttpTransfer> WhenChanged()
-        {
-            throw new NotImplementedException();
-        }
 
         //protected virtual HttpTransferConfiguration ToTaskConfiguration(NSUrlSessionTask native)
         //    => new HttpTransferConfiguration(native.OriginalRequest.ToString())

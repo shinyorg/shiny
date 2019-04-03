@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Database;
 using Shiny.Infrastructure;
 using Observable = System.Reactive.Linq.Observable;
@@ -16,13 +16,14 @@ namespace Shiny.Net.Http
         readonly IAndroidContext context;
         readonly IRepository repository;
         readonly object syncLock;
-        readonly IDictionary<long, HttpTransfer> transfers;
+        readonly IDictionary<string, HttpTransfer> transfers;
+        IDisposable refreshSub;
 
 
         public HttpTransferManager(IAndroidContext context, IRepository repository)
         {
             this.syncLock = new object();
-            this.transfers = new Dictionary<long, HttpTransfer>();
+            this.transfers = new Dictionary<string, HttpTransfer>();
 
             this.context = context;
             this.repository = repository;
@@ -31,7 +32,7 @@ namespace Shiny.Net.Http
 
         public Task Cancel(IHttpTransfer transfer)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
 
@@ -62,11 +63,10 @@ namespace Shiny.Net.Http
                 native.AddRequestHeader(header.Key, header.Value);
 
             var id = this.context.GetManager().Enqueue(native);
-            await this.repository.Set(id.ToString(), request);
+            //await this.repository.Set(id.ToString(), request);
 
-            var transfer = new HttpTransfer(request, id.ToString());
-            lock (this.syncLock)
-                this.transfers.Add(id, transfer);
+            var transfer = new HttpTransfer(this, request, id.ToString());
+            this.Sub(transfer);
 
             return transfer;
         }
@@ -84,65 +84,61 @@ namespace Shiny.Net.Http
         }
 
 
-        public IObservable<IHttpTransfer> WhenChanged() => Observable
-            .Interval(TimeSpan.FromSeconds(1))
-            .SelectMany(_ =>
-            {
-                // TODO: uploads too
-                var list = new List<IHttpTransfer>();
-                var query = new Native.Query().SetFilterByStatus(
-                    DownloadStatus.Paused |
-                    DownloadStatus.Pending |
-                    DownloadStatus.Running
-                );
-
-
-                // TODO: only broadcast actual changes
-                using (var cursor = this.context.GetManager().InvokeQuery(query))
-                {
-                    while (cursor.MoveToNext())
-                    {
-                        //cursor.GetColumnIndex(Native.ColumnLastModifiedTimestamp);
-
-                        list.Add(this.ToLib(cursor));
-                    }
-                }
-                return list;
-            });
-
-
-        public IHttpTransfer Get(long id)
+        void Sub(HttpTransfer transfer)
         {
-            var query = new Native.Query();
-            query.SetFilterById(id);
-            using (var cursor = this.context.GetManager().InvokeQuery(query))
+            lock (this.syncLock)
             {
-                if (cursor.MoveToFirst())
+                this.transfers.Add(transfer.Identifier, transfer);
+
+                // TODO: uploads too
+                if (this.refreshSub == null)
                 {
-                    return this.ToLib(cursor);
+                    this.refreshSub = Observable
+                        .Interval(TimeSpan.FromSeconds(1))
+                        .Subscribe(_ => this.Loop());
                 }
             }
-            return null;
+        }
+
+
+        void Loop()
+        {
+            var ids = this.transfers.Keys.Select(long.Parse).ToArray();
+            var query = new Native.Query().SetFilterById(ids);
+
+            using (var cursor = this.context.GetManager().InvokeQuery(query))
+            {
+                while (cursor.MoveToNext())
+                {
+                    var t = this.ToLib(cursor);
+                    switch (t.Status)
+                    {
+                        case HttpTransferState.Error:
+                        case HttpTransferState.Cancelled:
+                        case HttpTransferState.Completed:
+                            lock (this.syncLock)
+                                this.transfers.Remove(t.Identifier);
+                            break;
+                    }
+                }
+            }
         }
 
 
         IHttpTransfer ToLib(ICursor cursor)
         {
-            var id = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnId));
+            HttpTransfer transfer = null;
+            var id = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnId)).ToString();
+
             if (!this.transfers.ContainsKey(id))
             {
-                lock (this.syncLock)
-                {
-                    if (!this.transfers.ContainsKey(id))
-                    {
-                        var request = this.RebuildRequest(cursor);
-                        var transfer = new HttpTransfer(request, id.ToString());
-                        //transfer.Refresh(cursor);
-                        this.transfers.Add(id, transfer);
-                    }
-                }
+                var request = this.RebuildRequest(cursor);
+                transfer = new HttpTransfer(this, request, id.ToString());
+                this.Sub(transfer);
             }
-            return this.transfers[id];
+            transfer = this.transfers[id];
+            transfer.Refresh(cursor);
+            return transfer;
         }
 
 
