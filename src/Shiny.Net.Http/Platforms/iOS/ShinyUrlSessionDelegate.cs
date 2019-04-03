@@ -1,6 +1,5 @@
 ﻿using System;
 using Foundation;
-using ObjCRuntime;
 
 
 namespace Shiny.Net.Http
@@ -8,14 +7,17 @@ namespace Shiny.Net.Http
     public class CoreSessionDownloadDelegate : NSUrlSessionDownloadDelegate
     {
         // TODO: reload all transfer objects
-        public override void DidBecomeInvalid(NSUrlSession session, NSError error)
-        {
-            // TODO: hmmm
-        }
+        //public override void DidBecomeInvalid(NSUrlSession session, NSError error)
+        //{
+        //    // TODO: hmmm
+        //}
 
 
         public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
         {
+            var transfer = this.Get(task);
+            transfer.Exception = new Exception(error?.LocalizedDescription ?? "There was an error with the request");
+            transfer.Status = HttpTransferState.Error;
         }
 
 
@@ -23,7 +25,7 @@ namespace Shiny.Net.Http
         //{
         //}
 
-        // upload
+
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
         {
             var transfer = this.Get(task);
@@ -34,14 +36,21 @@ namespace Shiny.Net.Http
         public override void DidWriteData(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite)
         {
             var transfer = this.Get(downloadTask);
+            if (transfer.RemoteFileName == null)
+                transfer.RemoteFileName = downloadTask?.Response.SuggestedFilename;
 
+            // this will trump resumed state
+            transfer.Status = HttpTransferState.InProgress;
+            transfer.BytesTransferred = totalBytesWritten;
+            transfer.FileSize = totalBytesExpectedToWrite;
+            transfer.RunCalculations();
         }
 
 
         public override void DidResume(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long resumeFileOffset, long expectedTotalBytes)
         {
             var transfer = this.Get(downloadTask);
-            transfer.Status = HttpTransferState.Resumed; // TODO: or just running?
+            transfer.Status = HttpTransferState.InProgress;
             transfer.ResumeOffset = resumeFileOffset;
         }
 

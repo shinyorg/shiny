@@ -26,7 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		azure-pipelines.yml = azure-pipelines.yml
 		bean_testhost.ino = bean_testhost.ino
-		builddocs.cake = builddocs.cake
 		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
 		CONTRIBUTING.md = CONTRIBUTING.md
 		src\Directory.build.props = src\Directory.build.props
@@ -71,6 +70,7 @@ Global
 		Tests\Shiny.Device.Tests.Shared\Shiny.Device.Tests.Shared.projitems*{559dab2c-8bd6-41db-b77e-c446353100fb}*SharedItemsImports = 4
 		Tests\Shiny.Device.Tests.Shared\Shiny.Device.Tests.Shared.projitems*{692f40b4-fe18-4c0b-85a7-de8cfafb7dcd}*SharedItemsImports = 4
 		Tests\Shiny.Device.Tests.Shared\Shiny.Device.Tests.Shared.projitems*{7f310f01-48c4-4553-9b67-03d4f614ad31}*SharedItemsImports = 4
+		Tests\Shiny.Device.Tests.Shared\Shiny.Device.Tests.Shared.projitems*{923d64d4-5804-4621-8c17-a683d341bf07}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU

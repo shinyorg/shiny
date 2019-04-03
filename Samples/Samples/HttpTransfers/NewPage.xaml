@@ -11,9 +11,16 @@
 
                 <Label Text="Remote Url" />
                 <Entry Text="{Binding Url}" />
+                <Button Text="Reset to Default"
+                        HorizontalOptions="Center"
+                        Command="{Binding ResetUrl}" />
 
-                <Label Text="Local File Name" />
+                <Label Text="Local File Name (Local Path Will Be Prepended)" />
                 <Entry Text="{Binding LocalFileName}" />
+                <Label Text="A Temporary File Will Created"
+                       VerticalTextAlignment="Center"
+                       FontSize="Small"
+                       IsVisible="{Binding IsUpload}" />
 
                 <Label Text="Is Upload" />
                 <Switch IsToggled="{Binding IsUpload}" />

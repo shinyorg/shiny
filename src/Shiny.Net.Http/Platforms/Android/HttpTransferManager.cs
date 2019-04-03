@@ -65,7 +65,7 @@ namespace Shiny.Net.Http
             var id = this.context.GetManager().Enqueue(native);
             //await this.repository.Set(id.ToString(), request);
 
-            var transfer = new HttpTransfer(this, request, id.ToString());
+            var transfer = new HttpTransfer(request, id.ToString());
             this.Sub(transfer);
 
             return transfer;
@@ -133,7 +133,7 @@ namespace Shiny.Net.Http
             if (!this.transfers.ContainsKey(id))
             {
                 var request = this.RebuildRequest(cursor);
-                transfer = new HttpTransfer(this, request, id.ToString());
+                transfer = new HttpTransfer(request, id.ToString());
                 this.Sub(transfer);
             }
             transfer = this.transfers[id];
@@ -148,6 +148,7 @@ namespace Shiny.Net.Http
             var uri = cursor.GetString(cursor.GetColumnIndex(Native.ColumnUri));
             var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalUri));
 
+            // TODO: unmetered, post data, headers
             var request = new HttpTransferRequest(uri, localPath);
             return request;
         }
