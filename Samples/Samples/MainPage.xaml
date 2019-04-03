@@ -6,7 +6,7 @@
                   IsPresented="{Binding IsPresented}">
 
     <MasterDetailPage.Master>
-        <ContentPage Title="Menu" BackgroundColor="{StaticResource PrimaryDark}">
+        <ContentPage Title="Menu">
             <TableView Intent="Menu">
                 <TableRoot>
                     <TableSection>
