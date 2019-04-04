@@ -36,20 +36,23 @@ namespace Shiny.Net.Http
         }
 
 
-        public Task CancelAll()
+        public Task Cancel(QueryFilter filter = null)
         {
             // TODO
             return Task.CompletedTask;
         }
 
 
-        public Task<IEnumerable<IHttpTransfer>> GetTransfers()
+        public Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null)
             => Task.FromResult(this.GetAll());
 
 
         public async Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
         {
-            var native = new Native.Request(request.LocalFile.ToNativeUri());
+            var native = new Native
+                .Request(Android.Net.Uri.Parse(request.Uri))
+                //.SetDestinationUri(request.LocalFile.ToNativeUri())
+                .SetAllowedOverMetered(request.UseMeteredConnection);
             //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
             //native.SetAllowedOverRoaming()
             //native.SetNotificationVisibility(DownloadVisibility.Visible);
@@ -57,7 +60,6 @@ namespace Shiny.Net.Http
             //native.SetRequiresCharging
             //native.SetTitle("")
             //native.SetVisibleInDownloadsUi(true);
-            native.SetAllowedOverMetered(request.UseMeteredConnection);
 
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);

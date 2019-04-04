@@ -19,7 +19,7 @@ namespace Shiny.Net.Http
         protected IDictionary<string, IHttpTransfer> CurrentTransfers { get; private set; }
 
         public abstract Task Cancel(IHttpTransfer transfer);
-        public virtual async Task CancelAll()
+        public virtual async Task Cancel(QueryFilter filter)
         {
             lock (this.SyncLock)
                 this.CurrentTransfers?.Clear();
@@ -28,7 +28,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public virtual async Task<IEnumerable<IHttpTransfer>> GetTransfers()
+        public virtual async Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter)
         {
             if (this.CurrentTransfers == null)
             {

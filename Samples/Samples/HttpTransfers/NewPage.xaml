@@ -18,7 +18,9 @@
                 <Label Text="Local File Name (Local Path Will Be Prepended)" />
                 <Entry Text="{Binding LocalFileName}" />
                 <Label Text="A Temporary File Will Created"
-                       VerticalTextAlignment="Center"
+                       HorizontalTextAlignment="Center"
+                       HorizontalOptions="CenterAndExpand"
+                       TextColor="DarkBlue"
                        FontSize="Small"
                        IsVisible="{Binding IsUpload}" />
 
@@ -28,7 +30,7 @@
                 <Label Text="Allow Metered Connections" />
                 <Switch IsToggled="{Binding UseMeteredConnection}" />
 
-                <Button Text="Save Task" Command="{Binding Save}" />
+                <Button Text="Start Transfer" Command="{Binding Save}" />
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

@@ -15,7 +15,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public async Task CancelAll()
+        public async Task Cancel(QueryFilter filter)
         {
             var tasks = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
             foreach (var task in tasks)
@@ -45,7 +45,7 @@ namespace Shiny.Net.Http
             return null;
         }
 
-        public async Task<IEnumerable<IHttpTransfer>> GetTransfers()
+        public async Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter)
         {
             var downloads = await BackgroundDownloader
                 .GetCurrentDownloadsAsync()

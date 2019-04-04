@@ -24,7 +24,7 @@ namespace Samples.HttpTransfers
             });
             this.CancelAll = ReactiveCommand.CreateFromTask(async () =>
             {
-                await httpTransfers.CancelAll();
+                await httpTransfers.Cancel();
                 await this.Load.Execute().ToTask();
             });
             this.BindBusyCommand(this.Load);

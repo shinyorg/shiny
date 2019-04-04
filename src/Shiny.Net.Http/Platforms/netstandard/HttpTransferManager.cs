@@ -25,7 +25,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public Task CancelAll()
+        public Task Cancel(QueryFilter filter = null)
         {
             //lock (this.syncLock)
             //    foreach (var transfer in transfers)
@@ -35,10 +35,10 @@ namespace Shiny.Net.Http
         }
 
 
-        public async Task<IHttpTransfer> Create(HttpTransferRequest request)
+        public Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
         {
-            var id = Guid.NewGuid().ToString();
-            await this.repository.Set(id, request);
+            //var id = Guid.NewGuid().ToString();
+            //await this.repository.Set(id, request);
             //var transfer = new DownloadHttpTransfer(request, id);
             //lock (this.syncLock)
             //    this.transfers.Add(id, transfer);
@@ -47,18 +47,7 @@ namespace Shiny.Net.Http
             throw new NotImplementedException();
         }
 
-        public Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<IHttpTransfer>> GetTransfers()
-        {
-            throw new NotImplementedException();
-        }
-            //=> Task.FromResult<IEnumerable<IHttpTransfer>>(this.transfers.Values);
-
-        public IObservable<IHttpTransfer> WhenChanged()
+        public Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null)
         {
             throw new NotImplementedException();
         }

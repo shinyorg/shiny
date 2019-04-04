@@ -7,9 +7,9 @@ namespace Shiny.Net.Http
 {
     public interface IHttpTransferManager
     {
-        Task Cancel(IHttpTransfer transfer);
-        Task<IEnumerable<IHttpTransfer>> GetTransfers();
         Task<IHttpTransfer> Enqueue(HttpTransferRequest request);
-        Task CancelAll();
+        Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null);
+        Task Cancel(IHttpTransfer transfer = null);
+        Task Cancel(QueryFilter filter);
     }
 }

@@ -18,6 +18,7 @@ namespace Shiny.Net.Http
         {
             this.Uri = uri;
             this.LocalFile = localFile;
+            this.IsUpload = isUpload;
         }
 
 

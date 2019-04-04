@@ -30,10 +30,11 @@ namespace Shiny.Net.Http
             {
                 var elapsedTime = DateTime.Now - this.lastTime.Value;
                 this.BytesPerSecond = Convert.ToInt64(this.BytesTransferred / elapsedTime.TotalSeconds);
+
+                var rawEta = this.FileSize / this.BytesPerSecond;
+                this.EstimatedCompletionTime = TimeSpan.FromSeconds(rawEta);
             }
             this.lastTime = DateTime.Now;
-			var rawEta = this.FileSize / this.BytesPerSecond;
-			this.EstimatedCompletionTime = TimeSpan.FromSeconds(rawEta);
 		}
 
 

@@ -8,11 +8,14 @@ namespace Samples.Settings
 {
     public class AppSettings : ReactiveObject
     {
+        const string DEFAULT_TRANSFER = "http://ipv4.download.thinkbroadband.com/1GB.zip";
+
+
         public AppSettings()
         {
             this.WhenAnyValue(x => x.LastTransferUrl)
                 .Where(x => x == null)
-                .Subscribe(_ => this.LastTransferUrl = "http://ipv4.download.thinkbroadband.com/1GB.zip");
+                .Subscribe(_ => this.LastTransferUrl = DEFAULT_TRANSFER);
 
             this.WhenAnyValue(
                     x => x.IsChecked,
@@ -29,7 +32,7 @@ namespace Samples.Settings
         [Reactive] public string YourText { get; set; }
         [Reactive] public DateTime? LastUpdated { get; set; }
 
-        [Reactive] public string LastTransferUrl { get; set; } = "";
+        [Reactive] public string LastTransferUrl { get; set; } = DEFAULT_TRANSFER;
         [Reactive] public bool UseNotificationsBle { get; set; } = true;
         [Reactive] public bool UseNotificationsGeofences { get; set; } = true;
         [Reactive] public bool UseNotificationsJobs { get; set; } = true;

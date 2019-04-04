@@ -11,7 +11,6 @@ namespace Shiny.Net.Http
         PausedByNoNetwork,
         PausedByCostedNetwork,
         InProgress,
-        //Resumed,
         Retrying,
         Error,
         Cancelled,

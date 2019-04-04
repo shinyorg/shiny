@@ -47,7 +47,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public async Task CancelAll()
+        public async Task Cancel(QueryFilter filter = null)
         {
 
             throw new NotImplementedException();
@@ -64,7 +64,7 @@ namespace Shiny.Net.Http
             return null;
         }
 
-        public Task<IEnumerable<IHttpTransfer>> GetTransfers()
+        public Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null)
         {
             //this.session.GetTasks2((_, uploads, downloads) =>
             //{
