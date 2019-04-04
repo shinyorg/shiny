@@ -6,7 +6,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Central;
-using Shiny.Devices.Tests.BluetoothLE.Mocks;
+using Shiny.Testing.BluetoothLE.Central;
 using Xunit;
 using Xunit.Abstractions;
 

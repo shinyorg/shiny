@@ -196,6 +196,10 @@
       <Project>{34905983-1f79-4b74-9bb0-d1dc7d24b8bf}</Project>
       <Name>Shiny.SpeechRecognition</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj">
+      <Project>{204b1f42-0d9c-4349-87c5-34148e3d170a}</Project>
+      <Name>Shiny.Testing</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\Shiny.Device.Tests.Shared\Shiny.Device.Tests.Shared.projitems" Label="Shared" />
 </Project>

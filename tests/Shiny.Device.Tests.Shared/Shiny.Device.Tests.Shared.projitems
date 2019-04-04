@@ -14,10 +14,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\CharacteristicTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\Constants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\DeviceTests.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\Mocks\MockGattCharacteristic.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\Mocks\MockGattReliableWriteTransaction.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\Mocks\MockGattService.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\Mocks\MockPeripheral.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\PlatformTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnvironmentTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\FileSystemTests.cs" />
@@ -25,8 +21,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Settings\DefaultSettingTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings\TestBind.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestStartup.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)BluetoothLE\bean_testhost.ino" />
   </ItemGroup>
 </Project>
