@@ -73,20 +73,18 @@ namespace Samples.HttpTransfers
                 .Buffer(TimeSpan.FromSeconds(1))
                 .Where(x => x.Count > 0)
                 .Synchronize()
-                .Subscribe(this.Process)
+                .Subscribe(transfers =>
+                {
+                    foreach (var transfer in transfers)
+                    {
+                        var vm = this.Transfers.FirstOrDefault(x => x.Identifier == transfer.Identifier);
+                        if (vm != null)
+                            ToViewModel(vm, transfer);
+                    }
+                })
                 .DisposeWith(this.DeactivateWith);
         }
 
-
-        void Process(IEnumerable<IHttpTransfer> transfers)
-        {
-            foreach (var transfer in transfers)
-            {
-                var vm = this.Transfers.FirstOrDefault(x => x.Identifier == transfer.Identifier);
-                if (vm != null)
-                    ToViewModel(vm, transfer);
-            }
-        }
 
         static void ToViewModel(HttpTransferViewModel viewModel, IHttpTransfer transfer)
         {
