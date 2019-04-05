@@ -37,6 +37,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Compile Update="HttpTransfers\CreatePage.xaml.cs">
+        <DependentUpon>CreatePage.xaml</DependentUpon>
+      </Compile>
       <Compile Update="HttpTransfers\PendingPage.xaml.cs">
         <DependentUpon>PendingPage.xaml</DependentUpon>
       </Compile>

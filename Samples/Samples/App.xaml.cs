@@ -51,10 +51,15 @@ namespace Samples
             containerRegistry.RegisterForNavigation<BluetoothLE.PeripheralPage>("Peripheral");
             containerRegistry.RegisterForNavigation<BlePeripherals.MainPage>("BlePeripherals");
 
-            containerRegistry.RegisterForNavigation<Geofencing.MainPage>("Geofencing");
+            containerRegistry.RegisterForNavigation<Geofences.MainPage>("Geofencing");
+            containerRegistry.RegisterForNavigation<Geofences.CreatePage>("CreateGeofence");
+
             containerRegistry.RegisterForNavigation<HttpTransfers.MainPage>("HttpTransfers");
-            containerRegistry.RegisterForNavigation<HttpTransfers.NewPage>("NewTask");
+            containerRegistry.RegisterForNavigation<HttpTransfers.CreatePage>("CreateTransfer");
+
             containerRegistry.RegisterForNavigation<Jobs.MainPage>("Jobs");
+            containerRegistry.RegisterForNavigation<Jobs.CreatePage>("CreateJob");
+
             containerRegistry.RegisterForNavigation<Notifications.MainPage>("Notifications");
             containerRegistry.RegisterForNavigation<Sensors.MainPage>("Sensors");
             containerRegistry.RegisterForNavigation<Speech.MainPage>("SpeechRecognition");
