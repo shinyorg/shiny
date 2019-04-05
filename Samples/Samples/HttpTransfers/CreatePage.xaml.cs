@@ -4,9 +4,9 @@ using Xamarin.Forms;
 
 namespace Samples.HttpTransfers
 {
-    public partial class NewPage : ContentPage
+    public partial class CreatePage : ContentPage
     {
-        public NewPage()
+        public CreatePage()
         {
             this.InitializeComponent();
         }

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:acr="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
              x:Class="Samples.HttpTransfers.PendingPage"
              Title="Pending">
 
@@ -16,18 +15,13 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <ListView ItemsSource="{Binding Tasks}"
+            <ListView ItemsSource="{Binding Transfers}"
                       RowHeight="130"
                       Grid.Row="0">
-
-                <ListView.Behaviors>
-                    <acr:ItemTappedCommandBehavior Command="{Binding MoreInfo}" />
-                </ListView.Behaviors>
 
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-
                             <ViewCell.ContextActions>
                                 <MenuItem Text="Cancel"
                                           Command="{Binding Cancel}"

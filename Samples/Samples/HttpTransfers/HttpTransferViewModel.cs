@@ -1,40 +1,21 @@
 ﻿using System;
-using System.Reactive.Linq;
 using System.Windows.Input;
-using Humanizer;
 using ReactiveUI;
-using Shiny;
-using Shiny.Net.Http;
+using ReactiveUI.Fody.Helpers;
 
 
 namespace Samples.HttpTransfers
 {
-    public class HttpTaskViewModel : ViewModel
+    public class HttpTransferViewModel : ReactiveObject
     {
-        readonly IHttpTransfer transfer;
+        [Reactive] public string Identifier { get; set; }
+        [Reactive] public bool IsUpload { get; set; }
+        [Reactive] public string Status { get; set; }
+        [Reactive] public string Uri { get; set; }
+        [Reactive] public decimal PercentComplete { get; set; }
+        [Reactive] public string TransferSpeed { get; set; }
+        [Reactive] public string EstimateMinsRemaining { get; set; }
 
-
-        public HttpTaskViewModel(IHttpTransfer transfer)
-        {
-            this.transfer = transfer;
-            //this.Cancel = ReactiveCommand.Create(transfer.Cancel);
-
-            //transfer
-            //    .WhenAnyProperty()
-            //    .Sample(TimeSpan.FromSeconds(1))
-            //    .SubOnMainThread(_ => this.RaisePropertyChanged(String.Empty));
-        }
-
-
-        public string Identifier => this.transfer.Identifier;
-        public bool IsUpload => this.transfer.IsUpload;
-        public HttpTransferState Status => this.transfer.Status;
-        public string Uri => this.transfer.Request.Uri;
-        public decimal PercentComplete => this.transfer.PercentComplete;
-        public string TransferSpeed => Math.Round(this.transfer.BytesPerSecond.Bytes().Kilobytes, 2) + " Kb/s";
-        public string EstimateMinsRemaining => Math.Round(this.transfer.EstimatedCompletionTime.TotalMinutes, 1) + " min(s)";
-
-        //public ICommand Cancel { get; }
-        public ICommand MoreInfo { get; }
+        public ICommand Cancel { get; set; }
     }
 }

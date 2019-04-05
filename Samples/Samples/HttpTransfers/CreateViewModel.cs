@@ -14,15 +14,15 @@ using Samples.Settings;
 
 namespace Samples.HttpTransfers
 {
-    public class NewViewModel : ViewModel
+    public class CreateViewModel : ViewModel
     {
         readonly IFileSystem fileSystem;
 
 
-        public NewViewModel(INavigationService navigationService,
-                            IHttpTransferManager httpTransfers,
-                            IFileSystem fileSystem,
-                            AppSettings appSettings)
+        public CreateViewModel(INavigationService navigationService,
+                               IHttpTransferManager httpTransfers,
+                               IFileSystem fileSystem,
+                               AppSettings appSettings)
         {
             this.fileSystem = fileSystem;
             this.Url = appSettings.LastTransferUrl;

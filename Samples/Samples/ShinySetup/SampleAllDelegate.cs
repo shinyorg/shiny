@@ -130,10 +130,6 @@ namespace Samples.ShinySetup
         }
 
 
-        public async void OnStatusChanged(IHttpTransfer transfer)
-            => await this.CreateHttpTransferEvent(transfer, $"Status Changed: {transfer.Status}");
-
-
         public async void OnError(IHttpTransfer transfer, Exception ex)
             => await this.CreateHttpTransferEvent(transfer, "ERROR: " + ex);
 
@@ -147,7 +143,7 @@ namespace Samples.ShinySetup
             await this.conn.InsertAsync(new HttpEvent
             {
                 Identifier = transfer.Identifier,
-                IsUpload = transfer.IsUpload,
+                IsUpload = transfer.Request.IsUpload,
                 FileSize = transfer.FileSize,
                 Uri = transfer.Request.Uri,
                 Description = description,
