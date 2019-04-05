@@ -3,10 +3,10 @@ using System.Reactive;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Shiny.Locations;
-using Acr.UserDialogs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Prism.Navigation;
+using Shiny.Locations;
 
 
 namespace Samples.Geofences
@@ -16,16 +16,16 @@ namespace Samples.Geofences
         const double DEFAULT_DISTANCE_METERS = 200;
         readonly IGeofenceManager geofenceManager;
         readonly IGpsManager gpsManager;
-        readonly IUserDialogs dialogs;
+        readonly INavigationService navigator;
 
 
-        public CreateViewModel(IGeofenceManager geofenceManager,
-                               IGpsManager gpsManager,
-                               IUserDialogs dialogs)
+        public CreateViewModel(INavigationService navigator,
+                               IGeofenceManager geofenceManager,
+                               IGpsManager gpsManager)
         {
+            this.navigator = navigator;
             this.geofenceManager = geofenceManager;
             this.gpsManager = gpsManager;
-            this.dialogs = dialogs;
 
             var hasEventType = this.WhenAny(
                 x => x.NotifyOnEntry,
@@ -62,19 +62,13 @@ namespace Samples.Geofences
             );
 
             this.CreateGeofence = ReactiveCommand.CreateFromTask(
-                async _ =>
-                {
-                    await this.AddGeofence(
-                        this.Identifier,
-                        this.CenterLatitude,
-                        this.CenterLongitude,
-                        this.RadiusMeters
-                    );
-                    this.Identifier = String.Empty;
-                    this.CenterLatitude = 0;
-                    this.CenterLongitude = 0;
-                    this.RadiusMeters = DEFAULT_DISTANCE_METERS;
-                },
+                _ => this.AddGeofence
+                (
+                    this.Identifier,
+                    this.CenterLatitude,
+                    this.CenterLongitude,
+                    this.RadiusMeters
+                ),
                 this.WhenAny(
                     x => x.Identifier,
                     x => x.RadiusMeters,
@@ -136,7 +130,7 @@ namespace Samples.Geofences
                 NotifyOnExit = this.NotifyOnExit,
                 SingleUse = this.SingleUse
             });
-            this.dialogs.Toast($"Geofence {id} Created");
+            await this.navigator.GoBack();
         }
     }
 }

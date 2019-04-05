@@ -2,7 +2,7 @@
 using Xamarin.Forms;
 
 
-namespace Samples.Geofencing
+namespace Samples.Geofences
 {
 	public partial class MainPage : TabbedPage
 	{

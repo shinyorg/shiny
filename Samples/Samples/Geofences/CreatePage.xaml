@@ -4,40 +4,50 @@
              x:Class="Samples.Geofences.CreatePage"
              Title="Create">
     <ContentPage.Content>
-        <TableView Intent="Form">
-            <TableSection>
-                <EntryCell Label="Identifier"
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TableView Intent="Form" Grid.Row="0">
+                <TableSection>
+                    <EntryCell Label="Identifier"
                            Text="{Binding Identifier}"
                            Keyboard="Text" />
 
-                <EntryCell Label="Latitude"
+                    <EntryCell Label="Latitude"
                            Text="{Binding CenterLatitude}"
                            Keyboard="Numeric" />
 
-                <EntryCell Label="Longitude"
+                    <EntryCell Label="Longitude"
                            Text="{Binding CenterLongitude}"
                            Keyboard="Numeric" />
 
-                <EntryCell Label="Radius (meters)"
+                    <EntryCell Label="Radius (meters)"
                            Text="{Binding RadiusMeters}"
                            Keyboard="Numeric" />
-            </TableSection>
+                </TableSection>
 
-            <TableSection>
-                <SwitchCell Text="Notify On Entry" On="{Binding NotifyOnEntry}" />
-                <SwitchCell Text="Notify On Exit" On="{Binding NotifyOnExit}" />
-                <SwitchCell Text="Single Use" On="{Binding SingleUse}" />
-            </TableSection>
+                <TableSection>
+                    <SwitchCell Text="Notify On Entry" On="{Binding NotifyOnEntry}" />
+                    <SwitchCell Text="Notify On Exit" On="{Binding NotifyOnExit}" />
+                    <SwitchCell Text="Single Use" On="{Binding SingleUse}" />
+                </TableSection>
 
-            <TableSection>
-                <TextCell Text="Set Current Position" Command="{Binding SetCurrentLocation}" />
-                <TextCell Text="Create Geofence" Command="{Binding CreateGeofence}" />
-            </TableSection>
+                <TableSection>
+                    <TextCell Text="Set Current Position" Command="{Binding SetCurrentLocation}" />
+                </TableSection>
 
-            <TableSection Title="Quick Entries">
-                <TextCell Text="Apple HQ" Command="{Binding AddAppleHQ}" />
-                <TextCell Text="CN Tower, Toronto, Canada" Command="{Binding AddCnTower}" />
-            </TableSection>
-        </TableView>
+                <TableSection Title="Quick Entries">
+                    <TextCell Text="Apple HQ" Command="{Binding AddAppleHQ}" />
+                    <TextCell Text="CN Tower, Toronto, Canada" Command="{Binding AddCnTower}" />
+                </TableSection>
+            </TableView>
+
+            <Button Text="Create Geofence"
+                    Command="{Binding CreateGeofence}"
+                    Grid.Row="1" />
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

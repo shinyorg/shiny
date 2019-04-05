@@ -5,33 +5,42 @@
              Title="Geofences">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Clear" Command="{Binding DropAllFences}" />
+        <ToolbarItem Text="Create" Command="{Binding Create}" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
         <StackLayout>
-
             <Label Text="No Geofences Configured"
                    Style="{StaticResource NoDataLabel}"
                    IsVisible="{Binding HasGeofences, Converter={StaticResource Not}}" />
 
-            <ListView ItemsSource="{Binding Geofences}"
-                      IsVisible="{Binding HasGeofences}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextCell Text="{Binding Text}" Detail="{Binding Detail}">
-                            <TextCell.ContextActions>
-                                <MenuItem Text="Get Status"
+            <Grid IsVisible="{Binding HasGeofences}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ListView ItemsSource="{Binding Geofences}" Grid.Row="0">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextCell Text="{Binding Text}" Detail="{Binding Detail}">
+                                <TextCell.ContextActions>
+                                    <MenuItem Text="Get Status"
                                           Command="{Binding RequestCurrentState}" />
 
-                                <MenuItem Text="Remove"
+                                    <MenuItem Text="Remove"
                                           IsDestructive="True"
                                           Command="{Binding Remove}"/>
-                            </TextCell.ContextActions>
-                        </TextCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                                </TextCell.ContextActions>
+                            </TextCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <Button Text="Clear All Geofences"
+                        Command="{Binding DropAllFences}"
+                        Grid.Row="1" />
+            </Grid>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
