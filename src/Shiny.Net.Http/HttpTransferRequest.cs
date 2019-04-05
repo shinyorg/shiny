@@ -23,6 +23,7 @@ namespace Shiny.Net.Http
 
 
         public bool IsUpload { get; }
+        public string Description { get; set; }
         public string Uri { get; }
         public FileInfo LocalFile { get; }
         public bool UseMeteredConnection { get; set; }

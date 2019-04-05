@@ -8,7 +8,6 @@ namespace Shiny.Net.Http
     public interface IHttpTransferManager
     {
         //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
-        //native.SetAllowedOverRoaming()
         //native.SetNotificationVisibility(DownloadVisibility.Visible);
         //native.SetRequiresDeviceIdle
         //native.SetRequiresCharging
@@ -17,8 +16,11 @@ namespace Shiny.Net.Http
         //native.SetVisibleInDownloadsUi(true);
         //native.SetShowRunningNotification
         Task<IHttpTransfer> Enqueue(HttpTransferRequest request);
+        Task<IHttpTransfer> GetTransfer(string id);
         Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null);
+        Task Cancel(string id);
         Task Cancel(IHttpTransfer transfer = null);
         Task Cancel(QueryFilter filter);
+        IObservable<IHttpTransfer> WhenUpdated();
     }
 }

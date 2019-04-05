@@ -5,9 +5,8 @@ namespace Shiny.Net.Http
 {
     class HttpClientHttpTransfer : AbstractHttpTransfer
     {
-        public HttpClientHttpTransfer(HttpTransferRequest request, string id) : base(request)
+        public HttpClientHttpTransfer(HttpTransferRequest request, string id) : base(request, id)
         {
-
         }
 
         //static IObservable<IHttpTransfer> Upload(HttpTransferRequest request)

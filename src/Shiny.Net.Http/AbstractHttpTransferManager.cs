@@ -1,53 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
+
 
 namespace Shiny.Net.Http
 {
     public abstract class AbstractHttpTransferManager : IHttpTransferManager
     {
-        protected AbstractHttpTransferManager(IRepository repository)
-        {
-            this.Repository = repository;
-            this.SyncLock = new object();
-        }
-
-
-        protected IRepository Repository { get; }
-        protected object SyncLock { get; }
-        protected IDictionary<string, IHttpTransfer> CurrentTransfers { get; private set; }
-
         public abstract Task Cancel(IHttpTransfer transfer);
-        public virtual async Task Cancel(QueryFilter filter)
-        {
-            lock (this.SyncLock)
-                this.CurrentTransfers?.Clear();
+        public abstract IObservable<IHttpTransfer> WhenUpdated();
 
-            await this.Repository.Clear<HttpTransferRequest>();
+
+        public virtual async Task Cancel(string id)
+        {
+            var task = await this.GetTransfer(id).ConfigureAwait(false);
+            if (task != null)
+                await this.Cancel(task).ConfigureAwait(false);
         }
 
 
-        public virtual async Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter)
+        public virtual async Task Cancel(QueryFilter filter = null)
         {
-            if (this.CurrentTransfers == null)
+            var transfers = await this
+                .GetTransfers(filter)
+                .ConfigureAwait(false);
+
+            foreach (var transfer in transfers)
+                await this.Cancel(transfer).ConfigureAwait(false);
+        }
+
+
+        public virtual async Task<IHttpTransfer> GetTransfer(string id)
+        {
+            var transfers = await this.GetTransfers(new QueryFilter().Add(id)).ConfigureAwait(false);
+            return transfers.FirstOrDefault();
+        }
+
+
+        public virtual async Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null)
+        {
+            filter = filter ?? new QueryFilter();
+            switch (filter.Direction)
             {
-                lock (this.SyncLock)
-                {
-                    if (this.CurrentTransfers == null)
-                    {
-                        this.CurrentTransfers = new Dictionary<string, IHttpTransfer>();
-                        //await this.Repository.GetAll<HttpTransferRequest>(); // TODO: need Identifier
-                    }
-                }
+                case DirectionFilter.Download:
+                    return await this.GetDownloads(filter).ConfigureAwait(false);
+
+                case DirectionFilter.Upload:
+                    return await this.GetUploads(filter).ConfigureAwait(false);
+
+                default:
+                    var t1 = this.GetDownloads(filter);
+                    var t2 = this.GetUploads(filter);
+                    await Task.WhenAll(t1, t2).ConfigureAwait(false);
+                    return Enumerable.Concat(t1.Result, t2.Result);
             }
-            throw new NotImplementedException();
-        }
-
-
-        public virtual IObservable<IHttpTransfer> WhenChanged()
-        {
-            throw new NotImplementedException();
         }
 
 
@@ -61,6 +68,17 @@ namespace Shiny.Net.Http
             return transfer;
         }
 
+
+        protected virtual Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        protected virtual Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
+        {
+            throw new NotImplementedException();
+        }
 
         protected virtual Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
             => Task.FromResult<IHttpTransfer>(new HttpClientHttpTransfer(request, Guid.NewGuid().ToString()));

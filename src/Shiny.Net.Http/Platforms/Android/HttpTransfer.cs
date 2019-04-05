@@ -8,9 +8,8 @@ namespace Shiny.Net.Http
 {
     class HttpTransfer : AbstractHttpTransfer
     {
-        public HttpTransfer(HttpTransferRequest request, string id) : base(request)
+        public HttpTransfer(HttpTransferRequest request, string id) : base(request, id)
         {
-            this.Identifier = id;
         }
 
 
@@ -40,7 +39,7 @@ namespace Shiny.Net.Http
                     //this.RemoteFileName
                     this.FileSize = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnTotalSizeBytes));
                     this.BytesTransferred = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnBytesDownloadedSoFar));
-                    this.RunCalculations();
+                    //this.RunCalculations();
                     break;
 
                 case DownloadStatus.Successful:

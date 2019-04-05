@@ -11,7 +11,7 @@ using Native = Android.App.DownloadManager;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : IHttpTransferManager
+    public class HttpTransferManager : AbstractHttpTransferManager
     {
         readonly IAndroidContext context;
         readonly IRepository repository;
@@ -30,29 +30,12 @@ namespace Shiny.Net.Http
         }
 
 
-        public Task Cancel(IHttpTransfer transfer)
-        {
-            return Task.CompletedTask;
-        }
-
-
-        public Task Cancel(QueryFilter filter = null)
-        {
-            // TODO
-            return Task.CompletedTask;
-        }
-
-
-        public Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null)
-            => Task.FromResult(this.GetAll());
-
-
-        public async Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
+        protected override Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var native = new Native
-                .Request(Android.Net.Uri.Parse(request.Uri))
-                //.SetDestinationUri(request.LocalFile.ToNativeUri())
-                .SetAllowedOverMetered(request.UseMeteredConnection);
+                          .Request(Android.Net.Uri.Parse(request.Uri))
+                          .SetDestinationUri(request.LocalFile.ToNativeUri())
+                          .SetAllowedOverMetered(request.UseMeteredConnection);
 
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
@@ -63,13 +46,14 @@ namespace Shiny.Net.Http
             var transfer = new HttpTransfer(request, id.ToString());
             this.Sub(transfer);
 
-            return transfer;
+            return Task.FromResult<IHttpTransfer>(transfer);
         }
 
 
-        public IEnumerable<IHttpTransfer> GetAll()
+        public IEnumerable<IHttpTransfer> GetAll(QueryFilter filter)
         {
-            using (var cursor = this.context.GetManager().InvokeQuery(new Native.Query()))
+            var query = filter.ToNative();
+            using (var cursor = this.context.GetManager().InvokeQuery(query))
             {
                 while (cursor.MoveToNext())
                 {
@@ -98,10 +82,12 @@ namespace Shiny.Net.Http
 
         void Loop()
         {
-            var ids = this.transfers.Keys.Select(long.Parse).ToArray();
-            var query = new Native.Query().SetFilterById(ids);
+            var filter = new QueryFilter
+            {
+                Ids = this.transfers.Keys.ToList()
+            };
 
-            using (var cursor = this.context.GetManager().InvokeQuery(query))
+            using (var cursor = this.context.GetManager().InvokeQuery(filter.ToNative()))
             {
                 while (cursor.MoveToNext())
                 {
@@ -147,5 +133,23 @@ namespace Shiny.Net.Http
             var request = new HttpTransferRequest(uri, localPath);
             return request;
         }
+
+        public override Task Cancel(IHttpTransfer transfer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IObservable<IHttpTransfer> WhenUpdated()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
+            => Task.FromResult(this.GetAll(filter));
     }
 }

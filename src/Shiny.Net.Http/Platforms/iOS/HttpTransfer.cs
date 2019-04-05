@@ -4,20 +4,45 @@ using Foundation;
 
 namespace Shiny.Net.Http
 {
-    class HttpTransfer : AbstractHttpTransfer
+    public class HttpTransfer : IHttpTransfer
     {
+        public HttpTransfer(NSUrlSessionDownloadTask task, HttpTransferRequest request)
+        {
+            this.Request = request;
+            this.DownloadTask = task;
+            this.Identifier = task.TaskIdentifier.ToString();
+        }
+        public HttpTransfer(NSUrlSessionUploadTask task, HttpTransferRequest request)
+        {
+            this.Request = request;
+            this.UploadTask = task;
+            this.Identifier = task.TaskIdentifier.ToString();
+        }
+
+
         public NSUrlSessionDownloadTask DownloadTask { get; }
         public NSUrlSessionUploadTask UploadTask { get; }
 
-        public HttpTransfer(HttpTransferRequest request, NSUrlSessionDownloadTask task) : base(request)
-        {
-            this.DownloadTask = task;
-        }
+        public HttpTransferRequest Request { get; }
+        public string Identifier { get; }
+
+        public HttpTransferState Status { get; internal set; }
 
 
-        public HttpTransfer(HttpTransferRequest request, NSUrlSessionUploadTask task) : base(request)
+        Exception exception;
+        public Exception Exception
         {
-            this.UploadTask = task;
+            get => this.exception;
+            internal set
+            {
+                this.Status = HttpTransferState.Error;
+                this.exception = value;
+            }
         }
+
+        public string RemoteFileName => this.DownloadTask?.Response?.SuggestedFilename;
+        public long FileSize { get; internal set; }
+        public long BytesTransferred { get; internal set; }
+        public DateTime LastModified { get; internal set; }
     }
 }

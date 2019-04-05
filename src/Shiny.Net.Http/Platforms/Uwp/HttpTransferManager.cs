@@ -7,23 +7,35 @@ using Windows.Storage;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : IHttpTransferManager
+    public class HttpTransferManager : AbstractHttpTransferManager
     {
-        public Task Cancel(IHttpTransfer transfer)
+        protected override async Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
         {
-            throw new NotImplementedException();
+            var downloads = await BackgroundDownloader
+                .GetCurrentDownloadsAsync()
+                .AsTask();
+
+            return null;
         }
 
 
-        public async Task Cancel(QueryFilter filter)
+        protected override async Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
         {
-            var tasks = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
-            foreach (var task in tasks)
-                task.AttachAsync().Cancel();
+            var downloads = await BackgroundUploader
+                .GetCurrentUploadsAsync()
+                .AsTask();
+
+            return null;
         }
 
 
-        public async Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
+        protected override Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
+        {
+            return base.CreateUpload(request);
+        }
+
+
+        protected override async Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var task = new BackgroundDownloader
             {
@@ -38,23 +50,22 @@ namespace Shiny.Net.Http
             //var filePath = config.LocalFilePath ?? Path.Combine(ApplicationData.Current.LocalFolder.Path, Path.GetRandomFileName());
             var winFile = await StorageFile.GetFileFromPathAsync(request.LocalFile.FullName).AsTask();
             var op = task.CreateDownload(new Uri(request.Uri), winFile);
-
             //var operation = task.CreateDownload(new Uri(config.Uri), file);
             //var httpTask = new DownloadHttpTask(config, operation, false);
             //this.Add(httpTask);
             return null;
         }
 
-        public async Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter)
+        public override Task Cancel(IHttpTransfer transfer)
         {
-            var downloads = await BackgroundDownloader
-                .GetCurrentDownloadsAsync()
-                .AsTask();
-
-            return null;
+            //var tasks = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
+            //foreach (var task in tasks)
+            //    task.AttachAsync().Cancel();
+            throw new NotImplementedException();
         }
 
-        public IObservable<IHttpTransfer> WhenChanged()
+
+        public override IObservable<IHttpTransfer> WhenUpdated()
         {
             throw new NotImplementedException();
         }

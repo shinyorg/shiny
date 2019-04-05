@@ -29,7 +29,8 @@ namespace Shiny.Net.Http
             builder.AddSingleton<IHttpTransferManager>(services =>
             {
                 var repo = services.GetService<IRepository>();
-                return new HttpTransferManager(repo, maxConnectionsPerHost);
+                //return new HttpTransferManager(repo, maxConnectionsPerHost);
+                return null; // TODO
             });
             return true;
         }
