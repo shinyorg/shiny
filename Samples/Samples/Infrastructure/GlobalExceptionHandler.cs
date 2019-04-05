@@ -2,7 +2,7 @@
 using Acr.UserDialogs;
 using Autofac;
 using ReactiveUI;
-
+using Shiny.Logging;
 
 namespace Samples
 {
@@ -19,7 +19,7 @@ namespace Samples
 
         public void OnNext(Exception value)
         {
-            Console.WriteLine(value);
+            Log.Write(value);
             this.dialogs.Alert(value.ToString(), "ERROR");
         }
     }
