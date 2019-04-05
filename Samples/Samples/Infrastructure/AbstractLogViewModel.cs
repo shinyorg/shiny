@@ -5,9 +5,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
-using Prism.Navigation;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using Shiny;
 
 
