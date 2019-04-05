@@ -6,7 +6,6 @@
             Title="Jobs">
 
     <TabbedPage.Children>
-        <jobs:CreatePage />
         <jobs:ListPage />
         <jobs:LogPage />
     </TabbedPage.Children>

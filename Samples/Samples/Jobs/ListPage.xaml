@@ -4,40 +4,50 @@
              x:Class="Samples.Jobs.ListPage"
              Title="Jobs">
 
-    <ContentPage.Content>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Create" Command="{Binding Create}" />
+    </ContentPage.ToolbarItems>
 
-            <ListView ItemsSource="{Binding Jobs}"
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="No Job Logs"
+                   Style="{StaticResource NoDataLabel}"
+                   IsVisible="{Binding HasJobs, Converter={StaticResource Not}}" />
+
+            <Grid IsVisible="{Binding HasJobs}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <ListView ItemsSource="{Binding Jobs}"
                       IsPullToRefreshEnabled="true"
                       IsRefreshing="{Binding IsBusy}"
                       RefreshCommand="{Binding LoadJobs}"
                       Grid.Row="0">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextCell Text="{Binding Text}"
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextCell Text="{Binding Text}"
                                   Detail="{Binding Detail}"
                                   Command="{Binding PrimaryCommand}">
-                            <TextCell.ContextActions>
-                                <MenuItem Text="Cancel" Command="{Binding SecondaryCommand}" IsDestructive="true" />
-                                <MenuItem Text="Run" Command="{Binding PrimaryCommand}" />
-                            </TextCell.ContextActions>
-                        </TextCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                                <TextCell.ContextActions>
+                                    <MenuItem Text="Cancel" Command="{Binding SecondaryCommand}" IsDestructive="true" />
+                                    <MenuItem Text="Run" Command="{Binding PrimaryCommand}" />
+                                </TextCell.ContextActions>
+                            </TextCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
 
-            <Button Text="Cancel All Jobs"
+                <Button Text="Cancel All Jobs"
                     Command="{Binding CancelAllJobs}"
                     Grid.Row="1" />
 
-            <Button Text="Run All Jobs"
+                <Button Text="Run All Jobs"
                     Command="{Binding RunAllJobs}"
                     Grid.Row="2" />
-        </Grid>
+            </Grid>
+        </StackLayout>
     </ContentPage.Content>
 </ContentPage>

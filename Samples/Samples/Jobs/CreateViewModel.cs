@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Shiny;
-using Shiny.Jobs;
 using Acr.UserDialogs;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Prism.Navigation;
+using Shiny;
+using Shiny.Jobs;
 using Samples.ShinySetup;
+
 
 namespace Samples.Jobs
 {
@@ -16,7 +18,9 @@ namespace Samples.Jobs
         readonly IUserDialogs dialogs;
 
 
-        public CreateViewModel(IJobManager jobManager, IUserDialogs dialogs)
+        public CreateViewModel(IJobManager jobManager,
+                               INavigationService navigator,
+                               IUserDialogs dialogs)
         {
             this.jobManager = jobManager;
             this.dialogs = dialogs;
@@ -43,7 +47,7 @@ namespace Samples.Jobs
                     };
                     job.SetValue("LoopCount", this.JobLoopCount);
                     await this.jobManager.Schedule(job);
-                    this.dialogs.Toast("Job Created Successfully");
+                    await navigator.GoBack();
                 },
                 valObs
             );
