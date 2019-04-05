@@ -53,13 +53,6 @@ namespace Shiny.Net.Http
                 .Request(Android.Net.Uri.Parse(request.Uri))
                 //.SetDestinationUri(request.LocalFile.ToNativeUri())
                 .SetAllowedOverMetered(request.UseMeteredConnection);
-            //native.SetAllowedNetworkTypes(DownloadNetwork.Wifi)
-            //native.SetAllowedOverRoaming()
-            //native.SetNotificationVisibility(DownloadVisibility.Visible);
-            //native.SetRequiresDeviceIdle
-            //native.SetRequiresCharging
-            //native.SetTitle("")
-            //native.SetVisibleInDownloadsUi(true);
 
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
