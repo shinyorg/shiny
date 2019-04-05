@@ -3,7 +3,7 @@ using System.Globalization;
 using Xamarin.Forms;
 
 
-namespace Samples
+namespace Samples.Infrastructure
 {
     public class PercentToDecimalValueConverter : IValueConverter
     {

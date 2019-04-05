@@ -22,7 +22,6 @@
         <PackageReference Include="ReactiveUI.Fody" Version="9.12.1" />
         <PackageReference Include="sqlite-net-pcl" Version="1.5.231" />
         <PackageReference Include="Xamarin.Forms" Version="3.6.0.264807" />
-        <PackageReference Include="Acr.XamForms" Version="4.0.1" />
         <PackageReference Include="Acr.UserDialogs" Version="7.0.4" />
     </ItemGroup>
 

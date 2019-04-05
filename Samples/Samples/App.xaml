@@ -2,8 +2,7 @@
 <prism:PrismApplication xmlns="http://xamarin.com/schemas/2014/forms"
                         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                         xmlns:prism="clr-namespace:Prism.Autofac;assembly=Prism.Autofac.Forms"
-                        xmlns:acr="clr-namespace:Acr.XamForms;assembly=Acr.XamForms"
-                        xmlns:sample="clr-namespace:Samples"
+                        xmlns:sample="clr-namespace:Samples.Infrastructure"
                         x:Class="Samples.App">
     <prism:PrismApplication.Resources>
         <ResourceDictionary>
@@ -12,6 +11,19 @@
             <Color x:Key="PrimaryDark">#4ba677</Color>
             <Color x:Key="Accent">#745296</Color>
             <Color x:Key="NavigationBarTextColor">White</Color>
+
+            <!--<Image BackgroundColor="#D1D1D1">
+                <Image.Source>
+                    <FontImageSource Glyph="&#xf30c;"
+                         FontFamily="{StaticResource FontAwesome}"
+                         Size="44" />
+                </Image.Source>
+            </Image>-->
+            <OnPlatform x:TypeArguments="x:String" x:Key="FontAwesome">
+                <On Platform="Android" Value="fontawesome.otf#Regular" />
+                <On Platform="iOS" Value="FontAwesome5Free-Regular" />
+                <On Platform="UWP" Value="/Assets/fontawesome.otf#Font Awesome 5 Free" />
+            </OnPlatform>
 
             <Style TargetType="Button">
                 <Setter Property="CornerRadius" Value="23" />
@@ -72,7 +84,7 @@
                 <Setter Property="VerticalOptions" Value="FillAndExpand" />
             </Style>
 
-            <acr:InverseBooleanConverter x:Key="Not" />
+            <sample:InverseBooleanConverter x:Key="Not" />
             <sample:PercentToDecimalValueConverter x:Key="PercentToDecimalValueConverter" />
         </ResourceDictionary>
     </prism:PrismApplication.Resources>
