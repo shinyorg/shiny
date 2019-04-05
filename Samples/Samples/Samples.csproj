@@ -21,7 +21,7 @@
         <PackageReference Include="Prism.Autofac.Forms" Version="7.1.0.431" />
         <PackageReference Include="ReactiveUI.Fody" Version="9.12.1" />
         <PackageReference Include="sqlite-net-pcl" Version="1.5.231" />
-        <PackageReference Include="Xamarin.Forms" Version="3.6.0.264807" />
+        <PackageReference Include="Xamarin.Forms" Version="3.6.0.293080" />
         <PackageReference Include="Acr.UserDialogs" Version="7.0.4" />
     </ItemGroup>
 
