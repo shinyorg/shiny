@@ -12,6 +12,8 @@ namespace Shiny.Net.Http
             this.DownloadTask = task;
             this.Identifier = task.TaskIdentifier.ToString();
         }
+
+
         public HttpTransfer(NSUrlSessionUploadTask task, HttpTransferRequest request)
         {
             this.Request = request;
@@ -25,7 +27,6 @@ namespace Shiny.Net.Http
 
         public HttpTransferRequest Request { get; }
         public string Identifier { get; }
-
         public HttpTransferState Status { get; internal set; }
 
 

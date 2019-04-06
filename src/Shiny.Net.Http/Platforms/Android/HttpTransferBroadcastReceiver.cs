@@ -12,8 +12,8 @@ namespace Shiny.Net.Http
     [IntentFilter(new[] { Native.ActionDownloadComplete })]
     public class HttpTransferBroadcastReceiver : BroadcastReceiver
     {
-        public static IObservable<object> WhenReceived() => receiveSubject;
-        static Subject<object> receiveSubject = new Subject<object>();
+        public static IObservable<IHttpTransfer> WhenCompleted() => compSubj;
+        static Subject<IHttpTransfer> compSubj = new Subject<IHttpTransfer>();
 
 
         public override void OnReceive(Context context, Intent intent)
@@ -21,9 +21,11 @@ namespace Shiny.Net.Http
             if (intent.Action != Native.ActionDownloadComplete)
                 return;
 
-            var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
             var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
-            //ShinyHost.Resolve<IRepository>()
+            //compSubj.OnNext(null);
+            //ShinyHost
+            //    .Resolve<IHttpTransferDelegate>()
+            //    .OnCompleted(null);
         }
     }
 }

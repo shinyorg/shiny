@@ -13,7 +13,5 @@ namespace Shiny.Net.Http
         long FileSize { get; }
         long BytesTransferred { get; }
         DateTime LastModified { get; }
-
-        //HttpTransferMetrics CalculateMetrics();
     }
 }

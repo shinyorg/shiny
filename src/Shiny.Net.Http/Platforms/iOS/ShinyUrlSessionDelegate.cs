@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reactive.Subjects;
 using Foundation;
 
@@ -7,8 +8,8 @@ namespace Shiny.Net.Http
 {
     public class CoreSessionDownloadDelegate : NSUrlSessionDownloadDelegate
     {
-        readonly Subject<HttpTransfer> onEvent = new Subject<HttpTransfer>();
-        internal IObservable<HttpTransfer> WhenEventOccurs => this.onEvent;
+        readonly Subject<IHttpTransfer> onEvent = new Subject<IHttpTransfer>();
+        internal IObservable<IHttpTransfer> WhenEventOccurs() => this.onEvent;
 
 
         // TODO: reload all transfer objects
@@ -47,7 +48,6 @@ namespace Shiny.Net.Http
                 transfer.Status = HttpTransferState.InProgress;
                 transfer.BytesTransferred = totalBytesWritten;
                 transfer.FileSize = totalBytesExpectedToWrite;
-                //transfer.RunCalculations();
             });
 
 
@@ -67,6 +67,7 @@ namespace Shiny.Net.Http
             {
                 transfer.Status = HttpTransferState.Completed;
                 transfer.LastModified = DateTime.UtcNow;
+                File.Move(location.Path, transfer.Request.LocalFile.FullName);
                 tdelegate.OnCompleted(transfer);
             });
 
@@ -79,10 +80,10 @@ namespace Shiny.Net.Http
 
         void Set(NSUrlSessionTask task, Action<HttpTransfer> setter)
         {
-            // TODO: set last modified
             var transfer = this.Get(task);
             setter(transfer);
             transfer.LastModified = DateTime.UtcNow;
+            this.onEvent.OnNext(transfer);
         }
 
 
@@ -91,6 +92,7 @@ namespace Shiny.Net.Http
             var transfer = this.Get(task);
             var del = ShinyHost.Resolve<IHttpTransferDelegate>();
             setter(del, transfer);
+            this.onEvent.OnNext(transfer);
         }
     }
 }

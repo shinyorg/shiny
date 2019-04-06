@@ -30,8 +30,20 @@ namespace Shiny.Net.Http
                 if (filter.States?.Any() ?? false)
                 {
                     var stateFlags = 0;
+
+                    // TODO: filter out unknown states
                     foreach (var state in filter.States)
-                        stateFlags += (int)state.ToNative();
+                    {
+                        switch (state)
+                        {
+                            case HttpTransferState.Unknown:
+                                break;
+
+                            case HttpTransferState.Completed:
+                                stateFlags += (int)DownloadStatus.Successful;
+                                break;
+                        }
+                    }
 
                     var states = (DownloadStatus)stateFlags;
                     query.SetFilterByStatus(states);
@@ -40,18 +52,6 @@ namespace Shiny.Net.Http
             return query;
         }
 
-
-        static DownloadStatus ToNative(this HttpTransferState state)
-        {
-            switch (state)
-            {
-                case HttpTransferState.Completed:
-                    return DownloadStatus.Successful;
-
-                default:
-                    return DownloadStatus.Failed;
-            }
-        }
 
         static Native downloadManager;
         public static Native GetManager(this IAndroidContext context)

@@ -10,6 +10,13 @@ namespace Shiny.Net.Http
         public List<HttpTransferState> States { get; set; } = new List<HttpTransferState>();
 
 
+        public QueryFilter SetDirection(DirectionFilter direction)
+        {
+            this.Direction = direction;
+            return this;
+        }
+
+
         public QueryFilter Add(params string[] ids)
         {
             this.Ids.AddRange(ids);
@@ -17,9 +24,9 @@ namespace Shiny.Net.Http
         }
 
 
-        public QueryFilter Add(HttpTransferState state)
+        public QueryFilter Add(params HttpTransferState[] states)
         {
-            this.States.Add(state);
+            this.States.AddRange(states);
             return this;
         }
     }

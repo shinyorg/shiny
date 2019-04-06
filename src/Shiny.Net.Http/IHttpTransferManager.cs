@@ -20,6 +20,7 @@ namespace Shiny.Net.Http
         Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null);
         Task Cancel(string id);
         Task Cancel(IHttpTransfer transfer = null);
+        //Task<int> PurgeDatabase(QueryFilter query = null);
         Task Cancel(QueryFilter filter);
         IObservable<IHttpTransfer> WhenUpdated();
     }

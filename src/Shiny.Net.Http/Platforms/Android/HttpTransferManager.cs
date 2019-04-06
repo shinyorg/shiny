@@ -4,9 +4,9 @@ using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Database;
-using Shiny.Infrastructure;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.Net.Http
@@ -15,14 +15,11 @@ namespace Shiny.Net.Http
     {
         readonly IAndroidContext context;
         readonly IRepository repository;
-        readonly object syncLock;
         readonly IDictionary<string, HttpTransfer> transfers;
-        IDisposable refreshSub;
 
 
         public HttpTransferManager(IAndroidContext context, IRepository repository)
         {
-            this.syncLock = new object();
             this.transfers = new Dictionary<string, HttpTransfer>();
 
             this.context = context;
@@ -30,12 +27,55 @@ namespace Shiny.Net.Http
         }
 
 
+
+        //public override Task Cancel(QueryFilter filter = null)
+        //{
+        //}
+
+        public override Task Cancel(IHttpTransfer transfer)
+        {
+            var id = long.Parse(transfer.Identifier);
+            this.context
+                .GetManager()
+                .Remove(id);
+            return Task.CompletedTask;
+        }
+
+
+        static readonly QueryFilter updateFilter = new QueryFilter();
+
+        IObservable<IHttpTransfer> httpObs;
+        public override IObservable<IHttpTransfer> WhenUpdated()
+        {
+            this.httpObs = this.httpObs ?? Observable
+                .Create<IHttpTransfer>(ob =>
+                {
+                    var lastRun = DateTime.UtcNow;
+                    return Observable
+                        .Interval(TimeSpan.FromSeconds(1))
+                        .Subscribe(_ =>
+                        {
+                            var transfers = this.GetAll(updateFilter);
+                            foreach (var transfer in transfers)
+                                if (transfer.LastModified >= lastRun)
+                                    ob.OnNext(transfer);
+
+                            lastRun = DateTime.UtcNow;
+                        });
+                })
+                .Publish()
+                .RefCount();
+
+            return this.httpObs;
+        }
+
+
         protected override Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var native = new Native
-                          .Request(Android.Net.Uri.Parse(request.Uri))
-                          .SetDestinationUri(request.LocalFile.ToNativeUri())
-                          .SetAllowedOverMetered(request.UseMeteredConnection);
+                .Request(Android.Net.Uri.Parse(request.Uri))
+                .SetDestinationUri(request.LocalFile.ToNativeUri())
+                .SetAllowedOverMetered(request.UseMeteredConnection);
 
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
@@ -44,7 +84,7 @@ namespace Shiny.Net.Http
             //await this.repository.Set(id.ToString(), request);
 
             var transfer = new HttpTransfer(request, id.ToString());
-            this.Sub(transfer);
+            //this.Sub(transfer);
 
             return Task.FromResult<IHttpTransfer>(transfer);
         }
@@ -63,49 +103,6 @@ namespace Shiny.Net.Http
         }
 
 
-        void Sub(HttpTransfer transfer)
-        {
-            lock (this.syncLock)
-            {
-                this.transfers.Add(transfer.Identifier, transfer);
-
-                // TODO: uploads too
-                if (this.refreshSub == null)
-                {
-                    this.refreshSub = Observable
-                        .Interval(TimeSpan.FromSeconds(1))
-                        .Subscribe(_ => this.Loop());
-                }
-            }
-        }
-
-
-        void Loop()
-        {
-            var filter = new QueryFilter
-            {
-                Ids = this.transfers.Keys.ToList()
-            };
-
-            using (var cursor = this.context.GetManager().InvokeQuery(filter.ToNative()))
-            {
-                while (cursor.MoveToNext())
-                {
-                    var t = this.ToLib(cursor);
-                    switch (t.Status)
-                    {
-                        case HttpTransferState.Error:
-                        case HttpTransferState.Cancelled:
-                        case HttpTransferState.Completed:
-                            lock (this.syncLock)
-                                this.transfers.Remove(t.Identifier);
-                            break;
-                    }
-                }
-            }
-        }
-
-
         IHttpTransfer ToLib(ICursor cursor)
         {
             HttpTransfer transfer = null;
@@ -115,7 +112,7 @@ namespace Shiny.Net.Http
             {
                 var request = this.RebuildRequest(cursor);
                 transfer = new HttpTransfer(request, id.ToString());
-                this.Sub(transfer);
+                //this.Sub(transfer);
             }
             transfer = this.transfers[id];
             transfer.Refresh(cursor);
@@ -134,20 +131,12 @@ namespace Shiny.Net.Http
             return request;
         }
 
-        public override Task Cancel(IHttpTransfer transfer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IObservable<IHttpTransfer> WhenUpdated()
-        {
-            throw new NotImplementedException();
-        }
 
         protected override Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(Enumerable.Empty<IHttpTransfer>());
         }
+
 
         protected override Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
             => Task.FromResult(this.GetAll(filter));

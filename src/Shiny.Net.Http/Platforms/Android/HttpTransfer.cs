@@ -27,8 +27,25 @@ namespace Shiny.Net.Http
                     break;
 
                 case DownloadStatus.Paused:
-                    // TODO: get reason
-                    this.Status = HttpTransferState.Paused;
+                    var reason = (DownloadPausedReason)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
+                    switch (reason)
+                    {
+                        case DownloadPausedReason.Unknown:
+                            this.Status = HttpTransferState.Paused;
+                            break;
+
+                        case DownloadPausedReason.QueuedForWifi:
+                            this.Status = HttpTransferState.PausedByCostedNetwork;
+                            break;
+
+                        case DownloadPausedReason.WaitingForNetwork:
+                            this.Status = HttpTransferState.PausedByNoNetwork;
+                            break;
+
+                        case DownloadPausedReason.WaitingToRetry:
+                            this.Status = HttpTransferState.Retrying;
+                            break;
+                    }
                     break;
 
                 case DownloadStatus.Pending:
@@ -36,10 +53,8 @@ namespace Shiny.Net.Http
                     break;
 
                 case DownloadStatus.Running:
-                    //this.RemoteFileName
                     this.FileSize = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnTotalSizeBytes));
                     this.BytesTransferred = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnBytesDownloadedSoFar));
-                    //this.RunCalculations();
                     break;
 
                 case DownloadStatus.Successful:

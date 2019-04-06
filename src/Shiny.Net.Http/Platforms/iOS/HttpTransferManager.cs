@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Shiny.Infrastructure;
@@ -27,7 +28,6 @@ namespace Shiny.Net.Http
                 this.sessionDelegate,
                 new NSOperationQueue()
             );
-
         }
 
 
@@ -41,7 +41,6 @@ namespace Shiny.Net.Http
             else
                 t.UploadTask.Cancel();
 
-            // TODO: remove from queue
             t.Status = HttpTransferState.Cancelled;
             return Task.CompletedTask;
         }
@@ -49,68 +48,43 @@ namespace Shiny.Net.Http
 
         protected override Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
         {
-            //var task = this.session.CreateUpoadTask(request.ToNative());
-
             var task = this.session.CreateDownloadTask(request.ToNative());
-            //new HttpTransfer(request, task);
+            var transfer = new HttpTransfer(task, request);
 
-            return null;
+            return Task.FromResult<IHttpTransfer>(transfer);
         }
 
 
         protected override Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
         {
             var task = this.session.CreateUploadTask(request.ToNative());
+            var transfer = new HttpTransfer(task, request);
 
-            //new HttpTransfer(request, task);
-
-            return null;
+            return Task.FromResult<IHttpTransfer>(transfer);
         }
 
 
         public override IObservable<IHttpTransfer> WhenUpdated()
+            => this.sessionDelegate.WhenEventOccurs();
+
+
+        protected override async Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
         {
-            throw new NotImplementedException();
+            var tasks = await this.session.GetAllTasksAsync();
+            return tasks
+                .OfType<NSUrlSessionUploadTask>()
+                .Select(x => new HttpTransfer(x, null));
+            // TODO: resume?
         }
 
-        protected override Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+
+        protected override async Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
         {
-            throw new NotImplementedException();
+            var tasks = await this.session.GetAllTasksAsync();
+            return tasks
+                .OfType<NSUrlSessionDownloadTask>()
+                .Select(x => new HttpTransfer(x, null));
+            // TODO: resume?
         }
-
-        protected override Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        //this.session.GetTasks2((_, uploads, downloads) =>
-        //{
-        //    foreach (NSUrlSessionUploadTask upload in uploads)
-        //    {
-        //        // TODO: need localFilePath for what WAS uploading
-        //        // TODO: need to set resumed status
-        //        //this.Add(new HttpTask(this.ToTaskConfiguration(upload), upload));
-        //        upload.Resume();
-        //    }
-
-        //    foreach (var download in downloads)
-        //    {
-        //        //this.Add(new HttpTask(this.ToTaskConfiguration(download), download));
-        //        download.Resume();
-        //    }
-        //});
-
-        //protected virtual HttpTransferConfiguration ToTaskConfiguration(NSUrlSessionTask native)
-        //    => new HttpTransferConfiguration(native.OriginalRequest.ToString())
-        //    {
-        //        UseMeteredConnection = native.OriginalRequest.AllowsCellularAccess,
-        //        HttpMethod = native.OriginalRequest.HttpMethod,
-        //        PostData = native.OriginalRequest.Body.ToString(),
-        //        Headers = native.OriginalRequest.Headers.ToDictionary(
-        //            x => x.Key.ToString(),
-        //            x => x.Value.ToString()
-        //        )
-        //    };
     }
 }
