@@ -10,10 +10,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <EmbeddedResource Remove="LoggingPage.xaml" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
         <PackageReference Include="Humanizer" Version="2.6.2" />
         <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.14.0" />
@@ -36,36 +32,4 @@
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="HttpTransfers\CreatePage.xaml.cs">
-        <DependentUpon>CreatePage.xaml</DependentUpon>
-      </Compile>
-      <Compile Update="HttpTransfers\PendingPage.xaml.cs">
-        <DependentUpon>PendingPage.xaml</DependentUpon>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Update="HttpTransfers\LogPage.xaml">
-        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="HttpTransfers\MainPage.xaml">
-        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Logging\EventsPage.xaml">
-        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Logging\LoggingPage.xaml">
-        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Logging\TestPage.xaml">
-        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Notifications\SettingsPage.xaml">
-        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      </EmbeddedResource>
-      <EmbeddedResource Update="Notifications\SetupPage.xaml">
-        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      </EmbeddedResource>
-    </ItemGroup>
 </Project>
