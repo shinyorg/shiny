@@ -13,5 +13,6 @@ namespace Shiny.Net.Http
         long FileSize { get; }
         long BytesTransferred { get; }
         DateTime LastModified { get; }
+        double PercentComplete { get; }
     }
 }

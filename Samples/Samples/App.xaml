@@ -92,7 +92,6 @@
             </Style>
 
             <sample:InverseBooleanConverter x:Key="Not" />
-            <sample:PercentToDecimalValueConverter x:Key="PercentToDecimalValueConverter" />
         </ResourceDictionary>
     </prism:PrismApplication.Resources>
 </prism:PrismApplication>

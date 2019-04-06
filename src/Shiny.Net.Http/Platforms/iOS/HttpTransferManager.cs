@@ -10,16 +10,16 @@ namespace Shiny.Net.Http
 {
     public class HttpTransferManager : AbstractHttpTransferManager
     {
-        readonly IRepository repository;
-        readonly CoreSessionDownloadDelegate sessionDelegate;
+        readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;
         readonly NSUrlSession session;
 
 
-        public HttpTransferManager(IRepository repository, int maxConnectionsPerHost = 1)
+        public HttpTransferManager(IRepository repository,
+                                   IHttpTransferDelegate httpDelegate,
+                                   int maxConnectionsPerHost = 1)
         {
-            this.repository = repository;
-            this.sessionDelegate = new CoreSessionDownloadDelegate();
+            this.sessionDelegate = new ShinyUrlSessionDelegate(repository, httpDelegate);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(NSBundle.MainBundle.BundleIdentifier + ".BackgroundTransferSession");
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
 
@@ -28,6 +28,7 @@ namespace Shiny.Net.Http
                 this.sessionDelegate,
                 new NSOperationQueue()
             );
+            this.sessionDelegate.Init(this.session);
         }
 
 
@@ -42,6 +43,8 @@ namespace Shiny.Net.Http
                 t.UploadTask.Cancel();
 
             t.Status = HttpTransferState.Cancelled;
+            this.sessionDelegate.Remove(t);
+
             return Task.CompletedTask;
         }
 
@@ -50,6 +53,7 @@ namespace Shiny.Net.Http
         {
             var task = this.session.CreateDownloadTask(request.ToNative());
             var transfer = new HttpTransfer(task, request);
+            this.sessionDelegate.Add(transfer);
 
             return Task.FromResult<IHttpTransfer>(transfer);
         }
@@ -59,6 +63,7 @@ namespace Shiny.Net.Http
         {
             var task = this.session.CreateUploadTask(request.ToNative());
             var transfer = new HttpTransfer(task, request);
+            this.sessionDelegate.Add(transfer);
 
             return Task.FromResult<IHttpTransfer>(transfer);
         }
@@ -68,23 +73,25 @@ namespace Shiny.Net.Http
             => this.sessionDelegate.WhenEventOccurs();
 
 
-        protected override async Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+        protected override Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
         {
-            var tasks = await this.session.GetAllTasksAsync();
-            return tasks
-                .OfType<NSUrlSessionUploadTask>()
-                .Select(x => new HttpTransfer(x, null));
-            // TODO: resume?
+            var results = this.sessionDelegate
+                .GetCurrentTransfers()
+                .Where(x => x.UploadTask != null)
+                .Cast<IHttpTransfer>();
+
+            return Task.FromResult(results);
         }
 
 
-        protected override async Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
+        protected override Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
         {
-            var tasks = await this.session.GetAllTasksAsync();
-            return tasks
-                .OfType<NSUrlSessionDownloadTask>()
-                .Select(x => new HttpTransfer(x, null));
-            // TODO: resume?
+            var results = this.sessionDelegate
+                .GetCurrentTransfers()
+                .Where(x => x.DownloadTask != null)
+                .Cast<IHttpTransfer>();
+
+            return Task.FromResult(results);
         }
     }
 }

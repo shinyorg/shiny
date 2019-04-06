@@ -22,6 +22,8 @@ namespace Samples.HttpTransfers
         public PendingViewModel(INavigationService navigation,
                                 IHttpTransferManager httpTransfers)
         {
+            this.httpTransfers = httpTransfers;
+
             this.Create = navigation.NavigateCommand("CreateTransfer");
 
             this.Load = ReactiveCommand.CreateFromTask(async () =>
@@ -91,7 +93,7 @@ namespace Samples.HttpTransfers
             // => Math.Round(this.transfer.BytesPerSecond.Bytes().Kilobytes, 2) + " Kb/s";
             //public string EstimateMinsRemaining => Math.Round(this.transfer.EstimatedCompletionTime.TotalMinutes, 1) + " min(s)";
             //viewModel.EstimateMinsRemaining =
-            //viewModel.PercentComplete
+            viewModel.PercentComplete = transfer.PercentComplete;
             viewModel.Status = transfer.Status.ToString();
         }
     }

@@ -18,10 +18,13 @@ namespace Samples.ShinySetup
     {
         public override void ConfigureServices(IServiceCollection builder)
         {
+            Log.AddLogger(new DbLogger(), true, false);
+#if DEBUG
             Log.UseConsole();
             Log.UseDebug();
+#else
             Log.AddLogger(new AppCenterLogger(), true, true);
-            Log.AddLogger(new DbLogger(), true, false);
+#endif
 
             // create your infrastructures
             // jobs, connectivity, power, filesystem, are installed automatically

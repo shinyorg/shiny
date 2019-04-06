@@ -12,7 +12,7 @@ namespace Samples.HttpTransfers
         [Reactive] public bool IsUpload { get; set; }
         [Reactive] public string Status { get; set; }
         [Reactive] public string Uri { get; set; }
-        [Reactive] public decimal PercentComplete { get; set; }
+        [Reactive] public double PercentComplete { get; set; }
         [Reactive] public string TransferSpeed { get; set; }
         [Reactive] public string EstimateMinsRemaining { get; set; }
 

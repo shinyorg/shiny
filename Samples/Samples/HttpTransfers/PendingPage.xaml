@@ -76,7 +76,7 @@
                                            Grid.Column="2"
                                            Grid.Row="2" />
 
-                                    <ProgressBar Progress="{Binding PercentComplete, Converter={StaticResource PercentToDecimalValueConverter}}"
+                                    <ProgressBar Progress="{Binding PercentComplete}"
                                                  HorizontalOptions="FillAndExpand"
                                                  Grid.Column="0"
                                                  Grid.ColumnSpan="3"
