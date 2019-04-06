@@ -42,6 +42,7 @@ namespace Samples.Notifications
                 .DisposeWith(this.DeactivateWith);
         }
 
+
         [Reactive] public bool ToggleAll { get; set; }
         [Reactive] public bool UseNotificationsBle { get; set; }
         [Reactive] public bool UseNotificationsGeofences { get; set; }

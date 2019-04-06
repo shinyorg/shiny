@@ -5,12 +5,37 @@ using System.Windows.Input;
 using Shiny.Logging;
 using Prism.Navigation;
 using ReactiveUI;
-
+using Acr.UserDialogs;
+using Shiny;
 
 namespace Samples
 {
     public static class Extensions
     {
+        public static async Task<bool> RequestAccess(this IUserDialogs dialogs, Func<Task<AccessState>> request)
+        {
+            var access = await request();
+            return await dialogs.AlertAccess(access);
+        }
+
+
+        public static async Task<bool> AlertAccess(this IUserDialogs dialogs,  AccessState access)
+        {
+            switch (access)
+            {
+                case AccessState.Available:
+                    return true;
+
+                case AccessState.Restricted:
+                    await dialogs.AlertAsync("WARNING: Access is restricted");
+                    return true;
+
+                default:
+                    await dialogs.AlertAsync("Invalid Access State: " + access);
+                    return false;
+            }
+        }
+
         public static IDisposable SubOnMainThread<T>(this IObservable<T> obs, Action<T> onNext)
             => obs
                 .ObserveOn(RxApp.MainThreadScheduler)

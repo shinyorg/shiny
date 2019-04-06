@@ -7,6 +7,8 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Prism.Navigation;
 using Shiny.Locations;
+using Shiny;
+using Acr.UserDialogs;
 
 
 namespace Samples.Geofences
@@ -17,15 +19,18 @@ namespace Samples.Geofences
         readonly IGeofenceManager geofenceManager;
         readonly IGpsManager gpsManager;
         readonly INavigationService navigator;
+        readonly IUserDialogs dialogs;
 
 
         public CreateViewModel(INavigationService navigator,
                                IGeofenceManager geofenceManager,
-                               IGpsManager gpsManager)
+                               IGpsManager gpsManager,
+                               IUserDialogs dialogs)
         {
             this.navigator = navigator;
             this.geofenceManager = geofenceManager;
             this.gpsManager = gpsManager;
+            this.dialogs = dialogs;
 
             var hasEventType = this.WhenAny(
                 x => x.NotifyOnEntry,
@@ -120,17 +125,21 @@ namespace Samples.Geofences
 
         async Task AddGeofence(string id, double lat, double lng, double distance)
         {
-            await this.geofenceManager.StartMonitoring(new GeofenceRegion(
-                id,
-                new Position(lat, lng),
-                Distance.FromMeters(distance)
-            )
+            var access = await this.dialogs.RequestAccess(this.geofenceManager.RequestAccess);
+            if (access)
             {
-                NotifyOnEntry = this.NotifyOnEntry,
-                NotifyOnExit = this.NotifyOnExit,
-                SingleUse = this.SingleUse
-            });
-            await this.navigator.GoBack();
+                await this.geofenceManager.StartMonitoring(new GeofenceRegion(
+                    id,
+                    new Position(lat, lng),
+                    Distance.FromMeters(distance)
+                )
+                {
+                    NotifyOnEntry = this.NotifyOnEntry,
+                    NotifyOnExit = this.NotifyOnExit,
+                    SingleUse = this.SingleUse
+                });
+                await this.navigator.GoBack();
+            }
         }
     }
 }

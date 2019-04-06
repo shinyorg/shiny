@@ -30,6 +30,10 @@ namespace Samples.Gps
 
             this.GetCurrentPosition = ReactiveCommand.CreateFromTask(async _ =>
             {
+                var result = await dialogs.RequestAccess(() => this.manager.RequestAccess(true));
+                if (!result)
+                    return;
+
                 var reading = await this.manager.GetLastReading();
                 if (reading == null)
                     dialogs.Alert("Could not getting GPS coordinates");
@@ -47,6 +51,10 @@ namespace Samples.Gps
                 }
                 else
                 {
+                    var result = await dialogs.RequestAccess(() => this.manager.RequestAccess(true));
+                    if (!result)
+                        return;
+
                     await this.manager.StartListener(new GpsRequest
                     {
                         UseBackground = true
