@@ -33,9 +33,10 @@
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <BundleAssemblies>true</BundleAssemblies>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
@@ -45,6 +46,7 @@
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <BundleAssemblies>true</BundleAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
