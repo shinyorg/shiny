@@ -17,7 +17,7 @@ namespace Samples
                                       IConfirmNavigationAsync
     {
         CompositeDisposable deactivateWith;
-        protected CompositeDisposable DeactivateWith
+        public CompositeDisposable DeactivateWith
         {
             get
             {
@@ -26,9 +26,10 @@ namespace Samples
 
                 return this.deactivateWith;
             }
+            set => this.deactivateWith = value;
         }
 
-        protected CompositeDisposable DestroyWith { get; } = new CompositeDisposable();
+        public CompositeDisposable DestroyWith { get; set; } = new CompositeDisposable();
 
 
         public virtual void OnAppearing()
@@ -66,6 +67,7 @@ namespace Samples
 
         public virtual void Destroy()
         {
+            this.deactivateWith?.Dispose();
             this.DestroyWith?.Dispose();
         }
 
@@ -77,7 +79,11 @@ namespace Samples
         protected void BindBusyCommand<T, U>(ReactiveCommand<T, U> reactiveCommand)
             => reactiveCommand
                 .IsExecuting
-                .Subscribe(x => this.IsBusy = x)
+                .SubOnMainThread(
+                    x => this.IsBusy = x,
+                    _ => this.IsBusy = false,
+                    () => this.IsBusy = false
+                )
                 .DisposeWith(this.DeactivateWith);
     }
 }

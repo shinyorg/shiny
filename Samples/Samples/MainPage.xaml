@@ -3,6 +3,9 @@
                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                   x:Class="Samples.MainPage"
                   Title="Shiny"
+                  xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+                  ios:Page.UseSafeArea="true"
+                  ios:Page.LargeTitleDisplay="Always"
                   IsPresented="{Binding IsPresented}">
 
     <MasterDetailPage.Master>

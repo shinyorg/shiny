@@ -3,6 +3,7 @@
                         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                         xmlns:prism="clr-namespace:Prism.Autofac;assembly=Prism.Autofac.Forms"
                         xmlns:sample="clr-namespace:Samples.Infrastructure"
+                        xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
                         x:Class="Samples.App">
     <prism:PrismApplication.Resources>
         <ResourceDictionary>
@@ -19,11 +20,17 @@
                          Size="44" />
                 </Image.Source>
             </Image>-->
+
             <OnPlatform x:TypeArguments="x:String" x:Key="FontAwesome">
                 <On Platform="Android" Value="fontawesome.otf#Regular" />
                 <On Platform="iOS" Value="FontAwesome5Free-Regular" />
                 <On Platform="UWP" Value="/Assets/fontawesome.otf#Font Awesome 5 Free" />
             </OnPlatform>
+
+            <Style x:Key="ContentPage" TargetType="ContentPage">
+                <Setter Property="ios:Page.UseSafeArea" Value="True"/>
+                <Setter Property="ios:Page.LargeTitleDisplay" Value="Always" />
+            </Style>
 
             <Style TargetType="Button">
                 <Setter Property="CornerRadius" Value="23" />
