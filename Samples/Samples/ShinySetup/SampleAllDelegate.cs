@@ -60,10 +60,14 @@ namespace Samples.ShinySetup
                 Entered = newStatus == GeofenceState.Entered,
                 Date = DateTime.Now
             });
+            var notify = newStatus == GeofenceState.Entered
+                ? this.appSettings.UseNotificationsGeofenceEntry
+                : this.appSettings.UseNotificationsGeofenceExit;
+
             await this.DoNotification(
                 "Geofence Event",
                 $"{region.Identifier} was {newStatus}",
-                this.appSettings.UseNotificationsGeofences
+                notify
             );
         }
 
@@ -79,11 +83,15 @@ namespace Samples.ShinySetup
                 Entered = newStatus == BeaconRegionState.Entered,
                 Date = DateTime.UtcNow
             });
+            var notify = newStatus == BeaconRegionState.Entered
+                ? this.appSettings.UseNotificationsBeaconRegionEntry
+                : this.appSettings.UseNotificationsBeaconRegionExit;
+
             await this.DoNotification
             (
                 "Beacon Region {newStatus}",
                 $"{region.Identifier} - {region.Uuid}/{region.Major}/{region.Minor}",
-                this.appSettings.UseNotificationsBeaconMonitoring
+                notify
             );
         }
 
@@ -93,7 +101,7 @@ namespace Samples.ShinySetup
             await this.DoNotification(
                 "Job Started",
                 $"{jobInfo.Identifier} Started",
-                this.appSettings.UseNotificationsJobs
+                this.appSettings.UseNotificationsJobStart
             );
             var loops = jobInfo.Parameters.Get("Loops", 10);
             for (var i = 0; i < loops; i++)
@@ -106,7 +114,7 @@ namespace Samples.ShinySetup
             await this.DoNotification(
                 "Job Finished",
                 $"{jobInfo.Identifier} Finished",
-                this.appSettings.UseNotificationsJobs
+                this.appSettings.UseNotificationsJobFinish
             );
 
             // you really shouldn't lie about this on iOS as it is watching :)

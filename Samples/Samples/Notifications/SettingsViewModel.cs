@@ -10,7 +10,7 @@ using Shiny;
 
 namespace Samples.Notifications
 {
-    public class SettingsViewModel : ViewModel
+    public class SettingsViewModel : ViewModel, IAppSettings
     {
         public SettingsViewModel(AppSettings appSettings)
         {
@@ -26,13 +26,16 @@ namespace Samples.Notifications
             this.WhenAnyValue(x => x.ToggleAll)
                 .Skip(1)
                 .Subscribe(x =>
-                {
-                    this.UseNotificationsBle = x;
-                    this.UseNotificationsGeofences = x;
-                    this.UseNotificationsJobs = x;
-                    this.UseNotificationsHttpTransfers = x;
-                    this.UseNotificationsBeaconMonitoring = x;
-                })
+                    this.GetType()
+                        .GetProperties()
+                        .Where(y =>
+                            y.Name.StartsWith("UsesNotifications") &&
+                            y.CanWrite &&
+                            y.PropertyType == typeof(bool)
+                        )
+                        .ToList()
+                        .ForEach(y => y.SetValue(this, x))
+                )
                 .DisposeWith(this.DeactivateWith);
 
             this.WhenAnyProperty()
@@ -45,9 +48,12 @@ namespace Samples.Notifications
 
         [Reactive] public bool ToggleAll { get; set; }
         [Reactive] public bool UseNotificationsBle { get; set; }
-        [Reactive] public bool UseNotificationsGeofences { get; set; }
-        [Reactive] public bool UseNotificationsJobs { get; set; }
         [Reactive] public bool UseNotificationsHttpTransfers { get; set; }
-        [Reactive] public bool UseNotificationsBeaconMonitoring { get; set; }
+        [Reactive] public bool UseNotificationsBeaconRegionEntry { get; set; }
+        [Reactive] public bool UseNotificationsBeaconRegionExit { get; set; }
+        [Reactive] public bool UseNotificationsGeofenceEntry { get; set; }
+        [Reactive] public bool UseNotificationsGeofenceExit { get; set; }
+        [Reactive] public bool UseNotificationsJobStart { get; set; }
+        [Reactive] public bool UseNotificationsJobFinish { get; set; }
     }
 }

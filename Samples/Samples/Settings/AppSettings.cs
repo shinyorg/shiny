@@ -6,7 +6,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Samples.Settings
 {
-    public class AppSettings : ReactiveObject
+    public class AppSettings : ReactiveObject, IAppSettings
     {
         const string DEFAULT_TRANSFER = "http://ipv4.download.thinkbroadband.com/1GB.zip";
 
@@ -34,9 +34,12 @@ namespace Samples.Settings
 
         [Reactive] public string LastTransferUrl { get; set; } = DEFAULT_TRANSFER;
         [Reactive] public bool UseNotificationsBle { get; set; } = true;
-        [Reactive] public bool UseNotificationsGeofences { get; set; } = true;
-        [Reactive] public bool UseNotificationsJobs { get; set; } = true;
+        [Reactive] public bool UseNotificationsGeofenceEntry { get; set; } = true;
+        [Reactive] public bool UseNotificationsGeofenceExit { get; set; } = true;
+        [Reactive] public bool UseNotificationsJobStart { get; set; } = true;
+        [Reactive] public bool UseNotificationsJobFinish { get; set; } = true;
         [Reactive] public bool UseNotificationsHttpTransfers { get; set; } = true;
-        [Reactive] public bool UseNotificationsBeaconMonitoring { get; set; } = true;
+        [Reactive] public bool UseNotificationsBeaconRegionEntry { get; set; } = true;
+        [Reactive] public bool UseNotificationsBeaconRegionExit { get; set; } = true;
     }
 }
