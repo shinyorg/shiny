@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Shiny.Infrastructure;
+using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http
@@ -28,11 +29,10 @@ namespace Shiny.Net.Http
                 this.sessionDelegate,
                 new NSOperationQueue()
             );
-            this.sessionDelegate.Init(this.session);
         }
 
 
-        public override Task Cancel(IHttpTransfer transfer)
+        public override async Task Cancel(IHttpTransfer transfer)
         {
             var t = (HttpTransfer)transfer;
             //if (t.Status == HttpTransferState.Running)
@@ -43,29 +43,29 @@ namespace Shiny.Net.Http
                 t.UploadTask.Cancel();
 
             t.Status = HttpTransferState.Cancelled;
-            this.sessionDelegate.Remove(t);
-
-            return Task.CompletedTask;
+            await this.sessionDelegate.Remove(t);
         }
 
 
-        protected override Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
+        protected override async Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var task = this.session.CreateDownloadTask(request.ToNative());
             var transfer = new HttpTransfer(task, request);
-            this.sessionDelegate.Add(transfer);
+            await this.sessionDelegate.Add(transfer);
+            task.Resume();
 
-            return Task.FromResult<IHttpTransfer>(transfer);
+            return transfer;
         }
 
 
-        protected override Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
+        protected override async Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
         {
             var task = this.session.CreateUploadTask(request.ToNative());
             var transfer = new HttpTransfer(task, request);
-            this.sessionDelegate.Add(transfer);
+            await this.sessionDelegate.Add(transfer);
+            task.Resume();
 
-            return Task.FromResult<IHttpTransfer>(transfer);
+            return transfer;
         }
 
 

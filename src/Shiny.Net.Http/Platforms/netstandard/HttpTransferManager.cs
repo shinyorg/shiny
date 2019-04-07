@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http

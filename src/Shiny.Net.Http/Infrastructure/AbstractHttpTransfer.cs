@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Net.Http
+namespace Shiny.Net.Http.Infrastructure
 {
     public abstract class AbstractHttpTransfer : IHttpTransfer
     {

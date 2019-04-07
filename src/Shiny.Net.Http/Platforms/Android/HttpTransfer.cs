@@ -1,6 +1,7 @@
 ﻿using System;
 using Android.App;
 using Android.Database;
+using Shiny.Net.Http.Infrastructure;
 using Native = Android.App.DownloadManager;
 
 

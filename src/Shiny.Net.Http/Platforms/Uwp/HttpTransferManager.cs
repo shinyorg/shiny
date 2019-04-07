@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
+using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http

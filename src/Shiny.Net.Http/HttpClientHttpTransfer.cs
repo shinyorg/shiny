@@ -1,4 +1,5 @@
 ﻿using System;
+using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http

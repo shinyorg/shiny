@@ -7,6 +7,7 @@ using Android.Database;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
+using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http

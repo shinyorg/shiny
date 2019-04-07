@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using Foundation;
 using Shiny.Infrastructure;
 using Shiny.Logging;
+using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http
@@ -17,7 +20,7 @@ namespace Shiny.Net.Http
 
         readonly Subject<IHttpTransfer> onEvent;
         readonly object syncLock;
-        readonly IDictionary<nuint, HttpTransfer> currentTransfers;
+        IDictionary<nuint, HttpTransfer> currentTransfers;
 
 
         public ShinyUrlSessionDelegate(IRepository repository, IHttpTransferDelegate tdelegate)
@@ -27,33 +30,44 @@ namespace Shiny.Net.Http
 
             this.syncLock = new object();
             this.onEvent = new Subject<IHttpTransfer>();
-            this.currentTransfers = new Dictionary<nuint, HttpTransfer>();
-            // TODO: I need to reload the dictionary with current tasks and get all of the repo data (repo first likely) - likely need to restart task as well
         }
 
 
-        internal async void Init(NSUrlSession session)
+        async Task Init(NSUrlSession session)
         {
-            try
+            if (this.currentTransfers == null)
             {
-                var tasks = await session.GetAllTasksAsync();
-                lock (this.syncLock)
+                try
                 {
-                    //var transfers = await this.repository.GetAll<object>();
-                    foreach (var task in tasks)
-                    {
-                        var transfer = task is NSUrlSessionDownloadTask dl
-                            ? new HttpTransfer(dl, null)
-                            : new HttpTransfer((NSUrlSessionUploadTask)task, null);
+                    var tasks = await session.GetAllTasksAsync();
+                    var transfers = await this.repository.GetAll<HttpTransferStore>();
 
-                        this.currentTransfers.Add(transfer.NativeIdentifier, transfer);
-                        task.Resume();
+                    lock (this.syncLock)
+                    {
+                        if (this.currentTransfers == null)
+                        {
+                            this.currentTransfers = new Dictionary<nuint, HttpTransfer>();
+                            foreach (var task in tasks)
+                            {
+                                var id = task.TaskIdentifier.ToString();
+                                var store = transfers.FirstOrDefault(x => x.Identifier == id);
+                                var request = FromStore(store);
+
+                                var transfer = task is NSUrlSessionDownloadTask dl
+                                    ? new HttpTransfer(dl, request)
+                                    : new HttpTransfer((NSUrlSessionUploadTask)task, request);
+
+                                this.currentTransfers.Add(transfer.NativeIdentifier, transfer);
+                            }
+                        }
                     }
+                    //foreach (var task in tasks)
+                    //    task.Resume();
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
             }
         }
 
@@ -66,24 +80,39 @@ namespace Shiny.Net.Http
         }
 
 
-        public void Add(HttpTransfer transfer)
+        public async Task Add(HttpTransfer transfer)
         {
-            // TODO: add repo data
             lock (this.syncLock)
                 this.currentTransfers.Add(transfer.NativeIdentifier, transfer);
+
+            await this.repository.Set(transfer.Identifier, new HttpTransferStore
+            {
+                Identifier = transfer.Identifier,
+                Uri = transfer.Request.Uri,
+                LocalFilePath = transfer.Request.LocalFile.FullName,
+                UseMeteredConnection = transfer.Request.UseMeteredConnection,
+                PostData = transfer.Request.PostData,
+                Description = transfer.Request.Description,
+                IsUpload = transfer.Request.IsUpload,
+                HttpMethod = transfer.Request.HttpMethod.Method,
+                Headers = transfer.Request.Headers
+            });
         }
 
 
-        public void Remove(HttpTransfer transfer)
+        public async Task Remove(HttpTransfer transfer)
         {
-            // TODO: kill repo data
             lock (this.syncLock)
                 this.currentTransfers.Remove(transfer.NativeIdentifier);
+
+            await this.repository.Remove<HttpTransferStore>(transfer.Identifier);
         }
 
 
-        void Set(NSUrlSessionTask task, Action<HttpTransfer> setter)
+        async void Set(NSUrlSession session, NSUrlSessionTask task, Action<HttpTransfer> setter)
         {
+            await this.Init(session);
+
             HttpTransfer transfer = null;
             lock (this.syncLock)
             {
@@ -95,8 +124,8 @@ namespace Shiny.Net.Http
                     case HttpTransferState.Cancelled:
                     case HttpTransferState.Error:
                     case HttpTransferState.Completed:
-                        // TODO: repo data
                         this.currentTransfers.Remove(transfer.NativeIdentifier);
+                        this.repository.Remove<HttpTransferStore>(transfer.Identifier); // fire and forget
                         break;
                 }
             }
@@ -107,15 +136,14 @@ namespace Shiny.Net.Http
             }
         }
 
-        // TODO: reload all transfer objects
+        // reauthorize?
         //public override void DidBecomeInvalid(NSUrlSession session, NSError error)
-        //{
-        //    // TODO: hmmm
-        //}
+        //public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, [BlockProxy(typeof(NIDActionArity1V0))] Action<NSInputStream> completionHandler)
+        //public override void DidFinishCollectingMetrics(NSUrlSession session, NSUrlSessionTask task, NSUrlSessionTaskMetrics metrics)
 
 
         public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
-            => this.Set(task, transfer =>
+            => this.Set(session, task, transfer =>
             {
                 var ex = new Exception(error.LocalizedDescription);
                 transfer.Exception = ex;
@@ -126,13 +154,8 @@ namespace Shiny.Net.Http
             });
 
 
-        //public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, [BlockProxy(typeof(NIDActionArity1V0))] Action<NSInputStream> completionHandler)
-        //{
-        //}
-
-
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
-            => this.Set(task, transfer =>
+            => this.Set(session, task, transfer =>
             {
                 transfer.Status = HttpTransferState.InProgress;
                 transfer.BytesTransferred = totalBytesSent;
@@ -140,7 +163,7 @@ namespace Shiny.Net.Http
 
 
         public override void DidWriteData(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite)
-            => this.Set(downloadTask, transfer =>
+            => this.Set(session, downloadTask, transfer =>
             {
                 transfer.Status = HttpTransferState.InProgress;
                 transfer.BytesTransferred = totalBytesWritten;
@@ -149,23 +172,33 @@ namespace Shiny.Net.Http
 
 
         public override void DidResume(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long resumeFileOffset, long expectedTotalBytes)
-            => this.Set(downloadTask, transfer => transfer.Status = HttpTransferState.InProgress);
-
-
-        //public override void DidFinishCollectingMetrics(NSUrlSession session, NSUrlSessionTask task, NSUrlSessionTaskMetrics metrics)
-        //{
-        //    metrics.TaskInterval.
-        //    //metrics.TransactionMetrics[0].
-        //}
+            => this.Set(session, downloadTask, transfer => transfer.Status = HttpTransferState.InProgress);
 
 
         public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
-            => this.Set(downloadTask, transfer =>
+            => this.Set(session, downloadTask, transfer =>
             {
                 transfer.Status = HttpTransferState.Completed;
                 transfer.LastModified = DateTime.UtcNow;
                 File.Move(location.Path, transfer.Request.LocalFile.FullName);
+
+                // TODO: multiples
                 this.tdelegate.OnCompleted(transfer);
             });
+
+
+        static HttpTransferRequest FromStore(HttpTransferStore store) =>
+            new HttpTransferRequest(
+                store.Uri,
+                new FileInfo(store.LocalFilePath),
+                store.IsUpload
+            )
+            {
+                UseMeteredConnection = store.UseMeteredConnection,
+                PostData = store.PostData,
+                HttpMethod = new HttpMethod(store.HttpMethod),
+                Description = store.Description,
+                Headers = store.Headers
+            };
     }
 }

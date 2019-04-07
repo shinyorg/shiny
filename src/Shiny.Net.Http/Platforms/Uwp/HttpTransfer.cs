@@ -1,5 +1,7 @@
 ﻿using System;
 using Windows.Networking.BackgroundTransfer;
+using Shiny.Net.Http.Infrastructure;
+
 
 namespace Shiny.Net.Http
 {

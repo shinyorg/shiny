@@ -1,5 +1,6 @@
 ﻿using System;
 using Foundation;
+using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http
