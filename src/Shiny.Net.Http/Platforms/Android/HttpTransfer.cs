@@ -16,37 +16,20 @@ namespace Shiny.Net.Http
 
         internal void Refresh(ICursor cursor)
         {
+            this.FileSize = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnTotalSizeBytes));
+            this.BytesTransferred = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnBytesDownloadedSoFar));
             //Native.ColumnLocalUri
             //cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
+
             var nstatus = (DownloadStatus)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnStatus));
             switch (nstatus)
             {
                 case DownloadStatus.Failed:
-                    // TODO: get error reason
-                    this.Exception = new Exception("There was an error with the request");
-                    this.Status = HttpTransferState.Error;
+                    this.SetError(cursor);
                     break;
 
                 case DownloadStatus.Paused:
-                    var reason = (DownloadPausedReason)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
-                    switch (reason)
-                    {
-                        case DownloadPausedReason.Unknown:
-                            this.Status = HttpTransferState.Paused;
-                            break;
-
-                        case DownloadPausedReason.QueuedForWifi:
-                            this.Status = HttpTransferState.PausedByCostedNetwork;
-                            break;
-
-                        case DownloadPausedReason.WaitingForNetwork:
-                            this.Status = HttpTransferState.PausedByNoNetwork;
-                            break;
-
-                        case DownloadPausedReason.WaitingToRetry:
-                            this.Status = HttpTransferState.Retrying;
-                            break;
-                    }
+                    this.SetPaused(cursor);
                     break;
 
                 case DownloadStatus.Pending:
@@ -62,6 +45,69 @@ namespace Shiny.Net.Http
                     this.Status = HttpTransferState.Completed;
                     break;
             }
+        }
+
+
+        void SetPaused(ICursor cursor)
+        {
+            var reason = (DownloadPausedReason)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
+            switch (reason)
+            {
+                case DownloadPausedReason.Unknown:
+                    this.Status = HttpTransferState.Paused;
+                    break;
+
+                case DownloadPausedReason.QueuedForWifi:
+                    this.Status = HttpTransferState.PausedByCostedNetwork;
+                    break;
+
+                case DownloadPausedReason.WaitingForNetwork:
+                    this.Status = HttpTransferState.PausedByNoNetwork;
+                    break;
+
+                case DownloadPausedReason.WaitingToRetry:
+                    this.Status = HttpTransferState.Retrying;
+                    break;
+            }
+        }
+
+
+        void SetError(ICursor cursor)
+        {
+            this.Status = HttpTransferState.Error;
+            var msg = "There was an error with the request";
+            var error = (DownloadError)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
+            switch (error)
+            {
+                case DownloadError.CannotResume:
+                    break;
+
+                case DownloadError.DeviceNotFound:
+                    break;
+
+                case DownloadError.FileAlreadyExists:
+                    break;
+
+                case DownloadError.FileError:
+                    break;
+
+                case DownloadError.HttpDataError:
+                    break;
+
+                case DownloadError.InsufficientSpace:
+                    break;
+
+                case DownloadError.TooManyRedirects:
+                    break;
+
+                case DownloadError.UnhandledHttpCode:
+                    break;
+
+                case DownloadError.Unknown:
+                default:
+                    break;
+            }
+            this.Exception = new Exception(msg);
         }
     }
 }
