@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Collections.Generic;
 using Shiny.Settings;
 using Shiny.Jobs;
 using Shiny.Caching;
@@ -12,6 +13,27 @@ namespace Shiny
 {
     public static partial class Extensions
     {
+        static readonly List<Action<IServiceProvider>> postBuildActions = new List<Action<IServiceProvider>>();
+
+
+        /// <summary>
+        /// Registers a post container build step
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
+        public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
+            => postBuildActions.Add(action);
+
+
+        internal static void RunPostBuildActions(this IServiceProvider container)
+        {
+            foreach (var action in postBuildActions)
+                action(container);
+
+            postBuildActions.Clear();
+        }
+
+
         /// <summary>
         /// Adds an injectable (ICache) cache service that doesn't actually cache at all - good for testing
         /// </summary>
@@ -90,12 +112,11 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="jobInfo"></param>
         public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-        {
-            if (!services.Any(x => x.ImplementationType == typeof(PostRegisterTask)))
-                services.AddSingleton<IStartupTask, PostRegisterTask>();
-
-            PostRegisterTask.Jobs.Add(jobInfo);
-        }
+            => services.RegisterPostBuildAction(async c => await
+                c
+                    .GetService<IJobManager>()
+                    .Schedule(jobInfo)
+            );
 
 
         /// <summary>

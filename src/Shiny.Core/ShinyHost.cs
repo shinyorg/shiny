@@ -52,6 +52,7 @@ namespace Shiny
 
             container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
             startup?.ConfigureApp(container);
+            container.RunPostBuildActions();
         }
     }
 }

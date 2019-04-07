@@ -11,6 +11,9 @@ namespace Shiny.Net.Http
         {
             builder.AddSingleton<IHttpTransferDelegate, T>();
             builder.AddSingleton<IHttpTransferManager, HttpTransferManager>();
+
+            // need to spin this up right away to get it going again
+            builder.RegisterPostBuildAction(c => c.GetService<IHttpTransferManager>());
             return true;
         }
 
@@ -29,9 +32,12 @@ namespace Shiny.Net.Http
             builder.AddSingleton<IHttpTransferManager>(services =>
             {
                 var repo = services.GetService<IRepository>();
-                //return new HttpTransferManager(repo, maxConnectionsPerHost);
-                return null; // TODO
+                var del = services.GetService<IHttpTransferDelegate>();
+                return new HttpTransferManager(repo, del, maxConnectionsPerHost);
             });
+
+            // need to spin this up right away to get it going again
+            builder.RegisterPostBuildAction(c => c.GetService<IHttpTransferManager>());
             return true;
         }
 #endif
