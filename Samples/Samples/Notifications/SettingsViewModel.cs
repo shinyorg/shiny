@@ -29,7 +29,7 @@ namespace Samples.Notifications
                     this.GetType()
                         .GetProperties()
                         .Where(y =>
-                            y.Name.StartsWith("UsesNotifications") &&
+                            y.Name.StartsWith("UseNotifications") &&
                             y.CanWrite &&
                             y.PropertyType == typeof(bool)
                         )
