@@ -48,9 +48,12 @@ namespace Shiny.Net.Http
 
         static Native downloadManager;
         public static Native GetManager(this IAndroidContext context)
+            => context.AppContext.GetManager();
+
+        public static Native GetManager(this Context context)
         {
             if (downloadManager == null || downloadManager.Handle == IntPtr.Zero)
-                downloadManager = (Native)context.AppContext.GetSystemService(Context.DownloadService);
+                downloadManager = (Native)context.GetSystemService(Context.DownloadService);
 
             return downloadManager;
         }

@@ -11,6 +11,13 @@ namespace Shiny
         static Handler handler;
 
 
+        //        public static void ConfigureJobs(this IServiceCollection services)
+        //        {
+        //            //public static int AndroidJobId { get; set; } = 100;
+        //            //public static TimeSpan PeriodicRunTime { get; set; } = TimeSpan.FromMinutes(10);
+        //        }
+
+
         public static void Dispatch(this Action action)
         {
             if (handler == null || handler.Looper != Looper.MainLooper)

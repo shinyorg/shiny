@@ -1,12 +1,19 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 
 
 namespace Shiny
 {
-    static class UwpExtensions
+    public static class UwpExtensions
     {
+        //public static void ConfigureJobs(this IServiceCollection services)
+        //{
+        //    //JobBackgroundTask.PeriodicRunTime
+        //}
+
+
         public static void Dispatch(this Action action)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow?.Dispatcher;

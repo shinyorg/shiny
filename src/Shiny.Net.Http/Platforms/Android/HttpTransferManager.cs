@@ -8,7 +8,7 @@ using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
 using Shiny.Net.Http.Infrastructure;
-
+using System.IO;
 
 namespace Shiny.Net.Http
 {
@@ -25,6 +25,7 @@ namespace Shiny.Net.Http
 
             this.context = context;
             this.repository = repository;
+            //TODO: should I start intent service for receiver?
         }
 
 
@@ -71,11 +72,16 @@ namespace Shiny.Net.Http
         }
 
 
+        // TODO:
         protected override Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
         {
+            var dlPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads).AbsolutePath;
+            var path = new FileInfo(Path.Combine(dlPath, request.LocalFile.Name));
+
             var native = new Native
                 .Request(Android.Net.Uri.Parse(request.Uri))
-                .SetDestinationUri(request.LocalFile.ToNativeUri())
+                //.SetDestinationUri(request.LocalFile.ToNativeUri()) // TODO: Need WRITE_EXTERNAL_STORAGE
+                .SetDestinationUri(path.ToNativeUri())
                 .SetAllowedOverMetered(request.UseMeteredConnection);
 
             foreach (var header in request.Headers)

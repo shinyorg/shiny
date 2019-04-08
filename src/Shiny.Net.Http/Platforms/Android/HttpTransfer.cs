@@ -14,6 +14,9 @@ namespace Shiny.Net.Http
         }
 
 
+        public string TempFile { get; set; }
+
+
         internal void Refresh(ICursor cursor)
         {
             this.FileSize = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnTotalSizeBytes));

@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    public class IosShinyHost : ShinyHost
+    public class iOSShinyHost : ShinyHost
     {
         public static void Init(Startup startup = null, Action<IServiceCollection> platformBuild = null)
             => InitPlatform(startup, services =>

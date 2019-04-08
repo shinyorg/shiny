@@ -16,7 +16,7 @@ namespace Samples.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             // this needs to be loaded before EVERYTHING
-            IosShinyHost.Init(new SampleStartup());
+            iOSShinyHost.Init(new SampleStartup());
 
             Forms.Init();
             this.LoadApplication(new App());
@@ -26,7 +26,7 @@ namespace Samples.iOS
 
         // if you are using jobs, you need this
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-            => IosShinyHost.OnBackgroundFetch(completionHandler);
+            => iOSShinyHost.OnBackgroundFetch(completionHandler);
 
 
         public override void ReceivedLocalNotification(UIApplication application, UILocalNotification notification)
