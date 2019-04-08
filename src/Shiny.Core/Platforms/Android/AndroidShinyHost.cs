@@ -15,7 +15,7 @@ namespace Shiny
     public class AndroidShinyHost : ShinyHost
     {
         public static void Init(Application androidApp,
-                                Startup startup = null,
+                                IStartup startup = null,
                                 Action<IServiceCollection> platformBuild = null)
         {
             var callbacks = new ActivityLifecycleCallbacks();

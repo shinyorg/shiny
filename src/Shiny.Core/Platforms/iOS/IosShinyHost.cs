@@ -13,7 +13,7 @@ namespace Shiny
 {
     public class iOSShinyHost : ShinyHost
     {
-        public static void Init(Startup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
             => InitPlatform(startup, services =>
             {
                 services.AddSingleton<IEnvironment, EnvironmentImpl>();

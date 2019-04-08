@@ -42,7 +42,7 @@ namespace Shiny
         }
 
 
-        protected static void InitPlatform(Startup startup = null, Action<IServiceCollection> platformBuild = null)
+        protected static void InitPlatform(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
         {
             var services = new ServiceCollection();
 
@@ -52,7 +52,11 @@ namespace Shiny
 
             container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
             startup?.ConfigureApp(container);
+
             container.RunPostBuildActions();
+            var tasks = container.GetServices<IStartupTask>();
+            foreach (var task in tasks)
+                task.Start();
         }
     }
 }
