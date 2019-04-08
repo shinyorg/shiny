@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.68">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;monoandroid90;xamarinios10</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;monoandroid81;monoandroid90;xamarinios10</TargetFrameworks>
         <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
         <Description>Shiny addon for all your notification needs</Description>
     </PropertyGroup>
