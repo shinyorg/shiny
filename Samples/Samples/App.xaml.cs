@@ -2,7 +2,6 @@
 using Shiny;
 using Acr.UserDialogs;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Prism;
 using Prism.Autofac;
 using Prism.Ioc;
@@ -75,12 +74,18 @@ namespace Samples
         protected override IContainerExtension CreateContainerExtension()
         {
             var builder = new ContainerBuilder();
-            builder.Populate(ShinyHost.Services);
+            ShinyHost.Populate((serviceType, func, lifetime) =>
+                builder
+                    .Register(_ => func())
+                    .As(serviceType)
+                    .SingleInstance()
+            );
             builder
                 .RegisterType<GlobalExceptionHandler>()
                 .As<IStartable>()
                 .AutoActivate()
                 .SingleInstance();
+
             return new AutofacContainerExtension(builder);
         }
     }

@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.4.0" />
+        <PackageReference Include="Autofac" Version="4.9.2" />
         <PackageReference Include="Humanizer" Version="2.6.2" />
         <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.14.0" />
         <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.14.0" />

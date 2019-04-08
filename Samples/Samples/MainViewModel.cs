@@ -27,14 +27,14 @@ namespace Samples
         [Reactive] public bool IsPresented { get; set; }
 
 
-        //public override void OnAppearing()
-        //{
-        //    base.OnAppearing();
-        //    var conn2 = ShinyHost.Resolve<SampleSqliteConnection>();
-        //    //var same = Object.ReferenceEquals(this.conn, conn2);
-        //    //var hash1 = this.conn.GetHashCode();
-        //    //var hash2 = conn2.GetHashCode();
-        //    //Console.WriteLine($"Same: {same} - 1: {hash1} - 2: {hash2}");
-        //}
+        public override void OnAppearing()
+        {
+            base.OnAppearing();
+            var conn2 = ShinyHost.Resolve<SampleSqliteConnection>();
+            var same = Object.ReferenceEquals(this.conn, conn2);
+            var hash1 = this.conn.GetHashCode();
+            var hash2 = conn2.GetHashCode();
+            Console.WriteLine($"Same: {same} - 1: {hash1} - 2: {hash2}");
+        }
     }
 }
