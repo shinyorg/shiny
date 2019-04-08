@@ -8,13 +8,23 @@ namespace Shiny.Notifications
     {
         public static bool UseNotifications(this IServiceCollection builder, Action<AndroidOptions, UwpOptions> configure = null)
         {
-            var androidOpts = new AndroidOptions();
-            var uwpOpts = new UwpOptions();
+            if (configure != null)
+            {
+                var androidOpts = new AndroidOptions();
+                var uwpOpts = new UwpOptions();
+                configure(androidOpts, uwpOpts);
 
-            configure(androidOpts, uwpOpts);
+                AndroidOptions.DefaultChannel = androidOpts.ChannelDescription ?? AndroidOptions.DefaultChannel;
+                AndroidOptions.DefaultChannelDescription = androidOpts.ChannelDescription ?? AndroidOptions.DefaultChannelDescription;
+                AndroidOptions.DefaultChannelId = androidOpts.ChannelId ?? AndroidOptions.DefaultChannelId;
+                AndroidOptions.DefaultNotificationImportance = androidOpts.NotificationImportance;
+                AndroidOptions.DefaultLaunchActivityFlags = androidOpts.LaunchActivityFlags;
+                AndroidOptions.DefaultVibrate = androidOpts.Vibrate;
+                AndroidOptions.DefaultSmallIconResourceName = androidOpts.SmallIconResourceName ?? AndroidOptions.DefaultSmallIconResourceName;
 
-            AndroidOptions.DefaultChannel = androidOpts.Channel;
-            UwpOptions.DefaultUseLongDuration = uwpOpts.UseLongDuration;
+                UwpOptions.DefaultUseLongDuration = uwpOpts.UseLongDuration;
+            }
+
 #if NETSTANDARD
             return false;
 #else
