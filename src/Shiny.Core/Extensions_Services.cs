@@ -25,6 +25,26 @@ namespace Shiny
             => postBuildActions.Add(action);
 
 
+        /// <summary>
+        /// Register a module (like a category) of services
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="module"></param>
+        public static void RegisterModule(this IServiceCollection services, IModule module)
+        {
+            module.Register(services);
+            services.RegisterPostBuildAction(module.OnContainerReady);
+        }
+
+
+        /// <summary>
+        /// Register a module (like a category) of services
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        public static void RegisterModule<T>(this IServiceCollection services) where T : IModule, new() => services.RegisterModule(new T());
+
+
         internal static void RunPostBuildActions(this IServiceProvider container)
         {
             foreach (var action in postBuildActions)
