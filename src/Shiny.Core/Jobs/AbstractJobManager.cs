@@ -54,7 +54,7 @@ namespace Shiny.Jobs
                 case InternetAccess.None:
                     return true;
 
-                case InternetAccess.Direct:
+                case InternetAccess.Unmetered:
                     return hasInternet && directConnect;
 
                 case InternetAccess.Any:

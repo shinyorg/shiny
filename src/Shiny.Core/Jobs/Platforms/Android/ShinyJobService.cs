@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !ANDROID9
+using System;
 using System.Threading;
 using Android.App;
 using Android.App.Job;
@@ -34,3 +35,4 @@ namespace Shiny.Jobs
         }
     }
 }
+#endif
