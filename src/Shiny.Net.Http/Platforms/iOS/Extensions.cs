@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Foundation;
 
 
@@ -18,13 +19,12 @@ namespace Shiny.Net.Http
             if (!request.PostData.IsEmpty())
                 native.Body = NSData.FromString(request.PostData);
 
-            foreach (var header in request.Headers)
-            {
-                native.Headers.SetValueForKey(
-                    new NSString(header.Value),
-                    new NSString(header.Key)
+            if (request.Headers.Any())
+                native.Headers = NSDictionary.FromObjectsAndKeys(
+                    request.Headers.Values.ToArray(),
+                    request.Headers.Keys.ToArray()
                 );
-            }
+
             return native;
         }
     }

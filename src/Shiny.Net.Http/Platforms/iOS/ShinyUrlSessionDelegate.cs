@@ -15,6 +15,7 @@ namespace Shiny.Net.Http
 {
     public class ShinyUrlSessionDelegate : NSUrlSessionDownloadDelegate
     {
+        internal static Action CompletionHandler { get; set; }
         readonly IRepository repository;
         readonly IHttpTransferDelegate tdelegate;
 
@@ -31,6 +32,7 @@ namespace Shiny.Net.Http
             this.syncLock = new object();
             this.onEvent = new Subject<IHttpTransfer>();
         }
+
 
 
         async Task Init(NSUrlSession session)
@@ -136,10 +138,24 @@ namespace Shiny.Net.Http
             }
         }
 
+
         // reauthorize?
         //public override void DidBecomeInvalid(NSUrlSession session, NSError error)
         //public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, [BlockProxy(typeof(NIDActionArity1V0))] Action<NSInputStream> completionHandler)
         //public override void DidFinishCollectingMetrics(NSUrlSession session, NSUrlSessionTask task, NSUrlSessionTaskMetrics metrics)
+
+
+
+        public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
+            => completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+
+
+        public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
+            => completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+
+
+        public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
+            => CompletionHandler?.Invoke();
 
 
         public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)

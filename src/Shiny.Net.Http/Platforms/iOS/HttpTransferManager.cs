@@ -21,7 +21,7 @@ namespace Shiny.Net.Http
                                    int maxConnectionsPerHost = 1)
         {
             this.sessionDelegate = new ShinyUrlSessionDelegate(repository, httpDelegate);
-            this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(NSBundle.MainBundle.BundleIdentifier + ".BackgroundTransferSession");
+            this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
 
             this.session = NSUrlSession.FromConfiguration(
@@ -29,6 +29,14 @@ namespace Shiny.Net.Http
                 this.sessionDelegate,
                 new NSOperationQueue()
             );
+        }
+
+
+        static string SessionName => $"{NSBundle.MainBundle.BundleIdentifier}.BackgroundTransferSession";
+        public static void SetCompletionHandler(string sessionName, Action completionHandler)
+        {
+            if (SessionName.Equals(sessionName))
+                ShinyUrlSessionDelegate.CompletionHandler = completionHandler;
         }
 
 
@@ -80,6 +88,7 @@ namespace Shiny.Net.Http
                 .Where(x => x.UploadTask != null)
                 .Cast<IHttpTransfer>();
 
+            results = Filter(results, filter);
             return Task.FromResult(results);
         }
 
@@ -91,7 +100,29 @@ namespace Shiny.Net.Http
                 .Where(x => x.DownloadTask != null)
                 .Cast<IHttpTransfer>();
 
+            results = Filter(results, filter);
             return Task.FromResult(results);
+        }
+
+
+        static IEnumerable<IHttpTransfer> Filter(IEnumerable<IHttpTransfer> current, QueryFilter filter)
+        {
+            if (filter.Ids.Any())
+                current = current.Where(x => filter.Ids.Any(y => y == x.Identifier));
+
+            switch (filter.States)
+            {
+                case HttpTransferStateFilter.InProgress:
+                    current = current.Where(x => x.Status == HttpTransferState.InProgress);
+                    break;
+
+                case HttpTransferStateFilter.Pending:
+                    current = current.Where(x => x.Status == HttpTransferState.Pending);
+                    break;
+
+                    // TODO: paused
+            }
+            return current;
         }
     }
 }
