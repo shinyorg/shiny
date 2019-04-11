@@ -9,12 +9,12 @@ using Shiny.Power;
 
 namespace Shiny.Jobs
 {
-    public class JobManagerImpl : AbstractJobManager
+    public class JobManager : AbstractJobManager
     {
-        public JobManagerImpl(IServiceProvider container,
-                              IRepository repository,
-                              IPowerManager powerManager,
-                              IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+        public JobManager(IServiceProvider container,
+                          IRepository repository,
+                          IPowerManager powerManager,
+                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
         {
         }
 

@@ -15,19 +15,20 @@ using Java.Lang;
 
 namespace Shiny.Jobs
 {
-    public class JobManagerImpl : AbstractJobManager
+    public class JobManager : AbstractJobManager
     {
         readonly IAndroidContext context;
 
 
-        public JobManagerImpl(IAndroidContext context,
-                              IServiceProvider container,
-                              IRepository repository,
-                              IPowerManager powerManager,
-                              IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+        public JobManager(IAndroidContext context,
+                          IServiceProvider container,
+                          IRepository repository,
+                          IPowerManager powerManager,
+                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
         {
             this.context = context;
         }
+
 
         public override Task<AccessState> RequestAccess()
         {

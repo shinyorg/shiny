@@ -11,7 +11,7 @@ using UIKit;
 
 namespace Shiny.Jobs
 {
-    public class JobManagerImpl : AbstractJobManager, IBackgroundFetchProcessor
+    public class JobManager : AbstractJobManager
     {
         /// <summary>
         /// If you don't know what this does, don't touch it :)
@@ -19,10 +19,10 @@ namespace Shiny.Jobs
         public static double? BackgroundFetchInterval { get; set;}
 
 
-        public JobManagerImpl(IServiceProvider container,
-                              IRepository repository,
-                              IPowerManager powerManager,
-                              IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+        public JobManager(IServiceProvider container,
+                          IRepository repository,
+                          IPowerManager powerManager,
+                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
         {
         }
 
@@ -101,7 +101,7 @@ namespace Shiny.Jobs
         }
 
 
-        public virtual async void Process(Action<UIBackgroundFetchResult> completionHandler)
+        public virtual async void OnBackgroundFetch(Action<UIBackgroundFetchResult> completionHandler)
         {
             var result = UIBackgroundFetchResult.NoData;
             var app = UIApplication.SharedApplication;

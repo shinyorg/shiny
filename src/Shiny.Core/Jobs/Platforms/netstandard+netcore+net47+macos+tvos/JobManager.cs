@@ -9,15 +9,15 @@ using Timer = System.Timers.Timer;
 
 namespace Shiny.Jobs
 {
-    public class JobManagerImpl : AbstractJobManager
+    public class JobManager : AbstractJobManager
     {
         readonly Timer timer;
 
 
-        public JobManagerImpl(IServiceProvider container,
-                              IRepository repository,
-                              IPowerManager powerManager,
-                              IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+        public JobManager(IServiceProvider container,
+                          IRepository repository,
+                          IPowerManager powerManager,
+                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
         {
             this.timer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
             this.timer.Elapsed += async (sender, args) =>

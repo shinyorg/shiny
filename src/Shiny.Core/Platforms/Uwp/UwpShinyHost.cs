@@ -18,7 +18,7 @@ namespace Shiny
                 services.AddSingleton<IEnvironment, EnvironmentImpl>();
                 services.AddSingleton<IConnectivity, ConnectivityImpl>();
                 services.AddSingleton<IPowerManager, PowerManagerImpl>();
-                services.AddSingleton<IJobManager, JobManagerImpl>();
+                services.AddSingleton<IJobManager, JobManager>();
                 services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
                 services.AddSingleton<IFileSystem, FileSystemImpl>();
                 services.AddSingleton<ISerializer, JsonNetSerializer>();

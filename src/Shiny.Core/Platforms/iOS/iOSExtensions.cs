@@ -15,7 +15,7 @@ namespace Shiny
                 .SharedApplication
                 .SetMinimumBackgroundFetchInterval(backgroundFetchInterval);
 
-            JobManagerImpl.BackgroundFetchInterval = backgroundFetchInterval;
+            JobManager.BackgroundFetchInterval = backgroundFetchInterval;
         }
     }
 }
