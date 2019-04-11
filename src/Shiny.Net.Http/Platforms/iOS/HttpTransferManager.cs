@@ -57,21 +57,24 @@ namespace Shiny.Net.Http
 
         protected override async Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
         {
-            var task = this.session.CreateDownloadTask(request.ToNative());
-            var transfer = new HttpTransfer(task, request);
-            await this.sessionDelegate.Add(transfer);
-            task.Resume();
-
+            var transfer = await this.sessionDelegate.Add(() =>
+            {
+                var task = this.session.CreateDownloadTask(request.ToNative());
+                return new HttpTransfer(task, request);
+            });
+            transfer.DownloadTask.Resume();
             return transfer;
         }
 
 
         protected override async Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
         {
-            var task = this.session.CreateUploadTask(request.ToNative());
-            var transfer = new HttpTransfer(task, request);
-            await this.sessionDelegate.Add(transfer);
-            task.Resume();
+            var transfer = await this.sessionDelegate.Add(() =>
+            {
+                var task = this.session.CreateUploadTask(request.ToNative());
+                return new HttpTransfer(task, request);
+            });
+            transfer.UploadTask.Resume();
 
             return transfer;
         }

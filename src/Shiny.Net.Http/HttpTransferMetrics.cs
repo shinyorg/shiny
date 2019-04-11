@@ -9,8 +9,8 @@ namespace Shiny.Net.Http
         public long BytesPerSecond { get; internal set; }
         public TimeSpan EstimatedCompletionTime { get; internal set; }
 
-        internal DateTime? LastChanged { get; internal set; }
-        internal long LastBytesTransferred { get; internal set; }
+        internal DateTime? LastChanged { get; set; }
+        internal long LastBytesTransferred { get; set; }
         //internal HttpTransferState PreviousStatus { get; set; }
     }
 }

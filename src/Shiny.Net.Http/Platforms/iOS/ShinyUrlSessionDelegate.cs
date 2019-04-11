@@ -82,10 +82,14 @@ namespace Shiny.Net.Http
         }
 
 
-        public async Task Add(HttpTransfer transfer)
+        public async Task<HttpTransfer> Add(Func<HttpTransfer> createTransfer)
         {
+            HttpTransfer transfer = null;
             lock (this.syncLock)
+            {
+                transfer = createTransfer();
                 this.currentTransfers.Add(transfer.NativeIdentifier, transfer);
+            }
 
             await this.repository.Set(transfer.Identifier, new HttpTransferStore
             {
@@ -99,6 +103,7 @@ namespace Shiny.Net.Http
                 HttpMethod = transfer.Request.HttpMethod.Method,
                 Headers = transfer.Request.Headers
             });
+            return transfer;
         }
 
 
@@ -131,11 +136,7 @@ namespace Shiny.Net.Http
                         break;
                 }
             }
-            if (this.onEvent.HasObservers)
-            {
-                // TODO: calc metrics? need to compare last vs current transfer
-                this.onEvent.OnNext(transfer);
-            }
+            this.onEvent.OnNext(transfer);
         }
 
 
@@ -198,7 +199,6 @@ namespace Shiny.Net.Http
                 transfer.LastModified = DateTime.UtcNow;
                 File.Move(location.Path, transfer.Request.LocalFile.FullName);
 
-                // TODO: multiples
                 this.tdelegate.OnCompleted(transfer);
             });
 

@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 
 namespace Shiny.Net.Http
 {
-    public static class Extensions
+    public static class MetricExtensions
     {
         public static IObservable<HttpTransferMetrics> WithMetrics(this IObservable<IHttpTransfer> transfers)
         {
