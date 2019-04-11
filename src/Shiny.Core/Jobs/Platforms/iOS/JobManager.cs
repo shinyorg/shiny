@@ -101,8 +101,10 @@ namespace Shiny.Jobs
         }
 
 
-        public virtual async void OnBackgroundFetch(Action<UIBackgroundFetchResult> completionHandler)
+        public static async void OnBackgroundFetch(Action<UIBackgroundFetchResult> completionHandler)
         {
+            var jobManager = ShinyHost.Resolve<IJobManager>();
+
             var result = UIBackgroundFetchResult.NoData;
             var app = UIApplication.SharedApplication;
             var taskId = 0;
@@ -112,7 +114,7 @@ namespace Shiny.Jobs
                 using (var cancelSrc = new CancellationTokenSource())
                 {
                     taskId = (int)app.BeginBackgroundTask("RunAll", cancelSrc.Cancel);
-                    var results = await this
+                    var results = await jobManager
                         .RunAll(cancelSrc.Token)
                         .ConfigureAwait(false);
 
