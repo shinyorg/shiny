@@ -4,13 +4,13 @@ using Android.Hardware;
 
 namespace Shiny.Sensors
 {
-    public class AcrSensorManager : Java.Lang.Object, ISensorEventListener
+    public class ShinySensorManager : Java.Lang.Object, ISensorEventListener
     {
         readonly SensorManager sensorManager;
         Action<SensorEvent> action;
 
 
-		public AcrSensorManager(SensorManager sensorManager)
+		public ShinySensorManager(SensorManager sensorManager)
 		{
 			this.sensorManager = sensorManager;
 		}
