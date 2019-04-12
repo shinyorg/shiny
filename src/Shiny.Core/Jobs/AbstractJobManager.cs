@@ -203,7 +203,7 @@ namespace Shiny.Jobs
 
 
         protected virtual IJob ResolveJob(JobInfo jobInfo)
-            => (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, jobInfo.Type);
+            => (IJob)this.container.ResolveOrInstantiate(jobInfo.Type);
 
 
         protected virtual void LogJob(JobState state,

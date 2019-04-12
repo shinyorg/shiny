@@ -12,8 +12,6 @@ namespace Shiny.Net.Http
             builder.AddSingleton<IHttpTransferDelegate, T>();
             builder.AddSingleton<IHttpTransferManager, HttpTransferManager>();
 
-            // need to spin this up right away to get it going again - really only needed in iOS
-            builder.RegisterPostBuildAction(c => c.GetService<IHttpTransferManager>());
             return true;
         }
 
