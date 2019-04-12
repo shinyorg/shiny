@@ -35,7 +35,7 @@ namespace Shiny.Net.Http
 
 
 
-        async Task Init(NSUrlSession session)
+        internal async Task Init(NSUrlSession session)
         {
             if (this.currentTransfers == null)
             {

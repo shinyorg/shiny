@@ -84,27 +84,29 @@ namespace Shiny.Net.Http
             => this.sessionDelegate.WhenEventOccurs();
 
 
-        protected override Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+        protected override async Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
         {
+            await this.sessionDelegate.Init(this.session);
             var results = this.sessionDelegate
                 .GetCurrentTransfers()
                 .Where(x => x.UploadTask != null)
                 .Cast<IHttpTransfer>();
 
             results = Filter(results, filter);
-            return Task.FromResult(results);
+            return results;
         }
 
 
-        protected override Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
+        protected override async Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
         {
+            await this.sessionDelegate.Init(this.session);
             var results = this.sessionDelegate
                 .GetCurrentTransfers()
                 .Where(x => x.DownloadTask != null)
                 .Cast<IHttpTransfer>();
 
             results = Filter(results, filter);
-            return Task.FromResult(results);
+            return results;
         }
 
 
