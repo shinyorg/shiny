@@ -12,6 +12,8 @@ namespace Shiny.Net.Http
             builder.AddSingleton<IHttpTransferDelegate, T>();
             builder.AddSingleton<IHttpTransferManager, HttpTransferManager>();
 
+            // fire this guy up right away so any registrations get moving again - mostly needed for iOS
+            builder.RegisterPostBuildAction(sp => sp.GetService<IHttpTransferManager>());
             return true;
         }
 
