@@ -35,4 +35,8 @@
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="HttpClientHttpTransferManager.cs" />
+    </ItemGroup>
+
 </Project>

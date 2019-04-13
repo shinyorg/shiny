@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Infrastructure;
 
 
 namespace Shiny.Net.Http
@@ -31,9 +30,8 @@ namespace Shiny.Net.Http
             builder.AddSingleton<IHttpTransferDelegate, T>();
             builder.AddSingleton<IHttpTransferManager>(services =>
             {
-                var repo = services.GetService<IRepository>();
                 var del = services.GetService<IHttpTransferDelegate>();
-                return new HttpTransferManager(repo, del, maxConnectionsPerHost);
+                return new HttpTransferManager(del, maxConnectionsPerHost);
             });
 
             // need to spin this up right away to get it going again

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
-using Shiny.Infrastructure;
 using Shiny.Net.Http.Infrastructure;
 
 
@@ -16,11 +15,10 @@ namespace Shiny.Net.Http
         readonly NSUrlSession session;
 
 
-        public HttpTransferManager(IRepository repository,
-                                   IHttpTransferDelegate httpDelegate,
+        public HttpTransferManager(IHttpTransferDelegate httpDelegate,
                                    int maxConnectionsPerHost = 1)
         {
-            this.sessionDelegate = new ShinyUrlSessionDelegate(repository, httpDelegate);
+            this.sessionDelegate = new ShinyUrlSessionDelegate(httpDelegate);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
 
@@ -40,94 +38,55 @@ namespace Shiny.Net.Http
         }
 
 
-        public override async Task Cancel(IHttpTransfer transfer)
+        protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
-            var t = (HttpTransfer)transfer;
-            //if (t.Status == HttpTransferState.Running)
+            var task = this.session.CreateDownloadTask(request.ToNative());
+            var transfer = task.FromNative(HttpTransferState.Pending);
+            task.Resume();
 
-            if (t.UploadTask == null)
-                t.DownloadTask.Cancel();
-            else
-                t.UploadTask.Cancel();
-
-            t.Status = HttpTransferState.Cancelled;
-            await this.sessionDelegate.Remove(t);
+            return Task.FromResult(transfer);
         }
 
 
-        protected override async Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
+        protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
-            var transfer = await this.sessionDelegate.Add(() =>
-            {
-                var task = this.session.CreateDownloadTask(request.ToNative());
-                return new HttpTransfer(task, request);
-            });
-            transfer.DownloadTask.Resume();
-            return transfer;
+            var task = this.session.CreateUploadTask(request.ToNative());
+            var transfer = task.FromNative(HttpTransferState.Pending);
+            task.Resume();
+
+            return Task.FromResult(transfer);
         }
 
 
-        protected override async Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
-        {
-            var transfer = await this.sessionDelegate.Add(() =>
-            {
-                var task = this.session.CreateUploadTask(request.ToNative());
-                return new HttpTransfer(task, request);
-            });
-            transfer.UploadTask.Resume();
-
-            return transfer;
-        }
-
-
-        public override IObservable<IHttpTransfer> WhenUpdated()
+        public override IObservable<HttpTransfer> WhenUpdated()
             => this.sessionDelegate.WhenEventOccurs();
 
 
-        protected override async Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+        public override Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null)
+            => this.session.QueryTransfers(filter);
+
+
+        public override async Task Cancel(QueryFilter filter = null)
         {
-            await this.sessionDelegate.Init(this.session);
-            var results = this.sessionDelegate
-                .GetCurrentTransfers()
-                .Where(x => x.UploadTask != null)
-                .Cast<IHttpTransfer>();
-
-            results = Filter(results, filter);
-            return results;
-        }
-
-
-        protected override async Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
-        {
-            await this.sessionDelegate.Init(this.session);
-            var results = this.sessionDelegate
-                .GetCurrentTransfers()
-                .Where(x => x.DownloadTask != null)
-                .Cast<IHttpTransfer>();
-
-            results = Filter(results, filter);
-            return results;
-        }
-
-
-        static IEnumerable<IHttpTransfer> Filter(IEnumerable<IHttpTransfer> current, QueryFilter filter)
-        {
-            if (filter.Ids.Any())
-                current = current.Where(x => filter.Ids.Any(y => y == x.Identifier));
-
-            switch (filter.States)
+            var tasks = await this.session.QueryTasks(filter);
+            foreach (var task in tasks)
             {
-                case HttpTransferStateFilter.InProgress:
-                    current = current.Where(x => x.Status == HttpTransferState.InProgress);
-                    break;
-
-                case HttpTransferStateFilter.Pending:
-                    current = current.Where(x => x.Status == HttpTransferState.Pending);
-                    break;
-
-                    // TODO: paused
+                task.Cancel();
+                this.sessionDelegate.SetState(task.TaskIdentifier, HttpTransferState.Cancelled);
             }
-            return current;
+        }
+
+
+        public override async Task Cancel(string id)
+        {
+            var taskId = nuint.Parse(id);
+            var tasks = await this.session.GetAllTasksAsync();
+            var task = tasks.FirstOrDefault(x => x.TaskIdentifier == taskId);
+            if (task != null)
+            {
+                task.Cancel();
+                this.sessionDelegate.SetState(taskId, HttpTransferState.Cancelled);
+            }
         }
     }
 }

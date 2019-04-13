@@ -8,16 +8,8 @@ namespace Shiny.Net.Http.Infrastructure
 {
     public abstract class AbstractHttpTransferManager : IHttpTransferManager
     {
-        public abstract Task Cancel(IHttpTransfer transfer);
-        public abstract IObservable<IHttpTransfer> WhenUpdated();
-
-
-        public virtual async Task Cancel(string id)
-        {
-            var task = await this.GetTransfer(id).ConfigureAwait(false);
-            if (task != null)
-                await this.Cancel(task).ConfigureAwait(false);
-        }
+        public abstract IObservable<HttpTransfer> WhenUpdated();
+        public abstract Task Cancel(string id);
 
 
         public virtual async Task Cancel(QueryFilter filter = null)
@@ -27,18 +19,18 @@ namespace Shiny.Net.Http.Infrastructure
                 .ConfigureAwait(false);
 
             foreach (var transfer in transfers)
-                await this.Cancel(transfer).ConfigureAwait(false);
+                await this.Cancel(transfer.Identifier).ConfigureAwait(false);
         }
 
 
-        public virtual async Task<IHttpTransfer> GetTransfer(string id)
+        public virtual async Task<HttpTransfer> GetTransfer(string id)
         {
             var transfers = await this.GetTransfers(new QueryFilter().Add(id)).ConfigureAwait(false);
             return transfers.FirstOrDefault();
         }
 
 
-        public virtual async Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null)
+        public virtual async Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null)
         {
             filter = filter ?? new QueryFilter();
             switch (filter.Direction)
@@ -58,7 +50,7 @@ namespace Shiny.Net.Http.Infrastructure
         }
 
 
-        public virtual async Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
+        public virtual async Task<HttpTransfer> Enqueue(HttpTransferRequest request)
         {
             var task = request.IsUpload
                 ? this.CreateUpload(request)
@@ -69,22 +61,26 @@ namespace Shiny.Net.Http.Infrastructure
         }
 
 
-        protected virtual Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+        protected virtual Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
         {
             throw new NotImplementedException();
         }
 
 
-        protected virtual Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
+        protected virtual Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
         {
             throw new NotImplementedException();
         }
 
-        protected virtual Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
-            => Task.FromResult<IHttpTransfer>(new HttpClientHttpTransfer(request, Guid.NewGuid().ToString()));
+        protected virtual Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
+        {
+            throw new NotImplementedException();
+        }
 
 
-        protected virtual Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
-            => Task.FromResult<IHttpTransfer>(new HttpClientHttpTransfer(request, Guid.NewGuid().ToString()));
+        protected virtual Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

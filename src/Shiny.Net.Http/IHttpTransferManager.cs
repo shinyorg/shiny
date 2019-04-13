@@ -15,13 +15,11 @@ namespace Shiny.Net.Http
         //native.SetDescription()
         //native.SetVisibleInDownloadsUi(true);
         //native.SetShowRunningNotification
-        Task<IHttpTransfer> Enqueue(HttpTransferRequest request);
-        Task<IHttpTransfer> GetTransfer(string id);
-        Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null);
+        Task<HttpTransfer> Enqueue(HttpTransferRequest request);
+        Task<HttpTransfer> GetTransfer(string id);
+        Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null);
         Task Cancel(string id);
-        Task Cancel(IHttpTransfer transfer = null);
-        //Task<int> PurgeDatabase(QueryFilter query = null);
         Task Cancel(QueryFilter filter);
-        IObservable<IHttpTransfer> WhenUpdated();
+        IObservable<HttpTransfer> WhenUpdated();
     }
 }

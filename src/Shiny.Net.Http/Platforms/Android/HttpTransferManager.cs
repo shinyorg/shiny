@@ -1,14 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Database;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
 using Shiny.Net.Http.Infrastructure;
-using System.IO;
+
 
 namespace Shiny.Net.Http
 {
@@ -29,14 +31,9 @@ namespace Shiny.Net.Http
         }
 
 
-
-        //public override Task Cancel(QueryFilter filter = null)
-        //{
-        //}
-
-        public override Task Cancel(IHttpTransfer transfer)
+        public override Task Cancel(string identifier)
         {
-            var id = long.Parse(transfer.Identifier);
+            var id = long.Parse(identifier);
             this.context
                 .GetManager()
                 .Remove(id);
@@ -44,23 +41,31 @@ namespace Shiny.Net.Http
         }
 
 
-        static readonly QueryFilter updateFilter = new QueryFilter();
-
-        IObservable<IHttpTransfer> httpObs;
-        public override IObservable<IHttpTransfer> WhenUpdated()
+        IObservable<HttpTransfer> httpObs;
+        public override IObservable<HttpTransfer> WhenUpdated()
         {
+            // TODO: cancel/error, should remove from db
+            var query = ToNative(new QueryFilter());
+
             this.httpObs = this.httpObs ?? Observable
-                .Create<IHttpTransfer>(ob =>
+                .Create<HttpTransfer>(ob =>
                 {
                     var lastRun = DateTime.UtcNow;
                     return Observable
-                        .Interval(TimeSpan.FromSeconds(1))
+                        .Interval(TimeSpan.FromSeconds(2))
                         .Subscribe(_ =>
                         {
-                            var transfers = this.GetAll(updateFilter);
-                            foreach (var transfer in transfers)
-                                if (transfer.LastModified >= lastRun)
+                            using (var cursor = this.context.GetManager().InvokeQuery(query))
+                            {
+                                while (cursor.MoveToNext())
+                                {
+                                    var lastModEpoch = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnLastModifiedTimestamp));
+
+                                    //if (transfer.LastModified >= lastRun)
+                                    var transfer = ToLib(cursor);
                                     ob.OnNext(transfer);
+                                }
+                            }
 
                             lastRun = DateTime.UtcNow;
                         });
@@ -72,80 +77,187 @@ namespace Shiny.Net.Http
         }
 
 
-        // TODO:
-        protected override Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
+        protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var dlPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads).AbsolutePath;
-            var path = new FileInfo(Path.Combine(dlPath, request.LocalFile.Name));
+            var path = Path.Combine(dlPath, request.LocalFile.Name);
 
             var native = new Native
                 .Request(Android.Net.Uri.Parse(request.Uri))
-                //.SetDestinationUri(request.LocalFile.ToNativeUri()) // TODO: Need WRITE_EXTERNAL_STORAGE
-                .SetDestinationUri(path.ToNativeUri())
+                .SetDestinationUri(ToNativeUri(path)) // WRITE_EXTERNAL_STORAGE
                 .SetAllowedOverMetered(request.UseMeteredConnection);
 
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
 
             var id = this.context.GetManager().Enqueue(native);
-            //await this.repository.Set(id.ToString(), request);
-
-            var transfer = new HttpTransfer(request, id.ToString());
-            //this.Sub(transfer);
-
-            return Task.FromResult<IHttpTransfer>(transfer);
+            return Task.FromResult(new HttpTransfer(
+                id.ToString(),
+                request.Uri,
+                dlPath,
+                false,
+                request.UseMeteredConnection,
+                null,
+                null,
+                0,
+                0,
+                HttpTransferState.Pending
+            ));
         }
 
 
-        public IEnumerable<IHttpTransfer> GetAll(QueryFilter filter)
+        protected override Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
         {
-            var query = filter.ToNative();
+            return Task.FromResult(Enumerable.Empty<HttpTransfer>());
+        }
+
+
+        protected override Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
+            => Task.FromResult(this.GetAll(filter));
+
+
+
+        IEnumerable<HttpTransfer> GetAll(QueryFilter filter)
+        {
+            var query = ToNative(filter);
             using (var cursor = this.context.GetManager().InvokeQuery(query))
-            {
                 while (cursor.MoveToNext())
-                {
                     yield return ToLib(cursor);
+        }
+
+
+        static Android.Net.Uri ToNativeUri(string filePath)
+        {
+            var native = new Java.IO.File(filePath);
+            return Android.Net.Uri.FromFile(native);
+        }
+
+
+        static Native.Query ToNative(QueryFilter filter)
+        {
+            var query = new Native.Query();
+            if (filter != null)
+            {
+                if (filter.Ids?.Any() ?? false)
+                {
+                    var ids = filter.Ids.Select(long.Parse).ToArray();
+                    query.SetFilterById(ids);
+                }
+                switch (filter.States)
+                {
+                    case HttpTransferStateFilter.Both:
+                        query.SetFilterByStatus(DownloadStatus.Pending | DownloadStatus.Running);
+                        break;
+
+                    case HttpTransferStateFilter.Pending:
+                        query.SetFilterByStatus(DownloadStatus.Pending);
+                        break;
+
+                    case HttpTransferStateFilter.InProgress:
+                        query.SetFilterByStatus(DownloadStatus.Running);
+                        break;
                 }
             }
+            return query;
         }
 
 
-        IHttpTransfer ToLib(ICursor cursor)
+        static HttpTransfer ToLib(ICursor cursor)
         {
-            HttpTransfer transfer = null;
+            Exception exception = null;
+            var status = HttpTransferState.Unknown;
+            var useMetered = true;
             var id = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnId)).ToString();
+            var fileSize = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnTotalSizeBytes));
+            var bytesTransferred = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnBytesDownloadedSoFar));
+            var uri = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalUri));
+            var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
+            var nstatus = (DownloadStatus)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnStatus));
 
-            if (!this.transfers.ContainsKey(id))
+            switch (nstatus)
             {
-                var request = this.RebuildRequest(cursor);
-                transfer = new HttpTransfer(request, id.ToString());
-                //this.Sub(transfer);
+                case DownloadStatus.Failed:
+                    exception = GetError(cursor);
+                    status = HttpTransferState.Error;
+                    break;
+
+                case DownloadStatus.Paused:
+                    status = GetPausedReason(cursor);
+                    break;
+
+                case DownloadStatus.Pending:
+                    status = HttpTransferState.Pending;
+                    break;
+
+                case DownloadStatus.Running:
+                    status = HttpTransferState.InProgress;
+                    break;
+
+                case DownloadStatus.Successful:
+                    status = HttpTransferState.Completed;
+                    break;
             }
-            transfer = this.transfers[id];
-            transfer.Refresh(cursor);
-            return transfer;
+            return new HttpTransfer(id, uri, localPath, false, useMetered, exception, "remoteFileName", fileSize, bytesTransferred, status);
         }
 
 
-        HttpTransferRequest RebuildRequest(ICursor cursor)
+        static HttpTransferState GetPausedReason(ICursor cursor)
         {
-            // TODO: can't rebuild enough of the request, will have to swap to repo
-            var uri = cursor.GetString(cursor.GetColumnIndex(Native.ColumnUri));
-            var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalUri));
+            var reason = (DownloadPausedReason)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
+            switch (reason)
+            {
 
-            // TODO: unmetered, post data, headers
-            var request = new HttpTransferRequest(uri, localPath);
-            return request;
+                case DownloadPausedReason.QueuedForWifi:
+                    return HttpTransferState.PausedByCostedNetwork;
+
+                case DownloadPausedReason.WaitingForNetwork:
+                    return HttpTransferState.PausedByNoNetwork;
+
+                case DownloadPausedReason.WaitingToRetry:
+                    return HttpTransferState.Retrying;
+
+                case DownloadPausedReason.Unknown:
+                default:
+                    return HttpTransferState.Paused;
+            }
         }
 
 
-        protected override Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+        static Exception GetError(ICursor cursor)
         {
-            return Task.FromResult(Enumerable.Empty<IHttpTransfer>());
+            var msg = "There was an error with the request";
+            var error = (DownloadError)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
+            switch (error)
+            {
+                case DownloadError.CannotResume:
+                    break;
+
+                case DownloadError.DeviceNotFound:
+                    break;
+
+                case DownloadError.FileAlreadyExists:
+                    break;
+
+                case DownloadError.FileError:
+                    break;
+
+                case DownloadError.HttpDataError:
+                    break;
+
+                case DownloadError.InsufficientSpace:
+                    break;
+
+                case DownloadError.TooManyRedirects:
+                    break;
+
+                case DownloadError.UnhandledHttpCode:
+                    break;
+
+                case DownloadError.Unknown:
+                default:
+                    break;
+            }
+            return new Exception(msg);
         }
-
-
-        protected override Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
-            => Task.FromResult(this.GetAll(filter));
     }
 }

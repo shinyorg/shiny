@@ -1,14 +1,28 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Shiny.Infrastructure;
 using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http
 {
-    class HttpClientHttpTransfer : AbstractHttpTransfer
+    public class HttpClientHttpTransferManager : AbstractHttpTransferManager
     {
-        public HttpClientHttpTransfer(HttpTransferRequest request, string id) : base(request, id)
+        public HttpClientHttpTransferManager(IRepository repository)
         {
         }
+
+        public override Task Cancel(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public override IObservable<HttpTransfer> WhenUpdated()
+        {
+            throw new NotImplementedException();
+        }
+
 
         //static IObservable<IHttpTransfer> Upload(HttpTransferRequest request)
         //{

@@ -10,7 +10,7 @@ namespace Shiny.Net.Http
 {
     public class HttpTransferManager : AbstractHttpTransferManager
     {
-        protected override async Task<IEnumerable<IHttpTransfer>> GetDownloads(QueryFilter filter)
+        protected override async Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
         {
             var downloads = await BackgroundDownloader
                 .GetCurrentDownloadsAsync()
@@ -20,7 +20,7 @@ namespace Shiny.Net.Http
         }
 
 
-        protected override async Task<IEnumerable<IHttpTransfer>> GetUploads(QueryFilter filter)
+        protected override async Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
         {
             var downloads = await BackgroundUploader
                 .GetCurrentUploadsAsync()
@@ -30,13 +30,13 @@ namespace Shiny.Net.Http
         }
 
 
-        protected override Task<IHttpTransfer> CreateUpload(HttpTransferRequest request)
+        protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
             return base.CreateUpload(request);
         }
 
 
-        protected override async Task<IHttpTransfer> CreateDownload(HttpTransferRequest request)
+        protected override async Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var task = new BackgroundDownloader
             {
@@ -57,7 +57,7 @@ namespace Shiny.Net.Http
             return null;
         }
 
-        public override Task Cancel(IHttpTransfer transfer)
+        public override Task Cancel(HttpTransfer transfer)
         {
             //var tasks = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
             //foreach (var task in tasks)
@@ -66,7 +66,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public override IObservable<IHttpTransfer> WhenUpdated()
+        public override IObservable<HttpTransfer> WhenUpdated()
         {
             throw new NotImplementedException();
         }
