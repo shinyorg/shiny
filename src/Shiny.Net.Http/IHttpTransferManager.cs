@@ -19,7 +19,7 @@ namespace Shiny.Net.Http
         Task<HttpTransfer> GetTransfer(string id);
         Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null);
         Task Cancel(string id);
-        Task Cancel(QueryFilter filter);
+        Task Cancel(QueryFilter filter = null);
         IObservable<HttpTransfer> WhenUpdated();
     }
 }

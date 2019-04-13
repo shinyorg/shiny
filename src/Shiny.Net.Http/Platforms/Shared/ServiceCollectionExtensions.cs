@@ -9,7 +9,11 @@ namespace Shiny.Net.Http
         public static bool UseHttpTransfers<T>(this IServiceCollection builder) where T : class, IHttpTransferDelegate
         {
             builder.AddSingleton<IHttpTransferDelegate, T>();
+#if NETSTANDARD
+            builder.AddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
+#else
             builder.AddSingleton<IHttpTransferManager, HttpTransferManager>();
+#endif
 
             // fire this guy up right away so any registrations get moving again - mostly needed for iOS
             builder.RegisterPostBuildAction(sp => sp.GetService<IHttpTransferManager>());

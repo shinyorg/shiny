@@ -41,7 +41,7 @@ namespace Shiny.Net.Http
         protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var task = this.session.CreateDownloadTask(request.ToNative());
-            var transfer = task.FromNative(HttpTransferState.Pending);
+            var transfer = task.FromNative();
             task.Resume();
 
             return Task.FromResult(transfer);
@@ -51,7 +51,7 @@ namespace Shiny.Net.Http
         protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
             var task = this.session.CreateUploadTask(request.ToNative());
-            var transfer = task.FromNative(HttpTransferState.Pending);
+            var transfer = task.FromNative();
             task.Resume();
 
             return Task.FromResult(transfer);
@@ -70,10 +70,7 @@ namespace Shiny.Net.Http
         {
             var tasks = await this.session.QueryTasks(filter);
             foreach (var task in tasks)
-            {
                 task.Cancel();
-                this.sessionDelegate.SetState(task.TaskIdentifier, HttpTransferState.Cancelled);
-            }
         }
 
 
@@ -83,10 +80,7 @@ namespace Shiny.Net.Http
             var tasks = await this.session.GetAllTasksAsync();
             var task = tasks.FirstOrDefault(x => x.TaskIdentifier == taskId);
             if (task != null)
-            {
                 task.Cancel();
-                this.sessionDelegate.SetState(taskId, HttpTransferState.Cancelled);
-            }
         }
     }
 }
