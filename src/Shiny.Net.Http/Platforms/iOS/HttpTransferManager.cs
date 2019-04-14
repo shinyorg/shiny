@@ -41,6 +41,8 @@ namespace Shiny.Net.Http
         protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var task = this.session.CreateDownloadTask(request.ToNative());
+            task.TaskDescription = request.LocalFile.FullName;
+
             var transfer = task.FromNative();
             task.Resume();
 
@@ -51,6 +53,7 @@ namespace Shiny.Net.Http
         protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
             var task = this.session.CreateUploadTask(request.ToNative());
+            task.TaskDescription = request.LocalFile.FullName;
             var transfer = task.FromNative();
             task.Resume();
 

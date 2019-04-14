@@ -18,13 +18,10 @@ namespace Shiny.Net.Http
     {
         readonly IAndroidContext context;
         readonly IRepository repository;
-        readonly IDictionary<string, HttpTransfer> transfers;
 
 
         public HttpTransferManager(IAndroidContext context, IRepository repository)
         {
-            this.transfers = new Dictionary<string, HttpTransfer>();
-
             this.context = context;
             this.repository = repository;
             //TODO: should I start intent service for receiver?
@@ -45,7 +42,7 @@ namespace Shiny.Net.Http
         public override IObservable<HttpTransfer> WhenUpdated()
         {
             // TODO: cancel/error, should remove from db
-            var query = ToNative(new QueryFilter());
+            var query = ToNative(null);
 
             this.httpObs = this.httpObs ?? Observable
                 .Create<HttpTransfer>(ob =>
@@ -60,10 +57,12 @@ namespace Shiny.Net.Http
                                 while (cursor.MoveToNext())
                                 {
                                     var lastModEpoch = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnLastModifiedTimestamp));
-
-                                    //if (transfer.LastModified >= lastRun)
-                                    var transfer = ToLib(cursor);
-                                    ob.OnNext(transfer);
+                                    var epoch = DateTimeOffset.FromUnixTimeMilliseconds(lastModEpoch);
+                                    if (epoch > lastRun)
+                                    {
+                                        var transfer = ToLib(cursor);
+                                        ob.OnNext(transfer);
+                                    }
                                 }
                             }
 
@@ -114,7 +113,6 @@ namespace Shiny.Net.Http
 
         protected override Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
             => Task.FromResult(this.GetAll(filter));
-
 
 
         IEnumerable<HttpTransfer> GetAll(QueryFilter filter)
@@ -225,39 +223,8 @@ namespace Shiny.Net.Http
 
         static Exception GetError(ICursor cursor)
         {
-            var msg = "There was an error with the request";
             var error = (DownloadError)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
-            switch (error)
-            {
-                case DownloadError.CannotResume:
-                    break;
-
-                case DownloadError.DeviceNotFound:
-                    break;
-
-                case DownloadError.FileAlreadyExists:
-                    break;
-
-                case DownloadError.FileError:
-                    break;
-
-                case DownloadError.HttpDataError:
-                    break;
-
-                case DownloadError.InsufficientSpace:
-                    break;
-
-                case DownloadError.TooManyRedirects:
-                    break;
-
-                case DownloadError.UnhandledHttpCode:
-                    break;
-
-                case DownloadError.Unknown:
-                default:
-                    break;
-            }
-            return new Exception(msg);
+            return new Exception(error.ToString());
         }
     }
 }
