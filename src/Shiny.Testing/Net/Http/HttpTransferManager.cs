@@ -12,32 +12,28 @@ namespace Shiny.Testing.Net.Http
             throw new NotImplementedException();
         }
 
-        public Task Cancel(IHttpTransfer transfer = null)
+
+        public Task Cancel(QueryFilter filter = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task Cancel(QueryFilter filter)
+        public Task<HttpTransfer> Enqueue(HttpTransferRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IHttpTransfer> Enqueue(HttpTransferRequest request)
+        public Task<HttpTransfer> GetTransfer(string id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IHttpTransfer> GetTransfer(string id)
+        public Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<IHttpTransfer>> GetTransfers(QueryFilter filter = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<IHttpTransfer> WhenUpdated()
+        public IObservable<HttpTransfer> WhenUpdated()
         {
             throw new NotImplementedException();
         }
