@@ -141,20 +141,20 @@ namespace Shiny.Net.Http
                     var ids = filter.Ids.Select(long.Parse).ToArray();
                     query.SetFilterById(ids);
                 }
-                switch (filter.States)
-                {
-                    case HttpTransferStateFilter.Both:
-                        query.SetFilterByStatus(DownloadStatus.Pending | DownloadStatus.Running);
-                        break;
+                //switch (filter.States)
+                //{
+                //    case HttpTransferStateFilter.Both:
+                //        query.SetFilterByStatus(DownloadStatus.Pending | DownloadStatus.Running);
+                //        break;
 
-                    case HttpTransferStateFilter.Pending:
-                        query.SetFilterByStatus(DownloadStatus.Pending);
-                        break;
+                //    case HttpTransferStateFilter.Pending:
+                //        query.SetFilterByStatus(DownloadStatus.Pending);
+                //        break;
 
-                    case HttpTransferStateFilter.InProgress:
-                        query.SetFilterByStatus(DownloadStatus.Running);
-                        break;
-                }
+                //    case HttpTransferStateFilter.InProgress:
+                //        query.SetFilterByStatus(DownloadStatus.Running);
+                //        break;
+                //}
             }
             return query;
         }

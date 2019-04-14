@@ -21,12 +21,10 @@ namespace Shiny.Net.Http
 
             return transfers.Select(transfer =>
             {
-                var metric = default(HttpTransferMetric);
                 switch (transfer.Status)
                 {
                     case HttpTransferState.InProgress:
-                        metric = Calculate(transfer, metrics);
-                        break;
+                        return Calculate(transfer, metrics);
 
                     case HttpTransferState.Cancelled:
                     case HttpTransferState.Completed:
@@ -34,9 +32,9 @@ namespace Shiny.Net.Http
                     default:
                         lock (metrics)
                             metrics.Remove(transfer.Identifier);
-                        break;
+
+                        return new HttpTransferMetric(transfer);
                 }
-                return metric;
             });
         }
 
@@ -45,7 +43,7 @@ namespace Shiny.Net.Http
         {
             lock (metrics)
             {
-                var metric = default(HttpTransferMetric);
+                var metric = new HttpTransferMetric(transfer);
 
                 if (!metrics.ContainsKey(transfer.Identifier))
                 {

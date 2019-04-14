@@ -45,8 +45,12 @@ namespace Shiny.Net.Http
         public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
         {
             var transfer = task.FromNative();
-            Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
-            this.tdelegate.OnError(transfer, transfer.Exception);
+
+            if (task.State != NSUrlSessionTaskState.Canceling)
+            {
+                Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
+                this.tdelegate.OnError(transfer, transfer.Exception);
+            }
             this.onEvent.OnNext(transfer);
         }
 
@@ -66,7 +70,7 @@ namespace Shiny.Net.Http
         public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
         {
             var transfer = downloadTask.FromNative();
-            if (!transfer.LocalFilePath.IsEmpty())
+            if (!transfer.LocalFilePath.IsEmpty() && File.Exists(location.Path))
                 File.Move(location.Path, transfer.LocalFilePath);
 
             this.tdelegate.OnCompleted(transfer);

@@ -5,6 +5,7 @@ namespace Shiny.Net.Http
 {
     public struct HttpTransferMetric
     {
+        public HttpTransferMetric(HttpTransfer transfer) : this(transfer, 0, TimeSpan.Zero) { }
         public HttpTransferMetric(HttpTransfer transfer, long bytesPerSecond, TimeSpan estimatedTimeRemaining)
         {
             this.Transfer = transfer;

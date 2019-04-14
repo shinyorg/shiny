@@ -59,18 +59,18 @@ namespace Shiny.Net.Http
                     var ids = filter.Ids.Select(nuint.Parse);
                     results = results.Where(x => ids.Any(y => y == x.TaskIdentifier));
                 }
-                switch (filter.States)
-                {
-                    case HttpTransferStateFilter.InProgress:
-                        results = results.Where(x => x.GetTransferStatus() == HttpTransferState.InProgress);
-                        break;
+                //switch (filter.None)
+                //{
+                //    case HttpTransferStateFilter.InProgress:
+                //        results = results.Where(x => x.GetTransferStatus() == HttpTransferState.InProgress);
+                //        break;
 
-                    case HttpTransferStateFilter.Pending:
-                        results = results.Where(x => x.GetTransferStatus() == HttpTransferState.Pending);
-                        break;
+                //    case HttpTransferStateFilter.Pending:
+                //        results = results.Where(x => x.GetTransferStatus() == HttpTransferState.Pending);
+                //        break;
 
-                        // TODO: paused
-                }
+                //        // TODO: paused
+                //}
             }
             return results;
         }
@@ -80,7 +80,7 @@ namespace Shiny.Net.Http
         {
             var upload = task is NSUrlSessionUploadTask;
             Exception exception = null;
-            if (task.Error != null)
+            if (task.Error != null && task.State != NSUrlSessionTaskState.Canceling)
                 exception = new Exception(task.Error.LocalizedDescription);
 
             return new HttpTransfer(
@@ -107,23 +107,8 @@ namespace Shiny.Net.Http
 
         public static HttpTransferState GetTransferStatus(this NSUrlSessionTask task)
         {
-            NSUrlSessionTaskState? state = null;
-            long bytes = 0;
-
-            if (task is NSUrlSessionUploadTask up)
-            {
-                bytes = up.BytesSent;
-                state = up.State;
-            }
-            else if (task is NSUrlSessionDownloadTask down)
-            {
-                bytes = down.BytesReceived;
-                state = down.State;
-            }
-            if (state == null)
-                return HttpTransferState.Unknown;
-
-            switch (state)
+            var bytes = task.BytesSent + task.BytesReceived;
+            switch (task.State)
             {
                 case NSUrlSessionTaskState.Canceling:
                     return HttpTransferState.Cancelled;
