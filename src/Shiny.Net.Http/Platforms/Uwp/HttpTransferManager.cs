@@ -54,10 +54,10 @@ namespace Shiny.Net.Http
             //var operation = task.CreateDownload(new Uri(config.Uri), file);
             //var httpTask = new DownloadHttpTask(config, operation, false);
             //this.Add(httpTask);
-            return null;
+            return default(HttpTransfer);
         }
 
-        public override Task Cancel(HttpTransfer transfer)
+        public override Task Cancel(string id)
         {
             //var tasks = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
             //foreach (var task in tasks)

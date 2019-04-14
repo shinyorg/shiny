@@ -9,6 +9,9 @@ namespace Shiny.Net.Http
 {
     static class Extensions
     {
+        //const string FILE_PATH_KEY = nameof(HttpTransferRequest.LocalFile);
+
+
         public static NSUrlRequest ToNative(this HttpTransferRequest request)
         {
             var url = NSUrl.FromString(request.Uri);
@@ -28,6 +31,9 @@ namespace Shiny.Net.Http
                 );
 
             //native.SetValueForKey(
+            //    new NSString(request.LocalFile.FullName),
+            //    new NSString(FILE_PATH_KEY)
+            //);
             return native;
         }
 
@@ -88,7 +94,8 @@ namespace Shiny.Net.Http
             return new HttpTransfer(
                 task.TaskIdentifier.ToString(),
                 task.OriginalRequest.Url.ToString(),
-                task.ValueForKey(new NSString("LocalFilePath"))?.ToString(),
+                //task.OriginalRequest.ValueForKey(new NSString(FILE_PATH_KEY))?.ToString(),
+                "",
                 upload,
                 task.OriginalRequest.AllowsCellularAccess,
                 exception,
