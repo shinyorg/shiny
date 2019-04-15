@@ -7,10 +7,6 @@ using Shiny.Power;
 using Android;
 #if ANDROID9
 using AndroidX.Work;
-#else
-using Android.App.Job;
-using Android.Content;
-using Java.Lang;
 #endif
 
 namespace Shiny.Jobs
@@ -121,7 +117,7 @@ namespace Shiny.Jobs
         public override async Task Schedule(JobInfo jobInfo)
         {
             await base.Schedule(jobInfo);
-            this.StartJobService();
+            this.context.StartJobService();
         }
 
 
@@ -130,41 +126,14 @@ namespace Shiny.Jobs
             await base.Cancel(jobId);
             var jobs = await this.Repository.GetAll<JobInfo>();
             if (!jobs.Any())
-                this.StopJobService();
+                this.context.StopJobService();
         }
 
 
         public override async Task CancelAll()
         {
             await base.CancelAll();
-            this.StopJobService();
-        }
-
-
-        JobScheduler NativeScheduler() => (JobScheduler)this.context.AppContext.GetSystemService(JobService.JobSchedulerService);
-        public static int AndroidJobId { get; set; } = 100;
-        public static TimeSpan PeriodicRunTime { get; set; } = TimeSpan.FromMinutes(10);
-
-
-        void StopJobService() => this.NativeScheduler().Cancel(AndroidJobId);
-        void StartJobService()
-        {
-            var sch = this.NativeScheduler();
-            if (!sch.AllPendingJobs.Any(x => x.Id == AndroidJobId))
-            {
-                var job = new Android.App.Job.JobInfo.Builder(
-                        AndroidJobId,
-                        new ComponentName(
-                            this.context.AppContext,
-                            Class.FromType(typeof(ShinyJobService))
-                        )
-                    )
-                    .SetPeriodic(Convert.ToInt64(PeriodicRunTime.TotalMilliseconds))
-                    .SetPersisted(true)
-                    .Build();
-
-                sch.Schedule(job);
-            }
+            this.context.StopJobService();
         }
 
         #endif

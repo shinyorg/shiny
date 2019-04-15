@@ -17,9 +17,11 @@ namespace Shiny.Jobs
         public JobManager(IServiceProvider container,
                           IRepository repository,
                           IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+                          IConnectivity connectivity,
+                          JobManagerConfig config = null) : base(container, repository, powerManager, connectivity)
         {
-            this.timer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
+            config = config ?? new JobManagerConfig();
+            this.timer = new Timer(config.PeriodInterval.TotalMilliseconds);
             this.timer.Elapsed += async (sender, args) =>
             {
                 this.timer.Stop();
