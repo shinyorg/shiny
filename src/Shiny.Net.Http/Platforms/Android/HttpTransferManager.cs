@@ -9,32 +9,29 @@ using Android.Database;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
-using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : AbstractHttpTransferManager
+    public class HttpTransferManager : HttpClientHttpTransferManager
     {
         readonly IAndroidContext context;
-        readonly IRepository repository;
 
 
-        public HttpTransferManager(IAndroidContext context, IRepository repository)
+        public HttpTransferManager(IAndroidContext context, IRepository repository) : base(repository)
         {
             this.context = context;
-            this.repository = repository;
             //TODO: should I start intent service for receiver?
         }
 
 
-        public override Task Cancel(string identifier)
+        public override async Task Cancel(string identifier)
         {
-            var id = long.Parse(identifier);
-            this.context
-                .GetManager()
-                .Remove(id);
-            return Task.CompletedTask;
+            await base.Cancel(identifier);
+            if (Int64.TryParse(identifier, out var id))
+                this.context
+                    .GetManager()
+                    .Remove(id);
         }
 
 
@@ -72,7 +69,7 @@ namespace Shiny.Net.Http
                 .Publish()
                 .RefCount();
 
-            return this.httpObs;
+            return this.httpObs.Merge(base.WhenUpdated());
         }
 
 
@@ -102,12 +99,6 @@ namespace Shiny.Net.Http
                 0,
                 HttpTransferState.Pending
             ));
-        }
-
-
-        protected override Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
-        {
-            return Task.FromResult(Enumerable.Empty<HttpTransfer>());
         }
 
 
