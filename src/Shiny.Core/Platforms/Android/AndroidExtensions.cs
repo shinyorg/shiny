@@ -27,13 +27,8 @@ namespace Shiny
         }
 
 
-        public static long ToEpochMills(this DateTime sendTime)
-        {
-            var utc = sendTime.ToUniversalTime();
-            var epochDiff = (new DateTime(1970, 1, 1) - DateTime.MinValue).TotalSeconds;
-            var utcAlarmTimeInMillis = utc.AddSeconds(-epochDiff).Ticks / 10000;
-            return utcAlarmTimeInMillis;
-        }
+        public static long ToEpochMillis(this DateTime sendTime)
+            => new DateTimeOffset(sendTime).ToUnixTimeMilliseconds();
 
 
         public static Guid ToGuid(this byte[] uuidBytes)
@@ -58,7 +53,7 @@ namespace Shiny
                     return Guid.Parse(id);
 
                 default:
-                    Log.Write("BluetoothLE", "Invalid UUID Detected - " + id);
+                    Log.Write("Android", "Invalid UUID Detected - " + id);
                     return Guid.Empty;
             }
         }
