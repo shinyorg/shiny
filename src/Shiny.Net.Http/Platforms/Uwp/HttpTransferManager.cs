@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
 using Shiny.Net.Http.Infrastructure;
@@ -10,29 +12,86 @@ namespace Shiny.Net.Http
 {
     public class HttpTransferManager : AbstractHttpTransferManager
     {
+        // TODO: call to delegate
+        /*
+         var completionGroup = new BackgroundTransferCompletionGroup();
+        BackgroundTaskBuilder builder = new BackgroundTaskBuilder();
+
+        builder.Name = "MyDownloadProcessingTask";
+        builder.SetTrigger(completionGroup.Trigger);
+        builder.TaskEntryPoint = "Tasks.BackgroundDownloadProcessingTask";
+
+        BackgroundTaskRegistration downloadProcessingTask = builder.Register();
+        Next you associate background transfers with the completion group. Once all transfers are created, enable the completion group.
+        C#
+
+        Copy
+        BackgroundDownloader downloader = new BackgroundDownloader(completionGroup);
+        DownloadOperation download = downloader.CreateDownload(uri, file);
+        Task<DownloadOperation> startTask = download.StartAsync().AsTask();
+
+        // App still sees the normal completion path
+        startTask.ContinueWith(ForegroundCompletionHandler);
+
+        // Do not enable the CompletionGroup until after all downloads are created.
+        downloader.CompletinGroup.Enable();
+        The code in the background task extracts the list of operations from the trigger details, and your code can then inspect the details for each operation and perform appropriate post-processing for each operation.
+        C#
+
+        Copy
+        public class BackgroundDownloadProcessingTask : IBackgroundTask
+        {
+            public async void Run(IBackgroundTaskInstance taskInstance)
+            {
+            var details = (BackgroundTransferCompletionGroupTriggerDetails)taskInstance.TriggerDetails;
+            IReadOnlyList<DownloadOperation> downloads = details.Downloads;
+
+            // Do post-processing on each finished operation in the list of downloads
+            }
+        }
+                     */
         protected override async Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
         {
-            var downloads = await BackgroundDownloader
+            var items = await BackgroundDownloader
                 .GetCurrentDownloadsAsync()
                 .AsTask();
 
-            return null;
+            //x.GetResponseInformation().IsResumable
+            return items
+                .Select(x => x.FromNative())
+                .ToList();
         }
 
 
         protected override async Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
         {
-            var downloads = await BackgroundUploader
+            var items = await BackgroundUploader
                 .GetCurrentUploadsAsync()
                 .AsTask();
 
-            return null;
+            return items
+                .Select(x => x.FromNative())
+                .ToList();
         }
 
 
-        protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
+        protected override async Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
-            return base.CreateUpload(request);
+            var task = new BackgroundUploader
+            {
+                Method = request.HttpMethod.Method,
+                CostPolicy = request.UseMeteredConnection
+                    ? BackgroundTransferCostPolicy.Default
+                    : BackgroundTransferCostPolicy.UnrestrictedOnly
+            };
+            foreach (var header in request.Headers)
+                task.SetRequestHeader(header.Key, header.Value);
+
+            var winFile = await StorageFile.GetFileFromPathAsync(request.LocalFile.FullName).AsTask();
+            var operation = task.CreateUpload(new Uri(request.Uri), winFile);
+            await operation.StartAsync();
+
+            return operation.FromNative();
         }
 
 
@@ -48,27 +107,63 @@ namespace Shiny.Net.Http
             foreach (var header in request.Headers)
                 task.SetRequestHeader(header.Key, header.Value);
 
-            //var filePath = config.LocalFilePath ?? Path.Combine(ApplicationData.Current.LocalFolder.Path, Path.GetRandomFileName());
+            if (!request.LocalFile.Exists)
+                request.LocalFile.Create();
+
             var winFile = await StorageFile.GetFileFromPathAsync(request.LocalFile.FullName).AsTask();
-            var op = task.CreateDownload(new Uri(request.Uri), winFile);
-            //var operation = task.CreateDownload(new Uri(config.Uri), file);
-            //var httpTask = new DownloadHttpTask(config, operation, false);
-            //this.Add(httpTask);
-            return default(HttpTransfer);
+            var operation = task.CreateDownload(new Uri(request.Uri), winFile);
+            await operation.StartAsync();
+
+            return operation.FromNative();
         }
 
-        public override Task Cancel(string id)
+
+        public override async Task Cancel(string id)
         {
-            //var tasks = await BackgroundDownloader.GetCurrentDownloadsAsync().AsTask();
-            //foreach (var task in tasks)
-            //    task.AttachAsync().Cancel();
-            throw new NotImplementedException();
+            var guid = Guid.Parse(id);
+            var tasks = await BackgroundDownloader
+                .GetCurrentDownloadsAsync()
+                .AsTask();
+
+            var task = tasks.FirstOrDefault(x => x.Guid == guid);
+            if (task != null)
+                task.AttachAsync().Cancel();
         }
 
 
-        public override IObservable<HttpTransfer> WhenUpdated()
+        public override IObservable<HttpTransfer> WhenUpdated() => Observable.Create<HttpTransfer>(async (ob, ct) =>
         {
-            throw new NotImplementedException();
-        }
+            var downloads = await BackgroundDownloader
+                .GetCurrentDownloadsAsync()
+                .AsTask();
+
+            foreach (var download in downloads)
+            {
+                download
+                    .AttachAsync()
+                    .AsTask(
+                        ct,
+                        new Progress<DownloadOperation>(_ =>
+                            ob.OnNext(download.FromNative())
+                        )
+                    );
+            }
+
+            var uploads = await BackgroundUploader
+                .GetCurrentUploadsAsync()
+                .AsTask();
+
+            foreach (var upload in uploads)
+            {
+                upload
+                    .AttachAsync()
+                    .AsTask(
+                        ct,
+                        new Progress<UploadOperation>(_ =>
+                            ob.OnNext(upload.FromNative())
+                        )
+                    );
+            }
+        });
     }
 }
