@@ -5,7 +5,7 @@ namespace Shiny.Net.Http
 {
     public struct HttpTransfer
     {
-        public HttpTransfer(string identifier, string uri, string localFilePath, bool isUpload, bool useMeteredConnection, Exception exception, string remoteFileName, long fileSize, long bytesTransferred, HttpTransferState status)
+        public HttpTransfer(string identifier, string uri, string localFilePath, bool isUpload, bool useMeteredConnection, Exception exception, long fileSize, long bytesTransferred, HttpTransferState status)
         {
             this.Identifier = identifier;
             this.Uri = uri;
@@ -13,7 +13,6 @@ namespace Shiny.Net.Http
             this.IsUpload = isUpload;
             this.UseMeteredConnection = useMeteredConnection;
             this.Exception = exception;
-            this.RemoteFileName = remoteFileName;
             this.FileSize = fileSize;
             this.BytesTransferred = bytesTransferred;
 
@@ -29,7 +28,6 @@ namespace Shiny.Net.Http
         public bool IsUpload { get; }
         public bool UseMeteredConnection { get; }
         public Exception Exception { get; }
-        public string RemoteFileName { get; }
         public long FileSize { get; }
         public long BytesTransferred { get; }
         public HttpTransferState Status { get; }

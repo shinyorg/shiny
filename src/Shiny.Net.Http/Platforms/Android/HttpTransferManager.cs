@@ -94,7 +94,6 @@ namespace Shiny.Net.Http
                 false,
                 request.UseMeteredConnection,
                 null,
-                null,
                 0,
                 0,
                 HttpTransferState.Pending
@@ -186,7 +185,7 @@ namespace Shiny.Net.Http
                     status = HttpTransferState.Completed;
                     break;
             }
-            return new HttpTransfer(id, uri, localPath, false, useMetered, exception, "remoteFileName", fileSize, bytesTransferred, status);
+            return new HttpTransfer(id, uri, localPath, false, useMetered, exception, fileSize, bytesTransferred, status);
         }
 
 

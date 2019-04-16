@@ -91,9 +91,6 @@ namespace Shiny.Net.Http
                 task.OriginalRequest.AllowsCellularAccess,
                 exception,
                 upload
-                    ? task.TaskDescription
-                    : "", // TODO: remote filename for download
-                upload
                     ? task.BytesExpectedToSend
                     : task.BytesExpectedToReceive,
                 upload
