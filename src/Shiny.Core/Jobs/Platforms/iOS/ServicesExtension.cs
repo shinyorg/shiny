@@ -19,6 +19,6 @@ namespace Shiny.Jobs
 
 
         public static void ConfigureJobService(this IServiceCollection services, TimeSpan timeSpan)
-            => services.ConfigureJobService(timeSpan.TotalMilliseconds);
+            => services.ConfigureJobService(timeSpan.TotalSeconds);
     }
 }
