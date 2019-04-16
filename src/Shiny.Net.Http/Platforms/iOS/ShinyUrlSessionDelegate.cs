@@ -71,7 +71,8 @@ namespace Shiny.Net.Http
         {
             var transfer = downloadTask.FromNative();
             if (!transfer.LocalFilePath.IsEmpty() && File.Exists(location.Path))
-                File.Move(location.Path, transfer.LocalFilePath);
+                File.Copy(location.Path, transfer.LocalFilePath, true);
+                //File.Move(location.Path, transfer.LocalFilePath);
 
             this.tdelegate.OnCompleted(transfer);
             this.onEvent.OnNext(transfer);
