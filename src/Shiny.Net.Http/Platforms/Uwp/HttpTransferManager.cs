@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
-using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http

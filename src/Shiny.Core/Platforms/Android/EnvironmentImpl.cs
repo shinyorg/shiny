@@ -6,8 +6,8 @@ namespace Shiny
 {
     public class EnvironmentImpl : IEnvironment
     {
-        readonly IAndroidContext context;
-        public EnvironmentImpl(IAndroidContext context) => this.context = context;
+        readonly AndroidContext context;
+        public EnvironmentImpl(AndroidContext context) => this.context = context;
 
 
         public string AppIdentifier => this.context.AppContext.PackageName;

@@ -13,10 +13,10 @@ namespace Shiny.Jobs
 {
     public class JobManager : AbstractJobManager
     {
-        readonly IAndroidContext context;
+        readonly AndroidContext context;
 
 
-        public JobManager(IAndroidContext context,
+        public JobManager(AndroidContext context,
                           IServiceProvider container,
                           IRepository repository,
                           IPowerManager powerManager,

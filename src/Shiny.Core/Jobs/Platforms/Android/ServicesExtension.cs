@@ -13,7 +13,7 @@ namespace Shiny.Jobs
         public static void ConfigureJobService(this ServiceCollection services, TimeSpan serviceInterval)
             => services.RegisterPostBuildAction(sp =>
             {
-                var context = sp.GetService<IAndroidContext>();
+                var context = sp.GetService<AndroidContext>();
                 PeriodicJobInterval = serviceInterval;
                 context.StopJobService();
                 context.StartJobService();
@@ -25,9 +25,9 @@ namespace Shiny.Jobs
 
 
 
-        public static JobScheduler NativeScheduler(this IAndroidContext context) => (JobScheduler)context.AppContext.GetSystemService(JobService.JobSchedulerService);
-        public static void StopJobService(this IAndroidContext context) => context.NativeScheduler().Cancel(ANDROID_JOB_ID);
-        public static void StartJobService(this IAndroidContext context)
+        public static JobScheduler NativeScheduler(this AndroidContext context) => (JobScheduler)context.AppContext.GetSystemService(JobService.JobSchedulerService);
+        public static void StopJobService(this AndroidContext context) => context.NativeScheduler().Cancel(ANDROID_JOB_ID);
+        public static void StartJobService(this AndroidContext context)
         {
             var sch = context.NativeScheduler();
             if (!sch.AllPendingJobs.Any(x => x.Id == ANDROID_JOB_ID))

@@ -8,8 +8,9 @@ namespace Shiny.Net.Http
     static class Extensions
     {
         static Native downloadManager;
-        public static Native GetManager(this IAndroidContext context)
+        public static Native GetManager(this AndroidContext context)
             => context.AppContext.GetManager();
+
 
         public static Native GetManager(this Context context)
         {

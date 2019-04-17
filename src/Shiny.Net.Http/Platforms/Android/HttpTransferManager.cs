@@ -15,10 +15,12 @@ namespace Shiny.Net.Http
 {
     public class HttpTransferManager : HttpClientHttpTransferManager
     {
-        readonly IAndroidContext context;
+        readonly AndroidContext context;
 
 
-        public HttpTransferManager(IAndroidContext context, IRepository repository) : base(repository)
+        public HttpTransferManager(AndroidContext context,
+                                   IRepository repository,
+                                   IConnectivity connectivity) : base(repository, connectivity)
         {
             this.context = context;
             //TODO: should I start intent service for receiver?

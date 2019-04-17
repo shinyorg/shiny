@@ -18,7 +18,7 @@ namespace Shiny.BluetoothLE.Peripherals
         BluetoothGattServer server;
 
 
-        public PeripheralManager(IAndroidContext context)
+        public PeripheralManager(AndroidContext context)
         {
             this.context = new GattServerContext(context);
             this.services = new Dictionary<Guid, GattService>();

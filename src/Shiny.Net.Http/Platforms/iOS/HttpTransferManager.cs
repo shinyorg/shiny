@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
-using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http

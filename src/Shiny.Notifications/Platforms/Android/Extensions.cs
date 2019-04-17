@@ -23,7 +23,7 @@ namespace Shiny.Notifications
         }
 
 
-        public static int GetResourceIdByName(this IAndroidContext context, string iconName) => context
+        public static int GetResourceIdByName(this AndroidContext context, string iconName) => context
             .AppContext
             .Resources
             .GetIdentifier(

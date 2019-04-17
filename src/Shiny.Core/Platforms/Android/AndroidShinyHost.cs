@@ -25,7 +25,7 @@ namespace Shiny
                 startup,
                 services =>
                 {
-                    services.AddSingleton<IAndroidContext>(context);
+                    services.AddSingleton(context);
 
                     services.AddSingleton<IEnvironment, EnvironmentImpl>();
                     services.AddSingleton<IConnectivity, ConnectivityImpl>();
@@ -42,6 +42,6 @@ namespace Shiny
 
 
         public static void OnRequestPermissionsResult(int requestCode, string[] permissions, NativePerm[] grantResults)
-            => Resolve<IAndroidContext>().FirePermission(requestCode, permissions, grantResults);
+            => Resolve<AndroidContext>().FirePermission(requestCode, permissions, grantResults);
     }
 }

@@ -13,12 +13,12 @@ namespace Shiny.Locations
 {
     public class GpsManagerImpl : IGpsManager
     {
-        readonly IAndroidContext context;
+        readonly AndroidContext context;
         readonly FusedLocationProviderClient client;
         readonly ISettings settings;
 
 
-        public GpsManagerImpl(IAndroidContext context, ISettings settings)
+        public GpsManagerImpl(AndroidContext context, ISettings settings)
         {
             this.settings = settings;
             this.context = context;

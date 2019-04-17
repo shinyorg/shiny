@@ -9,11 +9,11 @@ namespace Shiny.Net
 {
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
-        readonly IAndroidContext context;
+        readonly AndroidContext context;
         IDisposable netmon;
 
 
-        public ConnectivityImpl(IAndroidContext context)
+        public ConnectivityImpl(AndroidContext context)
         {
             this.context = context;
         }

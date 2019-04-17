@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-namespace Shiny.Net.Http.Infrastructure
+namespace Shiny.Net.Http
 {
     public abstract class AbstractHttpTransferManager : IHttpTransferManager
     {

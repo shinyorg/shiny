@@ -15,7 +15,7 @@ namespace Shiny.Settings
         readonly ISharedPreferences prefs;
 
 
-        public SettingsImpl(IAndroidContext context, ISerializer serializer) : base(serializer)
+        public SettingsImpl(AndroidContext context, ISerializer serializer) : base(serializer)
         {
             this.prefs = PreferenceManager.GetDefaultSharedPreferences(context.AppContext);
         }

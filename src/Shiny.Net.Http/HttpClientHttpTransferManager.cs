@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Net.Http.Infrastructure;
 
 
 namespace Shiny.Net.Http
@@ -14,12 +13,13 @@ namespace Shiny.Net.Http
     {
         readonly ConcurrentQueue<HttpTransferRequest> requests;
         readonly IDictionary<string, HttpTransfer> transfers;
+        readonly IConnectivity connectivity;
         readonly IRepository repository;
         readonly Subject<HttpTransfer> transferSubj;
         // TODO: currentqueueprocesses
 
 
-        public HttpClientHttpTransferManager(IRepository repository)
+        public HttpClientHttpTransferManager(IRepository repository, IConnectivity connectivity)
         {
             this.repository = repository;
 
