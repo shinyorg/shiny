@@ -19,6 +19,7 @@ namespace Shiny.Net.Http
         {
             var metrics = new Dictionary<string, MetricHolder>();
 
+            // TODO: filter out zeros or sample times? instead of pumping out zeros
             return transfers.Select(transfer =>
             {
                 switch (transfer.Status)
@@ -65,14 +66,11 @@ namespace Shiny.Net.Http
                         var xferDiff = transfer.BytesTransferred - holder.LastBytesTransferred;
                         var bytesPerSecond = xferDiff / totalSeconds;
                         var rawEta = (transfer.FileSize - transfer.BytesTransferred) / bytesPerSecond;
-
-                        //Console.WriteLine($"b/s: {bytesPerSecond} - ETA: {rawEta}");
-                        //metric.BytesPerSecond = Convert.ToInt64(bytesPerSecond);
-                        //metric.EstimatedCompletionTime = TimeSpan.FromSeconds(rawEta);
                         metric = new HttpTransferMetric(transfer, bytesPerSecond, TimeSpan.FromSeconds(rawEta));
+
+                        holder.LastPing = DateTime.UtcNow;
+                        holder.LastBytesTransferred = transfer.BytesTransferred;
                     }
-                    holder.LastPing = DateTime.UtcNow;
-                    holder.LastBytesTransferred = transfer.BytesTransferred;
                 }
                 return metric;
             }
