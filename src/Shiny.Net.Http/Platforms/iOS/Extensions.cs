@@ -55,10 +55,8 @@ namespace Shiny.Net.Http
                         break;
                 }
                 if (filter.Ids.Any())
-                {
-                    var ids = filter.Ids.Select(nuint.Parse);
-                    results = results.Where(x => ids.Any(y => y == x.TaskIdentifier));
-                }
+                    results = results.Where(x => filter.Ids.Any(y => x.TaskDescription.StartsWith(y)));
+
                 //switch (filter.None)
                 //{
                 //    case HttpTransferStateFilter.InProgress:
@@ -83,10 +81,11 @@ namespace Shiny.Net.Http
             if (task.Error != null && task.State != NSUrlSessionTaskState.Canceling)
                 exception = new Exception(task.Error.LocalizedDescription);
 
+            var taskId = TaskIdentifier.FromString(task.TaskDescription);
             return new HttpTransfer(
-                task.TaskIdentifier.ToString(),
+                taskId.Value,
                 task.OriginalRequest.Url.ToString(),
-                task.TaskDescription,
+                taskId.File.FullName,
                 upload,
                 task.OriginalRequest.AllowsCellularAccess,
                 exception,

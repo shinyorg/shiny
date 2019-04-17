@@ -7,15 +7,18 @@ using Shiny.Logging;
 
 namespace Shiny.Net.Http
 {
+    //public class ShinyUrlSessionDelegate : NSObject, INSUrlSessionDownloadDelegate
     public class ShinyUrlSessionDelegate : NSUrlSessionDownloadDelegate
     {
         internal static Action CompletionHandler { get; set; }
         readonly IHttpTransferDelegate tdelegate;
         readonly Subject<HttpTransfer> onEvent;
+        readonly HttpTransferManager manager;
 
 
-        public ShinyUrlSessionDelegate(IHttpTransferDelegate tdelegate)
+        public ShinyUrlSessionDelegate(HttpTransferManager manager, IHttpTransferDelegate tdelegate)
         {
+            this.manager = manager;
             this.tdelegate = tdelegate;
             this.onEvent = new Subject<HttpTransfer>();
         }
@@ -24,10 +27,16 @@ namespace Shiny.Net.Http
         internal IObservable<HttpTransfer> WhenEventOccurs() => this.onEvent;
 
 
+        public override void DidBecomeInvalid(NSUrlSession session, NSError error)
+        {
+            this.manager.Session = null;
+            if (error != null)
+                Log.Write(new Exception(error.LocalizedDescription));
+        }
+
+
         // reauthorize?
-        //public override void DidBecomeInvalid(NSUrlSession session, NSError error)
         //public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, Action<NSInputStream> completionHandler)
-        //public override void DidFinishCollectingMetrics(NSUrlSession session, NSUrlSessionTask task, NSUrlSessionTaskMetrics metrics)
 
 
         public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
@@ -39,14 +48,17 @@ namespace Shiny.Net.Http
 
 
         public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
-            => CompletionHandler?.Invoke();
+        {
+            this.manager.Session = null;
+            CompletionHandler?.Invoke();
+        }
 
 
         public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
         {
             var transfer = task.FromNative();
 
-            if (task.State != NSUrlSessionTaskState.Canceling)
+            if (task.State != NSUrlSessionTaskState.Canceling && error != null)
             {
                 Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
                 this.tdelegate.OnError(transfer, transfer.Exception);
@@ -70,9 +82,10 @@ namespace Shiny.Net.Http
         public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
         {
             var transfer = downloadTask.FromNative();
-            if (!transfer.LocalFilePath.IsEmpty() && File.Exists(location.Path))
+
+            if (!transfer.LocalFilePath.IsEmpty())
+                // if you are debugging, the base path tends to change, so the destination path changes too
                 File.Copy(location.Path, transfer.LocalFilePath, true);
-                //File.Move(location.Path, transfer.LocalFilePath);
 
             this.tdelegate.OnCompleted(transfer);
             this.onEvent.OnNext(transfer);

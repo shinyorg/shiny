@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
@@ -12,21 +13,21 @@ namespace Shiny.Net.Http
     {
         readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;
-        readonly NSUrlSession session;
 
 
         public HttpTransferManager(IHttpTransferDelegate httpDelegate,
                                    int maxConnectionsPerHost = 1)
         {
-            this.sessionDelegate = new ShinyUrlSessionDelegate(httpDelegate);
+            this.sessionDelegate = new ShinyUrlSessionDelegate(this, httpDelegate);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
+            this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;
 
-            this.session = NSUrlSession.FromConfiguration(
-                this.sessionConfig,
-                this.sessionDelegate,
-                new NSOperationQueue()
-            );
+            var s = this.Session; // force load
+            //this.sessionConfig.Discretionary = true;
+            //this.sessionConfig.HttpShouldUsePipelining = true;
+            //this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringCacheData;
+            //this.sessionConfig.ShouldUseExtendedBackgroundIdleMode = true;
         }
 
 
@@ -40,8 +41,11 @@ namespace Shiny.Net.Http
 
         protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
-            var task = this.session.CreateDownloadTask(request.ToNative());
-            task.TaskDescription = request.LocalFile.FullName;
+            var task = this.Session.CreateDownloadTask(request.ToNative());
+            var taskId = TaskIdentifier.Create(request.LocalFile);
+            task.TaskDescription = taskId.ToString();
+            //task.Response.SuggestedFilename
+            //task.Response.ExpectedContentLength
 
             var transfer = task.FromNative();
             task.Resume();
@@ -52,8 +56,9 @@ namespace Shiny.Net.Http
 
         protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
-            var task = this.session.CreateUploadTask(request.ToNative());
-            task.TaskDescription = request.LocalFile.FullName;
+            var task = this.Session.CreateUploadTask(request.ToNative());
+            var taskId = TaskIdentifier.Create(request.LocalFile);
+            task.TaskDescription = taskId.ToString();
             var transfer = task.FromNative();
             task.Resume();
 
@@ -66,12 +71,12 @@ namespace Shiny.Net.Http
 
 
         public override Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null)
-            => this.session.QueryTransfers(filter);
+            => this.Session.QueryTransfers(filter);
 
 
         public override async Task Cancel(QueryFilter filter = null)
         {
-            var tasks = await this.session.QueryTasks(filter);
+            var tasks = await this.Session.QueryTasks(filter);
             foreach (var task in tasks)
                 task.Cancel();
         }
@@ -79,11 +84,33 @@ namespace Shiny.Net.Http
 
         public override async Task Cancel(string id)
         {
-            var taskId = nuint.Parse(id);
-            var tasks = await this.session.GetAllTasksAsync();
-            var task = tasks.FirstOrDefault(x => x.TaskIdentifier == taskId);
+            var tasks = await this.Session.GetAllTasksAsync();
+            var task = tasks.FirstOrDefault(x => x.TaskDescription.StartsWith(id + "|"));
+
             if (task != null)
                 task.Cancel();
+        }
+
+
+        protected string ToTaskDescription(FileInfo file)
+            => $"{Guid.NewGuid()}|{file.FullName}";
+
+        NSUrlSession session;
+        internal NSUrlSession Session
+        {
+            get
+            {
+                if (this.session == null)
+                {
+                    this.session = NSUrlSession.FromConfiguration(
+                        this.sessionConfig,
+                        this.sessionDelegate,
+                        new NSOperationQueue()
+                    );
+                }
+                return this.session;
+            }
+            set => this.session = null;
         }
     }
 }
