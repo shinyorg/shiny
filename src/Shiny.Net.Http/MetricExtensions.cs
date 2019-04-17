@@ -19,61 +19,64 @@ namespace Shiny.Net.Http
         {
             var metrics = new Dictionary<string, MetricHolder>();
 
-            // TODO: filter out zeros or sample times? instead of pumping out zeros
-            return transfers.Select(transfer =>
-            {
-                switch (transfer.Status)
+            return transfers
+                .Synchronize()
+                .Where(transfer =>
                 {
-                    case HttpTransferState.InProgress:
-                        return Calculate(transfer, metrics);
+                    if (transfer.Status == HttpTransferState.InProgress)
+                    {
+                        if (transfer.BytesTransferred <= 0 && transfer.FileSize <= 0)
+                            return false;
 
-                    case HttpTransferState.Cancelled:
-                    case HttpTransferState.Completed:
-                    case HttpTransferState.Error:
-                    default:
-                        lock (metrics)
-                            metrics.Remove(transfer.Identifier);
+                        var holder = Get(transfer, metrics);
+                        var elapsed = DateTime.UtcNow - holder.LastPing;
+                        var totalSeconds = (long)elapsed.TotalSeconds;
 
-                        return new HttpTransferMetric(transfer);
-                }
-            });
+                        return totalSeconds >= 2;
+                    }
+                    metrics.Remove(transfer.Identifier);
+                    return true;
+                })
+                .Select(transfer =>
+                {
+                    var result = transfer.Status == HttpTransferState.InProgress
+                        ? Calculate(transfer, metrics)
+                        : new HttpTransferMetric(transfer);
+
+                    return result;
+                });
+        }
+
+
+        static MetricHolder Get(HttpTransfer transfer, Dictionary<string, MetricHolder> metrics)
+        {
+            if (!metrics.ContainsKey(transfer.Identifier))
+            {
+                metrics.Add(transfer.Identifier, new MetricHolder
+                {
+                    LastBytesTransferred = transfer.BytesTransferred,
+                    LastPing = DateTime.UtcNow
+                });
+            }
+            return metrics[transfer.Identifier];
         }
 
 
         static HttpTransferMetric Calculate(HttpTransfer transfer, IDictionary<string, MetricHolder> metrics)
         {
-            lock (metrics)
-            {
-                var metric = new HttpTransferMetric(transfer);
+            var holder = metrics[transfer.Identifier];
+            var elapsed = DateTime.UtcNow - holder.LastPing;
+            var totalSeconds = (long)elapsed.TotalSeconds;
 
-                if (!metrics.ContainsKey(transfer.Identifier))
-                {
-                    metrics.Add(transfer.Identifier, new MetricHolder
-                    {
-                        LastBytesTransferred = transfer.BytesTransferred,
-                        LastPing = DateTime.UtcNow
-                    });
-                }
-                else if (transfer.BytesTransferred > 0 && transfer.FileSize > 0)
-                {
-                    var holder = metrics[transfer.Identifier];
-                    var elapsed = DateTime.UtcNow - holder.LastPing;
-                    var totalSeconds = (long)elapsed.TotalSeconds;
+            var xferDiff = transfer.BytesTransferred - holder.LastBytesTransferred;
+            var bytesPerSecond = xferDiff / totalSeconds;
+            var rawEta = (transfer.FileSize - transfer.BytesTransferred) / bytesPerSecond;
+            var metric = new HttpTransferMetric(transfer, bytesPerSecond, TimeSpan.FromSeconds(rawEta));
 
-                    // sampling rate of 2 seconds
-                    if (totalSeconds >= 2)
-                    {
-                        var xferDiff = transfer.BytesTransferred - holder.LastBytesTransferred;
-                        var bytesPerSecond = xferDiff / totalSeconds;
-                        var rawEta = (transfer.FileSize - transfer.BytesTransferred) / bytesPerSecond;
-                        metric = new HttpTransferMetric(transfer, bytesPerSecond, TimeSpan.FromSeconds(rawEta));
+            holder.LastPing = DateTime.UtcNow;
+            holder.LastBytesTransferred = transfer.BytesTransferred;
 
-                        holder.LastPing = DateTime.UtcNow;
-                        holder.LastBytesTransferred = transfer.BytesTransferred;
-                    }
-                }
-                return metric;
-            }
+            return metric;
         }
     }
 }
