@@ -7,11 +7,11 @@ namespace Shiny.Jobs
 {
     public static class Extensions
     {
-        public static void SetValue<T>(this JobInfo job, string key, T value)
+        public static void SetParameter<T>(this JobInfo job, string key, T value)
             => job.Parameters[key] = value;
 
 
-        public static T GetValue<T>(this JobInfo job, string key, T defaultValue = default)
+        public static T GetParameter<T>(this JobInfo job, string key, T defaultValue = default)
         {
             if (!job.Parameters.ContainsKey(key))
                 return defaultValue;
