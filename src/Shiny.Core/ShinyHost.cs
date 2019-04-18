@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-
+using Shiny.Infrastructure;
 
 namespace Shiny
 {
@@ -62,6 +62,9 @@ namespace Shiny
         protected static void InitPlatform(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
         {
             var services = new ServiceCollection();
+
+            // add standard infrastructure
+            services.AddSingleton<IMessageBus, MessageBus>();
 
             startup?.ConfigureServices(services);
             platformBuild?.Invoke(services);
