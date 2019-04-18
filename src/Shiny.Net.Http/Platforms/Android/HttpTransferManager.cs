@@ -9,6 +9,7 @@ using Android.Database;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
+using Shiny.Jobs;
 
 
 namespace Shiny.Net.Http
@@ -19,8 +20,9 @@ namespace Shiny.Net.Http
 
 
         public HttpTransferManager(AndroidContext context,
-                                   IRepository repository,
-                                   IConnectivity connectivity) : base(repository, connectivity)
+                                   IJobManager jobManager,
+                                   IMessageBus messageBus,
+                                   IRepository repository) : base(jobManager, messageBus, repository)
         {
             this.context = context;
             //TODO: should I start intent service for receiver?
