@@ -12,7 +12,7 @@ namespace Shiny.Locations
         IObservable<IGpsReading> WhenReading();
 
         bool IsListening { get; }
-        Task StartListener(GpsRequest request);
+        Task StartListener(GpsRequest request = null);
         Task StopListener();
     }
 }
