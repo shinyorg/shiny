@@ -4,7 +4,7 @@ using Windows.Networking.BackgroundTransfer;
 
 namespace Shiny.Net.Http
 {
-    public static class Extensions
+    static class PlatformExtensions
     {
         public static HttpTransfer FromNative(this DownloadOperation x) => new HttpTransfer(
             x.Guid.ToString(),

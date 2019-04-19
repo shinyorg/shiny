@@ -7,7 +7,7 @@ using Foundation;
 
 namespace Shiny.Net.Http
 {
-    static class Extensions
+    static class PlatformExtensions
     {
         public static NSUrlRequest ToNative(this HttpTransferRequest request)
         {
