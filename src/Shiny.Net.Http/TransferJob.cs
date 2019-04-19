@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
@@ -36,21 +37,20 @@ namespace Shiny.Net.Http
             // TODO: once transfer is over, kill repeat and delete store
             if (request.UseMeteredConnection || this.connectivity.IsDirectConnect())
             {
-                //var transfer = default(HttpTransfer);
-                var status = await this.Download(cancelToken).ConfigureAwait(false);
+                //var task = await this.Download(request, cancelToken).ConfigureAwait(false);
 
-                switch (status)
-                {
-                    case HttpTransferState.Completed:
-                        await this.StopJob(jobInfo);
-                        //this.tdelegate.OnCompleted(null);
-                        break;
+                //switch (status)
+                //{
+                //    case HttpTransferState.Completed:
+                //        await this.StopJob(jobInfo);
+                //        //this.tdelegate.OnCompleted(null);
+                //        break;
 
-                    case HttpTransferState.Error:
-                        await this.StopJob(jobInfo);
-                        //this.tdelegate.OnError(null, null);
-                        break;
-                }
+                //    case HttpTransferState.Error:
+                //        await this.StopJob(jobInfo);
+                //        //this.tdelegate.OnError(null, null);
+                //        break;
+                //}
             }
             return true;
         }
@@ -63,148 +63,146 @@ namespace Shiny.Net.Http
         }
 
 
-        async Task<HttpTransferState> Download(CancellationToken ct)
+        async Task<HttpTransferState> Upload(HttpTransferStore request, CancellationToken ct)
         {
-            //this.FileSize = this.Request.LocalFile.Length;
+            var file = new FileInfo(request.LocalFile);
+            var status = HttpTransferState.Pending;
             //this.RemoteFileName = this.Request.LocalFile.Name;
 
-            //while (this.Status != HttpTransferState.Completed && !this.cancelSrc.IsCancellationRequested)
-            //{
-            //    try
-            //    {
-            //        var content = new MultipartFormDataContent();
-            //        content.Add(
-            //            new ProgressStreamContent(
-            //                this.Request.LocalFile.OpenRead(),
-            //                8192,
-            //                sent =>
-            //                {
-            //                    this.Status = HttpTransferState.Running;
-            //                    this.BytesTransferred += sent;
-            //                    this.RunCalculations();
-            //                }
-            //            ),
-            //            "blob",
-            //            this.RemoteFileName
-            //        );
+            // and not cancelled or error
+            while (status != HttpTransferState.Completed && !ct.IsCancellationRequested)
+            {
+                try
+                {
+                    var bytesTransferred = 0L;
 
-            //        await this.httpClient
-            //            .PostAsync(this.Request.Uri, content, this.cancelSrc.Token)
-            //            .ConfigureAwait(false);
+                    var content = new MultipartFormDataContent();
+                    content.Add(
+                        new ProgressStreamContent(
+                            file.OpenRead(),
+                            8192,
+                            sent =>
+                            {
+                                status = HttpTransferState.InProgress;
+                                bytesTransferred += sent;
+                                // TODO: trigger
+                            }
+                        ),
+                        "blob",
+                        file.Name
+                    );
 
-            //        this.Status = this.cancelSrc.IsCancellationRequested
-            //            ? HttpTransferState.Cancelled
-            //            : HttpTransferState.Completed;
-            //    }
-            //    catch (TimeoutException)
-            //    {
-            //        this.Status = HttpTransferState.Retrying;
-            //    }
-            //    catch (IOException ex)
-            //    {
-            //        if (ex.InnerException is WebException)
-            //        {
-            //            this.Status = HttpTransferState.Retrying;
-            //        }
-            //        else
-            //        {
-            //            this.Exception = ex;
-            //        }
-            //    }
-            //    catch (WebException ex)
-            //    {
-            //        switch (ex.Status)
-            //        {
-            //            case WebExceptionStatus.ConnectFailure:
-            //            case WebExceptionStatus.Timeout:
-            //                this.Status = HttpTransferState.Retrying;
-            //                break;
+                    //await httpClient
+                    //    .PostAsync(request.Uri, content, ct)
+                    //    .ConfigureAwait(false);
 
-            //            default:
-            //                this.Status = HttpTransferState.Error;
-            //                this.Exception = ex;
-            //                break;
-            //        }
-            //    }
-            //    catch (TaskCanceledException)
-            //    {
-            //        this.Status = this.cancelSrc.IsCancellationRequested
-            //            ? HttpTransferState.Cancelled
-            //            : HttpTransferState.Retrying;
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        this.Exception = ex;
-            //    }
-            return HttpTransferState.Unknown;
+                    status = HttpTransferState.Completed;
+                }
+                catch (TimeoutException)
+                {
+                    status = HttpTransferState.Retrying;
+                }
+                catch (IOException ex)
+                {
+                    if (ex.InnerException is WebException)
+                        status = HttpTransferState.Retrying;
+                    else
+                    {
+                        //this.Exception = ex;
+                        status = HttpTransferState.Error;
+                    }
+                }
+                catch (WebException ex)
+                {
+                    switch (ex.Status)
+                    {
+                        case WebExceptionStatus.ConnectFailure:
+                        case WebExceptionStatus.Timeout:
+                            status = HttpTransferState.Retrying;
+                            break;
+
+                        default:
+                            status = HttpTransferState.Error;
+                            //this.Exception = ex;
+                            break;
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    status = ct.IsCancellationRequested
+                        ? HttpTransferState.Cancelled
+                        : HttpTransferState.Retrying;
+                }
+                catch (Exception ex)
+                {
+                    //        this.Exception = ex;
+                    status = HttpTransferState.Error;
+                }
+
+                // TODO: trigger
+            }
+            return status;
         }
-    }
-}
-/*
 
 
-            return true;
-  IObservable<HttpTransfer> Upload(HttpTransferRequest request) => Observable.Create<HttpTransfer>(ob =>
+        async Task Download(HttpTransferStore request, CancellationToken ct)
         {
+            var file = new FileInfo(request.LocalFile);
 
+            var fileMode = FileMode.CreateNew;
+            var resumeOffset = 0L;
+            var bytesTransferred = file.Length;
+            var status = HttpTransferState.Unknown;
 
-            //}
-            return () => { };
-        });
+            if (file.Exists)
+            {
+                resumeOffset = file.Length + 1;
+                bytesTransferred = file.Length;
+                fileMode = FileMode.Append;
+            }
 
+            using (var fs = file.Open(fileMode, FileAccess.Write, FileShare.Write))
+            {
+                // and not cancelled or error
+                while (status != HttpTransferState.Completed && !ct.IsCancellationRequested)
+                {
+                    try
+                    {
+                        //this.httpClient.DefaultRequestHeaders.ExpectContinue = false;
+                        //this.httpClient.DefaultRequestHeaders.TransferEncodingChunked = true;
+                        //this.httpClient.DefaultRequestHeaders.Add("Keep-Alive", "false");
 
-        IObservable<HttpTransfer> Download(HttpTransferRequest request) => Observable.Create<HttpTransfer>(ob =>
-        {
-            //var file = request.LocalFile;
-
-            //var fileMode = FileMode.CreateNew;
-            //if (file.Exists)
-            //{
-            //    this.ResumeOffset = file.Length + 1;
-            //    this.BytesTransferred = file.Length;
-            //    fileMode = FileMode.Append;
-            //}
-
-            //using (var fs = file.Open(fileMode, FileAccess.Write, FileShare.Write))
-            //{
-            //    while (this.Status != HttpTransferState.Completed && !this.cancelSrc.IsCancellationRequested)
-            //    {
-            //        try
-            //        {
-            //            //this.httpClient.DefaultRequestHeaders.ExpectContinue = false;
-            //            this.httpClient.DefaultRequestHeaders.TransferEncodingChunked = true;
-            //            this.httpClient.DefaultRequestHeaders.Add("Keep-Alive", "false");
-
-            //            await this.DoDownload(fs);
-            //            this.Status = this.cancelSrc.IsCancellationRequested
-            //                ? HttpTransferState.Cancelled
-            //                : HttpTransferState.Completed;
-            //        }
-            //        catch (TaskCanceledException)
-            //        {
-            //            this.Status = this.cancelSrc.IsCancellationRequested
-            //                ? HttpTransferState.Cancelled
-            //                : HttpTransferState.Retrying;
-            //        }
-            //        catch (IOException ex)
-            //        {
-            //            if (ex.InnerException is WebException)
-            //            {
-            //                this.Status = HttpTransferState.Retrying;
-            //            }
-            //            else
-            //            {
-            //                this.Exception = ex;
-            //            }
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            this.Exception = ex;
-            //        }
-            //    }
-            //}
-            return () => { };
-        });
+                        //await this.DoDownload(fs);
+                        //this.Status = this.cancelSrc.IsCancellationRequested
+                        //    ? HttpTransferState.Cancelled
+                        //    : HttpTransferState.Completed;
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        status = ct.IsCancellationRequested
+                            ? HttpTransferState.Cancelled
+                            : HttpTransferState.Retrying;
+                    }
+                    catch (IOException ex)
+                    {
+                        if (ex.InnerException is WebException)
+                        {
+                            status = HttpTransferState.Retrying;
+                        }
+                        else
+                        {
+                            //this.Exception = ex;
+                            status = HttpTransferState.Error;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //exception = ex;
+                        status = HttpTransferState.Error;
+                    }
+                }
+            }
+        }
 
 
         //static async Task DoDownload(HttpTransferRequest request, FileStream fs)
@@ -250,4 +248,5 @@ namespace Shiny.Net.Http
         //        read = inputStream.Read(buffer, 0, buffer.Length);
         //    }
         //}
-     */
+    }
+}
