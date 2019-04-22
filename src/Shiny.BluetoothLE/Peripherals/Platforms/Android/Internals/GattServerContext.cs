@@ -18,7 +18,18 @@ namespace Shiny.BluetoothLE.Peripherals.Internals
         public GattServerCallbacks Callbacks { get; }
         // subscribed device list
 
-        public BluetoothGattServer CreateServer()
-            => this.Manager.OpenGattServer(this.Context.AppContext, this.Callbacks);
+
+        BluetoothGattServer server;
+        public BluetoothGattServer Server
+        {
+            get
+            {
+                if (this.server == null)
+                {
+                    this.server = this.Manager.OpenGattServer(this.Context.AppContext, this.Callbacks);
+                }
+                return this.server;
+            }
+        }
     }
 }

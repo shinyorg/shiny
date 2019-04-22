@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Shiny.BluetoothLE.Peripherals
     {
         readonly GattServerContext context;
         readonly CompositeDisposable disposer;
+        readonly IDictionary<string, IPeripheral> subscribers;
         Action<CharacteristicSubscription> onSubscribe;
         Func<WriteRequest, GattState> onWrite;
         Func<ReadRequest, ReadResult> onRead;
@@ -22,6 +24,7 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public GattCharacteristic(GattServerContext context, Guid uuid)
         {
+            this.subscribers = new Dictionary<string, IPeripheral>();
             this.disposer = new CompositeDisposable();
             this.context = context;
             this.Uuid = uuid;
@@ -31,33 +34,27 @@ namespace Shiny.BluetoothLE.Peripherals
         public BluetoothGattCharacteristic Native { get; private set; }
         public Guid Uuid { get; }
         public CharacteristicProperties Properties { get; }
-        public IReadOnlyList<IPeripheral> SubscribedCentrals => throw new NotImplementedException();
-        //        public override IReadOnlyList<IPeripheral> SubscribedDevices
-        //        {
-        //            get
-        //            {
-        //                lock (this.subscribers)
-        //                {
-        //                    return new ReadOnlyCollection<IPeripheral>(this.subscribers.Values.ToArray());
-        //                }
-        //            }
-        //        }
+        public IReadOnlyList<IPeripheral> SubscribedCentrals
+        {
+            get
+            {
+                lock (this.subscribers)
+                {
+                    return this.subscribers.Values.ToList();
+                }
+            }
+        }
 
 
         public Task Notify(byte[] data, params IPeripheral[] centrals)
         {
-            //            this.Native.SetValue(value);
+            this.Native.SetValue(data);
+            var sendTo = (centrals.OfType<Peripheral>() ?? this.SubscribedCentrals.OfType<Peripheral>()).ToArray();
 
-            //            if (peripherals == null || peripherals.Length == 0)
-            //                peripherals = this.subscribers.Values.ToArray();
-
-            //            foreach (var x in peripherals.OfType<Device>())
-            //            {
-            //                lock (this.context.ServerReadWriteLock)
-            //                {
-            //                    this.context.Server.NotifyCharacteristicChanged(x.Native, this.Native, false);
-            //                }
-            //            }
+            foreach (var send in sendTo)
+            {
+                this.context.Server.NotifyCharacteristicChanged(send.Native, this.Native, false);
+            }
             return Task.CompletedTask;
         }
 
@@ -122,24 +119,44 @@ namespace Shiny.BluetoothLE.Peripherals
                         var peripheral = new Peripheral(ch.Device);
                         var request = new ReadRequest(this, peripheral, ch.Offset);
                         var result = this.onRead(request);
-                        //                    this.context.Server.SendResponse(
-                        //                        args.Device,
-                        //                        args.RequestId,
-                        //                        request.Status.ToNative(),
-                        //                        args.Offset,
-                        //                        request.Value
-                        //                    );
+
+                        this.context.Server.SendResponse
+                        (
+                            ch.Device,
+                            ch.RequestId,
+                            result.Status.ToNative(),
+                            ch.Offset,
+                            result.Data
+                        );
                     })
-                    .DisposeWith(this.disposer);
+                    .DisposeOn(this.disposer);
             }
             if (this.onSubscribe != null)
             {
-                //            this.subscriptionOb = this.subscriptionOb ?? Observable.Create<DeviceSubscriptionEvent>(ob =>
-                //            {
-                //                var handler = new EventHandler<DescriptorWriteEventArgs>((sender, args) =>
-                //                {
-                //                    if (args.Descriptor.Equals(this.NotificationDescriptor))
-                //                    {
+                this.context
+                    .Callbacks
+                    .DescriptorWrite
+                    .Subscribe(x =>
+                    {
+
+                    })
+                    .DisposeOn(this.disposer);
+
+                this.context
+                    .Callbacks
+                    .ConnectionStateChanged
+                    .Where(x => x.NewState == ProfileState.Disconnected)
+                    .Subscribe(x =>
+                    {
+                        var peripheral = this.Remove(x.Device);
+                        if (peripheral != null)
+                            this.onSubscribe(new CharacteristicSubscription(this, peripheral, false));
+                    })
+                    .DisposeOn(this.disposer);
+
+                    //if (args.Descriptor.Equals(this.NotificationDescriptor))
+                    //.Where(x => )
+
                 //                        if (args.Value.SequenceEqual(NotifyEnabledBytes) || args.Value.SequenceEqual(IndicateEnableBytes))
                 //                        {
                 //                            var device = this.GetOrAdd(args.Device);
@@ -151,26 +168,6 @@ namespace Shiny.BluetoothLE.Peripherals
                 //                            if (device != null)
                 //                                ob.OnNext(new DeviceSubscriptionEvent(device, false));
                 //                        }
-                //                    }
-                //                });
-                //                var dhandler = new EventHandler<ConnectionStateChangeEventArgs>((sender, args) =>
-                //                {
-                //                    if (args.NewState != ProfileState.Disconnected)
-                //                        return;
-
-                //                    var device = this.Remove(args.Device);
-                //                    if (device != null)
-                //                        ob.OnNext(new DeviceSubscriptionEvent(device, false));
-                //                });
-
-                //                this.context.Callbacks.ConnectionStateChanged += dhandler;
-                //                this.context.Callbacks.DescriptorWrite += handler;
-
-                //                return () =>
-                //                {
-                //                    this.context.Callbacks.DescriptorWrite -= handler;
-                //                    this.context.Callbacks.ConnectionStateChanged -= dhandler;
-                //                };
             }
             if (this.onWrite != null)
             {
@@ -183,19 +180,19 @@ namespace Shiny.BluetoothLE.Peripherals
                         var peripheral = new Peripheral(ch.Device);
                         var request = new WriteRequest(this, peripheral, ch.Value, ch.Offset, ch.ResponseNeeded);
                         var state = this.onWrite(request);
+
                         if (request.IsReplyNeeded)
                         {
-                            //                        this.context.Server.SendResponse
-                            //                        (
-                            //                            args.Device,
-                            //                            args.RequestId,
-                            //                            request.Status.ToNative(),
-                            //                            request.Offset,
-                            //                            request.Value
-                            //                        );
+                            this.context.Server.SendResponse(
+                                ch.Device,
+                                ch.RequestId,
+                                state.ToNative(),
+                                ch.Offset,
+                                ch.Value
+                            );
                         }
                     })
-                    .DisposeWith(this.disposer);
+                    .DisposeOn(this.disposer);
             }
 
             if (this.onSubscribe != null)
@@ -210,33 +207,35 @@ namespace Shiny.BluetoothLE.Peripherals
 
 
         public void Dispose() => this.disposer.Dispose();
+
+
+        IPeripheral GetOrAdd(BluetoothDevice native)
+        {
+            lock (this.subscribers)
+            {
+                if (this.subscribers.ContainsKey(native.Address))
+                    return this.subscribers[native.Address];
+
+                var device = new Peripheral(native);
+                this.subscribers.Add(native.Address, device);
+                return device;
+            }
+        }
+
+
+        IPeripheral Remove(BluetoothDevice native)
+        {
+            lock (this.subscribers)
+            {
+                if (this.subscribers.ContainsKey(native.Address))
+                {
+                    var device = this.subscribers[native.Address];
+                    this.subscribers.Remove(native.Address);
+                    return device;
+                }
+                return null;
+            }
+        }
     }
 }
 
-//        IPeripheral GetOrAdd(BluetoothDevice native)
-//        {
-//            lock (this.subscribers)
-//            {
-//                if (this.subscribers.ContainsKey(native.Address))
-//                    return this.subscribers[native.Address];
-
-//                var device = new Device(native);
-//                this.subscribers.Add(native.Address, device);
-//                return device;
-//            }
-//        }
-
-
-//        IPeripheral Remove(BluetoothDevice native)
-//        {
-//            lock (this.subscribers)
-//            {
-//                if (this.subscribers.ContainsKey(native.Address))
-//                {
-//                    var device = this.subscribers[native.Address];
-//                    this.subscribers.Remove(native.Address);
-//                    return device;
-//                }
-//                return null;
-//            }
-//        }

@@ -33,7 +33,7 @@ namespace Shiny
         /// <param name="this"></param>
         /// <param name="compositeDisposable"></param>
         /// <returns></returns>
-        public static T DisposeWith<T>(this T @this, CompositeDisposable compositeDisposable) where T : IDisposable
+        public static T DisposeOn<T>(this T @this, CompositeDisposable compositeDisposable) where T : IDisposable
         {
             compositeDisposable.Add(@this);
             return @this;
