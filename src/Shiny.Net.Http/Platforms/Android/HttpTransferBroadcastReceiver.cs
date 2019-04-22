@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Shiny.Logging;
@@ -32,7 +33,7 @@ namespace Shiny.Net.Http
                     {
                         var transfer = cursor.ToLib();
                         var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
-                        File.Move(localPath, transfer.LocalFilePath);
+                        await Task.Run(() => File.Move(localPath, transfer.LocalFilePath));
 
                         tdelegate.OnCompleted(transfer);
                     }
