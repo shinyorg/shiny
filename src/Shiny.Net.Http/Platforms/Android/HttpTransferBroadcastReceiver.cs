@@ -21,27 +21,37 @@ namespace Shiny.Net.Http
 
             var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
             var native = context.GetManager();
+            var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
+            HttpTransfer? transfer = null;
 
             try
             {
-                var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
-
                 var query = new QueryFilter().Add(id.ToString()).ToNative();
                 using (var cursor = native.InvokeQuery(query))
                 {
                     if (cursor.MoveToNext())
                     {
-                        var transfer = cursor.ToLib();
+                        transfer = cursor.ToLib();
                         var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
-                        await Task.Run(() => File.Move(localPath, transfer.LocalFilePath));
+                        await Task.Run(() =>
+                        {
+                            var to = transfer.Value.LocalFilePath;
+                            if (File.Exists(to))
+                                File.Delete(to);
 
-                        tdelegate.OnCompleted(transfer);
+                            File.Move(localPath, to);
+                        });
+
+                        tdelegate.OnCompleted(transfer.Value);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.Write(ex, ("TransferId", id.ToString()));
+                if (transfer == null)
+                    Log.Write(ex);
+                else
+                    tdelegate.OnError(transfer.Value, ex);
             }
 
             native.Remove(id);
