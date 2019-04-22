@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android;
 using Android.App;
 using Android.Database;
 using Observable = System.Reactive.Linq.Observable;
@@ -77,8 +78,12 @@ namespace Shiny.Net.Http
         }
 
 
-        protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
+        protected override async Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
+            var access = await this.context.RequestAccess(Manifest.Permission.WriteExternalStorage);
+            if (access != AccessState.Available)
+                throw new ArgumentException("Invalid access to external storage - " + access);
+
             var dlPath = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads).AbsolutePath;
             var path = Path.Combine(dlPath, request.LocalFile.Name);
 
