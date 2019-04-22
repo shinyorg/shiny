@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using Android.App;
 using Android.Content;
+using Shiny.Logging;
 using Native = Android.App.DownloadManager;
 
 
@@ -17,14 +19,31 @@ namespace Shiny.Net.Http
                 return;
 
             var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
-            var manager = ShinyHost.Resolve<IHttpTransferManager>();
-            var transfer = await manager.GetTransfer(id.ToString());
+            var native = context.GetManager();
 
-            ShinyHost
-                .Resolve<IHttpTransferDelegate>()
-                .OnCompleted(transfer);
+            try
+            {
+                var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
 
-            context.GetManager().Remove(id);
+                var query = new QueryFilter().Add(id.ToString()).ToNative();
+                using (var cursor = native.InvokeQuery(query))
+                {
+                    if (cursor.MoveToNext())
+                    {
+                        var transfer = cursor.ToLib();
+                        var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
+                        File.Move(localPath, transfer.LocalFilePath);
+
+                        tdelegate.OnCompleted(transfer);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex, ("TransferId", id.ToString()));
+            }
+
+            native.Remove(id);
         }
     }
 }
