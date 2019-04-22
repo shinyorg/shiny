@@ -9,6 +9,7 @@ using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using System.Linq;
+using System.Reactive.Disposables;
 
 namespace Shiny.Net.Http
 {
@@ -47,7 +48,14 @@ namespace Shiny.Net.Http
                 .Create<HttpTransfer>(ob =>
                 {
                     var lastRun = DateTime.UtcNow;
-                    return Observable
+                    var disposer = new CompositeDisposable();
+
+                    HttpTransferBroadcastReceiver
+                        .HttpEvents
+                        .Subscribe(ob.OnNext)
+                        .DisposeOn(disposer);
+
+                    Observable
                         .Interval(TimeSpan.FromSeconds(2))
                         .Subscribe(_ =>
                         {
@@ -66,7 +74,10 @@ namespace Shiny.Net.Http
                             }
 
                             lastRun = DateTime.UtcNow;
-                        });
+                        })
+                        .DisposeOn(disposer);
+
+                    return disposer;
                 })
                 .Publish()
                 .RefCount();
@@ -78,6 +89,10 @@ namespace Shiny.Net.Http
         protected override async Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
             var access = await this.context.RequestAccess(Manifest.Permission.WriteExternalStorage);
+            if (access != AccessState.Available)
+                throw new ArgumentException("Invalid access to external storage - " + access);
+
+            access = await this.context.RequestAccess(Manifest.Permission.ReadExternalStorage);
             if (access != AccessState.Available)
                 throw new ArgumentException("Invalid access to external storage - " + access);
 
@@ -97,7 +112,7 @@ namespace Shiny.Net.Http
             return new HttpTransfer(
                 id.ToString(),
                 request.Uri,
-                dlPath,
+                request.LocalFile.FullName,
                 false,
                 request.UseMeteredConnection,
                 null,

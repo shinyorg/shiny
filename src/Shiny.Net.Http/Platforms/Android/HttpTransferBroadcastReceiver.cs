@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -14,6 +15,9 @@ namespace Shiny.Net.Http
     [IntentFilter(new[] { Native.ActionDownloadComplete })]
     public class HttpTransferBroadcastReceiver : BroadcastReceiver
     {
+        public static Subject<HttpTransfer> HttpEvents { get; } = new Subject<HttpTransfer>();
+
+
         public override async void OnReceive(Context context, Intent intent)
         {
             if (intent.Action != Native.ActionDownloadComplete)
@@ -39,10 +43,13 @@ namespace Shiny.Net.Http
                             if (File.Exists(to))
                                 File.Delete(to);
 
+                            Console.WriteLine($"Transfer Complete: {localPath} => {to}");
+                            //File.Copy(localPath, to, true);
                             File.Move(localPath, to);
                         });
 
                         tdelegate.OnCompleted(transfer.Value);
+                        HttpEvents.OnNext(transfer.Value);
                     }
                 }
             }
@@ -51,7 +58,10 @@ namespace Shiny.Net.Http
                 if (transfer == null)
                     Log.Write(ex);
                 else
+                {
+                    HttpEvents.OnNext(transfer.Value);
                     tdelegate.OnError(transfer.Value, ex);
+                }
             }
 
             native.Remove(id);
