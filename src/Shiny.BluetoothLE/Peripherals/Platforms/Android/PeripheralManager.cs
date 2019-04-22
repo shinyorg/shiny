@@ -150,8 +150,10 @@ namespace Shiny.BluetoothLE.Peripherals
 
         void Cleanup()
         {
-            this.server?.Close();
-            this.server = null;
+            foreach (var service in this.services)
+                service.Value.Dispose();
+
+            this.context.CloseServer();
         }
     }
 }

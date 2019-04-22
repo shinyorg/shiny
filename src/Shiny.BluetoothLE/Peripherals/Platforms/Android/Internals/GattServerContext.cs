@@ -31,5 +31,12 @@ namespace Shiny.BluetoothLE.Peripherals.Internals
                 return this.server;
             }
         }
+
+
+        public void CloseServer()
+        {
+            this.server.Close();
+            this.server = null;
+        }
     }
 }
