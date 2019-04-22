@@ -36,19 +36,26 @@ namespace Shiny.Net.Http
                     if (cursor.MoveToNext())
                     {
                         transfer = cursor.ToLib();
-                        var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
-                        await Task.Run(() =>
+                        if (transfer.Value.Exception != null)
+                            tdelegate.OnError(transfer.Value, transfer.Value.Exception);
+
+                        else
                         {
-                            var to = transfer.Value.LocalFilePath;
-                            if (File.Exists(to))
-                                File.Delete(to);
+                            //ContentResolver.GetFileDescriptior();
+                            var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
+                            await Task.Run(() =>
+                            {
+                                var to = transfer.Value.LocalFilePath;
+                                if (File.Exists(to))
+                                    File.Delete(to);
 
-                            Console.WriteLine($"Transfer Complete: {localPath} => {to}");
-                            //File.Copy(localPath, to, true);
-                            File.Move(localPath, to);
-                        });
+                                //Console.WriteLine($"Transfer Complete: {localPath} => {to}");
+                                //File.Copy(localPath, to, true);
+                                File.Move(localPath, to);
+                            });
 
-                        tdelegate.OnCompleted(transfer.Value);
+                            tdelegate.OnCompleted(transfer.Value);
+                        }
                         HttpEvents.OnNext(transfer.Value);
                     }
                 }
