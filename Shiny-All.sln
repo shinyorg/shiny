@@ -58,8 +58,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "art", "art", "{B092BB14-4418-48EB-86C2-C496545F3390}"
 	ProjectSection(SolutionItems) = preProject
 		art\logo.ai = art\logo.ai
+		art\logo.pdf = art\logo.pdf
 		art\logo.png = art\logo.png
 		art\logo.svg = art\logo.svg
+		art\logo_black_bg.png = art\logo_black_bg.png
+		art\logo_white_bg.png = art\logo_white_bg.png
 	EndProjectSection
 EndProject
 Global
