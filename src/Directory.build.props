@@ -14,9 +14,9 @@
         <Version>1.0.0</Version>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/shinyorg/shiny</PackageProjectUrl>
-        <PackageIconUrl>https://github.com/shinyorg/shiny/raw/master/icon.png</PackageIconUrl>
-        <PackageReleaseNotes>https://github.com/shinyorg/shiny/blob/master/docs/changelog.md</PackageReleaseNotes>
+        <PackageProjectUrl>https://shinydocs.azurewebsites.net</PackageProjectUrl>
+        <PackageIconUrl>https://github.com/shinyorg/shiny/blob/dev/art/logo.png</PackageIconUrl>
+        <PackageReleaseNotes>https://https://shinydocs.azurewebsites.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
 
         <NullableContextOption>enable</NullableContextOption>

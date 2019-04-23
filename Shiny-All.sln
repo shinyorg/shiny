@@ -55,6 +55,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1DC4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Testing", "src\Shiny.Testing\Shiny.Testing.csproj", "{204B1F42-0D9C-4349-87C5-34148E3D170A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "art", "art", "{B092BB14-4418-48EB-86C2-C496545F3390}"
+	ProjectSection(SolutionItems) = preProject
+		art\logo.ai = art\logo.ai
+		art\logo.png = art\logo.png
+		art\logo.svg = art\logo.svg
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Tests\Shiny.Device.Tests.Shared\Shiny.Device.Tests.Shared.projitems*{559dab2c-8bd6-41db-b77e-c446353100fb}*SharedItemsImports = 4

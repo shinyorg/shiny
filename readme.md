@@ -1,4 +1,6 @@
-﻿# Shiny for Xamarin & Windows
+﻿# Shiny for Xamarin & Windows 
+<img src="art/logo.png" width="100" /> 
+
 
 Formerly the ACR Plugins
 
@@ -33,6 +35,9 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
 |Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
 
+
+## Contributor
+* Special Thanks to [Emily Stanek](https://github.com/emilystanek) from [BSI Labs](https://github.com/BSiLabs) for the fantastic logo
 
 ## Support This Project
 
