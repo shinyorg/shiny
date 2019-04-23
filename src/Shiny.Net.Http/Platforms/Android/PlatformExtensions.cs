@@ -15,6 +15,17 @@ namespace Shiny.Net.Http
             => context.AppContext.GetManager();
 
 
+        public static string GetString(this ICursor cursor, string column)
+            => cursor.GetString(cursor.GetColumnIndex(column));
+
+
+        public static int GetInt(this ICursor cursor, string column)
+            => cursor.GetInt(cursor.GetColumnIndex(column));
+
+        public static long GetLong(this ICursor cursor, string column)
+            => cursor.GetLong(cursor.GetColumnIndex(column));
+
+
         public static Native GetManager(this Context context)
         {
             if (downloadManager == null || downloadManager.Handle == IntPtr.Zero)
@@ -58,13 +69,12 @@ namespace Shiny.Net.Http
             Exception exception = null;
             var status = HttpTransferState.Unknown;
             var useMetered = true;
-            var id = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnId)).ToString();
-            var fileSize = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnTotalSizeBytes));
-            var bytesTransferred = cursor.GetLong(cursor.GetColumnIndex(Native.ColumnBytesDownloadedSoFar));
-            var uri = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalUri));
-            //var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
-            var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnDescription)); // temp piggybacking
-            var nstatus = (DownloadStatus)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnStatus));
+            var id = cursor.GetLong(Native.ColumnId).ToString();
+            var fileSize = cursor.GetLong(Native.ColumnTotalSizeBytes);
+            var bytesTransferred = cursor.GetLong(Native.ColumnBytesDownloadedSoFar);
+            var uri = cursor.GetString(Native.ColumnLocalUri);
+            var localPath = cursor.GetString(Native.ColumnDescription); // temp piggybacking
+            var nstatus = (DownloadStatus)cursor.GetInt(Native.ColumnStatus);
 
             switch (nstatus)
             {
@@ -89,14 +99,13 @@ namespace Shiny.Net.Http
                     status = HttpTransferState.Completed;
                     break;
             }
-            // TODO: I want to move out of local path, to requested path
             return new HttpTransfer(id, uri, localPath, false, useMetered, exception, fileSize, bytesTransferred, status);
         }
 
 
         static HttpTransferState GetPausedReason(ICursor cursor)
         {
-            var reason = (DownloadPausedReason)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
+            var reason = (DownloadPausedReason)cursor.GetInt(Native.ColumnReason);
             switch (reason)
             {
 
@@ -118,7 +127,7 @@ namespace Shiny.Net.Http
 
         static Exception GetError(ICursor cursor)
         {
-            var error = (DownloadError)cursor.GetInt(cursor.GetColumnIndex(Native.ColumnReason));
+            var error = (DownloadError)cursor.GetInt(Native.ColumnReason);
             return new Exception(error.ToString());
         }
     }

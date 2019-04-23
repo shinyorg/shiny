@@ -41,7 +41,9 @@ namespace Shiny.Net.Http
 
                         else
                         {
-                            var localPath = native.GetUriForDownloadedFile(id).Path;
+                            var localUri = cursor.GetString(Native.ColumnLocalUri).Replace("file://", String.Empty);
+                            var file = new FileInfo(localUri);
+                            Console.WriteLine("Local: " + file.FullName);
 
                             await Task.Run(() =>
                             {
@@ -49,9 +51,8 @@ namespace Shiny.Net.Http
                                 if (File.Exists(to))
                                     File.Delete(to);
 
-                                Console.WriteLine($"Transfer Complete: {localPath} => {to}");
                                 //File.Copy(localPath, to, true);
-                                File.Move(localPath, to);
+                                File.Move(file.FullName, to);
                             });
 
                             tdelegate.OnCompleted(transfer.Value);
