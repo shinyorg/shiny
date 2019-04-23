@@ -63,6 +63,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "art", "art", "{B092BB14-441
 		art\logo.svg = art\logo.svg
 		art\logo_black_bg.png = art\logo_black_bg.png
 		art\logo_white_bg.png = art\logo_white_bg.png
+		art\nuget.png = art\nuget.png
 	EndProjectSection
 EndProject
 Global

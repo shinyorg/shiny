@@ -15,7 +15,7 @@
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinydocs.azurewebsites.net</PackageProjectUrl>
-        <PackageIconUrl>https://github.com/shinyorg/shiny/blob/dev/art/logo.png</PackageIconUrl>
+        <PackageIconUrl>https://github.com/shinyorg/shiny/blob/dev/art/nuget.png</PackageIconUrl>
         <PackageReleaseNotes>https://https://shinydocs.azurewebsites.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
 
