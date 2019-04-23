@@ -24,7 +24,6 @@ namespace Shiny.Net.Http
                                    IRepository repository) : base(jobManager, messageBus, repository)
         {
             this.context = context;
-            //TODO: should I start intent service for receiver?
         }
 
 

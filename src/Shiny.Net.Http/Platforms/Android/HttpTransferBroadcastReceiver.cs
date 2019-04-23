@@ -41,15 +41,15 @@ namespace Shiny.Net.Http
 
                         else
                         {
-                            //ContentResolver.GetFileDescriptior();
-                            var localPath = cursor.GetString(cursor.GetColumnIndex(Native.ColumnLocalFilename));
+                            var localPath = native.GetUriForDownloadedFile(id).Path;
+
                             await Task.Run(() =>
                             {
                                 var to = transfer.Value.LocalFilePath;
                                 if (File.Exists(to))
                                     File.Delete(to);
 
-                                //Console.WriteLine($"Transfer Complete: {localPath} => {to}");
+                                Console.WriteLine($"Transfer Complete: {localPath} => {to}");
                                 //File.Copy(localPath, to, true);
                                 File.Move(localPath, to);
                             });
