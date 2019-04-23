@@ -49,7 +49,7 @@ namespace Shiny
         /// <param name="obj"></param>
         /// <param name="propertyName"></param>
         /// <param name="value"></param>
-        public static object GetValue(this object obj, string propertyName)
+        public static object ReflectGet(this object obj, string propertyName)
         {
             var prop = obj.GetType().GetProperty(propertyName);
             if (prop == null)
@@ -68,7 +68,7 @@ namespace Shiny
         /// <param name="obj"></param>
         /// <param name="propertyName"></param>
         /// <param name="value"></param>
-        public static void SetValue(this object obj, string propertyName, object value)
+        public static void ReflectSet(this object obj, string propertyName, object value)
         {
             var prop = obj.GetType().GetProperty(propertyName);
             if (prop == null)
