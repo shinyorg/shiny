@@ -15,7 +15,7 @@ namespace Shiny
     public class AndroidShinyHost : ShinyHost
     {
         public static void Init(Application androidApp,
-                                Startup startup = null,
+                                IStartup startup = null,
                                 Action<IServiceCollection> platformBuild = null)
         {
             var callbacks = new ActivityLifecycleCallbacks();
@@ -25,12 +25,12 @@ namespace Shiny
                 startup,
                 services =>
                 {
-                    services.AddSingleton<IAndroidContext>(context);
+                    services.AddSingleton(context);
 
                     services.AddSingleton<IEnvironment, EnvironmentImpl>();
                     services.AddSingleton<IConnectivity, ConnectivityImpl>();
                     services.AddSingleton<IPowerManager, PowerManagerImpl>();
-                    services.AddSingleton<IJobManager, JobManagerImpl>();
+                    services.AddSingleton<IJobManager, JobManager>();
                     services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
                     services.AddSingleton<IFileSystem, FileSystemImpl>();
                     services.AddSingleton<ISerializer, JsonNetSerializer>();
@@ -42,6 +42,6 @@ namespace Shiny
 
 
         public static void OnRequestPermissionsResult(int requestCode, string[] permissions, NativePerm[] grantResults)
-            => Resolve<IAndroidContext>().FirePermission(requestCode, permissions, grantResults);
+            => Resolve<AndroidContext>().FirePermission(requestCode, permissions, grantResults);
     }
 }

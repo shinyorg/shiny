@@ -16,7 +16,7 @@ namespace Shiny.BluetoothLE.Central.Internals
         LollipopScanCallback callbacks;
 
 
-        public CentralContext(IAndroidContext context)
+        public CentralContext(AndroidContext context)
         {
             this.Manager = (BluetoothManager)context.AppContext.GetSystemService(global::Android.App.Application.BluetoothService);
             this.Android = context;
@@ -25,7 +25,7 @@ namespace Shiny.BluetoothLE.Central.Internals
 
 
         public BluetoothManager Manager { get; }
-        public IAndroidContext Android { get; }
+        public AndroidContext Android { get; }
 
 
         public IPeripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(

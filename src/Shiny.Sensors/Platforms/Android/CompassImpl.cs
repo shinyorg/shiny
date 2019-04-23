@@ -38,8 +38,8 @@ namespace Shiny.Sensors
 
             this.readOb = this.readOb ?? Observable.Create<CompassReading>(ob =>
             {
-                var accelMgr = new AcrSensorManager(this.sensorManager);
-                var magMgr = new AcrSensorManager(this.sensorManager);
+                var accelMgr = new ShinySensorManager(this.sensorManager);
+                var magMgr = new ShinySensorManager(this.sensorManager);
                 accelMgr.Start(SensorType.Accelerometer, SensorDelay.Fastest, e =>
                 {
                     lock (this.syncLock)

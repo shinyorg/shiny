@@ -4,11 +4,13 @@ using System.Reactive.Linq;
 
 namespace Shiny.IO
 {
+    /// <summary>
+    /// An RX version of the .NET FileSystemWatcher
+    /// </summary>
     public class RxFileSystemWatcher : IDisposable
     {
         readonly FileSystemWatcher watcher;
         readonly IObservable<FileSystemEvent> changed;
-        readonly IObservable<Exception> error;
 
 
         public RxFileSystemWatcher(string path, string filter = null)
@@ -23,9 +25,13 @@ namespace Shiny.IO
                 var renameHandler = new RenamedEventHandler((sender, args) =>
                     ob.OnNext(new FileSystemEvent(args.ChangeType, args.Name, args.FullPath, args.OldName, args.OldFullPath))
                 );
+                var errorHandler = new ErrorEventHandler((sender, args) =>
+                    ob.OnError(args.GetException())
+                );
                 this.watcher.Created += handler;
                 this.watcher.Changed += handler;
                 this.watcher.Deleted += handler;
+                this.watcher.Error += errorHandler;
                 this.watcher.Renamed += renameHandler;
 
                 return () =>
@@ -35,24 +41,44 @@ namespace Shiny.IO
                     this.watcher.Changed -= handler;
                     this.watcher.Deleted -= handler;
                     this.watcher.Renamed -= renameHandler;
+                    this.watcher.Error -= errorHandler;
                 };
             })
             .Publish()
             .RefCount();
-
-            this.error = Observable.Create<Exception>(ob =>
-            {
-                var handler = new ErrorEventHandler((sender, args) =>
-                    ob.OnNext(args.GetException())
-                );
-                this.watcher.Error += handler;
-                return () => this.watcher.Error -= handler;
-            });
         }
 
 
+        /// <summary>
+        /// Returns a FileSystemEvent for the provided path and filter
+        /// </summary>
+        /// <param name="path">The file system path to watch</param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static IObservable<FileSystemEvent> Create(string path, string filter = null) => Observable.Create<FileSystemEvent>(ob =>
+        {
+            var watcher = new RxFileSystemWatcher(path, filter);
+            var sub = watcher
+                .WhenChanged()
+                .Subscribe(
+                    ob.OnNext,
+                    ob.OnError,
+                    ob.OnCompleted
+                );
+
+            return () =>
+            {
+                sub.Dispose();
+                watcher.Dispose();
+            };
+        });
+
+
+        /// <summary>
+        /// The main method to subscribe to
+        /// </summary>
+        /// <returns></returns>
         public IObservable<FileSystemEvent> WhenChanged() => this.changed;
-        public IObservable<Exception> WhenErrorOccurred() => this.error;
         public void Dispose() => this.watcher?.Dispose();
     }
 }

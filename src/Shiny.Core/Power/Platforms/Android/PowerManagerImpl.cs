@@ -7,11 +7,11 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
-        readonly IAndroidContext context;
+        readonly AndroidContext context;
         IDisposable dispose;
 
 
-        public PowerManagerImpl(IAndroidContext context)
+        public PowerManagerImpl(AndroidContext context)
         {
             this.context = context;
         }

@@ -8,6 +8,20 @@
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.Common.Default.props" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.Common.props" />
   <PropertyGroup />
-  <Import Project="Acr.Device.Tests.Shared.projitems" Label="Shared" />
+  <ItemGroup>
+    <Compile Include="AssemblyAttributes.cs" />
+    <Compile Include="BluetoothLE\AdapterTests.cs" />
+    <Compile Include="BluetoothLE\CharacteristicTests.cs" />
+    <Compile Include="BluetoothLE\Constants.cs" />
+    <Compile Include="BluetoothLE\DeviceTests.cs" />
+    <Compile Include="BluetoothLE\PlatformTests.cs" />
+    <Compile Include="EnvironmentTests.cs" />
+    <Compile Include="IO\FileSystemTests.cs" />
+    <Compile Include="Settings\AbstractSettingTests.cs" />
+    <Compile Include="Settings\DefaultSettingTests.cs" />
+    <Compile Include="Settings\TestBind.cs" />
+    <Compile Include="TestStartup.cs" />
+  </ItemGroup>
+  <Import Project="Shiny.Device.Tests.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.CSharp.targets" />
 </Project>

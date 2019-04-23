@@ -1,11 +1,11 @@
 ﻿using System;
 
 
-namespace Acr
+namespace Shiny
 {
-    public class LinuxShinyHost : CoreHost
+    public class LinuxShinyHost : ShinyHost
     {
-        public static void Init(Startup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
         {
         }
     }

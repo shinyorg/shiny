@@ -8,11 +8,11 @@ using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Acr
+namespace Shiny
 {
-    public class CoreMacHost : ShinyHost
+    public class MacShinyHost : ShinyHost
     {
-        public static void Init(Startup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
             => InitPlatform(startup, services =>
             {
                 services.AddSingleton<IConnectivity, SharedConnectivityImpl>();

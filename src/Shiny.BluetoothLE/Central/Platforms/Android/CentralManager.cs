@@ -17,7 +17,7 @@ namespace Shiny.BluetoothLE.Central
         bool isScanning;
 
 
-        public CentralManager(IAndroidContext context)
+        public CentralManager(AndroidContext context)
             => this.context = new CentralContext(context);
 
 

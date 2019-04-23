@@ -13,12 +13,12 @@ namespace Shiny.Locations
 {
     public class GpsManagerImpl : IGpsManager
     {
-        readonly IAndroidContext context;
+        readonly AndroidContext context;
         readonly FusedLocationProviderClient client;
         readonly ISettings settings;
 
 
-        public GpsManagerImpl(IAndroidContext context, ISettings settings)
+        public GpsManagerImpl(AndroidContext context, ISettings settings)
         {
             this.settings = settings;
             this.context = context;
@@ -48,7 +48,7 @@ namespace Shiny.Locations
             => this.context.RequestAccess(P.AccessFineLocation).ToTask();
 
 
-        public async Task StartListener(GpsRequest request)
+        public async Task StartListener(GpsRequest request = null)
         {
             if (this.IsListening)
                 throw new ArgumentException("GPS is already listening");

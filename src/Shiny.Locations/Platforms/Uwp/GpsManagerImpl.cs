@@ -66,7 +66,7 @@ namespace Shiny.Locations
         public Task<AccessState> RequestAccess(bool backgroundMode) => Task.FromResult(AccessState.Available);
 
 
-        public Task StartListener(GpsRequest request)
+        public Task StartListener(GpsRequest request = null)
         {
             if (this.IsListening)
                 throw new ArgumentException("GPS is already listening");

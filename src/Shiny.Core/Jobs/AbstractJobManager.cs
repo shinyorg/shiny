@@ -54,7 +54,7 @@ namespace Shiny.Jobs
                 case InternetAccess.None:
                     return true;
 
-                case InternetAccess.Direct:
+                case InternetAccess.Unmetered:
                     return hasInternet && directConnect;
 
                 case InternetAccess.Any:
@@ -203,7 +203,7 @@ namespace Shiny.Jobs
 
 
         protected virtual IJob ResolveJob(JobInfo jobInfo)
-            => (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, jobInfo.Type);
+            => (IJob)this.container.ResolveOrInstantiate(jobInfo.Type);
 
 
         protected virtual void LogJob(JobState state,

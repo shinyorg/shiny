@@ -13,7 +13,7 @@ using NativePerm = Android.Content.PM.Permission;
 
 namespace Shiny
 {
-    class AndroidContext : IAndroidContext
+    public class AndroidContext
     {
         readonly ActivityLifecycleCallbacks callbacks;
 

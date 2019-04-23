@@ -1,7 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Shiny.Logging;
 using Native = Android.App.DownloadManager;
 
 
@@ -9,38 +12,67 @@ namespace Shiny.Net.Http
 {
     //https://developer.android.com/reference/android/app/DownloadManager
     [BroadcastReceiver(Enabled = true, Exported = true)]
-    [IntentFilter(new[] {
-        Native.ActionDownloadComplete,
-        Native.ActionNotificationClicked,
-        Native.ActionViewDownloads
-    })]
+    [IntentFilter(new[] { Native.ActionDownloadComplete })]
     public class HttpTransferBroadcastReceiver : BroadcastReceiver
     {
-        public static IObservable<object> WhenReceived() => receiveSubject;
-        static Subject<object> receiveSubject = new Subject<object>();
+        public static Subject<HttpTransfer> HttpEvents { get; } = new Subject<HttpTransfer>();
 
 
-        public override void OnReceive(Context context, Intent intent)
+        public override async void OnReceive(Context context, Intent intent)
         {
+            if (intent.Action != Native.ActionDownloadComplete)
+                return;
+
             var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
-            switch (intent.Action)
+            var native = context.GetManager();
+            var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
+            HttpTransfer? transfer = null;
+
+            try
             {
-                case Native.ActionDownloadComplete:
-                    break;
+                var query = new QueryFilter().Add(id.ToString()).ToNative();
+                using (var cursor = native.InvokeQuery(query))
+                {
+                    if (cursor.MoveToNext())
+                    {
+                        transfer = cursor.ToLib();
+                        if (transfer.Value.Exception != null)
+                            tdelegate.OnError(transfer.Value, transfer.Value.Exception);
 
-                case Native.ActionNotificationClicked:
-                    break;
+                        else
+                        {
+                            var localUri = cursor.GetString(Native.ColumnLocalUri).Replace("file://", String.Empty);
+                            var file = new FileInfo(localUri);
+                            Console.WriteLine("Local: " + file.FullName);
 
-                case Native.ActionViewDownloads:
-                    break;
+                            await Task.Run(() =>
+                            {
+                                var to = transfer.Value.LocalFilePath;
+                                if (File.Exists(to))
+                                    File.Delete(to);
 
-                    //long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                    //DownloadManager.ColumnLocalFilename
-                    //DownloadManager.ColumnBytesDownloadedSoFar
-                    //DownloadManager.ColumnTotalSizeBytes
-                    //DownloadManager.ColumnLastModifiedTimestamp
+                                //File.Copy(localPath, to, true);
+                                File.Move(file.FullName, to);
+                            });
+
+                            tdelegate.OnCompleted(transfer.Value);
+                        }
+                        HttpEvents.OnNext(transfer.Value);
+                    }
+                }
             }
-            //File file = new File(getExternalFilesDir(null), "Dummy");
+            catch (Exception ex)
+            {
+                if (transfer == null)
+                    Log.Write(ex);
+                else
+                {
+                    HttpEvents.OnNext(transfer.Value);
+                    tdelegate.OnError(transfer.Value, ex);
+                }
+            }
+
+            native.Remove(id);
         }
     }
 }

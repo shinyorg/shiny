@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Shiny
 {
-    public static class Extensions_Collections
+    public static partial class Extensions
     {
         /// <summary>
         /// A safe dictionary Get, will return a default value if the dictionary does not contain the key

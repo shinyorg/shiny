@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Timers;
-
+using Shiny.Logging;
 
 namespace Shiny.Caching
 {
@@ -43,7 +43,7 @@ namespace Shiny.Caching
             }
             catch (Exception ex)
             {
-                // TODO?
+                Log.Write(ex);
             }
             this.timer.Start();
         }

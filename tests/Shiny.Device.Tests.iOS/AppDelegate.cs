@@ -14,7 +14,7 @@ namespace Shiny.Device.Tests.iOS
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             //Acr.Logging.Log.ToDebug();
-            IosShinyHost.Init(new TestStartup());
+            iOSShinyHost.Init(new TestStartup());
             this.AddExecutionAssembly(typeof(ExtensibilityPointFactory).Assembly);
             this.AddTestAssembly(typeof(TestStartup).Assembly);
             this.AddTestAssembly(Assembly.GetExecutingAssembly());

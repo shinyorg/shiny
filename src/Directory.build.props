@@ -13,10 +13,10 @@
         <IncludeSymbols>true</IncludeSymbols>
         <Version>1.0.0</Version>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
-        <PackageProjectUrl>https://github.com/shinyorg/shiny</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/shinyorg/shiny/blob/master/LICENSE.md</PackageLicenseUrl>
-        <PackageIconUrl>https://github.com/shinyorg/shiny/raw/master/icon.png</PackageIconUrl>
-        <PackageReleaseNotes>https://github.com/shinyorg/shiny/blob/master/docs/changelog.md</PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://shinydocs.azurewebsites.net</PackageProjectUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/dev/art/nuget.png</PackageIconUrl>
+        <PackageReleaseNotes>https://https://shinydocs.azurewebsites.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
 
         <NullableContextOption>enable</NullableContextOption>
@@ -35,8 +35,10 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DebugType>pdbonly</DebugType>
+        <!--<DebugType>pdbonly</DebugType>-->
+        <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">

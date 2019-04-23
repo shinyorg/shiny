@@ -15,10 +15,9 @@ namespace Shiny.BluetoothLE.Peripherals
         readonly GattServerContext context;
         readonly Dictionary<Guid, GattService> services;
         AdvertisementCallbacks adCallbacks;
-        BluetoothGattServer server;
 
 
-        public PeripheralManager(IAndroidContext context)
+        public PeripheralManager(AndroidContext context)
         {
             this.context = new GattServerContext(context);
             this.services = new Dictionary<Guid, GattService>();
@@ -75,12 +74,9 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public Task<IGattService> AddService(Guid uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
         {
-            if (this.server == null)
-                this.server = this.context.CreateServer();
-
             var service = new GattService(this.context, uuid, primary);
             serviceBuilder(service);
-            this.services.Add(uuid, service);
+            this.context.Server.AddService(service.Native);
             return Task.FromResult<IGattService>(service);
         }
 
@@ -88,7 +84,7 @@ namespace Shiny.BluetoothLE.Peripherals
         public void ClearServices()
         {
             this.services.Clear();
-            this.server.ClearServices();
+            this.context.Server.ClearServices();
             this.Cleanup();
         }
 
@@ -96,7 +92,7 @@ namespace Shiny.BluetoothLE.Peripherals
         public void RemoveService(Guid serviceUuid)
         {
             var s = this.services[serviceUuid];
-            this.server.RemoveService(s.Native);
+            this.context.Server.RemoveService(s.Native);
             this.services.Remove(serviceUuid);
             if (this.services.Count == 0)
                 this.Cleanup();
@@ -154,8 +150,10 @@ namespace Shiny.BluetoothLE.Peripherals
 
         void Cleanup()
         {
-            this.server?.Close();
-            this.server = null;
+            foreach (var service in this.services)
+                service.Value.Dispose();
+
+            this.context.CloseServer();
         }
     }
 }

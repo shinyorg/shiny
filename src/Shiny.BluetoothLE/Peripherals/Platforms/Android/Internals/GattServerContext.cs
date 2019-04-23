@@ -6,19 +6,37 @@ namespace Shiny.BluetoothLE.Peripherals.Internals
 {
     public class GattServerContext
     {
-        public GattServerContext(IAndroidContext context)
+        public GattServerContext(AndroidContext context)
         {
             this.Context = context;
             this.Manager = context.GetBluetooth();
             this.Callbacks = new GattServerCallbacks();
         }
 
-        public IAndroidContext Context { get; }
+        public AndroidContext Context { get; }
         public BluetoothManager Manager { get; }
         public GattServerCallbacks Callbacks { get; }
         // subscribed device list
 
-        public BluetoothGattServer CreateServer()
-            => this.Manager.OpenGattServer(this.Context.AppContext, this.Callbacks);
+
+        BluetoothGattServer server;
+        public BluetoothGattServer Server
+        {
+            get
+            {
+                if (this.server == null)
+                {
+                    this.server = this.Manager.OpenGattServer(this.Context.AppContext, this.Callbacks);
+                }
+                return this.server;
+            }
+        }
+
+
+        public void CloseServer()
+        {
+            this.server.Close();
+            this.server = null;
+        }
     }
 }

@@ -24,8 +24,22 @@ namespace Shiny
     }
 
 
-    public static class Extensions_Rx
+    public static partial class Extensions
     {
+        /// <summary>
+        /// A function from ReactiveUI - useful for non-ui stuff too ;)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="this"></param>
+        /// <param name="compositeDisposable"></param>
+        /// <returns></returns>
+        public static T DisposeOn<T>(this T @this, CompositeDisposable compositeDisposable) where T : IDisposable
+        {
+            compositeDisposable.Add(@this);
+            return @this;
+        }
+
+
         /// <summary>
         /// A handy way for replying & completing an observer - common for single valued observables
         /// </summary>

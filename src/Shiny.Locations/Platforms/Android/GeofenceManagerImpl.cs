@@ -16,11 +16,11 @@ namespace Shiny.Locations
 {
     public class GeofenceManagerImpl : AbstractGeofenceManager
     {
-        readonly IAndroidContext context;
+        readonly AndroidContext context;
         readonly GeofencingClient client;
 
 
-        public GeofenceManagerImpl(IAndroidContext context, IRepository repository) : base(repository)
+        public GeofenceManagerImpl(AndroidContext context, IRepository repository) : base(repository)
         {
             this.context = context;
             this.client = LocationServices.GetGeofencingClient(this.context.AppContext);

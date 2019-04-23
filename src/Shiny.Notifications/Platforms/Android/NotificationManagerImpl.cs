@@ -12,14 +12,14 @@ namespace Shiny.Notifications
 {
     public class NotificationManagerImpl : INotificationManager
     {
-        readonly IAndroidContext context;
+        readonly AndroidContext context;
         readonly ISettings settings;
 
         NotificationManager newManager;
         NotificationManagerCompat compatManager;
 
 
-        public NotificationManagerImpl(IAndroidContext context, ISettings settings)
+        public NotificationManagerImpl(AndroidContext context, ISettings settings)
         {
             this.settings = settings;
             this.context = context;

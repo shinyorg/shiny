@@ -7,11 +7,10 @@ using Shiny.BluetoothLE.Peripherals.Internals;
 
 namespace Shiny.BluetoothLE.Peripherals
 {
-    public class GattService : IGattService, IGattServiceBuilder
+    public class GattService : IGattService, IGattServiceBuilder, IDisposable
     {
         readonly GattServerContext context;
         readonly List<GattCharacteristic> characteristics;
-        readonly BluetoothGattService native;
 
 
         public GattService(GattServerContext context, Guid uuid, bool primary)
@@ -39,6 +38,13 @@ namespace Shiny.BluetoothLE.Peripherals
             this.Native.AddCharacteristic(ch.Native);
             this.characteristics.Add(ch);
             return ch;
+        }
+
+
+        public void Dispose()
+        {
+            foreach (var ch in this.characteristics)
+                ch.Dispose();
         }
     }
 }

@@ -12,13 +12,13 @@ namespace Shiny
 {
     public class UwpShinyHost : ShinyHost
     {
-        public static void Init(Startup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
             => InitPlatform(startup, services =>
             {
                 services.AddSingleton<IEnvironment, EnvironmentImpl>();
                 services.AddSingleton<IConnectivity, ConnectivityImpl>();
                 services.AddSingleton<IPowerManager, PowerManagerImpl>();
-                services.AddSingleton<IJobManager, JobManagerImpl>();
+                services.AddSingleton<IJobManager, JobManager>();
                 services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
                 services.AddSingleton<IFileSystem, FileSystemImpl>();
                 services.AddSingleton<ISerializer, JsonNetSerializer>();

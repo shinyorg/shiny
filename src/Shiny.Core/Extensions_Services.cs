@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Collections.Generic;
 using Shiny.Settings;
 using Shiny.Jobs;
 using Shiny.Caching;
@@ -10,8 +11,68 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    public static class Extensions_Services
+    public static partial class Extensions
     {
+        static readonly List<Action<IServiceProvider>> postBuildActions = new List<Action<IServiceProvider>>();
+
+
+        /// <summary>
+        /// Registers a post container build step
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="action"></param>
+        public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
+            => postBuildActions.Add(action);
+
+
+        /// <summary>
+        /// Attempts to resolve or build an instance from a service provider
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static object ResolveOrInstantiate(this IServiceProvider services, Type type)
+            => ActivatorUtilities.GetServiceOrCreateInstance(services, type);
+
+
+        /// <summary>
+        /// Attempts to resolve or build an instance from a service provider
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static T ResolveOrInstantiate<T>(this IServiceProvider services)
+            => (T)ActivatorUtilities.GetServiceOrCreateInstance(services, typeof(T));
+
+
+        /// <summary>
+        /// Register a module (like a category) of services
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="module"></param>
+        public static void RegisterModule(this IServiceCollection services, IModule module)
+        {
+            module.Register(services);
+            services.RegisterPostBuildAction(module.OnContainerReady);
+        }
+
+
+        /// <summary>
+        /// Register a module (like a category) of services
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        public static void RegisterModule<T>(this IServiceCollection services) where T : IModule, new() => services.RegisterModule(new T());
+
+
+        internal static void RunPostBuildActions(this IServiceProvider container)
+        {
+            foreach (var action in postBuildActions)
+                action(container);
+
+            postBuildActions.Clear();
+        }
+
+
         /// <summary>
         /// Adds an injectable (ICache) cache service that doesn't actually cache at all - good for testing
         /// </summary>
@@ -90,12 +151,11 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="jobInfo"></param>
         public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-        {
-            if (!services.Any(x => x.ImplementationType == typeof(PostRegisterTask)))
-                services.AddSingleton<IStartupTask, PostRegisterTask>();
-
-            PostRegisterTask.Jobs.Add(jobInfo);
-        }
+            => services.RegisterPostBuildAction(async c => await
+                c
+                    .GetService<IJobManager>()
+                    .Schedule(jobInfo)
+            );
 
 
         /// <summary>

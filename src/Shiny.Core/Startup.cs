@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    public abstract class Startup
+    public abstract class Startup : IStartup
     {
         /// <summary>
         /// Configure the service collection
@@ -18,8 +18,7 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public virtual IServiceProvider CreateServiceProvider(IServiceCollection services)
-            => services.BuildServiceProvider();
+        public virtual IServiceProvider CreateServiceProvider(IServiceCollection services) => null;
 
 
         /// <summary>
@@ -29,9 +28,6 @@ namespace Shiny
         /// <param name="provider"></param>
         public virtual void ConfigureApp(IServiceProvider provider)
         {
-            var tasks = provider.GetServices<IStartupTask>();
-            foreach (var task in tasks)
-                task.Start();
         }
     }
 }

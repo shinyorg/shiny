@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-
+using Shiny.Infrastructure;
 
 namespace Shiny
 {
@@ -29,6 +29,23 @@ namespace Shiny
         public static IServiceCollection Services { get; private set; }
 
 
+        /// <summary>
+        /// Feeds another service container
+        /// </summary>
+        /// <param name="feed"></param>
+        public static void Populate(Action<Type, Func<object>, ServiceLifetime> feed)
+        {
+            foreach (var service in Services)
+            {
+                feed(
+                    service.ServiceType,
+                    () => Container.GetService(service.ServiceType),
+                    service.Lifetime
+                );
+            }
+        }
+
+
         static IServiceProvider container;
         public static IServiceProvider Container
         {
@@ -42,9 +59,12 @@ namespace Shiny
         }
 
 
-        protected static void InitPlatform(Startup startup = null, Action<IServiceCollection> platformBuild = null)
+        protected static void InitPlatform(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
         {
             var services = new ServiceCollection();
+
+            // add standard infrastructure
+            services.AddSingleton<IMessageBus, MessageBus>();
 
             startup?.ConfigureServices(services);
             platformBuild?.Invoke(services);
@@ -52,6 +72,11 @@ namespace Shiny
 
             container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
             startup?.ConfigureApp(container);
+
+            container.RunPostBuildActions();
+            var tasks = container.GetServices<IStartupTask>();
+            foreach (var task in tasks)
+                task.Start();
         }
     }
 }

@@ -34,7 +34,7 @@ namespace Shiny.Sensors
         {
             this.readOb = this.readOb ?? Observable.Create<T>(ob =>
             {
-				var mgr = new AcrSensorManager(this.sensorManager);
+				var mgr = new ShinySensorManager(this.sensorManager);
                 //var delay = this.ToSensorDelay(this.ReportInterval);
 
                 mgr.Start(this.type, SensorDelay.Fastest, e =>

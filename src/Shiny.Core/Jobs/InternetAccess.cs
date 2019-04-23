@@ -7,6 +7,6 @@ namespace Shiny.Jobs
     {
         None = 0,
         Any = 1,
-        Direct = 2
+        Unmetered = 2
     }
 }
