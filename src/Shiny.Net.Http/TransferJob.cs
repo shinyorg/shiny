@@ -41,6 +41,7 @@ namespace Shiny.Net.Http
             {
                 var task = request.IsUpload ? this.Upload(request, cancelToken) : this.Download(request, cancelToken);
                 var transfer = await task.ConfigureAwait(false);
+                this.messageBus.Publish(transfer); // pump the transfer one last time
 
                 switch (transfer.Status)
                 {
@@ -63,7 +64,7 @@ namespace Shiny.Net.Http
         {
             var message = new HttpRequestMessage(new HttpMethod(request.HttpMethod), request.Uri);
             //message.Headers.ExpectContinue = false;
-            //message.Headers.TransferEncodingChunked = true;
+            message.Headers.TransferEncodingChunked = true;
             //message.Headers.Add("Keep-Alive", false);
 
             foreach (var header in request.Headers)
@@ -85,15 +86,14 @@ namespace Shiny.Net.Http
         {
             var file = new FileInfo(request.LocalFile);
             var status = HttpTransferState.Pending;
-            //this.RemoteFileName = this.Request.LocalFile.Name;
+            var bytesTransferred = 0L;
+            Exception exception = null;
 
             // and not cancelled or error
-            while (status != HttpTransferState.Completed && !ct.IsCancellationRequested)
+            while (!status.IsCompleted() && !ct.IsCancellationRequested)
             {
                 try
                 {
-                    var bytesTransferred = 0L;
-
                     var content = new MultipartFormDataContent();
                     content.Add(
                         new ProgressStreamContent(
@@ -103,9 +103,17 @@ namespace Shiny.Net.Http
                             {
                                 status = HttpTransferState.InProgress;
                                 bytesTransferred += sent;
-                                //this.messageBus.Publish(new HttpTransfer(
-                                //));
-                                // TODO: trigger
+                                this.messageBus.Publish(new HttpTransfer(
+                                    request.Id,
+                                    request.Uri,
+                                    request.LocalFile,
+                                    true,
+                                    request.UseMeteredConnection,
+                                    null,
+                                    file.Length,
+                                    bytesTransferred,
+                                    status
+                                ));
                             }
                         ),
                         "blob",
@@ -128,7 +136,7 @@ namespace Shiny.Net.Http
                         status = HttpTransferState.Retrying;
                     else
                     {
-                        //this.Exception = ex;
+                        exception = ex;
                         status = HttpTransferState.Error;
                     }
                 }
@@ -143,55 +151,107 @@ namespace Shiny.Net.Http
 
                         default:
                             status = HttpTransferState.Error;
-                            //this.Exception = ex;
+                            exception = ex;
                             break;
                     }
                 }
                 catch (TaskCanceledException)
                 {
                     status = ct.IsCancellationRequested
-                        ? HttpTransferState.Cancelled
+                        ? HttpTransferState.Canceled
                         : HttpTransferState.Retrying;
                 }
                 catch (Exception ex)
                 {
-                    //        this.Exception = ex;
+                    exception = ex;
                     status = HttpTransferState.Error;
                 }
-
-                // TODO: trigger
-                //this.messageBus.Publish(new HttpTransfer(
-                //));
             }
-            //return status;
-            return default(HttpTransfer);
+            return new HttpTransfer(
+                request.Id,
+                request.Uri,
+                request.LocalFile,
+                true,
+                request.UseMeteredConnection,
+                exception,
+                file.Length,
+                bytesTransferred,
+                status
+            );
         }
 
 
-        // TODO: pause due to network
         async Task<HttpTransfer> Download(HttpTransferStore request, CancellationToken ct)
         {
             var status = HttpTransferState.Pending;
             var file = new FileInfo(request.LocalFile);
+            var message = this.Build(request);
+            var fileSize = 0L;
+            var bytesTransferred = file.Exists ? file.Length : 0;
+            Exception exception = null;
             var fileMode = file.Exists ? FileMode.Append : FileMode.Create;
 
             using (var fs = file.Open(fileMode, FileAccess.Write, FileShare.Write))
             {
-                while (status.IsCompleted() && !ct.IsCancellationRequested)
+                while (!status.IsCompleted() && !ct.IsCancellationRequested)
                 {
                     try
                     {
-                        //var message = this.Build(request);
+                        if (fs.Length > 0)
+                        {
+                            var resumeOffset = fs.Length + 1;
+                            message.Content.Headers.ContentRange = new ContentRangeHeaderValue(resumeOffset);
+                        }
 
-                        //await this.DoDownload(fs);
-                        //this.Status = this.cancelSrc.IsCancellationRequested
-                        //    ? HttpTransferState.Cancelled
-                        //    : HttpTransferState.Completed;
+                        var buffer = new byte[8192];
+                        var response = await this.httpClient.SendAsync(
+                            message,
+                            HttpCompletionOption.ResponseHeadersRead,
+                            ct
+                        );
+                        response.EnsureSuccessStatusCode();
+
+                        var inputStream = await response.Content.ReadAsStreamAsync();
+                        var read = inputStream.Read(buffer, 0, buffer.Length);
+
+                        if (response.Headers.AcceptRanges == null && fs.Length > 0)
+                        {
+                            // resume not supported, starting over
+                            fs.SetLength(0);
+                            fs.Flush();
+                            bytesTransferred = 0;
+                        }
+
+                        while (read > 0 && !ct.IsCancellationRequested)
+                        {
+                            fileSize = response.Content.Headers?.ContentRange?.Length ?? response.Content?.Headers?.ContentLength ?? 0;
+                            //this.RemoteFileName = response.Content?.Headers?.ContentDisposition?.FileName ?? String.Empty;
+                            ////pr.FileSize = response.Content?.Headers?.ContentLength ?? 0; // this will change on resume
+                            bytesTransferred += read;
+
+                            fs.Write(buffer, 0, read);
+                            fs.Flush();
+
+                            // TODO: pump message for each 8k could be extreme
+                            this.messageBus.Publish(new HttpTransfer(
+                                request.Id,
+                                request.Uri,
+                                request.LocalFile,
+                                false,
+                                request.UseMeteredConnection,
+                                null,
+                                fileSize,
+                                bytesTransferred,
+                                HttpTransferState.InProgress
+                            ));
+                            read = inputStream.Read(buffer, 0, buffer.Length);
+                        }
+                        status = HttpTransferState.Completed;
                     }
                     catch (TaskCanceledException)
                     {
                         status = ct.IsCancellationRequested
-                            ? HttpTransferState.Cancelled
+                            ? HttpTransferState.Canceled
                             : HttpTransferState.Retrying;
                     }
                     catch (IOException ex)
@@ -202,69 +262,29 @@ namespace Shiny.Net.Http
                         }
                         else
                         {
-                            //this.Exception = ex;
+                            exception = ex;
                             status = HttpTransferState.Error;
                         }
                     }
                     catch (Exception ex)
                     {
-                        //exception = ex;
+                        exception = ex;
                         status = HttpTransferState.Error;
                     }
+                    // TODO: should only pump message when status is changing
                 }
             }
-            return default(HttpTransfer);
-        }
-
-
-        //static bool IsRequestFinished(HttpTransfer transfer)
-        //    => transfer.Status.IsCompleted() || transfer.Status.IsPaused();
-
-        async Task DoDownload(HttpTransferStore request, FileStream fs, CancellationToken ct)
-        {
-            var message = this.Build(request);
-            var bytesTransferred = fs.Length;
-
-            if (fs.Length > 0)
-            {
-                var resumeOffset = fs.Length + 1;
-                //this.httpClient.DefaultRequestHeaders.Range = new RangeHeaderValue(this.ResumeOffset, null);
-                //message.Content.Headers.ContentRange = new ContentRangeHeaderValue(resumeOffset);
-            }
-
-            var buffer = new byte[8192];
-            var response = await this.httpClient.SendAsync(
-                message,
-                HttpCompletionOption.ResponseHeadersRead,
-                ct
+            return new HttpTransfer(
+                request.Id,
+                request.Uri,
+                request.LocalFile,
+                true,
+                request.UseMeteredConnection,
+                exception,
+                fileSize,
+                bytesTransferred,
+                status
             );
-            response.EnsureSuccessStatusCode();
-
-            var inputStream = await response.Content.ReadAsStreamAsync();
-            var read = inputStream.Read(buffer, 0, buffer.Length);
-
-            if (response.Headers.AcceptRanges == null && fs.Length > 0)
-            {
-                // resume not supported, starting over
-                fs.SetLength(0);
-                fs.Flush();
-                //this.BytesTransferred = 0;
-                //this.ResumeOffset = 0;
-            }
-
-            while (read > 0 && !ct.IsCancellationRequested)
-            {
-                //this.FileSize = response.Content.Headers?.ContentRange?.Length ?? response.Content?.Headers?.ContentLength ?? 0;
-                //this.RemoteFileName = response.Content?.Headers?.ContentDisposition?.FileName ?? String.Empty;
-                ////pr.FileSize = response.Content?.Headers?.ContentLength ?? 0; // this will change on resume
-                //this.BytesTransferred += read;
-                //status = HttpTransferState.Running;
-
-                //fs.Write(buffer, 0, read);
-                //fs.Flush();
-
-                //read = inputStream.Read(buffer, 0, buffer.Length);
-            }
         }
     }
 }
