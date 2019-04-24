@@ -107,7 +107,7 @@ namespace Shiny.Net.Http
             switch (task.State)
             {
                 case NSUrlSessionTaskState.Canceling:
-                    return HttpTransferState.Cancelled;
+                    return HttpTransferState.Canceled;
 
                 case NSUrlSessionTaskState.Running:
                     return bytes == 0 ? HttpTransferState.Pending : HttpTransferState.InProgress;

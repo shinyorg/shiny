@@ -37,7 +37,7 @@ namespace Shiny.Net.Http
             switch (status)
             {
                 case BackgroundTransferStatus.Canceled:
-                    return HttpTransferState.Cancelled;
+                    return HttpTransferState.Canceled;
 
                 case BackgroundTransferStatus.Completed:
                     return HttpTransferState.Completed;

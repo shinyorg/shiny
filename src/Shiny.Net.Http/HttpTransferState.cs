@@ -13,7 +13,7 @@ namespace Shiny.Net.Http
         InProgress,
         Retrying,
         Error,
-        Cancelled,
+        Canceled,
         Completed
     }
 }

@@ -11,7 +11,7 @@ namespace Shiny.Net.Http
             {
                 case HttpTransferState.Completed:
                 case HttpTransferState.Error:
-                case HttpTransferState.Cancelled:
+                case HttpTransferState.Canceled:
                     return true;
 
                 default:
