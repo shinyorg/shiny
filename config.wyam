@@ -8,7 +8,10 @@ Settings[Keys.Host] = "shinydocs.azurewebsites.net";
 Settings[Keys.LinksUseHttps] = true;
 Settings[DocsKeys.Logo] = "/assets/img/logo.png";
 Settings[DocsKeys.Title] = "Shiny";
+Settings[DocsKeys.BaseEditUrl] = "https://github.com/shinyorg/shiny/tree/master/input/";
 Settings[DocsKeys.BlogTitle] = "Releases";
+Settings[DocsKeys.SourceFiles] = "../src/**/{!platforms,!infrastructure,!bin,!obj,!packages,}/**/*.cs";
+
 //Settings[DocsKeys.SourceFiles] = null;
 //Settings[DocsKeys.SolutionFiles] = "c:/dev/shiny/Libs.sln";
 //Settings[DocsKeys.SourceFiles] = @"C:/dev/shiny/src/**/{!platforms,!infrastructure,!bin,!obj,!packages,}/**/*.cs";
@@ -16,4 +19,3 @@ Settings[DocsKeys.BlogTitle] = "Releases";
 //    "src/**/{!platforms,!infrastructure,!bin,!obj,!packages,}/**/*.cs",
 //    "../src/**/{!platforms,!infrastructure,!bin,!obj,!packages,}/**/*.cs"
 //};
-Settings[DocsKeys.SourceFiles] = "../src/**/{!platforms,!infrastructure,!bin,!obj,!packages,}/**/*.cs";
