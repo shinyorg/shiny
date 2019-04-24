@@ -37,7 +37,9 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 
 
 ## Contributor
-* Special Thanks to [Emily Stanek](https://github.com/emilystanek) from [BSI Labs](https://github.com/BSiLabs) for the fantastic logo
+* Special Thanks to [Emily Stanek](https://github.com/emilystanek) from [BSI Labs](https://github.com/BSiLabs) for the fantastic logo  
+[![BSI Labs - Enterprise Mobile Done Right.](https://bsilabs.ca/wp-content/uploads/2019/04/BSILabsLogo-Grey-Lg@0.25x.png)](https://bsilabs.ca)
+
 
 ## Support This Project
 
