@@ -3,7 +3,7 @@
 
 namespace Shiny.Sensors
 {
-    public class CompassReading
+    public struct CompassReading
     {
         public CompassReading(CompassAccuracy accuracy, double magHeading, double? trueHeading)
         {
