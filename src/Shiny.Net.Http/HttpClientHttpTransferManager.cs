@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
@@ -23,16 +25,65 @@ namespace Shiny.Net.Http
         }
 
 
+        protected override Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
+            => this.Query(filter, false);
+
+
+        protected override Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
+            => this.Query(filter, true);
+
+
+        async Task<IEnumerable<HttpTransfer>> Query(QueryFilter filter, bool isUpload)
+        {
+            var stores = await this.repository
+                .GetAll<HttpTransferStore>()
+                .ConfigureAwait(false);
+
+            var query = stores
+                .Where(x => x.IsUpload == isUpload);
+
+            if (filter.Ids.Any())
+                query = query.Where(x => filter.Ids.Any(y => x.Id == y));
+
+            // TODO: get attributes (filesize, bytes xfer, etc)
+            return query.Select(x => new HttpTransfer(
+                x.Id,
+                x.Uri,
+                x.LocalFile,
+                isUpload,
+                x.UseMeteredConnection,
+                null,
+                0L,
+                0L,
+                HttpTransferState.Pending
+            ));
+        }
+
         // TODO: what if in the middle of job?
         public override Task Cancel(string id) => this.jobManager.Cancel(id);
 
 
-        protected override async Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
+        protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
+            => this.Create(request);
+
+
+        protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
+            => this.Create(request);
+
+
+        async Task<HttpTransfer> Create(HttpTransferRequest request)
         {
             var id = Guid.NewGuid().ToString();
             await this.repository.Set(id, new HttpTransferStore
             {
-                Id = id
+                Id = id,
+                Uri = request.Uri,
+                IsUpload = request.IsUpload,
+                PostData = request.PostData,
+                LocalFile = request.LocalFile.FullName,
+                UseMeteredConnection = request.UseMeteredConnection,
+                HttpMethod = request.HttpMethod.ToString(),
+                Headers = request.Headers
             });
             await this.jobManager.Schedule(new JobInfo
             {
@@ -45,40 +96,16 @@ namespace Shiny.Net.Http
                 id,
                 request.Uri,
                 request.LocalFile.FullName,
-                true,
+                request.IsUpload,
                 request.UseMeteredConnection,
                 null,
-                request.LocalFile.Length,
+                request.IsUpload ? request.LocalFile.Length : 0L,
                 0,
                 HttpTransferState.Pending
             );
-
+            // fire and forget
             this.jobManager.Run(id);
             return transfer;
-        }
-
-
-        protected override async Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
-        {
-            var id = Guid.NewGuid().ToString();
-            await this.repository.Set(id, new HttpTransferStore
-            {
-
-            });
-            var transfer = new HttpTransfer(
-                id,
-                request.Uri,
-                request.LocalFile.FullName,
-                true,
-                request.UseMeteredConnection,
-                null,
-                request.LocalFile.Length,
-                0,
-                HttpTransferState.Pending
-            );
-            this.jobManager.Run(id);
-            return transfer;
-
         }
 
 

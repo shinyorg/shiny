@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reactive.Linq;
+using System.Reactive.Disposables;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android;
@@ -8,8 +9,7 @@ using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
-using System.Linq;
-using System.Reactive.Disposables;
+
 
 namespace Shiny.Net.Http
 {
@@ -124,11 +124,6 @@ namespace Shiny.Net.Http
 
         protected override Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
             => Task.FromResult(this.GetAll(filter));
-
-
-        // TODO: temporary fix
-        protected override Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
-            => Task.FromResult(Enumerable.Empty<HttpTransfer>());
 
 
         IEnumerable<HttpTransfer> GetAll(QueryFilter filter)
