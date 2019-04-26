@@ -29,17 +29,8 @@ namespace Shiny.IO
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        public static IObservable<FileSystemEvent> WhenChanged(this FileInfo file)
+        public static IObservable<FileSystemEvent> WhenChanged(this FileSystemInfo file)
             => RxFileSystemWatcher.Create(file.FullName);
-
-
-        /// <summary>
-        /// Returns a FileSystemEvent for the directory
-        /// </summary>
-        /// <param name="directory"></param>
-        /// <returns></returns>
-        public static IObservable<FileSystemEvent> WhenChanged(this DirectoryInfo directory)
-            => RxFileSystemWatcher.Create(directory.FullName);
 
 
         public static Stream ToStream(this string s, Encoding encoding = null)
@@ -113,16 +104,14 @@ namespace Shiny.IO
 
 
 
-        public static FileDeleteResult TryDeleteIfExists(this FileInfo file) => TryDeleteIfExists(file.FullName);
-
-        public static FileDeleteResult TryDeleteIfExists(string filePath)
+        public static FileDeleteResult TryDeleteIfExists(this FileSystemInfo info)
         {
-            if (!File.Exists(filePath))
+            if (!info.Exists)
                 return FileDeleteResult.DoesNotExist;
 
             try
             {
-                File.Delete(filePath);
+                info.Delete();
                 return FileDeleteResult.Success;
             }
             catch
@@ -133,11 +122,10 @@ namespace Shiny.IO
 
 
         public static bool IsSuccess(this FileDeleteResult result) => result != FileDeleteResult.Fail;
-        public static void DeleteIfExists(this FileInfo file) => DeleteIfExists(file.FullName);
-        public static void DeleteIfExists(string filePath)
+        public static void DeleteIfExists(this FileSystemInfo info)
         {
-            if (File.Exists(filePath))
-                File.Delete(filePath);
+            if (info.Exists)
+                info.Delete();
         }
     }
 }
