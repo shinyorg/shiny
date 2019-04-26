@@ -1,5 +1,4 @@
 Title: Android
-Category: Platforms
 ---
 # Android
 
@@ -7,6 +6,14 @@ Android Bluetooth is painful and that's being nice.  This library attempts to de
 
 All of the classes and members listed in this page can only be called from your Android project, not your PCL/Core library.  You should call and set
 these values at your main launcher activity or even at an application level.
+
+## Setup
+
+Make sure to add the following to your application node in AndroidManifest.xml
+```xml
+<uses-permission android:name="android.permission.BLUETOOTH"/>
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+```
 
 ## General Rules
 
@@ -31,7 +38,7 @@ device.Connect(new GattConnectionConfig {
 });
 ```
 
-## Settings
+## Advanced Settings
 
 ```csharp
 The following values are only available to be set from your android project

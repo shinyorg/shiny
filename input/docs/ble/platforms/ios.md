@@ -1,12 +1,11 @@
 Title: iOS
-Category: Platforms
 ---
 # iOS
 
 Apple has some very interesting limitations on Bluetooth especially when it comes to background scanning
 
 ## Setup
-Make sure to add the following to your Info.plist
+Make sure to add the following to your Info.plist if you plan to use BLE from the background
 
 ```xml
 <array>

@@ -22,7 +22,7 @@ Windows UWP|16299+
 .NET Standard|2.0
 
 ## SETUP
-1. Install the NuGet package - [![NuGet](https://img.shields.io/nuget/v/Shiny.HttpTransferTasks.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.HttpTransfers/)
+1. Install the NuGet package - [![NuGet](https://img.shields.io/nuget/v/Shiny.Net.Http.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Net.Http/)
 
 2. In your [Shiny Startup](./startup) - add the following 
 ```csharp
