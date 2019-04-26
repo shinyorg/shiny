@@ -55,7 +55,7 @@ namespace Shiny.IO
         /// <param name="path">The file system path to watch</param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static IObservable<FileSystemEvent> Create(string path, string filter = null) => Observable.Create<FileSystemEvent>(ob =>
+        public static IObservable<FileSystemEvent> Create(string path, string filter = "*.*") => Observable.Create<FileSystemEvent>(ob =>
         {
             var watcher = new RxFileSystemWatcher(path, filter);
             var sub = watcher
