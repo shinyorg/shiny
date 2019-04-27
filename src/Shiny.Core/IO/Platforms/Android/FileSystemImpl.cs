@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Reactive.Linq;
+using Android.OS;
 
 
 namespace Shiny.IO
 {
-    public class FileSystemImpl : IFileSystem
+    public class FileSystemImpl : AbstractFileSystemImpl
     {
         public FileSystemImpl()
         {
@@ -18,10 +20,13 @@ namespace Shiny.IO
         }
 
 
-        public DirectoryInfo AppData { get; set; }
-        public DirectoryInfo Cache { get; set; }
-        public DirectoryInfo Public { get; set; }
+        public override IObservable<FileSystemEvent> Watch(string path, string filter = "*.*")
+        {
+            //var obs = new FileObserver("", FileObserverEvents.MovedFrom);
 
-        public string ToFileUri(string path) => "file:/" + path;
+            return Observable.Empty<FileSystemEvent>();
+        }
+
+        //public string ToFileUri(string path) => "file:/" + path;
     }
 }

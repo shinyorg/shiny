@@ -24,6 +24,13 @@ namespace Shiny.IO
         /// </summary>
         DirectoryInfo Public { get; set; }
 
-        string ToFileUri(string path);
+
+        /// <summary>
+        /// Creates a filesystem watcher
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        IObservable<FileSystemEvent> Watch(string path, string filter = "*.*");
     }
 }

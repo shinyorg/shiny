@@ -11,28 +11,6 @@ namespace Shiny.IO
 {
     public static class Extensions
     {
-        /// <summary>
-        /// Returns the full content of a file when it changes
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        public static IObservable<string> WhenTextContentChanged(this FileInfo file)
-            => file
-                .WhenChanged()
-                .Where(_ => file.Exists)
-                .Select(_ => File.ReadAllText(file.FullName))
-                .StartWith(File.ReadAllText(file.FullName));
-
-
-        /// <summary>
-        /// Returns a FileSystemEvent for the file
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        public static IObservable<FileSystemEvent> WhenChanged(this FileSystemInfo file)
-            => RxFileSystemWatcher.Create(file.FullName);
-
-
         public static Stream ToStream(this string s, Encoding encoding = null)
         {
             var bytes = (encoding ?? Encoding.UTF8).GetBytes(s);
