@@ -52,7 +52,7 @@ namespace Shiny.Net.Http
                     HttpTransferBroadcastReceiver
                         .HttpEvents
                         .Subscribe(ob.OnNext)
-                        .DisposeOn(disposer);
+                        .DisposedBy(disposer);
 
                     Observable
                         .Interval(TimeSpan.FromSeconds(2))
@@ -74,7 +74,7 @@ namespace Shiny.Net.Http
 
                             lastRun = DateTime.UtcNow;
                         })
-                        .DisposeOn(disposer);
+                        .DisposedBy(disposer);
 
                     return disposer;
                 })

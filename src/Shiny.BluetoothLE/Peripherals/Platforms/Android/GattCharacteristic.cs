@@ -129,7 +129,7 @@ namespace Shiny.BluetoothLE.Peripherals
                             result.Data
                         );
                     })
-                    .DisposeOn(this.disposer);
+                    .DisposedBy(this.disposer);
             }
             if (this.onSubscribe != null)
             {
@@ -140,7 +140,7 @@ namespace Shiny.BluetoothLE.Peripherals
                     {
 
                     })
-                    .DisposeOn(this.disposer);
+                    .DisposedBy(this.disposer);
 
                 this.context
                     .Callbacks
@@ -152,7 +152,7 @@ namespace Shiny.BluetoothLE.Peripherals
                         if (peripheral != null)
                             this.onSubscribe(new CharacteristicSubscription(this, peripheral, false));
                     })
-                    .DisposeOn(this.disposer);
+                    .DisposedBy(this.disposer);
 
                     //if (args.Descriptor.Equals(this.NotificationDescriptor))
                     //.Where(x => )
@@ -192,7 +192,7 @@ namespace Shiny.BluetoothLE.Peripherals
                             );
                         }
                     })
-                    .DisposeOn(this.disposer);
+                    .DisposedBy(this.disposer);
             }
 
             if (this.onSubscribe != null)
