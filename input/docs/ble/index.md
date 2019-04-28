@@ -1,16 +1,25 @@
 Title: BluetoothLE
-Order: 1
 ---
 
 # Bluetooth LE
 
 Bluetooth LE is divided into 2 separate categories - the central manager (client) and the peripheral manager (server). 
 
-# SETUP
+## NuGet
+[![NuGet](https://buildstats.info/nuget/Shiny.BluetoothLE)](https://nuget.org/packages/Shiny.BluetoothLE)
 
-* [Android](platforms/android)
-* [iOS](platforms/ios)
-* [UWP](platforms/uwp)
+[![MyGet Badge](https://buildstats.info/myget/acrfeed/Shiny.BluetoothLE/Shiny.BluetoothLE?includePreReleases=true)](https://www.myget.org/feed/acrfeed/package/nuget/Shiny.BluetoothLE)
+
+
+## Support Platforms
+
+|Platform|Version|Docs|
+|--------|-------|----|
+|Android|5+ (API21)|[Setup](platforms/android)|
+|iOS|9+|[Setup](platforms/ios)|
+|UWP|16299 - Limited Beta|[Setup](platforms/uwp)|
+
+
 
 # FAQ
 

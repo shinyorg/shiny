@@ -1,3 +1,5 @@
+Title: FAQ
+---
 ## FAQ
 
 Q. When should I schedule my defined jobs?  Should I do everytime I start the app.
