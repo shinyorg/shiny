@@ -72,6 +72,7 @@ namespace Shiny.Net.Http
             throw new NotImplementedException();
         }
 
+
         protected virtual Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
             throw new NotImplementedException();

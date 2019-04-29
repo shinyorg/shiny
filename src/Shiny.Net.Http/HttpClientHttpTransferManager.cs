@@ -59,8 +59,12 @@ namespace Shiny.Net.Http
             ));
         }
 
+
         // TODO: what if in the middle of job?
-        public override Task Cancel(string id) => this.jobManager.Cancel(id);
+        public override Task Cancel(string id) => Task.WhenAll(
+            this.jobManager.Cancel(id),
+            this.repository.Remove<HttpTransferStore>(id)
+        );
 
 
         protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
