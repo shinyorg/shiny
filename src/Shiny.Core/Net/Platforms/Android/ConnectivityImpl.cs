@@ -22,7 +22,11 @@ namespace Shiny.Net
         NetworkReach reach;
         public NetworkReach Reach
         {
-            get => this.reach;
+            get
+            {
+                this.DoDetection();
+                return this.reach;
+            }
             private set => this.Set(ref this.reach, value);
         }
 
@@ -30,7 +34,11 @@ namespace Shiny.Net
         NetworkAccess access;
         public NetworkAccess Access
         {
-            get => this.access;
+            get
+            {
+                this.DoDetection();
+                return this.access;
+            }
             private set => this.Set(ref this.access, value);
         }
 
