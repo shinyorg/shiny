@@ -6,6 +6,15 @@ namespace Shiny.Net.Http
 {
     public static class ServiceCollectionExtensions
     {
+        public static void UseHttpClientTransfers<T>(this IServiceCollection builder) where T : class, IHttpTransferDelegate
+        {
+            builder.AddSingleton<IHttpTransferDelegate, T>();
+            builder.AddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
+
+            builder.RegisterPostBuildAction(sp => sp.GetService<IHttpTransferManager>());
+        }
+
+
         public static bool UseHttpTransfers<T>(this IServiceCollection builder) where T : class, IHttpTransferDelegate
         {
             builder.AddSingleton<IHttpTransferDelegate, T>();
