@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <Authors>aritchie</Authors>
+        <Authors>shinylib aritchie</Authors>
         <!--
         <NullableContextOptions>enable</NullableContextOptions>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
