@@ -41,7 +41,6 @@ namespace Shiny.Net.Http
             {
                 var task = request.IsUpload ? this.Upload(request, cancelToken) : this.Download(request, cancelToken);
                 var transfer = await task.ConfigureAwait(false);
-                this.messageBus.Publish(transfer); // pump the transfer one last time
 
                 switch (transfer.Status)
                 {
@@ -88,6 +87,7 @@ namespace Shiny.Net.Http
             var status = HttpTransferState.Pending;
             var bytesTransferred = 0L;
             Exception exception = null;
+            HttpTransfer lastTransfer = default;
 
             // and not cancelled or error
             while (!status.IsCompleted() && !ct.IsCancellationRequested)
@@ -103,7 +103,7 @@ namespace Shiny.Net.Http
                             {
                                 status = HttpTransferState.InProgress;
                                 bytesTransferred += sent;
-                                this.messageBus.Publish(new HttpTransfer(
+                                lastTransfer = new HttpTransfer(
                                     request.Id,
                                     request.Uri,
                                     request.LocalFile,
@@ -113,7 +113,8 @@ namespace Shiny.Net.Http
                                     file.Length,
                                     bytesTransferred,
                                     status
-                                ));
+                                );
+                                this.messageBus.Publish(lastTransfer);
                             }
                         ),
                         "blob",
@@ -140,6 +141,7 @@ namespace Shiny.Net.Http
                         status = HttpTransferState.Error;
                     }
                 }
+                //Java.Net.ProtocolException
                 catch (WebException ex)
                 {
                     switch (ex.Status)
@@ -166,23 +168,26 @@ namespace Shiny.Net.Http
                     exception = ex;
                     status = HttpTransferState.Error;
                 }
+                lastTransfer = new HttpTransfer(
+                    request.Id,
+                    request.Uri,
+                    request.LocalFile,
+                    true,
+                    request.UseMeteredConnection,
+                    exception,
+                    file.Length,
+                    bytesTransferred,
+                    status
+                );
+                this.messageBus.Publish(lastTransfer);
             }
-            return new HttpTransfer(
-                request.Id,
-                request.Uri,
-                request.LocalFile,
-                true,
-                request.UseMeteredConnection,
-                exception,
-                file.Length,
-                bytesTransferred,
-                status
-            );
+            return lastTransfer;
         }
 
 
         async Task<HttpTransfer> Download(HttpTransferStore request, CancellationToken ct)
         {
+            HttpTransfer lastTransfer = default;
             var status = HttpTransferState.Pending;
             var file = new FileInfo(request.LocalFile);
             var message = this.Build(request);
@@ -200,20 +205,29 @@ namespace Shiny.Net.Http
                         if (fs.Length > 0)
                         {
                             var resumeOffset = fs.Length + 1;
-                            message.Content.Headers.ContentRange = new ContentRangeHeaderValue(resumeOffset);
+                            message.Headers.Range = new RangeHeaderValue(resumeOffset, null);
                         }
 
-                        var buffer = new byte[8192];
-                        var response = await this.httpClient.SendAsync(
-                            message,
-                            HttpCompletionOption.ResponseHeadersRead,
-                            ct
-                        );
+                        var buffer = new byte[65535];
+                        var response = await this.httpClient
+                            .SendAsync(
+                                message,
+                                HttpCompletionOption.ResponseHeadersRead,
+                                ct
+                            )
+                            .ConfigureAwait(false);
+
+
                         response.EnsureSuccessStatusCode();
 
-                        var inputStream = await response.Content.ReadAsStreamAsync();
+                        var inputStream = await response
+                            .Content
+                            .ReadAsStreamAsync()
+                            .ConfigureAwait(false);
+
                         var read = inputStream.Read(buffer, 0, buffer.Length);
 
+                        // status code 206 means restart
                         if (response.Headers.AcceptRanges == null && fs.Length > 0)
                         {
                             // resume not supported, starting over
@@ -222,6 +236,7 @@ namespace Shiny.Net.Http
                             bytesTransferred = 0;
                         }
 
+                        var i = 0;
                         while (read > 0 && !ct.IsCancellationRequested)
                         {
                             fileSize = response.Content.Headers?.ContentRange?.Length ?? response.Content?.Headers?.ContentLength ?? 0;
@@ -232,18 +247,22 @@ namespace Shiny.Net.Http
                             fs.Write(buffer, 0, read);
                             fs.Flush();
 
-                            // TODO: pump message for each 8k could be extreme
-                            this.messageBus.Publish(new HttpTransfer(
-                                request.Id,
-                                request.Uri,
-                                request.LocalFile,
-                                false,
-                                request.UseMeteredConnection,
-                                null,
-                                fileSize,
-                                bytesTransferred,
-                                HttpTransferState.InProgress
-                            ));
+                            i++;
+                            if (i % 4 == 0)
+                            {
+                                lastTransfer = new HttpTransfer(
+                                    request.Id,
+                                    request.Uri,
+                                    request.LocalFile,
+                                    false,
+                                    request.UseMeteredConnection,
+                                    null,
+                                    fileSize,
+                                    bytesTransferred,
+                                    HttpTransferState.InProgress
+                                );
+                                this.messageBus.Publish(lastTransfer);
+                            }
                             read = inputStream.Read(buffer, 0, buffer.Length);
                         }
                         status = HttpTransferState.Completed;
@@ -271,20 +290,21 @@ namespace Shiny.Net.Http
                         exception = ex;
                         status = HttpTransferState.Error;
                     }
-                    // TODO: should only pump message when status is changing
+                    lastTransfer = new HttpTransfer(
+                        request.Id,
+                        request.Uri,
+                        request.LocalFile,
+                        true,
+                        request.UseMeteredConnection,
+                        exception,
+                        fileSize,
+                        bytesTransferred,
+                        status
+                    );
+                    this.messageBus.Publish(lastTransfer);
                 }
             }
-            return new HttpTransfer(
-                request.Id,
-                request.Uri,
-                request.LocalFile,
-                true,
-                request.UseMeteredConnection,
-                exception,
-                fileSize,
-                bytesTransferred,
-                status
-            );
+            return lastTransfer;
         }
     }
 }

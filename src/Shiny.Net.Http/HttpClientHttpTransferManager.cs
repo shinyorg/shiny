@@ -22,8 +22,17 @@ namespace Shiny.Net.Http
             this.jobManager = jobManager;
             this.messageBus = messageBus;
             this.repository = repository;
+
+            this.Startup();
         }
 
+
+        async void Startup()
+        {
+            var requests = await this.repository.GetAll<HttpTransferStore>();
+            foreach (var request in requests)
+                this.jobManager.Run(request.Id);
+        }
 
         protected override Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
             => this.Query(filter, false);
