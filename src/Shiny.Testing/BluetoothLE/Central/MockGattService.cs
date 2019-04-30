@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 using Shiny.BluetoothLE.Central;
 
 
@@ -8,19 +11,13 @@ namespace Shiny.Testing.BluetoothLE.Central
     {
 
         public IPeripheral Peripheral { get; set; }
-
         public Guid Uuid => this.Peripheral?.Uuid ?? Guid.NewGuid();
+        public string Description { get; set; }
 
-        public string Description => throw new NotImplementedException();
 
-        public IObservable<IGattCharacteristic> DiscoverCharacteristics()
-        {
-            throw new NotImplementedException();
-        }
-
+        public IList<IGattCharacteristic> Characteristics { get; set; } = new List<IGattCharacteristic>();
+        public IObservable<IGattCharacteristic> DiscoverCharacteristics() => this.Characteristics.ToObservable();
         public IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
-        {
-            throw new NotImplementedException();
-        }
+            => this.DiscoverCharacteristics().Where(x => characteristicIds.Any(y => y == x.Uuid));
     }
 }

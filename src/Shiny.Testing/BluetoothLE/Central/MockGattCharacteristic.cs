@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Central;
 
@@ -13,48 +15,41 @@ namespace Shiny.Testing.BluetoothLE.Central
         {
         }
 
-        private byte[] _value;
-        public override byte[] Value { get; }
+        public byte[] ReturnValue { get; set; }
+        public override byte[] Value => this.ReturnValue;
 
-        public override IObservable<CharacteristicGattResult> DisableNotifications()
-        {
-            throw new NotImplementedException();
-        }
 
-        public override IObservable<IGattDescriptor> DiscoverDescriptors()
-        {
-            throw new NotImplementedException();
-        }
+        public IList<IGattDescriptor> GattDescriptors { get; set; } = new List<IGattDescriptor>();
+        public override IObservable<IGattDescriptor> DiscoverDescriptors() => this.GattDescriptors.ToObservable();
+
 
         public override IObservable<CharacteristicGattResult> EnableNotifications(bool enableIndicationsIfAvailable)
-        {
-            throw new NotImplementedException();
-        }
+            => Observable.Return(new CharacteristicGattResult(this, null));
+        public override IObservable<CharacteristicGattResult> DisableNotifications()
+            => Observable.Return(new CharacteristicGattResult(this, null));
 
+
+        public byte[] ReadBytes { get; set; }
         public override IObservable<CharacteristicGattResult> Read()
-        {
-            throw new NotImplementedException();
-        }
+            => Observable.Return(new CharacteristicGattResult(this, this.ReadBytes));
 
+
+        public Subject<byte[]> NotificationSubject { get; } = new Subject<byte[]>();
         public override IObservable<CharacteristicGattResult> WhenNotificationReceived()
-        {
-            throw new NotImplementedException();
-        }
+            => this.NotificationSubject.Select(x => new CharacteristicGattResult(this, x));
+
 
         public override IObservable<CharacteristicGattResult> Write(byte[] value)
         {
-            this._value = value;
-            return Observable.Create<CharacteristicGattResult>(obs =>
-            {
-                obs.OnNext(new CharacteristicGattResult(this, value));
-                obs.OnCompleted();
-                return () => { };
-            });
+            this.ReturnValue = value;
+            return Observable.Return(new CharacteristicGattResult(this, value));
         }
+
 
         public override IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value)
         {
-            throw new NotImplementedException();
+            this.ReturnValue = value;
+            return Observable.Return(new CharacteristicGattResult(this, value));
         }
     }
 }

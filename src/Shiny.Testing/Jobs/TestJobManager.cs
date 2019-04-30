@@ -10,19 +10,11 @@ namespace Shiny.Testing.Jobs
     public class TestJobManager : IJobManager
     {
         public bool IsRunning => throw new NotImplementedException();
-
         public event EventHandler<JobInfo> JobStarted;
         public event EventHandler<JobRunResult> JobFinished;
 
-        public Task Cancel(string jobName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task CancelAll()
-        {
-            throw new NotImplementedException();
-        }
+        public Task Cancel(string jobName) => Task.CompletedTask;
+        public Task CancelAll() => Task.CompletedTask;
 
         public Task<JobInfo> GetJob(string jobIdentifier)
         {
@@ -34,10 +26,10 @@ namespace Shiny.Testing.Jobs
             throw new NotImplementedException();
         }
 
-        public Task<AccessState> RequestAccess()
-        {
-            throw new NotImplementedException();
-        }
+
+        public AccessState ReturnStatus { get; set; } = AccessState.Available;
+        public Task<AccessState> RequestAccess() => Task.FromResult(this.ReturnStatus);
+
 
         public Task<JobRunResult> Run(string jobIdentifier, CancellationToken cancelToken = default)
         {
@@ -53,6 +45,7 @@ namespace Shiny.Testing.Jobs
         {
             throw new NotImplementedException();
         }
+
 
         public Task Schedule(JobInfo jobInfo)
         {

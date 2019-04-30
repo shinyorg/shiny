@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Central;
 
@@ -7,78 +10,41 @@ namespace Shiny.Testing.BluetoothLE.Central
 {
     public class MockPeripheral : IPeripheral
     {
-        public object NativeDevice => throw new NotImplementedException();
-
-        public string Name => throw new NotImplementedException();
-
+        public object NativeDevice { get; set; }
+        public string Name { get; set; }
         public Guid Uuid { get; set; }
-
         public int MtuSize { get; set; }
-
-        public PairingState PairingStatus => throw new NotImplementedException();
-
-        public ConnectionState Status => throw new NotImplementedException();
-
+        public PairingState PairingStatus { get; set; }
+        public ConnectionState Status { get; set; }
         public MockGattReliableWriteTransaction Transaction { get; set; }
 
-        public IGattReliableWriteTransaction BeginReliableWriteTransaction()
-        {
-            return  this.Transaction ?? new MockGattReliableWriteTransaction();
-        }
+        public IGattReliableWriteTransaction BeginReliableWriteTransaction() => this.Transaction;
+        public void CancelConnection() {}
+        public void Connect(ConnectionConfig config = null) {}
 
-        public void CancelConnection()
-        {
-            throw new NotImplementedException();
-        }
 
-        public void Connect(ConnectionConfig config = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IObservable<IGattService> DiscoverServices()
-        {
-            throw new NotImplementedException();
-        }
-
+        public IList<IGattService> Services { get; set; } = new List<IGattService>();
+        public IObservable<IGattService> DiscoverServices() => this.Services.ToObservable();
         public IObservable<IGattService> GetKnownService(Guid serviceUuid)
-        {
-            throw new NotImplementedException();
-        }
+            => this.DiscoverServices().Where(x => x.Uuid == serviceUuid);
+        public IObservable<bool> PairingRequest(string pin = null) => Observable.Return(this.PairingStatus == PairingState.Paired);
 
-        public IObservable<bool> PairingRequest(string pin = null)
-        {
-            throw new NotImplementedException();
-        }
 
-        public IObservable<int> ReadRssi()
-        {
-            throw new NotImplementedException();
-        }
+        public int Rssi { get; set; }
+        public IObservable<int> ReadRssi() => Observable.Return(this.Rssi);
 
-        public IObservable<int> RequestMtu(int size)
-        {
-            throw new NotImplementedException();
-        }
 
-        public IObservable<BleException> WhenConnectionFailed()
-        {
-            throw new NotImplementedException();
-        }
+        public int Mtu { get; set; }
+        public IObservable<int> RequestMtu(int size) => Observable.Return(this.Mtu);
+        public IObservable<BleException> WhenConnectionFailed() => Observable.Empty<BleException>();
 
-        public IObservable<int> WhenMtuChanged()
-        {
-            throw new NotImplementedException();
-        }
+        public Subject<int> MtuSubject { get; }
+        public IObservable<int> WhenMtuChanged() => this.MtuSubject;
 
-        public IObservable<string> WhenNameUpdated()
-        {
-            throw new NotImplementedException();
-        }
+        public Subject<string> NameSubject { get; } = new Subject<string>();
+        public IObservable<string> WhenNameUpdated() => this.NameSubject;
 
-        public IObservable<ConnectionState> WhenStatusChanged()
-        {
-            throw new NotImplementedException();
-        }
+        public Subject<ConnectionState> ConnectionSubject { get; } = new Subject<ConnectionState>();
+        public IObservable<ConnectionState> WhenStatusChanged() => this.ConnectionSubject;
     }
 }
