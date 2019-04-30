@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.IO;
 using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
@@ -7,6 +8,8 @@ using Shiny.Settings;
 using Shiny.Testing.Jobs;
 using Shiny.Testing.Net;
 using Shiny.Testing.Power;
+using Shiny.Testing.Settings;
+
 
 namespace Shiny.Testing
 {
@@ -18,9 +21,9 @@ namespace Shiny.Testing
             {
                 services.AddSingleton<IJobManager, TestJobManager>();
                 services.AddSingleton<IConnectivity, TestConnectivity>();
-                // HTTP transfers
                 services.AddSingleton<IPowerManager, TestPowerManager>();
-                //services.AddSingleton<ISettings, TestSettings>();
+                services.AddSingleton<IFileSystem, FileSystemImpl>();
+                services.AddSingleton<ISettings, TestSettings>();
                 services.AddSingleton<IEnvironment, TestEnvironment>();
                 platformBuild?.Invoke(services);
             });

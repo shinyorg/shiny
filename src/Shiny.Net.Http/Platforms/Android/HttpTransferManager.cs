@@ -9,7 +9,7 @@ using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
-
+using Android.OS;
 
 namespace Shiny.Net.Http
 {
@@ -135,6 +135,7 @@ namespace Shiny.Net.Http
         }
 
 
+        private PowerManager.WakeLock wakeLock;
         static Android.Net.Uri ToNativeUri(string filePath)
         {
             var native = new Java.IO.File(filePath);

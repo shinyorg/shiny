@@ -6,7 +6,7 @@ namespace Shiny.Testing.Net
 {
     public class TestConnectivity : NotifyPropertyChanged, IConnectivity
     {
-        NetworkReach reach;
+        NetworkReach reach = NetworkReach.Internet;
         public NetworkReach Reach
         {
             get => this.reach;
@@ -14,7 +14,7 @@ namespace Shiny.Testing.Net
         }
 
 
-        NetworkAccess access;
+        NetworkAccess access = NetworkAccess.WiFi;
         public NetworkAccess Access
         {
             get => this.access;

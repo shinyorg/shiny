@@ -7,12 +7,12 @@ namespace Shiny.Testing.Notifications
 {
     public class TestNotifications : INotificationManager
     {
-        public AccessState ReturnState { get; set; } = AccessState.Available;
+        public AccessState RequestAccessReply { get; set; } = AccessState.Available;
         public Notification LastNotification { get; private set; }
 
 
         public Task Clear() => Task.CompletedTask;
-        public Task<AccessState> RequestAccess() => Task.FromResult(this.ReturnState);
+        public Task<AccessState> RequestAccess() => Task.FromResult(this.RequestAccessReply);
         public Task Send(Notification notification)
         {
             this.LastNotification = notification;
