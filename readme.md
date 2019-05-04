@@ -6,7 +6,9 @@ Formerly the ACR Plugins
 
 * Beautiful Docs are in the works - for now, take a look here:
   * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
-  * [Background Jobs with Shiny](https://allancritchie.net/posts/shinyjobs)
+  * [Background Jobs - Shiny Style](https://allancritchie.net/posts/shinyjobs)
+  * [Settings in a New Light - Shiny Style](https://allancritchie.net/posts/shinysettings)
+  * [The Evolving Docs](https://shinydocs.azurewebsites.net)
 
 ## Builds
 
@@ -36,7 +38,7 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
 
 
-## Contributor
+## Contributors
 * Special Thanks to [Emily Stanek](https://github.com/emilystanek) from [BSI Labs](https://github.com/BSiLabs) for the fantastic logo  
 [![BSI Labs - Enterprise Mobile Done Right.](https://bsilabs.ca/wp-content/uploads/2019/04/BSILabsLogo-Grey-Lg@0.25x.png)](https://bsilabs.ca)
 
