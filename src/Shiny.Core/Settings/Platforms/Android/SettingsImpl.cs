@@ -8,16 +8,15 @@ using Android.Preferences;
 
 namespace Shiny.Settings
 {
-
     public class SettingsImpl : AbstractSettings
     {
         readonly object syncLock = new object();
-        readonly ISharedPreferences prefs;
+        readonly AndroidContext context;
 
 
         public SettingsImpl(AndroidContext context, ISerializer serializer) : base(serializer)
         {
-            this.prefs = PreferenceManager.GetDefaultSharedPreferences(context.AppContext);
+            this.context = context;
         }
 
 
@@ -25,7 +24,7 @@ namespace Shiny.Settings
         {
             lock (this.syncLock)
             {
-                using (var editor = this.prefs.Edit())
+                using (var editor = this.GetPrefs().Edit())
                 {
                     doWork(editor);
                     editor.Commit();
@@ -37,7 +36,7 @@ namespace Shiny.Settings
         public override bool Contains(string key)
         {
             lock (this.syncLock)
-                return this.prefs.Contains(key);
+                return this.GetPrefs().Contains(key);
         }
 
 
@@ -45,30 +44,32 @@ namespace Shiny.Settings
         {
             lock (this.syncLock)
             {
-                var typeCode = Type.GetTypeCode(type);
-                switch (typeCode)
+                using (var prefs = this.GetPrefs())
                 {
+                    var typeCode = Type.GetTypeCode(type);
+                    switch (typeCode)
+                    {
 
-                    case TypeCode.Boolean:
-                        return this.prefs.GetBoolean(key, false);
+                        case TypeCode.Boolean:
+                            return prefs.GetBoolean(key, false);
 
-                    case TypeCode.Int32:
-                        return this.prefs.GetInt(key, 0);
+                        case TypeCode.Int32:
+                            return prefs.GetInt(key, 0);
 
-                    case TypeCode.Int64:
-                        return this.prefs.GetLong(key, 0);
+                        case TypeCode.Int64:
+                            return prefs.GetLong(key, 0);
 
-                    case TypeCode.Single:
-                        return this.prefs.GetFloat(key, 0);
+                        case TypeCode.Single:
+                            return prefs.GetFloat(key, 0);
 
-                    case TypeCode.String:
-                        return this.prefs.GetString(key, String.Empty);
+                        case TypeCode.String:
+                            return prefs.GetString(key, String.Empty);
 
-                    default:
-                        var @string = this.prefs.GetString(key, String.Empty);
-                        return this.Deserialize(type, @string);
+                        default:
+                            var @string = prefs.GetString(key, String.Empty);
+                            return Deserialize(type, @string);
+                    }
                 }
-
             }
         }
 
@@ -80,7 +81,6 @@ namespace Shiny.Settings
                 var typeCode = Type.GetTypeCode(type);
                 switch (typeCode)
                 {
-
                     case TypeCode.Boolean:
                         x.PutBoolean(key, (bool)value);
                         break;
@@ -124,11 +124,15 @@ namespace Shiny.Settings
         {
             lock (this.syncLock)
             {
-                return this.prefs.All.ToDictionary(
+                return this.GetPrefs().All.ToDictionary(
                     x => x.Key,
                     x => x.Value.ToString()
                 );
             }
         }
+
+
+        protected ISharedPreferences GetPrefs()
+            => PreferenceManager.GetDefaultSharedPreferences(this.context.AppContext);
     }
 }
