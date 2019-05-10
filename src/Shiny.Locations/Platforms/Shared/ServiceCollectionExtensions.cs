@@ -49,6 +49,15 @@ namespace Shiny.Locations
 #else
             builder.AddSingleton<IGpsDelegate, T>();
             builder.AddSingleton<IGpsManager, GpsManagerImpl>();
+            //if (startIfPermissionAvailable)
+            //{
+            //    builder.RegisterPostBuildAction(async sp =>
+            //    {
+            //        var access = await sp.GetService<IGpsManager>().RequestAccess(true);
+            //        if (access == AccessState.Available)
+            //            await gps.StartListener()
+            //    });
+            //}
             return true;
 #endif
         }
