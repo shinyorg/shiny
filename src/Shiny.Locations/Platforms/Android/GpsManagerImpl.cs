@@ -2,7 +2,6 @@
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Shiny.Settings;
 using Android.App;
 using Android.Content;
 using Android.Gms.Location;
@@ -15,23 +14,20 @@ namespace Shiny.Locations
     {
         readonly AndroidContext context;
         readonly FusedLocationProviderClient client;
-        readonly ISettings settings;
 
 
-        public GpsManagerImpl(AndroidContext context, ISettings settings)
+        public GpsManagerImpl(AndroidContext context)
         {
-            this.settings = settings;
             this.context = context;
             this.client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);
+
+            //if (this.IsListening)
+            //    this.StartListenerInternal(); // fire and forget
         }
 
 
         public AccessState Status => this.context.GetCurrentAccessState(P.AccessFineLocation);
-        public bool IsListening
-        {
-            get => this.settings.Get(nameof(GpsManagerImpl), false);
-            private set => this.settings.Set(nameof(GpsManagerImpl), value);
-        }
+        public bool IsListening { get; internal set; }
 
 
         public IObservable<IGpsReading> GetLastReading() => Observable.FromAsync(async () =>
@@ -51,19 +47,9 @@ namespace Shiny.Locations
         public async Task StartListener(GpsRequest request = null)
         {
             if (this.IsListening)
-                throw new ArgumentException("GPS is already listening");
+                return;
 
-            var nativeRequest = new LocationRequest()
-                .SetInterval(0L)
-                .SetFastestInterval(0L)
-                .SetPriority(LocationRequest.PriorityHighAccuracy);
-                //.SetMaxWaitTime(0L)
-
-
-            await this.client.RequestLocationUpdatesAsync(
-                nativeRequest,
-                this.GetPendingIntent()
-            );
+            await this.StartListenerInternal();
             this.IsListening = true;
             //mLocationRequest.setInterval(UPDATE_INTERVAL);
             //mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL);
@@ -96,6 +82,26 @@ namespace Shiny.Locations
                 PendingIntentFlags.UpdateCurrent
             );
         }
+
+
+        //https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest
+        protected virtual async Task StartListenerInternal()
+        {
+            var nativeRequest = new LocationRequest()
+                .SetInterval(0L)
+                .SetFastestInterval(0L)
+                .SetMaxWaitTime(0L)
+                //.SetSmallestDisplacement
+                //.SetNumUpdates(10)
+                .SetPriority(LocationRequest.PriorityHighAccuracy);
+            //.SetMaxWaitTime(0L)
+
+            await this.client.RequestLocationUpdatesAsync(
+                nativeRequest,
+                this.GetPendingIntent()
+            );
+        }
+
     }
 }
 /*
