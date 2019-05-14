@@ -54,28 +54,25 @@ namespace Shiny.Locations
         });
 
 
-        public Task StartListener(GpsRequest request = null)
+        public Task StartListener(GpsRequest request)
         {
-            request = request ?? new GpsRequest();
-            // TODO: verify background handler set
             if (this.IsListening)
-                throw new ArgumentException("GPS is already listening");
-
+                return Task.CompletedTask;
 
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
+            if (request.DeferredDistanceMeters != null)
+                this.locationManager.DistanceFilter = request.DeferredDistanceMeters.Value;
+
             //this.locationManager.DesiredAccuracy = request
             //this.locationManager.ShouldDisplayHeadingCalibration
             //this.locationManager.ShowsBackgroundLocationIndicator
             //this.locationManager.PausesLocationUpdatesAutomatically = false;
-            //this.locationManager.DistanceFilter
             //this.locationManager.DisallowDeferredLocationUpdates
             //this.locationManager.ActivityType = CLActivityType.Airborne;
-
             //this.locationManager.LocationUpdatesPaused
             //this.locationManager.LocationUpdatesResumed
             //this.locationManager.Failed
             //this.locationManager.UpdatedHeading
-
             //if (CLLocationManager.HeadingAvailable)
             //    this.locationManager.StopUpdatingHeading();
             this.locationManager.StartUpdatingLocation();

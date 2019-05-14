@@ -48,26 +48,29 @@ namespace Shiny.Locations
             => this.context.RequestAccess(P.AccessFineLocation).ToTask();
 
 
-        public async Task StartListener(GpsRequest request = null)
+        public async Task StartListener(GpsRequest request)
         {
             if (this.IsListening)
-                throw new ArgumentException("GPS is already listening");
+                return;
+
+            var access = await this.RequestAccess(request.UseBackground);
+            if (access != AccessState.Available || access != AccessState.Restricted)
+                throw new ArgumentException("Invalid access state - " + access);
 
             var nativeRequest = new LocationRequest()
-                .SetInterval(0L)
-                .SetFastestInterval(0L)
-                .SetPriority(LocationRequest.PriorityHighAccuracy);
-                //.SetMaxWaitTime(0L)
+                .SetPriority(GetPriority(request.Priority));
 
+            if (request.DeferredTime != null)
+                nativeRequest.SetInterval(Convert.ToInt64(request.DeferredTime.Value.TotalMilliseconds));
+
+            if (request.DeferredDistanceMeters != null)
+                nativeRequest.SetSmallestDisplacement(Convert.ToInt64(request.DeferredDistanceMeters.Value));
 
             await this.client.RequestLocationUpdatesAsync(
                 nativeRequest,
                 this.GetPendingIntent()
             );
             this.IsListening = true;
-            //mLocationRequest.setInterval(UPDATE_INTERVAL);
-            //mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL);
-            //mLocationRequest.setMaxWaitTime(MAX_WAIT_TIME);
         }
 
 
@@ -95,6 +98,23 @@ namespace Shiny.Locations
                 intent,
                 PendingIntentFlags.UpdateCurrent
             );
+        }
+
+
+        protected static int GetPriority(GpsPriority priority)
+        {
+            switch (priority)
+            {
+                case GpsPriority.Low:
+                    return LocationRequest.PriorityLowPower;
+
+                case GpsPriority.Highest:
+                    return LocationRequest.PriorityHighAccuracy;
+
+                case GpsPriority.Normal:
+                default:
+                    return LocationRequest.PriorityBalancedPowerAccuracy;
+            }
         }
     }
 }
