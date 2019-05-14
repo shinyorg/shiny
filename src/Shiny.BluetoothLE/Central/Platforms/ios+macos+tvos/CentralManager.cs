@@ -26,44 +26,20 @@ namespace Shiny.BluetoothLE.Central
                     .StateUpdated
                     .Subscribe(_ =>
                     {
-                        var current = FromNative(this.context.Manager.State);
+                        var current = this.context.Manager.State.FromNative();
                         ob.Respond(current);
                     });
             }
             else
             {
-                ob.Respond(FromNative(this.context.Manager.State));
+                ob.Respond(this.context.Manager.State.FromNative());
             }
 
             return () => disp?.Dispose();
         });
 
 
-        static AccessState FromNative(CBCentralManagerState state)
-        {
-            switch (state)
-            {
-                case CBCentralManagerState.PoweredOff:
-                    return AccessState.Disabled;
-
-                case CBCentralManagerState.Resetting:
-                case CBCentralManagerState.PoweredOn:
-                    return AccessState.Available;
-
-                case CBCentralManagerState.Unauthorized:
-                    return AccessState.Denied;
-
-                case CBCentralManagerState.Unsupported:
-                    return AccessState.NotSupported;
-
-                case CBCentralManagerState.Unknown:
-                default:
-                    return AccessState.Unknown;
-            }
-        }
-
-
-        public override AccessState Status => FromNative(this.context.Manager.State);
+        public override AccessState Status => this.context.Manager.State.FromNative();
 
 
         public override IObservable<IPeripheral> GetKnownPeripheral(Guid deviceId)
