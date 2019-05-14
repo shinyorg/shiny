@@ -1,5 +1,6 @@
 ﻿using System;
 using Shiny.BluetoothLE.Central;
+using Shiny.BluetoothLE.Peripherals;
 using Microsoft.Extensions.DependencyInjection;
 
 
