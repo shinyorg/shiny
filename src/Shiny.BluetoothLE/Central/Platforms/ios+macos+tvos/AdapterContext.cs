@@ -3,9 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
-using Shiny.Infrastructure;
 using CoreBluetooth;
 using Foundation;
+using Shiny.Logging;
 
 
 namespace Shiny.BluetoothLE.Central
@@ -19,11 +19,11 @@ namespace Shiny.BluetoothLE.Central
         {
             var opts = new CBCentralInitOptions
             {
-                ShowPowerAlert = config?.ShowPowerAlert ?? false,
-#if __IOS__
-                RestoreIdentifier = config?.RestoreIdentifier ?? "pluginbluetoothle"
-#endif
+                ShowPowerAlert = config?.ShowPowerAlert ?? false
             };
+            if (!config.RestoreIdentifier.IsEmpty())
+                opts.RestoreIdentifier = config.RestoreIdentifier;
+
             this.Manager = new CBCentralManager(this, config?.DispatchQueue, opts);
         }
 
@@ -54,22 +54,31 @@ namespace Shiny.BluetoothLE.Central
         //public Subject<IPeripheral> WhenWillRestoreState { get; } = new Subject<IPeripheral>();
         public override void WillRestoreState(CBCentralManager central, NSDictionary dict)
         {
-            var repository = ShinyHost.Resolve<IRepository>();
+
 #if __IOS__
+            try
+            {
+                var delegates = ShinyHost
+                    .ResolveAll<IBleStateRestoreDelegate>()
+                    .ToList();
+
+                var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
+                for (nuint i = 0; i < peripheralArray.Count; i++)
+                {
+                    var item = peripheralArray.GetItem<CBPeripheral>(i);
+                    var peripheral = this.GetDevice(item);
+
+                    foreach (var del in delegates)
+                        del.OnConnected(peripheral);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
             // TODO: restore scan? CBCentralManager.RestoredStateScanOptionsKey
             //if (!dict.ContainsKey(CBCentralManager.RestoredStatePeripheralsKey))
             //    return;
-
-            //var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
-            //Log.Info(BleLogCategory.Adapter, $"Restoring peripheral state on {peripheralArray.Count} peripherals");
-
-            //for (nuint i = 0; i < peripheralArray.Count; i++)
-            //{
-            //    var item = peripheralArray.GetItem<CBPeripheral>(i);
-            //    var dev = this.GetPeripheral(item);
-            //    this.WhenWillRestoreState.OnNext(dev);
-            //    // TODO: should I trigger any of the peripheral events?
-            //}
 #endif
         }
 
@@ -97,6 +106,20 @@ namespace Shiny.BluetoothLE.Central
 
 
         public Subject<object> StateUpdated { get; } = new Subject<object>();
-        public override void UpdatedState(CBCentralManager central) => this.StateUpdated.OnNext(null);
+        public override void UpdatedState(CBCentralManager central)
+        {
+            this.StateUpdated.OnNext(null);
+            try
+            {
+                ShinyHost
+                    .ResolveAll<IBleAdapterDelegate>()
+                    .ToList()
+                    .ForEach(x => x.OnBleAdapterStateChanged(central.State.FromNative()));
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
     }
 }
