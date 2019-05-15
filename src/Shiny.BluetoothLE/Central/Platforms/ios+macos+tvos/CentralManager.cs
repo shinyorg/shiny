@@ -39,9 +39,6 @@ namespace Shiny.BluetoothLE.Central
         });
 
 
-
-
-
         public override AccessState Status => this.context.Manager.State.FromNative();
 
 
