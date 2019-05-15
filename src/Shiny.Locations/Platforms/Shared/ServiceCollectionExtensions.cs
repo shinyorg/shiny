@@ -31,7 +31,11 @@ namespace Shiny.Locations
         }
 
 
-        public static bool UseGpsForground(this IServiceCollection builder)
+        public static void RegisterGpsDelegate<T>(this IServiceCollection services) where T : class, IGpsDelegate
+            => services.AddSingleton<IGpsDelegate, T>();
+
+
+        public static bool UseGps(this IServiceCollection builder)
         {
 #if NETSTANDARD
             return false;
@@ -42,11 +46,27 @@ namespace Shiny.Locations
         }
 
 
-        public static bool UseGpsBackground<T>(this IServiceCollection builder) where T : class, IGpsDelegate
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="requestIfAccessAvailable"></param>
+        /// <returns></returns>
+        public static bool UseGps<T>(this IServiceCollection builder, GpsRequest requestIfAccessAvailable = null) where T : class, IGpsDelegate
         {
 #if NETSTANDARD
             return false;
 #else
+            if (requestIfAccessAvailable != null)
+            {
+                builder.RegisterPostBuildAction(async sp =>
+                {
+                    var gps = sp.GetService<IGpsManager>();
+                    if (gps.Status == AccessState.Available)
+                        await gps.StartListener(requestIfAccessAvailable);
+                });
+            }
             builder.AddSingleton<IGpsDelegate, T>();
             builder.AddSingleton<IGpsManager, GpsManagerImpl>();
             //if (startIfPermissionAvailable)

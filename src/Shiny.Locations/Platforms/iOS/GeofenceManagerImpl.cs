@@ -49,6 +49,9 @@ namespace Shiny.Locations
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
+            var access = await this.RequestAccess();
+            access.Assert();
+
             var native = region.ToNative();
             var tcs = new TaskCompletionSource<object>();
             UIApplication.SharedApplication.BeginInvokeOnMainThread(async () =>

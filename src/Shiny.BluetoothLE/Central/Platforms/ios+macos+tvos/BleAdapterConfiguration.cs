@@ -15,7 +15,7 @@ namespace Shiny.BluetoothLE.Central
         /// <summary>
         /// CBCentralInitOptions restoration key for background restoration
         /// </summary>
-        public string RestoreIdentifier { get; set; }
+        public string RestoreIdentifier { get; set; } = "shinyble";
 
 
         /// <summary>

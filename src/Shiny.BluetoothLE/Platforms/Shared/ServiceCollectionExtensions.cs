@@ -8,41 +8,34 @@ namespace Shiny.BluetoothLE
 {
     public static class ServiceCollectionExtensions
     {
+        public static void RegisterBleStateRestore<T>(this IServiceCollection services) where T : class, IBleStateRestoreDelegate
+            => services.AddSingleton<IBleStateRestoreDelegate, T>();
+
+
+        public static void RegisterBleAdapterState<T>(this IServiceCollection services) where T : class, IBleAdapterDelegate
+            => services.AddSingleton<IBleAdapterDelegate, T>();
+
+
         public static bool UseBleCentral(this IServiceCollection builder)
         {
 #if NETSTANDARD
             return false;
 #else
-            builder.AddSingleton<ICentralManager, CentralManager>();
+            builder
+                .AddSingleton<ICentralManager, CentralManager>()
+                .AsStartable<ICentralManager>();
             return true;
 #endif
         }
 
-
-        public static bool UseBleCentral<T>(this IServiceCollection builder) where T : class, IBleStateRestoreDelegate
-        {
-            builder.AddSingleton<IBleStateRestoreDelegate, T>();
-#if NETSTANDARD
-            return false;
-#else
-            builder.AddSingleton<ICentralManager, CentralManager>();
-            return true;
-#endif
-        }
 
 
 #if __IOS__
-       public static bool UseBleCentral(this IServiceCollection builder, BleAdapterConfiguration config = null)
-       {
-            builder.AddSingleton<ICentralManager>(_ => new CentralManager(config));
-            return true;
-       }
-
-
-        public static bool UseBleCentral<T>(this IServiceCollection builder, BleAdapterConfiguration config = null) where T : class, IBleStateRestoreDelegate
+        public static bool UseBleCentral(this IServiceCollection builder, BleAdapterConfiguration config = null)
         {
-            builder.AddSingleton<IBleStateRestoreDelegate, T>();
-            builder.AddSingleton<ICentralManager>(_ => new CentralManager(config));
+            builder
+                .AddSingleton<ICentralManager>(_ => new CentralManager(config))
+                .AsStartable<ICentralManager>();
             return true;
         }
 

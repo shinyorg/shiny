@@ -3,7 +3,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using Foundation;
 using CoreBluetooth;
-
+using Shiny.BluetoothLE.Central;
 
 namespace Shiny.BluetoothLE
 {
@@ -33,33 +33,6 @@ namespace Shiny.BluetoothLE
                     break;
             }
             return () => manager.StateUpdated -= handler;
-        });
-
-
-        public static IObservable<Unit> WhenReady(this CBCentralManager manager) => Observable.Create<Unit>(ob =>
-        {
-            var handler = new EventHandler((sender, args) =>
-            {
-                if (manager.State == CBCentralManagerState.PoweredOn)
-                    ob.Respond(Unit.Default);
-                else
-                    ob.OnError(new ArgumentException("Adapter state is invalid - " + manager.State));
-            });
-            switch (manager.State)
-            {
-                case CBCentralManagerState.Unknown:
-                    manager.UpdatedState += handler;
-                    break;
-
-                case CBCentralManagerState.PoweredOn:
-                    ob.Respond(Unit.Default);
-                    break;
-
-                default:
-                    ob.OnError(new ArgumentException("Adapter state is invalid - " + manager.State));
-                    break;
-            }
-            return () => manager.UpdatedState -= handler;
         });
 
 
