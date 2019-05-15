@@ -33,6 +33,9 @@ namespace Shiny.Locations
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
+            var access = await this.RequestAccess();
+            access.Assert();
+
             var transitions = this.GetTransitions(region);
             var geofence = new GeofenceBuilder()
                 .SetRequestId(region.Identifier)

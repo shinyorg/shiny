@@ -42,8 +42,11 @@ namespace Shiny.Locations
             try
             {
                 if (!wasListening)
+                {
+                    var access = await this.RequestAccess(false);
+                    access.Assert();
                     this.locationManager.StartUpdatingLocation();
-
+                }
                 return await task.ConfigureAwait(false);
             }
             finally
@@ -54,12 +57,14 @@ namespace Shiny.Locations
         });
 
 
-        public Task StartListener(GpsRequest request)
+        public async Task StartListener(GpsRequest request)
         {
             if (this.IsListening)
-                return Task.CompletedTask;
+                return;
 
-            this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
+            var access = await this.RequestAccess(request.UseBackground);
+            access.Assert();
+
             if (request.DeferredDistanceMeters != null)
                 this.locationManager.DistanceFilter = request.DeferredDistanceMeters.Value;
 
@@ -77,7 +82,6 @@ namespace Shiny.Locations
             //    this.locationManager.StopUpdatingHeading();
             this.locationManager.StartUpdatingLocation();
             this.IsListening = true;
-            return Task.CompletedTask;
         }
 
 
