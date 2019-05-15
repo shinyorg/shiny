@@ -111,7 +111,6 @@ namespace Shiny.BluetoothLE.Central
             if (state == AccessState.Unknown)
                 return;
 
-            Console.WriteLine("BLE State: " + state);
             this.StateUpdated.OnNext(state);
             try
             {
