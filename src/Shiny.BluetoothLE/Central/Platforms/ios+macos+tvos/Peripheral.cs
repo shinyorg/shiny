@@ -209,7 +209,7 @@ namespace Shiny.BluetoothLE.Central
             if (!this.Native.Equals(other.Native))
                 return false;
 
-            return false;
+            return true;
         }
 
 
