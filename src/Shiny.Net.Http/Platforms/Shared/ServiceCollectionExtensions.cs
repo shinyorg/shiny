@@ -9,9 +9,9 @@ namespace Shiny.Net.Http
         public static void UseHttpClientTransfers<T>(this IServiceCollection builder) where T : class, IHttpTransferDelegate
         {
             builder.AddSingleton<IHttpTransferDelegate, T>();
-            builder.AddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
-
-            builder.RegisterPostBuildAction(sp => sp.GetService<IHttpTransferManager>());
+            builder
+                .AddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>()
+                .AsStartable<IHttpTransferManager>();
         }
 
 
@@ -25,7 +25,7 @@ namespace Shiny.Net.Http
 #endif
 
             // fire this guy up right away so any registrations get moving again - mostly needed for iOS
-            builder.RegisterPostBuildAction(sp => sp.GetService<IHttpTransferManager>());
+            builder.AsStartable<IHttpTransferManager>();
             return true;
         }
 
@@ -41,14 +41,13 @@ namespace Shiny.Net.Http
         public static bool UseHttpTransfers<T>(this IServiceCollection builder, int maxConnectionsPerHost = 1) where T : class, IHttpTransferDelegate
         {
             builder.AddSingleton<IHttpTransferDelegate, T>();
-            builder.AddSingleton<IHttpTransferManager>(services =>
-            {
-                var del = services.GetService<IHttpTransferDelegate>();
-                return new HttpTransferManager(del, maxConnectionsPerHost);
-            });
-
-            // need to spin this up right away to get it going again
-            builder.RegisterPostBuildAction(c => c.GetService<IHttpTransferManager>());
+            builder
+                .AddSingleton<IHttpTransferManager>(services =>
+                {
+                    var del = services.GetService<IHttpTransferDelegate>();
+                    return new HttpTransferManager(del, maxConnectionsPerHost);
+                })
+                .AsStartable<IHttpTransferManager>();
             return true;
         }
 #endif
