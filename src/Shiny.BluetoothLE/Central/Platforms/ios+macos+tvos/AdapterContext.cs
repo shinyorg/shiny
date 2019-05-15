@@ -17,21 +17,22 @@ namespace Shiny.BluetoothLE.Central
 
         public AdapterContext(BleAdapterConfiguration config)
         {
+            config = config ?? new BleAdapterConfiguration();
             var opts = new CBCentralInitOptions
             {
-                ShowPowerAlert = config?.ShowPowerAlert ?? false
+                ShowPowerAlert = config.ShowPowerAlert
             };
             if (!config.RestoreIdentifier.IsEmpty())
                 opts.RestoreIdentifier = config.RestoreIdentifier;
 
-            this.Manager = new CBCentralManager(this, config?.DispatchQueue, opts);
+            this.Manager = new CBCentralManager(this, config.DispatchQueue, opts);
         }
 
 
         public CBCentralManager Manager { get; }
 
 
-        public IPeripheral GetDevice(CBPeripheral peripheral) => this.peripherals.GetOrAdd(
+        public IPeripheral GetPeripheral(CBPeripheral peripheral) => this.peripherals.GetOrAdd(
             peripheral.Identifier.ToString(),
             x => new Peripheral(this, peripheral)
         );
@@ -66,7 +67,7 @@ namespace Shiny.BluetoothLE.Central
                 for (nuint i = 0; i < peripheralArray.Count; i++)
                 {
                     var item = peripheralArray.GetItem<CBPeripheral>(i);
-                    var peripheral = this.GetDevice(item);
+                    var peripheral = this.GetPeripheral(item);
 
                     foreach (var del in delegates)
                         del.OnConnected(peripheral);
@@ -94,7 +95,7 @@ namespace Shiny.BluetoothLE.Central
         public Subject<ScanResult> ScanResultReceived { get; } = new Subject<ScanResult>();
         public override void DiscoveredPeripheral(CBCentralManager central, CBPeripheral peripheral, NSDictionary advertisementData, NSNumber rssi)
             => this.ScanResultReceived.OnNext(new ScanResult(
-                this.GetDevice(peripheral),
+                this.GetPeripheral(peripheral),
                 rssi?.Int32Value ?? 0,
                 new AdvertisementData(advertisementData)
             ));
