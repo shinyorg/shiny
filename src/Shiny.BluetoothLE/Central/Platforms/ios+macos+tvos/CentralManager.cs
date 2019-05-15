@@ -53,7 +53,7 @@ namespace Shiny.BluetoothLE.Central
             if (peripheral == null)
                 return Observable.Return<IPeripheral>(null);
 
-            var device = this.context.GetDevice(peripheral);
+            var device = this.context.GetPeripheral(peripheral);
             return Observable.Return(device);
         }
 
@@ -69,7 +69,7 @@ namespace Shiny.BluetoothLE.Central
             var peripherals = this.context.Manager.RetrieveConnectedPeripherals(serviceUuid.Value.ToCBUuid());
             foreach (var peripheral in peripherals)
             {
-                var dev = this.context.GetDevice(peripheral);
+                var dev = this.context.GetPeripheral(peripheral);
                 list.Add(dev);
             }
             return Observable.Return(list);

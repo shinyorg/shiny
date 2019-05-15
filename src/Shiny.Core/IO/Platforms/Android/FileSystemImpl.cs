@@ -18,11 +18,11 @@ namespace Shiny.IO
         }
 
 
-        public override IObservable<FileSystemEvent> Watch(string path, string filter = "*.*") => Observable.Create<FileSystemEvent>(ob =>
-        {
-            var obs = new ShinyFileObserver(path, ob.OnNext);
-            return Disposable.Empty;
-        });
+        //public override IObservable<FileSystemEvent> Watch(string path, string filter = "*.*") => Observable.Create<FileSystemEvent>(ob =>
+        //{
+        //    var obs = new ShinyFileObserver(path, ob.OnNext);
+        //    return Disposable.Empty;
+        //});
 
         //public string ToFileUri(string path) => "file:/" + path;
     }
