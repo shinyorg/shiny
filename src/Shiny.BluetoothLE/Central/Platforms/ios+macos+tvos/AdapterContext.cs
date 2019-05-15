@@ -106,16 +106,23 @@ namespace Shiny.BluetoothLE.Central
             => this.FailedConnection.OnNext(new PeripheralConnectionFailed(peripheral, error));
 
 
-        public Subject<object> StateUpdated { get; } = new Subject<object>();
+        public Subject<AccessState> StateUpdated { get; } = new Subject<AccessState>();
         public override void UpdatedState(CBCentralManager central)
         {
-            this.StateUpdated.OnNext(null);
+            var state = central.State.FromNative();
+            if (state == AccessState.Unknown)
+                return;
+
+            Console.WriteLine("BLE State: " + state);
+            this.StateUpdated.OnNext(state);
             try
             {
-                ShinyHost
+                var delegates = ShinyHost
                     .ResolveAll<IBleAdapterDelegate>()
-                    .ToList()
-                    .ForEach(x => x.OnBleAdapterStateChanged(central.State.FromNative()));
+                    .ToList();
+
+                foreach (var del in delegates)
+                    del.OnBleAdapterStateChanged(state);
             }
             catch (Exception ex)
             {
