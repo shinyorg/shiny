@@ -62,6 +62,7 @@ namespace Shiny.Locations
             if (this.IsListening)
                 return;
 
+            request = request ?? new GpsRequest();
             var access = await this.RequestAccess(request.UseBackground);
             access.Assert();
 
