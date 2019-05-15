@@ -53,7 +53,9 @@ namespace Shiny.Notifications
             if (notification.Id == 0)
                 notification.Id = this.settings.IncrementValue("NotificationId");
 
-            //var permission = await this.RequestAccess();
+            var access = await this.RequestAccess();
+            access.Assert();
+
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
