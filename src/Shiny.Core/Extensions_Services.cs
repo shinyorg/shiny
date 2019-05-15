@@ -26,6 +26,19 @@ namespace Shiny
 
 
         /// <summary>
+        /// Registers a startable service that needs to get going when the container builds
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AsStartable<T>(this IServiceCollection services)
+        {
+            postBuildActions.Add(sp => sp.GetService<T>());
+            return services;
+        }
+
+
+        /// <summary>
         /// Attempts to resolve or build an instance from a service provider
         /// </summary>
         /// <param name="services"></param>
