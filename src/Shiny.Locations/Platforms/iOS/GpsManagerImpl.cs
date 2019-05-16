@@ -66,9 +66,18 @@ namespace Shiny.Locations
             var access = await this.RequestAccess(request.UseBackground);
             access.Assert();
 
-            if (request.DeferredDistance != null)
-                this.locationManager.DistanceFilter = request.DeferredDistance.TotalMeters;
+            //if (request.DeferredDistance != null)
+            //    this.locationManager.DistanceFilter = request.DeferredDistance.TotalMeters;
 
+            var meters = request.DeferredDistance?.TotalMeters ?? 0;
+            var secs = request.DeferredTime?.TotalSeconds ?? 0;
+            if (meters > 0 || secs > 0)
+            {
+                this.locationManager.AllowDeferredLocationUpdatesUntil(
+                    request.DeferredDistance?.TotalMeters ?? 0,
+                    request.DeferredTime?.TotalSeconds ?? 0
+                );
+            }
             //this.locationManager.DesiredAccuracy = request
             //this.locationManager.ShouldDisplayHeadingCalibration
             //this.locationManager.ShowsBackgroundLocationIndicator
