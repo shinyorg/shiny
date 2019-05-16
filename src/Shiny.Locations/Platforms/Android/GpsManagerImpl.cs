@@ -20,9 +20,6 @@ namespace Shiny.Locations
         {
             this.context = context;
             this.client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);
-
-            //if (this.IsListening)
-            //    this.StartListenerInternal(); // fire and forget
         }
 
 
@@ -52,6 +49,7 @@ namespace Shiny.Locations
             if (this.IsListening)
                 return;
 
+            request = request ?? new GpsRequest();
             var access = await this.RequestAccess(request.UseBackground);
             access.Assert(allowRestricted: true);
 
@@ -61,8 +59,8 @@ namespace Shiny.Locations
             if (request.DeferredTime != null)
                 nativeRequest.SetInterval(Convert.ToInt64(request.DeferredTime.Value.TotalMilliseconds));
 
-            if (request.DeferredDistanceMeters != null)
-                nativeRequest.SetSmallestDisplacement(Convert.ToInt64(request.DeferredDistanceMeters.Value));
+            if (request.DeferredDistance != null)
+                nativeRequest.SetSmallestDisplacement((float)request.DeferredDistance.TotalMeters);
 
             await this.client.RequestLocationUpdatesAsync(
                 nativeRequest,

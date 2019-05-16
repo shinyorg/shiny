@@ -68,18 +68,22 @@ namespace Shiny.Locations
 
         public Task StartListener(GpsRequest request = null)
         {
-            if (this.IsListening)
-                throw new ArgumentException("GPS is already listening");
+            if (!this.IsListening)
+            {
+                this.IsListening = true;
+                request = request ?? new GpsRequest();
 
-            this.IsListening = true;
-            this.geolocator.PositionChanged += this.OnPositionChanged;
-            //this.geolocator.DesiredAccuracy
-            //this.geolocator.DesiredAccuracyInMeters
-            //this.geolocator.ReportInterval
+                if (request.DeferredTime != null)
+                    this.geolocator.ReportInterval = Convert.ToUInt32(request.DeferredTime.Value.TotalMilliseconds);
 
+                if (request.DeferredDistance != null)
+                    this.geolocator.DesiredAccuracyInMeters = Convert.ToUInt32(request.DeferredDistance.TotalMeters);
 
+                this.geolocator.PositionChanged += this.OnPositionChanged;
+            }
             return Task.CompletedTask;
         }
+
 
         public Task StopListener()
         {

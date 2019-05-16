@@ -66,8 +66,8 @@ namespace Shiny.Locations
             var access = await this.RequestAccess(request.UseBackground);
             access.Assert();
 
-            if (request.DeferredDistanceMeters != null)
-                this.locationManager.DistanceFilter = request.DeferredDistanceMeters.Value;
+            if (request.DeferredDistance != null)
+                this.locationManager.DistanceFilter = request.DeferredDistance.TotalMeters;
 
             //this.locationManager.DesiredAccuracy = request
             //this.locationManager.ShouldDisplayHeadingCalibration
