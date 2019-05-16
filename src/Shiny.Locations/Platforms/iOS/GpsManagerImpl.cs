@@ -66,19 +66,24 @@ namespace Shiny.Locations
             var access = await this.RequestAccess(request.UseBackground);
             access.Assert();
 
-            //if (request.DeferredDistance != null)
-            //    this.locationManager.DistanceFilter = request.DeferredDistance.TotalMeters;
+            
+            this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
+            this.locationManager.TrySetDeferrals(request);
 
-            var meters = request.DeferredDistance?.TotalMeters ?? 0;
-            var secs = request.DeferredTime?.TotalSeconds ?? 0;
-            if (meters > 0 || secs > 0)
+            switch (request.Priority)
             {
-                this.locationManager.AllowDeferredLocationUpdatesUntil(
-                    request.DeferredDistance?.TotalMeters ?? 0,
-                    request.DeferredTime?.TotalSeconds ?? 0
-                );
+                case GpsPriority.Highest:
+                    this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
+                    break;
+
+                case GpsPriority.Normal:
+                    this.locationManager.DesiredAccuracy = CLLocation.AccuracyNearestTenMeters;
+                    break;
+
+                case GpsPriority.Low:
+                    this.locationManager.DesiredAccuracy = CLLocation.AccuracyHundredMeters;
+                    break;
             }
-            //this.locationManager.DesiredAccuracy = request
             //this.locationManager.ShouldDisplayHeadingCalibration
             //this.locationManager.ShowsBackgroundLocationIndicator
             //this.locationManager.PausesLocationUpdatesAutomatically = false;
@@ -99,7 +104,7 @@ namespace Shiny.Locations
         {
             if (this.IsListening)
             {
-                //this.locationManager.AllowsBackgroundLocationUpdates = false;
+                this.locationManager.AllowsBackgroundLocationUpdates = false;
                 this.locationManager.StopUpdatingLocation();
                 this.IsListening = false;
             }

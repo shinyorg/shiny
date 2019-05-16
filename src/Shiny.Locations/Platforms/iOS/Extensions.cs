@@ -7,6 +7,17 @@ namespace Shiny.Locations
 {
     public static class iOSExtensions
     {
+        public static void TrySetDeferrals(this CLLocationManager manager, GpsRequest request)
+        {
+            var meters = request?.DeferredDistance?.TotalMeters ?? 0;
+            var secs = request?.DeferredTime?.TotalSeconds ?? 0;
+            if (meters > 0 || secs > 0)
+            {
+                ((GpsManagerDelegate)manager.Delegate).Request = request;
+                manager.AllowDeferredLocationUpdatesUntil(meters, secs);
+            }
+        }
+
 
         public static async Task<AccessState> RequestGpsAccess(this CLLocationManager locationManager, bool backgroundMode)
         {
