@@ -52,13 +52,13 @@ namespace Shiny.Locations
 
 
         /// <summary>
-        ///
+        /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="builder"></param>
-        /// <param name="requestIfAccessAvailable"></param>
+        /// <typeparam name="T">The IGpsDelegate to call</typeparam>
+        /// <param name="builder">The servicecollection to configure</param>
+        /// <param name="requestIfAccessAvailable">This will be called when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
         /// <returns></returns>
-        public static bool UseGps<T>(this IServiceCollection builder, GpsRequest requestWhenPermissionAvailable = null) where T : class, IGpsDelegate
+        public static bool UseGps<T>(this IServiceCollection builder, Action<GpsRequest> requestWhenPermissionAvailable = null) where T : class, IGpsDelegate
         {
             if (!builder.UseGps())
                 return false;
@@ -70,10 +70,16 @@ namespace Shiny.Locations
                 {
                     var gps = sp.GetService<IGpsManager>();
                     gps
-                        .WhenAccessStatusChanged(requestWhenPermissionAvailable.UseBackground)
+                        .WhenAccessStatusChanged(true)
                         .Where(x => x == AccessState.Available)
                         .Take(1)
-                        .SubscribeAsync(() => gps.StartListener(requestWhenPermissionAvailable));
+                        .SubscribeAsync(async () =>
+                        {
+                            var request = new GpsRequest();
+                            requestWhenPermissionAvailable(request);
+                            request.UseBackground = true;
+                            await gps.StartListener(request);
+                        });
                 });
             }
             return true;
