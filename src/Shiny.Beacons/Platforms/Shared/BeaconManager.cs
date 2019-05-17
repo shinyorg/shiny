@@ -174,6 +174,11 @@ namespace Shiny.Beacons
                     yield return state;
             }
         }
+
+        public override IObservable<AccessState> WhenAccessStatusChanged(bool monitoring)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 /*

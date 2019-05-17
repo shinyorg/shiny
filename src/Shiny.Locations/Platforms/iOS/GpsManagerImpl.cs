@@ -22,8 +22,8 @@ namespace Shiny.Locations
 
 
         public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => this.gdelegate.WhenAccessStatusChanged(forBackground);
-        public Task<AccessState> RequestAccess(bool backgroundMode) => this.locationManager.RequestGpsAccess(backgroundMode);
-        public AccessState Status => this.locationManager.CurrentAccessStatus();
+        public Task<AccessState> RequestAccess(bool background) => this.locationManager.RequestAccess(background);
+        public AccessState GetCurrentStatus(bool background) => this.locationManager.GetCurrentStatus(background);
         public bool IsListening { get; private set; }
 
 

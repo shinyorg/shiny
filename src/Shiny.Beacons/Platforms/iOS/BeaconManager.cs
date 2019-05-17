@@ -27,7 +27,7 @@ namespace Shiny.Beacons
 
         public override AccessState GetCurrentStatus(bool background) => this.manager.GetCurrentStatus<CLBeaconRegion>(background);
         public override IObservable<AccessState> WhenAccessStatusChanged(bool background) => this.manager.WhenAccessStatusChanged(background);
-        public override async Task<AccessState> RequestAccess(bool monitoring) => this.manager.RequestAccess(monitoring);
+        public override Task<AccessState> RequestAccess(bool monitoring) => this.manager.RequestAccess(monitoring);
 
 
         public override IObservable<Beacon> WhenBeaconRanged(BeaconRegion region)
