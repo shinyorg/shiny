@@ -3,7 +3,6 @@ using Shiny.Infrastructure;
 using Android.App;
 using Android.Content;
 using Android.OS;
-using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Shiny.Beacons

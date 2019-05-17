@@ -35,7 +35,7 @@ namespace Shiny.Beacons
         }
 
 
-        public override AccessState Status => this.centralManager.Status;
+        public override AccessState GetCurrentStatus(bool background) => this.centralManager.Status;
         public override Task<AccessState> RequestAccess(bool monitoring)
             => this.centralManager.RequestAccess().ToTask();
 

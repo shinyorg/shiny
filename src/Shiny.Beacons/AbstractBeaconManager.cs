@@ -31,7 +31,8 @@ namespace Shiny.Beacons
 
         protected RepositoryWrapper<BeaconRegion, BeaconRegionStore> Repository { get; }
 
-        public abstract AccessState Status { get; }
+        public abstract AccessState GetCurrentStatus(bool monitoring);
+        public abstract IObservable<AccessState> WhenAccessStatusChanged(bool monitoring);
         public abstract IObservable<Beacon> WhenBeaconRanged(BeaconRegion region);
         public abstract Task<AccessState> RequestAccess(bool monitoring);
         public abstract Task StartMonitoring(BeaconRegion region);

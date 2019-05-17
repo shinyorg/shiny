@@ -10,7 +10,14 @@ namespace Shiny.Beacons
         /// <summary>
         /// Current status of beacon hardware
         /// </summary>
-        AccessState Status { get; }
+        AccessState GetCurrentStatus(bool forMonitoring);
+
+
+        /// <summary>
+        /// Observes changes in the access state
+        /// </summary>
+        /// <returns></returns>
+        IObservable<AccessState> WhenAccessStatusChanged(bool monitoring);
 
 
         /// <summary>
