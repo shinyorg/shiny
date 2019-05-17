@@ -24,26 +24,23 @@ namespace Shiny.Locations
         }
 
 
-        public override Task<AccessState> RequestAccess() => this.locationManager.RequestGeofenceAccess();
-        public override AccessState Status => this.locationManager.CurrentAccessStatus();
+        public override IObservable<AccessState> WhenAccessStatusChanged() => this.locationManager.WhenAccessStatusChanged(true);
+        public override Task<AccessState> RequestAccess() => this.locationManager.RequestAccess(true);
+        public override AccessState Status => this.locationManager.GetCurrentStatus<CLCircularRegion>(true);
 
 
         public override async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
         {
-            var task = Observable
-                .FromEventPattern<CLRegionStateDeterminedEventArgs>(
-                    x => this.gdelegate.DeterminedState += x,
-                    x => this.gdelegate.DeterminedState -= x
-                )
+            var task = this.gdelegate
+                .WhenStateDetermined()
+                .Where(x => region.Equals(x))
+                .Select(x => x.Status)
                 .Timeout(TimeSpan.FromSeconds(20))
-                .Take(1)
-                .Select(x => x.EventArgs)
-                .Where(x => x.Region is CLRegion native && native.Identifier.Equals(region.Identifier))
                 .ToTask(cancelToken);
 
             this.locationManager.RequestState(region.ToNative());
-            var args = await task;
-            return args.State.FromNative();
+            var result = await task.ConfigureAwait(false);
+            return result;
         }
 
 

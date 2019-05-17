@@ -60,4 +60,8 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Locations\Platforms\android\" />
+    </ItemGroup>
+
 </Project>

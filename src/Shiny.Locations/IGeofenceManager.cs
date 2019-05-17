@@ -15,9 +15,10 @@ namespace Shiny.Locations
         Task<AccessState> RequestAccess();
 
         /// <summary>
-        /// If you want 1 delegate to use instead of setting them individually on the geofence
+        /// Observes changes in the access state
         /// </summary>
-        //Type DefaultDelegateType { get; set; }
+        /// <returns></returns>
+        IObservable<AccessState> WhenAccessStatusChanged();
 
         /// <summary>
         /// Geofencing Status

@@ -9,9 +9,25 @@ namespace Shiny.Testing.Locations
 {
     public class TestGpsManager : IGpsManager
     {
-        public AccessState Status { get; set; }
-        public bool IsListening { get; set; }
+        readonly Subject<AccessState> accessSubject = new Subject<AccessState>();
 
+
+        public bool IsListening { get; private set; }
+
+
+        AccessState replyStatus;
+        public AccessState ReplyStatus
+        {
+            get => this.replyStatus;
+            set
+            {
+                this.replyStatus = value;
+                this.accessSubject.OnNext(value);
+            }
+        }
+
+        public AccessState GetCurrentStatus(bool background) => this.ReplyStatus;
+        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => this.accessSubject;
 
         public IGpsReading LastGpsReading { get; set; }
         public IObservable<IGpsReading> GetLastReading() => Observable.Return(this.LastGpsReading);
@@ -22,12 +38,21 @@ namespace Shiny.Testing.Locations
 
 
         public GpsRequest LastGpsRequest { get; private set; }
+
+
         public Task StartListener(GpsRequest request = null)
         {
+            this.IsListening = true;
             this.LastGpsRequest = request;
             return Task.CompletedTask;
         }
-        public Task StopListener() => Task.CompletedTask;
+
+
+        public Task StopListener()
+        {
+            this.IsListening = false;
+            return Task.CompletedTask;
+        }
 
 
         public Subject<IGpsReading> ReadingSubject { get; } = new Subject<IGpsReading>();

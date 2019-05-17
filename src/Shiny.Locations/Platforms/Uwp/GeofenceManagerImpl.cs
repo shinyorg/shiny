@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
 using Shiny.Infrastructure;
-
+using System.Reactive.Linq;
 
 namespace Shiny.Locations
 {
@@ -14,6 +14,8 @@ namespace Shiny.Locations
     {
         public GeofenceManagerImpl(IRepository repository) : base(repository) {}
 
+
+        public override IObservable<AccessState> WhenAccessStatusChanged() => Observable.Return(AccessState.Available);
 
         public override async Task<AccessState> RequestAccess()
         {

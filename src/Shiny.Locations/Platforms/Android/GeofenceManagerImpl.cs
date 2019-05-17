@@ -10,7 +10,7 @@ using Shiny.Infrastructure;
 using Android;
 using Android.App;
 using Android.Content;
-
+using System.Reactive.Linq;
 
 namespace Shiny.Locations
 {
@@ -27,6 +27,7 @@ namespace Shiny.Locations
         }
 
 
+        public override IObservable<AccessState> WhenAccessStatusChanged() => Observable.Return(AccessState.Available);
         public override AccessState Status => this.context.GetCurrentAccessState(Manifest.Permission.AccessFineLocation);
         public override Task<AccessState> RequestAccess() => this.context.RequestAccess(Manifest.Permission.AccessFineLocation).ToTask();
 

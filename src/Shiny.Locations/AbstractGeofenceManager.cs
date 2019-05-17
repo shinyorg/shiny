@@ -19,6 +19,7 @@ namespace Shiny.Locations
 
         public abstract AccessState Status { get; }
         public abstract Task<AccessState> RequestAccess();
+        public abstract IObservable<AccessState> WhenAccessStatusChanged();
         public abstract Task StartMonitoring(GeofenceRegion region);
         public abstract Task StopMonitoring(GeofenceRegion region);
         public abstract Task StopAllMonitoring();

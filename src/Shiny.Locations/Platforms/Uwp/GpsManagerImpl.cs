@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
-
+using Windows.Foundation;
 
 namespace Shiny.Locations
 {
@@ -20,30 +20,39 @@ namespace Shiny.Locations
         }
 
 
-        public AccessState Status
+        public AccessState GetCurrentStatus(bool background)
         {
-            get
+            switch (this.geolocator.LocationStatus)
             {
-                switch (this.geolocator.LocationStatus)
-                {
-                    case PositionStatus.Disabled:
-                        return AccessState.Disabled;
+                case PositionStatus.Disabled:
+                    return AccessState.Disabled;
 
-                    case PositionStatus.NotAvailable:
-                        return AccessState.NotSupported;
+                case PositionStatus.NotAvailable:
+                    return AccessState.NotSupported;
 
-                    //case PositionStatus.NotInitialized:
-                    case PositionStatus.Ready:
-                        return AccessState.Available;
+                //case PositionStatus.NotInitialized:
+                case PositionStatus.Ready:
+                    return AccessState.Available;
 
-                    case PositionStatus.NoData:
-                    case PositionStatus.Initializing:
-                    default:
-                        return AccessState.Unknown;
-                }
+                case PositionStatus.NoData:
+                case PositionStatus.Initializing:
+                default:
+                    return AccessState.Unknown;
             }
         }
 
+
+        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => Observable.Create<AccessState>(ob =>
+        {
+            var handler = new TypedEventHandler<Geolocator, StatusChangedEventArgs>((sender, args) =>
+                ob.OnNext(this.GetCurrentStatus(true))
+            );
+            this.geolocator.StatusChanged += null;
+            return () => this.geolocator.StatusChanged -= null;
+        });
+
+
+        public Task<AccessState> RequestAccess(bool background) => Task.FromResult(this.GetCurrentStatus(background));
 
         public bool IsListening { get; private set; }
 
@@ -61,9 +70,6 @@ namespace Shiny.Locations
 
             return new GpsReading(location.Coordinate);
         });
-
-
-        public Task<AccessState> RequestAccess(bool backgroundMode) => Task.FromResult(AccessState.Available);
 
 
         public Task StartListener(GpsRequest request = null)

@@ -1,18 +1,30 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using CoreLocation;
 using Foundation;
 
+
 namespace Shiny.Locations
 {
-    public class GpsManagerDelegate : CLLocationManagerDelegate
+    public class GpsManagerDelegate : ShinyLocationDelegate
     {
-        public GpsRequest Request { get; set; }
+        public GpsManagerDelegate()
+        {
+            this.gdelegate = ShinyHost.Resolve<IGpsDelegate>();
+            this.readingSubject = new Subject<IGpsReading>();
+        }
+
+
+        readonly Subject<IGpsReading> readingSubject;
+        readonly IGpsDelegate gdelegate;
         bool deferringUpdates;
-        IGpsDelegate gdelegate;
+
+        internal GpsRequest Request { get; set; }
 
 
-        public event EventHandler<CLLocation[]> UpdatedLocations;
+        public IObservable<IGpsReading> WhenGps() => this.readingSubject;
         public override void LocationsUpdated(CLLocationManager manager, CLLocation[] locations)
         {
             if (this.Request == null)
@@ -28,36 +40,20 @@ namespace Shiny.Locations
 
 
         public override void DeferredUpdatesFinished(CLLocationManager manager, NSError error)
-        {
-            this.deferringUpdates = false;
-        }
+            => this.deferringUpdates = false;
 
 
         void InvokeChanges(CLLocation[] locations)
         {
-            if (this.gdelegate == null)
-                this.gdelegate = ShinyHost.Resolve<IGpsDelegate>();
-
             var loc = locations.Last();
             var reading = new GpsReading(loc);
             this.gdelegate?.OnReading(reading);
-
-            //if (this.gdelegate != null)
-            //{
-            //    foreach (var loc in locations)
-            //        this.gdelegate.OnReading(new GpsReading(loc));
-            //}
-            //this.UpdatedLocations?.Invoke(this, locations);
+            this.readingSubject.OnNext(reading);
         }
 
         //public override void Failed(CLLocationManager manager, NSError error)
         //{
         //    base.Failed(manager, error);
         //}
-
-
-        public event EventHandler<CLAuthorizationStatus> AuthStatusChanged;
-        public override void AuthorizationChanged(CLLocationManager manager, CLAuthorizationStatus status)
-            => this.AuthStatusChanged?.Invoke(this, status);
     }
 }

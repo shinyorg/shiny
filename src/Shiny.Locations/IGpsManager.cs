@@ -7,15 +7,23 @@ namespace Shiny.Locations
     public interface IGpsManager
     {
         /// <summary>
-        /// The current status of the GPS manager
-        /// </summary>
-        AccessState Status { get; }
-
-
-        /// <summary>
         /// If the device is currently listening to GPS broadcasts
         /// </summary>
         bool IsListening { get; }
+
+
+        /// <summary>
+        /// The current status of the GPS manager
+        /// </summary>
+        AccessState GetCurrentStatus(bool background);
+
+
+        /// <summary>
+        /// Observes changes in the access state
+        /// </summary>
+        /// <param name="forBackground"></param>
+        /// <returns></returns>
+        IObservable<AccessState> WhenAccessStatusChanged(bool forBackground);
 
 
         /// <summary>

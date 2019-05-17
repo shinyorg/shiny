@@ -23,14 +23,15 @@ namespace Shiny.Locations
         }
 
 
-        public AccessState Status => this.context.GetCurrentAccessState(P.AccessFineLocation);
+        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => Observable.Return(AccessState.Available); // TODO
+        public AccessState GetCurrentStatus(bool background) => this.context.GetCurrentAccessState(P.AccessFineLocation);
         public bool IsListening { get; private set; }
 
 
         public IObservable<IGpsReading> GetLastReading() => Observable.FromAsync(async () =>
         {
             var access = await this.RequestAccess(false);
-            access.Assert(allowRestricted: true);
+            access.Assert();
 
             var location = await this.client.GetLastLocationAsync();
             if (location == null)
@@ -51,7 +52,7 @@ namespace Shiny.Locations
 
             request = request ?? new GpsRequest();
             var access = await this.RequestAccess(request.UseBackground);
-            access.Assert(allowRestricted: true);
+            access.Assert();
 
             var nativeRequest = new LocationRequest()
                 .SetPriority(GetPriority(request.Priority));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Locations;
@@ -10,7 +11,19 @@ namespace Shiny.Testing.Locations
 {
     public class TestGeofenceManager : IGeofenceManager
     {
-        public AccessState Status { get; set; }
+        readonly Subject<AccessState> accessSubject = new Subject<AccessState>();
+
+        AccessState status;
+        public AccessState Status
+        {
+            get => this.status;
+            set
+            {
+                this.status = value;
+                this.accessSubject.OnNext(value);
+            }
+        }
+
 
         readonly IList<GeofenceRegion> regions = new List<GeofenceRegion>();
         public IReadOnlyList<GeofenceRegion> MonitoredRegions => this.regions.ToList();
@@ -20,8 +33,7 @@ namespace Shiny.Testing.Locations
             => Task.FromResult<IEnumerable<GeofenceRegion>>(this.MonitoredRegions);
 
 
-        public AccessState RequestAccessReply { get; set; } = AccessState.Available;
-        public Task<AccessState> RequestAccess() => Task.FromResult(this.RequestAccessReply);
+        public Task<AccessState> RequestAccess() => Task.FromResult(this.Status);
 
 
         public IDictionary<GeofenceRegion, GeofenceState> GeofenceRegionStates { get; } = new Dictionary<GeofenceRegion, GeofenceState>();
@@ -52,6 +64,11 @@ namespace Shiny.Testing.Locations
         {
             this.regions.Remove(region);
             return Task.CompletedTask;
+        }
+
+        public IObservable<AccessState> WhenAccessStatusChanged()
+        {
+            throw new NotImplementedException();
         }
     }
 }

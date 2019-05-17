@@ -21,10 +21,10 @@ namespace Shiny.Locations
         }
 
 
-        // TODO: for background, ensure gps delegate is registered
+        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => this.gdelegate.WhenAccessStatusChanged(forBackground);
         public Task<AccessState> RequestAccess(bool backgroundMode) => this.locationManager.RequestGpsAccess(backgroundMode);
         public AccessState Status => this.locationManager.CurrentAccessStatus();
-        public bool IsListening { get; private set; } // settings?
+        public bool IsListening { get; private set; }
 
 
         public IObservable<IGpsReading> GetLastReading() => Observable.FromAsync(async ct =>
@@ -66,7 +66,6 @@ namespace Shiny.Locations
             var access = await this.RequestAccess(request.UseBackground);
             access.Assert();
 
-            
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
             this.locationManager.TrySetDeferrals(request);
 
@@ -112,12 +111,6 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<IGpsReading> WhenReading() => Observable
-            .FromEventPattern<CLLocation[]>(
-                x => this.gdelegate.UpdatedLocations += x,
-                x => this.gdelegate.UpdatedLocations -= x
-            )
-            .SelectMany(x => x.EventArgs)
-            .Select(x => new GpsReading(x));
+        public IObservable<IGpsReading> WhenReading() => this.gdelegate.WhenGps();
     }
 }

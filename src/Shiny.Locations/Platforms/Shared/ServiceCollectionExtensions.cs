@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -6,26 +8,29 @@ namespace Shiny.Locations
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseGeofencing<T>(this IServiceCollection builder) where T : class, IGeofenceDelegate
+        public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regionsToRegisterWhenPermissionAvailable) where T : class, IGeofenceDelegate
         {
             builder.AddSingleton<IGeofenceDelegate, T>();
-            //if (registerGeofences != null)
-            //{
-            //    builder.OnBuild(async c =>
-            //    {
-            //        var mgr = c.Resolve<IGeofenceManager>();
-            //        var regions = registerGeofences();
-            //        // TODO: wait for grant state
-            //        foreach (var region in regions)
-            //        {
-            //            await mgr.StartMonitoring(region);
-            //        }
-            //    });
-            //}
 #if NETSTANDARD
             return false;
 #else
             builder.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            if (regionsToRegisterWhenPermissionAvailable.Any())
+            {
+                builder.RegisterPostBuildAction(sp =>
+                {
+                    var mgr = sp.GetService<IGeofenceManager>();
+                    mgr
+                        .WhenAccessStatusChanged()
+                        .Where(x => x == AccessState.Available)
+                        .Take(1)
+                        .SubscribeAsync(async () =>
+                        {
+                            foreach (var region in regionsToRegisterWhenPermissionAvailable)
+                                await mgr.StartMonitoring(region);
+                        });
+                });
+            }
             return true;
 #endif
         }
@@ -53,33 +58,25 @@ namespace Shiny.Locations
         /// <param name="builder"></param>
         /// <param name="requestIfAccessAvailable"></param>
         /// <returns></returns>
-        public static bool UseGps<T>(this IServiceCollection builder, GpsRequest requestIfAccessAvailable = null) where T : class, IGpsDelegate
+        public static bool UseGps<T>(this IServiceCollection builder, GpsRequest requestWhenPermissionAvailable = null) where T : class, IGpsDelegate
         {
-#if NETSTANDARD
-            return false;
-#else
-            if (requestIfAccessAvailable != null)
+            if (!builder.UseGps())
+                return false;
+
+            builder.AddSingleton<IGpsDelegate, T>();
+            if (requestWhenPermissionAvailable != null)
             {
-                builder.RegisterPostBuildAction(async sp =>
+                builder.RegisterPostBuildAction(sp =>
                 {
                     var gps = sp.GetService<IGpsManager>();
-                    if (gps.Status == AccessState.Available)
-                        await gps.StartListener(requestIfAccessAvailable);
+                    gps
+                        .WhenAccessStatusChanged(requestWhenPermissionAvailable.UseBackground)
+                        .Where(x => x == AccessState.Available)
+                        .Take(1)
+                        .SubscribeAsync(() => gps.StartListener(requestWhenPermissionAvailable));
                 });
             }
-            builder.AddSingleton<IGpsDelegate, T>();
-            builder.AddSingleton<IGpsManager, GpsManagerImpl>();
-            //if (startIfPermissionAvailable)
-            //{
-            //    builder.RegisterPostBuildAction(async sp =>
-            //    {
-            //        var access = await sp.GetService<IGpsManager>().RequestAccess(true);
-            //        if (access == AccessState.Available)
-            //            await gps.StartListener()
-            //    });
-            //}
             return true;
-#endif
         }
     }
 }
