@@ -5,7 +5,7 @@ using Android.Content;
 
 namespace Shiny.Notifications
 {
-    static class Extensions
+    static class AndroidExtensions
     {
         public static ActivityFlags ToNative(this AndroidActivityFlags flags)
         {
