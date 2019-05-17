@@ -2,6 +2,7 @@
 using System.Reactive.Subjects;
 using CoreLocation;
 using Shiny.Locations;
+using Shiny.Logging;
 
 
 namespace Shiny.Beacons
@@ -42,16 +43,23 @@ namespace Shiny.Beacons
 
         void Invoke(CLRegion region, BeaconRegionState status)
         {
-            var native = region as CLBeaconRegion;
-            if (native != null)
+            try
             {
-                var beaconRegion = new BeaconRegion(
-                    native.Identifier,
-                    native.ProximityUuid.ToGuid(),
-                    native.Major?.UInt16Value,
-                    native.Minor?.UInt16Value
-                );
-                this.bdelegate?.OnStatusChanged(status, beaconRegion);
+                var native = region as CLBeaconRegion;
+                if (native != null)
+                {
+                    var beaconRegion = new BeaconRegion(
+                        native.Identifier,
+                        native.ProximityUuid.ToGuid(),
+                        native.Major?.UInt16Value,
+                        native.Minor?.UInt16Value
+                    );
+                    this.bdelegate?.OnStatusChanged(status, beaconRegion);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
             }
         }
     }

@@ -21,6 +21,8 @@ namespace Shiny.Beacons
         public Guid Uuid { get; }
         public ushort? Major { get; }
         public ushort? Minor { get; }
+        public bool NotifyOnEntry { get; set; } = true;
+        public bool NotifyOnExit { get; set; } = true;
 
 
         public bool IsBeaconInRegion(Beacon beacon)

@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Reactive.Subjects;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 using CoreLocation;
-using System.Reactive.Subjects;
+
 
 namespace Shiny.Locations
 {

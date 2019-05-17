@@ -24,8 +24,8 @@ namespace Shiny.Beacons
                 native = new CLBeaconRegion(uuid, region.Identifier);
 
             //native.NotifyEntryStateOnDisplay = true;
-            native.NotifyOnEntry = true;
-            native.NotifyOnExit = true;
+            native.NotifyOnEntry = region.NotifyOnEntry;
+            native.NotifyOnExit = region.NotifyOnExit;
 
             return native;
         }

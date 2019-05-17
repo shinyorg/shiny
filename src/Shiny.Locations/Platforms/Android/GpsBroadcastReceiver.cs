@@ -40,11 +40,3 @@ namespace Shiny.Locations
         }
     }
 }
-/*
-package com.google.android.gms.location.sample.backgroundlocationupdates;
-
- For apps targeting API level 25 ("Nougat") or lower, location updates may be requested
- using {@link android.app.PendingIntent#getService(Context, int, Intent, int)} or
- {@link android.app.PendingIntent#getBroadcast(Context, int, Intent, int)}. For apps targeting
- API level O, only {@code getBroadcast} should be used.
-*/
