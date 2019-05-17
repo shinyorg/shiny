@@ -63,6 +63,21 @@ namespace Shiny
 
 
         /// <summary>
+        /// Gets an objects property dynamically through reflection - will throw an exception if proper has no getter or property does not exists
+        /// </summary>
+        /// <typeparam name="TSender"></typeparam>
+        /// <typeparam name="TReturn"></typeparam>
+        /// <param name="obj"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public static TReturn ReflectGet<TSender, TReturn>(this TSender obj, Expression<Func<TSender, TReturn>> expression)
+        {
+            var prop = obj.GetPropertyInfo(expression);
+            return (TReturn)prop.GetValue(obj);
+        }
+
+
+        /// <summary>
         /// Sets an objects property dynamically through reflection - will throw an exception if proper has no setter, wrong type, or property does not exists
         /// </summary>
         /// <param name="obj"></param>
