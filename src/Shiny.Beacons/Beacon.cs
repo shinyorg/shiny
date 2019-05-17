@@ -25,7 +25,7 @@ namespace Shiny.Beacons
 
 
         public override string ToString() => $"[Beacon: Uuid={this.Uuid}, Major={this.Major}, Minor={this.Minor}]";
-        public bool Equals(Beacon other) => (this.Uuid, this.Major, this.Minor).Equals((other?.Uuid, other?.Major, other?.Minor));
+        public bool Equals(Beacon other) => (this.Uuid, this.Major, this.Minor) == (other?.Uuid, other?.Major, other?.Minor);
         public static bool operator ==(Beacon left, Beacon right) => Equals(left, right);
         public static bool operator !=(Beacon left, Beacon right) => !Equals(left, right);
         public override bool Equals(object obj) => obj is Beacon beacon && this.Equals(beacon);

@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using CoreLocation;
 using Shiny.Infrastructure;
 using Shiny.Locations;
-using CoreLocation;
 
 
 namespace Shiny.Beacons
