@@ -52,25 +52,6 @@ namespace Shiny.Beacons
         }
 
 
-        static byte[] ToBytes(Guid guid)
-        {
-            var hex = guid
-                .ToString()
-                .Replace("-", String.Empty)
-                .Replace("{", String.Empty)
-                .Replace("}", String.Empty)
-                .Replace(":", String.Empty)
-                .Replace("-", String.Empty);
-
-            var bytes = Enumerable.Range(0, hex.Length)
-                .Where(x => x % 2 == 0)
-                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
-                .ToArray();
-
-            return bytes;
-        }
-
-
         public byte[] ToIBeaconPacket()
         {
             using (var ms = new MemoryStream())
@@ -115,19 +96,37 @@ namespace Shiny.Beacons
         }
 
 
-        public static bool IsIBeaconPacket(byte[] data)
+        public static bool IsBeaconPacket(byte[] data, bool skipManufacturerByte = true)
         {
             if (data == null)
                 return false;
 
-            if (data.Length < 25)
+            if (data.Length != 23)
                 return false;
 
             // apple manufacturerID - https://www.bluetooth.com/specifications/assigned-numbers/company-Identifiers
-            if (data[0] != 76 || data[1] != 0)
+            if (!skipManufacturerByte && data[0] != 76)
                 return false;
 
             return true;
+        }
+
+        static byte[] ToBytes(Guid guid)
+        {
+            var hex = guid
+                .ToString()
+                .Replace("-", String.Empty)
+                .Replace("{", String.Empty)
+                .Replace("}", String.Empty)
+                .Replace(":", String.Empty)
+                .Replace("-", String.Empty);
+
+            var bytes = Enumerable.Range(0, hex.Length)
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                .ToArray();
+
+            return bytes;
         }
     }
 }

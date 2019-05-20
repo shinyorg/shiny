@@ -25,10 +25,7 @@ namespace Shiny.Beacons
             if (md.CompanyId != 76)
                 return false;
 
-            if (md.Data.Length != 23)
-                return false;
-
-            return true;
+            return Beacon.IsBeaconPacket(md.Data);
         }
 
 
@@ -39,8 +36,8 @@ namespace Shiny.Beacons
 
             var uuidString = BitConverter.ToString(data, 2, 16).Replace("-", String.Empty);
             var uuid = new Guid(uuidString);
-            var major = BitConverter.ToUInt16(data.Skip(18).Take(2).ToArray(), 0);
-            var minor = BitConverter.ToUInt16(data.Skip(20).Take(2).ToArray(), 0);
+            var major = BitConverter.ToUInt16(data.Skip(18).Take(2).Reverse().ToArray(), 0);
+            var minor = BitConverter.ToUInt16(data.Skip(20).Take(2).Reverse().ToArray(), 0);
             var txpower = data[22];
             var accuracy = CalculateAccuracy(txpower, result.Rssi);
             var proximity = CalculateProximity(accuracy);

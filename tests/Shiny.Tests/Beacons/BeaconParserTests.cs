@@ -10,8 +10,8 @@ namespace Shiny.Tests.Beacons
     {
         [Theory]
         [InlineData(
-            "4C0002159DD3C2D7C05E417492D2CC30629E522700010001C6",
-            "9dd3c2d7-c05e-4174-92d2-cc30629e5227",
+            "02-15-B9-40-7F-30-F5-F8-46-6E-AF-F9-25-55-6B-57-FE-6D-39-B0-57-CA-BE",
+            "B9407F30-F5F8-466E-AFF9-25556B57FE6D",
             1,
             1,
             Proximity.Immediate
@@ -19,6 +19,7 @@ namespace Shiny.Tests.Beacons
         public void ParseBeaconPacketSuccess(string hexData, string beaconIdentifier, ushort major, ushort minor, Proximity prox)
         {
             var bytes = hexData.FromHex();
+            Beacon.IsBeaconPacket(bytes).Should().BeTrue();
             var beacon = Beacon.Parse(bytes, 10);
             beacon.Uuid.Should().Be(new Guid(beaconIdentifier));
             beacon.Major.Should().Be(major);
@@ -27,21 +28,12 @@ namespace Shiny.Tests.Beacons
         }
 
 
-        [Theory]
-        [InlineData("4C0002159DD3C2D7C05E417492D2CC30629E522700010001C6", true)]
-        public void DetectBeacon(string hexData, bool expectedResult)
-        {
-            var bytes = hexData.FromHex();
-            Beacon.IsIBeaconPacket(bytes).Should().Be(expectedResult);
-        }
-
-
         [Fact]
         public void ToBeaconIsBeacon()
         {
             var beacon = new Beacon(Guid.NewGuid(), 99, 199, 0, Proximity.Far);
             var bytes = beacon.ToIBeaconPacket();
-            Beacon.IsIBeaconPacket(bytes).Should().Be(true);
+            Beacon.IsBeaconPacket(bytes).Should().Be(true);
         }
 
 
