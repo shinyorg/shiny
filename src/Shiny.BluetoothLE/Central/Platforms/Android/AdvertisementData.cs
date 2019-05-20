@@ -13,18 +13,14 @@ namespace Shiny.BluetoothLE.Central
         {
             this.result = result;
 
-            this.manufacturerData = new Lazy<ManufacturerData[]>(() =>
+            this.manufacturerData = new Lazy<ManufacturerData>(() =>
             {
-                var md = this.result.ScanRecord.ManufacturerSpecificData;
-                var mdata = new ManufacturerData[md.Size()];
-                //for (var i = 0; i < md.Size(); i++)
-                //{
-                //    var companyId = mdata.KeyAt(i);
+                var manufacturerId = (ushort)this.result.ScanRecord.ManufacturerSpecificData.KeyAt(0);
+                if (manufacturerId == 0)
+                    return null;
 
-                //    mdata[i] = null;
-                //}
-
-                return mdata;
+                var data = this.result.ScanRecord.GetManufacturerSpecificData(manufacturerId);
+                return new ManufacturerData(manufacturerId, data);
             });
 
             this.serviceUuids = new Lazy<Guid[]>(() =>
@@ -49,8 +45,8 @@ namespace Shiny.BluetoothLE.Central
         public string LocalName => this.result.ScanRecord.DeviceName;
         public bool IsConnectable => this.result.IsConnectable; // only on droid8+
 
-        readonly Lazy<ManufacturerData[]> manufacturerData;
-        public ManufacturerData[] ManufacturerData => this.manufacturerData.Value;
+        readonly Lazy<ManufacturerData> manufacturerData;
+        public ManufacturerData ManufacturerData => this.manufacturerData.Value;
 
         readonly Lazy<Guid[]> serviceUuids;
         public Guid[] ServiceUuids => this.serviceUuids.Value;
