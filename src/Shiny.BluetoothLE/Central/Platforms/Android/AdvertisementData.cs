@@ -41,9 +41,18 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-
         public string LocalName => this.result.ScanRecord.DeviceName;
-        public bool IsConnectable => this.result.IsConnectable; // only on droid8+
+        public bool? IsConnectable
+        {
+            get
+            {
+                // if not Android8+, we don't know the state of connectable
+                if (Android.OS.Build.VERSION.SdkInt < Android.OS.BuildVersionCodes.O)
+                    return null;
+
+                return this.result.IsConnectable;
+            }
+        }
 
         readonly Lazy<ManufacturerData> manufacturerData;
         public ManufacturerData ManufacturerData => this.manufacturerData.Value;

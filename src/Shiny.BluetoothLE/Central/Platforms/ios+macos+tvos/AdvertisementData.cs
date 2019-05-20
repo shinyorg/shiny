@@ -66,7 +66,7 @@ namespace Shiny.BluetoothLE.Central
 
 
         public string LocalName => this.localName.Value;
-        public bool IsConnectable => this.connectable.Value;
+        public bool? IsConnectable => this.connectable.Value;
         public ManufacturerData ManufacturerData => this.manufacturerData.Value;
         public Guid[] ServiceUuids => this.serviceUuids.Value;
         public AdvertisementServiceData[] ServiceData => this.serviceData.Value;
