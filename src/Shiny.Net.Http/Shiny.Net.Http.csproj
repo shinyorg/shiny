@@ -1,7 +1,7 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/1.6.68">
+﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.24">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;monoandroid81;monoandroid90;xamarinios10</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;monoandroid90;xamarinios10</TargetFrameworks>
         <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
         <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
     </PropertyGroup>
