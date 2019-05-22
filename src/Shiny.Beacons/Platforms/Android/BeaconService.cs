@@ -1,8 +1,8 @@
 ﻿using System;
-using Shiny.Infrastructure;
 using Android.App;
 using Android.Content;
 using Android.OS;
+using Android.Runtime;
 
 
 namespace Shiny.Beacons
@@ -16,14 +16,18 @@ namespace Shiny.Beacons
         public override IBinder OnBind(Intent intent) => null;
 
 
+        [return: GeneratedEnum]
+        public override StartCommandResult OnStartCommand(Intent intent, [GeneratedEnum] StartCommandFlags flags, int startId)
+            => StartCommandResult.NotSticky;
+
+
         public override void OnCreate()
         {
             base.OnCreate();
-            var beaconManager = ShinyHost.Resolve<IBeaconManager>();
-            var beaconDelegate = ShinyHost.Resolve<IBeaconDelegate>();
-            var repository = ShinyHost.Resolve<IRepository>();
-            //var regions = await repo.GetAll<BeaconRegion>();
-            //mgr.WhenBeaconRanged(regions[0]);
+
+            ShinyHost
+                .Resolve<BackgroundTask>()
+                .Run();
         }
     }
 }

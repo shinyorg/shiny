@@ -9,8 +9,14 @@ namespace Shiny.Beacons
 {
     public static class BeaconExtensions
     {
-        public static IObservable<Beacon> ScanForBeacons(this ICentralManager centralManager) => centralManager
-            .Scan()
+        public static IObservable<Beacon> ScanForBeacons(this ICentralManager centralManager, bool forMonitoring = false) => centralManager
+            .Scan(new ScanConfig
+            {
+                AndroidUseScanBatching = true,
+                ScanType = forMonitoring
+                    ? BleScanType.LowPowered
+                    : BleScanType.Balanced
+            })
             .Where(x => x.IsBeacon())
             .Select(x => x.ToBeacon());
 
@@ -59,13 +65,11 @@ namespace Shiny.Beacons
 
         public static Proximity CalculateProximity(double accuracy)
         {
-            if (accuracy < 0)
-                return Proximity.Unknown;
-
-            if (accuracy < 0.5)
+            Console.WriteLine($"Accuracy: {accuracy}");
+            if (accuracy >= 4.0d)
                 return Proximity.Immediate;
 
-            if (accuracy <= 4.0)
+            if (accuracy >= 0.5d)
                 return Proximity.Near;
 
             return Proximity.Far;
