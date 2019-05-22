@@ -1,5 +1,6 @@
 using System;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Android;
 using Android.App;
 using Android.Content;
@@ -16,16 +17,17 @@ namespace Shiny.SpeechRecognition
 
         public SpeechRecognizerImpl(AndroidContext context) => this.context = context;
 
-        public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
+        public override Task<AccessState> RequestAccess()
         {
+            var state = AccessState.Available;
             if (!SpeechRecognizer.IsRecognitionAvailable(this.context.AppContext))
-                return AccessState.NotSupported;
+                state = AccessState.NotSupported;
 
-            if (!this.context.IsInManifest(Manifest.Permission.RecordAudio, false))
-                return AccessState.NotSetup;
+            else if (!this.context.IsInManifest(Manifest.Permission.RecordAudio, false))
+                state = AccessState.NotSetup;
 
-            return AccessState.Available;
-        });
+            return Task.FromResult(state);
+        }
 
 
         public override IObservable<string> ListenUntilPause() => Observable.Create<string>(ob =>

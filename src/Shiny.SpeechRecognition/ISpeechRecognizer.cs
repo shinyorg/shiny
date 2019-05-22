@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Threading.Tasks;
 
 namespace Shiny.SpeechRecognition
 {
@@ -9,15 +9,7 @@ namespace Shiny.SpeechRecognition
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
         /// <returns></returns>
-        IObservable<AccessState> RequestAccess();
-
-
-        /// <summary>
-        /// Optimal observable for taking command (yes/no/maybe/go away/etc)
-        /// </summary>
-        /// <param name="keywords"></param>
-        /// <returns></returns>
-        IObservable<string> ListenForFirstKeyword(params string[] keywords);
+        Task<AccessState> RequestAccess();
 
 
         /// <summary>
