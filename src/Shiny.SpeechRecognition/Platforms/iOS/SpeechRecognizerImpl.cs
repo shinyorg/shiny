@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using AVFoundation;
 using Speech;
 using UIKit;
@@ -10,22 +11,28 @@ namespace Shiny.SpeechRecognition
 {
     public class SpeechRecognizerImpl : AbstractSpeechRecognizer
     {
-        public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
+        public override async Task<AccessState> RequestAccess()
         {
+            var status = AccessState.Available;
+
             if (!UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
-                ob.Respond(AccessState.NotSupported);
+                status = AccessState.NotSupported;
 
             else
             {
-                var status = SFSpeechRecognizer.AuthorizationStatus;
-                if (status != SFSpeechRecognizerAuthorizationStatus.NotDetermined)
-                    ob.Respond(FromNative(status));
+                var nativeStatus = SFSpeechRecognizer.AuthorizationStatus;
+                if (nativeStatus != SFSpeechRecognizerAuthorizationStatus.NotDetermined)
+                    status = FromNative(nativeStatus);
 
                 else
-                    SFSpeechRecognizer.RequestAuthorization(x => ob.Respond(FromNative(x)));
+                {
+                    var tcs = new TaskCompletionSource<AccessState>();
+                    SFSpeechRecognizer.RequestAuthorization(x => tcs.SetResult(FromNative(x)));
+                    status = await tcs.Task.ConfigureAwait(false);
+                }
             }
-            return Disposable.Empty;
-        });
+            return status;
+        }
 
 
         static AccessState FromNative(SFSpeechRecognizerAuthorizationStatus status)
