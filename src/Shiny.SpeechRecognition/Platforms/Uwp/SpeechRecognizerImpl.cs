@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Windows.Foundation;
 using Windows.Media.SpeechRecognition;
@@ -10,11 +11,8 @@ namespace Shiny.SpeechRecognition
     public class SpeechRecognizerImpl : AbstractSpeechRecognizer
     {
         // TODO: appmanifest
-        public override IObservable<AccessState> RequestAccess()
-        {
+        public override Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
             //Permissions.IsInMainfest("speech")
-            return Observable.Return(AccessState.Available);
-        }
 
 
         public override IObservable<string> ListenUntilPause() => Observable.FromAsync(async ct =>
