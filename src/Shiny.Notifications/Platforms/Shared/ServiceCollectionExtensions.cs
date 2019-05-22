@@ -6,13 +6,15 @@ namespace Shiny.Notifications
 {
     public static class ContainerBuilderExtensions
     {
-        public static bool UseNotifications(this IServiceCollection builder, Action<AndroidOptions, UwpOptions> configure = null)
+        public static bool UseNotifications(this IServiceCollection builder,
+                                            bool requestPermissionImmediately = false,
+                                            Action<AndroidOptions> androidConfigure = null,
+                                            Action<UwpOptions> uwpConfigure = null)
         {
-            if (configure != null)
+            if (androidConfigure != null)
             {
                 var androidOpts = new AndroidOptions();
-                var uwpOpts = new UwpOptions();
-                configure(androidOpts, uwpOpts);
+                androidConfigure(androidOpts);
 
                 AndroidOptions.DefaultChannel = androidOpts.ChannelDescription ?? AndroidOptions.DefaultChannel;
                 AndroidOptions.DefaultChannelDescription = androidOpts.ChannelDescription ?? AndroidOptions.DefaultChannelDescription;
@@ -21,13 +23,25 @@ namespace Shiny.Notifications
                 AndroidOptions.DefaultLaunchActivityFlags = androidOpts.LaunchActivityFlags;
                 AndroidOptions.DefaultVibrate = androidOpts.Vibrate;
                 AndroidOptions.DefaultSmallIconResourceName = androidOpts.SmallIconResourceName ?? AndroidOptions.DefaultSmallIconResourceName;
-
+            }
+            if (uwpConfigure != null)
+            {
+                var uwpOpts = new UwpOptions();
+                uwpConfigure(uwpOpts);
                 UwpOptions.DefaultUseLongDuration = uwpOpts.UseLongDuration;
             }
 
 #if NETSTANDARD
             return false;
 #else
+            if (requestPermissionImmediately)
+            {
+                builder.RegisterPostBuildAction(async sp =>
+                    await sp
+                        .GetService<INotificationManager>()
+                        .RequestAccess()
+                );
+            }
             builder.AddSingleton<INotificationManager, NotificationManagerImpl>();
             return true;
 #endif
