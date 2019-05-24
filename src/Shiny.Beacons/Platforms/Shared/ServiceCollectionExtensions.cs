@@ -18,13 +18,6 @@ namespace Shiny.Beacons
         public static bool UseBeacons(this IServiceCollection builder)
         {
 
-#if __ANDROID__
-            builder.RegisterPostBuildAction(sp => sp
-                .GetService<AndroidContext>()
-                .StartService(typeof(BeaconService))
-            );
-#endif
-
 #if WINDOWS_UWP || __ANDROID__
             builder.UseBleCentral();
             builder.AddSingleton<BackgroundTask>();
@@ -54,6 +47,12 @@ namespace Shiny.Beacons
 
             builder.AddSingleton<IBeaconDelegate, T>();
 
+#if __ANDROID__
+            builder.RegisterPostBuildAction(sp => sp
+                .GetService<AndroidContext>()
+                .StartService(typeof(BeaconService))
+            );
+#endif
             if (regionsToMonitorWhenPermissionAvailable.Any())
             {
                 builder.RegisterPostBuildAction(sp =>

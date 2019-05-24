@@ -12,23 +12,25 @@ namespace Shiny.Beacons
 {
     public class BackgroundTask
     {
-        readonly IDictionary<string, BeaconRegionStatus> regionStates;
-
         readonly ICentralManager centralManager;
         readonly IBeaconManager beaconManager;
         readonly IRepository repository;
+        readonly IBeaconDelegate beaconDelegate;
+        readonly IDictionary<string, BeaconRegionStatus> states;
         IDisposable scanSub;
-
-        //this.regionStates = new Dictionary<string, BeaconRegionStatus>();
+        IDisposable cleanSub;
 
 
         public BackgroundTask(ICentralManager centralManager,
                               IBeaconManager beaconManager,
-                              IRepository repository)
+                              IRepository repository,
+                              IBeaconDelegate beaconDelegate)
         {
             this.centralManager = centralManager;
             this.beaconManager = beaconManager;
             this.repository = repository;
+            this.beaconDelegate = beaconDelegate;
+            this.states = new Dictionary<string, BeaconRegionStatus>();
         }
 
 
@@ -39,11 +41,17 @@ namespace Shiny.Beacons
                 switch (ev.Type)
                 {
                     case RepositoryEventType.Add:
+                        lock (this.states)
+                        {
+                            var region = (BeaconRegion)ev.Entity;
+                            this.states.Add(ev.Key, new BeaconRegionStatus(region));
+                        }
                         this.StartScan();
                         break;
 
                     case RepositoryEventType.Remove:
-                        this.ToggleIfApplicable();
+                        lock (this.states)
+                            this.states.Remove(ev.Key);
                         break;
 
                     case RepositoryEventType.Clear:
@@ -51,144 +59,103 @@ namespace Shiny.Beacons
                         break;
                 }
             });
-            // TODO: build the states
-            this.ToggleIfApplicable();
+            this.StartScan();
         }
 
 
-        async void ToggleIfApplicable()
-        {
-            var regions = await this.beaconManager.GetMonitoredRegions();
-            if (regions.Any())
-                this.StartScan();
-            else
-                this.StopScan();
-        }
-
-
-        void StartScan()
+        async void StartScan()
         {
             if (this.scanSub != null)
                 return;
 
-            List<Beacon> lastScan = null;
+            var regions = await this.beaconManager.GetMonitoredRegions();
+            if (!regions.Any())
+                return;
+
+            foreach (var region in regions)
+                this.states.Add(region.Identifier, new BeaconRegionStatus(region));
+
             this.scanSub = this.centralManager
                 .ScanForBeacons(true)
                 .Buffer(TimeSpan.FromSeconds(4))
                 .Subscribe(
-                    x =>
-                    {
-                        // TODO: get distinct beacons
-                        //if (lastScan == null)
-                            // don't do anything - just store
-
-                        // TODO: compare wave against last wave
-                            // TODO: new found beacons becomes an entry - if not already in region
-                        // TODO: non-found beacons become an exit - if there aren't others in the region
-                    },
+                    this.CheckStates,
                     ex => Log.Write(ex)
                 );
+
+            this.cleanSub = Observable
+                .Interval(TimeSpan.FromSeconds(5)) // TODO: configurable
+                .Subscribe(() => this.TimeOutRegions());
         }
 
+
+        IList<BeaconRegionStatus> GetCopy()
+        {
+            lock (this.states)
+                return this.states
+                    .Select(x => x.Value)
+                    .ToList();
+        }
 
         void StopScan()
         {
             this.scanSub?.Dispose();
+            this.cleanSub?.Dispose();
+            this.states.Clear();
             this.scanSub = null;
+        }
+
+
+        void CheckStates(IList<Beacon> beacons)
+        {
+            foreach (var beacon in beacons)
+            {
+                var copy = this.GetCopy();
+
+                foreach (var state in copy)
+                {
+                    var ranged = state.Region.IsBeaconInRegion(beacon);
+                    var fireChange = state.IsInRange != null && state.IsInRange != ranged;
+
+                    if (ranged)
+                    {
+                        state.IsInRange = true;
+                        state.LastPing = DateTime.UtcNow;
+                    }
+                    if (fireChange)
+                        this.FireDelegate(ranged, state.Region);
+                }
+            }
+        }
+
+
+        void TimeOutRegions()
+        {
+            var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(5)); //TODO: configurable
+            var copy = this.GetCopy();
+
+            foreach (var state in copy)
+            {
+                if (state.IsInRange == true && state.LastPing > maxAge)
+                {
+                    state.IsInRange = false;
+                    this.FireDelegate(false, state.Region);
+                }
+            }
+        }
+
+        void FireDelegate(bool ranged, BeaconRegion region)
+        {
+            var newState = ranged ? BeaconRegionState.Entered : BeaconRegionState.Exited;
+            try
+            {
+                this.beaconDelegate.OnStatusChanged(newState, region);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
         }
     }
 }
 #endif
-
-/*
-//protected void TryStartMonitorScanner()
-//{
-//    if (this.monitorScan != null)
-//        return;
-
-//    this.monitorScan = Observable.Create<BeaconRegionStatus>(ob =>
-//    {
-//        var internalScan = this.Scan()
-//            .Where(_ => this.regionStates.Count > 0)
-//            .Subscribe(beacon =>
-//            {
-//                var states = this.GetRegionStatesForBeacon(this.MonitoredRegions, beacon);
-//                foreach (var state in states)
-//                {
-//                    if (state.IsInRange != null && !state.IsInRange.Value)
-//                    {
-//                        //ob.OnNext(new BeaconRegionStatusChanged(state.Region, true));
-//                    }
-
-//                    state.IsInRange = true;
-//                    state.LastPing = DateTimeOffset.UtcNow;
-//                }
-//            });
-
-//        var cleanup = Observable
-//            .Interval(TimeSpan.FromSeconds(5)) // TODO: configurable
-//            .Subscribe(x =>
-//            {
-//                var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(5));
-
-//                foreach (var state in this.regionStates.Values)
-//                {
-//                    if (state.IsInRange == true && state.LastPing > maxAge)
-//                    {
-//                        state.IsInRange = false;
-//                        ob.OnNext(state);
-//                    }
-//                }
-//            });
-
-//        return () =>
-//        {
-//            internalScan.Dispose();
-//            cleanup.Dispose();
-//        };
-//    })
-//    .Subscribe(this.monitorSubject.OnNext);
-//}
-
-
-//protected void CleanupMonitoringScanner()
-//{
-//    this.monitorScan?.Dispose();
-//    this.monitorScan = null;
-//}
-
-
-//protected virtual BeaconRegionStatus SetRegion(BeaconRegion region)
-//{
-//    var key = region.ToString();
-//    BeaconRegionStatus status = null;
-
-//    lock (this.regionStates)
-//    {
-//        if (this.regionStates.ContainsKey(key))
-//        {
-//            status = this.regionStates[key];
-//        }
-//        else
-//        {
-//            status = new BeaconRegionStatus(region);
-//            this.regionStates.Add(key, status);
-//        }
-//    }
-//    //this.TryStartMonitorScanner();
-//    return status;
-//}
-
-
-protected virtual IEnumerable<BeaconRegionStatus> GetRegionStatesForBeacon(IEnumerable<BeaconRegion> regionList, Beacon beacon)
-{
-    var copy = this.regionStates.ToDictionary(x => x.Key, x => x.Value);
-
-    foreach (var region in regionList)
-    {
-        var state = copy[region.ToString()];
-        if (state.Region.IsBeaconInRegion(beacon))
-            yield return state;
-    }
-}
-     */
