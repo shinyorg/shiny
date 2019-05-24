@@ -36,29 +36,36 @@ namespace Shiny.Beacons
 
         public void Run()
         {
-            this.repository.WhenEvent().Subscribe(async ev =>
-            {
-                switch (ev.Type)
+            this.repository
+                .WhenEvent()
+                .Where(x => x.Entity is BeaconRegion)
+                .Subscribe(ev =>
                 {
-                    case RepositoryEventType.Add:
-                        lock (this.states)
-                        {
-                            var region = (BeaconRegion)ev.Entity;
-                            this.states.Add(ev.Key, new BeaconRegionStatus(region));
-                        }
-                        this.StartScan();
-                        break;
+                    switch (ev.Type)
+                    {
+                        case RepositoryEventType.Add:
+                            lock (this.states)
+                            {
+                                var region = (BeaconRegion)ev.Entity;
+                                this.states.Add(ev.Key, new BeaconRegionStatus(region));
+                            }
+                            this.StartScan();
+                            break;
 
-                    case RepositoryEventType.Remove:
-                        lock (this.states)
-                            this.states.Remove(ev.Key);
-                        break;
+                        case RepositoryEventType.Remove:
+                            lock (this.states)
+                            {
+                                this.states.Remove(ev.Key);
+                                if (this.states.Count == 0)
+                                    this.StopScan();
+                            }
+                            break;
 
-                    case RepositoryEventType.Clear:
-                        this.StopScan();
-                        break;
-                }
-            });
+                        case RepositoryEventType.Clear:
+                            this.StopScan();
+                            break;
+                    }
+                });
             this.StartScan();
         }
 
@@ -75,17 +82,18 @@ namespace Shiny.Beacons
             foreach (var region in regions)
                 this.states.Add(region.Identifier, new BeaconRegionStatus(region));
 
-            this.scanSub = this.centralManager
-                .ScanForBeacons(true)
-                .Buffer(TimeSpan.FromSeconds(4))
-                .Subscribe(
-                    this.CheckStates,
-                    ex => Log.Write(ex)
-                );
+            // TODO: something is not working well here
+            //this.scanSub = this.centralManager
+            //    .ScanForBeacons(true)
+            //    .Buffer(TimeSpan.FromSeconds(4))
+            //    .Subscribe(
+            //        this.CheckStates,
+            //        ex => Log.Write(ex);
+            //    );
 
-            this.cleanSub = Observable
-                .Interval(TimeSpan.FromSeconds(5)) // TODO: configurable
-                .Subscribe(() => this.TimeOutRegions());
+            //this.cleanSub = Observable
+            //    .Interval(TimeSpan.FromSeconds(5)) // TODO: configurable
+            //    .Subscribe(() => this.TimeOutRegions());
         }
 
 
@@ -109,39 +117,56 @@ namespace Shiny.Beacons
 
         void CheckStates(IList<Beacon> beacons)
         {
-            foreach (var beacon in beacons)
+            if (beacons == null)
+                return;
+
+            try
             {
-                var copy = this.GetCopy();
-
-                foreach (var state in copy)
+                foreach (var beacon in beacons)
                 {
-                    var ranged = state.Region.IsBeaconInRegion(beacon);
-                    var fireChange = state.IsInRange != null && state.IsInRange != ranged;
+                    var copy = this.GetCopy();
 
-                    if (ranged)
+                    foreach (var state in copy)
                     {
-                        state.IsInRange = true;
-                        state.LastPing = DateTime.UtcNow;
+                        var ranged = state.Region.IsBeaconInRegion(beacon);
+                        var fireChange = state.IsInRange != null && state.IsInRange != ranged;
+
+                        if (ranged)
+                        {
+                            state.IsInRange = true;
+                            state.LastPing = DateTime.UtcNow;
+                        }
+                        if (fireChange)
+                            this.FireDelegate(ranged, state.Region);
                     }
-                    if (fireChange)
-                        this.FireDelegate(ranged, state.Region);
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 
 
         void TimeOutRegions()
         {
-            var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(5)); //TODO: configurable
-            var copy = this.GetCopy();
-
-            foreach (var state in copy)
+            try
             {
-                if (state.IsInRange == true && state.LastPing < maxAge)
+                var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(5)); //TODO: configurable
+                var copy = this.GetCopy();
+
+                foreach (var state in copy)
                 {
-                    state.IsInRange = false;
-                    this.FireDelegate(false, state.Region);
+                    if (state.IsInRange == true && state.LastPing < maxAge)
+                    {
+                        state.IsInRange = false;
+                        this.FireDelegate(false, state.Region);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 
