@@ -97,6 +97,7 @@ namespace Shiny.Beacons
                     .ToList();
         }
 
+
         void StopScan()
         {
             this.scanSub?.Dispose();
@@ -136,7 +137,7 @@ namespace Shiny.Beacons
 
             foreach (var state in copy)
             {
-                if (state.IsInRange == true && state.LastPing > maxAge)
+                if (state.IsInRange == true && state.LastPing < maxAge)
                 {
                     state.IsInRange = false;
                     this.FireDelegate(false, state.Region);
