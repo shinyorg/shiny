@@ -10,13 +10,14 @@ namespace Shiny.Beacons
     public static class BeaconExtensions
     {
         public static IObservable<Beacon> ScanForBeacons(this ICentralManager centralManager, bool forMonitoring = false) => centralManager
-            .Scan(new ScanConfig
-            {
-                AndroidUseScanBatching = true,
-                ScanType = forMonitoring
-                    ? BleScanType.LowPowered
-                    : BleScanType.Balanced
-            })
+            .Scan()
+            //.Scan(new ScanConfig
+            //{
+            //    AndroidUseScanBatching = true,
+            //    ScanType = forMonitoring
+            //        ? BleScanType.LowPowered
+            //        : BleScanType.Balanced
+            //})
             .Where(x => x.IsBeacon())
             .Select(x => x.ToBeacon());
 
@@ -25,7 +26,7 @@ namespace Shiny.Beacons
         {
             var md = result.AdvertisementData?.ManufacturerData;
 
-            if (md == null)
+            if (md == null || md.Data == null || md.Data.Length != 23)
                 return false;
 
             if (md.CompanyId != 76)
@@ -38,7 +39,7 @@ namespace Shiny.Beacons
         public static Beacon ToBeacon(this IScanResult result)
         {
             var data = result.AdvertisementData.ManufacturerData.Data;
-            Console.WriteLine("RAW: " + BitConverter.ToString(data));
+            //Console.WriteLine("RAW: " + BitConverter.ToString(data));
 
             var uuidString = BitConverter.ToString(data, 2, 16).Replace("-", String.Empty);
             var uuid = new Guid(uuidString);
