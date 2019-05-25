@@ -13,6 +13,29 @@ namespace Shiny.Locations
             builder.AddSingleton<IGeofenceDelegate, T>();
 #if NETSTANDARD
             return false;
+#elif __ANDROID__
+            builder.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            if (regionsToRegisterWhenPermissionAvailable.Any())
+            {
+                builder.RegisterPostBuildAction(sp =>
+                {
+                    var mgr = sp.GetService<IGeofenceManager>();
+                    sp
+                        .GetService<AndroidContext>()
+                        .WhenActivityStatusChanged()
+                        .Where(x => x.Status == ActivityState.Created)
+                        .Select(x => mgr.WhenAccessStatusChanged())
+                        .Switch()
+                        .Where(x => x == AccessState.Available)
+                        .Take(1)
+                        .SubscribeAsync(async () =>
+                        {
+                            foreach (var region in regionsToRegisterWhenPermissionAvailable)
+                                await mgr.StartMonitoring(region);
+                        });
+                });
+            }
+            return true;
 #else
             builder.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             if (regionsToRegisterWhenPermissionAvailable.Any())
