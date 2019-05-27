@@ -14,7 +14,10 @@ namespace Shiny.Locations
 #if NETSTANDARD
             return false;
 #elif __ANDROID__
-            builder.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            builder.AddSingleton<GeofenceManagerImpl>();
+            builder.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GeofenceManagerImpl>());
+            builder.AddSingleton<IAndroidGeofenceManager>(sp => sp.GetRequiredService<GeofenceManagerImpl>());
+
             if (regionsToRegisterWhenPermissionAvailable.Any())
             {
                 builder.RegisterPostBuildAction(sp =>

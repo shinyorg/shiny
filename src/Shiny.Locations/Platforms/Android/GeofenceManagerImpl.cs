@@ -3,27 +3,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Android.Gms.Extensions;
 using Android.Gms.Location;
-using Shiny.Infrastructure;
 using Android;
 using Android.App;
 using Android.Content;
-using System.Reactive.Linq;
+using Shiny.Infrastructure;
+
 
 namespace Shiny.Locations
 {
-    public class GeofenceManagerImpl : AbstractGeofenceManager
+    public class GeofenceManagerImpl : AbstractGeofenceManager, IAndroidGeofenceManager
     {
         readonly AndroidContext context;
         readonly GeofencingClient client;
+        readonly IGeofenceDelegate geofenceDelegate;
 
 
-        public GeofenceManagerImpl(AndroidContext context, IRepository repository) : base(repository)
+        public GeofenceManagerImpl(AndroidContext context,
+                                   IRepository repository,
+                                   IGeofenceDelegate geofenceDelegate) : base(repository)
         {
             this.context = context;
             this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
+            this.geofenceDelegate = geofenceDelegate;
+        }
+
+
+        public async void ReceiveBoot()
+        {
+            var regions = await this.Repository.GetAll();
+            foreach (var region in regions)
+                await this.Create(region);
+        }
+
+
+        public async void Process(Intent intent)
+        {
+            var e = GeofencingEvent.FromIntent(intent);
+            if (e == null)
+                return;
+
+            foreach (var triggeringGeofence in e.TriggeringGeofences)
+            {
+                var region = await this.Repository.Get(triggeringGeofence.RequestId);
+                if (region != null)
+                {
+                    var state = (GeofenceState)e.GeofenceTransition;
+                    this.geofenceDelegate.OnStatusChanged(state, region);
+
+                    if (region.SingleUse)
+                        await this.StopMonitoring(region);
+                }
+            }
         }
 
 
@@ -37,27 +71,7 @@ namespace Shiny.Locations
             var access = await this.RequestAccess();
             access.Assert();
 
-            var transitions = this.GetTransitions(region);
-            var geofence = new GeofenceBuilder()
-                .SetRequestId(region.Identifier)
-                .SetExpirationDuration(Geofence.NeverExpire)
-                .SetCircularRegion(
-                    region.Center.Latitude,
-                    region.Center.Longitude,
-                    Convert.ToSingle(region.Radius.TotalMeters)
-                )
-                .SetTransitionTypes(transitions)
-                .Build();
-
-            var request = new GeofencingRequest.Builder()
-                .AddGeofence(geofence)
-                .SetInitialTrigger(transitions)
-                .Build();
-
-            await this.client.AddGeofences(
-                request,
-                this.GetPendingIntent()
-            );
+            await this.Create(region);
             await this.Repository.Set(region.Identifier, region);
         }
 
@@ -88,6 +102,32 @@ namespace Shiny.Locations
             var inside = region.IsPositionInside(new Position(location.Latitude, location.Longitude));
             var state = inside ? GeofenceState.Entered : GeofenceState.Exited;
             return state;
+        }
+
+
+        protected virtual async Task Create(GeofenceRegion region)
+        {
+            var transitions = this.GetTransitions(region);
+            var geofence = new GeofenceBuilder()
+                .SetRequestId(region.Identifier)
+                .SetExpirationDuration(Geofence.NeverExpire)
+                .SetCircularRegion(
+                    region.Center.Latitude,
+                    region.Center.Longitude,
+                    Convert.ToSingle(region.Radius.TotalMeters)
+                )
+                .SetTransitionTypes(transitions)
+                .Build();
+
+            var request = new GeofencingRequest.Builder()
+                .AddGeofence(geofence)
+                .SetInitialTrigger(transitions)
+                .Build();
+
+            await this.client.AddGeofences(
+                request,
+                this.GetPendingIntent()
+            );
         }
 
 

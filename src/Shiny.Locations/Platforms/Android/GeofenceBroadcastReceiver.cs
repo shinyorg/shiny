@@ -1,8 +1,7 @@
 ﻿using System;
-using Shiny.Infrastructure;
 using Android.App;
 using Android.Content;
-using Android.Gms.Location;
+using static Android.Manifest;
 
 
 namespace Shiny.Locations
@@ -13,37 +12,27 @@ namespace Shiny.Locations
         DirectBootAware = true
     )]
     [IntentFilter(new [] {
-        "com.shiny.locations.GeofenceBroadcastReceiver.ACTION_PROCESS"
+        "com.shiny.locations.GeofenceBroadcastReceiver.ACTION_PROCESS",
+        Permission.ReceiveBootCompleted
     })]
     public class GeofenceBroadcastReceiver : BroadcastReceiver
     {
         public const string INTENT_ACTION = "com.shiny.locations.GeofenceBroadcastReceiver.ACTION_PROCESS";
 
 
-        public override async void OnReceive(Context context, Intent intent)
+        public override void OnReceive(Context context, Intent intent)
         {
-            if (!intent.Action.Equals(INTENT_ACTION))
-                return;
+            var geofences = ShinyHost.Resolve<IAndroidGeofenceManager>();
 
-            var e = GeofencingEvent.FromIntent(intent);
-            if (e == null)
-                return;
-
-            var repository = ShinyHost.Resolve<IRepository>();
-            var geofences = ShinyHost.Resolve<IGeofenceManager>();
-            var geofenceDelegate = ShinyHost.Resolve<IGeofenceDelegate>();
-
-            foreach (var triggeringGeofence in e.TriggeringGeofences)
+            switch (intent.Action)
             {
-                var region = await repository.Get<GeofenceRegion>(triggeringGeofence.RequestId);
-                if (region != null)
-                {
-                    var state = (GeofenceState)e.GeofenceTransition;
-                    geofenceDelegate.OnStatusChanged(state, region);
+                case INTENT_ACTION:
+                    geofences.Process(intent);
+                    break;
 
-                    if (region.SingleUse)
-                        await geofences.StopMonitoring(region);
-                }
+                case Permission.ReceiveBootCompleted:
+                    geofences.ReceiveBoot();
+                    break;
             }
         }
     }
