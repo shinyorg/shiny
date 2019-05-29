@@ -29,35 +29,49 @@ namespace Shiny.Infrastructure
         public IObservable<RepositoryEvent> WhenEvent() => this.eventSubject;
 
 
+        public Task<bool> Exists<T>(string key) where T : class
+        {
+            var path = this.GetPath(typeof(T), key);
+            var exists = File.Exists(path);
+            return Task.FromResult(exists);
+        }
+
+
         public async Task<T> Get<T>(string key) where T : class
         {
-            var tcs = new TaskCompletionSource<T>();
+            T result = null;
             await this.InTransaction(typeof(T), list =>
             {
                 if (list.ContainsKey(key))
-                    tcs.SetResult((T)list[key]);
-                else
-                    tcs.SetResult(null);
+                    result = (T)list[key];
             });
-
-            return await tcs.Task;
+            return result;
         }
 
 
         public async Task<List<T>> GetAll<T>() where T : class
         {
-            var tcs = new TaskCompletionSource<List<T>>();
-            await this.InTransaction(typeof(T), list => tcs.SetResult(list.Values.Cast<T>().ToList()));
-            return await tcs.Task;
+            List<T> result = null;
+            await this.InTransaction(typeof(T), list => result = list.Values.Cast<T>().ToList());
+            return result;
         }
 
 
-        public Task Set(string key, object entity) => this.InTransaction(entity.GetType(), list =>
+        public async Task<bool> Set(string key, object entity)
         {
-            this.Write(key, entity);
-            list[key] = entity;
-            this.eventSubject.OnNext(new RepositoryEvent(RepositoryEventType.Add, key, entity));
-        });
+            var update = true;
+            await this.InTransaction(entity.GetType(), list =>
+            {
+                var eventType = this.Write(key, entity)
+                    ? RepositoryEventType.Update
+                    : RepositoryEventType.Add;
+
+                list[key] = entity;
+                update = eventType == RepositoryEventType.Update;
+                this.eventSubject.OnNext(new RepositoryEvent(eventType, key, entity));
+            });
+            return update;
+        }
 
 
         public Task<bool> Remove<T>(string key) where T : class
@@ -83,12 +97,15 @@ namespace Shiny.Infrastructure
 
         public Task Clear<T>() where T : class => this.InTransaction(typeof(T), list =>
         {
+            if (!list.Any())
+                return;
+
             list.Clear();
             var files = this.GetTypeFiles(typeof(T));
             foreach (var file in files)
                 File.Delete(file.FullName);
 
-            this.eventSubject.OnNext(new RepositoryEvent(RepositoryEventType.Clear));
+            this.eventSubject.OnNext(new RepositoryEvent(RepositoryEventType.Clear, null, null, typeof(T)));
         });
 
 
@@ -103,11 +120,13 @@ namespace Shiny.Infrastructure
         }
 
 
-        void Write(string key, object entity)
+        bool Write(string key, object entity)
         {
             var path = this.GetPath(entity.GetType(), key);
+            var update = File.Exists(path);
             var value = this.serializer.Serialize(entity);
             File.WriteAllText(path, value);
+            return update;
         }
 
 

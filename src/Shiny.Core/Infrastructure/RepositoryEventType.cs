@@ -7,6 +7,7 @@ namespace Shiny.Infrastructure
     {
         Add,
         Remove,
+        Update,
         Clear
     }
 }
