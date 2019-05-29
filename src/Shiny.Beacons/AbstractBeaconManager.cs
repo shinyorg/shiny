@@ -10,26 +10,28 @@ namespace Shiny.Beacons
     {
         protected AbstractBeaconManager(IRepository repository)
         {
-            this.Repository = new RepositoryWrapper<BeaconRegion, BeaconRegionStore>(
-                repository,
-                args => new BeaconRegionStore
-                {
-                    Identifier = args.Identifier,
-                    Uuid = args.Uuid,
-                    Major = args.Major,
-                    Minor = args.Minor
-                },
-                store => new BeaconRegion(
-                    store.Identifier,
-                    store.Uuid,
-                    store.Major,
-                    store.Minor
-                )
-            );
+            this.Repository = repository;
+        //    this.Repository = new RepositoryWrapper<BeaconRegion, BeaconRegionStore>(
+        //        repository,
+        //        args => new BeaconRegionStore
+        //        {
+        //            Identifier = args.Identifier,
+        //            Uuid = args.Uuid,
+        //            Major = args.Major,
+        //            Minor = args.Minor
+        //        },
+        //        store => new BeaconRegion(
+        //            store.Identifier,
+        //            store.Uuid,
+        //            store.Major,
+        //            store.Minor
+        //        )
+        //    );
         }
 
 
-        protected RepositoryWrapper<BeaconRegion, BeaconRegionStore> Repository { get; }
+        protected IRepository Repository { get; }
+        //protected RepositoryWrapper<BeaconRegion, BeaconRegionStore> Repository { get; }
 
         public abstract AccessState GetCurrentStatus(bool monitoring);
         public abstract IObservable<AccessState> WhenAccessStatusChanged(bool monitoring);
@@ -38,6 +40,6 @@ namespace Shiny.Beacons
         public abstract Task StartMonitoring(BeaconRegion region);
         public abstract Task StopMonitoring(BeaconRegion region);
         public abstract Task StopAllMonitoring();
-        public virtual async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions() => await this.Repository.GetAll();
+        public virtual async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions() => await this.Repository.GetAll<BeaconRegion>();
     }
 }

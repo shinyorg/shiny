@@ -10,16 +10,33 @@ namespace Shiny.Beacons
     public static class BeaconExtensions
     {
         public static IObservable<Beacon> ScanForBeacons(this ICentralManager centralManager, bool forMonitoring = false) => centralManager
-            .Scan()
-            //.Scan(new ScanConfig
-            //{
-            //    AndroidUseScanBatching = true,
-            //    ScanType = forMonitoring
-            //        ? BleScanType.LowPowered
-            //        : BleScanType.Balanced
-            //})
+            .Scan(new ScanConfig
+            {
+                AndroidUseScanBatching = true,
+                ScanType = forMonitoring
+                    ? BleScanType.LowPowered
+                    : BleScanType.Balanced
+            })
             .Where(x => x.IsBeacon())
             .Select(x => x.ToBeacon());
+
+
+        public static bool IsBeaconInRegion(this BeaconRegion region, Beacon beacon)
+        {
+            if (!region.Uuid.Equals(beacon.Uuid))
+                return false;
+
+            if (region.Major == null && region.Minor == null)
+                return true;
+
+            if (region.Major != beacon.Major)
+                return false;
+
+            if (region.Minor == null || region.Minor == beacon.Minor)
+                return true;
+
+            return false;
+        }
 
 
         public static bool IsBeacon(this IScanResult result)

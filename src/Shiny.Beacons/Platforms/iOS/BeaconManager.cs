@@ -53,14 +53,14 @@ namespace Shiny.Beacons
 
         public override async Task StopMonitoring(BeaconRegion region)
         {
-            await this.Repository.Remove(region.Identifier);
+            await this.Repository.Remove<BeaconRegion>(region.Identifier);
             this.manager.StopMonitoring(region.ToNative());
         }
 
 
         public override async Task StopAllMonitoring()
         {
-            await this.Repository.Clear();
+            await this.Repository.Clear<BeaconRegion>();
             var allRegions = this
                .manager
                .MonitoredRegions
