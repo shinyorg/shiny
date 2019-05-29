@@ -63,12 +63,19 @@ namespace Shiny.Net.Http
             }
             catch (Exception ex)
             {
-                if (transfer == null)
-                    Log.Write(ex);
-                else
+                Log.Write(ex);
+
+                if (transfer != null)
                 {
-                    HttpEvents.OnNext(transfer.Value);
-                    tdelegate.OnError(transfer.Value, ex);
+                    try
+                    {
+                        tdelegate.OnError(transfer.Value, ex);
+                        HttpEvents.OnNext(transfer.Value);
+                    }
+                    catch (Exception ex1)
+                    {
+                        Log.Write(ex1);
+                    }
                 }
             }
 
