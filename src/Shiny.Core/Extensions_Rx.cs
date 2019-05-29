@@ -189,8 +189,18 @@ namespace Shiny
                 .FromEventPattern<PropertyChangedEventArgs>(This, nameof(INotifyPropertyChanged.PropertyChanged))
                 .Select(x => new ItemChanged<TSender, string>(This, x.EventArgs.PropertyName));
 
+        public static IDisposable Subscribe<T>(this IObservable<T> observable, Action onNext)
+            => observable.Subscribe(_ => onNext());
 
-        public static IDisposable Subscribe<T>(this IObservable<T> observable, Action onNext, Action<Exception> onError = null, Action onComplete = null)
+
+        public static IDisposable Subscribe<T>(this IObservable<T> observable, Action onNext, Action<Exception> onError)
+            => observable.Subscribe(
+                _ => onNext(),
+                onError
+            );
+
+
+        public static IDisposable Subscribe<T>(this IObservable<T> observable, Action onNext, Action<Exception> onError, Action onComplete)
             => observable.Subscribe(
                 _ => onNext(),
                 onError,
