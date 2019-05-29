@@ -77,14 +77,16 @@ namespace Shiny.Infrastructure
         public Task<bool> Remove<T>(string key) where T : class
         {
             var tcs = new TaskCompletionSource<bool>();
-            this.InTransaction(typeof(T), async list =>
+            this.InTransaction(typeof(T), list =>
             {
                 var path = this.GetPath(typeof(T), key);
+
                 if (!File.Exists(path))
                     tcs.TrySetResult(false);
                 else
                 {
-                    var entity = await this.Get<T>(key);
+                    var entity = list[key];
+                    list.Remove(key);
                     File.Delete(path);
                     this.eventSubject.OnNext(new RepositoryEvent(RepositoryEventType.Remove, key, entity));
                     tcs.TrySetResult(true);
