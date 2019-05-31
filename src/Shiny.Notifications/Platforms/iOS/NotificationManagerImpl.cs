@@ -65,10 +65,14 @@ namespace Shiny.Notifications
                 //Subtitle = ""
             };
             //UNNotificationAttachment.FromIdentifier("", NSUrl.FromString(""), new UNNotificationAttachmentOptions().)
-            if (!String.IsNullOrWhiteSpace(notification.Payload))
-                content.UserInfo.SetValueForKey(new NSString(notification.Payload), new NSString("Payload"));
+            if (!notification.Payload.IsEmpty())
+            {
+                var dict = new NSMutableDictionary();
+                dict.Add(new NSString(notification.Payload), new NSString("Payload"));
+                content.UserInfo = dict;
+            }
 
-            if (!String.IsNullOrWhiteSpace(notification.Sound))
+            if (!notification.Sound.IsEmpty())
                 content.Sound = UNNotificationSound.GetSound(notification.Sound);
 
             var request = UNNotificationRequest.FromIdentifier(
