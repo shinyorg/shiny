@@ -119,8 +119,9 @@ namespace Shiny.BluetoothLE.Peripherals
                 if (adData.ManufacturerData != null)
                     data.AddManufacturerData(adData.ManufacturerData.CompanyId, adData.ManufacturerData.Data);
 
-                foreach (var serviceUuid in adData.ServiceUuids)
-                    data.AddServiceUuid(serviceUuid.ToParcelUuid());
+                if (adData.ServiceUuids != null)
+                    foreach (var serviceUuid in adData.ServiceUuids)
+                        data.AddServiceUuid(serviceUuid.ToParcelUuid());
             }
 
             this.context

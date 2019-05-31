@@ -21,14 +21,9 @@ namespace Shiny.BluetoothLE.Peripherals
         GattProperty properties = 0;
         GattPermission permissions = 0;
 
-        static readonly byte[] EnableNotificationBytes = BluetoothGattDescriptor.EnableNotificationValue.ToArray();
-        static readonly byte[] DisableNotificationBytes = BluetoothGattDescriptor.DisableNotificationValue.ToArray();
-        static readonly byte[] EnableIndicationBytes = BluetoothGattDescriptor.EnableIndicationValue.ToArray();
-
 
         public GattCharacteristic(GattServerContext context, Guid uuid)
         {
-
             this.subscribers = new Dictionary<string, IPeripheral>();
             this.disposer = new CompositeDisposable();
             this.context = context;
@@ -68,10 +63,10 @@ namespace Shiny.BluetoothLE.Peripherals
         {
             this.onSubscribe = onSubscribe;
             if (options.HasFlag(NotificationOptions.Indicate))
-                this.properties = GattProperty.Indicate;
+                this.properties |= GattProperty.Indicate;
 
             if (options.HasFlag(NotificationOptions.Notify))
-                this.properties = GattProperty.Notify;
+                this.properties |= GattProperty.Notify;
 
             return this;
         }
@@ -80,15 +75,20 @@ namespace Shiny.BluetoothLE.Peripherals
         public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, GattState> onWrite, WriteOptions options = WriteOptions.Write)
         {
             this.onWrite = onWrite;
-            if (options.HasFlag(NotificationOptions.EncryptionRequired))
+            if (options.HasFlag(WriteOptions.EncryptionRequired))
+            {
                 this.permissions = GattPermission.WriteEncrypted;
-
-            if (options.HasFlag(WriteOptions.AuthenticatedSignedWrites))
+            }
+            else if (options.HasFlag(WriteOptions.AuthenticatedSignedWrites))
+            {
                 this.properties |= GattProperty.SignedWrite;
-
-            if (options.HasFlag(WriteOptions.Write))
+                this.permissions |= GattPermission.WriteSigned;
+            }
+            else
+            {
                 this.properties |= GattProperty.Write;
-
+                this.permissions |= GattPermission.Write;
+            }
             if (options.HasFlag(WriteOptions.WriteWithoutResponse))
                 this.properties |= GattProperty.WriteNoResponse;
 
@@ -102,6 +102,9 @@ namespace Shiny.BluetoothLE.Peripherals
             this.properties |= GattProperty.Read;
             if (encrypted)
                 this.permissions |= GattPermission.ReadEncrypted;
+            else
+                this.permissions |= GattPermission.Read;
+
             return this;
         }
 
@@ -135,18 +138,17 @@ namespace Shiny.BluetoothLE.Peripherals
             this.Native.AddDescriptor(ndesc);
 
             this.context
-                .Callbacks
                 .DescriptorWrite
-                .Where(x => x.Equals(ndesc))
+                //.Where(x => x.Equals(ndesc))
                 .Subscribe(x =>
                 {
                     var respond = true;
-                    if (x.Value.SequenceEqual(EnableIndicationBytes) || x.Value.SequenceEqual(EnableNotificationBytes))
+                    if (x.Value.SequenceEqual(Constants.IndicateEnableBytes) || x.Value.SequenceEqual(Constants.NotifyEnableBytes))
                     {
                         var peripheral = this.GetOrAdd(x.Device);
                         this.onSubscribe(new CharacteristicSubscription(this, peripheral, true));
                     }
-                    else if (x.Value.SequenceEqual(DisableNotificationBytes))
+                    else if (x.Value.SequenceEqual(Constants.NotifyDisableBytes))
                     {
                         var peripheral = this.Remove(x.Device);
                         if (peripheral != null)
@@ -169,7 +171,6 @@ namespace Shiny.BluetoothLE.Peripherals
                 .DisposedBy(this.disposer);
 
             this.context
-                .Callbacks
                 .ConnectionStateChanged
                 .Where(x => x.NewState == ProfileState.Disconnected)
                 .Subscribe(x =>
@@ -187,7 +188,6 @@ namespace Shiny.BluetoothLE.Peripherals
                 return;
 
             this.context
-                .Callbacks
                 .CharacteristicRead
                 .Where(x => x.Characteristic.Equals(this.Native))
                 .Subscribe(ch =>
@@ -215,7 +215,6 @@ namespace Shiny.BluetoothLE.Peripherals
                 return;
 
             this.context
-                .Callbacks
                 .CharacteristicWrite
                 .Where(x => x.Characteristic.Equals(this.Native))
                 .Subscribe(ch =>
