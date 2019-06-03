@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
+using Shiny.Infrastructure;
 using Shiny.Settings;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
 
@@ -13,16 +15,21 @@ namespace Shiny.Notifications
     public class NotificationManagerImpl : INotificationManager
     {
         readonly AndroidContext context;
+        readonly IRepository repository;
         readonly ISettings settings;
 
         NotificationManager newManager;
         NotificationManagerCompat compatManager;
 
 
-        public NotificationManagerImpl(AndroidContext context, ISettings settings)
+        public NotificationManagerImpl(AndroidContext context,
+                                       IRepository repository,
+                                       ISettings settings)
         {
-            this.settings = settings;
             this.context = context;
+            this.repository = repository;
+            this.settings = settings;
+
             if ((int) Build.VERSION.SdkInt >= 26)
             {
                 this.newManager = NotificationManager.FromContext(context.AppContext);
@@ -34,14 +41,23 @@ namespace Shiny.Notifications
         }
 
 
-        public Task Clear()
+        public Task Cancel(int id)
+            => this.repository.Remove<Notification>(id.ToString());
+
+
+        public async Task Clear()
         {
             this.newManager?.CancelAll();
             this.compatManager?.CancelAll();
-            return Task.CompletedTask;
+            await this.repository.Clear<Notification>();
         }
 
-        public Task<AccessState> RequestAccess()
+
+        public async Task<IEnumerable<Notification>> GetPending()
+            => await this.repository.GetAll<Notification>();
+
+
+        public async Task<AccessState> RequestAccess()
         {
             var state = AccessState.Available;
             if (!this.compatManager?.AreNotificationsEnabled() ?? false)
@@ -50,9 +66,9 @@ namespace Shiny.Notifications
             else if (!this.newManager?.AreNotificationsEnabled() ?? false)
                 state = AccessState.Disabled;
 
-            //var result = await this.Jobs.RequestAccess();
-            //return result;
-            return Task.FromResult(state);
+            //else
+            //    state = await this.Jobs.RequestAccess();
+            return state;
         }
 
 
@@ -61,6 +77,12 @@ namespace Shiny.Notifications
         {
             if (notification.Id == 0)
                 notification.Id = this.settings.IncrementValue("NotificationId");
+
+            if (notification.ScheduleDate != null)
+            {
+                await this.repository.Set(notification.Id.ToString(), notification);
+                return;
+            }
 
             var launchIntent = this
                 .context

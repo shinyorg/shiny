@@ -31,6 +31,15 @@ namespace Shiny.Notifications
                 UwpOptions.DefaultUseLongDuration = uwpOpts.UseLongDuration;
             }
 
+#if __ANDROID__ || WINDOWS_UWP
+            builder.RegisterJob(new Jobs.JobInfo
+            {
+                Identifier = nameof(NotificationJob),
+                Type = typeof(NotificationJob),
+                Repeat = true
+            });
+#endif
+
 #if NETSTANDARD
             return false;
 #else

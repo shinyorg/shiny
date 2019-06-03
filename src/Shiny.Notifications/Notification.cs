@@ -12,7 +12,7 @@ namespace Shiny.Notifications
         public int Id { get; set; }
         public string Title { get; set; } = DefaultTitle;
         public string Message { get; set; }
-
+        public DateTime? ScheduleDate { get; set; }
 
         /// <summary>
         /// Play a sound from the native platform

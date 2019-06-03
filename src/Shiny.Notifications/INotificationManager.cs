@@ -22,6 +22,21 @@ namespace Shiny.Notifications
 
 
         /// <summary>
+        /// Gets all pending notifications
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<Notification>> GetPending();
+
+
+        /// <summary>
+        /// Cancels a specified notification
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task Cancel(int id);
+
+
+        /// <summary>
         /// Send a notification
         /// </summary>
         /// <param name="notification"></param>
