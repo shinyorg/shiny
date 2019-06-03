@@ -6,6 +6,7 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
 using Shiny.Infrastructure;
+using Shiny.Jobs;
 using Shiny.Settings;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
 
@@ -17,16 +18,19 @@ namespace Shiny.Notifications
         readonly AndroidContext context;
         readonly IRepository repository;
         readonly ISettings settings;
+        readonly IJobManager jobs;
 
         NotificationManager newManager;
         NotificationManagerCompat compatManager;
 
 
         public NotificationManagerImpl(AndroidContext context,
+                                       IJobManager jobs,
                                        IRepository repository,
                                        ISettings settings)
         {
             this.context = context;
+            this.jobs = jobs;
             this.repository = repository;
             this.settings = settings;
 
@@ -66,8 +70,9 @@ namespace Shiny.Notifications
             else if (!this.newManager?.AreNotificationsEnabled() ?? false)
                 state = AccessState.Disabled;
 
-            //else
-            //    state = await this.Jobs.RequestAccess();
+            else
+                state = await this.jobs.RequestAccess();
+
             return state;
         }
 
