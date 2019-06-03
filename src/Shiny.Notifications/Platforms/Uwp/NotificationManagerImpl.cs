@@ -5,6 +5,9 @@ using Windows.Foundation.Metadata;
 using Windows.System.Profile;
 using Windows.UI.Notifications;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Shiny.Jobs;
+using Shiny.Settings;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.Notifications
@@ -13,19 +16,37 @@ namespace Shiny.Notifications
     public class NotificationManagerImpl : INotificationManager
     {
         readonly ToastNotifier toastNotifier;
+        readonly IRepository repository;
+        readonly IJobManager jobs;
+        readonly ISettings settings;
 
 
-        public NotificationManagerImpl()
+        public NotificationManagerImpl(IJobManager jobs,
+                                       ISettings settings,
+                                       IRepository repository)
         {
             this.toastNotifier = ToastNotificationManager.CreateToastNotifier();
+            this.jobs = jobs;
+            this.settings = settings;
+            this.repository = repository;
         }
 
 
-        public Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
+        public Task<AccessState> RequestAccess()
+            => this.jobs.RequestAccess();
 
 
-        public Task Send(Notification notification)
+        public async Task Send(Notification notification)
         {
+            if (notification.Id == 0)
+                notification.Id = this.settings.IncrementValue("NotificationId");
+
+            if (notification.ScheduleDate != null)
+            {
+                await this.repository.Set(notification.Id.ToString(), notification);
+                return;
+            }
+
             var toastContent = new ToastContent
             {
                 Duration = notification.Windows.UseLongDuration ? ToastDuration.Long : ToastDuration.Short,
