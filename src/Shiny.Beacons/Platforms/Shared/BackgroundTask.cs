@@ -93,7 +93,7 @@ namespace Shiny.Beacons
             {
                 this.scanSub = this.centralManager
                     .ScanForBeacons(true)
-                    .Buffer(TimeSpan.FromSeconds(4))
+                    .Buffer(TimeSpan.FromSeconds(5))
                     .Subscribe(
                         this.CheckStates,
                         ex => Log.Write(ex)
@@ -128,7 +128,7 @@ namespace Shiny.Beacons
         void CheckStates(IList<Beacon> beacons)
         {
             var copy = this.GetCopy();
-            var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(10)); //TODO: configurable
+            var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(20)); //TODO: configurable
 
             foreach (var state in copy)
             {

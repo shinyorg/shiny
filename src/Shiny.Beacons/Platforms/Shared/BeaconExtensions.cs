@@ -12,7 +12,7 @@ namespace Shiny.Beacons
         public static IObservable<Beacon> ScanForBeacons(this ICentralManager centralManager, bool forMonitoring = false) => centralManager
             .Scan(new ScanConfig
             {
-                AndroidUseScanBatching = true,
+                //AndroidUseScanBatching = true,
                 ScanType = forMonitoring
                     ? BleScanType.LowPowered
                     : BleScanType.Balanced
