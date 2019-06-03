@@ -6,7 +6,7 @@ using Java.Util;
 
 namespace Shiny
 {
-    public static class AndroidExtensions
+    public static class PlatformExtensions
     {
         static Handler handler;
 
