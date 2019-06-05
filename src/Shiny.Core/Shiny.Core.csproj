@@ -1,8 +1,8 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.24">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;monoandroid90;xamarinios10;xamarintvos10</TargetFrameworks>
-        <!--<TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0.16299</TargetFrameworks>-->
+        <TargetFrameworks>netstandard2.0;monoandroid81;monoandroid90;xamarinios10;xamarintvos10</TargetFrameworks>
+        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
         <RootNamespace>Shiny</RootNamespace>
         <Description>The Shiny Core containing all of the major functionality like caching, logging, connectivity, environment, IO, power, settings, and jobs as well as many other utilities</Description>
         <PackageVersion>1.0.0</PackageVersion>
