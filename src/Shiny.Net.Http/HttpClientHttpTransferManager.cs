@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
-
+using Shiny.Logging;
 
 namespace Shiny.Net.Http
 {
-    public class HttpClientHttpTransferManager : AbstractHttpTransferManager
+    public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IStartupTask
     {
         readonly IJobManager jobManager;
         readonly IMessageBus messageBus;
@@ -22,17 +22,8 @@ namespace Shiny.Net.Http
             this.jobManager = jobManager;
             this.messageBus = messageBus;
             this.repository = repository;
-
-            this.Startup();
         }
 
-
-        async void Startup()
-        {
-            var requests = await this.repository.GetAll<HttpTransferStore>();
-            foreach (var request in requests)
-                this.jobManager.Run(request.Id);
-        }
 
         protected override Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
             => this.Query(filter, false);
@@ -125,5 +116,20 @@ namespace Shiny.Net.Http
         // overrides will have to merge with the base if they are only overriding one of the directions
         public override IObservable<HttpTransfer> WhenUpdated()
             => this.messageBus.Listener<HttpTransfer>();
+
+        public async void Start()
+        {
+            try
+            {
+                // TODO: jobs could be starting this
+                var requests = await this.repository.GetAll<HttpTransferStore>();
+                foreach (var request in requests)
+                    this.jobManager.Run(request.Id);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
     }
 }

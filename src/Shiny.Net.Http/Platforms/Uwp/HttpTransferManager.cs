@@ -5,50 +5,13 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
+using Shiny.Logging;
 
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : AbstractHttpTransferManager
+    public class HttpTransferManager : AbstractHttpTransferManager, IStartupTask
     {
-        // TODO: call to delegate
-        /*
-         var completionGroup = new BackgroundTransferCompletionGroup();
-        BackgroundTaskBuilder builder = new BackgroundTaskBuilder();
-
-        builder.Name = "MyDownloadProcessingTask";
-        builder.SetTrigger(completionGroup.Trigger);
-        builder.TaskEntryPoint = "Tasks.BackgroundDownloadProcessingTask";
-
-        BackgroundTaskRegistration downloadProcessingTask = builder.Register();
-        Next you associate background transfers with the completion group. Once all transfers are created, enable the completion group.
-        C#
-
-        Copy
-        BackgroundDownloader downloader = new BackgroundDownloader(completionGroup);
-        DownloadOperation download = downloader.CreateDownload(uri, file);
-        Task<DownloadOperation> startTask = download.StartAsync().AsTask();
-
-        // App still sees the normal completion path
-        startTask.ContinueWith(ForegroundCompletionHandler);
-
-        // Do not enable the CompletionGroup until after all downloads are created.
-        downloader.CompletinGroup.Enable();
-        The code in the background task extracts the list of operations from the trigger details, and your code can then inspect the details for each operation and perform appropriate post-processing for each operation.
-        C#
-
-        Copy
-        public class BackgroundDownloadProcessingTask : IBackgroundTask
-        {
-            public async void Run(IBackgroundTaskInstance taskInstance)
-            {
-            var details = (BackgroundTransferCompletionGroupTriggerDetails)taskInstance.TriggerDetails;
-            IReadOnlyList<DownloadOperation> downloads = details.Downloads;
-
-            // Do post-processing on each finished operation in the list of downloads
-            }
-        }
-                     */
         protected override async Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
         {
             var items = await BackgroundDownloader
@@ -88,7 +51,7 @@ namespace Shiny.Net.Http
 
             var winFile = await StorageFile.GetFileFromPathAsync(request.LocalFile.FullName).AsTask();
             var operation = task.CreateUpload(new Uri(request.Uri), winFile);
-            await operation.StartAsync();
+            operation.StartAsync();
 
             return operation.FromNative();
         }
@@ -111,7 +74,7 @@ namespace Shiny.Net.Http
 
             var winFile = await StorageFile.GetFileFromPathAsync(request.LocalFile.FullName).AsTask();
             var operation = task.CreateDownload(new Uri(request.Uri), winFile);
-            await operation.StartAsync();
+            operation.StartAsync();
 
             return operation.FromNative();
         }
@@ -164,5 +127,67 @@ namespace Shiny.Net.Http
                     );
             }
         });
+
+        public async void Start()
+        {
+            try
+            {
+                var downloads = await BackgroundDownloader
+                    .GetCurrentDownloadsAsync()
+                    .AsTask();
+
+                foreach (var dl in downloads)
+                    dl.Resume();
+
+                var uploads = await BackgroundUploader
+                    .GetCurrentUploadsAsync()
+                    .AsTask();
+
+                foreach (var ul in uploads)
+                    ul.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
     }
 }
+// TODO: call to delegate
+/*
+ var completionGroup = new BackgroundTransferCompletionGroup();
+BackgroundTaskBuilder builder = new BackgroundTaskBuilder();
+
+builder.Name = "MyDownloadProcessingTask";
+builder.SetTrigger(completionGroup.Trigger);
+builder.TaskEntryPoint = "Tasks.BackgroundDownloadProcessingTask";
+
+BackgroundTaskRegistration downloadProcessingTask = builder.Register();
+Next you associate background transfers with the completion group. Once all transfers are created, enable the completion group.
+C#
+
+Copy
+BackgroundDownloader downloader = new BackgroundDownloader(completionGroup);
+DownloadOperation download = downloader.CreateDownload(uri, file);
+Task<DownloadOperation> startTask = download.StartAsync().AsTask();
+
+// App still sees the normal completion path
+startTask.ContinueWith(ForegroundCompletionHandler);
+
+// Do not enable the CompletionGroup until after all downloads are created.
+downloader.CompletinGroup.Enable();
+The code in the background task extracts the list of operations from the trigger details, and your code can then inspect the details for each operation and perform appropriate post-processing for each operation.
+C#
+
+Copy
+public class BackgroundDownloadProcessingTask : IBackgroundTask
+{
+    public async void Run(IBackgroundTaskInstance taskInstance)
+    {
+    var details = (BackgroundTransferCompletionGroupTriggerDetails)taskInstance.TriggerDetails;
+    IReadOnlyList<DownloadOperation> downloads = details.Downloads;
+
+    // Do post-processing on each finished operation in the list of downloads
+    }
+}
+*/

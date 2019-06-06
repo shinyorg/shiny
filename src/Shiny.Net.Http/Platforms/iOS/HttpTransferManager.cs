@@ -8,7 +8,7 @@ using Foundation;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : AbstractHttpTransferManager
+    public class HttpTransferManager : AbstractHttpTransferManager, IStartupTask
     {
         readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;
@@ -27,6 +27,12 @@ namespace Shiny.Net.Http
             //this.sessionConfig.HttpShouldUsePipelining = true;
             //this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringCacheData;
             //this.sessionConfig.ShouldUseExtendedBackgroundIdleMode = true;
+        }
+
+
+        public void Start()
+        {
+            // this is just to fire off the constructor
         }
 
 
@@ -93,6 +99,7 @@ namespace Shiny.Net.Http
 
         protected string ToTaskDescription(FileInfo file)
             => $"{Guid.NewGuid()}|{file.FullName}";
+
 
         NSUrlSession session;
         internal NSUrlSession Session
