@@ -160,10 +160,11 @@ namespace Shiny.BluetoothLE.Peripherals
             {
                 if (this.IsThis(req.Characteristic))
                 {
+                    var peripheral = this.cache.GetOrAdd(req.Central);
                     var result = this.onWrite.Invoke(new WriteRequest(
                         this,
-                        this.cache.GetOrAdd(req.Central),
-                        req.Value.ToArray(),
+                        peripheral,
+                        req.Value?.ToArray(),
                         (int) req.Offset,
                         true
                     ));
@@ -178,9 +179,10 @@ namespace Shiny.BluetoothLE.Peripherals
             if (!args.Request.Characteristic.Equals(this.native))
                 return;
 
+            var peripheral = this.cache.GetOrAdd(args.Request.Central);
             var result = this.onRead.Invoke(new ReadRequest(
                 this,
-                this.cache.GetOrAdd(args.Request.Central),
+                peripheral,
                 (int)args.Request.Offset)
             );
             if (result.Status == GattState.Success)

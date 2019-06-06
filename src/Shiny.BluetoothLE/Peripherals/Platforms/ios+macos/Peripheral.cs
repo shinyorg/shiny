@@ -9,7 +9,7 @@ namespace Shiny.BluetoothLE.Peripherals
         public Peripheral(CBCentral central)
         {
             this.Central = central;
-            this.Uuid = new Guid(central.Identifier.ToString());
+            this.Uuid = central.Identifier.ToGuid();
         }
 
 
