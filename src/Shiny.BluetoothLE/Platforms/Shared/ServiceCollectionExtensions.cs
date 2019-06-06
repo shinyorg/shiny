@@ -21,9 +21,7 @@ namespace Shiny.BluetoothLE
 #if NETSTANDARD
             return false;
 #else
-            builder
-                .AddSingleton<ICentralManager, CentralManager>()
-                .AsStartable<ICentralManager>();
+            builder.AddSingleton<ICentralManager, CentralManager>();
             return true;
 #endif
         }
@@ -33,9 +31,7 @@ namespace Shiny.BluetoothLE
 #if __IOS__
         public static bool UseBleCentral(this IServiceCollection builder, BleAdapterConfiguration config = null)
         {
-            builder
-                .AddSingleton<ICentralManager>(_ => new CentralManager(config))
-                .AsStartable<ICentralManager>();
+            builder.AddSingleton<ICentralManager, CentralManager>();
             return true;
         }
 
