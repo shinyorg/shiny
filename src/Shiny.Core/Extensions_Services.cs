@@ -177,11 +177,14 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="jobInfo"></param>
         public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-            => services.RegisterPostBuildAction(async c => await
-                c
-                    .GetService<IJobManager>()
-                    .Schedule(jobInfo)
-            );
+            => services.RegisterPostBuildAction(async sp =>
+            {
+                // what if permission fails?
+                var jobs = sp.GetService<IJobManager>();
+                var access = await jobs.RequestAccess();
+                if (access == AccessState.Available)
+                    await jobs.Schedule(jobInfo);
+            });
 
 
         /// <summary>

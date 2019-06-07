@@ -8,7 +8,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure;
-
+using System.Collections.Generic;
 
 namespace Shiny.Notifications
 {
@@ -50,7 +50,7 @@ namespace Shiny.Notifications
             var toastContent = new ToastContent
             {
                 Duration = notification.Windows.UseLongDuration ? ToastDuration.Long : ToastDuration.Short,
-                //Launch = this.ToQueryString(notification.Metadata),
+                Launch = notification.Payload,
                 Visual = new ToastVisual
                 {
                     BindingGeneric = new ToastBindingGeneric
@@ -70,7 +70,7 @@ namespace Shiny.Notifications
                 }
             };
 
-            if (!String.IsNullOrWhiteSpace(notification.Sound) && this.IsAudioSupported)
+            if (!notification.Sound.IsEmpty())
             {
                 var sound = this.BuildSoundPath(notification.Sound);
                 toastContent.Audio = new ToastAudio
@@ -83,9 +83,6 @@ namespace Shiny.Notifications
             //toastContent.Launch = "";
             var native = new ToastNotification(toastContent.GetXml());
             this.toastNotifier.Show(native);
-
-            // TODO
-            return Task.CompletedTask;
         }
 
 
@@ -101,11 +98,9 @@ namespace Shiny.Notifications
             return sound;
         }
 
-        public Task Clear() => Task.CompletedTask;
 
-
-        protected virtual bool IsAudioSupported =>
-            AnalyticsInfo.VersionInfo.DeviceFamily.Equals("Windows.Desktop") &&
-            !ApiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 2);
+        public Task Clear() => this.repository.Clear<Notification>();
+        public async Task<IEnumerable<Notification>> GetPending() => await this.repository.GetAll<Notification>();
+        public Task Cancel(int id) => this.repository.Remove<Notification>(id.ToString());
     }
 }
