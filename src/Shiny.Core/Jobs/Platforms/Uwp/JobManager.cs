@@ -39,7 +39,14 @@ namespace Shiny.Jobs
 
         public override async Task Schedule(JobInfo jobInfo)
         {
-            this.TryRegUwpJob();
+            UwpShinyHost.TryRegister(typeof(JobBackgroundTask), builder =>
+            {
+                if (JobBackgroundTask.PeriodicRunTime.TotalSeconds < 15)
+                    throw new ArgumentException("Background timer cannot be less than 15mins");
+
+                var runMins = Convert.ToUInt32(Math.Round(JobBackgroundTask.PeriodicRunTime.TotalMinutes, 0));
+                builder.SetTrigger(new TimeTrigger(runMins, false));
+            });
             await base.Schedule(jobInfo);
         }
 
@@ -49,50 +56,14 @@ namespace Shiny.Jobs
             await base.Cancel(jobName);
             var jobs = await this.GetJobs();
             if (!jobs.Any())
-                GetPluginJob()?.Unregister(true);
+                UwpShinyHost.TryUnRegister(typeof(JobBackgroundTask));
         }
 
 
         public override async Task CancelAll()
         {
             await base.CancelAll();
-            GetPluginJob()?.Unregister(true);
+            UwpShinyHost.TryUnRegister(typeof(JobBackgroundTask));
         }
-
-
-        void TryRegUwpJob()
-        {
-            // TODO: do I have to reg every app start?
-            var job = GetPluginJob();
-            if (job == null)
-            {
-                var builder = new BackgroundTaskBuilder
-                {
-                    Name = JobBackgroundTask.BackgroundJobName,
-                    //CancelOnConditionLoss = false,
-                    //IsNetworkRequested = true,
-                    TaskEntryPoint = typeof(JobBackgroundTask).FullName
-                };
-                //builder.SetTrigger(new SystemTrigger(SystemTriggerType.InternetAvailable));
-                //builder.SetTrigger(new BluetoothLEAdvertisementWatcherTrigger());
-                //builder.SetTrigger(new GattServiceProviderTrigger());
-                //builder.SetTrigger(new GeovisitTrigger());
-                //builder.SetTrigger(new ToastNotificationActionTrigger());
-                if (JobBackgroundTask.PeriodicRunTime.TotalSeconds < 15)
-                    throw new ArgumentException("Background timer cannot be less than 15mins");
-
-                var runMins = Convert.ToUInt32(Math.Round(JobBackgroundTask.PeriodicRunTime.TotalMinutes, 0));
-                builder.SetTrigger(new TimeTrigger(runMins, false));
-                builder.Register();
-            }
-        }
-
-
-        static IBackgroundTaskRegistration GetPluginJob()
-            => BackgroundTaskRegistration
-                .AllTasks
-                .Where(x => x.Value.Name.Equals(JobBackgroundTask.BackgroundJobName))
-                .Select(x => x.Value)
-                .FirstOrDefault();
     }
 }

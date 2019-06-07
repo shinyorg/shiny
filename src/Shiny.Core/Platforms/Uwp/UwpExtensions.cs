@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 

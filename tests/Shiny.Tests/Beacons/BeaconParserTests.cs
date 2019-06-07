@@ -28,24 +28,24 @@ namespace Shiny.Tests.Beacons
         }
 
 
-        [Fact]
-        public void ToBeaconIsBeacon()
-        {
-            var beacon = new Beacon(Guid.NewGuid(), 99, 199, Proximity.Far);
-            var bytes = beacon.ToIBeaconPacket();
-            bytes.IsBeaconPacket().Should().Be(true);
-        }
+        //[Fact]
+        //public void ToBeaconIsBeacon()
+        //{
+        //    var beacon = new Beacon(Guid.NewGuid(), 99, 199, Proximity.Far);
+        //    var bytes = beacon.ToIBeaconPacket();
+        //    bytes.IsBeaconPacket().Should().Be(true);
+        //}
 
 
-        [Fact]
-        public void ToBeacon()
-        {
-            var beacon = new Beacon(Guid.NewGuid(), 99, 199, Proximity.Far);
-            var bytes = beacon.ToIBeaconPacket();
-            var beacon2 = bytes.Parse(0);
-            beacon.Uuid.Should().Be(beacon2.Uuid);
-            beacon.Major.Should().Be(beacon2.Major);
-            beacon.Minor.Should().Be(beacon2.Minor);
-        }
+        //[Fact]
+        //public void ToBeacon()
+        //{
+        //    var beacon = new Beacon(Guid.NewGuid(), 99, 199, Proximity.Far);
+        //    var bytes = beacon.ToIBeaconPacket();
+        //    var beacon2 = bytes.Parse(0);
+        //    beacon.Uuid.Should().Be(beacon2.Uuid);
+        //    beacon.Major.Should().Be(beacon2.Major);
+        //    beacon.Minor.Should().Be(beacon2.Minor);
+        //}
     }
 }

@@ -7,7 +7,6 @@ namespace Shiny.Jobs
 {
     public class JobBackgroundTask : IBackgroundTask
     {
-        public const string BackgroundJobName = nameof(JobBackgroundTask);
         public static TimeSpan PeriodicRunTime { get; set; } = TimeSpan.FromMinutes(15);
 
 

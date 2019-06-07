@@ -6,6 +6,7 @@ using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
 using Shiny.Infrastructure;
 using System.Reactive.Linq;
+using Windows.ApplicationModel.Background;
 
 namespace Shiny.Locations
 {
@@ -63,6 +64,10 @@ namespace Shiny.Locations
             await this.Repository.Set(region.Identifier, region);
             var native = this.ToNative(region);
             GeofenceMonitor.Current.Geofences.Add(native);
+            UwpShinyHost.TryRegister(typeof(GeofenceBackgroundTask), builder =>
+            {
+                builder.SetTrigger(new GeovisitTrigger());
+            });
         }
 
 
@@ -75,6 +80,8 @@ namespace Shiny.Locations
                 list.Remove(geofence);
 
             await this.Repository.Remove(region.Identifier);
+            if (list.Count == 0)
+                UwpShinyHost.TryUnRegister(typeof(GeofenceBackgroundTask));
         }
 
 
@@ -82,6 +89,7 @@ namespace Shiny.Locations
         {
             await this.Repository.Clear();
             GeofenceMonitor.Current.Geofences.Clear();
+            UwpShinyHost.TryUnRegister(typeof(GeofenceBackgroundTask));
         }
 
 

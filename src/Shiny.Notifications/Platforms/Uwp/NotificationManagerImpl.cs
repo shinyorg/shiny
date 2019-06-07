@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using Windows.Foundation.Metadata;
-using Windows.System.Profile;
+using System.Collections.Generic;
 using Windows.UI.Notifications;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure;
-using System.Collections.Generic;
+
 
 namespace Shiny.Notifications
 {
