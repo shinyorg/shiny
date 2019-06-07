@@ -19,8 +19,8 @@ namespace Shiny.Tests.Beacons
         public void ParseBeaconPacketSuccess(string hexData, string beaconIdentifier, ushort major, ushort minor, Proximity prox)
         {
             var bytes = hexData.FromHex();
-            Beacon.IsBeaconPacket(bytes).Should().BeTrue();
-            var beacon = Beacon.Parse(bytes, 10);
+            bytes.IsBeaconPacket().Should().BeTrue();
+            var beacon = bytes.Parse(10);
             beacon.Uuid.Should().Be(new Guid(beaconIdentifier));
             beacon.Major.Should().Be(major);
             beacon.Minor.Should().Be(minor);
@@ -31,18 +31,18 @@ namespace Shiny.Tests.Beacons
         [Fact]
         public void ToBeaconIsBeacon()
         {
-            var beacon = new Beacon(Guid.NewGuid(), 99, 199, 0, Proximity.Far);
+            var beacon = new Beacon(Guid.NewGuid(), 99, 199, Proximity.Far);
             var bytes = beacon.ToIBeaconPacket();
-            Beacon.IsBeaconPacket(bytes).Should().Be(true);
+            bytes.IsBeaconPacket().Should().Be(true);
         }
 
 
         [Fact]
         public void ToBeacon()
         {
-            var beacon = new Beacon(Guid.NewGuid(), 99, 199, 0, Proximity.Far);
+            var beacon = new Beacon(Guid.NewGuid(), 99, 199, Proximity.Far);
             var bytes = beacon.ToIBeaconPacket();
-            var beacon2 = Beacon.Parse(bytes, 0);
+            var beacon2 = bytes.Parse(0);
             beacon.Uuid.Should().Be(beacon2.Uuid);
             beacon.Major.Should().Be(beacon2.Major);
             beacon.Minor.Should().Be(beacon2.Minor);

@@ -25,24 +25,6 @@ namespace Shiny.Beacons
         public bool NotifyOnExit { get; set; } = true;
 
 
-        public bool IsBeaconInRegion(Beacon beacon)
-        {
-            if (!this.Uuid.Equals(beacon.Uuid))
-                return false;
-
-            if (this.Major == null && this.Minor == null)
-                return true;
-
-            if (this.Major != beacon.Major)
-                return false;
-
-            if (this.Minor == null || this.Minor == beacon.Minor)
-                return true;
-
-            return false;
-        }
-
-
         public override string ToString() => $"[Identifier: {this.Identifier} - UUID: {this.Uuid} - Major: {this.Major ?? 0} - Minor: {this.Minor ?? 0}]";
         public bool Equals(BeaconRegion other) => (this.Identifier, this.Uuid, this.Major, this.Minor).Equals((other?.Identifier, other?.Uuid, other?.Major, other?.Minor));
         public static bool operator ==(BeaconRegion left, BeaconRegion right) => Equals(left, right);

@@ -35,6 +35,8 @@ namespace Shiny.Beacons
 
         public void Run()
         {
+            Log.Write(BeaconLogCategory.Task, "Starting");
+
             this.repository
                 .WhenEvent()
                 .Where(x => x.EntityType == typeof(BeaconRegion))
@@ -73,7 +75,9 @@ namespace Shiny.Beacons
                             break;
                     }
                 });
+
             this.StartScan();
+            Log.Write(BeaconLogCategory.Task, "Started");
         }
 
 
@@ -82,6 +86,7 @@ namespace Shiny.Beacons
             if (this.scanSub != null)
                 return;
 
+            Log.Write(BeaconLogCategory.Task, "Scan Starting");
             var regions = await this.beaconManager.GetMonitoredRegions();
             if (!regions.Any())
                 return;
@@ -98,6 +103,8 @@ namespace Shiny.Beacons
                         this.CheckStates,
                         ex => Log.Write(ex)
                     );
+
+                Log.Write(BeaconLogCategory.Task, "Scan Started");
             }
             catch (Exception ex)
             {
@@ -117,11 +124,17 @@ namespace Shiny.Beacons
 
         void StopScan()
         {
+            if (this.scanSub == null)
+                return;
+
+            Log.Write(BeaconLogCategory.Task, "Scan Stopping");
             this.scanSub?.Dispose();
             this.states.Clear();
             this.scanSub = null;
             lock (this.states)
                 this.states.Clear();
+
+            Log.Write(BeaconLogCategory.Task, "Scan Stopped");
         }
 
 

@@ -35,7 +35,6 @@ namespace Shiny.Tests.Beacons
                         Guid.Parse(beaconUuid),
                         beaconMajor,
                         beaconMinor,
-                        0,
                         Proximity.Far
                     )
                 )
