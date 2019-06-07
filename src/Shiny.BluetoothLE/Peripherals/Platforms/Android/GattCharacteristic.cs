@@ -117,7 +117,7 @@ namespace Shiny.BluetoothLE.Peripherals
                 this.permissions
             );
 
-            this.SetNotification();
+            this.SetupNotifications();
             this.SetupRead();
             this.SetupWrite();
         }
@@ -126,7 +126,7 @@ namespace Shiny.BluetoothLE.Peripherals
         public void Dispose() => this.disposer.Dispose();
 
 
-        void SetupNotification()
+        void SetupNotifications()
         {
             if (this.onSubscribe == null)
                 return;
@@ -139,7 +139,7 @@ namespace Shiny.BluetoothLE.Peripherals
 
             this.context
                 .DescriptorWrite
-                //.Where(x => x.Equals(ndesc))
+                .Where(x => x.Descriptor.Equals(ndesc))
                 .Subscribe(x =>
                 {
                     var respond = true;
@@ -181,6 +181,7 @@ namespace Shiny.BluetoothLE.Peripherals
                 })
                 .DisposedBy(this.disposer);
         }
+
 
         void SetupRead()
         {
