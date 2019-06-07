@@ -37,6 +37,7 @@ namespace Shiny.Beacons
         {
             Log.Write(BeaconLogCategory.Task, "Starting");
 
+            // TODO: I should record state of the beacon region so I can fire stuff without going into initial state from unknown
             this.repository
                 .WhenEvent()
                 .Where(x => x.EntityType == typeof(BeaconRegion))
