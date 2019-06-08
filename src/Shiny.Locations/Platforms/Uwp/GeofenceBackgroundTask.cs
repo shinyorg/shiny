@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
@@ -9,20 +11,20 @@ using Shiny.Logging;
 
 namespace Shiny.Locations
 {
-    public class GeofenceBackgroundTask : IBackgroundTask
+    public class GeofenceBackgroundTask : IBackgroundTaskProcessor
     {
         readonly IGeofenceDelegate gdelegate;
         readonly IRepository repository;
 
 
-        public GeofenceBackgroundTask()
+        public GeofenceBackgroundTask(IGeofenceDelegate gdelegate, IRepository repository)
         {
-            this.gdelegate = ShinyHost.Resolve<IGeofenceDelegate>();
-            this.repository = ShinyHost.Resolve<IRepository>();
+            this.gdelegate = gdelegate;
+            this.repository = repository;
         }
 
 
-        public async void Run(IBackgroundTaskInstance taskInstance)
+        public async Task Process(IBackgroundTaskInstance taskInstance, CancellationToken cancelToken)
         {
             var reports = GeofenceMonitor
                 .Current
