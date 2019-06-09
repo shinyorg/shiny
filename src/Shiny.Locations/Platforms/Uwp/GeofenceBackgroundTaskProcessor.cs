@@ -11,21 +11,24 @@ using Shiny.Logging;
 
 namespace Shiny.Locations
 {
-    public class GeofenceBackgroundTask : IBackgroundTaskProcessor
+    public class GeofenceBackgroundTaskProcessor : IBackgroundTaskProcessor
     {
         readonly IGeofenceDelegate gdelegate;
         readonly IRepository repository;
 
 
-        public GeofenceBackgroundTask(IGeofenceDelegate gdelegate, IRepository repository)
+        public GeofenceBackgroundTaskProcessor(IGeofenceDelegate gdelegate, IRepository repository)
         {
             this.gdelegate = gdelegate;
             this.repository = repository;
         }
 
 
-        public async Task Process(IBackgroundTaskInstance taskInstance, CancellationToken cancelToken)
+        public async void Process(IBackgroundTaskInstance taskInstance)
         {
+            var deferral = taskInstance.GetDeferral();
+            // cancellation?
+
             var reports = GeofenceMonitor
                 .Current
                 .ReadReports()
@@ -41,6 +44,7 @@ namespace Shiny.Locations
                 if (region.SingleUse)
                     await this.repository.Remove<GeofenceRegion>(region.Identifier);
             }
+            deferral.Complete();
         }
 
 

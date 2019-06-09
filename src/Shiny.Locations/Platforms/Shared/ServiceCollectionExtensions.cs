@@ -11,6 +11,10 @@ namespace Shiny.Locations
         public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regionsToRegisterWhenPermissionAvailable) where T : class, IGeofenceDelegate
         {
             builder.AddSingleton<IGeofenceDelegate, T>();
+#if WINDOWS_UWP
+            builder.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
+#endif
+
 #if NETSTANDARD
             return false;
 #elif __ANDROID__

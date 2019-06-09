@@ -13,7 +13,13 @@ namespace Shiny.Locations
     //https://docs.microsoft.com/en-us/windows/uwp/maps-and-location/set-up-a-geofence
     public class GeofenceManagerImpl : AbstractGeofenceManager
     {
-        public GeofenceManagerImpl(IRepository repository) : base(repository) {}
+        readonly UwpContext context;
+
+
+        public GeofenceManagerImpl(IRepository repository, UwpContext context) : base(repository)
+        {
+            this.context = context;
+        }
 
 
         public override IObservable<AccessState> WhenAccessStatusChanged() => Observable.Return(AccessState.Available);
@@ -64,10 +70,10 @@ namespace Shiny.Locations
             await this.Repository.Set(region.Identifier, region);
             var native = this.ToNative(region);
             GeofenceMonitor.Current.Geofences.Add(native);
-            UwpShinyHost.TryRegister(typeof(GeofenceBackgroundTask), builder =>
-            {
-                builder.SetTrigger(new GeovisitTrigger());
-            });
+
+            this.context.RegisterBackground<GeofenceBackgroundTaskProcessor>(
+                new LocationTrigger(LocationTriggerType.Geofence)
+            );
         }
 
 
@@ -81,7 +87,7 @@ namespace Shiny.Locations
 
             await this.Repository.Remove(region.Identifier);
             if (list.Count == 0)
-                UwpShinyHost.TryUnRegister(typeof(GeofenceBackgroundTask));
+                this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>();
         }
 
 
@@ -89,7 +95,7 @@ namespace Shiny.Locations
         {
             await this.Repository.Clear();
             GeofenceMonitor.Current.Geofences.Clear();
-            UwpShinyHost.TryUnRegister(typeof(GeofenceBackgroundTask));
+            this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>();
         }
 
 

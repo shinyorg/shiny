@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 
 
@@ -8,9 +7,24 @@ namespace Shiny.Jobs
 {
     public class JobBackgroundTaskProcessor : IBackgroundTaskProcessor
     {
-        public Task Process(IBackgroundTaskInstance taskInstance, CancellationToken cancelToken)
+        readonly IJobManager jobManager;
+
+
+        public JobBackgroundTaskProcessor(IJobManager jobManager)
         {
-            throw new NotImplementedException();
+            this.jobManager = jobManager;
+        }
+
+
+        public async void Process(IBackgroundTaskInstance taskInstance)
+        {
+            var deferral = taskInstance.GetDeferral();
+            using (var cancelSrc = new CancellationTokenSource())
+            {
+                taskInstance.Canceled += (sender, args) => cancelSrc.Cancel();
+                await this.jobManager.RunAll(cancelSrc.Token);
+            }
+            deferral.Complete();
         }
     }
 }
