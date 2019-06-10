@@ -14,8 +14,8 @@
     <Resource Language="x-generate" />
   </Resources>
   <Applications>
-    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Acr.Peripheral.Tests.UWP.App">
-      <uap:VisualElements DisplayName="C0re Tests" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="C0re peripheral testing" BackgroundColor="transparent">
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Shiny.Device.Tests.Uwp.App">
+      <uap:VisualElements DisplayName="Shiny Tests" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Shiny Device Tests" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\LargeTile.png" Square71x71Logo="Assets\SmallTile.png">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square150x150Logo" />
@@ -25,10 +25,27 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <Extensions>
+        <Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+          <BackgroundTasks>
+            <Task Type="bluetooth"/>
+            <Task Type="deviceConnectionChange"/>
+            <Task Type="deviceServicing"/>
+            <Task Type="deviceUse"/>
+            <Task Type="general"/>
+            <Task Type="location"/>
+            <Task Type="timer"/>
+            <Task Type="systemEvent"/>
+          </BackgroundTasks>
+        </Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
+    <Capability Name="internetClientServer"/>
     <DeviceCapability Name="bluetooth" />
+    <DeviceCapability Name="location"/>
+    <DeviceCapability Name="microphone"/>
   </Capabilities>
 </Package>
