@@ -48,6 +48,7 @@ namespace Shiny.BluetoothLE.Peripherals
             }
         }
 
+
         public IObservable<AccessState> WhenStatusChanged() => Observable.Create<AccessState>(ob =>
         {
             var handler = new EventHandler((sender, args) => ob.Respond(this.Status));
@@ -66,10 +67,13 @@ namespace Shiny.BluetoothLE.Peripherals
             this.manager.StartAdvertising(new StartAdvertisingOptions
             {
                 LocalName = adData?.LocalName,
-                ServicesUUID = adData?
-                    .ServiceUuids?
-                    .Select(x => x.ToCBUuid())
+                ServicesUUID = this.services
+                    .Select(x => x.Value.Uuid.ToCBUuid())
                     .ToArray()
+                //ServicesUUID = adData?
+                //    .ServiceUuids?
+                //    .Select(x => x.ToCBUuid())
+                //    .ToArray()
             });
         }
 
@@ -102,10 +106,12 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public void ClearServices()
         {
-            this.manager.RemoveAllServices();
+            //this.manager.RemoveAllServices();
             foreach (var service in this.services.Values)
+            {
+                this.manager.RemoveService(service.Native);
                 service.Dispose();
-
+            }
             this.services.Clear();
         }
 

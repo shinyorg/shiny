@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using CoreBluetooth;
+using Foundation;
 
 namespace Shiny.BluetoothLE.Peripherals
 {
     class PeripheralCache
     {
-        readonly Dictionary<CBUUID, Peripheral> subscribed;
-        readonly Dictionary<CBUUID, Peripheral> peripherals;
+        readonly Dictionary<NSUuid, Peripheral> subscribed;
+        readonly Dictionary<NSUuid, Peripheral> peripherals;
 
 
         public PeripheralCache()
         {
-            this.subscribed = new Dictionary<CBUUID, Peripheral>();
-            this.peripherals = new Dictionary<CBUUID, Peripheral>();
+            this.subscribed = new Dictionary<NSUuid, Peripheral>();
+            this.peripherals = new Dictionary<NSUuid, Peripheral>();
         }
 
 
@@ -23,10 +24,10 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public Peripheral GetOrAdd(CBCentral central)
         {
-            if (!this.peripherals.ContainsKey(central.UUID))
-                this.peripherals.Add(central.UUID, new Peripheral(central));
+            if (!this.peripherals.ContainsKey(central.Identifier))
+                this.peripherals.Add(central.Identifier, new Peripheral(central));
 
-            return this.peripherals[central.UUID];
+            return this.peripherals[central.Identifier];
         }
 
 
@@ -35,11 +36,11 @@ namespace Shiny.BluetoothLE.Peripherals
             var peripheral = this.GetOrAdd(central);
             if (subscribe)
             {
-                this.subscribed.Add(central.UUID, peripheral);
+                this.subscribed.Add(central.Identifier, peripheral);
             }
             else
             {
-                this.subscribed.Remove(central.UUID);
+                this.subscribed.Remove(central.Identifier);
             }
             return peripheral;
         }

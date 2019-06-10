@@ -42,9 +42,7 @@ namespace Shiny.Beacons
         protected IObservable<Beacon> Scan()
         {
             this.beaconScanner = this.beaconScanner ?? this.centralManager
-                .Scan()
-                .Where(x => x.IsBeacon())
-                .Select(x => x.ToBeacon())
+                .ScanForBeacons(false)
                 .Publish()
                 .RefCount();
 

@@ -25,16 +25,13 @@ namespace Shiny
             => postBuildActions.Add(action);
 
 
-        /// <summary>
-        /// Registers a startable service that needs to get going when the container builds
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static IServiceCollection AsStartable<T>(this IServiceCollection services)
+        public static void AddStartupSingleton<TService, TImplementation>(this IServiceCollection services)
+            where TService : class
+            where TImplementation : class, TService, IStartupTask
         {
-            postBuildActions.Add(sp => sp.GetService<T>());
-            return services;
+            services.AddSingleton<TImplementation>();
+            services.AddSingleton<TService>(x => x.GetService<TImplementation>());
+            services.RegisterStartupTask(x => x.GetService<TImplementation>());
         }
 
 
@@ -159,16 +156,35 @@ namespace Shiny
 
 
         /// <summary>
+        /// Register a startup task that runs immediately after the container is built with full dependency injected services
+        /// </summary>
+        /// <param name="services"></param>
+        public static void RegisterStartupTask(this IServiceCollection services, IStartupTask instance)
+            => services.AddSingleton(instance);
+
+
+        /// <summary>
+        /// Register a startup task that runs immediately after the container is built with full dependency injected services
+        /// </summary>
+        /// <param name="services"></param>
+        public static void RegisterStartupTask(this IServiceCollection services, Func<IServiceProvider, IStartupTask> register)
+            => services.AddSingleton(register);
+
+
+        /// <summary>
         /// Register a job on the job manager
         /// </summary>
         /// <param name="services"></param>
         /// <param name="jobInfo"></param>
         public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-            => services.RegisterPostBuildAction(async c => await
-                c
-                    .GetService<IJobManager>()
-                    .Schedule(jobInfo)
-            );
+            => services.RegisterPostBuildAction(async sp =>
+            {
+                // what if permission fails?
+                var jobs = sp.GetService<IJobManager>();
+                var access = await jobs.RequestAccess();
+                if (access == AccessState.Available)
+                    await jobs.Schedule(jobInfo);
+            });
 
 
         /// <summary>

@@ -15,8 +15,4 @@
         <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="BluetoothLE\Central\" />
-    </ItemGroup>
-
 </Project>

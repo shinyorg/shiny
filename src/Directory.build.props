@@ -14,12 +14,12 @@
         <Version>1.0.0</Version>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://shinydocs.azurewebsites.net</PackageProjectUrl>
-        <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/dev/art/nuget.png</PackageIconUrl>
-        <PackageReleaseNotes>https://shinydocs.azurewebsites.net/blog/</PackageReleaseNotes>
+        <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
+        <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>
+        <PackageReleaseNotes>https://shinylib.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
 
-        <NullableContextOption>enable</NullableContextOption>
+        <!--<NullableContextOption>enable</NullableContextOption>-->
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>True</IncludeSymbols>
@@ -41,10 +41,10 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+    <!--<PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
         <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
-    </PropertyGroup>
+    </PropertyGroup>-->
 
     <ItemGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta-63127-02" PrivateAssets="All" />

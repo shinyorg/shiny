@@ -11,7 +11,7 @@ using Android;
 using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
-
+using static Android.Manifest;
 
 namespace Shiny.Locations
 {
@@ -148,6 +148,7 @@ namespace Shiny.Locations
         {
             var intent = new Intent(this.context.AppContext, typeof(GeofenceBroadcastReceiver));
             intent.SetAction(GeofenceBroadcastReceiver.INTENT_ACTION);
+            intent.SetAction(Permission.ReceiveBootCompleted);
             return PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,

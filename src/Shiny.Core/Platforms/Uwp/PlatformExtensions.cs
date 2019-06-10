@@ -1,12 +1,11 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 
 
 namespace Shiny
 {
-    public static class UwpExtensions
+    public static class PlatformExtensions
     {
         //public static void ConfigureJobs(this IServiceCollection services)
         //{

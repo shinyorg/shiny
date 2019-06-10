@@ -9,7 +9,8 @@ namespace Shiny.BluetoothLE.Peripherals
     public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilder, IDisposable
     {
         GattCharacteristicProperties properties = 0;
-        GattProtectionLevel protection = 0;
+        GattProtectionLevel readProtection = GattProtectionLevel.Plain;
+        GattProtectionLevel writeProtection = GattProtectionLevel.Plain;
 
 
         public GattCharacteristic(Guid uuid)
@@ -38,6 +39,7 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public IGattCharacteristicBuilder SetRead(Func<ReadRequest, ReadResult> request, bool encrypted = false)
         {
+
             this.properties |= GattCharacteristicProperties.Read;
 
             return this;
@@ -46,10 +48,20 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public IGattCharacteristicBuilder SetWrite(Func<WriteRequest, GattState> request, WriteOptions options = WriteOptions.Write)
         {
-            if (options.HasFlag(GattCharacteristicProperties.Write))
+            var enc = options.HasFlag(WriteOptions.EncryptionRequired);
+            var auth = options.HasFlag(WriteOptions.AuthenticatedSignedWrites);
+
+            if (enc && auth)
+                this.writeProtection = GattProtectionLevel.EncryptionAndAuthenticationRequired;
+            else if (enc)
+                this.writeProtection = GattProtectionLevel.EncryptionRequired;
+            else if (auth)
+                this.writeProtection = GattProtectionLevel.AuthenticationRequired;
+
+            if (options.HasFlag(WriteOptions.Write))
                 this.properties |= GattCharacteristicProperties.Write;
 
-            if (options.HasFlag(GattCharacteristicProperties.WriteWithoutResponse))
+            if (options.HasFlag(WriteOptions.WriteWithoutResponse))
                 this.properties |= GattCharacteristicProperties.WriteWithoutResponse;
 
             return this;
@@ -60,12 +72,9 @@ namespace Shiny.BluetoothLE.Peripherals
         {
             var parameters = new GattLocalCharacteristicParameters
             {
-                CharacteristicProperties = this.properties
-                //ReadProtectionLevel = this.EncryptedRead
-                //    ? GattProtectionLevel.EncryptionAndAuthenticationRequired
-                //    : GattProtectionLevel.Plain,
-
-                //WriteProtectionLevel = this.Write
+                CharacteristicProperties = this.properties,
+                ReadProtectionLevel = this.readProtection,
+                WriteProtectionLevel = this.writeProtection
             };
             var characteristic = await native
                 .ServiceProvider

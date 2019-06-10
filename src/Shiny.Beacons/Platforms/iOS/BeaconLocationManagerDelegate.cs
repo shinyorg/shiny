@@ -30,7 +30,7 @@ namespace Shiny.Beacons
                     native.ProximityUuid.ToGuid(),
                     native.Major.UInt16Value,
                     native.Minor.UInt16Value,
-                    native.Accuracy,
+                    //native.Accuracy,
                     native.Proximity.FromNative()
                 ));
             }

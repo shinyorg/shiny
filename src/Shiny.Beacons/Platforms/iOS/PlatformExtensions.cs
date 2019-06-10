@@ -4,7 +4,7 @@ using CoreLocation;
 
 namespace Shiny.Beacons
 {
-    public static class Extensions
+    public static class PlatformExtensions
     {
         public static CLBeaconRegion ToNative(this BeaconRegion region)
         {

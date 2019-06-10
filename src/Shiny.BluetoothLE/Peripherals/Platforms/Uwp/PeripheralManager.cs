@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Windows.Storage.Streams;
 using Windows.Devices.Bluetooth.Advertisement;
-using Windows.Devices.Bluetooth;
+
 
 namespace Shiny.BluetoothLE.Peripherals
 {

@@ -11,7 +11,11 @@ using Native = Android.App.DownloadManager;
 namespace Shiny.Net.Http
 {
     //https://developer.android.com/reference/android/app/DownloadManager
-    [BroadcastReceiver(Enabled = true, Exported = true)]
+    [BroadcastReceiver(
+        Name = "com.shiny.net.http.HttpTransferBroadcastReceiver",
+        Enabled = true,
+        Exported = true
+    )]
     [IntentFilter(new[] { Native.ActionDownloadComplete })]
     public class HttpTransferBroadcastReceiver : BroadcastReceiver
     {
