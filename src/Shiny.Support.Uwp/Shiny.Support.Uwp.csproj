@@ -11,7 +11,7 @@
     <ItemGroup>
         <!--<PackageReference Include="Shiny.Core" Version="1.0.0.204-beta" />-->
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj">
-            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+            <!--<ReferenceOutputAssembly>true</ReferenceOutputAssembly>-->
         </ProjectReference>
     </ItemGroup>
 </Project>
