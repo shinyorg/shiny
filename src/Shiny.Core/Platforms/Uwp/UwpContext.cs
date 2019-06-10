@@ -7,6 +7,7 @@ namespace Shiny
 {
     public class UwpContext
     {
+        static string BackgroundTaskEntryPoint { get; set; } = "Shiny.Support.Uwp.ShinyBackgroundTask";
         readonly IServiceProvider serviceProvider;
 
 
@@ -34,7 +35,7 @@ namespace Shiny
             var builder = new BackgroundTaskBuilder
             {
                 Name = typeof(TService).FullName,
-                TaskEntryPoint = UwpShinyHost.BackgroundTaskTypeName
+                TaskEntryPoint = BackgroundTaskEntryPoint
             };
             foreach (var trigger in triggers)
                 builder.SetTrigger(trigger);

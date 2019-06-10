@@ -13,13 +13,9 @@ namespace Shiny
 {
     public class UwpShinyHost : ShinyHost
     {
-        public static void Init<TBackgroundService>(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
-            where TBackgroundService : class, IBackgroundTask
-
+        public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
             => InitPlatform(startup, services =>
             {
-                BackgroundTaskTypeName = typeof(TBackgroundService).FullName;
-
                 services.AddSingleton<IEnvironment, EnvironmentImpl>();
                 services.AddSingleton<IConnectivity, ConnectivityImpl>();
                 services.AddSingleton<IPowerManager, PowerManagerImpl>();
@@ -36,7 +32,6 @@ namespace Shiny
             });
 
 
-        public static string BackgroundTaskTypeName { get; private set; }
         public static void Bridge(IBackgroundTaskInstance instanceTask) => Resolve<UwpContext>().Bridge(instanceTask);
     }
 }
