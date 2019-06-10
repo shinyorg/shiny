@@ -6,15 +6,20 @@ using Shiny.Net;
 using Shiny.Power;
 using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using Windows.ApplicationModel.Background;
 
 
 namespace Shiny
 {
     public class UwpShinyHost : ShinyHost
     {
-        public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init<TBackgroundService>(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
+            where TBackgroundService : class, IBackgroundTask
+
             => InitPlatform(startup, services =>
             {
+                BackgroundTaskTypeName = typeof(TBackgroundService).FullName;
+
                 services.AddSingleton<IEnvironment, EnvironmentImpl>();
                 services.AddSingleton<IConnectivity, ConnectivityImpl>();
                 services.AddSingleton<IPowerManager, PowerManagerImpl>();
@@ -29,5 +34,9 @@ namespace Shiny
 
                 platformBuild?.Invoke(services);
             });
+
+
+        public static string BackgroundTaskTypeName { get; private set; }
+        public static void Bridge(IBackgroundTaskInstance instanceTask) => Resolve<UwpContext>().Bridge(instanceTask);
     }
 }

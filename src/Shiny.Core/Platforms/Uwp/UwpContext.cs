@@ -34,7 +34,7 @@ namespace Shiny
             var builder = new BackgroundTaskBuilder
             {
                 Name = typeof(TService).FullName,
-                TaskEntryPoint = "Shiny.Support.Uwp.ShinyBackgroundTask"
+                TaskEntryPoint = UwpShinyHost.BackgroundTaskTypeName
             };
             foreach (var trigger in triggers)
                 builder.SetTrigger(trigger);
