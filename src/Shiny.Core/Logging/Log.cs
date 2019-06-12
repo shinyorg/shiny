@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Reactive.Subjects;
 
+
 namespace Shiny.Logging
 {
     public static class Log
     {
-        static readonly Subject<(Exception Exception, (string Key, string Value)[] Parameters)> errorSubj = new Subject<(Exception Exception, (string Key, string Value)[] Parameters)>();
-        public static IObservable<(Exception Exception, (string Key, string Value)[] Parameters)> WhenExceptionLogged() => errorSubj;
+        static readonly Subject<LogError> errorSubj = new Subject<LogError>();
+        public static IObservable<LogError> WhenExceptionLogged() => errorSubj;
 
 
-        static readonly Subject<(string EventName, string Description, (string Key, string Value)[] Parameters)> eventSubj = new Subject<(string EventName, string Description, (string Key, string Value)[] Parameters)>();
-        public static IObservable<(string EventName, string Description, (string Key, string Value)[] Parameters)> WhenEventLogged() => eventSubj;
+        static readonly Subject<LogEvent> eventSubj = new Subject<LogEvent>();
+        public static IObservable<LogEvent> WhenEventLogged() => eventSubj;
 #if DEBUG
         static Log() => UseDebug();
 #endif
 
 
-
         public static void Write(Exception exception, params (string Key, string Value)[] parameters)
         {
-            errorSubj.OnNext((exception, parameters));
+            errorSubj.OnNext(new LogError(exception, parameters));
             foreach (var log in Loggers)
             {
                 if (log.IsCrashEnabled)
@@ -31,7 +31,7 @@ namespace Shiny.Logging
 
         public static void Write(string eventName, string description, params (string Key, string Value)[] parameters)
         {
-            eventSubj.OnNext((eventName, description, parameters));
+            eventSubj.OnNext(new LogEvent(eventName, description, parameters));
             foreach (var log in Loggers)
                 if (log.IsEventsEnabled)
                     DoLog(log.Log, eventName, description, parameters);
