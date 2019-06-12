@@ -54,17 +54,17 @@ namespace Shiny.Net.Http
         }
 
 
-        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
+        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error) => Dispatcher.SmartExecuteSync(async () =>
         {
             var transfer = task.FromNative();
 
             if (task.State != NSUrlSessionTaskState.Canceling && error != null)
             {
                 Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
-                this.tdelegate.OnError(transfer, transfer.Exception);
+                await this.tdelegate.OnError(transfer, transfer.Exception);
             }
             this.onEvent.OnNext(transfer);
-        }
+        });
 
 
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
@@ -79,7 +79,7 @@ namespace Shiny.Net.Http
             => this.onEvent.OnNext(downloadTask.FromNative());
 
 
-        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
+        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location) => Dispatcher.SmartExecuteSync(async () =>
         {
             var transfer = downloadTask.FromNative();
 
@@ -87,8 +87,8 @@ namespace Shiny.Net.Http
                 // if you are debugging, the base path tends to change, so the destination path changes too
                 File.Copy(location.Path, transfer.LocalFilePath, true);
 
-            this.tdelegate.OnCompleted(transfer);
+            await this.tdelegate.OnCompleted(transfer);
             this.onEvent.OnNext(transfer);
-        }
+        });
     }
 }

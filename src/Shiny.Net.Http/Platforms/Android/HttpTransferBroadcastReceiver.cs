@@ -22,68 +22,64 @@ namespace Shiny.Net.Http
         public static Subject<HttpTransfer> HttpEvents { get; } = new Subject<HttpTransfer>();
 
 
-        public override async void OnReceive(Context context, Intent intent)
+        public override void OnReceive(Context context, Intent intent)
         {
             if (intent.Action != Native.ActionDownloadComplete)
                 return;
 
             var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
-            var native = context.GetManager();
-            var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
-            HttpTransfer? transfer = null;
 
-            try
+            Dispatcher.SmartExecuteSync(async () =>
             {
-                var query = new QueryFilter().Add(id.ToString()).ToNative();
-                using (var cursor = native.InvokeQuery(query))
-                {
-                    if (cursor.MoveToNext())
-                    {
-                        transfer = cursor.ToLib();
-                        if (transfer.Value.Exception != null)
-                            tdelegate.OnError(transfer.Value, transfer.Value.Exception);
+                var native = context.GetManager();
+                var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
+                HttpTransfer? transfer = null;
 
-                        else
+                try
+                {
+                    var query = new QueryFilter().Add(id.ToString()).ToNative();
+                    using (var cursor = native.InvokeQuery(query))
+                    {
+                        if (cursor.MoveToNext())
                         {
-                            var localUri = cursor.GetString(Native.ColumnLocalUri).Replace("file://", String.Empty);
-                            var file = new FileInfo(localUri);
-                            Console.WriteLine("Local: " + file.FullName);
+                            transfer = cursor.ToLib();
+                            if (transfer.Value.Exception != null)
+                                await tdelegate.OnError(transfer.Value, transfer.Value.Exception);
 
-                            await Task.Run(() =>
+                            else
                             {
-                                var to = transfer.Value.LocalFilePath;
-                                if (File.Exists(to))
-                                    File.Delete(to);
+                                var localUri = cursor.GetString(Native.ColumnLocalUri).Replace("file://", String.Empty);
+                                var file = new FileInfo(localUri);
+                                Console.WriteLine("Local: " + file.FullName);
 
-                                //File.Copy(localPath, to, true);
-                                File.Move(file.FullName, to);
-                            });
+                                await Task.Run(() =>
+                                {
+                                    var to = transfer.Value.LocalFilePath;
+                                    if (File.Exists(to))
+                                        File.Delete(to);
 
-                            tdelegate.OnCompleted(transfer.Value);
+                                    //File.Copy(localPath, to, true);
+                                    File.Move(file.FullName, to);
+                                });
+
+                                await tdelegate.OnCompleted(transfer.Value);
+                            }
+                            HttpEvents.OnNext(transfer.Value);
                         }
-                        HttpEvents.OnNext(transfer.Value);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-
-                if (transfer != null)
+                catch (Exception ex)
                 {
-                    try
+                    Log.Write(ex);
+
+                    if (transfer != null)
                     {
-                        tdelegate.OnError(transfer.Value, ex);
-                        HttpEvents.OnNext(transfer.Value);
-                    }
-                    catch (Exception ex1)
-                    {
-                        Log.Write(ex1);
+                        Dispatcher.SmartExecuteSync(() => tdelegate.OnError(transfer.Value, ex));
+                        Dispatcher.SafeExecute(() => HttpEvents.OnNext(transfer.Value));
                     }
                 }
-            }
-
-            native.Remove(id);
+                native.Remove(id);
+            });
         }
     }
 }

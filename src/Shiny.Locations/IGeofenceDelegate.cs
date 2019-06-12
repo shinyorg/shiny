@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Locations
 {
@@ -10,6 +10,6 @@ namespace Shiny.Locations
         /// </summary>
         /// <param name="newStatus"></param>
         /// <param name="region"></param>
-        void OnStatusChanged(GeofenceState newStatus, GeofenceRegion region);
+        Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region);
     }
 }

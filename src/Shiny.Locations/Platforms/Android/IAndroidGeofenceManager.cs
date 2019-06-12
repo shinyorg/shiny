@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Android.Content;
 
 
@@ -6,7 +7,7 @@ namespace Shiny.Locations
 {
     public interface IAndroidGeofenceManager
     {
-        void ReceiveBoot();
-        void Process(Intent intent);
+        Task ReceiveBoot();
+        Task Process(Intent intent);
     }
 }

@@ -8,6 +8,24 @@ namespace Shiny
     public static partial class Extensions
     {
         /// <summary>
+        /// Turns a paired key tuple into a dictionary
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="tuples"></param>
+        /// <returns></returns>
+        public static IDictionary<TKey, TValue> ToDictionary<TKey, TValue>(this IEnumerable<(TKey, TValue)> tuples)
+        {
+            var dict = new Dictionary<TKey, TValue>();
+            if (tuples != null)
+                foreach (var tuple in tuples)
+                    dict.Add(tuple.Item1, tuple.Item2);
+
+            return dict;
+        }
+
+
+        /// <summary>
         /// A safe dictionary Get, will return a default value if the dictionary does not contain the key
         /// </summary>
         /// <typeparam name="T"></typeparam>

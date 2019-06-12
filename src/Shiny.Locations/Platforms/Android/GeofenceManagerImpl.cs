@@ -13,6 +13,7 @@ using Android.Content;
 using Shiny.Infrastructure;
 using static Android.Manifest;
 
+
 namespace Shiny.Locations
 {
     public class GeofenceManagerImpl : AbstractGeofenceManager, IAndroidGeofenceManager
@@ -32,7 +33,7 @@ namespace Shiny.Locations
         }
 
 
-        public async void ReceiveBoot()
+        public async Task ReceiveBoot()
         {
             var regions = await this.Repository.GetAll();
             foreach (var region in regions)
@@ -40,7 +41,7 @@ namespace Shiny.Locations
         }
 
 
-        public async void Process(Intent intent)
+        public async Task Process(Intent intent)
         {
             var e = GeofencingEvent.FromIntent(intent);
             if (e == null)
@@ -52,7 +53,7 @@ namespace Shiny.Locations
                 if (region != null)
                 {
                     var state = (GeofenceState)e.GeofenceTransition;
-                    this.geofenceDelegate.OnStatusChanged(state, region);
+                    await this.geofenceDelegate.OnStatusChanged(state, region);
 
                     if (region.SingleUse)
                         await this.StopMonitoring(region);
