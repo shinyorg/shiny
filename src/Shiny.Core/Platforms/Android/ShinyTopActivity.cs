@@ -6,17 +6,17 @@ namespace Shiny
 {
     class ShinyTopActivity : ITopActivity
     {
-        ActivityLifecycleCallbacks callbacks;
+        readonly ActivityLifecycleCallbacks callbacks;
 
 
-        public void Init(Application app)
+        public ShinyTopActivity(Application app)
         {
             this.callbacks = new ActivityLifecycleCallbacks();
             app.RegisterActivityLifecycleCallbacks(this.callbacks);
         }
 
 
-        public Activity Current => this.callbacks?.Activity;
+        public Activity Current => this.callbacks.Activity;
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => this.callbacks.ActivitySubject;
     }
 }

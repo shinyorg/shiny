@@ -13,7 +13,7 @@ namespace Shiny.Locations
     )]
     [IntentFilter(new []
     {
-        "com.shiny.locations.GpsBroadcastReceiver.ACTION_PROCESS"
+        GpsBroadcastReceiver.INTENT_ACTION
     })]
     public class GpsBroadcastReceiver : BroadcastReceiver
     {
