@@ -13,7 +13,7 @@ namespace Shiny
 
     public abstract class Module : IModule
     {
-        public virtual void Register(IServiceCollection services) { }
+        public abstract void Register(IServiceCollection services);
         public virtual void OnContainerReady(IServiceProvider services) { }
     }
 }
