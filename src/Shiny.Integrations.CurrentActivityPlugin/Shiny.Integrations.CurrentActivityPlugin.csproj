@@ -1,0 +1,12 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.24">
+
+    <PropertyGroup>
+        <TargetFrameworks>monoandroid81;monoandroid90</TargetFrameworks>
+        <Description>Shiny Integration - Plugin.CurrentActivity</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <PackageReference Include="Plugin.CurrentActivity" Version="2.1.0.4" />
+    </ItemGroup>
+</Project>
