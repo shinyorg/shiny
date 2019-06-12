@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 
 namespace Shiny.Net.Http
 {
     public interface IHttpTransferDelegate
     {
-        void OnError(HttpTransfer transfer, Exception ex);
-        void OnCompleted(HttpTransfer transfer);
+        Task OnError(HttpTransfer transfer, Exception ex);
+        Task OnCompleted(HttpTransfer transfer);
     }
 }
