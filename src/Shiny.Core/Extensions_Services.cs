@@ -207,8 +207,8 @@ namespace Shiny
         /// Add or replace a service registration
         /// </summary>
         /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImpl"></typeparam>
         /// <param name="services"></param>
+        /// <param name="instance">The singleton instance you wish to use</param>
         public static void AddOrReplace<TService>(this IServiceCollection services, TService instance)
         {
             var desc = services.SingleOrDefault(x => x.ServiceType == typeof(TService));
@@ -216,6 +216,22 @@ namespace Shiny
                 services.Remove(desc);
 
             services.Add(new ServiceDescriptor(typeof(TService), instance));
+        }
+
+
+        /// <summary>
+        /// Add or replace a service registration
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="instance"></param>
+        public static void AddOrReplace<TService>(this IServiceCollection services, Func<IServiceProvider, TService> factory)
+        {
+            var desc = services.SingleOrDefault(x => x.ServiceType == typeof(TService));
+            if (desc != null)
+                services.Remove(desc);
+
+            services.Add(new ServiceDescriptor(typeof(TService), factory));
         }
 
 

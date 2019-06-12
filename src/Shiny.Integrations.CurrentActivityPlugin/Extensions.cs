@@ -1,4 +1,5 @@
 ﻿using System;
+using Android.App;
 using Microsoft.Extensions.DependencyInjection;
 using Plugin.CurrentActivity;
 
@@ -14,8 +15,17 @@ namespace Shiny.Integrations.CurrentActivityPlugin
         /// <summary>
         ///
         /// </summary>
-        /// <param name="autoInit">If true, Shiny will Init the activity plugin using its application context (you should set to true)</param>
-        public static void UseCurrentActivityIntegration(this IServiceCollection services, bool autoInit)
-            => services.AddOrReplace<ITopActivity>(new TopActivityImpl(autoInit));
+        public static void UseCurrentActivityPlugin(this IServiceCollection services)
+            => services.AddOrReplace<ITopActivity, TopActivityImpl>();
+        //{
+        //    services.AddOrReplace<ITopActivity>(sp =>
+        //    {
+        //        if (!autoInit)
+        //            return new TopActivityImpl();
+
+        //        var app = sp.GetService<Application>();
+        //        return new TopActivityImpl(app);
+        //    });
+        //}
     }
 }

@@ -8,15 +8,11 @@ namespace Shiny.Integrations.CurrentActivityPlugin
 {
     class TopActivityImpl : ITopActivity
     {
-        readonly bool autoInit;
-        public TopActivityImpl(bool autoInit) => this.autoInit = autoInit;
-
-
-        public void Init(Application app)
+        public TopActivityImpl(Application app)
         {
-            if (this.autoInit)
-                CrossCurrentActivity.Current.Init(app);
+            CrossCurrentActivity.Current.Init(app);
         }
+
 
 
         public Activity Current => CrossCurrentActivity.Current.Activity;
