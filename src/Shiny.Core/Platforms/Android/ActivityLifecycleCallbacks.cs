@@ -8,7 +8,7 @@ using Android.Runtime;
 namespace Shiny
 {
     [Preserve(AllMembers = true)]
-    public class ActivityLifecycleCallbacks : Java.Lang.Object, Application.IActivityLifecycleCallbacks
+    class ActivityLifecycleCallbacks : Java.Lang.Object, Application.IActivityLifecycleCallbacks
     {
         public Subject<ActivityChanged> ActivitySubject { get; } = new Subject<ActivityChanged>();
         readonly WeakReference<Activity> current = new WeakReference<Activity>(null);

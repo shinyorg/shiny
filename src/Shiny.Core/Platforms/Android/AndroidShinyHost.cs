@@ -18,14 +18,13 @@ namespace Shiny
                                 IStartup startup = null,
                                 Action<IServiceCollection> platformBuild = null)
         {
-            var callbacks = new ActivityLifecycleCallbacks();
-            androidApp.RegisterActivityLifecycleCallbacks(callbacks);
-            var context = new AndroidContext(androidApp, callbacks);
             InitPlatform(
                 startup,
                 services =>
                 {
-                    services.AddSingleton(context);
+                    services.AddSingleton(androidApp);
+                    services.AddSingleton<AndroidContext>();
+                    services.AddSingleton<ITopActivity, ShinyTopActivity>();
 
                     services.AddSingleton<IEnvironment, EnvironmentImpl>();
                     services.AddSingleton<IConnectivity, ConnectivityImpl>();

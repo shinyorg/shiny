@@ -15,19 +15,19 @@ namespace Shiny
 {
     public class AndroidContext
     {
-        readonly ActivityLifecycleCallbacks callbacks;
+        readonly ITopActivity topActivity;
 
 
-        public AndroidContext(Application app, ActivityLifecycleCallbacks callbacks)
+        public AndroidContext(Application app, ITopActivity topActivity)
         {
             this.AppContext = app;
-            this.callbacks = callbacks;
+            this.topActivity = topActivity;
         }
 
 
         public Application AppContext { get; }
-        public Activity CurrentActivity => this.callbacks.Activity;
-        public IObservable<ActivityChanged> WhenActivityStatusChanged() => this.callbacks.ActivitySubject;
+        public Activity CurrentActivity => this.topActivity.Current;
+        public IObservable<ActivityChanged> WhenActivityStatusChanged() => this.topActivity.WhenActivityStatusChanged();
         public PackageInfo Package => this
             .AppContext
             .PackageManager
