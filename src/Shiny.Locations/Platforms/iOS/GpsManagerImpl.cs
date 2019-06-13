@@ -66,8 +66,11 @@ namespace Shiny.Locations
             var access = await this.RequestAccess(request.UseBackground);
             access.Assert();
 
+            this.gdelegate.Request = request;
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
-            this.locationManager.TrySetDeferrals(request);
+
+            if (request.ThrottledInterval != null)
+                this.locationManager.AllowDeferredLocationUpdatesUntil(0, request.ThrottledInterval.Value.TotalMilliseconds);
 
             switch (request.Priority)
             {
@@ -83,6 +86,7 @@ namespace Shiny.Locations
                     this.locationManager.DesiredAccuracy = CLLocation.AccuracyHundredMeters;
                     break;
             }
+
             //this.locationManager.ShouldDisplayHeadingCalibration
             //this.locationManager.ShowsBackgroundLocationIndicator
             //this.locationManager.PausesLocationUpdatesAutomatically = false;

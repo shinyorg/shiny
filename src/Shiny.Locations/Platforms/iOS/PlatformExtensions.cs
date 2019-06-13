@@ -4,20 +4,8 @@ using CoreLocation;
 
 namespace Shiny.Locations
 {
-    internal static class iOSExtensions
+    static class PlatformExtensions
     {
-        public static void TrySetDeferrals(this CLLocationManager manager, GpsRequest request)
-        {
-            var meters = request?.DeferredDistance?.TotalMeters ?? 0;
-            var secs = request?.DeferredTime?.TotalSeconds ?? 0;
-            if (meters > 0 || secs > 0)
-            {
-                ((GpsManagerDelegate)manager.Delegate).Request = request;
-                manager.AllowDeferredLocationUpdatesUntil(meters, secs);
-            }
-        }
-
-
         public static GeofenceState FromNative(this CLRegionState state)
         {
             switch (state)

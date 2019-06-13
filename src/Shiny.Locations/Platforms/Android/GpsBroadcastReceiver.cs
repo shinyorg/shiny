@@ -3,7 +3,7 @@ using System.Reactive.Subjects;
 using Android.App;
 using Android.Content;
 using Android.Gms.Location;
-using Shiny.Logging;
+
 
 namespace Shiny.Locations
 {
@@ -13,7 +13,7 @@ namespace Shiny.Locations
     )]
     [IntentFilter(new []
     {
-        "com.shiny.locations.GpsBroadcastReceiver.ACTION_PROCESS"
+        GpsBroadcastReceiver.INTENT_ACTION
     })]
     public class GpsBroadcastReceiver : BroadcastReceiver
     {
@@ -31,20 +31,19 @@ namespace Shiny.Locations
             if (result == null)
                 return;
 
-            try
+            Dispatcher.SmartExecuteSync(async () =>
             {
                 var gpsDelegate = ShinyHost.Resolve<IGpsDelegate>();
                 foreach (var location in result.Locations)
                 {
                     var reading = new GpsReading(location);
                     readingSubject.OnNext(reading);
-                    gpsDelegate?.OnReading(reading);
+                    if (gpsDelegate != null)
+                        await gpsDelegate
+                            .OnReading(reading)
+                            .ConfigureAwait(false);
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+            });
         }
     }
 }

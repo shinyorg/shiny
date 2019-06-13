@@ -1,10 +1,10 @@
 ﻿using System;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Locations
 {
     public interface IGpsDelegate
     {
-        void OnReading(IGpsReading reading);
+        Task OnReading(IGpsReading reading);
     }
 }

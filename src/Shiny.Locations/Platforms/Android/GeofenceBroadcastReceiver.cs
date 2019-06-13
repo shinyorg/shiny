@@ -20,20 +20,20 @@ namespace Shiny.Locations
         public const string INTENT_ACTION = "com.shiny.locations.GeofenceBroadcastReceiver.ACTION_PROCESS";
 
 
-        public override void OnReceive(Context context, Intent intent)
+        public override void OnReceive(Context context, Intent intent) => Dispatcher.SmartExecuteSync(async () =>
         {
             var geofences = ShinyHost.Resolve<IAndroidGeofenceManager>();
 
             switch (intent.Action)
             {
                 case INTENT_ACTION:
-                    geofences.Process(intent);
+                    await geofences.Process(intent);
                     break;
 
                 case Permission.ReceiveBootCompleted:
-                    geofences.ReceiveBoot();
+                    await geofences.ReceiveBoot();
                     break;
             }
-        }
+        });
     }
 }

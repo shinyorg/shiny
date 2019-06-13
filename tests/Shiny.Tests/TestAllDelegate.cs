@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Shiny.Locations;
 
 
@@ -6,8 +7,6 @@ namespace Shiny.Tests
 {
     public class TestAllDelegate : IGeofenceDelegate
     {
-        public void OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
-        {
-        }
+        public Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region) => Task.CompletedTask;
     }
 }
