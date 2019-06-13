@@ -4,7 +4,7 @@ using Android.App;
 using Plugin.CurrentActivity;
 
 
-namespace Shiny.Integrations.CurrentActivityPlugin
+namespace Shiny
 {
     class TopActivityImpl : ITopActivity
     {

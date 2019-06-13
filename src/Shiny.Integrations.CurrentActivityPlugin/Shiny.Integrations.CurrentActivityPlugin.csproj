@@ -3,7 +3,14 @@
     <PropertyGroup>
         <TargetFrameworks>monoandroid81;monoandroid90</TargetFrameworks>
         <Description>Shiny Integration - Plugin.CurrentActivity</Description>
+        <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="obj\**" />
+      <EmbeddedResource Remove="obj\**" />
+      <None Remove="obj\**" />
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
