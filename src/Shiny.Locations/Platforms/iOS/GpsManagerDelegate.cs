@@ -32,7 +32,8 @@ namespace Shiny.Locations
 
             else if (!this.deferringUpdates)
             {
-                manager.TrySetDeferrals(this.Request);
+                //manager.TrySetDeferrals(this.Request);
+                manager.AllowDeferredLocationUpdatesUntil(0, this.Request.ThrottledInterval.Value.TotalMilliseconds);
                 this.deferringUpdates = true;
                 this.InvokeChanges(locations);
             }
@@ -50,6 +51,7 @@ namespace Shiny.Locations
             this.gdelegate?.OnReading(reading);
             this.readingSubject.OnNext(reading);
         }
+
 
         //public override void Failed(CLLocationManager manager, NSError error)
         //{

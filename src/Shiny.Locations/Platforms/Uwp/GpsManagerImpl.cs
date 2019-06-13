@@ -79,12 +79,7 @@ namespace Shiny.Locations
                 this.IsListening = true;
                 request = request ?? new GpsRequest();
 
-                if (request.DeferredTime != null)
-                    this.geolocator.ReportInterval = Convert.ToUInt32(request.DeferredTime.Value.TotalMilliseconds);
-
-                if (request.DeferredDistance != null)
-                    this.geolocator.DesiredAccuracyInMeters = Convert.ToUInt32(request.DeferredDistance.TotalMeters);
-
+                this.geolocator.ReportInterval = Convert.ToUInt32(request.Interval.TotalMilliseconds);
                 this.geolocator.PositionChanged += this.OnPositionChanged;
             }
             return Task.CompletedTask;

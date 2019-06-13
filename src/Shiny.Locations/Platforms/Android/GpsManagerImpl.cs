@@ -3,7 +3,6 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
 using Android.Gms.Location;
 using P = Android.Manifest.Permission;
 
@@ -54,18 +53,17 @@ namespace Shiny.Locations
             var access = await this.RequestAccess(request.UseBackground);
             access.Assert();
 
-            var nativeRequest = new LocationRequest()
-                .SetPriority(GetPriority(request.Priority));
+            var nativeRequest = LocationRequest
+                .Create()
+                .SetPriority(GetPriority(request.Priority))
+                .SetInterval(request.Interval.ToMillis());
 
-            if (request.DeferredTime != null)
-                nativeRequest.SetInterval(Convert.ToInt64(request.DeferredTime.Value.TotalMilliseconds));
-
-            if (request.DeferredDistance != null)
-                nativeRequest.SetSmallestDisplacement((float)request.DeferredDistance.TotalMeters);
+            if (request.ThrottledInterval != null)
+                nativeRequest.SetFastestInterval(request.ThrottledInterval.Value.ToMillis());
 
             await this.client.RequestLocationUpdatesAsync(
                 nativeRequest,
-                this.GetPendingIntent()
+                this.GetPendingIntent() // used for background - should switch to LocationCallback for foreground
             );
             this.IsListening = true;
         }
@@ -87,8 +85,7 @@ namespace Shiny.Locations
 
         protected virtual PendingIntent GetPendingIntent()
         {
-            var intent = new Intent(this.context.AppContext, typeof(GpsBroadcastReceiver));
-            intent.SetAction(GpsBroadcastReceiver.INTENT_ACTION);
+            var intent = this.context.CreateIntent<GpsBroadcastReceiver>(GpsBroadcastReceiver.INTENT_ACTION);
             return PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,
