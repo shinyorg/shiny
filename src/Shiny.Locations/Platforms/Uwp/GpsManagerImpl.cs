@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
 
+
 namespace Shiny.Locations
 {
     public class GpsManagerImpl : IGpsManager
