@@ -130,6 +130,15 @@ namespace Shiny
         });
 
 
+        public Intent CreateIntent<T>(params string[] actions)
+        {
+            var intent = new Intent(this.AppContext, typeof(T));
+            foreach (var action in actions)
+                intent.SetAction(action);
+
+            return intent;
+        }
+
         public bool IsInManifest(string androidPermission, bool assert)
         {
             var permissions = this.AppContext.PackageManager.GetPackageInfo(
