@@ -8,6 +8,6 @@ namespace Shiny
     public static class ServiceCollectionExtensions
     {
         public static void UseJsonNetSerialization(this IServiceCollection services)
-            => services.AddOrReplace<ISerializer, object>();
+            => services.AddOrReplace<ISerializer, JsonNetSerializer>();
     }
 }

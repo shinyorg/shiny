@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Caching;
 using Shiny.Infrastructure;
-
+using Shiny.Settings;
 
 namespace Shiny
 {
@@ -19,6 +19,13 @@ namespace Shiny
         {
             //services.AddIfNotRegister<ShinySqliteConnection>();
             services.AddSingleton<ICache, SqliteCache>();
+        }
+
+
+        public static void UseSqliteSettings(this IServiceCollection services)
+        {
+            //services.AddIfNotRegister<ShinySqliteConnection>();
+            services.AddSingleton<ISettings, SqliteSettings>();
         }
     }
 }
