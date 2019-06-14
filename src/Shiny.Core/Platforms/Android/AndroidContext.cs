@@ -26,7 +26,16 @@ namespace Shiny
 
 
         public Application AppContext { get; }
-        public Activity CurrentActivity => this.topActivity.Current;
+        public Activity CurrentActivity
+        {
+            get
+            {
+                if (this.topActivity.Current == null)
+                    throw new ApplicationException("TopActivity could not be found - are you calling this before an activity has been created or resumed?");
+
+                return this.topActivity.Current;
+            }
+        }
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => this.topActivity.WhenActivityStatusChanged();
         public PackageInfo Package => this
             .AppContext
