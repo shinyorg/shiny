@@ -1,24 +1,14 @@
 ﻿using System;
 using Shiny.Infrastructure;
+using System.Text.Json.Serialization;
 
 
 namespace Shiny
 {
     public class Serializer : ISerializer
     {
-        public T Deserialize<T>(string value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object Deserialize(Type objectType, string value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string Serialize(object value)
-        {
-            throw new NotImplementedException();
-        }
+        public T Deserialize<T>(string value) => JsonSerializer.Parse<T>(value);
+        public object Deserialize(Type objectType, string value) => JsonSerializer.Parse(value, objectType);
+        public string Serialize(object value) => JsonSerializer.ToString(value);
     }
 }
