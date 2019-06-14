@@ -6,11 +6,11 @@ using Shiny.Caching;
 
 namespace Shiny
 {
-    class SqliteCache : AbstractTimerCache
+    class LiteDbCache : AbstractTimerCache
     {
-        readonly ShinySqliteConnection conn;
-        public SqliteCache(ShinySqliteConnection conn)
-            => this.conn = conn;
+        readonly ShinyLiteDatabase database;
+        public LiteDbCache(ShinyLiteDatabase database)
+            => this.database = database;
 
 
         public override Task Clear()

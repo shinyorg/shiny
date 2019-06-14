@@ -6,11 +6,11 @@ using Shiny.Settings;
 
 namespace Shiny
 {
-    class SqliteSettings : AbstractSettings
+    class LiteDbSettings : AbstractSettings
     {
-        readonly ShinySqliteConnection conn;
-        public SqliteSettings(ShinySqliteConnection conn, ISerializer serializer) : base(serializer)
-            => this.conn = conn;
+        readonly ShinyLiteDatabase database;
+        public LiteDbSettings(ShinyLiteDatabase database, ISerializer serializer) : base(serializer)
+            => this.database = database;
 
 
         public override bool Contains(string key)
