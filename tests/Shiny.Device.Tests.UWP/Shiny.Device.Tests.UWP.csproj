@@ -185,7 +185,7 @@
       <Version>6.2.8</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Forms">
-      <Version>4.0.0.482894</Version>
+      <Version>4.0.0.497661</Version>
     </PackageReference>
     <PackageReference Include="xunit">
       <Version>2.4.1</Version>
