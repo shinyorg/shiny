@@ -95,7 +95,7 @@ namespace Shiny.Notifications
             if (!notification.Payload.IsEmpty())
             {
                 var dict = new NSMutableDictionary();
-                dict.Add(new NSString(notification.Payload), new NSString("Payload"));
+                dict.Add(new NSString("Payload"), new NSString(notification.Payload));
                 content.UserInfo = dict;
             }
 
