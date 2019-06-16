@@ -141,6 +141,7 @@ namespace Shiny
             this.PermissionResult += handler;
 
             var sub = this.WhenActivityStatusChanged()
+                .Take(1)
                 .Subscribe(x =>
                     ActivityCompat.RequestPermissions(
                         x.Activity,

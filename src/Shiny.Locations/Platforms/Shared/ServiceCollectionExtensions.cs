@@ -18,35 +18,6 @@ namespace Shiny.Locations
 
 #if NETSTANDARD
             return false;
-#elif __ANDROID__
-            builder.AddSingleton<GeofenceManagerImpl>();
-            builder.AddSingleton<IGeofenceManager>(sp => sp.GetRequiredService<GeofenceManagerImpl>());
-            builder.AddSingleton<IAndroidGeofenceManager>(sp => sp.GetRequiredService<GeofenceManagerImpl>());
-
-            if (regionsToRegisterWhenPermissionAvailable.Any())
-            {
-                builder.RegisterPostBuildAction(sp =>
-                {
-                    var mgr = sp.GetService<IGeofenceManager>();
-                    mgr
-                        .WhenAccessStatusChanged()
-                        .Where(x => x == AccessState.Available)
-                        .Take(1)
-                        .SubscribeAsync(async () =>
-                        {
-                            foreach (var region in regionsToRegisterWhenPermissionAvailable)
-                                await mgr.StartMonitoring(region);
-                        });
-
-                    sp
-                        .GetService<AndroidContext>()
-                        .WhenActivityStatusChanged()
-                        .Where(x => x.Status == ActivityState.Created)
-                        .Take(1)
-                        .SubscribeAsync(() => mgr.RequestAccess());
-                });
-            }
-            return true;
 #else
             builder.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             if (regionsToRegisterWhenPermissionAvailable.Any())
@@ -102,28 +73,6 @@ namespace Shiny.Locations
             builder.AddSingleton<IGpsDelegate, T>();
             if (requestIfPermissionGranted != null)
             {
-#if __ANDROID__
-                builder.RegisterPostBuildAction(async sp =>
-                {
-                    var request = new GpsRequest();
-                    requestIfPermissionGranted(request);
-                    request.UseBackground = true;
-
-                    var mgr = sp.GetService<IGpsManager>();
-                    mgr
-                        .WhenAccessStatusChanged(true)
-                        .Where(x => x == AccessState.Available)
-                        .Take(1)
-                        .SubscribeAsync(() => mgr.StartListener(request));
-
-                    sp
-                        .GetService<AndroidContext>()
-                        .WhenActivityStatusChanged()
-                        .Where(x => x.Status == ActivityState.Created)
-                        .Take(1)
-                        .SubscribeAsync(() => mgr.RequestAccess(true));
-                });
-#else
                 builder.RegisterPostBuildAction(async sp =>
                 {
                     var request = new GpsRequest();
