@@ -36,7 +36,18 @@ namespace Shiny
                 return this.topActivity.Current;
             }
         }
-        public IObservable<ActivityChanged> WhenActivityStatusChanged() => this.topActivity.WhenActivityStatusChanged();
+        public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
+        {
+            if (this.topActivity.Current != null)
+                ob.Respond(new ActivityChanged(this.topActivity.Current, ActivityState.Created, null));
+
+            return this
+                .topActivity
+                .WhenActivityStatusChanged()
+                .Subscribe(x => ob.Respond(x));
+        });
+
+
         public PackageInfo Package => this
             .AppContext
             .PackageManager
@@ -129,13 +140,21 @@ namespace Shiny
             });
             this.PermissionResult += handler;
 
-            ActivityCompat.RequestPermissions(
-                this.CurrentActivity,
-                new[] { androidPermission },
-                current
-            );
+            var sub = this.WhenActivityStatusChanged()
+                .Subscribe(x =>
+                    ActivityCompat.RequestPermissions(
+                        x.Activity,
+                        new[] { androidPermission },
+                        current
+                    )
+                );
 
-            return () => this.PermissionResult -= handler;
+
+            return () =>
+            {
+                this.PermissionResult -= handler;
+                sub?.Dispose();
+            };
         });
 
 
