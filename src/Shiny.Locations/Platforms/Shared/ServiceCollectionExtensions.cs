@@ -8,7 +8,7 @@ namespace Shiny.Locations
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regionsToRegisterWhenPermissionAvailable) where T : class, IGeofenceDelegate
+        public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regions) where T : class, IGeofenceDelegate
         {
             builder.AddSingleton<IGeofenceDelegate, T>();
 
@@ -20,22 +20,15 @@ namespace Shiny.Locations
             return false;
 #else
             builder.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
-            if (regionsToRegisterWhenPermissionAvailable.Any())
+            if (regions.Any())
             {
                 builder.RegisterPostBuildAction(async sp =>
                 {
                     var mgr = sp.GetService<IGeofenceManager>();
-                    mgr
-                        .WhenAccessStatusChanged()
-                        .Where(x => x == AccessState.Available)
-                        .Take(1)
-                        .SubscribeAsync(async () =>
-                        {
-                            foreach (var region in regionsToRegisterWhenPermissionAvailable)
-                                await mgr.StartMonitoring(region);
-                        });
-
-                    await mgr.RequestAccess();
+                    var access = await mgr.RequestAccess();
+                    if (access == AccessState.Available)
+                        foreach (var region in regions)
+                            await mgr.StartMonitoring(region);
                 });
             }
             return true;
@@ -80,15 +73,10 @@ namespace Shiny.Locations
                     request.UseBackground = true;
 
                     var mgr = sp.GetService<IGpsManager>();
-                    mgr
-                        .WhenAccessStatusChanged(true)
-                        .Where(x => x == AccessState.Available)
-                        .Take(1)
-                        .SubscribeAsync(() => mgr.StartListener(request));
-
-                    await mgr.RequestAccess(true);
+                    var access = await mgr.RequestAccess(true);
+                    if (access == AccessState.Available)
+                        await mgr.StartListener(request);
                 });
-#endif
             }
             return true;
         }
