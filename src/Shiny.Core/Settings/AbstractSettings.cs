@@ -84,16 +84,16 @@ namespace Shiny.Settings
         {
             try
             {
-                var action = this.Contains(key)
-                    ? SettingChangeAction.Update
-                    : SettingChangeAction.Add;
-
                 if (value == null)
                 {
                     this.Remove(key);
                 }
                 else
                 {
+                    var action = this.Contains(key)
+                        ? SettingChangeAction.Update
+                        : SettingChangeAction.Add;
+
                     var type = this.UnwrapType(value.GetType());
                     this.NativeSet(type, key, value);
                     this.OnChanged(new SettingChangeEventArgs(action, key, value));

@@ -80,7 +80,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.Sqlite",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.JsonNet", "src\Shiny.Integrations.JsonNet\Shiny.Integrations.JsonNet.csproj", "{D375BC97-554C-4E9D-B22A-60900199E948}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Integrations.LiteDB", "src\Shiny.Integrations.LiteDB\Shiny.Integrations.LiteDB.csproj", "{663C38F1-FEAC-4ABD-B018-FE01248BC88E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.LiteDB", "src\Shiny.Integrations.LiteDB\Shiny.Integrations.LiteDB.csproj", "{663C38F1-FEAC-4ABD-B018-FE01248BC88E}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

@@ -171,6 +171,27 @@ namespace Shiny.Device.Tests.Settings
 
 
         [Fact]
+        public void NullBools()
+        {
+            this.Settings.Set<bool?>("SetNullBool", null);
+            var value = this.Settings.Get<bool?>("SetNullBool");
+            Assert.Null(value);
+
+            this.Settings.Set<bool?>("SetNullBool", true);
+            value = this.Settings.Get<bool?>("SetNullBool");
+            Assert.Equal(value, true);
+
+            this.Settings.Set<bool?>("SetNullBool", false);
+            value = this.Settings.Get<bool?>("SetNullBool");
+            Assert.Equal(value, false);
+
+            this.Settings.Set<bool?>("SetNullBool", null);
+            value = this.Settings.Get<bool?>("SetNullBool");
+            Assert.Null(value);
+        }
+
+
+        [Fact]
         public void GetDefaultParameter()
         {
             var tmp = Guid.NewGuid().ToString();
