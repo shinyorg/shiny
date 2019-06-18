@@ -8,6 +8,15 @@ namespace Shiny
     public static partial class Extensions
     {
         /// <summary>
+        ///
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool IsNullable(this Type type)
+            => Nullable.GetUnderlyingType(type) != null;
+
+
+        /// <summary>
         /// Reflects out property information based on the expression value
         /// </summary>
         /// <typeparam name="TSender"></typeparam>

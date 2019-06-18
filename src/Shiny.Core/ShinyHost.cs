@@ -74,18 +74,10 @@ namespace Shiny
             container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
             startup?.ConfigureApp(container);
 
-            try
-            {
-                container.RunPostBuildActions();
-                var tasks = container.GetServices<IStartupTask>();
-                foreach (var task in tasks)
-                    task.Start();
-            }
-            catch (Exception ex)
-            {
-                // protect from the user so we can at least display a user
-                Log.Write(ex);
-            }
+            container.RunPostBuildActions();
+            var tasks = container.GetServices<IStartupTask>();
+            foreach (var task in tasks)
+                task.Start();
         }
     }
 }

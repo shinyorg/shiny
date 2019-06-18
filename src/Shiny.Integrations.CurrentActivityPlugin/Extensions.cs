@@ -1,10 +1,9 @@
 ﻿using System;
-using Android.App;
 using Microsoft.Extensions.DependencyInjection;
 using Plugin.CurrentActivity;
 
 
-namespace Shiny.Integrations.CurrentActivityPlugin
+namespace Shiny
 {
     public static class Extensions
     {

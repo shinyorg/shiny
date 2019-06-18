@@ -23,7 +23,6 @@
     <ItemGroup>
         <Compile Remove="Properties\**\*.cs" />
         <None Include="Properties\**\*.cs" />
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 </Project>
 <!--<?xml version="1.0" encoding="utf-8"?>

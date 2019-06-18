@@ -2,12 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Description>Shiny Integration - Xamarin Forms DependencyService</Description>
+        <Description>Shiny Integration - System.Text.Json Serializer</Description>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Xamarin.Forms" Version="4.0.0.497661" />
+        <PackageReference Include="System.Text.Json" Version="4.6.0-preview6.19303.8" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 

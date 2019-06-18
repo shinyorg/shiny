@@ -242,12 +242,25 @@ namespace Shiny
         /// <typeparam name="TImpl"></typeparam>
         /// <param name="services"></param>
         /// <param name="lifetime"></param>
-        public static void AddIfNotRegister<TService, TImpl>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        public static void AddIfNotRegistered<TService, TImpl>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Singleton)
         {
             if (!services.IsRegistered<TService>())
                 services.Add(new ServiceDescriptor(typeof(TService), typeof(TImpl), lifetime));
         }
 
+
+
+        /// <summary>
+        /// Regiseter a service on the collection if it one is not already registered
+        /// </summary>
+        /// <typeparam name="TImpl"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="lifetime"></param>
+        public static void AddIfNotRegistered<TImpl>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        {
+            if (!services.IsRegistered<TImpl>())
+                services.Add(new ServiceDescriptor(typeof(TImpl), lifetime));
+        }
 
         /// <summary>
         /// Check if a service type is registered on the service builder
