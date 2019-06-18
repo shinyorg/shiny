@@ -5,6 +5,7 @@ using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
 using Shiny.Settings;
+using Shiny.Support.Uwp;
 using Microsoft.Extensions.DependencyInjection;
 using Windows.ApplicationModel.Background;
 
@@ -28,10 +29,19 @@ namespace Shiny
                 services.AddSingleton<IJobManager, JobManager>();
                 services.AddSingleton<IBackgroundTaskProcessor, JobBackgroundTaskProcessor>();
 
+                services.RegisterPostBuildAction(sp =>
+                    ShinyBackgroundTask.Bridge = sp.ResolveOrInstantiate<IUwpBridge>()
+                );
+
                 platformBuild?.Invoke(services);
             });
 
+        public void Bridge(IBackgroundTaskInstance taskInstance)
+        {
+            throw new NotImplementedException();
+        }
 
-        public static void Bridge(IBackgroundTaskInstance instanceTask) => Resolve<UwpContext>().Bridge(instanceTask);
+
+        //public static void Bridge(IBackgroundTaskInstance instanceTask) => Resolve<UwpContext>().Bridge(instanceTask);
     }
 }

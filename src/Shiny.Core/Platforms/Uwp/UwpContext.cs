@@ -7,7 +7,8 @@ namespace Shiny
 {
     public class UwpContext
     {
-        static string BackgroundTaskEntryPoint { get; set; } = "Shiny.Support.Uwp.ShinyBackgroundTask";
+        //static string BackgroundTaskEntryPoint { get; set; } = "Shiny.Support.Uwp.ShinyBackgroundTask";
+        static readonly string BackgroundTaskEntryPoint = typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
         readonly IServiceProvider serviceProvider;
 
 
