@@ -113,15 +113,21 @@ namespace Shiny.Settings
 
             try
             {
+                var isDefault = EqualityComparer<T>.Default.Equals(value, default);
                 var action = this.Contains(key)
                     ? SettingChangeAction.Update
                     : SettingChangeAction.Add;
 
-                var isDefault = EqualityComparer<T>.Default.Equals(value, default(T));
-
-                if (isDefault && typeof(T).GetTypeInfo().IsClass)
+                if (isDefault)
                 {
-                    this.Remove(key);
+                    if (typeof(T).IsNullable())
+                        this.Remove(key);
+                    else
+                    {
+                        var type = this.UnwrapType(typeof(T));
+                        this.NativeSet(type, key, value);
+                        this.OnChanged(new SettingChangeEventArgs(action, key, value));
+                    }
                 }
                 else
                 {
