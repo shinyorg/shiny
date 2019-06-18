@@ -19,20 +19,20 @@ namespace Shiny
                     var instance = service.ImplementationInstance ?? sp.GetService(service.ServiceType);
                     var serviceType = service.ServiceType ?? service.ImplementationType ?? instance.GetType();
 
-                    var method = typeof(DependencyService)
-                        .GetMethods()
-                        .FirstOrDefault(x =>
-                            x.Name == nameof(DependencyService.Register) &&
-                            x.IsStatic &&
-                            x.IsPublic &&
-                            //x.GetParameters().Length == 1 &&
-                            x.GetGenericArguments().Length == 1
-                        );
+                    //var method = typeof(DependencyService)
+                    //    .GetMethods()
+                    //    .FirstOrDefault(x =>
+                    //        x.Name == nameof(DependencyService.Register) &&
+                    //        x.IsStatic &&
+                    //        x.IsPublic &&
+                    //        //x.GetParameters().Length == 1 &&
+                    //        x.GetGenericArguments().Length == 1
+                    //    );
 
                    // Console.WriteLine($"{serviceType} - {instance}");
 
-                    var generic = method.MakeGenericMethod(new[] { serviceType });
-                    generic.Invoke(null, new[] { instance });
+                    //var generic = method.MakeGenericMethod(new[] { serviceType });
+                    //generic.Invoke(null, new[] { instance });
                 }
             });
         }
