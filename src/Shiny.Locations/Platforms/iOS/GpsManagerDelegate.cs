@@ -44,13 +44,13 @@ namespace Shiny.Locations
             => this.deferringUpdates = false;
 
 
-        void InvokeChanges(CLLocation[] locations)
+        void InvokeChanges(CLLocation[] locations) => Dispatcher.SmartExecuteSync(async () =>
         {
             var loc = locations.Last();
             var reading = new GpsReading(loc);
             this.gdelegate?.OnReading(reading);
             this.readingSubject.OnNext(reading);
-        }
+        });
 
 
         //public override void Failed(CLLocationManager manager, NSError error)
