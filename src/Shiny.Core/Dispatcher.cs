@@ -12,21 +12,14 @@ namespace Shiny
         {
             using (var block = new ManualResetEvent(false))
             {
-                Task.Run(async () =>
+                functor().ContinueWith(x =>
                 {
-                    try
+                    if (x.IsFaulted)
                     {
-                        await functor().ConfigureAwait(false);
+                        onError?.SafeExecute(x.Exception);
+                        Log.Write(x.Exception);
                     }
-                    catch (Exception ex)
-                    {
-                        onError?.SafeExecute(ex);
-                        Log.Write(ex);
-                    }
-                    finally
-                    {
-                        block.Set();
-                    }
+                    block.Set();
                 });
                 block.WaitOne();
             }
