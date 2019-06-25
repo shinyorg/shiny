@@ -1,6 +1,7 @@
 ﻿using System;
 using Android.App;
 using Android.Content;
+using Shiny.Logging;
 using static Android.Manifest;
 
 
@@ -20,20 +21,32 @@ namespace Shiny.Locations
         public const string INTENT_ACTION = "com.shiny.locations.GeofenceBroadcastReceiver.ACTION_PROCESS";
 
 
-        public override void OnReceive(Context context, Intent intent) => Dispatcher.SmartExecuteSync(async () =>
+        public override async void OnReceive(Context context, Intent intent)
         {
-            var geofences = ShinyHost.Resolve<IAndroidGeofenceManager>();
-
-            switch (intent.Action)
+            var pendingResult = this.GoAsync();
+            try
             {
-                case INTENT_ACTION:
-                    await geofences.Process(intent);
-                    break;
+                var geofences = ShinyHost.Resolve<IAndroidGeofenceManager>();
 
-                case Permission.ReceiveBootCompleted:
-                    await geofences.ReceiveBoot();
-                    break;
+                switch (intent.Action)
+                {
+                    case INTENT_ACTION:
+                        await geofences.Process(intent);
+                        break;
+
+                    case Permission.ReceiveBootCompleted:
+                        await geofences.ReceiveBoot();
+                        break;
+                }
             }
-        });
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+            finally
+            {
+                pendingResult.Finish();
+            }
+        }
     }
 }

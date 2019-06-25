@@ -22,64 +22,60 @@ namespace Shiny.Net.Http
         public static Subject<HttpTransfer> HttpEvents { get; } = new Subject<HttpTransfer>();
 
 
-        public override void OnReceive(Context context, Intent intent)
+        public override async void OnReceive(Context context, Intent intent)
         {
             if (intent.Action != Native.ActionDownloadComplete)
                 return;
 
+            HttpTransfer? transfer = null;
             var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
+            var native = context.GetManager();
+            var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
 
-            Dispatcher.SmartExecuteSync(async () =>
+            try
             {
-                var native = context.GetManager();
-                var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
-                HttpTransfer? transfer = null;
+                var query = new QueryFilter().Add(id.ToString()).ToNative();
 
-                try
+                using (var cursor = native.InvokeQuery(query))
                 {
-                    var query = new QueryFilter().Add(id.ToString()).ToNative();
-                    using (var cursor = native.InvokeQuery(query))
+                    if (cursor.MoveToNext())
                     {
-                        if (cursor.MoveToNext())
+                        transfer = cursor.ToLib();
+                        if (transfer.Value.Exception != null)
+                            await tdelegate.OnError(transfer.Value, transfer.Value.Exception);
+
+                        else
                         {
-                            transfer = cursor.ToLib();
-                            if (transfer.Value.Exception != null)
-                                await tdelegate.OnError(transfer.Value, transfer.Value.Exception);
+                            var localUri = cursor.GetString(Native.ColumnLocalUri).Replace("file://", String.Empty);
+                            var file = new FileInfo(localUri);
 
-                            else
+                            await Task.Run(() =>
                             {
-                                var localUri = cursor.GetString(Native.ColumnLocalUri).Replace("file://", String.Empty);
-                                var file = new FileInfo(localUri);
-                                Console.WriteLine("Local: " + file.FullName);
+                                var to = transfer.Value.LocalFilePath;
+                                if (File.Exists(to))
+                                    File.Delete(to);
 
-                                await Task.Run(() =>
-                                {
-                                    var to = transfer.Value.LocalFilePath;
-                                    if (File.Exists(to))
-                                        File.Delete(to);
+                                //File.Copy(localPath, to, true);
+                                File.Move(file.FullName, to);
+                            });
 
-                                    //File.Copy(localPath, to, true);
-                                    File.Move(file.FullName, to);
-                                });
-
-                                await tdelegate.OnCompleted(transfer.Value);
-                            }
-                            HttpEvents.OnNext(transfer.Value);
+                            await tdelegate.OnCompleted(transfer.Value);
                         }
+                        HttpEvents.OnNext(transfer.Value);
                     }
                 }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
 
-                    if (transfer != null)
-                    {
-                        Dispatcher.SmartExecuteSync(() => tdelegate.OnError(transfer.Value, ex));
-                        Dispatcher.SafeExecute(() => HttpEvents.OnNext(transfer.Value));
-                    }
+                if (transfer != null)
+                {
+                    await tdelegate.OnError(transfer.Value, ex);
+                    HttpEvents.OnNext(transfer.Value);
                 }
-                native.Remove(id);
-            });
+            }
+            native.Remove(id);
         }
     }
 }

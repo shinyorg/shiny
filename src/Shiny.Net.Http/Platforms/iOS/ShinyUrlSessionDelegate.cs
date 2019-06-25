@@ -54,17 +54,24 @@ namespace Shiny.Net.Http
         }
 
 
-        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error) => Dispatcher.SmartExecuteSync(async () =>
+        public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
         {
-            var transfer = task.FromNative();
-
-            if (task.State != NSUrlSessionTaskState.Canceling && error != null)
+            try
             {
-                Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
-                await this.tdelegate.OnError(transfer, transfer.Exception);
+                var transfer = task.FromNative();
+
+                if (task.State != NSUrlSessionTaskState.Canceling && error != null)
+                {
+                    Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
+                    await this.tdelegate.OnError(transfer, transfer.Exception);
+                }
+                this.onEvent.OnNext(transfer);
             }
-            this.onEvent.OnNext(transfer);
-        });
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
 
 
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
@@ -79,16 +86,23 @@ namespace Shiny.Net.Http
             => this.onEvent.OnNext(downloadTask.FromNative());
 
 
-        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location) => Dispatcher.SmartExecuteSync(async () =>
+        public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
         {
-            var transfer = downloadTask.FromNative();
+            try
+            {
+                var transfer = downloadTask.FromNative();
 
-            if (!transfer.LocalFilePath.IsEmpty())
-                // if you are debugging, the base path tends to change, so the destination path changes too
-                File.Copy(location.Path, transfer.LocalFilePath, true);
+                if (!transfer.LocalFilePath.IsEmpty())
+                    // if you are debugging, the base path tends to change, so the destination path changes too
+                    File.Copy(location.Path, transfer.LocalFilePath, true);
 
-            await this.tdelegate.OnCompleted(transfer);
-            this.onEvent.OnNext(transfer);
-        });
+                await this.tdelegate.OnCompleted(transfer);
+                this.onEvent.OnNext(transfer);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
     }
 }

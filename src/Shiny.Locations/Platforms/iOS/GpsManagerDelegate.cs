@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CoreLocation;
 using Foundation;
-
+using UIKit;
 
 namespace Shiny.Locations
 {
@@ -44,13 +44,21 @@ namespace Shiny.Locations
             => this.deferringUpdates = false;
 
 
-        void InvokeChanges(CLLocation[] locations) => Dispatcher.SmartExecuteSync(async () =>
+        void InvokeChanges(CLLocation[] locations)
         {
-            var loc = locations.Last();
-            var reading = new GpsReading(loc);
-            this.gdelegate?.OnReading(reading);
-            this.readingSubject.OnNext(reading);
-        });
+            var taskId = UIApplication.SharedApplication.BeginBackgroundTask(() => { });
+            try
+            {
+                var loc = locations.Last();
+                var reading = new GpsReading(loc);
+                this.gdelegate?.OnReading(reading);
+                this.readingSubject.OnNext(reading);
+            }
+            finally
+            {
+                UIApplication.SharedApplication.EndBackgroundTask(taskId);
+            }
+        }
 
 
         //public override void Failed(CLLocationManager manager, NSError error)
