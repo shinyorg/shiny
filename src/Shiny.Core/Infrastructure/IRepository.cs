@@ -28,7 +28,14 @@ namespace Shiny.Infrastructure
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<List<T>> GetAll<T>() where T : class;
+        Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class;
+
+        /// <summary>
+        /// Gets all entities from storage of a given type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        Task<IEnumerable<T>> GetAll<T>() where T : class;
 
         /// <summary>
         /// Returns true if updating otherwise false if new
