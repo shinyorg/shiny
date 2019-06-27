@@ -61,7 +61,7 @@ namespace Shiny.Infrastructure
         }
 
 
-        public async Task<IEnumerable<T>> GetAll<T>() where T : class
+        public async Task<IList<T>> GetAll<T>() where T : class
         {
             var result = new List<T>();
             await this.InTransaction(typeof(T), list => result.AddRange(list.Values.OfType<T>()));

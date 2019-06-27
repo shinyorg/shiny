@@ -35,7 +35,7 @@ namespace Shiny.Infrastructure
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<IEnumerable<T>> GetAll<T>() where T : class;
+        Task<IList<T>> GetAll<T>() where T : class;
 
         /// <summary>
         /// Returns true if updating otherwise false if new
