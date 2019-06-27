@@ -1,1 +1,3 @@
-TODO
+iOS
+public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
+    => Shiny.Net.Http.HttpTransferManager.SetCompletionHandler(sessionIdentifier, completionHandler);

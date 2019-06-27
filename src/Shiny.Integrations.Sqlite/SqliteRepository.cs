@@ -28,7 +28,12 @@ namespace Shiny
             throw new NotImplementedException();
         }
 
-        public Task<List<T>> GetAll<T>() where T : class
+        public Task<IList<T>> GetAll<T>() where T : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class
         {
             throw new NotImplementedException();
         }

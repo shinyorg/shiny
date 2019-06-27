@@ -7,7 +7,7 @@ using CoreLocation;
 
 namespace Shiny.Locations
 {
-    public static class iOSExtensions
+    public static class PlatformExtensions
     {
         public static IObservable<AccessState> WhenAccessStatusChanged(this CLLocationManager locationManager, bool background)
             => ((ShinyLocationDelegate)locationManager.Delegate).WhenAccessStatusChanged(background);
@@ -18,7 +18,7 @@ namespace Shiny.Locations
             if (!CLLocationManager.LocationServicesEnabled)
                 return AccessState.Disabled;
 
-            return CLLocationManager.Status.FromNative(true);
+            return CLLocationManager.Status.FromNative(background);
         }
 
 
@@ -37,11 +37,17 @@ namespace Shiny.Locations
             if (status != AccessState.Unknown)
                 return status;
 
-            status = await locationManager
+            var task = locationManager
                 .WhenAccessStatusChanged(background)
                 .Take(1)
                 .ToTask();
 
+            if (background)
+                locationManager.RequestAlwaysAuthorization();
+            else
+                locationManager.RequestWhenInUseAuthorization();
+
+            status = await task;
             return status;
         }
     }

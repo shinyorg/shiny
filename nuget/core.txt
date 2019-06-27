@@ -2,6 +2,12 @@
 
 1. Create a Startup file in your core/abstraction/.NET standard
 
+public class YourStartup : Shiny.Startup
+{
+    public override void ConfigureServices(IServiceCollection services)
+    {
+    }
+}
 
 
 
@@ -44,8 +50,35 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
 IOS
 
 Info.plist
+<key>UIBackgroundModes</key>
+<array>
+	<string>fetch</string>
+</array>
+
 AppDelegate.cs
+Shiny.iOSShinyHost.Init(new YourStartup());
+
+public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+    => Shiny.Jobs.JobManager.OnBackgroundFetch(completionHandler);
 
 
 UWP
+In App.xaml.cs
+UwpShinyHost.Init(new YourStartup());
+
+
 Register the following in your mainfest
+<Extensions>
+    <Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+        <BackgroundTasks>
+            <Task Type="bluetooth"/>
+            <Task Type="deviceConnectionChange"/>
+            <Task Type="deviceServicing"/>
+            <Task Type="deviceUse"/>
+            <Task Type="general"/>
+            <Task Type="location"/>
+            <Task Type="systemEvent"/>
+            <Task Type="timer"/>
+        </BackgroundTasks>
+    </Extension>
+</Extensions>

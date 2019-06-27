@@ -31,7 +31,7 @@ namespace Shiny.Locations
             if (result == null)
                 return;
 
-            Dispatcher.SmartExecuteSync(async () =>
+            this.Execute(async () =>
             {
                 var gpsDelegate = ShinyHost.Resolve<IGpsDelegate>();
                 foreach (var location in result.Locations)

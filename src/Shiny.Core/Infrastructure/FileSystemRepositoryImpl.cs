@@ -49,10 +49,22 @@ namespace Shiny.Infrastructure
         }
 
 
-        public async Task<List<T>> GetAll<T>() where T : class
+        public async Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class
         {
-            List<T> result = null;
-            await this.InTransaction(typeof(T), list => result = list.Values.Cast<T>().ToList());
+            var result = new Dictionary<string, T>();
+            await this.InTransaction(typeof(T), list =>
+            {
+                foreach (var pair in list)
+                    result.Add(pair.Key, (T)pair.Value);
+            });
+            return result;
+        }
+
+
+        public async Task<IList<T>> GetAll<T>() where T : class
+        {
+            var result = new List<T>();
+            await this.InTransaction(typeof(T), list => result.AddRange(list.Values.OfType<T>()));
             return result;
         }
 
