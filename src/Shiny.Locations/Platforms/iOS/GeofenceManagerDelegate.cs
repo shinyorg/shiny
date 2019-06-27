@@ -2,7 +2,7 @@
 using System.Reactive.Subjects;
 using Shiny.Infrastructure;
 using CoreLocation;
-using UIKit;
+
 
 namespace Shiny.Locations
 {
@@ -44,30 +44,21 @@ namespace Shiny.Locations
         }
 
 
-        async void Broadcast(CLLocationManager manager, CLRegion region, GeofenceState status)
+        void Broadcast(CLLocationManager manager, CLRegion region, GeofenceState status) => Dispatcher.Execute(async () =>
         {
             if (region is CLCircularRegion native)
             {
                 var geofence = await this.repository.Get(native.Identifier);
-
                 if (geofence != null)
                 {
-                    var taskId = UIApplication.SharedApplication.BeginBackgroundTask(() => { });
-                    try
+                    await this.gdelegate.OnStatusChanged(status, geofence);
+                    if (geofence.SingleUse)
                     {
-                        await this.gdelegate.OnStatusChanged(status, geofence);
-                        if (geofence.SingleUse)
-                        {
-                            await this.repository.Remove(geofence.Identifier);
-                            manager.StopMonitoring(native);
-                        }
-                    }
-                    finally
-                    {
-                        UIApplication.SharedApplication.EndBackgroundTask(taskId);
+                        await this.repository.Remove(geofence.Identifier);
+                        manager.StopMonitoring(native);
                     }
                 }
             }
-        }
+        });
     }
 }

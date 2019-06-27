@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CoreLocation;
 using Foundation;
-using UIKit;
+
 
 namespace Shiny.Locations
 {
@@ -27,12 +27,11 @@ namespace Shiny.Locations
         public IObservable<IGpsReading> WhenGps() => this.readingSubject;
         public override void LocationsUpdated(CLLocationManager manager, CLLocation[] locations)
         {
-            if (this.Request == null)
+            if (this.Request?.ThrottledInterval == null)
                 this.InvokeChanges(locations);
 
             else if (!this.deferringUpdates)
             {
-                //manager.TrySetDeferrals(this.Request);
                 manager.AllowDeferredLocationUpdatesUntil(0, this.Request.ThrottledInterval.Value.TotalMilliseconds);
                 this.deferringUpdates = true;
                 this.InvokeChanges(locations);
@@ -44,21 +43,13 @@ namespace Shiny.Locations
             => this.deferringUpdates = false;
 
 
-        void InvokeChanges(CLLocation[] locations)
+        void InvokeChanges(CLLocation[] locations) => Dispatcher.Execute(async () =>
         {
-            var taskId = UIApplication.SharedApplication.BeginBackgroundTask(() => { });
-            try
-            {
-                var loc = locations.Last();
-                var reading = new GpsReading(loc);
-                this.gdelegate?.OnReading(reading);
-                this.readingSubject.OnNext(reading);
-            }
-            finally
-            {
-                UIApplication.SharedApplication.EndBackgroundTask(taskId);
-            }
-        }
+            var loc = locations.Last();
+            var reading = new GpsReading(loc);
+            this.gdelegate?.OnReading(reading);
+            this.readingSubject.OnNext(reading);
+        });
 
 
         //public override void Failed(CLLocationManager manager, NSError error)

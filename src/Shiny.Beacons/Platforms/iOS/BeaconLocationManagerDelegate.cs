@@ -2,8 +2,7 @@
 using System.Reactive.Subjects;
 using CoreLocation;
 using Shiny.Locations;
-using Shiny.Logging;
-using UIKit;
+
 
 namespace Shiny.Beacons
 {
@@ -41,28 +40,18 @@ namespace Shiny.Beacons
         public override void RegionLeft(CLLocationManager manager, CLRegion region) => this.Invoke(region, BeaconRegionState.Exited);
 
 
-        async void Invoke(CLRegion region, BeaconRegionState status)
+        void Invoke(CLRegion region, BeaconRegionState status) => Dispatcher.Execute(async () =>
         {
-
-            var native = region as CLBeaconRegion;
-            if (native != null)
+            if (region is CLBeaconRegion native)
             {
-                var taskId = UIApplication.SharedApplication.BeginBackgroundTask(() => { });
-                try
-                {
-                    var beaconRegion = new BeaconRegion(
-                        native.Identifier,
-                        native.ProximityUuid.ToGuid(),
-                        native.Major?.UInt16Value,
-                        native.Minor?.UInt16Value
-                    );
-                    await this.bdelegate?.OnStatusChanged(status, beaconRegion);
-                }
-                finally
-                {
-                    UIApplication.SharedApplication.EndBackgroundTask(taskId);
-                }
+                var beaconRegion = new BeaconRegion(
+                    native.Identifier,
+                    native.ProximityUuid.ToGuid(),
+                    native.Major?.UInt16Value,
+                    native.Minor?.UInt16Value
+                );
+                await this.bdelegate?.OnStatusChanged(status, beaconRegion);
             }
-        }
+        });
     }
 }

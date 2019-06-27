@@ -3,7 +3,7 @@ using System.Reactive.Subjects;
 using Android.App;
 using Android.Content;
 using Android.Gms.Location;
-using Shiny.Logging;
+
 
 namespace Shiny.Locations
 {
@@ -22,7 +22,7 @@ namespace Shiny.Locations
         static readonly Subject<IGpsReading> readingSubject = new Subject<IGpsReading>();
 
 
-        public override async void OnReceive(Context context, Intent intent)
+        public override void OnReceive(Context context, Intent intent)
         {
             if (!intent.Action.Equals(INTENT_ACTION))
                 return;
@@ -31,8 +31,7 @@ namespace Shiny.Locations
             if (result == null)
                 return;
 
-            var pendingResult = this.GoAsync();
-            try
+            this.Execute(async () =>
             {
                 var gpsDelegate = ShinyHost.Resolve<IGpsDelegate>();
                 foreach (var location in result.Locations)
@@ -44,15 +43,7 @@ namespace Shiny.Locations
                             .OnReading(reading)
                             .ConfigureAwait(false);
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-            finally
-            {
-                pendingResult.Finish();
-            }
+            });
         }
     }
 }
