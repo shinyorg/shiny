@@ -1,3 +1,5 @@
+# IF YOU DON'T ANSWER THIS TEMPLATE - THE BOT WILL AUTOMATICALLY CLOSE YOUR ISSUE!
+
 ## Please check all of the platforms you are having the issue on (if platform is not listed, it is not supported)
 
  - [ ] iOS
@@ -14,11 +16,16 @@
  - [ ] Notifications
  - [ ] Sensors
 
+## Version of Library
+
 ## Version of OS(s) listed above with issue
 
 
-## Version of Library
 
+## Steps to Reproduce
+1.
+2.
+3.
 
 ## Expected Behavior
 
