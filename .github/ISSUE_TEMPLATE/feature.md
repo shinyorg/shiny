@@ -2,10 +2,11 @@
 name: Feature Request
 about: Suggest an idea for this project
 title: "[Enhancement] YOUR IDEA!"
-labels: t/enhancement ➕, proposal-open
+labels: ''
 assignees: ''
 
 ---
+
 # IF YOU DON'T ANSWER THIS TEMPLATE - THE BOT WILL AUTOMATICALLY CLOSE YOUR ISSUE! 
 
 ## Summary
