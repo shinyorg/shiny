@@ -7,8 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="**\Platforms\**\*.cs" />
-        <None Include="**\Platforms\**\*.cs" />
+        <None Include="..\..\nuget\sensors.txt" PackagePath="readme.txt" Pack="true" />
+        <Compile Remove="Platforms\**\*.cs" />
+        <None Include="Platforms\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">

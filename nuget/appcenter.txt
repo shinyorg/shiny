@@ -1,6 +1,6 @@
------------------
-Shiny.Locations
------------------
+-----------------------
+Shiny.Logging.AppCenter
+-----------------------
 
 Be sure to start this project on GitHub if it helps
 https://github.com/shinyorg/Shiny
