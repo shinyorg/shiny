@@ -1,13 +1,10 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
-using Shiny.Settings;
 using Shiny.Jobs;
-using Shiny.Caching;
-using Shiny.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-
+using System.ComponentModel;
+using Shiny.Settings;
 
 namespace Shiny
 {
@@ -25,6 +22,12 @@ namespace Shiny
             => postBuildActions.Add(action);
 
 
+        /// <summary>
+        /// Registers a startup singleton
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TImplementation"></typeparam>
+        /// <param name="services"></param>
         public static void AddStartupSingleton<TService, TImplementation>(this IServiceCollection services)
             where TService : class
             where TImplementation : class, TService, IStartupTask
@@ -33,6 +36,42 @@ namespace Shiny
             services.AddSingleton<TService>(x => x.GetService<TImplementation>());
             services.RegisterStartupTask(x => x.GetService<TImplementation>());
         }
+
+
+        /// <summary>
+        /// Creates a special stateful service where your reactive properties are saved
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TImplementation"></typeparam>
+        /// <param name="services"></param>
+        public static void AddStatefulSingleton<TService, TImplementation>(this IServiceCollection services, string settingsKey)
+                where TService : class
+                where TImplementation : class, TService, INotifyPropertyChanged
+            => services.AddSingleton<TService>(sp =>
+            {
+                var instance = ActivatorUtilities.CreateInstance<TImplementation>(sp);
+                sp.GetService<ISettings>().Bind(instance, settingsKey);
+                return instance;
+            });
+
+
+        /// <summary>
+        /// Creates a special stateful service where your reactive properties are saved
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <typeparam name="TImplementation"></typeparam>
+        /// <param name="services"></param>
+        public static void TryAddStatefulSingleton<TService, TImplementation>(this IServiceCollection services, string settingsKey)
+                where TService : class
+                where TImplementation : class, TService
+            => services.AddSingleton<TService>(sp =>
+            {
+                var instance = ActivatorUtilities.CreateInstance<TImplementation>(sp);
+                if (instance is INotifyPropertyChanged npc)
+                    sp.GetService<ISettings>().Bind(npc, settingsKey);
+
+                return instance;
+            });
 
 
         /// <summary>
@@ -71,7 +110,8 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        public static void RegisterModule<T>(this IServiceCollection services) where T : IModule, new() => services.RegisterModule(new T());
+        public static void RegisterModule<T>(this IServiceCollection services)
+            where T : IModule, new() => services.RegisterModule(new T());
 
 
         internal static void RunPostBuildActions(this IServiceProvider container)
@@ -81,69 +121,6 @@ namespace Shiny
 
             postBuildActions.Clear();
         }
-
-
-        /// <summary>
-        /// Adds an injectable (ICache) cache service that doesn't actually cache at all - good for testing
-        /// </summary>
-        /// <param name="services"></param>
-        public static void UseVoidCache(this IServiceCollection services)
-            => services.AddSingleton<ICache, VoidCache>();
-
-
-        /// <summary>
-        /// Adds an injectable (ICache) in-memory cache
-        /// </summary>
-        /// <param name="services">The service collection</param>
-        /// <param name="defaultLifespan">The default timespan for how long objects should live in cache if time is not explicitly set</param>
-        /// <param name="cleanUpTimer">The internal cleanup time interval (don't make this too big or too small)</param>
-        public static void UseMemoryCache(this IServiceCollection services,
-                                          TimeSpan? defaultLifespan = null,
-                                          TimeSpan? cleanUpTimer = null)
-            => services.AddSingleton<ICache>(_ => new MemoryCache(defaultLifespan, cleanUpTimer));
-
-
-        /// <summary>
-        /// Uses the built-in repository (default is file based) to store cache data
-        /// </summary>
-        /// <param name="services">The service collection</param>
-        /// <param name="defaultLifespan">The default timespan for how long objects should live in cache if time is not explicitly set</param>
-        /// <param name="cleanUpTimer">The internal cleanup time interval (don't make this too big or too small)</param>
-        public static void UseRepositoryCache(this IServiceCollection services,
-                                              TimeSpan? defaultLifespan = null,
-                                              TimeSpan? cleanUpTimer = null)
-            => services.AddSingleton<ICache>(sp =>
-            {
-                var repository = sp.GetRequiredService<IRepository>();
-                return new RepositoryCache(repository, defaultLifespan, cleanUpTimer);
-            });
-
-
-        /// <summary>
-        /// Register a strongly typed application settings provider on the service container
-        /// </summary>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="prefix"></param>
-        public static void RegisterSettings<TImpl>(this IServiceCollection services, string prefix = null)
-                where TImpl : class, INotifyPropertyChanged, new()
-            => services.RegisterSettings<TImpl, TImpl>(prefix);
-
-
-        /// <summary>
-        /// Register a strongly typed application settings provider on the service container with a service interface
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="prefix"></param>
-        public static void RegisterSettings<TService, TImpl>(this IServiceCollection services, string prefix = null)
-                where TService : class
-                where TImpl : class, TService, INotifyPropertyChanged, new()
-            => services.AddSingleton<TService>(c => c
-                .GetService<ISettings>()
-                .Bind<TImpl>(prefix)
-            );
 
 
         /// <summary>
@@ -199,7 +176,11 @@ namespace Shiny
             if (desc != null)
                 services.Remove(desc);
 
-            services.Add(new ServiceDescriptor(typeof(TService), typeof(TImpl), desc.Lifetime));
+            services.Add(new ServiceDescriptor(
+                typeof(TService),
+                typeof(TImpl),
+                desc.Lifetime
+            ));
         }
 
 

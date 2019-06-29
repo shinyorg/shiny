@@ -1,17 +1,32 @@
+----------
+Shiny.Core
+----------
+
+Be sure to start this project on GitHub if it helps
+https://github.com/shinyorg/Shiny
 
 
-1. Create a Startup file in your core/abstraction/.NET standard
+
+----------
+SETUP
+----------
+
+
+1. Create a Startup.cs file in your core/abstraction/.NET standard
 
 public class YourStartup : Shiny.Startup
 {
     public override void ConfigureServices(IServiceCollection services)
     {
+        // register your shiny services here
     }
 }
 
 
 
+----------
 ANDROID
+----------
 
 1. Create an application in your android head project
 
@@ -40,45 +55,54 @@ public class YourApplication : Application
 
 
 
-
-2. In your main activity (or every activity where you are going to ask for permissions)
+2. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
 
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
     => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
 
-IOS
 
-Info.plist
+----------
+IOS
+----------
+
+* Add the following as the first line in your AppDelegate.cs - FinishedLaunching method
+
+Shiny.iOSShinyHost.Init(new YourStartup());
+
+
+** IOS JOBS **
+If you plan to use jobs in iOS, please do the following:
+
+1. Add this to your AppDelegate.cs
+
+public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
+    => Shiny.Jobs.JobManager.OnBackgroundFetch(completionHandler);
+
+2. Add the following to your Info.plist
+
 <key>UIBackgroundModes</key>
 <array>
 	<string>fetch</string>
 </array>
 
-AppDelegate.cs
-Shiny.iOSShinyHost.Init(new YourStartup());
-
-public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-    => Shiny.Jobs.JobManager.OnBackgroundFetch(completionHandler);
 
 
+----------
 UWP
-In App.xaml.cs
+----------
+
+1. Add the following to your App.xaml.cs constructor
+
 UwpShinyHost.Init(new YourStartup());
 
 
-Register the following in your mainfest
-<Extensions>
-    <Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
-        <BackgroundTasks>
-            <Task Type="bluetooth"/>
-            <Task Type="deviceConnectionChange"/>
-            <Task Type="deviceServicing"/>
-            <Task Type="deviceUse"/>
-            <Task Type="general"/>
-            <Task Type="location"/>
-            <Task Type="systemEvent"/>
-            <Task Type="timer"/>
-        </BackgroundTasks>
-    </Extension>
-</Extensions>
+2. Add the following to your Package.appxmanifest under the <Application><Extensions> node
+
+<Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+    <BackgroundTasks>
+        <Task Type="general"/>
+        <Task Type="systemEvent"/>
+        <Task Type="timer"/>
+    </BackgroundTasks>
+</Extension>

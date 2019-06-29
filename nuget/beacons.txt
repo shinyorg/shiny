@@ -1,1 +1,20 @@
-TODO
+-----------------
+Shiny.Beacons
+-----------------
+
+Be sure to start this project on GitHub if it helps
+https://github.com/shinyorg/Shiny
+
+-----------------
+Shiny Startup
+-----------------
+
+
+-----------------
+iOS
+-----------------
+
+
+-----------------
+Android
+-----------------
