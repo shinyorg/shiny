@@ -10,7 +10,7 @@ namespace Shiny.Locations
     {
         public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regions) where T : class, IGeofenceDelegate
         {
-            builder.AddSingleton<IGeofenceDelegate, T>();
+            builder.TryAddStatefulSingleton<IGeofenceDelegate, T>(nameof(IGeofenceDelegate));
 
 #if WINDOWS_UWP
             builder.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
@@ -36,10 +36,6 @@ namespace Shiny.Locations
         }
 
 
-        public static void RegisterGpsDelegate<T>(this IServiceCollection services) where T : class, IGpsDelegate
-            => services.AddSingleton<IGpsDelegate, T>();
-
-
         public static bool UseGps(this IServiceCollection builder)
         {
 #if NETSTANDARD
@@ -63,7 +59,7 @@ namespace Shiny.Locations
             if (!builder.UseGps())
                 return false;
 
-            builder.AddSingleton<IGpsDelegate, T>();
+            builder.TryAddStatefulSingleton<IGpsDelegate, T>(nameof(IGpsDelegate));
             if (requestIfPermissionGranted != null)
             {
                 builder.RegisterPostBuildAction(async sp =>

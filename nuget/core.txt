@@ -1,6 +1,6 @@
 
 
-1. Create a Startup file in your core/abstraction/.NET standard
+1. Create a Startup.cs file in your core/abstraction/.NET standard
 
 public class YourStartup : Shiny.Startup
 {
