@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Shiny</RootNamespace>
+        <Description>Shiny Integration - Microsoft AppCenter Logging</Description>
     </PropertyGroup>
 
     <ItemGroup>
