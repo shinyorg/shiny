@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.24">
+﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;monoandroid81;monoandroid90;xamarinios10;xamarintvos10</TargetFrameworks>
@@ -8,6 +8,10 @@
         <PackageVersion>1.0.0</PackageVersion>
         <!--<OutputType Condition=" $(TargetFramework.StartsWith('uap')) ">winmdobj</OutputType>-->
         <!--<DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">$(DefineConstants);ANDROID9</DefineConstants>-->
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFrameworkOverride)' != ''">
+        <TargetFrameworks>$(TargetFrameworkOverride)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

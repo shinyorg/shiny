@@ -1,0 +1,24 @@
+{
+  "solution": {
+    "path": "Shiny-All.sln",
+    "projects": [
+      "src\\Shiny.Beacons\\Shiny.Beacons.csproj",
+      "src\\Shiny.BluetoothLE\\Shiny.BluetoothLE.csproj",
+      "src\\Shiny.Core\\Shiny.Core.csproj",
+      "src\\Shiny.Integrations.CurrentActivityPlugin\\Shiny.Integrations.CurrentActivityPlugin.csproj",
+      "src\\Shiny.Integrations.JsonNet\\Shiny.Integrations.JsonNet.csproj",
+      "src\\Shiny.Integrations.LiteDB\\Shiny.Integrations.LiteDB.csproj",
+      "src\\Shiny.Integrations.Sqlite\\Shiny.Integrations.Sqlite.csproj",
+      "src\\Shiny.Integrations.SysTextJson\\Shiny.Integrations.SysTextJson.csproj",
+      "src\\Shiny.Integrations.XamarinForms\\Shiny.Integrations.XamarinForms.csproj",
+      "src\\Shiny.Locations\\Shiny.Locations.csproj",
+      "src\\Shiny.Logging.AppCenter\\Shiny.Logging.AppCenter.csproj",
+      "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
+      "src\\Shiny.Notifications\\Shiny.Notifications.csproj",
+      "src\\Shiny.Sensors\\Shiny.Sensors.csproj",
+      "src\\Shiny.SpeechRecognition\\Shiny.SpeechRecognition.csproj",
+      "src\\Shiny.Support.Uwp\\Shiny.Support.Uwp.csproj",
+      "src\\Shiny.Testing\\Shiny.Testing.csproj"
+    ]
+  }
+}
