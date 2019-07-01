@@ -32,6 +32,7 @@ namespace Shiny
             where TService : class
             where TImplementation : class, TService, IStartupTask
         {
+            //services.TryAddStatefulSingleton<TImplementation>();
             services.AddSingleton<TImplementation>();
             services.AddSingleton<TService>(x => x.GetService<TImplementation>());
             services.RegisterStartupTask(x => x.GetService<TImplementation>());
@@ -61,17 +62,35 @@ namespace Shiny
         /// <typeparam name="TService"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
         /// <param name="services"></param>
-        public static void TryAddStatefulSingleton<TService, TImplementation>(this IServiceCollection services, string settingsKey)
+        public static void TryAddStatefulSingleton<TService, TImplementation>(this IServiceCollection services, string statefulKey = null)
                 where TService : class
                 where TImplementation : class, TService
             => services.AddSingleton<TService>(sp =>
             {
                 var instance = ActivatorUtilities.CreateInstance<TImplementation>(sp);
                 if (instance is INotifyPropertyChanged npc)
-                    sp.GetService<ISettings>().Bind(npc, settingsKey);
+                    sp.GetService<ISettings>().Bind(npc, statefulKey);
 
                 return instance;
             });
+
+
+        ///// <summary>
+        ///// Creates a special stateful service where your reactive properties are saved
+        ///// </summary>
+        ///// <typeparam name="TService"></typeparam>
+        ///// <typeparam name="TImplementation"></typeparam>
+        ///// <param name="services"></param>
+        //public static void TryAddStatefulSingleton<TService, TImplementation>(this IServiceCollection services, TImplementation instance, string settingsKey)
+        //        where TService : class
+        //        where TImplementation : class, TService
+        //    => services.AddSingleton<TService>(sp =>
+        //    {
+        //        if (instance is INotifyPropertyChanged npc)
+        //            sp.GetService<ISettings>().Bind(npc, settingsKey);
+
+        //        return instance;
+        //    });
 
 
         /// <summary>
@@ -128,24 +147,25 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        public static void RegisterStartupTask<T>(this IServiceCollection services) where T : class, IStartupTask
-            => services.AddSingleton<IStartupTask, T>();
+        public static void RegisterStartupTask<T>(this IServiceCollection services, string statefulKey = null) where T : class, IStartupTask
+            => services.TryAddStatefulSingleton<IStartupTask, T>(statefulKey);
 
 
         /// <summary>
         /// Register a startup task that runs immediately after the container is built with full dependency injected services
         /// </summary>
         /// <param name="services"></param>
-        public static void RegisterStartupTask(this IServiceCollection services, IStartupTask instance)
-            => services.AddSingleton(instance);
+        public static void RegisterStartupTask(this IServiceCollection services,
+                                               Func<IServiceProvider, IStartupTask> register,
+                                               string statefulKey = null)
+            => services.AddSingleton(sp =>
+            {
+                var impl = register(sp);
+                if (impl is INotifyPropertyChanged npc)
+                    sp.GetService<ISettings>().Bind(npc, statefulKey);
 
-
-        /// <summary>
-        /// Register a startup task that runs immediately after the container is built with full dependency injected services
-        /// </summary>
-        /// <param name="services"></param>
-        public static void RegisterStartupTask(this IServiceCollection services, Func<IServiceProvider, IStartupTask> register)
-            => services.AddSingleton(register);
+                return impl;
+            });
 
 
         /// <summary>
@@ -242,6 +262,7 @@ namespace Shiny
             if (!services.IsRegistered<TImpl>())
                 services.Add(new ServiceDescriptor(typeof(TImpl), lifetime));
         }
+
 
         /// <summary>
         /// Check if a service type is registered on the service builder
