@@ -44,6 +44,7 @@ namespace Shiny.BluetoothLE.Peripherals
                     this.native,
                     null
                 );
+                tcs.TrySetResult(null);
             });
             this.manager.ReadyToUpdateSubscribers += handler;
 
