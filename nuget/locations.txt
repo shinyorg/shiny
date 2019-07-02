@@ -2,5 +2,5 @@
 Shiny.Locations
 -----------------
 
-Be sure to start this project on GitHub if it helps
+Be sure to star this project on GitHub if it helps
 https://github.com/shinyorg/Shiny
