@@ -36,20 +36,34 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public async Task Notify(byte[] data, params IPeripheral[] centrals)
         {
-            var tcs = new TaskCompletionSource<object>();
-            var handler = new EventHandler((sender, args) =>
+            var success = this.manager.UpdateValue(
+                NSData.FromArray(data),
+                this.native,
+                null
+            );
+            if (!success)
             {
-                this.manager.UpdateValue(
-                    NSData.FromArray(data),
-                    this.native,
-                    null
-                );
-                tcs.TrySetResult(null);
-            });
-            this.manager.ReadyToUpdateSubscribers += handler;
+                var tcs = new TaskCompletionSource<object>();
+                var handler = new EventHandler((sender, args) =>
+                {
+                    this.manager.UpdateValue(
+                        NSData.FromArray(data),
+                        this.native,
+                        null
+                    );
+                    tcs.TrySetResult(null);
+                });
 
-            await tcs.Task.ConfigureAwait(false);
-            this.manager.ReadyToUpdateSubscribers -= handler;
+                try
+                {
+                    this.manager.ReadyToUpdateSubscribers += handler;
+                    await tcs.Task.ConfigureAwait(false);
+                }
+                finally
+                {
+                    this.manager.ReadyToUpdateSubscribers -= handler;
+                }
+            }
         }
 
 
