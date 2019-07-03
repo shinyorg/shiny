@@ -4,9 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 
+
 namespace Shiny
 {
-    public abstract partial class ShinyHost
+    public abstract class ShinyHost
     {
         /// <summary>
         /// Resolve a specified service from the container

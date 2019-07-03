@@ -29,19 +29,12 @@ namespace Shiny
                 services.AddSingleton<IJobManager, JobManager>();
                 services.AddSingleton<IBackgroundTaskProcessor, JobBackgroundTaskProcessor>();
 
-                services.RegisterPostBuildAction(sp =>
-                    ShinyBackgroundTask.Bridge = sp.ResolveOrInstantiate<IUwpBridge>()
-                );
+                // TODO
+                //services.RegisterPostBuildAction(sp =>
+                //    ShinyBackgroundTask.Bridge = sp.ResolveOrInstantiate<IUwpBridge>()
+                //);
 
                 platformBuild?.Invoke(services);
             });
-
-        public void Bridge(IBackgroundTaskInstance taskInstance)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        //public static void Bridge(IBackgroundTaskInstance instanceTask) => Resolve<UwpContext>().Bridge(instanceTask);
     }
 }

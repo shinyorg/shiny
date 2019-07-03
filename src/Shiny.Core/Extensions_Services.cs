@@ -1,16 +1,26 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Shiny.Jobs;
-using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny.Jobs;
 using Shiny.Settings;
+
 
 namespace Shiny
 {
     public static partial class Extensions
     {
         static readonly List<Action<IServiceProvider>> postBuildActions = new List<Action<IServiceProvider>>();
+
+
+        internal static void RunPostBuildActions(this IServiceProvider container)
+        {
+            foreach (var action in postBuildActions)
+                action(container);
+
+            postBuildActions.Clear();
+        }
 
 
         /// <summary>
@@ -22,75 +32,67 @@ namespace Shiny
             => postBuildActions.Add(action);
 
 
+
         /// <summary>
-        /// Registers a startup singleton
+        /// Registers a shiny singleton - If it implements IStartupTask
         /// </summary>
         /// <typeparam name="TService"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
         /// <param name="services"></param>
-        public static void AddStartupSingleton<TService, TImplementation>(this IServiceCollection services)
+        public static void AddService<TService, TImplementation>(this IServiceCollection services)
             where TService : class
-            where TImplementation : class, TService, IStartupTask
+            where TImplementation : class, TService
         {
-            //services.TryAddStatefulSingleton<TImplementation>();
-            services.AddSingleton<TImplementation>();
-            services.AddSingleton<TService>(x => x.GetService<TImplementation>());
-            services.RegisterStartupTask(x => x.GetService<TImplementation>());
+            services.AddSingleton<TService>(sp =>
+            {
+                var instance = sp.ResolveOrInstantiate<TImplementation>();
+                if (instance is INotifyPropertyChanged npc)
+                    // attribute to get bindable point
+                    sp.GetService<ISettings>().Bind(npc);
+
+                return instance;
+            });
+            if (typeof(TService).IsAssignableFrom(typeof(IStartupTask)) ||
+                typeof(TImplementation).IsAssignableFrom(typeof(IStartup)))
+            {
+                postBuildActions.Add(sp =>
+                    ((IStartupTask)sp.GetService<TService>()).Start()
+                );
+            }
         }
 
 
         /// <summary>
-        /// Creates a special stateful service where your reactive properties are saved
+        /// Register a startup task that runs immediately after the container is built with full dependency injected services
         /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImplementation"></typeparam>
         /// <param name="services"></param>
-        public static void AddStatefulSingleton<TService, TImplementation>(this IServiceCollection services, string settingsKey)
-                where TService : class
-                where TImplementation : class, TService, INotifyPropertyChanged
-            => services.AddSingleton<TService>(sp =>
+        public static void RegisterStartupTask<TImplementation>(this IServiceCollection services)
+            where TImplementation : IStartupTask
+
+            => services.RegisterPostBuildAction(sp =>
             {
-                var instance = ActivatorUtilities.CreateInstance<TImplementation>(sp);
-                sp.GetService<ISettings>().Bind(instance, settingsKey);
-                return instance;
+                var instance = sp.ResolveOrInstantiate<TImplementation>();
+                if (instance is INotifyPropertyChanged npc)
+                    sp.GetService<ISettings>().Bind(npc);
+
+                instance.Start();
             });
 
 
         /// <summary>
-        /// Creates a special stateful service where your reactive properties are saved
+        /// Register a job on the job manager
         /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImplementation"></typeparam>
         /// <param name="services"></param>
-        public static void TryAddStatefulSingleton<TService, TImplementation>(this IServiceCollection services, string statefulKey = null)
-                where TService : class
-                where TImplementation : class, TService
-            => services.AddSingleton<TService>(sp =>
+        /// <param name="jobInfo"></param>
+        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
+            => services.RegisterPostBuildAction(async sp =>
             {
-                var instance = ActivatorUtilities.CreateInstance<TImplementation>(sp);
-                if (instance is INotifyPropertyChanged npc)
-                    sp.GetService<ISettings>().Bind(npc, statefulKey);
-
-                return instance;
+                // what if permission fails?
+                var jobs = sp.GetService<IJobManager>();
+                var access = await jobs.RequestAccess();
+                if (access == AccessState.Available)
+                    await jobs.Schedule(jobInfo);
             });
-
-
-        ///// <summary>
-        ///// Creates a special stateful service where your reactive properties are saved
-        ///// </summary>
-        ///// <typeparam name="TService"></typeparam>
-        ///// <typeparam name="TImplementation"></typeparam>
-        ///// <param name="services"></param>
-        //public static void TryAddStatefulSingleton<TService, TImplementation>(this IServiceCollection services, TImplementation instance, string settingsKey)
-        //        where TService : class
-        //        where TImplementation : class, TService
-        //    => services.AddSingleton<TService>(sp =>
-        //    {
-        //        if (instance is INotifyPropertyChanged npc)
-        //            sp.GetService<ISettings>().Bind(npc, settingsKey);
-
-        //        return instance;
-        //    });
 
 
         /// <summary>
@@ -131,57 +133,6 @@ namespace Shiny
         /// <param name="services"></param>
         public static void RegisterModule<T>(this IServiceCollection services)
             where T : IModule, new() => services.RegisterModule(new T());
-
-
-        internal static void RunPostBuildActions(this IServiceProvider container)
-        {
-            foreach (var action in postBuildActions)
-                action(container);
-
-            postBuildActions.Clear();
-        }
-
-
-        /// <summary>
-        /// Register a startup task that runs immediately after the container is built with full dependency injected services
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="services"></param>
-        public static void RegisterStartupTask<T>(this IServiceCollection services, string statefulKey = null) where T : class, IStartupTask
-            => services.TryAddStatefulSingleton<IStartupTask, T>(statefulKey);
-
-
-        /// <summary>
-        /// Register a startup task that runs immediately after the container is built with full dependency injected services
-        /// </summary>
-        /// <param name="services"></param>
-        public static void RegisterStartupTask(this IServiceCollection services,
-                                               Func<IServiceProvider, IStartupTask> register,
-                                               string statefulKey = null)
-            => services.AddSingleton(sp =>
-            {
-                var impl = register(sp);
-                if (impl is INotifyPropertyChanged npc)
-                    sp.GetService<ISettings>().Bind(npc, statefulKey);
-
-                return impl;
-            });
-
-
-        /// <summary>
-        /// Register a job on the job manager
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="jobInfo"></param>
-        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-            => services.RegisterPostBuildAction(async sp =>
-            {
-                // what if permission fails?
-                var jobs = sp.GetService<IJobManager>();
-                var access = await jobs.RequestAccess();
-                if (access == AccessState.Available)
-                    await jobs.Schedule(jobInfo);
-            });
 
 
         /// <summary>
