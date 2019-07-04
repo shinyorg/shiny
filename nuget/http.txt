@@ -2,8 +2,13 @@
 Shiny.Net.Http
 -----------------
 
-Be sure to start this project on GitHub if it helps
-https://github.com/shinyorg/Shiny
+GitHub: https://github.com/shinyorg/Shiny
+Samples: https://github.com/shinyorg/ShinySamples
+Docs: https://shinylib.net
+Blog: https://allancritchie.net
+
+Please star this project on GitHub if you use it in your projects
+
 
 -----------------
 iOS
@@ -13,3 +18,16 @@ Add the following to your AppDelegate.cs
 
 public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
     => Shiny.Net.Http.HttpTransferManager.SetCompletionHandler(sessionIdentifier, completionHandler);
+
+
+-----------------
+Android
+-----------------
+
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+-----------------
+UWP
+-----------------

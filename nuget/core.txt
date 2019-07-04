@@ -2,9 +2,12 @@
 Shiny.Core
 ----------
 
-Be sure to start this project on GitHub if it helps
-https://github.com/shinyorg/Shiny
+GitHub: https://github.com/shinyorg/Shiny
+Samples: https://github.com/shinyorg/ShinySamples
+Docs: https://shinylib.net
+Blog: https://allancritchie.net
 
+Please star this project on GitHub if you use it in your projects
 
 
 ----------
@@ -54,12 +57,18 @@ public class YourApplication : Application
 }
 
 
-
 2. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
 
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
     => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
+
+3. In your Android.manifest for Jobs
+
+<uses-permission android:name="android.permission.BATTERY_STATS" />
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 
 ----------

@@ -2,5 +2,46 @@
 Shiny.Locations
 -----------------
 
-Be sure to start this project on GitHub if it helps
-https://github.com/shinyorg/Shiny
+GitHub: https://github.com/shinyorg/Shiny
+Samples: https://github.com/shinyorg/ShinySamples
+Docs: https://shinylib.net
+Blog: https://allancritchie.net
+
+Please star this project on GitHub if you use it in your projects
+
+
+//builder.UseGeofencing<LocationDelegates>(new GeofenceRegion("Test", new Position(1, 1), Distance.FromKilometers(1)));
+builder.UseGeofencing<LocationDelegates>();
+builder.UseGps<LocationDelegates>();
+
+-----------------
+iOS
+-----------------
+
+<key>NSLocationAlwaysUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+
+<key>UIBackgroundModes</key>
+<array>
+	<string>location</string>
+</array>
+
+-----------------
+Android
+-----------------
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+-----------------
+UWP
+-----------------
+
+<Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+    <BackgroundTasks>
+        <Task Type="location" />
+    </BackgroundTasks>
+</Extension>
