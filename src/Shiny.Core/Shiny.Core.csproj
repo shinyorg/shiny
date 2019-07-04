@@ -18,7 +18,6 @@
         <None Include="..\..\nuget\core.txt" PackagePath="readme.txt" Pack="true" />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
-        <None Remove="Platforms\Uwp\UwpBridgeImpl.cs" />
         <PackageReference Include="System.Reactive" Version="4.1.5" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />

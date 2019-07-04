@@ -8,9 +8,9 @@
 
     <ItemGroup>
         <None Include="..\..\nuget\activity.txt" PackagePath="readme.txt" Pack="true" />
-        <Compile Remove="obj\**" />
+        <!--<Compile Remove="obj\**" />
         <EmbeddedResource Remove="obj\**" />
-        <None Remove="obj\**" />
+        <None Remove="obj\**" />-->
     </ItemGroup>
 
     <ItemGroup>

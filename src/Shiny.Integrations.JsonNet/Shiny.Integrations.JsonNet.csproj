@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="..\..\nuget\jsonnet.txt" PackagePath="readme.txt" Pack="true" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     </ItemGroup>
 

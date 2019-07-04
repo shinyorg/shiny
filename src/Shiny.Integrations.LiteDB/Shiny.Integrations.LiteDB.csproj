@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="..\..\nuget\litedb.txt" PackagePath="readme.txt" Pack="true" />
         <PackageReference Include="LiteDB" Version="4.1.4" />
     </ItemGroup>
 

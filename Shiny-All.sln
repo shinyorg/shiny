@@ -16,10 +16,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		azure-pipelines.yml = azure-pipelines.yml
 		bean_testhost.ino = bean_testhost.ino
-		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
-		CONTRIBUTING.md = CONTRIBUTING.md
-		src\Directory.build.props = src\Directory.build.props
-		ISSUE_TEMPLATE.md = ISSUE_TEMPLATE.md
 		LICENSE.md = LICENSE.md
 		readme.md = readme.md
 		support.xlsx = support.xlsx
@@ -47,8 +43,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Device.Tests.Shared",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1DC43C21-5765-4B46-95F9-CDECB851DF94}"
 	ProjectSection(SolutionItems) = preProject
+		.github\CODE_OF_CONDUCT.md = .github\CODE_OF_CONDUCT.md
+		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
+		.github\FUNDING.yml = .github\FUNDING.yml
 		.github\issue-close-app.yml = .github\issue-close-app.yml
+		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
 		.github\noresponse.yml = .github\noresponse.yml
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 		.github\stale.yml = .github\stale.yml
 		.github\support.yaml = .github\support.yaml
 	EndProjectSection
@@ -83,6 +84,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.LiteDB", "src\Shiny.Integrations.LiteDB\Shiny.Integrations.LiteDB.csproj", "{663C38F1-FEAC-4ABD-B018-FE01248BC88E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.AppCenter", "src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj", "{A9FE0230-4CFC-4633-B44D-5B4174032E64}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.XamEssentials", "src\Shiny.Integrations.XamEssentials\Shiny.Integrations.XamEssentials.csproj", "{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{48AE87AB-C0FE-4426-860C-2C5808E10238}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug.md = .github\ISSUE_TEMPLATE\bug.md
+		.github\ISSUE_TEMPLATE\feature.md = .github\ISSUE_TEMPLATE\feature.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -1320,6 +1329,62 @@ Global
 		{A9FE0230-4CFC-4633-B44D-5B4174032E64}.Release|x64.Build.0 = Release|Any CPU
 		{A9FE0230-4CFC-4633-B44D-5B4174032E64}.Release|x86.ActiveCfg = Release|Any CPU
 		{A9FE0230-4CFC-4633-B44D-5B4174032E64}.Release|x86.Build.0 = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|Any CPU.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|Any CPU.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|ARM.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|ARM.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|ARM64.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|ARM64.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|x64.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|x64.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|x86.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Ad-Hoc|x86.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|Any CPU.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|Any CPU.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|ARM.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|ARM.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|ARM64.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|ARM64.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|iPhone.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|x64.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|x64.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|x86.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.AppStore|x86.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|ARM.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|x64.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|ARM.ActiveCfg = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|ARM.Build.0 = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|ARM64.Build.0 = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|iPhone.Build.0 = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|x64.ActiveCfg = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|x64.Build.0 = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1337,6 +1402,8 @@ Global
 		{D375BC97-554C-4E9D-B22A-60900199E948} = {105E8691-5840-4DBD-BC8E-C9FDAB1633D6}
 		{663C38F1-FEAC-4ABD-B018-FE01248BC88E} = {105E8691-5840-4DBD-BC8E-C9FDAB1633D6}
 		{A9FE0230-4CFC-4633-B44D-5B4174032E64} = {105E8691-5840-4DBD-BC8E-C9FDAB1633D6}
+		{675BCCD7-A38A-475A-A664-F09D0AAFD1C8} = {105E8691-5840-4DBD-BC8E-C9FDAB1633D6}
+		{48AE87AB-C0FE-4426-860C-2C5808E10238} = {1DC43C21-5765-4B46-95F9-CDECB851DF94}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {135D86AF-4EC4-4AA0-BD06-75C410F3EA08}
