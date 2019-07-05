@@ -47,7 +47,7 @@ public class YourApplication : Application
     public override void OnCreate()
     {
         base.OnCreate();
-        AndroidShinyHost.Init(new Startup(), services => {
+        Shiny.AndroidShinyHost.Init(this, new YourStartup(), services => {
             // register any platform specific stuff you need here
         });
     }
@@ -58,7 +58,10 @@ public class YourApplication : Application
 2. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
 
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
-    => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+{
+    Shiny.AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+    base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+}
 
 
 
@@ -94,7 +97,7 @@ UWP
 
 1. Add the following to your App.xaml.cs constructor
 
-UwpShinyHost.Init(new YourStartup());
+Shiny.UwpShinyHost.Init(new YourStartup());
 
 
 2. Add the following to your Package.appxmanifest under the <Application><Extensions> node
