@@ -9,13 +9,15 @@
 
     <ItemGroup>
         <None Include="..\..\nuget\xamessentials.txt" PackagePath="readme.txt" Pack="true" />
-        <Compile Remove="Platforms\**\*.cs" />
-        <None Include="Platforms\**\*.cs" />
         <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
     </ItemGroup>
 
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <Compile Include="Platforms\Android\**\*.cs" />
+        <Compile Include="Android\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
