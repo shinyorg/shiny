@@ -23,7 +23,7 @@ namespace Shiny.SpeechRecognition
             if (!SpeechRecognizer.IsRecognitionAvailable(this.context.AppContext))
                 state = AccessState.NotSupported;
 
-            else if (!this.context.IsInManifest(Manifest.Permission.RecordAudio, false))
+            else if (!this.context.IsInManifest(Manifest.Permission.RecordAudio))
                 state = AccessState.NotSetup;
 
             return Task.FromResult(state);

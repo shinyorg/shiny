@@ -168,21 +168,20 @@ namespace Shiny
             return intent;
         }
 
-        public bool IsInManifest(string androidPermission, bool assert)
+
+        public bool IsInManifest(string androidPermission)
         {
             var permissions = this.AppContext.PackageManager.GetPackageInfo(
                 this.AppContext.PackageName,
                 PackageInfoFlags.Permissions
             )?.RequestedPermissions;
 
-            var exists = !permissions?.Any(x => x.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase)) ?? false;
-            if (!exists)
-            {
-                Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
-                return false;
-            }
+            foreach (var permission in permissions)
+                if (permission.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
 
-            return true;
+            Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
+            return false;
         }
     }
 }
