@@ -64,14 +64,15 @@ namespace Shiny.Locations
             {
                 builder.RegisterPostBuildAction(async sp =>
                 {
-                    var request = new GpsRequest();
-                    requestIfPermissionGranted(request);
-                    request.UseBackground = true;
-
                     var mgr = sp.GetService<IGpsManager>();
                     var access = await mgr.RequestAccess(true);
                     if (access == AccessState.Available)
+                    {
+                        var request = new GpsRequest();
+                        request.UseBackground = true;
+                        requestIfPermissionGranted(request);
                         await mgr.StartListener(request);
+                    }
                 });
             }
             return true;
