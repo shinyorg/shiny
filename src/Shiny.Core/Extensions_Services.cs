@@ -52,8 +52,8 @@ namespace Shiny
 
                 return instance;
             });
-            if (typeof(TService).IsAssignableFrom(typeof(IStartupTask)) ||
-                typeof(TImplementation).IsAssignableFrom(typeof(IStartup)))
+            if (typeof(TService).GetInterface(typeof(IStartupTask).FullName) != null ||
+                typeof(TImplementation).GetInterface(typeof(IStartupTask).FullName) != null)
             {
                 postBuildActions.Add(sp =>
                     ((IStartupTask)sp.GetService<TService>()).Start()
