@@ -108,7 +108,6 @@ namespace Shiny.Notifications
             var smallIconResourceId = this.context.GetResourceIdByName(notification.Android.SmallIconResourceName);
 
             var builder = new NotificationCompat.Builder(this.context.AppContext)
-                .SetAutoCancel(true)
                 .SetContentTitle(notification.Title)
                 .SetContentText(notification.Message)
                 .SetSmallIcon(smallIconResourceId)
@@ -117,6 +116,9 @@ namespace Shiny.Notifications
             // TODO
             //if ((int)Build.VERSION.SdkInt >= 21 && notification.Android.Color != null)
             //    builder.SetColor(notification.Android.Color.Value)
+
+            builder.SetAutoCancel(notification.Android.AutoCancel);
+            builder.SetOngoing(notification.Android.OnGoing);
 
             if (notification.Android.Priority != null)
                 builder.SetPriority(notification.Android.Priority.Value);
