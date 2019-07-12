@@ -23,6 +23,8 @@ namespace Shiny.Notifications
         public string ChannelDescription { get; set; } = DefaultChannelDescription;
         public AndroidNotificationImportance NotificationImportance { get; set; } = DefaultNotificationImportance;
         public string SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
+        public bool OnGoing { get; set; }
+        public bool AutoCancel { get; set; } = true;
     }
 
 
