@@ -17,14 +17,21 @@ SETUP
 
 1. Create a Startup.cs file in your core/abstraction/.NET standard
 
-public class YourStartup : Shiny.Startup
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny;
+
+
+namespace YourNamespace
 {
-    public override void ConfigureServices(IServiceCollection services)
+    public class YourStartup : ShinyStartup
     {
-        // register your shiny services here
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            // register your shiny services here
+        }
     }
 }
-
 
 
 ----------
@@ -39,20 +46,23 @@ using Android.App;
 using Android.Runtime;
 
 
-[Application]
-public class YourApplication : Application
+namespace YourNamespace
 {
-    public YourApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+    [Application]
+    public class YourApplication : Application
     {
-    }
+        public YourApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+        {
+        }
 
 
-    public override void OnCreate()
-    {
-        base.OnCreate();
-        Shiny.AndroidShinyHost.Init(this, new YourStartup(), services => {
-            // register any platform specific stuff you need here
-        });
+        public override void OnCreate()
+        {
+            base.OnCreate();
+            Shiny.AndroidShinyHost.Init(this, new YourStartup(), services => {
+                // register any platform specific stuff you need here
+            });
+        }
     }
 }
 
