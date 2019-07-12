@@ -1,65 +1,22 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Settings;
-
+using Shiny.Infrastructure.DependencyInjection;
 
 namespace Shiny
 {
     public static partial class Extensions
     {
-        static readonly List<Action<IServiceProvider>> postBuildActions = new List<Action<IServiceProvider>>();
-
-
-        internal static void RunPostBuildActions(this IServiceProvider container)
-        {
-            foreach (var action in postBuildActions)
-                action(container);
-
-            postBuildActions.Clear();
-        }
-
-
         /// <summary>
         /// Registers a post container build step
         /// </summary>
         /// <param name="services"></param>
         /// <param name="action"></param>
         public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
-            => postBuildActions.Add(action);
-
-
-
-        /// <summary>
-        /// Registers a shiny singleton - If it implements IStartupTask
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImplementation"></typeparam>
-        /// <param name="services"></param>
-        public static void AddService<TService, TImplementation>(this IServiceCollection services)
-            where TService : class
-            where TImplementation : class, TService
-        {
-            services.AddSingleton<TService>(sp =>
-            {
-                var instance = sp.ResolveOrInstantiate<TImplementation>();
-                if (instance is INotifyPropertyChanged npc)
-                    // attribute to get bindable point
-                    sp.GetService<ISettings>().Bind(npc);
-
-                return instance;
-            });
-            if (typeof(TService).GetInterface(typeof(IStartupTask).FullName) != null ||
-                typeof(TImplementation).GetInterface(typeof(IStartupTask).FullName) != null)
-            {
-                postBuildActions.Add(sp =>
-                    ((IStartupTask)sp.GetService<TService>()).Start()
-                );
-            }
-        }
+            => ((ShinyServiceCollection)services).RegisterPostBuildAction(action);
 
 
         /// <summary>
@@ -67,7 +24,7 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         public static void RegisterStartupTask<TImplementation>(this IServiceCollection services)
-            where TImplementation : IStartupTask
+            where TImplementation : IShinyStartupTask
 
             => services.RegisterPostBuildAction(sp =>
             {

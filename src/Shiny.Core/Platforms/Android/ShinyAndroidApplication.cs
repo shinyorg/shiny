@@ -22,7 +22,7 @@ namespace Shiny
 
 
 
-    public abstract class ShinyAndroidApplication<T> : Application where T : IStartup, new()
+    public abstract class ShinyAndroidApplication<T> : Application where T : IShinyStartup, new()
     {
         protected ShinyAndroidApplication(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) {}
 

@@ -12,7 +12,7 @@ namespace Shiny
 {
     public class TvShinyHost : ShinyHost
     {
-        public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init(IShinyStartup startup = null, Action<IServiceCollection> platformBuild = null)
             => InitPlatform(startup, services =>
             {
                 services.AddSingleton<IConnectivity, SharedConnectivityImpl>();

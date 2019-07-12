@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
-using Shiny.Logging;
+using Shiny.Infrastructure.DependencyInjection;
 
 
 namespace Shiny
@@ -61,24 +61,20 @@ namespace Shiny
         }
 
 
-        protected static void InitPlatform(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
+        protected static void InitPlatform(IShinyStartup startup = null, Action<IServiceCollection> platformBuild = null)
         {
-            var services = new ServiceCollection();
+            var services = new ShinyServiceCollection();
 
             // add standard infrastructure
             services.AddSingleton<IMessageBus, MessageBus>();
 
             startup?.ConfigureServices(services);
             platformBuild?.Invoke(services);
-            Services = services;
 
+            Services = services;
             container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
             startup?.ConfigureApp(container);
-
-            container.RunPostBuildActions();
-            var tasks = container.GetServices<IStartupTask>();
-            foreach (var task in tasks)
-                task.Start();
+            services.RunPostBuildActions(container);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Shiny.Testing
 {
     public class ShinyTestHost : ShinyHost
     {
-        public static void Init(Startup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init(ShinyStartup startup = null, Action<IServiceCollection> platformBuild = null)
         {
             InitPlatform(startup, services =>
             {

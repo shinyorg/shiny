@@ -44,7 +44,7 @@ namespace Shiny.Beacons
             if (!builder.UseBeacons())
                 return false;
 
-            builder.AddService<IBeaconDelegate, T>();
+            builder.AddSingleton<IBeaconDelegate, T>();
 
 #if __ANDROID__
             builder.RegisterPostBuildAction(sp => sp

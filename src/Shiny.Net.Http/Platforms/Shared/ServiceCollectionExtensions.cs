@@ -8,8 +8,8 @@ namespace Shiny.Net.Http
     {
         public static void UseHttpClientTransfers<T>(this IServiceCollection builder) where T : class, IHttpTransferDelegate
         {
-            builder.AddService<IHttpTransferDelegate, T>();
-            builder.AddService<IHttpTransferManager, HttpClientHttpTransferManager>();
+            builder.AddSingleton<IHttpTransferDelegate, T>();
+            builder.AddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
         }
 
 
@@ -18,11 +18,11 @@ namespace Shiny.Net.Http
 #if NETSTANDARD
             builder.UseHttpClientTransfers<T>();
 #elif WINDOWS_UWP || __IOS__
-            builder.AddService<IHttpTransferDelegate, T>();
-            builder.AddService<IHttpTransferManager, HttpTransferManager>();
+            builder.AddSingleton<IHttpTransferDelegate, T>();
+            builder.AddSingleton<IHttpTransferManager, HttpTransferManager>();
 #elif __ANDROID__
-            builder.AddService<IHttpTransferDelegate, T>();
-            builder.AddService<IHttpTransferManager, HttpTransferManager>();
+            builder.AddSingleton<IHttpTransferDelegate, T>();
+            builder.AddSingleton<IHttpTransferManager, HttpTransferManager>();
 #endif
         }
     }

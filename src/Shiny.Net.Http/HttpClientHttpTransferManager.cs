@@ -8,7 +8,7 @@ using Shiny.Logging;
 
 namespace Shiny.Net.Http
 {
-    public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IStartupTask
+    public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
     {
         readonly IJobManager jobManager;
         readonly IMessageBus messageBus;

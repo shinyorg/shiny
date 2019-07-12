@@ -8,7 +8,7 @@ using Foundation;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : AbstractHttpTransferManager, IStartupTask
+    public class HttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
     {
         readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;

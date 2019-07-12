@@ -10,12 +10,12 @@ namespace Shiny.BluetoothLE
     {
         public static void RegisterBleStateRestore<T>(this IServiceCollection services)
             where T : class, IBleStateRestoreDelegate
-            => services.AddService<IBleStateRestoreDelegate, T>();
+            => services.AddSingleton<IBleStateRestoreDelegate, T>();
 
 
         public static void RegisterBleAdapterState<T>(this IServiceCollection services)
             where T : class, IBleAdapterDelegate
-            => services.AddService<IBleAdapterDelegate, T>();
+            => services.AddSingleton<IBleAdapterDelegate, T>();
 
 
         public static bool UseBleCentral(this IServiceCollection builder)

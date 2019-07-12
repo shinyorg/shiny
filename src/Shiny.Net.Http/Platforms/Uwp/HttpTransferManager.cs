@@ -10,7 +10,7 @@ using Shiny.Logging;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : AbstractHttpTransferManager, IStartupTask
+    public class HttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
     {
         protected override async Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
         {
