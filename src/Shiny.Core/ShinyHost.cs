@@ -67,6 +67,7 @@ namespace Shiny
 
             // add standard infrastructure
             services.AddSingleton<IMessageBus, MessageBus>();
+            services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
             services.AddSingleton<ISerializer, JsonNetSerializer>();
 
             startup?.ConfigureServices(services);

@@ -2,7 +2,6 @@
 using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
-using Shiny.Infrastructure;
 using Shiny.IO;
 using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +18,6 @@ namespace Shiny
                 services.AddSingleton<IConnectivity, ConnectivityImpl>();
                 services.AddSingleton<IPowerManager, PowerManagerImpl>();
                 services.AddSingleton<IJobManager, JobManager>();
-                services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
                 services.AddSingleton<IFileSystem, FileSystemImpl>();
                 services.AddSingleton<ISettings, SettingsImpl>();
                 platformBuild?.Invoke(services);
