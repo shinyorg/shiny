@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
-using Shiny;
 
 
 namespace Shiny.Tests.Infrastructure
 {
     public interface IFullService : INotifyPropertyChanged, IShinyStartupTask
     {
-        object Count { get; }
+        int Count { get; }
     }
 
 
