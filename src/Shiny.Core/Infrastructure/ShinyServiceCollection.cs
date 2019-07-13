@@ -53,6 +53,7 @@ namespace Shiny.Infrastructure.DependencyInjection
                     service.Lifetime
                 ));
             }
+            // TODO; this trap IPowerManager as well
             else if (ImplementsInterface<INotifyPropertyChanged>(service))
             {
                 var resolveType = service.ServiceType ?? service.ImplementationType;
@@ -61,7 +62,7 @@ namespace Shiny.Infrastructure.DependencyInjection
                     resolveType,
                     sp =>
                     {
-                        var bindable = (INotifyPropertyChanged)sp.GetService(resolveType);
+                        var bindable = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, service.ImplementationType);
                         sp.GetService<ISettings>().Bind(bindable);
                         return bindable;
                     },
