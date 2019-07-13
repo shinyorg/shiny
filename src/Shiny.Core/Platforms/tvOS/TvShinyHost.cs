@@ -20,7 +20,6 @@ namespace Shiny
                 services.AddSingleton<IJobManager, JobManager>();
                 services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
                 services.AddSingleton<IFileSystem, FileSystemImpl>();
-                services.AddSingleton<ISerializer, JsonNetSerializer>();
                 services.AddSingleton<ISettings, SettingsImpl>();
                 platformBuild?.Invoke(services);
             });
