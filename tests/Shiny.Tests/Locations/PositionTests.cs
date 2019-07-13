@@ -4,7 +4,7 @@ using FluentAssertions;
 using Xunit;
 
 
-namespace Shiny.Tests
+namespace Shiny.Tests.Locations
 {
     public class PositionTests
     {

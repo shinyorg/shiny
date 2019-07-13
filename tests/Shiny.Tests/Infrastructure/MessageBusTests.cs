@@ -7,7 +7,7 @@ using Shiny.Infrastructure;
 using Xunit;
 
 
-namespace Shiny.Tests
+namespace Shiny.Tests.Infrastructure
 {
     public class BusTest
     {
