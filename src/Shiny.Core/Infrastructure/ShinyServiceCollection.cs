@@ -24,6 +24,8 @@ namespace Shiny.Infrastructure.DependencyInjection
         }
 
 
+        internal void AddPostBuildAction(Action<IServiceProvider> action) => this.postBuildActions.Add(action);
+
         internal void RunPostBuildActions(IServiceProvider container)
         {
             foreach (var action in postBuildActions)

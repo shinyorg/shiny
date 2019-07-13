@@ -6,6 +6,7 @@ using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure.DependencyInjection;
 
+
 namespace Shiny
 {
     public static partial class Extensions
@@ -16,7 +17,7 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="action"></param>
         public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
-            => ((ShinyServiceCollection)services).RegisterPostBuildAction(action);
+            => ((ShinyServiceCollection)services).AddPostBuildAction(action);
 
 
         /// <summary>
@@ -53,6 +54,33 @@ namespace Shiny
 
 
         /// <summary>
+        /// Registers a job on the job manager
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="jobType"></param>
+        /// <param name="identifier"></param>
+        public static void RegisterJob(this IServiceCollection services,
+                                       Type jobType,
+                                       string identifier = null,
+                                       InternetAccess requiredNetwork = InternetAccess.None)
+            => services.RegisterPostBuildAction(async sp =>
+            {
+                // what if permission fails?
+                var jobs = sp.GetService<IJobManager>();
+                var access = await jobs.RequestAccess();
+                if (access == AccessState.Available)
+                {
+                    await jobs.Schedule(new JobInfo
+                    {
+                        Type = jobType,
+                        Identifier = identifier ?? jobType.GetType().FullName,
+                        RequiredInternetAccess = requiredNetwork,
+                        Repeat = true
+                    });
+                }
+            });
+
+        /// <summary>
         /// Attempts to resolve or build an instance from a service provider
         /// </summary>
         /// <param name="services"></param>
@@ -76,7 +104,7 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         /// <param name="module"></param>
-        public static void RegisterModule(this IServiceCollection services, IModule module)
+        public static void RegisterModule(this IServiceCollection services, IShinyModule module)
         {
             module.Register(services);
             services.RegisterPostBuildAction(module.OnContainerReady);
@@ -89,7 +117,7 @@ namespace Shiny
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
         public static void RegisterModule<T>(this IServiceCollection services)
-            where T : IModule, new() => services.RegisterModule(new T());
+            where T : IShinyModule, new() => services.RegisterModule(new T());
 
 
         /// <summary>
