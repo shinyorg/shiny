@@ -1,0 +1,34 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;xamarinios10;xamarinwatchos10</TargetFrameworks>
+        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">tizen40;$(TargetFrameworks)</TargetFrameworks>
+        <RootNamespace>Shiny</RootNamespace>
+        <Description>The Shiny Wearables</Description>
+        <PackageVersion>1.0.0</PackageVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFrameworkOverride)' != ''">
+        <TargetFrameworks>$(TargetFrameworkOverride)</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\nuget\wearables.txt" PackagePath="readme.txt" Pack="true" />
+        <None Include="Platforms\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
+        <PackageReference Include="Tizen.NET" Version="4.0.0" />
+        <Compile Include="Platforms\Tizen\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinios')) ">
+        <Compile Include="Platforms\iOS\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinwatchos')) ">
+        <PackageReference Include="Tizen.NET" Version="4.0.0" />
+        <Compile Include="Platforms\watchOS\**\*.cs" />
+    </ItemGroup>
+
+</Project>
