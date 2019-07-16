@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		azure-pipelines.yml = azure-pipelines.yml
 		bean_testhost.ino = bean_testhost.ino
+		global.json = global.json
 		LICENSE.md = LICENSE.md
 		readme.md = readme.md
 		support.xlsx = support.xlsx
@@ -93,7 +94,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 		.github\ISSUE_TEMPLATE\feature.md = .github\ISSUE_TEMPLATE\feature.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Wearables", "src\Shiny.Wearables\Shiny.Wearables.csproj", "{4CA7863A-8A9F-4678-8558-2053CB626AEC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Wearables", "src\Shiny.Wearables\Shiny.Wearables.csproj", "{4CA7863A-8A9F-4678-8558-2053CB626AEC}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

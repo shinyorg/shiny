@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;xamarinios10;xamarinwatchos10</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarinios10;xamarin.watchos10</TargetFrameworks>
         <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">tizen40;$(TargetFrameworks)</TargetFrameworks>
         <RootNamespace>Shiny</RootNamespace>
         <Description>The Shiny Wearables</Description>
@@ -26,8 +26,7 @@
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinwatchos')) ">
-        <PackageReference Include="Tizen.NET" Version="4.0.0" />
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.watchos')) ">
         <Compile Include="Platforms\watchOS\**\*.cs" />
     </ItemGroup>
 
