@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.IO;
+using Shiny.Settings;
 
 
 namespace Shiny.Platforms.watchOS
@@ -15,8 +17,8 @@ namespace Shiny.Platforms.watchOS
                 //services.AddSingleton<IPowerManager, PowerManagerImpl>();
                 //services.AddSingleton<IJobManager, JobManager>();
                 //services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
-                //services.AddSingleton<IFileSystem, FileSystemImpl>();
-                //services.AddSingleton<ISettings, SettingsImpl>();
+                services.AddSingleton<IFileSystem, FileSystemImpl>();
+                services.AddSingleton<ISettings, SettingsImpl>();
                 platformBuild?.Invoke(services);
             });
     }

@@ -2,7 +2,6 @@
 using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
-using Shiny.Infrastructure;
 using Shiny.IO;
 using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
