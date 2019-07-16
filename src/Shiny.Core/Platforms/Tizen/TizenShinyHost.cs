@@ -14,7 +14,6 @@ namespace Shiny
                 //services.AddSingleton<IConnectivity, ConnectivityImpl>();
                 //services.AddSingleton<IPowerManager, PowerManagerImpl>();
                 //services.AddSingleton<IJobManager, JobManager>();
-                //services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
                 services.AddSingleton<IFileSystem, FileSystemImpl>();
                 services.AddSingleton<ISettings, SettingsImpl>();
                 platformBuild?.Invoke(services);

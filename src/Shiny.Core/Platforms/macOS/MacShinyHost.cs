@@ -15,6 +15,7 @@ namespace Shiny
         public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
             => InitPlatform(startup, services =>
             {
+                services.AddSingleton<IEnvironment, EnvironmentImpl>();
                 services.AddSingleton<IConnectivity, SharedConnectivityImpl>();
                 services.AddSingleton<IPowerManager, PowerManagerImpl>();
                 services.AddSingleton<IJobManager, JobManagerImpl>();

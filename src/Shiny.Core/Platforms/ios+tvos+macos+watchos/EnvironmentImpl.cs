@@ -10,7 +10,13 @@ namespace Shiny
         public string AppBuild => NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"].ToString();
 
         public string MachineName { get; } = "";
+#if __IOS__
         public string OperatingSystem { get; } = "iOS";
+#elif __TVOS__
+        public string OperatingSystem { get; } = "tvOS";
+#else
+        public string OperatingSystem { get; } = "watchOS";
+#endif
         public string Manufacturer { get; } = "Apple";
         public string Model { get; }
     }

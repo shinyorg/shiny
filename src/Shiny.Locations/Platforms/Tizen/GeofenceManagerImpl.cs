@@ -1,9 +1,10 @@
-﻿//using System;
+﻿using System;
+using Tizen.Location;
 
 
-//namespace Shiny.Locations
-//{
-//    public class GeofenceManagerImpl : IGeofenceManager
-//    {
-//    }
-//}
+namespace Shiny.Locations
+{
+    public class GeofenceManagerImpl : IGeofenceManager
+    {
+    }
+}
