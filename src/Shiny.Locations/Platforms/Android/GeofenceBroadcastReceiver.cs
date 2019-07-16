@@ -22,7 +22,10 @@ namespace Shiny.Locations
 
         public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
         {
-            var geofences = ShinyHost.Resolve<IAndroidGeofenceManager>();
+            // TODO: this is no longer registered
+            var geofences = ShinyHost.Resolve<IGeofenceManager>() as IAndroidGeofenceManager;
+            if (geofences == null)
+                throw new ArgumentException("Invalid AndroidGeofenceManager");
 
             switch (intent.Action)
             {
