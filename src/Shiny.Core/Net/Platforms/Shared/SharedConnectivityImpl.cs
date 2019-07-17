@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
+
 namespace Shiny.Net
 {
     public class SharedConnectivityImpl : NotifyPropertyChanged, IConnectivity

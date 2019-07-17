@@ -46,8 +46,8 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
-        <PackageReference Include="Tizen.NET" Version="4.0.0" />
         <Compile Include="**\Platforms\Tizen\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">

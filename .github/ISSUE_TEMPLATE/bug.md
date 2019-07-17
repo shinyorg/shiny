@@ -14,12 +14,16 @@ assignees: ''
  - [ ] iOS
  - [ ] Android
  - [ ] UWP
+ - [ ] watchOS
+ - [ ] tvOS
+ - [ ] Tizen
  - [ ] .NET Standard
 
 ## Feature Library
 
  - [ ] Core
  - [ ] BluetoothLE
+ - [ ] Beacons
  - [ ] Locations
  - [ ] HTTP Transfers
  - [ ] Notifications
