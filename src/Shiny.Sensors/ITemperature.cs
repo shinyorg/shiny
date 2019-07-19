@@ -3,7 +3,7 @@
 
 namespace Shiny.Sensors
 {
-    public class HeartRateImpl
+    public interface ITemperature : ISensor<double>
     {
     }
 }

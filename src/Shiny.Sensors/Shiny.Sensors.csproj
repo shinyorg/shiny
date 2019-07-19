@@ -1,9 +1,8 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;monoandroid81;monoandroid90;xamarinios10;</TargetFrameworks>
-        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
-        <!--xamarin.watchos10;tizen40;-->
+        <TargetFrameworks>netstandard2.0;monoandroid81;monoandroid90;xamarinios10;xamarin.watchos10</TargetFrameworks>
+        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">uap10.0.16299;tizen40;$(TargetFrameworks)</TargetFrameworks>
         <Description>Shiny addon for all imaginable sensors for mobile devices</Description>
     </PropertyGroup>
 
@@ -25,13 +24,13 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinios')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\iOS\**\*.cs" />
+        <Compile Include="Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.watchos')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\watchOS\**\*.cs" />
+        <Compile Include="Platforms\*watchOS*\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
@@ -51,4 +50,5 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Tizen\**\*.cs" />
     </ItemGroup>
+
 </Project>
