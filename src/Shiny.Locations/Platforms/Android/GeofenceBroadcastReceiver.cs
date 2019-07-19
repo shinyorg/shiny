@@ -22,7 +22,6 @@ namespace Shiny.Locations
 
         public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
         {
-            // TODO: this is no longer registered
             var geofences = ShinyHost.Resolve<IGeofenceManager>() as IAndroidGeofenceManager;
             if (geofences == null)
                 throw new ArgumentException("Invalid AndroidGeofenceManager");
@@ -34,7 +33,7 @@ namespace Shiny.Locations
                     break;
 
                 case Permission.ReceiveBootCompleted:
-                    await geofences.ReceiveBoot();
+                    // startup tasks replace this, but this receiver is still used to trigger the wakeup on reboot
                     break;
             }
         });

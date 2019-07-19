@@ -16,7 +16,9 @@ using static Android.Manifest;
 
 namespace Shiny.Locations
 {
-    public class GeofenceManagerImpl : AbstractGeofenceManager, IAndroidGeofenceManager
+    public class GeofenceManagerImpl : AbstractGeofenceManager,
+                                       IShinyStartupTask,
+                                       IAndroidGeofenceManager
     {
         readonly AndroidContext context;
         readonly GeofencingClient client;
@@ -30,14 +32,6 @@ namespace Shiny.Locations
             this.context = context;
             this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
             this.geofenceDelegate = geofenceDelegate;
-        }
-
-
-        public async Task ReceiveBoot()
-        {
-            var regions = await this.Repository.GetAll();
-            foreach (var region in regions)
-                await this.Create(region);
         }
 
 
@@ -156,6 +150,13 @@ namespace Shiny.Locations
                 intent,
                 PendingIntentFlags.UpdateCurrent
             );
+        }
+
+        public async void Start()
+        {
+            var regions = await this.Repository.GetAll();
+            foreach (var region in regions)
+                await this.Create(region);
         }
     }
 }
