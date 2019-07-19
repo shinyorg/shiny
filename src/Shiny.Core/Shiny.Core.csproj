@@ -42,7 +42,7 @@
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.1" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
@@ -59,7 +59,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinios')) ">
         <Compile Include="**\Platforms\*iOS*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.2" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarintvos')) ">
