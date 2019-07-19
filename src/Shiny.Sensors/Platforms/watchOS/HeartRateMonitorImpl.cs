@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+
 namespace Shiny.Sensors
 {
     //https://docs.microsoft.com/en-us/xamarin/ios/watchos/platform/workout-apps
@@ -13,7 +14,7 @@ namespace Shiny.Sensors
             throw new NotImplementedException();
         }
 
-        public IObservable<ushort> WhenBpmChanged()
+        public IObservable<ushort> WhenReadingTaken()
         {
             throw new NotImplementedException();
         }
