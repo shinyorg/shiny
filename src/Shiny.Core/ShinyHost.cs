@@ -61,6 +61,11 @@ namespace Shiny
         }
 
 
+        /// <summary>
+        /// Setting this before calling build will force the internal service builder to validate scopes of DI registrations (THIS IS SLOW - USE IT FOR DEBUGGING)
+        /// </summary>
+        public static bool ValidateScopes { get; set; }
+
         protected static void InitPlatform(IShinyStartup startup = null, Action<IServiceCollection> platformBuild = null)
         {
             var services = new ShinyServiceCollection();
@@ -74,7 +79,7 @@ namespace Shiny
             platformBuild?.Invoke(services);
 
             Services = services;
-            container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
+            container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider(ValidateScopes);
             startup?.ConfigureApp(container);
             services.RunPostBuildActions(container);
         }
