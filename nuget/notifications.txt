@@ -17,7 +17,7 @@ SETUP
 
 1. Create a Startup.cs file in your core/abstraction/.NET standard
 
-public class YourStartup : Shiny.Startup
+public class YourStartup : Shiny.ShinyStartup
 {
     public override void ConfigureServices(IServiceCollection services)
     {
