@@ -22,7 +22,8 @@ namespace Shiny
             services.RegisterPostBuildAction(sp =>
             {
                 var conn = sp.GetService<ShinySqliteConnection>();
-                Log.AddLogger(new SqliteLog(conn), enableCrashes, enableEvents);
+                var serializer = sp.GetService<ISerializer>();
+                Log.AddLogger(new SqliteLog(conn, serializer), enableCrashes, enableEvents);
             });
         }
 
