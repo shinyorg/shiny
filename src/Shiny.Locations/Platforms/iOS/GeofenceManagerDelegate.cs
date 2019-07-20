@@ -8,14 +8,13 @@ namespace Shiny.Locations
 {
     public class GeofenceManagerDelegate : ShinyLocationDelegate
     {
-        readonly IGeofenceDelegate gdelegate;
         readonly RepositoryWrapper<GeofenceRegion, GeofenceRegionStore> repository;
         readonly Subject<GeofenceCurrentStatus> stateSubject;
+        IGeofenceDelegate gdelegate;
 
 
         public GeofenceManagerDelegate()
         {
-            this.gdelegate = ShinyHost.Resolve<IGeofenceDelegate>();
             this.repository = ShinyHost.Resolve<IRepository>().Wrap();
             this.stateSubject = new Subject<GeofenceCurrentStatus>();
         }
@@ -32,6 +31,9 @@ namespace Shiny.Locations
         public IObservable<GeofenceCurrentStatus> WhenStateDetermined() => this.stateSubject;
         public override async void DidDetermineState(CLLocationManager manager, CLRegionState state, CLRegion region)
         {
+            if (this.gdelegate == null)
+                this.gdelegate = ShinyHost.Resolve<IGeofenceDelegate>();
+
             if (region is CLCircularRegion native)
             {
                 var geofence = await this.repository.Get(native.Identifier);
