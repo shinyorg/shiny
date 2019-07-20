@@ -18,9 +18,18 @@ namespace Shiny.Tests.Locations
 
 
         [Fact]
-        public void MilesToKm() =>
+        public void Int32MilesToKm() =>
             Distance
                 .FromMiles(2)
+                .TotalKilometers
+                .Should()
+                .Be(3.21868);
+
+
+        [Fact]
+        public void DoubleMilesToKm() =>
+            Distance
+                .FromMiles(2.0)
                 .TotalKilometers
                 .Should()
                 .Be(3.21868);

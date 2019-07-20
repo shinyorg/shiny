@@ -32,6 +32,10 @@ namespace Shiny.Locations
         {
             TotalKilometers = miles * MILES_TO_KM
         };
+        public static Distance FromMiles(double miles) => new Distance
+        {
+            TotalKilometers = miles * MILES_TO_KM
+        };
         public static Distance FromMeters(double meters) => new Distance
         {
             TotalKilometers = meters / KM_TO_METERS
