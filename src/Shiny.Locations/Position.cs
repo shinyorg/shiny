@@ -3,7 +3,7 @@
 
 namespace Shiny.Locations
 {
-    public class Position
+    public class Position : IEquatable<Position>
     {
         public Position(double lat, double lng)
         {
@@ -37,21 +37,7 @@ namespace Shiny.Locations
 
 
         public override string ToString() => $"Latitude: {this.Latitude} - Longitude: {this.Longitude}";
-        //public bool Equals(Position other)
-        //{
-        //    if (other == null)
-        //        return false;
-
-        //    if (this.Latitude != other.Latitude)
-        //        return false;
-
-        //    if (this.Longitude != other.Longitude)
-        //        return false;
-
-        //    return false;
-        //}
-
-        public bool Equals(Position other) => (this.Latitude, this.Longitude).Equals((other?.Latitude, other?.Longitude));
+        public bool Equals(Position other) => other != null && (this.Latitude, this.Longitude).Equals((other.Latitude, other.Longitude));
         public static bool operator ==(Position left, Position right) => Equals(left, right);
         public static bool operator !=(Position left, Position right) => !Equals(left, right);
         public override bool Equals(object obj) => obj is Position pos && this.Equals(pos);
