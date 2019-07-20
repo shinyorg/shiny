@@ -10,9 +10,9 @@ using Android.Gms.Location;
 using Android;
 using Android.App;
 using Android.Content;
-using Shiny.Infrastructure;
 using static Android.Manifest;
-
+using Shiny.Infrastructure;
+using Shiny.Logging;
 
 namespace Shiny.Locations
 {
@@ -23,6 +23,7 @@ namespace Shiny.Locations
         readonly AndroidContext context;
         readonly GeofencingClient client;
         readonly IGeofenceDelegate geofenceDelegate;
+        PendingIntent geofencePendingIntent;
 
 
         public GeofenceManagerImpl(AndroidContext context,
@@ -30,8 +31,29 @@ namespace Shiny.Locations
                                    IGeofenceDelegate geofenceDelegate) : base(repository)
         {
             this.context = context;
-            this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
             this.geofenceDelegate = geofenceDelegate;
+            this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
+            //mGoogleApiClient = new GoogleApiClient.Builder(this)
+            //        .addConnectionCallbacks(this)
+            //        .addOnConnectionFailedListener(this)
+            //        .addApi(LocationServices.API)
+            //        .build();
+            //this.client.Connect();
+        }
+
+
+        public async void Start()
+        {
+            try
+            {
+                var regions = await this.Repository.GetAll();
+                foreach (var region in regions)
+                    await this.Create(region);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
         }
 
 
@@ -141,22 +163,19 @@ namespace Shiny.Locations
 
         protected virtual PendingIntent GetPendingIntent()
         {
+            if (this.geofencePendingIntent != null)
+                return this.geofencePendingIntent;
+
             var intent = new Intent(this.context.AppContext, typeof(GeofenceBroadcastReceiver));
             intent.SetAction(GeofenceBroadcastReceiver.INTENT_ACTION);
-            intent.SetAction(Permission.ReceiveBootCompleted);
-            return PendingIntent.GetBroadcast(
+            //intent.SetAction(Permission.ReceiveBootCompleted);
+            this.geofencePendingIntent = PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,
                 intent,
                 PendingIntentFlags.UpdateCurrent
             );
-        }
-
-        public async void Start()
-        {
-            var regions = await this.Repository.GetAll();
-            foreach (var region in regions)
-                await this.Create(region);
+            return this.geofencePendingIntent;
         }
     }
 }
