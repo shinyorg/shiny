@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Caching;
+using Shiny.Infrastructure;
+using Shiny.Logging;
+using Shiny.Models;
 
 
 namespace Shiny
@@ -9,38 +13,73 @@ namespace Shiny
     class SqliteCache : AbstractTimerCache
     {
         readonly ShinySqliteConnection conn;
-        public SqliteCache(ShinySqliteConnection conn)
-            => this.conn = conn;
+        readonly ISerializer serializer;
+
+
+        public SqliteCache(ShinySqliteConnection conn, ISerializer serializer)
+        {
+            this.conn = conn;
+            this.serializer = serializer;
+        }
 
 
         public override Task Clear()
+            => this.conn.DeleteAllAsync<CacheItem>();
+
+
+        public override async Task<T> Get<T>(string key)
         {
-            throw new NotImplementedException();
+            var item = await this.conn.GetAsync<CacheStore>(key);
+            if (item == null)
+                return default;
+
+            var cache = this.serializer.Deserialize<T>(item.Blob);
+            return cache;
         }
 
-        public override Task<T> Get<T>(string key)
+
+        public override async Task<IEnumerable<CacheItem>> GetCachedItems()
         {
-            throw new NotImplementedException();
+            var items = await this.conn.Cache.ToListAsync();
+            return items.Select(x => new CacheItem
+            {
+                Key = x.Key,
+                Object = this.serializer.Deserialize(Type.GetType(x.TypeName), x.Blob),
+                ExpiryTime = x.ExpiryDateUtc
+            });
         }
 
-        public override Task<IEnumerable<CacheItem>> GetCachedItems()
+        public override async Task<bool> Remove(string key)
         {
-            throw new NotImplementedException();
+            var count = await this.conn.DeleteAsync<CacheStore>(key);
+            return count > 0;
         }
 
-        public override Task<bool> Remove(string key)
+
+        public override async Task Set(string key, object obj, TimeSpan? timeSpan = null)
         {
-            throw new NotImplementedException();
+            var expiry = DateTime.UtcNow.Add(timeSpan ?? TimeSpan.FromMinutes(30));
+            var blob = this.serializer.Serialize(obj);
+
+            await this.conn.InsertOrReplaceAsync(new CacheStore
+            {
+                Key = key,
+                Blob = blob,
+                TypeName = obj.GetType().FullName,
+                ExpiryDateUtc = expiry
+            });
         }
 
-        public override Task Set(string key, object obj, TimeSpan? timeSpan = null)
+        protected override async Task OnTimerElapsed()
         {
-            throw new NotImplementedException();
-        }
-
-        protected override Task OnTimerElapsed()
-        {
-            throw new NotImplementedException();
+            try
+            {
+                await this.conn.ExecuteScalarAsync<int>("DELETE FROM CacheStore WHERE ExpiryDateUtc IS NOT NULL AND ExpiryDateUtc < ?", DateTime.UtcNow);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
         }
     }
 }

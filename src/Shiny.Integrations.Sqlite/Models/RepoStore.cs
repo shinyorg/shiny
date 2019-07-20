@@ -4,12 +4,14 @@ using SQLite;
 
 namespace Shiny.Models
 {
-    public class Store
+    public class RepoStore
     {
         [PrimaryKey]
-        public string Id { get; set; }
+        [AutoIncrement]
+        public int Id { get; set; }
 
         public string TypeName { get; set; }
         public string Key { get; set; }
+        public string Blob { get; set; }
     }
 }
