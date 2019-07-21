@@ -6,7 +6,11 @@ namespace Shiny.Support.Uwp
 {
     public sealed class ShinyBackgroundTask : IBackgroundTask
     {
-        public static IUwpBridge Bridge { get; set; }
-        public void Run(IBackgroundTaskInstance taskInstance) => Bridge.Bridge(taskInstance);
+        public void Run(IBackgroundTaskInstance taskInstance)
+        {
+            var host = Type.GetType("Shiny.UwpShinyHost, Shiny.Core");
+            var method = host.GetMethod("BackgroundRun");
+            method.Invoke(host, new [] { taskInstance });
+        }
     }
 }
