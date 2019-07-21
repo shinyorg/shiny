@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny.Device.Tests
 {
-    public class TestStartup : Startup
+    public class TestStartup : ShinyStartup
     {
         public override void ConfigureServices(IServiceCollection services)
         {

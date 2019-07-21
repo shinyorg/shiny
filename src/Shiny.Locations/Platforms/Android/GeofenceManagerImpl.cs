@@ -5,12 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using Android.Gms.Extensions;
 using Android.Gms.Location;
 using Android;
 using Android.App;
 using Android.Content;
-using static Android.Manifest;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 
@@ -96,7 +94,7 @@ namespace Shiny.Locations
         public override async Task StopMonitoring(GeofenceRegion region)
         {
             await this.Repository.Remove(region.Identifier);
-            await this.client.RemoveGeofences(new List<string> { region.Identifier });
+            await this.client.RemoveGeofencesAsync(new List<string> { region.Identifier });
         }
 
 
@@ -104,7 +102,7 @@ namespace Shiny.Locations
         {
             var regions = await this.Repository.GetAll();
             var regionIds = regions.Select(x => x.Identifier).ToArray();
-            await this.client.RemoveGeofences(regionIds);
+            await this.client.RemoveGeofencesAsync(regionIds);
             await this.Repository.Clear();
         }
 
@@ -141,7 +139,7 @@ namespace Shiny.Locations
                 .SetInitialTrigger(transitions)
                 .Build();
 
-            await this.client.AddGeofences(
+            await this.client.AddGeofencesAsync(
                 request,
                 this.GetPendingIntent()
             );
