@@ -65,7 +65,7 @@ namespace Shiny
             {
                 Key = key,
                 Blob = blob,
-                TypeName = obj.GetType().FullName,
+                TypeName = obj.GetType().AssemblyQualifiedName,
                 ExpiryDateUtc = expiry
             });
         }

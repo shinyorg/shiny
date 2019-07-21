@@ -25,7 +25,7 @@ namespace Shiny
 
         public async Task Clear<T>() where T : class
         {
-            var count = await this.conn.ExecuteAsync($"DELETE FROM {nameof(RepoStore)} WHERE TypeName = ?", typeof(T).FullName);
+            var count = await this.conn.ExecuteAsync($"DELETE FROM {nameof(RepoStore)} WHERE TypeName = ?", typeof(T).AssemblyQualifiedName);
             if (count > 0)
                 this.repoSubject.OnNext(new RepositoryEvent(RepositoryEventType.Clear, null, null, typeof(T)));
         }
@@ -35,17 +35,18 @@ namespace Shiny
         {
             var count = await this.conn.ExecuteScalarAsync<int>(
                 $"SELECT COUNT(*) FROM {nameof(RepoStore)} WHERE TypeName = ? AND Key = ?",
-                typeof(T).FullName,
+                typeof(T).AssemblyQualifiedName,
                 key
             );
             return count > 0;
         }
 
+
         public async Task<T> Get<T>(string key) where T : class
         {
             var item = await this.conn.RepoItems.FirstOrDefaultAsync(x =>
                 x.Key == key &&
-                x.TypeName == typeof(T).FullName
+                x.TypeName == typeof(T).AssemblyQualifiedName
             );
             if (item == null)
                 return null;
@@ -67,7 +68,7 @@ namespace Shiny
             var dict = new Dictionary<string, T>();
             var items = await this.conn
                 .RepoItems
-                .Where(x => x.TypeName == typeof(T).FullName)
+                .Where(x => x.TypeName == typeof(T).AssemblyQualifiedName)
                 .ToListAsync();
 
             foreach (var item in items)
@@ -98,7 +99,7 @@ namespace Shiny
                 await this.conn.InsertAsync(new RepoStore
                 {
                     Key = key,
-                    TypeName = entity.GetType().FullName,
+                    TypeName = entity.GetType().AssemblyQualifiedName,
                     Blob = this.serializer.Serialize(entity)
                 });
                 this.repoSubject.OnNext(new RepositoryEvent(RepositoryEventType.Add, key, entity));
@@ -106,7 +107,7 @@ namespace Shiny
             }
             else
             {
-                item.TypeName = entity.GetType().FullName;
+                item.TypeName = entity.GetType().AssemblyQualifiedName;
                 item.Blob = this.serializer.Serialize(entity);
                 await this.conn.UpdateAsync(item);
                 this.repoSubject.OnNext(new RepositoryEvent(RepositoryEventType.Update, key, entity));
