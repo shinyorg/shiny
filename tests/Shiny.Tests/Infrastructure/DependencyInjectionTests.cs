@@ -9,7 +9,7 @@ namespace Shiny.Tests.Infrastructure
 {
     public class DependencyInjectionTests
     {
-        [Fact]
+        [Fact(Skip = "TODO")]
         public void DoesStartup()
         {
             var services = new ShinyServiceCollection();
@@ -19,7 +19,7 @@ namespace Shiny.Tests.Infrastructure
         }
 
 
-        [Fact]
+        [Fact(Skip = "TODO")]
         public void DoesBind()
         {
             var settings = new InMemorySetttings();

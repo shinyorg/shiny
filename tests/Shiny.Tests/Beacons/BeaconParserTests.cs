@@ -8,7 +8,7 @@ namespace Shiny.Tests.Beacons
 {
     public class BeaconParserTests
     {
-        [Theory]
+        [Theory(Skip = "TODO")]
         [InlineData(
             "02-15-B9-40-7F-30-F5-F8-46-6E-AF-F9-25-55-6B-57-FE-6D-39-B0-57-CA-BE",
             "B9407F30-F5F8-466E-AFF9-25556B57FE6D",
