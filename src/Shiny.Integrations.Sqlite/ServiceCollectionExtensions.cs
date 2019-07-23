@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Caching;
 using Shiny.Infrastructure;
 using Shiny.Logging;
@@ -18,7 +19,7 @@ namespace Shiny
         /// <param name="enableEvents"></param>
         public static void UseSqliteLogging(this IServiceCollection services, bool enableCrashes = true, bool enableEvents = false)
         {
-            services.AddIfNotRegistered<ShinySqliteConnection>();
+            services.TryAddSingleton<ShinySqliteConnection>();
             services.RegisterPostBuildAction(sp =>
             {
                 var conn = sp.GetService<ShinySqliteConnection>();
@@ -30,21 +31,21 @@ namespace Shiny
 
         public static void UseSqliteStorage(this IServiceCollection services)
         {
-            services.AddIfNotRegistered<ShinySqliteConnection>();
+            services.TryAddSingleton<ShinySqliteConnection>();
             services.AddSingleton<IRepository, SqliteRepository>();
         }
 
 
         public static void UseSqliteCache(this IServiceCollection services)
         {
-            services.AddIfNotRegistered<ShinySqliteConnection>();
+            services.TryAddSingleton<ShinySqliteConnection>();
             services.AddSingleton<ICache, SqliteCache>();
         }
 
 
         public static void UseSqliteSettings(this IServiceCollection services)
         {
-            services.AddIfNotRegistered<ShinySqliteConnection>();
+            services.TryAddSingleton<ShinySqliteConnection>();
             services.AddSingleton<ISettings, SqliteSettings>();
         }
     }

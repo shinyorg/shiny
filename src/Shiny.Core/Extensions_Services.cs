@@ -4,7 +4,6 @@ using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Settings;
-using Shiny.Infrastructure.DependencyInjection;
 
 
 namespace Shiny
@@ -17,8 +16,7 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="action"></param>
         public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
-            => ((ShinyServiceCollection)services).AddPostBuildAction(action);
-
+            => ShinyHost.AddPostBuildAction(action);
 
         /// <summary>
         /// Register a startup task that runs immediately after the container is built with full dependency injected services
@@ -118,86 +116,6 @@ namespace Shiny
         /// <param name="services"></param>
         public static void RegisterModule<T>(this IServiceCollection services)
             where T : IShinyModule, new() => services.RegisterModule(new T());
-
-
-        /// <summary>
-        /// Add or replace a service registration
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        public static void AddOrReplace<TService, TImpl>(this IServiceCollection services)
-        {
-            var desc = services.SingleOrDefault(x => x.ServiceType == typeof(TService));
-            if (desc != null)
-                services.Remove(desc);
-
-            services.Add(new ServiceDescriptor(
-                typeof(TService),
-                typeof(TImpl),
-                desc.Lifetime
-            ));
-        }
-
-
-        /// <summary>
-        /// Add or replace a service registration
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="instance">The singleton instance you wish to use</param>
-        public static void AddOrReplace<TService>(this IServiceCollection services, TService instance)
-        {
-            var desc = services.SingleOrDefault(x => x.ServiceType == typeof(TService));
-            if (desc != null)
-                services.Remove(desc);
-
-            services.Add(new ServiceDescriptor(typeof(TService), instance));
-        }
-
-
-        /// <summary>
-        /// Add or replace a service registration
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="instance"></param>
-        public static void AddOrReplace<TService>(this IServiceCollection services, Func<IServiceProvider, TService> factory)
-        {
-            var desc = services.SingleOrDefault(x => x.ServiceType == typeof(TService));
-            if (desc != null)
-                services.Remove(desc);
-
-            services.Add(new ServiceDescriptor(typeof(TService), factory));
-        }
-
-
-        /// <summary>
-        /// Regiseter a service on the collection if it one is not already registered
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="lifetime"></param>
-        public static void AddIfNotRegistered<TService, TImpl>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Singleton)
-        {
-            if (!services.IsRegistered<TService>())
-                services.Add(new ServiceDescriptor(typeof(TService), typeof(TImpl), lifetime));
-        }
-
-
-
-        /// <summary>
-        /// Regiseter a service on the collection if it one is not already registered
-        /// </summary>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="lifetime"></param>
-        public static void AddIfNotRegistered<TImpl>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Singleton)
-        {
-            if (!services.IsRegistered<TImpl>())
-                services.Add(new ServiceDescriptor(typeof(TImpl), lifetime));
-        }
 
 
         /// <summary>
