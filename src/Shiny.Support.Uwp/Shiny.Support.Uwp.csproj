@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.24">
+﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
     <PropertyGroup>
         <TargetFrameworks>uap10.0.16299</TargetFrameworks>
         <RootNamespace>Shiny.Support.Uwp</RootNamespace>
