@@ -5,11 +5,11 @@ using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Settings;
 
+
 namespace Shiny.Infrastructure.DependencyInjection
 {
     public class ShinyServiceCollection : IServiceCollection
     {
-        readonly List<Action<IServiceProvider>> postBuildActions = new List<Action<IServiceProvider>>();
         readonly ServiceCollection services = new ServiceCollection();
 
 
@@ -24,59 +24,49 @@ namespace Shiny.Infrastructure.DependencyInjection
         }
 
 
-        public void AddPostBuildAction(Action<IServiceProvider> action) => this.postBuildActions.Add(action);
-
-        public void RunPostBuildActions(IServiceProvider container)
-        {
-            foreach (var action in postBuildActions)
-                action(container);
-
-            postBuildActions.Clear();
-        }
+        void AddItem(ServiceDescriptor descriptor) => ((ICollection<ServiceDescriptor>)this.services).Add(descriptor);
 
 
         public void Add(ServiceDescriptor service)
         {
             if (service.Lifetime != ServiceLifetime.Singleton)
             {
-                this.services.Insert(0, service);
+                this.AddItem(service);
             }
             else if (service.ImplementationInstance is INotifyPropertyChanged npc)
             {
-                this.services.Insert(0, new ServiceDescriptor(
+                this.services.AddSingleton(
                     service.ServiceType ?? npc.GetType(),
                     sp =>
                     {
                         sp.GetService<ISettings>().Bind(npc);
                         return npc;
-                    },
-                    service.Lifetime
-                ));
+                    }
+                );
             }
             // TODO; this trap IPowerManager as well
             else if (ImplementsInterface<INotifyPropertyChanged>(service))
             {
                 var resolveType = service.ServiceType ?? service.ImplementationType;
 
-                this.services.Insert(0, new ServiceDescriptor(
+                this.services.AddSingleton(
                     resolveType,
                     sp =>
                     {
                         var bindable = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, service.ImplementationType);
                         sp.GetService<ISettings>().Bind(bindable);
                         return bindable;
-                    },
-                    service.Lifetime
-                ));
+                    }
+                );
             }
             else
             {
-                this.services.Insert(0, service);
+                this.AddItem(service);
             }
 
             if (ImplementsInterface<IShinyStartupTask>(service))
             {
-                this.postBuildActions.Add(sp =>
+                services.RegisterPostBuildAction(sp =>
                 {
                     var resolveType = service.ServiceType ?? service.ImplementationType;
                     ((IShinyStartupTask)sp.GetService(resolveType)).Start();

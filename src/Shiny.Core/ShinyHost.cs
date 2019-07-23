@@ -1,14 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 using Shiny.Infrastructure.DependencyInjection;
-
+using Shiny.Settings;
 
 namespace Shiny
 {
     public abstract class ShinyHost
     {
+        static readonly List<Action<IServiceProvider>> postBuildActions = new List<Action<IServiceProvider>>();
+
+        static void RunPostBuildActions(IServiceProvider container)
+        {
+            foreach (var action in postBuildActions)
+                action(container);
+
+            postBuildActions.Clear();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="action"></param>
+        public static void AddPostBuildAction(Action<IServiceProvider> action) => postBuildActions.Add(action);
+
         /// <summary>
         /// Resolve a specified service from the container
         /// </summary>
@@ -77,11 +94,11 @@ namespace Shiny
 
             startup?.ConfigureServices(services);
             platformBuild?.Invoke(services);
-
             Services = services;
+
             container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider(ValidateScopes);
             startup?.ConfigureApp(container);
-            services.RunPostBuildActions(container);
+            RunPostBuildActions(container);
         }
     }
 }
