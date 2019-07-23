@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Infrastructure;
 using Shiny.Infrastructure.DependencyInjection;
 using Shiny.Settings;
@@ -87,13 +88,13 @@ namespace Shiny
         {
             var services = new ShinyServiceCollection();
 
-            // add standard infrastructure
-            services.AddSingleton<IMessageBus, MessageBus>();
-            services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
-            services.AddSingleton<ISerializer, JsonNetSerializer>();
-
             startup?.ConfigureServices(services);
             platformBuild?.Invoke(services);
+
+            services.TryAddSingleton<IMessageBus, MessageBus>();
+            services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
+            services.TryAddSingleton<ISerializer, JsonNetSerializer>();
+
             Services = services;
 
             container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider(ValidateScopes);

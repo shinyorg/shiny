@@ -15,7 +15,7 @@ namespace Shiny
         ///
         /// </summary>
         public static void UseCurrentActivityPlugin(this IServiceCollection services)
-            => services.AddOrReplace<ITopActivity, TopActivityImpl>();
+            => services.AddSingleton<ITopActivity, TopActivityImpl>();
         //{
         //    services.AddOrReplace<ITopActivity>(sp =>
         //    {

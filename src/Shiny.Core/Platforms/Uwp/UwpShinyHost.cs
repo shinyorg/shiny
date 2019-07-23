@@ -4,9 +4,9 @@ using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
 using Shiny.Settings;
-using Microsoft.Extensions.DependencyInjection;
 using Windows.Storage;
 using Windows.ApplicationModel.Background;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 
 namespace Shiny
@@ -20,15 +20,15 @@ namespace Shiny
         public static void Init(IShinyStartup startup = null, IShinyModule platformModule = null)
             => InitPlatform(startup, services =>
             {
-                services.AddSingleton<IEnvironment, EnvironmentImpl>();
-                services.AddSingleton<IConnectivity, ConnectivityImpl>();
-                services.AddSingleton<IPowerManager, PowerManagerImpl>();
-                services.AddSingleton<IFileSystem, FileSystemImpl>();
-                services.AddSingleton<ISettings, SettingsImpl>();
-                services.AddSingleton<UwpContext>();
+                services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
+                services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
+                services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
+                services.TryAddSingleton<IFileSystem, FileSystemImpl>();
+                services.TryAddSingleton<ISettings, SettingsImpl>();
+                services.TryAddSingleton<UwpContext>();
 
-                services.AddSingleton<IJobManager, JobManager>();
-                services.AddSingleton<IBackgroundTaskProcessor, JobBackgroundTaskProcessor>();
+                services.TryAddSingleton<IJobManager, JobManager>();
+                services.TryAddSingleton<IBackgroundTaskProcessor, JobBackgroundTaskProcessor>();
 
                 if (platformModule != null)
                     services.RegisterModule(platformModule);
