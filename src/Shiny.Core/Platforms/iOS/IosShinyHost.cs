@@ -6,6 +6,8 @@ using Shiny.IO;
 using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using UIKit;
+
 
 namespace Shiny
 {
@@ -17,9 +19,17 @@ namespace Shiny
                 services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
                 services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
                 services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
-                services.TryAddSingleton<IJobManager, JobManager>();
                 services.TryAddSingleton<IFileSystem, FileSystemImpl>();
                 services.TryAddSingleton<ISettings, SettingsImpl>();
+
+                //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                //{
+                //    services.TryAddSingleton<IJobManager, BgTasksJobManager>();
+                //}
+                //else
+                //{
+                    services.TryAddSingleton<IJobManager, JobManager>();
+                //}
                 platformBuild?.Invoke(services);
             });
     }
