@@ -1,0 +1,34 @@
+-----------------------
+Shiny.Bluetooth Classic
+-----------------------
+
+GitHub: https://github.com/shinyorg/Shiny
+Samples: https://github.com/shinyorg/ShinySamples
+Docs: https://shinylib.net
+Blog: https://allancritchie.net
+
+Please star this project on GitHub if you use it in your projects
+
+-----------------
+iOS
+-----------------
+
+-----------------
+Android
+-----------------
+
+<uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+<uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+-----------------
+UWP
+-----------------
+
+<Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+    <BackgroundTasks>
+        <Task Type="bluetooth" />
+    </BackgroundTasks>
+</Extension>
