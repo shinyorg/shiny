@@ -12,24 +12,21 @@ using Android.Content;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 
+
 namespace Shiny.Locations
 {
     public class GeofenceManagerImpl : AbstractGeofenceManager,
-                                       IShinyStartupTask,
-                                       IAndroidGeofenceManager
+                                       IShinyStartupTask
     {
         readonly AndroidContext context;
         readonly GeofencingClient client;
-        readonly IGeofenceDelegate geofenceDelegate;
         PendingIntent geofencePendingIntent;
 
 
         public GeofenceManagerImpl(AndroidContext context,
-                                   IRepository repository,
-                                   IGeofenceDelegate geofenceDelegate) : base(repository)
+                                   IRepository repository) : base(repository)
         {
             this.context = context;
-            this.geofenceDelegate = geofenceDelegate;
             this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
             //mGoogleApiClient = new GoogleApiClient.Builder(this)
             //        .addConnectionCallbacks(this)
@@ -51,27 +48,6 @@ namespace Shiny.Locations
             catch (Exception ex)
             {
                 Log.Write(ex);
-            }
-        }
-
-
-        public async Task Process(Intent intent)
-        {
-            var e = GeofencingEvent.FromIntent(intent);
-            if (e == null)
-                return;
-
-            foreach (var triggeringGeofence in e.TriggeringGeofences)
-            {
-                var region = await this.Repository.Get(triggeringGeofence.RequestId);
-                if (region != null)
-                {
-                    var state = (GeofenceState)e.GeofenceTransition;
-                    await this.geofenceDelegate.OnStatusChanged(state, region);
-
-                    if (region.SingleUse)
-                        await this.StopMonitoring(region);
-                }
             }
         }
 

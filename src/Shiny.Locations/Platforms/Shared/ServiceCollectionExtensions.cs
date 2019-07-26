@@ -14,6 +14,8 @@ namespace Shiny.Locations
 
 #if WINDOWS_UWP
             builder.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
+#elif __ANDROID__
+            builder.AddSingleton<GeofenceProcessor>();
 #endif
 
 #if NETSTANDARD
