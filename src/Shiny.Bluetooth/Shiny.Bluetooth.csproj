@@ -39,12 +39,4 @@
         <Compile Include="**\Platforms\iOS\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Remove="Platforms\Uwp\BluetoothManagerImpl.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Platforms\Shared\ServiceCollectionExtensions.cs" />
-    </ItemGroup>
-
 </Project>
