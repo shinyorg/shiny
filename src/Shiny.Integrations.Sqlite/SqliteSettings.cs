@@ -5,9 +5,9 @@ using Shiny.Models;
 using Shiny.Settings;
 
 
-namespace Shiny
+namespace Shiny.Integrations.Sqlite
 {
-    class SqliteSettings : AbstractSettings
+    public class SqliteSettings : AbstractSettings
     {
         readonly ShinySqliteConnection conn;
         public SqliteSettings(ShinySqliteConnection conn, ISerializer serializer) : base(serializer)

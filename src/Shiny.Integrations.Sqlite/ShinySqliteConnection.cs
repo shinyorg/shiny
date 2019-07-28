@@ -5,7 +5,7 @@ using Shiny.Models;
 using SQLite;
 
 
-namespace Shiny
+namespace Shiny.Integrations.Sqlite
 {
     public class ShinySqliteConnection : SQLiteAsyncConnection
     {

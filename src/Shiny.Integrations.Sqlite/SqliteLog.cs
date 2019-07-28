@@ -3,9 +3,10 @@ using Shiny.Infrastructure;
 using Shiny.Logging;
 using Shiny.Models;
 
-namespace Shiny
+
+namespace Shiny.Integrations.Sqlite
 {
-    class SqliteLog : ILogger
+    public class SqliteLog : ILogger
     {
         readonly ShinySqliteConnection conn;
         readonly ISerializer serializer;

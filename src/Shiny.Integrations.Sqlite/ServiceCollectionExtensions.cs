@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Caching;
 using Shiny.Infrastructure;
+using Shiny.Integrations.Sqlite;
 using Shiny.Logging;
 using Shiny.Settings;
 

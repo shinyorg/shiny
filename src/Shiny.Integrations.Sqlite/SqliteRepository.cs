@@ -6,9 +6,9 @@ using Shiny.Infrastructure;
 using Shiny.Models;
 
 
-namespace Shiny
+namespace Shiny.Integrations.Sqlite
 {
-    class SqliteRepository : IRepository
+    public class SqliteRepository : IRepository
     {
         readonly Subject<RepositoryEvent> repoSubject;
         readonly ShinySqliteConnection conn;

@@ -8,9 +8,9 @@ using Shiny.Logging;
 using Shiny.Models;
 
 
-namespace Shiny
+namespace Shiny.Integrations.Sqlite
 {
-    class SqliteCache : AbstractTimerCache
+    public class SqliteCache : AbstractTimerCache
     {
         readonly ShinySqliteConnection conn;
         readonly ISerializer serializer;
