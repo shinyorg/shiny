@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Shiny.Infrastructure;
 
 
-namespace Shiny
+namespace Shiny.Integrations.JsonNet
 {
     public class JsonNetSerializer : ISerializer
     {

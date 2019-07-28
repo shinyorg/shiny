@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Infrastructure;
 
 
 namespace Shiny
@@ -8,6 +7,6 @@ namespace Shiny
     public static class ServiceCollectionExtensions
     {
         public static void UseJsonNetSerialization(this IServiceCollection services)
-            => services.AddSingleton<ISerializer, JsonNetSerializer>();
+            => services.AddSingleton<Shiny.Infrastructure.ISerializer, Shiny.Integrations.JsonNet.JsonNetSerializer>();
     }
 }
