@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using BackgroundTasks;
+using CoreFoundation;
 
 namespace Shiny.Jobs
 {
@@ -19,11 +21,13 @@ namespace Shiny.Jobs
 
         public Task CancelAll()
         {
-            throw new NotImplementedException();
+            BGTaskScheduler.Shared.CancelAll();
+            return Task.CompletedTask;
         }
 
         public Task<JobInfo> GetJob(string jobIdentifier)
         {
+
             throw new NotImplementedException();
         }
 
@@ -54,7 +58,30 @@ namespace Shiny.Jobs
 
         public Task Schedule(JobInfo jobInfo)
         {
-            throw new NotImplementedException();
+            //BGProcessingTask
+            //BGTask
+            //BGTaskScheduler
+            //BGAppRefreshTask
+            //BGAppRefreshTaskRequest
+
+            var request = new BGProcessingTaskRequest(jobInfo.Identifier)
+            {
+                RequiresExternalPower = jobInfo.DeviceCharging,
+                RequiresNetworkConnectivity = jobInfo.RequiredInternetAccess != InternetAccess.None
+                //EarliestBeginDate
+            };
+            if (!BGTaskScheduler.Shared.Submit(request, out var error))
+                throw new ArgumentException(error.LocalizedDescription);
+            //var request = new BGProcessingTaskRequest()
+            //BGTaskScheduler.Shared.Register(
+            //    jobInfo.Identifier,
+            //    DispatchQueue.DefaultGlobalQueue,
+            //    task =>
+            //    {
+            //    }
+            //);
+
+            return Task.CompletedTask;
         }
     }
 }
