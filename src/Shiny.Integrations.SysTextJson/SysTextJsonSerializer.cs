@@ -3,9 +3,9 @@ using Shiny.Infrastructure;
 using System.Text.Json.Serialization;
 
 
-namespace Shiny
+namespace Shiny.Integrations.SysTextJson
 {
-    public class Serializer : ISerializer
+    public class SysTextJsonSerializer : ISerializer
     {
         public T Deserialize<T>(string value) => JsonSerializer.Parse<T>(value);
         public object Deserialize(Type objectType, string value) => JsonSerializer.Parse(value, objectType);

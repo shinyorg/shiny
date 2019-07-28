@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 
+
 namespace Shiny
 {
     public static class ServiceCollectionExtensions
