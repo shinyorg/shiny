@@ -43,7 +43,19 @@ namespace Shiny.Locations
             {
                 var regions = await this.Repository.GetAll();
                 foreach (var region in regions)
-                    await this.Create(region);
+                {
+                    try
+                    {
+                        await this.Create(region);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex,
+                            ("RegionIdentifier", region?.Identifier),
+                            ("RegionRadius", region?.Radius?.ToString()),
+                            ("RegionCenter", region?.Center?.ToString()));
+                    }
+                }
             }
             catch (Exception ex)
             {
