@@ -38,6 +38,9 @@ namespace Shiny.Locations
                 return;
             }
 
+            if (e.TriggeringGeofences == null)
+                return;
+
             foreach (var triggeringGeofence in e.TriggeringGeofences)
             {
                 var state = (GeofenceState)e.GeofenceTransition;
