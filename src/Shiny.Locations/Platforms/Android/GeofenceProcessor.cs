@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Gms.Location;
 using Shiny.Infrastructure;
+using Shiny.Logging;
 
 
 namespace Shiny.Locations
@@ -29,6 +30,13 @@ namespace Shiny.Locations
             var e = GeofencingEvent.FromIntent(intent);
             if (e == null)
                 return;
+
+            if (e.HasError)
+            {
+                Log.Write(LocationLogCategory.Geofence, "Event Error",
+                    ("ErrorCode", GeofenceStatusCodes.GetStatusCodeString(e.ErrorCode)));
+                return;
+            }
 
             foreach (var triggeringGeofence in e.TriggeringGeofences)
             {
