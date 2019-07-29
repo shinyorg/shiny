@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Gms.Location;
 using Shiny.Infrastructure;
+using Shiny.Logging;
 
 
 namespace Shiny.Locations
@@ -30,16 +31,40 @@ namespace Shiny.Locations
             if (e == null)
                 return;
 
+            if (e.HasError)
+            {
+                Log.Write(LocationLogCategory.Geofence, "Event Error",
+                    ("ErrorCode", GeofenceStatusCodes.GetStatusCodeString(e.ErrorCode)));
+                return;
+            }
+
+            if (e.TriggeringGeofences == null)
+                return;
+
             foreach (var triggeringGeofence in e.TriggeringGeofences)
             {
+                var state = (GeofenceState)e.GeofenceTransition;
+
                 var region = await this.repository.Get(triggeringGeofence.RequestId);
-                if (region != null)
+                if (region == null)
                 {
-                    var state = (GeofenceState)e.GeofenceTransition;
+                    Log.Write(LocationLogCategory.Geofence, "Not Found",
+                        ("RequestId", triggeringGeofence.RequestId));
+                    continue;
+                }
+
+                try
+                {
                     await this.geofenceDelegate.OnStatusChanged(state, region);
 
                     if (region.SingleUse)
                         await this.geofenceManager.StopMonitoring(region);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex,
+                        ("RequestId", triggeringGeofence.RequestId),
+                        ("Transition", state.ToString()));
                 }
             }
         }
