@@ -40,14 +40,28 @@ namespace Shiny.Locations
 
             foreach (var triggeringGeofence in e.TriggeringGeofences)
             {
+                var state = (GeofenceState)e.GeofenceTransition;
+
                 var region = await this.repository.Get(triggeringGeofence.RequestId);
-                if (region != null)
+                if (region == null)
                 {
-                    var state = (GeofenceState)e.GeofenceTransition;
+                    Log.Write(LocationLogCategory.Geofence, "Not Found",
+                        ("RequestId", triggeringGeofence.RequestId));
+                    continue;
+                }
+
+                try
+                {
                     await this.geofenceDelegate.OnStatusChanged(state, region);
 
                     if (region.SingleUse)
                         await this.geofenceManager.StopMonitoring(region);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex,
+                        ("RequestId", triggeringGeofence.RequestId),
+                        ("Transition", state.ToString()));
                 }
             }
         }
