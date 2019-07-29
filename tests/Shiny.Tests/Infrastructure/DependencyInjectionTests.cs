@@ -22,7 +22,7 @@ namespace Shiny.Tests.Infrastructure
         [Fact(Skip = "TODO")]
         public void DoesBind()
         {
-            var settings = new InMemorySetttings();
+            //var settings = new InMemorySetttings();
             //settings.("FullService.Count", 3);
         }
     }
