@@ -252,7 +252,7 @@ namespace Shiny.Settings
         public virtual void Bind(INotifyPropertyChanged obj, string prefix = null)
         {
             var type = obj.GetType();
-            var prefixValue = prefix ?? type.Name + ".";
+            var prefixValue = prefix ?? type.FullName + ".";
             var props = this.GetTypeProperties(type);
 
             foreach (var prop in props)

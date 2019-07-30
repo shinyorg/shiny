@@ -24,6 +24,15 @@ namespace Shiny.Infrastructure.DependencyInjection
         }
 
 
+        public void RunPostBuildActions(IServiceProvider container)
+        {
+            foreach (var action in ShinyHost.PostBuildActions)
+                action(container);
+
+            ShinyHost.PostBuildActions.Clear();
+        }
+
+
         void AddItem(ServiceDescriptor descriptor) => ((ICollection<ServiceDescriptor>)this.services).Add(descriptor);
 
 
