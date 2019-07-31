@@ -1,4 +1,5 @@
-Title: Ranging Beacons
+Title: Ranging
+Order: 2
 ---
 
 # Ranging Beacons

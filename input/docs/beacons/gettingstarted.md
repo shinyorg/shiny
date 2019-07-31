@@ -1,9 +1,44 @@
 Title: Getting Started
+Order: 1
 ---
 
 # Beacons
 
 This library deals specifically with iBeacons (Apple's beacon technology).  iBeacons are used to provide contextual location information to a device.  They are built upon BluetoothLE advertising.  They are basically radio'ing out a small piece of data every 700-1400ms that other devices can "hear" if they are listening properly. 
+
+## SETUP
+
+### Android & UWP
+Android & UWP piggyback their functionality with Shiny.BluetoothLE.  Use the following links to ensure your setup for those:
+* [Android](/docs/ble/platforms/android)
+* [UWP](/docs/ble/platforms/uwp)
+
+### iOS
+# Beacons - iOS
+
+iOS has its own official iBeacon API that of course uses BLE under the hood, but all of its permission set is based on Locations.  
+
+## Setup
+
+In your Info.plist, add the following:
+
+```xml
+<key>NSLocationAlwaysUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+```
+
+If you also want to monitoring (background searching for beacons), you'll also need to add the following node to your Info.plist UIBackground modes
+
+```xml
+<key>UIBackgroundModes</key>
+<array>
+    <string>location</string>
+</array>
+```
 
 ## Terminology
 |Term|Description|
@@ -22,3 +57,4 @@ This library deals specifically with iBeacons (Apple's beacon technology).  iBea
     2. Major
     3. Minor
 * You must always have an initial filter of a UUID for ranging or monitoring
+* iOS limits the amount of beacons you are allowed to monitor to 20.  This value is also shared with your geofences, so you need to think about your strategy when using beacons
