@@ -25,7 +25,7 @@ namespace Shiny
     }
 
 
-    public static partial class Extensions
+    public static class RxExtensions
     {
         /// <summary>
         /// A function from ReactiveUI - useful for non-ui stuff too ;)

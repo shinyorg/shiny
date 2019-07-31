@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Shiny
 {
-    public static partial class Extensions
+    public static class ReflectionExtensions
     {
         /// <summary>
         ///
