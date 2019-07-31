@@ -1,10 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Notifications;
 
 
-namespace Shiny.Notifications
+namespace Shiny
 {
-    public static class ContainerBuilderExtensions
+    public static class ServiceCollectionExtensions
     {
         public static bool UseNotifications(this IServiceCollection builder,
                                             bool requestPermissionImmediately = false,

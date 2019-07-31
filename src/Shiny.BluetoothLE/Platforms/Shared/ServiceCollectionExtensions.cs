@@ -1,10 +1,11 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Central;
 using Shiny.BluetoothLE.Peripherals;
-using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Shiny.BluetoothLE
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {

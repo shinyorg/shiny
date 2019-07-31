@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Net.Http;
 
-
-namespace Shiny.Net.Http
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {

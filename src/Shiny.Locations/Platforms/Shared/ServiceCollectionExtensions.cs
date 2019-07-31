@@ -2,9 +2,10 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Locations;
 
 
-namespace Shiny.Locations
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {

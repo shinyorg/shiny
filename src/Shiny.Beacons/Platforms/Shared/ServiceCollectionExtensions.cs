@@ -2,11 +2,13 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Beacons;
 #if WINDOWS_UWP || __ANDROID__
 using Shiny.BluetoothLE;
 #endif
 
-namespace Shiny.Beacons
+
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {

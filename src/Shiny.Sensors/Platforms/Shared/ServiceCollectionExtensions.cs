@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Sensors;
 
 
-namespace Shiny.Sensors
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
@@ -19,7 +20,7 @@ namespace Shiny.Sensors
 
         public static bool UseAmbientLightSensor(this IServiceCollection services)
         {
-#if NETSTANDARD
+#if NETSTANDARD || __IOS__
             return false;
 #else
             services.AddSingleton<IAmbientLight, AmbientLightImpl>();
@@ -44,6 +45,8 @@ namespace Shiny.Sensors
 #if NETSTANDARD
             return false;
 #elif __WATCHOS__ || TIZEN
+            services.UseAccelerometer();
+            services.UseMagnetometer();
             services.AddSingleton<ICompass, SharedCompassImpl>();
             return true;
 #else
