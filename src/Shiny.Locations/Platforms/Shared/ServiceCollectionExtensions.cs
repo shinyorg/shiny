@@ -72,8 +72,8 @@ namespace Shiny
                     if (access == AccessState.Available)
                     {
                         var request = new GpsRequest();
-                        request.UseBackground = true;
                         requestIfPermissionGranted(request);
+                        request.UseBackground = true;
                         await mgr.StartListener(request);
                     }
                 });
