@@ -1,28 +1,55 @@
 Title: Geofences
 ---
 
-## HOW TO USE
+# SETUP
 
-### To start monitoring
+## REGISTRATION
 
-    CrossGeofences.Current.StartMonitoring(new GeofenceRegion( 
-        "My House", // identifier - must be unique per registered geofence
-        Center = new Position(LATITUDE, LONGITUDE), // center point    
-        Distance.FromKilometers(1) // radius of fence
-    ));
+```csharp
+using System;
+using System.Threading.Tasks;
+using Shiny;
+using Shiny.Locations;
+using Microsoft.Extensions.DependencyInjection;
 
-### Wire up to notifications
 
-    CrossGeofences.Current.RegionStatusChanged += (sender, args) => 
+public class YourStartup : ShinyStartup
+{
+    public override void ConfigureServices(IServiceCollection services)
     {
-        args.State // entered or exited
-        args.Region // Identifier & details
-    };
+        services.UseGeofencing<YourGeofenceDelegate>();
+    }
+}
 
-### Stop monitoring a region
+
+public class YourGeofenceDelegate : IGeofenceDelegate 
+{
+
+    public async Task OnStatusChanged(GeofenceRegion region)
+    {
+
+    }
+}
+```
+
+# HOW TO USE
+
+## To start monitoring
+
+```csharp
+Shiny.ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>().StartMonitoring(new GeofenceRegion( 
+    "My House", // identifier - must be unique per registered geofence
+    Center = new Position(LATITUDE, LONGITUDE), // center point    
+    Distance.FromKilometers(1) // radius of fence
+));
+```
+
+## Stop monitoring a region
     
-    CrossGeofences.Current.StopMonitoring(GeofenceRegion);
+```csharp
+Shiny.ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>().StopMonitoring(GeofenceRegion);
 
-    or
+//or
 
-    CrossGeofences.Current.StopAllMonitoring();
+Shiny.ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>().StopAllMonitoring();
+```

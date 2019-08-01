@@ -8,17 +8,16 @@ This library deals specifically with iBeacons (Apple's beacon technology).  iBea
 
 ## SETUP
 
+First - install the NuGet package into your shared code project: [![NuGet](https://img.shields.io/nuget/v/Shiny.Beacons.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Beacons/)
+
 ### Android & UWP
 Android & UWP piggyback their functionality with Shiny.BluetoothLE.  Use the following links to ensure your setup for those:
 * [Android](/docs/ble/platforms/android)
 * [UWP](/docs/ble/platforms/uwp)
 
 ### iOS
-# Beacons - iOS
 
 iOS has its own official iBeacon API that of course uses BLE under the hood, but all of its permission set is based on Locations.  
-
-## Setup
 
 In your Info.plist, add the following:
 
