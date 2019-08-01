@@ -20,7 +20,7 @@ namespace Shiny
 
         public static bool UseAmbientLightSensor(this IServiceCollection services)
         {
-#if NETSTANDARD || __IOS__
+#if NETSTANDARD || __IOS__ || __WATCHOS__
             return false;
 #else
             services.AddSingleton<IAmbientLight, AmbientLightImpl>();
