@@ -1,5 +1,7 @@
 <Project>
     <PropertyGroup>
+        <TargetsToBuildDeveloperOverride>android</TargetsToBuildDeveloperOverride>
+
         <Authors>shinylib aritchie</Authors>
         <!--
         <NullableContextOptions>enable</NullableContextOptions>
@@ -30,11 +32,13 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <TargetsToBuild>$(TargetsToBuildDeveloperOverride)</TargetsToBuild>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <TargetsToBuild>All</TargetsToBuild>
         <!--<DebugType>pdbonly</DebugType>-->
         <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

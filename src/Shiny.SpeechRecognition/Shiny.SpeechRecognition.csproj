@@ -1,13 +1,36 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;monoandroid81;monoandroid90;xamarinios10</TargetFrameworks>
-        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
         <Description>Shiny addon for speech recognition on mobile platforms</Description>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(TargetFrameworkOverride)' != ''">
-        <TargetFrameworks>$(TargetFrameworkOverride)</TargetFrameworks>
+    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'all' ">
+        <TargetFrameworks>netstandard2.0;monoandroid81;monoandroid90;xamarinios10</TargetFrameworks>
+        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'android' ">
+        <TargetFrameworks>netstandard2.0;monoandroid90</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'ios' ">
+        <TargetFrameworks>netstandard2.0;xamarinios10</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'watchos' ">
+        <TargetFrameworks>netstandard2.0;xamarin.watchos10</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'tvos' ">
+        <TargetFrameworks>netstandard2.0;xamarin.tvos10</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'uap' ">
+        <TargetFrameworks>netstandard2.0;uap10.0.16299</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'tizen' ">
+        <TargetFrameworks>netstandard2.0;tizen50</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
