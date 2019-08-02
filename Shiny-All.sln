@@ -14,8 +14,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{482108EE-8D47-4693-80B4-B609B536491B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.whitesource = .whitesource
 		azure-pipelines.yml = azure-pipelines.yml
 		bean_testhost.ino = bean_testhost.ino
+		src\Directory.build.props = src\Directory.build.props
 		global.json = global.json
 		LICENSE.md = LICENSE.md
 		readme.md = readme.md
@@ -44,15 +46,18 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Device.Tests.Shared",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1DC43C21-5765-4B46-95F9-CDECB851DF94}"
 	ProjectSection(SolutionItems) = preProject
+		build.sh = build.sh
+		builddocs.ps1 = builddocs.ps1
 		.github\CODE_OF_CONDUCT.md = .github\CODE_OF_CONDUCT.md
 		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
 		.github\FUNDING.yml = .github\FUNDING.yml
+		global.json = global.json
 		.github\issue-close-app.yml = .github\issue-close-app.yml
 		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
 		.github\noresponse.yml = .github\noresponse.yml
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 		.github\stale.yml = .github\stale.yml
-		.github\support.yaml = .github\support.yaml
+		support.xlsx = support.xlsx
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Testing", "src\Shiny.Testing\Shiny.Testing.csproj", "{204B1F42-0D9C-4349-87C5-34148E3D170A}"
