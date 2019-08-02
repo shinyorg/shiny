@@ -6,15 +6,6 @@ namespace Shiny.BluetoothLE.Central
 {
     public static partial class Extensions
     {
-        public static bool IsPairingRequestsAvailable(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.PairingRequests);
-        public static bool IsMtuRequestsAvailable(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.MtuRequests);
-        public static bool IsReliableTransactionsAvailable(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.ReliableTransactions);
-        public static bool CanOpenSettings(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.OpenSettings);
-        public static bool CanViewPairedPeripherals(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.ViewPairedPeripherals);
-        public static bool CanControlAdapterState(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.ControlAdapterState);
-        public static bool CanPerformLowPoweredScans(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.LowPoweredScan);
-
-
         /// <summary>
         /// This will scan until the peripheral a specific peripheral is found, then cancel the scan
         /// </summary>
