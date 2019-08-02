@@ -39,16 +39,10 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <TargetsToBuild>All</TargetsToBuild>
-        <!--<DebugType>pdbonly</DebugType>-->
         <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
-
-    <!--<PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
-        <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
-    </PropertyGroup>-->
 
     <ItemGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
