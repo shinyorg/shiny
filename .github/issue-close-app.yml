@@ -1,16 +1,10 @@
-# Comment that will be sent if an issue is judged to be closed
-comment: "This issue is closed because it does not meet our criteria listed in the issue template."
+comment: "This issue is closed because it does not meet our criteria listed in the issue template OR you are simply saying thank you."
 issueConfigs:
-# There can be several configs for different kind of issues.
 - content:
-# Example 1: bug report  
   - "Version of OS(s) listed above with issue"
   - "Expected Behavior"
   - "Actual Behavior"
 - content:
-# Example 2: feature request
   - "Summary"
   - "API Changes"
   - "Intended Use Case"
-# The issue is judged to be legal if it includes all keywords from any of these two configs.
-# Or it will be closed by the app.

@@ -4,12 +4,15 @@
 
 Formerly the ACR Plugins
 
-* Beautiful Docs are in the works - for now, take a look here:
+* [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
   * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
   * [Background Jobs - Shiny Style](https://allancritchie.net/posts/shinyjobs)
   * [Settings in a New Light - Shiny Style](https://allancritchie.net/posts/shinysettings)
-  * [The Evolving Docs](https://shinydocs.azurewebsites.net)
-
+  * [Geofencing with a Pinch of Notifications - Shiny Style](https://allancritchie.net/posts/shiny-geofencing)
+  * [Startup Tasks, Modules, and Stateful Delegates - Shiny Style](https://allancritchie.net/posts/shiny-di)
+  * [Beacons - Shiny Style](https://allancritchie.net/posts/shiny-beacons)
+  
+  
 ## Builds
 
 Branch|Status
@@ -37,21 +40,17 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
 |Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
 
+## Integrations
+|Project|NuGet|MyGet|Description|
+|-------|-----|-----|-----------|
+|SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] | Provides caching, logging, storage, & settings implementations
+|AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | Log errors to AppCenter
+|System.Text.Json Serializer| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | This is the new .NET serializer coming into modern .NET.  This will eventually be standard in Shiny
+|(Android) Current Activity| [![CurrentActivityNugetShield]][CurrentActivityNuget] | [![CurrentActivityMygetShield]][CurrentActivityMyget] | If you use James Montemagno's current top activity plugin, Shiny can use it instead of its internal version
 
 ## Contributors
 * Special Thanks to [Emily Stanek](https://github.com/emilystanek) from [BSI Labs](https://github.com/BSiLabs) for the fantastic logo  
 [![BSI Labs - Enterprise Mobile Done Right.](https://bsilabs.ca/wp-content/uploads/2019/04/BSILabsLogo-Grey-Lg@0.25x.png)](https://bsilabs.ca)
-
-
-## Support This Project
-
-Want to help out?  There are several ways to do that
-
-* Help write documentation/samples
-* Fix bugs listed with "Help Wanted"
-* File defects with complete test cases
-* [Become a Patreon](https://patreon.com/Aritchie)
-* [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/QDF8SWy)
 
 
 [BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg
@@ -88,3 +87,23 @@ Want to help out?  There are several ways to do that
 [NotificationsNuget]: https://www.nuget.org/packages/Shiny.Notifications/
 [NotificationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Notifications.svg
 [NotificationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Notifications
+
+[SqliteNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.Sqlite.svg
+[SqliteNuget]: https://www.nuget.org/packages/Shiny.Integrations.Sqlite/
+[SqliteMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.Sqlite.svg
+[SqliteMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.Sqlite
+
+[AppCenterNugetShield]: https://img.shields.io/nuget/v/Shiny.Logging.AppCenter.svg
+[AppCenterNuget]: https://www.nuget.org/packages/Shiny.Logging.AppCenter/
+[AppCenterMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Logging.AppCenter.svg
+[AppCenterMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Logging.AppCenter
+
+[CurrentActivityNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.CurrentActivityPlugin.svg
+[CurrentActivityNuget]: https://www.nuget.org/packages/Shiny.Integrations.CurrentActivityPlugin/
+[CurrentActivityMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.CurrentActivityPlugin.svg
+[CurrentActivityMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.CurrentActivityPlugin
+
+[SysTextJsonNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.SysTextJson.svg
+[SysTextJsonNuget]: https://www.nuget.org/packages/Shiny.Integrations.SysTextJson/
+[SysTextJsonMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.SysTextJson.svg
+[SysTextJsonMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.SysTextJson
