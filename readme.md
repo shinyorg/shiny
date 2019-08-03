@@ -4,12 +4,15 @@
 
 Formerly the ACR Plugins
 
-* Beautiful Docs are in the works - for now, take a look here:
+* [Beautiful Docs](shinylib.net) are in the works - for now, take a look here:
   * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
   * [Background Jobs - Shiny Style](https://allancritchie.net/posts/shinyjobs)
   * [Settings in a New Light - Shiny Style](https://allancritchie.net/posts/shinysettings)
-  * [The Evolving Docs](https://shinydocs.azurewebsites.net)
-
+  * [Geofencing with a Pinch of Notifications - Shiny Style](https://allancritchie.net/posts/shiny-geofencing)
+  * [Startup Tasks, Modules, and Stateful Delegates - Shiny Style](https://allancritchie.net/posts/shiny-di)
+  * [Beacons - Shiny Style](https://allancritchie.net/posts/shiny-beacons)
+  
+  
 ## Builds
 
 Branch|Status
