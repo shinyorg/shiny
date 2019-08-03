@@ -2,7 +2,8 @@
     <PropertyGroup>
         <TargetsToBuildDeveloperOverride>android</TargetsToBuildDeveloperOverride>
 
-        <Authors>shinylib aritchie</Authors>
+        <Authors>Allan Ritchie</Authors>
+        <Owners>aritchie;shinylib</Owners>
         <!--
         <NullableContextOptions>enable</NullableContextOptions>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -19,7 +20,7 @@
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
         <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>
         <PackageReleaseNotes>https://shinylib.net/blog/</PackageReleaseNotes>
-        <PackageTags>xamarin uwp ios android ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
+        <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
 
         <!--<NullableContextOption>enable</NullableContextOption>-->
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
