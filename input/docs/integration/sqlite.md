@@ -2,6 +2,8 @@ Title: SQLite
 ---
 # INTEGRATIONS - SQLite
 
+Install from NuGet: [![NuGet](https://img.shields.io/nuget/v/Shiny.Integrations.Sqlite.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Integrations.Sqlite/)
+
 The SQLite integration provides several overrides to the built-in modules within Shiny.  
 
 * Caching
