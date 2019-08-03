@@ -36,7 +36,8 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpMygetShield]][HttpMyget] |
 |Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
 |Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
-
+|SQLite Integration| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] |
+|AppCenter Logging Integration| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] |
 
 ## Contributors
 * Special Thanks to [Emily Stanek](https://github.com/emilystanek) from [BSI Labs](https://github.com/BSiLabs) for the fantastic logo  
@@ -88,3 +89,13 @@ Want to help out?  There are several ways to do that
 [NotificationsNuget]: https://www.nuget.org/packages/Shiny.Notifications/
 [NotificationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Notifications.svg
 [NotificationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Notifications
+
+[SqliteNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.Sqlite.svg
+[SqliteNuget]: https://www.nuget.org/packages/Shiny.Integrations.Sqlite/
+[SqliteMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.Sqlite.svg
+[SqliteMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.Sqlite
+
+[AppCenterNugetShield]: https://img.shields.io/nuget/v/Shiny.Logging.AppCenter.svg
+[AppCenterNuget]: https://www.nuget.org/packages/Shiny.Logging.AppCenter/
+[AppCenterMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Logging.AppCenter.svg
+[AppCenterMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Logging.AppCenter
