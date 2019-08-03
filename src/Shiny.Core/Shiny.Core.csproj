@@ -39,7 +39,7 @@
         <None Include="..\..\nuget\core.txt" PackagePath="readme.txt" Pack="true" />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
-        <PackageReference Include="System.Reactive" Version="4.1.5" />
+        <PackageReference Include="System.Reactive" Version="4.1.6" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />

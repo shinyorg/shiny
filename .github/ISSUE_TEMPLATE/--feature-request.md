@@ -1,8 +1,8 @@
 ---
-name: Feature Request
+name: "\U0001F354Feature Request"
 about: Suggest an idea for this project
 title: "[Enhancement] YOUR IDEA!"
-labels: t/enhancement ➕, open
+labels: open
 assignees: ''
 
 ---
