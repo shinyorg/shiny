@@ -12,7 +12,9 @@ using Windows.Devices.Enumeration;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public class CentralManager : AbstractCentralManager
+    public class CentralManager : AbstractCentralManager,
+                                  ICanOpenAdapterSettings,
+                                  ICanSeePairedPeripherals
     {
         readonly AdapterContext context;
         readonly Subject<bool> scanSubject;
@@ -39,22 +41,22 @@ namespace Shiny.BluetoothLE.Central
         public override IObservable<AccessState> RequestAccess() => Observable.Return(AccessState.Available);
 
 
-        public override BleFeatures Features
-        {
-            get
-            {
-                if (this.native == null || !this.native.IsLowEnergySupported || !this.native.IsCentralRoleSupported)
-                    return BleFeatures.None;
+        //public override BleFeatures Features
+        //{
+        //    get
+        //    {
+        //        if (this.native == null || !this.native.IsLowEnergySupported || !this.native.IsCentralRoleSupported)
+        //            return BleFeatures.None;
 
-                return BleFeatures.ControlAdapterState |
-                       BleFeatures.LowPoweredScan |
-                       BleFeatures.MtuRequests |
-                       BleFeatures.OpenSettings |
-                       BleFeatures.PairingRequests |
-                       BleFeatures.ReliableTransactions |
-                       BleFeatures.ViewPairedPeripherals;
-            }
-        }
+        //        return BleFeatures.ControlAdapterState |
+        //               BleFeatures.LowPoweredScan |
+        //               BleFeatures.MtuRequests |
+        //               BleFeatures.OpenSettings |
+        //               BleFeatures.PairingRequests |
+        //               BleFeatures.ReliableTransactions |
+        //               BleFeatures.ViewPairedPeripherals;
+        //    }
+        //}
 
 
         public override bool IsScanning { get; protected set; }
@@ -101,11 +103,6 @@ namespace Shiny.BluetoothLE.Central
 
         public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null) => this.GetDevices(
             BluetoothLEDevice.GetDeviceSelectorFromConnectionStatus(BluetoothConnectionStatus.Connected)
-        );
-
-
-        public override IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => this.GetDevices(
-            BluetoothLEDevice.GetDeviceSelectorFromPairingState(true)
         );
 
 
@@ -192,11 +189,14 @@ namespace Shiny.BluetoothLE.Central
         .StartWith(this.Status);
 
 
-        public override async void OpenSettings()
-            => await Launcher.LaunchUriAsync(new Uri("ms-settings:bluetooth"));
+        public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => this.GetDevices(
+            BluetoothLEDevice.GetDeviceSelectorFromPairingState(true)
+        );
+        public bool OpenSettings()
+            => Launcher.LaunchUriAsync(new Uri("ms-settings:bluetooth")).GetResults();
 
 
-        public override async void SetAdapterState(bool enable)
+        public async void SetAdapterState(bool enable)
         {
             var state = enable ? RadioState.On : RadioState.Off;
             await this.radio.SetStateAsync(state);

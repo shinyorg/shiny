@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public static partial class Extensions
+    public static class PeripheralExtensions
     {
         public static bool IsConnected(this IPeripheral peripheral) => peripheral.Status == ConnectionState.Connected;
         public static bool IsDisconnected(this IPeripheral peripheral) => !peripheral.IsConnected();

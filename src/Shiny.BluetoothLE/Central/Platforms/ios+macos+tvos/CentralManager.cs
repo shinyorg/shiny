@@ -58,8 +58,6 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => Observable.Return(new IPeripheral[0]);
-
         public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null)
         {
             if (serviceUuid == null)

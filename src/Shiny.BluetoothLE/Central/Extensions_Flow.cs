@@ -1,10 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Threading;
 
 
 namespace Shiny.BluetoothLE.Central
@@ -98,32 +95,15 @@ namespace Shiny.BluetoothLE.Central
         //});
 
 
-        //public static IObservable<Unit> TxFlow()
-
-        /// <summary>
-        /// Used for writing blobs
-        /// </summary>
-        /// <param name="ch">The characteristic to write on</param>
-        /// <param name="value">The bytes to send</param>
-        /// <param name="reliableWrite">Use reliable write atomic writing if available (windows and android)</param>
-        public static IObservable<BleWriteSegment> BlobWrite(this IGattCharacteristic ch, byte[] value, bool reliableWrite)
-            // don't need to dispose of memorystream
-            => ch.BlobWrite(new MemoryStream(value), reliableWrite);
-
-
         /// <summary>
         /// Used for writing blobs
         /// </summary>
         /// <param name="ch">The characteristic to write on</param>
         /// <param name="stream">The stream to send</param>
-        /// <param name="reliableWrite">Use reliable write atomic writing if available (windows and android)</param>
-        public static IObservable<BleWriteSegment> BlobWrite(this IGattCharacteristic ch, Stream stream, bool reliableWrite)
+        public static IObservable<BleWriteSegment> BlobWrite(this IGattCharacteristic ch, Stream stream)
             => Observable.Create<BleWriteSegment>(async (ob, ct) =>
             {
-                var trans = reliableWrite
-                    ? ch.Service.Peripheral.BeginReliableWriteTransaction()
-                    : new VoidGattReliableWriteTransaction();
-
+                var trans = ch.Service.Peripheral.TryBeginTransaction() ?? new VoidGattReliableWriteTransaction();
                 using (trans)
                 {
                     var mtu = ch.Service.Peripheral.MtuSize;

@@ -30,16 +30,6 @@ namespace Shiny.BluetoothLE.Central
         Guid Uuid { get; }
 
         /// <summary>
-        /// Gets the size of the current mtu.
-        /// </summary>
-        int MtuSize { get; }
-
-        /// <summary>
-        /// The current pairing status
-        /// </summary>
-        PairingState PairingStatus { get; }
-
-        /// <summary>
         /// The current connection status
         /// </summary>
         /// <value>The status.</value>
@@ -94,27 +84,8 @@ namespace Shiny.BluetoothLE.Central
         IObservable<int> ReadRssi();
 
         /// <summary>
-        /// Make a pairing request
+        /// This is the current MTU size (must be connected to get a true value)
         /// </summary>
-        /// <returns></returns>
-        IObservable<bool> PairingRequest(string pin = null);
-
-        /// <summary>
-        /// Send request to set MTU size
-        /// </summary>
-        /// <param name="size"></param>
-        IObservable<int> RequestMtu(int size);
-
-        /// <summary>
-        /// Fires when MTU size changes
-        /// </summary>
-        /// <returns>The mtu change requested.</returns>
-        IObservable<int> WhenMtuChanged();
-
-        /// <summary>
-        /// Begins a reliable write transaction
-        /// </summary>
-        /// <returns>Transaction session</returns>
-        IGattReliableWriteTransaction BeginReliableWriteTransaction();
+        int MtuSize { get; }
     }
 }

@@ -11,7 +11,10 @@ using Android.OS;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public class CentralManager : AbstractCentralManager
+    public class CentralManager : AbstractCentralManager,
+                                  ICanControlAdapterState,
+                                  ICanOpenAdapterSettings,
+                                  ICanSeePairedPeripherals
     {
         readonly CentralContext context;
         bool isScanning;
@@ -22,13 +25,13 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override string AdapterName => "Default Bluetooth Peripheral";
-        public override BleFeatures Features => BleFeatures.ControlAdapterState |
-                                                BleFeatures.LowPoweredScan |
-                                                BleFeatures.MtuRequests |
-                                                BleFeatures.OpenSettings |
-                                                BleFeatures.PairingRequests |
-                                                BleFeatures.ReliableTransactions |
-                                                BleFeatures.ViewPairedPeripherals;
+        //public override BleFeatures Features => BleFeatures.ControlAdapterState |
+        //                                        BleFeatures.LowPoweredScan |
+        //                                        BleFeatures.MtuRequests |
+        //                                        BleFeatures.OpenSettings |
+        //                                        BleFeatures.PairingRequests |
+        //                                        BleFeatures.ReliableTransactions |
+        //                                        BleFeatures.ViewPairedPeripherals;
         public override bool IsScanning => this.isScanning;
 
 
@@ -45,17 +48,8 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals()
-            => Observable.Return<IEnumerable<IPeripheral>>(this.context
-                .Manager
-                .Adapter
-                .BondedDevices
-                .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le)
-                .Select(this.context.GetDevice));
-
-
         public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null)
-            => Observable.Return<IEnumerable<IPeripheral>>(this.context
+            => Observable.Return(this.context
                 .Manager
                 .GetConnectedDevices(ProfileType.Gatt)
                 .Select(this.context.GetDevice));
@@ -133,15 +127,25 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override void OpenSettings()
+        public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals()
+            => Observable.Return(this.context
+                .Manager
+                .Adapter
+                .BondedDevices
+                .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le)
+                .Select(this.context.GetDevice));
+
+
+        public bool OpenSettings()
         {
             var intent = new Intent(Android.Provider.Settings.ActionBluetoothSettings);
             intent.SetFlags(ActivityFlags.NewTask);
             Android.App.Application.Context.StartActivity(intent);
+            return true;
         }
 
 
-        public override void SetAdapterState(bool enable)
+        public void SetAdapterState(bool enable)
         {
             if (enable && !BluetoothAdapter.DefaultAdapter.IsEnabled)
                 BluetoothAdapter.DefaultAdapter.Enable();

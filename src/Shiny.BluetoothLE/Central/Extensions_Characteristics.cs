@@ -5,7 +5,7 @@ using Shiny.Logging;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public static partial class Extensions
+    public static class CharacteristicExtensions
     {
         /// <summary>
         /// Enables notifications and hooks it for discovered characteristic.  When subscription is disposed, it will also clean up.

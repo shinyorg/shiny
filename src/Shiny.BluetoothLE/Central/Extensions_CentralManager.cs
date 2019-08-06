@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public static partial class Extensions
+    public static class CentralManagerExtensions
     {
         /// <summary>
         /// This will scan until the peripheral a specific peripheral is found, then cancel the scan
@@ -31,10 +31,6 @@ namespace Shiny.BluetoothLE.Central
             .Take(1)
             .Select(x => x.Peripheral);
 
-
-        //public static IObservable<IScanResult> ScanTimed(this ICentralManager centralManager, TimeSpan scanTime, ScanConfig config = null) => centralManager
-        //    .Scan(config)
-        //    .Take(scanTime);
 
         /// <summary>
         /// Scans only for distinct peripherals instead of repeating each peripheral scan response - this will only give you peripherals, not RSSI or ad packets

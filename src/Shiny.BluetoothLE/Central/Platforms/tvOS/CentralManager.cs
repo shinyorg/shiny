@@ -9,8 +9,5 @@ namespace Acr.BluetoothLE.Central
         {
             this.context = new AdapterContext(config);
         }
-
-
-        public override BleFeatures Features => BleFeatures.None;
 	}
 }

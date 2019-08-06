@@ -9,9 +9,9 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static void RegisterBleStateRestore<T>(this IServiceCollection services)
-            where T : class, IBleStateRestoreDelegate
-            => services.AddSingleton<IBleStateRestoreDelegate, T>();
+        public static void RegisterBlePeripheralDelegate<T>(this IServiceCollection services)
+            where T : class, IBlePeripheralDelegate
+            => services.AddSingleton<IBlePeripheralDelegate, T>();
 
 
         public static void RegisterBleAdapterState<T>(this IServiceCollection services)

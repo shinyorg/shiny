@@ -59,7 +59,7 @@ namespace Shiny.BluetoothLE.Central
             try
             {
                 var delegates = ShinyHost
-                    .ResolveAll<IBleStateRestoreDelegate>()
+                    .ResolveAll<IBlePeripheralDelegate>()
                     .ToList();
 
                 var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];

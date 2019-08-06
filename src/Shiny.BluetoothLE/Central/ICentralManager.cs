@@ -12,11 +12,6 @@ namespace Shiny.BluetoothLE.Central
         string AdapterName { get; }
 
         /// <summary>
-        /// This readonly property contains a flags enum stating what platform adapter features that are available
-        /// </summary>
-        BleFeatures Features { get; }
-
-        /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
         /// <returns></returns>
@@ -50,11 +45,7 @@ namespace Shiny.BluetoothLE.Central
         /// <returns></returns>
         IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null);
 
-        /// <summary>
-        /// Get the list of paired peripherals
-        /// </summary>
-        /// <returns></returns>
-        IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals();
+
 
         /// <summary>
         /// Start scanning for BluetoothLE peripherals
@@ -68,21 +59,5 @@ namespace Shiny.BluetoothLE.Central
         /// </summary>
         /// <returns></returns>
         IObservable<AccessState> WhenStatusChanged();
-
-        /// <summary>
-        /// Opens the platform settings screen
-        /// </summary>
-        void OpenSettings();
-
-        /// <summary>
-        /// Toggles the bluetooth adapter on/off - returns true if successful
-        /// Works only on Android
-        /// </summary>
-        /// <returns></returns>
-        void SetAdapterState(bool enable);
-
-
-        //void RegisterBackgroundScan<T>(Guid serviceUuid) where T : IBlePeripheralAdvertisedDelegate;
-        //void RegisterDeviceRestore<T>(Guid peripheralUuid) where T : IBlePeripheralConnectedDelegate;
     }
 }

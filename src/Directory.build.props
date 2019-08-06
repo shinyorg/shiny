@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <TargetsToBuildDeveloperOverride>android</TargetsToBuildDeveloperOverride>
+        <TargetsToBuildDeveloperOverride>all</TargetsToBuildDeveloperOverride>
 
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>

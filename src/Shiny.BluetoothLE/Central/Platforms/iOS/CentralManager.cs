@@ -9,8 +9,5 @@ namespace Shiny.BluetoothLE.Central
         {
             this.context = new AdapterContext(config);
         }
-
-
-        public override BleFeatures Features => BleFeatures.LowPoweredScan | BleFeatures.ViewPairedPeripherals;
 	}
 }

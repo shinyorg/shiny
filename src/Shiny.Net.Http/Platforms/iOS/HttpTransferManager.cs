@@ -14,6 +14,7 @@ namespace Shiny.Net.Http
         readonly NSUrlSessionConfiguration sessionConfig;
 
 
+        // TODO: don't resolve the delegate here
         public HttpTransferManager(IHttpTransferDelegate httpDelegate,
                                    int maxConnectionsPerHost = 1)
         {

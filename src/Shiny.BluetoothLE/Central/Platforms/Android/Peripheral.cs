@@ -11,7 +11,10 @@ using Android.OS;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public class Peripheral : AbstractPeripheral
+    public class Peripheral : AbstractPeripheral,
+                              ICanDoTransactions,
+                              ICanPairPeripherals,
+                              ICanRequestMtu
     {
         readonly Subject<ConnectionState> connSubject;
         readonly DeviceContext context;
@@ -127,7 +130,7 @@ namespace Shiny.BluetoothLE.Central
         });
 
 
-        public override IObservable<bool> PairingRequest(string pin) => Observable.Create<bool>(ob =>
+        public IObservable<bool> PairingRequest(string pin) => Observable.Create<bool>(ob =>
         {
             IDisposable requestOb = null;
             IDisposable istatusOb = null;
@@ -171,11 +174,11 @@ namespace Shiny.BluetoothLE.Central
         });
 
 
-        public override IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
+        public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
             new GattReliableWriteTransaction(this.context);
 
 
-        public override PairingState PairingStatus
+        public PairingState PairingStatus
         {
             get
             {
@@ -193,7 +196,7 @@ namespace Shiny.BluetoothLE.Central
 
 
         int currentMtu = 20;
-        public override IObservable<int> RequestMtu(int size) => Observable.Create<int>(ob =>
+        public IObservable<int> RequestMtu(int size) => Observable.Create<int>(ob =>
         {
             var sub = this.WhenMtuChanged().Skip(1).Subscribe(ob.Respond);
             this.context.Gatt.RequestMtu(size);
@@ -201,7 +204,7 @@ namespace Shiny.BluetoothLE.Central
         });
 
 
-        public override IObservable<int> WhenMtuChanged() => this.context
+        public IObservable<int> WhenMtuChanged() => this.context
             .Callbacks
             .MtuChanged
             .Where(x => x.Gatt.Equals(this.context.Gatt))
@@ -214,6 +217,7 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override int MtuSize => this.currentMtu;
+
         public override int GetHashCode() => this.context.NativeDevice.GetHashCode();
 
 
@@ -267,79 +271,6 @@ namespace Shiny.BluetoothLE.Central
             macBytes.CopyTo(deviceGuid, 10);
             return new Guid(deviceGuid);
         }
-
-
-        //// TODO: do I need to watch for connection errors here?
-        //IDisposable CreateAutoReconnectSubscription(GattConnectionConfig config) => this
-        //    .WhenStatusChanged()
-        //    .Skip(1) // skip the initial "Disconnected"
-        //    .Where(x => x == ConnectionStatus.Disconnected)
-        //    .Select(_ => Observable.FromAsync(ct1 => this.DoReconnect(config, ct1)))
-        //    .Merge()
-        //    .Subscribe();
-
-
-        //async Task DoReconnect(GattConnectionConfig config, CancellationToken ct)
-        //{
-        //    Log.Debug("Reconnect", "Starting reconnection loop");
-        //    this.connSubject.OnNext(ConnectionStatus.Connecting);
-        //    var attempts = 1;
-
-        //    while (!ct.IsCancellationRequested &&
-        //           this.Status != ConnectionStatus.Connected &&
-        //           attempts <= AndroidBleConfiguration.MaxAutoReconnectAttempts)
-        //    {
-        //        Log.Write("Reconnect", "Reconnection Attempt " + attempts);
-
-        //        // breathe before attempting (again)
-        //        await Task.Delay(
-        //            AndroidBleConfiguration.PauseBetweenAutoReconnectAttempts,
-        //            ct
-        //        );
-        //        try
-        //        {
-        //            //await this.context.Reconnect(config.Priority);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Log.Warn("Reconnect", "Error reconnecting " + ex);
-        //        }
-        //        attempts++;
-        //    }
-        //    if (this.Status != ConnectionStatus.Connected)
-        //        await this.DoFallbackReconnect(config, ct);
-        //}
-
-
-        //async Task DoFallbackReconnect(GattConnectionConfig config, CancellationToken ct)
-        //{
-        //    if (this.Status == ConnectionStatus.Connected)
-        //    {
-        //        Log.Debug("Reconnect", "Reconnection successful");
-        //    }
-        //    else
-        //    {
-        //        this.context.Close(); // kill current gatt
-
-        //        if (ct.IsCancellationRequested)
-        //        {
-        //            Log.Debug("Reconnect", "Reconnection loop cancelled");
-        //        }
-        //        else
-        //        {
-        //            Log.Debug("Reconnect", "Reconnection failed - handing off to android autoReconnect");
-        //            try
-        //            {
-        //                //await this.context.Connect(config.Priority, true);
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                Log.Error("Reconnect", "Reconnection failed to hand off - " + ex);
-        //            }
-        //        }
-
-        //    }
-        //}
 
         #endregion
     }
