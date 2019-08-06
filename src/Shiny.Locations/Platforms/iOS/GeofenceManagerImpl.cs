@@ -39,8 +39,15 @@ namespace Shiny.Locations
                 .ToTask(cancelToken);
 
             this.locationManager.RequestState(region.ToNative());
-            var result = await task.ConfigureAwait(false);
-            return result;
+            try
+            {
+                var result = await task.ConfigureAwait(false);
+                return result;
+            }
+            catch (TimeoutException ex)
+            {
+                throw new TimeoutException("Could not retrieve latest GPS coordinates to be able to determine geofence current state", ex);
+            }
         }
 
 
