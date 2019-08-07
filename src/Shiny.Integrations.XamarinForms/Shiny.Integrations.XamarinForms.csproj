@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid81;monoandroid90</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid90</TargetFrameworks>
         <Description>Shiny Integration - Xamarin Forms</Description>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>

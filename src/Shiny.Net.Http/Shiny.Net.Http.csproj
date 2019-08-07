@@ -1,39 +1,37 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;monoandroid90;xamarinios10</TargetFrameworks>
-        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;$(TargetFrameworks)</TargetFrameworks>
         <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'all' ">
-        <TargetFrameworks>netstandard2.0;monoandroid90;xamarinios10</TargetFrameworks>
-        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
+    <PropertyGroup Condition=" $(TargetsToBuild.Contains('android')) ">
+        <TargetFrameworks>$(TargetFrameworks);monoandroid90</TargetFrameworks>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'android' ">
-        <TargetFrameworks>netstandard2.0;monoandroid90</TargetFrameworks>
+    <PropertyGroup Condition=" $(TargetsToBuild.Contains('ios')) ">
+        <TargetFrameworks>$(TargetFrameworks);xamarinios10</TargetFrameworks>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'ios' ">
-        <TargetFrameworks>netstandard2.0;xamarinios10</TargetFrameworks>
+    <!--<PropertyGroup Condition=" $(TargetsToBuild.Contains('mac')) ">
+        <TargetFrameworks>$(TargetFrameworks);xamarin.mac20</TargetFrameworks>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'watchos' ">
-        <TargetFrameworks>netstandard2.0;xamarin.watchos10</TargetFrameworks>
+    <PropertyGroup Condition=" $(TargetsToBuild.Contains('watchos')) ">
+        <TargetFrameworks>$(TargetFrameworks);xamarin.watchos10</TargetFrameworks>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'tvos' ">
-        <TargetFrameworks>netstandard2.0;xamarin.tvos10</TargetFrameworks>
+    <PropertyGroup Condition=" $(TargetsToBuild.Contains('tvos')) ">
+        <TargetFrameworks>$(TargetFrameworks);xamarin.tvos10</TargetFrameworks>
+    </PropertyGroup>-->
+
+    <PropertyGroup Condition=" $(TargetsToBuild.Contains('uap')) ">
+        <TargetFrameworks>$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'uap' ">
-        <TargetFrameworks>netstandard2.0;uap10.0.16299</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'tizen' ">
-        <TargetFrameworks>netstandard2.0;tizen50</TargetFrameworks>
-    </PropertyGroup>
+    <!--<PropertyGroup Condition=" $(TargetsToBuild.Contains('tizen')) ">
+        <TargetFrameworks>$(TargetFrameworks);tizen50</TargetFrameworks>
+    </PropertyGroup>-->
 
     <ItemGroup>
         <None Include="..\..\nuget\http.txt" PackagePath="readme.txt" Pack="true" />

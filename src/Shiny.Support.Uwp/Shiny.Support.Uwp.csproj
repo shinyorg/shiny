@@ -1,6 +1,6 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
     <PropertyGroup>
-        <TargetFrameworks>uap10.0.16299</TargetFrameworks>
+        <TargetFramework>uap10.0.16299</TargetFramework>
         <RootNamespace>Shiny.Support.Uwp</RootNamespace>
         <Description>Shiny UWP Support Library</Description>
         <PackageVersion>1.0.0</PackageVersion>

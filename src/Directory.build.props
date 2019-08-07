@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <TargetsToBuildDeveloperOverride>all</TargetsToBuildDeveloperOverride>
+        <TargetsToBuildDeveloperOverride>netstandard;android;ios;tvos;watchos;uap;tizen</TargetsToBuildDeveloperOverride>
 
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
@@ -39,7 +39,11 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <TargetsToBuild>All</TargetsToBuild>
+        <TargetsToBuild>netstandard;android;ios;tvos;uap;watchos</TargetsToBuild>
+        <!--
+        <TargetsToBuild Condition=" '$(OS)' == 'Windows_NT' ">uap;tizen;$(TargetsToBuild)</TargetsToBuild>
+        <TargetsToBuild Condition=" '$(OS)' != 'Windows_NT' ">mac;$(TargetsToBuild)</TargetsToBuild>
+        -->
         <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
