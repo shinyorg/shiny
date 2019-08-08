@@ -20,9 +20,9 @@ namespace Shiny.Notifications
         readonly ISettings settings;
 
 
-        public NotificationManagerImpl(IJobManager jobs,
-                                       ISettings settings,
-                                       IRepository repository)
+        public NotificationManager(IJobManager jobs,
+                                   ISettings settings,
+                                   IRepository repository)
         {
             this.toastNotifier = ToastNotificationManager.CreateToastNotifier();
             this.jobs = jobs;

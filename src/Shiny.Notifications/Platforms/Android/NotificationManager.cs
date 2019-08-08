@@ -9,25 +9,25 @@ using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Settings;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
-
+using Native = Android.App.NotificationManager;
 
 namespace Shiny.Notifications
 {
-    public class NotificationManagerImpl : INotificationManager
+    public class NotificationManager : INotificationManager
     {
         readonly AndroidContext context;
         readonly IRepository repository;
         readonly ISettings settings;
         readonly IJobManager jobs;
 
-        NotificationManager newManager;
+        Native newManager;
         NotificationManagerCompat compatManager;
 
 
-        public NotificationManagerImpl(AndroidContext context,
-                                       IJobManager jobs,
-                                       IRepository repository,
-                                       ISettings settings)
+        public NotificationManager(AndroidContext context,
+                                   IJobManager jobs,
+                                   IRepository repository,
+                                   ISettings settings)
         {
             this.context = context;
             this.jobs = jobs;
@@ -36,7 +36,7 @@ namespace Shiny.Notifications
 
             if ((int) Build.VERSION.SdkInt >= 26)
             {
-                this.newManager = NotificationManager.FromContext(context.AppContext);
+                this.newManager = Native.FromContext(context.AppContext);
             }
             else
             {

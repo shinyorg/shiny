@@ -14,7 +14,7 @@ namespace Shiny.Notifications
     {
         readonly ISettings settings; // this will have problems with data protection
 
-        public NotificationManagerImpl(ISettings settings)
+        public NotificationManager(ISettings settings)
         {
             this.settings = settings;
         }
