@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Locations;
 
@@ -11,8 +10,6 @@ namespace Shiny
     {
         public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regions) where T : class, IGeofenceDelegate
         {
-            builder.AddSingleton<IGeofenceDelegate, T>();
-
 #if WINDOWS_UWP
             builder.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
 #elif __ANDROID__
@@ -22,6 +19,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
+            builder.AddSingleton<IGeofenceDelegate, T>();
             builder.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             if (regions.Any())
             {
@@ -39,17 +37,6 @@ namespace Shiny
         }
 
 
-        public static bool UseGps(this IServiceCollection builder)
-        {
-#if NETSTANDARD
-            return false;
-#else
-            builder.AddSingleton<IGpsManager, GpsManagerImpl>();
-            return true;
-#endif
-        }
-
-
         /// <summary>
         /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
         /// </summary>
@@ -59,9 +46,10 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseGps<T>(this IServiceCollection builder, Action<GpsRequest> requestIfPermissionGranted = null) where T : class, IGpsDelegate
         {
-            if (!builder.UseGps())
-                return false;
-
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<IGpsManager, GpsManagerImpl>();
             builder.AddSingleton<IGpsDelegate, T>();
             if (requestIfPermissionGranted != null)
             {
@@ -79,6 +67,7 @@ namespace Shiny
                 });
             }
             return true;
+#endif
         }
     }
 }

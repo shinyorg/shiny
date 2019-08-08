@@ -45,6 +45,15 @@ namespace Shiny.Notifications
         }
 
 
+        public static void TryProcessIntent(Intent intent)
+        {
+            if (intent?.HasExtra("NOTIFICATION_ID") ?? false)
+            {
+                var notificationId = intent.GetStringExtra("NOTIFICATION_ID");
+                ShinyHost.Resolve<NotificationProcessor>().Entry(notificationId);
+            }
+        }
+
         public Task Cancel(int id)
             => this.repository.Remove<Notification>(id.ToString());
 

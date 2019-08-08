@@ -1,13 +1,14 @@
 ﻿using System;
 using Android.App;
 using Android.Content;
+using Shiny.Notifications;
 
 
-namespace Shiny.Notifications
+namespace Shiny
 {
     static class PlatformExtensions
     {
-        public static ActivityFlags ToNative(this AndroidActivityFlags flags)
+        internal static ActivityFlags ToNative(this AndroidActivityFlags flags)
         {
             var intValue = (int) flags;
             var native = (ActivityFlags) intValue;
@@ -15,7 +16,7 @@ namespace Shiny.Notifications
         }
 
 
-        public static NotificationImportance ToNative(this AndroidNotificationImportance import)
+        internal static NotificationImportance ToNative(this AndroidNotificationImportance import)
         {
             var intValue = (int) import;
             var native = (NotificationImportance) intValue;
@@ -23,13 +24,13 @@ namespace Shiny.Notifications
         }
 
 
-        public static int GetResourceIdByName(this AndroidContext context, string iconName) => context
+        internal static int GetResourceIdByName(this AndroidContext context, string iconName) => context
             .AppContext
             .Resources
             .GetIdentifier(
                 iconName,
                 "drawable",
-                Application.Context.PackageName
+                context.AppContext.PackageName
             );
     }
 }

@@ -10,13 +10,19 @@ using UserNotifications;
 
 namespace Shiny.Notifications
 {
-    public class NotificationManagerImpl : INotificationManager
+    public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         readonly ISettings settings; // this will have problems with data protection
 
         public NotificationManagerImpl(ISettings settings)
         {
             this.settings = settings;
+        }
+
+
+        public void Start()
+        {
+            UNUserNotificationCenter.Current.Delegate = new ShinyNotificationDelegate();
         }
 
 
@@ -169,7 +175,6 @@ namespace Shiny.Notifications
                 //Metadata = native.Content.UserInfo.FromNsDictionary()
             };
 
-            // TODO: restore payload
             if (native.Trigger is UNCalendarNotificationTrigger calendar)
                 shiny.ScheduleDate = calendar.NextTriggerDate.ToDateTime();
 
@@ -194,11 +199,3 @@ namespace Shiny.Notifications
 //        UNNotificationCategoryOptions.None
 //    )
 //);
-
-//UNUserNotificationCenter
-//    .Current
-//    .Delegate = new AcrUserNotificationCenterDelegate(response =>
-//    {
-//        var notification = response.Notification.Request.FromNative();
-//        this.OnActivated(notification);
-//    });

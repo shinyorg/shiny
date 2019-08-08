@@ -7,11 +7,31 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
+        public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection builder,
+                                                                   bool requestPermissionImmediately = false,
+                                                                   Action<AndroidOptions> androidConfigure = null,
+                                                                   Action<UwpOptions> uwpConfigure = null)
+                where TNotificationDelegate : class, INotificationDelegate
+        {
+            if (builder.UseNotifications(requestPermissionImmediately, androidConfigure, uwpConfigure))
+            {
+                builder.AddSingleton<INotificationDelegate, TNotificationDelegate>();
+                return true;
+            }
+            return false;
+        }
+
+
         public static bool UseNotifications(this IServiceCollection builder,
                                             bool requestPermissionImmediately = false,
                                             Action<AndroidOptions> androidConfigure = null,
                                             Action<UwpOptions> uwpConfigure = null)
         {
+#if NETSTANDARD
+            return false;
+#else
+builder.AddSingleton<NotificationProcessor>();
+
             if (androidConfigure != null)
             {
                 var androidOpts = new AndroidOptions();
@@ -41,9 +61,6 @@ namespace Shiny
             });
 #endif
 
-#if NETSTANDARD
-            return false;
-#else
             if (requestPermissionImmediately)
             {
                 builder.RegisterPostBuildAction(async sp =>
@@ -52,7 +69,7 @@ namespace Shiny
                         .RequestAccess()
                 );
             }
-            builder.AddSingleton<INotificationManager, NotificationManagerImpl>();
+            builder.AddSingleton<INotificationManager, NotificationManager>();
             return true;
 #endif
         }

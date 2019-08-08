@@ -12,7 +12,7 @@ using Shiny.Infrastructure;
 namespace Shiny.Notifications
 {
     //https://blogs.msdn.microsoft.com/tiles_and_toasts/2015/07/08/quickstart-sending-a-local-toast-notification-and-handling-activations-from-it-windows-10/
-    public class NotificationManagerImpl : INotificationManager
+    public class NotificationManager : INotificationManager
     {
         readonly ToastNotifier toastNotifier;
         readonly IRepository repository;
