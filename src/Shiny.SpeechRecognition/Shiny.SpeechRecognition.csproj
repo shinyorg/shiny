@@ -2,36 +2,15 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('android')) ">$(TargetFrameworks);monoandroid90</TargetFrameworks>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('ios')) ">$(TargetFrameworks);xamarinios10</TargetFrameworks>
+        <!--<TargetFrameworks Condition=" $(TargetsToBuild.Contains('mac')) ">$(TargetFrameworks);xamarin.mac20</TargetFrameworks>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('watchos')) ">$(TargetFrameworks);xamarin.watchos10</TargetFrameworks>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('tvos')) ">$(TargetFrameworks);xamarin.tvos10</TargetFrameworks>-->
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('uap')) ">$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
+        <!--<TargetFrameworks Condition=" $(TargetsToBuild.Contains('tizen')) ">$(TargetFrameworks);tizen50</TargetFrameworks>-->
         <Description>Shiny addon for speech recognition on mobile platforms</Description>
     </PropertyGroup>
-
-    <PropertyGroup Condition=" $(TargetsToBuild.Contains('android')) ">
-        <TargetFrameworks>$(TargetFrameworks);monoandroid90</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" $(TargetsToBuild.Contains('ios')) ">
-        <TargetFrameworks>$(TargetFrameworks);xamarinios10</TargetFrameworks>
-    </PropertyGroup>
-
-    <!--<PropertyGroup Condition=" $(TargetsToBuild.Contains('mac')) ">
-        <TargetFrameworks>$(TargetFrameworks);xamarin.mac20</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" $(TargetsToBuild.Contains('watchos')) ">
-        <TargetFrameworks>$(TargetFrameworks);xamarin.watchos10</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" $(TargetsToBuild.Contains('tvos')) ">
-        <TargetFrameworks>$(TargetFrameworks);xamarin.tvos10</TargetFrameworks>
-    </PropertyGroup>-->
-
-    <PropertyGroup Condition=" $(TargetsToBuild.Contains('uap')) ">
-        <TargetFrameworks>$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
-    </PropertyGroup>
-
-    <!--<PropertyGroup Condition=" $(TargetsToBuild.Contains('tizen')) ">
-        <TargetFrameworks>$(TargetFrameworks);tizen50</TargetFrameworks>
-    </PropertyGroup>-->
 
     <ItemGroup>
         <None Include="..\..\nuget\speech.txt" PackagePath="readme.txt" Pack="true" />

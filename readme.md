@@ -4,6 +4,7 @@
 
 Formerly the ACR Plugins
 
+* [Samples](https://github.com/shinyorg/shinysamples) - Shows almost every single function point within Shiny
 * [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
   * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
   * [Background Jobs - Shiny Style](https://allancritchie.net/posts/shinyjobs)

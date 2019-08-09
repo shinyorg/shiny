@@ -2,7 +2,14 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
-        <Description>Shiny addon for all imaginable sensors for mobile devices</Description>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('android')) ">$(TargetFrameworks);monoandroid90</TargetFrameworks>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('ios')) ">$(TargetFrameworks);xamarinios10</TargetFrameworks>
+        <!--<TargetFrameworks Condition=" $(TargetsToBuild.Contains('mac')) ">$(TargetFrameworks);xamarin.mac20</TargetFrameworks>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('watchos')) ">$(TargetFrameworks);xamarin.watchos10</TargetFrameworks>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('tvos')) ">$(TargetFrameworks);xamarin.tvos10</TargetFrameworks>-->
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('uap')) ">$(TargetFrameworks);uap10.0.16299</TargetFrameworks>
+        <TargetFrameworks Condition=" $(TargetsToBuild.Contains('tizen')) ">$(TargetFrameworks);tizen50</TargetFrameworks>
+        <Description>Shiny addon for all imaginable sensors for your devices</Description>
     </PropertyGroup>
 
     <PropertyGroup Condition=" $(TargetsToBuild.Contains('android')) ">
