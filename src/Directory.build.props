@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <TargetsToBuildDeveloperOverride>netstandard;android;ios;tvos;watchos;uap;tizen</TargetsToBuildDeveloperOverride>
+        <TargetsToBuildDeveloperOverride>All</TargetsToBuildDeveloperOverride>
 
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
@@ -41,18 +41,14 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <TargetsToBuild>netstandard;android;ios;tvos;uap;watchos</TargetsToBuild>
-        <!--
-        <TargetsToBuild Condition=" '$(OS)' == 'Windows_NT' ">uap;tizen;$(TargetsToBuild)</TargetsToBuild>
-        <TargetsToBuild Condition=" '$(OS)' != 'Windows_NT' ">mac;$(TargetsToBuild)</TargetsToBuild>
-        -->
+        <TargetsToBuild>All</TargetsToBuild>
         <DebugType Condition=" !$(TargetFramework.StartsWith('MonoAndroid')) ">portable</DebugType>
         <DebugType Condition=" $(TargetFramework.StartsWith('MonoAndroid')) ">Full</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
-    <ItemGroup Condition=" '$(SourceLinkEnabled)' != 'false' ">
+    <ItemGroup Condition=" '$(SourceLinkEnabled)' == 'true' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All" />
     </ItemGroup>
 
