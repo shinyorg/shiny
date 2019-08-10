@@ -31,8 +31,8 @@ namespace Shiny.Beacons
         public override Task StartMonitoring(BeaconRegion region)
             => this.Repository.Set(region.Identifier, region);
 
-        public override Task StopMonitoring(BeaconRegion region)
-            => this.Repository.Remove<BeaconRegion>(region.Identifier);
+        public override Task StopMonitoring(string identifier)
+            => this.Repository.Remove<BeaconRegion>(identifier);
 
         public override Task StopAllMonitoring()
             => this.Repository.Clear<BeaconRegion>();

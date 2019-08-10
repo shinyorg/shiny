@@ -51,8 +51,9 @@ namespace Shiny.Beacons
         }
 
 
-        public override async Task StopMonitoring(BeaconRegion region)
+        public override async Task StopMonitoring(string identifier)
         {
+            var region = await this.Repository.Get<BeaconRegion>(identifier);
             await this.Repository.Remove<BeaconRegion>(region.Identifier);
             this.manager.StopMonitoring(region.ToNative());
         }

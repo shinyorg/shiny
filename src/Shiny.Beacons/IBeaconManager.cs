@@ -51,9 +51,9 @@ namespace Shiny.Beacons
         /// <summary>
         /// Stops monitoring a beacon region
         /// </summary>
-        /// <param name="region"></param>
+        /// <param name="identifier"></param>
         /// <returns></returns>
-        Task StopMonitoring(BeaconRegion region);
+        Task StopMonitoring(string identifier);
 
 
         /// <summary>

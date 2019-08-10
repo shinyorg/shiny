@@ -60,15 +60,15 @@ namespace Shiny.Testing.Locations
         }
 
 
-        public Task StopMonitoring(GeofenceRegion region)
+        public Task StopMonitoring(string identifier)
         {
-            this.regions.Remove(region);
+            var region = this.regions.FirstOrDefault(x => x.Identifier == identifier);
+            if (region != null)
+                this.regions.Remove(region);
+
             return Task.CompletedTask;
         }
 
-        public IObservable<AccessState> WhenAccessStatusChanged()
-        {
-            throw new NotImplementedException();
-        }
+        public IObservable<AccessState> WhenAccessStatusChanged() => this.accessSubject;
     }
 }

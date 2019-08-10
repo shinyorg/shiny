@@ -38,7 +38,7 @@ namespace Shiny.Beacons
         public abstract IObservable<Beacon> WhenBeaconRanged(BeaconRegion region);
         public abstract Task<AccessState> RequestAccess(bool monitoring);
         public abstract Task StartMonitoring(BeaconRegion region);
-        public abstract Task StopMonitoring(BeaconRegion region);
+        public abstract Task StopMonitoring(string identifier);
         public abstract Task StopAllMonitoring();
         public virtual async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions() => await this.Repository.GetAll<BeaconRegion>();
     }

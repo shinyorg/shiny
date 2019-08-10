@@ -42,9 +42,12 @@ namespace Shiny.Testing.Beacons
         }
 
 
-        public Task StopMonitoring(BeaconRegion region)
+        public Task StopMonitoring(string identifier)
         {
-            this.monitoredRegions.Remove(region);
+            var region = this.monitoredRegions.FirstOrDefault(x => x.Identifier == identifier);
+            if (region != null)
+                this.monitoredRegions.Remove(region);
+
             return Task.CompletedTask;
         }
 
