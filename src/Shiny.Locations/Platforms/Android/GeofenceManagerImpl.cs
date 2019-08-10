@@ -67,10 +67,10 @@ namespace Shiny.Locations
         }
 
 
-        public override async Task StopMonitoring(GeofenceRegion region)
+        public override async Task StopMonitoring(string identifier)
         {
-            await this.Repository.Remove(region.Identifier);
-            await this.client.RemoveGeofencesAsync(new List<string> { region.Identifier });
+            await this.Repository.Remove(identifier);
+            await this.client.RemoveGeofencesAsync(new List<string> { identifier });
         }
 
 

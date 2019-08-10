@@ -76,10 +76,14 @@ namespace Shiny.Locations
         }
 
 
-        public override async Task StopMonitoring(GeofenceRegion region)
+        public override async Task StopMonitoring(string identifier)
         {
-            await this.Repository.Remove(region.Identifier);
-            this.locationManager.StopMonitoring(region.ToNative());
+            var region = await this.Repository.Get(identifier);
+            if (region != null)
+            {
+                await this.Repository.Remove(region.Identifier);
+                this.locationManager.StopMonitoring(region.ToNative());
+            }
         }
 
 

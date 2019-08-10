@@ -61,7 +61,7 @@ namespace Shiny.Locations
                             await this.geofenceDelegate.OnStatusChanged(state, region);
 
                             if (region.SingleUse)
-                                await this.geofenceManager.StopMonitoring(region);
+                                await this.geofenceManager.StopMonitoring(region.Identifier);
                         }
                         catch (Exception ex)
                         {
