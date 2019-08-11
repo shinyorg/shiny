@@ -38,6 +38,21 @@ namespace Shiny
 
 
         /// <summary>
+        /// This registers GPS services with the Shiny container - foreground only
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static bool UseGps(this IServiceCollection builder)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.AddSingleton<IGpsManager, GpsManagerImpl>();
+            return true;
+#endif
+        }
+
+        /// <summary>
         /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
         /// </summary>
         /// <typeparam name="T">The IGpsDelegate to call</typeparam>
@@ -46,10 +61,9 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseGps<T>(this IServiceCollection builder, Action<GpsRequest> requestIfPermissionGranted = null) where T : class, IGpsDelegate
         {
-#if NETSTANDARD
-            return false;
-#else
-            builder.AddSingleton<IGpsManager, GpsManagerImpl>();
+            if (!builder.UseGps())
+                return false;
+
             builder.AddSingleton<IGpsDelegate, T>();
             if (requestIfPermissionGranted != null)
             {
@@ -67,7 +81,6 @@ namespace Shiny
                 });
             }
             return true;
-#endif
         }
     }
 }
