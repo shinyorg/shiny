@@ -33,7 +33,8 @@ namespace Shiny.Locations
         {
             var task = this.gdelegate
                 .WhenStateDetermined()
-                .Where(x => region.Equals(x))
+                .Where(x => region.Equals(x.Region))
+                .Take(1)
                 .Select(x => x.Status)
                 .Timeout(TimeSpan.FromSeconds(20))
                 .ToTask(cancelToken);
