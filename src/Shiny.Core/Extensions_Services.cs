@@ -18,6 +18,7 @@ namespace Shiny
         public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
             => ShinyHost.AddPostBuildAction(action);
 
+
         /// <summary>
         /// Register a startup task that runs immediately after the container is built with full dependency injected services
         /// </summary>
@@ -41,7 +42,10 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="jobInfo"></param>
         public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-            => services.RegisterPostBuildAction(async sp =>
+        {
+            jobInfo.AssertValid();
+
+            services.RegisterPostBuildAction(async sp =>
             {
                 // what if permission fails?
                 var jobs = sp.GetService<IJobManager>();
@@ -49,6 +53,7 @@ namespace Shiny
                 if (access == AccessState.Available)
                     await jobs.Schedule(jobInfo);
             });
+        }
 
 
         /// <summary>

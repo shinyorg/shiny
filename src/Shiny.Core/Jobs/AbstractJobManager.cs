@@ -115,11 +115,7 @@ namespace Shiny.Jobs
 
         public virtual async Task Schedule(JobInfo jobInfo)
         {
-            if (String.IsNullOrWhiteSpace(jobInfo.Identifier))
-                throw new ArgumentException("No job name defined");
-
-            if (jobInfo.Type == null)
-                throw new ArgumentException("Type not set");
+            jobInfo.AssertValid();
 
             // we do a force resolve here to ensure all is good
             this.ResolveJob(jobInfo);
