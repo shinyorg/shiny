@@ -9,6 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using NativePerm = Android.Content.PM.Permission;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+[assembly: UsesPermission(Android.Manifest.Permission.AccessNetworkState)]
+[assembly: UsesPermission(Android.Manifest.Permission.BatteryStats)]
+[assembly: UsesPermission(Android.Manifest.Permission.ReceiveBootCompleted)]
 
 namespace Shiny
 {

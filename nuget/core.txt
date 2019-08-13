@@ -38,7 +38,9 @@ namespace YourNamespace
 ANDROID
 ----------
 
-1. Create an application in your android head project
+1. You must set your "Target Android verion" to "Android 9.0 (API Level 28)" or higher
+
+2. Create an application in your android head project
 
 using System;
 using Shiny;
@@ -67,21 +69,13 @@ namespace YourNamespace
 }
 
 
-2. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
+3. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
 
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
 {
     Shiny.AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
-
-
-3. In your Android.manifest for Jobs
-
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<uses-permission android:name="android.permission.BATTERY_STATS" />
-<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
 
 ----------
 IOS
