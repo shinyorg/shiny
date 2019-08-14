@@ -61,7 +61,7 @@ namespace Shiny.Notifications
                         .GetPendingNotificationRequestsAsync();
 
                     var notifications = requests
-                        .Select(this.FromNative)
+                        .Select(x => x.FromNative())
                         .Where(x => x != null);
                     tcs.TrySetResult(notifications);
                 }
@@ -158,27 +158,6 @@ namespace Shiny.Notifications
                 }
             });
             return tcs.Task;
-        }
-
-
-        protected virtual Notification FromNative(UNNotificationRequest native)
-        {
-            if (!Int32.TryParse(native.Identifier, out var i))
-                return null;
-
-            var shiny = new Notification
-            {
-                Id = i,
-                Title = native.Content?.Title,
-                Message = native.Content?.Body,
-                Sound = native.Content.Sound?.ToString(),
-                //Metadata = native.Content.UserInfo.FromNsDictionary()
-            };
-
-            if (native.Trigger is UNCalendarNotificationTrigger calendar)
-                shiny.ScheduleDate = calendar.NextTriggerDate.ToDateTime();
-
-            return shiny;
         }
     }
 }
