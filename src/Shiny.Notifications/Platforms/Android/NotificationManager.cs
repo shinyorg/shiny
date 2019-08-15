@@ -11,10 +11,12 @@ using Shiny.Settings;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
 using Native = Android.App.NotificationManager;
 
+
 namespace Shiny.Notifications
 {
     public class NotificationManager : INotificationManager
     {
+        const string NOTIFICATION_ID = "NotificationId";
         readonly AndroidContext context;
         readonly IRepository repository;
         readonly ISettings settings;
@@ -47,12 +49,16 @@ namespace Shiny.Notifications
 
         public static void TryProcessIntent(Intent intent)
         {
-            if (intent?.HasExtra("NOTIFICATION_ID") ?? false)
+            // TODO: test
+            if (intent?.HasExtra(NOTIFICATION_ID) ?? false)
             {
-                var notificationId = intent.GetStringExtra("NOTIFICATION_ID");
-                ShinyHost.Resolve<NotificationProcessor>().Entry(notificationId);
+                var notificationId = intent.GetStringExtra(NOTIFICATION_ID);
+                ShinyHost
+                    .Resolve<NotificationProcessor>()
+                    .Entry(notificationId);
             }
         }
+
 
         public Task Cancel(int id)
             => this.repository.Remove<Notification>(id.ToString());
@@ -105,6 +111,7 @@ namespace Shiny.Notifications
                 .GetLaunchIntentForPackage(this.context.Package.PackageName)
                 .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
 
+            launchIntent.PutExtra(NOTIFICATION_ID, notification.Id.ToString());
             if (!notification.Payload.IsEmpty())
                 launchIntent.PutExtra("Payload", notification.Payload);
 
@@ -170,6 +177,8 @@ namespace Shiny.Notifications
             {
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
+
+            // TODO: fire received event here?
         }
     }
 }
