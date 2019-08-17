@@ -122,6 +122,8 @@ namespace Shiny.Notifications
                 //.GetPendingIntent(notification.Id, PendingIntentFlags.OneShot | PendingIntentFlags.CancelCurrent);
 
             var smallIconResourceId = this.context.GetResourceIdByName(notification.Android.SmallIconResourceName);
+            if (smallIconResourceId <= 0)
+                throw new ArgumentException($"No ResourceId found for '{notification.Android.SmallIconResourceName}' - You can set this per notification using notification.Android.SmallIconResourceName or globally using Shiny.Android.AndroidOptions.SmallIconResourceName");
 
             var builder = new NotificationCompat.Builder(this.context.AppContext)
                 .SetContentTitle(notification.Title)
@@ -178,7 +180,9 @@ namespace Shiny.Notifications
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
 
-            // TODO: fire received event here?
+            ShinyHost
+                .Resolve<INotificationDelegate>()?
+                .OnReceived(notification);
         }
     }
 }

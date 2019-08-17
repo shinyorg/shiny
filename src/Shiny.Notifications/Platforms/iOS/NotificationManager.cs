@@ -108,10 +108,15 @@ namespace Shiny.Notifications
             if (!notification.Sound.IsEmpty())
                 content.Sound = UNNotificationSound.GetSound(notification.Sound);
 
-            var dt = notification.ScheduleDate ?? DateTime.Now;
-            var trigger = notification.ScheduleDate == null
-                ? (UNNotificationTrigger)UNTimeIntervalNotificationTrigger.CreateTrigger(3, false)
-                : UNCalendarNotificationTrigger.CreateTrigger(new NSDateComponents
+            UNNotificationTrigger trigger = null;
+            if (notification.ScheduleDate == null)
+            {
+                trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(3, false);
+            }
+            else
+            {
+                var dt = notification.ScheduleDate.Value.ToLocalTime();
+                UNCalendarNotificationTrigger.CreateTrigger(new NSDateComponents
                 {
                     Year = dt.Year,
                     Month = dt.Month,
@@ -120,6 +125,7 @@ namespace Shiny.Notifications
                     Minute = dt.Minute,
                     Second = dt.Second
                 }, false);
+            }
 
             var request = UNNotificationRequest.FromIdentifier(
                 notification.Id.ToString(),
