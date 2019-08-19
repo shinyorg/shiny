@@ -46,12 +46,12 @@ namespace Shiny.Net.Http
                 {
                     case HttpTransferState.Completed:
                         await this.StopJob(jobInfo);
-                        this.tdelegate.OnCompleted(transfer);
+                        await this.tdelegate.OnCompleted(transfer);
                         break;
 
                     case HttpTransferState.Error:
                         await this.StopJob(jobInfo);
-                        this.tdelegate.OnError(transfer, transfer.Exception);
+                        await this.tdelegate.OnError(transfer, transfer.Exception);
                         break;
                 }
             }

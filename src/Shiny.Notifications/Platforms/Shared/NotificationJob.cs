@@ -25,7 +25,9 @@ namespace Shiny.Notifications
         public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
             var all = await this.repository.GetAll<Notification>();
-            var pending = all.Where(x => x.ScheduleDate.Value < DateTime.UtcNow);
+            var pending = all
+                .Where(x => x.ScheduleDate.Value < DateTimeOffset.UtcNow)
+                .ToList();
 
             var anyPending = false;
             foreach (var notification in pending)

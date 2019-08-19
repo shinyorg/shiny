@@ -6,6 +6,7 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
 using Shiny.Infrastructure;
+using Shiny.Logging;
 using Shiny.Jobs;
 using Shiny.Settings;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
@@ -16,10 +17,10 @@ namespace Shiny.Notifications
 {
     public class NotificationManager : INotificationManager
     {
-        const string NOTIFICATION_ID = "NotificationId";
         readonly AndroidContext context;
         readonly IRepository repository;
         readonly ISettings settings;
+        readonly ISerializer serializer;
         readonly IJobManager jobs;
 
         Native newManager;
@@ -27,11 +28,13 @@ namespace Shiny.Notifications
 
 
         public NotificationManager(AndroidContext context,
+                                   ISerializer serializer,
                                    IJobManager jobs,
                                    IRepository repository,
                                    ISettings settings)
         {
             this.context = context;
+            this.serializer = serializer;
             this.jobs = jobs;
             this.repository = repository;
             this.settings = settings;
@@ -47,17 +50,9 @@ namespace Shiny.Notifications
         }
 
 
-        public static void TryProcessIntent(Intent intent)
-        {
-            // TODO: test
-            if (intent?.HasExtra(NOTIFICATION_ID) ?? false)
-            {
-                var notificationId = intent.GetStringExtra(NOTIFICATION_ID);
-                ShinyHost
-                    .Resolve<NotificationProcessor>()
-                    .Entry(notificationId);
-            }
-        }
+        public static void TryProcessIntent(Intent intent) => ShinyHost
+            .Resolve<AndroidNotificationProcessor>()
+            .TryProcessIntent(intent);
 
 
         public Task Cancel(int id)
@@ -111,7 +106,8 @@ namespace Shiny.Notifications
                 .GetLaunchIntentForPackage(this.context.Package.PackageName)
                 .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
 
-            launchIntent.PutExtra(NOTIFICATION_ID, notification.Id.ToString());
+            var notificationString = this.serializer.Serialize(notification);
+            launchIntent.PutExtra(AndroidNotificationProcessor.NOTIFICATION_KEY, notificationString);
             if (!notification.Payload.IsEmpty())
                 launchIntent.PutExtra("Payload", notification.Payload);
 
@@ -122,6 +118,8 @@ namespace Shiny.Notifications
                 //.GetPendingIntent(notification.Id, PendingIntentFlags.OneShot | PendingIntentFlags.CancelCurrent);
 
             var smallIconResourceId = this.context.GetResourceIdByName(notification.Android.SmallIconResourceName);
+            if (smallIconResourceId <= 0)
+                throw new ArgumentException($"No ResourceId found for '{notification.Android.SmallIconResourceName}' - You can set this per notification using notification.Android.SmallIconResourceName or globally using Shiny.Android.AndroidOptions.SmallIconResourceName");
 
             var builder = new NotificationCompat.Builder(this.context.AppContext)
                 .SetContentTitle(notification.Title)
@@ -178,7 +176,16 @@ namespace Shiny.Notifications
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
 
-            // TODO: fire received event here?
+            try
+            {
+                await ShinyHost
+                    .Resolve<INotificationDelegate>()?
+                    .OnReceived(notification);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
         }
     }
 }
