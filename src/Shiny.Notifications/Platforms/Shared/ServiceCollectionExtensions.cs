@@ -30,8 +30,6 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-builder.AddSingleton<NotificationProcessor>();
-
             if (androidConfigure != null)
             {
                 var androidOpts = new AndroidOptions();
@@ -51,6 +49,10 @@ builder.AddSingleton<NotificationProcessor>();
                 uwpConfigure(uwpOpts);
                 UwpOptions.DefaultUseLongDuration = uwpOpts.UseLongDuration;
             }
+
+#if __ANDROID__
+            builder.AddSingleton<AndroidNotificationProcessor>();
+#endif
 
 #if __ANDROID__ || WINDOWS_UWP
             builder.RegisterJob(new Jobs.JobInfo
