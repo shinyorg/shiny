@@ -43,7 +43,7 @@
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <!--<TargetsToBuild>android;ios;watchos;mac;tvos;uap;tizen</TargetsToBuild>-->
-        <TargetsToBuild>android;ios;watchos;tvos;uap</TargetsToBuild>
+        <TargetsToBuild>android;ios;uap</TargetsToBuild>
         <DesignTimeBuild>false</DesignTimeBuild>
         <DebugType Condition=" !$(TargetFramework.StartsWith('monoandroid')) ">portable</DebugType>
         <DebugType Condition=" $(TargetFramework.StartsWith('monoandroid')) ">Full</DebugType>

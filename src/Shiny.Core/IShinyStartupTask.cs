@@ -4,7 +4,7 @@
 namespace Shiny
 {
     /// <summary>
-    /// Registering this in your Shiny.Startup (using RegisterStartupTask<T>) will run these tasks immediately after the
+    /// Registering this in your Shiny.Startup (using RegisterStartupTask) will run these tasks immediately after the
     /// service container has been built
     /// </summary>
     public interface IShinyStartupTask
