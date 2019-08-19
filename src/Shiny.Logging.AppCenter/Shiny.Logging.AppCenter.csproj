@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="..\..\nuget\appcenter.txt" PackagePath="readme.txt" Pack="true" />
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <PackageReference Include="Microsoft.AppCenter.Analytics" Version="2.1.1" />
         <PackageReference Include="Microsoft.AppCenter.Crashes" Version="2.1.1" />
     </ItemGroup>

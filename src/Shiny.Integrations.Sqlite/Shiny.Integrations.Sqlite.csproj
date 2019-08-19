@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="..\..\nuget\sqlite.txt" PackagePath="readme.txt" Pack="true" />
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <PackageReference Include="sqlite-net-pcl" Version="1.5.231" />
     </ItemGroup>
 

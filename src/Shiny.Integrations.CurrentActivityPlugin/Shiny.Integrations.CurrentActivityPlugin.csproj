@@ -9,18 +9,12 @@
     <!--https://github.com/onovotny/MSBuildSdkExtras/issues/174-->
     <Target Name="_RemoveNonExistingResgenFile" BeforeTargets="CoreCompile" Condition="'$(_SdkSetAndroidResgenFile)' == 'true' And '$(AndroidResgenFile)' != '' And !Exists('$(AndroidResgenFile)')">
         <ItemGroup>
-            <Compile Remove="$(AndroidResgenFile)"/>
+            <Compile Remove="$(AndroidResgenFile)" />
         </ItemGroup>
     </Target>
 
     <ItemGroup>
-        <None Include="..\..\nuget\activity.txt" PackagePath="readme.txt" Pack="true" />
-        <!--<Compile Remove="obj\**" />
-        <EmbeddedResource Remove="obj\**" />
-        <None Remove="obj\**" />-->
-    </ItemGroup>
-
-    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <PackageReference Include="Plugin.CurrentActivity" Version="2.1.0.4" />
     </ItemGroup>

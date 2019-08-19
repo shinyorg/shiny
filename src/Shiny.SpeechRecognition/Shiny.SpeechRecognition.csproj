@@ -20,7 +20,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="..\..\nuget\speech.txt" PackagePath="readme.txt" Pack="true" />
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
     </ItemGroup>

@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="..\..\nuget\systextjson.txt" PackagePath="readme.txt" Pack="true" />
         <PackageReference Include="System.Text.Json" Version="4.6.0-preview6.19303.8" />
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 

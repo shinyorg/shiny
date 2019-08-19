@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="..\..\nuget\litedb.txt" PackagePath="readme.txt" Pack="true" />
         <PackageReference Include="LiteDB" Version="4.1.4" />
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
