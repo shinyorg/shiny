@@ -1,7 +1,8 @@
 <Project>
     <PropertyGroup>
-        <TargetsToBuildDeveloperOverride>Android</TargetsToBuildDeveloperOverride>
-
+        <AndroidVersionsToBuild>monoandroid90</AndroidVersionsToBuild>
+        <UapVersionsToBuild>uap10.0.16299</UapVersionsToBuild>
+        <TizenVersionsToBuild>tizen50</TizenVersionsToBuild>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
         <!--
@@ -35,16 +36,17 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <TargetsToBuild>$(TargetsToBuildDeveloperOverride)</TargetsToBuild>
+        <TargetsToBuild>android;ios;watchos;tvos;uap;tizen</TargetsToBuild>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <TargetsToBuild>All</TargetsToBuild>
+        <!--<TargetsToBuild>android;ios;watchos;mac;tvos;uap;tizen</TargetsToBuild>-->
+        <TargetsToBuild>android;ios;watchos;tvos;uap</TargetsToBuild>
         <DesignTimeBuild>false</DesignTimeBuild>
-        <DebugType Condition=" !$(TargetFramework.StartsWith('MonoAndroid')) ">portable</DebugType>
-        <DebugType Condition=" $(TargetFramework.StartsWith('MonoAndroid')) ">Full</DebugType>
+        <DebugType Condition=" !$(TargetFramework.StartsWith('monoandroid')) ">portable</DebugType>
+        <DebugType Condition=" $(TargetFramework.StartsWith('monoandroid')) ">Full</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>

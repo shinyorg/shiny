@@ -1,22 +1,15 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
-
-    <PropertyGroup Condition=" '$(TargetsToBuild)' == 'All' ">
-        <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">netstandard2.0;monoandroid90;xamarinios10;uap10.0.16299</TargetFrameworks>
-        <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netstandard2.0;monoandroid90;xamarinios10</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(TargetsToBuild)' != 'All' ">
-        <TargetFrameworks Condition=" '$(TargetsToBuild)' == 'android' ">netstandard2.0;monoandroid90</TargetFrameworks>
-        <TargetFrameworks Condition=" '$(TargetsToBuild)' == 'ios' ">netstandard2.0;xamarinios10</TargetFrameworks>
-        <!--<TargetFrameworks Condition=" '$(TargetsToBuild)' == 'mac' ">netstandard2.0;xamarin.mac20</TargetFrameworks>
-        <TargetFrameworks Condition=" '$(TargetsToBuild)' == 'watchos' ">netstandard2.0;xamarin.watchos10</TargetFrameworks>
-        <TargetFrameworks Condition=" '$(TargetsToBuild)' == 'tvos' ">netstandard2.0;xamarin.tvos10</TargetFrameworks>-->
-        <TargetFrameworks Condition=" '$(TargetsToBuild)' == 'uap' ">netstandard2.0;uap10.0.16299</TargetFrameworks>
-        <!--<TargetFrameworks Condition=" '$(TargetsToBuild)' == 'tizen' ">netstandard2.0;tizen50</TargetFrameworks>-->
-    </PropertyGroup>
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <Description>Shiny addon for all your notification needs</Description>
+        <TargetFrameworks>netstandard2.0</TargetFrameworks>
+        <TargetFrameworks Condition="$(TargetsToBuild.Contains('android'))">$(AndroidVersionsToBuild);$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks Condition="$(TargetsToBuild.Contains('ios'))">xamarinios10;$(TargetFrameworks)</TargetFrameworks>
+        <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('mac'))">xamarin.mac20;$(TargetFrameworks)</TargetFrameworks>-->
+        <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('watchos'))">xamarin.watchos10;$(TargetFrameworks)</TargetFrameworks>-->
+        <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('tvos'))">xamarin.tvos10;$(TargetFrameworks)</TargetFrameworks>-->
+        <TargetFrameworks Condition="$(TargetsToBuild.Contains('uap'))">$(UapVersionsToBuild);$(TargetFrameworks)</TargetFrameworks>
+        <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('tizen'))">$(TizenVersionsToBuild);$(TargetFrameworks)</TargetFrameworks>-->
     </PropertyGroup>
 
     <ItemGroup>
