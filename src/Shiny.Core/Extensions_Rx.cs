@@ -42,7 +42,7 @@ namespace Shiny
 
 
         /// <summary>
-        /// A handy way for replying & completing an observer - common for single valued observables
+        /// A handy way for replying and completing an observer - common for single valued observables
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="ob"></param>

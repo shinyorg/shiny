@@ -1,15 +1,37 @@
 ﻿using System;
 using System.Linq;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
+using Shiny.Logging;
 using Shiny.Settings;
 
 
 namespace Shiny
 {
-    public static partial class Extensions
+    public static class ServiceExtensions
     {
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        public static async Task SafeResolveAndExecute<T>(this IServiceProvider services, Func<T, Task> execute)
+        {
+            try
+            {
+                var service = services.GetService(typeof(T));
+                if (service is T tservice)
+                    await execute.Invoke(tservice).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
+
+
         /// <summary>
         /// Registers a post container build step
         /// </summary>
