@@ -7,27 +7,33 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure;
-
+using Windows.ApplicationModel.Background;
 
 namespace Shiny.Notifications
 {
     //https://blogs.msdn.microsoft.com/tiles_and_toasts/2015/07/08/quickstart-sending-a-local-toast-notification-and-handling-activations-from-it-windows-10/
-    public class NotificationManager : INotificationManager
+    public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         readonly ToastNotifier toastNotifier;
+        readonly IServiceProvider services;
         readonly IRepository repository;
         readonly IJobManager jobs;
         readonly ISettings settings;
+        readonly UwpContext context;
 
 
-        public NotificationManager(IJobManager jobs,
+        public NotificationManager(IServiceProvider services,
+                                   IJobManager jobs,
                                    ISettings settings,
-                                   IRepository repository)
+                                   IRepository repository,
+                                   UwpContext context)
         {
             this.toastNotifier = ToastNotificationManager.CreateToastNotifier();
+            this.services = services;
             this.jobs = jobs;
             this.settings = settings;
             this.repository = repository;
+            this.context = context;
         }
 
 
@@ -50,6 +56,7 @@ namespace Shiny.Notifications
             {
                 Duration = notification.Windows.UseLongDuration ? ToastDuration.Long : ToastDuration.Short,
                 Launch = notification.Payload,
+                ActivationType = ToastActivationType.Background,
                 Visual = new ToastVisual
                 {
                     BindingGeneric = new ToastBindingGeneric
@@ -77,11 +84,10 @@ namespace Shiny.Notifications
                     Src = new Uri(sound)
                 };
             }
-            //toastContent.Actions
-            //toastContent.AdditionalProperties.Ad
-            //toastContent.Launch = "";
             var native = new ToastNotification(toastContent.GetXml());
             this.toastNotifier.Show(native);
+
+            await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
 
 
@@ -101,5 +107,14 @@ namespace Shiny.Notifications
         public Task Clear() => this.repository.Clear<Notification>();
         public async Task<IEnumerable<Notification>> GetPending() => await this.repository.GetAll<Notification>();
         public Task Cancel(int id) => this.repository.Remove<Notification>(id.ToString());
+        public void Start()
+        {
+            if (this.services.IsRegistered<INotificationDelegate>())
+            {
+                this.context.RegisterBackground<NotificationBackgroundTaskProcessor>(
+                    new UserNotificationChangedTrigger(NotificationKinds.Toast)
+                );
+            }
+        }
     }
 }
