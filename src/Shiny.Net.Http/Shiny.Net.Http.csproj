@@ -4,7 +4,7 @@
         <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <TargetFrameworks Condition="$(TargetsToBuild.Contains('android'))">$(AndroidVersionsToBuild);$(TargetFrameworks)</TargetFrameworks>
-        <TargetFrameworks Condition="$(TargetsToBuild.Contains('ios'))">xamarinios10;$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks Condition="$(TargetsToBuild.Contains('ios'))">xamarin.ios10;$(TargetFrameworks)</TargetFrameworks>
         <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('mac'))">xamarin.mac20;$(TargetFrameworks)</TargetFrameworks>-->
         <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('watchos'))">xamarin.watchos10;$(TargetFrameworks)</TargetFrameworks>-->
         <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('tvos'))">xamarin.tvos10;$(TargetFrameworks)</TargetFrameworks>-->
@@ -23,7 +23,7 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinios')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\iOS\**\*.cs" />

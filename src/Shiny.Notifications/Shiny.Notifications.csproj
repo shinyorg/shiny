@@ -4,7 +4,7 @@
         <Description>Shiny addon for all your notification needs</Description>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <TargetFrameworks Condition="$(TargetsToBuild.Contains('android'))">$(AndroidVersionsToBuild);$(TargetFrameworks)</TargetFrameworks>
-        <TargetFrameworks Condition="$(TargetsToBuild.Contains('ios'))">xamarinios10;$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks Condition="$(TargetsToBuild.Contains('ios'))">xamarin.ios10;$(TargetFrameworks)</TargetFrameworks>
         <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('mac'))">xamarin.mac20;$(TargetFrameworks)</TargetFrameworks>-->
         <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('watchos'))">xamarin.watchos10;$(TargetFrameworks)</TargetFrameworks>-->
         <!--<TargetFrameworks Condition="$(TargetsToBuild.Contains('tvos'))">xamarin.tvos10;$(TargetFrameworks)</TargetFrameworks>-->
@@ -30,13 +30,13 @@
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="5.1.1" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinios')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarintvos')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.tvos')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\tvOS\**\*.cs" />

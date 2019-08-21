@@ -6,7 +6,7 @@
         <PackageVersion>1.0.0</PackageVersion>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <TargetFrameworks Condition="$(TargetsToBuild.Contains('android'))">$(TargetFrameworks);$(AndroidVersionsToBuild)</TargetFrameworks>
-        <TargetFrameworks Condition="$(TargetsToBuild.Contains('ios'))">$(TargetFrameworks);xamarinios10</TargetFrameworks>
+        <TargetFrameworks Condition="$(TargetsToBuild.Contains('ios'))">$(TargetFrameworks);xamarin.ios10</TargetFrameworks>
         <TargetFrameworks Condition="$(TargetsToBuild.Contains('mac'))">$(TargetFrameworks);xamarin.mac20</TargetFrameworks>
         <TargetFrameworks Condition="$(TargetsToBuild.Contains('watchos'))">$(TargetFrameworks);xamarin.watchos10</TargetFrameworks>
         <TargetFrameworks Condition="$(TargetsToBuild.Contains('tvos'))">$(TargetFrameworks);xamarin.tvos10</TargetFrameworks>
@@ -59,7 +59,7 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarinios')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
         <Compile Include="**\Platforms\*iOS*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
