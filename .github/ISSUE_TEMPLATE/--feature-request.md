@@ -2,7 +2,7 @@
 name: "\U0001F354Feature Request"
 about: Suggest an idea for this project
 title: "[Enhancement] YOUR IDEA!"
-labels: open
+labels: ''
 assignees: ''
 
 ---
