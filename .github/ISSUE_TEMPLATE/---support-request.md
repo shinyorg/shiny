@@ -8,9 +8,9 @@ labels: ''
 assignees: ''
 
 ---
+
 ONLY active OSS contributors OR people who buy me a coffee can ask questions here.  If you don't do either of these things - DO NOT FILE HERE OR I WILL SIMPLY REMOVE YOUR ACCOUNT :)
 
 Give as much details as humanly possible if you want any sort of answer!
 
 Enter Question Below (don't delete this line)
-
