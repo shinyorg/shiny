@@ -94,8 +94,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.XamEssen
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{48AE87AB-C0FE-4426-860C-2C5808E10238}"
 	ProjectSection(SolutionItems) = preProject
-		.github\ISSUE_TEMPLATE\bug.md = .github\ISSUE_TEMPLATE\bug.md
-		.github\ISSUE_TEMPLATE\feature.md = .github\ISSUE_TEMPLATE\feature.md
+		.github\ISSUE_TEMPLATE\---support-request.md = .github\ISSUE_TEMPLATE\---support-request.md
+		.github\ISSUE_TEMPLATE\--bug.md = .github\ISSUE_TEMPLATE\--bug.md
+		.github\ISSUE_TEMPLATE\--feature-request.md = .github\ISSUE_TEMPLATE\--feature-request.md
+		.github\ISSUE_TEMPLATE\--thank-you.md = .github\ISSUE_TEMPLATE\--thank-you.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "platforms", "platforms", "{E12428B2-0D52-4356-80CF-D49B9521997E}"

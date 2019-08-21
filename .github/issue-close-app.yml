@@ -1,4 +1,4 @@
-comment: "This issue is closed because it does not meet our criteria listed in the issue template OR you are simply saying thank you."
+comment: "This issue is closed because it does not meet our criteria listed in the issue template"
 issueConfigs:
 - content:
   - "Version of OS(s) listed above with issue"
@@ -8,3 +8,7 @@ issueConfigs:
   - "Summary"
   - "API Changes"
   - "Intended Use Case"
+- content:
+  - "Leave Your Message Below (don't delete this line though)"
+- content:
+  - "Enter Question Below (don't delete this line)"
