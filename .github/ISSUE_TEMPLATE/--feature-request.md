@@ -1,7 +1,7 @@
 ---
 name: "\U0001F354Feature Request"
 about: Suggest an idea for this project
-title: "[Enhancement] YOUR IDEA!"
+title: ''
 labels: "s/unverified, t/enhancement \U0001F423"
 assignees: ''
 
