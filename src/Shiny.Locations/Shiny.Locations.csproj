@@ -52,7 +52,7 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="60.1142.1" />
-        <PackageReference Include="Xamarin.Android.Support.Compat" Version="28.0.0.1" />
+        <PackageReference Include="Xamarin.Android.Support.Compat" Version="28.0.0.2" />
     </ItemGroup>
 
 </Project>
