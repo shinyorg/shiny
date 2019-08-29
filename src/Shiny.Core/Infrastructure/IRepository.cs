@@ -60,10 +60,10 @@ namespace Shiny.Infrastructure
         /// <returns></returns>
         Task Clear<T>() where T : class;
 
-        /// <summary>
-        /// Fires when an entity is changed
-        /// </summary>
-        /// <returns></returns>
-        IObservable<RepositoryEvent> WhenEvent();
+        ///// <summary>
+        ///// Fires when an entity is changed
+        ///// </summary>
+        ///// <returns></returns>
+        //IObservable<RepositoryEvent> WhenEvent();
     }
 }

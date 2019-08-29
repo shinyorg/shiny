@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Models;
@@ -10,25 +9,19 @@ namespace Shiny.Integrations.Sqlite
 {
     public class SqliteRepository : IRepository
     {
-        readonly Subject<RepositoryEvent> repoSubject;
         readonly ShinySqliteConnection conn;
         readonly ISerializer serializer;
 
 
         public SqliteRepository(ShinySqliteConnection conn, ISerializer serializer)
         {
-            this.repoSubject = new Subject<RepositoryEvent>();
             this.conn = conn;
             this.serializer = serializer;
         }
 
 
-        public async Task Clear<T>() where T : class
-        {
-            var count = await this.conn.ExecuteAsync($"DELETE FROM {nameof(RepoStore)} WHERE TypeName = ?", typeof(T).AssemblyQualifiedName);
-            if (count > 0)
-                this.repoSubject.OnNext(new RepositoryEvent(RepositoryEventType.Clear, null, null, typeof(T)));
-        }
+        public Task Clear<T>() where T : class
+            => this.conn.ExecuteAsync($"DELETE FROM {nameof(RepoStore)} WHERE TypeName = ?", typeof(T).AssemblyQualifiedName);
 
 
         public async Task<bool> Exists<T>(string key) where T : class
@@ -82,12 +75,7 @@ namespace Shiny.Integrations.Sqlite
         public async Task<bool> Remove<T>(string key) where T : class
         {
             var count = await this.conn.DeleteAsync<RepoStore>(key);
-            if (count > 0)
-            {
-                this.repoSubject.OnNext(new RepositoryEvent(RepositoryEventType.Remove, key, null));
-                return true;
-            }
-            return false;
+            return (count > 0);
         }
 
 
@@ -102,7 +90,6 @@ namespace Shiny.Integrations.Sqlite
                     TypeName = entity.GetType().AssemblyQualifiedName,
                     Blob = this.serializer.Serialize(entity)
                 });
-                this.repoSubject.OnNext(new RepositoryEvent(RepositoryEventType.Add, key, entity));
                 return true;
             }
             else
@@ -110,12 +97,8 @@ namespace Shiny.Integrations.Sqlite
                 item.TypeName = entity.GetType().AssemblyQualifiedName;
                 item.Blob = this.serializer.Serialize(entity);
                 await this.conn.UpdateAsync(item);
-                this.repoSubject.OnNext(new RepositoryEvent(RepositoryEventType.Update, key, entity));
                 return false;
             }
         }
-
-
-        public IObservable<RepositoryEvent> WhenEvent() => this.repoSubject;
     }
 }

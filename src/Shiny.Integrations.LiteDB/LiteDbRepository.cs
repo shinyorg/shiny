@@ -49,10 +49,5 @@ namespace Shiny
         {
             throw new NotImplementedException();
         }
-
-        public IObservable<RepositoryEvent> WhenEvent()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
