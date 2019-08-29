@@ -140,7 +140,7 @@ namespace Shiny.BluetoothLE.Central
         {
             var intent = new Intent(Android.Provider.Settings.ActionBluetoothSettings);
             intent.SetFlags(ActivityFlags.NewTask);
-            Android.App.Application.Context.StartActivity(intent);
+            this.context.Android.AppContext.StartActivity(intent);
             return true;
         }
 

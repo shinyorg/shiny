@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <AndroidVersionsToBuild>monoandroid90</AndroidVersionsToBuild>
+        <AndroidVersionsToBuild>monoandroid81;monoandroid90</AndroidVersionsToBuild>
         <UapVersionsToBuild>uap10.0.16299</UapVersionsToBuild>
         <TizenVersionsToBuild>tizen50</TizenVersionsToBuild>
         <Authors>Allan Ritchie</Authors>
