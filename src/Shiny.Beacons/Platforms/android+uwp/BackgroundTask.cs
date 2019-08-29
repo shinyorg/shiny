@@ -1,5 +1,4 @@
-﻿#if WINDOWS_UWP || __ANDROID__
-using System;
+﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Collections.Generic;
@@ -15,6 +14,7 @@ namespace Shiny.Beacons
         readonly ICentralManager centralManager;
         readonly IBeaconManager beaconManager;
         readonly IRepository repository;
+        readonly IMessageBus messageBus;
         readonly IBeaconDelegate beaconDelegate;
         readonly IDictionary<string, BeaconRegionStatus> states;
         IDisposable scanSub;
@@ -22,11 +22,13 @@ namespace Shiny.Beacons
 
         public BackgroundTask(ICentralManager centralManager,
                               IBeaconManager beaconManager,
+                              IMessageBus messageBus,
                               IRepository repository,
                               IBeaconDelegate beaconDelegate)
         {
             this.centralManager = centralManager;
             this.beaconManager = beaconManager;
+            this.messageBus = messageBus;
             this.repository = repository;
             this.beaconDelegate = beaconDelegate;
             this.states = new Dictionary<string, BeaconRegionStatus>();
@@ -38,40 +40,38 @@ namespace Shiny.Beacons
             Log.Write(BeaconLogCategory.Task, "Starting");
 
             // TODO: I should record state of the beacon region so I can fire stuff without going into initial state from unknown
-            this.repository
-                .WhenEvent()
-                .Where(x => x.EntityType == typeof(BeaconRegion))
+            this.messageBus
+                .Listener<BeaconRegisterEvent>()
                 .Subscribe(ev =>
                 {
                     switch (ev.Type)
                     {
-                        case RepositoryEventType.Add:
+                        case BeaconRegisterEventType.Add:
                             if (this.states.Count == 0)
                                 this.StartScan();
                             else
                             {
                                 lock (this.states)
                                 {
-                                    var region = (BeaconRegion)ev.Entity;
-                                    this.states.Add(ev.Key, new BeaconRegionStatus(region));
+                                    this.states.Add(ev.Region.Identifier, new BeaconRegionStatus(ev.Region));
                                 }
                             }
                             break;
 
-                        case RepositoryEventType.Update:
+                        case BeaconRegisterEventType.Update:
                             // TODO: this actually shouldn't be allowed
                             break;
 
-                        case RepositoryEventType.Remove:
+                        case BeaconRegisterEventType.Remove:
                             lock (this.states)
                             {
-                                this.states.Remove(ev.Key);
+                                this.states.Remove(ev.Region.Identifier);
                                 if (this.states.Count == 0)
                                     this.StopScan();
                             }
                             break;
 
-                        case RepositoryEventType.Clear:
+                        case BeaconRegisterEventType.Clear:
                             this.StopScan();
                             break;
                     }
@@ -189,4 +189,3 @@ namespace Shiny.Beacons
         }
     }
 }
-#endif

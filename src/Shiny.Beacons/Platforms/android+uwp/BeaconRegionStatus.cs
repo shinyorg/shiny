@@ -1,5 +1,4 @@
-﻿#if WINDOWS_UWP || __ANDROID__
-using System;
+﻿using System;
 
 
 namespace Shiny.Beacons
@@ -17,4 +16,3 @@ namespace Shiny.Beacons
         public DateTimeOffset LastPing { get; set; }
     }
 }
-#endif

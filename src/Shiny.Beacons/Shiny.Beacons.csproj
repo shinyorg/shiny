@@ -27,14 +27,14 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\Uwp\**\*.cs" />
+        <Compile Include="Platforms\*Uwp*\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\Android\**\*.cs" />
+        <Compile Include="Platforms\*Android*\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
@@ -42,4 +42,5 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
+
 </Project>

@@ -1,4 +1,3 @@
-#if WINDOWS_UWP || __ANDROID__
 using System;
 using System.Threading.Tasks;
 using System.Linq;
@@ -13,11 +12,15 @@ namespace Shiny.Beacons
     public class BeaconManager : AbstractBeaconManager
     {
         readonly ICentralManager centralManager;
+        readonly IMessageBus messageBus;
 
 
-        public BeaconManager(ICentralManager centralManager, IRepository repository) : base(repository)
+        public BeaconManager(ICentralManager centralManager,
+                              IMessageBus messageBus,
+                              IRepository repository) : base(repository)
         {
             this.centralManager = centralManager;
+            this.messageBus = messageBus;
         }
 
 
@@ -28,14 +31,29 @@ namespace Shiny.Beacons
         public override IObservable<Beacon> WhenBeaconRanged(BeaconRegion region)
             => this.Scan().Where(region.IsBeaconInRegion);
 
-        public override Task StartMonitoring(BeaconRegion region)
-            => this.Repository.Set(region.Identifier, region);
 
-        public override Task StopMonitoring(string identifier)
-            => this.Repository.Remove<BeaconRegion>(identifier);
+        public override async Task StartMonitoring(BeaconRegion region)
+        {
+            var stored = await this.Repository.Set(region.Identifier, region);
+            var eventType = stored ? BeaconRegisterEventType.Add : BeaconRegisterEventType.Update;
+            this.messageBus.Publish(new BeaconRegisterEvent(eventType, region));
+        }
 
-        public override Task StopAllMonitoring()
-            => this.Repository.Clear<BeaconRegion>();
+        public override async Task StopMonitoring(string identifier)
+        {
+            var region = await this.Repository.Get<BeaconRegion>(identifier);
+            if (region != null)
+            {
+                await this.Repository.Remove<BeaconRegion>(identifier);
+                this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Remove, region));
+            }
+        }
+
+        public override async Task StopAllMonitoring()
+        {
+            await this.Repository.Clear<BeaconRegion>();
+            this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Clear));
+        }
 
 
         IObservable<Beacon> beaconScanner;
@@ -78,4 +96,3 @@ namespace Shiny.Beacons
 
     this.AdvertisedBeacon = beacon;
  */
-#endif
