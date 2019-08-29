@@ -1,57 +1,57 @@
 ﻿using System;
-using System.Reactive.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Android.App;
-//using Android.Gms.Awareness;
-using Android.Gms.Common.Apis;
-using Android.Gms.Extensions;
+using Android.Content;
 using Android.Gms.Location;
-using Android.Gms.Tasks;
 
 
 namespace Shiny.Locations
 {
-    public class MotionActivityImpl : Java.Lang.Object,
-                                      IMotionActivity,
-                                      IOnSuccessListener,
-                                      IOnFailureListener
+    public class MotionActivityImpl : IMotionActivity
     {
-        public bool IsSupported => true;
+        readonly AndroidContext context;
+        readonly ActivityRecognitionClient client;
+        readonly IMessageBus messageBus;
 
-        //<uses-permission android:name="com.google.android.gms.permission.ACITIVITY_RECOGNITION" />
-        public IObservable<MotionActivityEvent> WhenActivityChanged() => Observable.Create<MotionActivityEvent>(async ob =>
+
+        public MotionActivityImpl(AndroidContext context, IMessageBus messageBus)
         {
-            var client1 = await new GoogleApiClient.Builder(Application.Context)
-                //.AddApi(Awareness)
-                .AddConnectionCallbacks(() =>
-                {
-                    //Connected Successful
-                })
-                .BuildAndConnectAsync((i) => { });
-
-            //SnapshotClient.GetDetectedActivityAsync()
-            //var request = new ActivityTransition.Builder();
-            //new ActivityTransitionRequest();
-            //new ActivityTransition.Builder();
-            //new Awareness().api.GetDetectedActivityAsync(null).Result.Status.HasResolution;
-            var client = ActivityRecognition.GetClient(Application.Context);
-
-            var task = client.RequestActivityUpdates(0, null);
-            task.AddOnSuccessListener(this);
-            task.AddOnFailureListener(this);
-
-            return () => { };
-        });
-
-
-        public void OnFailure(Java.Lang.Exception e)
-        {
-            throw new NotImplementedException();
+            this.context = context;
+            this.messageBus = messageBus;
+            this.client = ActivityRecognition.GetClient(context.AppContext);
         }
 
 
-        public void OnSuccess(Java.Lang.Object result)
+        public bool IsSupported => true;
+
+
+        public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset end)
         {
-            throw new NotImplementedException();
+            await this.client.RequestActivityUpdatesAsync(5000, this.GetPendingIntent());
+            //await this.client.RemoveActivityUpdatesAsync(this.GetPendingIntent());
+            return null;
+        }
+
+
+        public IObservable<MotionActivityEvent> WhenActivityChanged() => this.messageBus.Listener<MotionActivityEvent>();
+
+
+        PendingIntent pendingIntent;
+        protected virtual PendingIntent GetPendingIntent()
+        {
+            if (this.pendingIntent != null)
+                return this.pendingIntent;
+
+            var intent = new Intent(this.context.AppContext, typeof(MotionActivityBroadcastReceiver));
+            //intent.SetAction(GeofenceBroadcastReceiver.INTENT_ACTION);
+            this.pendingIntent = PendingIntent.GetBroadcast(
+                this.context.AppContext,
+                0,
+                intent,
+                PendingIntentFlags.UpdateCurrent
+            );
+            return this.pendingIntent;
         }
     }
 }

@@ -8,6 +8,29 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
+        public static bool UseMotionActivity(this IServiceCollection builder)
+        {
+#if __ANDROID__ || __IOS__
+            builder.AddSingleton<IMotionActivity, MotionActivityImpl>();
+            return true;
+#else
+            return false;
+#endif
+        }
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="regions"></param>
+        /// <returns></returns>
         public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regions) where T : class, IGeofenceDelegate
         {
 #if WINDOWS_UWP
@@ -51,6 +74,7 @@ namespace Shiny
             return true;
 #endif
         }
+
 
         /// <summary>
         /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received

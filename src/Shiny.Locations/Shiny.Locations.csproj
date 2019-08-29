@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <Description>Shiny Locations - bringing geofencing and GPS to a background service near you!</Description>

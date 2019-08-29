@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using CoreMotion;
 using Foundation;
 
@@ -14,47 +17,65 @@ namespace Shiny.Locations
         public MotionActivityImpl()
         {
             this.activityManager = new CMMotionActivityManager();
-            //this.activityManager.QueryActivityAsync
         }
 
 
-        //public IObservable<MotionActivityEvent> WhenActivityChanged()
-        //    => Observable.Create<MotionActivityEvent>(ob =>
-        //    {
-        //        //CMMotionActivityManager.IsActivityAvailable
-        //        //CMMotionActivityManager.AuthorizationStatus == CMAuthorizationStatus.Authorized
-        //        var am = new CMMotionActivityManager();
-        //        am.StartActivityUpdates(NSOperationQueue.CurrentQueue, target =>
-        //        {
-        //            var flags = MotionFlags.Unknown;
-        //            if (!target.Unknown)
-        //            {
-        //                flags &= MotionFlags.Unknown;
-        //                if (target.Automotive)
-        //                    flags |= MotionFlags.Automotive;
+        public bool IsSupported => CMMotionActivityManager.IsActivityAvailable &&
+                                   CMMotionActivityManager.AuthorizationStatus != CMAuthorizationStatus.Denied;
 
-        //                if (target.Cycling)
-        //                    flags |= MotionFlags.Cycling;
 
-        //                if (target.Running)
-        //                    flags |= MotionFlags.Running;
+        public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset end)
+        {
+            var results = await this.activityManager.QueryActivityAsync(
+                (NSDate)start.LocalDateTime,
+                (NSDate)end.LocalDateTime,
+                NSOperationQueue.MainQueue
+            );
+            return results.Select(x => ToEvent(x)).ToList();
+        }
 
-        //                if (target.Stationary)
-        //                    flags |= MotionFlags.Stationary;
 
-        //                if (target.Walking)
-        //                    flags |= MotionFlags.Walking;
-        //            }
+        public IObservable<MotionActivityEvent> WhenActivityChanged() => Observable.Create<MotionActivityEvent>(ob =>
+        {
+            var am = new CMMotionActivityManager();
+            am.StartActivityUpdates(NSOperationQueue.CurrentQueue, target =>
+            {
+                var e = ToEvent(target);
+                ob.OnNext(e);
+            });
+            return () =>
+            {
+                am.StopActivityUpdates();
+                am.Dispose();
+            };
+        });
 
-        //            var conf = (Confidence)Enum.Parse(typeof(Confidence), target.Confidence.ToString(), true);
-        //            ob.OnNext(new MotionActivityEvent(flags, conf, (DateTime)target.StartDate));
-        //        });
-        //        return () =>
-        //        {
-        //            am.StopActivityUpdates();
-        //            am.Dispose();
-        //        };
-        //    })
-        //    .Repeat(1);
+
+        static MotionActivityEvent ToEvent(CMMotionActivity target)
+        {
+            var flags = MotionActivityType.Unknown;
+            if (!target.Unknown)
+            {
+                flags &= MotionActivityType.Unknown;
+                if (target.Automotive)
+                    flags |= MotionActivityType.Automotive;
+
+                if (target.Cycling)
+                    flags |= MotionActivityType.Cycling;
+
+                if (target.Running)
+                    flags |= MotionActivityType.Running;
+
+                if (target.Stationary)
+                    flags |= MotionActivityType.Stationary;
+
+                if (target.Walking)
+                    flags |= MotionActivityType.Walking;
+            }
+
+            var conf = (MotionActivityConfidence)Enum.Parse(typeof(MotionActivityConfidence), target.Confidence.ToString(), true);
+            var activity = new MotionActivityEvent(flags, conf, (DateTime)target.StartDate);
+            return activity;
+        }
     }
 }
