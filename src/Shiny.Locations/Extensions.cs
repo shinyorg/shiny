@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
@@ -7,6 +8,10 @@ namespace Shiny.Locations
 {
     public static class Extensions
     {
+        public static Task<IList<MotionActivityEvent>> QueryByDate(this IMotionActivity activity, DateTimeOffset date)
+            => activity.Query(date.Date, new DateTimeOffset(date.Date.AddDays(1)));
+
+
         //https://stackoverflow.com/questions/2042599/direction-between-2-latitude-longitude-points-in-c-sharp
         public static double GetCompassBearingTo(this Position from, Position to)
         {

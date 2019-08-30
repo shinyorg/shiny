@@ -9,6 +9,7 @@ namespace Shiny.BluetoothLE.Central.Delegates
     {
         readonly IMessageBus messageBus;
 
+
         public ShinyCbCentralManagerDelegate()
         {
             this.messageBus = ShinyHost.Resolve<IMessageBus>();
