@@ -13,11 +13,17 @@ Please star this project on GitHub if you use it in your projects
 //builder.UseGeofencing<LocationDelegates>(new GeofenceRegion("Test", new Position(1, 1), Distance.FromKilometers(1)));
 builder.UseGeofencing<LocationDelegates>();
 builder.UseGps<LocationDelegates>();
+builder.UseMotionActivity();
 
 -----------------
 iOS
 -----------------
 
+The following is required for Motion Activity
+<key>NSMotionUsageDescription</key>
+<string>Required for pedometer</string>
+
+The following is required for GPS & Geofencing
 <key>NSLocationAlwaysUsageDescription</key>
 <string>The beacons or geofences or GPS always have you!</string>
 <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

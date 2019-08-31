@@ -42,8 +42,11 @@ namespace Shiny
                 var list = new List<T>();
                 using (var cursor = this.WritableDatabase.RawQuery(sql, null))
                 {
-                    var obj = builder(cursor);
-                    list.Add(obj);
+                    while (cursor.MoveToNext())
+                    {
+                        var obj = builder(cursor);
+                        list.Add(obj);
+                    }
                 }
                 return list;
             }
