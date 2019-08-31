@@ -268,3 +268,4 @@ paket-files/
 __pycache__/
 *.pyc
 ._support.xlsx
+.ionide/symbolCache.db
