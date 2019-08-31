@@ -15,7 +15,11 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseMotionActivity(this IServiceCollection builder)
         {
-#if __ANDROID__ || __IOS__
+#if __ANDROID__
+            builder.AddSingleton<AndroidSqliteDatabase>();
+            builder.AddSingleton<IMotionActivity, MotionActivityImpl>();
+            return true;
+#elif __IOS__
             builder.AddSingleton<IMotionActivity, MotionActivityImpl>();
             return true;
 #else
