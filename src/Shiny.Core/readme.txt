@@ -51,19 +51,10 @@ using Android.Runtime;
 namespace YourNamespace
 {
     [Application]
-    public class YourApplication : Application
+    public class YourApplication : Shiny.ShinyAndroidApplication<YourStartup>
     {
         public YourApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
         {
-        }
-
-
-        public override void OnCreate()
-        {
-            base.OnCreate();
-            Shiny.AndroidShinyHost.Init(this, new YourStartup(), services => {
-                // register any platform specific stuff you need here
-            });
         }
     }
 }
