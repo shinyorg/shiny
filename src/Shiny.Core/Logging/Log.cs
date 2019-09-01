@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Subjects;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Logging
 {
@@ -16,6 +16,32 @@ namespace Shiny.Logging
 #if DEBUG
         static Log() => UseDebug();
 #endif
+
+
+        public static void SafeExecute(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                Write(ex);
+            }
+        }
+
+
+        public static async Task SafeExecute(Func<Task> action)
+        {
+            try
+            {
+                await action().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Write(ex);
+            }
+        }
 
 
         public static void Write(Exception exception, params (string Key, string Value)[] parameters)
