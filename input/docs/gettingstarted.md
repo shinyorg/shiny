@@ -148,7 +148,24 @@ public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 ```
 
 ### UWP
-COMING SOON
+
+1. Add the following to your App.xaml.cs constructor
+
+```csharp
+Shiny.UwpShinyHost.Init(new YourStartup());
+```
+
+2. Add the following to your Package.appxmanifest under the <Application><Extensions> node
+
+```xml
+<Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+    <BackgroundTasks>
+        <Task Type="general"/>
+        <Task Type="systemEvent"/>
+        <Task Type="timer"/>
+    </BackgroundTasks>
+</Extension>
+```
 
 ### Tizen
 COMING SOON

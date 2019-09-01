@@ -1,5 +1,8 @@
-Title: Modules, Startable Tasks, &amp; State Restored Services
+Title: Modules, Startable Tasks, and State Restored Services
+Order: 2
 ---
+
+There are lots of little tidbits that help your Shiny applications really shine.  Below are some great additions to the underlying dependency injection engine that help decouple your applications even further.  
 
 ## Modules
 
@@ -21,7 +24,7 @@ public class YourModule : ShinyModule
 
 ## Startup Tasks
 
-Startup tasks are great for wiring up events and spinning up infrastructure.  These fire immediately after the container is built.  However, do any sort of blocking operation in them as this will cause your app to pause starting up causing a poor user experience.
+Startup tasks are great for wiring up events and spinning up infrastructure.  These fire immediately after the container is built.  However, don't do any sort of blocking operation in them as this will cause your app to pause starting up causing a poor user experience.
 
 ```csharp
 public class YourStartupTask : IShinyStartupTask
@@ -38,17 +41,17 @@ public class YourStartupTask : IShinyStartupTask
 
 This is pretty cool, imagine you want the state of your service preserved across restarts - Shiny does this in epic fashion
 
-Simply turn your service into a viewmodel and register it in your shiny startup and Shiny will take care of the rest
+Simply turn your service implement INotifyPropertyChanged (or the easy Shiny.NotifyPropertyChanged) and register it in your shiny startup and Shiny will take care of the rest
 
 ```csharp
 // you can inject into this thing as well add IShinyStartupTask as well
-public class MyBadAssService : INotifyPropertyChanged, IMyBadAssService, IStartupTask
+public class MyBadAssService : Shiny.NotifyPropertyChanged, IMyBadAssService, IStartupTask
 {
-    public int RunCount
+    int count;
+    public int Count
     {
-        // left out for brevity
-        get ...
-        set ...
+        get => this.count;
+        set => this.Set(ref this.count, value);
     }
 
 

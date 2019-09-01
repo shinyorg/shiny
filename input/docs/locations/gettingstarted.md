@@ -14,7 +14,7 @@ A cross platform library for Xamarin & Windows that allows for easy geofence det
 
 ## SETUP
 
-Be sure to install the Shiny.Geofencing nuget package in all of your main platform projects as well as your core/NETStandard project
+Be sure to install the Shiny.Locations nuget package in all of your main platform projects as well as your core/NETStandard project
 
 [![NuGet](https://img.shields.io/nuget/v/Shiny.Locations.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Locations/)
 
