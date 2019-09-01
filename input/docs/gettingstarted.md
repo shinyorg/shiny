@@ -64,62 +64,115 @@ RedirectFrom:
 [AppCenterMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Logging.AppCenter.svg
 [AppCenterMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Logging.AppCenter
 
+## Setup
+
+1. The first thing is to install any of the nuget packages you need from above.  
+
+2. In your shared code project.  Create a Shiny startup file:
+
+```csharp
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny;
+
+
+namespace YourNamespace 
+{
+    public class YourShinyStartup : ShinyStartup
+    {
+        public override void ConfigureServices(IServiceCollection services) 
+        {
+            // this is where you'll load things like BLE, GPS, etc - those are covered in other sections
+            // things like the jobs, environment, power, are all installed automatically
+        }
+    }
+}
+```
 
 ### Android
 
+1. Create a new "MainApplication" in your Android head project.
 
 ```csharp
+using System;
+using Android.App;
+using Android.Runtime;
 
+namespace YourNamespace.Droid
+{
+    [Application]
+    public class MainApplication : Shiny.ShinyAndroidApplication<YourNamespace.YourShinyStartup>
+    {
+        public MainApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+        {
+        }
+    }
+}
+
+```
+
+IF you have an application file already, simple add the following to your OnCreate method
+
+```csharp
+public override void OnCreate()
+{
+    base.OnCreate();
+
+    Shiny.AndroidShinyHost.Init(
+        this,
+        new YourShinyStartup()
+    );
+}
+```
+
+
+2. Add the following to your activity classes
+
+```csharp
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
 {
     AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
+```
 
+### iOS
 
-using System;
-using Shiny;
-using Shiny.Jobs;
-using Android.App;
-using Android.Runtime;
-using Samples.ShinySetup;
-
-
-namespace Samples.Droid
+1. In your ApplicationDelegate.cs, add the following in your FinishedLaunching method
+```csharp
+public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 {
-#if DEBUG
-    [Application(Debuggable = true)]
-#else
-    [Application(Debuggable = false)]
-#endif
-    //public class MainApplication : ShinyAndroidApplication<SampleStartup>
-    public class MainApplication : Application
-    {
-        public MainApplication() : base() { }
-        public MainApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
-        {
-        }
-
-
-        public override void OnCreate()
-        {
-            base.OnCreate();
-
-            AndroidShinyHost.Init(
-                this,
-                new SampleStartup()
-#if DEBUG
-                , services =>
-                {
-                    // TODO: make android great again - by running jobs faster for debugging purposes ;)
-                    services.ConfigureJobService(TimeSpan.FromMinutes(1));
-                }
-#endif
-            );
-        }
-    }
+    Shiny.iOSShinyHost.Init(new YourShinyStartup());
+    ...
 }
 ```
+
+### UWP
+
+1. Add the following to your App.xaml.cs constructor
+
+```csharp
+Shiny.UwpShinyHost.Init(new YourStartup());
+```
+
+2. Add the following to your Package.appxmanifest under the <Application><Extensions> node
+
+```xml
+<Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+    <BackgroundTasks>
+        <Task Type="general"/>
+        <Task Type="systemEvent"/>
+        <Task Type="timer"/>
+    </BackgroundTasks>
+</Extension>
+```
+
+### Tizen
+COMING SOON
+
+### macOS
+macOS, watchOS, & tvOS are not officially supported by Shiny yet, but will be in the future
+
 # Shiny Startup
 
 Startup is the place where you wire up all of the necessary application depedencies you need
@@ -131,57 +184,3 @@ Out of the box, Shiny automatically pushes the following on to the service conta
 * IPowerManager
 * IJobManager
 * ISettings
-
-## Modules
-
-```csharp
-using Shiny;
-using Microsoft.Extensions.DependencyInjection;
-
-
-public class YourModule : ShinyModule 
-{
-    public override void Register(IServiceCollection services) 
-    {
-
-    }
-}
-```
-
-## Startup Tasks
-
-```csharp
-public class YourStartupTask : IShinyStartupTask
-{
-    // you can inject into the constructor here as long as you register the service in the sta
-    public void Start() 
-    {
-
-    }
-}
-```
-
-## State Restorable Services
-
-This is pretty cool, imagine you want the state of your service preserved across restarts - Shiny does this in epic fashion
-
-Simply turn your service into a viewmodel and register it in your shiny startup and Shiny will take care of the rest
-
-```csharp
-// you can inject into this thing as well add IShinyStartupTask as well
-public class MyBadAssService : INotifyPropertyChanged, IMyBadAssService, IStartupTask
-{
-    public int RunCount
-    {
-        // left out for brevity
-        get ...
-        set ...
-    }
-
-
-    public void Start()
-    {
-        this.Count++;
-    }
-}
-```
