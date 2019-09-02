@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
@@ -8,6 +9,68 @@ namespace Shiny.Locations
 {
     public static class Extensions
     {
+        /// <summary>
+        /// Queries for the most current event
+        /// </summary>
+        /// <param name="activity"></param>
+        /// <param name="maxAgeMinutes"></param>
+        /// <returns></returns>
+        public static async Task<MotionActivityEvent> GetCurrentActivity(this IMotionActivity activity, int maxAgeMinutes = 5)
+        {
+            var end = DateTimeOffset.UtcNow;
+            var result = (await activity.Query(end.AddMinutes(-maxAgeMinutes), end)).OrderBy(x => x.Timestamp).FirstOrDefault();
+            return result;
+        }
+
+
+        /// <summary>
+        /// Queries for the most current event and checks against type & confidence
+        /// </summary>
+        /// <param name="activity"></param>
+        /// <param name="type"></param>
+        /// <param name="maxAgeMinutes"></param>
+        /// <param name="minConfidence"></param>
+        /// <returns></returns>
+        public static async Task<bool> IsCurrentActivity(this IMotionActivity activity, MotionActivityType type, int maxAgeMinutes = 5, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        {
+            var result = await activity.GetCurrentActivity(maxAgeMinutes);
+            //if (result == default(MotionActivityEvent))
+                //return false;
+            if (result.Confidence < minConfidence)
+                return false;
+
+            return result.Types.HasFlag(type);
+        }
+
+
+        /// <summary>
+        /// Queries if most recent activity is automotive
+        /// </summary>
+        /// <param name="activity"></param>
+        /// <param name="maxAgeMinutes"></param>
+        /// <param name="minConfidence"></param>
+        /// <returns></returns>
+        public static Task<bool> IsCurrentAutomotive(this IMotionActivity activity, int maxAgeMinutes = 5, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+            => activity.IsCurrentActivity(MotionActivityType.Automotive, maxAgeMinutes, minConfidence);
+
+
+        /// <summary>
+        /// Queries if most recent activity is stationary
+        /// </summary>
+        /// <param name="activity"></param>
+        /// <param name="maxAgeMinutes"></param>
+        /// <param name="minConfidence"></param>
+        /// <returns></returns>
+        public static Task<bool> IsCurrentStationary(this IMotionActivity activity, int maxAgeMinutes = 5, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+            => activity.IsCurrentActivity(MotionActivityType.Stationary, maxAgeMinutes, minConfidence);
+
+
+        /// <summary>
+        /// Queries for activities for an entire day (beginning to end)
+        /// </summary>
+        /// <param name="activity"></param>
+        /// <param name="date"></param>
+        /// <returns></returns>
         public static Task<IList<MotionActivityEvent>> QueryByDate(this IMotionActivity activity, DateTimeOffset date)
             => activity.Query(date.Date, new DateTimeOffset(date.Date.AddDays(1)));
 
