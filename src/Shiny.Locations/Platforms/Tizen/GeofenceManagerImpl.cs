@@ -36,7 +36,7 @@ namespace Shiny.Locations
             throw new NotImplementedException();
         }
 
-        public override Task StopMonitoring(GeofenceRegion region)
+        public override Task StopMonitoring(string identifier)
         {
             throw new NotImplementedException();
         }
@@ -853,4 +853,3 @@ namespace Shiny.Locations
 //        }
 //    }
 //}
-     */

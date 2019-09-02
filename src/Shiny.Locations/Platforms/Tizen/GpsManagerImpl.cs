@@ -6,7 +6,8 @@ using Tizen.Location;
 
 namespace Shiny.Locations
 {
-    public class GpsManagerImpl : IGpsManager
+    //https://developer.tizen.org/development/guides/.net-application/location-and-sensors/location-information
+    public class GpsManagerImpl : IGpsManager, IShinyStartupTask
     {
         readonly Locator locator;
         static Location lastKnownLocation = new Location();
@@ -37,7 +38,7 @@ namespace Shiny.Locations
         }
 
         public IObservable<IGpsReading> GetLastReading()
-            => Observable.Return(lastKnownLocation);
+            => Observable.Empty<IGpsReading>();
 
         public Task<AccessState> RequestAccess(bool backgroundMode)
         {
@@ -73,6 +74,23 @@ namespace Shiny.Locations
             this.locator.LocationChanged += handler;
             return () => this.locator.LocationChanged -= handler;
         });
+
+        public void Start()
+        {
+            this.locator.LocationChanged += this.OnLocationChanged;
+            this.locator.DistanceBasedLocationChanged += this.OnLocationChanged;
+            this.locator.ServiceStateChanged += this.OnServiceStateChanged;
+            //this.locator.ZoneChanged
+        }
+
+         void OnServiceStateChanged(object sender, ServiceStateChangedEventArgs e)
+        {
+        }
+
+
+        void OnLocationChanged(object sender, LocationChangedEventArgs e)
+        {
+        }
     }
 }
 
