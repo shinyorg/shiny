@@ -156,6 +156,16 @@ namespace Shiny
 
 
         /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serviceProvider"></param>
+        /// <returns></returns>
+        public static T GetService<T>(this IServiceProvider serviceProvider)
+            => (T)serviceProvider.GetService(typeof(T));
+
+
+        /// <summary>
         /// Check if a service is registered in the container
         /// </summary>
         /// <typeparam name="T"></typeparam>
