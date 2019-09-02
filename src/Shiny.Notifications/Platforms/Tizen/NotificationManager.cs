@@ -1,47 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
-using Tizen.Applications.Notifications;
+using Shiny.Infrastructure;
+using Shiny.IO;
+using Shiny.Settings;
+using NativeManager = Tizen.Applications.Notifications.NotificationManager;
 using NativeNot = Tizen.Applications.Notifications.Notification;
 
 
 namespace Shiny.Notifications
 {
     //https://developer.tizen.org/development/guides/.net-application/notifications-and-content-sharing/notifications
-    public class NotificationManagerImpl : INotificationManager
+    //https://developer.tizen.org/development/guides/.net-application/alarms
+    public class NotificationManager : INotificationManager
     {
-        public Task Cancel(int id)
+        readonly IFileSystem fileSystem;
+        readonly ISettings settings;
+        readonly IRepository repository;
+
+
+        public NotificationManager(IFileSystem fileSystem,
+                                   ISettings settings,
+                                   IRepository repository)
         {
-            NotificationManager.Delete(new NativeNot
+            this.fileSystem = fileSystem;
+            this.settings = settings;
+            this.repository = repository;
+        }
+
+
+        public async Task Cancel(int id)
+        {
+            await this.repository.Remove<Notification>(id.ToString());
+            var native = NativeManager.Load(id.ToString());
+            if (native != null)
+                NativeManager.Delete(native);
+        }
+
+
+        public async Task Clear()
+        {
+            await this.repository.Clear<Notification>();
+            NativeManager.DeleteAll();
+        }
+
+
+        public async Task<IEnumerable<Notification>> GetPending()
+            => await this.repository.GetAll<Notification>();
+
+
+        public Task<AccessState> RequestAccess() => Platform.RequestAccess("notification");
+
+
+        public async Task Send(Notification notification)
+        {
+            if (notification.Id == 0)
+                notification.Id = this.settings.IncrementValue("NotificationId");
+
+            NativeManager.Post(this.Create(notification));
+            await this.repository.Set(notification.Id.ToString(), notification);
+        }
+
+        NativeNot Create(Notification notification)
+        {
+            //DirectoryInfo info = Application.Current.DirectoryInfo;
+            //String imagePath;
+            //String sharedPath = info.SharedData;
+            //imagePath = sharedPath + "imageName.png";
+            var native = new NativeNot
             {
-
-            });
-            return Task.CompletedTask;
-        }
-
-        public Task Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Notification>> GetPending()
-        {
-
-            throw new NotImplementedException();
-        }
-
-        public Task<AccessState> RequestAccess()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Send(Notification notification)
-        {
-            NotificationManager.Post(new NativeNot
+                Tag = notification.Id.ToString(),
+                Title = notification.Title,
+                Content = notification.Message,
+                //Icon = imagePath,
+                //Count = 2,
+                //TimeStamp = time,
+                //Property = DisableAppLaunch
+            };
+            if (!notification.Sound.IsEmpty())
             {
-
-            });
-            return Task.CompletedTask;
+                native.Accessory = new NativeNot.AccessorySet
+                {
+                    //CanVibrate = true,
+                    //LedOnMillisecond = 100,
+                    //LedOffMillisecond = 100,
+                    //SoundOption = AccessoryOption.Custom,
+                    SoundPath = Path.Combine(this.fileSystem.AppData.FullName, notification.Sound)
+                };
+            }
+            return native;
         }
     }
 }

@@ -92,3 +92,10 @@ Shiny.UwpShinyHost.Init(new YourStartup());
         <Task Type="timer"/>
     </BackgroundTasks>
 </Extension>
+
+------
+Tizen
+------
+<privileges>
+   <privilege>http://tizen.org/privilege/notification</privilege>
+</privileges>
