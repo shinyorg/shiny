@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.IO;
 using Shiny.Settings;
+using Tizen.Applications;
 using NativeManager = Tizen.Applications.Notifications.NotificationManager;
 using NativeNot = Tizen.Applications.Notifications.Notification;
 
@@ -58,9 +59,13 @@ namespace Shiny.Notifications
             if (notification.Id == 0)
                 notification.Id = this.settings.IncrementValue("NotificationId");
 
-            NativeManager.Post(this.Create(notification));
+            var native = this.Create(notification);
+            //AlarmManager.CreateAlarm(notification.ScheduleDate.Value.ToLocalTime(), AlarmWeekFlag.AllDays, native);
+
+            NativeManager.Post(native);
             await this.repository.Set(notification.Id.ToString(), notification);
         }
+
 
         NativeNot Create(Notification notification)
         {
