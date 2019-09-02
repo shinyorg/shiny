@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 
 namespace Shiny.BluetoothLE
 {
     public interface IBleAdapterDelegate
     {
-        void OnBleAdapterStateChanged(AccessState state);
+        Task OnBleAdapterStateChanged(AccessState state);
     }
 }

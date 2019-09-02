@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 
 namespace Shiny.BluetoothLE.Central
 {
     public interface IBlePeripheralDelegate
     {
-        void OnConnected(IPeripheral peripheral);
+        Task OnConnected(IPeripheral peripheral);
         //void OnConnectFailed(IPeripheral peripheral);
         //void OnAdvertised(IScanResult result);
     }
