@@ -13,10 +13,13 @@ namespace Shiny.BluetoothLE.Central
     public class AdapterContext : CBCentralManagerDelegate
     {
         readonly ConcurrentDictionary<string, IPeripheral> peripherals = new ConcurrentDictionary<string, IPeripheral>();
+        readonly IServiceProvider services;
 
 
-        public AdapterContext(BleAdapterConfiguration config)
+        public AdapterContext(IServiceProvider services, BleAdapterConfiguration config)
         {
+            this.services = services;
+
             config = config ?? new BleAdapterConfiguration();
             var opts = new CBCentralInitOptions
             {
@@ -53,23 +56,19 @@ namespace Shiny.BluetoothLE.Central
             .ForEach(x => this.peripherals.TryRemove(x.Key, out var device));
 
 
-        public override void WillRestoreState(CBCentralManager central, NSDictionary dict)
+        public override async void WillRestoreState(CBCentralManager central, NSDictionary dict)
         {
 #if __IOS__
             try
             {
-                var delegates = ShinyHost
-                    .ResolveAll<IBlePeripheralDelegate>()
-                    .ToList();
+                var del = this.services.GetService<IBlePeripheralDelegate>();
 
                 var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
                 for (nuint i = 0; i < peripheralArray.Count; i++)
                 {
                     var item = peripheralArray.GetItem<CBPeripheral>(i);
                     var peripheral = this.GetPeripheral(item);
-
-                    foreach (var del in delegates)
-                        del.OnConnected(peripheral);
+                    await del.OnConnected(peripheral);
                 }
             }
             catch (Exception ex)
@@ -104,7 +103,7 @@ namespace Shiny.BluetoothLE.Central
 
 
         public Subject<AccessState> StateUpdated { get; } = new Subject<AccessState>();
-        public override void UpdatedState(CBCentralManager central)
+        public override async void UpdatedState(CBCentralManager central)
         {
             var state = central.State.FromNative();
 
@@ -114,12 +113,9 @@ namespace Shiny.BluetoothLE.Central
             this.StateUpdated.OnNext(state);
             try
             {
-                var delegates = ShinyHost
-                    .ResolveAll<IBleAdapterDelegate>()
-                    .ToList();
-
-                foreach (var del in delegates)
-                    del.OnBleAdapterStateChanged(state);
+                await this.services
+                    .GetService<IBleAdapterDelegate>()?
+                    .OnBleAdapterStateChanged(state);
             }
             catch (Exception ex)
             {

@@ -11,7 +11,7 @@ namespace Shiny.BluetoothLE.Peripherals.Internals
         public GattServerContext(AndroidContext context)
         {
             this.Context = context;
-            this.Manager = context.GetBluetooth();
+            //this.Manager = context.GetBluetooth();
         }
 
 

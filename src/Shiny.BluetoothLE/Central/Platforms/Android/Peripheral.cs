@@ -69,12 +69,13 @@ namespace Shiny.BluetoothLE.Central
             .Select(x => x);
 
 
-        public override IObservable<string> WhenNameUpdated() => this.context
-            .CentralContext
-            .Android
-            .WhenDeviceNameChanged()
-            .Where(x => x.Equals(this.context.NativeDevice))
-            .Select(x => this.Name);
+        public override IObservable<string> WhenNameUpdated() => null;
+        //this.context
+        //    .CentralContext
+        //    .Android
+        //    .WhenDeviceNameChanged()
+        //    .Where(x => x.Equals(this.context.NativeDevice))
+        //    .Select(x => this.Name);
 
 
         public override IObservable<ConnectionState> WhenStatusChanged()
@@ -141,26 +142,26 @@ namespace Shiny.BluetoothLE.Central
             }
             else
             {
-                if (pin != null && Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
-                {
-                    requestOb = this.context
-                        .CentralContext
-                        .Android
-                        .WhenBondRequestReceived()
-                        .Where(x => x.Equals(this.context.NativeDevice))
-                        .Subscribe(x =>
-                        {
-                            var bytes = ConvertPinToBytes(pin);
-                            x.SetPin(bytes);
-                            x.SetPairingConfirmation(true);
-                        });
-                }
-                istatusOb = this.context
-                    .CentralContext
-                    .Android
-                    .WhenBondStatusChanged()
-                    .Where(x => x.Equals(this.context.NativeDevice) && x.BondState != Bond.Bonding)
-                    .Subscribe(x => ob.Respond(x.BondState == Bond.Bonded)); // will complete here
+                //if (pin != null && Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+                //{
+                //    requestOb = this.context
+                //        .CentralContext
+                //        .Android
+                //        .WhenBondRequestReceived()
+                //        .Where(x => x.Equals(this.context.NativeDevice))
+                //        .Subscribe(x =>
+                //        {
+                //            var bytes = ConvertPinToBytes(pin);
+                //            x.SetPin(bytes);
+                //            x.SetPairingConfirmation(true);
+                //        });
+                //}
+                //istatusOb = this.context
+                //    .CentralContext
+                //    .Android
+                //    .WhenBondStatusChanged()
+                //    .Where(x => x.Equals(this.context.NativeDevice) && x.BondState != Bond.Bonding)
+                //    .Subscribe(x => ob.Respond(x.BondState == Bond.Bonded)); // will complete here
 
                 // execute
                 if (!this.context.NativeDevice.CreateBond())

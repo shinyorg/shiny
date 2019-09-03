@@ -17,11 +17,15 @@ namespace Shiny.BluetoothLE.Central
                                   ICanSeePairedPeripherals
     {
         readonly CentralContext context;
+        readonly IMessageBus messageBus;
         bool isScanning;
 
 
-        public CentralManager(AndroidContext context)
-            => this.context = new CentralContext(context);
+        public CentralManager(AndroidContext context, IMessageBus messageBus)
+        {
+            this.context = new CentralContext(context);
+            this.messageBus = messageBus;
+        }
 
 
         public override string AdapterName => "Default Bluetooth Peripheral";
@@ -78,29 +82,14 @@ namespace Shiny.BluetoothLE.Central
                 if (!this.context.Manager.Adapter.IsEnabled)
                     return AccessState.Disabled;
 
-                switch (this.context.Manager.Adapter.State)
-                {
-                    case State.Off:
-                    case State.TurningOff:
-                    case State.Disconnecting:
-                    case State.Disconnected:
-                        return AccessState.Disabled;
-
-                    case State.On:
-                    case State.Connected:
-                        return AccessState.Available;
-
-                    default:
-                        return AccessState.Unknown;
-                }
+                return this.context.Manager.Adapter.State.FromNative();
             }
         }
 
 
-        public override IObservable<AccessState> WhenStatusChanged() => this.context
-            .Android
-            .WhenAdapterStatusChanged()
-            .Select(x => this.Status)
+        public override IObservable<AccessState> WhenStatusChanged() => this.messageBus
+            .Listener<AccessState>() // TODO: needs to be more defined
+            //.Select(x => this.Status)
             .StartWith(this.Status);
 
 

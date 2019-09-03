@@ -11,27 +11,47 @@ namespace Shiny.BluetoothLE
 {
     public static class Extensions
     {
-        public static IObservable<Unit> WhenAdapterStatusChanged(this AndroidContext context)
-            => context.WhenIntentReceived(BluetoothAdapter.ActionStateChanged).Select(_ => Unit.Default);
-
-        public static IObservable<BluetoothDevice> WhenBondRequestReceived(this AndroidContext context)
-            => context.WhenDeviceEventReceived(BluetoothDevice.ActionPairingRequest);
-
-        public static IObservable<BluetoothDevice> WhenBondStatusChanged(this AndroidContext context)
-            => context.WhenDeviceEventReceived(BluetoothDevice.ActionBondStateChanged);
-
-        public static IObservable<BluetoothDevice> WhenDeviceNameChanged(this AndroidContext context)
-            => context.WhenDeviceEventReceived(BluetoothDevice.ActionNameChanged);
-
-        public static IObservable<BluetoothDevice> WhenDeviceEventReceived(this AndroidContext context, string action)
-            => context.WhenIntentReceived(action).Select(intent =>
+        public static AccessState FromNative(this State state)
+        {
+            switch (state)
             {
-                var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
-                return device;
-            });
+                case State.Off:
+                case State.TurningOff:
+                case State.Disconnecting:
+                case State.Disconnected:
+                    return AccessState.Disabled;
 
-        public static BluetoothManager GetBluetooth(this AndroidContext context)
-            => (BluetoothManager)context.AppContext.GetSystemService(Context.BluetoothService);
+                case State.On:
+                case State.Connected:
+                    return AccessState.Available;
+
+                default:
+                    return AccessState.Unknown;
+            }
+        }
+
+
+        //public static IObservable<Unit> WhenAdapterStatusChanged(this AndroidContext context)
+        //    => context.WhenIntentReceived(BluetoothAdapter.ActionStateChanged).Select(_ => Unit.Default);
+
+        //public static IObservable<BluetoothDevice> WhenBondRequestReceived(this AndroidContext context)
+        //    => context.WhenDeviceEventReceived(BluetoothDevice.ActionPairingRequest);
+
+        //public static IObservable<BluetoothDevice> WhenBondStatusChanged(this AndroidContext context)
+        //    => context.WhenDeviceEventReceived(BluetoothDevice.ActionBondStateChanged);
+
+        //public static IObservable<BluetoothDevice> WhenDeviceNameChanged(this AndroidContext context)
+        //    => context.WhenDeviceEventReceived(BluetoothDevice.ActionNameChanged);
+
+        //public static IObservable<BluetoothDevice> WhenDeviceEventReceived(this AndroidContext context, string action)
+        //    => context.WhenIntentReceived(action).Select(intent =>
+        //    {
+        //        var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
+        //        return device;
+        //    });
+
+        //public static BluetoothManager GetBluetooth(this AndroidContext context)
+        //    => (BluetoothManager)context.AppContext.GetSystemService(Context.BluetoothService);
 
 
         public static ConnectionState ToStatus(this ProfileState state)

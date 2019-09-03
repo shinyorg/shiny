@@ -5,9 +5,9 @@ namespace Acr.BluetoothLE.Central
 {
     public partial class CentralManager : AbstractCentralManager
     {
-        public CentralManager(BleAdapterConfiguration config = null)
+        public CentralManager(ServiceProvider services, BleAdapterConfiguration config = null)
         {
-            this.context = new AdapterContext(config);
+            this.context = new AdapterContext(services, config);
         }
 	}
 }
