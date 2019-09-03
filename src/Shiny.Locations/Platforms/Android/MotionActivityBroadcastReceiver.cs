@@ -1,15 +1,23 @@
 ﻿using System;
+using Android.App;
 using Android.Content;
 using Android.Gms.Location;
 
 
 namespace Shiny.Locations
 {
+    [BroadcastReceiver(
+        Name = "com.shiny.locations.MotionActivityBroadcastReceiver",
+        Enabled = true
+    )]
+    [IntentFilter(new[] {
+        MotionActivityBroadcastReceiver.ReceiverName
+    })]
     public class MotionActivityBroadcastReceiver : BroadcastReceiver
     {
+        public const string ReceiverName = nameof(MotionActivityBroadcastReceiver);
         readonly IMessageBus messageBus;
         readonly AndroidSqliteDatabase database;
-        //https://developer.android.com/training/data-storage/sqlite
 
 
         public MotionActivityBroadcastReceiver()
@@ -61,9 +69,9 @@ namespace Shiny.Locations
             var timestamp = DateTime.UtcNow.Ticks;
 
             await this.database.ExecuteNonQuery(
-                $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({type}, {confidence}, {timestamp})"
+                $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
             );
-            this.messageBus.Publish(new MotionActivityEvent(type, MotionActivityConfidence.High, DateTimeOffset.UtcNow));
+            this.messageBus.Publish(new MotionActivityEvent(type, confidence, DateTimeOffset.UtcNow));
         });
 
 

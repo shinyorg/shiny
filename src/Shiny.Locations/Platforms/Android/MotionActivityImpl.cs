@@ -11,6 +11,8 @@ namespace Shiny.Locations
 {
     public class MotionActivityImpl : IMotionActivity, IShinyStartupTask
     {
+        public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromSeconds(10);
+
         readonly ActivityRecognitionClient client;
         readonly AndroidContext context;
         readonly AndroidSqliteDatabase database;
@@ -32,8 +34,10 @@ namespace Shiny.Locations
         {
             try
             {
-                // TODO: ping timer should be configurable?  10 seconds for now
-                await this.client.RequestActivityUpdatesAsync(10000, this.GetPendingIntent());
+                await this.client.RequestActivityUpdatesAsync(
+                    Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
+                    this.GetPendingIntent()
+                );
             }
             catch (Exception ex)
             {
@@ -47,7 +51,16 @@ namespace Shiny.Locations
 
         public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset end)
             => this.database.RawQuery(
-                $"SELECT Confidence, Event, Timestamp FROM motion_activity WHERE Timestamp BETWEEN ${start.Ticks} AND ${end.Ticks}",
+$@"SELECT 
+    Confidence, 
+    Event, 
+    Timestamp 
+FROM 
+    motion_activity 
+WHERE 
+    Timestamp BETWEEN ${start.UtcDateTime.Ticks} AND ${end.UtcDateTime.Ticks} 
+ORDER BY 
+    Timestamp",
                 cursor =>
                 {
                     var confidence = cursor.GetInt(0);
@@ -57,7 +70,7 @@ namespace Shiny.Locations
 
                     return new MotionActivityEvent(
                         (MotionActivityType)events,
-                        MotionActivityConfidence.Low,
+                        (MotionActivityConfidence)confidence,
                         dt
                     );
                 }
@@ -75,7 +88,7 @@ namespace Shiny.Locations
                 return this.pendingIntent;
 
             var intent = new Intent(this.context.AppContext, typeof(MotionActivityBroadcastReceiver));
-            //intent.SetAction(GeofenceBroadcastReceiver.INTENT_ACTION);
+            intent.SetAction(MotionActivityBroadcastReceiver.ReceiverName);
             this.pendingIntent = PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,

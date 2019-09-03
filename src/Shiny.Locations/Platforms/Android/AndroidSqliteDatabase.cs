@@ -20,6 +20,7 @@ namespace Shiny
         public override void OnCreate(SQLiteDatabase db)
         {
             db.ExecSQL("CREATE TABLE motion_activity(Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, Confidence FLOAT NOT NULL, Event INTEGER NOT NULL, Timestamp INTEGER NOT NULL)");
+            db.ExecSQL("CREATE INDEX idx_timestamp ON motion_activity(Timestamp);");
         }
 
 

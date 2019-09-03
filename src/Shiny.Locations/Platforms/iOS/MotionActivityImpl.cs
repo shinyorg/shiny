@@ -31,23 +31,23 @@ namespace Shiny.Locations
                 (NSDate)end.LocalDateTime,
                 NSOperationQueue.MainQueue
             );
-            return results.Select(x => ToEvent(x)).ToList();
+            return results
+                .Select(x => ToEvent(x))
+                .ToList();
         }
 
 
         public IObservable<MotionActivityEvent> WhenActivityChanged() => Observable.Create<MotionActivityEvent>(ob =>
         {
-            var am = new CMMotionActivityManager();
-            am.StartActivityUpdates(NSOperationQueue.CurrentQueue, target =>
-            {
-                var e = ToEvent(target);
-                ob.OnNext(e);
-            });
-            return () =>
-            {
-                am.StopActivityUpdates();
-                am.Dispose();
-            };
+            this.activityManager.StartActivityUpdates(
+                NSOperationQueue.CurrentQueue,
+                target =>
+                {
+                    var e = ToEvent(target);
+                    ob.OnNext(e);
+                }
+            );
+            return () => this.activityManager.StopActivityUpdates();
         });
 
 
