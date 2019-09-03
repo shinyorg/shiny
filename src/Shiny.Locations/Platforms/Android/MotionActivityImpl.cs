@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content;
 using Android.Gms.Location;
 using Shiny.Logging;
 
@@ -12,6 +11,10 @@ namespace Shiny.Locations
     public class MotionActivityImpl : IMotionActivity, IShinyStartupTask
     {
         public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromSeconds(10);
+        public const string IntentAction = ReceiverName + ".INTENT_ACTION";
+        public const string ReceiverName = "com.shiny.locations." + nameof(MotionActivityBroadcastReceiver);
+        public static int HighConfidenceValue { get; set; } = 70;
+        public static int MediumConfidenceValue { get; set; } = 40;
 
         readonly ActivityRecognitionClient client;
         readonly AndroidContext context;
@@ -99,8 +102,7 @@ ORDER BY
             if (this.pendingIntent != null)
                 return this.pendingIntent;
 
-            var intent = new Intent(this.context.AppContext, typeof(MotionActivityBroadcastReceiver));
-            intent.SetAction(MotionActivityBroadcastReceiver.ReceiverName);
+            var intent = this.context.CreateIntent<MotionActivityBroadcastReceiver>(IntentAction);
             this.pendingIntent = PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,

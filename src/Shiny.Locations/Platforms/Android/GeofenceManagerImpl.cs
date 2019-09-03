@@ -8,16 +8,16 @@ using System.Reactive.Threading.Tasks;
 using Android.Gms.Location;
 using Android;
 using Android.App;
-using Android.Content;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 
 
 namespace Shiny.Locations
 {
-    public class GeofenceManagerImpl : AbstractGeofenceManager,
-                                       IShinyStartupTask
+    public class GeofenceManagerImpl : AbstractGeofenceManager, IShinyStartupTask
     {
+        public const string ReceiverName = "com.shiny.locations." + nameof(GeofenceBroadcastReceiver);
+        public const string IntentAction = ReceiverName + ".INTENT_ACTION";
         readonly AndroidContext context;
         readonly GeofencingClient client;
         PendingIntent geofencePendingIntent;
@@ -37,19 +37,12 @@ namespace Shiny.Locations
         }
 
 
-        public async void Start()
+        public async void Start() => Log.SafeExecute(async () =>
         {
-            try
-            {
-                var regions = await this.Repository.GetAll();
-                foreach (var region in regions)
-                    await this.Create(region);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-        }
+            var regions = await this.Repository.GetAll();
+            foreach (var region in regions)
+                await this.Create(region);
+        });
 
 
         public override IObservable<AccessState> WhenAccessStatusChanged() => Observable.Return(AccessState.Available);
@@ -140,9 +133,7 @@ namespace Shiny.Locations
             if (this.geofencePendingIntent != null)
                 return this.geofencePendingIntent;
 
-            var intent = new Intent(this.context.AppContext, typeof(GeofenceBroadcastReceiver));
-            intent.SetAction(GeofenceBroadcastReceiver.INTENT_ACTION);
-            //intent.SetAction(Permission.ReceiveBootCompleted);
+            var intent = this.context.CreateIntent<GeofenceBroadcastReceiver>(IntentAction);
             this.geofencePendingIntent = PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,

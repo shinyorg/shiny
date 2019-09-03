@@ -11,6 +11,8 @@ namespace Shiny.Locations
 {
     public class GpsManagerImpl : IGpsManager
     {
+        public const string ReceiverName = "com.shiny.locations." + nameof(GpsBroadcastReceiver);
+        public const string IntentAction = ReceiverName + ".INTENT_ACTION";
         readonly AndroidContext context;
         readonly FusedLocationProviderClient client;
 
@@ -85,7 +87,7 @@ namespace Shiny.Locations
 
         protected virtual PendingIntent GetPendingIntent()
         {
-            var intent = this.context.CreateIntent<GpsBroadcastReceiver>(GpsBroadcastReceiver.INTENT_ACTION);
+            var intent = this.context.CreateIntent<GpsBroadcastReceiver>(IntentAction);
             return PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,

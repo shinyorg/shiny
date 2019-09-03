@@ -13,12 +13,13 @@ namespace Shiny.Locations
         /// Queries for the most current event
         /// </summary>
         /// <param name="activity"></param>
-        /// <param name="maxAgeMinutes"></param>
+        /// <param name="maxAge">Timespan containing max age of "current"</param>
         /// <returns></returns>
-        public static async Task<MotionActivityEvent> GetCurrentActivity(this IMotionActivity activity, int maxAgeMinutes = 5)
+        public static async Task<MotionActivityEvent> GetCurrentActivity(this IMotionActivity activity, TimeSpan? maxAge = null)
         {
+            maxAge = maxAge ?? TimeSpan.FromMinutes(5);
             var end = DateTimeOffset.UtcNow;
-            var result = (await activity.Query(end.AddMinutes(-maxAgeMinutes), end)).OrderBy(x => x.Timestamp).FirstOrDefault();
+            var result = (await activity.Query(end.Subtract(maxAge.Value), end)).OrderBy(x => x.Timestamp).FirstOrDefault();
             return result;
         }
 
@@ -28,12 +29,12 @@ namespace Shiny.Locations
         /// </summary>
         /// <param name="activity"></param>
         /// <param name="type"></param>
-        /// <param name="maxAgeMinutes"></param>
+        /// <param name="maxAge"></param>
         /// <param name="minConfidence"></param>
         /// <returns></returns>
-        public static async Task<bool> IsCurrentActivity(this IMotionActivity activity, MotionActivityType type, int maxAgeMinutes = 5, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        public static async Task<bool> IsCurrentActivity(this IMotionActivity activity, MotionActivityType type, TimeSpan? maxAge = null, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
         {
-            var result = await activity.GetCurrentActivity(maxAgeMinutes);
+            var result = await activity.GetCurrentActivity(maxAge);
             //if (result == default(MotionActivityEvent))
                 //return false;
             if (result.Confidence < minConfidence)
@@ -47,22 +48,22 @@ namespace Shiny.Locations
         /// Queries if most recent activity is automotive
         /// </summary>
         /// <param name="activity"></param>
-        /// <param name="maxAgeMinutes"></param>
+        /// <param name="maxAge"></param>
         /// <param name="minConfidence"></param>
         /// <returns></returns>
-        public static Task<bool> IsCurrentAutomotive(this IMotionActivity activity, int maxAgeMinutes = 5, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
-            => activity.IsCurrentActivity(MotionActivityType.Automotive, maxAgeMinutes, minConfidence);
+        public static Task<bool> IsCurrentAutomotive(this IMotionActivity activity, TimeSpan? maxAge = null, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+            => activity.IsCurrentActivity(MotionActivityType.Automotive, maxAge, minConfidence);
 
 
         /// <summary>
         /// Queries if most recent activity is stationary
         /// </summary>
         /// <param name="activity"></param>
-        /// <param name="maxAgeMinutes"></param>
+        /// <param name="maxAge"></param>
         /// <param name="minConfidence"></param>
         /// <returns></returns>
-        public static Task<bool> IsCurrentStationary(this IMotionActivity activity, int maxAgeMinutes = 5, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
-            => activity.IsCurrentActivity(MotionActivityType.Stationary, maxAgeMinutes, minConfidence);
+        public static Task<bool> IsCurrentStationary(this IMotionActivity activity, TimeSpan? maxAge = null, MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+            => activity.IsCurrentActivity(MotionActivityType.Stationary, maxAge, minConfidence);
 
 
         /// <summary>
