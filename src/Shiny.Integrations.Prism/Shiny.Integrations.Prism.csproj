@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Prism.Core" Version="7.2.0.1367" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+  </ItemGroup>
+
+</Project>
