@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Reactive.Linq;
+using ReactiveUI;
 using Splat;
+
 
 namespace Shiny.Integrations.ReactiveUI
 {
