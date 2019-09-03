@@ -50,23 +50,35 @@ namespace Shiny.Locations
 
 
         public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset end)
-            => this.database.RawQuery(
+        {
+            var st = start.ToUnixTimeSeconds();
+            var et = end.ToUnixTimeSeconds();
+
+//            $@"SELECT 
+//    Confidence, 
+//    Event, 
+//    Timestamp 
+//FROM 
+//    motion_activity 
+//WHERE 
+//    Timestamp BETWEEN ${st} AND ${et} 
+//ORDER BY 
+//    Timestamp DESC",
+            return this.database.RawQuery(
 $@"SELECT 
     Confidence, 
     Event, 
     Timestamp 
 FROM 
     motion_activity 
-WHERE 
-    Timestamp BETWEEN ${start.UtcDateTime.Ticks} AND ${end.UtcDateTime.Ticks} 
 ORDER BY 
-    Timestamp",
+    Timestamp DESC",
                 cursor =>
                 {
                     var confidence = cursor.GetInt(0);
                     var events = cursor.GetInt(1);
-                    var ticks = cursor.GetLong(2);
-                    var dt = new DateTimeOffset(ticks, TimeSpan.FromHours(0));
+                    var epochSeconds = cursor.GetLong(2);
+                    var dt = DateTimeOffset.FromUnixTimeSeconds(epochSeconds);
 
                     return new MotionActivityEvent(
                         (MotionActivityType)events,
@@ -75,7 +87,7 @@ ORDER BY
                     );
                 }
             );
-
+        }
 
         public IObservable<MotionActivityEvent> WhenActivityChanged()
             => this.messageBus.Listener<MotionActivityEvent>();

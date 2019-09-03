@@ -66,7 +66,7 @@ namespace Shiny.Locations
                 }
             }
             var confidence = this.ToConfidence(result.MostProbableActivity.Confidence);
-            var timestamp = DateTime.UtcNow.Ticks;
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
             await this.database.ExecuteNonQuery(
                 $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
