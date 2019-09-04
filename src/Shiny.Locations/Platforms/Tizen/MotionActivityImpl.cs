@@ -25,8 +25,16 @@ namespace Shiny.Locations
 
         public void Start()
         {
-        }
+            this.vehicle.DataUpdated += (sender, args) => {  };
+            this.walking.DataUpdated += (sender, args) => { };
+            this.running.DataUpdated += (sender, args) => { };
+            this.stationary.DataUpdated += (sender, args) => { };
 
+            this.vehicle.Start();
+            this.walking.Start();
+            this.running.Start();
+            this.stationary.Start();
+        }
 
         public bool IsSupported => true;
 
