@@ -18,17 +18,33 @@ namespace Shiny.Tests.Infrastructure
     public class MessageBusTests
     {
         [Fact]
-        public async Task Test()
+        public async Task EndToEnd()
         {
             var bus = new MessageBus();
+            var count = 0;
 
-            var task = bus.Listener<BusTest>().Take(2).ToList().ToTask();
-            bus.Publish(new BusTest {  Value = "1" });
+            bus.Listener<BusTest>().Subscribe(_ => count++);
+            bus.Publish(new BusTest { Value = "1" });
             bus.Publish(new BusTest { Value = "2" });
             bus.Publish(new object());
-            var results = await task;
+            await Task.Delay(1000);
+            count.Should().Be(2);
+        }
 
-            results.Count.Should().Be(2);
+
+        [Fact]
+        public async Task NamedEndToEnd()
+        {
+            var bus = new MessageBus();
+            var count = 0;
+
+            bus.Listener<BusTest>("test").Subscribe(_ => count++);
+            bus.Publish("test", new BusTest { Value = "1" });
+            bus.Publish("test", new BusTest { Value = "2" });
+            bus.Publish("test", new object());
+            bus.Publish(new BusTest());
+            await Task.Delay(1000);
+            count.Should().Be(2);
         }
     }
 }
