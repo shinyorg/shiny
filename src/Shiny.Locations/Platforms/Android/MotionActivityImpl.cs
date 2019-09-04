@@ -33,20 +33,12 @@ namespace Shiny.Locations
         }
 
 
-        public async void Start()
-        {
-            try
-            {
-                await this.client.RequestActivityUpdatesAsync(
-                    Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
-                    this.GetPendingIntent()
-                );
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-        }
+        public void Start() => Log.SafeExecute(() =>
+            this.client.RequestActivityUpdatesAsync(
+                Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
+                this.GetPendingIntent()
+            )
+        );
 
 
         public bool IsSupported => true;
@@ -56,26 +48,19 @@ namespace Shiny.Locations
         {
             var st = start.ToUnixTimeSeconds();
             var et = end.ToUnixTimeSeconds();
-
-//            $@"SELECT 
-//    Confidence, 
-//    Event, 
-//    Timestamp 
-//FROM 
-//    motion_activity 
-//WHERE 
-//    Timestamp BETWEEN ${st} AND ${et} 
-//ORDER BY 
-//    Timestamp DESC",
-            return this.database.RawQuery(
-$@"SELECT 
+            var sql = $@"SELECT 
     Confidence, 
     Event, 
     Timestamp 
 FROM 
     motion_activity 
+WHERE
+    Timestamp > {st} AND Timestamp < {et}
 ORDER BY 
-    Timestamp DESC",
+    Timestamp DESC";
+
+            return this.database.RawQuery(
+                sql,
                 cursor =>
                 {
                     var confidence = cursor.GetInt(0);
