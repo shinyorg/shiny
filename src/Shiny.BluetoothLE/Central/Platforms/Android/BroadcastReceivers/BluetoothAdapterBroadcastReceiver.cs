@@ -8,11 +8,9 @@ namespace Shiny.BluetoothLE.Central
 {
     [BroadcastReceiver(
         Name = "com.shiny.bluetoothle.BluetoothAdapterBroadcastReceiver",
-        Enabled = true,
-        Exported = true
+        Enabled = true
     )]
     [IntentFilter(new [] {
-        //BluetoothAdapter.ActionConnectionStateChanged,
         BluetoothAdapter.ActionStateChanged
     })]
     public class BluetoothAdapterBroadcastReceiver : BroadcastReceiver
@@ -33,7 +31,7 @@ namespace Shiny.BluetoothLE.Central
             var nativeState = (State)Enum.Parse(typeof(State), intent.GetStringExtra(BluetoothAdapter.ExtraState));
             var access = nativeState.FromNative();
             this.adapterDelegate?.OnBleAdapterStateChanged(access);
-            this.messageBus.Publish(access); // TODO: this needs to be more defined
+            this.messageBus.Publish(MessageBusNames.AdapterStateChanged, access);
         });
     }
 }
