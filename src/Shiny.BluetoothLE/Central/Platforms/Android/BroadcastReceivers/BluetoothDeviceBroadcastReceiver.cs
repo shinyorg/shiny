@@ -38,24 +38,24 @@ namespace Shiny.BluetoothLE.Central.BroadcastReceivers
             switch (intent.Action)
             {
                 case BluetoothDevice.ActionAclConnected:
-                    //this.peripheralDelegate.OnConnected()
-                    //this.messageBus.Publish()
+                    await this.peripheralDelegate.OnConnected(null); // TODO:
+                    this.messageBus.Publish(MessageBusNames.PeripheralConnected, device);
                     break;
 
                 case BluetoothDevice.ActionAclDisconnected:
-                    // bus only
+                    this.messageBus.Publish(MessageBusNames.PeripheralDisconnected, device);
                     break;
 
                 case BluetoothDevice.ActionBondStateChanged:
-                    //this.messageBus.Publish()
+                    this.messageBus.Publish(MessageBusNames.PeripheralBondState, device);
                     break;
 
                 case BluetoothDevice.ActionNameChanged:
-                    // bus only
+                    this.messageBus.Publish(MessageBusNames.PeripheralNameChanged, device);
                     break;
 
                 case BluetoothDevice.ActionPairingRequest:
-                    // bus only
+                    this.messageBus.Publish(MessageBusNames.PeripheralPairingRequest, device);
                     break;
             }
         });
