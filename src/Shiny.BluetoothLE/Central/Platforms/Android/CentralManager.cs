@@ -29,13 +29,6 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override string AdapterName => "Default Bluetooth Peripheral";
-        //public override BleFeatures Features => BleFeatures.ControlAdapterState |
-        //                                        BleFeatures.LowPoweredScan |
-        //                                        BleFeatures.MtuRequests |
-        //                                        BleFeatures.OpenSettings |
-        //                                        BleFeatures.PairingRequests |
-        //                                        BleFeatures.ReliableTransactions |
-        //                                        BleFeatures.ViewPairedPeripherals;
         public override bool IsScanning => this.isScanning;
 
 
@@ -88,8 +81,7 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override IObservable<AccessState> WhenStatusChanged() => this.messageBus
-            .Listener<AccessState>() // TODO: needs to be more defined
-            //.Select(x => this.Status)
+            .Listener<AccessState>(MessageBusNames.AdapterStateChanged)
             .StartWith(this.Status);
 
 
