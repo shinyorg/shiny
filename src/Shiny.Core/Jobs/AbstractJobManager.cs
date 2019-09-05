@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 using Shiny.Net;
@@ -207,7 +206,7 @@ namespace Shiny.Jobs
                                       Exception exception = null)
         {
             if (exception == null)
-                Log.Write("Jobs", "Job Success", ("JobName", job.Identifier));
+                Log.Write("Jobs", state == JobState.Finish ? "Job Success" : $"Job ${state}", ("JobName", job.Identifier));
             else
                 Log.Write(exception, ("JobName", job.Identifier));
         }
@@ -216,7 +215,7 @@ namespace Shiny.Jobs
         protected virtual void LogTask(JobState state, string taskName, Exception exception = null)
         {
             if (exception == null)
-                Log.Write("Jobs", "Task Success", ("TaskName", taskName));
+                Log.Write("Jobs", state == JobState.Finish ? "Task Success" : $"Task ${state}", ("TaskName", taskName));
             else
                 Log.Write(exception, ("TaskName", taskName));
         }
