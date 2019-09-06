@@ -156,7 +156,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             try
             {
                 this.running = true;
-                var ts = AndroidBleConfig.PauseBetweenInvocations;
+                var ts = this.CentralContext.Configuration.AndroidPauseBetweenInvocations;
                 Func<Task> outTask;
 
                 while (this.Actions.TryDequeue(out outTask) && this.running)
