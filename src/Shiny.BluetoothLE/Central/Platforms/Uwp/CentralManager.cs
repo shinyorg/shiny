@@ -16,16 +16,16 @@ namespace Shiny.BluetoothLE.Central
                                   ICanOpenAdapterSettings,
                                   ICanSeePairedPeripherals
     {
-        readonly AdapterContext context;
+        readonly CentralContext context;
         readonly Subject<bool> scanSubject;
         BluetoothAdapter native;
         Radio radio;
 
 
-        public CentralManager()
+        public CentralManager(CentralContext context)
         {
             this.scanSubject = new Subject<bool>();
-            this.context = new AdapterContext();
+            this.context = context;
         }
 
 

@@ -11,11 +11,11 @@ namespace Shiny.BluetoothLE.Central
 {
     public partial class Peripheral : AbstractPeripheral
     {
-        readonly AdapterContext context;
+        readonly CentralContext context;
         IDisposable autoReconnectSub;
 
 
-        public Peripheral(AdapterContext context, CBPeripheral native) : base(native.Name, native.Identifier.ToGuid())
+        public Peripheral(CentralContext context, CBPeripheral native) : base(native.Name, native.Identifier.ToGuid())
         {
             this.context = context;
             this.Native = native;

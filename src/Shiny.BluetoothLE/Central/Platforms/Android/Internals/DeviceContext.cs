@@ -62,7 +62,7 @@ namespace Shiny.BluetoothLE.Central.Internals
 
         public IObservable<T> Invoke<T>(IObservable<T> observable)
         {
-            if (!AndroidBleConfig.UseInternalSyncQueue)
+            if (!this.CentralContext.Configuration.UseInternalSyncQueue)
                 return observable;
 
             return Observable.Create<T>(ob =>
@@ -94,7 +94,7 @@ namespace Shiny.BluetoothLE.Central.Internals
 
         public async Task OpPause(CancellationToken? cancelToken = null)
         {
-            var ts = AndroidBleConfig.PauseBetweenInvocations;
+            var ts = this.CentralContext.Configuration.AndroidPauseBetweenInvocations;
             if (ts.TotalMilliseconds > 0)
                 await Task.Delay((int)ts.TotalMilliseconds, cancelToken ?? CancellationToken.None);
         }
@@ -102,7 +102,7 @@ namespace Shiny.BluetoothLE.Central.Internals
 
         public void RefreshServices()
         {
-            if (this.Gatt == null || !AndroidBleConfig.RefreshServices)
+            if (this.Gatt == null) //|| !this.CentralContext.Configuration.AndroidRefreshServices)
                 return;
 
             // https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android
@@ -125,7 +125,7 @@ namespace Shiny.BluetoothLE.Central.Internals
 
         public void InvokeOnMainThread(Action action)
         {
-            if (AndroidBleConfig.ShouldInvokeOnMainThread)
+            if (this.CentralContext.Configuration.AndroidShouldInvokeOnMainThread)
                 action.Dispatch();
             else
                 action();

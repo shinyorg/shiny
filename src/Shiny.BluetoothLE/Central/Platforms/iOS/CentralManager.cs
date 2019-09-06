@@ -5,9 +5,9 @@ namespace Shiny.BluetoothLE.Central
 {
     public partial class CentralManager : AbstractCentralManager
     {
-        public CentralManager(IServiceProvider services, BleAdapterConfiguration config = null)
+        public CentralManager(CentralContext context)
         {
-            this.context = new AdapterContext(services, config);
+            this.context = context;
         }
 	}
 }

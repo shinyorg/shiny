@@ -9,7 +9,7 @@ namespace Shiny.BluetoothLE.Central
 {
     public partial class CentralManager : AbstractCentralManager
     {
-        readonly AdapterContext context;
+        readonly CentralContext context;
 
 
         public override string AdapterName => "Default Bluetooth Peripheral";

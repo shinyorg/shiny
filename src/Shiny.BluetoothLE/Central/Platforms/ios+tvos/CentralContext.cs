@@ -10,26 +10,26 @@ using Shiny.Logging;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public class AdapterContext : CBCentralManagerDelegate
+    public class CentralContext : CBCentralManagerDelegate
     {
         readonly ConcurrentDictionary<string, IPeripheral> peripherals = new ConcurrentDictionary<string, IPeripheral>();
         readonly IServiceProvider services;
 
 
-        public AdapterContext(IServiceProvider services, BleAdapterConfiguration config)
+        public CentralContext(IServiceProvider services, BleCentralConfiguration config)
         {
             this.services = services;
 
-            config = config ?? new BleAdapterConfiguration();
+            config = config ?? new BleCentralConfiguration();
             var opts = new CBCentralInitOptions
             {
-                ShowPowerAlert = config.ShowPowerAlert
+                ShowPowerAlert = config.iOSShowPowerAlert
             };
 
-            if (!config.RestoreIdentifier.IsEmpty())
-                opts.RestoreIdentifier = config.RestoreIdentifier;
+            if (!config.iOSRestoreIdentifier.IsEmpty())
+                opts.RestoreIdentifier = config.iOSRestoreIdentifier;
 
-            this.Manager = new CBCentralManager(this, config.DispatchQueue, opts);
+            this.Manager = new CBCentralManager(this, null, opts);
         }
 
 

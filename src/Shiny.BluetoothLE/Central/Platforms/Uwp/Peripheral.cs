@@ -17,7 +17,7 @@ namespace Shiny.BluetoothLE.Central
         readonly DeviceContext context;
 
 
-        public Peripheral(AdapterContext adapterContext, BluetoothLEDevice native)
+        public Peripheral(CentralContext adapterContext, BluetoothLEDevice native)
         {
             this.context = new DeviceContext(adapterContext, this, native);
             this.Name = native.Name;

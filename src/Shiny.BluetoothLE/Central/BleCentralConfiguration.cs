@@ -3,18 +3,18 @@
 
 namespace Shiny.BluetoothLE.Central
 {
-    public static class AndroidBleConfig
+    public class BleCentralConfiguration
     {
         /// <summary>
         /// Allows you to disable the internal sync queue
         /// DO NOT CHANGE this if you don't know what this is!
         /// </summary>
-        public static bool UseInternalSyncQueue { get; set; } = true;
+        public bool UseInternalSyncQueue { get; set; } = true;
 
-        /// <summary>
-        /// This is only necessary on niche cases and thus must be enabled by default
-        /// </summary>
-        public static bool RefreshServices { get; set; }
+        ///// <summary>
+        ///// This is only necessary on niche cases and thus must be enabled by default
+        ///// </summary>
+        //public bool RefreshServices { get; set; }
 
         ///// <summary>
         ///// Suggests whether main thread is to be used
@@ -25,17 +25,28 @@ namespace Shiny.BluetoothLE.Central
         /// If you disable this, you need to manage serial/sequential access to ALL bluetooth operations yourself!
         /// DO NOT CHANGE this if you don't know what this is!
         /// </summary>
-        public static bool ShouldInvokeOnMainThread { get; set; } = true;
+        public bool AndroidShouldInvokeOnMainThread { get; set; } = true;
 
         /// <summary>
         /// This performs pauses between each operation helping android recover from itself
         /// </summary>
-        public static TimeSpan PauseBetweenInvocations { get; set; } = TimeSpan.FromMilliseconds(100);
+        public TimeSpan AndroidPauseBetweenInvocations { get; set; } = TimeSpan.FromMilliseconds(100);
 
         /// <summary>
         /// Time span to pause before service discovery (helps in combating GATT133 error) when service discovery is performed immediately after connection
         /// DO NOT CHANGE this if you don't know what this is!
         /// </summary>
-        public static TimeSpan PauseBeforeServiceDiscovery { get; set; } = TimeSpan.FromMilliseconds(750);
+        public TimeSpan AndroidPauseBeforeServiceDiscovery { get; set; } = TimeSpan.FromMilliseconds(750);
+
+        /// <summary>
+        /// This will display an alert dialog when the user powers off their bluetooth adapter
+        /// </summary>
+        public bool iOSShowPowerAlert { get; set; }
+
+
+        /// <summary>
+        /// CBCentralInitOptions restoration key for background restoration
+        /// </summary>
+        public string iOSRestoreIdentifier { get; set; } = "shinyble";
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using Foundation;
 using CoreBluetooth;
-using Shiny.BluetoothLE.Central;
+
 
 namespace Shiny.BluetoothLE
 {
@@ -11,6 +10,7 @@ namespace Shiny.BluetoothLE
     {
         public static IObservable<Unit> WhenReady(this CBPeripheralManager manager) => Observable.Create<Unit>(ob =>
         {
+            // TODO: put this on the message bus
             var handler = new EventHandler((sender, args) =>
             {
                 if (manager.State == CBPeripheralManagerState.PoweredOn)
