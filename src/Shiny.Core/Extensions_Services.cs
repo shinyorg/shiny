@@ -13,6 +13,17 @@ namespace Shiny
     public static class ServiceExtensions
     {
         /// <summary>
+        /// Get Service of Type T from the IServiceProvider
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serviceProvider"></param>
+        /// <param name="requiredService"></param>
+        /// <returns></returns>
+        public static T Resolve<T>(this IServiceProvider serviceProvider, bool requiredService = false)
+            => requiredService ? serviceProvider.GetRequiredService<T>() : serviceProvider.GetService<T>();
+
+
+        /// <summary>
         ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -153,16 +164,6 @@ namespace Shiny
         /// <returns></returns>
         public static bool IsRegistered<TService>(this IServiceCollection services)
             => services.Any(x => x.ServiceType == typeof(TService));
-
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="serviceProvider"></param>
-        /// <returns></returns>
-        public static T GetService<T>(this IServiceProvider serviceProvider)
-            => (T)serviceProvider.GetService(typeof(T));
 
 
         /// <summary>

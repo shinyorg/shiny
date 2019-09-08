@@ -61,7 +61,7 @@ namespace Shiny.BluetoothLE.Central
 #if __IOS__
             try
             {
-                var del = this.services.GetService<IBlePeripheralDelegate>();
+                var del = this.services.Resolve<IBlePeripheralDelegate>();
 
                 var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
                 for (nuint i = 0; i < peripheralArray.Count; i++)
@@ -114,7 +114,7 @@ namespace Shiny.BluetoothLE.Central
             try
             {
                 await this.services
-                    .GetService<IBleAdapterDelegate>()?
+                    .Resolve<IBleAdapterDelegate>()?
                     .OnBleAdapterStateChanged(state);
             }
             catch (Exception ex)
