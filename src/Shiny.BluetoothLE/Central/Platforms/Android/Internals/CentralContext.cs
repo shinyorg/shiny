@@ -16,9 +16,9 @@ namespace Shiny.BluetoothLE.Central.Internals
         LollipopScanCallback callbacks;
 
 
-        public CentralContext(AndroidContext context, BleCentralConfiguration config = null)
+        public CentralContext(AndroidContext context, BleCentralConfiguration config)
         {
-            this.Configuration = config ?? new BleCentralConfiguration();
+            this.Configuration = config;
             this.Manager = (BluetoothManager)context.AppContext.GetSystemService(global::Android.App.Application.BluetoothService);
             this.Android = context;
             this.devices = new ConcurrentDictionary<string, IPeripheral>();

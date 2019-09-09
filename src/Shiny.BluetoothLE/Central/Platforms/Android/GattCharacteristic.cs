@@ -189,7 +189,7 @@ namespace Shiny.BluetoothLE.Central
                 var wrap = new GattDescriptor(this, this.context, descriptor);
                 sub = wrap
                     .WriteInternal(BluetoothGattDescriptor.DisableNotificationValue.ToArray())
-                    .Delay(AndroidConfig.PauseBetweenInvocations)
+                    .Delay(this.context.CentralContext.Configuration.AndroidPauseBetweenInvocations)
                     .Subscribe(
                         _ => success(),
                         ex => success()

@@ -20,7 +20,6 @@ namespace Shiny.BluetoothLE.Central
         {
             this.services = services;
 
-            config = config ?? new BleCentralConfiguration();
             var opts = new CBCentralInitOptions
             {
                 ShowPowerAlert = config.iOSShowPowerAlert

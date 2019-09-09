@@ -23,7 +23,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new BleCentralShinyModule(config));
+            builder.RegisterModule(new BleCentralShinyModule(config ?? new BleCentralConfiguration()));
             return true;
 #endif
         }
