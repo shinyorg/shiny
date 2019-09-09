@@ -56,10 +56,10 @@ namespace Shiny.BluetoothLE.Central
             .ForEach(x => this.peripherals.TryRemove(x.Key, out var device));
 
 
-        public override async void WillRestoreState(CBCentralManager central, NSDictionary dict)
+        public override void WillRestoreState(CBCentralManager central, NSDictionary dict)
         {
 #if __IOS__
-            try
+            Dispatcher.Execute(async () =>
             {
                 var del = this.services.Resolve<IBlePeripheralDelegate>();
 
@@ -70,11 +70,7 @@ namespace Shiny.BluetoothLE.Central
                     var peripheral = this.GetPeripheral(item);
                     await del.OnConnected(peripheral);
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+            });
             // TODO: restore scan? CBCentralManager.RestoredStateScanOptionsKey
 #endif
         }
@@ -106,21 +102,16 @@ namespace Shiny.BluetoothLE.Central
         public override async void UpdatedState(CBCentralManager central)
         {
             var state = central.State.FromNative();
-
             if (state == AccessState.Unknown)
                 return;
 
+            await Log.SafeExecute(async () =>
+            {
+                var s = this.services.Resolve<IBleAdapterDelegate>();
+                if (s != null)
+                    await s.OnBleAdapterStateChanged(state);
+            });
             this.StateUpdated.OnNext(state);
-            try
-            {
-                await this.services
-                    .Resolve<IBleAdapterDelegate>()?
-                    .OnBleAdapterStateChanged(state);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
         }
     }
 }
