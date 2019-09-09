@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Linq;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Logging;
-using Shiny.Settings;
 
 
 namespace Shiny
@@ -28,13 +26,12 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        public static async Task SafeResolveAndExecute<T>(this IServiceProvider services, Func<T, Task> execute)
+        public static async Task SafeResolveAndExecute<T>(this IServiceProvider services, Func<T, Task> execute, bool requiredService = true)
         {
             try
             {
-                var service = services.GetService(typeof(T));
-                if (service is T tservice)
-                    await execute.Invoke(tservice).ConfigureAwait(false);
+                var service = services.Resolve<T>(requiredService);
+                await execute.Invoke(service).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -52,24 +49,7 @@ namespace Shiny
             => ShinyHost.AddPostBuildAction(action);
 
 
-        /// <summary>
-        /// Register a startup task that runs immediately after the container is built with full dependency injected services
-        /// </summary>
-        /// <param name="services"></param>
-        public static void RegisterStartupTask<TImplementation>(this IServiceCollection services)
-            where TImplementation : IShinyStartupTask
-
-            => services.RegisterPostBuildAction(sp =>
-            {
-                var instance = sp.ResolveOrInstantiate<TImplementation>();
-                if (instance is INotifyPropertyChanged npc)
-                    sp.GetService<ISettings>().Bind(npc);
-
-                instance.Start();
-            });
-
-
-        /// <summary>
+         /// <summary>
         /// Register a job on the job manager
         /// </summary>
         /// <param name="services"></param>
