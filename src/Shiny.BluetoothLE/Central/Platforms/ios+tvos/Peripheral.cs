@@ -24,7 +24,9 @@ namespace Shiny.BluetoothLE.Central
 
         public CBPeripheral Native { get; }
         public override object NativeDevice => this.Native;
-
+        public override int MtuSize => (int)this
+            .Native
+            .GetMaximumWriteValueLength(CBCharacteristicWriteType.WithoutResponse);
 
         public override ConnectionState Status
         {

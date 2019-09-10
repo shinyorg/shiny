@@ -7,9 +7,15 @@ using CoreBluetooth;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public partial class CentralManager : AbstractCentralManager
+    public class CentralManager : AbstractCentralManager
     {
         readonly CentralContext context;
+
+
+        public CentralManager(CentralContext context)
+        {
+            this.context = context;
+        }
 
 
         public override string AdapterName => "Default Bluetooth Peripheral";
