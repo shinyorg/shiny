@@ -60,7 +60,7 @@ namespace Shiny.BluetoothLE.Central
 #if __IOS__
             Dispatcher.Execute(async () =>
             {
-                var del = this.services.Resolve<IBlePeripheralDelegate>();
+                var del = this.services.Resolve<IBleCentralDelegate>();
 
                 var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
                 for (nuint i = 0; i < peripheralArray.Count; i++)
@@ -106,9 +106,9 @@ namespace Shiny.BluetoothLE.Central
 
             await Log.SafeExecute(async () =>
             {
-                var s = this.services.Resolve<IBleAdapterDelegate>();
+                var s = this.services.Resolve<IBleCentralDelegate>();
                 if (s != null)
-                    await s.OnBleAdapterStateChanged(state);
+                    await s.OnAdapterStateChanged(state);
             });
             this.StateUpdated.OnNext(state);
         }

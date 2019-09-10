@@ -8,16 +8,30 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        //public static void RegisterBlePeripheralDelegate<T>(this IServiceCollection services)
-        //    where T : class, IBlePeripheralDelegate
-        //    => services.AddSingleton<IBlePeripheralDelegate, T>();
+        /// <summary>
+        /// Register the ICentralManager service that allows you to connect to other BLE devices - Delegates used here are intended for background usage
+        /// </summary>
+        /// <typeparam name="TCentralDelegate"></typeparam>
+        /// <param name="builder"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static bool UseBleCentral<TCentralDelegate>(this IServiceCollection builder, BleCentralConfiguration config = null) where TCentralDelegate : class, IBleCentralDelegate
+        {
+            if (builder.UseBleCentral(config))
+            {
+                builder.AddSingleton<IBleCentralDelegate, TCentralDelegate>();
+                return true;
+            }
+            return false;
+        }
 
 
-        //public static void RegisterBleAdapterState<T>(this IServiceCollection services)
-        //    where T : class, IBleAdapterDelegate
-        //    => services.AddSingleton<IBleAdapterDelegate, T>();
-
-
+        /// <summary>
+        /// Register the ICentralManager service that allows you to connect to other BLE devices
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
         public static bool UseBleCentral(this IServiceCollection builder, BleCentralConfiguration config = null)
         {
 #if NETSTANDARD
@@ -29,6 +43,11 @@ namespace Shiny
         }
 
 
+        /// <summary>
+        /// Registers the IPeripheralManager service that allows you to be a host BLE device
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         public static bool UseBlePeripherals(this IServiceCollection builder)
         {
 #if NETSTANDARD
