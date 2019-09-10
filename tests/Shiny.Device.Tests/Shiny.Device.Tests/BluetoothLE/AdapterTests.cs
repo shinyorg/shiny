@@ -93,67 +93,67 @@ namespace Shiny.Devices.Tests.BluetoothLE
         //}
 
 
-        [Fact]
-        public async Task Devices_GetPaired()
-        {
-            var devices = await this.manager.GetPairedPeripherals();
+        //[Fact]
+        //public async Task Devices_GetPaired()
+        //{
+        //    var devices = await this.manager.GetPairedPeripherals();
 
-            foreach (var device in devices)
-            {
-                this.output.WriteLine($"Paired Bluetooth Devices: Identifier={device.Name} UUID={device.Uuid} Paired={device.PairingStatus}");
-                Assert.True(device.PairingStatus == PairingState.Paired);
-            }
-        }
-
-
-        [Fact]
-        public async Task Devices_GetConnected()
-        {
-            var devices = await this.manager.GetConnectedPeripherals();
-
-            if (devices.Count() == 0)
-            {
-                this.output.WriteLine("There are no connected Bluetooth peripherals. Trying to connect a peripheral...");
-                var paired = await this.manager.GetPairedPeripherals();
-
-                // Get the first paired peripheral
-                var device = paired.FirstOrDefault();
-                if (device != null)
-                {
-                    await device.ConnectWait().ToTask();
-                    devices = await this.manager.GetConnectedPeripherals();
-                }
-                else
-                {
-                    this.output.WriteLine("There are no connected Bluetooth peripherals. Connect a peripheral and try again.");
-                }
-            }
-
-            foreach (var device in devices)
-            {
-                this.output.WriteLine($"Connected Bluetooth Devices: Identifier={device.Name} UUID={device.Uuid} Connected={device.IsConnected()}");
-                Assert.True(device.Status == ConnectionState.Connected);
-            }
-        }
+        //    foreach (var device in devices)
+        //    {
+        //        this.output.WriteLine($"Paired Bluetooth Devices: Identifier={device.Name} UUID={device.Uuid} Paired={device.PairingStatus}");
+        //        Assert.True(device.PairingStatus == PairingState.Paired);
+        //    }
+        //}
 
 
-        [Fact]
-        public async Task Devices_GetKnown()
-        {
-            var devices = await this.manager.GetPairedPeripherals();
+        //[Fact]
+        //public async Task Devices_GetConnected()
+        //{
+        //    var devices = await this.manager.GetConnectedPeripherals();
 
-            // Get the first paired peripheral
-            var known = devices.FirstOrDefault();
-            if (known != null)
-            {
-                // Now try to get it from the known Devices
-                var found = await this.manager.GetKnownPeripheral(known.Uuid);
-                Assert.True(known.Uuid == found.Uuid);
-            }
-            else
-            {
-                this.output.WriteLine("No well known peripheral found to test with. Please pair a peripheral");
-            }
-        }
+        //    if (devices.Count() == 0)
+        //    {
+        //        this.output.WriteLine("There are no connected Bluetooth peripherals. Trying to connect a peripheral...");
+        //        var paired = await this.manager.GetPairedPeripherals();
+
+        //        // Get the first paired peripheral
+        //        var device = paired.FirstOrDefault();
+        //        if (device != null)
+        //        {
+        //            await device.ConnectWait().ToTask();
+        //            devices = await this.manager.GetConnectedPeripherals();
+        //        }
+        //        else
+        //        {
+        //            this.output.WriteLine("There are no connected Bluetooth peripherals. Connect a peripheral and try again.");
+        //        }
+        //    }
+
+        //    foreach (var device in devices)
+        //    {
+        //        this.output.WriteLine($"Connected Bluetooth Devices: Identifier={device.Name} UUID={device.Uuid} Connected={device.IsConnected()}");
+        //        Assert.True(device.Status == ConnectionState.Connected);
+        //    }
+        //}
+
+
+        //[Fact]
+        //public async Task Devices_GetKnown()
+        //{
+        //    var devices = await this.manager.GetPairedPeripherals();
+
+        //    // Get the first paired peripheral
+        //    var known = devices.FirstOrDefault();
+        //    if (known != null)
+        //    {
+        //        // Now try to get it from the known Devices
+        //        var found = await this.manager.GetKnownPeripheral(known.Uuid);
+        //        Assert.True(known.Uuid == found.Uuid);
+        //    }
+        //    else
+        //    {
+        //        this.output.WriteLine("No well known peripheral found to test with. Please pair a peripheral");
+        //    }
+        //}
     }
 }

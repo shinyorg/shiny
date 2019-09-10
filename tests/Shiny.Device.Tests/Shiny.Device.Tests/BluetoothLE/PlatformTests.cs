@@ -22,7 +22,7 @@ namespace Shiny.Device.Tests.BluetoothLE
     public class PlatformTests
     {
         readonly ITestOutputHelper output;
-        readonly CentralManager manager;
+        readonly ICentralManager manager;
 
 
         public PlatformTests(ITestOutputHelper output)

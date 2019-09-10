@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -260,7 +261,7 @@ namespace Shiny.Devices.Tests.BluetoothLE
                 blob[i] = 2;
             }
 
-            await characteristic.BlobWrite(blob, true).FirstAsync(segment => segment.Position == segment.TotalLength);
+            await characteristic.BlobWrite(new MemoryStream(blob)).FirstAsync(segment => segment.Position == segment.TotalLength);
 
             // First packet should be all 1s
             Assert.True(transaction.WrittenValues.First().All(val => val == 1));

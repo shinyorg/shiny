@@ -6,7 +6,7 @@ using Shiny.Net;
 
 namespace Shiny.Integrations.ReactiveUI
 {
-    public class ShinyReactiveObject : ReactiveObject, ISupportsActivation
+    public class ShinyReactiveObject : ReactiveObject, IActivatableViewModel
     {
         CompositeDisposable compositeCapture;
 
