@@ -111,11 +111,23 @@ namespace Shiny.Notifications
             if (!notification.Payload.IsEmpty())
                 launchIntent.PutExtra("Payload", notification.Payload);
 
-            var pendingIntent = TaskStackBuilder
-                .Create(this.context.AppContext)
-                .AddNextIntent(launchIntent)
-                .GetPendingIntent(notification.Id, PendingIntentFlags.OneShot);
-                //.GetPendingIntent(notification.Id, PendingIntentFlags.OneShot | PendingIntentFlags.CancelCurrent);
+            PendingIntent pendingIntent = null;
+            if ((notification.Android.LaunchActivityFlags & AndroidActivityFlags.ClearTask) != 0)
+            {
+                pendingIntent = TaskStackBuilder
+                    .Create(this.context.AppContext)
+                    .AddNextIntent(launchIntent)
+                    .GetPendingIntent(notification.Id, PendingIntentFlags.OneShot);
+            }
+            else
+            {
+                pendingIntent = PendingIntent.GetActivity(
+                    this.context.AppContext,
+                    notification.Id,
+                    launchIntent,
+                    PendingIntentFlags.OneShot
+                );
+            }
 
             var smallIconResourceId = this.context.GetResourceIdByName(notification.Android.SmallIconResourceName);
             if (smallIconResourceId <= 0)
