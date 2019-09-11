@@ -7,7 +7,7 @@ using Android.Content;
 namespace Shiny.BluetoothLE.Central.Internals
 {
     [BroadcastReceiver(
-        Name = "com.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver",
+        Name = CentralManager.BroadcastReceiverName,
         Enabled = true,
         Exported = true
     )]
@@ -32,42 +32,18 @@ namespace Shiny.BluetoothLE.Central.Internals
 
         public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
         {
-
-
             if (intent.Action.Equals(BluetoothAdapter.ActionStateChanged))
             {
-                //var nativeState = (State)Enum.Parse(typeof(State), intent.GetStringExtra(BluetoothAdapter.ExtraState));
-                //var access = nativeState.FromNative();
-                //this.sdelegate?.OnAdapterStateChanged(access);
-                //this.messageBus.Publish(MessageBusNames.AdapterStateChanged, access);
+                var nativeState = (State)Enum.Parse(
+                    typeof(State),
+                    intent.GetStringExtra(BluetoothAdapter.ExtraState)
+                );
+                this.context.ChangeStatus(nativeState);
             }
             else
             {
                 var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
-
-                switch (intent.Action)
-                {
-                    case BluetoothDevice.ActionAclConnected:
-                        //await this.sdelegate.OnConnected(null); // TODO:
-                        //this.messageBus.Publish(MessageBusNames.PeripheralConnected, device);
-                        break;
-
-                    case BluetoothDevice.ActionAclDisconnected:
-                        //this.messageBus.Publish(MessageBusNames.PeripheralDisconnected, device);
-                        break;
-
-                    case BluetoothDevice.ActionBondStateChanged:
-                        //this.messageBus.Publish(MessageBusNames.PeripheralBondState, device);
-                        break;
-
-                    case BluetoothDevice.ActionNameChanged:
-                        //this.messageBus.Publish(MessageBusNames.PeripheralNameChanged, device);
-                        break;
-
-                    case BluetoothDevice.ActionPairingRequest:
-                        //this.messageBus.Publish(MessageBusNames.PeripheralPairingRequest, device);
-                        break;
-                }
+                this.context.DeviceEvent(intent.Action, device);
             }
         });
     }

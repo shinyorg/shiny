@@ -6,7 +6,6 @@ using Shiny.BluetoothLE.Central.Internals;
 using Android;
 using Android.Bluetooth;
 using Android.Content;
-using Android.OS;
 
 
 namespace Shiny.BluetoothLE.Central
@@ -16,15 +15,15 @@ namespace Shiny.BluetoothLE.Central
                                   ICanOpenAdapterSettings,
                                   ICanSeePairedPeripherals
     {
+        public const string BroadcastReceiverName = "com.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
+
         readonly CentralContext context;
-        readonly IMessageBus messageBus;
         bool isScanning;
 
 
-        public CentralManager(CentralContext context, IMessageBus messageBus)
+        public CentralManager(CentralContext context)
         {
             this.context = context;
-            this.messageBus = messageBus;
         }
 
 
@@ -40,6 +39,9 @@ namespace Shiny.BluetoothLE.Central
                 .Take(6)
                 .ToArray()
             );
+            if (native == null)
+                return Observable.Return<IPeripheral>(null);
+
             var device = this.context.GetDevice(native);
             return Observable.Return(device);
         }
@@ -62,26 +64,9 @@ namespace Shiny.BluetoothLE.Central
         });
 
 
-        public override AccessState Status
-        {
-            get
-            {
-                if (Build.VERSION.SdkInt < BuildVersionCodes.Lollipop)
-                    return AccessState.NotSupported;
-
-                if (this.context.Manager?.Adapter == null)
-                    return AccessState.NotSupported;
-
-                if (!this.context.Manager.Adapter.IsEnabled)
-                    return AccessState.Disabled;
-
-                return this.context.Manager.Adapter.State.FromNative();
-            }
-        }
-
-
-        public override IObservable<AccessState> WhenStatusChanged() => this.messageBus
-            .Listener<AccessState>(MessageBusNames.AdapterStateChanged)
+        public override AccessState Status => this.context.Status;
+        public override IObservable<AccessState> WhenStatusChanged() => this.context
+            .StatusChanged
             .StartWith(this.Status);
 
 
