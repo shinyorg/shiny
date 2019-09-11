@@ -84,6 +84,15 @@ namespace Shiny.BluetoothLE.Central.Internals
         }
 
 
+        public IObservable<IPeripheral> ListenForMe(string eventName, IPeripheral me) => this
+            .peripheralSubject
+            .Where(x =>
+                x.Name.Equals(eventName) &&
+                x.Arg.Equals(me)
+            )
+            .Select(x => x.Arg);
+
+
         public IPeripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(
             btDevice.Address,
             x => new Peripheral(this, btDevice)

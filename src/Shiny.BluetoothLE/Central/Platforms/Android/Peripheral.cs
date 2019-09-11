@@ -29,14 +29,7 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override object NativeDevice => this.context.NativeDevice;
-
-
-        public override ConnectionState Status => this
-            .context
-            .CentralContext
-            .Manager
-            .GetConnectionState(this.context.NativeDevice, ProfileType.Gatt)
-            .ToStatus();
+        public override ConnectionState Status => this.context.Status;
 
 
         public override void Connect(ConnectionConfig config)
@@ -54,11 +47,6 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override IObservable<BleException> WhenConnectionFailed() => this.context.ConnectionFailed;
-        //public override IObservable<BleException> WhenConnectionFailed() => this.context
-        //    .Callbacks
-        //    .ConnectionStateChanged
-        //    .Where(x => !x.IsSuccessful)
-        //    .Select(x => new BleException($"Failed to connect to peripheral - {x.Status}"));
 
 
         // android does not have a find "1" service - it must discover all services.... seems shit
@@ -69,46 +57,30 @@ namespace Shiny.BluetoothLE.Central
             .Select(x => x);
 
 
-        public override IObservable<string> WhenNameUpdated() => null;
-        //this.context
-        //    .CentralContext
-        //    .Android
-        //    .WhenDeviceNameChanged()
-        //    .Where(x => x.Equals(this.context.NativeDevice))
-        //    .Select(x => this.Name);
+        public override IObservable<string> WhenNameUpdated() => this.context
+            .CentralContext
+            .ListenForMe(BluetoothDevice.ActionNameChanged, this)
+            .Select(x => x.Name);
 
 
         public override IObservable<ConnectionState> WhenStatusChanged()
-            => Observable.Create<ConnectionState>(ob => new CompositeDisposable(
-                this.connSubject.Subscribe(ob.OnNext),
-                this.context
-                    .Callbacks
-                    .ConnectionStateChanged
-                    .Where(x => x.Gatt.Device.Address.Equals(this.context.NativeDevice.Address))
-                    .Select(x => x.NewState.ToStatus())
-                    //.DistinctUntilChanged()
-                    .Subscribe(ob.OnNext)
-            ));
+            => this.connSubject.Merge(this.context.WhenConnectionStatusChanged());
 
 
         public override IObservable<IGattService> DiscoverServices()
             => Observable.Create<IGattService>(ob =>
             {
-                var sub = this.context
-                    .Callbacks
-                    .ServicesDiscovered
-                    .Where(x => x.Gatt.Device.Equals(this.context.NativeDevice))
-                    .Subscribe(args =>
+                var sub = this.context.WhenServicesDiscovered().Subscribe(services =>
+                {
+                    foreach (var ns in services)
                     {
-                        foreach (var ns in args.Gatt.Services)
-                        {
-                            var service = new GattService(this, this.context, ns);
-                            ob.OnNext(service);
-                        }
-                        ob.OnCompleted();
-                    });
+                        var service = new GattService(this, this.context, ns);
+                        ob.OnNext(service);
+                    }
+                    ob.OnCompleted();
+                });
 
-                this.context.RefreshServices();
+                //this.context.RefreshServices();
                 this.context.Gatt.DiscoverServices();
 
                 return sub;
@@ -118,10 +90,9 @@ namespace Shiny.BluetoothLE.Central
         public override IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
         {
             var sub = this.context
-                .Callbacks
-                .ReadRemoteRssi
+                .WhenRssiRead()
                 .Take(1)
-                .Subscribe(x => ob.Respond(x.Rssi));
+                .Subscribe(ob.Respond);
 
             this.context.Gatt?.ReadRemoteRssi();
             //if (this.context.Gatt?.ReadRemoteRssi() ?? false)
@@ -133,45 +104,36 @@ namespace Shiny.BluetoothLE.Central
 
         public IObservable<bool> PairingRequest(string pin) => Observable.Create<bool>(ob =>
         {
-            IDisposable requestOb = null;
-            IDisposable istatusOb = null;
+            var composite = new CompositeDisposable();
 
             if (this.PairingStatus == PairingState.Paired)
-            {
                 ob.Respond(true);
-            }
+
             else
             {
-                //if (pin != null && Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
-                //{
-                //    requestOb = this.context
-                //        .CentralContext
-                //        .Android
-                //        .WhenBondRequestReceived()
-                //        .Where(x => x.Equals(this.context.NativeDevice))
-                //        .Subscribe(x =>
-                //        {
-                //            var bytes = ConvertPinToBytes(pin);
-                //            x.SetPin(bytes);
-                //            x.SetPairingConfirmation(true);
-                //        });
-                //}
-                //istatusOb = this.context
-                //    .CentralContext
-                //    .Android
-                //    .WhenBondStatusChanged()
-                //    .Where(x => x.Equals(this.context.NativeDevice) && x.BondState != Bond.Bonding)
-                //    .Subscribe(x => ob.Respond(x.BondState == Bond.Bonded)); // will complete here
-
+                if (pin != null && Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+                {
+                    composite.Add(this.context
+                        .CentralContext
+                        .ListenForMe(BluetoothDevice.ActionPairingRequest, this)
+                        .Subscribe(x =>
+                        {
+                            var bytes = ConvertPinToBytes(pin);
+                            this.context.NativeDevice.SetPin(bytes);
+                            this.context.NativeDevice.SetPairingConfirmation(true);
+                        })
+                    );
+                }
+                composite.Add(this.context.CentralContext
+                    .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
+                    .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
+                    .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired))
+                );
                 // execute
                 if (!this.context.NativeDevice.CreateBond())
                     ob.Respond(false);
             }
-            return () =>
-            {
-                requestOb?.Dispose();
-                istatusOb?.Dispose();
-            };
+            return composite;
         });
 
 
@@ -206,19 +168,16 @@ namespace Shiny.BluetoothLE.Central
 
 
         public IObservable<int> WhenMtuChanged() => this.context
-            .Callbacks
-            .MtuChanged
-            .Where(x => x.Gatt.Equals(this.context.Gatt))
+            .WhenMtuChanged()
             .Select(x =>
             {
-                this.currentMtu = x.Mtu;
-                return x.Mtu;
+                this.currentMtu = x;
+                return x;
             })
             .StartWith(this.currentMtu);
 
 
         public override int MtuSize => this.currentMtu;
-
         public override int GetHashCode() => this.context.NativeDevice.GetHashCode();
 
 
