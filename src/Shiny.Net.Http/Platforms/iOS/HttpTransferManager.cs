@@ -14,11 +14,9 @@ namespace Shiny.Net.Http
         readonly NSUrlSessionConfiguration sessionConfig;
 
 
-        // TODO: don't resolve the delegate here
-        public HttpTransferManager(IHttpTransferDelegate httpDelegate,
-                                   int maxConnectionsPerHost = 1)
+        public HttpTransferManager(int maxConnectionsPerHost = 1)
         {
-            this.sessionDelegate = new ShinyUrlSessionDelegate(this, httpDelegate);
+            this.sessionDelegate = new ShinyUrlSessionDelegate(this);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
             this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;

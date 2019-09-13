@@ -11,15 +11,14 @@ namespace Shiny.Net.Http
     public class ShinyUrlSessionDelegate : NSUrlSessionDownloadDelegate
     {
         internal static Action CompletionHandler { get; set; }
-        readonly IHttpTransferDelegate tdelegate;
+        readonly Lazy<IHttpTransferDelegate> tdelegate = new Lazy<IHttpTransferDelegate>(() => ShinyHost.Resolve<IHttpTransferDelegate>());
         readonly Subject<HttpTransfer> onEvent;
         readonly HttpTransferManager manager;
 
 
-        public ShinyUrlSessionDelegate(HttpTransferManager manager, IHttpTransferDelegate tdelegate)
+        public ShinyUrlSessionDelegate(HttpTransferManager manager)
         {
             this.manager = manager;
-            this.tdelegate = tdelegate;
             this.onEvent = new Subject<HttpTransfer>();
         }
 
@@ -54,24 +53,17 @@ namespace Shiny.Net.Http
         }
 
 
-        public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
+        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error) => Dispatcher.Execute(async () =>
         {
-            try
-            {
-                var transfer = task.FromNative();
+            var transfer = task.FromNative();
 
-                if (task.State != NSUrlSessionTaskState.Canceling && error != null)
-                {
-                    Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
-                    await this.tdelegate.OnError(transfer, transfer.Exception);
-                }
-                this.onEvent.OnNext(transfer);
-            }
-            catch (Exception ex)
+            if (task.State != NSUrlSessionTaskState.Canceling && error != null)
             {
-                Log.Write(ex);
+                Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
+                await this.tdelegate.Value.OnError(transfer, transfer.Exception);
             }
-        }
+            this.onEvent.OnNext(transfer);
+        });
 
 
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
@@ -86,23 +78,16 @@ namespace Shiny.Net.Http
             => this.onEvent.OnNext(downloadTask.FromNative());
 
 
-        public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
+        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location) => Dispatcher.Execute(async () =>
         {
-            try
-            {
-                var transfer = downloadTask.FromNative();
+            var transfer = downloadTask.FromNative();
 
-                if (!transfer.LocalFilePath.IsEmpty())
-                    // if you are debugging, the base path tends to change, so the destination path changes too
-                    File.Copy(location.Path, transfer.LocalFilePath, true);
+            if (!transfer.LocalFilePath.IsEmpty())
+                // if you are debugging, the base path tends to change, so the destination path changes too
+                File.Copy(location.Path, transfer.LocalFilePath, true);
 
-                await this.tdelegate.OnCompleted(transfer);
-                this.onEvent.OnNext(transfer);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-        }
+            await this.tdelegate.Value.OnCompleted(transfer);
+            this.onEvent.OnNext(transfer);
+        });
     }
 }
