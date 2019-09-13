@@ -13,7 +13,7 @@ namespace Shiny.BluetoothLE.Central
 
         public override void Register(IServiceCollection services)
         {
-            if (this.config == null)
+            if (this.config != null)
                 services.AddSingleton(this.config);
 
             services.AddSingleton<CentralContext>();
