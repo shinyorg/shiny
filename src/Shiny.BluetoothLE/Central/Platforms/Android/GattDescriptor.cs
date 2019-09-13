@@ -28,7 +28,7 @@ namespace Shiny.BluetoothLE.Central
             this.context.Invoke(this.WriteInternal(data));
 
 
-        protected internal IObservable<DescriptorGattResult> WriteInternal(byte[] data) => Observable.Create<DescriptorGattResult>(ob => //=> this.context.Invoke(Observable.Create<DescriptorGattResult>(ob =>
+        protected internal IObservable<DescriptorGattResult> WriteInternal(byte[] data) => Observable.Create<DescriptorGattResult>(ob =>
         {
             var sub = this.context
                 .Callbacks

@@ -32,6 +32,9 @@ namespace Shiny.BluetoothLE.Central.Internals
         }
 
 
+        // TODO: eliminate this
+        public GattCallbacks Callbacks => this.callbacks;
+
         public CentralContext CentralContext { get; }
         public BluetoothGatt Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
@@ -54,6 +57,9 @@ namespace Shiny.BluetoothLE.Central.Internals
             .Where(x => x.Gatt.Equals(this.Gatt))
             .SelectMany(x => x.Gatt.Services)
             .ToList();
+
+        public IObservable<GattCharacteristicEventArgs> WhenWrite(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicWrite.Where(x => x.Characteristic.Equals(native));
+        public IObservable<GattCharacteristicEventArgs> WhenRead(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicRead.Where(x => x.Characteristic.Equals(native));
 
         public void Connect(ConnectionConfig config) => this.InvokeOnMainThread(() =>
         {

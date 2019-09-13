@@ -66,9 +66,7 @@ namespace Shiny.BluetoothLE.Central
             this.AssertWrite(false);
 
             var sub = this.context
-                .Callbacks
-                .CharacteristicWrite
-                .Where(this.NativeEquals)
+                .WhenWrite(this.native)
                 .Subscribe(args =>
                 {
                     Log.Write("BLE-Characteristic", "write event - " + args.Characteristic.Uuid);
@@ -158,7 +156,7 @@ namespace Shiny.BluetoothLE.Central
                 var bytes = this.GetNotifyDescriptorBytes(useIndicationsIfAvailable);
                 sub = wrap
                     .WriteInternal(bytes)
-                    //.Delay(CrossBleAdapter.AndroidConfiguration.PauseBetweenInvocations)
+                    //.Delay(this.context.CentralContext.Configuration.AndroidPauseBetweenInvocations)
                     .Subscribe(
                         _ => success(),
                         ex => success()
