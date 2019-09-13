@@ -4,8 +4,9 @@ using Prism;
 using Prism.AppModel;
 using Prism.Mvvm;
 using Prism.Navigation;
+using Prism.Services;
 using Shiny.Net;
-
+using Xamarin.Forms;
 
 namespace Shiny.Integrations.Prism
 {
@@ -21,14 +22,13 @@ namespace Shiny.Integrations.Prism
 
         public virtual void OnAppearing()
         {
+            var device = (IDeviceService)PrismApplicationBase.Current.Container.Resolve(typeof(IDeviceService));
             ShinyHost
                 .Resolve<IConnectivity>()
                 .WhenInternetStatusChanged()
-                .Subscribe(x =>
-                {
-                    // TODO: needs to be on main thread, but don't want DI down
-                    this.IsInternetAvailable = x;
-                })
+                .Subscribe(x => device.BeginInvokeOnMainThread(() =>
+                    this.IsInternetAvailable = x
+                ))
                 .DisposedBy(this.DeactivateWith);
         }
 

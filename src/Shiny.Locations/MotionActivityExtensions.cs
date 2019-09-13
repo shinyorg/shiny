@@ -79,7 +79,7 @@ namespace Shiny.Locations
                         lastEvent = item;
                     else
                     {
-                        if (dict.ContainsKey(item.Types))
+                        if (!dict.ContainsKey(item.Types))
                             dict.Add(item.Types, TimeSpan.Zero);
 
                         var ts = item.Timestamp.Subtract(lastEvent.Value.Timestamp);

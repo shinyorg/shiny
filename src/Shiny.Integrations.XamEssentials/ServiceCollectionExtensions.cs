@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-
+using Shiny.Net;
 
 namespace Shiny
 {
@@ -15,7 +15,7 @@ namespace Shiny
 
         public static void UseXamEssentialsConnectivity(this IServiceCollection services)
         {
-
+            services.AddSingleton<IConnectivity, EssentialsConnectivityImpl>();
         }
     }
 }

@@ -26,11 +26,12 @@ namespace Shiny.Tests.Locations
 
         public IList<MotionActivityEvent> Data => new List<MotionActivityEvent>
         {
+            new MotionActivityEvent(MotionActivityType.Automotive, MotionActivityConfidence.Low, DateTimeOffset.UtcNow.AddDays(-3)),
             new MotionActivityEvent(MotionActivityType.Automotive, MotionActivityConfidence.Low, DateTimeOffset.UtcNow.AddDays(-3))
         };
 
 
-        [Theory]
+        [Theory(Skip = "TODO")]
         [InlineData(5)]
         public async Task GetCurrentActivityTest(int maxAgeSeconds)
         {
@@ -38,14 +39,14 @@ namespace Shiny.Tests.Locations
         }
 
 
-        [Theory]
-        [InlineData()]
-        public async Task GetTotalsForRangeTest()
-        {
-            //this.activityManager.Object.GetTotalsForRange()
-        }
+        //[Theory]
+        //[InlineData()]
+        //public async Task GetTotalsForRangeTest()
+        //{
+        //    this.activityManager.Object.GetTotalsForRange();
+        //}
 
-        [Theory]
+        [Theory(Skip = "TODO")]
         [InlineData(MotionActivityConfidence.Low, 0)]
         [InlineData(MotionActivityConfidence.Medium, 0)]
         [InlineData(MotionActivityConfidence.High, 0)]

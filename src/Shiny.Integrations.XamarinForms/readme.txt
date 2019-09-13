@@ -1,6 +1,6 @@
------------------------
-Shiny.SpeechRecognition
------------------------
+-------------------------------
+Shiny.Integrations.XamarinForms
+-------------------------------
 
 GitHub: https://github.com/shinyorg/Shiny
 Samples: https://github.com/shinyorg/ShinySamples
