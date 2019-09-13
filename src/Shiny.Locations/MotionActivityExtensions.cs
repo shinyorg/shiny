@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
 
 
 namespace Shiny.Locations
 {
-    public static class Extensions
+    public static class MotionActivityExtensions
     {
         /// <summary>
         /// Queries for the most current event
@@ -21,6 +20,75 @@ namespace Shiny.Locations
             var end = DateTimeOffset.UtcNow;
             var result = (await activity.Query(end.Subtract(maxAge.Value), end)).OrderBy(x => x.Timestamp).FirstOrDefault();
             return result;
+        }
+
+
+        public static async Task<IList<MotionActivityTimeBlock>> GetTimeBlocksForRange(this IMotionActivity activity,
+                                                                                       DateTimeOffset start,
+                                                                                       DateTimeOffset? end = null,
+                                                                                       MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        {
+            var list = new List<MotionActivityTimeBlock>();
+            var result = await activity.Query(start, end);
+            var set = result
+                .Where(x => x.Confidence >= minConfidence)
+                .OrderBy(x => x.Timestamp)
+                .ToList();
+
+            if (set.Count > 1)
+            {
+                MotionActivityEvent? firstEvent = null;
+                foreach (var item in set)
+                {
+                    if (firstEvent == null)
+                        firstEvent = item;
+                    else if (!firstEvent.Value.Types.HasFlag(item.Types)) // has to have 1 of the types
+                    {
+                        var block = new MotionActivityTimeBlock(item.Types, firstEvent.Value.Timestamp, item.Timestamp);
+                        list.Add(block);
+
+                        // first event of next time block
+                        firstEvent = item;
+                    }
+
+                }
+            }
+
+            return list;
+        }
+
+
+        public static async Task<IDictionary<MotionActivityType, TimeSpan>> GetTotalsForRange(this IMotionActivity activity,
+                                                                                              DateTimeOffset start,
+                                                                                              DateTimeOffset? end = null,
+                                                                                              MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        {
+            var dict = new Dictionary<MotionActivityType, TimeSpan>();
+            var result = await activity.Query(start, end);
+            var set = result
+                .Where(x => x.Confidence >= minConfidence)
+                .OrderBy(x => x.Timestamp)
+                .ToList();
+
+            if (set.Count > 1)
+            {
+                MotionActivityEvent? lastEvent = null;
+                foreach (var item in set)
+                {
+                    if (lastEvent == null)
+                        lastEvent = item;
+                    else
+                    {
+                        if (dict.ContainsKey(item.Types))
+                            dict.Add(item.Types, TimeSpan.Zero);
+
+                        var ts = item.Timestamp.Subtract(lastEvent.Value.Timestamp);
+                        dict[item.Types] += ts;
+                    }
+
+                }
+            }
+            return dict;
         }
 
 
@@ -76,69 +144,6 @@ namespace Shiny.Locations
             => activity.Query(date.Date, new DateTimeOffset(date.Date.AddDays(1)));
 
 
-        //https://stackoverflow.com/questions/2042599/direction-between-2-latitude-longitude-points-in-c-sharp
-        public static double GetCompassBearingTo(this Position from, Position to)
-        {
-            var dLon = ToRad(to.Longitude - from.Longitude);
-            var dPhi = Math.Log(Math.Tan(ToRad(to.Latitude) / 2 + Math.PI / 4) / Math.Tan(ToRad(from.Latitude) / 2 + Math.PI / 4));
-            if (Math.Abs(dLon) > Math.PI)
-                dLon = dLon > 0 ? -(2 * Math.PI - dLon) : (2 * Math.PI + dLon);
 
-            return ToBearing(Math.Atan2(dLon, dPhi));
-        }
-
-
-        public static double ToRad(double degrees)
-            => degrees * (Math.PI / 180);
-
-        public static double ToDegrees(double radians)
-            => radians * 180 / Math.PI;
-
-        public static double ToBearing(double radians)
-            => (ToDegrees(radians) + 360) % 360;
-
-
-        public static bool IsPositionInside(this GeofenceRegion region, Position position)
-        {
-            var distance = region.Center.GetDistanceTo(position);
-            var inside = distance.TotalMeters <= region.Radius.TotalMeters;
-            return inside;
-        }
-
-
-        public static async Task<AccessState> RequestAccessAndStart(this IGpsManager gps, GpsRequest request)
-        {
-            var access = await gps.RequestAccess(request.UseBackground);
-            if (access == AccessState.Available)
-                await gps.StartListener(request);
-
-            return access;
-        }
-
-
-        internal static RepositoryWrapper<GeofenceRegion, GeofenceRegionStore> Wrap(this IRepository repository) => new RepositoryWrapper<GeofenceRegion, GeofenceRegionStore>
-        (
-            repository,
-            args => new GeofenceRegionStore
-            {
-                Identifier = args.Identifier,
-                CenterLatitude = args.Center.Latitude,
-                CenterLongitude = args.Center.Longitude,
-                RadiusMeters = args.Radius.TotalMeters,
-                SingleUse = args.SingleUse,
-                NotifyOnEntry = args.NotifyOnEntry,
-                NotifyOnExit = args.NotifyOnExit
-            },
-            store => new GeofenceRegion(
-                store.Identifier,
-                new Position(store.CenterLatitude, store.CenterLongitude),
-                Distance.FromMeters(store.RadiusMeters)
-            )
-            {
-                SingleUse = store.SingleUse,
-                NotifyOnEntry = store.NotifyOnEntry,
-                NotifyOnExit = store.NotifyOnExit
-            }
-        );
     }
 }
