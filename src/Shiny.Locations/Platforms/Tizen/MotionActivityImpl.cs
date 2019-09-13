@@ -39,7 +39,7 @@ namespace Shiny.Locations
         public bool IsSupported => true;
 
 
-        public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset end)
+        public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {
             throw new NotImplementedException();
         }

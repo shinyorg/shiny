@@ -44,10 +44,10 @@ namespace Shiny.Locations
         public bool IsSupported => true;
 
 
-        public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset end)
+        public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {
             var st = start.ToUnixTimeSeconds();
-            var et = end.ToUnixTimeSeconds();
+            var et = (end ?? DateTimeOffset.UtcNow).ToUnixTimeSeconds();
             var sql = $@"SELECT 
     Confidence, 
     Event, 

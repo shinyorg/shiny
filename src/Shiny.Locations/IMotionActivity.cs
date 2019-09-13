@@ -15,10 +15,10 @@ namespace Shiny.Locations
         /// <summary>
         ///
         /// </summary>
-        /// <param name="start"></param>
-        /// <param name="end"></param>
+        /// <param name="start">Start of time range</param>
+        /// <param name="end">End time range - assumes now if not passed</param>
         /// <returns></returns>
-        Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset end);
+        Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null);
 
         /// <summary>
         /// This will only work in the foreground on iOS

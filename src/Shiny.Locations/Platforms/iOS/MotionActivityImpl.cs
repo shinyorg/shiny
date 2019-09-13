@@ -24,11 +24,12 @@ namespace Shiny.Locations
                                    CMMotionActivityManager.AuthorizationStatus != CMAuthorizationStatus.Denied;
 
 
-        public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset end)
+        public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {
+            end = end ?? DateTimeOffset.UtcNow;
             var results = await this.activityManager.QueryActivityAsync(
                 (NSDate)start.LocalDateTime,
-                (NSDate)end.LocalDateTime,
+                (NSDate)end.Value.LocalDateTime,
                 NSOperationQueue.MainQueue
             );
             return results
