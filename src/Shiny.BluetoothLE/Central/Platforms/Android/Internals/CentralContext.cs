@@ -28,7 +28,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             this.Android = context;
             this.Configuration = config;
             this.sdelegate = sdelegate;
-            this.Manager = (BluetoothManager)context.AppContext.GetSystemService(global::Android.App.Application.BluetoothService);
+            this.Manager = context.GetBluetooth();
 
             this.devices = new ConcurrentDictionary<string, IPeripheral>();
             this.statusSubject = new Subject<AccessState>();
