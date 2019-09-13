@@ -17,21 +17,20 @@ namespace Shiny.BluetoothLE.Central.Internals
         readonly ConcurrentDictionary<string, IPeripheral> devices;
         readonly Subject<AccessState> statusSubject;
         readonly Subject<NamedMessage<IPeripheral>> peripheralSubject;
-        readonly IBleCentralDelegate sdelegate;
+        readonly Lazy<IBleCentralDelegate> sdelegate;
         LollipopScanCallback callbacks;
 
 
-        public CentralContext(AndroidContext context,
-                              BleCentralConfiguration config,
-                              IBleCentralDelegate sdelegate = null)
+        public CentralContext(IServiceProvider serviceProvider, AndroidContext context, BleCentralConfiguration config)
         {
             this.Android = context;
             this.Configuration = config;
-            this.sdelegate = sdelegate;
             this.Manager = context.GetBluetooth();
 
+            this.sdelegate = new Lazy<IBleCentralDelegate>(() => serviceProvider.Resolve<IBleCentralDelegate>());
             this.devices = new ConcurrentDictionary<string, IPeripheral>();
             this.statusSubject = new Subject<AccessState>();
+            this.peripheralSubject = new Subject<NamedMessage<IPeripheral>>();
         }
 
 
@@ -64,7 +63,7 @@ namespace Shiny.BluetoothLE.Central.Internals
         internal void ChangeStatus(State state)
         {
             var status = state.FromNative();
-            this.sdelegate?.OnAdapterStateChanged(status);
+            this.sdelegate.Value?.OnAdapterStateChanged(status);
             this.statusSubject.OnNext(status);
         }
 
@@ -73,7 +72,7 @@ namespace Shiny.BluetoothLE.Central.Internals
         {
             var peripheral = this.GetDevice(device);
             if (eventName.Equals(BluetoothDevice.ActionAclConnected))
-                this.sdelegate?.OnConnected(peripheral);
+                this.sdelegate.Value?.OnConnected(peripheral);
 
             this.peripheralSubject.OnNext(new NamedMessage<IPeripheral>(eventName, peripheral));
             //case BluetoothDevice.ActionAclConnected:
