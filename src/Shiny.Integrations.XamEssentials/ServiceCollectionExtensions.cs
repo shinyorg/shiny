@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Integrations.XamEssentials;
 using Shiny.Net;
+
 
 namespace Shiny
 {
