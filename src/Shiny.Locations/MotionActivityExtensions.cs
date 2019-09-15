@@ -18,7 +18,8 @@ namespace Shiny.Locations
         {
             maxAge = maxAge ?? TimeSpan.FromMinutes(5);
             var end = DateTimeOffset.UtcNow;
-            var result = (await activity.Query(end.Subtract(maxAge.Value), end)).OrderBy(x => x.Timestamp).FirstOrDefault();
+            var start = end.Subtract(maxAge.Value);
+            var result = (await activity.Query(start, end)).OrderBy(x => x.Timestamp).FirstOrDefault();
             return result;
         }
 
@@ -141,9 +142,9 @@ namespace Shiny.Locations
         /// <param name="date"></param>
         /// <returns></returns>
         public static Task<IList<MotionActivityEvent>> QueryByDate(this IMotionActivity activity, DateTimeOffset date)
-            => activity.Query(date.Date, new DateTimeOffset(date.Date.AddDays(1)));
-
-
-
+        {
+            var range = date.GetRangeForDate();
+            return activity.Query(range.Start, range.End);
+        }
     }
 }

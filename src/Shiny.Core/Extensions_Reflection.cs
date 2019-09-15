@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -14,6 +15,27 @@ namespace Shiny
         /// <returns></returns>
         public static bool IsNullable(this Type type)
             => Nullable.GetUnderlyingType(type) != null;
+
+
+        /// <summary>
+        /// This will do a 1-1 shallow reflection copy - types & names must match or it will crash
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        public static void ReflectCopyTo(this object source, object target)
+        {
+            var srcProps = source.GetType().GetRuntimeProperties().Where(x => x.CanRead);
+            var targetProps = target.GetType().GetRuntimeProperties().Where(x => x.CanWrite);
+            foreach (var prop in srcProps)
+            {
+                var targetProp = targetProps.FirstOrDefault(x => x.Name.Equals(prop.Name));
+                if (targetProp != null)
+                {
+                    var value = prop.GetValue(source, null);
+                    targetProp.SetValue(target, value);
+                }
+            }
+        }
 
 
         /// <summary>
