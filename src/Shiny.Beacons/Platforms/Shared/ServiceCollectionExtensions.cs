@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Beacons;
-#if WINDOWS_UWP || __ANDROID__
-using Shiny.BluetoothLE;
-#endif
 
 
 namespace Shiny
@@ -19,17 +14,11 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseBeacons(this IServiceCollection builder)
         {
-#if WINDOWS_UWP || __ANDROID__
-            builder.UseBleCentral();
-            builder.AddSingleton<BackgroundTask>();
-
-            builder.AddSingleton<IBeaconManager, BeaconManager>();
-            return true;
-#elif __IOS__
-            builder.AddSingleton<IBeaconManager, BeaconManager>();
-            return true;
-#else
+#if NETSTANDARD
             return false;
+#else
+            builder.RegisterModule(new BeaconModule(null));
+            return true;
 #endif
         }
 
@@ -43,34 +32,13 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseBeacons<T>(this IServiceCollection builder, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable) where T : class, IBeaconDelegate
         {
-            if (!builder.UseBeacons())
-                return false;
-
+#if NETSTANDARD
+            return false;
+#else
             builder.AddSingleton<IBeaconDelegate, T>();
-
-#if __ANDROID__
-            builder.RegisterPostBuildAction(sp => sp
-                .GetService<AndroidContext>()
-                .StartService(typeof(BeaconService))
-            );
+            builder.RegisterModule(new BeaconModule(regionsToMonitorWhenPermissionAvailable));
+            return false;
 #endif
-            if (regionsToMonitorWhenPermissionAvailable.Any())
-            {
-                builder.RegisterPostBuildAction(sp =>
-                {
-                    var mgr = sp.GetService<IBeaconManager>();
-                    mgr
-                        .WhenAccessStatusChanged(true)
-                        .Where(x => x == AccessState.Available)
-                        .Take(1)
-                        .SubscribeAsync(async () =>
-                        {
-                            foreach (var region in regionsToMonitorWhenPermissionAvailable)
-                                await mgr.StartMonitoring(region);
-                        });
-                });
-            }
-            return true;
         }
     }
 }
