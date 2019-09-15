@@ -10,13 +10,8 @@ namespace Shiny.Locations
 {
     public class GpsManagerDelegate : ShinyLocationDelegate
     {
-        public GpsManagerDelegate()
-        {
-            this.readingSubject = new Subject<IGpsReading>();
-        }
-
-
-        readonly Subject<IGpsReading> readingSubject;
+        readonly Lazy<IGpsDelegate> gdelegate = new Lazy<IGpsDelegate>(() => ShinyHost.Resolve<IGpsDelegate>());
+        readonly Subject<IGpsReading> readingSubject = new Subject<IGpsReading>();
         bool deferringUpdates;
 
         internal GpsRequest Request { get; set; }
@@ -45,7 +40,7 @@ namespace Shiny.Locations
         {
             var loc = locations.Last();
             var reading = new GpsReading(loc);
-            ShinyHost.Resolve<IGpsDelegate>()?.OnReading(reading);
+            this.gdelegate.Value?.OnReading(reading);
             this.readingSubject.OnNext(reading);
         });
 

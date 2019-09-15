@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Locations;
 
@@ -37,28 +36,10 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regions) where T : class, IGeofenceDelegate
         {
-#if WINDOWS_UWP
-            builder.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
-#elif __ANDROID__
-            builder.AddSingleton<GeofenceProcessor>();
-#endif
-
 #if NETSTANDARD
             return false;
 #else
-            builder.AddSingleton<IGeofenceDelegate, T>();
-            builder.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
-            if (regions.Any())
-            {
-                builder.RegisterPostBuildAction(async sp =>
-                {
-                    var mgr = sp.GetService<IGeofenceManager>();
-                    var access = await mgr.RequestAccess();
-                    if (access == AccessState.Available)
-                        foreach (var region in regions)
-                            await mgr.StartMonitoring(region);
-                });
-            }
+            builder.RegisterModule(new GeofenceModule<T>(regions));
             return true;
 #endif
         }
@@ -74,7 +55,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            builder.AddSingleton<IGpsManager, GpsManagerImpl>();
+            builder.RegisterModule(new GpsModule(null));
             return true;
 #endif
         }
@@ -89,26 +70,13 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseGps<T>(this IServiceCollection builder, Action<GpsRequest> requestIfPermissionGranted = null) where T : class, IGpsDelegate
         {
-            if (!builder.UseGps())
-                return false;
-
+#if NETSTANDARD
+            return false;
+#else
+            builder.RegisterModule(new GpsModule(requestIfPermissionGranted));
             builder.AddSingleton<IGpsDelegate, T>();
-            if (requestIfPermissionGranted != null)
-            {
-                builder.RegisterPostBuildAction(async sp =>
-                {
-                    var mgr = sp.GetService<IGpsManager>();
-                    var access = await mgr.RequestAccess(true);
-                    if (access == AccessState.Available)
-                    {
-                        var request = new GpsRequest();
-                        requestIfPermissionGranted(request);
-                        request.UseBackground = true;
-                        await mgr.StartListener(request);
-                    }
-                });
-            }
             return true;
+#endif
         }
     }
 }

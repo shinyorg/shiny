@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
