@@ -66,4 +66,8 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Tizen\**\*.cs" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Platforms\Shared\NotificationModule.cs" />
+    </ItemGroup>
 </Project>

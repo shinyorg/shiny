@@ -13,17 +13,8 @@ namespace Shiny.Notifications
     public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         readonly ISettings settings; // this will have problems with data protection
-
-        public NotificationManager(ISettings settings)
-        {
-            this.settings = settings;
-        }
-
-
-        public void Start()
-        {
-            UNUserNotificationCenter.Current.Delegate = new ShinyNotificationDelegate();
-        }
+        public NotificationManager(ISettings settings) => this.settings = settings;
+        public void Start() => UNUserNotificationCenter.Current.Delegate = new ShinyNotificationDelegate();
 
 
         public Task<AccessState> RequestAccess()
@@ -37,7 +28,9 @@ namespace Shiny.Notifications
                 (approved, error) =>
                 {
                     if (error != null)
+                    {
                         tcs.SetException(new Exception(error.Description));
+                    }
                     else
                     {
                         var state = approved ? AccessState.Available : AccessState.Denied;
