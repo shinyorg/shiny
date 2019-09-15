@@ -25,7 +25,7 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Resolve<T>() => Container.GetService<T>();
+        public static T Resolve<T>() => Container.Resolve<T>();
 
 
         /// <summary>

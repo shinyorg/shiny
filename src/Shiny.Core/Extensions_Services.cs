@@ -18,8 +18,15 @@ namespace Shiny
         /// <param name="requiredService"></param>
         /// <returns></returns>
         public static T Resolve<T>(this IServiceProvider serviceProvider, bool requiredService = false)
-            => requiredService ? serviceProvider.GetRequiredService<T>() : serviceProvider.GetService<T>();
+        {
+            if (serviceProvider.IsRegistered<T>())
+                return serviceProvider.GetService<T>();
 
+            if (requiredService)
+                throw new ArgumentException("There is no required service registered on the container for " + typeof(T).FullName);
+
+            return default;
+        }
 
         /// <summary>
         ///
