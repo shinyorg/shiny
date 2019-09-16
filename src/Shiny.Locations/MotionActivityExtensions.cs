@@ -38,14 +38,14 @@ namespace Shiny.Locations
 
             if (set.Count > 1)
             {
-                MotionActivityEvent? firstEvent = null;
+                MotionActivityEvent firstEvent = null;
                 foreach (var item in set)
                 {
                     if (firstEvent == null)
                         firstEvent = item;
-                    else if (!firstEvent.Value.Types.HasFlag(item.Types)) // has to have 1 of the types
+                    else if (!firstEvent.Types.HasFlag(item.Types)) // has to have 1 of the types
                     {
-                        var block = new MotionActivityTimeBlock(item.Types, firstEvent.Value.Timestamp, item.Timestamp);
+                        var block = new MotionActivityTimeBlock(item.Types, firstEvent.Timestamp, item.Timestamp);
                         list.Add(block);
 
                         // first event of next time block
@@ -73,7 +73,7 @@ namespace Shiny.Locations
 
             if (set.Count > 1)
             {
-                MotionActivityEvent? lastEvent = null;
+                MotionActivityEvent lastEvent = null;
                 foreach (var item in set)
                 {
                     if (lastEvent == null)
@@ -83,7 +83,7 @@ namespace Shiny.Locations
                         if (!dict.ContainsKey(item.Types))
                             dict.Add(item.Types, TimeSpan.Zero);
 
-                        var ts = item.Timestamp.Subtract(lastEvent.Value.Timestamp);
+                        var ts = item.Timestamp.Subtract(lastEvent.Timestamp);
                         dict[item.Types] += ts;
                     }
 

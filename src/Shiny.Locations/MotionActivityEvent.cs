@@ -22,7 +22,7 @@ namespace Shiny.Locations
         High
     }
 
-    public struct MotionActivityEvent
+    public class MotionActivityEvent
     {
         public MotionActivityEvent(MotionActivityType types, MotionActivityConfidence confidence, DateTimeOffset timestamp)
         {
