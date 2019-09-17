@@ -94,14 +94,13 @@ namespace Shiny.Settings
         /// Will create a bound object set FROM the settings
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="prefix">Set this if you want to send multiple objects of this type to settings - otherwise default of type name is assumed</param>
-        T Bind<T>(string prefix = null) where T : INotifyPropertyChanged, new();
+        T Bind<T>() where T : INotifyPropertyChanged, new();
 
         /// <summary>
         /// Bind to existing instance
         /// </summary>
         /// <param name="obj"></param>
-        void Bind(INotifyPropertyChanged obj, string prefix = null);
+        void Bind(INotifyPropertyChanged obj);
 
         /// <summary>
         /// Unbinds an object from monitoring

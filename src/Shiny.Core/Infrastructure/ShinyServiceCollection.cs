@@ -48,7 +48,7 @@ namespace Shiny.Infrastructure.DependencyInjection
                     service.ServiceType ?? npc.GetType(),
                     sp =>
                     {
-                        sp.GetService<ISettings>().Bind(npc);
+                        sp.Resolve<ISettings>(true).Bind(npc);
                         return npc;
                     }
                 );
@@ -63,7 +63,7 @@ namespace Shiny.Infrastructure.DependencyInjection
                     sp =>
                     {
                         var bindable = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, service.ImplementationType);
-                        sp.GetService<ISettings>().Bind(bindable);
+                        sp.Resolve<ISettings>(true).Bind(bindable);
                         return bindable;
                     }
                 );

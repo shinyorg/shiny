@@ -9,7 +9,6 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Settings
 {
-
     public abstract class AbstractSettings : ISettings
     {
         readonly ISerializer serializer;
@@ -241,23 +240,25 @@ namespace Shiny.Settings
             t == typeof(decimal);
 
 
-        public virtual T Bind<T>(string prefix = null) where T : INotifyPropertyChanged, new()
+        protected virtual string GetBindingKey(Type type, PropertyInfo prop)
+            => $"{type.FullName}.{prop.Name}";
+
+        public virtual T Bind<T>() where T : INotifyPropertyChanged, new()
         {
             var obj = new T();
-            this.Bind(obj, prefix);
+            this.Bind(obj);
             return obj;
         }
 
 
-        public virtual void Bind(INotifyPropertyChanged obj, string prefix = null)
+        public virtual void Bind(INotifyPropertyChanged obj)
         {
             var type = obj.GetType();
-            var prefixValue = prefix ?? type.FullName + ".";
             var props = this.GetTypeProperties(type);
 
             foreach (var prop in props)
             {
-                var key = prefixValue + prop.Name;
+                var key = this.GetBindingKey(type, prop);
                 if (this.Contains(key))
                 {
                     var value = this.GetValue(prop.PropertyType, key);
@@ -278,7 +279,6 @@ namespace Shiny.Settings
             .Where(x =>
                 x.CanRead &&
                 x.CanWrite
-                //x.GetCustomAttribute<IgnoreAttribute>() == null
             );
 
 
@@ -290,7 +290,7 @@ namespace Shiny.Settings
 
             if (prop != null)
             {
-                var key = $"{sender.GetType().Name}.{prop.Name}";
+                var key = this.GetBindingKey(sender.GetType(), prop);
                 var value = prop.GetValue(sender);
                 this.SetValue(key, value);
             }

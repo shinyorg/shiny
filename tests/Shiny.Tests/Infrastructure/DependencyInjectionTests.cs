@@ -39,16 +39,17 @@ namespace Shiny.Tests.Infrastructure
         [Fact]
         public void ServiceRestoresState()
         {
-            var value = new Random().Next(1, Int32.MaxValue - 1);
+            var key = $"{typeof(FullService).FullName}.Count";
+            var count = 6;
+            ISettings settings = null;
             var sp = Create(s =>
-                s.Set(typeof(FullService).FullName + ".Count", value)
-            );
-
-            sp
-                .GetService<IFullService>()
-                .Count
-                .Should()
-                .Be(value + 1);
+            {
+                s.Set(key, count);
+                settings = s;
+            });
+            var service = sp.Resolve<IFullService>(true);
+            service.Count.Should().Be(7);
+            settings.Get<int>(key).Should().Be(7);
         }
     }
 }
