@@ -102,14 +102,10 @@ namespace Shiny.Notifications
                 content.Sound = UNNotificationSound.GetSound(notification.Sound);
 
             UNNotificationTrigger trigger = null;
-            if (notification.ScheduleDate == null)
-            {
-                trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(3, false);
-            }
-            else
+            if (notification.ScheduleDate != null)
             {
                 var dt = notification.ScheduleDate.Value.ToLocalTime();
-                UNCalendarNotificationTrigger.CreateTrigger(new NSDateComponents
+                trigger = UNCalendarNotificationTrigger.CreateTrigger(new NSDateComponents
                 {
                     Year = dt.Year,
                     Month = dt.Month,
