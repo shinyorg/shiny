@@ -16,7 +16,6 @@ namespace Shiny.Notifications
                 Id = i,
                 Title = native.Content?.Title,
                 Message = native.Content?.Body,
-                Sound = native.Content.Sound?.ToString(),
                 //Metadata = native.Content.UserInfo.FromNsDictionary()
             };
 

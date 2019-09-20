@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.IO;
 using Shiny.Settings;
-using Tizen.Applications;
 using NativeManager = Tizen.Applications.Notifications.NotificationManager;
 using NativeNot = Tizen.Applications.Notifications.Notification;
 
@@ -16,16 +13,13 @@ namespace Shiny.Notifications
     //https://developer.tizen.org/development/guides/.net-application/alarms
     public class NotificationManager : INotificationManager
     {
-        readonly IFileSystem fileSystem;
         readonly ISettings settings;
         readonly IRepository repository;
 
 
-        public NotificationManager(IFileSystem fileSystem,
-                                   ISettings settings,
+        public NotificationManager(ISettings settings,
                                    IRepository repository)
         {
-            this.fileSystem = fileSystem;
             this.settings = settings;
             this.repository = repository;
         }
@@ -83,7 +77,7 @@ namespace Shiny.Notifications
                 //TimeStamp = time,
                 //Property = DisableAppLaunch
             };
-            if (!notification.Sound.IsEmpty())
+            if (!Notification.CustomSoundFilePath.IsEmpty())
             {
                 native.Accessory = new NativeNot.AccessorySet
                 {
@@ -91,7 +85,8 @@ namespace Shiny.Notifications
                     //LedOnMillisecond = 100,
                     //LedOffMillisecond = 100,
                     //SoundOption = AccessoryOption.Custom,
-                    SoundPath = Path.Combine(this.fileSystem.AppData.FullName, notification.Sound)
+                    //SoundPath = Path.Combine(this.fileSystem.AppData.FullName, notification.Sound)
+                    SoundPath = Notification.CustomSoundFilePath
                 };
             }
             return native;
