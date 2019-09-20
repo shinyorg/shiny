@@ -76,32 +76,25 @@ namespace Shiny.Notifications
                 }
             };
 
-            if (!notification.Sound.IsEmpty())
-            {
-                var sound = this.BuildSoundPath(notification.Sound);
-                toastContent.Audio = new ToastAudio
-                {
-                    Src = new Uri(sound)
-                };
-            }
-            var native = new ToastNotification(toastContent.GetXml());
-            this.toastNotifier.Show(native);
+            if (!Notification.CustomSoundFilePath.IsEmpty())
+                toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
 
+            this.toastNotifier.Show(new ToastNotification(toastContent.GetXml()));
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
 
 
-        string BuildSoundPath(string sound)
-        {
-            var ext = Path.GetExtension(sound);
-            if (String.IsNullOrWhiteSpace(ext))
-                sound += ".mp4";
+        //string BuildSoundPath(string sound)
+        //{
+        //    var ext = Path.GetExtension(sound);
+        //    if (String.IsNullOrWhiteSpace(ext))
+        //        sound += ".mp4";
 
-            if (sound.StartsWith("ms-appx://"))
-                sound = "ms-appx://" + sound;
+        //    if (sound.StartsWith("ms-appx://"))
+        //        sound = "ms-appx://" + sound;
 
-            return sound;
-        }
+        //    return sound;
+        //}
 
 
         public Task Clear() => this.repository.Clear<Notification>();

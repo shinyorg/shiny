@@ -98,8 +98,8 @@ namespace Shiny.Notifications
                 content.UserInfo = dict;
             }
 
-            if (!notification.Sound.IsEmpty())
-                content.Sound = UNNotificationSound.GetSound(notification.Sound);
+            if (!Notification.CustomSoundFilePath.IsEmpty())
+                content.Sound = UNNotificationSound.GetSound(Notification.CustomSoundFilePath);
 
             UNNotificationTrigger trigger = null;
             if (notification.ScheduleDate != null)

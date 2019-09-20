@@ -6,7 +6,6 @@ using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
 using Shiny.Infrastructure;
-using Shiny.Logging;
 using Shiny.Jobs;
 using Shiny.Settings;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
@@ -18,6 +17,7 @@ namespace Shiny.Notifications
     public class NotificationManager : INotificationManager
     {
         readonly AndroidContext context;
+        readonly IServiceProvider services;
         readonly IRepository repository;
         readonly ISettings settings;
         readonly ISerializer serializer;
@@ -28,12 +28,14 @@ namespace Shiny.Notifications
 
 
         public NotificationManager(AndroidContext context,
+                                   IServiceProvider services,
                                    ISerializer serializer,
                                    IJobManager jobs,
                                    IRepository repository,
                                    ISettings settings)
         {
             this.context = context;
+            this.services = services;
             this.serializer = serializer;
             this.jobs = jobs;
             this.repository = repository;
@@ -73,17 +75,13 @@ namespace Shiny.Notifications
 
         public async Task<AccessState> RequestAccess()
         {
-            var state = AccessState.Available;
             if (!this.compatManager?.AreNotificationsEnabled() ?? false)
-                state = AccessState.Disabled;
+                return AccessState.Disabled;
 
-            else if (!this.newManager?.AreNotificationsEnabled() ?? false)
-                state = AccessState.Disabled;
+            if (!this.newManager?.AreNotificationsEnabled() ?? false)
+                return AccessState.Disabled;
 
-            else
-                state = await this.jobs.RequestAccess();
-
-            return state;
+            return await this.jobs.RequestAccess();
         }
 
 
@@ -139,7 +137,6 @@ namespace Shiny.Notifications
                 .SetSmallIcon(smallIconResourceId)
                 .SetContentIntent(pendingIntent);
 
-            // TODO
             //if ((int)Build.VERSION.SdkInt >= 21 && notification.Android.Color != null)
             //    builder.SetColor(notification.Android.Color.Value)
 
@@ -152,13 +149,13 @@ namespace Shiny.Notifications
             if (notification.Android.Vibrate)
                 builder.SetVibrate(new long[] {500, 500});
 
-            if (notification.Sound != null)
+            if (Notification.CustomSoundFilePath.IsEmpty())
             {
-                if (!notification.Sound.Contains("://"))
-                    notification.Sound =
-                        $"{ContentResolver.SchemeAndroidResource}://{this.context.Package.PackageName}/raw/{notification.Sound}";
-
-                var uri = Android.Net.Uri.Parse(notification.Sound);
+                builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
+            }
+            else
+            {
+                var uri = Android.Net.Uri.Parse(Notification.CustomSoundFilePath);
                 builder.SetSound(uri);
             }
 
@@ -188,16 +185,7 @@ namespace Shiny.Notifications
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
 
-            try
-            {
-                await ShinyHost
-                    .Resolve<INotificationDelegate>()?
-                    .OnReceived(notification);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+            await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
     }
 }
