@@ -5,7 +5,7 @@
         <Description>Shiny UWP Support Library</Description>
         <PackageVersion>1.0.0</PackageVersion>
         <OutputType>winmdobj</OutputType>
-        <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
+        <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
         <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     </PropertyGroup>
 
