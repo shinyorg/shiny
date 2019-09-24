@@ -1,15 +1,12 @@
 <Project>
     <PropertyGroup>
-        <AndroidVersionsToBuild>monoandroid81;monoandroid90</AndroidVersionsToBuild>
-        <UapVersionsToBuild>uap10.0.16299</UapVersionsToBuild>
-        <TizenVersionsToBuild>tizen50</TizenVersionsToBuild>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
         <!--
         <NullableContextOptions>enable</NullableContextOptions>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <LangVersion>8.0</LangVersion>
         -->
+        <LangVersion>8.0</LangVersion>
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
         <LangVersion>latest</LangVersion>
         <Description>Shiny</Description>
@@ -21,7 +18,6 @@
         <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>
         <PackageReleaseNotes>https://shinylib.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
-        <!--<NullableContextOption>enable</NullableContextOption>-->
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
@@ -42,8 +38,8 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <!--<TargetsToBuild>android;ios;watchos;mac;tvos;uap;tizen</TargetsToBuild>-->
-        <TargetsToBuild>android;ios;watchos;tvos;uap;tizen</TargetsToBuild>
+        <TargetsToBuild>android;ios;watchos;tvos</TargetsToBuild>
+        <TargetsToBuild Condition=" $(OS) == 'WINDOWS_NT' ">uap;tizen;$(TargetsToBuild)</TargetsToBuild>
         <DebugType Condition=" !$(TargetFramework.StartsWith('monoandroid')) ">portable</DebugType>
         <DebugType Condition=" $(TargetFramework.StartsWith('monoandroid')) ">Full</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
