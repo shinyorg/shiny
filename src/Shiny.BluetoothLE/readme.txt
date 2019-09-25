@@ -16,6 +16,10 @@ iOS
 <key>NSBluetoothPeripheralUsageDescription</key>
 <string>Example</string>
 
+<!--iOS 13+-->
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>Example</string>
+
 <key>UIBackgroundModes</key>
 <array>
 	<string>bluetooth-central</string>

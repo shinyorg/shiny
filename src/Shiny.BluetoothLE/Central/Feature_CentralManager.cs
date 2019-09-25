@@ -30,12 +30,12 @@ namespace Shiny.BluetoothLE.Central
         public static bool CanControlAdapterState(this ICentralManager centralManager) => centralManager is ICanControlAdapterState;
 
 
-        public static bool? TryOpenSettings(this ICentralManager centralManager)
+        public static AccessState TryOpenSettings(this ICentralManager centralManager)
         {
             if (centralManager is ICanOpenAdapterSettings settings)
-                return settings.OpenSettings();
+                return settings.OpenSettings() ? AccessState.Available : AccessState.Denied;
 
-            return null;
+            return AccessState.NotSupported;
         }
 
 
