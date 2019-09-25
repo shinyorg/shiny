@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using CoreBluetooth;
-using CoreFoundation;
 using Foundation;
 using Shiny.Logging;
 
@@ -21,17 +20,21 @@ namespace Shiny.BluetoothLE.Central
         {
             this.services = services;
 
-            //var opts = new CBCentralInitOptions
-            //{
-            //    ShowPowerAlert = config.iOSShowPowerAlert
-            //};
+            var opts = new CBCentralInitOptions
+            {
+                ShowPowerAlert = config.iOSShowPowerAlert
+            };
 
-            //if (!config.iOSRestoreIdentifier.IsEmpty())
-            //    opts.RestoreIdentifier = config.iOSRestoreIdentifier;
+            if (!config.iOSRestoreIdentifier.IsEmpty())
+                opts.RestoreIdentifier = config.iOSRestoreIdentifier;
 
-            //this.Manager = new CBCentralManager(this, DispatchQueue.DefaultGlobalQueue, opts);
-            this.Manager = new CBCentralManager();
-            //this.Manager.Delegate = this;
+            if (!PlatformExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
+                Console.WriteLine("NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
+
+            if (!PlatformExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
+                Console.WriteLine("NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
+
+            this.Manager = new CBCentralManager(this, null, opts);
         }
 
 

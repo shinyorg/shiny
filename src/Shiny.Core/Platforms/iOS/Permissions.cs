@@ -38,38 +38,5 @@ namespace Shiny
         //    //  throw new ArgumentException("You must set 'bluetooth-peripheral' in
         //    return Task.FromResult(AccessState.Granted);
         //}
-
-
-        public static bool AssertInfoPlistEntry(string key, bool assert)
-        {
-            var contains = NSBundle.MainBundle.InfoDictionary.ContainsKey(new NSString(key));
-            if (!contains)
-            {
-                if (assert)
-                    throw new ArgumentException($"You must set '{key}' in your Info.plist file");
-
-                return false;
-            }
-            return true;
-        }
-
-
-        public static bool HasBackgroundMode(string bgMode)
-        {
-            var info = NSBundle.MainBundle.InfoDictionary;
-            var key = new NSString("UIBackgroundModes");
-            var mode = new NSString(bgMode);
-
-            if (info.ContainsKey(key))
-            {
-                var array = info[key] as NSArray;
-                for (nuint i = 0; i < array.Count; i++)
-                {
-                    if (array.GetItem<NSString>(i) == mode)
-                        return true;
-                }
-            }
-            return false;
-        }
     }
 }

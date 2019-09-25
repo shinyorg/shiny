@@ -32,7 +32,7 @@ namespace Shiny.Jobs
 
         public override Task<AccessState> RequestAccess()
         {
-            if (!Permissions.HasBackgroundMode("fetch"))
+            if (!PlatformExtensions.HasBackgroundMode("fetch"))
                 return Task.FromResult(AccessState.NotSetup);
 
             var app = UIApplication.SharedApplication;
