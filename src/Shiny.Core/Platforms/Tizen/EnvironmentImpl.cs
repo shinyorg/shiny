@@ -10,6 +10,7 @@ namespace Shiny
         public string AppBuild => "1";
         public string MachineName => Platform.Get<string>("device_name", PlatformNamespace.Feature);
         public string OperatingSystem => "Tizen";
+        public string OperationSystemVersion => Platform.Get<string>("platform.version");
         public string Manufacturer => Platform.Get<string>("manufacturer", PlatformNamespace.Feature);
         public string Model => Platform.Get<string>("model_name", PlatformNamespace.Feature);
     }
