@@ -13,7 +13,7 @@ Please star this project on GitHub if you use it in your projects
 Shiny Startup
 -----------------
 
-public class YourShinyStartup : Shiny.Startup
+public class YourShinyStartup : Shiny.ShinyStartup
 {
     public override void ConfigureServices(IServiceCollection services)
     {
