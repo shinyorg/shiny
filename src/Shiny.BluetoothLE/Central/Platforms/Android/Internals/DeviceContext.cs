@@ -114,14 +114,6 @@ namespace Shiny.BluetoothLE.Central.Internals
         }
 
 
-        public async Task OpPause(CancellationToken? cancelToken = null)
-        {
-            var ts = this.CentralContext.Configuration.AndroidPauseBetweenInvocations;
-            if (ts.TotalMilliseconds > 0)
-                await Task.Delay((int)ts.TotalMilliseconds, cancelToken ?? CancellationToken.None);
-        }
-
-
         //public void RefreshServices()
         //{
         //    if (this.Gatt == null) //|| !this.CentralContext.Configuration.AndroidRefreshServices)
@@ -178,14 +170,10 @@ namespace Shiny.BluetoothLE.Central.Internals
             try
             {
                 this.running = true;
-                var ts = this.CentralContext.Configuration.AndroidPauseBetweenInvocations;
-                Func<Task> outTask;
-
+                Func<Task> outTask = null;
                 while (this.Actions.TryDequeue(out outTask) && this.running)
                 {
                     await outTask();
-                    if (ts.TotalMilliseconds > 0)
-                        await Task.Delay(ts, this.cancelSrc.Token);
                 }
             }
             catch (TaskCanceledException)

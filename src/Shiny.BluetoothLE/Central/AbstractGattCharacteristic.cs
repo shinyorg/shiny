@@ -28,8 +28,7 @@ namespace Shiny.BluetoothLE.Central
         public abstract IObservable<CharacteristicGattResult> EnableNotifications(bool enableIndicationsIfAvailable);
         public abstract IObservable<CharacteristicGattResult> DisableNotifications();
         public abstract IObservable<CharacteristicGattResult> Read();
-        public abstract IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value);
-        public abstract IObservable<CharacteristicGattResult> Write(byte[] value);
+        public abstract IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true);
         public abstract IObservable<CharacteristicGattResult> WhenNotificationReceived();
     }
 }
