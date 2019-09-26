@@ -20,7 +20,7 @@ namespace Shiny
         public string Manufacturer => this.deviceInfo.SystemManufacturer;
         public string Model => this.deviceInfo.SystemSku;
         public string OperatingSystem => "Windows"; //this.deviceInfo.OperatingSystem;
-
+        public string OperatingSystemVersion => "";
         public string MachineName => "";
     }
 }

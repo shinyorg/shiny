@@ -28,11 +28,6 @@ namespace Shiny.BluetoothLE.Central
         public bool AndroidShouldInvokeOnMainThread { get; set; } = true;
 
         /// <summary>
-        /// This performs pauses between each operation helping android recover from itself
-        /// </summary>
-        public TimeSpan AndroidPauseBetweenInvocations { get; set; } = TimeSpan.FromMilliseconds(100);
-
-        /// <summary>
         /// Time span to pause before service discovery (helps in combating GATT133 error) when service discovery is performed immediately after connection
         /// DO NOT CHANGE this if you don't know what this is!
         /// </summary>

@@ -11,6 +11,7 @@ namespace Shiny
 
         string MachineName { get; }
         string OperatingSystem { get; }
+        string OperatingSystemVersion { get; }
         string Manufacturer { get; }
         string Model { get; }
 

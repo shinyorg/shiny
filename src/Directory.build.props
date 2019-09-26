@@ -6,7 +6,6 @@
         <NullableContextOptions>enable</NullableContextOptions>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         -->
-        <LangVersion>8.0</LangVersion>
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
         <LangVersion>latest</LangVersion>
         <Description>Shiny</Description>

@@ -38,16 +38,11 @@ namespace Shiny.BluetoothLE.Central
         IObservable<IGattDescriptor> DiscoverDescriptors();
 
         /// <summary>
-        /// This will fire and forget a write
-        /// </summary>
-        /// <param name="value"></param>
-        IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value);
-
-        /// <summary>
         /// Writes the value to the remote characteristic
         /// </summary>
         /// <param name="value">The bytes to send</param>
-        IObservable<CharacteristicGattResult> Write(byte[] value);
+        /// <param name="withResponse">Write with or without response</param>
+        IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true);
 
         /// <summary>
         /// Read characteristic remote value

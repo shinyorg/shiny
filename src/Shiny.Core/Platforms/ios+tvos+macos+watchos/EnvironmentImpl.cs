@@ -1,31 +1,40 @@
 ﻿using System;
 using Foundation;
+using UIKit;
 
 namespace Shiny
 {
-    public class EnvironmentImpl : IEnvironment
+    // this is startable so the properties can be set on the main thread - this is mostly an iOS thing
+    public class EnvironmentImpl : IEnvironment, IShinyStartupTask
     {
-        public string AppIdentifier => NSBundle.MainBundle.BundleIdentifier;
-        public string AppVersion => NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
-        public string AppBuild => NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"].ToString();
+        public string AppIdentifier { get; private set; }
+        public string AppVersion { get; private set; }
+        public string AppBuild { get; private set; }
 
         public string MachineName { get; } = "";
-#if __IOS__
-        public string OperatingSystem { get; } = "iOS";
-#elif __TVOS__
-        public string OperatingSystem { get; } = "tvOS";
-#else
-        public string OperatingSystem { get; } = "watchOS";
-#endif
+        public string OperatingSystem { get; private set; }
+        public string OperatingSystemVersion { get; private set; }
         public string Manufacturer { get; } = "Apple";
         public string Model { get; }
+
+
+        public void Start()
+        {
+            //this.operatingSystem = UIDevice.CurrentDevice.SystemName;
+            this.AppIdentifier = NSBundle.MainBundle.BundleIdentifier;
+            this.AppVersion = NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
+            this.AppBuild = NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"].ToString();
+#if __IOS__
+            this.OperatingSystem = "iOS";
+            this.OperatingSystemVersion = UIDevice.CurrentDevice.SystemVersion;
+#elif __TVSOS__
+            this.OperatingSystem = "tvOS";
+            this.OperatingSystemVersion = UIDevice.CurrentDevice.SystemVersion;
+#elif __WATCHOS__
+            this.OperatingSystem = "watchOS";
+            this.OperatingSystemVersion = "1";
+#endif
+
+        }
     }
 }
-/*
- need to be on UI thread
-this.operatingSystem = UIDevice.CurrentDevice.SystemName;
-this.operatingSystemVersion = UIDevice.CurrentDevice.SystemVersion;
-this.tablet = UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad;
-this.simulator = Runtime.Arch == Arch.SIMULATOR;
-
- */
