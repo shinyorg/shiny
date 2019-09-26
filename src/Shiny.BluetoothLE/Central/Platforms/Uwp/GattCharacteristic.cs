@@ -51,24 +51,17 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value) => Observable.FromAsync(async _ =>
-        {
-            this.AssertWrite(false);
-            var status = await this.Native.WriteValueAsync(value.AsBuffer(), GattWriteOption.WriteWithoutResponse);
-            if (status != GattCommunicationStatus.Success)
-                throw new BleException($"Failed to write characteristic - {status}");
-
-            this.value = value;
-            return new CharacteristicGattResult(this, value);
-        });
-
-
         // TODO: reliable write
-        public override IObservable<CharacteristicGattResult> Write(byte[] value) => Observable.FromAsync(async ct =>
+        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse) => Observable.FromAsync(async ct =>
         {
-            this.AssertWrite(true);
+            this.AssertWrite(withResponse);
+
+            var writeType = withResponse
+                ? GattWriteOption.WriteWithResponse
+                : GattWriteOption.WriteWithoutResponse;
+
             var status = await this.Native
-                .WriteValueAsync(value.AsBuffer(), GattWriteOption.WriteWithResponse)
+                .WriteValueAsync(value.AsBuffer(), writeType)
                 .AsTask(ct)
                 .ConfigureAwait(false);
 
