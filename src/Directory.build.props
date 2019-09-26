@@ -7,7 +7,7 @@
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         -->
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>latest</LangVersion>
         <Description>Shiny</Description>
         <Product>Shiny .NET</Product>
         <Version>1.0.0</Version>
