@@ -69,9 +69,7 @@ namespace Shiny.Beacons
 
 
         public override IObservable<AccessState> WhenAccessStatusChanged(bool monitoring)
-        {
-            throw new NotImplementedException();
-        }
+            => this.centralManager.WhenStatusChanged();
     }
 }
 /*
