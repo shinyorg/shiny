@@ -49,17 +49,9 @@ namespace Shiny.BluetoothLE.Central.Internals
         public ConcurrentQueue<Func<Task>> Actions { get; }
         public IObservable<BleException> ConnectionFailed => this.connErrorSubject; // TODO: need the device
 
-        public IObservable<int> WhenMtuChanged() => this.callbacks.MtuChanged.Where(x => x.Gatt.Equals(this.Gatt)).Select(x => x.Mtu);
-        public IObservable<int> WhenRssiRead() => this.callbacks.ReadRemoteRssi.Where(x => x.Gatt.Equals(this.Gatt)).Select(x => x.Rssi);
-        public IObservable<ConnectionState> WhenConnectionStatusChanged() => this.callbacks.ConnectionStateChanged.Where(x => x.Gatt.Equals(this.Gatt)).Select(x => x.NewState.ToStatus());
-        public IObservable<IList<BluetoothGattService>> WhenServicesDiscovered() => this.callbacks
-            .ServicesDiscovered
-            .Where(x => x.Gatt.Equals(this.Gatt))
-            .SelectMany(x => x.Gatt.Services)
-            .ToList();
-
-        public IObservable<GattCharacteristicEventArgs> WhenWrite(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicWrite.Where(x => x.Characteristic.Equals(native));
-        public IObservable<GattCharacteristicEventArgs> WhenRead(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicRead.Where(x => x.Characteristic.Equals(native));
+        //public IObservable<ConnectionState> WhenConnectionStatusChanged() => this.callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus());
+        //public IObservable<GattCharacteristicEventArgs> WhenWrite(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicWrite.Where(x => x.Characteristic.Equals(native));
+        //public IObservable<GattCharacteristicEventArgs> WhenRead(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicRead.Where(x => x.Characteristic.Equals(native));
 
         public void Connect(ConnectionConfig config) => this.InvokeOnMainThread(() =>
         {

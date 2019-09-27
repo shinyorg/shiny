@@ -39,7 +39,9 @@ namespace Shiny.BluetoothLE.Central
             this.AssertWrite(false);
 
             var sub = this.context
-                .WhenWrite(this.native)
+                .Callbacks
+                .CharacteristicWrite
+                .Where(this.NativeEquals)
                 .Subscribe(args =>
                 {
                     Log.Write("BLE-Characteristic", "write event - " + args.Characteristic.Uuid);

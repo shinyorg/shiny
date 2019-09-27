@@ -64,15 +64,15 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override IObservable<ConnectionState> WhenStatusChanged()
-            => this.connSubject.Merge(this.context.WhenConnectionStatusChanged());
+            => this.connSubject.Merge(this.context.Callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus()));
 
 
         public override IObservable<IGattService> DiscoverServices()
             => Observable.Create<IGattService>(ob =>
             {
-                var sub = this.context.WhenServicesDiscovered().Subscribe(services =>
+                var sub = this.context.Callbacks.ServicesDiscovered.Subscribe(cb =>
                 {
-                    foreach (var ns in services)
+                    foreach (var ns in cb.Gatt.Services)
                     {
                         var service = new GattService(this, this.context, ns);
                         ob.OnNext(service);
@@ -90,14 +90,18 @@ namespace Shiny.BluetoothLE.Central
         public override IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
         {
             var sub = this.context
-                .WhenRssiRead()
+                .Callbacks
+                .ReadRemoteRssi
                 .Take(1)
-                .Subscribe(ob.Respond);
-
+                .Subscribe(cb =>
+                {
+                    if (cb.IsSuccessful)
+                        ob.Respond(cb.Rssi);
+                    else
+                        ob.OnError(new BleException("Failed to get RSSI - " + cb.Status));
+                });
+                
             this.context.Gatt?.ReadRemoteRssi();
-            //if (this.context.Gatt?.ReadRemoteRssi() ?? false)
-            //    ob.OnError(new BleException("Failed to read RSSI"));
-
             return sub;
         });
 
@@ -161,19 +165,27 @@ namespace Shiny.BluetoothLE.Central
         int currentMtu = 20;
         public IObservable<int> RequestMtu(int size) => Observable.Create<int>(ob =>
         {
-            var sub = this.WhenMtuChanged().Skip(1).Subscribe(ob.Respond);
+            var sub = this.WhenMtuChanged().Skip(1).Take(1).Subscribe(ob.Respond);
             this.context.Gatt.RequestMtu(size);
             return sub;
         });
 
 
-        public IObservable<int> WhenMtuChanged() => this.context
-            .WhenMtuChanged()
-            .Select(x =>
-            {
-                this.currentMtu = x;
-                return x;
-            })
+        public IObservable<int> WhenMtuChanged() => Observable
+            .Create<int>(ob => this.context
+                .Callbacks
+                .MtuChanged
+                .Subscribe(cb =>
+                {
+                    if (!cb.IsSuccessful)
+                        ob.OnError(new BleException("Failed to request MTU - " + cb.Status));
+                    else
+                    {
+                        this.currentMtu = cb.Mtu;
+                        ob.Respond(cb.Mtu);
+                    }
+                })
+            )
             .StartWith(this.currentMtu);
 
 
