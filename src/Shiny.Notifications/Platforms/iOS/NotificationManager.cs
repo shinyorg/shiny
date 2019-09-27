@@ -13,7 +13,15 @@ namespace Shiny.Notifications
     public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         readonly ISettings settings; // this will have problems with data protection
-        public NotificationManager(ISettings settings) => this.settings = settings;
+        //readonly BadgeUpdater badgeUpdater;
+
+        public NotificationManager(ISettings settings)
+        {
+            this.settings = settings;
+            
+        }
+
+
         public void Start() => UNUserNotificationCenter.Current.Delegate = new ShinyNotificationDelegate();
 
 
@@ -56,6 +64,7 @@ namespace Shiny.Notifications
                     var notifications = requests
                         .Select(x => x.FromNative())
                         .Where(x => x != null);
+
                     tcs.TrySetResult(notifications);
                 }
                 catch (Exception ex)
@@ -85,8 +94,8 @@ namespace Shiny.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message
-                //Badge=
+                Body = notification.Message,
+                Badge = notification.BadgeCount
                 //LaunchImageName = ""
                 //Subtitle = ""
             };

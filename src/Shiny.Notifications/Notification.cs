@@ -39,6 +39,13 @@ namespace Shiny.Notifications
         public string Payload { get; set; }
 
         /// <summary>
+        /// The value to display on the homescreen badge - set to 0 to remove it
+        /// Android does auto-increment this (so this value would override)
+        /// iOS/UWP require you set this if you want a badge
+        /// </summary>
+        public int BadgeCount { get; set; }
+
+        /// <summary>
         /// Options specific to android
         /// </summary>
         public AndroidOptions Android { get; set; } = new AndroidOptions();

@@ -137,6 +137,9 @@ namespace Shiny.Notifications
                 .SetSmallIcon(smallIconResourceId)
                 .SetContentIntent(pendingIntent);
 
+            if (notification.BadgeCount > 0)
+                builder.SetNumber(notification.BadgeCount);
+
             //if ((int)Build.VERSION.SdkInt >= 21 && notification.Android.Color != null)
             //    builder.SetColor(notification.Android.Color.Value)
 
