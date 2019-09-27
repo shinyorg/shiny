@@ -9,6 +9,7 @@ using Shiny.Settings;
 using Shiny.Infrastructure;
 using Windows.ApplicationModel.Background;
 
+
 namespace Shiny.Notifications
 {
     //https://blogs.msdn.microsoft.com/tiles_and_toasts/2015/07/08/quickstart-sending-a-local-toast-notification-and-handling-activations-from-it-windows-10/
@@ -20,7 +21,7 @@ namespace Shiny.Notifications
         readonly IJobManager jobs;
         readonly ISettings settings;
         readonly UwpContext context;
-
+        readonly BadgeUpdater badgeUpdater;
 
         public NotificationManager(IServiceProvider services,
                                    IJobManager jobs,
@@ -29,6 +30,7 @@ namespace Shiny.Notifications
                                    UwpContext context)
         {
             this.toastNotifier = ToastNotificationManager.CreateToastNotifier();
+            this.badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
             this.services = services;
             this.jobs = jobs;
             this.settings = settings;
@@ -80,6 +82,9 @@ namespace Shiny.Notifications
                 toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
 
             this.toastNotifier.Show(new ToastNotification(toastContent.GetXml()));
+            var badge = new BadgeNumericContent((uint)notification.BadgeCount);
+            this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
+
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
 
