@@ -50,9 +50,8 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |(Android) Current Activity| [![CurrentActivityNugetShield]][CurrentActivityNuget] | [![CurrentActivityMygetShield]][CurrentActivityMyget] | If you use James Montemagno's current top activity plugin, Shiny can use it instead of its internal version
 
 ## Contributors
-* Special Thanks to [Emily Stanek](https://github.com/emilystanek) from [BSI Labs](https://github.com/BSiLabs) for the fantastic logo  
-[![BSI Labs - Enterprise Mobile Done Right.](https://bsilabs.ca/wp-content/uploads/2019/04/BSILabsLogo-Grey-Lg@0.25x.png)](https://bsilabs.ca)
-
+* [Allan Ritchie](https://github.com/aritchie) - Project Lead
+* [Emily Stanek](https://github.com/emilystanek) - Logo Designer
 
 [BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg
 [BeaconsNuget]: https://www.nuget.org/packages/Shiny.Beacons/
