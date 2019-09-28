@@ -40,6 +40,9 @@ namespace Shiny.Notifications
             NativeManager.DeleteAll();
         }
 
+        public Task<int> GetBadge() => Task.FromResult(0);
+        public Task SetBadge(int badge) => Task.CompletedTask;
+
 
         public async Task<IEnumerable<Notification>> GetPending()
             => await this.repository.GetAll<Notification>();

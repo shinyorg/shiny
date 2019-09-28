@@ -118,5 +118,9 @@ namespace Shiny.Notifications
                 );
             }
         }
+
+
+        public Task SetBadge(int value) => Task.CompletedTask;
+        public Task<int> GetBadge() => Task.FromResult(0);
     }
 }
