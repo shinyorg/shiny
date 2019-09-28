@@ -51,5 +51,24 @@ namespace Shiny.Tests.Infrastructure
             service.Count.Should().Be(7);
             settings.Get<int>(key).Should().Be(7);
         }
+
+
+        [Fact]
+        public void StartupAndBindableInstantiateOnce()
+        {
+            var key = $"{typeof(FullService).FullName}.Count";
+            var count = 99;
+            ISettings settings = null;
+            var sp = Create(s =>
+            {
+                s.Set(key, count);
+                settings = s;
+            });
+            var service1 = sp.Resolve<IFullService>(true);
+            service1.Count.Should().Be(100);
+
+            var service2 = sp.Resolve<IFullService>(true);
+            service2.Count.Should().Be(100);
+        }
     }
 }
