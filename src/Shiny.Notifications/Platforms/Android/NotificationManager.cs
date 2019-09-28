@@ -137,8 +137,8 @@ namespace Shiny.Notifications
                 .SetSmallIcon(smallIconResourceId)
                 .SetContentIntent(pendingIntent);
 
-            if (notification.BadgeCount > 0)
-                builder.SetNumber(notification.BadgeCount);
+            if (notification.BadgeCount != null)
+                builder.SetNumber(notification.BadgeCount.Value);
 
             //if ((int)Build.VERSION.SdkInt >= 21 && notification.Android.Color != null)
             //    builder.SetColor(notification.Android.Color.Value)
@@ -190,5 +190,9 @@ namespace Shiny.Notifications
 
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
+
+
+        public Task<int> GetBadge() => Task.FromResult(0);
+        public Task SetBadge(int value) => Task.CompletedTask;
     }
 }

@@ -3,26 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
-using Shiny.Settings;
 using UIKit;
 using UserNotifications;
+using Shiny.Settings;
 
 
 namespace Shiny.Notifications
 {
-    public class NotificationManager : INotificationManager, IShinyStartupTask
+    public class NotificationManager : INotificationManager
     {
         readonly ISettings settings; // this will have problems with data protection
-        //readonly BadgeUpdater badgeUpdater;
+
 
         public NotificationManager(ISettings settings)
         {
             this.settings = settings;
-            
+            UNUserNotificationCenter.Current.Delegate = new ShinyNotificationDelegate();
         }
 
 
-        public void Start() => UNUserNotificationCenter.Current.Delegate = new ShinyNotificationDelegate();
+        public Task SetBadge(int value) => Dispatcher.InvokeOnMainThreadAsync(() =>
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = value
+        );
+
+
+        public Task<int> GetBadge() => Dispatcher.InvokeOnMainThreadAsync(() =>
+            (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
+        );
 
 
         public Task<AccessState> RequestAccess()
@@ -50,33 +57,21 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<IEnumerable<Notification>> GetPending()
+        public Task<IEnumerable<Notification>> GetPending() => Dispatcher.InvokeOnMainThread<IEnumerable<Notification>>(async tcs =>
         {
-            var tcs = new TaskCompletionSource<IEnumerable<Notification>>();
-            UIApplication.SharedApplication.BeginInvokeOnMainThread(async () =>
-            {
-                try
-                {
-                    var requests = await UNUserNotificationCenter
-                        .Current
-                        .GetPendingNotificationRequestsAsync();
+            var requests = await UNUserNotificationCenter
+                .Current
+                .GetPendingNotificationRequestsAsync();
 
-                    var notifications = requests
-                        .Select(x => x.FromNative())
-                        .Where(x => x != null);
+            var notifications = requests
+                .Select(x => x.FromNative())
+                .Where(x => x != null);
 
-                    tcs.TrySetResult(notifications);
-                }
-                catch (Exception ex)
-                {
-                    tcs.TrySetException(ex);
-                }
-            });
-            return tcs.Task;
-        }
+            tcs.SetResult(notifications);
+        });
 
 
-        public Task Clear() => this.Invoke(() =>
+        public Task Clear() => Dispatcher.InvokeOnMainThreadAsync(() =>
         {
             UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
             UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
@@ -94,11 +89,13 @@ namespace Shiny.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message,
-                Badge = notification.BadgeCount
+                Body = notification.Message
                 //LaunchImageName = ""
                 //Subtitle = ""
             };
+            if (notification.BadgeCount != null)
+                content.Badge = notification.BadgeCount.Value;
+
             //UNNotificationAttachment.FromIdentifier("", NSUrl.FromString(""), new UNNotificationAttachmentOptions().)
             if (!notification.Payload.IsEmpty())
             {
@@ -136,33 +133,13 @@ namespace Shiny.Notifications
         }
 
 
-        public Task Cancel(int notificationId) => this.Invoke(() =>
+        public Task Cancel(int notificationId) => Dispatcher.InvokeOnMainThreadAsync(() =>
         {
             var ids = new[] { notificationId.ToString() };
 
             UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
             UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
         });
-
-
-        protected Task Invoke(Action action)
-        {
-            var tcs = new TaskCompletionSource<object>();
-            var app = UIApplication.SharedApplication;
-            app.BeginInvokeOnMainThread(() =>
-            {
-                try
-                {
-                    action();
-                    tcs.TrySetResult(null);
-                }
-                catch (Exception ex)
-                {
-                    tcs.TrySetException(ex);
-                }
-            });
-            return tcs.Task;
-        }
     }
 }
 //UNUserNotificationCenter.Current.SetNotificationCategories(

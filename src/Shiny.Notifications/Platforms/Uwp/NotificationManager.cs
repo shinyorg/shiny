@@ -82,8 +82,12 @@ namespace Shiny.Notifications
                 toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
 
             this.toastNotifier.Show(new ToastNotification(toastContent.GetXml()));
-            var badge = new BadgeNumericContent((uint)notification.BadgeCount);
-            this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
+
+            if (notification.BadgeCount != null)
+            {
+                var badge = new BadgeNumericContent((uint)notification.BadgeCount);
+                this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
+            }
 
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
