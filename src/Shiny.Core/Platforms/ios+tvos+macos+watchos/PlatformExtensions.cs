@@ -1,38 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Foundation;
-using Shiny.Logging;
 using UIKit;
 
 
 namespace Shiny
 {
-    public static class Dispatcher
-    {
-        public static void Execute(Func<Task> task)
-        {
-#if __IOS__ || __TVOS__
-            var taskId = UIApplication.SharedApplication.BeginBackgroundTask(() => { });
-
-            task().ContinueWith(x =>
-            {
-                if (x.IsFaulted)
-                    Log.Write(x.Exception);
-
-                UIApplication.SharedApplication.EndBackgroundTask(taskId);
-            });
-#else
-            task().ContinueWith(x =>
-            {
-                if (x.IsFaulted)
-                    Log.Write(x.Exception);
-            });
-#endif
-        }
-    }
-
-
     public static class PlatformExtensions
     {
         static DateTime reference = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
@@ -108,13 +81,13 @@ namespace Shiny
         }
 
 
-        public static void Dispatch(this Action action)
-        {
-            if (NSThread.Current.IsMainThread)
-                action();
-            else
-                NSRunLoop.Main.BeginInvokeOnMainThread(action);
-        }
+        //public static void Dispatch(this Action action)
+        //{
+        //    if (NSThread.Current.IsMainThread)
+        //        action();
+        //    else
+        //        NSRunLoop.Main.BeginInvokeOnMainThread(action);
+        //}
 
 
         public static bool HasPlistValue(string key, int? ifVersion = null)

@@ -40,7 +40,7 @@ namespace Shiny.Beacons
         public override void RegionLeft(CLLocationManager manager, CLRegion region) => this.Invoke(region, BeaconRegionState.Exited);
 
 
-        void Invoke(CLRegion region, BeaconRegionState status) => Dispatcher.Execute(async () =>
+        void Invoke(CLRegion region, BeaconRegionState status) => Dispatcher.ExecuteBackgroundTask(async () =>
         {
             if (region is CLBeaconRegion native)
             {

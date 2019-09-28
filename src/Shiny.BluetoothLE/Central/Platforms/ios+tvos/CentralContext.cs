@@ -64,7 +64,7 @@ namespace Shiny.BluetoothLE.Central
         public override void WillRestoreState(CBCentralManager central, NSDictionary dict)
         {
 #if __IOS__
-            Dispatcher.Execute(async () =>
+            Dispatcher.ExecuteBackgroundTask(async () =>
             {
                 var del = this.services.Resolve<IBleCentralDelegate>();
 

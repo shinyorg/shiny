@@ -53,7 +53,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error) => Dispatcher.Execute(async () =>
+        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error) => Dispatcher.ExecuteBackgroundTask(async () =>
         {
             var transfer = task.FromNative();
 
@@ -78,7 +78,7 @@ namespace Shiny.Net.Http
             => this.onEvent.OnNext(downloadTask.FromNative());
 
 
-        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location) => Dispatcher.Execute(async () =>
+        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location) => Dispatcher.ExecuteBackgroundTask(async () =>
         {
             var transfer = downloadTask.FromNative();
 

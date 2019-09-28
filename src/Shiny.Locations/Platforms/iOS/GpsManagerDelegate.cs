@@ -36,7 +36,7 @@ namespace Shiny.Locations
             => this.deferringUpdates = false;
 
 
-        void InvokeChanges(CLLocation[] locations) => Dispatcher.Execute(async () =>
+        void InvokeChanges(CLLocation[] locations) => Dispatcher.ExecuteBackgroundTask(async () =>
         {
             var loc = locations.Last();
             var reading = new GpsReading(loc);
