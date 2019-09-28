@@ -46,23 +46,23 @@ namespace Shiny.Tests.Locations
         //    this.activityManager.Object.GetTotalsForRange();
         //}
 
-        [Theory(Skip = "TODO")]
-        [InlineData(MotionActivityConfidence.Low, 0)]
-        [InlineData(MotionActivityConfidence.Medium, 0)]
-        [InlineData(MotionActivityConfidence.High, 0)]
-        public async Task GetTimeBlocksTest(MotionActivityConfidence confidence, int expectedAutoSeconds)
-        {
-            var result = await this.activityManager.Object.GetTimeBlocksForRange(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, confidence);
+        //[Theory(Skip = "TODO")]
+        //[InlineData(MotionActivityConfidence.Low, 0)]
+        //[InlineData(MotionActivityConfidence.Medium, 0)]
+        //[InlineData(MotionActivityConfidence.High, 0)]
+        //public async Task GetTimeBlocksTest(MotionActivityConfidence confidence, int expectedAutoSeconds)
+        //{
+        //    var result = await this.activityManager.Object.GetTimeBlocksForRange(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, confidence);
 
-            var auto = result.FirstOrDefault(x => x.Type == MotionActivityType.Automotive);
-            if (expectedAutoSeconds == 0)
-                auto.Should().Be(null);
-            else
-            {
-                auto.Should().NotBeNull();
-                //auto.Start
-                //    auto.End
-            }
-        }
+        //    var auto = result.FirstOrDefault(x => x.Type == MotionActivityType.Automotive);
+        //    if (expectedAutoSeconds == 0)
+        //        auto.Should().Be(null);
+        //    else
+        //    {
+        //        auto.Should().NotBeNull();
+        //        //auto.Start
+        //        //    auto.End
+        //    }
+        //}
     }
 }
