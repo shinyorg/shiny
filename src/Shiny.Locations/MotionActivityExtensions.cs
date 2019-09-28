@@ -24,73 +24,73 @@ namespace Shiny.Locations
         }
 
 
-        public static async Task<IList<MotionActivityTimeBlock>> GetTimeBlocksForRange(this IMotionActivity activity,
-                                                                                       DateTimeOffset start,
-                                                                                       DateTimeOffset? end = null,
-                                                                                       MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
-        {
-            var list = new List<MotionActivityTimeBlock>();
-            var result = await activity.Query(start, end);
-            var set = result
-                .Where(x => x.Confidence >= minConfidence)
-                .OrderBy(x => x.Timestamp)
-                .ToList();
+        //public static async Task<IList<MotionActivityTimeBlock>> GetTimeBlocksForRange(this IMotionActivity activity,
+        //                                                                               DateTimeOffset start,
+        //                                                                               DateTimeOffset? end = null,
+        //                                                                               MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        //{
+        //    var list = new List<MotionActivityTimeBlock>();
+        //    var result = await activity.Query(start, end);
+        //    var set = result
+        //        .Where(x => x.Confidence >= minConfidence)
+        //        .OrderBy(x => x.Timestamp)
+        //        .ToList();
 
-            if (set.Count > 1)
-            {
-                MotionActivityEvent firstEvent = null;
-                foreach (var item in set)
-                {
-                    if (firstEvent == null)
-                        firstEvent = item;
-                    else if (!firstEvent.Types.HasFlag(item.Types)) // has to have 1 of the types
-                    {
-                        var block = new MotionActivityTimeBlock(item.Types, firstEvent.Timestamp, item.Timestamp);
-                        list.Add(block);
+        //    if (set.Count > 1)
+        //    {
+        //        MotionActivityEvent firstEvent = null;
+        //        foreach (var item in set)
+        //        {
+        //            if (firstEvent == null)
+        //                firstEvent = item;
+        //            else if (!firstEvent.Types.HasFlag(item.Types)) // has to have 1 of the types
+        //            {
+        //                var block = new MotionActivityTimeBlock(item.Types, firstEvent.Timestamp, item.Timestamp);
+        //                list.Add(block);
 
-                        // first event of next time block
-                        firstEvent = item;
-                    }
+        //                // first event of next time block
+        //                firstEvent = item;
+        //            }
 
-                }
-            }
+        //        }
+        //    }
 
-            return list;
-        }
+        //    return list;
+        //}
 
 
-        public static async Task<IDictionary<MotionActivityType, TimeSpan>> GetTotalsForRange(this IMotionActivity activity,
-                                                                                              DateTimeOffset start,
-                                                                                              DateTimeOffset? end = null,
-                                                                                              MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
-        {
-            var dict = new Dictionary<MotionActivityType, TimeSpan>();
-            var result = await activity.Query(start, end);
-            var set = result
-                .Where(x => x.Confidence >= minConfidence)
-                .OrderBy(x => x.Timestamp)
-                .ToList();
+        //public static async Task<IDictionary<MotionActivityType, TimeSpan>> GetTotalsForRange(this IMotionActivity activity,
+        //                                                                                      DateTimeOffset start,
+        //                                                                                      DateTimeOffset? end = null,
+        //                                                                                      MotionActivityConfidence minConfidence = MotionActivityConfidence.Medium)
+        //{
+        //    var dict = new Dictionary<MotionActivityType, TimeSpan>();
+        //    var result = await activity.Query(start, end);
+        //    var set = result
+        //        .Where(x => x.Confidence >= minConfidence)
+        //        .OrderBy(x => x.Timestamp)
+        //        .ToList();
 
-            if (set.Count > 1)
-            {
-                MotionActivityEvent lastEvent = null;
-                foreach (var item in set)
-                {
-                    if (lastEvent == null)
-                        lastEvent = item;
-                    else
-                    {
-                        if (!dict.ContainsKey(item.Types))
-                            dict.Add(item.Types, TimeSpan.Zero);
+        //    if (set.Count > 1)
+        //    {
+        //        MotionActivityEvent lastEvent = null;
+        //        foreach (var item in set)
+        //        {
+        //            if (lastEvent == null)
+        //                lastEvent = item;
+        //            else
+        //            {
+        //                if (!dict.ContainsKey(item.Types))
+        //                    dict.Add(item.Types, TimeSpan.Zero);
 
-                        var ts = item.Timestamp.Subtract(lastEvent.Timestamp);
-                        dict[item.Types] += ts;
-                    }
+        //                var ts = item.Timestamp.Subtract(lastEvent.Timestamp);
+        //                dict[item.Types] += ts;
+        //            }
 
-                }
-            }
-            return dict;
-        }
+        //        }
+        //    }
+        //    return dict;
+        //}
 
 
         /// <summary>
