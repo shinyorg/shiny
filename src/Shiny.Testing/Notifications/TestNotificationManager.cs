@@ -7,7 +7,7 @@ using Shiny.Notifications;
 
 namespace Shiny.Testing.Notifications
 {
-    public class TestNotifications : INotificationManager
+    public class TestNotificationManager : INotificationManager
     {
         public int CurrentNotificationId { get; set; } = 1;
         public int CurrentBadge { get; set; }

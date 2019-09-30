@@ -3,7 +3,7 @@
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
         <!--
-        <NullableContextOptions>enable</NullableContextOptions>
+        <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         -->
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
