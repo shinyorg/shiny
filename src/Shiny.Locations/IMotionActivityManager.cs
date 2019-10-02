@@ -5,12 +5,9 @@ using System.Threading.Tasks;
 
 namespace Shiny.Locations
 {
-    public interface IMotionActivity
+    public interface IMotionActivityManager
     {
-        /// <summary>
-        ///
-        /// </summary>
-        bool IsSupported { get; }
+        Task<AccessState> RequestPermission();
 
         /// <summary>
         ///

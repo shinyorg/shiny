@@ -8,12 +8,14 @@ using Shiny.Locations;
 
 namespace Shiny.Testing.Locations
 {
-    public class TestMotionActivity : IMotionActivity
+    public class TestMotionActivityManager : IMotionActivityManager
     {
-        public bool IsSupported { get; set; } = true;
+        public AccessState CurrentStatus { get; set; } = AccessState.Available;        
         public List<MotionActivityEvent> EventData { get; set; } = new List<MotionActivityEvent>();
         public Subject<MotionActivityEvent> ActivitySubject { get; } = new Subject<MotionActivityEvent>();
 
+
+        public Task<AccessState> RequestPermission() => Task.FromResult(this.CurrentStatus);
 
         public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {

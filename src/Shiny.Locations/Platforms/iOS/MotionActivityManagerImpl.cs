@@ -9,19 +9,45 @@ using Foundation;
 
 namespace Shiny.Locations
 {
-    public class MotionActivityImpl : IMotionActivity
+    public class MotionActivityManagerImpl : IMotionActivityManager
     {
         readonly CMMotionActivityManager activityManager;
 
 
-        public MotionActivityImpl()
+        public MotionActivityManagerImpl()
         {
             this.activityManager = new CMMotionActivityManager();
         }
 
 
-        public bool IsSupported => CMMotionActivityManager.IsActivityAvailable &&
-                                   CMMotionActivityManager.AuthorizationStatus != CMAuthorizationStatus.Denied;
+        public async Task<AccessState> RequestPermission()
+        {
+            if (!CMMotionActivityManager.IsActivityAvailable)
+                return AccessState.NotSupported;
+
+            if (CMMotionActivityManager.AuthorizationStatus == CMAuthorizationStatus.Authorized)
+                return AccessState.Available;
+
+            try
+            {
+                await this.Query(DateTimeOffset.UtcNow);
+                await Task.Delay(500);
+            }
+            catch {}
+
+            switch (CMMotionActivityManager.AuthorizationStatus)
+            {
+                case CMAuthorizationStatus.Denied:
+                    return AccessState.Denied;
+
+                case CMAuthorizationStatus.Restricted:
+                    return AccessState.Restricted;
+
+                case CMAuthorizationStatus.Authorized:
+                default:
+                    return AccessState.Available;
+            }
+        }
 
 
         public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)

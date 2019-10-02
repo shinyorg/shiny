@@ -8,7 +8,7 @@ using Shiny.Logging;
 
 namespace Shiny.Locations
 {
-    public class MotionActivityImpl : IMotionActivity, IShinyStartupTask
+    public class MotionActivityManagerImpl : IMotionActivityManager, IShinyStartupTask
     {
         public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromSeconds(10);
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
@@ -22,7 +22,7 @@ namespace Shiny.Locations
         readonly IMessageBus messageBus;
 
 
-        public MotionActivityImpl(AndroidContext context,
+        public MotionActivityManagerImpl(AndroidContext context,
                                   AndroidSqliteDatabase database,
                                   IMessageBus messageBus)
         {
@@ -41,7 +41,7 @@ namespace Shiny.Locations
         );
 
 
-        public bool IsSupported => true;
+        public Task<AccessState> RequestPermission() => Task.FromResult(AccessState.Available);
 
 
         public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
