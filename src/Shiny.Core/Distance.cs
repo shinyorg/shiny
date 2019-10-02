@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shiny.Locations
+namespace Shiny
 {
     public sealed class Distance : IEquatable<Distance>
     {
