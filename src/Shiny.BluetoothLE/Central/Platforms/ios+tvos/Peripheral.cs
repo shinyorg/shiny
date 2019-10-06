@@ -9,7 +9,7 @@ using Foundation;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public partial class Peripheral : AbstractPeripheral
+    public class Peripheral : AbstractPeripheral
     {
         readonly CentralContext context;
         IDisposable autoReconnectSub;
@@ -70,10 +70,8 @@ namespace Shiny.BluetoothLE.Central
             .ConnectPeripheral(this.Native, new PeripheralConnectionOptions
             {
                 NotifyOnDisconnection = true,
-#if __IOS__ || __TVOS__
                 NotifyOnConnection = true,
                 NotifyOnNotification = true
-#endif
             });
 
 
@@ -195,7 +193,7 @@ namespace Shiny.BluetoothLE.Central
             this.Native.RssiRead += handler;
             this.Native.ReadRSSI();
 
-            return () => this.Native.RssiRead += handler;
+            return () => this.Native.RssiRead -= handler;
         });
 
 

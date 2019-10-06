@@ -42,6 +42,5 @@ namespace Shiny.BluetoothLE.Central
 
             return null;
         }
-
     }
 }
