@@ -37,28 +37,6 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        //public static IObservable<CharacteristicGattResult> ReadUntil(this IGattCharacteristic characteristic, byte[] endBytes)
-        //    => Observable.Create<CharacteristicGattResult>(async ob =>
-        //    {
-        //        var cancelSrc = new CancellationTokenSource();
-        //        try
-        //        {
-        //            var result = await characteristic.Read().RunAsync(cancelSrc.Token);
-        //            while (!result.Data.SequenceEqual(endBytes) && !cancelSrc.IsCancellationRequested)
-        //            {
-        //                ob.OnNext(result);
-        //                result = await characteristic.Read().RunAsync(cancelSrc.Token);
-        //            }
-        //            ob.OnCompleted();
-        //        }
-        //        catch (OperationCanceledException)
-        //        {
-        //            // swallow
-        //        }
-        //        return () => cancelSrc.Cancel();
-        //    });
-
-
         public static IObservable<CharacteristicGattResult> ReadInterval(this IGattCharacteristic character, TimeSpan timeSpan)
             => Observable
                 .Interval(timeSpan)
