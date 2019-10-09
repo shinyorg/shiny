@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Windows.UI.Notifications;
@@ -82,12 +81,8 @@ namespace Shiny.Notifications
                 toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
 
             this.toastNotifier.Show(new ToastNotification(toastContent.GetXml()));
-
             if (notification.BadgeCount != null)
-            {
-                var badge = new BadgeNumericContent((uint)notification.BadgeCount);
-                this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
-            }
+                await this.SetBadge(notification.BadgeCount.Value);
 
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
@@ -120,7 +115,20 @@ namespace Shiny.Notifications
         }
 
 
-        public Task SetBadge(int value) => Task.CompletedTask;
-        public Task<int> GetBadge() => Task.FromResult(0);
+        const string BADGE_KEY = "ShinyNotificationBadge";
+        public Task SetBadge(int value)
+        {
+            var badge = new BadgeNumericContent((uint)value);
+            this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
+            this.settings.Set(BADGE_KEY, value);
+            return Task.CompletedTask;
+        }
+
+
+        public Task<int> GetBadge()
+        {
+            var badge = this.settings.Get(BADGE_KEY, 0);
+            return Task.FromResult(badge);
+        }
     }
 }
