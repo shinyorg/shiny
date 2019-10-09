@@ -12,12 +12,12 @@ namespace Shiny.Tests.Locations
 {
     public class MotionActivityTests
     {
-        readonly Mock<IMotionActivity> activityManager;
+        readonly Mock<IMotionActivityManager> activityManager;
 
 
         public MotionActivityTests()
         {
-            this.activityManager = new Mock<IMotionActivity>();
+            this.activityManager = new Mock<IMotionActivityManager>();
             this.activityManager
                 .Setup(x => x.Query(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset?>()))
                 .Returns(Task.FromResult(this.Data));

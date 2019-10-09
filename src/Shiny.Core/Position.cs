@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Locations
+namespace Shiny
 {
     public class Position : IEquatable<Position>
     {
@@ -34,6 +34,30 @@ namespace Shiny.Locations
             var meters = 6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
             return Distance.FromMeters(meters);
         }
+
+
+        //https://stackoverflow.com/questions/2042599/direction-between-2-latitude-longitude-points-in-c-sharp
+        public double GetCompassBearingTo(Position to)
+        {
+            var dLon = ToRad(to.Longitude - this.Longitude);
+            var dPhi = Math.Log(Math.Tan(ToRad(to.Latitude) / 2 + Math.PI / 4) / Math.Tan(ToRad(this.Latitude) / 2 + Math.PI / 4));
+            if (Math.Abs(dLon) > Math.PI)
+                dLon = dLon > 0 ? -(2 * Math.PI - dLon) : (2 * Math.PI + dLon);
+
+            return ToBearing(Math.Atan2(dLon, dPhi));
+        }
+
+
+        public static double ToRad(double degrees)
+            => degrees * (Math.PI / 180);
+
+
+        public static double ToDegrees(double radians)
+            => radians * 180 / Math.PI;
+
+
+        public static double ToBearing(double radians)
+            => (ToDegrees(radians) + 360) % 360;
 
 
         public override string ToString() => $"Latitude: {this.Latitude} - Longitude: {this.Longitude}";

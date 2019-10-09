@@ -45,7 +45,7 @@ namespace Shiny.Infrastructure.DependencyInjection
             else if (service.ImplementationInstance is INotifyPropertyChanged npc)
             {
                 this.services.AddSingleton(
-                    service.ServiceType ?? npc.GetType(),
+                    service.ServiceType ?? service.ImplementationInstance.GetType(),
                     sp =>
                     {
                         sp.Resolve<ISettings>(true).Bind(npc);
@@ -77,8 +77,15 @@ namespace Shiny.Infrastructure.DependencyInjection
             {
                 services.RegisterPostBuildAction(sp =>
                 {
-                    var resolveType = service.ServiceType ?? service.ImplementationType;
-                    ((IShinyStartupTask)sp.GetService(resolveType)).Start();
+                    if (service.ImplementationInstance != null)
+                    {
+                        ((IShinyStartupTask)service.ImplementationInstance).Start();
+                    }
+                    else
+                    {
+                        var resolveType = service.ServiceType ?? service.ImplementationType;
+                        ((IShinyStartupTask)sp.GetService(resolveType)).Start();
+                    }
                 });
             }
         }

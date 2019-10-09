@@ -16,10 +16,10 @@ namespace Shiny
         {
 #if __ANDROID__
             builder.AddSingleton<AndroidSqliteDatabase>();
-            builder.AddSingleton<IMotionActivity, MotionActivityImpl>();
+            builder.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
             return true;
 #elif __IOS__
-            builder.AddSingleton<IMotionActivity, MotionActivityImpl>();
+            builder.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
             return true;
 #else
             return false;

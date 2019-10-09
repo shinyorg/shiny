@@ -7,11 +7,11 @@ using Android.Gms.Location;
 namespace Shiny.Locations
 {
     [BroadcastReceiver(
-        Name = MotionActivityImpl.ReceiverName,
+        Name = MotionActivityManagerImpl.ReceiverName,
         Enabled = true
     )]
     [IntentFilter(new[] {
-        MotionActivityImpl.IntentAction
+        MotionActivityManagerImpl.IntentAction
     })]
     public class MotionActivityBroadcastReceiver : BroadcastReceiver
     {
@@ -77,10 +77,10 @@ namespace Shiny.Locations
 
         protected virtual MotionActivityConfidence ToConfidence(int value)
         {
-            if (value >= MotionActivityImpl.HighConfidenceValue)
+            if (value >= MotionActivityManagerImpl.HighConfidenceValue)
                 return MotionActivityConfidence.High;
 
-            if (value >= MotionActivityImpl.MediumConfidenceValue)
+            if (value >= MotionActivityManagerImpl.MediumConfidenceValue)
                 return MotionActivityConfidence.Medium;
 
             return MotionActivityConfidence.Low;

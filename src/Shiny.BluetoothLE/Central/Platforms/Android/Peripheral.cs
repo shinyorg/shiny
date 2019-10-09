@@ -15,6 +15,7 @@ namespace Shiny.BluetoothLE.Central
                               ICanDoTransactions,
                               ICanPairPeripherals,
                               ICanRequestMtu
+
     {
         readonly Subject<ConnectionState> connSubject;
         readonly DeviceContext context;
