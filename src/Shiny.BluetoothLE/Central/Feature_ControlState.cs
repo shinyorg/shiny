@@ -14,29 +14,9 @@ namespace Shiny.BluetoothLE.Central
     }
 
 
-    public interface ICanOpenAdapterSettings
-    {
-        /// <summary>
-        /// Opens the platform settings screen
-        /// </summary>
-        bool OpenSettings();
-    }
-
-
     public static class Feature_CentralManager
     {
-        public static bool CanOpenSettings(this ICentralManager centralManager) => centralManager is ICanOpenAdapterSettings;
-
         public static bool CanControlAdapterState(this ICentralManager centralManager) => centralManager is ICanControlAdapterState;
-
-
-        public static AccessState TryOpenSettings(this ICentralManager centralManager)
-        {
-            if (centralManager is ICanOpenAdapterSettings settings)
-                return settings.OpenSettings() ? AccessState.Available : AccessState.Denied;
-
-            return AccessState.NotSupported;
-        }
 
 
         public static bool TrySetAdapterState(this ICentralManager centralManager, bool enable)

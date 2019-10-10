@@ -12,7 +12,6 @@ namespace Shiny.BluetoothLE.Central
 {
     public class CentralManager : AbstractCentralManager,
                                   ICanControlAdapterState,
-                                  ICanOpenAdapterSettings,
                                   ICanSeePairedPeripherals
     {
         public const string BroadcastReceiverName = "com.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
@@ -100,15 +99,6 @@ namespace Shiny.BluetoothLE.Central
                 .BondedDevices
                 .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le)
                 .Select(this.context.GetDevice));
-
-
-        public bool OpenSettings()
-        {
-            var intent = new Intent(Android.Provider.Settings.ActionBluetoothSettings);
-            intent.SetFlags(ActivityFlags.NewTask);
-            this.context.Android.AppContext.StartActivity(intent);
-            return true;
-        }
 
 
         public void SetAdapterState(bool enable)
