@@ -12,6 +12,7 @@ namespace Shiny.BluetoothLE.Peripherals
 
         bool IsAdvertising { get; }
         Task StartAdvertising(AdvertisementData adData = null);
+        Task StartAdvertising(AdvertisementData adData = null, AdvertisementData scanrespadData = null);
         void StopAdvertising();
 
         Task<IGattService> AddService(Guid uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder);

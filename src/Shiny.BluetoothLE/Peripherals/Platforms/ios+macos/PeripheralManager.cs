@@ -76,7 +76,26 @@ namespace Shiny.BluetoothLE.Peripherals
                 //    .ToArray()
             });
         }
+        public async Task StartAdvertising(AdvertisementData adData = null, AdvertisementData scanrespadData = null)
+        {
+            if (this.manager.Advertising)
+                throw new ArgumentException("Advertising is already active");
 
+            await this.manager.WhenReady().ToTask();
+            this.manager.StartAdvertising(new StartAdvertisingOptions
+            {
+                LocalName = adData?.LocalName,
+                ServicesUUID = this.services
+                    .Select(x => x.Value.Uuid.ToCBUuid())
+                    .ToArray()
+                //ServicesUUID = adData?
+                //    .ServiceUuids?
+                //    .Select(x => x.ToCBUuid())
+                //    .ToArray()
+            });
+        }
+
+        
 
         public void StopAdvertising() => this.manager.StopAdvertising();
 

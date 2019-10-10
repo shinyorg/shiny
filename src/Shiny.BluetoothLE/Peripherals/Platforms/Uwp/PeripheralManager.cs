@@ -116,6 +116,29 @@ namespace Shiny.BluetoothLE.Peripherals
             this.publisher.Start();
             return Task.CompletedTask;
         }
+        public Task StartAdvertising(AdvertisementData adData = null, AdvertisementData scanrespadData = null)
+        {
+            this.publisher.Advertisement.Flags = BluetoothLEAdvertisementFlags.ClassicNotSupported;
+            this.publisher.Advertisement.ManufacturerData.Clear();
+            this.publisher.Advertisement.ServiceUuids.Clear();
+
+            if (adData?.ManufacturerData != null)
+            {
+                using (var writer = new DataWriter())
+                {
+                    writer.WriteBytes(adData.ManufacturerData.Data);
+                    var md = new BluetoothLEManufacturerData(adData.ManufacturerData.CompanyId, writer.DetachBuffer());
+                    this.publisher.Advertisement.ManufacturerData.Add(md);
+                }
+            }
+
+            if (adData?.ServiceUuids != null)
+                foreach (var serviceUuid in adData.ServiceUuids)
+                    this.publisher.Advertisement.ServiceUuids.Add(serviceUuid);
+
+            this.publisher.Start();
+            return Task.CompletedTask;
+        }
 
 
         public void StopAdvertising() => this.publisher.Stop();

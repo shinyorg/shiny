@@ -110,9 +110,9 @@ namespace Shiny.BluetoothLE.Peripherals
                 .SetAdvertiseMode(AdvertiseMode.Balanced)
                 .SetConnectable(true);
 
-            var data = new AdvertiseData.Builder()
-                .SetIncludeDeviceName(true)
-                .SetIncludeTxPowerLevel(true);
+            var data = new AdvertiseData.Builder();
+            data.SetIncludeDeviceName(adData.IncludeDeviceName);
+            data.SetIncludeTxPowerLevel(adData.IncludeTxPowerLevel);
 
             if (adData != null)
             {
@@ -131,6 +131,59 @@ namespace Shiny.BluetoothLE.Peripherals
                 .StartAdvertising(
                     settings.Build(),
                     data.Build(),
+                    this.adCallbacks
+                );
+
+            return Task.CompletedTask;
+        }
+        public Task StartAdvertising(AdvertisementData adData = null, AdvertisementData scanrespadData = null)
+        {
+            //            //if (!CrossBleAdapter.AndroidConfiguration.IsServerSupported)
+            //            //    throw new BleException("BLE Advertiser needs API Level 23+");
+
+            this.adCallbacks = new AdvertisementCallbacks();
+
+            var settings = new AdvertiseSettings.Builder()
+                .SetAdvertiseMode(AdvertiseMode.Balanced)
+                .SetConnectable(true);
+
+            var data = new AdvertiseData.Builder();
+            data.SetIncludeDeviceName(adData.IncludeDeviceName);
+            data.SetIncludeTxPowerLevel(adData.IncludeTxPowerLevel);
+
+            if (adData != null)
+            {
+                if (adData.ManufacturerData != null)
+                    data.AddManufacturerData(adData.ManufacturerData.CompanyId, adData.ManufacturerData.Data);
+
+                if (adData.ServiceUuids != null)
+                    foreach (var serviceUuid in adData.ServiceUuids)
+                        data.AddServiceUuid(serviceUuid.ToParcelUuid());
+            }
+
+            var respdata = new AdvertiseData.Builder();
+            if (scanrespadData != null)
+            {
+                data.SetIncludeDeviceName(scanrespadData.IncludeDeviceName);
+                data.SetIncludeTxPowerLevel(scanrespadData.IncludeTxPowerLevel);
+
+                if (scanrespadData.ManufacturerData != null)
+                    data.AddManufacturerData(scanrespadData.ManufacturerData.CompanyId, scanrespadData.ManufacturerData.Data);
+
+                if (scanrespadData.ServiceUuids != null)
+                    foreach (var serviceUuid in scanrespadData.ServiceUuids)
+                        respdata.AddServiceUuid(serviceUuid.ToParcelUuid());
+            }
+
+
+            this.context
+                .Manager
+                .Adapter
+                .BluetoothLeAdvertiser
+                .StartAdvertising(
+                    settings.Build(),
+                    data.Build(),
+                    respdata.Build(),
                     this.adCallbacks
                 );
 
