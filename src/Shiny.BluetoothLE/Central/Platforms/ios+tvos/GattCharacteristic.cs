@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using CoreBluetooth;
 using Foundation;
+using UIKit;
 
 
 namespace Shiny.BluetoothLE.Central
 {
-    public partial class GattCharacteristic : AbstractGattCharacteristic
+    public class GattCharacteristic : AbstractGattCharacteristic
     {
         readonly GattService serivceObj;
         public CBPeripheral Peripheral => this.serivceObj.Peripherial;
@@ -25,9 +26,17 @@ namespace Shiny.BluetoothLE.Central
         public override byte[] Value => this.NativeCharacteristic.Value?.ToArray();
 
 
-        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse) => Observable.Create<CharacteristicGattResult>(ob =>
+        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse)
         {
-            this.AssertWrite(true);
+            this.AssertWrite(withResponse);
+            return withResponse
+                ? this.WriteWithResponse(value)
+                : this.WriteWithoutResponse(value);
+        }
+
+
+        IObservable<CharacteristicGattResult> WriteWithResponse(byte[] value) => Observable.Create<CharacteristicGattResult>(ob =>
+        {
             var data = NSData.FromArray(value);
             var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
             {
@@ -40,51 +49,47 @@ namespace Shiny.BluetoothLE.Central
                     ob.OnError(new BleException(args.Error.Description));
             });
             this.Peripheral.WroteCharacteristicValue += handler;
-
-            var writeType = withResponse
-                ? CBCharacteristicWriteType.WithResponse
-                : CBCharacteristicWriteType.WithoutResponse;
-            this.Peripheral.WriteValue(data, this.NativeCharacteristic, writeType);
+            this.Peripheral.WriteValue(data, this.NativeCharacteristic, CBCharacteristicWriteType.WithResponse);
 
             return () => this.Peripheral.WroteCharacteristicValue -= handler;
         });
 
 
-        //public override IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value)
-        //{
-        //    if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
-        //        return this.NewInternalWrite(value);
+        IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value)
+        {
+            if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
+                return this.NewInternalWrite(value);
 
-        //    return Observable.Return(this.InternalWrite(value));
-        //}
-
-
-        //IObservable<CharacteristicGattResult> NewInternalWrite(byte[] value) => Observable.Create<CharacteristicGattResult>(ob =>
-        //{
-        //    EventHandler handler = null;
-        //    if (this.Peripheral.CanSendWriteWithoutResponse)
-        //    {
-        //        ob.Respond(this.InternalWrite(value));
-        //    }
-        //    else
-        //    {
-        //        handler = new EventHandler((sender, args) => ob.Respond(this.InternalWrite(value)));
-        //        this.Peripheral.IsReadyToSendWriteWithoutResponse += handler;
-        //    }
-        //    return () =>
-        //    {
-        //        if (handler != null)
-        //            this.Peripheral.IsReadyToSendWriteWithoutResponse -= handler;
-        //    };
-        //});
+            return Observable.Return(this.DoWriteNoResponse(value));
+        }
 
 
-        //CharacteristicGattResult InternalWrite(byte[] value)
-        //{
-        //    var data = NSData.FromArray(value);
-        //    this.Peripheral.WriteValue(data, this.NativeCharacteristic, CBCharacteristicWriteType.WithoutResponse);
-        //    return new CharacteristicGattResult(this, value);
-        //}
+        IObservable<CharacteristicGattResult> NewInternalWrite(byte[] value) => Observable.Create<CharacteristicGattResult>(ob =>
+        {
+            EventHandler handler = null;
+            if (this.Peripheral.CanSendWriteWithoutResponse)
+            {
+                ob.Respond(this.DoWriteNoResponse(value));
+            }
+            else
+            {
+                handler = new EventHandler((sender, args) => ob.Respond(this.DoWriteNoResponse(value)));
+                this.Peripheral.IsReadyToSendWriteWithoutResponse += handler;
+            }
+            return () =>
+            {
+                if (handler != null)
+                    this.Peripheral.IsReadyToSendWriteWithoutResponse -= handler;
+            };
+        });
+
+
+        CharacteristicGattResult DoWriteNoResponse(byte[] value)
+        {
+            var data = NSData.FromArray(value);
+            this.Peripheral.WriteValue(data, this.NativeCharacteristic, CBCharacteristicWriteType.WithoutResponse);
+            return new CharacteristicGattResult(this, value);
+        }
 
 
         public override IObservable<CharacteristicGattResult> Read() => Observable.Create<CharacteristicGattResult>(ob =>
