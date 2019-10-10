@@ -23,8 +23,8 @@ namespace Shiny.Locations
 
 
         public MotionActivityManagerImpl(AndroidContext context,
-                                  AndroidSqliteDatabase database,
-                                  IMessageBus messageBus)
+                                         AndroidSqliteDatabase database,
+                                         IMessageBus messageBus)
         {
             this.context = context;
             this.database = database;
