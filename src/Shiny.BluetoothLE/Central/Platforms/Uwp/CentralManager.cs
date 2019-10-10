@@ -6,14 +6,13 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Radios;
 using Windows.Foundation;
-using Windows.System;
 using Windows.Devices.Enumeration;
 
 
 namespace Shiny.BluetoothLE.Central
 {
     public class CentralManager : AbstractCentralManager,
-                                  ICanOpenAdapterSettings,
+                                  ICanControlAdapterState,
                                   ICanSeePairedPeripherals
     {
         readonly CentralContext context;
@@ -39,26 +38,6 @@ namespace Shiny.BluetoothLE.Central
 
         // TODO: check appmanifest
         public override IObservable<AccessState> RequestAccess() => Observable.Return(AccessState.Available);
-
-
-        //public override BleFeatures Features
-        //{
-        //    get
-        //    {
-        //        if (this.native == null || !this.native.IsLowEnergySupported || !this.native.IsCentralRoleSupported)
-        //            return BleFeatures.None;
-
-        //        return BleFeatures.ControlAdapterState |
-        //               BleFeatures.LowPoweredScan |
-        //               BleFeatures.MtuRequests |
-        //               BleFeatures.OpenSettings |
-        //               BleFeatures.PairingRequests |
-        //               BleFeatures.ReliableTransactions |
-        //               BleFeatures.ViewPairedPeripherals;
-        //    }
-        //}
-
-
         public override bool IsScanning { get; protected set; }
 
 
@@ -192,8 +171,6 @@ namespace Shiny.BluetoothLE.Central
         public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => this.GetDevices(
             BluetoothLEDevice.GetDeviceSelectorFromPairingState(true)
         );
-        public bool OpenSettings()
-            => Launcher.LaunchUriAsync(new Uri("ms-settings:bluetooth")).GetResults();
 
 
         public async void SetAdapterState(bool enable)

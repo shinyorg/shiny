@@ -50,11 +50,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Platforms\Android\MotionActivityManagerImpl.cs">
-        <SubType>Code</SubType>
-      </None>
-      <None Update="Platforms\iOS\MotionActivityManagerImpl.cs">
-        <SubType>Code</SubType>
-      </None>
+      <None Update="Platforms\Android\MotionActivityManagerImpl.cs" />
+      <None Update="Platforms\iOS\MotionActivityManagerImpl.cs" />
     </ItemGroup>
 </Project>
