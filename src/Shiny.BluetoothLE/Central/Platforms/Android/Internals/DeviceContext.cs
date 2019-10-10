@@ -76,7 +76,7 @@ namespace Shiny.BluetoothLE.Central.Internals
 
         public IObservable<T> Invoke<T>(IObservable<T> observable)
         {
-            if (!this.CentralContext.Configuration.UseInternalSyncQueue)
+            if (!this.CentralContext.Configuration.AndroidUseInternalSyncQueue)
                 return observable;
 
             return Observable.Create<T>(ob =>
