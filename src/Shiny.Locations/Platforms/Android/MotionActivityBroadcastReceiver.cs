@@ -49,6 +49,7 @@ namespace Shiny.Locations
                         break;
 
                     case DetectedActivity.OnFoot:
+                    case DetectedActivity.Walking:
                         type |= MotionActivityType.Walking;
                         break;
 
@@ -58,10 +59,6 @@ namespace Shiny.Locations
 
                     case DetectedActivity.Still:
                         type |= MotionActivityType.Stationary;
-                        break;
-
-                    case DetectedActivity.Walking:
-                        type |= MotionActivityType.Walking;
                         break;
                 }
             }
