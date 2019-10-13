@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
-using Shiny.Locations;
 
-[assembly: LocationsAutoRegisterAttribute]
+[assembly: Shiny.Locations.LocationsServiceModule]
+
 
 namespace Shiny.Locations
 {
-    public class LocationsAutoRegisterAttribute : AutoRegisterAttribute
+    public class LocationsServiceModuleAttribute : ServiceModuleAttribute
     {
         public override void Register(IServiceCollection services)
         {

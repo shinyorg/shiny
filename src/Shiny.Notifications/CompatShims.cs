@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
-using Shiny.Notifications;
 
-[assembly: NotificationAutoRegisterAttribute]
+[assembly: Shiny.Notifications.NotificationServiceModule]
+
 
 namespace Shiny.Notifications
 {
-    public class NotificationAutoRegisterAttribute : AutoRegisterAttribute
+    public class NotificationServiceModuleAttribute : ServiceModuleAttribute
     {
         public override void Register(IServiceCollection services)
         {

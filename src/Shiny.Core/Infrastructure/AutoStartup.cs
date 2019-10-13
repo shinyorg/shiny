@@ -8,7 +8,7 @@ namespace Shiny.Infrastructure
     {
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.RegisterModule(new AutoRegistrationModule());
+            services.RegisterModule(new AssemblyServiceModule());
         }
     }
 }

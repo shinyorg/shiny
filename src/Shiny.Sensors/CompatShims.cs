@@ -1,10 +1,13 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Infrastructure;
+
+[assembly: Shiny.Sensors.SensorsServiceModule]
 
 
 namespace Shiny.Sensors
 {
-    public class SensorsAutoRegisterAttribute : Shiny.Infrastructure.AutoRegisterAttribute
+    public class SensorsServiceModuleAttribute : ServiceModuleAttribute
     {
         public override void Register(IServiceCollection services)
         {

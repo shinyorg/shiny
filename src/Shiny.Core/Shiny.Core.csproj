@@ -69,4 +69,9 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Infrastructure\DelegeteRegistrationAttribute.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
 </Project>
