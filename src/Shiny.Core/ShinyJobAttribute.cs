@@ -1,15 +1,17 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
+using Shiny.Jobs;
 
 
-namespace Shiny.Jobs
+namespace Shiny
 {
-    public class JobRegistrationAttribute : ServiceModuleAttribute
+    public class ShinyJobAttribute : ServiceModuleAttribute
     {
-        public JobRegistrationAttribute(Type jobType)
+        public ShinyJobAttribute(Type jobType, string identifier = null)
         {
             this.Type = jobType;
+            this.Identifier = identifier;
         }
 
 
