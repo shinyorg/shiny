@@ -17,7 +17,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new BeaconModule(null));
+            services.RegisterModule(new BeaconModule(null, null));
             return true;
 #endif
         }
@@ -26,9 +26,9 @@ namespace Shiny
         /// <summary>
         /// Use this method if you plan to use background monitoring (works for ranging as well)
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="services"></param>
         /// <param name="delegateType"></param>
-        /// <param name="registerBeaconsIfPermissionAvailable"></param>
+        /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
         /// <returns></returns>
         public static bool UseBeacons(this IServiceCollection services, Type delegateType, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable)
         {

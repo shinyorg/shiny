@@ -5,9 +5,9 @@ using Shiny.Infrastructure;
 
 namespace Shiny
 {
-    public class ShinyHttpTransferAttribute : ServiceModuleAttribute
+    public class ShinyHttpTransfersAttribute : ServiceModuleAttribute
     {
-        public ShinyHttpTransferAttribute(Type delegateType)
+        public ShinyHttpTransfersAttribute(Type delegateType)
             => this.DelegateType = delegateType;
 
 

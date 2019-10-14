@@ -16,7 +16,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new NotificationModule(delegateType, requestPermissionImmediately, androidConfig, uwpConfig));
+            services.RegisterModule(new NotificationModule(delegateType, requestPermissionImmediately, androidConfig, uwpConfig));
             return true;
 #endif
         }

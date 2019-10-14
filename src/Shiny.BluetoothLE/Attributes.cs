@@ -7,6 +7,9 @@ namespace Shiny
 {
     public class ShinyBleCentralAttribute : ServiceModuleAttribute
     {
+        public ShinyBleCentralAttribute(Type delegateType = null)
+            => this.DelegateType = delegateType;
+
         public Type DelegateType { get; set; }
         public override void Register(IServiceCollection services)
             => services.UseBleCentral(this.DelegateType);

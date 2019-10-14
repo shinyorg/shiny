@@ -8,6 +8,8 @@ namespace Shiny
 {
     public class ShinyGpsAttribute : ServiceModuleAttribute
     {
+        public ShinyGpsAttribute(Type delegateType = null)
+            => this.DelegateType = delegateType;
         public Type DelegateType { get; set; }
 
 
@@ -30,9 +32,9 @@ namespace Shiny
     }
 
 
-    public class ShinyGeofenceAttribute : ServiceModuleAttribute
+    public class ShinyGeofencesAttribute : ServiceModuleAttribute
     {
-        public ShinyGeofenceAttribute(Type delegateType)
+        public ShinyGeofencesAttribute(Type delegateType)
             => this.DelegateType = delegateType;
 
         public Type DelegateType { get; }

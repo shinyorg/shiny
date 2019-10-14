@@ -5,8 +5,15 @@ using Shiny.Infrastructure;
 
 namespace Shiny
 {
-    public class ShinyNotificationAttribute : ServiceModuleAttribute
+    public class ShinyNotificationsAttribute : ServiceModuleAttribute
     {
+        public ShinyNotificationsAttribute(Type delegateType = null, bool requestPermission = false)
+        {
+            this.DelegateType = delegateType;
+            this.RequestPermissionOnStart = requestPermission;
+        }
+
+
         public bool RequestPermissionOnStart { get; set; }
         public Type DelegateType { get; set; }
 
