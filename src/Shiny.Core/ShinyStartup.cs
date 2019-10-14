@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-
+using Shiny.Infrastructure;
 
 namespace Shiny
 {
@@ -30,8 +31,24 @@ namespace Shiny
     }
 
 
+    class InternalShinyStartup : ShinyStartup
+    {
+        readonly Action<IServiceCollection> callback;
+        public InternalShinyStartup(Action<IServiceCollection> serviceCallback)
+            => this.callback = serviceCallback;
+        public override void ConfigureServices(IServiceCollection services)
+            => this.callback.Invoke(services);
+    }
+
+
     public abstract class ShinyStartup : IShinyStartup
     {
+        public static IShinyStartup FromAttributes(params Assembly[] assemblies)
+            => new InternalShinyStartup(s => s.RegisterModule(new AssemblyServiceModule(assemblies)));
+
+        public static IShinyStartup AutoRegister()
+            => new InternalShinyStartup(s => s.RegisterModule(new AutoRegisterModule()));
+
         /// <summary>
         /// Configure the service collection
         /// </summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -7,6 +8,13 @@ namespace Shiny.Infrastructure
 {
     public class AssemblyServiceModule : ShinyModule
     {
+        readonly Assembly[] assemblies;
+        public AssemblyServiceModule(Assembly[] assemblies = null)
+        {
+            this.assemblies = assemblies ?? AppDomain.CurrentDomain.GetAssemblies();
+        }
+
+
         public override void Register(IServiceCollection services)
         {
             var attributes = AppDomain
@@ -16,20 +24,29 @@ namespace Shiny.Infrastructure
 
             foreach (var attribute in attributes)
             {
-                if (attribute is ServiceRegisterAttribute serviceAttribute)
+                if (attribute is ShinyServiceAttribute serviceAttribute)
                 {
                     switch (serviceAttribute.Lifetime)
                     {
                         case ServiceLifetime.Transient:
-                            services.AddTransient(serviceAttribute.ServiceType, serviceAttribute.ImplementationType);
+                            if (serviceAttribute.ServiceType == null)
+                                services.AddTransient(serviceAttribute.ImplementationType);
+                            else
+                                services.AddTransient(serviceAttribute.ServiceType, serviceAttribute.ImplementationType);
                             break;
 
                         case ServiceLifetime.Scoped:
-                            services.AddScoped(serviceAttribute.ServiceType, serviceAttribute.ImplementationType);
+                            if (serviceAttribute.ServiceType == null)
+                                services.AddScoped(serviceAttribute.ImplementationType);
+                            else
+                                services.AddScoped(serviceAttribute.ServiceType, serviceAttribute.ImplementationType);
                             break;
 
                         case ServiceLifetime.Singleton:
-                            services.AddSingleton(serviceAttribute.ServiceType, serviceAttribute.ImplementationType);
+                            if (serviceAttribute.ServiceType == null)
+                                services.AddSingleton(serviceAttribute.ImplementationType);
+                            else
+                                services.AddSingleton(serviceAttribute.ServiceType, serviceAttribute.ImplementationType);
                             break;
                     }
                     
