@@ -9,14 +9,21 @@ namespace Shiny.Beacons
     class BeaconModule : ShinyModule
     {
         readonly BeaconRegion[] regionsToMonitorWhenPermissionAvailable;
-        public BeaconModule(BeaconRegion[] regionsToMonitorWhenPermissionAvailable)
+        readonly Type delegateType;
+
+
+        public BeaconModule(Type delegateType, BeaconRegion[] regionsToMonitorWhenPermissionAvailable)
         {
+            this.delegateType = delegateType;
             this.regionsToMonitorWhenPermissionAvailable = regionsToMonitorWhenPermissionAvailable;
         }
 
 
         public override void Register(IServiceCollection services)
         {
+            if (this.delegateType != null)
+                services.AddSingleton(typeof(IBeaconDelegate), this.delegateType);
+
 #if WINDOWS_UWP || __ANDROID__
             services.UseBleCentral();
             services.AddSingleton<BackgroundTask>();

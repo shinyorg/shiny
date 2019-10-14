@@ -11,19 +11,31 @@ namespace Shiny
         /// <summary>
         /// Register the ICentralManager service that allows you to connect to other BLE devices - Delegates used here are intended for background usage
         /// </summary>
-        /// <typeparam name="TCentralDelegate"></typeparam>
-        /// <param name="builder"></param>
+        /// <param name="services"></param>
         /// <param name="config"></param>
+        /// <param name="delegateType"></param>
         /// <returns></returns>
-        public static bool UseBleCentral<TCentralDelegate>(this IServiceCollection builder, BleCentralConfiguration config = null) where TCentralDelegate : class, IBleCentralDelegate
+        public static bool UseBleCentral(this IServiceCollection services, Type delegateType, BleCentralConfiguration config = null)
         {
-            if (builder.UseBleCentral(config))
+            if (services.UseBleCentral(config))
             {
-                builder.AddSingleton<IBleCentralDelegate, TCentralDelegate>();
+                if (delegateType != null)
+                    services.AddSingleton(typeof(IBleCentralDelegate), delegateType);
                 return true;
             }
             return false;
         }
+
+
+        /// <summary>
+        /// Register the ICentralManager service that allows you to connect to other BLE devices - Delegates used here are intended for background usage
+        /// </summary>
+        /// <typeparam name="TCentralDelegate"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public static bool UseBleCentral<TCentralDelegate>(this IServiceCollection services, BleCentralConfiguration config = null) where TCentralDelegate : class, IBleCentralDelegate
+            => services.UseBleCentral(typeof(TCentralDelegate), config);
 
 
         /// <summary>

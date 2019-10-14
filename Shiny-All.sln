@@ -17,15 +17,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		support.xlsx = support.xlsx
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Core", "src\Shiny.Core\Shiny.Core.csproj", "{84C6A1B8-0A57-4C6F-8738-3D3C03CE6F55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Core", "src\Shiny.Core\Shiny.Core.csproj", "{84C6A1B8-0A57-4C6F-8738-3D3C03CE6F55}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE", "src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj", "{007465D6-5714-4E7E-929D-6F01D04E43B6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Locations", "src\Shiny.Locations\Shiny.Locations.csproj", "{5A0DD7A1-E497-4051-84B0-2E16B015E012}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Locations", "src\Shiny.Locations\Shiny.Locations.csproj", "{5A0DD7A1-E497-4051-84B0-2E16B015E012}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Sensors", "src\Shiny.Sensors\Shiny.Sensors.csproj", "{BE287E27-B7BC-44F5-8E0D-2F1A6E016D47}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Notifications", "src\Shiny.Notifications\Shiny.Notifications.csproj", "{E76DB2CB-7A95-40B0-9A50-230320554B6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Notifications", "src\Shiny.Notifications\Shiny.Notifications.csproj", "{E76DB2CB-7A95-40B0-9A50-230320554B6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.SpeechRecognition", "src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj", "{34905983-1F79-4B74-9BB0-D1DC7D24B8BF}"
 EndProject

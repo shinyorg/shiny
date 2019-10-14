@@ -30,6 +30,23 @@ namespace Shiny
         /// <summary>
         ///
         /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="regions"></param>
+        /// <returns></returns>
+        public static bool UseGeofencing(this IServiceCollection builder, Type geofenceDelegateType, params GeofenceRegion[] regions)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            builder.RegisterModule(new GeofenceModule(geofenceDelegateType, regions));
+            return true;
+#endif
+        }
+
+
+        /// <summary>
+        ///
+        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="builder"></param>
         /// <param name="regions"></param>
@@ -39,7 +56,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new GeofenceModule<T>(regions));
+            builder.RegisterModule(new GeofenceModule(typeof(T), regions));
             return true;
 #endif
         }

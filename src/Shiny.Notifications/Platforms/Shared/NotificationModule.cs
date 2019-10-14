@@ -7,12 +7,18 @@ namespace Shiny.Notifications
 {
     class NotificationModule : ShinyModule
     {
+        readonly Type delegateType;
         readonly bool requestPermissionImmediately;
-        public NotificationModule(bool requestPermissionImmediately,
+
+
+        public NotificationModule(Type delegateType,
+                                  bool requestPermissionImmediately,
                                   AndroidOptions androidConfig,
                                   UwpOptions uwpConfig)
         {
+            this.delegateType = delegateType;
             this.requestPermissionImmediately = requestPermissionImmediately;
+
             if (androidConfig != null)
             {
                 AndroidOptions.DefaultChannel = androidConfig.ChannelDescription ?? AndroidOptions.DefaultChannel;
@@ -30,6 +36,9 @@ namespace Shiny.Notifications
 
         public override void Register(IServiceCollection services)
         {
+            if (this.delegateType != null)
+                services.AddSingleton(typeof(INotificationDelegate), this.delegateType);
+
             services.AddSingleton<INotificationManager, NotificationManager>();
 #if __ANDROID__
             services.AddSingleton<AndroidNotificationProcessor>();

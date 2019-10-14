@@ -271,3 +271,4 @@ __pycache__/
 *.pyc
 ._support.xlsx
 .ionide/symbolCache.db
+.DS_Store

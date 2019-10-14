@@ -1,7 +1,7 @@
 ﻿using System;
+using Shiny.Beacons;
 
-
-namespace Shiny.Beacons
+namespace Shiny
 {
     public static class CrossBeacons
     {
