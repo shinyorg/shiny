@@ -34,7 +34,7 @@ namespace Shiny
                 uwpConfig
             );
 
-        public static bool UseNotifications(this IServiceCollection builder,
+        public static bool UseNotifications(this IServiceCollection services,
                                             bool requestPermissionImmediately = false,
                                             AndroidOptions androidConfig = null,
                                             UwpOptions uwpConfig = null)
@@ -42,7 +42,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new NotificationModule(null, requestPermissionImmediately, androidConfig, uwpConfig));
+            services.RegisterModule(new NotificationModule(null, requestPermissionImmediately, androidConfig, uwpConfig));
             return true;
 #endif
         }
