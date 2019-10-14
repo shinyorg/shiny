@@ -46,7 +46,7 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        /// <param name="registerBeaconsIfPermissionAvailable"></param>
+        /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
         /// <returns></returns>
         public static bool UseBeacons<T>(this IServiceCollection services, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable) where T : class, IBeaconDelegate
             => services.UseBeacons(typeof(T), regionsToMonitorWhenPermissionAvailable);

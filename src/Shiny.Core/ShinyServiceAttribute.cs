@@ -2,15 +2,16 @@
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Shiny.Infrastructure
+namespace Shiny
 {
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true, Inherited = true)]
-    public class ServiceRegisterAttribute : Attribute
+    public class ShinyServiceAttribute : Attribute
     {
-        public ServiceRegisterAttribute(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        public ShinyServiceAttribute(Type serviceType, Type implementationType, ServiceLifetime lifetime = ServiceLifetime.Singleton)
         {
             this.ServiceType = serviceType;
             this.ImplementationType = implementationType;
+            this.Lifetime = lifetime;
         }
 
         public ServiceLifetime Lifetime { get; }

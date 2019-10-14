@@ -12,7 +12,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
-        <PackageReference Include="System.Reactive" Version="4.1.6" />
+        <PackageReference Include="System.Reactive" Version="4.2.0" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
@@ -33,7 +33,6 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <!-- not ready for androidx <PackageReference Include="Xamarin.Android.Arch.Work.Runtime" Version="1.0.0" />-->
         <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.3" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
         <PackageReference Include="Xamarin.Build.Download" Version="0.4.11" PrivateAssets="All" />
     </ItemGroup>
 
@@ -72,6 +71,12 @@
     <ItemGroup>
       <Compile Update="Infrastructure\DelegeteRegistrationAttribute.cs">
         <SubType></SubType>
+      </Compile>
+      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="ServiceRegisterAttribute.cs">
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="ShinyServiceAttribute.cs">
+        <SubType>Code</SubType>
       </Compile>
     </ItemGroup>
 </Project>
