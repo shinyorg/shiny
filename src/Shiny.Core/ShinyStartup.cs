@@ -31,24 +31,20 @@ namespace Shiny
     }
 
 
-    class InternalShinyStartup : ShinyStartup
+
+    public class AttributeShinyStartup : ShinyStartup
     {
-        readonly Action<IServiceCollection> callback;
-        public InternalShinyStartup(Action<IServiceCollection> serviceCallback)
-            => this.callback = serviceCallback;
+        readonly Assembly[] assemblies;
+        public AttributeShinyStartup(params Assembly[] assemblies)
+            => this.assemblies = assemblies;
+
         public override void ConfigureServices(IServiceCollection services)
-            => this.callback.Invoke(services);
+            => services.RegisterModule(new AssemblyServiceModule(this.assemblies));
     }
 
 
     public abstract class ShinyStartup : IShinyStartup
     {
-        public static IShinyStartup FromAttributes(params Assembly[] assemblies)
-            => new InternalShinyStartup(s => s.RegisterModule(new AssemblyServiceModule(assemblies)));
-
-        public static IShinyStartup AutoRegister()
-            => new InternalShinyStartup(s => s.RegisterModule(new AutoRegisterModule()));
-
         /// <summary>
         /// Configure the service collection
         /// </summary>

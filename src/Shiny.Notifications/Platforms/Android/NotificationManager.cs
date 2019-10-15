@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -40,6 +41,12 @@ namespace Shiny.Notifications
             this.jobs = jobs;
             this.repository = repository;
             this.settings = settings;
+
+            // auto process intent?
+            //this.context
+            //    .WhenActivityStatusChanged()
+            //    .Where(x => x.Status == ActivityState.Created)
+            //    .Subscribe(x => TryProcessIntent(x.Activity.Intent));
 
             if ((int) Build.VERSION.SdkInt >= 26)
             {
