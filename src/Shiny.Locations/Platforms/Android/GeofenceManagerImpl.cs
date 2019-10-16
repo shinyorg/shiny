@@ -28,12 +28,6 @@ namespace Shiny.Locations
         {
             this.context = context;
             this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
-            //mGoogleApiClient = new GoogleApiClient.Builder(this)
-            //        .addConnectionCallbacks(this)
-            //        .addOnConnectionFailedListener(this)
-            //        .addApi(LocationServices.API)
-            //        .build();
-            //this.client.Connect();
         }
 
 
@@ -78,8 +72,10 @@ namespace Shiny.Locations
 
         public override async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken)
         {
-            var client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);
-            var location = await client.GetLastLocationAsync();
+            var location = await LocationServices
+                .GetFusedLocationProviderClient(this.context.AppContext)
+                .GetLastLocationAsync();
+
             if (location == null)
                 return GeofenceState.Unknown;
 
@@ -92,6 +88,7 @@ namespace Shiny.Locations
         protected virtual async Task Create(GeofenceRegion region)
         {
             var transitions = this.GetTransitions(region);
+
             var geofence = new GeofenceBuilder()
                 .SetRequestId(region.Identifier)
                 .SetExpirationDuration(Geofence.NeverExpire)
@@ -104,8 +101,8 @@ namespace Shiny.Locations
                 .Build();
 
             var request = new GeofencingRequest.Builder()
+                .SetInitialTrigger(0)
                 .AddGeofence(geofence)
-                .SetInitialTrigger(transitions)
                 .Build();
 
             await this.client.AddGeofencesAsync(
@@ -119,10 +116,10 @@ namespace Shiny.Locations
         {
             var i = 0;
             if (region.NotifyOnEntry)
-                i = 1;
+                i += Geofence.GeofenceTransitionEnter;
 
             if (region.NotifyOnExit)
-                i += 2;
+                i += Geofence.GeofenceTransitionExit;
 
             return i;
         }
