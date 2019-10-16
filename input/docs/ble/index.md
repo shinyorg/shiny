@@ -20,6 +20,38 @@ Bluetooth LE is divided into 2 separate categories - the central manager (client
 |UWP|16299 - Limited Beta|[Setup](platforms/uwp)|
 
 
+## Shiny Setup
+
+Startup
+ Services.UseBleCentral() or services.UseBleCentral<YourBleCentralDelegate>();
+ 
+ 
+Attribute
+  [assembly: ShinyBleCentral(typeof(YourDelegate))]
+ 
+## Background Delegate
+
+```csharp
+Public class YourDelegate : Shiny.BluetoothLE.IBleCentralDelegate {
+
+  Public override void OnAdapterStatusChanged() 
+  {
+  }
+  
+  Public override void OnConnected(IPeripheral peripheral) {
+  }
+}
+```
+
+## Accessing The Service
+
+```csharp
+Shiny.ShinyHost.Resolve<Shiny.BluetoothLE.ICentralManager>();
+
+// or DI the interface
+
+Shiny.CrossBleAdapter.Current
+```
 
 # FAQ
 
