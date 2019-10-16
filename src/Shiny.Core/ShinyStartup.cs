@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-
+using Shiny.Infrastructure;
 
 namespace Shiny
 {
@@ -27,6 +28,18 @@ namespace Shiny
         /// </summary>
         /// <param name="provider"></param>
         void ConfigureApp(IServiceProvider provider);
+    }
+
+
+
+    public class AttributeShinyStartup : ShinyStartup
+    {
+        readonly Assembly[] assemblies;
+        public AttributeShinyStartup(params Assembly[] assemblies)
+            => this.assemblies = assemblies;
+
+        public override void ConfigureServices(IServiceCollection services)
+            => services.RegisterModule(new AssemblyServiceModule(this.assemblies));
     }
 
 

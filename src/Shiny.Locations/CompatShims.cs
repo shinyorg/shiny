@@ -1,23 +1,9 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Shiny.Infrastructure;
 using Shiny.Locations;
 
-[assembly: LocationsAutoRegisterAttribute]
 
-namespace Shiny.Locations
+namespace Shiny
 {
-    public class LocationsAutoRegisterAttribute : AutoRegisterAttribute
-    {
-        public override void Register(IServiceCollection services)
-        {
-            services.UseGps();
-            //services.UseGeofencing<>
-            //services.UseMotionActivity();
-        }
-    }
-
-
     public static class CrossGps
     {
         public static IGpsManager Current => ShinyHost.Resolve<IGpsManager>();

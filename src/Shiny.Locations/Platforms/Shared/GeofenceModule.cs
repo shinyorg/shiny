@@ -5,12 +5,16 @@ using Shiny.Logging;
 
 namespace Shiny.Locations
 {
-    class GeofenceModule<T> : ShinyModule where T: class, IGeofenceDelegate
+    class GeofenceModule : ShinyModule
     {
         readonly GeofenceRegion[] startingRegions;
-        public GeofenceModule(GeofenceRegion[] regions)
+        readonly Type delegateType;
+
+
+        public GeofenceModule(Type delegateType, GeofenceRegion[] regions)
         {
             this.startingRegions = regions;
+            this.delegateType = delegateType;
         }
 
 
@@ -21,7 +25,7 @@ namespace Shiny.Locations
 #elif WINDOWS_UWP
             services.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
 #endif
-            services.AddSingleton<IGeofenceDelegate, T>();
+            services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
             services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
         }
 

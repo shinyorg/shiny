@@ -10,14 +10,14 @@ namespace Shiny
         /// <summary>
         /// Register the beacon service with this if you only plan to use ranging
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="services"></param>
         /// <returns></returns>
-        public static bool UseBeacons(this IServiceCollection builder)
+        public static bool UseBeacons(this IServiceCollection services)
         {
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new BeaconModule(null));
+            services.RegisterModule(new BeaconModule(null, null));
             return true;
 #endif
         }
@@ -26,19 +26,29 @@ namespace Shiny
         /// <summary>
         /// Use this method if you plan to use background monitoring (works for ranging as well)
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="builder"></param>
-        /// <param name="registerBeaconsIfPermissionAvailable"></param>
+        /// <param name="services"></param>
+        /// <param name="delegateType"></param>
+        /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
         /// <returns></returns>
-        public static bool UseBeacons<T>(this IServiceCollection builder, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable) where T : class, IBeaconDelegate
+        public static bool UseBeacons(this IServiceCollection services, Type delegateType, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable)
         {
 #if NETSTANDARD
             return false;
 #else
-            builder.AddSingleton<IBeaconDelegate, T>();
-            builder.RegisterModule(new BeaconModule(regionsToMonitorWhenPermissionAvailable));
+            services.RegisterModule(new BeaconModule(delegateType, regionsToMonitorWhenPermissionAvailable));
             return false;
 #endif
         }
+
+
+        /// <summary>
+        /// Use this method if you plan to use background monitoring (works for ranging as well)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
+        /// <returns></returns>
+        public static bool UseBeacons<T>(this IServiceCollection services, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable) where T : class, IBeaconDelegate
+            => services.UseBeacons(typeof(T), regionsToMonitorWhenPermissionAvailable);
     }
 }

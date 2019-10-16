@@ -31,6 +31,7 @@ namespace Shiny.Locations
             if (e == null)
                 return;
 
+            
             if (e.HasError)
             {
                 Log.Write(
@@ -44,8 +45,8 @@ namespace Shiny.Locations
                 foreach (var triggeringGeofence in e.TriggeringGeofences)
                 {
                     var state = (GeofenceState)e.GeofenceTransition;
-
                     var region = await this.repository.Get(triggeringGeofence.RequestId);
+
                     if (region == null)
                     {
                         Log.Write(

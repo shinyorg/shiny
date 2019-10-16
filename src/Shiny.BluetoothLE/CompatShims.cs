@@ -2,7 +2,7 @@
 using Shiny.BluetoothLE.Central;
 
 
-namespace Shiny.BluetoothLE
+namespace Shiny
 {
     public static class CrossBleAdapter
     {

@@ -6,24 +6,20 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static void UseHttpClientTransfers<T>(this IServiceCollection builder) where T : class, IHttpTransferDelegate
+        public static void UseHttpTransfers(this IServiceCollection services, Type transferDelegateType)
         {
-            builder.AddSingleton<IHttpTransferDelegate, T>();
-            builder.AddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
-        }
-
-
-        public static void UseHttpTransfers<T>(this IServiceCollection builder) where T : class, IHttpTransferDelegate
-        {
+            services.AddSingleton(typeof(IHttpTransferDelegate), transferDelegateType);
 #if NETSTANDARD
-            builder.UseHttpClientTransfers<T>();
+            services.AddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
 #elif WINDOWS_UWP || __IOS__
-            builder.AddSingleton<IHttpTransferDelegate, T>();
-            builder.AddSingleton<IHttpTransferManager, HttpTransferManager>();
+            services.AddSingleton<IHttpTransferManager, HttpTransferManager>();
 #elif __ANDROID__
-            builder.AddSingleton<IHttpTransferDelegate, T>();
-            builder.AddSingleton<IHttpTransferManager, HttpTransferManager>();
+            services.AddSingleton<IHttpTransferManager, HttpTransferManager>();
 #endif
         }
+
+
+        public static void UseHttpTransfers<T>(this IServiceCollection services) where T : class, IHttpTransferDelegate
+            => services.UseHttpTransfers(typeof(T));
     }
 }
