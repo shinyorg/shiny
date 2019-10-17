@@ -75,6 +75,12 @@
       <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="ServiceRegisterAttribute.cs">
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Infrastructure\ShinyServiceModuleAttribute.cs">
+        <SubType></SubType>
+      </Compile>
+      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Infrastructure\ShinyServiceAttribute.cs">
+        <SubType>Code</SubType>
+      </Compile>
       <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="ShinyServiceAttribute.cs">
         <SubType>Code</SubType>
       </Compile>

@@ -10,17 +10,12 @@ namespace Shiny.Infrastructure
     {
         readonly Assembly[] assemblies;
         public AssemblyServiceModule(Assembly[] assemblies = null)
-        {
-            this.assemblies = assemblies ?? AppDomain.CurrentDomain.GetAssemblies();
-        }
+            => this.assemblies = assemblies ?? AssemblyQueries.GetAssumedUserAssemblies().ToArray();
 
 
         public override void Register(IServiceCollection services)
         {
-            var attributes = AppDomain
-                .CurrentDomain
-                .GetAssemblies()
-                .SelectMany(ass => ass.GetCustomAttributes(true));
+            var attributes = this.assemblies.SelectMany(ass => ass.GetCustomAttributes(true));
 
             foreach (var attribute in attributes)
             {

@@ -5,6 +5,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny
 {
+
     public class ShinyNotificationsAttribute : ServiceModuleAttribute
     {
         public ShinyNotificationsAttribute(Type delegateType = null, bool requestPermission = false)
