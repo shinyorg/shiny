@@ -72,7 +72,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new GpsModule(null));
+            services.RegisterModule(new GpsModule(null, null));
             return true;
 #endif
         }
