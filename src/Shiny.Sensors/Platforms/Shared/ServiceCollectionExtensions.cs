@@ -7,7 +7,7 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static void UseAll(this IServiceCollection services)
+        public static void UseAllSensors(this IServiceCollection services)
         {
             services.UseAccelerometer();
             services.UseAmbientLightSensor();

@@ -9,17 +9,13 @@ namespace Shiny
     public class ShinySensorsAutoRegisterAttribute : AutoRegisterAttribute
     {
         public override void Register(IServiceCollection services)
-        {
-            services.UseAll();
-        }
+            => services.UseAllSensors();
     }
 
 
     public class ShinySensorsAttribute : ServiceModuleAttribute
     {
         public override void Register(IServiceCollection services)
-        {
-            services.UseAll();
-        }
+            => services.UseAllSensors();
     }
 }
