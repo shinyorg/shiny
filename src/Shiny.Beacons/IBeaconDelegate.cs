@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-
+using Shiny.Infrastructure;
 
 namespace Shiny.Beacons
 {

@@ -4,7 +4,8 @@ using Shiny.Infrastructure;
 
 [assembly: Shiny.ShinySpeechRecognitionAutoRegister]
 
-namespace Shiny.SpeechRecognition
+
+namespace Shiny
 {
     public class ShinySpeechRecognitionAutoRegisterAttribute : AutoRegisterAttribute
     {
