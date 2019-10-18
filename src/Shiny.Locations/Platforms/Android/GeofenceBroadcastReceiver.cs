@@ -17,11 +17,10 @@ namespace Shiny.Locations
     public class GeofenceBroadcastReceiver : BroadcastReceiver
     {
         // startup tasks replace this, but this receiver is still used to trigger the wakeup on reboot
-        public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
-        {
-                await ShinyHost
-                    .Resolve<GeofenceProcessor>()
-                    .Process(intent);
-        });
+        public override void OnReceive(Context context, Intent intent) => this.Execute(() =>
+            ShinyHost
+                .Resolve<GeofenceProcessor>()
+                .Process(intent)
+        );
     }
 }

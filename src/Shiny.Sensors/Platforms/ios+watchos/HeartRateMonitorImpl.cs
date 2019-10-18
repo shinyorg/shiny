@@ -15,9 +15,9 @@ namespace Shiny.Sensors
 
         public async Task<AccessState> RequestAccess()
         {
-            var hrId = HKQuantityTypeIdentifier.HeartRate;
+            //var hrId = HKQuantityTypeIdentifier.HeartRate;
 
-            var result = await this.healthStore.RequestAuthorizationToShareAsync(null, null);
+            //var result = await this.healthStore.RequestAuthorizationToShareAsync(null, null);
 
             //HKObjectType.
             //new HKHealthStore().RequestAuthorizationToShareAsync(

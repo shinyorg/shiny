@@ -2,9 +2,17 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 
+[assembly: Shiny.ShinyAppCenterIntegrationAutoRegister]
 
 namespace Shiny
 {
+    public class ShinyAppCenterIntegrationAutoRegisterAttribute : AutoRegisterAttribute
+    {
+        public override void Register(IServiceCollection services)
+           => services.UseAppCenterLogging(null, true, false);
+    }
+
+
     public class ShinyAppCenterIntegrationAttribute : ServiceModuleAttribute
     {
         public ShinyAppCenterIntegrationAttribute(string appSecret = null, bool logCrashes = true, bool logEvents = false)

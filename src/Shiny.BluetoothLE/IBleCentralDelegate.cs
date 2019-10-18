@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.BluetoothLE.Central
 {
-    public interface IBleCentralDelegate
+    public interface IBleCentralDelegate : IShinyDelegate
     {
         Task OnAdapterStateChanged(AccessState state);
         Task OnConnected(IPeripheral peripheral);

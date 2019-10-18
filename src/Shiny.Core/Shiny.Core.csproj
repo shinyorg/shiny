@@ -67,16 +67,4 @@
         <Compile Include="**\Platforms\*macOS*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Infrastructure\DelegeteRegistrationAttribute.cs">
-        <SubType></SubType>
-      </Compile>
-      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="ServiceRegisterAttribute.cs">
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="ShinyServiceAttribute.cs">
-        <SubType>Code</SubType>
-      </Compile>
-    </ItemGroup>
 </Project>

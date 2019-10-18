@@ -19,6 +19,13 @@ To add a description to the Bluetooth request message (on iOS 10 this is require
 <string>YOUR CUSTOM MESSAGE</string>
 ```
 
+On iOS 13, you must also add the following
+
+```xml
+<key></key>
+<string></string>
+```
+
 ## Backgrounding
 * Device names are not available at all
 * When scanning in the background, pass a ScanConfig argument with a service UUID you wish to scan for.  Without this, you will get nothing

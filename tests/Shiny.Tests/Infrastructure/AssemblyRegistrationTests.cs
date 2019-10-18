@@ -1,12 +1,13 @@
 ﻿using System;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny;
 using Shiny.Infrastructure;
 using Shiny.Tests.Infrastructure;
 using Xunit;
 
 [assembly: TestServiceModule]
-[assembly: ServiceRegister(typeof(ITestAssemblyService2), typeof(TestAssemblyService2))]
+[assembly: ShinyServiceAttribute(typeof(ITestAssemblyService2), typeof(TestAssemblyService2))]
 
 
 namespace Shiny.Tests.Infrastructure
