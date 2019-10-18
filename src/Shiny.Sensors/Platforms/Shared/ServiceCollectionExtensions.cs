@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Sensors;
 
 
 namespace Shiny
@@ -56,9 +57,10 @@ namespace Shiny
 
         public static bool UseCompass(this IServiceCollection services)
         {
+            // TODO: watch os compass
 #if NETSTANDARD
             return false;
-#elif __WATCHOS__ || TIZEN
+#elif TIZEN || __WATCHOS__
             services.UseAccelerometer();
             services.UseMagnetometer();
             services.AddSingleton<ICompass, SharedCompassImpl>();
@@ -91,6 +93,7 @@ namespace Shiny
 #endif
         }
 
+
         public static bool UseMagnetometer(this IServiceCollection services)
         {
 #if NETSTANDARD
@@ -111,6 +114,7 @@ namespace Shiny
             return false;
 #endif
         }
+
 
         public static bool UseHeartRateMonitor(this IServiceCollection services)
         {
