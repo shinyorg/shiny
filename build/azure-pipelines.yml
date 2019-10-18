@@ -1,0 +1,168 @@
+trigger:
+  branches:
+    include:
+    - master
+    - dev
+    - rel/*
+  paths:
+    exclude:
+    - README.md
+    - .editorconfig
+    - .gitignore
+
+pr:
+  branches:
+    include:
+    - master
+    - dev
+  paths:
+    exclude:
+    - README.md
+    - .editorconfig
+    - .gitignore
+
+name: $(Build.BuildId)
+
+variables:
+- name: BuildConfiguration
+  value: 'Release'
+- name: TargetSolution
+  value: 'DemoDevOps.sln'
+- group: DemoDevOps-Secrets
+- group: iOS-Signing
+- group: AndroidSigning
+
+stages:
+- stage: QA
+  displayName: QA
+  jobs:
+  - job: iOS_QA
+    displayName: iOS QA Build
+    condition: not(startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/'))
+    pool:
+      vmImage: macOS-latest
+      demands:
+      - MSBuild
+      - xcode
+      - Xamarin.iOS
+    steps:
+      - template: jobs/ios.yml
+        parameters:
+          solution: $(TargetSolution)
+          appcenterKey: $(AppCenterKey_iOS_QA)
+          artifactName: 'iOS-QA'
+          isStoreRelease: false
+          buildConfiguration: Release
+          iOSCertificateFile: $(iOSDevelopmentCertificate)
+          iOSCertificatePassword: $(iOSDevelopmentPassword)
+          iOSProvisioningProfile: $(iOSDevelopmentProvisioningProfile)
+
+  - job: Android_QA
+    displayName: Android QA Build
+    condition: not(startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/'))
+    pool:
+      vmImage: macOS-latest
+      demands:
+      - MSBuild
+      - Xamarin.Android
+      - JDK
+      - AndroidSDK
+    steps:
+      - template: jobs/android.yml
+        parameters:
+          solution: $(TargetSolution)
+          appcenterKey: $(AppCenterKey_Android_QA)
+          artifactName: 'Droid-QA'
+          environment: 'QA'
+
+- stage: production
+  displayName: Production
+  jobs:
+  - job: iOS_Release
+    displayName: iOS Release Build
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/')
+    pool:
+      vmImage: macOS-latest
+      demands:
+      - MSBuild
+      - xcode
+      - Xamarin.iOS
+    steps:
+      - template: jobs/ios.yml
+        parameters:
+          solution: $(TargetSolution)
+          appcenterKey: $(AppCenterKey_iOS_Store)
+          artifactName: 'iOS-Store'
+          isStoreRelease: true
+          buildConfiguration: Store
+          iOSCertificateFile: $(iOSDistributionCertificate)
+          iOSCertificatePassword: $(iOSDistributionPassword)
+          iOSProvisioningProfile: $(iOSDistributionProvisioningProfile)
+
+  - job: Android_Release
+    displayName: Android Release Build
+    condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/')
+    pool:
+      vmImage: macOS-latest
+      demands:
+      - MSBuild
+      - Xamarin.Android
+      - JDK
+      - AndroidSDK
+    steps:
+      - template: jobs/android.yml
+        parameters:
+          solution: $(TargetSolution)
+          appcenterKey: $(AppCenterKey_Android_Store)
+          artifactName: 'Droid-Store'
+          environment: 'Store'
+
+- stage: deploy
+  displayName: Deploy
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/')
+  jobs:
+  - deployment: GooglePlay
+    displayName: Google Play
+    environment: Google Play
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: GooglePlayReleaseBundle@3
+              inputs:
+                serviceConnection: 'GooglePlay'
+                applicationId: 'com.avantipoint.demodevops'
+                bundleFile: 'Droid-Store/com.avantipoint.demodevops-Signed.aab'
+                track: 'internal'
+                rolloutToUserFraction: true
+
+  - deployment: AppCenter
+    displayName: Upload Artifacts to App Center
+    environment: App Center
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: AppCenterDistribute@3
+              displayName: 'Deploy to Visual Studio App Center (QA)'
+              condition: and(succeeded(), eq(startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/'), false))
+              inputs:
+                serverEndpoint: 'App Center'
+                appSlug: 'dansiegel/DemoDevOps.iOS.QA'
+                appFile: '$(Pipeline.Workspace)/iOS-QA/DemoDevOps.iOS.ipa'
+                symbolsDsymFiles: '$(Pipeline.Workspace)/iOS-QA/DemoDevOps.iOS.app.dSYM'
+                symbolsIncludeParentDirectory: false
+                releaseNotesInput: 'This is an automated release from the Dev Branch'
+                isSilent: false
+
+            - task: AppCenterDistribute@3
+              displayName: 'Deploy to Visual Studio App Center (Store)'
+              condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/rel/'))
+              inputs:
+                serverEndpoint: 'App Center'
+                appSlug: 'dansiegel/DemoDevOps.iOS.Store'
+                appFile: '$(Pipeline.Workspace)/iOS-Store/DemoDevOps.iOS.ipa'
+                symbolsDsymFiles: '$(Pipeline.Workspace)/iOS-Store/DemoDevOps.iOS.app.dSYM'
+                symbolsIncludeParentDirectory: false
+                releaseNotesInput: 'This is an official release'
+                isSilent: false

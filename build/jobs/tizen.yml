@@ -1,0 +1,33 @@
+pool:
+  name: Azure Pipelines
+  demands: msbuild
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Use .Net Core sdk 2.2.x'
+  inputs:
+    version: 2.2.x
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: restore
+
+- task: MSBuild@1
+  displayName: 'Build Tizen Mobile'
+  inputs:
+    solution: Samples.Tizen/Samples.Tizen.Mobile/Samples.Tizen.Mobile.csproj
+
+- task: tizen.d45d5e83-ee47-4ffc-abe7-844bcc1640a6.custom-build-task.TizenSigningTool@0
+  displayName: 'Signing TPK file(s) **/*.tpk'
+  enabled: false
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+  inputs:
+    SourceFolder: '$(system.defaultworkingdirectory)'
+    Contents: '**/*.tpk'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
