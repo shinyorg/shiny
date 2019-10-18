@@ -7,12 +7,22 @@ namespace Shiny.Locations
 {
     class GpsModule : ShinyModule
     {
+        readonly Type delegateType;
         readonly Action<GpsRequest> requestIfPermissionGranted;
-        public GpsModule(Action<GpsRequest> requestIfPermissionGranted) => this.requestIfPermissionGranted = requestIfPermissionGranted;
+
+
+        public GpsModule(Type delegateType, Action<GpsRequest> requestIfPermissionGranted)
+        {
+            this.delegateType = delegateType;
+            this.requestIfPermissionGranted = requestIfPermissionGranted;
+        }
 
 
         public override void Register(IServiceCollection services)
         {
+            if (this.delegateType != null)
+                services.AddSingleton(typeof(IGpsDelegate), this.delegateType);
+
             services.AddSingleton<IGpsManager, GpsManagerImpl>();
         }
 

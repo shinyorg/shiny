@@ -10,16 +10,16 @@ namespace Shiny
         /// <summary>
         ///
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="services"></param>
         /// <returns></returns>
-        public static bool UseMotionActivity(this IServiceCollection builder)
+        public static bool UseMotionActivity(this IServiceCollection services)
         {
 #if __ANDROID__
-            builder.AddSingleton<AndroidSqliteDatabase>();
-            builder.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
+            services.AddSingleton<AndroidSqliteDatabase>();
+            services.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
             return true;
 #elif __IOS__
-            builder.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
+            services.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
             return true;
 #else
             return false;
@@ -30,15 +30,15 @@ namespace Shiny
         /// <summary>
         ///
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="services"></param>
         /// <param name="regions"></param>
         /// <returns></returns>
-        public static bool UseGeofencing(this IServiceCollection builder, Type geofenceDelegateType, params GeofenceRegion[] regions)
+        public static bool UseGeofencing(this IServiceCollection services, Type geofenceDelegateType, params GeofenceRegion[] regions)
         {
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new GeofenceModule(geofenceDelegateType, regions));
+            services.RegisterModule(new GeofenceModule(geofenceDelegateType, regions));
             return true;
 #endif
         }
@@ -48,15 +48,15 @@ namespace Shiny
         ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="builder"></param>
+        /// <param name="services"></param>
         /// <param name="regions"></param>
         /// <returns></returns>
-        public static bool UseGeofencing<T>(this IServiceCollection builder, params GeofenceRegion[] regions) where T : class, IGeofenceDelegate
+        public static bool UseGeofencing<T>(this IServiceCollection services, params GeofenceRegion[] regions) where T : class, IGeofenceDelegate
         {
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new GeofenceModule(typeof(T), regions));
+            services.RegisterModule(new GeofenceModule(typeof(T), regions));
             return true;
 #endif
         }
@@ -65,14 +65,33 @@ namespace Shiny
         /// <summary>
         /// This registers GPS services with the Shiny container - foreground only
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="services"></param>
         /// <returns></returns>
-        public static bool UseGps(this IServiceCollection builder)
+        public static bool UseGps(this IServiceCollection services)
         {
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new GpsModule(null));
+            services.RegisterModule(new GpsModule(null));
+            return true;
+#endif
+        }
+
+
+        /// <summary>
+        /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
+        /// </summary>
+        /// <param name="delegateType">The IGpsDelegate to call</param>
+        /// <param name="services">The servicecollection to configure</param>
+        /// <param name="requestIfPermissionGranted">This will be called when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
+        /// <returns></returns>
+
+        public static bool UseGps(this IServiceCollection services, Type delegateType, Action<GpsRequest> requestIfPermissionGranted = null)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            services.RegisterModule(new GpsModule(delegateType, requestIfPermissionGranted));
             return true;
 #endif
         }
@@ -82,18 +101,10 @@ namespace Shiny
         /// This registers GPS services with the Shiny container as well as the delegate - you can also auto-start the listener when necessary background permissions are received
         /// </summary>
         /// <typeparam name="T">The IGpsDelegate to call</typeparam>
-        /// <param name="builder">The servicecollection to configure</param>
+        /// <param name="services">The servicecollection to configure</param>
         /// <param name="requestIfPermissionGranted">This will be called when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
         /// <returns></returns>
-        public static bool UseGps<T>(this IServiceCollection builder, Action<GpsRequest> requestIfPermissionGranted = null) where T : class, IGpsDelegate
-        {
-#if NETSTANDARD
-            return false;
-#else
-            builder.RegisterModule(new GpsModule(requestIfPermissionGranted));
-            builder.AddSingleton<IGpsDelegate, T>();
-            return true;
-#endif
-        }
+        public static bool UseGps<T>(this IServiceCollection services, Action<GpsRequest> requestIfPermissionGranted = null) where T : class, IGpsDelegate
+            => services.UseGps(typeof(T), requestIfPermissionGranted);
     }
 }

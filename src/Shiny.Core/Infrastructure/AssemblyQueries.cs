@@ -13,17 +13,17 @@ namespace Shiny.Infrastructure
             .GetAssemblies()
             .Where(x =>
             {
-                var name = x.GetName()?.Name?.ToLower();
+                var name = x.GetName()?.FullName?.ToLower();
                 if (name == null)
                     return false;
 
-                if (name.StartsWith("shiny"))
+                if (name.StartsWith("shiny."))
                     return false;
 
-                if (name.StartsWith("system"))
+                if (name.StartsWith("system."))
                     return false;
 
-                if (name.StartsWith("xamarin"))
+                if (name.StartsWith("xamarin."))
                     return false;
 
                 return true;
@@ -33,7 +33,7 @@ namespace Shiny.Infrastructure
         public static IEnumerable<Assembly> GetShinyAssemblies() => AppDomain
             .CurrentDomain
             .GetAssemblies()
-            .Where(x => x.GetName()?.Name.Equals("Shiny", StringComparison.InvariantCultureIgnoreCase) ?? false);
+            .Where(x => x.GetName()?.FullName.StartsWith("Shiny.", StringComparison.InvariantCultureIgnoreCase) ?? false);
 
 
         public static IEnumerable<Type> GetAssumedUserTypes() => GetAssumedUserAssemblies()

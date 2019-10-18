@@ -1,12 +1,26 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Sensors;
 
 
 namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
+        public static void UseAll(this IServiceCollection services)
+        {
+            services.UseAccelerometer();
+            services.UseAmbientLightSensor();
+            services.UseBarometer();
+            services.UseCompass();
+            services.UseMagnetometer();
+            services.UsePedometer();
+            services.UseProximitySensor();
+            services.UseHeartRateMonitor();
+            services.UseTemperature();
+            services.UseHumidity();
+        }
+
+
         public static bool UseAccelerometer(this IServiceCollection services)
         {
 #if NETSTANDARD

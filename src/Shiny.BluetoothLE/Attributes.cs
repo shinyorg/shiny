@@ -1,7 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.BluetoothLE.Central;
 using Shiny.Infrastructure;
 
+[assembly: Shiny.ShinyBleAutoRegister]
 
 namespace Shiny
 {
@@ -20,5 +22,16 @@ namespace Shiny
     {
         public override void Register(IServiceCollection services)
             => services.UseBlePeripherals();
+    }
+
+
+    public class ShinyBleAutoRegisterAttribute : AutoRegisterAttribute
+    {
+        public override void Register(IServiceCollection services)
+        {
+            var implType = this.FindImplementationType(typeof(IBleCentralDelegate), false);
+            services.UseBleCentral(implType);
+            services.UseBlePeripherals();
+        }
     }
 }

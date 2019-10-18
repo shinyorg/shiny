@@ -1,10 +1,22 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny;
 using Shiny.Infrastructure;
+using Shiny.Notifications;
 
+[assembly: ShinyNotificationsAutoRegister]
 
 namespace Shiny
 {
+    public class ShinyNotificationsAutoRegisterAttribute : AutoRegisterAttribute
+    {
+        public override void Register(IServiceCollection services)
+        {
+            var implType = this.FindImplementationType(typeof(INotificationDelegate), false);
+            services.UseNotifications(implType, true);
+        }
+    }
+
 
     public class ShinyNotificationsAttribute : ServiceModuleAttribute
     {
