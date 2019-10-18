@@ -50,7 +50,7 @@ namespace Shiny.Infrastructure
         {
             EnsureTypeCache();
             return typeCache
-                .Where(x => x.IsAssignableFrom(delegateInterfaceType))
+                .Where(delegateInterfaceType.IsAssignableFrom)
                 .ToList();
         }
 
@@ -61,7 +61,7 @@ namespace Shiny.Infrastructure
             { 
                 typeCache = AssemblyQueries
                     .GetAssumedUserTypes()
-                    .Where(x => x.IsAssignableFrom(typeof(IShinyDelegate)))
+                    .Where(typeof(IShinyDelegate).IsAssignableFrom)
                     .ToList();
             }
         }
