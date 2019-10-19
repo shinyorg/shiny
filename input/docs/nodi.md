@@ -1,7 +1,7 @@
 Title: Using Shiny without Dependency Injection
 ---
 
-Using Shiny without dependency injection is not only possible, it is quite easy to do.  Do also you like the old plugin style of CrossPlugin.Current?  Than you've come to the right document
+Using Shiny without dependency injection is not only possible, it is quite easy to do.  Do also you like the old plugin style of CrossPlugin.Current?  Then you've come to the right document
 
  Shiny offer a couple different ways of accomplishing this
 
