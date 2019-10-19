@@ -80,79 +80,90 @@ There are also shims setup for the more classic way of using plugins
 
 
 // Jobs
-Shiny.CrossJobManager.Current
+Shiny.CrossJobManager
 Shiny.ShinyHost.Resolve<Shiny.Jobs.IJobManager>();
 
 // Environment
-Shiny.CrossEnvironment.Current
+Shiny.CrossEnvironment
 Shiny.ShinyHost.Resolve<Shiny.IEnvironment>();
 
 // Settings
-Shiny.CrossSettings.Current
+Shiny.CrossSettings
+Shiny.ShinyHost.Resolve<Shiny.Settings.ISettings>();
 
 // Connectivity
-Shiny.CrossConnectivity.Current
+Shiny.CrossConnectivity
+Shiny.ShinyHost.Resolve<Shiny.Net.IConnectivity>();
 
 // Power/Battery
-Shiny.CrossPower.Current
+Shiny.CrossPower
+Shiny.ShinyHost.Resolve<Shiny.Power.IPowerManager>();
 
 // File System
-Shiny.CrossFileSystems.Current
+Shiny.CrossFileSystems
+Shiny.ShinyHost.Resolve<Shiny.IO.IFileSystem>();
 
 // Central BLE - Install Shiny.BluetoothLE nuget
-Shiny.CrossBleAdapter.Current
-Shiny.ShinyHost.Resolve<Shiny.BluetoothLE.ICentralManager>();
+Shiny.CrossBle.Central
+Shiny.CrossBle.Peripheral
+
+Shiny.ShinyHost.Resolve<Shiny.BluetoothLE.Central.ICentralManager>();
+Shiny.ShinyHost.Resolve<Shiny.BluetoothLE.Peripherals.IPeripheralManager>();
 
 // Beacons - Install Shiny.Beacons nuget
-Shiny.CrossBeacons.Current
+Shiny.CrossBeacons
 Shiny.ShinyHost.Resolve<Shiny.Beacons.IBeaconManager>
 
-
 // Geofencing - Install Shiny.Locations nuget
-Shiny.CrossGeofences.Current
+Shiny.CrossGeofences
+Shiny.ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>();
 
 // GPS - Install Shiny.Locations nuget
-Shiny.CrossGps.Current
+Shiny.CrossGps
+Shiny.ShinyHost.Resolve<Shiny.Locations.IGpsManager>();
 
 // Motion Activity - Install Shiny.Locations nuget
-Shiny.CrossMotionActivity.Current
+Shiny.CrossMotionActivity
+Shiny.ShinyHost.Resolve<Shiny.Locations.IMotionActivityManager>();
 
 // HTTP Transfers - Install Shiny.Net.Http nuget
-Shiny.CrossHttpTransfers.Current
+Shiny.CrossHttpTransfers
+Shiny.ShinyHost.Resolve<Shiny.Net.Http.IHttpTransferManager>();
 
 // Notifications - Install Shiny.Notifications nuget
-Shiny.CrossNotifications.Current
+Shiny.CrossNotifications
+Shiny.ShinyHost.Resolve<Shiny.Notifications.INotificationManager>();
 
 // Sensors - Install Shiny.Sensors nuget
 Shiny.CrossSensors.Accelerometer
-Shiny.ShinyHost.Resolve<IAccelerometer>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.IAccelerometer>();
 
 Shiny.CrossSensors.AmbientLight
-Shiny.ShinyHost.Resolve<IAmbientLight>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.IAmbientLight>();
 
 Shiny.CrossSensors.Barometer
-Shiny.ShinyHost.Resolve<IBarometer>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.IBarometer>();
 
 Shiny.CrossSensors.Compass
-Shiny.ShinyHost.Resolve<ICompass>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.ICompass>();
 
 Shiny.CrossSensors.HeartRate
-Shiny.ShinyHost.Resolve<IHeartRateMonitor>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.IHeartRateMonitor>();
 
 Shiny.CrossSensors.Humidity
-Shiny.ShinyHost.Resolve<IHumidity>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.IHumidity>();
 
 Shiny.CrossSensors.Magnetometer
-Shiny.ShinyHost.Resolve<IMagnetometer>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.IMagnetometer>();
 
 Shiny.CrossSensors.Pedometer
-Shiny.ShinyHost.Resolve<IPedometer>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.IPedometer>();
 
 Shiny.CrossSensors.Proximity 
-Shiny.ShinyHost.Resolve<IProximity>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.IProximity>();
 
 Shiny.CrossSensors.Temperature 
-Shiny.ShinyHost.Resolve<ITemperature>();
+Shiny.ShinyHost.Resolve<Shiny.Sensors.ITemperature>();
 
 
 ```
