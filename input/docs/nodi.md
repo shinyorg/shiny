@@ -64,6 +64,8 @@ and lastly, want to register a job that always runs:
 
 This gets you up and running with almost minimal effort, however, it does come at a price of startup speed since it scans your assemblies for delegates relating to Shiny libraries you have included in your project.  Note that you will likely have to configure the linker to not delink some of your stuff as well as Shiny to get this to work.
 
+In auto registration mode, Shiny will look for any delegate (if the service has one) implementations in your application.  If a delegate is required in order to function (ie. Geofencing) and Shiny can't find one, it will throw an exception on startup with a error message stating what is missing.
+
 To use auto registration, you can 
 ```csharp
 
