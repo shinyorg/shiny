@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Acr.UserDialogs" Version="7.0.32" />
+    <PackageReference Include="Acr.UserDialogs" Version="7.0.35" />
     <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
 
