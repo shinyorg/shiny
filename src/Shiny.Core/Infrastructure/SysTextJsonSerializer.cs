@@ -1,8 +1,11 @@
-﻿using System;
+﻿#if NETSTANDARD2_1
+using System;
 using Shiny.Infrastructure;
 using System.Text.Json;
 
 
+        //public static void UseSystemTextJsonSerialization(this IServiceCollection services)
+        //    => services.AddSingleton<ISerializer, SysTextJsonSerializer>();
 namespace Shiny.Integrations.SysTextJson
 {
     public class SysTextJsonSerializer : ISerializer
@@ -12,3 +15,4 @@ namespace Shiny.Integrations.SysTextJson
         public string Serialize(object value) => JsonSerializer.Serialize(value);
     }
 }
+#endif
