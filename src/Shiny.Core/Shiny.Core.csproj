@@ -23,11 +23,17 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard2.1')) ">
         <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
-
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard2.0')) ">
+        <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    </ItemGroup>
+    
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
@@ -66,5 +72,10 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
         <Compile Include="**\Platforms\*macOS*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Infrastructure\SysTextJsonSerializer.cs">
+        <SubType></SubType>
+      </Compile>
     </ItemGroup>
 </Project>
