@@ -62,6 +62,9 @@ namespace Shiny
             => this.AppContext.StopService(new Intent(this.AppContext, serviceType));
 
 
+        public bool IsMinApiLevel(int apiLevel)
+            => apiLevel >= (int)Android.OS.Build.VERSION.SdkInt;
+
         public void FirePermission(int requestCode, string[] permissions, NativePerm[] grantResult)
             => this.PermissionResult?.Invoke(this, new PermissionRequestResult(requestCode, permissions, grantResult));
 
