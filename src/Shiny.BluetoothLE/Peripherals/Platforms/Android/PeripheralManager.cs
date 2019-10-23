@@ -14,60 +14,23 @@ namespace Shiny.BluetoothLE.Peripherals
     {
         readonly GattServerContext context;
         readonly Dictionary<Guid, GattService> services;
+        readonly IMessageBus messageBus;
         AdvertisementCallbacks adCallbacks;
 
 
-        public PeripheralManager(AndroidContext context)
+        public PeripheralManager(AndroidContext context, IMessageBus messageBus)
         {
             this.context = new GattServerContext(context);
             this.services = new Dictionary<Guid, GattService>();
+            this.messageBus = messageBus;
         }
 
 
-        public AccessState Status
-        {
-            get
-            {
-                //if (Build.VERSION.SdkInt < BuildVersionCodes.JellyBeanMr2)
-                //    return AdapterStatus.Unsupported;
-
-                //if (!Application.Context.PackageManager.HasSystemFeature(PackageManager.FeatureBluetoothLe))
-                //    return AdapterStatus.Unsupported;
-
-                var ad = this.context.Manager?.Adapter;
-                if (ad == null)
-                    return AccessState.NotSupported;
-
-                if (!ad.IsEnabled)
-                    return AccessState.Disabled;
-
-                switch (ad.State)
-                {
-                    case State.Off:
-                    case State.TurningOff:
-                    case State.Disconnecting:
-                    case State.Disconnected:
-                        return AccessState.Disabled;
-
-                    //case State.Connecting
-                    case State.On:
-                    case State.Connected:
-                        return AccessState.Available;
-
-                    default:
-                        return AccessState.Unknown;
-                }
-            }
-        }
-
-
-        public IObservable<AccessState> WhenStatusChanged() => null; //this.context
-            //.Context
-            //.WhenAdapterStatusChanged()
-            //.Select(_ => this.Status)
-            //.StartWith(this.Status);
-
-
+        public AccessState Status => this.context.Manager.GetAccessState();
+        public IObservable<AccessState> WhenStatusChanged() => this.messageBus
+            .Listener<State>()
+            .Select(x => x.FromNative())
+            .StartWith(this.Status);
         public bool IsAdvertising => this.adCallbacks != null;
         public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
 
@@ -101,8 +64,8 @@ namespace Shiny.BluetoothLE.Peripherals
 
         public Task StartAdvertising(AdvertisementData adData = null)
         {
-            //            //if (!CrossBleAdapter.AndroidConfiguration.IsServerSupported)
-            //            //    throw new BleException("BLE Advertiser needs API Level 23+");
+            if (!this.context.Context.IsMinApiLevel(23))
+                throw new ApplicationException("BLE Advertiser needs API Level 23+");
 
             this.adCallbacks = new AdvertisementCallbacks();
 
