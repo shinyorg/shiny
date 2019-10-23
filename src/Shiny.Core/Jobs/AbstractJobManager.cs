@@ -106,7 +106,13 @@ namespace Shiny.Jobs
         public virtual async Task<IEnumerable<JobInfo>> GetJobs() => await this.Repository.GetAll<JobInfo>();
         public Task<JobInfo> GetJob(string jobName) => this.Repository.Get<JobInfo>(jobName);
         public virtual Task Cancel(string jobName) => this.Repository.Remove<JobInfo>(jobName);
-        public virtual Task CancelAll() => this.Repository.Clear<JobInfo>();
+        public virtual async Task CancelAll()
+        {
+            var jobs = await this.Repository.GetAllWithKeys<JobInfo>();
+            foreach (var job in jobs)
+                if (!job.Value.IsSystemJob)
+                    await this.Repository.Remove<JobInfo>(job.Key);
+        }
         public bool IsRunning { get; protected set; }
         public event EventHandler<JobInfo> JobStarted;
         public event EventHandler<JobRunResult> JobFinished;

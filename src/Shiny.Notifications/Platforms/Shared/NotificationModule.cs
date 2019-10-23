@@ -49,7 +49,8 @@ namespace Shiny.Notifications
             {
                 Identifier = nameof(NotificationJob),
                 Type = typeof(NotificationJob),
-                Repeat = true
+                Repeat = true,
+                IsSystemJob = true
             });
 #endif
         }

@@ -17,6 +17,11 @@ namespace Shiny.Jobs
         public bool Repeat { get; set; } = true;
         public bool DeviceCharging { get; set; }
         public bool BatteryNotLow { get; set; }
+
+        /// <summary>
+        /// Calling JobManager.Clear will not remove this task
+        /// </summary>
+        public bool IsSystemJob { get; set; }
         public InternetAccess RequiredInternetAccess { get; set; } = InternetAccess.None;
         public DateTime? LastRunUtc { get; set; }
         public IDictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
