@@ -5,6 +5,12 @@
 //using BackgroundTasks;
 //using CoreFoundation;
 
+//<key>BGTaskSchedulerPermittedIdentifiers</key>
+//<array>
+//	<string>com.xamarin.ColorFeed.refresh</string>
+//	<string>com.xamarin.ColorFeed.cleaning_db</string>
+//</array>
+//You need to add a unique task id into Info.plist for each background task you want to execute.
 //namespace Shiny.Jobs
 //{
 //    public class BgTasksJobManager : IJobManager
