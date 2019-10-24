@@ -44,9 +44,20 @@ namespace Shiny.Notifications
             services.AddSingleton<AndroidNotificationProcessor>();
 #endif
 
-#if __ANDROID__ || WINDOWS_UWP
+
+#if __ANDROID__
             services.RegisterJob(new Jobs.JobInfo
             {
+                PeriodicTime = TimeSpan.FromMinutes(2),
+                Identifier = nameof(NotificationJob),
+                Type = typeof(NotificationJob),
+                Repeat = true,
+                IsSystemJob = true
+            });
+#elif WINDOWS_UWP
+            services.RegisterJob(new Jobs.JobInfo
+            {
+                PeriodicTime = TimeSpan.FromMinutes(15),
                 Identifier = nameof(NotificationJob),
                 Type = typeof(NotificationJob),
                 Repeat = true,

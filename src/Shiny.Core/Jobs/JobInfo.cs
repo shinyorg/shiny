@@ -9,14 +9,18 @@ namespace Shiny.Jobs
         public string Identifier { get; set; }
         public Type Type { get; set; }
 
-        // TODO: next run time? Date/Time or TimeSpan
-        // TODO: priority?
         //public bool RunPeriodic { get; set; }
         //public bool DeviceIdle { get; set; } // this will only work on droid
 
         public bool Repeat { get; set; } = true;
         public bool DeviceCharging { get; set; }
         public bool BatteryNotLow { get; set; }
+
+        /// <summary>
+        /// This only applies to UWP and Android - NOT iOS
+        /// UWP can be a
+        /// </summary>
+        public TimeSpan? PeriodicTime { get; set; }
 
         /// <summary>
         /// Calling JobManager.Clear will not remove this task

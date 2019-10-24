@@ -1,10 +1,15 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Net;
 using Shiny.Power;
+using Shiny.Settings;
 using Android;
+using Android.OS;
+using Android.App.Job;
+using Android.Content;
+using Java.Lang;
+using JobBuilder = Android.App.Job.JobInfo.Builder;
 #if ANDROID9
 using AndroidX.Work;
 #endif
@@ -14,15 +19,18 @@ namespace Shiny.Jobs
     public class JobManager : AbstractJobManager
     {
         readonly AndroidContext context;
+        readonly ISettings settings;
 
 
         public JobManager(AndroidContext context,
                           IServiceProvider container,
                           IRepository repository,
                           IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+                          ISettings settings,
+                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity, TimeSpan.FromSeconds(30))
         {
             this.context = context;
+            this.settings = settings;
         }
 
 
@@ -114,28 +122,81 @@ namespace Shiny.Jobs
         }
 
         #else
+
         public override async Task Schedule(JobInfo jobInfo)
         {
+            // TODO: make sure this jobIdentifier doesn't already exist - it has to be unique or cancel/reinsert job?
+
+            var newJobId = this.settings.IncrementValue("JobId");
+            var builder = new JobBuilder(
+                newJobId,
+                new ComponentName(
+                    context.AppContext,
+                    Class.FromType(typeof(ShinyJobService))
+                )
+            )
+            .SetPersisted(true);
+
+            var bundle = new PersistableBundle();
+            bundle.PutString("ShinyJobId", jobInfo.Identifier);
+            builder.SetExtras(bundle);
+
+            if (jobInfo.PeriodicTime != null)
+                builder.SetPeriodic(jobInfo.PeriodicTime.Value.Milliseconds);
+
+            if (jobInfo.BatteryNotLow)
+                builder.SetRequiresBatteryNotLow(true);
+
+            if (jobInfo.DeviceCharging)
+                builder.SetRequiresCharging(true);
+
+            if (jobInfo.RequiredInternetAccess != InternetAccess.None)
+            {
+                //builder.SetRequiredNetwork(new Android.Net.NetworkRequest { }.HasCapability(Android.Net.NetCapability.Internet).)
+                var networkType = jobInfo.RequiredInternetAccess == InternetAccess.Unmetered
+                    ? NetworkType.Unmetered
+                    : NetworkType.Any;
+                builder.SetRequiredNetworkType(networkType);
+            }
+
+            this.context.Native().Schedule(builder.Build());
             await base.Schedule(jobInfo);
-            this.context.StartJobService();
         }
 
 
-        public override async Task Cancel(string jobId)
+        public override async Task Cancel(string jobIdentifier)
         {
-            await base.Cancel(jobId);
-            var jobs = await this.Repository.GetAll<JobInfo>();
-            if (!jobs.Any())
-                this.context.StopJobService();
+            var job = await this.Repository.Get<JobInfo>(jobIdentifier);
+            if (job == null)
+                return;
+
+            var native = this.context.Native();
+            var nativeJob = native.GetNativeJobByShinyId(jobIdentifier);
+             
+            if (nativeJob == null)
+                return;
+
+            await this.Repository.Remove<JobInfo>(jobIdentifier);
+            native.Cancel(nativeJob.Id);
         }
 
 
         public override async Task CancelAll()
         {
-            await base.CancelAll();
-            this.context.StopJobService();
+            var native = this.context.Native();
+            var jobs = await this.Repository.GetAllWithKeys<JobInfo>();
+
+            foreach (var job in jobs)
+            {
+                if (!job.Value.IsSystemJob)
+                {
+                    var nativeJob = native.GetNativeJobByShinyId(job.Key);
+                    native.Cancel(nativeJob.Id);
+                    await this.Repository.Remove<JobInfo>(job.Key);
+                }
+            }
         }
 
-        #endif
+#endif
     }
 }

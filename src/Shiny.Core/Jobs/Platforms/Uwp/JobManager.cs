@@ -19,10 +19,9 @@ namespace Shiny.Jobs
                           IServiceProvider container,
                           IRepository repository,
                           IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity, TimeSpan.FromMinutes(15))
         {
             this.context = context;
-
         }
 
 

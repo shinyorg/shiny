@@ -19,10 +19,11 @@ namespace Shiny.Jobs
 
         public override bool OnStartJob(JobParameters @params)
         {
+            var jobIdentifier = @params.GetShinyJobId();
             this.cancelSrc = new CancellationTokenSource();
             ShinyHost
                 .Resolve<IJobManager>()
-                .RunAll(this.cancelSrc.Token)
+                .Run(jobIdentifier, this.cancelSrc.Token)
                 .ContinueWith(x => this.JobFinished(@params, false));
             return true;
         }

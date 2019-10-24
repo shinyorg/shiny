@@ -24,9 +24,11 @@ namespace Shiny.Beacons
             if (this.delegateType != null)
                 services.AddSingleton(typeof(IBeaconDelegate), this.delegateType);
 
-#if WINDOWS_UWP || __ANDROID__
+#if WINDOWS_UWP
             services.UseBleCentral();
             services.AddSingleton<BackgroundTask>();
+#elif __ANDROID__
+services.UseBleCentral();
 #endif
             services.AddSingleton<IBeaconManager, BeaconManager>();
         }
@@ -35,11 +37,6 @@ namespace Shiny.Beacons
         public override void OnContainerReady(IServiceProvider services)
         {
             base.OnContainerReady(services);
-#if __ANDROID__
-            services
-                .Resolve<AndroidContext>(true)
-                .StartService(typeof(BeaconService));
-#endif
 
             if (this.regionsToMonitorWhenPermissionAvailable != null)
             {

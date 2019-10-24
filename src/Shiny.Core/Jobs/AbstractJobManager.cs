@@ -22,11 +22,14 @@ namespace Shiny.Jobs
                                      IRepository repository,
                                      IPowerManager powerManager,
                                      IConnectivity connectivity)
+                                     IConnectivity connectivity,
+                                     TimeSpan minAllowedPeriodicTime)
         {
             this.container = container;
             this.Repository = repository;
             this.powerManager = powerManager;
             this.connectivity = connectivity;
+            this.MinimumAllowedPeriodicTime = minAllowedPeriodicTime;
         }
 
 
@@ -114,6 +117,7 @@ namespace Shiny.Jobs
                     await this.Repository.Remove<JobInfo>(job.Key);
         }
         public bool IsRunning { get; protected set; }
+        public TimeSpan? MinimumAllowedPeriodicTime { get; }
         public event EventHandler<JobInfo> JobStarted;
         public event EventHandler<JobRunResult> JobFinished;
 
