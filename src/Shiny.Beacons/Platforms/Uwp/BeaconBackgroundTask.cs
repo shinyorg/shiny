@@ -10,10 +10,12 @@ namespace Shiny.Beacons
         public BeaconBackgroundTask(BackgroundTask task) => this.task = task;
 
 
-        public void Process(IBackgroundTaskInstance taskInstance)
+        public void Process(string taskName, IBackgroundTaskInstance taskInstance)
         {
-            taskInstance.GetDeferral(); // run indefinitely - need to figure this out
-            this.task.Run(); // TODO: this will execute and end - need to fix as this guy runs almost indefinitely
+            // this task basically runs indefinitely
+            taskInstance.GetDeferral();
+            taskInstance.Canceled += (obj, sender) => this.task.StopScan();
+            this.task.Run();
         }
     }
 }

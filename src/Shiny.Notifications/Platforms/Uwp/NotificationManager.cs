@@ -109,7 +109,8 @@ namespace Shiny.Notifications
             if (this.services.IsRegistered<INotificationDelegate>())
             {
                 this.context.RegisterBackground<NotificationBackgroundTaskProcessor>(
-                    new UserNotificationChangedTrigger(NotificationKinds.Toast)
+                    nameof(NotificationBackgroundTaskProcessor),
+                    builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
                 );
             }
         }

@@ -5,7 +5,7 @@ using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
 using Shiny.Infrastructure;
 using Shiny.Logging;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Locations
 {
@@ -22,7 +22,7 @@ namespace Shiny.Locations
         }
 
 
-        public async void Process(IBackgroundTaskInstance taskInstance)
+        public async void Process(string taskName, IBackgroundTaskInstance taskInstance)
         {
             var deferral = taskInstance.GetDeferral();
             // cancellation?
@@ -37,7 +37,7 @@ namespace Shiny.Locations
                 var region = await this.repository.Get<GeofenceRegion>(report.Geofence.Id);
 
                 var newStatus = report.NewState.FromNative();
-                this.FireDelegate(newStatus, region);
+                await this.FireDelegate(newStatus, region);
 
                 if (region.SingleUse)
                     await this.repository.Remove<GeofenceRegion>(region.Identifier);
@@ -46,11 +46,11 @@ namespace Shiny.Locations
         }
 
 
-        void FireDelegate(GeofenceState state, GeofenceRegion region)
+        async Task FireDelegate(GeofenceState state, GeofenceRegion region)
         {
             try
             {
-                this.gdelegate.OnStatusChanged(state, region);
+                await this.gdelegate.OnStatusChanged(state, region);
             }
             catch (Exception ex)
             {

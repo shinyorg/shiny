@@ -72,7 +72,8 @@ namespace Shiny.Locations
             GeofenceMonitor.Current.Geofences.Add(native);
 
             this.context.RegisterBackground<GeofenceBackgroundTaskProcessor>(
-                new LocationTrigger(LocationTriggerType.Geofence)
+                nameof(GeofenceBackgroundTaskProcessor),
+                builder => builder.SetTrigger(new LocationTrigger(LocationTriggerType.Geofence))
             );
         }
 
@@ -87,7 +88,7 @@ namespace Shiny.Locations
 
             await this.Repository.Remove(identifier);
             if (list.Count == 0)
-                this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>();
+                this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>(nameof(GeofenceBackgroundTaskProcessor));
         }
 
 
@@ -95,7 +96,7 @@ namespace Shiny.Locations
         {
             await this.Repository.Clear();
             GeofenceMonitor.Current.Geofences.Clear();
-            this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>();
+            this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>(nameof(GeofenceBackgroundTaskProcessor));
         }
 
 
