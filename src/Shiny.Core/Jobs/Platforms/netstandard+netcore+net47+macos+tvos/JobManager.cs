@@ -18,7 +18,7 @@ namespace Shiny.Jobs
                           IRepository repository,
                           IPowerManager powerManager,
                           IConnectivity connectivity,
-                          JobManagerConfig config = null) : base(container, repository, powerManager, connectivity)
+                          JobManagerConfig config = null) : base(container, repository, powerManager, connectivity, TimeSpan.FromSeconds(30))
         {
             config = config ?? new JobManagerConfig();
             this.timer = new Timer(config.PeriodInterval.TotalMilliseconds);

@@ -22,7 +22,7 @@ namespace Shiny.Jobs
         public JobManager(IServiceProvider container,
                           IRepository repository,
                           IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity, TimeSpan.FromMinutes(15))
         {
         }
 

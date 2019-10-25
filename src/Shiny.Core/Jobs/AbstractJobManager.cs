@@ -21,9 +21,8 @@ namespace Shiny.Jobs
         protected AbstractJobManager(IServiceProvider container,
                                      IRepository repository,
                                      IPowerManager powerManager,
-                                     IConnectivity connectivity)
                                      IConnectivity connectivity,
-                                     TimeSpan minAllowedPeriodicTime)
+                                     TimeSpan? minAllowedPeriodicTime)
         {
             this.container = container;
             this.Repository = repository;
