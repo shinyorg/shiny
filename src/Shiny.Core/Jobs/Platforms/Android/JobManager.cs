@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Net;
-using Shiny.Power;
 using Shiny.Settings;
 using Android;
 using Android.OS;
@@ -25,9 +23,7 @@ namespace Shiny.Jobs
         public JobManager(AndroidContext context,
                           IServiceProvider container,
                           IRepository repository,
-                          IPowerManager powerManager,
-                          ISettings settings,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity, TimeSpan.FromSeconds(30))
+                          ISettings settings) : base(container, repository, TimeSpan.FromSeconds(30))
         {
             this.context = context;
             this.settings = settings;
@@ -172,7 +168,7 @@ namespace Shiny.Jobs
 
             var native = this.context.Native();
             var nativeJob = native.GetNativeJobByShinyId(jobIdentifier);
-             
+
             if (nativeJob == null)
                 return;
 

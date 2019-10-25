@@ -16,13 +16,14 @@ namespace Shiny.Jobs
         }
 
 
-        public async void Process(IBackgroundTaskInstance taskInstance)
+        public async void Process(string taskName, IBackgroundTaskInstance taskInstance)
         {
             var deferral = taskInstance.GetDeferral();
             using (var cancelSrc = new CancellationTokenSource())
             {
                 taskInstance.Canceled += (sender, args) => cancelSrc.Cancel();
-                await this.jobManager.RunAll(cancelSrc.Token);
+                // task name is the jobId now
+                await this.jobManager.Run(taskName, cancelSrc.Token);
             }
             deferral.Complete();
         }

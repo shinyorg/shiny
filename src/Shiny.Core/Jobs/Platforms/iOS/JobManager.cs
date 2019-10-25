@@ -20,14 +20,10 @@ namespace Shiny.Jobs
 
 
         public JobManager(IServiceProvider container,
-                          IRepository repository,
-                          IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity, TimeSpan.FromMinutes(15))
+                          IRepository repository)
+            : base(container, repository, TimeSpan.FromMinutes(15))
         {
         }
-
-
-        protected override bool CheckCriteria(JobInfo job) => true;
 
 
         public override Task<AccessState> RequestAccess()

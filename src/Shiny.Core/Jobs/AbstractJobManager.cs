@@ -5,8 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Logging;
-using Shiny.Net;
-using Shiny.Power;
 
 
 namespace Shiny.Jobs
@@ -14,55 +12,20 @@ namespace Shiny.Jobs
     public abstract class AbstractJobManager : IJobManager
     {
         readonly IServiceProvider container;
-        readonly IPowerManager powerManager;
-        readonly IConnectivity connectivity;
 
 
         protected AbstractJobManager(IServiceProvider container,
                                      IRepository repository,
-                                     IPowerManager powerManager,
-                                     IConnectivity connectivity,
                                      TimeSpan? minAllowedPeriodicTime)
         {
             this.container = container;
             this.Repository = repository;
-            this.powerManager = powerManager;
-            this.connectivity = connectivity;
             this.MinimumAllowedPeriodicTime = minAllowedPeriodicTime;
         }
 
 
         protected IRepository Repository { get; }
 
-
-        protected virtual bool CheckCriteria(JobInfo job)
-        {
-            var pluggedIn = this.powerManager.IsPluggedIn();
-            if (job.DeviceCharging && !pluggedIn)
-                return false;
-
-            if (job.BatteryNotLow && !pluggedIn && this.powerManager.BatteryLevel <= 0.2)
-                return false;
-
-            if (job.RequiredInternetAccess == InternetAccess.None)
-                return true;
-
-            var hasInternet = this.connectivity.IsInternetAvailable();
-            var directConnect = this.connectivity.IsDirectConnect();
-
-            switch (job.RequiredInternetAccess)
-            {
-                case InternetAccess.None:
-                    return true;
-
-                case InternetAccess.Unmetered:
-                    return hasInternet && directConnect;
-
-                case InternetAccess.Any:
-                default:
-                    return hasInternet;
-            }
-        }
 
 
         public virtual async void RunTask(string taskName, Func<CancellationToken, Task> task)
@@ -145,8 +108,7 @@ namespace Shiny.Jobs
 
                     foreach (var job in jobs)
                     {
-                        if (this.CheckCriteria(job))
-                            tasks.Add(this.RunJob(job, cancelToken));
+                        tasks.Add(this.RunJob(job, cancelToken));
                     }
 
                     await Task.WhenAll(tasks).ConfigureAwait(false);
