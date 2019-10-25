@@ -7,12 +7,23 @@ namespace Shiny.Beacons
 {
     public class BeaconRegionScanJob : IJob
     {
-        public Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
+        readonly BackgroundTask task;
+
+
+        public BeaconRegionScanJob(BackgroundTask task) => this.task = task;
+        public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            //ShinyHost
-            //    .Resolve<BackgroundTask>()
-            //    .Run();
-            throw new NotImplementedException();
+            var tcs = new TaskCompletionSource<object>();
+            using (cancelToken.Register(() =>
+            {
+                this.task.StopScan();
+                tcs.SetResult(null);
+            }))
+            {
+                task.StartScan();
+                await tcs.Task;
+            }
+            return true;
         }
     }
 }

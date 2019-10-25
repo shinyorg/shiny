@@ -82,7 +82,7 @@ namespace Shiny.Beacons
         }
 
 
-        async void StartScan()
+        public async void StartScan()
         {
             if (this.scanSub != null)
                 return;
@@ -123,7 +123,7 @@ namespace Shiny.Beacons
         }
 
 
-        void StopScan()
+        public void StopScan()
         {
             if (this.scanSub == null)
                 return;

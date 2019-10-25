@@ -43,7 +43,7 @@ namespace Shiny.Jobs
             {
                 if (jobInfo.PeriodicTime != null)
                 {
-                    var runMins = Convert.ToUInt32(jobInfo.PeriodicTime.Value.TotalMinutes, 0);
+                    var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.Value.TotalMinutes, 0));
                     builder.SetTrigger(new TimeTrigger(runMins, false));
                 }
                 if (jobInfo.RequiredInternetAccess != InternetAccess.None)
