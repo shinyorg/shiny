@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Windows.UI.Notifications;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Windows.ApplicationModel.Background;
 using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure;
-using Windows.ApplicationModel.Background;
 
 
 namespace Shiny.Notifications
