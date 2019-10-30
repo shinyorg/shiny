@@ -190,6 +190,7 @@ namespace Shiny
                 .FromEventPattern<PropertyChangedEventArgs>(This, nameof(INotifyPropertyChanged.PropertyChanged))
                 .Select(x => new ItemChanged<TSender, string>(This, x.EventArgs.PropertyName));
 
+
         public static IDisposable Subscribe<T>(this IObservable<T> observable, Action onNext)
             => observable.Subscribe(_ => onNext());
 
@@ -208,17 +209,25 @@ namespace Shiny
                 onComplete
             );
 
-        public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<Task> onNextAsync)
-            => observable
-                .Select(x => Observable.FromAsync(onNextAsync))
-                .Concat()
-                .Subscribe();
-
 
         public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, Task> onNextAsync)
             => observable
                 .Select(x => Observable.FromAsync(() => onNextAsync(x)))
                 .Concat()
+                .Subscribe();
+
+
+        public static IDisposable SubscribeAsyncConcurrent<T>(this IObservable<T> observable, Func<T, Task> onNextAsync)
+            => observable
+                .Select(x => Observable.FromAsync(() => onNextAsync(x)))
+                .Merge()
+                .Subscribe();
+
+
+        public static IDisposable SubscribeAsyncConcurrent<T>(this IObservable<T> observable, Func<T, Task> onNextAsync, int maxConcurrent)
+            => observable
+                .Select(x => Observable.FromAsync(() => onNextAsync(x)))
+                .Merge(maxConcurrent)
                 .Subscribe();
 
         //public static IDisposable ApplyMaxLengthConstraint<T>(this T npc, Expression<Func<T, string>> expression, int maxLength) where T : INotifyPropertyChanged

@@ -52,7 +52,7 @@ namespace Shiny.Beacons
                     .WhenAccessStatusChanged(true)
                     .Where(x => x == AccessState.Available)
                     .Take(1)
-                    .SubscribeAsync(async () =>
+                    .SubscribeAsync(async _ =>
                     {
                         foreach (var region in regionsToMonitorWhenPermissionAvailable)
                             await mgr.StartMonitoring(region);
