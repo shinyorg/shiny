@@ -26,16 +26,20 @@ namespace Shiny.Beacons
 
 #if WINDOWS_UWP || __ANDROID__
             services.UseBleCentral();
-            services.AddSingleton<BackgroundTask>();
+            if (this.delegateType != null)
+                services.AddSingleton<BackgroundTask>();
 #endif
 #if __ANDROID__
-            services.RegisterJob(new Shiny.Jobs.JobInfo
+            if (this.delegateType != null)
             {
-                Identifier = nameof(BeaconRegionScanJob),
-                Type = typeof(BeaconRegionScanJob),
-                BatteryNotLow = true,
-                PeriodicTime = TimeSpan.FromSeconds(30)
-            });
+                services.RegisterJob(new Shiny.Jobs.JobInfo
+                {
+                    Identifier = nameof(BeaconRegionScanJob),
+                    Type = typeof(BeaconRegionScanJob),
+                    BatteryNotLow = true,
+                    PeriodicTime = TimeSpan.FromSeconds(30)
+                });
+            }
 #endif
             services.AddSingleton<IBeaconManager, BeaconManager>();
         }
