@@ -15,13 +15,15 @@ namespace Shiny.Jobs
         public bool BatteryNotLow { get; set; }
 
         /// <summary>
-        ///
-        /// If left null, the suggested time will be used
-        ///     iOS -
-        ///     Android - Suggested: 15mins - Min: 30 seconds
-        ///     UWP - Suggested: 15mins - Min: 15mins
+        /// The desired time to run the job
+        /// The minimum time is determined by IJobManager.Minimum
+        /// It is suggested you use a value of 15 minutes.
+        /// THIS VALUE DOES NOTHING ON IOS
+        /// Minumum Values for:
+        ///     UWP - 15 minutes
+        ///     Android - 30 seconds
         /// </summary>
-        public TimeSpan? PeriodicTime { get; set; }
+        public TimeSpan PeriodicTime { get; set; } = TimeSpan.FromMinutes(15);
 
         /// <summary>
         /// Calling JobManager.Clear will not remove this task

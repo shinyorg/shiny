@@ -34,9 +34,9 @@ namespace Shiny.Jobs
         }
 
 
-        public override async Task Schedule(JobInfo jobInfo)
+        protected override void ScheduleNative(JobInfo jobInfo)
         {
-            if (jobInfo.PeriodicTime != null && jobInfo.PeriodicTime < this.MinimumAllowedPeriodicTime)
+            if (jobInfo.PeriodicTime < this.MinimumAllowedPeriodicTime)
                 throw new ArgumentException($"Background timer cannot be less than {this.MinimumAllowedPeriodicTime.Value.TotalMinutes} minutes");
 
             this.context.RegisterBackground<JobBackgroundTaskProcessor>(jobInfo.Identifier, builder =>
@@ -52,32 +52,14 @@ namespace Shiny.Jobs
                         ? SystemConditionType.InternetAvailable
                         : SystemConditionType.FreeNetworkAvailable;
 
-                     builder.AddCondition(new SystemCondition(type));
+                    builder.AddCondition(new SystemCondition(type));
                 }
             });
-            await base.Schedule(jobInfo);
         }
 
 
-        public override async Task Cancel(string jobName)
-        {
-            this.context.UnRegisterBackground<JobBackgroundTaskProcessor>(jobName);
-            await this.Repository.Remove<JobInfo>(jobName);
-        }
-
-
-        public override async Task CancelAll()
-        {
-            var jobs = await this.Repository.GetAllWithKeys<JobInfo>();
-            foreach (var job in jobs)
-            {
-                if (!job.Value.IsSystemJob)
-                {
-                    this.context.UnRegisterBackground<JobBackgroundTaskProcessor>(job.Key);
-                    await this.Repository.Remove<JobInfo>(job.Key);
-                }
-            }
-        }
+        protected override void CancelNative(JobInfo jobInfo)
+            => this.context.UnRegisterBackground<JobBackgroundTaskProcessor>(jobName);
     }
 }
 

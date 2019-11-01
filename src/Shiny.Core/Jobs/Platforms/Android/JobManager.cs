@@ -8,7 +8,7 @@ using Android.App.Job;
 using Android.Content;
 using Java.Lang;
 using JobBuilder = Android.App.Job.JobInfo.Builder;
-#if ANDROID9
+#if ANDROIDX
 using AndroidX.Work;
 #endif
 
@@ -47,7 +47,7 @@ namespace Shiny.Jobs
         }
 
 
-        #if ANDROID9
+#if ANDROIDX
 
         public override async Task Schedule(JobInfo jobInfo)
         {
@@ -117,12 +117,10 @@ namespace Shiny.Jobs
             WorkManager.Instance.CancelAllWork();
         }
 
-        #else
+#else
 
-        public override async Task Schedule(JobInfo jobInfo)
+        protected override void ScheduleNative(JobInfo jobInfo)
         {
-            // TODO: make sure this jobIdentifier doesn't already exist - it has to be unique or cancel/reinsert job?
-
             var newJobId = this.settings.IncrementValue("JobId");
             var builder = new JobBuilder(
                 newJobId,
@@ -136,9 +134,7 @@ namespace Shiny.Jobs
             var bundle = new PersistableBundle();
             bundle.PutString("ShinyJobId", jobInfo.Identifier);
             builder.SetExtras(bundle);
-
-            if (jobInfo.PeriodicTime != null)
-                builder.SetPeriodic(jobInfo.PeriodicTime.Value.Milliseconds);
+            builder.SetPeriodic(Convert.ToInt64(jobInfo.PeriodicTime.TotalMilliseconds));
 
             if (jobInfo.BatteryNotLow)
                 builder.SetRequiresBatteryNotLow(true);
@@ -156,41 +152,16 @@ namespace Shiny.Jobs
             }
 
             this.context.Native().Schedule(builder.Build());
-            await base.Schedule(jobInfo);
         }
 
 
-        public override async Task Cancel(string jobIdentifier)
-        {
-            var job = await this.Repository.Get<JobInfo>(jobIdentifier);
-            if (job == null)
-                return;
-
-            var native = this.context.Native();
-            var nativeJob = native.GetNativeJobByShinyId(jobIdentifier);
-
-            if (nativeJob == null)
-                return;
-
-            await this.Repository.Remove<JobInfo>(jobIdentifier);
-            native.Cancel(nativeJob.Id);
-        }
-
-
-        public override async Task CancelAll()
+        protected override void CancelNative(JobInfo jobInfo)
         {
             var native = this.context.Native();
-            var jobs = await this.Repository.GetAllWithKeys<JobInfo>();
+            var nativeJob = native.GetNativeJobByShinyId(jobInfo.Identifier);
 
-            foreach (var job in jobs)
-            {
-                if (!job.Value.IsSystemJob)
-                {
-                    var nativeJob = native.GetNativeJobByShinyId(job.Key);
-                    native.Cancel(nativeJob.Id);
-                    await this.Repository.Remove<JobInfo>(job.Key);
-                }
-            }
+            if (nativeJob != null)
+                native.Cancel(nativeJob.Id);
         }
 
 #endif

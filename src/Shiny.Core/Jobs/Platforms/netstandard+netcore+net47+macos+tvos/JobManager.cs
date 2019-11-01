@@ -24,6 +24,8 @@ namespace Shiny.Jobs
         }
 
 
+        protected override void ScheduleNative(JobInfo jobInfo) { }
+        protected override void CancelNative(JobInfo jobInfo) { }
         public override Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
     }
 }

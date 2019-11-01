@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
+using Shiny.Jobs.Infrastructure;
 using Shiny.Logging;
 
 
@@ -11,6 +12,7 @@ namespace Shiny.Jobs
 {
     public abstract class AbstractJobManager : IJobManager
     {
+        readonly IRepository repository;
         readonly IServiceProvider container;
 
 
@@ -19,13 +21,15 @@ namespace Shiny.Jobs
                                      TimeSpan? minAllowedPeriodicTime)
         {
             this.container = container;
-            this.Repository = repository;
+            this.repository = repository;
             this.MinimumAllowedPeriodicTime = minAllowedPeriodicTime;
+
         }
 
 
-        protected IRepository Repository { get; }
-
+        public abstract Task<AccessState> RequestAccess();
+        protected abstract void ScheduleNative(JobInfo jobInfo);
+        protected abstract void CancelNative(JobInfo jobInfo);
 
 
         public virtual async void RunTask(string taskName, Func<CancellationToken, Task> task)
@@ -48,11 +52,12 @@ namespace Shiny.Jobs
             JobRunResult result = default;
             try
             {
-                var job = await this.Repository.Get<JobInfo>(jobName);
+                var job = await this.repository.Get<PersistJobInfo>(jobName);
                 if (job == null)
                     throw new ArgumentException("No job found named " + jobName);
 
-                result = await this.RunJob(job, cancelToken).ConfigureAwait(false);
+                var actual = PersistJobInfo.FromPersist(job);
+                result = await this.RunJob(actual, cancelToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -67,34 +72,61 @@ namespace Shiny.Jobs
         }
 
 
-        public abstract Task<AccessState> RequestAccess();
-        public virtual async Task<IEnumerable<JobInfo>> GetJobs() => await this.Repository.GetAll<JobInfo>();
-        public Task<JobInfo> GetJob(string jobName) => this.Repository.Get<JobInfo>(jobName);
-        public virtual Task Cancel(string jobName) => this.Repository.Remove<JobInfo>(jobName);
+        public async Task<IEnumerable<JobInfo>> GetJobs()
+        {
+            var jobs = await this.repository.GetAll<PersistJobInfo>();
+            return jobs.Select(PersistJobInfo.FromPersist);
+        }
+
+
+        public async Task<JobInfo> GetJob(string jobName)
+        {
+            var job = await this.repository.Get<PersistJobInfo>(jobName);
+            return PersistJobInfo.FromPersist(job);
+        }
+
+
+        public async Task Cancel(string jobIdentifier)
+        {
+            var job = await this.repository.Get<PersistJobInfo>(jobIdentifier);
+            if (job != null)
+            {
+                this.CancelNative(PersistJobInfo.FromPersist(job));
+                await this.repository.Remove<PersistJobInfo>(jobIdentifier);
+            }
+        }
+
+
         public virtual async Task CancelAll()
         {
-            var jobs = await this.Repository.GetAllWithKeys<JobInfo>();
+            var jobs = await this.repository.GetAllWithKeys<PersistJobInfo>();
             foreach (var job in jobs)
+            {
                 if (!job.Value.IsSystemJob)
-                    await this.Repository.Remove<JobInfo>(job.Key);
+                {
+                    this.CancelNative(PersistJobInfo.FromPersist(job.Value));
+                    await this.repository.Remove<PersistJobInfo>(job.Key);
+                }
+            }
         }
+
+
         public bool IsRunning { get; protected set; }
         public TimeSpan? MinimumAllowedPeriodicTime { get; }
         public event EventHandler<JobInfo> JobStarted;
         public event EventHandler<JobRunResult> JobFinished;
 
 
-        public virtual async Task Schedule(JobInfo jobInfo)
+        public async Task Schedule(JobInfo jobInfo)
         {
             jobInfo.AssertValid();
-
-            // we do a force resolve here to ensure all is good
             this.ResolveJob(jobInfo);
-            await this.Repository.Set(jobInfo.Identifier, jobInfo);
+            this.ScheduleNative(jobInfo);
+            await this.repository.Set(jobInfo.Identifier, PersistJobInfo.ToPersist(jobInfo));
         }
 
 
-        public virtual async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken)
+        public async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken)
         {
             var list = new List<JobRunResult>();
 
@@ -103,12 +135,13 @@ namespace Shiny.Jobs
                 try
                 {
                     this.IsRunning = true;
-                    var jobs = await this.Repository.GetAll<JobInfo>();
+                    var jobs = await this.repository.GetAll<PersistJobInfo>();
                     var tasks = new List<Task<JobRunResult>>();
 
                     foreach (var job in jobs)
                     {
-                        tasks.Add(this.RunJob(job, cancelToken));
+                        var actual = PersistJobInfo.FromPersist(job);
+                        tasks.Add(this.RunJob(actual, cancelToken));
                     }
 
                     await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -127,7 +160,7 @@ namespace Shiny.Jobs
         }
 
 
-        protected virtual async Task<JobRunResult> RunJob(JobInfo job, CancellationToken cancelToken)
+        protected async Task<JobRunResult> RunJob(JobInfo job, CancellationToken cancelToken)
         {
             this.JobStarted?.Invoke(this, job);
             var result = default(JobRunResult);
@@ -160,7 +193,7 @@ namespace Shiny.Jobs
                 if (!cancel)
                 {
                     job.LastRunUtc = DateTime.UtcNow;
-                    await this.Repository.Set(job.Identifier, job);
+                    await this.repository.Set(job.Identifier, PersistJobInfo.ToPersist(job));
                 }
             }
             this.JobFinished?.Invoke(this, result);

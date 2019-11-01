@@ -1,4 +1,4 @@
-﻿#if !ANDROID9
+﻿#if !ANDROIDX
 using System;
 using System.Threading;
 using Android.App;

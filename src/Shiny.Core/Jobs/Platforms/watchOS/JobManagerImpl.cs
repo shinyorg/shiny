@@ -16,5 +16,15 @@ namespace Shiny.Jobs
         {
             throw new NotImplementedException();
         }
+
+        protected override void CancelNative(JobInfo jobInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ScheduleNative(JobInfo jobInfo)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
