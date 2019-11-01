@@ -13,14 +13,14 @@ namespace Shiny.Notifications
 
         public override async void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
-            await this.Execute(response.Notification.Request, x => this.sdelegate.Value?.OnReceived(x));
+            await this.Execute(response.Notification.Request, x => this.sdelegate.Value?.OnEntry(x));
             completionHandler();
         }
 
 
         public override async void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
         {
-            await this.Execute(notification.Request, x => this.sdelegate.Value?.OnEntry(x));
+            await this.Execute(notification.Request, x => this.sdelegate.Value?.OnReceived(x));
             completionHandler(UNNotificationPresentationOptions.Alert);
         }
 
