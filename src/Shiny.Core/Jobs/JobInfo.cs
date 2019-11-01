@@ -8,8 +8,6 @@ namespace Shiny.Jobs
     {
         public string Identifier { get; set; }
         public Type Type { get; set; }
-
-        //public bool RunPeriodic { get; set; }
         //public bool DeviceIdle { get; set; } // this will only work on droid
 
         public bool Repeat { get; set; } = true;
@@ -17,8 +15,11 @@ namespace Shiny.Jobs
         public bool BatteryNotLow { get; set; }
 
         /// <summary>
-        /// This only applies to UWP and Android - NOT iOS
-        /// UWP can be a
+        ///
+        /// If left null, the suggested time will be used
+        ///     iOS -
+        ///     Android - Suggested: 15mins - Min: 30 seconds
+        ///     UWP - Suggested: 15mins - Min: 15mins
         /// </summary>
         public TimeSpan? PeriodicTime { get; set; }
 

@@ -38,17 +38,9 @@ namespace Shiny.BluetoothLE.Central.Internals
 
             this.StatusChanged
                 .Skip(1)
-                .Subscribe(async status =>
-                {
-                    try
-                    {
-                        await this.sdelegate.Value?.OnAdapterStateChanged(status);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                });
+                .SubscribeAsync(status => Log.SafeExecute(
+                    async () => await this.sdelegate.Value?.OnAdapterStateChanged(status)
+                ));
         }
 
 

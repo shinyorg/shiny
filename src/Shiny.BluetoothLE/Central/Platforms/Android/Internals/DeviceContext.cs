@@ -11,7 +11,7 @@ using Android.Bluetooth;
 using Android.OS;
 using Java.Lang;
 using Exception = System.Exception;
-using System.Collections.Generic;
+
 
 namespace Shiny.BluetoothLE.Central.Internals
 {
@@ -32,9 +32,7 @@ namespace Shiny.BluetoothLE.Central.Internals
         }
 
 
-        // TODO: eliminate this
         public GattCallbacks Callbacks => this.callbacks;
-
         public CentralContext CentralContext { get; }
         public BluetoothGatt Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
@@ -49,9 +47,6 @@ namespace Shiny.BluetoothLE.Central.Internals
         public ConcurrentQueue<Func<Task>> Actions { get; }
         public IObservable<BleException> ConnectionFailed => this.connErrorSubject; // TODO: need the device
 
-        //public IObservable<ConnectionState> WhenConnectionStatusChanged() => this.callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus());
-        //public IObservable<GattCharacteristicEventArgs> WhenWrite(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicWrite.Where(x => x.Characteristic.Equals(native));
-        //public IObservable<GattCharacteristicEventArgs> WhenRead(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicRead.Where(x => x.Characteristic.Equals(native));
 
         public void Connect(ConnectionConfig config) => this.InvokeOnMainThread(() =>
         {
