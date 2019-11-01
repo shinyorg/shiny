@@ -41,11 +41,9 @@ namespace Shiny.Jobs
 
             this.context.RegisterBackground<JobBackgroundTaskProcessor>(jobInfo.Identifier, builder =>
             {
-                if (jobInfo.PeriodicTime != null)
-                {
-                    var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.Value.TotalMinutes, 0));
-                    builder.SetTrigger(new TimeTrigger(runMins, false));
-                }
+                var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.TotalMinutes, 0));
+                builder.SetTrigger(new TimeTrigger(runMins, false));
+
                 if (jobInfo.RequiredInternetAccess != InternetAccess.None)
                 {
                     var type = jobInfo.RequiredInternetAccess == InternetAccess.Any
@@ -59,7 +57,7 @@ namespace Shiny.Jobs
 
 
         protected override void CancelNative(JobInfo jobInfo)
-            => this.context.UnRegisterBackground<JobBackgroundTaskProcessor>(jobName);
+            => this.context.UnRegisterBackground<JobBackgroundTaskProcessor>(jobInfo.Identifier);
     }
 }
 
