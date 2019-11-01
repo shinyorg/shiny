@@ -1,4 +1,5 @@
 ﻿using System;
+using Foundation;
 using UserNotifications;
 
 
@@ -16,7 +17,7 @@ namespace Shiny.Notifications
                 Id = i,
                 Title = native.Content?.Title,
                 Message = native.Content?.Body,
-                //Metadata = native.Content.UserInfo.FromNsDictionary()
+                Payload = GetPayload(native)
             };
 
             if (native.Trigger is UNCalendarNotificationTrigger calendar)
@@ -24,6 +25,20 @@ namespace Shiny.Notifications
                 // if null, it is firing and it is firing right now
 
             return shiny;
+        }
+
+
+        static string GetPayload(UNNotificationRequest request)
+        {
+            var userInfo = request?.Content?.UserInfo;
+            if (userInfo == null)
+                return null;
+
+            var key = new NSString("Payload");
+            if (!userInfo.ContainsKey(key))
+                return null;
+
+            return userInfo[key].ToString();
         }
     }
 }
