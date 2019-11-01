@@ -59,11 +59,11 @@ namespace Shiny.Net.Http
         }
 
 
-        HttpRequestMessage Build(HttpTransferStore request, bool transferEncodingChunked = true)
+        HttpRequestMessage Build(HttpTransferStore request)
         {
             var message = new HttpRequestMessage(new HttpMethod(request.HttpMethod), request.Uri);
             //message.Headers.ExpectContinue = false;
-            message.Headers.TransferEncodingChunked = transferEncodingChunked;
+            //message.Headers.TransferEncodingChunked = transferEncodingChunked;
             //message.Headers.Add("Keep-Alive", false);
 
             foreach (var header in request.Headers)
@@ -80,7 +80,6 @@ namespace Shiny.Net.Http
         }
 
 
-        // TODO: pause due to network
         async Task<HttpTransfer> Upload(HttpTransferStore request, CancellationToken ct)
         {
             var file = new FileInfo(request.LocalFile);
@@ -141,7 +140,6 @@ namespace Shiny.Net.Http
                         status = HttpTransferState.Error;
                     }
                 }
-                //Java.Net.ProtocolException
                 catch (WebException ex)
                 {
                     switch (ex.Status)
@@ -190,7 +188,7 @@ namespace Shiny.Net.Http
             HttpTransfer lastTransfer = default;
             var status = HttpTransferState.Pending;
             var file = new FileInfo(request.LocalFile);
-            var message = this.Build(request, false);
+            var message = this.Build(request);
             var fileSize = 0L;
             var bytesTransferred = file.Exists ? file.Length : 0;
             Exception exception = null;
