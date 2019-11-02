@@ -37,7 +37,8 @@ namespace Shiny.Beacons
                     Identifier = nameof(BeaconRegionScanJob),
                     Type = typeof(BeaconRegionScanJob),
                     BatteryNotLow = true,
-                    PeriodicTime = TimeSpan.FromSeconds(30)
+                    PeriodicTime = TimeSpan.FromSeconds(30),
+                    IsSystemJob = true
                 });
             }
 #endif
