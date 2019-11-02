@@ -42,10 +42,6 @@ namespace Shiny.Notifications
             services.AddSingleton<INotificationManager, NotificationManager>();
 #if __ANDROID__
             services.AddSingleton<AndroidNotificationProcessor>();
-#endif
-
-
-#if __ANDROID__
             services.RegisterJob(new Jobs.JobInfo
             {
                 PeriodicTime = TimeSpan.FromMinutes(2),
