@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Settings;
 using Android;
-using Android.OS;
 using Android.App.Job;
 using Android.Content;
 using Java.Lang;
@@ -129,18 +128,11 @@ namespace Shiny.Jobs
                     Class.FromType(typeof(ShinyJobService))
                 )
             )
-            .SetPersisted(true);
-
-            var bundle = new PersistableBundle();
-            bundle.PutString("ShinyJobId", jobInfo.Identifier);
-            builder.SetExtras(bundle);
-            builder.SetPeriodic(Convert.ToInt64(jobInfo.PeriodicTime.TotalMilliseconds));
-
-            if (jobInfo.BatteryNotLow)
-                builder.SetRequiresBatteryNotLow(true);
-
-            if (jobInfo.DeviceCharging)
-                builder.SetRequiresCharging(true);
+            .SetShinyIdentifier(jobInfo.Identifier)
+            .SetPersisted(true)
+            .SetPeriodic(Convert.ToInt64(jobInfo.PeriodicTime.TotalMilliseconds))
+            .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
+            .SetRequiresCharging(jobInfo.DeviceCharging);
 
             if (jobInfo.RequiredInternetAccess != InternetAccess.None)
             {

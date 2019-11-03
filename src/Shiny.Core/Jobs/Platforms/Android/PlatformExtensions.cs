@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Android.OS;
 using Android.App.Job;
 using NativeJob = Android.App.Job.JobInfo;
+using JobBuilder = Android.App.Job.JobInfo.Builder;
 
 
 namespace Shiny.Jobs
@@ -9,6 +11,15 @@ namespace Shiny.Jobs
     static class PlatformExtensions
     {
         const string ShinyJobIdentifierKey = "ShinyJobId";
+
+
+        public static JobBuilder SetShinyIdentifier(this JobBuilder builder, string jobIdentifier)
+        {
+            var bundle = new PersistableBundle();
+            bundle.PutString(ShinyJobIdentifierKey, jobIdentifier);
+            builder.SetExtras(bundle);
+            return builder;
+        }
 
 
         public static string GetShinyJobId(this JobParameters jobParameters)
