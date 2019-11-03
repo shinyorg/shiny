@@ -151,7 +151,8 @@ namespace Shiny.Jobs
                 builder.SetRequiredNetworkType(networkType);
             }
 
-            this.context.Native().Schedule(builder.Build());
+            var nativeJob = builder.Build();
+            this.context.Native().Schedule(nativeJob);
         }
 
 
