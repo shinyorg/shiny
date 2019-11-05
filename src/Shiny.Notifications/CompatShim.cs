@@ -11,10 +11,13 @@ namespace Shiny
 
         public static Task Cancel(int id) => Current.Cancel(id);
         public static Task Clear() => Current.Clear();
-        public static Task<int> GetBadge() => Current.GetBadge();
+        public static int Badge
+        {
+            get => Current.Badge;
+            set => Current.Badge = value;
+        }
         public static Task<IEnumerable<Notification>> GetPending() => Current.GetPending();
         public static Task<AccessState> RequestAccess() => Current.RequestAccess();
         public static Task Send(Notification notification) => Current.Send(notification);
-        public static Task SetBadge(int value) => Current.SetBadge(value);
     }
 }

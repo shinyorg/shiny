@@ -8,6 +8,12 @@ namespace Shiny.Notifications
     public interface INotificationManager
     {
         /// <summary>
+        /// Adds a notification category that you can set on your notification.Category
+        /// </summary>
+        /// <param name="category"></param>
+        void RegisterCategory(NotificationCategory category);
+
+        /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
         /// <returns></returns>
@@ -45,17 +51,8 @@ namespace Shiny.Notifications
 
 
         /// <summary>
-        /// Sets the current badge
+        /// Sets the app icon badge
         /// </summary>
-        /// <param name="value">Pass zero to remove</param>
-        /// <returns></returns>
-        Task SetBadge(int value);
-
-
-        /// <summary>
-        /// Gets the current badge
-        /// </summary>
-        /// <returns></returns>
-        Task<int> GetBadge();
+        int Badge { get; set; }
     }
 }

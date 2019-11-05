@@ -28,17 +28,13 @@ namespace Shiny.Notifications
             if (!intent.HasExtra(NOTIFICATION_KEY))
                 return;
 
-            try
+            await Log.SafeExecute(async () =>
             {
                 var notificationString = intent.GetStringExtra(NOTIFICATION_KEY);
                 var notification = this.serializer.Deserialize<Notification>(notificationString);
-
-                await this.ndelegate.OnEntry(notification);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+                var response = new NotificationResponse(notification, null, null);
+                await this.ndelegate.OnEntry(response);
+            });
         }
     }
 }

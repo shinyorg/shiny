@@ -22,14 +22,72 @@ namespace Shiny.Notifications
         }
 
 
-        public Task SetBadge(int value) => Dispatcher.InvokeOnMainThreadAsync(() =>
-            UIApplication.SharedApplication.ApplicationIconBadgeNumber = value
-        );
+        public int Badge
+        {
+            get => this.settings.Get("Badge", 0);
+            set
+            {
+                this.settings.Set("Badge", value);
+                Dispatcher.InvokeOnMainThreadAsync(() =>
+                    UIApplication.SharedApplication.ApplicationIconBadgeNumber = value
+                );
+            }
+        }
 
 
-        public Task<int> GetBadge() => Dispatcher.InvokeOnMainThreadAsync(() =>
-            (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
-        );
+        public void RegisterCategory(NotificationCategory category)
+        {
+            var actions = new List<UNNotificationAction>();
+            foreach (var action in category.Actions)
+            {
+                switch (action.ActionType)
+                {
+                    case NotificationActionType.TextReply:
+                        actions.Add(UNTextInputNotificationAction.FromIdentifier(
+                            action.Identifier,
+                            action.Title,
+                            UNNotificationActionOptions.None,
+                            action.Title,
+                            String.Empty
+                        ));
+                        break;
+
+                    case NotificationActionType.Destructive:
+                        actions.Add(UNNotificationAction.FromIdentifier(
+                            action.Identifier,
+                            action.Title,
+                            UNNotificationActionOptions.Destructive
+                        ));
+                        break;
+
+                    case NotificationActionType.OpenApp:
+                        actions.Add(UNNotificationAction.FromIdentifier(
+                            action.Identifier,
+                            action.Title,
+                            UNNotificationActionOptions.Foreground
+                        ));
+                        break;
+
+                    case NotificationActionType.None:
+                        actions.Add(UNNotificationAction.FromIdentifier(
+                            action.Identifier,
+                            action.Title,
+                            UNNotificationActionOptions.None
+                        ));
+                        break;
+                }
+            }
+
+            var native = UNNotificationCategory.FromIdentifier(
+                category.Identifier,
+                actions.ToArray(),
+                new string[] { "" },
+                UNNotificationCategoryOptions.None
+            );
+
+            var set = new NSSet<UNNotificationCategory>(new[] { native });
+            UNUserNotificationCenter.Current.SetNotificationCategories(set);
+        }
 
 
         public Task<AccessState> RequestAccess()
@@ -89,7 +147,8 @@ namespace Shiny.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message
+                Body = notification.Message,
+                CategoryIdentifier = notification.Category
                 //LaunchImageName = ""
                 //Subtitle = ""
             };
@@ -142,20 +201,3 @@ namespace Shiny.Notifications
         });
     }
 }
-//UNUserNotificationCenter.Current.SetNotificationCategories(
-//    UNNotificationCategory.FromIdentifier(
-//        "",
-//        new UNNotificationAction[]
-//        {
-//            UNNotificationAction.FromIdentifier(
-//                "id",
-//                "title",
-//                UNNotificationActionOptions.AuthenticationRequired
-//            )
-//        },
-//        new string[] { "" },
-//        "hiddenPreviewsBodyPlaceholder",
-//        new NSString(""),
-//        UNNotificationCategoryOptions.None
-//    )
-//);

@@ -9,15 +9,18 @@ namespace Shiny.Notifications
     {
         readonly Type delegateType;
         readonly bool requestPermissionImmediately;
+        readonly NotificationCategory[] notificationCategories;
 
 
         public NotificationModule(Type delegateType,
                                   bool requestPermissionImmediately,
                                   AndroidOptions androidConfig,
-                                  UwpOptions uwpConfig)
+                                  UwpOptions uwpConfig,
+                                  NotificationCategory[] notificationCategories)
         {
             this.delegateType = delegateType;
             this.requestPermissionImmediately = requestPermissionImmediately;
+            this.notificationCategories = notificationCategories;
 
             if (androidConfig != null)
             {
@@ -66,12 +69,13 @@ namespace Shiny.Notifications
         public override async void OnContainerReady(IServiceProvider services)
         {
             base.OnContainerReady(services);
+            var manager = services.GetRequiredService<INotificationManager>();
+
             if (requestPermissionImmediately)
-            {
-                await services
-                    .GetService<INotificationManager>()
-                    .RequestAccess();
-            }
+                await manager.RequestAccess();
+
+            foreach (var category in this.notificationCategories)
+                manager.RegisterCategory(category);
         }
     }
 }
