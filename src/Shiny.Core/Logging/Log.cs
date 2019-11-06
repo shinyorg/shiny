@@ -1,21 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Subjects;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Logging
 {
     public static class Log
     {
+
+        public static void UseDebug(bool crashesEnabled = true, bool eventsEnabled = true)
+            => AddLogger(new DebugLogger(), crashesEnabled, eventsEnabled);
+
+        public static void UseConsole(bool crashesEnabled = true, bool eventsEnabled = true)
+            => AddLogger(new ConsoleLogger(), crashesEnabled, eventsEnabled);
+
+        public static void UseFile(bool crashesEnabled = true, bool eventsEnabled = true)
+            => AddLogger(new FileLogger(), crashesEnabled, eventsEnabled);
+
+
         static readonly Subject<LogError> errorSubj = new Subject<LogError>();
         public static IObservable<LogError> WhenExceptionLogged() => errorSubj;
 
 
         static readonly Subject<LogEvent> eventSubj = new Subject<LogEvent>();
         public static IObservable<LogEvent> WhenEventLogged() => eventSubj;
-#if DEBUG
-        static Log() => UseDebug();
-#endif
+
+
+        public static void SafeExecute(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                Write(ex);
+            }
+        }
+
+
+        public static async Task SafeExecute(Func<Task> action)
+        {
+            try
+            {
+                await action().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Write(ex);
+            }
+        }
 
 
         public static void Write(Exception exception, params (string Key, string Value)[] parameters)
@@ -47,13 +81,6 @@ namespace Shiny.Logging
                 IsCrashEnabled = crashesEnabled,
                 IsEventsEnabled = eventsEnabled
             });
-
-
-        public static void UseDebug(bool crashesEnabled = true, bool eventsEnabled = true)
-            => AddLogger(new DebugLogger(), crashesEnabled, eventsEnabled);
-
-        public static void UseConsole(bool crashesEnabled = true, bool eventsEnabled = true)
-            => AddLogger(new ConsoleLogger(), crashesEnabled, eventsEnabled);
 
 
         static void DoLog(ILogger logger, Exception ex, (string Key, string Value)[] parameters)

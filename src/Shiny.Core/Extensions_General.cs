@@ -3,7 +3,7 @@
 
 namespace Shiny
 {
-    public static partial class Extensions
+    public static class GeneralExtensions
     {
         public static void Assert(this AccessState state, string message = null, bool allowRestricted = false)
         {

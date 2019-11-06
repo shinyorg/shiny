@@ -77,15 +77,15 @@ namespace Shiny.Locations
         }
 
 
-        public override async Task StopMonitoring(GeofenceRegion region)
+        public override async Task StopMonitoring(string identifier)
         {
             var list = GeofenceMonitor.Current.Geofences;
-            var geofence = list.FirstOrDefault(x => x.Id.Equals(region.Identifier));
+            var geofence = list.FirstOrDefault(x => x.Id.Equals(identifier));
 
             if (geofence != null)
                 list.Remove(geofence);
 
-            await this.Repository.Remove(region.Identifier);
+            await this.Repository.Remove(identifier);
             if (list.Count == 0)
                 this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>();
         }
@@ -125,7 +125,8 @@ namespace Shiny.Locations
 
             var circle = new Geocircle(position, region.Radius.TotalMeters);
             var geofence = new Geofence(
-                region.Identifier, circle,
+                region.Identifier,
+                circle,
                 ToStates(region),
                 region.SingleUse
             );

@@ -5,8 +5,8 @@ namespace Shiny.Notifications
 {
     public class AndroidOptions
     {
-        public static string DefaultChannelId { get; set; } = "pluginnotificationId";
-        public static string DefaultChannel { get; set; } = "pluginnotifications";
+        public static string DefaultChannelId { get; set; } = "shinynotificationchannelid";
+        public static string DefaultChannel { get; set; } = "shinynotificationchannel";
         public static string DefaultSmallIconResourceName { get; set; } = "notification";
         public static string DefaultChannelDescription { get; set; }
         public static AndroidNotificationImportance DefaultNotificationImportance { get; set; } = AndroidNotificationImportance.Default;
@@ -23,6 +23,8 @@ namespace Shiny.Notifications
         public string ChannelDescription { get; set; } = DefaultChannelDescription;
         public AndroidNotificationImportance NotificationImportance { get; set; } = DefaultNotificationImportance;
         public string SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
+        public bool OnGoing { get; set; }
+        public bool AutoCancel { get; set; } = true;
     }
 
 

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Shiny.Infrastructure;
+
 
 namespace Shiny.Locations
 {
-    public interface IGeofenceDelegate
+    public interface IGeofenceDelegate : IShinyDelegate
     {
         /// <summary>
         /// This is fired when the geofence region status has changed

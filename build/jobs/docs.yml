@@ -1,0 +1,30 @@
+pool:
+  name: Azure Pipelines
+steps:
+- task: DotNetCoreInstaller@0
+  displayName: 'Install .NET Core SDK 2.2'
+  inputs:
+    version: 2.2.101
+
+- script: 'dotnet tool install -g Wyam.Tool'
+  displayName: 'Install Wyam'
+
+- script: 'wyam build'
+  displayName: 'Build Wyam'
+
+- task: ArchiveFiles@2
+  displayName: 'Archive $(Build.BinariesDirectory)'
+  inputs:
+    rootFolderOrFile: '$(Agent.BuildDirectory)/s/output'
+    includeRootFolder: false
+
+- task: AzureRmWebAppDeployment@4
+  displayName: 'Azure App Service Deploy: shinydocs'
+  inputs:
+    azureSubscription: 'Visual Studio Enterprise (1574dd30-dfbf-4b36-b94d-2416fc2f07c3)'
+    WebAppName: shinydocs
+    packageForLinux: '$(build.artifactstagingdirectory)/**/*.zip'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+

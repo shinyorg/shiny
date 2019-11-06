@@ -16,7 +16,8 @@ namespace Shiny
 
         public string MachineName => "Android";
         public string OperatingSystem => B.VERSION.Release;
+        public string OperatingSystemVersion => B.VERSION.Sdk;
         public string Manufacturer => B.Manufacturer;
-        public string Model => B.Model;
+        public string Model => B.Model;       
     }
 }

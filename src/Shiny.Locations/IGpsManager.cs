@@ -42,7 +42,7 @@ namespace Shiny.Locations
 
 
         /// <summary>
-        /// Hook to the GPS events - usualful for front ends ONLY.  If you need background operations, register the delegate
+        /// Hook to the GPS events - useful for front ends ONLY.  If you need background operations, register the delegate
         /// </summary>
         /// <returns></returns>
         IObservable<IGpsReading> WhenReading();

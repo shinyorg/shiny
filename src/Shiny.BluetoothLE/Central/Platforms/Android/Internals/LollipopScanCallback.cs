@@ -24,7 +24,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             if (results == null)
                 return;
 
-            foreach (SR result in results)
+            foreach (var result in results)
                 this.callback(result);
         }
     }

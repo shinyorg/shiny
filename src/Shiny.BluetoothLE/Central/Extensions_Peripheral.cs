@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public static partial class Extensions
+    public static class PeripheralExtensions
     {
         public static bool IsConnected(this IPeripheral peripheral) => peripheral.Status == ConnectionState.Connected;
         public static bool IsDisconnected(this IPeripheral peripheral) => !peripheral.IsConnected();
@@ -98,12 +98,13 @@ namespace Shiny.BluetoothLE.Central
         /// <param name="peripheral"></param>
         /// <param name="serviceUuid"></param>
         /// <param name="characteristicUuid"></param>
+        /// <param name="withResponse"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> WriteCharacteristic(this IPeripheral peripheral, Guid serviceUuid, Guid characteristicUuid, byte[] data)
+        public static IObservable<CharacteristicGattResult> WriteCharacteristic(this IPeripheral peripheral, Guid serviceUuid, Guid characteristicUuid, byte[] data, bool withResponse = true)
             => peripheral
                 .GetKnownCharacteristics(serviceUuid, characteristicUuid)
-                .Select(x => x.Write(data))
+                .Select(x => x.Write(data, withResponse))
                 .Switch();
 
 

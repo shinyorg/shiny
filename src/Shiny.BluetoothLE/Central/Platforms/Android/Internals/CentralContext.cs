@@ -3,8 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.OS;
 using ScanMode = Android.Bluetooth.LE.ScanMode;
 
 
@@ -13,19 +15,81 @@ namespace Shiny.BluetoothLE.Central.Internals
     public class CentralContext
     {
         readonly ConcurrentDictionary<string, IPeripheral> devices;
+        readonly Subject<AccessState> statusSubject;
+        readonly Subject<NamedMessage<IPeripheral>> peripheralSubject;
+        readonly Lazy<IBleCentralDelegate> sdelegate;
         LollipopScanCallback callbacks;
 
 
-        public CentralContext(AndroidContext context)
+        public CentralContext(IServiceProvider serviceProvider, AndroidContext context, BleCentralConfiguration config)
         {
-            this.Manager = (BluetoothManager)context.AppContext.GetSystemService(global::Android.App.Application.BluetoothService);
             this.Android = context;
+            this.Configuration = config;
+            this.Manager = context.GetBluetooth();
+
+            this.sdelegate = new Lazy<IBleCentralDelegate>(() => serviceProvider.Resolve<IBleCentralDelegate>());
             this.devices = new ConcurrentDictionary<string, IPeripheral>();
+            this.statusSubject = new Subject<AccessState>();
+            this.peripheralSubject = new Subject<NamedMessage<IPeripheral>>();
         }
 
 
+        public AccessState Status
+        {
+            get
+            {
+                if (Build.VERSION.SdkInt < BuildVersionCodes.Lollipop)
+                    return AccessState.NotSupported;
+
+                if (this.Manager.Adapter == null)
+                    return AccessState.NotSupported;
+
+                if (!this.Manager.Adapter.IsEnabled)
+                    return AccessState.Disabled;
+
+                return this.Manager.Adapter.State.FromNative();
+            }
+        }
+
+
+        public IObservable<AccessState> StatusChanged => this.statusSubject;
+        public IObservable<NamedMessage<IPeripheral>> PeripheralEvents => this.peripheralSubject;
+
+        public BleCentralConfiguration Configuration { get; }
         public BluetoothManager Manager { get; }
         public AndroidContext Android { get; }
+
+
+        internal void ChangeStatus(State state)
+        {
+            var status = state.FromNative();
+            this.sdelegate.Value?.OnAdapterStateChanged(status);
+            this.statusSubject.OnNext(status);
+        }
+
+
+        internal void DeviceEvent(string eventName, BluetoothDevice device)
+        {
+            var peripheral = this.GetDevice(device);
+            if (eventName.Equals(BluetoothDevice.ActionAclConnected))
+                this.sdelegate.Value?.OnConnected(peripheral);
+
+            this.peripheralSubject.OnNext(new NamedMessage<IPeripheral>(eventName, peripheral));
+            //case BluetoothDevice.ActionAclConnected:
+            //case BluetoothDevice.ActionAclDisconnected:
+            //case BluetoothDevice.ActionBondStateChanged:
+            //case BluetoothDevice.ActionNameChanged:
+            //case BluetoothDevice.ActionPairingRequest:
+        }
+
+
+        public IObservable<IPeripheral> ListenForMe(string eventName, IPeripheral me) => this
+            .peripheralSubject
+            .Where(x =>
+                x.Name.Equals(eventName) &&
+                x.Arg.Equals(me)
+            )
+            .Select(x => x.Arg);
 
 
         public IPeripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(
@@ -36,12 +100,11 @@ namespace Shiny.BluetoothLE.Central.Internals
 
         public IEnumerable<IPeripheral> GetConnectedDevices()
         {
-            var nativeDevices = this.Manager
-                .GetDevicesMatchingConnectionStates(ProfileType.Gatt, new[]
-                {
-                    (int) ProfileState.Connecting,
-                    (int) ProfileState.Connected
-                });
+            var nativeDevices = this.Manager.GetDevicesMatchingConnectionStates(ProfileType.Gatt, new[]
+            {
+                (int) ProfileState.Connecting,
+                (int) ProfileState.Connected
+            });
             foreach (var native in nativeDevices)
                 yield return this.GetDevice(native);
         }
@@ -56,7 +119,7 @@ namespace Shiny.BluetoothLE.Central.Internals
         }
 
 
-        public IObservable<IScanResult> Scan(ScanConfig config)  => Observable.Create<ScanResult>(ob =>
+        public IObservable<IScanResult> Scan(ScanConfig config) => Observable.Create<ScanResult>(ob =>
         {
             this.devices.Clear();
 

@@ -1,19 +1,43 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
-using System.Collections.Generic;
-using Shiny.Settings;
-using Shiny.Jobs;
-using Shiny.Caching;
-using Shiny.Infrastructure;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Jobs;
+using Shiny.Logging;
 
 
 namespace Shiny
 {
-    public static partial class Extensions
+    public static class ServiceExtensions
     {
-        static readonly List<Action<IServiceProvider>> postBuildActions = new List<Action<IServiceProvider>>();
+        /// <summary>
+        /// Get Service of Type T from the IServiceProvider
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="serviceProvider"></param>
+        /// <param name="requiredService"></param>
+        /// <returns></returns>
+        public static T Resolve<T>(this IServiceProvider serviceProvider, bool requiredService = false)
+            => requiredService ? serviceProvider.GetRequiredService<T>() : serviceProvider.GetService<T>();
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        public static async Task SafeResolveAndExecute<T>(this IServiceProvider services, Func<T, Task> execute, bool requiredService = true)
+        {
+            try
+            {
+                var service = services.Resolve<T>(requiredService);
+                await execute.Invoke(service).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
 
 
         /// <summary>
@@ -22,18 +46,55 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="action"></param>
         public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
-            => postBuildActions.Add(action);
+            => ShinyHost.AddPostBuildAction(action);
 
 
-        public static void AddStartupSingleton<TService, TImplementation>(this IServiceCollection services)
-            where TService : class
-            where TImplementation : class, TService, IStartupTask
+         /// <summary>
+        /// Register a job on the job manager
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="jobInfo"></param>
+        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
         {
-            services.AddSingleton<TImplementation>();
-            services.AddSingleton<TService>(x => x.GetService<TImplementation>());
-            services.RegisterStartupTask(x => x.GetService<TImplementation>());
+            jobInfo.AssertValid();
+
+            services.RegisterPostBuildAction(async sp =>
+            {
+                // what if permission fails?
+                var jobs = sp.GetService<IJobManager>();
+                var access = await jobs.RequestAccess();
+                if (access == AccessState.Available)
+                    await jobs.Schedule(jobInfo);
+            });
         }
 
+
+        /// <summary>
+        /// Registers a job on the job manager
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="jobType"></param>
+        /// <param name="identifier"></param>
+        public static void RegisterJob(this IServiceCollection services,
+                                       Type jobType,
+                                       string identifier = null,
+                                       InternetAccess requiredNetwork = InternetAccess.None)
+            => services.RegisterPostBuildAction(async sp =>
+            {
+                // what if permission fails?
+                var jobs = sp.GetService<IJobManager>();
+                var access = await jobs.RequestAccess();
+                if (access == AccessState.Available)
+                {
+                    await jobs.Schedule(new JobInfo
+                    {
+                        Type = jobType,
+                        Identifier = identifier ?? jobType.GetType().FullName,
+                        RequiredInternetAccess = requiredNetwork,
+                        Repeat = true
+                    });
+                }
+            });
 
         /// <summary>
         /// Attempts to resolve or build an instance from a service provider
@@ -59,7 +120,7 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         /// <param name="module"></param>
-        public static void RegisterModule(this IServiceCollection services, IModule module)
+        public static void RegisterModule(this IServiceCollection services, IShinyModule module)
         {
             module.Register(services);
             services.RegisterPostBuildAction(module.OnContainerReady);
@@ -71,182 +132,8 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        public static void RegisterModule<T>(this IServiceCollection services) where T : IModule, new() => services.RegisterModule(new T());
-
-
-        internal static void RunPostBuildActions(this IServiceProvider container)
-        {
-            foreach (var action in postBuildActions)
-                action(container);
-
-            postBuildActions.Clear();
-        }
-
-
-        /// <summary>
-        /// Adds an injectable (ICache) cache service that doesn't actually cache at all - good for testing
-        /// </summary>
-        /// <param name="services"></param>
-        public static void UseVoidCache(this IServiceCollection services)
-            => services.AddSingleton<ICache, VoidCache>();
-
-
-        /// <summary>
-        /// Adds an injectable (ICache) in-memory cache
-        /// </summary>
-        /// <param name="services">The service collection</param>
-        /// <param name="defaultLifespan">The default timespan for how long objects should live in cache if time is not explicitly set</param>
-        /// <param name="cleanUpTimer">The internal cleanup time interval (don't make this too big or too small)</param>
-        public static void UseMemoryCache(this IServiceCollection services,
-                                          TimeSpan? defaultLifespan = null,
-                                          TimeSpan? cleanUpTimer = null)
-            => services.AddSingleton<ICache>(_ => new MemoryCache(defaultLifespan, cleanUpTimer));
-
-
-        /// <summary>
-        /// Uses the built-in repository (default is file based) to store cache data
-        /// </summary>
-        /// <param name="services">The service collection</param>
-        /// <param name="defaultLifespan">The default timespan for how long objects should live in cache if time is not explicitly set</param>
-        /// <param name="cleanUpTimer">The internal cleanup time interval (don't make this too big or too small)</param>
-        public static void UseRepositoryCache(this IServiceCollection services,
-                                              TimeSpan? defaultLifespan = null,
-                                              TimeSpan? cleanUpTimer = null)
-            => services.AddSingleton<ICache>(sp =>
-            {
-                var repository = sp.GetRequiredService<IRepository>();
-                return new RepositoryCache(repository, defaultLifespan, cleanUpTimer);
-            });
-
-
-        /// <summary>
-        /// Register a strongly typed application settings provider on the service container
-        /// </summary>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="prefix"></param>
-        public static void RegisterSettings<TImpl>(this IServiceCollection services, string prefix = null)
-                where TImpl : class, INotifyPropertyChanged, new()
-            => services.RegisterSettings<TImpl, TImpl>(prefix);
-
-
-        /// <summary>
-        /// Register a strongly typed application settings provider on the service container with a service interface
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="prefix"></param>
-        public static void RegisterSettings<TService, TImpl>(this IServiceCollection services, string prefix = null)
-                where TService : class
-                where TImpl : class, TService, INotifyPropertyChanged, new()
-            => services.AddSingleton<TService>(c => c
-                .GetService<ISettings>()
-                .Bind<TImpl>(prefix)
-            );
-
-
-        /// <summary>
-        /// Register a startup task that runs immediately after the container is built with full dependency injected services
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="services"></param>
-        public static void RegisterStartupTask<T>(this IServiceCollection services) where T : class, IStartupTask
-            => services.AddSingleton<IStartupTask, T>();
-
-
-        /// <summary>
-        /// Register a startup task that runs immediately after the container is built with full dependency injected services
-        /// </summary>
-        /// <param name="services"></param>
-        public static void RegisterStartupTask(this IServiceCollection services, IStartupTask instance)
-            => services.AddSingleton(instance);
-
-
-        /// <summary>
-        /// Register a startup task that runs immediately after the container is built with full dependency injected services
-        /// </summary>
-        /// <param name="services"></param>
-        public static void RegisterStartupTask(this IServiceCollection services, Func<IServiceProvider, IStartupTask> register)
-            => services.AddSingleton(register);
-
-
-        /// <summary>
-        /// Register a job on the job manager
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="jobInfo"></param>
-        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-            => services.RegisterPostBuildAction(async sp =>
-            {
-                // what if permission fails?
-                var jobs = sp.GetService<IJobManager>();
-                var access = await jobs.RequestAccess();
-                if (access == AccessState.Available)
-                    await jobs.Schedule(jobInfo);
-            });
-
-
-        /// <summary>
-        /// Add or replace a service registration
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        public static void AddOrReplace<TService, TImpl>(this IServiceCollection services)
-        {
-            var desc = services.SingleOrDefault(x => x.ServiceType == typeof(TService));
-            if (desc != null)
-                services.Remove(desc);
-
-            services.Add(new ServiceDescriptor(typeof(TService), typeof(TImpl), desc.Lifetime));
-        }
-
-
-        /// <summary>
-        /// Add or replace a service registration
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="instance">The singleton instance you wish to use</param>
-        public static void AddOrReplace<TService>(this IServiceCollection services, TService instance)
-        {
-            var desc = services.SingleOrDefault(x => x.ServiceType == typeof(TService));
-            if (desc != null)
-                services.Remove(desc);
-
-            services.Add(new ServiceDescriptor(typeof(TService), instance));
-        }
-
-
-        /// <summary>
-        /// Add or replace a service registration
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="instance"></param>
-        public static void AddOrReplace<TService>(this IServiceCollection services, Func<IServiceProvider, TService> factory)
-        {
-            var desc = services.SingleOrDefault(x => x.ServiceType == typeof(TService));
-            if (desc != null)
-                services.Remove(desc);
-
-            services.Add(new ServiceDescriptor(typeof(TService), factory));
-        }
-
-
-        /// <summary>
-        /// Regiseter a service on the collection if it one is not already registered
-        /// </summary>
-        /// <typeparam name="TService"></typeparam>
-        /// <typeparam name="TImpl"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="lifetime"></param>
-        public static void AddIfNotRegister<TService, TImpl>(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Singleton)
-        {
-            if (!services.IsRegistered<TService>())
-                services.Add(new ServiceDescriptor(typeof(TService), typeof(TImpl), lifetime));
-        }
+        public static void RegisterModule<T>(this IServiceCollection services)
+            where T : IShinyModule, new() => services.RegisterModule(new T());
 
 
         /// <summary>

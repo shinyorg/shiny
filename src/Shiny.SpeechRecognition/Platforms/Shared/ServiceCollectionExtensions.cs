@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.SpeechRecognition;
 
 
-namespace Shiny.SpeechRecognition
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {

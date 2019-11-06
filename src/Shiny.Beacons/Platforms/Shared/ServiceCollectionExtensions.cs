@@ -1,33 +1,41 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
-#if WINDOWS_UWP || __ANDROID__
-using Shiny.BluetoothLE;
-#endif
+using Shiny.Beacons;
 
-namespace Shiny.Beacons
+
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
         /// <summary>
         /// Register the beacon service with this if you only plan to use ranging
         /// </summary>
-        /// <param name="builder"></param>
+        /// <param name="services"></param>
         /// <returns></returns>
-        public static bool UseBeacons(this IServiceCollection builder)
+        public static bool UseBeacons(this IServiceCollection services)
         {
-
-#if WINDOWS_UWP || __ANDROID__
-            builder.UseBleCentral();
-            builder.AddSingleton<BackgroundTask>();
-
-            builder.AddSingleton<IBeaconManager, BeaconManager>();
-            return true;
-#elif __IOS__
-            builder.AddSingleton<IBeaconManager, BeaconManager>();
-            return true;
+#if NETSTANDARD
+            return false;
 #else
+            services.RegisterModule(new BeaconModule(null, null));
+            return true;
+#endif
+        }
+
+
+        /// <summary>
+        /// Use this method if you plan to use background monitoring (works for ranging as well)
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="delegateType"></param>
+        /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
+        /// <returns></returns>
+        public static bool UseBeacons(this IServiceCollection services, Type delegateType, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            services.RegisterModule(new BeaconModule(delegateType, regionsToMonitorWhenPermissionAvailable));
             return false;
 #endif
         }
@@ -37,39 +45,10 @@ namespace Shiny.Beacons
         /// Use this method if you plan to use background monitoring (works for ranging as well)
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="builder"></param>
-        /// <param name="registerBeaconsIfPermissionAvailable"></param>
+        /// <param name="services"></param>
+        /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
         /// <returns></returns>
-        public static bool UseBeacons<T>(this IServiceCollection builder, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable) where T : class, IBeaconDelegate
-        {
-            if (!builder.UseBeacons())
-                return false;
-
-            builder.AddSingleton<IBeaconDelegate, T>();
-
-#if __ANDROID__
-            builder.RegisterPostBuildAction(sp => sp
-                .GetService<AndroidContext>()
-                .StartService(typeof(BeaconService))
-            );
-#endif
-            if (regionsToMonitorWhenPermissionAvailable.Any())
-            {
-                builder.RegisterPostBuildAction(sp =>
-                {
-                    var mgr = sp.GetService<IBeaconManager>();
-                    mgr
-                        .WhenAccessStatusChanged(true)
-                        .Where(x => x == AccessState.Available)
-                        .Take(1)
-                        .SubscribeAsync(async () =>
-                        {
-                            foreach (var region in regionsToMonitorWhenPermissionAvailable)
-                                await mgr.StartMonitoring(region);
-                        });
-                });
-            }
-            return true;
-        }
+        public static bool UseBeacons<T>(this IServiceCollection services, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable) where T : class, IBeaconDelegate
+            => services.UseBeacons(typeof(T), regionsToMonitorWhenPermissionAvailable);
     }
 }

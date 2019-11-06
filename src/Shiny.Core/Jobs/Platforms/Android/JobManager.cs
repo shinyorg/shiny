@@ -30,10 +30,10 @@ namespace Shiny.Jobs
         {
             var permission = AccessState.Available;
 
-            if (!this.context.IsInManifest(Manifest.Permission.AccessNetworkState, false))
+            if (!this.context.IsInManifest(Manifest.Permission.AccessNetworkState))
                 permission = AccessState.NotSetup;
 
-            if (!this.context.IsInManifest(Manifest.Permission.BatteryStats, false))
+            if (!this.context.IsInManifest(Manifest.Permission.BatteryStats))
                 permission = AccessState.NotSetup;
 
             //if (!this.context.IsInManifest(Manifest.Permission.ReceiveBootCompleted, false))

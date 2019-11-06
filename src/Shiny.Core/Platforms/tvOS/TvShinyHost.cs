@@ -2,26 +2,24 @@
 using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
-using Shiny.Infrastructure;
 using Shiny.IO;
 using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Shiny
 {
     public class TvShinyHost : ShinyHost
     {
-        public static void Init(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init(IShinyStartup startup = null, Action<IServiceCollection> platformBuild = null)
             => InitPlatform(startup, services =>
             {
-                services.AddSingleton<IConnectivity, SharedConnectivityImpl>();
-                services.AddSingleton<IPowerManager, PowerManagerImpl>();
-                services.AddSingleton<IJobManager, JobManager>();
-                services.AddSingleton<IRepository, FileSystemRepositoryImpl>();
-                services.AddSingleton<IFileSystem, FileSystemImpl>();
-                services.AddSingleton<ISerializer, JsonNetSerializer>();
-                services.AddSingleton<ISettings, SettingsImpl>();
+                services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
+                services.TryAddSingleton<IConnectivity, SharedConnectivityImpl>();
+                services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
+                services.TryAddSingleton<IJobManager, JobManager>();
+                services.TryAddSingleton<IFileSystem, FileSystemImpl>();
+                services.TryAddSingleton<ISettings, SettingsImpl>();
                 platformBuild?.Invoke(services);
             });
     }

@@ -5,61 +5,38 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using Android.Gms.Extensions;
 using Android.Gms.Location;
 using Android;
 using Android.App;
-using Android.Content;
 using Shiny.Infrastructure;
-using static Android.Manifest;
+using Shiny.Logging;
 
 
 namespace Shiny.Locations
 {
-    public class GeofenceManagerImpl : AbstractGeofenceManager, IAndroidGeofenceManager
+    public class GeofenceManagerImpl : AbstractGeofenceManager, IShinyStartupTask
     {
+        public const string ReceiverName = "com.shiny.locations." + nameof(GeofenceBroadcastReceiver);
+        public const string IntentAction = ReceiverName + ".INTENT_ACTION";
         readonly AndroidContext context;
         readonly GeofencingClient client;
-        readonly IGeofenceDelegate geofenceDelegate;
+        PendingIntent geofencePendingIntent;
 
 
         public GeofenceManagerImpl(AndroidContext context,
-                                   IRepository repository,
-                                   IGeofenceDelegate geofenceDelegate) : base(repository)
+                                   IRepository repository) : base(repository)
         {
             this.context = context;
             this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
-            this.geofenceDelegate = geofenceDelegate;
         }
 
 
-        public async Task ReceiveBoot()
+        public async void Start() => Log.SafeExecute(async () =>
         {
             var regions = await this.Repository.GetAll();
             foreach (var region in regions)
                 await this.Create(region);
-        }
-
-
-        public async Task Process(Intent intent)
-        {
-            var e = GeofencingEvent.FromIntent(intent);
-            if (e == null)
-                return;
-
-            foreach (var triggeringGeofence in e.TriggeringGeofences)
-            {
-                var region = await this.Repository.Get(triggeringGeofence.RequestId);
-                if (region != null)
-                {
-                    var state = (GeofenceState)e.GeofenceTransition;
-                    await this.geofenceDelegate.OnStatusChanged(state, region);
-
-                    if (region.SingleUse)
-                        await this.StopMonitoring(region);
-                }
-            }
-        }
+        });
 
 
         public override IObservable<AccessState> WhenAccessStatusChanged() => Observable.Return(AccessState.Available);
@@ -77,10 +54,10 @@ namespace Shiny.Locations
         }
 
 
-        public override async Task StopMonitoring(GeofenceRegion region)
+        public override async Task StopMonitoring(string identifier)
         {
-            await this.Repository.Remove(region.Identifier);
-            await this.client.RemoveGeofences(new List<string> { region.Identifier });
+            await this.Repository.Remove(identifier);
+            await this.client.RemoveGeofencesAsync(new List<string> { identifier });
         }
 
 
@@ -88,15 +65,17 @@ namespace Shiny.Locations
         {
             var regions = await this.Repository.GetAll();
             var regionIds = regions.Select(x => x.Identifier).ToArray();
-            await this.client.RemoveGeofences(regionIds);
+            await this.client.RemoveGeofencesAsync(regionIds);
             await this.Repository.Clear();
         }
 
 
         public override async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken)
         {
-            var client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);
-            var location = await client.GetLastLocationAsync();
+            var location = await LocationServices
+                .GetFusedLocationProviderClient(this.context.AppContext)
+                .GetLastLocationAsync();
+
             if (location == null)
                 return GeofenceState.Unknown;
 
@@ -109,6 +88,7 @@ namespace Shiny.Locations
         protected virtual async Task Create(GeofenceRegion region)
         {
             var transitions = this.GetTransitions(region);
+
             var geofence = new GeofenceBuilder()
                 .SetRequestId(region.Identifier)
                 .SetExpirationDuration(Geofence.NeverExpire)
@@ -121,11 +101,11 @@ namespace Shiny.Locations
                 .Build();
 
             var request = new GeofencingRequest.Builder()
+                .SetInitialTrigger(0)
                 .AddGeofence(geofence)
-                .SetInitialTrigger(transitions)
                 .Build();
 
-            await this.client.AddGeofences(
+            await this.client.AddGeofencesAsync(
                 request,
                 this.GetPendingIntent()
             );
@@ -136,10 +116,10 @@ namespace Shiny.Locations
         {
             var i = 0;
             if (region.NotifyOnEntry)
-                i = 1;
+                i += Geofence.GeofenceTransitionEnter;
 
             if (region.NotifyOnExit)
-                i += 2;
+                i += Geofence.GeofenceTransitionExit;
 
             return i;
         }
@@ -147,15 +127,17 @@ namespace Shiny.Locations
 
         protected virtual PendingIntent GetPendingIntent()
         {
-            var intent = new Intent(this.context.AppContext, typeof(GeofenceBroadcastReceiver));
-            intent.SetAction(GeofenceBroadcastReceiver.INTENT_ACTION);
-            intent.SetAction(Permission.ReceiveBootCompleted);
-            return PendingIntent.GetBroadcast(
+            if (this.geofencePendingIntent != null)
+                return this.geofencePendingIntent;
+
+            var intent = this.context.CreateIntent<GeofenceBroadcastReceiver>(IntentAction);
+            this.geofencePendingIntent = PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,
                 intent,
                 PendingIntentFlags.UpdateCurrent
             );
+            return this.geofencePendingIntent;
         }
     }
 }

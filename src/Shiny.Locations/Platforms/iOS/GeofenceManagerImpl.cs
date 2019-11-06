@@ -33,14 +33,22 @@ namespace Shiny.Locations
         {
             var task = this.gdelegate
                 .WhenStateDetermined()
-                .Where(x => region.Equals(x))
+                .Where(x => region.Equals(x.Region))
+                .Take(1)
                 .Select(x => x.Status)
                 .Timeout(TimeSpan.FromSeconds(20))
                 .ToTask(cancelToken);
 
             this.locationManager.RequestState(region.ToNative());
-            var result = await task.ConfigureAwait(false);
-            return result;
+            try
+            {
+                var result = await task.ConfigureAwait(false);
+                return result;
+            }
+            catch (TimeoutException ex)
+            {
+                throw new TimeoutException("Could not retrieve latest GPS coordinates to be able to determine geofence current state", ex);
+            }
         }
 
 
@@ -69,10 +77,14 @@ namespace Shiny.Locations
         }
 
 
-        public override async Task StopMonitoring(GeofenceRegion region)
+        public override async Task StopMonitoring(string identifier)
         {
-            await this.Repository.Remove(region.Identifier);
-            this.locationManager.StopMonitoring(region.ToNative());
+            var region = await this.Repository.Get(identifier);
+            if (region != null)
+            {
+                await this.Repository.Remove(region.Identifier);
+                this.locationManager.StopMonitoring(region.ToNative());
+            }
         }
 
 

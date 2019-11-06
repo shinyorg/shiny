@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DebugType>pdbonly</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Prism.DryIoc.Forms" Version="7.2.0.1233-pre" />
+        <PackageReference Include="ReactiveUI.Fody" Version="9.16.3" />
+        <PackageReference Include="Acr.UserDialogs.Forms" Version="1.0.0.7-beta" />
+        <PackageReference Include="Xamarin.Forms" Version="4.0.0.482894" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="FodyWeavers.xsd" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\$ext_projectname$.Data\$ext_projectname$.Data.csproj" />
+        <ProjectReference Include="..\$ext_projectname$.Localization.Resx\$ext_projectname$.Localization.Resx.csproj" />
+        <ProjectReference Include="..\$ext_projectname$.AppCenterIntegration\$ext_projectname$.AppCenterIntegration.csproj" />
+        <ProjectReference Include="..\$ext_projectname$.Core\$ext_projectname$.Core.csproj" />
+    </ItemGroup>
+
+</Project>

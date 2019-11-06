@@ -3,7 +3,7 @@
 
 namespace Shiny.Locations
 {
-    public class GeofenceRegion
+    public class GeofenceRegion : IEquatable<GeofenceRegion>
     {
         public GeofenceRegion(string identifier,
                               Position center,
@@ -24,9 +24,9 @@ namespace Shiny.Locations
         public bool NotifyOnExit { get; set; } = true;
 
         public override string ToString() => $"[Identifier: {this.Identifier}]";
-        public bool Equals(GeofenceRegion other) => (this.Identifier) == (other.Identifier);
+        public bool Equals(GeofenceRegion other) => (this.Identifier) == (other?.Identifier);
         public override bool Equals(object obj) => obj is GeofenceRegion region && this.Equals(region);
-        public override int GetHashCode() => (this.Identifier).GetHashCode();
+        public override int GetHashCode() => (this.Identifier)?.GetHashCode() ?? 0;
 
         public static bool operator ==(GeofenceRegion left, GeofenceRegion right) => Equals(left, right);
         public static bool operator !=(GeofenceRegion left, GeofenceRegion right) => !Equals(left, right);

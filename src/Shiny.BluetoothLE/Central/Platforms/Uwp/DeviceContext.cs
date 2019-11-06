@@ -13,13 +13,13 @@ namespace Shiny.BluetoothLE.Central
     public class DeviceContext
     {
         readonly object syncLock;
-        readonly AdapterContext adapterContext;
+        readonly CentralContext adapterContext;
         readonly IList<GattCharacteristic> subscribers;
         readonly Subject<ConnectionState> connSubject;
         readonly ulong bluetoothAddress;
 
 
-        public DeviceContext(AdapterContext adapterContext,
+        public DeviceContext(CentralContext adapterContext,
                              IPeripheral peripheral,
                              BluetoothLEDevice native)
         {

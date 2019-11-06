@@ -4,17 +4,8 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public static partial class Extensions
+    public static class CentralManagerExtensions
     {
-        public static bool IsPairingRequestsAvailable(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.PairingRequests);
-        public static bool IsMtuRequestsAvailable(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.MtuRequests);
-        public static bool IsReliableTransactionsAvailable(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.ReliableTransactions);
-        public static bool CanOpenSettings(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.OpenSettings);
-        public static bool CanViewPairedPeripherals(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.ViewPairedPeripherals);
-        public static bool CanControlAdapterState(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.ControlAdapterState);
-        public static bool CanPerformLowPoweredScans(this ICentralManager centralManager) => centralManager.Features.HasFlag(BleFeatures.LowPoweredScan);
-
-
         /// <summary>
         /// This will scan until the peripheral a specific peripheral is found, then cancel the scan
         /// </summary>
@@ -33,17 +24,17 @@ namespace Shiny.BluetoothLE.Central
         /// </summary>
         /// <param name="centralManager"></param>
         /// <param name="deviceName"></param>
+        /// <param name="includeLocalName"></param>
         /// <returns></returns>
-        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this ICentralManager centralManager, string deviceName) => centralManager
+        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this ICentralManager centralManager, string deviceName, bool includeLocalName = true) => centralManager
             .Scan()
-            .Where(x => x.Peripheral.Name?.Equals(deviceName, StringComparison.OrdinalIgnoreCase) ?? false)
+            .Where(x =>
+                x.Peripheral.Name?.Equals(deviceName, StringComparison.OrdinalIgnoreCase) ?? false
+                || (includeLocalName && (x.AdvertisementData?.LocalName?.Equals(deviceName, StringComparison.InvariantCultureIgnoreCase) ?? false))
+            )
             .Take(1)
             .Select(x => x.Peripheral);
 
-
-        //public static IObservable<IScanResult> ScanTimed(this ICentralManager centralManager, TimeSpan scanTime, ScanConfig config = null) => centralManager
-        //    .Scan(config)
-        //    .Take(scanTime);
 
         /// <summary>
         /// Scans only for distinct peripherals instead of repeating each peripheral scan response - this will only give you peripherals, not RSSI or ad packets

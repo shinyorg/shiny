@@ -10,12 +10,14 @@ using Windows.Foundation;
 
 namespace Shiny.BluetoothLE.Central
 {
-    public class Peripheral : AbstractPeripheral
+    public class Peripheral : AbstractPeripheral,
+                              ICanDoTransactions,
+                              ICanPairPeripherals
     {
         readonly DeviceContext context;
 
 
-        public Peripheral(AdapterContext adapterContext, BluetoothLEDevice native)
+        public Peripheral(CentralContext adapterContext, BluetoothLEDevice native)
         {
             this.context = new DeviceContext(adapterContext, this, native);
             this.Name = native.Name;
@@ -24,8 +26,6 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override object NativeDevice => this.context.NativeDevice;
-        public override IGattReliableWriteTransaction BeginReliableWriteTransaction() => new GattReliableWriteTransaction();
-
         public override void Connect(ConnectionConfig config) => this.context.Connect();
         public override void CancelConnection() => this.context.Disconnect();
         public override ConnectionState Status => this.context.Status;
@@ -83,12 +83,15 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override PairingState PairingStatus => this.context.NativeDevice.DeviceInformation.Pairing.IsPaired
+        public IGattReliableWriteTransaction BeginReliableWriteTransaction() => new GattReliableWriteTransaction();
+
+
+        public PairingState PairingStatus => this.context.NativeDevice.DeviceInformation.Pairing.IsPaired
             ? PairingState.Paired
             : PairingState.NotPaired;
 
 
-        public override IObservable<bool> PairingRequest(string pin = null) => Observable.FromAsync(async token =>
+        public IObservable<bool> PairingRequest(string pin = null) => Observable.FromAsync(async token =>
         {
             var result = await this.context.NativeDevice.DeviceInformation.Pairing.PairAsync(DevicePairingProtectionLevel.None);
             var state = result.Status == DevicePairingResultStatus.Paired;

@@ -39,8 +39,8 @@ namespace Shiny.Locations
         /// <summary>
         /// Stop monitoring a geofence
         /// </summary>
-        /// <param name="region"></param>
-        Task StopMonitoring(GeofenceRegion region);
+        /// <param name="identifier"></param>
+        Task StopMonitoring(string identifier);
 
         /// <summary>
         /// Stop monitoring all active geofences

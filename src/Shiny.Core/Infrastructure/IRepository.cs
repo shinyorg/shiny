@@ -28,7 +28,14 @@ namespace Shiny.Infrastructure
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Task<List<T>> GetAll<T>() where T : class;
+        Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class;
+
+        /// <summary>
+        /// Gets all entities from storage of a given type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        Task<IList<T>> GetAll<T>() where T : class;
 
         /// <summary>
         /// Returns true if updating otherwise false if new
@@ -53,10 +60,10 @@ namespace Shiny.Infrastructure
         /// <returns></returns>
         Task Clear<T>() where T : class;
 
-        /// <summary>
-        /// Fires when an entity is changed
-        /// </summary>
-        /// <returns></returns>
-        IObservable<RepositoryEvent> WhenEvent();
+        ///// <summary>
+        ///// Fires when an entity is changed
+        ///// </summary>
+        ///// <returns></returns>
+        //IObservable<RepositoryEvent> WhenEvent();
     }
 }

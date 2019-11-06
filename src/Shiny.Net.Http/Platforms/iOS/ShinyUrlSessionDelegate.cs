@@ -11,15 +11,14 @@ namespace Shiny.Net.Http
     public class ShinyUrlSessionDelegate : NSUrlSessionDownloadDelegate
     {
         internal static Action CompletionHandler { get; set; }
-        readonly IHttpTransferDelegate tdelegate;
+        readonly Lazy<IHttpTransferDelegate> tdelegate = new Lazy<IHttpTransferDelegate>(() => ShinyHost.Resolve<IHttpTransferDelegate>());
         readonly Subject<HttpTransfer> onEvent;
         readonly HttpTransferManager manager;
 
 
-        public ShinyUrlSessionDelegate(HttpTransferManager manager, IHttpTransferDelegate tdelegate)
+        public ShinyUrlSessionDelegate(HttpTransferManager manager)
         {
             this.manager = manager;
-            this.tdelegate = tdelegate;
             this.onEvent = new Subject<HttpTransfer>();
         }
 
@@ -54,14 +53,14 @@ namespace Shiny.Net.Http
         }
 
 
-        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error) => Dispatcher.SmartExecuteSync(async () =>
+        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error) => Dispatcher.ExecuteBackgroundTask(async () =>
         {
             var transfer = task.FromNative();
 
             if (task.State != NSUrlSessionTaskState.Canceling && error != null)
             {
                 Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
-                await this.tdelegate.OnError(transfer, transfer.Exception);
+                await this.tdelegate.Value.OnError(transfer, transfer.Exception);
             }
             this.onEvent.OnNext(transfer);
         });
@@ -79,7 +78,7 @@ namespace Shiny.Net.Http
             => this.onEvent.OnNext(downloadTask.FromNative());
 
 
-        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location) => Dispatcher.SmartExecuteSync(async () =>
+        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location) => Dispatcher.ExecuteBackgroundTask(async () =>
         {
             var transfer = downloadTask.FromNative();
 
@@ -87,7 +86,7 @@ namespace Shiny.Net.Http
                 // if you are debugging, the base path tends to change, so the destination path changes too
                 File.Copy(location.Path, transfer.LocalFilePath, true);
 
-            await this.tdelegate.OnCompleted(transfer);
+            await this.tdelegate.Value.OnCompleted(transfer);
             this.onEvent.OnNext(transfer);
         });
     }

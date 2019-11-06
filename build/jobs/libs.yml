@@ -1,0 +1,140 @@
+
+Azure DevOps
+shinylib
+/
+Shiny
+/
+Pipelines
+Search
+
+Shiny
+
+Overview
+
+Pipelines
+Pipelines
+Environments
+Releases
+Library
+Task groups
+Deployment groups
+Project settings
+
+Build Libraries
+
+Tasks
+
+Variables
+
+Triggers
+
+Options
+
+Retention
+
+History
+Agent job
+Display name
+Build
+Agent selection
+Agent pool
+| Manage
+<inherit from pipeline>
+Demands
+msbuild
+exists
+Execution plan
+Parallelism
+
+
+
+Timeout
+0
+Job cancel timeout
+0
+Dependencies
+Select dependencies
+
+Additional options
+Allow scripts to access the OAuth token
+Run this job
+Only when all previous jobs have succeeded
+Copy to clipboard
+
+Below is a clipboard-friendly view of your selection. To copy to the clipboard, either right-click and choose 'Copy' from the browser’s context menu or press Ctrl+C. [more information about YAML builds]
+pool:
+  name: Azure Pipelines
+  demands: msbuild
+
+#Your build pipeline references an undefined variable named ‘JAVA_HOME’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references an undefined variable named ‘JAVA_HOME’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references an undefined variable named ‘JAVA_HOME’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references an undefined variable named ‘Pipeline.Workspace’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+variables:
+  BuildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Use .Net Core SDK 3.x'
+  inputs:
+    version: 3.0.x
+
+- task: MSBuild@1
+  displayName: 'Build Release Libraries'
+  inputs:
+    solution: 'Libs-Release.slnf'
+    msbuildArchitecture: x64
+    configuration: Release
+    msbuildArguments: '/t:restore;build;pack /p:PackageVersion=$(Build.BuildNumber) /p:PackageOutputPath=$(build.artifactstagingdirectory)/public  /p:AssemblyFileVersion=$(Build.BuildNumber) /p:JavaSdkDirectory="$(JAVA_HOME)/"'
+    clean: true
+  enabled: false
+
+- task: MSBuild@1
+  displayName: 'Build Beta Libraries'
+  inputs:
+    solution: 'Libs-Beta.slnf'
+    msbuildArchitecture: x64
+    configuration: Release
+    msbuildArguments: '/t:restore;build;pack /p:PackageVersion=$(Build.BuildNumber)-beta /p:PackageOutputPath=$(build.artifactstagingdirectory)/public  /p:AssemblyFileVersion=$(Build.BuildNumber) /p:JavaSdkDirectory="$(JAVA_HOME)/"'
+    clean: true
+  enabled: false
+
+- task: MSBuild@1
+  displayName: 'Build & Pack'
+  inputs:
+    solution: Build.sln
+    msbuildVersion: 16.0
+    msbuildArchitecture: x64
+    configuration: Release
+    msbuildArguments: '/t:restore;build;pack /p:PackageVersion=$(Build.BuildNumber)-beta /p:PackageOutputPath=$(build.artifactstagingdirectory)/public  /p:AssemblyFileVersion=$(Build.BuildNumber) /p:JavaSdkDirectory="$(JAVA_HOME)/"'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: test
+    projects: tests/Shiny.Tests/Shiny.Tests.csproj
+  enabled: false
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  inputs:
+    testResultsFormat: XUnit
+    testResultsFiles: '**\*.trx'
+  enabled: false
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory) '
+  inputs:
+    SourceFolder: '$(build.sourcesdirectory)'
+    Contents: '**\bin\$(BuildConfiguration)\**\*.nupkg'
+    TargetFolder: '$(build.artifactstagingdirectory) '
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+
+- task: CacheBeta@1
+  displayName: 'Cache NuGet Packages'
+  inputs:
+    key: 'nuget | packages.lock.json'
+    path: '$(Pipeline.Workspace)/.nuget/packages'
+  enabled: false

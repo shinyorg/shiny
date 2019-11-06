@@ -8,16 +8,15 @@ using Foundation;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : AbstractHttpTransferManager, IStartupTask
+    public class HttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
     {
         readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;
 
 
-        public HttpTransferManager(IHttpTransferDelegate httpDelegate,
-                                   int maxConnectionsPerHost = 1)
+        public HttpTransferManager(int maxConnectionsPerHost = 1)
         {
-            this.sessionDelegate = new ShinyUrlSessionDelegate(this, httpDelegate);
+            this.sessionDelegate = new ShinyUrlSessionDelegate(this);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
             this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;

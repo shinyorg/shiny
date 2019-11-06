@@ -33,35 +33,8 @@ namespace Shiny.BluetoothLE.Central
         public override byte[] Value => this.native.GetValue();
 
 
-        public override IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
-        {
-            this.AssertWrite(false);
 
-            this.context.InvokeOnMainThread(() =>
-            {
-                try
-                {
-                    this.native.WriteType = GattWriteType.NoResponse;
-
-                    if (!this.native.SetValue(value))
-                        throw new BleException("Failed to write characteristic value");
-
-                    if (!this.context.Gatt.WriteCharacteristic(this.native))
-                        throw new BleException("Failed to write to characteristic");
-
-                    ob.Respond( new CharacteristicGattResult(this, value));
-                }
-                catch (Exception ex)
-                {
-                    ob.OnError(new BleException("Error during characteristic write", ex));
-                }
-            });
-
-            return Disposable.Empty;
-        }));
-
-
-        public override IObservable<CharacteristicGattResult> Write(byte[] value) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
+        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
         {
             this.AssertWrite(false);
 
@@ -83,7 +56,8 @@ namespace Shiny.BluetoothLE.Central
             {
                 try
                 {
-                    this.native.WriteType = GattWriteType.Default;
+                    // TODO: signed write
+                    this.native.WriteType = withResponse ? GattWriteType.Default : GattWriteType.NoResponse;
                     this.native.SetValue(value);
                     //if (!this.native.SetValue(value))
                     //ob.OnError(new BleException("Failed to set characteristic value"));
@@ -158,7 +132,7 @@ namespace Shiny.BluetoothLE.Central
                 var bytes = this.GetNotifyDescriptorBytes(useIndicationsIfAvailable);
                 sub = wrap
                     .WriteInternal(bytes)
-                    //.Delay(CrossBleAdapter.AndroidConfiguration.PauseBetweenInvocations)
+                    //.Delay(this.context.CentralContext.Configuration.AndroidPauseBetweenInvocations)
                     .Subscribe(
                         _ => success(),
                         ex => success()
@@ -189,7 +163,6 @@ namespace Shiny.BluetoothLE.Central
                 var wrap = new GattDescriptor(this, this.context, descriptor);
                 sub = wrap
                     .WriteInternal(BluetoothGattDescriptor.DisableNotificationValue.ToArray())
-                    .Delay(AndroidConfig.PauseBetweenInvocations)
                     .Subscribe(
                         _ => success(),
                         ex => success()

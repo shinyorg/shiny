@@ -1,10 +1,9 @@
 ﻿using System;
-using Android.App;
 using Microsoft.Extensions.DependencyInjection;
 using Plugin.CurrentActivity;
 
 
-namespace Shiny.Integrations.CurrentActivityPlugin
+namespace Shiny
 {
     public static class Extensions
     {
@@ -16,16 +15,6 @@ namespace Shiny.Integrations.CurrentActivityPlugin
         ///
         /// </summary>
         public static void UseCurrentActivityPlugin(this IServiceCollection services)
-            => services.AddOrReplace<ITopActivity, TopActivityImpl>();
-        //{
-        //    services.AddOrReplace<ITopActivity>(sp =>
-        //    {
-        //        if (!autoInit)
-        //            return new TopActivityImpl();
-
-        //        var app = sp.GetService<Application>();
-        //        return new TopActivityImpl(app);
-        //    });
-        //}
+            => services.AddSingleton<ITopActivity, TopActivityImpl>();
     }
 }

@@ -39,14 +39,7 @@ namespace Shiny.Testing.BluetoothLE.Central
             => this.NotificationSubject.Select(x => new CharacteristicGattResult(this, x));
 
 
-        public override IObservable<CharacteristicGattResult> Write(byte[] value)
-        {
-            this.ReturnValue = value;
-            return Observable.Return(new CharacteristicGattResult(this, value));
-        }
-
-
-        public override IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value)
+        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse)
         {
             this.ReturnValue = value;
             return Observable.Return(new CharacteristicGattResult(this, value));

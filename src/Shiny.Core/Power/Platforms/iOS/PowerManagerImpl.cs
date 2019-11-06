@@ -13,6 +13,7 @@ namespace Shiny.Power
 
         protected override void OnNpcHookChanged(bool hasSubscribers)
         {
+
             if (hasSubscribers)
             {
                 this.dispose = new CompositeDisposable(

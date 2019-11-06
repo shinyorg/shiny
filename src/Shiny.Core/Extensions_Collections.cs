@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Shiny
 {
-    public static partial class Extensions
+    public static class CollectionExtensions
     {
         /// <summary>
         /// Turns a paired key tuple into a dictionary

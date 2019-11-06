@@ -1,0 +1,24 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;monoandroid90</TargetFrameworks>
+        <RootNamespace>Shiny</RootNamespace>
+        <PackageVersion>1.0.0</PackageVersion>
+        <Description>Shiny Integration - Xamarin Essentials</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <PackageReference Include="Xamarin.Essentials" Version="1.3.1" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <Compile Include="Android\**\*.cs" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+</Project>

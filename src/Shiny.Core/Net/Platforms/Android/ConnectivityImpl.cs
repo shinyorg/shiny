@@ -47,7 +47,9 @@ namespace Shiny.Net
         {
             try
             {
-                this.context.IsInManifest(Android.Manifest.Permission.AccessNetworkState, true);
+                if (!this.context.IsInManifest(Android.Manifest.Permission.AccessNetworkState))
+                    throw new ArgumentException("ACCESS_NETWORK_STATE has not been granted");
+
                 // API 26
                 //new ConnectivityManager.NetworkCallback();
                 //this.Connectivity.RegisterNetworkCallback(new NetworkRequest

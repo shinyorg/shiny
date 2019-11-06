@@ -7,6 +7,16 @@ namespace Shiny.Jobs
 {
     public static class Extensions
     {
+        public static void AssertValid(this JobInfo jobInfo)
+        {
+            if (String.IsNullOrWhiteSpace(jobInfo.Identifier))
+                throw new ArgumentException("Job identifier defined");
+
+            if (jobInfo.Type == null)
+                throw new ArgumentException("Job Type not set");
+        }
+
+
         public static void SetParameter<T>(this JobInfo job, string key, T value)
             => job.Parameters[key] = value;
 

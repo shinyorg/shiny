@@ -42,5 +42,20 @@ namespace Shiny.Notifications
         /// <param name="notification"></param>
         /// <returns>The messageID that you can use to cancel with</returns>
         Task Send(Notification notification);
+
+
+        /// <summary>
+        /// Sets the current badge
+        /// </summary>
+        /// <param name="value">Pass zero to remove</param>
+        /// <returns></returns>
+        Task SetBadge(int value);
+
+
+        /// <summary>
+        /// Gets the current badge
+        /// </summary>
+        /// <returns></returns>
+        Task<int> GetBadge();
     }
 }

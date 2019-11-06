@@ -10,15 +10,8 @@ namespace Shiny.Locations
 {
     public class GpsManagerDelegate : ShinyLocationDelegate
     {
-        public GpsManagerDelegate()
-        {
-            this.gdelegate = ShinyHost.Resolve<IGpsDelegate>();
-            this.readingSubject = new Subject<IGpsReading>();
-        }
-
-
-        readonly Subject<IGpsReading> readingSubject;
-        readonly IGpsDelegate gdelegate;
+        readonly Lazy<IGpsDelegate> gdelegate = new Lazy<IGpsDelegate>(() => ShinyHost.Resolve<IGpsDelegate>());
+        readonly Subject<IGpsReading> readingSubject = new Subject<IGpsReading>();
         bool deferringUpdates;
 
         internal GpsRequest Request { get; set; }
@@ -27,12 +20,11 @@ namespace Shiny.Locations
         public IObservable<IGpsReading> WhenGps() => this.readingSubject;
         public override void LocationsUpdated(CLLocationManager manager, CLLocation[] locations)
         {
-            if (this.Request == null)
+            if (this.Request?.ThrottledInterval == null)
                 this.InvokeChanges(locations);
 
             else if (!this.deferringUpdates)
             {
-                //manager.TrySetDeferrals(this.Request);
                 manager.AllowDeferredLocationUpdatesUntil(0, this.Request.ThrottledInterval.Value.TotalMilliseconds);
                 this.deferringUpdates = true;
                 this.InvokeChanges(locations);
@@ -44,13 +36,13 @@ namespace Shiny.Locations
             => this.deferringUpdates = false;
 
 
-        void InvokeChanges(CLLocation[] locations)
+        void InvokeChanges(CLLocation[] locations) => Dispatcher.ExecuteBackgroundTask(async () =>
         {
             var loc = locations.Last();
             var reading = new GpsReading(loc);
-            this.gdelegate?.OnReading(reading);
+            this.gdelegate.Value?.OnReading(reading);
             this.readingSubject.OnNext(reading);
-        }
+        });
 
 
         //public override void Failed(CLLocationManager manager, NSError error)

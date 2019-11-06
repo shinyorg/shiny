@@ -1,0 +1,126 @@
+#Multi-configuration and multi-agent job options are not exported to YAML. Configure these options using documentation guidance: https://docs.microsoft.com/vsts/pipelines/process/phases
+
+pool:
+  name: Azure Pipelines
+  demands:
+  - xcode
+  - Xamarin.iOS
+
+#Your build pipeline references an undefined variable named ‘p12Password’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+
+steps:
+- task: pjcollins.azp-utilities-boots.boots.Boots@1
+  displayName: 'Install .NET Core 3.0.100'
+  inputs:
+    uri: 'https://download.visualstudio.microsoft.com/download/pr/5c281f95-91c4-499d-baa2-31fec919047a/38c6964d72438ac30032bce516b655d9/dotnet-sdk-3.0.100-osx-x64.pkg'
+  enabled: false
+
+- task: pjcollins.azp-utilities-boots.boots.Boots@1
+  displayName: 'Install Xamarin iOS 13.2'
+  inputs:
+    uri: 'https://bosstoragemirror.blob.core.windows.net/wrench/jenkins/d16-3/745dda43b1e763c32ef617acef841cfc20195c8b/43/package/notarized/xamarin.ios-13.2.0.45.pkg'
+  enabled: false
+
+- task: pjcollins.azp-utilities-boots.boots.Boots@1
+  displayName: 'Install Mono MDK 6.4.0'
+  inputs:
+    uri: 'https://download.mono-project.com/archive/6.0.0/macos-10-universal/MonoFramework-MDK-6.4.0.327.macos10.xamarin.universal.pkg'
+  enabled: false
+
+- bash: |
+   echo "Setting mono version to 6_4_0"
+   MONOVERSION=6_4_0
+   MONOPREFIX=/Library/Frameworks/Mono.framework/Versions/$MONOVERSION
+   echo "##vso[task.setvariable variable=DYLD_FALLBACK_LIBRARY_PATH;]$MONOPREFIX/lib:/lib:/usr/lib:$DYLD_LIBRARY_FALLBACK_PATH"
+   echo "##vso[task.setvariable variable=PKG_CONFIG_PATH;]$MONOPREFIX/lib/pkgconfig:$MONOPREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
+   echo "##vso[task.setvariable variable=PATH;]$MONOPREFIX/bin:$PATH"
+   echo "Appending AppleSdkRoot to Settings.plist"
+   mkdir -p /Users/vsts/Library/Preferences/Xamarin
+   cd /Users/vsts/Library/Preferences/Xamarin
+   echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"https://www.apple.com/DTDs/PropertyList-1.0.dtd\"><plist version=\"1.0\"><dict><key>AppleSdkRoot</key><string>/Applications/Xcode_11.app</string></dict></plist>" >> Settings.plist
+   echo "Setting Xcode version to 11 for Visual Studio for Mac"
+   sudo xcode-select -s /Applications/Xcode_11.app/Contents/Developer
+   sudo xcodebuild -showsdks
+   sudo $AGENT_HOMEDIRECTORY/scripts/select-xamarin-sdk.sh $MONOVERSION
+  displayName: 'Mono 6.4 & XCode 11'
+
+- task: UseDotNet@2
+  displayName: 'Use .Net Core SDK 3.0.x'
+  inputs:
+    version: 3.0.x
+
+- task: InstallAppleCertificate@2
+  displayName: 'Install an Apple certificate'
+  inputs:
+    certSecureFile: '214da3f4-3b2b-43af-9767-4c586ea6b1b3'
+    certPwd: '$(p12Password)'
+
+- task: InstallAppleProvisioningProfile@1
+  displayName: 'Install an Apple provisioning profile'
+  inputs:
+    provProfileSecureFile: '54b1753f-dfcb-4cea-965d-4b8798c03bf5'
+
+- task: NuGetToolInstaller@1
+  displayName: 'Use NuGet '
+  inputs:
+    checkLatest: true
+
+- task: NuGetCommand@2
+  displayName: 'NuGet restore'
+  inputs:
+    restoreSolution: Samples.sln
+    feedsToUse: config
+    nugetConfigPath: nuget.config
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: restore
+    projects: Samples.sln
+    feedsToUse: config
+    nugetConfigPath: nuget.config
+
+- task: vs-publisher-473885.motz-mobile-buildtasks.ios-bundle-identifier.ios-bundle-identifier@1
+  displayName: 'Change Identifier'
+  inputs:
+    sourcePath: Samples.iOS/Info.plist
+    bundleIdentifier: com.shinyorg.samples
+    bundleName: Shiny
+    bundleDisplayName: Shiny
+
+- task: vs-publisher-473885.motz-mobile-buildtasks.ios-bundle-version.ios-bundle-version@1
+  displayName: 'Bump iOS Versions'
+  inputs:
+    sourcePath: Samples.iOS/Info.plist
+
+- task: qetza.replacetokens.replacetokens-task.replacetokens@3
+  displayName: 'Replace Tokens in Constants.cs'
+  inputs:
+    targetFiles: |
+     **/Constants.cs
+     **/AndroidManifest.xml
+
+- task: XamariniOS@2
+  displayName: Build
+  inputs:
+    solutionFile: Samples.iOS/Samples.iOS.csproj
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)/'
+  inputs:
+    SourceFolder: Samples.iOS
+    Contents: '**/*.ipa'
+    TargetFolder: '$(build.artifactstagingdirectory)/'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+
+- task: AppCenterDistribute@3
+  displayName: 'Deploy $(Build.ArtifactStagingDirectory)/**/*.ipa to Visual Studio App Center'
+  inputs:
+    serverEndpoint: AppCenter
+    appSlug: 'ShinyOrg/Shiny-1'
+    appFile: '$(Build.ArtifactStagingDirectory)/**/*.ipa'
+    symbolsIncludeParentDirectory: false
+    releaseNotesInput: 'A NEW RELEASE'
+    isSilent: false

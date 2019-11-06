@@ -10,6 +10,7 @@ namespace Shiny.Testing
         public string AppBuild { get; set; } = "0.0";
         public string MachineName { get; set; } = "Testing";
         public string OperatingSystem { get; set; } = "Windows";
+        public string OperatingSystemVersion { get; set; } = "1";
         public string Manufacturer { get; set; } = "You";
         public string Model { get; set; } = "Computer";
     }

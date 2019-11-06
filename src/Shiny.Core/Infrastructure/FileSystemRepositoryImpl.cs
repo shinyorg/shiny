@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Shiny.IO;
 
@@ -12,7 +11,6 @@ namespace Shiny.Infrastructure
     public class FileSystemRepositoryImpl : IRepository
     {
         readonly IDictionary<Type, Dictionary<string, object>> memory;
-        readonly Subject<RepositoryEvent> eventSubject;
         readonly IFileSystem fileSystem;
         readonly ISerializer serializer;
 
@@ -21,12 +19,8 @@ namespace Shiny.Infrastructure
         {
             this.fileSystem = fileSystem;
             this.serializer = serializer;
-            this.eventSubject = new Subject<RepositoryEvent>();
             this.memory = new Dictionary<Type, Dictionary<string, object>>();
         }
-
-
-        public IObservable<RepositoryEvent> WhenEvent() => this.eventSubject;
 
 
         public Task<bool> Exists<T>(string key) where T : class
@@ -49,10 +43,22 @@ namespace Shiny.Infrastructure
         }
 
 
-        public async Task<List<T>> GetAll<T>() where T : class
+        public async Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class
         {
-            List<T> result = null;
-            await this.InTransaction(typeof(T), list => result = list.Values.Cast<T>().ToList());
+            var result = new Dictionary<string, T>();
+            await this.InTransaction(typeof(T), list =>
+            {
+                foreach (var pair in list)
+                    result.Add(pair.Key, (T)pair.Value);
+            });
+            return result;
+        }
+
+
+        public async Task<IList<T>> GetAll<T>() where T : class
+        {
+            var result = new List<T>();
+            await this.InTransaction(typeof(T), list => result.AddRange(list.Values.OfType<T>()));
             return result;
         }
 
@@ -62,13 +68,8 @@ namespace Shiny.Infrastructure
             var update = true;
             await this.InTransaction(entity.GetType(), list =>
             {
-                var eventType = this.Write(key, entity)
-                    ? RepositoryEventType.Update
-                    : RepositoryEventType.Add;
-
+                update = this.Write(key, entity);
                 list[key] = entity;
-                update = eventType == RepositoryEventType.Update;
-                this.eventSubject.OnNext(new RepositoryEvent(eventType, key, entity));
             });
             return update;
         }
@@ -88,7 +89,6 @@ namespace Shiny.Infrastructure
                     var entity = list[key];
                     list.Remove(key);
                     File.Delete(path);
-                    this.eventSubject.OnNext(new RepositoryEvent(RepositoryEventType.Remove, key, entity));
                     tcs.TrySetResult(true);
                 }
             });
@@ -105,8 +105,6 @@ namespace Shiny.Infrastructure
             var files = this.GetTypeFiles(typeof(T));
             foreach (var file in files)
                 File.Delete(file.FullName);
-
-            this.eventSubject.OnNext(new RepositoryEvent(RepositoryEventType.Clear, null, null, typeof(T)));
         });
 
 

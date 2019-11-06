@@ -1,19 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Infrastructure;
-using Shiny.Logging;
+using Shiny.Infrastructure.DependencyInjection;
+
 
 namespace Shiny
 {
-    public abstract partial class ShinyHost
+    public abstract class ShinyHost
     {
+        internal static List<Action<IServiceProvider>> PostBuildActions { get; } = new List<Action<IServiceProvider>>();
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="action"></param>
+        public static void AddPostBuildAction(Action<IServiceProvider> action) => PostBuildActions.Add(action);
+
+
         /// <summary>
         /// Resolve a specified service from the container
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Resolve<T>() => Container.GetService<T>();
+        public static T Resolve<T>() => Container.Resolve<T>();
 
 
         /// <summary>
@@ -60,32 +72,27 @@ namespace Shiny
         }
 
 
-        protected static void InitPlatform(IStartup startup = null, Action<IServiceCollection> platformBuild = null)
-        {
-            var services = new ServiceCollection();
+        /// <summary>
+        /// Setting this before calling build will force the internal service builder to validate scopes of DI registrations (THIS IS SLOW - USE IT FOR DEBUGGING)
+        /// </summary>
+        public static bool ValidateScopes { get; set; }
 
-            // add standard infrastructure
-            services.AddSingleton<IMessageBus, MessageBus>();
+        protected static void InitPlatform(IShinyStartup startup = null, Action<IServiceCollection> platformBuild = null)
+        {
+            var services = new ShinyServiceCollection();
 
             startup?.ConfigureServices(services);
             platformBuild?.Invoke(services);
+
+            services.TryAddSingleton<IMessageBus, MessageBus>();
+            services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
+            services.TryAddSingleton<ISerializer, JsonNetSerializer>();
+
             Services = services;
 
-            container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
+            container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider(ValidateScopes);
+            services.RunPostBuildActions(container);
             startup?.ConfigureApp(container);
-
-            try
-            {
-                container.RunPostBuildActions();
-                var tasks = container.GetServices<IStartupTask>();
-                foreach (var task in tasks)
-                    task.Start();
-            }
-            catch (Exception ex)
-            {
-                // protect from the user so we can at least display a user
-                Log.Write(ex);
-            }
         }
     }
 }

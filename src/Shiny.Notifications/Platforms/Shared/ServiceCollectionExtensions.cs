@@ -1,57 +1,48 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Notifications;
 
 
-namespace Shiny.Notifications
+namespace Shiny
 {
-    public static class ContainerBuilderExtensions
+    public static class ServiceCollectionExtensions
     {
-        public static bool UseNotifications(this IServiceCollection builder,
+        public static bool UseNotifications(this IServiceCollection services,
+                                            Type delegateType,
                                             bool requestPermissionImmediately = false,
-                                            Action<AndroidOptions> androidConfigure = null,
-                                            Action<UwpOptions> uwpConfigure = null)
+                                            AndroidOptions androidConfig = null,
+                                            UwpOptions uwpConfig = null)
         {
-            if (androidConfigure != null)
-            {
-                var androidOpts = new AndroidOptions();
-                androidConfigure(androidOpts);
-
-                AndroidOptions.DefaultChannel = androidOpts.ChannelDescription ?? AndroidOptions.DefaultChannel;
-                AndroidOptions.DefaultChannelDescription = androidOpts.ChannelDescription ?? AndroidOptions.DefaultChannelDescription;
-                AndroidOptions.DefaultChannelId = androidOpts.ChannelId ?? AndroidOptions.DefaultChannelId;
-                AndroidOptions.DefaultNotificationImportance = androidOpts.NotificationImportance;
-                AndroidOptions.DefaultLaunchActivityFlags = androidOpts.LaunchActivityFlags;
-                AndroidOptions.DefaultVibrate = androidOpts.Vibrate;
-                AndroidOptions.DefaultSmallIconResourceName = androidOpts.SmallIconResourceName ?? AndroidOptions.DefaultSmallIconResourceName;
-            }
-            if (uwpConfigure != null)
-            {
-                var uwpOpts = new UwpOptions();
-                uwpConfigure(uwpOpts);
-                UwpOptions.DefaultUseLongDuration = uwpOpts.UseLongDuration;
-            }
-
-#if __ANDROID__ || WINDOWS_UWP
-            builder.RegisterJob(new Jobs.JobInfo
-            {
-                Identifier = nameof(NotificationJob),
-                Type = typeof(NotificationJob),
-                Repeat = true
-            });
-#endif
-
 #if NETSTANDARD
             return false;
 #else
-            if (requestPermissionImmediately)
-            {
-                builder.RegisterPostBuildAction(async sp =>
-                    await sp
-                        .GetService<INotificationManager>()
-                        .RequestAccess()
-                );
-            }
-            builder.AddSingleton<INotificationManager, NotificationManagerImpl>();
+            services.RegisterModule(new NotificationModule(delegateType, requestPermissionImmediately, androidConfig, uwpConfig));
+            return true;
+#endif
+        }
+
+
+        public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
+                                                                   bool requestPermissionImmediately = false,
+                                                                   AndroidOptions androidConfig = null,
+                                                                   UwpOptions uwpConfig = null)
+                where TNotificationDelegate : class, INotificationDelegate
+            => services.UseNotifications(
+                typeof(TNotificationDelegate),
+                requestPermissionImmediately,
+                androidConfig,
+                uwpConfig
+            );
+
+        public static bool UseNotifications(this IServiceCollection services,
+                                            bool requestPermissionImmediately = false,
+                                            AndroidOptions androidConfig = null,
+                                            UwpOptions uwpConfig = null)
+        {
+#if NETSTANDARD
+            return false;
+#else
+            services.RegisterModule(new NotificationModule(null, requestPermissionImmediately, androidConfig, uwpConfig));
             return true;
 #endif
         }

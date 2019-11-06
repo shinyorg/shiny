@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reactive.Subjects;
 using Shiny.Infrastructure;
-using Shiny.Logging;
 using CoreLocation;
 
 
@@ -9,14 +8,13 @@ namespace Shiny.Locations
 {
     public class GeofenceManagerDelegate : ShinyLocationDelegate
     {
-        readonly IGeofenceDelegate gdelegate;
         readonly RepositoryWrapper<GeofenceRegion, GeofenceRegionStore> repository;
         readonly Subject<GeofenceCurrentStatus> stateSubject;
+        readonly Lazy<IGeofenceDelegate> gdelegate = new Lazy<IGeofenceDelegate>(() => ShinyHost.Resolve<IGeofenceDelegate>());
 
 
         public GeofenceManagerDelegate()
         {
-            this.gdelegate = ShinyHost.Resolve<IGeofenceDelegate>();
             this.repository = ShinyHost.Resolve<IRepository>().Wrap();
             this.stateSubject = new Subject<GeofenceCurrentStatus>();
         }
@@ -45,29 +43,21 @@ namespace Shiny.Locations
         }
 
 
-        async void Broadcast(CLLocationManager manager, CLRegion region, GeofenceState status)
+        void Broadcast(CLLocationManager manager, CLRegion region, GeofenceState status) => Dispatcher.ExecuteBackgroundTask(async () =>
         {
-            try
+            if (region is CLCircularRegion native)
             {
-                if (region is CLCircularRegion native)
+                var geofence = await this.repository.Get(native.Identifier);
+                if (geofence != null)
                 {
-                    var geofence = await this.repository.Get(native.Identifier);
-
-                    if (geofence != null)
+                    await this.gdelegate.Value.OnStatusChanged(status, geofence);
+                    if (geofence.SingleUse)
                     {
-                        this.gdelegate.OnStatusChanged(status, geofence);
-                        if (geofence.SingleUse)
-                        {
-                            await this.repository.Remove(geofence.Identifier);
-                            manager.StopMonitoring(native);
-                        }
+                        await this.repository.Remove(geofence.Identifier);
+                        manager.StopMonitoring(native);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
-        }
+        });
     }
 }

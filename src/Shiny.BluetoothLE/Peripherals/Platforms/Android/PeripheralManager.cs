@@ -61,11 +61,11 @@ namespace Shiny.BluetoothLE.Peripherals
         }
 
 
-        public IObservable<AccessState> WhenStatusChanged() => this.context
-            .Context
-            .WhenAdapterStatusChanged()
-            .Select(_ => this.Status)
-            .StartWith(this.Status);
+        public IObservable<AccessState> WhenStatusChanged() => null; //this.context
+            //.Context
+            //.WhenAdapterStatusChanged()
+            //.Select(_ => this.Status)
+            //.StartWith(this.Status);
 
 
         public bool IsAdvertising => this.adCallbacks != null;

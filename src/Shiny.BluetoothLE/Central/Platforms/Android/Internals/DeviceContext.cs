@@ -11,12 +11,13 @@ using Android.Bluetooth;
 using Android.OS;
 using Java.Lang;
 using Exception = System.Exception;
-
+using System.Collections.Generic;
 
 namespace Shiny.BluetoothLE.Central.Internals
 {
     public class DeviceContext
     {
+        readonly GattCallbacks callbacks;
         readonly Subject<BleException> connErrorSubject;
         CancellationTokenSource cancelSrc;
 
@@ -25,19 +26,32 @@ namespace Shiny.BluetoothLE.Central.Internals
         {
             this.CentralContext = context;
             this.NativeDevice = device;
-            this.Callbacks = new GattCallbacks();
+            this.callbacks = new GattCallbacks();
             this.Actions = new ConcurrentQueue<Func<Task>>();
             this.connErrorSubject = new Subject<BleException>();
         }
 
 
+        // TODO: eliminate this
+        public GattCallbacks Callbacks => this.callbacks;
+
         public CentralContext CentralContext { get; }
         public BluetoothGatt Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
-        public GattCallbacks Callbacks { get; }
-        public ConcurrentQueue<Func<Task>> Actions { get; }
-        public IObservable<BleException> ConnectionFailed => this.connErrorSubject;
 
+        public ConnectionState Status => this
+            .CentralContext
+            .Manager
+            .GetConnectionState(this.NativeDevice, ProfileType.Gatt)
+            .ToStatus();
+
+
+        public ConcurrentQueue<Func<Task>> Actions { get; }
+        public IObservable<BleException> ConnectionFailed => this.connErrorSubject; // TODO: need the device
+
+        //public IObservable<ConnectionState> WhenConnectionStatusChanged() => this.callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus());
+        //public IObservable<GattCharacteristicEventArgs> WhenWrite(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicWrite.Where(x => x.Characteristic.Equals(native));
+        //public IObservable<GattCharacteristicEventArgs> WhenRead(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicRead.Where(x => x.Characteristic.Equals(native));
 
         public void Connect(ConnectionConfig config) => this.InvokeOnMainThread(() =>
         {
@@ -62,7 +76,7 @@ namespace Shiny.BluetoothLE.Central.Internals
 
         public IObservable<T> Invoke<T>(IObservable<T> observable)
         {
-            if (!AndroidBleConfig.UseInternalSyncQueue)
+            if (!this.CentralContext.Configuration.AndroidUseInternalSyncQueue)
                 return observable;
 
             return Observable.Create<T>(ob =>
@@ -92,40 +106,32 @@ namespace Shiny.BluetoothLE.Central.Internals
         }
 
 
-        public async Task OpPause(CancellationToken? cancelToken = null)
-        {
-            var ts = AndroidBleConfig.PauseBetweenInvocations;
-            if (ts.TotalMilliseconds > 0)
-                await Task.Delay((int)ts.TotalMilliseconds, cancelToken ?? CancellationToken.None);
-        }
+        //public void RefreshServices()
+        //{
+        //    if (this.Gatt == null) //|| !this.CentralContext.Configuration.AndroidRefreshServices)
+        //        return;
 
-
-        public void RefreshServices()
-        {
-            if (this.Gatt == null || !AndroidBleConfig.RefreshServices)
-                return;
-
-            // https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android
-            try
-            {
-                Log.Write(BleLogCategory.Device, "Try to clear Android cache");
-                var method = this.Gatt.Class.GetMethod("refresh");
-                if (method != null)
-                {
-                    var result = (bool)method.Invoke(this.Gatt);
-                    Log.Write(BleLogCategory.Device, "Cache result = " + result);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(BleLogCategory.Device, "Failed to refresh services - " + ex);
-            }
-        }
+        //    // https://stackoverflow.com/questions/22596951/how-to-programmatically-force-bluetooth-low-energy-service-discovery-on-android
+        //    try
+        //    {
+        //        Log.Write(BleLogCategory.Device, "Try to clear Android cache");
+        //        var method = this.Gatt.Class.GetMethod("refresh");
+        //        if (method != null)
+        //        {
+        //            var result = (bool)method.Invoke(this.Gatt);
+        //            Log.Write(BleLogCategory.Device, "Cache result = " + result);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Write(BleLogCategory.Device, "Failed to refresh services - " + ex);
+        //    }
+        //}
 
 
         public void InvokeOnMainThread(Action action)
         {
-            if (AndroidBleConfig.ShouldInvokeOnMainThread)
+            if (this.CentralContext.Configuration.AndroidShouldInvokeOnMainThread)
                 action.Dispatch();
             else
                 action();
@@ -156,14 +162,10 @@ namespace Shiny.BluetoothLE.Central.Internals
             try
             {
                 this.running = true;
-                var ts = AndroidBleConfig.PauseBetweenInvocations;
-                Func<Task> outTask;
-
+                Func<Task> outTask = null;
                 while (this.Actions.TryDequeue(out outTask) && this.running)
                 {
                     await outTask();
-                    if (ts.TotalMilliseconds > 0)
-                        await Task.Delay(ts, this.cancelSrc.Token);
                 }
             }
             catch (TaskCanceledException)
