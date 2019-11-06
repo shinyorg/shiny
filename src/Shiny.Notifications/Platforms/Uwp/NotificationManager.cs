@@ -7,7 +7,7 @@ using Windows.ApplicationModel.Background;
 using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure;
-
+using System.Linq;
 
 namespace Shiny.Notifications
 {
@@ -58,6 +58,7 @@ namespace Shiny.Notifications
                 Duration = notification.Windows.UseLongDuration ? ToastDuration.Long : ToastDuration.Short,
                 Launch = notification.Payload,
                 ActivationType = ToastActivationType.Background,
+                //ActivationType = ToastActivationType.Foreground,
                 Visual = new ToastVisual
                 {
                     BindingGeneric = new ToastBindingGeneric
@@ -76,13 +77,51 @@ namespace Shiny.Notifications
                     }
                 }
             };
+            if (!notification.Category.IsEmpty())
+            {
+                var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
+
+                var nativeActions = new ToastActionsCustom();
+
+                foreach (var action in category.Actions)
+                {
+                    switch (action.ActionType)
+                    {
+                        case NotificationActionType.OpenApp:
+                            nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
+                            {
+                                ActivationType = ToastActivationType.Foreground
+                            });
+                            break;
+
+                        case NotificationActionType.None:
+                        case NotificationActionType.Destructive:
+                            nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
+                            {
+                                ActivationType = ToastActivationType.Background
+                            });
+                            break;
+
+                        case NotificationActionType.TextReply:
+                            nativeActions.Inputs.Add(new ToastTextBox(action.Identifier)
+                            {
+                                Title = notification.Title
+                                //DefaultInput = "",
+                                //PlaceholderContent = ""
+                            });
+                            break;
+                    }
+                }
+                toastContent.Actions = nativeActions;
+            }
 
             if (!Notification.CustomSoundFilePath.IsEmpty())
                 toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
 
-            this.toastNotifier.Show(new ToastNotification(toastContent.GetXml()));
+            var native = new ToastNotification(toastContent.GetXml());
+            this.toastNotifier.Show(native);
             if (notification.BadgeCount != null)
-                await this.SetBadge(notification.BadgeCount.Value);
+                this.Badge = notification.BadgeCount.Value;
 
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
@@ -101,6 +140,9 @@ namespace Shiny.Notifications
         //}
 
 
+        readonly List<NotificationCategory> registeredCategories = new List<NotificationCategory>();
+        public void RegisterCategory(NotificationCategory category) => this.registeredCategories.Add(category);
+
         public Task Clear() => this.repository.Clear<Notification>();
         public async Task<IEnumerable<Notification>> GetPending() => await this.repository.GetAll<Notification>();
         public Task Cancel(int id) => this.repository.Remove<Notification>(id.ToString());
@@ -117,19 +159,15 @@ namespace Shiny.Notifications
 
 
         const string BADGE_KEY = "ShinyNotificationBadge";
-        public Task SetBadge(int value)
+        public int Badge
         {
-            var badge = new BadgeNumericContent((uint)value);
-            this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
-            this.settings.Set(BADGE_KEY, value);
-            return Task.CompletedTask;
-        }
-
-
-        public Task<int> GetBadge()
-        {
-            var badge = this.settings.Get(BADGE_KEY, 0);
-            return Task.FromResult(badge);
+            get => this.settings.Get(BADGE_KEY, 0);
+            set
+            {
+                var badge = new BadgeNumericContent((uint)value);
+                this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
+                this.settings.Set(BADGE_KEY, value);
+            }
         }
     }
 }

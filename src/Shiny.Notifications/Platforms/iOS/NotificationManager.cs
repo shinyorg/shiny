@@ -155,7 +155,6 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
 
-            //UNNotificationAttachment.FromIdentifier("", NSUrl.FromString(""), new UNNotificationAttachmentOptions().)
             if (!notification.Payload.IsEmpty())
             {
                 var dict = new NSMutableDictionary();
