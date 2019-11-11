@@ -8,11 +8,11 @@ namespace Shiny.Beacons
 {
     class BeaconModule : ShinyModule
     {
-        readonly BeaconRegion[] regionsToMonitorWhenPermissionAvailable;
-        readonly Type delegateType;
+        readonly BeaconRegion[]? regionsToMonitorWhenPermissionAvailable;
+        readonly Type? delegateType;
 
 
-        public BeaconModule(Type delegateType, BeaconRegion[] regionsToMonitorWhenPermissionAvailable)
+        public BeaconModule(Type? delegateType, BeaconRegion[]? regionsToMonitorWhenPermissionAvailable)
         {
             this.delegateType = delegateType;
             this.regionsToMonitorWhenPermissionAvailable = regionsToMonitorWhenPermissionAvailable;

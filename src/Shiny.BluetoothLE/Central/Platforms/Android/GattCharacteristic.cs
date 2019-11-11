@@ -16,6 +16,8 @@ namespace Shiny.BluetoothLE.Central
         static readonly UUID NotifyDescriptorId = UUID.FromString("00002902-0000-1000-8000-00805f9b34fb");
         readonly BluetoothGattCharacteristic native;
         readonly DeviceContext context;
+        IObservable<CharacteristicGattResult>? notifyOb;
+        IObservable<IGattDescriptor>? descriptorOb;
 
 
         public GattCharacteristic(IGattService service,
@@ -120,7 +122,7 @@ namespace Shiny.BluetoothLE.Central
             if (!this.context.Gatt.SetCharacteristicNotification(this.native, true))
                 throw new BleException("Failed to set characteristic notification value");
 
-            IDisposable sub = null;
+            IDisposable? sub = null;
             var descriptor = this.native.GetDescriptor(NotifyDescriptorId);
             if (descriptor == null)
             {
@@ -152,7 +154,7 @@ namespace Shiny.BluetoothLE.Central
             if (!this.context.Gatt.SetCharacteristicNotification(this.native, false))
                 throw new BleException("Could not set characteristic notification value");
 
-            IDisposable sub = null;
+            IDisposable? sub = null;
             var descriptor = this.native.GetDescriptor(NotifyDescriptorId);
             if (descriptor == null)
             {
@@ -173,12 +175,12 @@ namespace Shiny.BluetoothLE.Central
         }));
 
 
-        IObservable<CharacteristicGattResult> notifyOb;
+
         public override IObservable<CharacteristicGattResult> WhenNotificationReceived()
         {
             this.AssertNotify();
 
-            this.notifyOb = this.notifyOb ?? Observable.Create<CharacteristicGattResult>(ob =>
+            return this.notifyOb ??= Observable.Create<CharacteristicGattResult>(ob =>
                 this.context
                     .Callbacks
                     .CharacteristicChanged
@@ -193,15 +195,11 @@ namespace Shiny.BluetoothLE.Central
             )
             .Publish()
             .RefCount();
-
-            return this.notifyOb;
         }
 
 
-        IObservable<IGattDescriptor> descriptorOb;
         public override IObservable<IGattDescriptor> DiscoverDescriptors()
-        {
-            this.descriptorOb = this.descriptorOb ?? Observable.Create<IGattDescriptor>(ob =>
+            => this.descriptorOb ??= Observable.Create<IGattDescriptor>(ob =>
             {
                 foreach (var nd in this.native.Descriptors)
                 {
@@ -212,9 +210,6 @@ namespace Shiny.BluetoothLE.Central
             })
             .Replay()
             .RefCount();
-
-            return this.descriptorOb;
-        }
 
 
         public override bool Equals(object obj)

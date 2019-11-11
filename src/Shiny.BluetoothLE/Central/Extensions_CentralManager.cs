@@ -75,12 +75,12 @@ namespace Shiny.BluetoothLE.Central
         public static IObservable<IScanResult> ScanInterval(this ICentralManager centralManager, TimeSpan scanTime, TimeSpan scanPauseTime, ScanConfig config = null) => Observable.Create<IScanResult>(ob =>
         {
             var scanObs = centralManager.Scan(config).Do(ob.OnNext, ob.OnError);
-            IObservable<long> scanPauseObs = null;
-            IObservable<long> scanStopObs = null;
+            IObservable<long>? scanPauseObs = null;
+            IObservable<long>? scanStopObs = null;
 
-            IDisposable scanSub = null;
-            IDisposable scanStopSub = null;
-            IDisposable scanPauseSub = null;
+            IDisposable? scanSub = null;
+            IDisposable? scanStopSub = null;
+            IDisposable? scanPauseSub = null;
 
             void Scan()
             {

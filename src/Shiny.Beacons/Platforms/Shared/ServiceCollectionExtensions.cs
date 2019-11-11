@@ -35,6 +35,9 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
+            if (delegateType == null)
+                throw new ArgumentException("You can't register monitoring regions without a delegate type");
+
             services.RegisterModule(new BeaconModule(delegateType, regionsToMonitorWhenPermissionAvailable));
             return false;
 #endif

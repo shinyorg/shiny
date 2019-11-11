@@ -14,23 +14,20 @@ namespace Shiny.Beacons
     {
         readonly ICentralManager centralManager;
         readonly IBeaconManager beaconManager;
-        readonly IRepository repository;
         readonly IMessageBus messageBus;
         readonly IBeaconDelegate beaconDelegate;
         readonly IDictionary<string, BeaconRegionStatus> states;
-        IDisposable scanSub;
+        IDisposable? scanSub;
 
 
         public BackgroundTask(ICentralManager centralManager,
                               IBeaconManager beaconManager,
                               IMessageBus messageBus,
-                              IRepository repository,
                               IBeaconDelegate beaconDelegate)
         {
             this.centralManager = centralManager;
             this.beaconManager = beaconManager;
             this.messageBus = messageBus;
-            this.repository = repository;
             this.beaconDelegate = beaconDelegate;
             this.states = new Dictionary<string, BeaconRegionStatus>();
         }
@@ -157,7 +154,7 @@ namespace Shiny.Beacons
                                 await Log.SafeExecute(() =>
                                     this.beaconDelegate.OnStatusChanged(BeaconRegionState.Entered, state.Region)
                                 );
-                            }                            
+                            }
                         }
                     }
                 }
