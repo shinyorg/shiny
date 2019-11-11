@@ -10,7 +10,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
-        <PackageReference Include="Xamarin.Forms" Version="4.3.0.908675" />
+        <PackageReference Include="Xamarin.Forms" Version="4.3.0.947036" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
