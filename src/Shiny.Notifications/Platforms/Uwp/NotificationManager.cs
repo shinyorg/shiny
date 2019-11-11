@@ -90,7 +90,8 @@ namespace Shiny.Notifications
                         case NotificationActionType.OpenApp:
                             nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
                             {
-                                ActivationType = ToastActivationType.Foreground
+                                //ActivationType = ToastActivationType.Foreground
+                                ActivationType = ToastActivationType.Background
                             });
                             break;
 
@@ -150,10 +151,10 @@ namespace Shiny.Notifications
         {
             if (this.services.IsRegistered<INotificationDelegate>())
             {
-                this.context.RegisterBackground<NotificationBackgroundTaskProcessor>(
-                    nameof(NotificationBackgroundTaskProcessor),
-                    builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
-                );
+                //this.context.RegisterBackground<NotificationBackgroundTaskProcessor>(
+                //    nameof(NotificationBackgroundTaskProcessor),
+                //    builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
+                //);
             }
         }
 

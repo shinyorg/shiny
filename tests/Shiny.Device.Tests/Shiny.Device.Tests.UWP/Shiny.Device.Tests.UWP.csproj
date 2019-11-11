@@ -174,10 +174,6 @@
       <Project>{34905983-1f79-4b74-9bb0-d1dc7d24b8bf}</Project>
       <Name>Shiny.SpeechRecognition</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj">
-      <Project>{ad889fae-9382-4333-83a9-1653f4e2bfe8}</Project>
-      <Name>Shiny.Support.Uwp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Shiny.Device.Tests\Shiny.Device.Tests.csproj">
       <Project>{14B36205-6EB0-487E-9BE0-1C99B882A3D5}</Project>
       <Name>Shiny.Device.Tests</Name>

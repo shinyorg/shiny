@@ -39,7 +39,7 @@ namespace Shiny
         /// <summary>
         /// The configured service collection post container set
         /// </summary>
-        public static IServiceCollection Services { get; private set; }
+        public static IServiceCollection? Services { get; private set; }
 
 
         /// <summary>
@@ -48,6 +48,9 @@ namespace Shiny
         /// <param name="feed"></param>
         public static void Populate(Action<Type, Func<object>, ServiceLifetime> feed)
         {
+            if (Services == null)
+                throw new ArgumentException("Services have not yet been initialized");
+
             foreach (var service in Services)
             {
                 feed(
@@ -59,7 +62,7 @@ namespace Shiny
         }
 
 
-        static IServiceProvider container;
+        static IServiceProvider? container;
         public static IServiceProvider Container
         {
             get
@@ -77,7 +80,7 @@ namespace Shiny
         /// </summary>
         public static bool ValidateScopes { get; set; }
 
-        protected static void InitPlatform(IShinyStartup startup = null, Action<IServiceCollection> platformBuild = null)
+        protected static void InitPlatform(IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
         {
             var services = new ShinyServiceCollection();
 

@@ -22,7 +22,7 @@ namespace Shiny.BluetoothLE.Central
         public bool IsNotifying { get; protected set; }
         public Guid Uuid { get; }
         public CharacteristicProperties Properties { get; }
-        public abstract byte[] Value { get; }
+        public abstract byte[]? Value { get; }
 
         public abstract IObservable<IGattDescriptor> DiscoverDescriptors();
         public abstract IObservable<CharacteristicGattResult> EnableNotifications(bool enableIndicationsIfAvailable);

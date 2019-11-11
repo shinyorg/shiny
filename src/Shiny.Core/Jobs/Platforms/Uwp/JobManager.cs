@@ -39,20 +39,20 @@ namespace Shiny.Jobs
             if (jobInfo.PeriodicTime < this.MinimumAllowedPeriodicTime)
                 throw new ArgumentException($"Background timer cannot be less than {this.MinimumAllowedPeriodicTime.Value.TotalMinutes} minutes");
 
-            this.context.RegisterBackground<JobBackgroundTaskProcessor>(jobInfo.Identifier, builder =>
-            {
-                var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.TotalMinutes, 0));
-                builder.SetTrigger(new TimeTrigger(runMins, false));
+            //this.context.RegisterBackground<JobBackgroundTaskProcessor>(typeof(Shiny.ShinyBackgroundTask), jobInfo.Identifier, builder =>
+            //{
+            //    var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.TotalMinutes, 0));
+            //    builder.SetTrigger(new TimeTrigger(runMins, false));
 
-                if (jobInfo.RequiredInternetAccess != InternetAccess.None)
-                {
-                    var type = jobInfo.RequiredInternetAccess == InternetAccess.Any
-                        ? SystemConditionType.InternetAvailable
-                        : SystemConditionType.FreeNetworkAvailable;
+            //    if (jobInfo.RequiredInternetAccess != InternetAccess.None)
+            //    {
+            //        var type = jobInfo.RequiredInternetAccess == InternetAccess.Any
+            //            ? SystemConditionType.InternetAvailable
+            //            : SystemConditionType.FreeNetworkAvailable;
 
-                    builder.AddCondition(new SystemCondition(type));
-                }
-            });
+            //        builder.AddCondition(new SystemCondition(type));
+            //    }
+            //});
         }
 
 

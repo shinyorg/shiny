@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
     <PropertyGroup>
         <TargetFramework>uap10.0.16299</TargetFramework>
-        <RootNamespace>Shiny.Support.Uwp</RootNamespace>
+        <RootNamespace>Shiny.Locations</RootNamespace>
         <Description>Shiny UWP Support Library</Description>
         <PackageVersion>1.0.0</PackageVersion>
         <OutputType>winmdobj</OutputType>
@@ -19,9 +19,4 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Compile Remove="Properties\**\*.cs" />
-        <None Include="Properties\**\*.cs" />
-    </ItemGroup>
 </Project>

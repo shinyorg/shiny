@@ -6,12 +6,11 @@ namespace Shiny.Sensors
 {
     public class SharedCompassImpl : ICompass
     {
-        readonly IAccelerometer accelerometer;
-        readonly IMagnetometer magnetometer;
+        readonly IAccelerometer? accelerometer;
+        readonly IMagnetometer? magnetometer;
 
 
-        public SharedCompassImpl(IAccelerometer accelerometer = null,
-                                 IMagnetometer magnetometer = null)
+        public SharedCompassImpl(IAccelerometer? accelerometer = null, IMagnetometer? magnetometer = null)
         {
             this.accelerometer = accelerometer;
             this.magnetometer = magnetometer;
@@ -30,8 +29,8 @@ namespace Shiny.Sensors
             {
                 var comp = new CompositeDisposable();
                 var syncLock = new object();
-                MotionReading lastAccel = null;
-                MotionReading lastMag = null;
+                MotionReading? lastAccel = null;
+                MotionReading? lastMag = null;
 
                 comp.Add(this.accelerometer
                     .WhenReadingTaken()
@@ -57,7 +56,7 @@ namespace Shiny.Sensors
             });
         }
 
-        static void Calc(IObserver<CompassReading> ob, ref MotionReading lastMag, ref MotionReading lastAccel)
+        static void Calc(IObserver<CompassReading> ob, ref MotionReading? lastMag, ref MotionReading? lastAccel)
         {
             if (lastMag == null || lastAccel == null)
                 return;

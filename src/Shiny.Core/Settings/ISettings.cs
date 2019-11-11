@@ -15,12 +15,12 @@ namespace Shiny.Settings
         /// <summary>
         /// List current values from settings store
         /// </summary>
-        IReadOnlyDictionary<string, string> List { get; }
+        IReadOnlyDictionary<string, string>? List { get; }
 
         /// <summary>
         /// Monitor setting events (Add, Update, Remove, Clear)
         /// </summary>
-		event EventHandler<SettingChangeEventArgs> Changed;
+		event EventHandler<SettingChangeEventArgs>? Changed;
 
         /// <summary>
         /// Gets an object from settings
@@ -38,7 +38,7 @@ namespace Shiny.Settings
         /// <param name="key"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        object GetValue(Type type, string key, object defaultValue = null);
+        object? GetValue(Type type, string key, object? defaultValue = null);
 
         /// <summary>
         /// Enforces that the key is set and returns value

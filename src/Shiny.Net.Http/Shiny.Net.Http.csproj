@@ -25,6 +25,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Net.Http.UwpSupport\Shiny.Net.Http.UwpSupport.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Uwp\**\*.cs" />
     </ItemGroup>

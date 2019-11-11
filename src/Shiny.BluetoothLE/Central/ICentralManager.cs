@@ -52,7 +52,7 @@ namespace Shiny.BluetoothLE.Central
         /// WARNING: only one scan can be active at a time.  Use IsScanning to check for active scanning
         /// </summary>
         /// <returns></returns>
-        IObservable<IScanResult> Scan(ScanConfig config = null);
+        IObservable<IScanResult> Scan(ScanConfig? config = null);
 
         /// <summary>
         /// Monitor for status changes with adapter (on/off/permissions)

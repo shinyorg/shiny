@@ -6,11 +6,9 @@ namespace Shiny.Infrastructure
 {
     public class JsonNetSerializer : ISerializer
     {
-        readonly JsonSerializerSettings settings;
+        readonly JsonSerializerSettings? settings;
+        public JsonNetSerializer(JsonSerializerSettings? settings = null) => this.settings = settings;
 
-        public JsonNetSerializer() { }
-
-        public JsonNetSerializer(JsonSerializerSettings settings) => this.settings = settings;
 
         public T Deserialize<T>(string value) => JsonConvert.DeserializeObject<T>(value, this.settings);
         public object Deserialize(Type objectType, string value) => JsonConvert.DeserializeObject(value, objectType, this.settings);

@@ -104,23 +104,19 @@ namespace Shiny
         public static IObservable<List<Timestamped<T>>> BufferWhile<T>(this IObservable<T> thisObs, Func<T, bool> predicate)
             => Observable.Create<List<Timestamped<T>>>(ob =>
             {
-                List<Timestamped<T>> list = null;
+                var list = new List<Timestamped<T>>();
                 return thisObs
                     .Timestamp()
                     .Subscribe(x =>
                     {
                         if (predicate(x.Value))
                         {
-                            if (list == null)
-                            {
-                                list = new List<Timestamped<T>>();
-                            }
                             list.Add(x);
                         }
                         else if (list != null)
                         {
                             ob.OnNext(list);
-                            list = null;
+                            list.Clear();
                         }
                     });
             });

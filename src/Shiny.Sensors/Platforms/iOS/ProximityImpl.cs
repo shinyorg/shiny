@@ -11,10 +11,9 @@ namespace Shiny.Sensors
         public bool IsAvailable => true;
 
 
-        IObservable<bool> readOb;
+        IObservable<bool>? readOb;
         public IObservable<bool> WhenReadingTaken()
-        {
-            this.readOb = this.readOb ?? Observable.Create<bool>(ob =>
+            => this.readOb ??= Observable.Create<bool>(ob =>
             {
                 UIDevice.CurrentDevice.ProximityMonitoringEnabled = true;
                 var observer = NSNotificationCenter
@@ -33,8 +32,5 @@ namespace Shiny.Sensors
             .StartWith(UIDevice.CurrentDevice.ProximityState)
             .Publish()
             .RefCount();
-
-            return this.readOb;
-        }
     }
 }

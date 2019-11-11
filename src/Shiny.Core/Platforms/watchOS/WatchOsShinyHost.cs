@@ -12,7 +12,7 @@ namespace Shiny
     public class WatchOsShinyHost : ShinyHost
     {
         //https://docs.microsoft.com/en-us/xamarin/ios/watchos/platform/background-tasks
-        public static void Init(IShinyStartup startup = null, Action<IServiceCollection> platformBuild = null)
+        public static void Init(IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
             => InitPlatform(startup, services =>
             {
                 services.TryAddSingleton<IEnvironment, EnvironmentImpl>();

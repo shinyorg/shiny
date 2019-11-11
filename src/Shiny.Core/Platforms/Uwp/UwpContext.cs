@@ -8,7 +8,7 @@ namespace Shiny
 {
     public class UwpContext
     {
-        static readonly string BackgroundTaskEntryPoint = typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
+        //static readonly string BackgroundTaskEntryPoint = typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
         readonly IServiceProvider serviceProvider;
         readonly IRepository repository;
 
@@ -29,8 +29,9 @@ namespace Shiny
         }
 
 
-        public async void RegisterBackground<TService>(string taskIdentifier, Action<BackgroundTaskBuilder> builderAction = null) where TService : IBackgroundTaskProcessor
+        public async void RegisterBackground<TService>(string taskIdentifier, string backgroundTaskName, Action<BackgroundTaskBuilder> builderAction = null) where TService : IBackgroundTaskProcessor
         {
+            // TODO: make sure the type isn't already registered - should do startup to reg tasks?
             var task = GetTask(taskIdentifier, typeof(TService));
             if (task != null)
                 return;
@@ -38,7 +39,7 @@ namespace Shiny
             var builder = new BackgroundTaskBuilder();
             builderAction?.Invoke(builder);
             builder.Name = taskIdentifier;
-            builder.TaskEntryPoint = BackgroundTaskEntryPoint;
+            builder.TaskEntryPoint = backgroundTaskName;
 
             var registration = builder.Register();
             await this.repository.Set(registration.TaskId.ToString(), new UwpTaskRegister

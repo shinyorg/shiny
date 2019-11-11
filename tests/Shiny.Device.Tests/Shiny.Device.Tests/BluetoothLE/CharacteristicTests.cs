@@ -64,7 +64,7 @@ namespace Shiny.Devices.Tests.BluetoothLE
             var value = new byte[] { 0x01, 0x02 };
             foreach (var ch in this.characteristics)
             {
-                await ch.WriteWithoutResponse(value);
+                await ch.Write(value, false);
                 //Assert.True(write.Success, "Write failed - " + write.ErrorMessage);
 
                 // TODO: enable write back on host

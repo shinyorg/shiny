@@ -11,7 +11,7 @@ namespace Shiny.IO
 {
     public static class Extensions
     {
-        public static Stream ToStream(this string s, Encoding encoding = null)
+        public static Stream ToStream(this string s, Encoding? encoding = null)
         {
             var bytes = (encoding ?? Encoding.UTF8).GetBytes(s);
             return new MemoryStream(bytes);

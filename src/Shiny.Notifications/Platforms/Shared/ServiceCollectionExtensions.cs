@@ -31,8 +31,8 @@ namespace Shiny
 
         public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
                                                                    bool requestPermissionImmediately = false,
-                                                                   AndroidOptions androidConfig = null,
-                                                                   UwpOptions uwpConfig = null,
+                                                                   AndroidOptions? androidConfig = null,
+                                                                   UwpOptions? uwpConfig = null,
                                                                    params NotificationCategory[] notificationCategories)
                 where TNotificationDelegate : class, INotificationDelegate
             => services.UseNotifications(
@@ -45,8 +45,8 @@ namespace Shiny
 
         public static bool UseNotifications(this IServiceCollection services,
                                             bool requestPermissionImmediately = false,
-                                            AndroidOptions androidConfig = null,
-                                            UwpOptions uwpConfig = null,
+                                            AndroidOptions? androidConfig = null,
+                                            UwpOptions? uwpConfig = null,
                                             params NotificationCategory[] notificationCategories)
         {
 #if NETSTANDARD

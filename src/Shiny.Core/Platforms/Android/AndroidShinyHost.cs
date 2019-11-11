@@ -18,8 +18,8 @@ namespace Shiny
     public class AndroidShinyHost : ShinyHost
     {
         public static void Init(Application androidApp,
-                                IShinyStartup startup = null,
-                                Action<IServiceCollection> platformBuild = null)
+                                IShinyStartup? startup = null,
+                                Action<IServiceCollection>? platformBuild = null)
         {
             InitPlatform(
                 startup,

@@ -32,10 +32,8 @@ namespace Shiny.Beacons
 #if __ANDROID__
             if (this.delegateType != null)
             {
-                services.RegisterJob(new Shiny.Jobs.JobInfo
+                services.RegisterJob(new Shiny.Jobs.JobInfo(typeof(BeaconRegionScanJob))
                 {
-                    Identifier = nameof(BeaconRegionScanJob),
-                    Type = typeof(BeaconRegionScanJob),
                     BatteryNotLow = true,
                     PeriodicTime = TimeSpan.FromSeconds(30),
                     IsSystemJob = true

@@ -10,7 +10,7 @@ namespace Shiny
     public class NotifyPropertyChanged : INotifyPropertyChanged
     {
 
-        PropertyChangedEventHandler handler;
+        PropertyChangedEventHandler? handler;
         public event PropertyChangedEventHandler PropertyChanged
         {
             add
@@ -50,7 +50,7 @@ namespace Shiny
         /// Manually raise a PropertyChanged event for the caller member name or set property name
         /// </summary>
         /// <param name="propertyName"></param>
-        protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
             => this.handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 
@@ -72,7 +72,7 @@ namespace Shiny
         /// <param name="value"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        protected virtual bool Set<T>(ref T property, T value, [CallerMemberName] string propertyName = null)
+        protected virtual bool Set<T>(ref T property, T value, [CallerMemberName] string? propertyName = null)
         {
             if (EqualityComparer<T>.Default.Equals(property, value))
                 return false;

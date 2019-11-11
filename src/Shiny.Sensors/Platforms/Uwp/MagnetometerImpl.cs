@@ -8,23 +8,16 @@ namespace Shiny.Sensors
 {
     public class MagnetometerImpl : IMagnetometer
     {
-        readonly Magnetometer magnetometer;
-
-
-        public MagnetometerImpl()
-        {
-            this.magnetometer = Magnetometer.GetDefault();
-        }
+        readonly Magnetometer magnetometer = Magnetometer.GetDefault();
 
 
         public TimeSpan ReportInterval { get; set; }
         public bool IsAvailable => this.magnetometer != null;
 
 
-        IObservable<MotionReading> readOb;
+        IObservable<MotionReading>? readOb;
         public IObservable<MotionReading> WhenReadingTaken()
-        {
-            this.readOb = this.readOb ?? Observable.Create<MotionReading>(ob =>
+            => this.readOb ??= Observable.Create<MotionReading>(ob =>
             {
                 //this.magnetometer.ReportInterval;
                 var handler = new TypedEventHandler<Magnetometer, MagnetometerReadingChangedEventArgs>((sender, args) =>
@@ -38,7 +31,5 @@ namespace Shiny.Sensors
                 this.magnetometer.ReadingChanged += handler;
                 return () => this.magnetometer.ReadingChanged -= handler;
             });
-            return this.readOb;
-        }
     }
 }

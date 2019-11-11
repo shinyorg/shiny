@@ -8,22 +8,13 @@ namespace Shiny.Sensors
 {
     public class AmbientLightImpl : IAmbientLight
     {
-        readonly LightSensor sensor;
-
-
-        public AmbientLightImpl()
-        {
-            this.sensor = LightSensor.GetDefault();
-        }
-
-
+        readonly LightSensor sensor = LightSensor.GetDefault();
         public bool IsAvailable => this.sensor != null;
 
 
-        IObservable<double> readOb;
+        IObservable<double>? readOb;
         public IObservable<double> WhenReadingTaken()
-        {
-            this.readOb = this.readOb ?? Observable.Create<double>(ob =>
+            => this.readOb ??= Observable.Create<double>(ob =>
             {
                 var handler = new TypedEventHandler<LightSensor, LightSensorReadingChangedEventArgs>((sender, args) =>
                     ob.OnNext(args.Reading.IlluminanceInLux)
@@ -33,8 +24,5 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.readOb;
-        }
     }
 }

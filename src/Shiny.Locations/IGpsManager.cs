@@ -38,7 +38,7 @@ namespace Shiny.Locations
         /// Gets the last reading - will also try to get access if you have not used RequestAccess, if access is not granted, this will throw an exception
         /// </summary>
         /// <returns></returns>
-        IObservable<IGpsReading> GetLastReading();
+        IObservable<IGpsReading?> GetLastReading();
 
 
         /// <summary>

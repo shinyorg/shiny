@@ -71,10 +71,10 @@ namespace Shiny.Locations
             var native = this.ToNative(region);
             GeofenceMonitor.Current.Geofences.Add(native);
 
-            this.context.RegisterBackground<GeofenceBackgroundTaskProcessor>(
-                nameof(GeofenceBackgroundTaskProcessor),
-                builder => builder.SetTrigger(new LocationTrigger(LocationTriggerType.Geofence))
-            );
+            //this.context.RegisterBackground<GeofenceBackgroundTaskProcessor>(
+            //    nameof(GeofenceBackgroundTaskProcessor),
+            //    builder => builder.SetTrigger(new LocationTrigger(LocationTriggerType.Geofence))
+            //);
         }
 
 

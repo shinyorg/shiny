@@ -7,15 +7,15 @@ namespace Shiny.Notifications
 {
     class NotificationModule : ShinyModule
     {
-        readonly Type delegateType;
+        readonly Type? delegateType;
         readonly bool requestPermissionImmediately;
         readonly NotificationCategory[] notificationCategories;
 
 
-        public NotificationModule(Type delegateType,
+        public NotificationModule(Type? delegateType,
                                   bool requestPermissionImmediately,
-                                  AndroidOptions androidConfig,
-                                  UwpOptions uwpConfig,
+                                  AndroidOptions? androidConfig,
+                                  UwpOptions? uwpConfig,
                                   NotificationCategory[] notificationCategories)
         {
             this.delegateType = delegateType;
@@ -45,20 +45,16 @@ namespace Shiny.Notifications
             services.AddSingleton<INotificationManager, NotificationManager>();
 #if __ANDROID__
             services.AddSingleton<AndroidNotificationProcessor>();
-            services.RegisterJob(new Jobs.JobInfo
+            services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
             {
                 PeriodicTime = TimeSpan.FromMinutes(2),
-                Identifier = nameof(NotificationJob),
-                Type = typeof(NotificationJob),
                 Repeat = true,
                 IsSystemJob = true
             });
 #elif WINDOWS_UWP
-            services.RegisterJob(new Jobs.JobInfo
+            services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
             {
                 PeriodicTime = TimeSpan.FromMinutes(15),
-                Identifier = nameof(NotificationJob),
-                Type = typeof(NotificationJob),
                 Repeat = true,
                 IsSystemJob = true
             });

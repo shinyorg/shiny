@@ -7,13 +7,9 @@ namespace Shiny.Sensors
     public class ShinySensorManager : Java.Lang.Object, ISensorEventListener
     {
         readonly SensorManager sensorManager;
-        Action<SensorEvent> action;
+        Action<SensorEvent>? action;
 
-
-		public ShinySensorManager(SensorManager sensorManager)
-		{
-			this.sensorManager = sensorManager;
-		}
+		public ShinySensorManager(SensorManager sensorManager)=> this.sensorManager = sensorManager;
 
 
         public bool Start(SensorType sensorType, SensorDelay delay, Action<SensorEvent> sensorAction)
@@ -26,13 +22,7 @@ namespace Shiny.Sensors
 
 
         public void Stop() => this.sensorManager.UnregisterListener(this);
-
-
-        public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy)
-        {
-        }
-
-
-        public void OnSensorChanged(SensorEvent e) => this.action(e);
+        public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy) {}
+        public void OnSensorChanged(SensorEvent e) => this.action?.Invoke(e);
     }
 }

@@ -30,14 +30,14 @@ namespace Shiny.Net.Http
         }
 
 
-        public static async Task<IEnumerable<HttpTransfer>> QueryTransfers(this NSUrlSession session, QueryFilter filter)
+        public static async Task<IEnumerable<HttpTransfer>> QueryTransfers(this NSUrlSession session, QueryFilter? filter)
         {
             var tasks = await session.QueryTasks(filter);
             return tasks.Select(x => x.FromNative());
         }
 
 
-        public static async Task<IEnumerable<NSUrlSessionTask>> QueryTasks(this NSUrlSession session, QueryFilter filter)
+        public static async Task<IEnumerable<NSUrlSessionTask>> QueryTasks(this NSUrlSession session, QueryFilter? filter)
         {
             var tasks = await session.GetAllTasksAsync();
             var results = tasks.AsEnumerable();
@@ -77,7 +77,7 @@ namespace Shiny.Net.Http
         public static HttpTransfer FromNative(this NSUrlSessionTask task)
         {
             var upload = task is NSUrlSessionUploadTask;
-            Exception exception = null;
+            Exception? exception = null;
             if (task.Error != null && task.State != NSUrlSessionTaskState.Canceling)
                 exception = new Exception(task.Error.LocalizedDescription);
 

@@ -9,6 +9,6 @@ namespace Shiny.Power
         public PowerState Status => PowerState.Charged;
         public int BatteryLevel => 100;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

@@ -69,7 +69,7 @@ namespace Shiny
             => this.PermissionResult?.Invoke(this, new PermissionRequestResult(requestCode, permissions, grantResult));
 
 
-        public event EventHandler<PermissionRequestResult> PermissionResult;
+        public event EventHandler<PermissionRequestResult>? PermissionResult;
 
 
         //public IObservable<Configuration> WhenConfigurationChanged() => this
@@ -174,14 +174,18 @@ namespace Shiny
 
         public bool IsInManifest(string androidPermission)
         {
-            var permissions = this.AppContext.PackageManager.GetPackageInfo(
-                this.AppContext.PackageName,
-                PackageInfoFlags.Permissions
-            )?.RequestedPermissions;
+            var permissions = this.AppContext
+                .PackageManager
+                .GetPackageInfo(
+                    this.AppContext.PackageName,
+                    PackageInfoFlags.Permissions
+                )
+                ?.RequestedPermissions;
 
-            foreach (var permission in permissions)
-                if (permission.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase))
-                    return true;
+            if (permissions != null)
+                foreach (var permission in permissions)
+                    if (permission.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase))
+                        return true;
 
             Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
             return false;

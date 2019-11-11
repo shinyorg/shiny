@@ -12,10 +12,9 @@ namespace Shiny.Sensors
         public bool IsAvailable => HeartRateMonitor.IsSupported;
 
 
-        IObservable<ushort> observable;
+        IObservable<ushort>? observable;
         public IObservable<ushort> WhenReadingTaken()
-        {
-            this.observable = this.observable ?? Observable.Create<ushort>(ob =>
+            => this.observable ??= Observable.Create<ushort>(ob =>
             {
                 var handler = new EventHandler<HeartRateMonitorDataUpdatedEventArgs>((sender, args) =>
                     ob.OnNext((ushort)args.HeartRate)
@@ -36,8 +35,5 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.observable;
-        }
     }
 }

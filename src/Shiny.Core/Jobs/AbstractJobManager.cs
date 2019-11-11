@@ -50,22 +50,20 @@ namespace Shiny.Jobs
         public virtual async Task<JobRunResult> Run(string jobName, CancellationToken cancelToken)
         {
             JobRunResult result = default;
+            JobInfo actual = null;
             try
             {
                 var job = await this.repository.Get<PersistJobInfo>(jobName);
                 if (job == null)
                     throw new ArgumentException("No job found named " + jobName);
 
-                var actual = PersistJobInfo.FromPersist(job);
+                actual = PersistJobInfo.FromPersist(job);
                 result = await this.RunJob(actual, cancelToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Log.Write(ex);
-                result = new JobRunResult(false, new JobInfo
-                {
-                    Identifier = jobName
-                }, ex);
+                result = new JobRunResult(false, actual, ex);
             }
 
             return result;
@@ -79,9 +77,12 @@ namespace Shiny.Jobs
         }
 
 
-        public async Task<JobInfo> GetJob(string jobName)
+        public async Task<JobInfo?> GetJob(string jobName)
         {
             var job = await this.repository.Get<PersistJobInfo>(jobName);
+            if (job == null)
+                return null;
+
             return PersistJobInfo.FromPersist(job);
         }
 
@@ -113,8 +114,8 @@ namespace Shiny.Jobs
 
         public bool IsRunning { get; protected set; }
         public TimeSpan? MinimumAllowedPeriodicTime { get; }
-        public event EventHandler<JobInfo> JobStarted;
-        public event EventHandler<JobRunResult> JobFinished;
+        public event EventHandler<JobInfo>? JobStarted;
+        public event EventHandler<JobRunResult>? JobFinished;
 
 
         public async Task Schedule(JobInfo jobInfo)
@@ -207,7 +208,7 @@ namespace Shiny.Jobs
 
         protected virtual void LogJob(JobState state,
                                       JobInfo job,
-                                      Exception exception = null)
+                                      Exception? exception = null)
         {
             if (exception == null)
                 Log.Write("Jobs", state == JobState.Finish ? "Job Success" : $"Job {state}", ("JobName", job.Identifier));
@@ -216,7 +217,7 @@ namespace Shiny.Jobs
         }
 
 
-        protected virtual void LogTask(JobState state, string taskName, Exception exception = null)
+        protected virtual void LogTask(JobState state, string taskName, Exception? exception = null)
         {
             if (exception == null)
                 Log.Write("Jobs", state == JobState.Finish ? "Task Success" : $"Task {state}", ("TaskName", taskName));

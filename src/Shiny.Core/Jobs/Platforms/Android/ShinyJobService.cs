@@ -14,13 +14,12 @@ namespace Shiny.Jobs
     )]
     public class ShinyJobService : JobService
     {
-        CancellationTokenSource cancelSrc;
+        readonly CancellationTokenSource cancelSrc = new CancellationTokenSource();
 
 
         public override bool OnStartJob(JobParameters @params)
         {
             var jobIdentifier = @params.GetShinyJobId();
-            this.cancelSrc = new CancellationTokenSource();
             ShinyHost
                 .Resolve<IJobManager>()
                 .Run(jobIdentifier, this.cancelSrc.Token)
@@ -31,7 +30,7 @@ namespace Shiny.Jobs
 
         public override bool OnStopJob(JobParameters @params)
         {
-            this.cancelSrc?.Cancel();
+            this.cancelSrc.Cancel();
             return true;
         }
     }

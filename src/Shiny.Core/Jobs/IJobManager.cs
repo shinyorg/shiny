@@ -69,7 +69,7 @@ namespace Shiny.Jobs
         /// </summary>
         /// <param name="jobIdentifier"></param>
         /// <returns></returns>
-        Task<JobInfo> GetJob(string jobIdentifier);
+        Task<JobInfo?> GetJob(string jobIdentifier);
 
 
         /// <summary>

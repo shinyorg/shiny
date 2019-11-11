@@ -8,22 +8,13 @@ namespace Shiny.Sensors
 {
     public class BarometerImpl : IBarometer
     {
-        readonly Barometer barometer;
-
-
-        public BarometerImpl()
-        {
-            this.barometer = Barometer.GetDefault();
-        }
-
-
+        readonly Barometer barometer = Barometer.GetDefault();
         public bool IsAvailable => this.barometer != null;
 
 
-        IObservable<double> readOb;
+        IObservable<double>? readOb;
         public IObservable<double> WhenReadingTaken()
-        {
-            this.readOb = this.readOb ?? Observable.Create<double>(ob =>
+            => this.readOb ??= Observable.Create<double>(ob =>
             {
                 var handler = new TypedEventHandler<Barometer, BarometerReadingChangedEventArgs>((sender, args) =>
                     ob.OnNext(args.Reading.StationPressureInHectopascals)
@@ -33,8 +24,5 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.readOb;
-        }
     }
 }

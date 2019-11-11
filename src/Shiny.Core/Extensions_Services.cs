@@ -77,7 +77,7 @@ namespace Shiny
         /// <param name="identifier"></param>
         public static void RegisterJob(this IServiceCollection services,
                                        Type jobType,
-                                       string identifier = null,
+                                       string? identifier = null,
                                        InternetAccess requiredNetwork = InternetAccess.None)
             => services.RegisterPostBuildAction(async sp =>
             {
@@ -86,10 +86,8 @@ namespace Shiny
                 var access = await jobs.RequestAccess();
                 if (access == AccessState.Available)
                 {
-                    await jobs.Schedule(new JobInfo
+                    await jobs.Schedule(new JobInfo(jobType, identifier)
                     {
-                        Type = jobType,
-                        Identifier = identifier ?? jobType.GetType().FullName,
                         RequiredInternetAccess = requiredNetwork,
                         Repeat = true
                     });

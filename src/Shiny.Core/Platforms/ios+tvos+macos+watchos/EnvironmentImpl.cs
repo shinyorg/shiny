@@ -1,24 +1,13 @@
 ﻿using System;
 using Foundation;
-using UIKit;
+
 
 namespace Shiny
 {
     // this is startable so the properties can be set on the main thread - this is mostly an iOS thing
     public class EnvironmentImpl : IEnvironment, IShinyStartupTask
     {
-        public string AppIdentifier { get; private set; }
-        public string AppVersion { get; private set; }
-        public string AppBuild { get; private set; }
-
-        public string MachineName { get; } = "";
-        public string OperatingSystem { get; private set; }
-        public string OperatingSystemVersion { get; private set; }
-        public string Manufacturer { get; } = "Apple";
-        public string Model { get; }
-
-
-        public void Start()
+        public EnvironmentImpl()
         {
             //this.operatingSystem = UIDevice.CurrentDevice.SystemName;
             this.AppIdentifier = NSBundle.MainBundle.BundleIdentifier;
@@ -26,15 +15,30 @@ namespace Shiny
             this.AppBuild = NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"].ToString();
 #if __IOS__
             this.OperatingSystem = "iOS";
-            this.OperatingSystemVersion = UIDevice.CurrentDevice.SystemVersion;
+            this.OperatingSystemVersion = UIKit.UIDevice.CurrentDevice.SystemVersion;
 #elif __TVSOS__
             this.OperatingSystem = "tvOS";
-            this.OperatingSystemVersion = UIDevice.CurrentDevice.SystemVersion;
+            this.OperatingSystemVersion = UIKit.UIDevice.CurrentDevice.SystemVersion;
 #elif __WATCHOS__
             this.OperatingSystem = "watchOS";
             this.OperatingSystemVersion = "1";
 #endif
+        }
 
+
+        public string AppIdentifier { get; }
+        public string AppVersion { get; }
+        public string AppBuild { get; }
+
+        public string MachineName { get; } = "";
+        public string OperatingSystem { get; }
+        public string OperatingSystemVersion { get; }
+        public string Manufacturer { get; } = "Apple";
+        public string Model { get; } = "";
+
+
+        public void Start()
+        {
         }
     }
 }

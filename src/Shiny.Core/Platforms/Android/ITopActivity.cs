@@ -5,7 +5,7 @@ namespace Shiny
 {
     public interface ITopActivity
     {
-        Activity Current { get; }
+        Activity? Current { get; }
         IObservable<ActivityChanged> WhenActivityStatusChanged();
     }
 }

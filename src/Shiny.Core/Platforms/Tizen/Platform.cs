@@ -83,7 +83,7 @@ namespace Shiny
                         break;
                 }
             });
-            PrivacyPrivilegeManager.ResponseContext context = null;
+            PrivacyPrivilegeManager.ResponseContext? context = null;
 
             try
             {

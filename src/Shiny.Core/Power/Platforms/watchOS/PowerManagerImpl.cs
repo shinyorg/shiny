@@ -6,7 +6,7 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
-        IDisposable timerSub;
+        IDisposable? timerSub;
 
 
         public PowerState Status

@@ -27,8 +27,8 @@ namespace Shiny.Notifications
         readonly ISerializer serializer;
         readonly IJobManager jobs;
 
-        Native newManager;
-        NotificationManagerCompat compatManager;
+        NotificationManagerCompat? compatManager;
+        Native? newManager;
 
 
         public NotificationManager(AndroidContext context,
@@ -167,7 +167,7 @@ namespace Shiny.Notifications
                 builder.SetChannelId(channelId);
                 this.newManager.Notify(notification.Id, builder.Build());
             }
-            else
+            else if (this.compatManager != null)
             {
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
@@ -287,7 +287,6 @@ namespace Shiny.Notifications
             var pendingIntent = PendingIntent.GetBroadcast(this.context.AppContext, 100, intent, PendingIntentFlags.UpdateCurrent);
 
             //this.context.GetResourceIdByName(action.Identifier)
-            // TODO: get iconId
             var nativeAction = new NotificationCompat.Action.Builder(0, action.Title, pendingIntent)
                 .SetAllowGeneratedReplies(true)
                 .AddRemoteInput(input)

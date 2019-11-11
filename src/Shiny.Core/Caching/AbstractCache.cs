@@ -32,7 +32,8 @@ namespace Shiny.Caching
             if (obj == null)
             {
                 obj = await getter().ConfigureAwait(false);
-                await this.Set(key, obj, timeSpan).ConfigureAwait(false);
+                if (obj != null)
+                    await this.Set(key, obj, timeSpan).ConfigureAwait(false);
             }
             return obj;
         }

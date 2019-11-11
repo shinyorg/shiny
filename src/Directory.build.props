@@ -2,13 +2,11 @@
     <PropertyGroup>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
-        <!--
+        <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+        <LangVersion>8.0</LangVersion>
         <Nullable>enable</Nullable>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        -->
         <DisableExtraReferences>False</DisableExtraReferences>
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
-        <LangVersion>latest</LangVersion>
         <Description>Shiny</Description>
         <Product>Shiny .NET</Product>
         <Version>1.0.0</Version>

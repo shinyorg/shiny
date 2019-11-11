@@ -5,7 +5,7 @@ using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
 using Shiny.Infrastructure;
 using Shiny.Logging;
-using System.Threading.Tasks;
+
 
 namespace Shiny.Locations
 {
@@ -35,27 +35,16 @@ namespace Shiny.Locations
             foreach (var report in reports)
             {
                 var region = await this.repository.Get<GeofenceRegion>(report.Geofence.Id);
+                if (region != null)
+                {
+                    var newStatus = report.NewState.FromNative();
+                    await Log.SafeExecute(() => this.gdelegate.OnStatusChanged(newStatus, region));
 
-                var newStatus = report.NewState.FromNative();
-                await this.FireDelegate(newStatus, region);
-
-                if (region.SingleUse)
-                    await this.repository.Remove<GeofenceRegion>(region.Identifier);
+                    if (region.SingleUse)
+                        await this.repository.Remove<GeofenceRegion>(region.Identifier);
+                }
             }
             deferral.Complete();
-        }
-
-
-        async Task FireDelegate(GeofenceState state, GeofenceRegion region)
-        {
-            try
-            {
-                await this.gdelegate.OnStatusChanged(state, region);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
         }
     }
 }

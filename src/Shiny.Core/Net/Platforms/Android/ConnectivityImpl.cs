@@ -10,7 +10,8 @@ namespace Shiny.Net
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
         readonly AndroidContext context;
-        IDisposable netmon;
+        ConnectivityManager? connectivityMgr;
+        IDisposable? netmon;
 
 
         public ConnectivityImpl(AndroidContext context)
@@ -61,10 +62,8 @@ namespace Shiny.Net
                         Caps: this.Connectivity.GetNetworkCapabilities(x)
                     ))
                     .Where(x =>
-                        x.Info != null &&
-                        x.Caps != null &&
-                        x.Info.IsAvailable &&
-                        x.Info.IsConnectedOrConnecting
+                        (x.Info?.IsAvailable ?? false) &&
+                        (x.Info?.IsConnectedOrConnecting ?? false)
                     );
 
                 var access = NetworkAccess.None;
@@ -124,7 +123,6 @@ namespace Shiny.Net
         }
 
 
-        ConnectivityManager connectivityMgr;
         ConnectivityManager Connectivity
         {
             get

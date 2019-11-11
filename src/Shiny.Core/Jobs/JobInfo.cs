@@ -6,8 +6,15 @@ namespace Shiny.Jobs
 {
     public class JobInfo
     {
-        public string Identifier { get; set; }
-        public Type Type { get; set; }
+        public JobInfo(Type jobType, string? identifier = null)
+        {
+            this.Type = jobType;
+            this.Identifier = identifier ?? jobType.GetType().FullName;
+        }
+
+
+        public string Identifier { get; }
+        public Type Type { get; }
         //public bool DeviceIdle { get; set; } // this will only work on droid
 
         public bool Repeat { get; set; } = true;

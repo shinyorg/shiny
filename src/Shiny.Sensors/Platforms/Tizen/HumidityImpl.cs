@@ -10,10 +10,9 @@ namespace Shiny.Sensors
         public bool IsAvailable => HumiditySensor.IsSupported;
 
 
-        IObservable<double> observable;
+        IObservable<double>? observable;
         public IObservable<double> WhenReadingTaken()
-        {
-            this.observable = this.observable ?? Observable.Create<double>(ob =>
+            => this.observable ??= Observable.Create<double>(ob =>
             {
                 var handler = new EventHandler<HumiditySensorDataUpdatedEventArgs>((sender, args) =>
                     ob.OnNext(args.Humidity)
@@ -34,8 +33,5 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.observable;
-        }
     }
 }
