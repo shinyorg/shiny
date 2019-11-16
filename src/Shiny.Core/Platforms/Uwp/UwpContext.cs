@@ -23,13 +23,16 @@ namespace Shiny
         public async void Bridge(IBackgroundTaskInstance task)
         {
             var register = await this.repository.Get<UwpTaskRegister>(task.Task.TaskId.ToString());
+            if (register == null)
+                throw new NullReferenceException("Could not find background task");
+
             var type = Type.GetType(register.DelegateTypeName);
             var processor = this.serviceProvider.ResolveOrInstantiate(type) as IBackgroundTaskProcessor;
-            processor.Process(task.Task.Name, task);
+            processor?.Process(task.Task.Name, task);
         }
 
 
-        public async void RegisterBackground<TService>(string taskIdentifier, string backgroundTaskName, Action<BackgroundTaskBuilder> builderAction = null) where TService : IBackgroundTaskProcessor
+        public async void RegisterBackground<TService>(string taskIdentifier, string backgroundTaskName, Action<BackgroundTaskBuilder>? builderAction = null) where TService : IBackgroundTaskProcessor
         {
             // TODO: make sure the type isn't already registered - should do startup to reg tasks?
             var task = GetTask(taskIdentifier, typeof(TService));
@@ -57,7 +60,7 @@ namespace Shiny
 
         static IBackgroundTaskRegistration GetTask(string taskIdentifier, Type serviceType) => BackgroundTaskRegistration
             .AllTasks
-            .Where(x => x.Value.Name.Equals(taskIdentifier) && x.Value.Name.Equals(serviceType.FullName))
+            .Where(x => x.Value.Name.Equals(taskIdentifier) || x.Value.Name.Equals(serviceType.FullName))
             .Select(x => x.Value)
             .FirstOrDefault();
     }

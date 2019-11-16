@@ -34,9 +34,6 @@ namespace Shiny.Locations
                 await this.geofenceDelegate.OnStatusChanged(state, geofence);
             }
         }
-
-        public Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
-            => Task.CompletedTask;
     }
 
 
