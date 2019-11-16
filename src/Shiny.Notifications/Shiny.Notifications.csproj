@@ -22,7 +22,7 @@
         <Compile Include="Platforms\Uwp\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Notifications.UwpSupport\Shiny.Notifications.UwpSupport.csproj" />
-        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="5.1.1" />
+        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">

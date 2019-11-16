@@ -12,7 +12,7 @@ namespace Shiny.Testing.Notifications
         public int CurrentNotificationId { get; set; } = 1;
         public int CurrentBadge { get; set; }
         public AccessState RequestAccessReply { get; set; } = AccessState.Available;
-        public Notification LastNotification { get; private set; }
+        public Notification? LastNotification { get; private set; }
 
         public Task Cancel(int id) => Task.CompletedTask;
         public Task Clear() => Task.CompletedTask;
