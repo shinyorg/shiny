@@ -63,7 +63,7 @@ namespace Shiny
 
 
         public bool IsMinApiLevel(int apiLevel)
-            => apiLevel >= (int)Android.OS.Build.VERSION.SdkInt;
+            => (int)Android.OS.Build.VERSION.SdkInt >= apiLevel;
 
         public void FirePermission(int requestCode, string[] permissions, NativePerm[] grantResult)
             => this.PermissionResult?.Invoke(this, new PermissionRequestResult(requestCode, permissions, grantResult));

@@ -9,7 +9,7 @@ namespace Shiny
 {
     public class ShinyBeaconsAttribute : ServiceModuleAttribute
     {
-        public ShinyBeaconsAttribute(Type delegateType = null)
+        public ShinyBeaconsAttribute(Type? delegateType = null)
             => this.DelegateType = delegateType;
 
         public Type? DelegateType { get; }
