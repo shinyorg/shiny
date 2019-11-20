@@ -11,7 +11,9 @@ namespace Shiny.Notifications
         Enabled = true,
         Exported = false
     )]
-    [IntentFilter(new[] { IntentAction })]
+    [IntentFilter(new[] {
+        IntentAction
+    })]
     public class NotificationBroadcastReceiver : BroadcastReceiver
     {
         public const string ReceiverName = "com.shiny.locations." + nameof(NotificationBroadcastReceiver);

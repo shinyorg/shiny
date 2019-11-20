@@ -65,7 +65,12 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override IObservable<ConnectionState> WhenStatusChanged()
-            => this.connSubject.Merge(this.context.Callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus()));
+            => this.context
+                .Callbacks
+                .ConnectionStateChanged
+                .Select(x => x.NewState.ToStatus())
+                .StartWith(this.Status);
+                        //=> this.connSubject.Merge(this.context.Callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus()));
 
 
         public override IObservable<IGattService> DiscoverServices()
