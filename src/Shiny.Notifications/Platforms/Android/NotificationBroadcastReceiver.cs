@@ -1,6 +1,7 @@
 ﻿using System;
 using Android.App;
 using Android.Content;
+using Shiny.Infrastructure;
 using RemoteInput = Android.Support.V4.App.RemoteInput;
 
 
@@ -25,7 +26,19 @@ namespace Shiny.Notifications
             var bundle = RemoteInput.GetResultsFromIntent(intent);
             if (bundle != null)
             {
-                //bundle.GetString(KEY_REPLY);
+                var text = bundle.GetString("Result");
+                var notificationId = bundle.GetString("NotificationId", String.Empty);
+
+                this.Execute(async () =>
+                {
+                    var notification = await ShinyHost.Resolve<IRepository>().Get<Notification>(notificationId);
+                    if (notification != null)
+                    {
+                        ShinyHost
+                            .Resolve<INotificationDelegate>()?
+                            .OnEntry(new NotificationResponse(notification, null, text));
+                    }
+                });
                 //int messageId = intent.getIntExtra(KEY_MESSAGE_ID, 0);
             }
         }

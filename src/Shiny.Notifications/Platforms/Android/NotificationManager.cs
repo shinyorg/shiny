@@ -107,18 +107,22 @@ namespace Shiny.Notifications
                 return;
             }
 
-            var pendingIntent = this.BuildPendingIntent(notification);
             var iconId = this.GetIconResource(notification);
-
             var builder = new NotificationCompat.Builder(this.context.AppContext)
                 .SetContentTitle(notification.Title)
                 .SetContentText(notification.Message)
                 .SetSmallIcon(iconId)
                 .SetAutoCancel(notification.Android.AutoCancel)
-                .SetOngoing(notification.Android.OnGoing)
-                .SetContentIntent(pendingIntent);
+                .SetOngoing(notification.Android.OnGoing);
 
-            this.AddCategory(builder, notification);
+            if (!notification.Category.IsEmpty())
+                this.AddCategory(builder, notification);
+            else
+            {
+                var pendingIntent = this.BuildPendingIntent(notification);
+                builder.SetContentIntent(pendingIntent);
+            }
+
             this.AddSound(builder);
 
             if (notification.BadgeCount != null)
@@ -188,7 +192,7 @@ namespace Shiny.Notifications
             if (!notification.Payload.IsEmpty())
                 launchIntent.PutExtra("Payload", notification.Payload);
 
-            PendingIntent pendingIntent = null;
+            PendingIntent pendingIntent;
             if ((notification.Android.LaunchActivityFlags & AndroidActivityFlags.ClearTask) != 0)
             {
                 pendingIntent = TaskStackBuilder
@@ -277,7 +281,7 @@ namespace Shiny.Notifications
 
         protected virtual NotificationCompat.Action CreateTextReply(int notificationId, NotificationAction action)
         {
-            var input = new RemoteInput.Builder(action.Title)
+            var input = new RemoteInput.Builder("Result")
                 .SetLabel(action.Title)
                 .Build();
 
