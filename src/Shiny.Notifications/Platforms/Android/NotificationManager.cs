@@ -266,6 +266,7 @@ namespace Shiny.Notifications
                         case NotificationActionType.TextReply:
                             var nativeAction = this.CreateTextReply(notification.Id, action);
                             builder.AddAction(nativeAction);
+                            builder.Extras.PutString("ActionId", action.Identifier);
                             break;
 
                         case NotificationActionType.Destructive:
@@ -281,14 +282,21 @@ namespace Shiny.Notifications
 
         protected virtual NotificationCompat.Action CreateTextReply(int notificationId, NotificationAction action)
         {
+            var intent = this.context.CreateIntent<NotificationBroadcastReceiver>(NotificationBroadcastReceiver.IntentAction);
+            intent
+                .PutExtra("NotificationId", notificationId)
+                .PutExtra("ActionId", action.Identifier);
+
+            var pendingIntent = PendingIntent.GetBroadcast(
+                this.context.AppContext,
+                100,
+                intent,
+                PendingIntentFlags.UpdateCurrent
+            );
+
             var input = new RemoteInput.Builder("Result")
                 .SetLabel(action.Title)
                 .Build();
-
-            var intent = this.context.CreateIntent<NotificationBroadcastReceiver>(NotificationBroadcastReceiver.IntentAction);
-            intent.PutExtra("NotificationId", notificationId);
-
-            var pendingIntent = PendingIntent.GetBroadcast(this.context.AppContext, 100, intent, PendingIntentFlags.UpdateCurrent);
 
             //this.context.GetResourceIdByName(action.Identifier)
             var nativeAction = new NotificationCompat.Action.Builder(0, action.Title, pendingIntent)

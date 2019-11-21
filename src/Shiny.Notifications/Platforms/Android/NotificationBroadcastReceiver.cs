@@ -27,19 +27,22 @@ namespace Shiny.Notifications
             if (bundle != null)
             {
                 var text = bundle.GetString("Result");
-                var notificationId = bundle.GetString("NotificationId", String.Empty);
-
+                var actionId = intent.GetStringExtra("ActionId");
+                var notificationId = intent.GetIntExtra("NotificationId", 0);
+                
                 this.Execute(async () =>
                 {
-                    var notification = await ShinyHost.Resolve<IRepository>().Get<Notification>(notificationId);
+                    var notification = await ShinyHost
+                        .Resolve<IRepository>()
+                        .Get<Notification>(notificationId.ToString());
+
                     if (notification != null)
                     {
                         ShinyHost
                             .Resolve<INotificationDelegate>()?
-                            .OnEntry(new NotificationResponse(notification, null, text));
+                            .OnEntry(new NotificationResponse(notification, actionId, text));
                     }
                 });
-                //int messageId = intent.getIntExtra(KEY_MESSAGE_ID, 0);
             }
         }
     }
