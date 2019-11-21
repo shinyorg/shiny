@@ -13,6 +13,7 @@ namespace Shiny.Notifications
         /// <param name="category"></param>
         void RegisterCategory(NotificationCategory category);
 
+
         /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>

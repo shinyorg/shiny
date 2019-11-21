@@ -119,18 +119,15 @@ namespace Shiny.Notifications
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
-            if (notification.Category.IsEmpty())
-            {
-                var pendingIntent = this.BuildPendingIntent(notification);
-                builder.SetContentIntent(pendingIntent);
-            }
+            this.AddSound(builder);
+
+            if (!notification.Category.IsEmpty())
+                this.AddCategory(builder, notification);
             else
             {
-                await this.repository.Set(notification.Id.ToString(), notification);
-                this.AddCategory(builder, notification);
+                var pendingIntent = this.GetLaunchPendingIntent(notification);
+                builder.SetContentIntent(pendingIntent);
             }
-
-            this.AddSound(builder);
 
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
@@ -185,7 +182,7 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual PendingIntent BuildPendingIntent(Notification notification)
+        protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string actionId = null)
         {
             var launchIntent = this
                 .context
@@ -260,23 +257,24 @@ namespace Shiny.Notifications
             }
             else
             {
+                var notificationString = this.serializer.Serialize(notification);                
+
                 foreach (var action in category.Actions)
                 {
                     switch (action.ActionType)
                     {
-                        case NotificationActionType.None:
-                            break;
-
                         case NotificationActionType.OpenApp:
                             break;
 
                         case NotificationActionType.TextReply:
-                            var nativeAction = this.CreateTextReply(notification.Id, action);
-                            builder.AddAction(nativeAction);
-                            builder.Extras.PutString("ActionId", action.Identifier);
+                            var textReplyAction = this.CreateTextReply(notification, action);
+                            builder.AddAction(textReplyAction);
                             break;
 
+                        case NotificationActionType.None:
                         case NotificationActionType.Destructive:
+                            var destAction = this.CreateAction(notification, action);
+                            builder.AddAction(destAction);
                             break;
 
                         default:
@@ -287,26 +285,45 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual NotificationCompat.Action CreateTextReply(int notificationId, NotificationAction action)
+        static int counter = 100;
+        protected virtual PendingIntent CreateActionIntent(Notification notification, NotificationAction action)
         {
             var intent = this.context.CreateIntent<NotificationBroadcastReceiver>(NotificationBroadcastReceiver.IntentAction);
+            var content = this.serializer.Serialize(notification);
             intent
-                .PutExtra("NotificationId", notificationId)
-                .PutExtra("ActionId", action.Identifier);
+                .PutExtra("Notification", content)
+                .PutExtra("Action", action.Identifier);
 
+            counter++;
             var pendingIntent = PendingIntent.GetBroadcast(
                 this.context.AppContext,
-                100,
+                counter,
                 intent,
                 PendingIntentFlags.UpdateCurrent
             );
+            return pendingIntent;
+        }
 
+
+        protected virtual NotificationCompat.Action CreateAction(Notification notification, NotificationAction action)
+        {
+            var pendingIntent = this.CreateActionIntent(notification, action);
+            var iconId = this.context.GetResourceIdByName(action.Identifier);
+            var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
+            
+            return nativeAction;
+        }
+
+
+        protected virtual NotificationCompat.Action CreateTextReply(Notification notification, NotificationAction action)
+        {
+            var pendingIntent = this.CreateActionIntent(notification, action);
             var input = new RemoteInput.Builder("Result")
                 .SetLabel(action.Title)
                 .Build();
 
-            //this.context.GetResourceIdByName(action.Identifier)
-            var nativeAction = new NotificationCompat.Action.Builder(0, action.Title, pendingIntent)
+            var iconId = this.context.GetResourceIdByName(action.Identifier);
+            var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
                 .SetAllowGeneratedReplies(true)
                 .AddRemoteInput(input)
                 .Build();

@@ -23,28 +23,28 @@ namespace Shiny.Notifications
 
         public override void OnReceive(Context context, Intent intent)
         {
-            var bundle = RemoteInput.GetResultsFromIntent(intent);
-            if (bundle != null)
-            {
-                var text = bundle.GetString("Result");
-                var actionId = intent.GetStringExtra("ActionId");
-                var notificationId = intent.GetIntExtra("NotificationId", 0);
-                
-                this.Execute(async () =>
-                {
-                    var manager = ShinyHost.Resolve<INotificationManager>();
-                    var repo = ShinyHost.Resolve<IRepository>();
-                    var notification = await repo.Get<Notification>(notificationId.ToString());
-                    await manager.Cancel(notificationId);
+            var ndelegate = ShinyHost.Resolve<INotificationDelegate>();
+            if (ndelegate == null)
+                return;
 
-                    if (notification != null)
-                    {
-                        var ndelegate = ShinyHost.Resolve<INotificationDelegate>();
-                        if (ndelegate != null)
-                            await ndelegate.OnEntry(new NotificationResponse(notification, actionId, text));
-                    }
-                });
-            }
+            this.Execute(async () =>
+            {
+                var manager = ShinyHost.Resolve<INotificationManager>();
+                var serializer = ShinyHost.Resolve<ISerializer>();
+
+                var stringNotification = intent.GetStringExtra("Notification");
+                var action = intent.GetStringExtra("Action");
+                var notification = serializer.Deserialize<Notification>(stringNotification);
+                var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
+
+                ShinyHost
+                    .Resolve<AndroidContext>()
+                    .AppContext
+                    .SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
+
+                await ndelegate.OnEntry(new NotificationResponse(notification, action, text));
+                await manager.Cancel(notification.Id);
+            });
         }
     }
 }
