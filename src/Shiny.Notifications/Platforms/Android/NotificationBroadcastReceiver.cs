@@ -32,9 +32,10 @@ namespace Shiny.Notifications
                 
                 this.Execute(async () =>
                 {
-                    var notification = await ShinyHost
-                        .Resolve<IRepository>()
-                        .Get<Notification>(notificationId.ToString());
+                    var manager = ShinyHost.Resolve<INotificationManager>();
+                    var repo = ShinyHost.Resolve<IRepository>();
+                    var notification = await repo.Get<Notification>(notificationId.ToString());
+                    await manager.Cancel(notificationId);
 
                     if (notification != null)
                     {

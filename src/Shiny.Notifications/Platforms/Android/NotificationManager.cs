@@ -67,8 +67,12 @@ namespace Shiny.Notifications
             .TryProcessIntent(intent);
 
 
-        public Task Cancel(int id)
-            => this.repository.Remove<Notification>(id.ToString());
+        public async Task Cancel(int id)
+        {
+            this.newManager?.Cancel(id);
+            this.compatManager?.Cancel(id);
+            await this.repository.Remove<Notification>(id.ToString());
+        }
 
 
         public async Task Clear()
@@ -115,12 +119,15 @@ namespace Shiny.Notifications
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
-            if (!notification.Category.IsEmpty())
-                this.AddCategory(builder, notification);
-            else
+            if (notification.Category.IsEmpty())
             {
                 var pendingIntent = this.BuildPendingIntent(notification);
                 builder.SetContentIntent(pendingIntent);
+            }
+            else
+            {
+                await this.repository.Set(notification.Id.ToString(), notification);
+                this.AddCategory(builder, notification);
             }
 
             this.AddSound(builder);
