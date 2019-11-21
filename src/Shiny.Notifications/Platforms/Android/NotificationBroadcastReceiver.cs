@@ -38,9 +38,9 @@ namespace Shiny.Notifications
 
                     if (notification != null)
                     {
-                        ShinyHost
-                            .Resolve<INotificationDelegate>()?
-                            .OnEntry(new NotificationResponse(notification, actionId, text));
+                        var ndelegate = ShinyHost.Resolve<INotificationDelegate>();
+                        if (ndelegate != null)
+                            await ndelegate.OnEntry(new NotificationResponse(notification, actionId, text));
                     }
                 });
             }
