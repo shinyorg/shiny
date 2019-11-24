@@ -31,7 +31,7 @@ namespace Shiny.Notifications
         }
 
 
-        static string GetPayload(UNNotificationRequest request)
+        static string? GetPayload(UNNotificationRequest request)
         {
             var userInfo = request?.Content?.UserInfo;
             if (userInfo == null)
