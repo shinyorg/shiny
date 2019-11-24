@@ -25,7 +25,6 @@ namespace Shiny.Notifications
 
             if (native.Trigger is UNCalendarNotificationTrigger calendar)
                 shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
-                // if null, it is firing and it is firing right now
 
             return shiny;
         }
