@@ -11,7 +11,7 @@ namespace Shiny.BluetoothLE.Central
         string Description { get; }
         bool IsNotifying { get; }
         CharacteristicProperties Properties { get; }
-        byte[] Value { get; }
+        byte[]? Value { get; }
 
         /// <summary>
         /// Enable notifications (or indications if available)

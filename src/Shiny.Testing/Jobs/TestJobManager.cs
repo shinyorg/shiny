@@ -9,7 +9,7 @@ namespace Shiny.Testing.Jobs
 {
     public class TestJobManager : IJobManager
     {
-        public bool IsRunning => throw new NotImplementedException();
+        public bool IsRunning { get; set; }
         public event EventHandler<JobInfo> JobStarted;
         public event EventHandler<JobRunResult> JobFinished;
 
@@ -28,6 +28,9 @@ namespace Shiny.Testing.Jobs
 
 
         public AccessState ReturnStatus { get; set; } = AccessState.Available;
+
+        public TimeSpan? MinimumAllowedPeriodicTime => throw new NotImplementedException();
+
         public Task<AccessState> RequestAccess() => Task.FromResult(this.ReturnStatus);
 
 

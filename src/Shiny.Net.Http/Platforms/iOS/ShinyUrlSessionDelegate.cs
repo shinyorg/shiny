@@ -7,10 +7,9 @@ using Shiny.Logging;
 
 namespace Shiny.Net.Http
 {
-    //public class ShinyUrlSessionDelegate : NSObject, INSUrlSessionDownloadDelegate
     public class ShinyUrlSessionDelegate : NSUrlSessionDownloadDelegate
     {
-        internal static Action CompletionHandler { get; set; }
+        internal static Action? CompletionHandler { get; set; }
         readonly Lazy<IHttpTransferDelegate> tdelegate = new Lazy<IHttpTransferDelegate>(() => ShinyHost.Resolve<IHttpTransferDelegate>());
         readonly Subject<HttpTransfer> onEvent;
         readonly HttpTransferManager manager;
@@ -28,7 +27,7 @@ namespace Shiny.Net.Http
 
         public override void DidBecomeInvalid(NSUrlSession session, NSError error)
         {
-            this.manager.Session = null;
+            this.manager.CompleteSession();
             if (error != null)
                 Log.Write(new Exception(error.LocalizedDescription));
         }
@@ -48,7 +47,7 @@ namespace Shiny.Net.Http
 
         public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
         {
-            this.manager.Session = null;
+            this.manager.CompleteSession();
             CompletionHandler?.Invoke();
         }
 
@@ -57,7 +56,7 @@ namespace Shiny.Net.Http
         {
             var transfer = task.FromNative();
 
-            if (task.State != NSUrlSessionTaskState.Canceling && error != null)
+            if (task.State != NSUrlSessionTaskState.Canceling && error != null && transfer.Exception != null)
             {
                 Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
                 await this.tdelegate.Value.OnError(transfer, transfer.Exception);

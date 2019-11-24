@@ -6,6 +6,8 @@ namespace Shiny.Notifications
 
     public class Notification
     {
+        public static string DefaultCategory { get; set; }
+
         public static string DefaultTitle { get; set; }
 
         /// <summary>
@@ -32,6 +34,11 @@ namespace Shiny.Notifications
         /// Scheduled date for notification - leave blank for immediate
         /// </summary>
         public DateTimeOffset? ScheduleDate { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Category { get; set; } = DefaultCategory;
 
         /// <summary>
         /// Additional data you can add to your notification

@@ -22,7 +22,7 @@ namespace Shiny.Locations
         }
 
 
-        public async void Process(IBackgroundTaskInstance taskInstance)
+        public async void Process(string taskName, IBackgroundTaskInstance taskInstance)
         {
             var deferral = taskInstance.GetDeferral();
             // cancellation?
@@ -35,27 +35,16 @@ namespace Shiny.Locations
             foreach (var report in reports)
             {
                 var region = await this.repository.Get<GeofenceRegion>(report.Geofence.Id);
+                if (region != null)
+                {
+                    var newStatus = report.NewState.FromNative();
+                    await Log.SafeExecute(() => this.gdelegate.OnStatusChanged(newStatus, region));
 
-                var newStatus = report.NewState.FromNative();
-                this.FireDelegate(newStatus, region);
-
-                if (region.SingleUse)
-                    await this.repository.Remove<GeofenceRegion>(region.Identifier);
+                    if (region.SingleUse)
+                        await this.repository.Remove<GeofenceRegion>(region.Identifier);
+                }
             }
             deferral.Complete();
-        }
-
-
-        void FireDelegate(GeofenceState state, GeofenceRegion region)
-        {
-            try
-            {
-                this.gdelegate.OnStatusChanged(state, region);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
         }
     }
 }

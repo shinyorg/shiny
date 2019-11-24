@@ -1,11 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Net;
-using Shiny.Power;
+using Shiny.Settings;
 using Android;
-#if ANDROID9
+using Android.App.Job;
+using Android.Content;
+using Java.Lang;
+using JobBuilder = Android.App.Job.JobInfo.Builder;
+#if ANDROIDX
 using AndroidX.Work;
 #endif
 
@@ -14,15 +16,16 @@ namespace Shiny.Jobs
     public class JobManager : AbstractJobManager
     {
         readonly AndroidContext context;
+        readonly ISettings settings;
 
 
         public JobManager(AndroidContext context,
                           IServiceProvider container,
                           IRepository repository,
-                          IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+                          ISettings settings) : base(container, repository, TimeSpan.FromSeconds(30))
         {
             this.context = context;
+            this.settings = settings;
         }
 
 
@@ -43,7 +46,7 @@ namespace Shiny.Jobs
         }
 
 
-        #if ANDROID9
+#if ANDROIDX
 
         public override async Task Schedule(JobInfo jobInfo)
         {
@@ -113,29 +116,47 @@ namespace Shiny.Jobs
             WorkManager.Instance.CancelAllWork();
         }
 
-        #else
-        public override async Task Schedule(JobInfo jobInfo)
+#else
+
+        protected override void ScheduleNative(JobInfo jobInfo)
         {
-            await base.Schedule(jobInfo);
-            this.context.StartJobService();
+            var newJobId = this.settings.IncrementValue("JobId");
+            var builder = new JobBuilder(
+                newJobId,
+                new ComponentName(
+                    context.AppContext,
+                    Class.FromType(typeof(ShinyJobService))
+                )
+            )
+            .SetShinyIdentifier(jobInfo.Identifier)
+            .SetPersisted(true)
+            .SetPeriodic(Convert.ToInt64(jobInfo.PeriodicTime.TotalMilliseconds))
+            .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
+            .SetRequiresCharging(jobInfo.DeviceCharging);
+
+            if (jobInfo.RequiredInternetAccess != InternetAccess.None)
+            {
+                //builder.SetRequiredNetwork(new Android.Net.NetworkRequest { }.HasCapability(Android.Net.NetCapability.Internet).)
+                var networkType = jobInfo.RequiredInternetAccess == InternetAccess.Unmetered
+                    ? NetworkType.Unmetered
+                    : NetworkType.Any;
+                builder.SetRequiredNetworkType(networkType);
+            }
+
+            var nativeJob = builder.Build();
+            this.context.Native().Schedule(nativeJob);
         }
 
 
-        public override async Task Cancel(string jobId)
+        protected override void CancelNative(JobInfo jobInfo)
         {
-            await base.Cancel(jobId);
-            var jobs = await this.Repository.GetAll<JobInfo>();
-            if (!jobs.Any())
-                this.context.StopJobService();
+            var native = this.context.Native();
+            var nativeJob = native.GetNativeJobByShinyId(jobInfo.Identifier);
+
+            if (nativeJob != null)
+                native.Cancel(nativeJob.Id);
         }
 
-
-        public override async Task CancelAll()
-        {
-            await base.CancelAll();
-            this.context.StopJobService();
-        }
-
-        #endif
+#endif
     }
 }

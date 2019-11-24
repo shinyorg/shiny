@@ -66,7 +66,7 @@ namespace Shiny.Net.Http
 
         public static HttpTransfer ToLib(this ICursor cursor)
         {
-            Exception exception = null;
+            Exception? exception = null;
             var status = HttpTransferState.Unknown;
             var useMetered = true;
             var id = cursor.GetLong(Native.ColumnId).ToString();

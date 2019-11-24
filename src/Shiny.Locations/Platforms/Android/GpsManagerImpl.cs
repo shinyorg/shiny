@@ -29,7 +29,7 @@ namespace Shiny.Locations
         public bool IsListening { get; private set; }
 
 
-        public IObservable<IGpsReading> GetLastReading() => Observable.FromAsync(async () =>
+        public IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>
         {
             var access = await this.RequestAccess(false);
             access.Assert();

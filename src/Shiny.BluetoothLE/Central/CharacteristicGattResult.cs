@@ -5,7 +5,7 @@ namespace Shiny.BluetoothLE.Central
 {
     public class CharacteristicGattResult
     {
-        public CharacteristicGattResult(IGattCharacteristic characteristic, byte[] data)
+        public CharacteristicGattResult(IGattCharacteristic characteristic, byte[]? data)
         {
             this.Characteristic = characteristic;
             this.Data = data;
@@ -13,6 +13,6 @@ namespace Shiny.BluetoothLE.Central
 
 
         public IGattCharacteristic Characteristic { get; }
-        public byte[] Data { get; }
+        public byte[]? Data { get; }
     }
 }

@@ -28,13 +28,13 @@ namespace Shiny.Settings
         protected abstract IDictionary<string, string> NativeValues();
 
 
-        public event EventHandler<SettingChangeEventArgs> Changed;
+        public event EventHandler<SettingChangeEventArgs>? Changed;
 
         public List<string> KeysNotToClear { get; set; }
-        public virtual IReadOnlyDictionary<string, string> List { get; protected set; }
+        public virtual IReadOnlyDictionary<string, string>? List { get; protected set; }
 
 
-        public virtual object GetValue(Type type, string key, object defaultValue = null)
+        public virtual object? GetValue(Type type, string key, object? defaultValue = null)
         {
             try
             {
@@ -120,7 +120,9 @@ namespace Shiny.Settings
                 if (isDefault)
                 {
                     if (typeof(T).IsNullable())
+                    {
                         this.Remove(key);
+                    }
                     else
                     {
                         var type = this.UnwrapType(typeof(T));

@@ -31,18 +31,14 @@ namespace Shiny.Sensors
         }
 
 
-        IObservable<MotionReading> readOb;
+        IObservable<MotionReading>? readOb;
         public IObservable<MotionReading> WhenReadingTaken()
-        {
-            this.readOb = this.readOb ?? Observable.Create<MotionReading>(ob =>
+            => this.readOb ??= Observable.Create<MotionReading>(ob =>
             {
                 this.Start(this.motionManager, ob);
                 return () => this.Stop(this.motionManager);
             })
             .Publish()
             .RefCount();
-
-            return this.readOb;
-        }
     }
 }

@@ -89,10 +89,8 @@ namespace Shiny.Net.Http
                 HttpMethod = request.HttpMethod.ToString(),
                 Headers = request.Headers
             });
-            await this.jobManager.Schedule(new JobInfo
+            await this.jobManager.Schedule(new JobInfo(typeof(TransferJob), id)
             {
-                Identifier = id,
-                Type = typeof(TransferJob),
                 RequiredInternetAccess = InternetAccess.Any,
                 Repeat = true
             });

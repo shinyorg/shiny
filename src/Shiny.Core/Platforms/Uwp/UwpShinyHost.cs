@@ -17,7 +17,7 @@ namespace Shiny
         const string MODULE_KEY = "ShinyPlatformModuleTypeName";
 
 
-        public static void Init(IShinyStartup startup = null, IShinyModule platformModule = null)
+        public static void Init(IShinyStartup? startup = null, IShinyModule? platformModule = null)
             => InitPlatform(startup, services =>
             {
                 services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
@@ -31,10 +31,12 @@ namespace Shiny
                 services.TryAddSingleton<IBackgroundTaskProcessor, JobBackgroundTaskProcessor>();
 
                 if (platformModule != null)
+                {
                     services.RegisterModule(platformModule);
-
-                Dehydrate(STARTUP_KEY, startup);
-                Dehydrate(MODULE_KEY, platformModule);
+                    Dehydrate(MODULE_KEY, platformModule);
+                }
+                if (startup != null)
+                    Dehydrate(STARTUP_KEY, startup);
             });
 
 

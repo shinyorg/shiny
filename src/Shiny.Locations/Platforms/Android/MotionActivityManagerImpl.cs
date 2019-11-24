@@ -20,6 +20,7 @@ namespace Shiny.Locations
         readonly AndroidContext context;
         readonly AndroidSqliteDatabase database;
         readonly IMessageBus messageBus;
+        PendingIntent? pendingIntent;
 
 
         public MotionActivityManagerImpl(AndroidContext context,
@@ -81,7 +82,6 @@ ORDER BY
             => this.messageBus.Listener<MotionActivityEvent>();
 
 
-        PendingIntent pendingIntent;
         protected virtual PendingIntent GetPendingIntent()
         {
             if (this.pendingIntent != null)

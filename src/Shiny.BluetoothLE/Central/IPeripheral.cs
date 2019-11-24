@@ -39,7 +39,7 @@ namespace Shiny.BluetoothLE.Central
         /// Connect to a peripheral
         /// </summary>
         /// <param name="config">Connection configuration</param>
-        void Connect(ConnectionConfig config = null);
+        void Connect(ConnectionConfig? config = null);
 
         /// <summary>
         /// Disconnect from the peripheral and cancel persistent connection

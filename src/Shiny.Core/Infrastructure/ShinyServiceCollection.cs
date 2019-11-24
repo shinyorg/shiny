@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Settings;
 
@@ -26,7 +27,8 @@ namespace Shiny.Infrastructure.DependencyInjection
 
         public void RunPostBuildActions(IServiceProvider container)
         {
-            foreach (var action in ShinyHost.PostBuildActions)
+            var actions = ShinyHost.PostBuildActions.ToList();
+            foreach (var action in actions)
                 action(container);
 
             ShinyHost.PostBuildActions.Clear();

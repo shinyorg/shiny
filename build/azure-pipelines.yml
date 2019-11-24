@@ -5,10 +5,8 @@ trigger:
     - dev
     - rel/*
   paths:
-    exclude:
-    - README.md
-    - .editorconfig
-    - .gitignore
+    include:
+    - src
 
 pr:
   branches:
@@ -16,22 +14,17 @@ pr:
     - master
     - dev
   paths:
-    exclude:
-    - README.md
-    - .editorconfig
-    - .gitignore
+    include:
+    - src
 
 name: $(Build.BuildId)
 
 variables:
-- name: BuildConfiguration
-  value: 'Release'
-- name: TargetSolution
-  value: 'DemoDevOps.sln'
-- group: DemoDevOps-Secrets
-- group: iOS-Signing
-- group: AndroidSigning
-
+  BuildConfiguration: 'Release'
+  major: '1'
+  minor: '0'
+  app_version: '$(major).$(minor).$(revision)'
+  
 stages:
 - stage: QA
   displayName: QA

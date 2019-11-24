@@ -5,7 +5,7 @@ namespace Shiny
 {
     public static class GeneralExtensions
     {
-        public static void Assert(this AccessState state, string message = null, bool allowRestricted = false)
+        public static void Assert(this AccessState state, string? message = null, bool allowRestricted = false)
         {
             if (state == AccessState.Available)
                 return;

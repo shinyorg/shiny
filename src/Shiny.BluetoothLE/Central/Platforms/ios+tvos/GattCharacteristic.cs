@@ -16,14 +16,15 @@ namespace Shiny.BluetoothLE.Central
         public CBCharacteristic NativeCharacteristic { get; }
 
 
-        public GattCharacteristic(GattService service, CBCharacteristic native) : base(service, native.UUID.ToGuid(), (CharacteristicProperties)(int)native.Properties)
+        public GattCharacteristic(GattService service, CBCharacteristic native)
+            : base(service, native.UUID.ToGuid(), (CharacteristicProperties)(int)native.Properties)
         {
             this.serivceObj = service;
             this.NativeCharacteristic = native;
         }
 
 
-        public override byte[] Value => this.NativeCharacteristic.Value?.ToArray();
+        public override byte[]? Value => this.NativeCharacteristic.Value?.ToArray();
 
 
         public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse)
@@ -66,7 +67,7 @@ namespace Shiny.BluetoothLE.Central
 
         IObservable<CharacteristicGattResult> NewInternalWrite(byte[] value) => Observable.Create<CharacteristicGattResult>(ob =>
         {
-            EventHandler handler = null;
+            EventHandler? handler = null;
             if (this.Peripheral.CanSendWriteWithoutResponse)
             {
                 ob.Respond(this.DoWriteNoResponse(value));

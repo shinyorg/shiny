@@ -4,63 +4,32 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
+using Shiny.Jobs.Infrastructure;
 using Shiny.Logging;
-using Shiny.Net;
-using Shiny.Power;
 
 
 namespace Shiny.Jobs
 {
     public abstract class AbstractJobManager : IJobManager
     {
+        readonly IRepository repository;
         readonly IServiceProvider container;
-        readonly IPowerManager powerManager;
-        readonly IConnectivity connectivity;
 
 
         protected AbstractJobManager(IServiceProvider container,
                                      IRepository repository,
-                                     IPowerManager powerManager,
-                                     IConnectivity connectivity)
+                                     TimeSpan? minAllowedPeriodicTime)
         {
             this.container = container;
-            this.Repository = repository;
-            this.powerManager = powerManager;
-            this.connectivity = connectivity;
+            this.repository = repository;
+            this.MinimumAllowedPeriodicTime = minAllowedPeriodicTime;
+
         }
 
 
-        protected IRepository Repository { get; }
-
-
-        protected virtual bool CheckCriteria(JobInfo job)
-        {
-            var pluggedIn = this.powerManager.IsPluggedIn();
-            if (job.DeviceCharging && !pluggedIn)
-                return false;
-
-            if (job.BatteryNotLow && !pluggedIn && this.powerManager.BatteryLevel <= 0.2)
-                return false;
-
-            if (job.RequiredInternetAccess == InternetAccess.None)
-                return true;
-
-            var hasInternet = this.connectivity.IsInternetAvailable();
-            var directConnect = this.connectivity.IsDirectConnect();
-
-            switch (job.RequiredInternetAccess)
-            {
-                case InternetAccess.None:
-                    return true;
-
-                case InternetAccess.Unmetered:
-                    return hasInternet && directConnect;
-
-                case InternetAccess.Any:
-                default:
-                    return hasInternet;
-            }
-        }
+        public abstract Task<AccessState> RequestAccess();
+        protected abstract void ScheduleNative(JobInfo jobInfo);
+        protected abstract void CancelNative(JobInfo jobInfo);
 
 
         public virtual async void RunTask(string taskName, Func<CancellationToken, Task> task)
@@ -81,48 +50,84 @@ namespace Shiny.Jobs
         public virtual async Task<JobRunResult> Run(string jobName, CancellationToken cancelToken)
         {
             JobRunResult result = default;
+            JobInfo actual = null;
             try
             {
-                var job = await this.Repository.Get<JobInfo>(jobName);
+                var job = await this.repository.Get<PersistJobInfo>(jobName);
                 if (job == null)
                     throw new ArgumentException("No job found named " + jobName);
 
-                result = await this.RunJob(job, cancelToken).ConfigureAwait(false);
+                actual = PersistJobInfo.FromPersist(job);
+                result = await this.RunJob(actual, cancelToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Log.Write(ex);
-                result = new JobRunResult(false, new JobInfo
-                {
-                    Identifier = jobName
-                }, ex);
+                result = new JobRunResult(false, actual, ex);
             }
 
             return result;
         }
 
 
-        public abstract Task<AccessState> RequestAccess();
-        public virtual async Task<IEnumerable<JobInfo>> GetJobs() => await this.Repository.GetAll<JobInfo>();
-        public Task<JobInfo> GetJob(string jobName) => this.Repository.Get<JobInfo>(jobName);
-        public virtual Task Cancel(string jobName) => this.Repository.Remove<JobInfo>(jobName);
-        public virtual Task CancelAll() => this.Repository.Clear<JobInfo>();
-        public bool IsRunning { get; protected set; }
-        public event EventHandler<JobInfo> JobStarted;
-        public event EventHandler<JobRunResult> JobFinished;
-
-
-        public virtual async Task Schedule(JobInfo jobInfo)
+        public async Task<IEnumerable<JobInfo>> GetJobs()
         {
-            jobInfo.AssertValid();
-
-            // we do a force resolve here to ensure all is good
-            this.ResolveJob(jobInfo);
-            await this.Repository.Set(jobInfo.Identifier, jobInfo);
+            var jobs = await this.repository.GetAll<PersistJobInfo>();
+            return jobs.Select(PersistJobInfo.FromPersist);
         }
 
 
-        public virtual async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken)
+        public async Task<JobInfo?> GetJob(string jobName)
+        {
+            var job = await this.repository.Get<PersistJobInfo>(jobName);
+            if (job == null)
+                return null;
+
+            return PersistJobInfo.FromPersist(job);
+        }
+
+
+        public async Task Cancel(string jobIdentifier)
+        {
+            var job = await this.repository.Get<PersistJobInfo>(jobIdentifier);
+            if (job != null)
+            {
+                this.CancelNative(PersistJobInfo.FromPersist(job));
+                await this.repository.Remove<PersistJobInfo>(jobIdentifier);
+            }
+        }
+
+
+        public virtual async Task CancelAll()
+        {
+            var jobs = await this.repository.GetAllWithKeys<PersistJobInfo>();
+            foreach (var job in jobs)
+            {
+                if (!job.Value.IsSystemJob)
+                {
+                    this.CancelNative(PersistJobInfo.FromPersist(job.Value));
+                    await this.repository.Remove<PersistJobInfo>(job.Key);
+                }
+            }
+        }
+
+
+        public bool IsRunning { get; protected set; }
+        public TimeSpan? MinimumAllowedPeriodicTime { get; }
+        public event EventHandler<JobInfo>? JobStarted;
+        public event EventHandler<JobRunResult>? JobFinished;
+
+
+        public async Task Schedule(JobInfo jobInfo)
+        {
+            jobInfo.AssertValid();
+            this.ResolveJob(jobInfo);
+            this.ScheduleNative(jobInfo);
+            await this.repository.Set(jobInfo.Identifier, PersistJobInfo.ToPersist(jobInfo));
+        }
+
+
+        public async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken)
         {
             var list = new List<JobRunResult>();
 
@@ -131,13 +136,13 @@ namespace Shiny.Jobs
                 try
                 {
                     this.IsRunning = true;
-                    var jobs = await this.Repository.GetAll<JobInfo>();
+                    var jobs = await this.repository.GetAll<PersistJobInfo>();
                     var tasks = new List<Task<JobRunResult>>();
 
                     foreach (var job in jobs)
                     {
-                        if (this.CheckCriteria(job))
-                            tasks.Add(this.RunJob(job, cancelToken));
+                        var actual = PersistJobInfo.FromPersist(job);
+                        tasks.Add(this.RunJob(actual, cancelToken));
                     }
 
                     await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -156,7 +161,7 @@ namespace Shiny.Jobs
         }
 
 
-        protected virtual async Task<JobRunResult> RunJob(JobInfo job, CancellationToken cancelToken)
+        protected async Task<JobRunResult> RunJob(JobInfo job, CancellationToken cancelToken)
         {
             this.JobStarted?.Invoke(this, job);
             var result = default(JobRunResult);
@@ -189,7 +194,7 @@ namespace Shiny.Jobs
                 if (!cancel)
                 {
                     job.LastRunUtc = DateTime.UtcNow;
-                    await this.Repository.Set(job.Identifier, job);
+                    await this.repository.Set(job.Identifier, PersistJobInfo.ToPersist(job));
                 }
             }
             this.JobFinished?.Invoke(this, result);
@@ -203,7 +208,7 @@ namespace Shiny.Jobs
 
         protected virtual void LogJob(JobState state,
                                       JobInfo job,
-                                      Exception exception = null)
+                                      Exception? exception = null)
         {
             if (exception == null)
                 Log.Write("Jobs", state == JobState.Finish ? "Job Success" : $"Job {state}", ("JobName", job.Identifier));
@@ -212,7 +217,7 @@ namespace Shiny.Jobs
         }
 
 
-        protected virtual void LogTask(JobState state, string taskName, Exception exception = null)
+        protected virtual void LogTask(JobState state, string taskName, Exception? exception = null)
         {
             if (exception == null)
                 Log.Write("Jobs", state == JobState.Finish ? "Task Success" : $"Task {state}", ("TaskName", taskName));

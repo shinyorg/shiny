@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Description>Shiny Reactive BluetoothLE Plugin for client and gatt server</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>        
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,9 +23,10 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications.UwpSupport\Shiny.Notifications.UwpSupport.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">

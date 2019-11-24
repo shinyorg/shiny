@@ -4,8 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Logging;
-using Shiny.Net;
-using Shiny.Power;
 using UIKit;
 
 
@@ -19,15 +17,14 @@ namespace Shiny.Jobs
         public static double? BackgroundFetchInterval { get; set;}
 
 
-        public JobManager(IServiceProvider container,
-                          IRepository repository,
-                          IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository, TimeSpan.FromMinutes(15))
         {
+            //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
         }
 
 
-        protected override bool CheckCriteria(JobInfo job) => true;
+        protected override void ScheduleNative(JobInfo jobInfo) { }
+        protected override void CancelNative(JobInfo jobInfo) { }
 
 
         public override Task<AccessState> RequestAccess()
@@ -58,6 +55,7 @@ namespace Shiny.Jobs
 
             return Task.FromResult(grantResult);
         }
+
 
 
         public override async Task<JobRunResult> Run(string jobName, CancellationToken cancelToken)

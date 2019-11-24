@@ -99,7 +99,6 @@ namespace Shiny.SpeechRecognition
                 {
                     currentIndex = 0;
                     speechRecognizer.Destroy();
-                    speechRecognizer = null;
 
                     speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.context.AppContext);
                     speechRecognizer.SetRecognitionListener(listener);
@@ -119,7 +118,6 @@ namespace Shiny.SpeechRecognition
                                 return;
 
                             speechRecognizer.Destroy();
-                            speechRecognizer = null;
 
                             speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.context.AppContext);
                             speechRecognizer.SetRecognitionListener(listener);

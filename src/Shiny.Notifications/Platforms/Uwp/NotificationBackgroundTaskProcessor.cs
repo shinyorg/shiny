@@ -20,7 +20,7 @@ namespace Shiny.Notifications
         }
 
 
-        public async void Process(IBackgroundTaskInstance taskInstance)
+        public async void Process(string taskName, IBackgroundTaskInstance taskInstance)
         {
             var deferral = taskInstance.GetDeferral();
 

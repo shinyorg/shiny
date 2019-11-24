@@ -6,6 +6,10 @@ pool:
   - xcode
   - Xamarin.iOS
 
+variables:
+  MONO_VERSION: '6_4_0'
+  NETCORE_VERSION: '3.0.x'
+  XCODE_VERSION: 11
 #Your build pipeline references an undefined variable named ‘p12Password’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
 
 steps:

@@ -9,6 +9,12 @@ namespace Shiny.Jobs
     public interface IJobManager
     {
         /// <summary>
+        /// This is the minimum time allowed by the operating system
+        /// </summary>
+        TimeSpan? MinimumAllowedPeriodicTime { get; }
+
+
+        /// <summary>
         /// Runs a one time, adhoc task - on iOS, it will initiate a background task
         /// </summary>
         /// <param name="taskName"></param>
@@ -63,7 +69,7 @@ namespace Shiny.Jobs
         /// </summary>
         /// <param name="jobIdentifier"></param>
         /// <returns></returns>
-        Task<JobInfo> GetJob(string jobIdentifier);
+        Task<JobInfo?> GetJob(string jobIdentifier);
 
 
         /// <summary>

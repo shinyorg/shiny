@@ -31,9 +31,9 @@ namespace Shiny.Infrastructure
         }
 
 
-        public async Task<T> Get<T>(string key) where T : class
+        public async Task<T?> Get<T>(string key) where T : class
         {
-            T result = null;
+            T? result = null;
             await this.InTransaction(typeof(T), list =>
             {
                 if (list.ContainsKey(key))

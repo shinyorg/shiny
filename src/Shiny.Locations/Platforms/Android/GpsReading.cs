@@ -21,6 +21,9 @@ namespace Shiny.Locations
         public double Speed => this.location.Speed;
         public Position Position { get; }
         public double PositionAccuracy => this.location.Accuracy;
-        public DateTime Timestamp => DateTime.UtcNow; // TODO
+
+
+        DateTime? time;
+        public DateTime Timestamp => this.time ??= DateTimeOffset.FromUnixTimeMilliseconds(this.location.Time).UtcDateTime;
     }
 }

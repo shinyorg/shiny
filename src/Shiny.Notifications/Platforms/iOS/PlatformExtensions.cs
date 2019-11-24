@@ -17,8 +17,11 @@ namespace Shiny.Notifications
                 Id = i,
                 Title = native.Content?.Title,
                 Message = native.Content?.Body,
-                Payload = GetPayload(native)
+                Payload = GetPayload(native),
+                BadgeCount = native.Content?.Badge.Int32Value
             };
+            //UNUserNotificationCenter.Current.GetNotificationCategoriesAsync();
+            //native.Content.CategoryIdentifier
 
             if (native.Trigger is UNCalendarNotificationTrigger calendar)
                 shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;

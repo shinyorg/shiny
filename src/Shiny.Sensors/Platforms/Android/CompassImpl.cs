@@ -13,30 +13,18 @@ namespace Shiny.Sensors
     {
         readonly object syncLock;
         readonly SensorManager sensorManager;
+        readonly IObservable<CompassReading> readOb;
         readonly float[] rMatrix = new float[9];
         readonly float[] orientation = new float[3];
-        float[] lastAccel;
-        float[] lastMag;
+        float[]? lastAccel;
+        float[]? lastMag;
 
 
         public CompassImpl()
         {
             this.syncLock = new object();
             this.sensorManager = (SensorManager)Application.Context.GetSystemService(Context.SensorService);
-        }
-
-
-        public bool IsAvailable => this.sensorManager.GetDefaultSensor(SensorType.Accelerometer) != null &&
-                                   this.sensorManager.GetDefaultSensor(SensorType.MagneticField) != null;
-
-
-        IObservable<CompassReading> readOb;
-        public IObservable<CompassReading> WhenReadingTaken()
-        {
-            if (!this.IsAvailable)
-                return Observable.Empty<CompassReading>();
-
-            this.readOb = this.readOb ?? Observable.Create<CompassReading>(ob =>
+            this.readOb = Observable.Create<CompassReading>(ob =>
             {
                 var accelMgr = new ShinySensorManager(this.sensorManager);
                 var magMgr = new ShinySensorManager(this.sensorManager);
@@ -64,9 +52,12 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.readOb;
         }
+
+
+        public bool IsAvailable => this.sensorManager.GetDefaultSensor(SensorType.Accelerometer) != null &&
+                                   this.sensorManager.GetDefaultSensor(SensorType.MagneticField) != null;
+        public IObservable<CompassReading> WhenReadingTaken() => this.IsAvailable ? this.readOb : Observable.Empty<CompassReading>();
 
 
         void Calc(IObserver<CompassReading> ob)

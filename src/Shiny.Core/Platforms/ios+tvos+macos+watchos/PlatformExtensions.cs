@@ -60,10 +60,13 @@ namespace Shiny
             if (info.ContainsKey(key))
             {
                 var array = info[key] as NSArray;
-                for (nuint i = 0; i < array.Count; i++)
+                if (array != null)
                 {
-                    if (array.GetItem<NSString>(i) == mode)
-                        return true;
+                    for (nuint i = 0; i < array.Count; i++)
+                    {
+                        if (array.GetItem<NSString>(i) == mode)
+                            return true;
+                    }
                 }
             }
             return false;

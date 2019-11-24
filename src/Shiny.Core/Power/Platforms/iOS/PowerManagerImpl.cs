@@ -8,7 +8,7 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
-        CompositeDisposable dispose;
+        CompositeDisposable? dispose;
 
 
         protected override void OnNpcHookChanged(bool hasSubscribers)

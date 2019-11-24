@@ -11,8 +11,7 @@ namespace Shiny.Locations
         Name = GpsManagerImpl.ReceiverName,
         Exported = true
     )]
-    [IntentFilter(new []
-    {
+    [IntentFilter(new [] {
         GpsManagerImpl.IntentAction
     })]
     public class GpsBroadcastReceiver : BroadcastReceiver

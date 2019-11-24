@@ -20,11 +20,10 @@ namespace Shiny.Locations
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
         readonly AndroidContext context;
         readonly GeofencingClient client;
-        PendingIntent geofencePendingIntent;
+        PendingIntent? geofencePendingIntent;
 
 
-        public GeofenceManagerImpl(AndroidContext context,
-                                   IRepository repository) : base(repository)
+        public GeofenceManagerImpl(AndroidContext context, IRepository repository) : base(repository)
         {
             this.context = context;
             this.client = LocationServices.GetGeofencingClient(this.context.AppContext);

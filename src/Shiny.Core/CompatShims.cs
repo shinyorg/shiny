@@ -30,7 +30,7 @@ namespace Shiny
         }
         public static Task Cancel(string jobName) => Current.Cancel(jobName);
         public static Task CancelAll() => Current.CancelAll();
-        public static Task<JobInfo> GetJob(string jobIdentifier) => Current.GetJob(jobIdentifier);
+        public static Task<JobInfo?> GetJob(string jobIdentifier) => Current.GetJob(jobIdentifier);
         public static Task<IEnumerable<JobInfo>> GetJobs() => Current.GetJobs();
         public static Task<AccessState> RequestAccess() => Current.RequestAccess();
         public static Task<JobRunResult> Run(string jobIdentifier, CancellationToken cancelToken = default) => Current.Run(jobIdentifier, cancelToken);
@@ -92,7 +92,7 @@ namespace Shiny
         public static bool Contains(string key) => Current.Contains(key);
         public static T Get<T>(string key, T defaultValue = default) => Current.Get(key, defaultValue);
         public static T GetRequired<T>(string key) => Current.GetRequired<T>(key);
-        public static object GetValue(Type type, string key, object defaultValue = null) => Current.GetValue(type, key, defaultValue);
+        public static object? GetValue(Type type, string key, object? defaultValue = null) => Current.GetValue(type, key, defaultValue);
         public static bool Remove(string key) => Current.Remove(key);
         public static void Set<T>(string key, T value) => Current.Set(key, value);
         public static bool SetDefault<T>(string key, T value) => Current.SetDefault(key, value);

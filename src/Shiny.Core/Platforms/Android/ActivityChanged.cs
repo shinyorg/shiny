@@ -18,7 +18,7 @@ namespace Shiny
 
     public class ActivityChanged
     {
-        public ActivityChanged(Activity activity, ActivityState state, Bundle stateBundle)
+        public ActivityChanged(Activity activity, ActivityState state, Bundle? stateBundle)
         {
             this.Activity = activity;
             this.Status = state;
@@ -28,6 +28,6 @@ namespace Shiny
 
         public Activity Activity { get; }
         public ActivityState Status { get; }
-        public Bundle Bundle { get; }
+        public Bundle? Bundle { get; }
     }
 }

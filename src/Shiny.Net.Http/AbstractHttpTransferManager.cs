@@ -12,7 +12,7 @@ namespace Shiny.Net.Http
         public abstract Task Cancel(string id);
 
 
-        public virtual async Task Cancel(QueryFilter filter = null)
+        public virtual async Task Cancel(QueryFilter? filter = null)
         {
             var transfers = await this
                 .GetTransfers(filter)
@@ -30,7 +30,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public virtual async Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null)
+        public virtual async Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter? filter = null)
         {
             filter = filter ?? new QueryFilter();
             switch (filter.Direction)

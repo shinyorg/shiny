@@ -8,7 +8,7 @@ namespace Shiny.Power
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
         readonly AndroidContext context;
-        IDisposable dispose;
+        IDisposable? dispose;
 
 
         public PowerManagerImpl(AndroidContext context)

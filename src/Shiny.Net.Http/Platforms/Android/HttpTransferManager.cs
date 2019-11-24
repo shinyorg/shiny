@@ -4,18 +4,19 @@ using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Shiny.Infrastructure;
+using Shiny.Jobs;
 using Android;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
-using Shiny.Infrastructure;
-using Shiny.Jobs;
-using Android.OS;
+
 
 namespace Shiny.Net.Http
 {
     public class HttpTransferManager : HttpClientHttpTransferManager
     {
         readonly AndroidContext context;
+        IObservable<HttpTransfer>? httpObs;
 
 
         public HttpTransferManager(AndroidContext context,
@@ -37,13 +38,13 @@ namespace Shiny.Net.Http
         }
 
 
-        IObservable<HttpTransfer> httpObs;
+
         public override IObservable<HttpTransfer> WhenUpdated()
         {
             // TODO: cancel/error, should remove from db
             var query = new QueryFilter().ToNative();
 
-            this.httpObs = this.httpObs ?? Observable
+            this.httpObs ??= Observable
                 .Create<HttpTransfer>(ob =>
                 {
                     var lastRun = DateTime.UtcNow;
@@ -135,7 +136,6 @@ namespace Shiny.Net.Http
         }
 
 
-        private PowerManager.WakeLock wakeLock;
         static Android.Net.Uri ToNativeUri(string filePath)
         {
             var native = new Java.IO.File(filePath);

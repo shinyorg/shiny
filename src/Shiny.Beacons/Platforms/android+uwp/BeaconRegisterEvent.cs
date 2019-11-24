@@ -14,7 +14,7 @@ namespace Shiny.Beacons
 
     public class BeaconRegisterEvent
     {
-        public BeaconRegisterEvent(BeaconRegisterEventType eventType, BeaconRegion region = null)
+        public BeaconRegisterEvent(BeaconRegisterEventType eventType, BeaconRegion? region = null)
         {
             this.Type = eventType;
             this.Region = region;
@@ -22,6 +22,6 @@ namespace Shiny.Beacons
 
 
         public BeaconRegisterEventType Type { get; }
-        public BeaconRegion Region { get; }
+        public BeaconRegion? Region { get; }
     }
 }

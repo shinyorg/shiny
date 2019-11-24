@@ -19,7 +19,7 @@ namespace Shiny.BluetoothLE.Central
         public static bool IsL2CapAvailable(this IPeripheral peripheral) => peripheral is IL2CapSupport;
 
 
-        public static IObservable<IChannel> OpenChannel(this IPeripheral peripheral, int psm)
+        public static IObservable<IChannel>? OpenChannel(this IPeripheral peripheral, int psm)
         {
             if (peripheral is IL2CapSupport support)
                 return support.OpenChannel(psm);

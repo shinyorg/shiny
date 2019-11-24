@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reactive;
-using System.Reactive.Linq;
 using Android.Bluetooth;
 using Shiny.BluetoothLE.Peripherals;
 using Android.Content;
@@ -11,6 +9,19 @@ namespace Shiny.BluetoothLE
 {
     public static class Extensions
     {
+        public static AccessState GetAccessState(this BluetoothManager bluetoothManager)
+        {
+            var ad = bluetoothManager?.Adapter;
+            if (ad == null)
+                return AccessState.NotSupported;
+
+            if (!ad.IsEnabled)
+                return AccessState.Disabled;
+
+            return ad.State.FromNative();
+        }
+
+
         public static AccessState FromNative(this State state)
         {
             switch (state)

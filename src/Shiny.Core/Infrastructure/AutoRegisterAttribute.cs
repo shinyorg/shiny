@@ -13,7 +13,7 @@ namespace Shiny.Infrastructure
         public abstract void Register(IServiceCollection services);
 
 
-        static List<Type> typeCache;
+        static List<Type>? typeCache;
 
         protected virtual Type FindImplementationType(Type delegateInterfaceType, bool required)
         {
@@ -57,13 +57,10 @@ namespace Shiny.Infrastructure
 
         static void EnsureTypeCache()
         {
-            if (typeCache == null)
-            { 
-                typeCache = AssemblyQueries
-                    .GetAssumedUserTypes()
-                    .Where(typeof(IShinyDelegate).IsAssignableFrom)
-                    .ToList();
-            }
+            typeCache ??= AssemblyQueries
+                .GetAssumedUserTypes()
+                .Where(typeof(IShinyDelegate).IsAssignableFrom)
+                .ToList();
         }
     }
 }

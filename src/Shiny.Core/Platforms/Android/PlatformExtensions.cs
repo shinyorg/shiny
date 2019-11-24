@@ -8,7 +8,7 @@ namespace Shiny
 {
     public static class PlatformExtensions
     {
-        static Handler handler;
+        static Handler? handler;
 
 
         //        public static void ConfigureJobs(this IServiceCollection services)

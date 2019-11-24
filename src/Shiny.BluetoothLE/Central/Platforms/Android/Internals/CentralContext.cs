@@ -8,6 +8,7 @@ using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.OS;
 using ScanMode = Android.Bluetooth.LE.ScanMode;
+using Shiny.Logging;
 
 
 namespace Shiny.BluetoothLE.Central.Internals
@@ -15,13 +16,16 @@ namespace Shiny.BluetoothLE.Central.Internals
     public class CentralContext
     {
         readonly ConcurrentDictionary<string, IPeripheral> devices;
-        readonly Subject<AccessState> statusSubject;
         readonly Subject<NamedMessage<IPeripheral>> peripheralSubject;
         readonly Lazy<IBleCentralDelegate> sdelegate;
+        readonly IMessageBus messageBus;
         LollipopScanCallback callbacks;
 
 
-        public CentralContext(IServiceProvider serviceProvider, AndroidContext context, BleCentralConfiguration config)
+        public CentralContext(IServiceProvider serviceProvider,
+                              AndroidContext context,
+                              IMessageBus messageBus,
+                              BleCentralConfiguration config)
         {
             this.Android = context;
             this.Configuration = config;
@@ -29,43 +33,28 @@ namespace Shiny.BluetoothLE.Central.Internals
 
             this.sdelegate = new Lazy<IBleCentralDelegate>(() => serviceProvider.Resolve<IBleCentralDelegate>());
             this.devices = new ConcurrentDictionary<string, IPeripheral>();
-            this.statusSubject = new Subject<AccessState>();
             this.peripheralSubject = new Subject<NamedMessage<IPeripheral>>();
+            this.messageBus = messageBus;
+
+            this.StatusChanged
+                .Skip(1)
+                .SubscribeAsync(status => Log.SafeExecute(
+                    async () => await this.sdelegate.Value?.OnAdapterStateChanged(status)
+                ));
         }
 
 
-        public AccessState Status
-        {
-            get
-            {
-                if (Build.VERSION.SdkInt < BuildVersionCodes.Lollipop)
-                    return AccessState.NotSupported;
+        public AccessState Status => this.Manager.GetAccessState();
+        public IObservable<AccessState> StatusChanged => this.messageBus
+            .Listener<State>()
+            .Select(x => x.FromNative())
+            .StartWith(this.Status);
 
-                if (this.Manager.Adapter == null)
-                    return AccessState.NotSupported;
-
-                if (!this.Manager.Adapter.IsEnabled)
-                    return AccessState.Disabled;
-
-                return this.Manager.Adapter.State.FromNative();
-            }
-        }
-
-
-        public IObservable<AccessState> StatusChanged => this.statusSubject;
         public IObservable<NamedMessage<IPeripheral>> PeripheralEvents => this.peripheralSubject;
 
         public BleCentralConfiguration Configuration { get; }
         public BluetoothManager Manager { get; }
         public AndroidContext Android { get; }
-
-
-        internal void ChangeStatus(State state)
-        {
-            var status = state.FromNative();
-            this.sdelegate.Value?.OnAdapterStateChanged(status);
-            this.statusSubject.OnNext(status);
-        }
 
 
         internal void DeviceEvent(string eventName, BluetoothDevice device)

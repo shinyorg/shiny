@@ -11,12 +11,19 @@ namespace Shiny
                                             Type delegateType,
                                             bool requestPermissionImmediately = false,
                                             AndroidOptions androidConfig = null,
-                                            UwpOptions uwpConfig = null)
+                                            UwpOptions uwpConfig = null,
+                                            params NotificationCategory[] notificationCategories)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new NotificationModule(delegateType, requestPermissionImmediately, androidConfig, uwpConfig));
+            services.RegisterModule(new NotificationModule(
+                delegateType,
+                requestPermissionImmediately,
+                androidConfig,
+                uwpConfig,
+                notificationCategories
+            ));
             return true;
 #endif
         }
@@ -24,25 +31,34 @@ namespace Shiny
 
         public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
                                                                    bool requestPermissionImmediately = false,
-                                                                   AndroidOptions androidConfig = null,
-                                                                   UwpOptions uwpConfig = null)
+                                                                   AndroidOptions? androidConfig = null,
+                                                                   UwpOptions? uwpConfig = null,
+                                                                   params NotificationCategory[] notificationCategories)
                 where TNotificationDelegate : class, INotificationDelegate
             => services.UseNotifications(
                 typeof(TNotificationDelegate),
                 requestPermissionImmediately,
                 androidConfig,
-                uwpConfig
+                uwpConfig,
+                notificationCategories
             );
 
         public static bool UseNotifications(this IServiceCollection services,
                                             bool requestPermissionImmediately = false,
-                                            AndroidOptions androidConfig = null,
-                                            UwpOptions uwpConfig = null)
+                                            AndroidOptions? androidConfig = null,
+                                            UwpOptions? uwpConfig = null,
+                                            params NotificationCategory[] notificationCategories)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new NotificationModule(null, requestPermissionImmediately, androidConfig, uwpConfig));
+            services.RegisterModule(new NotificationModule(
+                null,
+                requestPermissionImmediately,
+                androidConfig,
+                uwpConfig,
+                notificationCategories
+            ));
             return true;
 #endif
         }
