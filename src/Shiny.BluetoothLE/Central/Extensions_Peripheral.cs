@@ -14,7 +14,7 @@ namespace Shiny.BluetoothLE.Central
         /// Starts connection process if not already connecteds
         /// </summary>
         /// <param name="peripheral"></param>
-        public static void ConnectIf(this IPeripheral peripheral,ConnectionConfig connectionConfig)
+        public static void ConnectIf(this IPeripheral peripheral,ConnectionConfig connectionConfig=null)
         {
             if (peripheral.Status == ConnectionState.Disconnected)
                 peripheral.Connect(connectionConfig);
