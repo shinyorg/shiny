@@ -4,5 +4,5 @@ update_configs:
     directory: "/"
     update_schedule: "weekly"
     default_labels:
-      - "dependency"
+      - "dependencies"
     target_branch: "dev"
