@@ -6,6 +6,7 @@ using Shiny.Push;
 
 [assembly: ShinyPushNotificationsAutoRegister]
 
+
 namespace Shiny
 {
     public class ShinyPushNotificationsAutoRegisterAttribute : AutoRegisterAttribute
@@ -20,16 +21,8 @@ namespace Shiny
 
     public class ShinyPushNotificationsAttribute : ServiceModuleAttribute
     {
-        public ShinyPushNotificationsAttribute(Type delegateType)
-        {
-            this.DelegateType = delegateType;
-        }
-
-
-        public Type DelegateType { get; set; }
-
-
-        public override void Register(IServiceCollection services)
-            => services.UsePushNotifications(this.DelegateType);
+        public ShinyPushNotificationsAttribute(Type delegateType) => this.DelegateType = delegateType;
+        public Type DelegateType { get; }
+        public override void Register(IServiceCollection services) => services.UsePushNotifications(this.DelegateType);
     }
 }
