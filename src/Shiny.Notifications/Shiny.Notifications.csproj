@@ -21,8 +21,7 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Uwp\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Notifications.UwpSupport\Shiny.Notifications.UwpSupport.csproj" />
-        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="[6.0.0, 7)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
@@ -53,7 +52,7 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
-        <PackageReference Include="Xamarin.Android.Support.Compat" Version="28.0.0.3" />
+        <PackageReference Include="Xamarin.Android.Support.Compat" Version="[28.0.0.3, 29)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">

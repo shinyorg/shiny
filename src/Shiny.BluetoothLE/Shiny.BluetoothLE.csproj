@@ -26,7 +26,6 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Notifications.UwpSupport\Shiny.Notifications.UwpSupport.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
