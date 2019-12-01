@@ -49,9 +49,9 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj" />
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <ProjectReference Include="..\Shiny.Core.UwpSupport\Shiny.Core.UwpSupport.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">

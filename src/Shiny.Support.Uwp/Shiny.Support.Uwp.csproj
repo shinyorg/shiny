@@ -1,7 +1,7 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
     <PropertyGroup>
         <TargetFramework>uap10.0.16299</TargetFramework>
-        <RootNamespace>Shiny.Locations</RootNamespace>
+        <RootNamespace>Shiny</RootNamespace>
         <Description>Shiny UWP Support Library</Description>
         <PackageVersion>1.0.0</PackageVersion>
         <OutputType>winmdobj</OutputType>
