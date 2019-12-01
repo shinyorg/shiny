@@ -14,8 +14,8 @@
         <None Include="**\Platforms\**\*.cs" />
         <PackageReference Include="System.Reactive" Version="[4.2.0, 5)" />
         <PackageReference Include="System.ValueTuple" Version="[4.5.0, 5)" />
-        <PackageReference Include="Newtonsoft.Json" Version="[12.0.2,)" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="[12.0.3, 13)" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="[3.0.1, 4)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
@@ -24,11 +24,13 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard2.1')) ">
+        <!--<Compile Include="**\Platforms\netstandard21\**\*.cs" />-->
         <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard2.0')) ">
+        <!--<Compile Include="**\Platforms\netstandard20\**\*.cs" />-->
         <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
