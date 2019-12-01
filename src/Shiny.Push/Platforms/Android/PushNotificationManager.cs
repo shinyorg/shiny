@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Android.Gms.Common;
 using Android.Gms.Tasks;
+using Android.Runtime;
 using Firebase.Iid;
 using Firebase.Messaging;
 
@@ -9,12 +9,12 @@ namespace Shiny.Push
 {
     public class PushNotificationManager : Java.Lang.Object, IOnCompleteListener, IPushNotificationManager
     {
-        TaskCompletionSource<object> taskSrc = null;
+        TaskCompletionSource<string>? taskSrc = null;
 
         public void OnComplete(Android.Gms.Tasks.Task task)
         {
             if (task.IsSuccessful)
-                this.taskSrc?.TrySetResult(task.Result);
+                this.taskSrc?.TrySetResult(task.Result.JavaCast<IInstanceIdResult>().Token);
             else
                 this.taskSrc?.TrySetException(task.Exception);
         }
@@ -34,12 +34,13 @@ namespace Shiny.Push
         //</receiver>
         public async Task<PushAccessState> RequestAccess()
         {
-            //FirebaseMessaging.Instance.AutoInitEnabled = true;
+            FirebaseMessaging.Instance.AutoInitEnabled = true;
 
-            this.taskSrc = new TaskCompletionSource<object>();
+            this.taskSrc = new TaskCompletionSource<string>();
             FirebaseInstanceId.Instance.GetInstanceId().AddOnCompleteListener(this);
-            await this.taskSrc.Task;
+            var token = await this.taskSrc.Task;
 
+            return new PushAccessState(AccessState.Available, token);
 
 
             //int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
@@ -58,8 +59,6 @@ namespace Shiny.Push
             //{
             //    msgText.Text = "Google Play Services is available.";
             //    return true;
-            //}
-            throw new NotImplementedException();
         }
     }
 }
