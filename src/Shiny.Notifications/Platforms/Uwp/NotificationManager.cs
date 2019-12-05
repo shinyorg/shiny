@@ -19,14 +19,12 @@ namespace Shiny.Notifications
         readonly IRepository repository;
         readonly IJobManager jobs;
         readonly ISettings settings;
-        readonly UwpContext context;
         readonly BadgeUpdater badgeUpdater;
 
         public NotificationManager(IServiceProvider services,
                                    IJobManager jobs,
                                    ISettings settings,
-                                   IRepository repository,
-                                   UwpContext context)
+                                   IRepository repository)
         {
             this.toastNotifier = ToastNotificationManager.CreateToastNotifier();
             this.badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
@@ -34,7 +32,6 @@ namespace Shiny.Notifications
             this.jobs = jobs;
             this.settings = settings;
             this.repository = repository;
-            this.context = context;
         }
 
 

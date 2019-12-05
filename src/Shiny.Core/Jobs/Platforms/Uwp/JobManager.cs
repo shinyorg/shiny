@@ -8,12 +8,8 @@ namespace Shiny.Jobs
 {
     public class JobManager : AbstractJobManager
     {
-        readonly UwpContext context;
-
-
-        public JobManager(UwpContext context, IServiceProvider container, IRepository repository) : base(container, repository, TimeSpan.FromMinutes(15))
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository, TimeSpan.FromMinutes(15))
         {
-            this.context = context;
         }
 
 
@@ -56,8 +52,8 @@ namespace Shiny.Jobs
         }
 
 
-        protected override void CancelNative(JobInfo jobInfo)
-            => this.context.UnRegisterBackground<JobBackgroundTaskProcessor>(jobInfo.Identifier);
+        protected override void CancelNative(JobInfo jobInfo) { }
+     //       => this.context.UnRegisterBackground<JobBackgroundTaskProcessor>(jobInfo.Identifier);
     }
 }
 

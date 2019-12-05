@@ -25,10 +25,8 @@ namespace Shiny
                 services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
                 services.TryAddSingleton<IFileSystem, FileSystemImpl>();
                 services.TryAddSingleton<ISettings, SettingsImpl>();
-                services.TryAddSingleton<UwpContext>();
-
                 services.TryAddSingleton<IJobManager, JobManager>();
-                services.TryAddSingleton<IBackgroundTaskProcessor, JobBackgroundTaskProcessor>();
+                //services.TryAddSingleton<IBackgroundTaskProcessor, JobBackgroundTaskProcessor>();
 
                 if (platformModule != null)
                 {
@@ -40,15 +38,55 @@ namespace Shiny
             });
 
 
+        static bool hydrated = false;
+
         public static void BackgroundRun(IBackgroundTaskInstance taskInstance)
         {
-            var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
-            var module = Hydrate<IShinyModule>(MODULE_KEY);
+            if (!hydrated)
+            {
+                var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
+                var module = Hydrate<IShinyModule>(MODULE_KEY);
 
-            Init(startup, module);
-            Resolve<UwpContext>().Bridge(taskInstance);
+                Init(startup, module);
+                hydrated = true;
+            }
+            //    var targetType(register.DelegateTypeName);
+            //    var processor = this.serviceProvider.ResolveOrInstantiate(type) as IBackgroundTaskProcessor;
+            //    processor?.Process(task.Task.Name, task); type = Type.G
         }
 
+
+        //public async void RegisterBackground<TService>(string taskIdentifier, string backgroundTaskName, Action<BackgroundTaskBuilder>? builderAction = null) where TService : IBackgroundTaskProcessor
+        //{
+        //    // TODO: make sure the type isn't already registered - should do startup to reg tasks?
+        //    var task = GetTask(taskIdentifier, typeof(TService));
+        //    if (task != null)
+        //        return;
+
+        //    var builder = new BackgroundTaskBuilder();
+        //    builderAction?.Invoke(builder);
+        //    builder.Name = taskIdentifier;
+        //    builder.TaskEntryPoint = backgroundTaskName;
+
+        //    var registration = builder.Register();
+        //    await this.repository.Set(registration.TaskId.ToString(), new UwpTaskRegister
+        //    {
+        //        TaskId = registration.TaskId,
+        //        TaskName = taskIdentifier,
+        //        DelegateTypeName = typeof(TService).AssemblyQualifiedName
+        //    });
+        //}
+
+
+        //public void UnRegisterBackground<TService>(string taskIdentifier) where TService : IBackgroundTaskProcessor
+        //    => GetTask(taskIdentifier, typeof(TService))?.Unregister(true);
+
+
+        //static IBackgroundTaskRegistration GetTask(string taskIdentifier, Type serviceType) => BackgroundTaskRegistration
+        //    .AllTasks
+        //    .Where(x => x.Value.Name.Equals(taskIdentifier) || x.Value.Name.Equals(serviceType.FullName))
+        //    .Select(x => x.Value)
+        //    .FirstOrDefault();
 
         static void Dehydrate(string key, object obj)
         {
@@ -59,7 +97,7 @@ namespace Shiny
         }
 
 
-        static T Hydrate<T>(string key) where T : class
+        static T? Hydrate<T>(string key) where T : class
         {
             var settings = ApplicationData.Current.LocalSettings.Values;
             if (!settings.ContainsKey(key))

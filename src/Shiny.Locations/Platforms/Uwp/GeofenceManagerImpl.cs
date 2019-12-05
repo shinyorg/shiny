@@ -2,23 +2,19 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
 using Shiny.Infrastructure;
-using System.Reactive.Linq;
-using Windows.ApplicationModel.Background;
+
 
 namespace Shiny.Locations
 {
     //https://docs.microsoft.com/en-us/windows/uwp/maps-and-location/set-up-a-geofence
     public class GeofenceManagerImpl : AbstractGeofenceManager
     {
-        readonly UwpContext context;
-
-
-        public GeofenceManagerImpl(IRepository repository, UwpContext context) : base(repository)
+        public GeofenceManagerImpl(IRepository repository) : base(repository)
         {
-            this.context = context;
         }
 
 
@@ -87,8 +83,8 @@ namespace Shiny.Locations
                 list.Remove(geofence);
 
             await this.Repository.Remove(identifier);
-            if (list.Count == 0)
-                this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>(nameof(GeofenceBackgroundTaskProcessor));
+            //if (list.Count == 0)
+            //    this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>(nameof(GeofenceBackgroundTaskProcessor));
         }
 
 
@@ -96,7 +92,7 @@ namespace Shiny.Locations
         {
             await this.Repository.Clear();
             GeofenceMonitor.Current.Geofences.Clear();
-            this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>(nameof(GeofenceBackgroundTaskProcessor));
+            //this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>(nameof(GeofenceBackgroundTaskProcessor));
         }
 
 
