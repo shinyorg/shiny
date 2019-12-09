@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ReactiveUI" Version="10.5.31" />
+    <PackageReference Include="ReactiveUI" Version="10.5.43" />
   </ItemGroup>
 
   <ItemGroup>
