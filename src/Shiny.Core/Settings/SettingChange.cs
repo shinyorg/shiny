@@ -3,9 +3,18 @@
 
 namespace Shiny.Settings
 {
-    public class SettingChangeEventArgs : EventArgs
+    public enum SettingChangeAction
     {
-        public SettingChangeEventArgs(SettingChangeAction action, string? key, object? value)
+        Add,
+        Update,
+        Remove,
+        Clear
+    }
+
+
+    public class SettingChange
+    {
+        public SettingChange(SettingChangeAction action, string? key, object? value)
         {
             this.Action = action;
             this.Key = key;

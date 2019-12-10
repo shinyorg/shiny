@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Reflection;
 using Shiny.Infrastructure;
 
@@ -12,10 +14,12 @@ namespace Shiny.Settings
     public abstract class AbstractSettings : ISettings
     {
         readonly ISerializer serializer;
+        readonly Subject<SettingChange> changedSubject;
 
 
         protected AbstractSettings(ISerializer serializer)
         {
+            this.changedSubject = new Subject<SettingChange>();
             this.serializer = serializer;
             this.KeysNotToClear = new List<string>();
         }
@@ -26,10 +30,7 @@ namespace Shiny.Settings
         protected abstract void NativeSet(Type type, string key, object value);
         protected abstract void NativeRemove(string[] keys);
         protected abstract IDictionary<string, string> NativeValues();
-
-
-        public event EventHandler<SettingChangeEventArgs>? Changed;
-
+        public IObservable<SettingChange> Changed => this.changedSubject;
         public List<string> KeysNotToClear { get; set; }
         public virtual IReadOnlyDictionary<string, string>? List { get; protected set; }
 
@@ -95,7 +96,7 @@ namespace Shiny.Settings
 
                     var type = this.UnwrapType(value.GetType());
                     this.NativeSet(type, key, value);
-                    this.OnChanged(new SettingChangeEventArgs(action, key, value));
+                    this.OnChanged(new SettingChange(action, key, value));
                 }
             }
             catch (Exception ex)
@@ -127,14 +128,14 @@ namespace Shiny.Settings
                     {
                         var type = this.UnwrapType(typeof(T));
                         this.NativeSet(type, key, value);
-                        this.OnChanged(new SettingChangeEventArgs(action, key, value));
+                        this.OnChanged(new SettingChange(action, key, value));
                     }
                 }
                 else
                 {
                     var type = this.UnwrapType(typeof(T));
                     this.NativeSet(type, key, value);
-                    this.OnChanged(new SettingChangeEventArgs(action, key, value));
+                    this.OnChanged(new SettingChange(action, key, value));
                 }
             }
             catch (Exception ex)
@@ -173,13 +174,13 @@ namespace Shiny.Settings
                 .ToArray();
 
             this.NativeRemove(keys);
-            this.OnChanged(new SettingChangeEventArgs(SettingChangeAction.Clear, null, null));
+            this.OnChanged(new SettingChange(SettingChangeAction.Clear, null, null));
         }
 
 
-        protected virtual void OnChanged(SettingChangeEventArgs args)
+        protected virtual void OnChanged(SettingChange args)
         {
-            this.Changed?.Invoke(this, args);
+            this.changedSubject.OnNext(args);
             var native = this.NativeValues();
             this.List = new ReadOnlyDictionary<string, string>(native);
         }
@@ -195,7 +196,7 @@ namespace Shiny.Settings
                 var format = value as IFormattable;
                 return format == null
                     ? value.ToString()
-                    : format.ToString(null, System.Globalization.CultureInfo.InvariantCulture);
+                    : format.ToString(null, CultureInfo.InvariantCulture);
             }
 
             return this.serializer.Serialize(value);

@@ -20,7 +20,7 @@ namespace Shiny.Settings
         /// <summary>
         /// Monitor setting events (Add, Update, Remove, Clear)
         /// </summary>
-		event EventHandler<SettingChangeEventArgs>? Changed;
+		IObservable<SettingChange> Changed { get; }
 
         /// <summary>
         /// Gets an object from settings

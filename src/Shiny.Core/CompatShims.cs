@@ -18,16 +18,8 @@ namespace Shiny
         static IJobManager Current { get; } = ShinyHost.Resolve<IJobManager>();
 
         public static bool IsRunning => Current.IsRunning;
-        public static event EventHandler<JobInfo> JobStarted
-        {
-            add { Current.JobStarted += value; }
-            remove { Current.JobStarted -= value; }
-        }
-        public static event EventHandler<JobRunResult> JobFinished
-        {
-            add => Current.JobFinished += value;
-            remove => Current.JobFinished -= value;
-        }
+        public static IObservable<JobInfo> JobStarted => Current.JobStarted;
+        public static IObservable<JobRunResult> JobFinished => Current.JobFinished;
         public static Task Cancel(string jobName) => Current.Cancel(jobName);
         public static Task CancelAll() => Current.CancelAll();
         public static Task<JobInfo?> GetJob(string jobIdentifier) => Current.GetJob(jobIdentifier);
@@ -80,12 +72,8 @@ namespace Shiny
         static ISettings Current { get; } = ShinyHost.Resolve<ISettings>();
 
         public static List<string> KeysNotToClear => Current.KeysNotToClear;
-        public static IReadOnlyDictionary<string, string> List => Current.List;
-        public static event EventHandler<SettingChangeEventArgs> Changed
-        {
-            add => Current.Changed += value;
-            remove => Current.Changed -= value;
-        }
+        public static IReadOnlyDictionary<string, string>? List => Current.List;
+        public static IObservable<SettingChange> Changed => Current.Changed;
         public static T Bind<T>() where T : INotifyPropertyChanged, new() => Current.Bind<T>();
         public static void Bind(INotifyPropertyChanged obj) => Current.Bind(obj);
         public static void Clear() => Current.Clear();

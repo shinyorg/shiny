@@ -32,9 +32,6 @@ namespace Shiny.Jobs
 
         protected override void ScheduleNative(JobInfo jobInfo)
         {
-            if (jobInfo.PeriodicTime < this.MinimumAllowedPeriodicTime)
-                throw new ArgumentException($"Background timer cannot be less than {this.MinimumAllowedPeriodicTime.Value.TotalMinutes} minutes");
-
             //this.context.RegisterBackground<JobBackgroundTaskProcessor>(typeof(Shiny.ShinyBackgroundTask), jobInfo.Identifier, builder =>
             //{
             //    var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.TotalMinutes, 0));

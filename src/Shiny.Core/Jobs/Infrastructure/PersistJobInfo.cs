@@ -9,7 +9,6 @@ namespace Shiny.Jobs.Infrastructure
         public string? Identifier { get; set; }
         public string? TypeName { get; set; }
         public bool IsSystemJob { get; set; }
-        public double PeriodicTimeMs { get; set; }
         public bool Repeat { get; set; }
         public bool BatteryNotLow { get; set; }
         public bool DeviceCharging { get; set; }
@@ -30,7 +29,6 @@ namespace Shiny.Jobs.Infrastructure
             job.Assert();
             return new JobInfo(Type.GetType(job.TypeName), job.Identifier)
             {
-                PeriodicTime = TimeSpan.FromMilliseconds(job.PeriodicTimeMs),
                 IsSystemJob = job.IsSystemJob,
                 LastRunUtc = job.LastRunUtc,
                 Repeat = job.Repeat,
@@ -46,7 +44,6 @@ namespace Shiny.Jobs.Infrastructure
         {
             Identifier = job.Identifier,
             TypeName = job.Type.AssemblyQualifiedName,
-            PeriodicTimeMs = job.PeriodicTime.TotalMilliseconds,
             IsSystemJob = job.IsSystemJob,
             Repeat = job.Repeat,
             LastRunUtc = job.LastRunUtc,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
@@ -14,6 +15,8 @@ namespace Shiny.Jobs
     {
         readonly IRepository repository;
         readonly IServiceProvider container;
+        readonly Subject<JobRunResult> jobFinished;
+        readonly Subject<JobInfo> jobStarted;
 
 
         protected AbstractJobManager(IServiceProvider container,
@@ -23,7 +26,8 @@ namespace Shiny.Jobs
             this.container = container;
             this.repository = repository;
             this.MinimumAllowedPeriodicTime = minAllowedPeriodicTime;
-
+            this.jobStarted = new Subject<JobInfo>();
+            this.jobFinished = new Subject<JobRunResult>();
         }
 
 
@@ -114,8 +118,8 @@ namespace Shiny.Jobs
 
         public bool IsRunning { get; protected set; }
         public TimeSpan? MinimumAllowedPeriodicTime { get; }
-        public event EventHandler<JobInfo>? JobStarted;
-        public event EventHandler<JobRunResult>? JobFinished;
+        public IObservable<JobInfo> JobStarted => this.jobStarted;
+        public IObservable<JobRunResult> JobFinished => this.jobFinished;
 
 
         public async Task Schedule(JobInfo jobInfo)
@@ -145,7 +149,9 @@ namespace Shiny.Jobs
                         tasks.Add(this.RunJob(actual, cancelToken));
                     }
 
-                    await Task.WhenAll(tasks).ConfigureAwait(false);
+                    await Task
+                        .WhenAll(tasks)
+                        .ConfigureAwait(false);
                     list.AddRange(tasks.Select(x => x.Result));
                 }
                 catch (Exception ex)
@@ -163,7 +169,7 @@ namespace Shiny.Jobs
 
         protected async Task<JobRunResult> RunJob(JobInfo job, CancellationToken cancelToken)
         {
-            this.JobStarted?.Invoke(this, job);
+            this.jobStarted.OnNext(job);
             var result = default(JobRunResult);
             var cancel = false;
 
@@ -197,7 +203,7 @@ namespace Shiny.Jobs
                     await this.repository.Set(job.Identifier, PersistJobInfo.ToPersist(job));
                 }
             }
-            this.JobFinished?.Invoke(this, result);
+            this.jobFinished.OnNext(result);
             return result;
         }
 

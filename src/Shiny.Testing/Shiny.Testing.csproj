@@ -6,6 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="BluetoothLE\**" />
+      <EmbeddedResource Remove="BluetoothLE\**" />
+      <None Remove="BluetoothLE\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />

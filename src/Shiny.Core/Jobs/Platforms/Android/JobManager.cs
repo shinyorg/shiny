@@ -130,7 +130,6 @@ namespace Shiny.Jobs
             )
             .SetShinyIdentifier(jobInfo.Identifier)
             .SetPersisted(true)
-            .SetPeriodic(Convert.ToInt64(jobInfo.PeriodicTime.TotalMilliseconds))
             .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
             .SetRequiresCharging(jobInfo.DeviceCharging);
 

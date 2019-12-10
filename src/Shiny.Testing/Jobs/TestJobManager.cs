@@ -10,8 +10,8 @@ namespace Shiny.Testing.Jobs
     public class TestJobManager : IJobManager
     {
         public bool IsRunning { get; set; }
-        public event EventHandler<JobInfo> JobStarted;
-        public event EventHandler<JobRunResult> JobFinished;
+        public IObservable<JobInfo> JobStarted {  get; set; }
+        public IObservable<JobRunResult> JobFinished { get; set; }
 
         public Task Cancel(string jobName) => Task.CompletedTask;
         public Task CancelAll() => Task.CompletedTask;
