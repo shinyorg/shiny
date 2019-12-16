@@ -69,7 +69,13 @@ namespace Shiny.BluetoothLE.Central
                 throw new BleException($"Failed to write characteristic - {status}");
 
             this.value = value;
-            return new CharacteristicGattResult(this, value);
+            return new CharacteristicGattResult(
+                this,
+                value,
+                withResponse
+                    ? CharacteristicResultType.Write
+                    : CharacteristicResultType.WriteWithoutResponse
+            );
         });
 
 
@@ -85,54 +91,60 @@ namespace Shiny.BluetoothLE.Central
                 throw new BleException($"Failed to read characteristic - {result.Status}");
 
             this.value = result.Value?.ToArray();
-            return new CharacteristicGattResult(this, this.value);
+            return new CharacteristicGattResult(
+                this,
+                this.value,
+                CharacteristicResultType.Read
+            );
         });
 
 
-        public override IObservable<CharacteristicGattResult> EnableNotifications(bool useIndicationIfAvailable)
+        //public override IObservable<CharacteristicGattResult> EnableNotifications(bool useIndicationIfAvailable)
+        //{
+        //    var type = useIndicationIfAvailable && this.CanIndicate()
+        //        ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
+        //        : GattClientCharacteristicConfigurationDescriptorValue.Notify;
+
+        //    return this.SetNotify(type);
+        //}
+
+
+        //public override IObservable<CharacteristicGattResult> DisableNotifications() =>
+        //    this.SetNotify(GattClientCharacteristicConfigurationDescriptorValue.None);
+
+
+
+        IObservable<CharacteristicGattResult> notifyOb;
+        public override IObservable<CharacteristicGattResult> Notify(bool enableIndicationsIfAvailable)
         {
-            var type = useIndicationIfAvailable && this.CanIndicate()
-                ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
-                : GattClientCharacteristicConfigurationDescriptorValue.Notify;
+            this.notifyOb ??= Observable.Create<CharacteristicGattResult>(
+                ob =>
+                {
+                    //        var status = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(value);
+                    //        if (status != GattCommunicationStatus.Success)
+                    //            throw new BleException($"Failed to write client characteristic configuration descriptor - {status}");
 
-            return this.SetNotify(type);
-        }
+                    //        this.IsNotifying = value != GattClientCharacteristicConfigurationDescriptorValue.None;
+                    //        this.context.SetNotifyCharacteristic(this);
+                    //        return new CharacteristicGattResult(
+                    //            this,
+                    //            null,
+                    //            value == GattClientCharacteristicConfigurationDescriptorValue.None
+                    //                ? CharacteristicResultType.NotificationUnsubscribed
+                    //                : CharacteristicResultType.NotificationSubscribed
+                    //        );
 
+                    //        this.currentOb = ob;
+                    //        //var trigger = new GattCharacteristicNotificationTrigger(this.native);
+                    //        this.Native.ValueChanged += this.OnValueChanged;
+                    //        return () => this.Native.ValueChanged -= this.OnValueChanged;
 
-        public override IObservable<CharacteristicGattResult> DisableNotifications() =>
-            this.SetNotify(GattClientCharacteristicConfigurationDescriptorValue.None);
+                    return () => { };
+                })
+                .Publish()
+                .RefCount();
 
-
-        IObservable<CharacteristicGattResult> SetNotify(GattClientCharacteristicConfigurationDescriptorValue value)
-            => Observable.FromAsync(async ct =>
-            {
-                var status = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(value);
-                if (status != GattCommunicationStatus.Success)
-                    throw new BleException($"Failed to write client characteristic configuration descriptor - {status}");
-
-                this.IsNotifying = value != GattClientCharacteristicConfigurationDescriptorValue.None;
-                this.context.SetNotifyCharacteristic(this);
-                return new CharacteristicGattResult(this, null);
-            });
-
-
-        IObserver<CharacteristicGattResult> currentOb;
-        IObservable<CharacteristicGattResult> notificationOb;
-        public override IObservable<CharacteristicGattResult> WhenNotificationReceived()
-        {
-            this.AssertNotify();
-
-            this.notificationOb = this.notificationOb ?? Observable.Create<CharacteristicGattResult>(ob =>
-            {
-                this.currentOb = ob;
-                //var trigger = new GattCharacteristicNotificationTrigger(this.native);
-                this.Native.ValueChanged += this.OnValueChanged;
-                return () => this.Native.ValueChanged -= this.OnValueChanged;
-            })
-            .Publish()
-            .RefCount();
-
-            return this.notificationOb;
+            return this.notifyOb;
         }
 
 
@@ -149,8 +161,8 @@ namespace Shiny.BluetoothLE.Central
             if (sender.Equals(this.Native))
             {
                 var bytes = args.CharacteristicValue.ToArray();
-                var result = new CharacteristicGattResult(this, bytes);
-                this.currentOb.OnNext(result);
+                var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
+                //this.currentOb.OnNext(result);
             }
         }
     }

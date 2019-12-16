@@ -47,8 +47,9 @@ namespace Shiny.BluetoothLE.Central
                 .Subscribe(args =>
                 {
                     Log.Write("BLE-Characteristic", "write event - " + args.Characteristic.Uuid);
+
                     if (args.IsSuccessful)
-                        ob.Respond(new CharacteristicGattResult(this, value));
+                        ob.Respond(new CharacteristicGattResult(this, value, withResponse ? CharacteristicResultType.Write : CharacteristicResultType.WriteWithoutResponse));
                     else
                         ob.OnError(new BleException($"Failed to write characteristic - {args.Status}"));
                 });
@@ -89,7 +90,7 @@ namespace Shiny.BluetoothLE.Central
                 .Subscribe(args =>
                 {
                     if (args.IsSuccessful)
-                        ob.Respond(new CharacteristicGattResult(this, args.Characteristic.GetValue()));
+                        ob.Respond(new CharacteristicGattResult(this, args.Characteristic.GetValue(), CharacteristicResultType.Read));
                     else
                         ob.OnError(new BleException($"Failed to read characteristic - {args.Status}"));
                 });
@@ -111,76 +112,13 @@ namespace Shiny.BluetoothLE.Central
         }));
 
 
-        public override IObservable<CharacteristicGattResult> EnableNotifications(bool useIndicationsIfAvailable) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
-        {
-            void success()
-            {
-                this.IsNotifying = true;
-                ob.Respond(new CharacteristicGattResult(this, null));
-            };
 
-            if (!this.context.Gatt.SetCharacteristicNotification(this.native, true))
-                throw new BleException("Failed to set characteristic notification value");
-
-            IDisposable? sub = null;
-            var descriptor = this.native.GetDescriptor(NotifyDescriptorId);
-            if (descriptor == null)
-            {
-                success();
-            }
-            else
-            {
-                var wrap = new GattDescriptor(this, this.context, descriptor);
-                var bytes = this.GetNotifyDescriptorBytes(useIndicationsIfAvailable);
-                sub = wrap
-                    .WriteInternal(bytes)
-                    //.Delay(this.context.CentralContext.Configuration.AndroidPauseBetweenInvocations)
-                    .Subscribe(
-                        _ => success(),
-                        ex => success()
-                    );
-            }
-            return () => sub?.Dispose();
-        }));
-
-
-        public override IObservable<CharacteristicGattResult> DisableNotifications() => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
-        {
-            void success()
-            {
-                this.IsNotifying = false;
-                ob.Respond(new CharacteristicGattResult(this, null));
-            };
-            if (!this.context.Gatt.SetCharacteristicNotification(this.native, false))
-                throw new BleException("Could not set characteristic notification value");
-
-            IDisposable? sub = null;
-            var descriptor = this.native.GetDescriptor(NotifyDescriptorId);
-            if (descriptor == null)
-            {
-                success();
-            }
-            else
-            {
-                var wrap = new GattDescriptor(this, this.context, descriptor);
-                sub = wrap
-                    .WriteInternal(BluetoothGattDescriptor.DisableNotificationValue.ToArray())
-                    .Subscribe(
-                        _ => success(),
-                        ex => success()
-                    );
-            }
-
-            return () => sub?.Dispose();
-        }));
-
-
-
-        public override IObservable<CharacteristicGattResult> WhenNotificationReceived()
+        public override IObservable<CharacteristicGattResult> Notify(bool enableIndicationsIfAvailable = false)
         {
             this.AssertNotify();
 
             return this.notifyOb ??= Observable.Create<CharacteristicGattResult>(ob =>
+            {
                 this.context
                     .Callbacks
                     .CharacteristicChanged
@@ -188,11 +126,23 @@ namespace Shiny.BluetoothLE.Central
                     .Subscribe(args =>
                     {
                         if (args.IsSuccessful)
-                            ob.OnNext(new CharacteristicGattResult(this, args.Characteristic.GetValue()));
+                            ob.OnNext(new CharacteristicGattResult(this, args.Characteristic.GetValue(), CharacteristicResultType.Notification));
                         else
                             ob.OnError(new BleException($"Notification error - {args.Status}"));
-                    })
-            )
+                    });
+
+                this.EnableNotifications(enableIndicationsIfAvailable).Subscribe(
+                    _ => ob.OnNext(new CharacteristicGattResult(this, null, CharacteristicResultType.NotificationSubscribed)),
+                    ob.OnError
+                );
+
+                return () => this
+                    .DisableNotifications()
+                    .Subscribe(
+                        _ => { },
+                        ex => { }
+                    );
+            })
             .Publish()
             .RefCount();
         }
@@ -228,6 +178,69 @@ namespace Shiny.BluetoothLE.Central
         public override int GetHashCode() => this.native.GetHashCode();
         public override string ToString() => $"Characteristic: {this.Uuid}";
 
+        #region Internals
+
+        IObservable<CharacteristicGattResult> EnableNotifications(bool useIndicationsIfAvailable) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
+        {
+            void success()
+            {
+                this.IsNotifying = true;
+                ob.Respond(new CharacteristicGattResult(this, null, CharacteristicResultType.NotificationSubscribed));
+            };
+
+            if (!this.context.Gatt.SetCharacteristicNotification(this.native, true))
+                throw new BleException("Failed to set characteristic notification value");
+
+            IDisposable? sub = null;
+            var descriptor = this.native.GetDescriptor(NotifyDescriptorId);
+            if (descriptor == null)
+            {
+                success();
+            }
+            else
+            {
+                var wrap = new GattDescriptor(this, this.context, descriptor);
+                var bytes = this.GetNotifyDescriptorBytes(useIndicationsIfAvailable);
+                sub = wrap
+                    .WriteInternal(bytes)
+                    .Subscribe(
+                        _ => success(),
+                        ex => success()
+                    );
+            }
+            return () => sub?.Dispose();
+        }));
+
+
+        IObservable<CharacteristicGattResult> DisableNotifications() => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
+        {
+            void success()
+            {
+                this.IsNotifying = false;
+                ob.Respond(new CharacteristicGattResult(this, null, CharacteristicResultType.NotificationUnsubscribed));
+            };
+            if (!this.context.Gatt.SetCharacteristicNotification(this.native, false))
+                throw new BleException("Could not set characteristic notification value");
+
+            IDisposable? sub = null;
+            var descriptor = this.native.GetDescriptor(NotifyDescriptorId);
+            if (descriptor == null)
+            {
+                success();
+            }
+            else
+            {
+                var wrap = new GattDescriptor(this, this.context, descriptor);
+                sub = wrap
+                    .WriteInternal(BluetoothGattDescriptor.DisableNotificationValue.ToArray())
+                    .Subscribe(
+                        _ => success(),
+                        ex => success()
+                    );
+            }
+
+            return () => sub?.Dispose();
+        }));
 
         bool NativeEquals(GattCharacteristicEventArgs args)
         {
@@ -263,5 +276,7 @@ namespace Shiny.BluetoothLE.Central
 
              return BluetoothGattDescriptor.EnableNotificationValue.ToArray();
         }
+
+        #endregion
     }
 }

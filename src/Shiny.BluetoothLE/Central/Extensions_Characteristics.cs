@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using Shiny.Logging;
 
 
@@ -8,33 +10,45 @@ namespace Shiny.BluetoothLE.Central
     public static class CharacteristicExtensions
     {
         /// <summary>
-        /// Enables notifications and hooks it for discovered characteristic.  When subscription is disposed, it will also clean up.
+        /// Used for writing blobs
         /// </summary>
-        /// <param name="characteristic"></param>
-        /// <param name="useIndicationIfAvailable"></param>
-        /// <param name="autoCleanup"></param>
-        /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> RegisterAndNotify(this IGattCharacteristic characteristic, bool useIndicationIfAvailable = false, bool autoCleanup = true)
+        /// <param name="ch">The characteristic to write on</param>
+        /// <param name="stream">The stream to send</param>
+        public static IObservable<BleWriteSegment> BlobWrite(this IGattCharacteristic ch, Stream stream) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
         {
-            var ob = characteristic
-                .EnableNotifications(useIndicationIfAvailable)
-                .Select(x => x.Characteristic.WhenNotificationReceived())
-                .Switch();
-
-            if (autoCleanup)
+            var trans = ch.Service.Peripheral.TryBeginTransaction() ?? new VoidGattReliableWriteTransaction();
+            using (trans)
             {
-                ob = ob.Finally(() => characteristic
-                    .DisableNotifications()
-                    .Where(x => x.Characteristic.Service.Peripheral.Status == ConnectionState.Connected)
-                    .Subscribe(
-                        _ => { },
-                        ex => Log.Write(ex)
-                    )
-                );
-            }
+                var mtu = ch.Service.Peripheral.MtuSize;
+                var buffer = new byte[mtu];
+                var read = stream.Read(buffer, 0, buffer.Length);
+                var pos = read;
+                var len = Convert.ToInt32(stream.Length);
 
-            return ob;
-        }
+                while (!ct.IsCancellationRequested && read > 0)
+                {
+                    await trans
+                        .Write(ch, buffer)
+                        .ToTask(ct)
+                        .ConfigureAwait(false);
+
+                    //if (this.Value != buffer)
+                    //{
+                    //    trans.Abort();
+                    //    throw new GattReliableWriteTransactionException("There was a mismatch response");
+                    //}
+                    var seg = new BleWriteSegment(buffer, pos, len);
+                    ob.OnNext(seg);
+
+                    read = stream.Read(buffer, 0, buffer.Length);
+                    pos += read;
+                }
+                await trans.Commit();
+            }
+            ob.OnCompleted();
+
+            return trans;
+        });
 
 
         public static IObservable<CharacteristicGattResult> ReadInterval(this IGattCharacteristic character, TimeSpan timeSpan)

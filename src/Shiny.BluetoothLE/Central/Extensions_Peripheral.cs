@@ -6,7 +6,20 @@ namespace Shiny.BluetoothLE.Central
 {
     public static class PeripheralExtensions
     {
+
+        /// <summary>
+        /// An easy wrapper around checking peripheral status == ConnectionState.Connected
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <returns>Return true if connected, otherwise false</returns>
         public static bool IsConnected(this IPeripheral peripheral) => peripheral.Status == ConnectionState.Connected;
+
+
+        /// <summary>
+        /// An easy wrapper around checking peripheral status == ConnectionState.Disconnected
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <returns>Return true if disconnected, otherwise false</returns>
         public static bool IsDisconnected(this IPeripheral peripheral) => !peripheral.IsConnected();
 
 
@@ -14,10 +27,15 @@ namespace Shiny.BluetoothLE.Central
         /// Starts connection process if not already connecteds
         /// </summary>
         /// <param name="peripheral"></param>
-        public static void ConnectIf(this IPeripheral peripheral,ConnectionConfig connectionConfig=null)
+        /// <returns>True if connection attempt was sent, otherwise false</returns>
+        public static bool ConnectIf(this IPeripheral peripheral, ConnectionConfig? connectionConfig = null)
         {
             if (peripheral.Status == ConnectionState.Disconnected)
+            {
                 peripheral.Connect(connectionConfig);
+                return true;
+            }
+            return false;
         }
 
 
@@ -25,9 +43,9 @@ namespace Shiny.BluetoothLE.Central
         /// Continuously reads RSSI from a connected peripheral
         /// WARNING: you really don't want to run this with an Android GATT connection
         /// </summary>
-        /// <param name="peripheral"></param>
-        /// <param name="readInterval"></param>
-        /// <returns></returns>
+        /// <param name="peripheral">The peripheral to read RSSI</param>
+        /// <param name="readInterval">The interval to poll the RSSI - defaults to 1 second if not set</param>
+        /// <returns>RSSI value every read interval</returns>
         public static IObservable<int> ReadRssiContinuously(this IPeripheral peripheral, TimeSpan? readInterval = null) => Observable
             .Interval(readInterval ?? TimeSpan.FromSeconds(1))
             .Select(_ => peripheral.ReadRssi())
@@ -82,13 +100,12 @@ namespace Shiny.BluetoothLE.Central
         /// <param name="serviceUuid"></param>
         /// <param name="characteristicUuids"></param>
         /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, Guid serviceUuid,
-            params Guid[] characteristicUuids)
+        public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, Guid serviceUuid, params Guid[] characteristicUuids)
             => peripheral
                 .WhenConnected()
                 .Select(_ => peripheral.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuids))
                 .Switch()
-                .Select(x => x.RegisterAndNotify(false, false))
+                .Select(x => x.Notify())
                 .Switch();
 
 
@@ -123,21 +140,6 @@ namespace Shiny.BluetoothLE.Central
 
 
         /// <summary>
-        /// Discover the known characteristic and read on a set interval
-        /// </summary>
-        /// <param name="peripheral"></param>
-        /// <param name="serviceUuid"></param>
-        /// <param name="characteristicUuid"></param>
-        /// <param name="timeSpan"></param>
-        /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> ReadIntervalCharacteristic(this IPeripheral peripheral, Guid serviceUuid, Guid characteristicUuid, TimeSpan timeSpan)
-            => peripheral
-                .GetKnownCharacteristics(serviceUuid, characteristicUuid)
-                .Select(ch => ch.ReadInterval(timeSpan))
-                .Switch();
-
-
-        /// <summary>
         /// Get known characteristic(s) without service instance
         /// </summary>
         /// <param name="peripheral"></param>
@@ -148,19 +150,6 @@ namespace Shiny.BluetoothLE.Central
             peripheral
                 .GetKnownService(serviceUuid)
                 .SelectMany(x => x.GetKnownCharacteristics(characteristicIds));
-
-
-
-        /// <summary>
-        /// Discovers all characteristics for a known service
-        /// </summary>
-        /// <param name="peripheral"></param>
-        /// <param name="serviceUuid"></param>
-        /// <returns></returns>
-        public static IObservable<IGattCharacteristic> GetCharacteristicsForService(this IPeripheral peripheral, Guid serviceUuid) =>
-            peripheral
-                .GetKnownService(serviceUuid)
-                .SelectMany(x => x.DiscoverCharacteristics());
 
 
         /// <summary>
