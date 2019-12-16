@@ -33,7 +33,7 @@ namespace Shiny.Locations
         public override async void OnContainerReady(IServiceProvider services)
         {
             base.OnContainerReady(services);
-            if (this.startingRegions == null)
+            if (this.startingRegions.IsEmpty())
                 return;
 
             try
