@@ -35,7 +35,7 @@ namespace Shiny.Beacons
                 services.RegisterJob(new Shiny.Jobs.JobInfo(typeof(BeaconRegionScanJob))
                 {
                     BatteryNotLow = true,
-                    PeriodicTime = TimeSpan.FromSeconds(30),
+                    //PeriodicTime = TimeSpan.FromSeconds(30),
                     IsSystemJob = true
                 });
             }
