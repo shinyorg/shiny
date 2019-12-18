@@ -8,10 +8,10 @@ namespace Shiny
     public static class ServiceCollectionExtensions
     {
         public static bool UseNotifications(this IServiceCollection services,
-                                            Type delegateType,
+                                            Type? delegateType,
                                             bool requestPermissionImmediately = false,
-                                            AndroidOptions androidConfig = null,
-                                            UwpOptions uwpConfig = null,
+                                            AndroidOptions? androidConfig = null,
+                                            UwpOptions? uwpConfig = null,
                                             params NotificationCategory[] notificationCategories)
         {
 #if NETSTANDARD
