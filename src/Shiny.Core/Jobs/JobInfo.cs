@@ -9,7 +9,7 @@ namespace Shiny.Jobs
         public JobInfo(Type jobType, string? identifier = null)
         {
             this.Type = jobType;
-            this.Identifier = identifier ?? jobType.GetType().FullName;
+            this.Identifier = identifier ?? jobType.AssemblyQualifiedName;
         }
 
 
