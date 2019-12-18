@@ -130,6 +130,8 @@ namespace Shiny.Jobs
             )
             .SetShinyIdentifier(jobInfo.Identifier)
             .SetPersisted(true)
+            // this is the min time for android
+            .SetPeriodic((long)TimeSpan.FromMinutes(15).TotalMilliseconds)
             .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
             .SetRequiresCharging(jobInfo.DeviceCharging);
 
