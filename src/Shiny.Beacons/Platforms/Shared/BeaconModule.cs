@@ -48,7 +48,7 @@ namespace Shiny.Beacons
         {
             base.OnContainerReady(services);
 
-            if (this.regionsToMonitorWhenPermissionAvailable != null)
+            if (!this.regionsToMonitorWhenPermissionAvailable.IsEmpty())
             {
                 var mgr = services.GetService<IBeaconManager>();
                 mgr
