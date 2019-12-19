@@ -147,11 +147,13 @@ namespace Shiny.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message,
-                CategoryIdentifier = notification.Category
+                Body = notification.Message                
                 //LaunchImageName = ""
                 //Subtitle = ""
             };
+            if (!notification.Category.IsEmpty())
+                content.CategoryIdentifier = notification.Category;
+
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
 
