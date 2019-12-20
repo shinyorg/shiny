@@ -38,6 +38,9 @@ namespace Shiny.Notifications
 
         public override async void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
         {
+            if (this.sdelegate.Value == null)
+                return;
+             
             await Log.SafeExecute(async () =>
             {
                 var shinyNotification = notification.Request.FromNative();

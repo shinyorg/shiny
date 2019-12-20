@@ -7,7 +7,7 @@ namespace Shiny.Notifications
 {
     public static class PlatformExtensions
     {
-        public static Notification FromNative(this UNNotificationRequest native)
+        public static Notification? FromNative(this UNNotificationRequest native)
         {
             if (!Int32.TryParse(native.Identifier, out var i))
                 return null;
@@ -18,10 +18,9 @@ namespace Shiny.Notifications
                 Title = native.Content?.Title,
                 Message = native.Content?.Body,
                 Payload = GetPayload(native),
-                BadgeCount = native.Content?.Badge.Int32Value
+                BadgeCount = native.Content?.Badge?.Int32Value,
+                Category = native.Content?.CategoryIdentifier
             };
-            //UNUserNotificationCenter.Current.GetNotificationCategoriesAsync();
-            //native.Content.CategoryIdentifier
 
             if (native.Trigger is UNCalendarNotificationTrigger calendar)
                 shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
