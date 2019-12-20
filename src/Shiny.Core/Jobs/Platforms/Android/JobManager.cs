@@ -48,9 +48,8 @@ namespace Shiny.Jobs
 
 #if ANDROIDX
 
-        public override async Task Schedule(JobInfo jobInfo)
+        protected override void ScheduleNative(JobInfo jobInfo)
         {
-            await base.Schedule(jobInfo);
             //WorkManager.Initialize(this.context.AppContext, new Configuration())
             var constraints = new Constraints.Builder()
                 .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
@@ -59,8 +58,8 @@ namespace Shiny.Jobs
                 .Build();
 
             var data = new Data.Builder();
-            foreach (var parameter in jobInfo.Parameters)
-                data.Put(parameter.Key, parameter.Value);
+            //foreach (var parameter in jobInfo.Parameters)
+            //    data.Put(parameter.Key, parameter.Value);
 
             if (jobInfo.Repeat)
             {
@@ -79,7 +78,7 @@ namespace Shiny.Jobs
             }
             else
             {
-                var worker = new OneTimeWorkRequest.Builder()
+                var worker = new OneTimeWorkRequest.Builder(typeof(ShinyJobWorker))
                     .SetInputData(data.Build())
                     .SetConstraints(constraints);
 
@@ -87,26 +86,25 @@ namespace Shiny.Jobs
         }
 
 
-        static NetworkType ToNative(InternetAccess access)
+        static AndroidX.Work.NetworkType ToNative(InternetAccess access)
         {
             switch (access)
             {
                 case InternetAccess.Any:
-                    return NetworkType.Connected;
+                    return AndroidX.Work.NetworkType.Connected;
 
                 case InternetAccess.Unmetered:
-                    return NetworkType.Unmetered;
+                    return AndroidX.Work.NetworkType.Unmetered;
 
                 case InternetAccess.None:
                 default:
-                    return NetworkType.NotRequired;
+                    return AndroidX.Work.NetworkType.NotRequired;
             }
         }
 
-        public override async Task Cancel(string jobId)
+        protected override void CancelNative(JobInfo jobInfo)
         {
-            await base.Cancel(jobId);
-            WorkManager.Instance.CancelUniqueWork(jobId);
+            WorkManager.Instance.CancelUniqueWork(jobInfo.Identifier);
         }
 
 

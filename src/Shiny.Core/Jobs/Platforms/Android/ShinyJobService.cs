@@ -16,7 +16,6 @@ namespace Shiny.Jobs
     {
         readonly CancellationTokenSource cancelSrc = new CancellationTokenSource();
 
-
         public override bool OnStartJob(JobParameters @params)
         {
             var jobIdentifier = @params.GetShinyJobId();
