@@ -68,6 +68,15 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
 
+
+Testing on Android
+
+* Open an SDK command prompt
+* run 'adb shell cmd jobscheduler'
+* find your job
+* run 'adb shell cmd jobschedule run XXX'
+
+
 ----------
 IOS
 ----------
@@ -92,6 +101,13 @@ public override void PerformFetch(UIApplication application, Action<UIBackground
 	<string>fetch</string>
 </array>
 
+
+To Test:
+* Use Visual Studio for Mac
+* Set on debug, deploy to iOS simulator
+* Select your iOS head project
+* Go to toolbar and find "Run"
+* Under run, click "Simulate iOS Background Fetch"
 
 
 ----------
