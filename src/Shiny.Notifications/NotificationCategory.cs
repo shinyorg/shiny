@@ -9,7 +9,7 @@ namespace Shiny.Notifications
         public NotificationCategory(string identifier, params NotificationAction[] actions)
         {
             this.Identifier = identifier;
-            this.Actions = new List<NotificationAction>(actions);
+            this.Actions = new List<NotificationAction>();
             if (actions.Length > 0)
                 this.Actions.AddRange(actions);
         }
