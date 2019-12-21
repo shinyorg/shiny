@@ -7,13 +7,12 @@
         <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;monoandroid90</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;tizen50;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
-    
-    
+
+
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
-        <None Remove="Platforms\Uwp\IBackgroundTaskProcessor.cs" />
         <PackageReference Include="System.Reactive" Version="4.3.1" />
         <PackageReference Include="System.ValueTuple" Version="[4.5.0, 5)" />
         <PackageReference Include="Newtonsoft.Json" Version="[12.0.3, 13)" />
@@ -35,12 +34,12 @@
         <!--<Compile Include="**\Platforms\netstandard20\**\*.cs" />-->
         <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-    </ItemGroup>   
-    
+    </ItemGroup>
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-         <PackageReference Include="Xamarin.Android.Arch.Work.Runtime" Version="1.0.0.3" Condition=" $(UseAndroidX) == true " />
+        <PackageReference Include="Xamarin.Android.Arch.Work.Runtime" Version="1.0.0.3" Condition=" $(UseAndroidX) == true " />
         <PackageReference Include="System.Threading.Tasks.Extensions" Version="[4.5.3, 5)" />
         <PackageReference Include="Xamarin.Android.Support.v4" Version="[28.0.0.3, 29)" Condition=" $(UseAndroidX) == false " />
     </ItemGroup>

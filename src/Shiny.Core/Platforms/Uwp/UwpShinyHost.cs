@@ -59,9 +59,20 @@ namespace Shiny
 
                 InternalInit(startup, module, true);
             }
-            var targetType = Type.GetType(taskInstance.Task.Name);
-            var processor = UwpShinyHost.Container.ResolveOrInstantiate(targetType) as IBackgroundTaskProcessor;
-            processor.Process(taskInstance);
+            if (taskInstance.Task.Name.StartsWith("JOB-"))
+            {
+                UwpShinyHost
+                    .Container
+                    .ResolveOrInstantiate<JobBackgroundTaskProcessor>()
+                    .Process(taskInstance);
+            }
+            else
+            {
+
+                var targetType = Type.GetType(taskInstance.Task.Name);
+                var processor = UwpShinyHost.Container.ResolveOrInstantiate(targetType) as IBackgroundTaskProcessor;
+                processor.Process(taskInstance);
+            }
         }
 
 
@@ -89,9 +100,6 @@ namespace Shiny
             .Where(x => x.Value.Name.Equals(taskName))
             .Select(x => x.Value)
             .FirstOrDefault();
-
-
-        static bool IsRegistered(string taskName) => GetTask(taskName) != null;
 
 
         static void Dehydrate(string key, object? obj)
