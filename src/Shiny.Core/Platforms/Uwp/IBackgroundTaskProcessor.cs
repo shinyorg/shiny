@@ -6,6 +6,7 @@ namespace Shiny
 {
     public interface IBackgroundTaskProcessor
     {
-        void Process(string taskName, IBackgroundTaskInstance taskInstance);
+        void Process(IBackgroundTaskInstance taskInstance);
+        //void Register();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Shiny.IO;
 using Shiny.Jobs;
 using Shiny.Net;
@@ -15,10 +16,19 @@ namespace Shiny
     {
         const string STARTUP_KEY = "ShinyStartupTypeName";
         const string MODULE_KEY = "ShinyPlatformModuleTypeName";
+        static bool hydrated = false;
 
 
         public static void Init(IShinyStartup? startup = null, IShinyModule? platformModule = null)
-            => InitPlatform(startup, services =>
+        {
+            if (!hydrated)
+                InternalInit(startup, platformModule, false);
+        }
+
+
+        static void InternalInit(IShinyStartup? startup, IShinyModule? platformModule, bool fromBackground)
+        {
+            InitPlatform(startup, services =>
             {
                 services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
                 services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
@@ -26,19 +36,19 @@ namespace Shiny
                 services.TryAddSingleton<IFileSystem, FileSystemImpl>();
                 services.TryAddSingleton<ISettings, SettingsImpl>();
                 services.TryAddSingleton<IJobManager, JobManager>();
-                //services.TryAddSingleton<IBackgroundTaskProcessor, JobBackgroundTaskProcessor>();
 
                 if (platformModule != null)
-                {
                     services.RegisterModule(platformModule);
+
+                if (!fromBackground)
+                {
+                    Dehydrate(STARTUP_KEY, startup);
                     Dehydrate(MODULE_KEY, platformModule);
                 }
-                if (startup != null)
-                    Dehydrate(STARTUP_KEY, startup);
             });
+            hydrated = true;
+        }
 
-
-        static bool hydrated = false;
 
         public static void BackgroundRun(IBackgroundTaskInstance taskInstance)
         {
@@ -47,53 +57,47 @@ namespace Shiny
                 var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
                 var module = Hydrate<IShinyModule>(MODULE_KEY);
 
-                Init(startup, module);
-                hydrated = true;
+                InternalInit(startup, module, true);
             }
-            //    var targetType(register.DelegateTypeName);
-            //    var processor = this.serviceProvider.ResolveOrInstantiate(type) as IBackgroundTaskProcessor;
-            //    processor?.Process(task.Task.Name, task); type = Type.G
+            var targetType = Type.GetType(taskInstance.Task.Name);
+            var processor = UwpShinyHost.Container.ResolveOrInstantiate(targetType) as IBackgroundTaskProcessor;
+            processor.Process(taskInstance);
         }
 
 
-        //public async void RegisterBackground<TService>(string taskIdentifier, string backgroundTaskName, Action<BackgroundTaskBuilder>? builderAction = null) where TService : IBackgroundTaskProcessor
-        //{
-        //    // TODO: make sure the type isn't already registered - should do startup to reg tasks?
-        //    var task = GetTask(taskIdentifier, typeof(TService));
-        //    if (task != null)
-        //        return;
-
-        //    var builder = new BackgroundTaskBuilder();
-        //    builderAction?.Invoke(builder);
-        //    builder.Name = taskIdentifier;
-        //    builder.TaskEntryPoint = backgroundTaskName;
-
-        //    var registration = builder.Register();
-        //    await this.repository.Set(registration.TaskId.ToString(), new UwpTaskRegister
-        //    {
-        //        TaskId = registration.TaskId,
-        //        TaskName = taskIdentifier,
-        //        DelegateTypeName = typeof(TService).AssemblyQualifiedName
-        //    });
-        //}
-
-
-        //public void UnRegisterBackground<TService>(string taskIdentifier) where TService : IBackgroundTaskProcessor
-        //    => GetTask(taskIdentifier, typeof(TService))?.Unregister(true);
-
-
-        //static IBackgroundTaskRegistration GetTask(string taskIdentifier, Type serviceType) => BackgroundTaskRegistration
-        //    .AllTasks
-        //    .Where(x => x.Value.Name.Equals(taskIdentifier) || x.Value.Name.Equals(serviceType.FullName))
-        //    .Select(x => x.Value)
-        //    .FirstOrDefault();
-
-        static void Dehydrate(string key, object obj)
+        public static void RegisterBackground<TService>(Action<BackgroundTaskBuilder>? builderAction = null) where TService : IBackgroundTaskProcessor
         {
-            if (obj == null)
-                return;
+            var taskName = typeof(TService).AssemblyQualifiedName;
+            if (GetTask(taskName) == null)
+            {
+                var builder = new BackgroundTaskBuilder();
+                builder.Name = taskName;
+                builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
 
-            ApplicationData.Current.LocalSettings.Values[key] = obj.GetType().AssemblyQualifiedName;
+                builderAction?.Invoke(builder);
+                builder.Register();
+            }
+        }
+
+
+        public void UnRegisterBackground<TService>() where TService : IBackgroundTaskProcessor
+            => GetTask(typeof(TService).AssemblyQualifiedName)?.Unregister(true);
+
+
+        static IBackgroundTaskRegistration GetTask(string taskName) => BackgroundTaskRegistration
+            .AllTasks
+            .Where(x => x.Value.Name.Equals(taskName))
+            .Select(x => x.Value)
+            .FirstOrDefault();
+
+
+        static bool IsRegistered(string taskName) => GetTask(taskName) != null;
+
+
+        static void Dehydrate(string key, object? obj)
+        {
+            if (obj != null)
+                ApplicationData.Current.LocalSettings.Values[key] = obj.GetType().AssemblyQualifiedName;
         }
 
 

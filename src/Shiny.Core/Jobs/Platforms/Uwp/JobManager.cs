@@ -6,7 +6,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Jobs
 {
-    public class JobManager : AbstractJobManager
+    public class JobManager : AbstractJobManager, IShinyStartupTask
     {
         public JobManager(IServiceProvider container, IRepository repository) : base(container, repository, TimeSpan.FromMinutes(15))
         {
@@ -30,27 +30,9 @@ namespace Shiny.Jobs
         }
 
 
-        protected override void ScheduleNative(JobInfo jobInfo)
-        {
-            //this.context.RegisterBackground<JobBackgroundTaskProcessor>(typeof(Shiny.ShinyBackgroundTask), jobInfo.Identifier, builder =>
-            //{
-            //    var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.TotalMinutes, 0));
-            //    builder.SetTrigger(new TimeTrigger(runMins, false));
-
-            //    if (jobInfo.RequiredInternetAccess != InternetAccess.None)
-            //    {
-            //        var type = jobInfo.RequiredInternetAccess == InternetAccess.Any
-            //            ? SystemConditionType.InternetAvailable
-            //            : SystemConditionType.FreeNetworkAvailable;
-
-            //        builder.AddCondition(new SystemCondition(type));
-            //    }
-            //});
-        }
-
-
+        protected override void ScheduleNative(JobInfo jobInfo) {}
         protected override void CancelNative(JobInfo jobInfo) { }
-     //       => this.context.UnRegisterBackground<JobBackgroundTaskProcessor>(jobInfo.Identifier);
+        public void Start() => UwpShinyHost.RegisterBackground<JobBackgroundTaskProcessor>(builder => builder.SetTrigger(new TimeTrigger(15, false)));
     }
 }
 

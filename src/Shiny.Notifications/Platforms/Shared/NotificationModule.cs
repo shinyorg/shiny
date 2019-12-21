@@ -51,6 +51,10 @@ namespace Shiny.Notifications
                 IsSystemJob = true
             });
 #elif WINDOWS_UWP
+            UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
+            {
+                builder.SetTrigger(new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(Windows.UI.Notifications.NotificationKinds.Toast));
+            });
             services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
             {
                 Repeat = true,

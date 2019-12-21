@@ -22,7 +22,7 @@ namespace Shiny.Locations
         }
 
 
-        public async void Process(string taskName, IBackgroundTaskInstance taskInstance)
+        public async void Process(IBackgroundTaskInstance taskInstance)
         {
             var deferral = taskInstance.GetDeferral();
             // cancellation?
