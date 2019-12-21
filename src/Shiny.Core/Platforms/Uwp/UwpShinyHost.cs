@@ -63,7 +63,7 @@ namespace Shiny
             {
                 UwpShinyHost
                     .Container
-                    .ResolveOrInstantiate<JobBackgroundTaskProcessor>()
+                    .ResolveOrInstantiate<JobManager>()
                     .Process(taskInstance);
             }
             else

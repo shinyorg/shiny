@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Shiny.Infrastructure;
@@ -7,7 +8,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Jobs
 {
-    public class JobManager : AbstractJobManager
+    public class JobManager : AbstractJobManager, IBackgroundTaskProcessor
     {
         public JobManager(IServiceProvider container, IRepository repository) : base(container, repository, TimeSpan.FromMinutes(15))
         {
@@ -31,6 +32,24 @@ namespace Shiny.Jobs
         }
 
 
+        public async void Process(IBackgroundTaskInstance taskInstance)
+        {
+            var deferral = taskInstance.GetDeferral();
+            try
+            {
+                using (var cancelSrc = new CancellationTokenSource())
+                {
+                    taskInstance.Canceled += (sender, args) => cancelSrc.Cancel();
+                    await this.Run(taskInstance.Task.Name.Replace("JOB-", String.Empty), cancelSrc.Token);
+                }
+            }
+            finally
+            {
+                deferral.Complete();
+            }
+        }
+
+
         protected override void ScheduleNative(JobInfo jobInfo)
         {
             this.CancelNative(jobInfo);
@@ -39,14 +58,23 @@ namespace Shiny.Jobs
             builder.Name = GetJobTaskName(jobInfo);
             builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
 
-            //public void Start() => UwpShinyHost.RegisterBackground<JobBackgroundTaskProcessor>(builder => builder.SetTrigger(new TimeTrigger(15, false)));
-            // TODO: criteria
+            //var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.TotalMinutes, 0));
+            //builder.SetTrigger(new TimeTrigger(runMins, false));
+
+            // TODO: idle, power change, etc
+            if (jobInfo.RequiredInternetAccess != InternetAccess.None)
+            {
+                var type = jobInfo.RequiredInternetAccess == InternetAccess.Any
+                    ? SystemConditionType.InternetAvailable
+                    : SystemConditionType.FreeNetworkAvailable;
+
+                builder.AddCondition(new SystemCondition(type));
+            }
             builder.Register();
         }
 
 
         protected override void CancelNative(JobInfo jobInfo) => GetTask("JOB-" + jobInfo.Identifier)?.Unregister(false);
-
 
         static string GetJobTaskName(JobInfo job) => "JOB-" + job.Identifier;
 
