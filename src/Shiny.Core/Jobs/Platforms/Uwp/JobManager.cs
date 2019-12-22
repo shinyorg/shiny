@@ -59,7 +59,7 @@ namespace Shiny.Jobs
             builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
 
             //var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.TotalMinutes, 0));
-            //builder.SetTrigger(new TimeTrigger(runMins, false));
+            builder.SetTrigger(new TimeTrigger(15, false));
 
             // TODO: idle, power change, etc
             if (jobInfo.RequiredInternetAccess != InternetAccess.None)

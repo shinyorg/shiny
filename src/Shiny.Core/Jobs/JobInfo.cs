@@ -13,6 +13,7 @@ namespace Shiny.Jobs
         }
 
 
+        public TimeSpan? PeriodicTime { get; set; }
         public string Identifier { get; }
         public Type Type { get; }
         public bool Repeat { get; set; } = true;

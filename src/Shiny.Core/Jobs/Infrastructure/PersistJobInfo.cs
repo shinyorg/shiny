@@ -12,6 +12,7 @@ namespace Shiny.Jobs.Infrastructure
         public bool Repeat { get; set; }
         public bool BatteryNotLow { get; set; }
         public bool DeviceCharging { get; set; }
+        public double? PeriodicTimeSeconds { get; set; }
         public DateTime? LastRunUtc { get; set; }
         public InternetAccess RequiredInternetAccess { get; set; }
         public IDictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
@@ -27,7 +28,7 @@ namespace Shiny.Jobs.Infrastructure
         public static JobInfo FromPersist(PersistJobInfo job)
         {
             job.Assert();
-            return new JobInfo(Type.GetType(job.TypeName), job.Identifier)
+            var info = new JobInfo(Type.GetType(job.TypeName), job.Identifier)
             {
                 IsSystemJob = job.IsSystemJob,
                 LastRunUtc = job.LastRunUtc,
@@ -37,6 +38,9 @@ namespace Shiny.Jobs.Infrastructure
                 RequiredInternetAccess = job.RequiredInternetAccess,
                 Parameters = job.Parameters
             };
+            if (job.PeriodicTimeSeconds != null)
+                info.PeriodicTime = TimeSpan.FromSeconds(job.PeriodicTimeSeconds.Value);
+            return info;
         }
 
 
@@ -44,6 +48,7 @@ namespace Shiny.Jobs.Infrastructure
         {
             Identifier = job.Identifier,
             TypeName = job.Type.AssemblyQualifiedName,
+            PeriodicTimeSeconds = job.PeriodicTime?.TotalSeconds,
             IsSystemJob = job.IsSystemJob,
             Repeat = job.Repeat,
             LastRunUtc = job.LastRunUtc,

@@ -23,6 +23,12 @@ namespace Shiny.Jobs
 
 
         /// <summary>
+        /// This is the minimum allowed time for job intervals
+        /// </summary>
+        TimeSpan? MinimumAllowedPeriodicTime { get; }
+
+
+        /// <summary>
         /// Fires just as a job is about to start
         /// </summary>
         IObservable<JobInfo> JobStarted { get; }
