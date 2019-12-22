@@ -7,7 +7,7 @@ namespace Shiny.Jobs
 {
     public class JobManagerImpl : AbstractJobManager
     {
-        public JobManagerImpl(IServiceProvider container, IRepository repository) : base(container, repository, null)
+        public JobManagerImpl(IServiceProvider container, IRepository repository) : base(container, repository)
         {
         }
 

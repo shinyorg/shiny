@@ -12,7 +12,7 @@ namespace Shiny.Jobs
         readonly Timer timer;
 
 
-        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository, TimeSpan.FromSeconds(30))
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
             this.timer = new Timer(TimeSpan.FromSeconds(30).TotalMilliseconds);
             this.timer.Elapsed += async (sender, args) =>

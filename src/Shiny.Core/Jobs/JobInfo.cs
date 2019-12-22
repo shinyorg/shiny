@@ -10,9 +10,14 @@ namespace Shiny.Jobs
         {
             this.Type = jobType;
             this.Identifier = identifier ?? jobType.AssemblyQualifiedName;
+            this.PeriodicTime = TimeSpan.FromMinutes(15);
         }
 
 
+        /// <summary>
+        /// Periodic time works with Android & UWP. Though optional, you must provide some form of criteria for the platforms to trigger your job
+        /// To prevent breaking changes, this is defaulted to 15 minutes which is the minimum value on UWP & Android
+        /// </summary>
         public TimeSpan? PeriodicTime { get; set; }
         public string Identifier { get; }
         public Type Type { get; }

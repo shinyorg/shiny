@@ -22,7 +22,7 @@ namespace Shiny.Jobs
         public JobManager(AndroidContext context,
                           IServiceProvider container,
                           IRepository repository,
-                          ISettings settings) : base(container, repository, TimeSpan.FromSeconds(30))
+                          ISettings settings) : base(container, repository)
         {
             this.context = context;
             this.settings = settings;
@@ -118,6 +118,7 @@ namespace Shiny.Jobs
 
         protected override void ScheduleNative(JobInfo jobInfo)
         {
+
             var newJobId = this.settings.IncrementValue("JobId");
             var builder = new JobBuilder(
                 newJobId,
@@ -128,10 +129,16 @@ namespace Shiny.Jobs
             )
             .SetShinyIdentifier(jobInfo.Identifier)
             .SetPersisted(true)
-            // this is the min time for android
-            .SetPeriodic((long)TimeSpan.FromMinutes(15).TotalMilliseconds)
             .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
             .SetRequiresCharging(jobInfo.DeviceCharging);
+
+            if (jobInfo.PeriodicTime != null)
+            {
+                if (jobInfo.PeriodicTime < TimeSpan.FromMinutes(15))
+                    throw new ArgumentException("You cannot schedule periodic jobs faster than 15 minutes");
+
+                builder.SetPeriodic(Convert.ToInt64(System.Math.Round(jobInfo.PeriodicTime.Value.TotalMilliseconds, 0)));
+            }
 
             if (jobInfo.RequiredInternetAccess != InternetAccess.None)
             {

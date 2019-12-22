@@ -19,13 +19,10 @@ namespace Shiny.Jobs
         readonly Subject<JobInfo> jobStarted;
 
 
-        protected AbstractJobManager(IServiceProvider container,
-                                     IRepository repository,
-                                     TimeSpan? minAllowedPeriodicTime)
+        protected AbstractJobManager(IServiceProvider container, IRepository repository)
         {
             this.container = container;
             this.repository = repository;
-            this.MinimumAllowedPeriodicTime = minAllowedPeriodicTime;
             this.jobStarted = new Subject<JobInfo>();
             this.jobFinished = new Subject<JobRunResult>();
         }

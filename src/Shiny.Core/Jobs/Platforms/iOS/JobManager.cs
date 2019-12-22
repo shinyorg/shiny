@@ -17,7 +17,7 @@ namespace Shiny.Jobs
         public static double? BackgroundFetchInterval { get; set;}
 
 
-        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository, TimeSpan.FromMinutes(15))
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
             //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
         }

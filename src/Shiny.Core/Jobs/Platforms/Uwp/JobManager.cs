@@ -10,7 +10,7 @@ namespace Shiny.Jobs
 {
     public class JobManager : AbstractJobManager, IBackgroundTaskProcessor
     {
-        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository, TimeSpan.FromMinutes(15))
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
         }
 
@@ -58,8 +58,14 @@ namespace Shiny.Jobs
             builder.Name = GetJobTaskName(jobInfo);
             builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
 
-            //var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.TotalMinutes, 0));
-            builder.SetTrigger(new TimeTrigger(15, false));
+            if (jobInfo.PeriodicTime != null)
+            {
+                if (jobInfo.PeriodicTime < TimeSpan.FromMinutes(15))
+                    throw new ArgumentException("You cannot schedule periodic jobs faster than 15 minutes");
+
+                var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.Value.TotalMinutes, 0));
+                builder.SetTrigger(new TimeTrigger(runMins, false));
+            }
 
             // TODO: idle, power change, etc
             if (jobInfo.RequiredInternetAccess != InternetAccess.None)
