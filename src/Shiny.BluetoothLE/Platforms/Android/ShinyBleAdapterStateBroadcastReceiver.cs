@@ -23,11 +23,8 @@ namespace Shiny.BluetoothLE
         {
             if (intent.Action.Equals(BluetoothAdapter.ActionStateChanged))
             {
-                var nativeState = (State)Enum.Parse(
-                    typeof(State),
-                    intent.GetStringExtra(BluetoothAdapter.ExtraState)
-                );
-                this.messageBus.Value.Publish(nativeState);
+                var newState = intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
+                this.messageBus.Value.Publish(newState);
             }
         }
     }
