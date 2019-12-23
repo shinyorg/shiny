@@ -12,6 +12,7 @@ using Android.OS;
 namespace Shiny.BluetoothLE.Central
 {
     public class Peripheral : AbstractPeripheral,
+                              ICanPairPeripherals,
                               ICanDoTransactions,
                               ICanPairPeripherals,
                               ICanRequestMtu
