@@ -13,18 +13,27 @@ namespace Shiny.BluetoothLE
     )]
     [IntentFilter(new[] {
         BluetoothAdapter.ActionStateChanged
+        //Intent.ActionAirplaneModeChanged
     })]
     public class ShinyBleAdapterStateBroadcastReceiver : BroadcastReceiver
     {
         readonly Lazy<IMessageBus> messageBus = new Lazy<IMessageBus>(() => ShinyHost.Resolve<IMessageBus>());
-
+        //android.intent.action.AIRPLANE_MOD
 
         public override void OnReceive(Context context, Intent intent)
         {
-            if (intent.Action.Equals(BluetoothAdapter.ActionStateChanged))
+            switch (intent.Action)
             {
-                var newState = intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
-                this.messageBus.Value.Publish(newState);
+                //case Intent.ActionAirplaneModeChanged:
+                //    var mode = intent.GetBooleanExtra("state", false);
+                //    if (mode)
+                //        this.messageBus.Value.Publish(State.Off);
+                //    break;
+
+                case BluetoothAdapter.ActionConnectionStateChanged:
+                    var newState = intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
+                    this.messageBus.Value.Publish(newState);
+                    break;
             }
         }
     }
