@@ -15,7 +15,7 @@ namespace Shiny.BluetoothLE.Peripherals
         readonly GattServerContext context;
         readonly Dictionary<Guid, GattService> services;
         readonly IMessageBus messageBus;
-        AdvertisementCallbacks adCallbacks;
+        AdvertisementCallbacks? adCallbacks;
 
 
         public PeripheralManager(AndroidContext context, IMessageBus messageBus)
@@ -62,7 +62,7 @@ namespace Shiny.BluetoothLE.Peripherals
         }
 
 
-        public Task StartAdvertising(AdvertisementData adData = null)
+        public Task StartAdvertising(AdvertisementData? adData = null)
         {
             if (!this.context.Context.IsMinApiLevel(23))
                 throw new ApplicationException("BLE Advertiser needs API Level 23+");

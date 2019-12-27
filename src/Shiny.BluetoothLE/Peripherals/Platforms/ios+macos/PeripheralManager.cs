@@ -58,7 +58,7 @@ namespace Shiny.BluetoothLE.Peripherals
 
 
         public bool IsAdvertising => this.manager.Advertising;
-        public async Task StartAdvertising(AdvertisementData adData = null)
+        public async Task StartAdvertising(AdvertisementData? adData = null)
         {
             if (this.manager.Advertising)
                 throw new ArgumentException("Advertising is already active");
@@ -70,10 +70,6 @@ namespace Shiny.BluetoothLE.Peripherals
                 ServicesUUID = this.services
                     .Select(x => x.Value.Uuid.ToCBUuid())
                     .ToArray()
-                //ServicesUUID = adData?
-                //    .ServiceUuids?
-                //    .Select(x => x.ToCBUuid())
-                //    .ToArray()
             });
         }
 
