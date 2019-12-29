@@ -40,7 +40,7 @@ namespace Shiny.Nfc
                     .Select(x => new ShinyNDefRecord(x))
                     .ToArray();
 
-                // TODO: publish to delegate
+                ShinyHost.Resolve<INfcDelegate>().OnReceived(records);
             }
         }
 

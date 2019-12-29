@@ -8,9 +8,7 @@ namespace Shiny.Nfc
 {
     public class ShinyNfcDelegate : NFCNdefReaderSessionDelegate
     {
-        public ShinyNfcDelegate()
-        {
-        }
+        readonly Lazy<INfcDelegate> sdelegate = new Lazy<INfcDelegate>(() => ShinyHost.Resolve<INfcDelegate>());
 
 
         public override void DidDetect(NFCNdefReaderSession session, NFCNdefMessage[] messages)
@@ -21,7 +19,7 @@ namespace Shiny.Nfc
                 foreach (var record in message.Records)
                     list.Add(new ShinyNDefRecord(record));
 
-                // TODO: broadcast to delegate
+                this.sdelegate.Value.OnReceived(list.ToArray());
             }
         }
 
