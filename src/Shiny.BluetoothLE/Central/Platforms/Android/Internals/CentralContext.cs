@@ -19,7 +19,7 @@ namespace Shiny.BluetoothLE.Central.Internals
         readonly Subject<NamedMessage<IPeripheral>> peripheralSubject;
         readonly Lazy<IBleCentralDelegate> sdelegate;
         readonly IMessageBus messageBus;
-        LollipopScanCallback callbacks;
+        LollipopScanCallback? callbacks;
 
 
         public CentralContext(IServiceProvider serviceProvider,
