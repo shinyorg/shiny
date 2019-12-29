@@ -18,9 +18,9 @@ namespace Shiny
     }
 
 
-    public class ShinyNotificationsAttribute : ServiceModuleAttribute
+    public class ShinyNfcAttribute : ServiceModuleAttribute
     {
-        public ShinyNotificationsAttribute(Type delegateType)
+        public ShinyNfcAttribute(Type delegateType)
             => this.DelegateType = delegateType;
 
         public Type DelegateType { get; set; }
