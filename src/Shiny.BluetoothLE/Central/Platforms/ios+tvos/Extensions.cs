@@ -12,7 +12,7 @@ namespace Shiny.BluetoothLE.Central
         {
             var context = manager.Delegate as CentralContext;
             if (context == null)
-                throw new ArgumentException("CBCentralManager.Delegate is not AdapterContext");
+                throw new ArgumentException("CBCentralManager.Delegate is not CentralContext");
 
             return context
                 .StateUpdated
@@ -58,6 +58,18 @@ namespace Shiny.BluetoothLE.Central
                 default:
                     return AccessState.Unknown;
             }
+        }
+
+
+        public static bool IsEqual(this CBPeripheral peripheral, CBPeripheral other)
+        {
+            if (Object.ReferenceEquals(peripheral, other))
+                return true;
+
+            if (peripheral.UUID.Equals(other.UUID))
+                return true;
+
+            return false;
         }
     }
 }
