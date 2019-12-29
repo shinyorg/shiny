@@ -7,7 +7,7 @@ using Android.App;
 using Android.Content;
 using Android.Nfc;
 using Android.Nfc.Tech;
-
+using Shiny.Logging;
 
 namespace Shiny.Nfc
 {
@@ -26,7 +26,7 @@ namespace Shiny.Nfc
         }
 
 
-        public static void OnNewIntent(Intent intent)
+        public static async void OnNewIntent(Intent intent)
         {
             if (intent == null)
                 return;
@@ -40,7 +40,7 @@ namespace Shiny.Nfc
                     .Select(x => new ShinyNDefRecord(x))
                     .ToArray();
 
-                ShinyHost.Resolve<INfcDelegate>().OnReceived(records);
+                await Log.SafeExecute(() => ShinyHost.Resolve<INfcDelegate>().OnReceived(records));
             }
         }
 
