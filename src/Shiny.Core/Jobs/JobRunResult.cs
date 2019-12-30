@@ -5,7 +5,7 @@ namespace Shiny.Jobs
 {
     public struct JobRunResult
     {
-        public JobRunResult(bool hasNewData, JobInfo jobInfo, Exception? exception)
+        public JobRunResult(bool hasNewData, JobInfo? jobInfo, Exception? exception)
         {
             this.HasNewData = hasNewData;
             this.Job = jobInfo;
@@ -15,7 +15,7 @@ namespace Shiny.Jobs
 
         public bool Success => this.Exception == null;
         public bool HasNewData { get; }
-        public JobInfo Job { get; }
+        public JobInfo? Job { get; }
         public Exception? Exception { get; }
     }
 }

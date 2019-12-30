@@ -50,8 +50,8 @@ namespace Shiny.Jobs
 
         public virtual async Task<JobRunResult> Run(string jobName, CancellationToken cancelToken)
         {
-            JobRunResult result = default;
-            JobInfo actual = null;
+            JobRunResult result;
+            JobInfo? actual = null;
             try
             {
                 var job = await this.repository.Get<PersistJobInfo>(jobName);

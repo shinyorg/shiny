@@ -95,6 +95,13 @@ namespace Shiny
             => GetTask(typeof(TService).AssemblyQualifiedName)?.Unregister(true);
 
 
+        public static void ClearBackgroundTasks() => BackgroundTaskRegistration
+                .AllTasks
+                .Select(x => x.Value)
+                .ToList()
+                .ForEach(x => x.Unregister(false));
+
+
         static IBackgroundTaskRegistration GetTask(string taskName) => BackgroundTaskRegistration
             .AllTasks
             .Where(x => x.Value.Name.Equals(taskName))

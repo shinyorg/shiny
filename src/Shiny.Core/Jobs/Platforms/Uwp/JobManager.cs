@@ -40,7 +40,8 @@ namespace Shiny.Jobs
                 using (var cancelSrc = new CancellationTokenSource())
                 {
                     taskInstance.Canceled += (sender, args) => cancelSrc.Cancel();
-                    await this.Run(taskInstance.Task.Name.Replace("JOB-", String.Empty), cancelSrc.Token);
+                    var jobId = taskInstance.Task.Name.Replace("JOB-", String.Empty);
+                    await this.Run(jobId, cancelSrc.Token);
                 }
             }
             finally
@@ -67,6 +68,7 @@ namespace Shiny.Jobs
                 builder.SetTrigger(new TimeTrigger(runMins, false));
             }
 
+            //SystemTriggerType.PowerStateChange
             // TODO: idle, power change, etc
             if (jobInfo.RequiredInternetAccess != InternetAccess.None)
             {
@@ -80,15 +82,21 @@ namespace Shiny.Jobs
         }
 
 
-        protected override void CancelNative(JobInfo jobInfo) => GetTask("JOB-" + jobInfo.Identifier)?.Unregister(false);
+        protected override void CancelNative(JobInfo jobInfo) => GetTask("JOB-" + jobInfo.Identifier)?.Unregister(true);
 
         static string GetJobTaskName(JobInfo job) => "JOB-" + job.Identifier;
 
-        static IBackgroundTaskRegistration GetTask(string taskName) => BackgroundTaskRegistration
-            .AllTasks
-            .Where(x => x.Value.Name.Equals(taskName))
-            .Select(x => x.Value)
-            .FirstOrDefault();
+        static IBackgroundTaskRegistration GetTask(string taskName)
+        {
+            var tasks = BackgroundTaskRegistration
+                .AllTasks
+                .ToList();
+
+            return tasks
+                .Where(x => x.Value.Name.Equals(taskName))
+                .Select(x => x.Value)
+                .FirstOrDefault();
+        }
     }
 }
 
