@@ -7,17 +7,17 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UsePushNotifications<TDelegate>(this IServiceCollection services) where TDelegate : class, IPushNotificationDelegate
-            => services.UsePushNotifications(typeof(TDelegate));
+        public static bool UsePush<TDelegate>(this IServiceCollection services) where TDelegate : class, IPushDelegate
+            => services.UsePush(typeof(TDelegate));
 
 
-        public static bool UsePushNotifications(this IServiceCollection services, Type delegateType)
+        public static bool UsePush(this IServiceCollection services, Type delegateType)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.AddSingleton<IPushNotificationManager, PushNotificationManager>();
-            services.AddSingleton(typeof(IPushNotificationDelegate), delegateType);
+            services.AddSingleton<IPushManager, PushManager>();
+            services.AddSingleton(typeof(IPushDelegate), delegateType);
             return true;
 #endif
         }

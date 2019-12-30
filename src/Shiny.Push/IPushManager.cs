@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.Push
 {
-    public interface IPushNotificationManager
+    public interface IPushManager
     {
         //string CurrentRegistrationToken { get; }
         Task<PushAccessState> RequestAccess();

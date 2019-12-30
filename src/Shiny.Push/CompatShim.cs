@@ -5,9 +5,9 @@ using Shiny.Push;
 
 namespace Shiny
 {
-    public static class CrossPushNotifications
+    public static class CrossPush
     {
-        static IPushNotificationManager Current { get; } = ShinyHost.Resolve<IPushNotificationManager>();
+        static IPushManager Current { get; } = ShinyHost.Resolve<IPushManager>();
 
         public static Task<PushAccessState> RequestAccess() => Current.RequestAccess();
     }

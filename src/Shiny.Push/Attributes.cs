@@ -4,25 +4,25 @@ using Shiny;
 using Shiny.Infrastructure;
 using Shiny.Push;
 
-[assembly: ShinyPushNotificationsAutoRegister]
+[assembly: ShinyPushAutoRegister]
 
 
 namespace Shiny
 {
-    public class ShinyPushNotificationsAutoRegisterAttribute : AutoRegisterAttribute
+    public class ShinyPushAutoRegisterAttribute : AutoRegisterAttribute
     {
         public override void Register(IServiceCollection services)
         {
-            var implType = this.FindImplementationType(typeof(IPushNotificationDelegate), true);
-            services.UsePushNotifications(implType);
+            var implType = this.FindImplementationType(typeof(IPushDelegate), true);
+            services.UsePush(implType);
         }
     }
 
 
-    public class ShinyPushNotificationsAttribute : ServiceModuleAttribute
+    public class ShinyPushAttribute : ServiceModuleAttribute
     {
-        public ShinyPushNotificationsAttribute(Type delegateType) => this.DelegateType = delegateType;
+        public ShinyPushAttribute(Type delegateType) => this.DelegateType = delegateType;
         public Type DelegateType { get; }
-        public override void Register(IServiceCollection services) => services.UsePushNotifications(this.DelegateType);
+        public override void Register(IServiceCollection services) => services.UsePush(this.DelegateType);
     }
 }

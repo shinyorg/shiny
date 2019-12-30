@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.Push
 {
-    public interface IPushNotificationDelegate
+    public interface IPushDelegate
     {
         Task OnReceived(string payload);
     }

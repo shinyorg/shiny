@@ -5,9 +5,9 @@ using UserNotifications;
 
 namespace Shiny.Push
 {
-    public class ShinyPushNotificationDelegate : UNUserNotificationCenterDelegate
+    public class ShinyPushDelegate : UNUserNotificationCenterDelegate
     {
-        readonly Lazy<IPushNotificationDelegate> sdelegate = new Lazy<IPushNotificationDelegate>(() => ShinyHost.Resolve<IPushNotificationDelegate>());
+        readonly Lazy<IPushDelegate> sdelegate = new Lazy<IPushDelegate>(() => ShinyHost.Resolve<IPushDelegate>());
 
 
         public override async void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)

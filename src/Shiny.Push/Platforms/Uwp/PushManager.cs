@@ -6,10 +6,10 @@ using Shiny.Logging;
 
 namespace Shiny.Push
 {
-    public class PushNotificationManager : IPushNotificationManager
+    public class PushManager : IPushManager
     {
         readonly IServiceProvider serviceProvider;
-        public PushNotificationManager(IServiceProvider serviceProvider) => this.serviceProvider = serviceProvider;
+        public PushManager(IServiceProvider serviceProvider) => this.serviceProvider = serviceProvider;
 
 
         public async Task<PushAccessState> RequestAccess()
@@ -23,7 +23,7 @@ namespace Shiny.Push
 
         void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => Log.SafeExecute(async () =>
         {
-            await this.serviceProvider.Resolve<IPushNotificationDelegate>()?.OnReceived(e.RawNotification.Content);
+            await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
             e.Cancel = true;
         });
     }

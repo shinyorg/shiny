@@ -7,7 +7,7 @@ using Firebase.Messaging;
 
 namespace Shiny.Push
 {
-    public class PushNotificationManager : Java.Lang.Object, IOnCompleteListener, IPushNotificationManager
+    public class PushManager : Java.Lang.Object, IOnCompleteListener, IPushManager
     {
         TaskCompletionSource<string>? taskSrc = null;
 
