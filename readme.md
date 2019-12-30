@@ -40,6 +40,9 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpMygetShield]][HttpMyget] |
 |Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
 |Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
+|Push| [![PushNugetShield]][PushNuget] | [![PushMygetShield]][PushMyget] |
+|NFC| [![NfcNugetShield]][NfcNuget] | [![NfcMygetShield]][NfcMyget] |
+
 
 ## Integrations
 |Project|NuGet|MyGet|Description|
@@ -87,6 +90,16 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [NotificationsNuget]: https://www.nuget.org/packages/Shiny.Notifications/
 [NotificationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Notifications.svg
 [NotificationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Notifications
+
+[PushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.svg
+[PushNuget]: https://www.nuget.org/packages/Shiny.Push/
+[PushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.svg
+[PushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push
+
+[NfcNugetShield]: https://img.shields.io/nuget/v/Shiny.Nfc.svg
+[NfcNuget]: https://www.nuget.org/packages/Shiny.Nfc/
+[NfcMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Nfc.svg
+[NfcMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Nfc
 
 [SqliteNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.Sqlite.svg
 [SqliteNuget]: https://www.nuget.org/packages/Shiny.Integrations.Sqlite/
