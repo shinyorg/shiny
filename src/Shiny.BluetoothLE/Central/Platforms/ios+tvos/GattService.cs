@@ -100,7 +100,10 @@ namespace Shiny.BluetoothLE.Central
             if (other == null)
                 return false;
 
-			if (!Object.ReferenceEquals(this, other))
+            if (!this.Service.Peripheral.IsEqual(other.Service.Peripheral))
+                return false;
+
+            if (!this.Service.UUID.Equals(other.Service.UUID))
                 return false;
 
             return true;

@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
-using Android.OS;
 using ScanMode = Android.Bluetooth.LE.ScanMode;
 using Shiny.Logging;
 
@@ -15,8 +14,8 @@ namespace Shiny.BluetoothLE.Central.Internals
 {
     public class CentralContext
     {
-        readonly ConcurrentDictionary<string, IPeripheral> devices;
-        readonly Subject<NamedMessage<IPeripheral>> peripheralSubject;
+        readonly ConcurrentDictionary<string, Peripheral> devices;
+        readonly Subject<NamedMessage<Peripheral>> peripheralSubject;
         readonly Lazy<IBleCentralDelegate> sdelegate;
         readonly IMessageBus messageBus;
         LollipopScanCallback? callbacks;
@@ -32,8 +31,8 @@ namespace Shiny.BluetoothLE.Central.Internals
             this.Manager = context.GetBluetooth();
 
             this.sdelegate = new Lazy<IBleCentralDelegate>(() => serviceProvider.Resolve<IBleCentralDelegate>());
-            this.devices = new ConcurrentDictionary<string, IPeripheral>();
-            this.peripheralSubject = new Subject<NamedMessage<IPeripheral>>();
+            this.devices = new ConcurrentDictionary<string, Peripheral>();
+            this.peripheralSubject = new Subject<NamedMessage<Peripheral>>();
             this.messageBus = messageBus;
 
             this.StatusChanged
@@ -50,7 +49,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             .Select(x => x.FromNative())
             .StartWith(this.Status);
 
-        public IObservable<NamedMessage<IPeripheral>> PeripheralEvents => this.peripheralSubject;
+        public IObservable<NamedMessage<Peripheral>> PeripheralEvents => this.peripheralSubject;
 
         public BleCentralConfiguration Configuration { get; }
         public BluetoothManager Manager { get; }
@@ -63,7 +62,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             if (eventName.Equals(BluetoothDevice.ActionAclConnected))
                 this.sdelegate.Value?.OnConnected(peripheral);
 
-            this.peripheralSubject.OnNext(new NamedMessage<IPeripheral>(eventName, peripheral));
+            this.peripheralSubject.OnNext(new NamedMessage<Peripheral>(eventName, peripheral));
             //case BluetoothDevice.ActionAclConnected:
             //case BluetoothDevice.ActionAclDisconnected:
             //case BluetoothDevice.ActionBondStateChanged:
@@ -81,13 +80,13 @@ namespace Shiny.BluetoothLE.Central.Internals
             .Select(x => x.Arg);
 
 
-        public IPeripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(
+        public Peripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(
             btDevice.Address,
             x => new Peripheral(this, btDevice)
         );
 
 
-        public IEnumerable<IPeripheral> GetConnectedDevices()
+        public IEnumerable<Peripheral> GetConnectedDevices()
         {
             var nativeDevices = this.Manager.GetDevicesMatchingConnectionStates(ProfileType.Gatt, new[]
             {
@@ -104,7 +103,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             var connectedDevices = this.GetConnectedDevices().ToList();
             this.devices.Clear();
             foreach (var dev in connectedDevices)
-                this.devices.TryAdd(((BluetoothDevice) dev.NativeDevice).Address, dev);
+                this.devices.TryAdd(dev.Native.Address, dev);
         }
 
 

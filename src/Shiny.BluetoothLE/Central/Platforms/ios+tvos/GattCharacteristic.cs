@@ -151,7 +151,10 @@ namespace Shiny.BluetoothLE.Central
             if (other == null)
                 return false;
 
-			if (!Object.ReferenceEquals(this, other))
+            if (!this.NativeCharacteristic.UUID.Equals(other.NativeCharacteristic.UUID))
+                return false;
+
+            if (!other.Service.Equals(this.Service))
                 return false;
 
             return true;
@@ -161,14 +164,6 @@ namespace Shiny.BluetoothLE.Central
         public override int GetHashCode() => this.NativeCharacteristic.GetHashCode();
         public override string ToString() => this.Uuid.ToString();
 
-
-        IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value)
-        {
-            if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
-                return this.NewInternalWrite(value);
-
-            return Observable.Return(this.DoWriteNoResponse(value));
-        }
 
         #region Internals
 
@@ -184,6 +179,15 @@ namespace Shiny.BluetoothLE.Central
                 return false;
 
             return true;
+        }
+
+
+        IObservable<CharacteristicGattResult> WriteWithoutResponse(byte[] value)
+        {
+            if (UIDevice.CurrentDevice.CheckSystemVersion(11, 0))
+                return this.NewInternalWrite(value);
+
+            return Observable.Return(this.DoWriteNoResponse(value));
         }
 
 

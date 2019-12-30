@@ -29,6 +29,7 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
+        public BluetoothDevice Native => this.context.NativeDevice;
         public override ConnectionState Status => this.context.Status;
 
 
