@@ -25,8 +25,7 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override object NativeDevice => this.context.NativeDevice;
-        public override void Connect(ConnectionConfig config) => this.context.Connect();
+        public override void Connect(ConnectionConfig? config) => this.context.Connect();
         public override void CancelConnection() => this.context.Disconnect();
         public override ConnectionState Status => this.context.Status;
         public override IObservable<ConnectionState> WhenStatusChanged() => this.context.WhenStatusChanged();
