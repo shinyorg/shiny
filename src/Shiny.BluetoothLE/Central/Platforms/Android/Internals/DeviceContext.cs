@@ -48,7 +48,7 @@ namespace Shiny.BluetoothLE.Central.Internals
         public IObservable<BleException> ConnectionFailed => this.connErrorSubject; // TODO: need the device
 
 
-        public void Connect(ConnectionConfig config) => this.InvokeOnMainThread(() =>
+        public void Connect(ConnectionConfig? config) => this.InvokeOnMainThread(() =>
         {
             try
             {

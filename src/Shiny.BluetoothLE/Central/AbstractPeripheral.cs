@@ -16,12 +16,11 @@ namespace Shiny.BluetoothLE.Central
 
         public virtual string Name { get; protected set; }
         public virtual Guid Uuid { get; protected set; }
-        public abstract object NativeDevice { get; }
         public abstract ConnectionState Status { get; }
         public virtual int MtuSize { get; } = 20;
         public virtual IObservable<BleException> WhenConnectionFailed() => Observable.Empty<BleException>();
 
-        public abstract void Connect(ConnectionConfig config);
+        public abstract void Connect(ConnectionConfig? config);
         public abstract void CancelConnection();
         public abstract IObservable<ConnectionState> WhenStatusChanged();
         public abstract IObservable<IGattService> DiscoverServices();

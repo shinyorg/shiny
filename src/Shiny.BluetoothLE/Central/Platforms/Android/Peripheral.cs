@@ -29,11 +29,11 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override object NativeDevice => this.context.NativeDevice;
+        public BluetoothDevice Native => this.context.NativeDevice;
         public override ConnectionState Status => this.context.Status;
 
 
-        public override void Connect(ConnectionConfig config)
+        public override void Connect(ConnectionConfig? config)
         {
             this.connSubject.OnNext(ConnectionState.Connecting);
             this.context.Connect(config);
@@ -70,7 +70,7 @@ namespace Shiny.BluetoothLE.Central
                 .ConnectionStateChanged
                 .Select(x => x.NewState.ToStatus())
                 .StartWith(this.Status);
-                        //=> this.connSubject.Merge(this.context.Callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus()));
+                //=> this.connSubject.Merge(this.context.Callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus()));
 
 
         public override IObservable<IGattService> DiscoverServices()

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Shiny.BluetoothLE.Central.Internals;
 using Android;
 using Android.Bluetooth;
-using Android.Content;
 
 
 namespace Shiny.BluetoothLE.Central

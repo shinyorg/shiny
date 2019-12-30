@@ -15,11 +15,6 @@ namespace Shiny.BluetoothLE.Central
         //IObservable<int> WhenRssiChanged();
 
         /// <summary>
-        /// Returns the native peripheral instance for external use
-        /// </summary>
-        object NativeDevice { get; }
-
-        /// <summary>
         /// The peripheral name - note that this is not readable in the background on most platforms
         /// </summary>
         string Name { get; }
