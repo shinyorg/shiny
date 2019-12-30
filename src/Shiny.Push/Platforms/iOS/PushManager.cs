@@ -9,13 +9,13 @@ using Shiny.Settings;
 namespace Shiny.Push
 {
     //https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/enhanced-user-notifications?tabs=windows
-    public class PushNotificationManager : IPushManager
+    public class PushManager : IPushManager
     {
         static TaskCompletionSource<string>? RemoteTokenTask;
         readonly ISettings settings;
 
 
-        public PushNotificationManager(ISettings settings)
+        public PushManager(ISettings settings)
         {
             this.settings = settings;
             UNUserNotificationCenter.Current.Delegate = new ShinyPushDelegate();
