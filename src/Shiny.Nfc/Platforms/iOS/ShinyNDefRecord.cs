@@ -13,33 +13,15 @@ namespace Shiny.Nfc
         public byte[] Identifier => this.native.Identifier.ToArray();
         public byte[]? Payload => this.native.Payload?.ToArray();
         public string? Uri => this.native.WellKnownTypeUriPayload?.ToString();
-        public NfcPayloadType PayloadType
+        public NfcPayloadType PayloadType => this.native.TypeNameFormat switch
         {
-            get
-            {
-                switch (this.native.TypeNameFormat)
-                {
-                    case NFCTypeNameFormat.AbsoluteUri:
-                        return NfcPayloadType.Uri;
-
-                    case NFCTypeNameFormat.Empty:
-                        return NfcPayloadType.Empty;
-
-                    //case NFCTypeNameFormat.Media: // TODO: mime?
-
-                    case NFCTypeNameFormat.NFCExternal:
-                        return NfcPayloadType.External;
-
-                    case NFCTypeNameFormat.NFCWellKnown:
-                        return NfcPayloadType.WellKnown;
-
-                    case NFCTypeNameFormat.Unchanged:
-                        return NfcPayloadType.Unchanged;
-
-                    default:
-                        return NfcPayloadType.Unknown;
-                }
-            }
-        }
+            NFCTypeNameFormat.AbsoluteUri => NfcPayloadType.Uri,
+            NFCTypeNameFormat.Empty => NfcPayloadType.Empty,
+            NFCTypeNameFormat.NFCExternal => NfcPayloadType.External,
+            NFCTypeNameFormat.NFCWellKnown => NfcPayloadType.WellKnown,
+            NFCTypeNameFormat.Unchanged => NfcPayloadType.Unchanged,
+            //case NFCTypeNameFormat.Media: // TODO: mime?
+            _ => NfcPayloadType.Unknown
+        };
     }
 }
