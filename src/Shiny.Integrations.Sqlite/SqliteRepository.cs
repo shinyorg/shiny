@@ -74,7 +74,15 @@ namespace Shiny.Integrations.Sqlite
 
         public async Task<bool> Remove<T>(string key) where T : class
         {
-            var count = await this.conn.DeleteAsync<RepoStore>(key);
+            var item = await this.conn.RepoItems.FirstOrDefaultAsync(x =>
+                    x.Key == key &&
+                    x.TypeName == typeof(T).AssemblyQualifiedName
+                );
+
+            if (item == null)
+                return false;
+
+            var count = await this.conn.DeleteAsync<RepoStore>(item.Id);
             return (count > 0);
         }
 
