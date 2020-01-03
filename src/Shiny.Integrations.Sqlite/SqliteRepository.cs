@@ -89,7 +89,14 @@ namespace Shiny.Integrations.Sqlite
 
         public async Task<bool> Set(string key, object entity)
         {
-            var item = await this.conn.GetAsync<RepoStore>(key);
+            if (entity == null)
+                return false;
+
+            var item = await this.conn.RepoItems.FirstOrDefaultAsync(x =>
+                    x.Key == key &&
+                    x.TypeName == entity.GetType().AssemblyQualifiedName
+                    );
+
             if (item == null)
             {
                 await this.conn.InsertAsync(new RepoStore
