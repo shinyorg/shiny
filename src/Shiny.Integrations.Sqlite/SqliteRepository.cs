@@ -35,7 +35,7 @@ namespace Shiny.Integrations.Sqlite
         }
 
 
-        public async Task<T> Get<T>(string key) where T : class
+        public async Task<T?> Get<T>(string key) where T : class
         {
             var item = await this.conn.RepoItems.FirstOrDefaultAsync(x =>
                 x.Key == key &&
@@ -74,22 +74,21 @@ namespace Shiny.Integrations.Sqlite
 
         public async Task<bool> Remove<T>(string key) where T : class
         {
-            var item = await this.conn.RepoItems.FirstOrDefaultAsync(x =>
-                    x.Key == key &&
-                    x.TypeName == typeof(T).AssemblyQualifiedName
-                );
-
+            var item = await this.Get<T>(key);
             if (item == null)
                 return false;
 
-            var count = await this.conn.DeleteAsync<RepoStore>(item.Id);
-            return (count > 0);
+            await this.conn.DeleteAsync(item);
+            return true;
         }
 
 
         public async Task<bool> Set(string key, object entity)
         {
-            var item = await this.conn.GetAsync<RepoStore>(key);
+            var item = await this.conn.RepoItems.FirstOrDefaultAsync(x =>
+                x.Key == key &&
+                x.TypeName == entity.GetType().AssemblyQualifiedName
+            );
             if (item == null)
             {
                 await this.conn.InsertAsync(new RepoStore
