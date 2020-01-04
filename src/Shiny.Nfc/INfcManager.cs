@@ -5,9 +5,8 @@ namespace Shiny.Nfc
 {
     public interface INfcManager
     {
-        Task<AccessState> RequestAccess(bool forWrite = false);
-        bool IsListening { get; }
-        void StartListener();
-        void StopListening();
+        IObservable<AccessState> RequestAccess(bool forBroadcasting = false);
+        //IObservable<object> Broadcast();
+        IObservable<INDefRecord[]> Reader();
     }
 }

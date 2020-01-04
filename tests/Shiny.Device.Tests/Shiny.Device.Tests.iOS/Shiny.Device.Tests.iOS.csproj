@@ -160,7 +160,7 @@
       <Name>Shiny.SpeechRecognition</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shiny.Device.Tests\Shiny.Device.Tests.csproj">
-      <Project>{14B36205-6EB0-487E-9BE0-1C99B882A3D5}</Project>
+      <Project>{8E87D625-07EA-4CE2-A549-E3A815AB52D6}</Project>
       <Name>Shiny.Device.Tests</Name>
     </ProjectReference>
   </ItemGroup>

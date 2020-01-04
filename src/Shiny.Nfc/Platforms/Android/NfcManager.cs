@@ -1,81 +1,52 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Android;
-using Android.App;
-using Android.Content;
 using Android.Nfc;
-using Android.Nfc.Tech;
-using Shiny.Logging;
+
 
 namespace Shiny.Nfc
 {
     //https://developer.android.com/guide/topics/connectivity/nfc/nfc.html
-    public class NfcManager : INfcManager
+    public class NfcManager : Java.Lang.Object, NfcAdapter.IReaderCallback, INfcManager
     {
-        readonly NfcAdapter adapter;
         readonly AndroidContext context;
-
+        readonly Subject<INDefRecord[]> recordSubj;
         
 
         public NfcManager(AndroidContext context)
         {
             this.context = context;
-            this.adapter = NfcAdapter.GetDefaultAdapter(context.AppContext);
+            this.recordSubj = new Subject<INDefRecord[]>();
         }
 
 
-        public static async void OnNewIntent(Intent intent)
+        public IObservable<AccessState> RequestAccess(bool forPublishing = false)
+            => this.context.RequestAccess(Manifest.Permission.Nfc);
+
+
+        public IObservable<INDefRecord[]> Reader() => Observable.Create<INDefRecord[]>(ob =>
         {
-            if (intent == null)
-                return;
+            var adapter = NfcAdapter.GetDefaultAdapter(this.context.AppContext);
 
-            var tag = intent.GetParcelableExtra(NfcAdapter.ExtraTag) as Tag;
-            if (tag != null)
-            {
-                var message = Ndef.Get(tag).CachedNdefMessage;
-                var records = message
-                    .GetRecords()
-                    .Select(x => new ShinyNDefRecord(x))
-                    .ToArray();
-
-                await Log.SafeExecute(() => ShinyHost.Resolve<INfcDelegate>().OnReceived(records));
-            }
-        }
-
-
-        public bool IsListening => this.adapter.IsEnabled;
-
-
-        public void StartListener()
-        {
-            var activity = this.context.CurrentActivity;
-
-            var intent = new Intent(activity, activity.GetType());
-            var pendingIntent = PendingIntent.GetActivity(activity, 0, intent, 0);
-
-            var ndef = new IntentFilter(NfcAdapter.ActionNdefDiscovered);
-            ndef.AddDataType("*/*");
-
-            var tag = new IntentFilter(NfcAdapter.ActionTagDiscovered);
-            tag.AddCategory(Intent.CategoryDefault);
-
-            this.adapter.EnableForegroundDispatch(
-                activity,
-                pendingIntent,
-                new IntentFilter[] { ndef, tag },
-                null
+            adapter.EnableReaderMode(
+                this.context.CurrentActivity,
+                this,
+                NfcReaderFlags.NfcA,
+                new Android.OS.Bundle()
             );
+            var sub = this.recordSubj.Subscribe(ob.OnNext);
+
+            return () =>
+            {
+                adapter.DisableReaderMode(this.context.CurrentActivity);
+                sub.Dispose();
+            };
+        });
+
+
+        public void OnTagDiscovered(Tag tag)
+        {
         }
-
-
-        public void StopListening()
-            => this.adapter.DisableForegroundDispatch(this.context.CurrentActivity);
-
-
-        public Task<AccessState> RequestAccess(bool forWrite = false) => this.context
-            .RequestAccess(Manifest.Permission.Nfc)
-            .ToTask();
     }
 }

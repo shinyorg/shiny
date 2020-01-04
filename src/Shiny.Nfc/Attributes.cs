@@ -12,19 +12,14 @@ namespace Shiny
     {
         public override void Register(IServiceCollection services)
         {
-            var implType = this.FindImplementationType(typeof(INfcDelegate), false);
-            services.UseNfc(implType);
+            services.UseNfc();
         }
     }
 
 
     public class ShinyNfcAttribute : ServiceModuleAttribute
     {
-        public ShinyNfcAttribute(Type delegateType)
-            => this.DelegateType = delegateType;
-
-        public Type DelegateType { get; set; }
         public override void Register(IServiceCollection services)
-            => services.UseNfc(this.DelegateType);
+            => services.UseNfc();
     }
 }

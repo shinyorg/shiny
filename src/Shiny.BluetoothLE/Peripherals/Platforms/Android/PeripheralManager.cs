@@ -71,11 +71,11 @@ namespace Shiny.BluetoothLE.Peripherals
 
             var settings = new AdvertiseSettings.Builder()
                 .SetAdvertiseMode(AdvertiseMode.Balanced)
-                .SetConnectable(true);
+                .SetConnectable(true); // TODO: configurable
 
             var data = new AdvertiseData.Builder()
-                .SetIncludeDeviceName(true)
-                .SetIncludeTxPowerLevel(true);
+                .SetIncludeDeviceName(true) // TODO: configurable
+                .SetIncludeTxPowerLevel(true); // TODO: configurable
 
             if (adData != null)
             {
