@@ -17,7 +17,7 @@ namespace Shiny.SpeechRecognition
 
         public SpeechRecognizerImpl(AndroidContext context) => this.context = context;
 
-        public override Task<AccessState> RequestAccess()
+        public override async Task<AccessState> RequestAccess()
         {
             var state = AccessState.Available;
             if (!SpeechRecognizer.IsRecognitionAvailable(this.context.AppContext))
@@ -25,8 +25,11 @@ namespace Shiny.SpeechRecognition
 
             else if (!this.context.IsInManifest(Manifest.Permission.RecordAudio))
                 state = AccessState.NotSetup;
+            
+            else if (this.context.GetCurrentAccessState(Manifest.Permission.RecordAudio) == AccessState.Denied)
+                state = await this.context.RequestAccess(Manifest.Permission.RecordAudio);
 
-            return Task.FromResult(state);
+            return state;
         }
 
 
