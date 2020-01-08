@@ -276,7 +276,7 @@ namespace Shiny.Notifications
             var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
             if (category == null)
             {
-                Log.Write("Notifications", "No notification category found for " + notification.Category);
+                Log.Write(NotificationLogCategory.Notifications, "No notification category found for " + notification.Category);
             }
             else
             {
