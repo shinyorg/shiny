@@ -235,7 +235,10 @@ namespace Shiny.Notifications
 
             var colorResourceId = this.context.GetColorByName(colorResourceName);
             if (colorResourceId <= 0)
-                throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
+            {
+                Log.Write(NotificationLogCategory.Notifications, $"Color ResourceId for {colorResourceName} not found");
+                return null;
+            }
 
             return ContextCompat.GetColor(this.context.AppContext, colorResourceId);
         }
@@ -247,7 +250,10 @@ namespace Shiny.Notifications
 
             var smallIconResourceId = this.context.GetResourceIdByName(notification.Android.SmallIconResourceName);
             if (smallIconResourceId <= 0)
-                throw new ArgumentException($"Icon ResourceId for {notification.Android.SmallIconResourceName} not found");
+            {
+                Log.Write(NotificationLogCategory.Notifications, $"Icon ResourceId for {notification.Android.SmallIconResourceName} not found");
+                return this.context.AppContext.ApplicationInfo.Icon;
+            }
 
             return smallIconResourceId;
         }
