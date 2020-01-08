@@ -1,8 +1,8 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -12,9 +12,9 @@ using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
 using Shiny.Settings;
-using TaskStackBuilder = Android.App.TaskStackBuilder;
 using Native = Android.App.NotificationManager;
 using RemoteInput = Android.Support.V4.App.RemoteInput;
+using TaskStackBuilder = Android.App.TaskStackBuilder;
 
 
 namespace Shiny.Notifications
@@ -52,7 +52,7 @@ namespace Shiny.Notifications
             //    .Where(x => x.Status == ActivityState.Created)
             //    .Subscribe(x => TryProcessIntent(x.Activity.Intent));
 
-            if ((int) Build.VERSION.SdkInt >= 26)
+            if ((int)Build.VERSION.SdkInt >= 26)
             {
                 this.newManager = Native.FromContext(context.AppContext);
             }
@@ -150,7 +150,7 @@ namespace Shiny.Notifications
                 builder.SetWhen(notification.Android.When.Value.ToEpochMillis());
 
             if (notification.Android.Vibrate)
-                builder.SetVibrate(new long[] {500, 500});
+                builder.SetVibrate(new long[] { 500, 500 });
 
             this.DoNotify(builder, notification);
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
@@ -286,7 +286,7 @@ namespace Shiny.Notifications
             }
             else
             {
-                var notificationString = this.serializer.Serialize(notification);                
+                var notificationString = this.serializer.Serialize(notification);
 
                 foreach (var action in category.Actions)
                 {
@@ -339,7 +339,7 @@ namespace Shiny.Notifications
             var pendingIntent = this.CreateActionIntent(notification, action);
             var iconId = this.context.GetResourceIdByName(action.Identifier);
             var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
-            
+
             return nativeAction;
         }
 
