@@ -11,6 +11,7 @@ namespace Shiny.Notifications
         public static string DefaultChannelDescription { get; set; }
         public static AndroidNotificationImportance DefaultNotificationImportance { get; set; } = AndroidNotificationImportance.Default;
         //public static Color? DefaultColor { get; set; }
+        public static bool? DefaultShowWhen { get; set; }
         public static bool DefaultVibrate { get; set; }
         public static AndroidActivityFlags DefaultLaunchActivityFlags { get; set; } = AndroidActivityFlags.NewTask | AndroidActivityFlags.ClearTask;
 
@@ -25,6 +26,8 @@ namespace Shiny.Notifications
         public string SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
         public bool OnGoing { get; set; }
         public bool AutoCancel { get; set; } = true;
+        public bool? ShowWhen { get; set; } = DefaultShowWhen;
+        public DateTime? When { get; set; }
     }
 
 

@@ -138,6 +138,12 @@ namespace Shiny.Notifications
             if (notification.Android.Priority != null)
                 builder.SetPriority(notification.Android.Priority.Value);
 
+            if (notification.Android.ShowWhen != null)
+                builder.SetShowWhen(notification.Android.ShowWhen.Value);
+
+            if (notification.Android.When != null)
+                builder.SetWhen(notification.Android.When.Value.ToEpochMillis());
+
             if (notification.Android.Vibrate)
                 builder.SetVibrate(new long[] {500, 500});
 
