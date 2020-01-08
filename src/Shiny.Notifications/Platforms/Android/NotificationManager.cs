@@ -7,6 +7,7 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
@@ -132,8 +133,12 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
 
-            //if ((int)Build.VERSION.SdkInt >= 21 && notification.Android.Color != null)
-            //    builder.SetColor(notification.Android.Color.Value)
+            if ((int)Build.VERSION.SdkInt >= 21 && notification.Android.ColorResourceName != null)
+            {
+                var color = this.GetColor(notification.Android.ColorResourceName);
+                if (color != null)
+                    builder.SetColor(color.Value);
+            }
 
             if (notification.Android.Priority != null)
                 builder.SetPriority(notification.Android.Priority.Value);
@@ -222,6 +227,18 @@ namespace Shiny.Notifications
             return pendingIntent;
         }
 
+
+        protected virtual int? GetColor(string colorResourceName)
+        {
+            if (colorResourceName.IsEmpty())
+                return null;
+
+            var colorResourceId = this.context.GetColorByName(colorResourceName);
+            if (colorResourceId <= 0)
+                throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
+
+            return ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+        }
 
         protected virtual int GetIconResource(Notification notification)
         {
