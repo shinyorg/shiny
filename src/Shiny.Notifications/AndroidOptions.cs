@@ -9,7 +9,7 @@ namespace Shiny.Notifications
         public static string DefaultChannel { get; set; } = "shinynotificationchannel";
         public static string DefaultSmallIconResourceName { get; set; } = "notification";
         public static string? DefaultColorResourceName { get; set; }
-        public static string DefaultChannelDescription { get; set; }
+        public static string? DefaultChannelDescription { get; set; }
         public static AndroidNotificationImportance DefaultNotificationImportance { get; set; } = AndroidNotificationImportance.Default;
         public static bool? DefaultShowWhen { get; set; }
         public static bool DefaultVibrate { get; set; }
@@ -20,7 +20,7 @@ namespace Shiny.Notifications
         public int? Priority { get; set; }
         public string ChannelId { get; set; } = DefaultChannelId;
         public string Channel { get; set; } = DefaultChannel;
-        public string ChannelDescription { get; set; } = DefaultChannelDescription;
+        public string? ChannelDescription { get; set; } = DefaultChannelDescription;
         public AndroidNotificationImportance NotificationImportance { get; set; } = DefaultNotificationImportance;
         public string SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
         public string? ColorResourceName { get; set; } = DefaultColorResourceName;
