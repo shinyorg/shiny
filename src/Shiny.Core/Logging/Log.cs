@@ -2,12 +2,30 @@
 using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace Shiny.Logging
 {
+    public static class LoggingExtensions
+    {
+        public static void AddLogging<T>(this IServiceCollection services, bool crashesEnabled = true, bool eventsEnabled = true) where T : class, ILogger
+        {
+            services.AddSingleton<ILogger, T>();
+            services.RegisterPostBuildAction(sp =>
+            {
+                var logger = sp.Resolve<ILogger>();
+                Log.AddLogger(new ActionLogger(
+                    (ex, parameters) => logger.Write(ex, parameters),
+                    (ev, desc, parameters) => logger.Write(ev, desc, parameters)
+                ), crashesEnabled, eventsEnabled);
+            });
+        }
+    }
+
+
     public static class Log
     {
-
         public static void UseDebug(bool crashesEnabled = true, bool eventsEnabled = true)
             => AddLogger(new DebugLogger(), crashesEnabled, eventsEnabled);
 
