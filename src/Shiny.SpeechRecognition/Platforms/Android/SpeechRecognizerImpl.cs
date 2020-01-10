@@ -19,17 +19,13 @@ namespace Shiny.SpeechRecognition
 
         public override async Task<AccessState> RequestAccess()
         {
-            var state = AccessState.Available;
             if (!SpeechRecognizer.IsRecognitionAvailable(this.context.AppContext))
-                state = AccessState.NotSupported;
+                return AccessState.NotSupported;
 
-            else if (!this.context.IsInManifest(Manifest.Permission.RecordAudio))
-                state = AccessState.NotSetup;
-            
-            else if (this.context.GetCurrentAccessState(Manifest.Permission.RecordAudio) == AccessState.Denied)
-                state = await this.context.RequestAccess(Manifest.Permission.RecordAudio);
+            if (!this.context.IsInManifest(Manifest.Permission.RecordAudio))
+                return AccessState.NotSetup;
 
-            return state;
+            return await this.context.RequestAccess(Manifest.Permission.RecordAudio);
         }
 
 
