@@ -7,6 +7,7 @@ using Android.App.Job;
 using Android.Content;
 using Java.Lang;
 using JobBuilder = Android.App.Job.JobInfo.Builder;
+using Shiny.Logging;
 #if ANDROIDX
 using AndroidX.Work;
 #endif
@@ -130,7 +131,6 @@ namespace Shiny.Jobs
             )
             .SetShinyIdentifier(jobInfo.Identifier)
             .SetPersisted(true)
-            .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
             .SetRequiresCharging(jobInfo.DeviceCharging);
 
             if (jobInfo.PeriodicTime != null)
@@ -141,9 +141,16 @@ namespace Shiny.Jobs
                 builder.SetPeriodic(Convert.ToInt64(System.Math.Round(jobInfo.PeriodicTime.Value.TotalMilliseconds, 0)));
             }
 
+            if (jobInfo.BatteryNotLow)
+            {
+                if (this.context.IsMinApiLevel(26))
+                    builder.SetRequiresBatteryNotLow(jobInfo.BatteryNotLow);
+                else
+                    Log.Write(nameof(JobManager), "BatteryNotLow criteria is only supported on API 26+");
+            }
+
             if (jobInfo.RequiredInternetAccess != InternetAccess.None)
             {
-                //builder.SetRequiredNetwork(new Android.Net.NetworkRequest { }.HasCapability(Android.Net.NetCapability.Internet).)
                 var networkType = jobInfo.RequiredInternetAccess == InternetAccess.Unmetered
                     ? NetworkType.Unmetered
                     : NetworkType.Any;
