@@ -118,6 +118,7 @@ namespace Shiny.Jobs
 
         protected override void ScheduleNative(JobInfo jobInfo)
         {
+            this.CancelNative(jobInfo);
 
             var newJobId = this.settings.IncrementValue("JobId");
             var builder = new JobBuilder(
