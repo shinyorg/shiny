@@ -1,19 +1,20 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Support.V4.App;
+using Android.Support.V4.Content;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
 using Shiny.Settings;
-using TaskStackBuilder = Android.App.TaskStackBuilder;
 using Native = Android.App.NotificationManager;
 using RemoteInput = Android.Support.V4.App.RemoteInput;
+using TaskStackBuilder = Android.App.TaskStackBuilder;
 
 
 namespace Shiny.Notifications
@@ -51,7 +52,7 @@ namespace Shiny.Notifications
             //    .Where(x => x.Status == ActivityState.Created)
             //    .Subscribe(x => TryProcessIntent(x.Activity.Intent));
 
-            if ((int) Build.VERSION.SdkInt >= 26)
+            if ((int)Build.VERSION.SdkInt >= 26)
             {
                 this.newManager = Native.FromContext(context.AppContext);
             }
@@ -132,14 +133,31 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
 
-            //if ((int)Build.VERSION.SdkInt >= 21 && notification.Android.Color != null)
-            //    builder.SetColor(notification.Android.Color.Value)
+            if (notification.Android.ColorResourceName != null)
+            {
+                if (this.context.IsMinApiLevel(21))
+                {
+                    var color = this.GetColor(notification.Android.ColorResourceName);
+                    if (color != null)
+                        builder.SetColor(color.Value);
+                }
+                else
+                {
+                    Log.Write(NotificationLogCategory.Notifications, "ColorResourceName is only supported on API 21+");
+                }
+            }
 
             if (notification.Android.Priority != null)
                 builder.SetPriority(notification.Android.Priority.Value);
 
+            if (notification.Android.ShowWhen != null)
+                builder.SetShowWhen(notification.Android.ShowWhen.Value);
+
+            if (notification.Android.When != null)
+                builder.SetWhen(notification.Android.When.Value.ToEpochMillis());
+
             if (notification.Android.Vibrate)
-                builder.SetVibrate(new long[] {500, 500});
+                builder.SetVibrate(new long[] { 500, 500 });
 
             this.DoNotify(builder, notification);
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
@@ -217,6 +235,18 @@ namespace Shiny.Notifications
         }
 
 
+        protected virtual int? GetColor(string colorResourceName)
+        {
+            if (colorResourceName.IsEmpty())
+                return null;
+
+            var colorResourceId = this.context.GetColorByName(colorResourceName);
+            if (colorResourceId <= 0)
+                throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
+
+            return ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+        }
+
         protected virtual int GetIconResource(Notification notification)
         {
             if (notification.Android.SmallIconResourceName.IsEmpty())
@@ -253,11 +283,11 @@ namespace Shiny.Notifications
             var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
             if (category == null)
             {
-                Log.Write("Notifications", "No notification category found for " + notification.Category);
+                Log.Write(NotificationLogCategory.Notifications, "No notification category found for " + notification.Category);
             }
             else
             {
-                var notificationString = this.serializer.Serialize(notification);                
+                var notificationString = this.serializer.Serialize(notification);
 
                 foreach (var action in category.Actions)
                 {
@@ -310,7 +340,7 @@ namespace Shiny.Notifications
             var pendingIntent = this.CreateActionIntent(notification, action);
             var iconId = this.context.GetResourceIdByName(action.Identifier);
             var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
-            
+
             return nativeAction;
         }
 

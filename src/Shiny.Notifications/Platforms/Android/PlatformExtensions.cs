@@ -1,5 +1,4 @@
-﻿using System;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Shiny.Notifications;
 
@@ -23,6 +22,15 @@ namespace Shiny
             return native;
         }
 
+
+        internal static int GetColorByName(this AndroidContext context, string colorName) => context
+            .AppContext
+            .Resources
+            .GetIdentifier(
+                colorName,
+                "color",
+                context.AppContext.PackageName
+            );
 
         internal static int GetResourceIdByName(this AndroidContext context, string iconName) => context
             .AppContext
