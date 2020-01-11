@@ -7,6 +7,6 @@ namespace Shiny.Nfc
     {
         IObservable<AccessState> RequestAccess(bool forBroadcasting = false);
         //IObservable<object> Broadcast();
-        IObservable<INDefRecord[]> Reader();
+        IObservable<NDefRecord[]> Reader();
     }
 }

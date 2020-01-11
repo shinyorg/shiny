@@ -6,7 +6,7 @@ using Shiny.Nfc;
 
 namespace Shiny.Testing.Nfc
 {
-    public class TestNDefRecord : INDefRecord
+    public class TestNDefRecord : NDefRecord
     {
         public byte[] Identifier { get; set; }
         public byte[]? Payload { get; set; }
@@ -17,8 +17,8 @@ namespace Shiny.Testing.Nfc
 
     public class TestNfcManager : INfcManager
     {
-        public Subject<INDefRecord[]> ReaderSubject { get; } = new Subject<INDefRecord[]>();
-        public IObservable<INDefRecord[]> Reader() => this.ReaderSubject;
+        public Subject<NDefRecord[]> ReaderSubject { get; } = new Subject<NDefRecord[]>();
+        public IObservable<NDefRecord[]> Reader() => this.ReaderSubject;
 
         public AccessState RequestAccessReply { get; set; } = AccessState.Available;
         public IObservable<AccessState> RequestAccess(bool forBroadcasting = false) => Observable.Return(this.RequestAccessReply);
