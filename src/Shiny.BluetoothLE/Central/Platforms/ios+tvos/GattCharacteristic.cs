@@ -24,9 +24,6 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override byte[]? Value => this.NativeCharacteristic.Value?.ToArray();
-
-
         public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse)
         {
             this.AssertWrite(withResponse);
@@ -65,7 +62,7 @@ namespace Shiny.BluetoothLE.Central
                     return;
 
                 if (args.Error == null)
-                    ob.Respond(new CharacteristicGattResult(this, this.Value, CharacteristicResultType.Read));
+                    ob.Respond(new CharacteristicGattResult(this, this.NativeCharacteristic.Value?.ToArray(), CharacteristicResultType.Read));
                 else
                     ob.OnError(new BleException(args.Error.Description));
             });
@@ -77,7 +74,7 @@ namespace Shiny.BluetoothLE.Central
 
 
         IObservable<CharacteristicGattResult> notifyOb;
-        public override IObservable<CharacteristicGattResult> Notify(bool enableIndicationsIfAvailable)
+        public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable)
         {
             this.AssertNotify();
 

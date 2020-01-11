@@ -6,7 +6,6 @@ using System.Reactive.Subjects;
 using System.Reactive.Disposables;
 using Shiny.BluetoothLE.Central.Internals;
 using Android.Bluetooth;
-using Android.OS;
 
 
 namespace Shiny.BluetoothLE.Central
@@ -112,7 +111,7 @@ namespace Shiny.BluetoothLE.Central
         });
 
 
-        public IObservable<bool> PairingRequest(string pin) => Observable.Create<bool>(ob =>
+        public IObservable<bool> PairingRequest(string? pin) => Observable.Create<bool>(ob =>
         {
             var composite = new CompositeDisposable();
 
@@ -121,7 +120,7 @@ namespace Shiny.BluetoothLE.Central
 
             else
             {
-                if (pin != null && Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
+                if (pin != null)
                 {
                     composite.Add(this.context
                         .CentralContext
@@ -169,12 +168,12 @@ namespace Shiny.BluetoothLE.Central
 
 
         int currentMtu = 20;
-        public IObservable<int> RequestMtu(int size) => Observable.Create<int>(ob =>
+        public IObservable<int> RequestMtu(int size) => this.context.Invoke(Observable.Create<int>(ob =>
         {
             var sub = this.WhenMtuChanged().Skip(1).Take(1).Subscribe(ob.Respond);
             this.context.Gatt.RequestMtu(size);
             return sub;
-        });
+        }));
 
 
         public IObservable<int> WhenMtuChanged() => Observable

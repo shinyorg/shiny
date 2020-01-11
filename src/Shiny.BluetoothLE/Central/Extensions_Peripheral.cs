@@ -24,15 +24,51 @@ namespace Shiny.BluetoothLE.Central
 
 
         /// <summary>
+        /// Connect and manage connection as well as hook into your required characterisitcs with all proper cleanups necessary
+        /// </summary>
+        /// <param name="device"></param>
+        /// <param name="serviceUuid"></param>
+        /// <param name="characteristicUuids"></param>
+        /// <returns></returns>
+        public static IObservable<CharacteristicGattResult> ConnectHook(this IPeripheral device, Guid serviceUuid, params Guid[] characteristicUuids)
+            => Observable.Create<CharacteristicGattResult>(ob =>
+            {
+                var sub = device
+                    .WhenConnected()
+                    .Select(_ => device.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuids))
+                    .Switch()
+                    .Select(x => x.Notify(false))
+                    .Merge()
+                    .Subscribe(
+                        ob.OnNext,
+                        ob.OnError
+                    );
+
+                var connSub = device
+                    .WhenConnectionFailed()
+                    .Subscribe(ob.OnError);
+
+                device.ConnectIf();
+
+                return () =>
+                {
+                    device.CancelConnection();
+                    sub?.Dispose();
+                    connSub?.Dispose();
+                };
+            });
+
+        /// <summary>
         /// Starts connection process if not already connecteds
         /// </summary>
         /// <param name="peripheral"></param>
+        /// <param name="connectionConfig"></param>
         /// <returns>True if connection attempt was sent, otherwise false</returns>
-        public static bool ConnectIf(this IPeripheral peripheral, ConnectionConfig? connectionConfig = null)
+        public static bool ConnectIf(this IPeripheral peripheral, ConnectionConfig? config = null)
         {
             if (peripheral.Status == ConnectionState.Disconnected)
             {
-                peripheral.Connect(connectionConfig);
+                peripheral.Connect(config);
                 return true;
             }
             return false;
@@ -69,8 +105,9 @@ namespace Shiny.BluetoothLE.Central
         /// Waits for connection to actually happen
         /// </summary>
         /// <param name="peripheral"></param>
+        /// <param name="config"></param>
         /// <returns></returns>
-        public static IObservable<IPeripheral> ConnectWait(this IPeripheral peripheral)
+        public static IObservable<IPeripheral> ConnectWait(this IPeripheral peripheral, ConnectionConfig? config = null)
             => Observable.Create<IPeripheral>(ob =>
             {
                 var sub1 = peripheral
@@ -82,7 +119,7 @@ namespace Shiny.BluetoothLE.Central
                     .WhenConnectionFailed()
                     .Subscribe(ob.OnError);
 
-                peripheral.ConnectIf();
+                peripheral.ConnectIf(config);
                 return () =>
                 {
                     sub1.Dispose();

@@ -13,7 +13,7 @@ namespace Shiny.BluetoothLE.Central
         {
             this.result = result;
 
-            this.manufacturerData = new Lazy<ManufacturerData>(() =>
+            this.manufacturerData = new Lazy<ManufacturerData?>(() =>
             {
                 var manufacturerId = (ushort)this.result.ScanRecord.ManufacturerSpecificData.KeyAt(0);
                 if (manufacturerId == 0)
@@ -28,15 +28,15 @@ namespace Shiny.BluetoothLE.Central
                     .ScanRecord
                     .ServiceUuids?
                     .Select(x => x.Uuid.ToGuid())
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<Guid>()
             );
 
             this.serviceData = new Lazy<AdvertisementServiceData[]>(() =>
                 result
                     .ScanRecord
-                    .ServiceData
+                    .ServiceData?
                     .Select(x => new AdvertisementServiceData(x.Key.Uuid.ToGuid(), x.Value))
-                    .ToArray()
+                    .ToArray() ?? Array.Empty<AdvertisementServiceData>()
             );
         }
 
@@ -54,8 +54,8 @@ namespace Shiny.BluetoothLE.Central
             }
         }
 
-        readonly Lazy<ManufacturerData> manufacturerData;
-        public ManufacturerData ManufacturerData => this.manufacturerData.Value;
+        readonly Lazy<ManufacturerData?> manufacturerData;
+        public ManufacturerData? ManufacturerData => this.manufacturerData.Value;
 
         readonly Lazy<Guid[]> serviceUuids;
         public Guid[] ServiceUuids => this.serviceUuids.Value;

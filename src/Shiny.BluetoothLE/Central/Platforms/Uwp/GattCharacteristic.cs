@@ -27,8 +27,6 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        byte[] value;
-        public override byte[] Value => this.value;
         public Native Native { get; }
 
 
@@ -68,7 +66,6 @@ namespace Shiny.BluetoothLE.Central
             if (status != GattCommunicationStatus.Success)
                 throw new BleException($"Failed to write characteristic - {status}");
 
-            this.value = value;
             return new CharacteristicGattResult(
                 this,
                 value,
@@ -90,10 +87,9 @@ namespace Shiny.BluetoothLE.Central
             if (result.Status != GattCommunicationStatus.Success)
                 throw new BleException($"Failed to read characteristic - {result.Status}");
 
-            this.value = result.Value?.ToArray();
             return new CharacteristicGattResult(
                 this,
-                this.value,
+                result.Value?.ToArray(),
                 CharacteristicResultType.Read
             );
         });
@@ -115,7 +111,7 @@ namespace Shiny.BluetoothLE.Central
 
 
         IObservable<CharacteristicGattResult> notifyOb;
-        public override IObservable<CharacteristicGattResult> Notify(bool enableIndicationsIfAvailable)
+        public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable)
         {
             this.notifyOb ??= Observable.Create<CharacteristicGattResult>(
                 ob =>
