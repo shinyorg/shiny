@@ -133,11 +133,18 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
 
-            if ((int)Build.VERSION.SdkInt >= 21 && notification.Android.ColorResourceName != null)
+            if (notification.Android.ColorResourceName != null)
             {
-                var color = this.GetColor(notification.Android.ColorResourceName);
-                if (color != null)
-                    builder.SetColor(color.Value);
+                if (this.context.IsMinApiLevel(21))
+                {
+                    var color = this.GetColor(notification.Android.ColorResourceName);
+                    if (color != null)
+                        builder.SetColor(color.Value);
+                }
+                else
+                {
+                    Log.Write(NotificationLogCategory.Notifications, "ColorResourceName is only supported on API 21+");
+                }
             }
 
             if (notification.Android.Priority != null)
