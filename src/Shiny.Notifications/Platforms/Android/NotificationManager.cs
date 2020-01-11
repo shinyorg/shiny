@@ -52,7 +52,7 @@ namespace Shiny.Notifications
             //    .Where(x => x.Status == ActivityState.Created)
             //    .Subscribe(x => TryProcessIntent(x.Activity.Intent));
 
-            if ((int)Build.VERSION.SdkInt >= 26)
+            if (this.context.IsMinApiLevel(26))
             {
                 this.newManager = Native.FromContext(context.AppContext);
             }
@@ -133,13 +133,16 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
 
-            if (notification.Android.ColorResourceName != null)
+
+            // disabled until System.Drawing reliable works in Xamarin again
+            //if (notification.Android.Color != null)
+            //    builder.SetColor(notification.Android.Color.Value)
+            if (!notification.Android.ColorResourceName.IsEmpty())
             {
                 if (this.context.IsMinApiLevel(21))
                 {
                     var color = this.GetColor(notification.Android.ColorResourceName);
-                    if (color != null)
-                        builder.SetColor(color.Value);
+                    builder.SetColor(color);
                 }
                 else
                 {
@@ -235,11 +238,8 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual int? GetColor(string colorResourceName)
+        protected virtual int GetColor(string colorResourceName)
         {
-            if (colorResourceName.IsEmpty())
-                return null;
-
             var colorResourceId = this.context.GetColorByName(colorResourceName);
             if (colorResourceId <= 0)
                 throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
