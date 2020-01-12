@@ -41,6 +41,7 @@ namespace Shiny.BluetoothLE.Central
 
         public override void CancelConnection()
         {
+            //this.connSubject.OnNext(ConnectionState.Disconnecting);
             this.context.Close();
             this.connSubject.OnNext(ConnectionState.Disconnected);
         }
@@ -68,8 +69,8 @@ namespace Shiny.BluetoothLE.Central
                 .Callbacks
                 .ConnectionStateChanged
                 .Select(x => x.NewState.ToStatus())
-                .StartWith(this.Status);
-                //=> this.connSubject.Merge(this.context.Callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus()));
+                .StartWith(this.Status)
+                .Merge(this.connSubject);
 
 
         public override IObservable<IGattService> DiscoverServices()
@@ -106,7 +107,7 @@ namespace Shiny.BluetoothLE.Central
                         ob.OnError(new BleException("Failed to get RSSI - " + cb.Status));
                 });
                 
-            this.context.Gatt?.ReadRemoteRssi();
+            this.context.Gatt.ReadRemoteRssi();
             return sub;
         });
 
@@ -116,8 +117,9 @@ namespace Shiny.BluetoothLE.Central
             var composite = new CompositeDisposable();
 
             if (this.PairingStatus == PairingState.Paired)
+            {
                 ob.Respond(true);
-
+            }
             else
             {
                 if (pin != null)
@@ -133,7 +135,8 @@ namespace Shiny.BluetoothLE.Central
                         })
                     );
                 }
-                composite.Add(this.context.CentralContext
+                composite.Add(this.context
+                    .CentralContext
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
                     .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
                     .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired))

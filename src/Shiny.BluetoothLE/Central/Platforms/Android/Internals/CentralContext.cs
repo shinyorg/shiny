@@ -60,8 +60,10 @@ namespace Shiny.BluetoothLE.Central.Internals
         {
             var peripheral = this.GetDevice(device);
             if (eventName.Equals(BluetoothDevice.ActionAclConnected))
+            {
                 this.sdelegate.Value?.OnConnected(peripheral);
-
+                return;
+            }
             this.peripheralSubject.OnNext(new NamedMessage<Peripheral>(eventName, peripheral));
             //case BluetoothDevice.ActionAclConnected:
             //case BluetoothDevice.ActionAclDisconnected:
@@ -71,11 +73,11 @@ namespace Shiny.BluetoothLE.Central.Internals
         }
 
 
-        public IObservable<IPeripheral> ListenForMe(string eventName, IPeripheral me) => this
+        public IObservable<IPeripheral> ListenForMe(string eventName, Peripheral me) => this
             .peripheralSubject
             .Where(x =>
                 x.Name.Equals(eventName) &&
-                x.Arg.Equals(me)
+                x.Arg.Native.Address.Equals(me.Native.Address)
             )
             .Select(x => x.Arg);
 

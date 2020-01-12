@@ -14,7 +14,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <PackageReference Include="Tmds.DBus" Version="0.7.0" />
+        <PackageReference Include="Tmds.DBus" Version="0.8.0" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
