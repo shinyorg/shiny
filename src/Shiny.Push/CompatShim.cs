@@ -10,5 +10,7 @@ namespace Shiny
         static IPushManager Current { get; } = ShinyHost.Resolve<IPushManager>();
 
         public static Task<PushAccessState> RequestAccess() => Current.RequestAccess();
+        public static string? CurrentRegistrationToken => Current.CurrentRegistrationToken;
+        public static DateTime? CurrentRegistrationTokenDate => Current.CurrentRegistrationTokenDate;
     }
 }

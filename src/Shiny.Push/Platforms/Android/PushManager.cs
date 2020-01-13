@@ -4,13 +4,18 @@ using Android.Gms.Tasks;
 using Android.Runtime;
 using Firebase.Iid;
 using Firebase.Messaging;
-
+using Shiny.Settings;
 
 namespace Shiny.Push
 {
     public class PushManager : Java.Lang.Object, IOnCompleteListener, IPushManager
     {
+        readonly ISettings settings;
         TaskCompletionSource<string>? taskSrc = null;
+
+
+        public PushManager(ISettings settings) => this.settings = settings;
+
 
         public void OnComplete(Android.Gms.Tasks.Task task)
         {
@@ -19,6 +24,21 @@ namespace Shiny.Push
             else
                 this.taskSrc?.TrySetException(task.Exception);
         }
+
+
+        public string? CurrentRegistrationToken
+        {
+            get => this.settings.Get<string?>(nameof(CurrentRegistrationToken));
+            private set => this.settings.Set(nameof(CurrentRegistrationToken), value);
+        }
+
+
+        public DateTime? CurrentRegistrationTokenDate
+        {
+            get => this.settings.Get<DateTime?>(nameof(CurrentRegistrationTokenDate));
+            private set => this.settings.Set(nameof(CurrentRegistrationTokenDate), value);
+        }
+
 
         //<receiver
         //    android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver"
@@ -40,6 +60,9 @@ namespace Shiny.Push
             this.taskSrc = new TaskCompletionSource<string>();
             FirebaseInstanceId.Instance.GetInstanceId().AddOnCompleteListener(this);
             var token = await this.taskSrc.Task;
+
+            this.CurrentRegistrationToken = token;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
 
             return new PushAccessState(AccessState.Available, token);
 

@@ -6,7 +6,8 @@ namespace Shiny.Push
 {
     public interface IPushManager
     {
-        //string CurrentRegistrationToken { get; }
+        DateTime? CurrentRegistrationTokenDate { get; }
+        string? CurrentRegistrationToken { get; }
         Task<PushAccessState> RequestAccess();
 
         // observable on notification access state?

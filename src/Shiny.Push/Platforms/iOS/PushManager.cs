@@ -9,20 +9,19 @@ using Shiny.Settings;
 namespace Shiny.Push
 {
     //https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/enhanced-user-notifications?tabs=windows
-    public class PushManager : IPushManager
+    public class PushManager : AbstractPushManager
     {
         static TaskCompletionSource<string>? RemoteTokenTask;
-        readonly ISettings settings;
 
 
-        public PushManager(ISettings settings)
+
+        public PushManager(ISettings settings) : base(settings)
         {
-            this.settings = settings;
             UNUserNotificationCenter.Current.Delegate = new ShinyPushDelegate();
         }
 
 
-        public async Task<PushAccessState> RequestAccess()
+        public override async Task<PushAccessState> RequestAccess()
         {
             // TODO: error on pending request?
             //if (!UIApplication.SharedApplication.IsRegisteredForRemoteNotifications)
@@ -41,6 +40,8 @@ namespace Shiny.Push
                     if (error != null)
                     {
                         tcs.SetException(new Exception(error.Description));
+                        this.CurrentRegistrationToken = null;
+                        this.CurrentRegistrationTokenDate = null;
                     }
                     else
                     {
@@ -54,6 +55,9 @@ namespace Shiny.Push
                 RemoteTokenTask.Task,
                 tcs.Task
             );
+
+            this.CurrentRegistrationToken = RemoteTokenTask.Task.Result;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
 
             // TODO: timeout?
             return new PushAccessState(tcs.Task.Result, RemoteTokenTask.Task.Result);
