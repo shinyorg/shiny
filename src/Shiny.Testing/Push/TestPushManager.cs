@@ -7,9 +7,10 @@ namespace Shiny.Testing.Push
 {
     public class TestPushManager : IPushManager
     {
-        public Task<PushAccessState> RequestAccess()
-        {
-            throw new NotImplementedException();
-        }
+        public AccessState ResultStatus { get; set; } = AccessState.Available;
+        public DateTime? CurrentRegistrationTokenDate { get; set; }
+        public string? CurrentRegistrationToken { get; set; }
+
+        public Task<PushAccessState> RequestAccess() => Task.FromResult(new PushAccessState(this.ResultStatus, this.CurrentRegistrationToken));
     }
 }
