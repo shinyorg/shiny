@@ -48,6 +48,7 @@ namespace Shiny.BluetoothLE.Central
                     .WhenConnectionFailed()
                     .Subscribe(ob.OnError);
 
+                // TODO: connectconfig - pass args object
                 device.ConnectIf();
 
                 return () =>
@@ -84,6 +85,7 @@ namespace Shiny.BluetoothLE.Central
         /// <returns>RSSI value every read interval</returns>
         public static IObservable<int> ReadRssiContinuously(this IPeripheral peripheral, TimeSpan? readInterval = null) => Observable
             .Interval(readInterval ?? TimeSpan.FromSeconds(1))
+            .Where(_ => peripheral.IsConnected())
             .Select(_ => peripheral.ReadRssi())
             .Switch();
 
@@ -143,7 +145,7 @@ namespace Shiny.BluetoothLE.Central
                 .Select(_ => peripheral.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuids))
                 .Switch()
                 .Select(x => x.Notify())
-                .Switch();
+                .Merge();
 
 
         /// <summary>

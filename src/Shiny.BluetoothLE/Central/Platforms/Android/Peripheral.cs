@@ -76,6 +76,8 @@ namespace Shiny.BluetoothLE.Central
         public override IObservable<IGattService> DiscoverServices()
             => Observable.Create<IGattService>(ob =>
             {
+                this.AssertConnection();
+
                 var sub = this.context.Callbacks.ServicesDiscovered.Subscribe(cb =>
                 {
                     foreach (var ns in cb.Gatt.Services)
@@ -95,6 +97,8 @@ namespace Shiny.BluetoothLE.Central
 
         public override IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
         {
+            this.AssertConnection();
+
             var sub = this.context
                 .Callbacks
                 .ReadRemoteRssi
@@ -106,7 +110,7 @@ namespace Shiny.BluetoothLE.Central
                     else
                         ob.OnError(new BleException("Failed to get RSSI - " + cb.Status));
                 });
-                
+
             this.context.Gatt.ReadRemoteRssi();
             return sub;
         });
@@ -173,6 +177,7 @@ namespace Shiny.BluetoothLE.Central
         int currentMtu = 20;
         public IObservable<int> RequestMtu(int size) => this.context.Invoke(Observable.Create<int>(ob =>
         {
+            this.AssertConnection();
             var sub = this.WhenMtuChanged().Skip(1).Take(1).Subscribe(ob.Respond);
             this.context.Gatt.RequestMtu(size);
             return sub;
@@ -218,6 +223,13 @@ namespace Shiny.BluetoothLE.Central
 
 
         #region Internals
+
+        void AssertConnection()
+        {
+            if (this.Status != ConnectionState.Connected)
+                throw new ArgumentException("Peripheral is not connected");
+        }
+
 
         public static byte[] ConvertPinToBytes(string pin)
         {
