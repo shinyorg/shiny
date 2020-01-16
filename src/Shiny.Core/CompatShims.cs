@@ -13,7 +13,7 @@ using Shiny.Settings;
 
 namespace Shiny
 {
-    public static class CrossJobManager
+    public static class ShinyJobManager
     {
         static IJobManager Current { get; } = ShinyHost.Resolve<IJobManager>();
 
@@ -32,7 +32,7 @@ namespace Shiny
     }
 
 
-    public static class CrossFileSystem
+    public static class ShinyFileSystem
     {
         static IFileSystem Current { get; } = ShinyHost.Resolve<IFileSystem>();
         public static DirectoryInfo AppData { get => Current.AppData; set => Current.AppData = value; }
@@ -41,7 +41,7 @@ namespace Shiny
     }
 
 
-    public static class CrossPower
+    public static class ShinyPower
     {
         static IPowerManager Current { get; } = ShinyHost.Resolve<IPowerManager>();
         public static PowerState Status => Current.Status;
@@ -54,7 +54,7 @@ namespace Shiny
     }
 
 
-    public static class CrossConnectivity
+    public static class ShinyConnectivity
     {
         static IConnectivity Current { get; } = ShinyHost.Resolve<IConnectivity>();
         public static NetworkReach Reach => Current.Reach;
@@ -67,7 +67,7 @@ namespace Shiny
     }
 
 
-    public static class CrossSettings
+    public static class ShinySettings
     {
         static ISettings Current { get; } = ShinyHost.Resolve<ISettings>();
 
@@ -89,7 +89,7 @@ namespace Shiny
     }
 
 
-    public static class CrossEnvironment
+    public static class ShinyEnvironment
     {
         static IEnvironment Current { get; } = ShinyHost.Resolve<IEnvironment>();
 

@@ -5,7 +5,7 @@ using Shiny.SpeechRecognition;
 
 namespace Shiny
 {
-    public static class CrossSpeechRecognizer
+    public static class ShinySpeechRecognizer
     {
         static ISpeechRecognizer Current => ShinyHost.Resolve<ISpeechRecognizer>();
 

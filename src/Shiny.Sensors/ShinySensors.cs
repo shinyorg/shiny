@@ -3,7 +3,7 @@ using Shiny.Sensors;
 
 namespace Shiny
 {
-    public static class CrossSensors
+    public static class ShinySensors
     {
         public static IAccelerometer Accelerometer { get; } = ShinyHost.Resolve<IAccelerometer>();
         public static IAmbientLight AmbientLight { get; } = ShinyHost.Resolve<IAmbientLight>();

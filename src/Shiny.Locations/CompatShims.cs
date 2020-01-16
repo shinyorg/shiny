@@ -7,7 +7,7 @@ using Shiny.Locations;
 
 namespace Shiny
 {
-    public static class CrossGps
+    public static class ShinyGps
     {
         static IGpsManager Current { get; } = ShinyHost.Resolve<IGpsManager>();
 
@@ -22,7 +22,7 @@ namespace Shiny
     }
 
 
-    public static class CrossGeofences
+    public static class ShinyGeofences
     {
         static IGeofenceManager Current { get; } = ShinyHost.Resolve<IGeofenceManager>();
 
@@ -38,7 +38,7 @@ namespace Shiny
     }
 
 
-    public static class CrossMotionActivity
+    public static class ShinyMotionActivity
     {
         static IMotionActivityManager Current { get; } = ShinyHost.Resolve<IMotionActivityManager>();
 

@@ -5,7 +5,7 @@ using Shiny.Notifications;
 
 namespace Shiny
 {
-    public static class CrossNotifications
+    public static class ShinyNotifications
     {
         static INotificationManager Current { get; } = ShinyHost.Resolve<INotificationManager>();
 

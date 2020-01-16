@@ -5,7 +5,7 @@ using Shiny.Push;
 
 namespace Shiny
 {
-    public static class CrossPush
+    public static class ShinyPush
     {
         static IPushManager Current { get; } = ShinyHost.Resolve<IPushManager>();
 

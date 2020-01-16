@@ -6,7 +6,7 @@ using Shiny.Beacons;
 
 namespace Shiny
 {
-    public static class CrossBeacons
+    public static class ShinyBeacons
     {
         static IBeaconManager Current { get; } = ShinyHost.Resolve<IBeaconManager>();
 
