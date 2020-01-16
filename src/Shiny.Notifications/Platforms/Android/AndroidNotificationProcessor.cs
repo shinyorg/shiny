@@ -35,7 +35,7 @@ namespace Shiny.Notifications
                 var notification = this.serializer.Deserialize<Notification>(notificationString);
                 var response = new NotificationResponse(notification, null, null);
                 await ndelegate.OnEntry(response);
-            });
+            }, false);
         }
     }
 }

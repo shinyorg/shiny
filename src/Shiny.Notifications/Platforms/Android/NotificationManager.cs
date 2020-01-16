@@ -163,7 +163,7 @@ namespace Shiny.Notifications
                 builder.SetVibrate(new long[] { 500, 500 });
 
             this.DoNotify(builder, notification);
-            await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
+            await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification), false);
         }
 
 
