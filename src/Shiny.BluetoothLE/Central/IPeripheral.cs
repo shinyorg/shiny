@@ -5,15 +5,6 @@ namespace Shiny.BluetoothLE.Central
 {
     public interface IPeripheral
     {
-        //IObservable<> WriteDescriptor(Guid uuid, byte[] data);
-        //IObservable<> ReadDescriptor(Guid uuid);
-        //IObservable<> ReadCharacteristic(Guid uuid);
-        //IObservable<> WriteCharacteristic(Guid uuid, byte[] data, bool withResponse = true)
-        //IObservable<> WhenValueChanged(Guid uuid, bool useIndicationIfAvailable);
-
-        //IObservable<string> WhenNameChanged();
-        //IObservable<int> WhenRssiChanged();
-
         /// <summary>
         /// The peripheral name - note that this is not readable in the background on most platforms
         /// </summary>

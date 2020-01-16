@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Disposables;
 using Shiny.BluetoothLE.Central.Internals;
 using Android.Bluetooth;
 
@@ -116,45 +114,31 @@ namespace Shiny.BluetoothLE.Central
         });
 
 
-        public IObservable<bool> PairingRequest(string? pin) => Observable.Create<bool>(ob =>
-        {
-            var composite = new CompositeDisposable();
+        public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
+            new GattReliableWriteTransaction(this.context);
 
+
+        public IObservable<bool> PairingRequest() => Observable.Create<bool>(ob =>
+        {
+            IDisposable? sub = null;
             if (this.PairingStatus == PairingState.Paired)
             {
                 ob.Respond(true);
             }
             else
             {
-                if (pin != null)
-                {
-                    composite.Add(this.context
-                        .CentralContext
-                        .ListenForMe(BluetoothDevice.ActionPairingRequest, this)
-                        .Subscribe(x =>
-                        {
-                            var bytes = ConvertPinToBytes(pin);
-                            this.context.NativeDevice.SetPin(bytes);
-                            this.context.NativeDevice.SetPairingConfirmation(true);
-                        })
-                    );
-                }
-                composite.Add(this.context
+                sub = this.context
                     .CentralContext
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
                     .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
-                    .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired))
-                );
+                    .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired));
+
                 // execute
                 if (!this.context.NativeDevice.CreateBond())
                     ob.Respond(false);
             }
-            return composite;
+            return () => sub?.Dispose();
         });
-
-
-        public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
-            new GattReliableWriteTransaction(this.context);
 
 
         public PairingState PairingStatus
@@ -228,24 +212,6 @@ namespace Shiny.BluetoothLE.Central
         {
             if (this.Status != ConnectionState.Connected)
                 throw new ArgumentException("Peripheral is not connected");
-        }
-
-
-        public static byte[] ConvertPinToBytes(string pin)
-        {
-            var bytes = new List<byte>();
-            foreach (var p in pin)
-            {
-                if (!char.IsDigit(p))
-                    throw new ArgumentException("PIN contain invalid value - " + p);
-
-                var value = byte.Parse(p.ToString());
-                if (value > 10)
-                    throw new ArgumentException("Invalid range for PIN value - " + value);
-
-                bytes.Add(value);
-            }
-            return bytes.ToArray();
         }
 
 

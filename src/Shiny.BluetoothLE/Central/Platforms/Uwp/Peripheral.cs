@@ -90,7 +90,7 @@ namespace Shiny.BluetoothLE.Central
             : PairingState.NotPaired;
 
 
-        public IObservable<bool> PairingRequest(string pin = null) => Observable.FromAsync(async token =>
+        public IObservable<bool> PairingRequest() => Observable.FromAsync(async token =>
         {
             var result = await this.context.NativeDevice.DeviceInformation.Pairing.PairAsync(DevicePairingProtectionLevel.None);
             var state = result.Status == DevicePairingResultStatus.Paired;
