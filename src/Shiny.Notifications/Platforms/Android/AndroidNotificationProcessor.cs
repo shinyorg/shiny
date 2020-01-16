@@ -29,11 +29,7 @@ namespace Shiny.Notifications
             if (!intent.HasExtra(NOTIFICATION_KEY))
                 return;
 
-            var ndelegate = this.services.GetService<INotificationDelegate>();
-            if (ndelegate == null)
-                return;
-
-            await Log.SafeExecute(async () =>
+            await this.services.SafeResolveAndExecute<INotificationDelegate>(async ndelegate =>
             {
                 var notificationString = intent.GetStringExtra(NOTIFICATION_KEY);
                 var notification = this.serializer.Deserialize<Notification>(notificationString);

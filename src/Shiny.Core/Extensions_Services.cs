@@ -31,7 +31,8 @@ namespace Shiny
             try
             {
                 var service = services.Resolve<T>(requiredService);
-                await execute.Invoke(service).ConfigureAwait(false);
+                if (service != null)
+                    await execute.Invoke(service).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
