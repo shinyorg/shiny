@@ -6,7 +6,7 @@ using Shiny.Net.Http;
 
 namespace Shiny
 {
-    public static class CrossHttpTransfers
+    public static class ShinyHttpTransfers
     {
         static IHttpTransferManager Current { get; } = ShinyHost.Resolve<IHttpTransferManager>();
 
