@@ -8,6 +8,20 @@ pool:
 variables:
   BuildConfiguration: 'Release'
 
+trigger:
+  batch: true 
+  branches:
+    include: [ master, dev ]
+  paths:
+    include: [ src ] 
+
+pr:
+  autoCancel: true
+  branches:
+    include: [ master, dev ]
+  paths:
+    include: [ src ]
+
 steps:
 - task: UseDotNet@2
   displayName: 'Use .Net Core SDK 3.x'
@@ -17,12 +31,12 @@ steps:
 - task: MSBuild@1
   displayName: 'Build & Pack'
   inputs:
-    solution: Build.sln
-    msbuildVersion: 16.0
-    msbuildArchitecture: x64
-    configuration: Release
+    solution: 'Build.sln'
+    msbuildArchitecture: 'x64'
+    configuration: 'Release'
     msbuildArguments: '/t:restore;build;pack /p:PackageVersion=$(Build.BuildNumber)-beta /p:PackageOutputPath=$(build.artifactstagingdirectory)/public  /p:AssemblyFileVersion=$(Build.BuildNumber) /p:JavaSdkDirectory="$(JAVA_HOME)/"'
 
+#1.0.0$(rev:.r)
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory) '
   inputs:
