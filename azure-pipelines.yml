@@ -2,10 +2,10 @@ resources:
 - repo: self
 
 pool:
-  vmImage: Hosted VS2017
+  vmImage: Azure Pipelines
   demands: msbuild
 
-#Your build pipeline references an undefined variable named ‘BuildConfiguration’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+#Your build pipeline references an undefined variable named â€˜BuildConfigurationâ€™. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
 
 steps:
 - task: NuGetToolInstaller@0
