@@ -35,8 +35,7 @@ namespace Shiny.Integrations.Prism
 
         public virtual void OnDisappearing()
         {
-            this.deactivateWith?.Dispose();
-            this.deactivateWith = null;
+            this.Deactivate();
         }
 
 
@@ -58,6 +57,12 @@ namespace Shiny.Integrations.Prism
             }
         }
 
+
+        protected virtual void Deactivate()
+        {
+            this.deactivateWith?.Dispose();
+            this.deactivateWith = null;
+        }
 
         protected CompositeDisposable DestroyWith { get; } = new CompositeDisposable();
     }

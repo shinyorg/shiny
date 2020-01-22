@@ -3,14 +3,13 @@
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
         <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <DisableExtraReferences>False</DisableExtraReferences>
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
         <Description>Shiny</Description>
-        <Product>Shiny .NET</Product>
-        <Version>1.0.0</Version>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
+        <Version>1.0.0</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
         <!--<PackageIcon>../../art/nuget.png</PackageIcon>-->
@@ -19,7 +18,8 @@
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-
+        <PreRelease>False</PreRelease>
+        
         <!-- disable sourcelink on mono, to workaround https://github.com/dotnet/sourcelink/issues/155 -->
         <EnableSourceLink Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' AND '$(MSBuildRuntimeType)' == 'Core' ">true</EnableSourceLink>
         <EnableSourceControlManagerQueries>$(EnableSourceLink)</EnableSourceControlManagerQueries>
@@ -27,16 +27,21 @@
         <IncludeSource>True</IncludeSource>
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
-        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>               
     </PropertyGroup>
  
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <TargetsToBuild>android;ios;watchos;tvos;uap;tizen</TargetsToBuild>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
+        <PackageVersion>1.0.0-debug</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <PackageVersion Condition=" '$(Version)' == '' AND $(PreRelease) == True ">1.0.0-pre</PackageVersion>
+        <PackageVersion Condition=" '$(Version)' == '' AND $(PreRelease) != True ">1.0.0</PackageVersion>
+        <PackageVersion Condition=" '$(Version)' != '' AND $(PreRelease) == True ">$(Version)-pre</PackageVersion>
+        
         <TargetsToBuild>android;ios;watchos;tvos</TargetsToBuild>
         <TargetsToBuild Condition=" $(OS) == 'WINDOWS_NT' ">uap;tizen;$(TargetsToBuild)</TargetsToBuild>
         <DebugType Condition=" !$(TargetFramework.StartsWith('monoandroid')) ">portable</DebugType>
