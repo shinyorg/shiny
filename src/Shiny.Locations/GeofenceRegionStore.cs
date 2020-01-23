@@ -14,6 +14,15 @@ namespace Shiny.Locations
         public bool SingleUse { get; set; }
         public bool NotifyOnEntry { get; set; }
         public bool NotifyOnExit { get; set; }
-        public Dictionary<string, object>? Payload { get; set; }
+        public List<PayloadEntry>? Payload { get; set; }
+
+        public struct PayloadEntry
+        {
+            public string? Key { get; set; }
+            public object? Value { get; set; }
+
+            public static explicit operator PayloadEntry(KeyValuePair<string?, object?> kvp) =>
+                new PayloadEntry { Key = kvp.Key, Value = kvp.Value };
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Shiny.Infrastructure;
 using Shiny.Locations;
@@ -32,7 +33,7 @@ namespace Shiny.Tests
                     { "String", "Test Geofence" },
                     { "Number", 3.14 },
                     { "Bool", true },
-                },
+                }.Cast<GeofenceRegionStore.PayloadEntry>().ToList(),
             };
 
             var end = this.SerializeDeserialize(start);

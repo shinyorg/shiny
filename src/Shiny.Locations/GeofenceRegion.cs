@@ -24,7 +24,7 @@ namespace Shiny.Locations
         public bool NotifyOnEntry { get; set; } = true;
         public bool NotifyOnExit { get; set; } = true;
 
-        public Dictionary<string, object>? Payload { get; set; }
+        public Dictionary<string?, object?>? Payload { get; set; }
 
         public override string ToString() => $"[Identifier: {this.Identifier}]";
         public bool Equals(GeofenceRegion other) => (this.Identifier) == (other?.Identifier);
