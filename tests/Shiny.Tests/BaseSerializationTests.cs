@@ -29,8 +29,12 @@ namespace Shiny.Tests
         [Fact]
         public virtual void GeofenceRegion()
         {
-            var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromKilometers(99))
+            var start = new GeofenceRegionStore
             {
+                Identifier = "testing",
+                CenterLatitude = 59.1,
+                CenterLongitude = 62.5,
+                RadiusMeters = 99,
                 Payload = new Dictionary<string, object>
                 {
                     { "String", "Test Geofence" },
@@ -41,9 +45,10 @@ namespace Shiny.Tests
 
             var end = this.SerializeDeserialize(start);
 
-            end.Should().Be(start); // Identifier
-            end.Radius.Should().Be(start.Radius);
-            end.Center.Should().Be(start.Center);
+            end.Should().BeEquivalentTo(start);
+            end.RadiusMeters.Should().Be(start.RadiusMeters);
+            end.CenterLatitude.Should().Be(start.CenterLatitude);
+            end.CenterLongitude.Should().Be(start.CenterLongitude);
             end.Payload.Should().BeEquivalentTo(start.Payload);
         }
     }

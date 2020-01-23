@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
 
@@ -36,7 +35,8 @@ namespace Shiny.Locations
                 RadiusMeters = args.Radius.TotalMeters,
                 SingleUse = args.SingleUse,
                 NotifyOnEntry = args.NotifyOnEntry,
-                NotifyOnExit = args.NotifyOnExit
+                NotifyOnExit = args.NotifyOnExit,
+                Payload = args.Payload,
             },
             store => new GeofenceRegion(
                 store.Identifier,
@@ -46,7 +46,8 @@ namespace Shiny.Locations
             {
                 SingleUse = store.SingleUse,
                 NotifyOnEntry = store.NotifyOnEntry,
-                NotifyOnExit = store.NotifyOnExit
+                NotifyOnExit = store.NotifyOnExit,
+                Payload = store.Payload,
             }
         );
     }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 
 namespace Shiny.Locations
@@ -14,5 +14,6 @@ namespace Shiny.Locations
         public bool SingleUse { get; set; }
         public bool NotifyOnEntry { get; set; }
         public bool NotifyOnExit { get; set; }
+        public Dictionary<string, object>? Payload { get; set; }
     }
 }
