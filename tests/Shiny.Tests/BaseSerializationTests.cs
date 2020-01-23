@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using FluentAssertions;
 using Shiny.Infrastructure;
 using Shiny.Locations;
@@ -22,22 +22,29 @@ namespace Shiny.Tests
         public virtual void Position()
         {
             var start = new Position(1.23, 4.56);
-
             var end = this.SerializeDeserialize(start);
-
             end.Should().Be(start);
         }
 
         [Fact]
         public virtual void GeofenceRegion()
         {
-            var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromKilometers(99));
+            var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromKilometers(99))
+            {
+                Payload = new Dictionary<string, object>
+                {
+                    { "String", "Test Geofence" },
+                    { "Number", 3.14 },
+                    { "Bool", true },
+                },
+            };
 
             var end = this.SerializeDeserialize(start);
 
             end.Should().Be(start); // Identifier
             end.Radius.Should().Be(start.Radius);
             end.Center.Should().Be(start.Center);
+            end.Payload.Should().BeEquivalentTo(start.Payload);
         }
     }
 }
