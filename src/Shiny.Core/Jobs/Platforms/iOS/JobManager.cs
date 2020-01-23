@@ -19,6 +19,8 @@ namespace Shiny.Jobs
 
         public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
+            if (PlatformExtensions.HasBackgroundMode("fetch"))
+                UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum);
             //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
         }
 
