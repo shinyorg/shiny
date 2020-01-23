@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <PreRelease>True</PreRelease>
+        <VersionSuffix>beta</VersionSuffix>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Description>Shiny Integration - Prism</Description>
     </PropertyGroup>

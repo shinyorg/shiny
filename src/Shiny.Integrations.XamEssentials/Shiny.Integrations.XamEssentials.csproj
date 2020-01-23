@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <PreRelease>True</PreRelease>
+        <VersionSuffix>beta</VersionSuffix>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <RootNamespace>Shiny</RootNamespace>
         <PackageVersion>1.0.0</PackageVersion>

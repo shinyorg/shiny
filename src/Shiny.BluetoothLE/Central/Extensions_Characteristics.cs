@@ -2,7 +2,6 @@
 using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using Shiny.Logging;
 
 
 namespace Shiny.BluetoothLE.Central

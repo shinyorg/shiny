@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Shiny.Settings;
 using Xunit;
@@ -20,11 +21,9 @@ namespace Shiny.Device.Tests.Settings
         [Fact]
         public async Task OnSettingChanged()
         {
-            var tcs = new TaskCompletionSource<SettingChangeEventArgs>();
-            this.Settings.Changed += (sender, args) => tcs.TrySetResult(args);
-
+            var task = this.Settings.Changed.ToTask();
             this.Settings.Set("OnSettingChanged", "boo");
-            var eventArgs = await tcs.Task;
+            var eventArgs = await task;
 
             Assert.Equal(eventArgs.Action, SettingChangeAction.Add);
             Assert.Equal(eventArgs.Key, "OnSettingChanged");

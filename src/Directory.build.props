@@ -2,23 +2,24 @@
     <PropertyGroup>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
-        <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <DisableExtraReferences>False</DisableExtraReferences>
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
         <Description>Shiny</Description>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
-        <Version>1.0.0</Version>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
-        <!--<PackageIcon>../../art/nuget.png</PackageIcon>-->
+        <!--<PackageIcon>nuget.png</PackageIcon>-->
         <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>
         <PackageReleaseNotes>https://shinylib.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PreRelease>False</PreRelease>
+        
+        <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">1.0.0</ShinyVersion>        
+        <VersionPrefix>$(ShinyVersion)</VersionPrefix>
+        <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
         
         <!-- disable sourcelink on mono, to workaround https://github.com/dotnet/sourcelink/issues/155 -->
         <EnableSourceLink Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' AND '$(MSBuildRuntimeType)' == 'Core' ">true</EnableSourceLink>
@@ -34,21 +35,16 @@
         <TargetsToBuild>android;ios;watchos;tvos;uap;tizen</TargetsToBuild>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
-        <PackageVersion>1.0.0-debug</PackageVersion>
     </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <PackageVersion Condition=" '$(Version)' == '' AND $(PreRelease) == True ">1.0.0-pre</PackageVersion>
-        <PackageVersion Condition=" '$(Version)' == '' AND $(PreRelease) != True ">1.0.0</PackageVersion>
-        <PackageVersion Condition=" '$(Version)' != '' AND $(PreRelease) == True ">$(Version)-pre</PackageVersion>
         
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">    
         <TargetsToBuild>android;ios;watchos;tvos</TargetsToBuild>
         <TargetsToBuild Condition=" $(OS) == 'WINDOWS_NT' ">uap;tizen;$(TargetsToBuild)</TargetsToBuild>
         <DebugType Condition=" !$(TargetFramework.StartsWith('monoandroid')) ">portable</DebugType>
         <DebugType Condition=" $(TargetFramework.StartsWith('monoandroid')) ">Full</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
+    </PropertyGroup>      
     
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <UseAndroidX>false</UseAndroidX>
@@ -58,5 +54,11 @@
     <ItemGroup Condition=" '$(SourceLinkEnabled)' == 'true' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     </ItemGroup>
+    
+    <!--    
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="\icon.png" />
+    </ItemGroup>
+    -->
 
 </Project>

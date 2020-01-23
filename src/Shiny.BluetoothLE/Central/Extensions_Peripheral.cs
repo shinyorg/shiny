@@ -7,6 +7,18 @@ namespace Shiny.BluetoothLE.Central
     public static class PeripheralExtensions
     {
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <param name="serviceUuid"></param>
+        /// <returns></returns>
+        public static IObservable<IGattCharacteristic> GetCharacteristicsForService(this IPeripheral peripheral, Guid serviceUuid)
+            => peripheral
+                .GetKnownService(serviceUuid)
+                .Select(x => x.DiscoverCharacteristics()).Switch();
+
+
+        /// <summary>
         /// Connect and manage connection as well as hook into your required characterisitcs with all proper cleanups necessary
         /// </summary>
         /// <param name="peripheral"></param>
