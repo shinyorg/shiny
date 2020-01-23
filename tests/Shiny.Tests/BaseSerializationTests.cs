@@ -19,14 +19,6 @@ namespace Shiny.Tests
         }
 
         [Fact]
-        public virtual void Position()
-        {
-            var start = new Position(1.23, 4.56);
-            var end = this.SerializeDeserialize(start);
-            end.Should().Be(start);
-        }
-
-        [Fact]
         public virtual void GeofenceRegion()
         {
             var start = new GeofenceRegionStore
