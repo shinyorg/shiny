@@ -1,6 +1,6 @@
 ﻿using System;
-using Shiny.Locations;
 using FluentAssertions;
+using Shiny.Locations;
 using Xunit;
 
 
@@ -12,6 +12,40 @@ namespace Shiny.Tests.Locations
         const double lng0 = -79.3789959;
         const double lat1 = 43.6411314;
         const double lng1 = -79.3808415;
+
+        [Theory]
+        [InlineData(0.0, 180.0)]
+        [InlineData(0.0, -180.0)]
+        [InlineData(90.0, 0)]
+        [InlineData(-90.0, 0)]
+        public void Allow_valid_values(double lat, double lng)
+        {
+            var p1 = new Position { Latitude = lat, Longitude = lng };
+            p1.Latitude.Should().Be(lat);
+            p1.Longitude.Should().Be(lng);
+
+            var p2 = new Position(lat, lng);
+            p2.Latitude.Should().Be(lat);
+            p2.Longitude.Should().Be(lng);
+        }
+
+        [Theory]
+        [InlineData(0.0, 180.1, "Longitude must be between -180 and 180")]
+        [InlineData(0.0, -180.1, "Longitude must be between -180 and 180")]
+        [InlineData(90.1, 0, "Latitude must be between -90 and 90")]
+        [InlineData(-90.1, 0, "Latitude must be between -90 and 90")]
+        public void Throw_for_invalid_values(double lat, double lng, string expectedMessage)
+        {
+            Action act = () => new Position { Latitude = lat, Longitude = lng };
+            act.Should()
+                .ThrowExactly<ArgumentException>()
+                .WithMessage(expectedMessage);
+
+            act = () => new Position(lat, lng);
+            act.Should()
+                .ThrowExactly<ArgumentException>()
+                .WithMessage(expectedMessage);
+        }
 
         [Fact]
         public void Inside_Geofence()

@@ -5,22 +5,32 @@ namespace Shiny
 {
     public class Position : IEquatable<Position>
     {
+        private double latitude;
+        private double longitude;
+
+        public Position() { }
         public Position(double lat, double lng)
         {
-            if (lat < -90 || lat > 90)
-                throw new ArgumentException($"Invalid latitude value - {lat}");
-
-            if (lng < -180 || lng > 180)
-                throw new ArgumentException($"Invalid longitude value - {lng}");
-
             this.Latitude = lat;
             this.Longitude = lng;
         }
 
 
-        public double Latitude { get; }
-        public double Longitude { get; }
+        public double Latitude
+        {
+            get => this.latitude;
+            set => this.latitude = this.ValidateRange(nameof(this.Latitude), value, -90, 90);
+        }
 
+        public double Longitude
+        {
+            get => this.longitude;
+            set => this.longitude = this.ValidateRange(nameof(this.Longitude), value, -180, 180);
+        }
+
+        double ValidateRange(string name, double value, double min, double max) =>
+            min <= value && value <= max ? value :
+                throw new ArgumentException($"{name} must be between {min} and {max}");
 
         public Distance GetDistanceTo(Position other)
         {
