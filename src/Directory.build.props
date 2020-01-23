@@ -10,8 +10,8 @@
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
-        <PackageIcon>nuget.png</PackageIcon>
-<!--        <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>-->
+<!--        <PackageIcon>nuget.png</PackageIcon>-->
+        <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>
         <PackageReleaseNotes>https://shinylib.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
@@ -55,8 +55,10 @@
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     </ItemGroup>
        
+    <!--
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)art\nuget.png" Pack="true" PackagePath="\icon.png" />
-    </ItemGroup>    
+    </ItemGroup>
+    -->
 
 </Project>
