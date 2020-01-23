@@ -14,7 +14,7 @@ namespace Shiny.Jobs
         /// <summary>
         /// If you don't know what this does, don't touch it :)
         /// </summary>
-        public static double? BackgroundFetchInterval { get; set;}
+        public static double? BackgroundFetchInterval { get; set; }
 
 
         public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
@@ -113,7 +113,7 @@ namespace Shiny.Jobs
                 {
                     taskId = (int)app.BeginBackgroundTask("RunAll", cancelSrc.Cancel);
                     var results = await jobManager
-                        .RunAll(cancelSrc.Token)
+                        .RunAll(cancelSrc.Token, true)
                         .ConfigureAwait(false);
 
                     if (results.Any(x => x.HasNewData))

@@ -45,8 +45,9 @@ namespace Shiny.Jobs
         /// This force runs the manager and any registered jobs
         /// </summary>
         /// <param name="cancelToken"></param>
+        /// <param name="runSequentially"></param>
         /// <returns></returns>
-        Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default);
+        Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default, bool runSequentially = false);
 
 
         /// <summary>

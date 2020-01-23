@@ -18,7 +18,7 @@ namespace Shiny.Jobs
             this.timer.Elapsed += async (sender, args) =>
             {
                 this.timer.Stop();
-                await this.RunAll(CancellationToken.None);
+                await this.RunAll(CancellationToken.None, false);
                 this.timer.Start();
             };
         }

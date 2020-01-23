@@ -26,7 +26,7 @@ namespace Shiny
         public static Task<IEnumerable<JobInfo>> GetJobs() => Current.GetJobs();
         public static Task<AccessState> RequestAccess() => Current.RequestAccess();
         public static Task<JobRunResult> Run(string jobIdentifier, CancellationToken cancelToken = default) => Current.Run(jobIdentifier, cancelToken);
-        public static Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default) => Current.RunAll(cancelToken);
+        public static Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default, bool runSequentially = false) => Current.RunAll(cancelToken, runSequentially);
         public static void RunTask(string taskName, Func<CancellationToken, Task> task) => Current.RunTask(taskName, task);
         public static Task Schedule(JobInfo jobInfo) => Current.Schedule(jobInfo);
     }
