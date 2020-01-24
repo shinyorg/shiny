@@ -4,7 +4,6 @@
         <VersionSuffix>beta</VersionSuffix>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <RootNamespace>Shiny</RootNamespace>
-        <PackageVersion>1.0.0</PackageVersion>
         <Description>Shiny Integration - Xamarin Essentials - replaces a lot of the Shiny guts with the Essentials, but with all of the DI goodness</Description>
     </PropertyGroup>
 
