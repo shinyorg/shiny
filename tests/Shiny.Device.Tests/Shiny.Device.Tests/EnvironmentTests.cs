@@ -13,7 +13,7 @@ namespace Shiny.Device.Tests
 
         [Fact]
         public void AppIdentifier()
-            => Assert.Equal("com.acrapps.coretests", ShinyHost.Resolve<IEnvironment>().AppIdentifier);
+            => Assert.Equal("com.shiny.devicetests", ShinyHost.Resolve<IEnvironment>().AppIdentifier);
 
 
         [Fact]

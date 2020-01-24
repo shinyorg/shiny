@@ -4,7 +4,7 @@ using Shiny.Nfc;
 
 namespace Shiny
 {
-    public static class ShinyHttpTransfers
+    public static class ShinyNFC
     {
         static INfcManager Current { get; } = ShinyHost.Resolve<INfcManager>();
 

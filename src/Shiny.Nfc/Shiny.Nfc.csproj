@@ -1,6 +1,7 @@
 <Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
+        <VersionSuffix>beta</VersionSuffix>
         <Description>Shiny NFC</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>              
     </PropertyGroup>

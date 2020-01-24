@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <VersionSuffix>beta</VersionSuffix>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Description>Shiny Integration - Sqlite-net-pcl Storage Repository</Description>
+        <Description>Shiny Integration - SQLite Plugins for Cache, Logging, Service Repo Layers, and Settings</Description>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
 

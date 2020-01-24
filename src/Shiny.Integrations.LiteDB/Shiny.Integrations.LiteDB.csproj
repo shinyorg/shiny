@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <VersionSuffix>beta</VersionSuffix>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <RootNamespace>Shiny</RootNamespace>
+        <Description>Shiny Integration - LiteDB</Description>
     </PropertyGroup>
 
     <ItemGroup>

@@ -2,6 +2,7 @@ int count = 0;
 
 void setup()
 {
+    Bean.setBeanName("ShinyTest");
 }
 
 

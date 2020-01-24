@@ -128,7 +128,7 @@ namespace Shiny.Jobs
         }
 
 
-        public async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken)
+        public async Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken, bool runSequentially)
         {
             var list = new List<JobRunResult>();
 
@@ -140,16 +140,30 @@ namespace Shiny.Jobs
                     var jobs = await this.repository.GetAll<PersistJobInfo>();
                     var tasks = new List<Task<JobRunResult>>();
 
-                    foreach (var job in jobs)
+                    if (runSequentially)
                     {
-                        var actual = PersistJobInfo.FromPersist(job);
-                        tasks.Add(this.RunJob(actual, cancelToken));
+                        foreach (var job in jobs)
+                        {
+                            var actual = PersistJobInfo.FromPersist(job);
+                            var result = await this
+                                .RunJob(actual, cancelToken)
+                                .ConfigureAwait(false);
+                            list.Add(result);
+                        }
                     }
+                    else
+                    {
+                        foreach (var job in jobs)
+                        {
+                            var actual = PersistJobInfo.FromPersist(job);
+                            tasks.Add(this.RunJob(actual, cancelToken));
+                        }
 
-                    await Task
-                        .WhenAll(tasks)
-                        .ConfigureAwait(false);
-                    list.AddRange(tasks.Select(x => x.Result));
+                        await Task
+                            .WhenAll(tasks)
+                            .ConfigureAwait(false);
+                        list.AddRange(tasks.Select(x => x.Result));
+                    }
                 }
                 catch (Exception ex)
                 {

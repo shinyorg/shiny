@@ -6,6 +6,32 @@ namespace Shiny.BluetoothLE.Central
 {
     public static class PeripheralExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <param name="serviceUuid"></param>
+        /// <returns></returns>
+        public static IObservable<IGattCharacteristic> GetCharacteristicsForService(this IPeripheral peripheral, Guid serviceUuid)
+            => peripheral
+                .GetKnownService(serviceUuid)
+                .Select(x => x.DiscoverCharacteristics()).Switch();
+
+
+        /// <summary>
+        /// Connect and manage connection as well as hook into your required characterisitcs with all proper cleanups necessary
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <param name="serviceUuid"></param>
+        /// <param name="characteristicUuids"></param>
+        /// <returns></returns>
+        public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, Guid serviceUuid, params Guid[] characteristicUuids)
+            => peripheral
+                .WhenConnected()
+                .Select(_ => peripheral.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuids))
+                .Switch()
+                .Select(x => x.Notify())
+                .Merge();
 
         /// <summary>
         /// An easy wrapper around checking peripheral status == ConnectionState.Connected
@@ -22,42 +48,6 @@ namespace Shiny.BluetoothLE.Central
         /// <returns>Return true if disconnected, otherwise false</returns>
         public static bool IsDisconnected(this IPeripheral peripheral) => !peripheral.IsConnected();
 
-
-        /// <summary>
-        /// Connect and manage connection as well as hook into your required characterisitcs with all proper cleanups necessary
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="serviceUuid"></param>
-        /// <param name="characteristicUuids"></param>
-        /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> ConnectHook(this IPeripheral device, Guid serviceUuid, params Guid[] characteristicUuids)
-            => Observable.Create<CharacteristicGattResult>(ob =>
-            {
-                var sub = device
-                    .WhenConnected()
-                    .Select(_ => device.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuids))
-                    .Switch()
-                    .Select(x => x.Notify(false))
-                    .Merge()
-                    .Subscribe(
-                        ob.OnNext,
-                        ob.OnError
-                    );
-
-                var connSub = device
-                    .WhenConnectionFailed()
-                    .Subscribe(ob.OnError);
-
-                // TODO: connectconfig - pass args object
-                device.ConnectIf();
-
-                return () =>
-                {
-                    device.CancelConnection();
-                    sub?.Dispose();
-                    connSub?.Dispose();
-                };
-            });
 
         /// <summary>
         /// Starts connection process if not already connecteds
@@ -91,19 +81,6 @@ namespace Shiny.BluetoothLE.Central
 
 
         /// <summary>
-        /// When peripheral is connected, this will call for RSSI continuously
-        /// </summary>
-        /// <param name="peripheral"></param>
-        /// <param name="readInterval"></param>
-        /// <returns></returns>
-        public static IObservable<int> WhenReadRssiContinuously(this IPeripheral peripheral, TimeSpan? readInterval = null)
-            => peripheral
-                .WhenConnected()
-                .Select(x => x.ReadRssiContinuously(readInterval))
-                .Switch();
-
-
-        /// <summary>
         /// Waits for connection to actually happen
         /// </summary>
         /// <param name="peripheral"></param>
@@ -130,22 +107,6 @@ namespace Shiny.BluetoothLE.Central
                         peripheral.CancelConnection();
                 };
             });
-
-
-        /// <summary>
-        /// Connect and manage connection as well as hook into your required characterisitcs with all proper cleanups necessary
-        /// </summary>
-        /// <param name="peripheral"></param>
-        /// <param name="serviceUuid"></param>
-        /// <param name="characteristicUuids"></param>
-        /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, Guid serviceUuid, params Guid[] characteristicUuids)
-            => peripheral
-                .WhenConnected()
-                .Select(_ => peripheral.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuids))
-                .Switch()
-                .Select(x => x.Notify())
-                .Merge();
 
 
         /// <summary>
