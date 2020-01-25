@@ -113,8 +113,8 @@ namespace Shiny.Notifications
                 toastContent.Actions = nativeActions;
             }
 
-            if (!Notification.CustomSoundFilePath.IsEmpty())
-                toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
+            //if (!Notification.CustomSoundFilePath.IsEmpty())
+            //    toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
 
             var native = new ToastNotification(toastContent.GetXml());
             this.toastNotifier.Show(native);

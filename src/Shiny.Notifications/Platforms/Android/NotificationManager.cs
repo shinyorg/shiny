@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Android.OS;
 using Android.Support.V4.App;
 using Android.Support.V4.Content;
 using Shiny.Infrastructure;
@@ -120,7 +119,7 @@ namespace Shiny.Notifications
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
-            this.AddSound(builder);
+            this.AddSound(notification, builder);
 
             if (!notification.Category.IsEmpty())
                 this.AddCategory(builder, notification);
@@ -132,7 +131,6 @@ namespace Shiny.Notifications
 
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
-
 
             // disabled until System.Drawing reliable works in Xamarin again
             //if (notification.Android.Color != null)
@@ -260,16 +258,24 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual void AddSound(NotificationCompat.Builder builder)
+        protected virtual void AddSound(Notification notification, NotificationCompat.Builder builder)
         {
-            if (Notification.CustomSoundFilePath.IsEmpty())
+            var s = notification.Sound;
+            if (!s.Equals(NotificationSound.None))
             {
-                builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
-            }
-            else
-            {
-                var uri = Android.Net.Uri.Parse(Notification.CustomSoundFilePath);
-                builder.SetSound(uri);
+                if (s.Equals(NotificationSound.DefaultSystem))
+                {
+                    builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
+                }
+                else if (s.Equals(NotificationSound.DefaultPriority))
+                {
+                    builder.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri);
+                }
+                else
+                {
+                    var uri = Android.Net.Uri.Parse(s.Path);
+                    builder.SetSound(uri);
+                }
             }
         }
 

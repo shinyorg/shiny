@@ -144,13 +144,25 @@ namespace Shiny.Notifications
             var access = await this.RequestAccess();
             access.Assert();
 
+            var request = UNNotificationRequest.FromIdentifier(
+                notification.Id.ToString(),
+                this.GetContent(notification),
+                this.GetTrigger(notification)
+            );
+            await UNUserNotificationCenter
+                .Current
+                .AddNotificationRequestAsync(request);
+        }
+
+
+        protected virtual UNNotificationContent GetContent(Notification notification)
+        {
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message                
-                //LaunchImageName = ""
-                //Subtitle = ""
+                Body = notification.Message
             };
+            this.SetSound(notification, content);
             if (!notification.Category.IsEmpty())
                 content.CategoryIdentifier = notification.Category;
 
@@ -163,11 +175,28 @@ namespace Shiny.Notifications
                 dict.Add(new NSString("Payload"), new NSString(notification.Payload));
                 content.UserInfo = dict;
             }
+            return content;
+        }
 
-            if (!Notification.CustomSoundFilePath.IsEmpty())
-                content.Sound = UNNotificationSound.GetSound(Notification.CustomSoundFilePath);
 
-            UNNotificationTrigger trigger = null;
+        protected virtual void SetSound(Notification notification, UNMutableNotificationContent content)
+        {
+            var s = notification.Sound;
+            if (!s.Equals(NotificationSound.None))
+            {
+                if (s.Equals(NotificationSound.DefaultSystem))
+                    content.Sound = UNNotificationSound.Default;
+                else if (s.Equals(NotificationSound.DefaultPriority))
+                    content.Sound = UNNotificationSound.DefaultCriticalSound;
+                else
+                    content.Sound = UNNotificationSound.GetSound(s.Path);
+            }
+        }
+
+
+        protected virtual UNNotificationTrigger? GetTrigger(Notification notification)
+        {
+            UNNotificationTrigger? trigger = null;
             if (notification.ScheduleDate != null)
             {
                 var dt = notification.ScheduleDate.Value.ToLocalTime();
@@ -181,15 +210,7 @@ namespace Shiny.Notifications
                     Second = dt.Second
                 }, false);
             }
-
-            var request = UNNotificationRequest.FromIdentifier(
-                notification.Id.ToString(),
-                content,
-                trigger
-            );
-            await UNUserNotificationCenter
-                .Current
-                .AddNotificationRequestAsync(request);
+            return trigger;
         }
 
 
