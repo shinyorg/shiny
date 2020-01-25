@@ -83,18 +83,18 @@ namespace Shiny.Notifications
                 //Property = DisableAppLaunch
             };
 
-            if (!Notification.CustomSoundFilePath.IsEmpty())
-            {
-                native.Accessory = new NativeNot.AccessorySet
-                {
-                    //CanVibrate = true,
-                    //LedOnMillisecond = 100,
-                    //LedOffMillisecond = 100,
-                    //SoundOption = AccessoryOption.Custom,
-                    //SoundPath = Path.Combine(this.fileSystem.AppData.FullName, notification.Sound)
-                    SoundPath = Notification.CustomSoundFilePath
-                };
-            }
+            //if (!Notification.CustomSoundFilePath.IsEmpty())
+            //{
+            //    native.Accessory = new NativeNot.AccessorySet
+            //    {
+            //        //CanVibrate = true,
+            //        //LedOnMillisecond = 100,
+            //        //LedOffMillisecond = 100,
+            //        //SoundOption = AccessoryOption.Custom,
+            //        //SoundPath = Path.Combine(this.fileSystem.AppData.FullName, notification.Sound)
+            //        SoundPath = Notification.CustomSoundFilePath
+            //    };
+            //}
             return native;
         }
     }
