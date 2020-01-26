@@ -26,7 +26,7 @@ namespace Shiny.Locations
                 SingleUse = @this.SingleUse,
                 NotifyOnEntry = @this.NotifyOnEntry,
                 NotifyOnExit = @this.NotifyOnExit,
-                Payload = @this.Payload.Select(kvp => (PayloadEntry)kvp).ToList(),
+                Payload = @this.Payload?.Select(kvp => (PayloadEntry)kvp).ToList(),
             };
 
         public static explicit operator GeofenceRegion(GeofenceRegionStore store) =>
@@ -39,7 +39,7 @@ namespace Shiny.Locations
                 SingleUse = store.SingleUse,
                 NotifyOnEntry = store.NotifyOnEntry,
                 NotifyOnExit = store.NotifyOnExit,
-                Payload = store.Payload.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+                Payload = store.Payload?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
             };
 
         public struct PayloadEntry

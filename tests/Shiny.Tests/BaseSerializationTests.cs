@@ -19,7 +19,19 @@ namespace Shiny.Tests
         }
 
         [Fact]
-        public virtual void GeofenceRegion()
+        public virtual void GeofenceRegion_without_Payload()
+        {
+            var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromMeters(99));
+
+            var end = (GeofenceRegion)this.SerializeDeserialize((GeofenceRegionStore)start);
+
+            end.Should().BeEquivalentTo(start);
+            end.Radius.Should().Be(start.Radius);
+            end.Center.Should().Be(start.Center);
+        }
+
+        [Fact]
+        public virtual void GeofenceRegion_with_Payload()
         {
             var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromMeters(99))
             {
