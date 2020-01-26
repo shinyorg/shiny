@@ -10,6 +10,8 @@ namespace Shiny.Tests
     public abstract class BaseSerializationTests<T> where T : ISerializer
     {
         protected abstract T Create();
+        protected abstract void DeserializedCollectionShouldBeNull<TValue>(IEnumerable<TValue> collection);
+
 
         protected TValue SerializeDeserialize<TValue>(TValue start)
         {
@@ -28,6 +30,8 @@ namespace Shiny.Tests
             end.Should().BeEquivalentTo(start);
             end.Radius.Should().Be(start.Radius);
             end.Center.Should().Be(start.Center);
+
+            DeserializedCollectionShouldBeNull(end.Payload);
         }
 
         [Fact]

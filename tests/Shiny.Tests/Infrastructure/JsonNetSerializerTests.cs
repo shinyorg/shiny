@@ -1,4 +1,6 @@
-﻿using Shiny.Infrastructure;
+﻿using System.Collections.Generic;
+using FluentAssertions;
+using Shiny.Infrastructure;
 
 namespace Shiny.Tests.Infrastructure
 {
@@ -6,5 +8,8 @@ namespace Shiny.Tests.Infrastructure
     {
         protected override JsonNetSerializer Create()
             => new JsonNetSerializer();
+
+        protected override void DeserializedCollectionShouldBeNull<TValue>(IEnumerable<TValue> collection) =>
+            collection.Should().BeNull();
     }
 }
