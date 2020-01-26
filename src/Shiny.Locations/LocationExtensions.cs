@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
 
@@ -28,28 +27,7 @@ namespace Shiny.Locations
         internal static RepositoryWrapper<GeofenceRegion, GeofenceRegionStore> Wrap(this IRepository repository) => new RepositoryWrapper<GeofenceRegion, GeofenceRegionStore>
         (
             repository,
-            args => new GeofenceRegionStore
-            {
-                Identifier = args.Identifier,
-                CenterLatitude = args.Center.Latitude,
-                CenterLongitude = args.Center.Longitude,
-                RadiusMeters = args.Radius.TotalMeters,
-                SingleUse = args.SingleUse,
-                NotifyOnEntry = args.NotifyOnEntry,
-                NotifyOnExit = args.NotifyOnExit,
-                Payload = args.Payload.Cast<GeofenceRegionStore.PayloadEntry>().ToList(),
-            },
-            store => new GeofenceRegion(
-                store.Identifier,
-                new Position(store.CenterLatitude, store.CenterLongitude),
-                Distance.FromMeters(store.RadiusMeters)
-            )
-            {
-                SingleUse = store.SingleUse,
-                NotifyOnEntry = store.NotifyOnEntry,
-                NotifyOnExit = store.NotifyOnExit,
-                Payload = store.Payload.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-            }
-        );
+            args => (GeofenceRegionStore)args,
+            store => (GeofenceRegion)store);
     }
 }
