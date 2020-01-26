@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-
 namespace Shiny.Locations
 {
     public class GeofenceRegionStore
@@ -27,7 +26,7 @@ namespace Shiny.Locations
                 SingleUse = @this.SingleUse,
                 NotifyOnEntry = @this.NotifyOnEntry,
                 NotifyOnExit = @this.NotifyOnExit,
-                Payload = @this.Payload.Cast<PayloadEntry>().ToList(),
+                Payload = @this.Payload.Select(kvp => (PayloadEntry)kvp).ToList(),
             };
 
         public static explicit operator GeofenceRegion(GeofenceRegionStore store) =>
