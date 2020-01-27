@@ -12,6 +12,11 @@ namespace Shiny.Notifications
 {
     public class NotificationManager : INotificationManager
     {
+        /// <summary>
+        /// This requires a special entitlement from Apple that is general disabled for anything but healt & public safety alerts
+        /// </summary>
+        public static bool UseCriticalAlerts { get; set; }
+
         readonly ISettings settings; // this will have problems with data protection
 
 
@@ -93,11 +98,19 @@ namespace Shiny.Notifications
         public Task<AccessState> RequestAccess()
         {
             var tcs = new TaskCompletionSource<AccessState>();
+            var request = UNAuthorizationOptions.Alert |
+                    UNAuthorizationOptions.Badge |
+                    UNAuthorizationOptions.Sound;
+
+            if (UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0))
+            { 
+                request |= UNAuthorizationOptions.CriticalAlert;
+                //UNNotificationSound.GetCriticalSound("my_critical_sound.m4a", 1.0f)
+                //UNAuthorizationOptions.CriticalAlert
+            }
 
             UNUserNotificationCenter.Current.RequestAuthorization(
-                UNAuthorizationOptions.Alert |
-                UNAuthorizationOptions.Badge |
-                UNAuthorizationOptions.Sound,
+                request,
                 (approved, error) =>
                 {
                     if (error != null)
@@ -187,7 +200,9 @@ namespace Shiny.Notifications
                 if (s.Equals(NotificationSound.DefaultSystem))
                     content.Sound = UNNotificationSound.Default;
                 else if (s.Equals(NotificationSound.DefaultPriority))
-                    content.Sound = UNNotificationSound.DefaultCriticalSound;
+                    content.Sound = UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0)
+                        ? UNNotificationSound.DefaultCriticalSound
+                        : UNNotificationSound.Default;
                 else
                     content.Sound = UNNotificationSound.GetSound(s.Path);
             }
