@@ -13,7 +13,7 @@ namespace Shiny
 
         public static bool IsListening => Current.IsListening;
         public static AccessState GetCurrentStatus(bool background) => Current.GetCurrentStatus(background);
-        public static IObservable<IGpsReading> GetLastReading() => Current.GetLastReading();
+        public static IObservable<IGpsReading?> GetLastReading() => Current.GetLastReading();
         public static Task<AccessState> RequestAccess(bool backgroundMode) => Current.RequestAccess(backgroundMode);
         public static Task StartListener(GpsRequest request) => Current.StartListener(request);
         public static Task StopListener() => Current.StopListener();
