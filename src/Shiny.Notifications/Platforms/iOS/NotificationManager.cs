@@ -99,15 +99,11 @@ namespace Shiny.Notifications
         {
             var tcs = new TaskCompletionSource<AccessState>();
             var request = UNAuthorizationOptions.Alert |
-                    UNAuthorizationOptions.Badge |
-                    UNAuthorizationOptions.Sound;
+                          UNAuthorizationOptions.Badge |
+                          UNAuthorizationOptions.Sound;
 
             if (UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0))
-            { 
                 request |= UNAuthorizationOptions.CriticalAlert;
-                //UNNotificationSound.GetCriticalSound("my_critical_sound.m4a", 1.0f)
-                //UNAuthorizationOptions.CriticalAlert
-            }
 
             UNUserNotificationCenter.Current.RequestAuthorization(
                 request,
