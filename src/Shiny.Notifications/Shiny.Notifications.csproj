@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>Shiny addon for all your notification needs</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;tizen50;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
@@ -47,8 +47,16 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\macOS\**\*.cs" />
     </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\Android\**\*.cs" />
+        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.1.0-rc1" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.1.0-rc1" />
+    </ItemGroup>
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
@@ -59,10 +67,5 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Tizen\**\*.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Update="NotificationSound.cs">
-        <SubType></SubType>
-      </Compile>
     </ItemGroup>
 </Project>

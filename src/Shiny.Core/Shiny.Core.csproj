@@ -34,10 +34,6 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
     
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
-        <DefineConstants>$(DefineConstants);ANDROIDX</DefineConstants>
-    </PropertyGroup>
-    
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />        

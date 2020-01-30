@@ -2,7 +2,11 @@
 using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
+#if ANDROIDX
+using RemoteInput = AndroidX.Core.App.RemoteInput;
+#else
 using RemoteInput = Android.Support.V4.App.RemoteInput;
+#endif
 
 
 namespace Shiny.Notifications

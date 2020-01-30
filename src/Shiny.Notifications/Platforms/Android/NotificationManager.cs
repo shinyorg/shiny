@@ -5,16 +5,21 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
 using Shiny.Settings;
 using Native = Android.App.NotificationManager;
+
+#if ANDROIDX
+using AndroidX.Core.App;
+using RemoteInput = AndroidX.Core.App.RemoteInput;
+using TaskStackBuilder = AndroidX.Core.App.TaskStackBuilder;
+#else
+using Android.Support.V4.App;
 using RemoteInput = Android.Support.V4.App.RemoteInput;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
-
+#endif
 
 namespace Shiny.Notifications
 {
@@ -27,8 +32,8 @@ namespace Shiny.Notifications
         readonly ISerializer serializer;
         readonly IJobManager jobs;
 
-        NotificationManagerCompat? compatManager;
-        Native? newManager;
+        readonly NotificationManagerCompat? compatManager;
+        readonly Native? newManager;
 
 
         public NotificationManager(AndroidContext context,
@@ -45,20 +50,19 @@ namespace Shiny.Notifications
             this.repository = repository;
             this.settings = settings;
 
+#if ANDROIDX
+            this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
+#else
+            if (this.context.IsMinApiLevel(26))            
+                this.newManager = Native.FromContext(this.context.AppContext);
+            else
+                this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
+#endif
             // auto process intent?
             //this.context
             //    .WhenActivityStatusChanged()
             //    .Where(x => x.Status == ActivityState.Created)
             //    .Subscribe(x => TryProcessIntent(x.Activity.Intent));
-
-            if (this.context.IsMinApiLevel(26))
-            {
-                this.newManager = Native.FromContext(context.AppContext);
-            }
-            else
-            {
-                this.compatManager = NotificationManagerCompat.From(context.AppContext);
-            }
         }
 
 
@@ -173,6 +177,26 @@ namespace Shiny.Notifications
 
         protected virtual void DoNotify(NotificationCompat.Builder builder, Notification notification)
         {
+#if ANDROIDX
+            var channelId = notification.Android.ChannelId;
+
+            if (this.compatManager.GetNotificationChannel(channelId) == null)
+            {
+                var channel = new NotificationChannel(
+                    channelId,
+                    notification.Android.Channel,
+                    notification.Android.NotificationImportance.ToNative()
+                );
+                var d = notification.Android.ChannelDescription;
+                if (!d.IsEmpty())
+                    channel.Description = d;
+
+                this.compatManager.CreateNotificationChannel(channel);
+            }
+
+            builder.SetChannelId(channelId);
+            this.compatManager.Notify(notification.Id, builder.Build());
+#else
             if (this.newManager != null)
             {
                 var channelId = notification.Android.ChannelId;
@@ -194,10 +218,11 @@ namespace Shiny.Notifications
                 builder.SetChannelId(channelId);
                 this.newManager.Notify(notification.Id, builder.Build());
             }
-            else if (this.compatManager != null)
+            else
             {
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
+#endif
         }
 
 
@@ -221,7 +246,11 @@ namespace Shiny.Notifications
                 pendingIntent = TaskStackBuilder
                     .Create(this.context.AppContext)
                     .AddNextIntent(launchIntent)
+#if ANDROIDX
+                    .GetPendingIntent(notification.Id, (int)PendingIntentFlags.OneShot);
+#else
                     .GetPendingIntent(notification.Id, PendingIntentFlags.OneShot);
+#endif
             }
             else
             {
@@ -242,8 +271,13 @@ namespace Shiny.Notifications
             if (colorResourceId <= 0)
                 throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
 
-            return ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+#if ANDROIDX
+            return AndroidX.Core.Content.ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+#else
+            return Android.Support.V4.Content.ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+#endif
         }
+
 
         protected virtual int GetIconResource(Notification notification)
         {

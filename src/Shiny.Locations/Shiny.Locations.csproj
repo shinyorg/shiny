@@ -40,7 +40,14 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Uwp\**\*.cs" />
     </ItemGroup>
-
+    
+<!--    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\Android\**\*.cs" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.1.0-rc1" />
+    </ItemGroup>-->
+    
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />

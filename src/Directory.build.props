@@ -30,7 +30,11 @@
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>               
     </PropertyGroup>
- 
+    
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
+        <DefineConstants>$(DefineConstants);ANDROIDX</DefineConstants>
+    </PropertyGroup>
+     
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <TargetsToBuild>android;ios;watchos;tvos;uap;tizen</TargetsToBuild>
         <DebugType>full</DebugType>
