@@ -6,8 +6,6 @@ using Shiny.Logging;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
 using NativePerm = Android.Content.PM.Permission;
 
 
@@ -36,6 +34,8 @@ namespace Shiny
                 return this.topActivity.Current;
             }
         }
+
+
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
         {
             if (this.topActivity.Current != null)
@@ -109,8 +109,13 @@ namespace Shiny
 
         public AccessState GetCurrentAccessState(string androidPermission)
         {
-            var result = ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
+#if !ANDROIDX
+            var result = Android.Support.V4.Content.ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
             return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
+#else
+            var result = AndroidX.Core.Content.ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
+            return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
+#endif
         }
 
 
@@ -146,11 +151,19 @@ namespace Shiny
             var sub = this.WhenActivityStatusChanged()
                 .Take(1)
                 .Subscribe(x =>
-                    ActivityCompat.RequestPermissions(
+#if !ANDROIDX
+                    Android.Support.V4.App.ActivityCompat.RequestPermissions(
                         x.Activity,
                         new[] { androidPermission },
                         current
                     )
+#else
+                    AndroidX.Core.App.ActivityCompat.RequestPermissions(
+                        x.Activity,
+                        new[] { androidPermission },
+                        current
+                    )
+#endif
                 );
 
 
