@@ -45,12 +45,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>      
-    
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <UseAndroidX>false</UseAndroidX>
-        <DefineConstants Condition=" $(UseAndroidX) == true ">$(DefineConstants);ANDROIDX</DefineConstants>
-    </PropertyGroup>
-    
+   
     <ItemGroup Condition=" '$(SourceLinkEnabled)' == 'true' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     </ItemGroup>

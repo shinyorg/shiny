@@ -59,14 +59,11 @@ namespace Shiny.Jobs
                 .Build();
 
             var data = new Data.Builder();
-            //foreach (var parameter in jobInfo.Parameters)
-            //    data.Put(parameter.Key, parameter.Value);
+            data.PutString(ShinyJobWorker.ShinyJobIdentifier, jobInfo.Identifier);
 
             if (jobInfo.Repeat)
             {
-                var request = PeriodicWorkRequest
-                    .Builder
-                    .From<ShinyJobWorker>(TimeSpan.FromMinutes(20))
+                var request = new PeriodicWorkRequest.Builder(typeof(ShinyJobWorker), TimeSpan.FromMinutes(15)) 
                     .SetConstraints(constraints)
                     .SetInputData(data.Build())
                     .Build();
@@ -81,8 +78,14 @@ namespace Shiny.Jobs
             {
                 var worker = new OneTimeWorkRequest.Builder(typeof(ShinyJobWorker))
                     .SetInputData(data.Build())
-                    .SetConstraints(constraints);
+                    .SetConstraints(constraints)
+                    .Build();
 
+                WorkManager.Instance.EnqueueUniqueWork(
+                    jobInfo.Identifier,
+                    ExistingWorkPolicy.Append,
+                    worker
+                );
             }
         }
 
@@ -104,9 +107,7 @@ namespace Shiny.Jobs
         }
 
         protected override void CancelNative(JobInfo jobInfo)
-        {
-            WorkManager.Instance.CancelUniqueWork(jobInfo.Identifier);
-        }
+            => WorkManager.Instance.CancelUniqueWork(jobInfo.Identifier);
 
 
         public override async Task CancelAll()
