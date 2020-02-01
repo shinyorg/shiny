@@ -5,9 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using Android.Gms.Location;
 using Android;
 using Android.App;
+using Android.Locations;
+using Android.Content;
+using Android.Gms.Location;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 
@@ -38,9 +40,37 @@ namespace Shiny.Locations
         });
 
 
-        public override IObservable<AccessState> WhenAccessStatusChanged() => Observable.Return(AccessState.Available);
-        public override AccessState Status => this.context.GetCurrentAccessState(Manifest.Permission.AccessFineLocation);
-        public override Task<AccessState> RequestAccess() => this.context.RequestAccess(Manifest.Permission.AccessFineLocation).ToTask();
+        public override IObservable<AccessState> WhenAccessStatusChanged()
+            => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.Status);
+
+
+        public override AccessState Status
+        {
+            get
+            {
+                if (this.LocationStatus != AccessState.Available)
+                    return this.LocationStatus;
+
+                return this.context.GetCurrentAccessState(Manifest.Permission.AccessFineLocation);
+            }
+        }
+
+
+        public override async Task<AccessState> RequestAccess()
+        {
+            var locationManager = (LocationManager)this.context.AppContext.GetSystemService(Context.LocationService);
+            if (!locationManager.IsLocationEnabled)
+                return AccessState.Disabled;
+
+            var hasGps = locationManager.IsProviderEnabled(LocationManager.GpsProvider);
+            var hasNet = locationManager.IsProviderEnabled(LocationManager.NetworkProvider);
+            if (!hasGps || !hasNet)
+                return AccessState.Disabled;
+
+            return await this.context
+                .RequestAccess(Manifest.Permission.AccessFineLocation)
+                .ToTask();
+        }
 
 
         public override async Task StartMonitoring(GeofenceRegion region)
@@ -137,6 +167,24 @@ namespace Shiny.Locations
                 PendingIntentFlags.UpdateCurrent
             );
             return this.geofencePendingIntent;
+        }
+
+
+        protected AccessState LocationStatus
+        {
+            get
+            {
+                var locationManager = (LocationManager)this.context.AppContext.GetSystemService(Context.LocationService);
+                if (!locationManager.IsLocationEnabled)
+                    return AccessState.Disabled;
+
+                var hasGps = locationManager.IsProviderEnabled(LocationManager.GpsProvider);
+                var hasNet = locationManager.IsProviderEnabled(LocationManager.NetworkProvider);
+                if (!hasGps || !hasNet)
+                    return AccessState.Disabled;
+
+                return AccessState.Available;
+            }
         }
     }
 }

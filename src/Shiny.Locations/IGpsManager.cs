@@ -15,7 +15,7 @@ namespace Shiny.Locations
         /// <summary>
         /// The current status of the GPS manager
         /// </summary>
-        AccessState GetCurrentStatus(bool background);
+        AccessState GetCurrentStatus(GpsRequest request);
 
 
         /// <summary>
@@ -23,15 +23,15 @@ namespace Shiny.Locations
         /// </summary>
         /// <param name="forBackground"></param>
         /// <returns></returns>
-        IObservable<AccessState> WhenAccessStatusChanged(bool forBackground);
+        IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request);
 
 
         /// <summary>
         /// Request access to use GPS hardware
         /// </summary>
-        /// <param name="backgroundMode"></param>
+        /// <param name="request"></param>
         /// <returns></returns>
-        Task<AccessState> RequestAccess(bool backgroundMode);
+        Task<AccessState> RequestAccess(GpsRequest request);
 
 
         /// <summary>

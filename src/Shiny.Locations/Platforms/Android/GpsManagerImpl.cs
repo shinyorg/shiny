@@ -24,14 +24,30 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => Observable.Return(AccessState.Available); // TODO
-        public AccessState GetCurrentStatus(bool background) => this.context.GetCurrentAccessState(P.AccessFineLocation);
+        public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request)
+            => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.GetCurrentStatus(request));
+
+
+        public AccessState GetCurrentStatus(GpsRequest request) => this.context.GetCurrentAccessState(P.AccessFineLocation);
         public bool IsListening { get; private set; }
+
+
+
+        public Task<AccessState> RequestAccess(GpsRequest request)
+        {
+            if (this.context.IsMinApiLevel(29) && request.UseBackground)
+            {
+                return this.context
+                    .RequestAccess("ACCESS_BACKGROUND_LOCATION")
+                    .ToTask();
+            }
+            return this.context.RequestAccess(P.AccessFineLocation).ToTask();
+        }
 
 
         public IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>
         {
-            var access = await this.RequestAccess(false);
+            var access = await this.RequestAccess(new GpsRequest());
             access.Assert();
 
             var location = await this.client.GetLastLocationAsync();
@@ -42,17 +58,13 @@ namespace Shiny.Locations
         });
 
 
-        public Task<AccessState> RequestAccess(bool backgroundMode)
-            => this.context.RequestAccess(P.AccessFineLocation).ToTask();
-
-
         public async Task StartListener(GpsRequest request)
         {
             if (this.IsListening)
                 return;
 
             request = request ?? new GpsRequest();
-            var access = await this.RequestAccess(request.UseBackground);
+            var access = await this.RequestAccess(request);
             access.Assert();
 
             var nativeRequest = LocationRequest

@@ -1,10 +1,19 @@
 ﻿# Change Log
 
 ## 1.0.1
-[Enhancement][Breaking] New way to set notification sounds which allows you to use system sounds - Notification.CustomSoundFilePath has been removed
-[Enhancement][Android] If you target android 10, the following now use full AndroidX support
-    * Shiny.Core - WorkManager replaces JobService under the hood
-    * Shiny.Notifications - Uses NotificationCompat
+
+* Shiny.Core
+    * [Enhancement][Android] AndroidX support on android 10 targets - WorkManager replaces JobService under the hood
+
+* Shiny.Notifications
+    * [Enhancement][Breaking] New way to set notification sounds which allows you to use system sounds - Notification.CustomSoundFilePath has been removed
+    * [Enhancement][Android] AndroidX support on android 10 targets
+
+* Shiny.Locations
+    * [Fix][Geofences][Android] Status observable now works
+    * [Fix][Geofences][Android] Status check now includes GPS radio checks + permissions
+    * [Fix][GPS][BREAKING] RequestAccess, WhenStatusChanged, and GetCurrentStatus all now accept GpsRequest to increase the scope/accuracy of the necessary permission checks
+    * [Fix][GPS][Android] RequestAccess now checks for new Android 10 permission for ACCESS_BACKGROUND_LOCATION
 
 ## 1.0.0
 Initial Release for

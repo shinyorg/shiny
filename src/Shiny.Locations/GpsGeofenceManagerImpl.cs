@@ -12,7 +12,7 @@ namespace Shiny.Locations
     {
         readonly IGeofenceManager geofenceManager;
         readonly IGeofenceDelegate geofenceDelegate;
-
+        
 
         public GpsGeofenceDelegate(IGeofenceManager geofenceManager, IGeofenceDelegate geofenceDelegate)
         {
@@ -39,18 +39,21 @@ namespace Shiny.Locations
 
     public class GpsGeofenceManagerImpl : AbstractGeofenceManager
     {
+        static readonly GpsRequest Request = new GpsRequest { UseBackground = true };
+
+
         readonly IGpsManager? gpsManager;
         public GpsGeofenceManagerImpl(IRepository repository, IGpsManager? gpsManager = null) : base(repository)
             => this.gpsManager = gpsManager;
 
 
-        public override AccessState Status => this.gpsManager?.GetCurrentStatus(true) ?? AccessState.NotSupported;
+        public override AccessState Status => this.gpsManager?.GetCurrentStatus(Request) ?? AccessState.NotSupported;
         public override async Task<AccessState> RequestAccess()
         {
             if (this.gpsManager == null)
                 return AccessState.NotSupported;
 
-            return await this.gpsManager.RequestAccess(true);
+            return await this.gpsManager.RequestAccess(new GpsRequest { UseBackground = true });
         }
 
 
@@ -110,7 +113,7 @@ namespace Shiny.Locations
         public override IObservable<AccessState> WhenAccessStatusChanged()
         {
             this.Assert();
-            return this.gpsManager.WhenAccessStatusChanged(true);
+            return this.gpsManager.WhenAccessStatusChanged(Request);
         }
 
 
@@ -119,7 +122,7 @@ namespace Shiny.Locations
             if (this.gpsManager == null)
                 throw new ArgumentException("GPS Manager is not available");
 
-            this.gpsManager.GetCurrentStatus(true).Assert();
+            this.gpsManager.GetCurrentStatus(Request).Assert();
         }
     }
 }

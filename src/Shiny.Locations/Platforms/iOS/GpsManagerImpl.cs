@@ -21,9 +21,9 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => this.gdelegate.WhenAccessStatusChanged(forBackground);
-        public Task<AccessState> RequestAccess(bool background) => this.locationManager.RequestAccess(background);
-        public AccessState GetCurrentStatus(bool background) => this.locationManager.GetCurrentStatus(background);
+        public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => this.gdelegate.WhenAccessStatusChanged(request.UseBackground);
+        public Task<AccessState> RequestAccess(GpsRequest request) => this.locationManager.RequestAccess(request.UseBackground);
+        public AccessState GetCurrentStatus(GpsRequest request) => this.locationManager.GetCurrentStatus(request.UseBackground);
         public bool IsListening { get; private set; }
 
 
@@ -43,7 +43,7 @@ namespace Shiny.Locations
             {
                 if (!wasListening)
                 {
-                    var access = await this.RequestAccess(false);
+                    var access = await this.RequestAccess(new GpsRequest());
                     access.Assert();
                     this.locationManager.StartUpdatingLocation();
                 }
@@ -63,7 +63,7 @@ namespace Shiny.Locations
                 return;
 
             request = request ?? new GpsRequest();
-            var access = await this.RequestAccess(request.UseBackground);
+            var access = await this.RequestAccess(request);
             access.Assert();
 
             this.gdelegate.Request = request;
