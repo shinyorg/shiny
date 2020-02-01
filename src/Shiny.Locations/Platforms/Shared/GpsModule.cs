@@ -33,11 +33,12 @@ namespace Shiny.Locations
             if (this.requestIfPermissionGranted != null)
             {
                 var mgr = services.GetService<IGpsManager>();
-                var access = await mgr.RequestAccess(true);
+                var request = new GpsRequest();
+                this.requestIfPermissionGranted(request);
+
+                var access = await mgr.RequestAccess(request);
                 if (access == AccessState.Available)
                 {
-                    var request = new GpsRequest();
-                    this.requestIfPermissionGranted(request);
                     request.UseBackground = true;
                     await mgr.StartListener(request);
                 }
