@@ -26,21 +26,21 @@ namespace Shiny.Testing.Locations
             }
         }
 
-        public AccessState GetCurrentStatus(bool background) => this.ReplyStatus;
-        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => this.accessSubject;
+        public AccessState GetCurrentStatus(GpsRequest request) => this.ReplyStatus;
+        public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => this.accessSubject;
 
-        public IGpsReading LastGpsReading { get; set; }
-        public IObservable<IGpsReading> GetLastReading() => Observable.Return(this.LastGpsReading);
+        public IGpsReading? LastGpsReading { get; set; }
+        public IObservable<IGpsReading?> GetLastReading() => Observable.Return(this.LastGpsReading);
 
 
         public AccessState RequestAccessReply { get; set; } = AccessState.Available;
-        public Task<AccessState> RequestAccess(bool backgroundMode) => Task.FromResult(this.RequestAccessReply);
+        public Task<AccessState> RequestAccess(GpsRequest request) => Task.FromResult(this.RequestAccessReply);
 
 
-        public GpsRequest LastGpsRequest { get; private set; }
+        public GpsRequest? LastGpsRequest { get; private set; }
 
 
-        public Task StartListener(GpsRequest request = null)
+        public Task StartListener(GpsRequest? request = null)
         {
             this.IsListening = true;
             this.LastGpsRequest = request;
