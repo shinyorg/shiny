@@ -80,4 +80,21 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="AppState\IAppStateDelegate.cs">
+        <SubType></SubType>
+      </Compile>
+      <Compile Update="AppState\AppStateManager.cs">
+        <SubType></SubType>
+      </Compile>
+      <Compile Update="AppState\ServiceCollectionExtensions.cs">
+        <SubType></SubType>
+      </Compile>
+      <Compile Update="AppEvent.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="AppState\" />
+    </ItemGroup>
 </Project>

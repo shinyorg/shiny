@@ -43,5 +43,20 @@ namespace Shiny
 
         public static void OnRequestPermissionsResult(int requestCode, string[] permissions, NativePerm[] grantResults)
             => Resolve<AndroidContext>().FirePermission(requestCode, permissions, grantResults);
+
+
+        public static void OnForeground()
+        {
+        }
+
+
+        public static void OnBackground()
+        {
+        }
+
+
+        public static void OnAppTerminating()
+        {
+        }
     }
 }

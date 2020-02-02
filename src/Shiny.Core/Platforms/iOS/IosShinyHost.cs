@@ -7,6 +7,7 @@ using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using UIKit;
+using Foundation;
 
 
 namespace Shiny
@@ -32,5 +33,47 @@ namespace Shiny
                 //}
                 platformBuild?.Invoke(services);
             });
+
+
+        public static void RegisteredForRemoteNotifications(NSData deviceToken)
+        {
+            // PushManager.RegisteredForRemoteNotifications(deviceToken);
+        }
+
+
+        public static void FailedToRegisterForRemoteNotifications(NSError error)
+        {
+            // PushManager.FailedToRegisterForRemoteNotifications(error);
+        }
+
+
+        public static void PerformFetch(Action<UIBackgroundFetchResult> completionHandler)
+        {
+            //Resolve<IMessageBus>().Publish(new AppEvent)
+            JobManager.OnBackgroundFetch(completionHandler);
+        }
+
+
+        public static void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
+        {
+            // HttpTransferManager.SetCompletionHandler(sessionIdentifier, completionHandler);
+        }
+
+
+        public static void OnActivated()
+        {
+        }
+
+        public static void OnTerminate()
+        {
+        }
+
+        public static void OnForeground()
+        {
+        }
+
+        public static void OnBackground()
+        {
+        }
     }
 }

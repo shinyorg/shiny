@@ -27,4 +27,9 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="FormsShinyApp.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

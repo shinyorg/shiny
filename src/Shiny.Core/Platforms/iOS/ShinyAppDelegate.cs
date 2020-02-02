@@ -1,34 +1,26 @@
 ﻿using System;
 using Foundation;
-using Microsoft.Extensions.DependencyInjection;
 using UIKit;
-using Xamarin.Forms;
-using Xamarin.Forms.Platform.iOS;
-
 
 namespace Shiny
 {
-    public class ShinyFormsAppDelegate<T> : FormsApplicationDelegate where T : Application, IShinyStartup, new()
+    public class ShinyAppDelegate<T> : UIApplicationDelegate where T : IShinyStartup, new()
     {
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            var instance = new T();
-            iOSShinyHost.Init(instance, this.RegisterPlatformServices);
-            Forms.Init();
-            this.LoadApplication(instance);
-
+            iOSShinyHost.Init(new T());
             return base.FinishedLaunching(app, options);
         }
 
 
-        protected virtual void RegisterPlatformServices(IServiceCollection services) {}
+        public override void OnActivated(UIApplication application)
+            => iOSShinyHost.OnActivated();
 
+        public override void OnResignActivation(UIApplication uiApplication)
+            => iOSShinyHost.OnBackground();
 
-        //public override void OnActivated(UIApplication uiApplication)
-        //public override void OnResignActivation(UIApplication uiApplication)
-        //public override void WillTerminate(UIApplication uiApplication)
-
-        //public void ProtectedDataDidBecomeAvailable(UIApplication application)
+        public override void WillTerminate(UIApplication uiApplication)
+            => iOSShinyHost.OnTerminate();
 
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
             => iOSShinyHost.RegisteredForRemoteNotifications(deviceToken);
