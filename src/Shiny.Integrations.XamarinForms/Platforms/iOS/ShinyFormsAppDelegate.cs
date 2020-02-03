@@ -23,12 +23,14 @@ namespace Shiny
 
         protected virtual void RegisterPlatformServices(IServiceCollection services) {}
 
+        public override void OnActivated(UIApplication application)
+            => iOSShinyHost.OnActivated();
 
-        //public override void OnActivated(UIApplication uiApplication)
-        //public override void OnResignActivation(UIApplication uiApplication)
-        //public override void WillTerminate(UIApplication uiApplication)
+        public override void OnResignActivation(UIApplication uiApplication)
+            => iOSShinyHost.OnBackground();
 
-        //public void ProtectedDataDidBecomeAvailable(UIApplication application)
+        public override void WillTerminate(UIApplication uiApplication)
+            => iOSShinyHost.OnTerminate();
 
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
             => iOSShinyHost.RegisteredForRemoteNotifications(deviceToken);

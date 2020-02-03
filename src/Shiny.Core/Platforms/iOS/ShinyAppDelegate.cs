@@ -1,6 +1,8 @@
 ﻿using System;
 using Foundation;
+using Microsoft.Extensions.DependencyInjection;
 using UIKit;
+
 
 namespace Shiny
 {
@@ -8,10 +10,11 @@ namespace Shiny
     {
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            iOSShinyHost.Init(new T());
+            iOSShinyHost.Init(new T(), this.RegisterPlatformServices);
             return base.FinishedLaunching(app, options);
         }
 
+        protected virtual void RegisterPlatformServices(IServiceCollection services) { }
 
         public override void OnActivated(UIApplication application)
             => iOSShinyHost.OnActivated();

@@ -7,6 +7,14 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
+        public static void RegisterTerminationNotification(this IServiceCollection services, string title, string message)
+        {
+            AppTerminateNotificationAppStateDelegate.Title = title;
+            AppTerminateNotificationAppStateDelegate.Message = message;
+            services.AddAppState<AppTerminateNotificationAppStateDelegate>();
+        }
+
+
         public static bool UseNotifications(this IServiceCollection services,
                                             Type? delegateType,
                                             bool requestPermissionImmediately = false,
