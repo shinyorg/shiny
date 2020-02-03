@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid90</TargetFrameworks>
@@ -27,9 +27,4 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="FormsShinyApp.cs">
-        <SubType></SubType>
-      </Compile>
-    </ItemGroup>
 </Project>
