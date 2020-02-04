@@ -10,6 +10,7 @@ namespace Shiny.Notifications
         public static string DefaultSmallIconResourceName { get; set; } = "notification";
         public static string? DefaultColorResourceName { get; set; }
         public static string? DefaultChannelDescription { get; set; }
+        public static bool DefaultUseBigTextStyle { get; set; }
         public static AndroidNotificationImportance DefaultNotificationImportance { get; set; } = AndroidNotificationImportance.Default;
         public static bool? DefaultShowWhen { get; set; }
         public static bool DefaultVibrate { get; set; }
@@ -25,6 +26,7 @@ namespace Shiny.Notifications
         public string SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
         public string? ColorResourceName { get; set; } = DefaultColorResourceName;
         public bool OnGoing { get; set; }
+        public bool UseBigTextStyle { get; set; } = DefaultUseBigTextStyle;
         public bool AutoCancel { get; set; } = true;
         public bool? ShowWhen { get; set; } = DefaultShowWhen;
         public DateTime? When { get; set; }

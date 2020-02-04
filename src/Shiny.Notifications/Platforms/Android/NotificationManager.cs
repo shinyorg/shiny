@@ -117,16 +117,22 @@ namespace Shiny.Notifications
 
             var iconId = this.GetIconResource(notification);
             var builder = new NotificationCompat.Builder(this.context.AppContext)
-                .SetContentTitle(notification.Title)
-                .SetContentText(notification.Message)
+                .SetContentTitle(notification.Title)                
                 .SetSmallIcon(iconId)
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
+            if (notification.Android.UseBigTextStyle)
+                builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
+            else
+                builder.SetContentText(notification.Message);
+
             this.AddSound(notification, builder);
 
             if (!notification.Category.IsEmpty())
+            {
                 this.AddCategory(builder, notification);
+            }
             else
             {
                 var pendingIntent = this.GetLaunchPendingIntent(notification);
@@ -153,7 +159,10 @@ namespace Shiny.Notifications
             }
 
             if (notification.Android.Priority != null)
+            {
                 builder.SetPriority(notification.Android.Priority.Value);
+                builder.SetDefaults(NotificationCompat.DefaultAll);
+            }
 
             if (notification.Android.ShowWhen != null)
                 builder.SetShowWhen(notification.Android.ShowWhen.Value);
