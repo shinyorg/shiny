@@ -4,17 +4,14 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
-
+using System.Reactive.Threading.Tasks;
+using System.Reactive.Linq;
 
 namespace Shiny.Push
 {
     //https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/enhanced-user-notifications?tabs=windows
     public class PushManager : AbstractPushManager
     {
-        static TaskCompletionSource<string>? RemoteTokenTask;
-
-
-
         public PushManager(ISettings settings) : base(settings)
         {
             UNUserNotificationCenter.Current.Delegate = new ShinyPushDelegate();
@@ -23,14 +20,10 @@ namespace Shiny.Push
 
         public override async Task<PushAccessState> RequestAccess()
         {
-            // TODO: error on pending request?
-            //if (!UIApplication.SharedApplication.IsRegisteredForRemoteNotifications)
-            //{
-                RemoteTokenTask = new TaskCompletionSource<string>();
-                UIApplication.SharedApplication.RegisterForRemoteNotifications();
-            //}
-
+            // TODO: timeout & cancellation
+            var remoteTask = iOSShinyHost.WhenRegisteredForRemoteNotifications().Take(1).ToTask();
             var tcs = new TaskCompletionSource<AccessState>();
+
             UNUserNotificationCenter.Current.RequestAuthorization(
                 UNAuthorizationOptions.Alert |
                 UNAuthorizationOptions.Badge |
@@ -50,36 +43,27 @@ namespace Shiny.Push
                     }
                 }
             );
-
+            UIApplication.SharedApplication.RegisterForRemoteNotifications();
+            
             await Task.WhenAll(
-                RemoteTokenTask.Task,
+                remoteTask,
                 tcs.Task
             );
 
-            this.CurrentRegistrationToken = RemoteTokenTask.Task.Result;
+            this.CurrentRegistrationToken = ToTokenString(remoteTask.Result);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-
-            // TODO: timeout?
-            return new PushAccessState(tcs.Task.Result, RemoteTokenTask.Task.Result);
+            
+            return new PushAccessState(tcs.Task.Result, this.CurrentRegistrationToken);
         }
 
 
-        public static void RegisteredForRemoteNotifications(NSData deviceToken)
+        protected static string ToTokenString(NSData deviceToken)
         {
-            if (!deviceToken.Description.IsEmpty())
-            {
-                var token = deviceToken.Description.Trim('<', '>');
-                RemoteTokenTask?.SetResult(token);
-            }
-            // TODO: if empty returned? old token vs new token?
-            // TODO: store it in settings?
-        }
+            var token = "";
+            if (!deviceToken.Description.IsEmpty())            
+                token = deviceToken.Description.Trim('<', '>');
 
-
-        public static void FailedToRegisterForRemoteNotifications(NSError error)
-        {
-            Console.WriteLine("Failed to register for remote notifications - " + error.LocalizedDescription);
-            RemoteTokenTask?.SetException(new ArgumentException(error.LocalizedDescription));
+            return token;
         }
     }
 }

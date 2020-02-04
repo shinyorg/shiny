@@ -16,7 +16,8 @@ namespace Shiny
     public class iOSShinyHost : ShinyHost
     {
         public static void Init(IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
-            => InitPlatform(startup, services =>
+        {
+            InitPlatform(startup, services =>
             {
                 services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
                 services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
@@ -30,34 +31,35 @@ namespace Shiny
                 //}
                 //else
                 //{
-                    services.TryAddSingleton<IJobManager, JobManager>();
+                services.TryAddSingleton<IJobManager, JobManager>();
                 //}
                 platformBuild?.Invoke(services);
             });
+            var app = UIApplication.SharedApplication;
 
-
-        readonly static Subject<string> remoteNotifySubj = new Subject<string>();
-        public static IObservable<string> WhenRegisteredForRemoteNotifications()
-            => remoteNotifySubj;
-
-        public static void RegisteredForRemoteNotifications(NSData deviceToken)
-        {
-            //remoteNotifySubj.OnNext(deviceToken)
+            //UIApplication.Notifications.ObserveBackgroundRefreshStatusDidChange((sender, args) =>
+            UIApplication.Notifications.ObserveWillEnterForeground(app, (_, __) => OnForeground());
+            UIApplication.Notifications.ObserveDidEnterBackground(app, (_, __) => OnBackground());
+            UIApplication.Notifications.ObserveWillTerminate(app, (_, __) => OnTerminate());
         }
 
 
+        readonly static Subject<NSData> remoteNotifySubj = new Subject<NSData>();
+        public static IObservable<NSData> WhenRegisteredForRemoteNotifications()
+            => remoteNotifySubj;
+
+        public static void RegisteredForRemoteNotifications(NSData deviceToken)
+            => remoteNotifySubj.OnNext(deviceToken);
+
         public static void FailedToRegisterForRemoteNotifications(NSError error)
             => remoteNotifySubj.OnError(new Exception(error.LocalizedDescription.ToString()));
-
 
         public static void PerformFetch(Action<UIBackgroundFetchResult> completionHandler)
             => JobManager.OnBackgroundFetch(completionHandler);
 
 
-        //public static Action<string, Action> HandleEventsForBackgroundUrl
+        public static Action<string, Action>? HandleEventsForBackgroundUrlAction { get; set; }
         public static void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
-        {
-            // HttpTransferManager.SetCompletionHandler(sessionIdentifier, completionHandler);
-        }
+            => HandleEventsForBackgroundUrlAction?.Invoke(sessionIdentifier, completionHandler);
     }
 }
