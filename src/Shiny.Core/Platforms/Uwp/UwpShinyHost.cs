@@ -8,7 +8,7 @@ using Shiny.Settings;
 using Windows.Storage;
 using Windows.ApplicationModel.Background;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-
+using Windows.UI.Xaml;
 
 namespace Shiny
 {
@@ -19,8 +19,12 @@ namespace Shiny
         static bool hydrated = false;
 
 
-        public static void Init(IShinyStartup? startup = null, IShinyModule? platformModule = null)
+        public static void Init(Application app, IShinyStartup? startup = null, IShinyModule? platformModule = null)
         {
+            //app.Suspending += 
+            app.LeavingBackground += (sender, args) => OnForeground();
+            app.EnteredBackground += (sender, args) => OnBackground();
+
             if (!hydrated)
                 InternalInit(startup, platformModule, false);
         }
