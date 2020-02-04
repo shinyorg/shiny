@@ -18,6 +18,20 @@ namespace Shiny
         }
 
 
+        public override void OnTrimMemory([GeneratedEnum] TrimMemory level)
+        {
+            AndroidShinyHost.OnBackground(level);
+            base.OnTrimMemory(level);
+        }
+
+
+        public override void OnTerminate()
+        {
+            AndroidShinyHost.OnTerminate();
+            base.OnTerminate();
+        }
+
+
         protected virtual void OnBuildApplication(IServiceCollection builder) { }
     }
 
@@ -53,17 +67,14 @@ namespace Shiny
 
         public override void OnTrimMemory([GeneratedEnum] TrimMemory level)
         {
-            if (level == TrimMemory.UiHidden || level == TrimMemory.Complete)
-            {
-                AndroidShinyHost.OnBackground();
-            }
+            AndroidShinyHost.OnBackground(level);
             base.OnTrimMemory(level);
         }
 
 
         public override void OnTerminate()
         {
-            AndroidShinyHost.OnAppTerminating();
+            AndroidShinyHost.OnTerminate();
             base.OnTerminate();
         }
 

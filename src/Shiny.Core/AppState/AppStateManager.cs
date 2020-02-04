@@ -8,22 +8,13 @@ namespace Shiny.AppState
     class AppStateManager : IShinyStartupTask
     {
         readonly IEnumerable<IAppStateDelegate> delegates;
-        public AppStateManager(IMessageBus messageBus, IEnumerable<IAppStateDelegate> delegates)
-        {
-            this.delegates = delegates;
-            messageBus
-                .Listener<AppEvent>()
-                .Subscribe(x =>
-                {
-                    this.Execute(x => x.OnForeground());
-                    this.Execute(x => x.OnBackground());
-                    this.Execute(x => x.OnTerminate());
-                });
-        }
-
-
+        public AppStateManager(IEnumerable<IAppStateDelegate> delegates)
+            => this.delegates = delegates;
+        
         public void Start() => this.Execute(x => x.OnStart());
-
+        internal void OnForeground() => this.Execute(x => x.OnForeground());
+        internal void OnBackground() => this.Execute(x => x.OnBackground());
+        internal void OnTerminate() => this.Execute(x => x.OnBackground());
 
         void Execute(Action<IAppStateDelegate> execute) => Log.SafeExecute(() =>
         {

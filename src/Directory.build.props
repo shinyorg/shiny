@@ -10,7 +10,7 @@
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
-<!--        <PackageIcon>nuget.png</PackageIcon>-->
+        <!--<PackageIcon>nuget.png</PackageIcon>-->
         <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>
         <PackageReleaseNotes>https://shinylib.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
@@ -34,18 +34,23 @@
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <DefineConstants>$(DefineConstants);ANDROIDX</DefineConstants>
     </PropertyGroup>
-     
+
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <AndroidResgenFile></AndroidResgenFile>
+        <AndroidResgenClass></AndroidResgenClass>
+    </PropertyGroup>
+    
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <TargetsToBuild>android;ios;watchos;tvos;uap;tizen</TargetsToBuild>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
         
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">    
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DesignTimeBuild>false</DesignTimeBuild>
         <TargetsToBuild>android;ios;watchos;tvos</TargetsToBuild>
         <TargetsToBuild Condition=" $(OS) == 'WINDOWS_NT' ">uap;tizen;$(TargetsToBuild)</TargetsToBuild>
-        <DebugType Condition=" !$(TargetFramework.StartsWith('monoandroid')) ">portable</DebugType>
-        <DebugType Condition=" $(TargetFramework.StartsWith('monoandroid')) ">Full</DebugType>
+        <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>      

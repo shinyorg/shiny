@@ -17,7 +17,7 @@ namespace Shiny
         protected virtual void RegisterPlatformServices(IServiceCollection services) { }
 
         public override void OnActivated(UIApplication application)
-            => iOSShinyHost.OnActivated();
+            => iOSShinyHost.OnForeground();
 
         public override void OnResignActivation(UIApplication uiApplication)
             => iOSShinyHost.OnBackground();

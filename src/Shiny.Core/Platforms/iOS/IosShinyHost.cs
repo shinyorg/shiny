@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Subjects;
 using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
@@ -35,45 +36,28 @@ namespace Shiny
             });
 
 
+        readonly static Subject<string> remoteNotifySubj = new Subject<string>();
+        public static IObservable<string> WhenRegisteredForRemoteNotifications()
+            => remoteNotifySubj;
+
         public static void RegisteredForRemoteNotifications(NSData deviceToken)
         {
-            // PushManager.RegisteredForRemoteNotifications(deviceToken);
+            //remoteNotifySubj.OnNext(deviceToken)
         }
 
 
         public static void FailedToRegisterForRemoteNotifications(NSError error)
-        {
-            // PushManager.FailedToRegisterForRemoteNotifications(error);
-        }
+            => remoteNotifySubj.OnError(new Exception(error.LocalizedDescription.ToString()));
 
 
         public static void PerformFetch(Action<UIBackgroundFetchResult> completionHandler)
-        {
-            //Resolve<IMessageBus>().Publish(new AppEvent)
-            JobManager.OnBackgroundFetch(completionHandler);
-        }
+            => JobManager.OnBackgroundFetch(completionHandler);
 
 
+        //public static Action<string, Action> HandleEventsForBackgroundUrl
         public static void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
         {
             // HttpTransferManager.SetCompletionHandler(sessionIdentifier, completionHandler);
-        }
-
-
-        public static void OnActivated()
-        {
-        }
-
-        public static void OnTerminate()
-        {
-        }
-
-        public static void OnForeground()
-        {
-        }
-
-        public static void OnBackground()
-        {
         }
     }
 }

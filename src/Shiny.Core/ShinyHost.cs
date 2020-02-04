@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.AppState;
 using Shiny.Infrastructure;
 using Shiny.Infrastructure.DependencyInjection;
 
@@ -68,7 +69,7 @@ namespace Shiny
             get
             {
                 if (container == null)
-                    throw new ArgumentException("Container has not been setup - have you initialized the Platform provider?");
+                    throw new ArgumentException("Container has not been setup - have you initialized the Platform provider using ShinyHost.Init?");
 
                 return container;
             }
@@ -97,6 +98,16 @@ namespace Shiny
             services.RunPostBuildActions(container);
             startup?.ConfigureApp(container);
         }
+
+
+        public static void OnTerminate()
+            => Container.GetService<AppStateManager>();
+
+        public static void OnForeground()
+            => Container.GetService<AppStateManager>()?.OnForeground();
+
+        public static void OnBackground()
+            => Container.GetService<AppStateManager>()?.OnBackground();
     }
 }
 

@@ -8,6 +8,8 @@ using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using NativePerm = Android.Content.PM.Permission;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Android.Runtime;
+using Android.Content;
 
 [assembly: UsesPermission(Android.Manifest.Permission.AccessNetworkState)]
 [assembly: UsesPermission(Android.Manifest.Permission.BatteryStats)]
@@ -41,22 +43,14 @@ namespace Shiny
         }
 
 
+        public static void OnBackground([GeneratedEnum] TrimMemory level)
+        {
+            if (level == TrimMemory.UiHidden || level == TrimMemory.Complete)
+                OnBackground();
+        }
+
+
         public static void OnRequestPermissionsResult(int requestCode, string[] permissions, NativePerm[] grantResults)
             => Resolve<AndroidContext>().FirePermission(requestCode, permissions, grantResults);
-
-
-        public static void OnForeground()
-        {
-        }
-
-
-        public static void OnBackground()
-        {
-        }
-
-
-        public static void OnAppTerminating()
-        {
-        }
     }
 }

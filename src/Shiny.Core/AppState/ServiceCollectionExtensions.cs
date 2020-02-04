@@ -9,7 +9,7 @@ namespace Shiny
     {
         public static void AddAppState<T>(this IServiceCollection services) where T : class, IAppStateDelegate
         {
-            if (services.IsRegistered<AppStateManager>())
+            if (!services.IsRegistered<AppStateManager>())
                 services.AddSingleton<AppStateManager>();
 
             services.AddSingleton<IAppStateDelegate, T>();

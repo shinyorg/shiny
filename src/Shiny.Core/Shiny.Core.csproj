@@ -79,5 +79,5 @@
         <Compile Include="**\Platforms\*macOS*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
-    
+
 </Project>
