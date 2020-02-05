@@ -4,7 +4,7 @@
 ---
 
 ### Shiny.Core
-* [Feature] App State Delegate - In your shiny startup, use services.AddAppState<YourAppStateDelegate> that inherits from IAppStateDelegate.  Watch for app start, background, foreground, & termination
+* [Feature] App State Delegate - In your shiny startup, use services.AddAppState<YourAppStateDelegate> that inherits from IAppStateDelegate.  Watch for app start, foreground, & background
 * [Enhancement][iOS][Android] Easier boilerplate setup
 * [Enhancement][Android] AndroidX support on android 10 targets - WorkManager replaces JobService under the hood
 
