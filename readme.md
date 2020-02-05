@@ -56,6 +56,7 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 
 ## 3rd Party
 |Project|NuGet|Description|
+|-------|-----|-----------|
 |Shiny.Prism|[![https://img.shields.io/nuget/v/Shiny.Prism.svg]][https://www.nuget.org/packages/Shiny.Prism/)] | Prism integration with Shiny maintained by Dan Siegel|
 
 ## Contributors
