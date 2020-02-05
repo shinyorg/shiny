@@ -148,10 +148,7 @@ namespace Shiny.Notifications
         public async Task Send(Notification notification)
         {
             if (notification.Id == 0)
-                notification.Id = this.settings.IncrementValue("NotificationId");
-
-            var access = await this.RequestAccess();
-            access.Assert();
+                notification.Id = this.settings.IncrementValue("NotificationId");   
 
             var request = UNNotificationRequest.FromIdentifier(
                 notification.Id.ToString(),
