@@ -29,14 +29,14 @@ namespace Shiny.Push
         public string? CurrentRegistrationToken
         {
             get => this.settings.Get<string?>(nameof(CurrentRegistrationToken));
-            private set => this.settings.Set(nameof(CurrentRegistrationToken), value);
+            protected set => this.settings.Set(nameof(CurrentRegistrationToken), value);
         }
 
 
         public DateTime? CurrentRegistrationTokenDate
         {
             get => this.settings.Get<DateTime?>(nameof(CurrentRegistrationTokenDate));
-            private set => this.settings.Set(nameof(CurrentRegistrationTokenDate), value);
+            protected set => this.settings.Set(nameof(CurrentRegistrationTokenDate), value);
         }
 
 
@@ -53,7 +53,7 @@ namespace Shiny.Push
         //        <category android:name="${applicationId}" />
         //    </intent-filter>
         //</receiver>
-        public async Task<PushAccessState> RequestAccess()
+        public virtual async Task<PushAccessState> RequestAccess()
         {
             FirebaseMessaging.Instance.AutoInitEnabled = true;
 

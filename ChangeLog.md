@@ -23,6 +23,9 @@
 * [Feature] Less boilerplate to wire into XF
 * [Feature] You can now use the DependencyService to Shiny services in your viewmodels
 
+### [NEW] Shiny.Integrations.AzureNotifications
+* Wraps the Azure Notification Hubs in an injectable/testable interface (and gives you comfort of being able to swap out mechanisms easily)
+
 1.0.0
 ---
 Initial Release for
