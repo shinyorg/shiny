@@ -18,10 +18,5 @@ namespace Shiny
         public virtual void OnStart()
         {
         }
-
-
-        public virtual void OnTerminate()
-        {
-        }
     }
 }

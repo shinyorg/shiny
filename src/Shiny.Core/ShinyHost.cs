@@ -99,10 +99,6 @@ namespace Shiny
             startup?.ConfigureApp(container);
         }
 
-
-        public static void OnTerminate()
-            => Container.GetService<AppStateManager>();
-
         public static void OnForeground()
             => Container.GetService<AppStateManager>()?.OnForeground();
 

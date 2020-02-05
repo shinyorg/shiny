@@ -37,10 +37,8 @@ namespace Shiny
             });
             var app = UIApplication.SharedApplication;
 
-            //UIApplication.Notifications.ObserveBackgroundRefreshStatusDidChange((sender, args) =>
             UIApplication.Notifications.ObserveWillEnterForeground(app, (_, __) => OnForeground());
             UIApplication.Notifications.ObserveDidEnterBackground(app, (_, __) => OnBackground());
-            UIApplication.Notifications.ObserveWillTerminate(app, (_, __) => OnTerminate());
         }
 
 

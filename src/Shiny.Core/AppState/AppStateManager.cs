@@ -14,7 +14,6 @@ namespace Shiny.AppState
         public void Start() => this.Execute(x => x.OnStart());
         internal void OnForeground() => this.Execute(x => x.OnForeground());
         internal void OnBackground() => this.Execute(x => x.OnBackground());
-        internal void OnTerminate() => this.Execute(x => x.OnTerminate());
 
         void Execute(Action<IAppStateDelegate> execute) => Log.SafeExecute(() =>
         {
