@@ -27,6 +27,7 @@ namespace Shiny.Push
             return new PushAccessState(AccessState.Available, channel.Uri);
         }
 
+        public override Task UnRegister() => Task.CompletedTask;
 
         void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => Log.SafeExecute(async () =>
         {
