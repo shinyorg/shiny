@@ -1,4 +1,4 @@
-﻿#if !NETSTANDARD20
+﻿#if !NETSTANDARD2_0
 using System;
 using System.Threading.Tasks;
 using Shiny.Push;
@@ -13,8 +13,11 @@ namespace Shiny.Integrations.AzureNotifications
     {
         readonly NotificationHubClient hub;
 
-
+#if WINDOWS_UWP
+        public PushManager(AzureNotificationConfig config, IServiceProvider serviceProvider, ISettings settings) : base(serviceProvider, settings)
+#else
         public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
+#endif
         {
             this.hub = new NotificationHubClient(
                 config.HubName,
@@ -67,8 +70,6 @@ namespace Shiny.Integrations.AzureNotifications
             return reg.RegistrationId;
         }
 #endif
-
-
     }
 }
 #endif
