@@ -1,12 +1,12 @@
 <Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
+        <VersionSuffix>beta</VersionSuffix>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
-        <RootNamespace>Shiny.Push.AzureNotifications</RootNamespace>
         <Description>Shiny Integration - Microsoft Azure Notification Hubs</Description>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
@@ -38,6 +38,6 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-    </ItemGroup>    
+    </ItemGroup>
 
 </Project>
