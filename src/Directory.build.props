@@ -36,8 +36,11 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <DefineConstants>$(DefineConstants);__ANDROID__</DefineConstants>
+        <!--
         <AndroidResgenFile></AndroidResgenFile>
         <AndroidResgenClass></AndroidResgenClass>
+        -->
     </PropertyGroup>
     
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

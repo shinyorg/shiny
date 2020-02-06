@@ -9,8 +9,6 @@ namespace Shiny.Push
         DateTime? CurrentRegistrationTokenDate { get; }
         string? CurrentRegistrationToken { get; }
         Task<PushAccessState> RequestAccess();
-
-        // observable on notification access state?
-        // old/new - event EventHandler<string> RegistrationTokenChanged;  - not really need - requestaccess should almost always be called
+        Task UnRegister();
     }
 }

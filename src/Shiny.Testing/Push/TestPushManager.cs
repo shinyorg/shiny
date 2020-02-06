@@ -12,5 +12,6 @@ namespace Shiny.Testing.Push
         public string? CurrentRegistrationToken { get; set; }
 
         public Task<PushAccessState> RequestAccess() => Task.FromResult(new PushAccessState(this.ResultStatus, this.CurrentRegistrationToken));
+        public Task UnRegister() => Task.CompletedTask;
     }
 }

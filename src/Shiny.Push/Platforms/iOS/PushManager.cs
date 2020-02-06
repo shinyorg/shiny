@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
+using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
-using System.Reactive.Threading.Tasks;
-using System.Reactive.Linq;
+using Shiny.Logging;
+
 
 namespace Shiny.Push
 {
@@ -21,39 +23,30 @@ namespace Shiny.Push
         public override async Task<PushAccessState> RequestAccess()
         {
             // TODO: timeout & cancellation
-            var remoteTask = iOSShinyHost.WhenRegisteredForRemoteNotifications().Take(1).ToTask();
-            var tcs = new TaskCompletionSource<AccessState>();
-
-            UNUserNotificationCenter.Current.RequestAuthorization(
+            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
                 UNAuthorizationOptions.Alert |
                 UNAuthorizationOptions.Badge |
-                UNAuthorizationOptions.Sound,
-                (approved, error) =>
-                {
-                    if (error != null)
-                    {
-                        tcs.SetException(new Exception(error.Description));
-                        this.CurrentRegistrationToken = null;
-                        this.CurrentRegistrationTokenDate = null;
-                    }
-                    else
-                    {
-                        var state = approved ? AccessState.Available : AccessState.Denied;
-                        tcs.SetResult(state);
-                    }
-                }
+                UNAuthorizationOptions.Sound
             );
+            if (!result.Item1)
+            {
+                Log.Write("PushNotification", result.Item2.LocalizedDescription);
+                return new PushAccessState(AccessState.Unknown, null);
+            }
+            var remoteTask = iOSShinyHost.WhenRegisteredForRemoteNotifications().Take(1).ToTask();
             UIApplication.SharedApplication.RegisterForRemoteNotifications();
-            
-            await Task.WhenAll(
-                remoteTask,
-                tcs.Task
-            );
 
-            this.CurrentRegistrationToken = ToTokenString(remoteTask.Result);
+            var deviceToken = await remoteTask;
+            this.CurrentRegistrationToken = ToTokenString(deviceToken);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            
-            return new PushAccessState(tcs.Task.Result, this.CurrentRegistrationToken);
+            return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
+        }
+
+
+        public override Task UnRegister()
+        {
+            UIApplication.SharedApplication.UnregisterForRemoteNotifications();
+            return Task.CompletedTask;
         }
 
 

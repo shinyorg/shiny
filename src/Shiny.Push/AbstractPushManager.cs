@@ -12,6 +12,7 @@ namespace Shiny.Push
 
 
         public abstract Task<PushAccessState> RequestAccess();
+        public abstract Task UnRegister();
 
         
         public string? CurrentRegistrationToken

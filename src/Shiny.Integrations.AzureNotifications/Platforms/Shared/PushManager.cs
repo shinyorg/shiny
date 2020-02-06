@@ -15,6 +15,8 @@ namespace Shiny.Integrations.AzureNotifications
 
 #if WINDOWS_UWP
         public PushManager(AzureNotificationConfig config, IServiceProvider serviceProvider, ISettings settings) : base(serviceProvider, settings)
+#elif __ANDROID__
+        public PushManager(AzureNotificationConfig config, ISettings settings, AndroidContext context) : base(settings, context)
 #else
         public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
 #endif
@@ -26,6 +28,7 @@ namespace Shiny.Integrations.AzureNotifications
             );
         }
 
+
         public override async Task<PushAccessState> RequestAccess()
         {
             var access = await base.RequestAccess();
@@ -33,14 +36,13 @@ namespace Shiny.Integrations.AzureNotifications
             {
                 try
                 {
-                    var regId = await this.CreateRegistration(access.RegistrationToken);
-                    access = new PushAccessState(AccessState.Available, regId);
-                    //this.CurrentRegistrationToken = regId;
+                    this.CurrentRegistrationToken = await this.CreateRegistration(access.RegistrationToken);
+                    access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
                 }
                 catch
                 {
-                    // wipe out vars
-                    //access = new PushAccessState(AccessState.Unknown, null);
+                    this.CurrentRegistrationToken = null;
+                    this.CurrentRegistrationTokenDate = null;
                     throw;
                 }
             }
@@ -48,25 +50,30 @@ namespace Shiny.Integrations.AzureNotifications
         }
 
 
+        //public override async Task UnRegister()
+        //{
+        //    await base.UnRegister();
+        //}
+
 #if XAMARIN_IOS
         protected virtual async Task<string> CreateRegistration(string accessToken)
         {
             var reg = await this.hub.CreateAppleNativeRegistrationAsync(accessToken);
-            //this.CurrentRegistrationTokenDate = reg.ExpirationTime;
+            this.CurrentRegistrationTokenDate = reg.ExpirationTime;
             return reg.RegistrationId;
         }
 #elif WINDOWS_UWP
         protected virtual async Task<string> CreateRegistration(string accessToken)
         {
             var reg = await this.hub.CreateWindowsNativeRegistrationAsync(accessToken);
-            //this.CurrentRegistrationTokenDate = reg.ExpirationTime;
+            this.CurrentRegistrationTokenDate = reg.ExpirationTime;
             return reg.RegistrationId;
         }
 #else
         protected virtual async Task<string> CreateRegistration(string accessToken)
         {
             var reg = await this.hub.CreateFcmNativeRegistrationAsync(accessToken);
-            //this.CurrentRegistrationTokenDate = reg.ExpirationTime;
+            this.CurrentRegistrationTokenDate = reg.ExpirationTime;
             return reg.RegistrationId;
         }
 #endif
