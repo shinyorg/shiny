@@ -23,8 +23,16 @@
 * [Feature] Less boilerplate to wire into XF
 * [Feature] You can now use the DependencyService to Shiny services in your viewmodels
 
+### [NEW] Shiny.Push
+* Leaving BETA - while this does work with the push notification mechanics, its primary purpose is to provide
+    * A wrapper for all push messaging systems - if appcenter dies today, you can be on azure notification hubs tomorrow with 1 line of code change
+    * A consistent event structure to work with in the background (delegates - like all other shiny services)
+
 ### [NEW] Shiny.Integrations.AzureNotifications
 * Wraps the Azure Notification Hubs in an injectable/testable interface (and gives you comfort of being able to swap out mechanisms easily)
+
+### [NEW] Shiny.Integrations.FirebaseNotifications
+* Wraps the Firebase messaging for Android & iOS
 
 1.0.0
 ---
