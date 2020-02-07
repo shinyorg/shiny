@@ -49,6 +49,8 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 ## Integrations
 |Project|NuGet|MyGet|Description|
 |-------|-----|-----|-----------|
+|Azure Notifications Push| [![AzureHubsPushNugetShield]][AzureHubsPushNuget] | [![AzureHubsPushMygetShield]][AzureHubsPushMyget] | Push Integration for Azure Notification Hubs - Support for iOS, Android, & UWP
+|Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushMygetShield]][FirebasePushMyget] | Push Integration for Google Firebase - Support for iOS & Android
 |SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] | Provides caching, logging, storage, & settings implementations
 |AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | Log errors to AppCenter
 |System.Text.Json Serializer| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | This is the new .NET serializer coming into modern .NET.  This will eventually be standard in Shiny
@@ -132,3 +134,19 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [SysTextJsonNuget]: https://www.nuget.org/packages/Shiny.Integrations.SysTextJson/
 [SysTextJsonMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.SysTextJson.svg
 [SysTextJsonMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.SysTextJson
+
+
+[PushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.svg
+[PushNuget]: https://www.nuget.org/packages/Shiny.Push/
+[PushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.svg
+[PushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push
+
+[AzureHubPushNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.AzureNotifications.svg
+[AzureHubPushNuget]: https://www.nuget.org/packages/Shiny.Integrations.AzureNotifications/
+[AzureHubPushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.AzureNotifications.svg
+[AzureHubPushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.AzureNotifications
+
+[FirebasePushNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.FirebaseNotifications.svg
+[FirebasePushNuget]: https://www.nuget.org/packages/Shiny.Integrations.FirebaseNotifications/
+[FirebasePushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.FirebaseNotifications.svg
+[FirebasePushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.FirebaseNotifications

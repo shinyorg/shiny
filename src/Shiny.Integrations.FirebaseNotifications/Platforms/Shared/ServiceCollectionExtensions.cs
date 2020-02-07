@@ -1,18 +1,20 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Push;
 
 
-namespace Shiny.Integrations.FirebaseNotifications
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseFirebaseMessaging(this IServiceCollection services)
+        public static bool UseFirebaseMessaging<TPushDelegate>(this IServiceCollection services) where TPushDelegate : class, IPushDelegate
         {
 #if XAMARIN_IOS
-            services.AddSingleton<Shiny.Push.IPushManager, Shiny.Integrations.FirebaseNotifications.PushManager>();
+            services.AddSingleton<IPushManager, Shiny.Integrations.FirebaseNotifications.PushManager>();
+            services.AddSingleton<IPushDelegate, TPushDelegate>();
             return true;
 #elif __ANDROID__
-            return services.UsePush();
+            return services.UsePush<TPushDelegate>();
 #else
             return false;
 #endif

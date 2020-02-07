@@ -31,7 +31,10 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <PackageReference Include="Xamarin.Firebase.Common" Version="[71.1610.0, 72)" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="[71.1740.0, 72)" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="[71.1620.0, 72)" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="[71.1601.0, 72)" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />

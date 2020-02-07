@@ -12,9 +12,7 @@ namespace Shiny.Push
 
         public override async void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
-            if (this.sdelegate.Value == null)
-                return;
-
+            
             //var notification = response.Notification.Request.FromNative();
             //if (response is UNTextInputNotificationResponse textResponse)
             //{

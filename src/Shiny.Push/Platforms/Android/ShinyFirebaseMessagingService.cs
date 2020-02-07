@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.App;
 using Firebase.Messaging;
-
+using Shiny.Settings;
 
 namespace Shiny.Push
 {
@@ -12,9 +12,9 @@ namespace Shiny.Push
 
         public override async void OnMessageReceived(RemoteMessage message)
         {
-            await ShinyHost.Container.SafeResolveAndExecute<IPushDelegate>(async ndelegate =>
+            await ShinyHost.Container.SafeResolveAndExecute<IPushDelegate>(ndelegate =>
             {
-                ndelegate.OnReceived("");
+                return ndelegate.OnReceived("");
                 //var notification = message.GetNotification();
                 //notification.Body;
                 //notification.BodyLocalizationKey
@@ -38,9 +38,15 @@ namespace Shiny.Push
         }
 
 
-        public override void OnNewToken(string token)
+        public override async void OnNewToken(string token)
         {
-            // token refreshes need to be stored
+            var settings = ShinyHost.Resolve<ISettings>();
+            settings.SetRegToken(token);
+            settings.SetRegDate(DateTime.UtcNow);
+
+            await ShinyHost
+                .Container
+                .SafeResolveAndExecute<IPushDelegate>(x => x.OnTokenChanged(token));
         }
     }
 }
