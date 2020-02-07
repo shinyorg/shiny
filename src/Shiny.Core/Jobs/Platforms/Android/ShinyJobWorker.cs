@@ -14,7 +14,7 @@ namespace Shiny.Jobs
     public class ShinyJobWorker : ListenableWorker, CallbackToFutureAdapter.IResolver
     {
         public const string ShinyJobIdentifier = nameof(ShinyJobIdentifier);
-
+        readonly CancellationTokenSource cancelSource = new CancellationTokenSource();
 
         public ShinyJobWorker(Context context, WorkerParameters workerParams) : base(context, workerParams)
         {
@@ -26,13 +26,13 @@ namespace Shiny.Jobs
             var jobName = this.InputData.GetString(ShinyJobIdentifier);
             if (jobName.IsEmpty())
             {
-                completer.Set(null);
+                completer.Set(Result.InvokeFailure());
             }
             else
             { 
                 ShinyHost
                     .Resolve<IJobManager>()
-                    .Run(jobName, CancellationToken.None)
+                    .Run(jobName, this.cancelSource.Token)
                     .ContinueWith(x =>
                     {
                         switch (x.Status)
@@ -47,7 +47,7 @@ namespace Shiny.Jobs
                                 break;
 
                             case TaskStatus.RanToCompletion:
-                                completer.Set(null);
+                                completer.Set(Result.InvokeSuccess());
                                 break;
                         }
                     });
@@ -62,6 +62,7 @@ namespace Shiny.Jobs
 
         public override void OnStopped()
         {
+            this.cancelSource.Cancel();
             base.OnStopped();
         }
     }
