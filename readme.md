@@ -49,7 +49,7 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 ## Integrations
 |Project|NuGet|MyGet|Description|
 |-------|-----|-----|-----------|
-|Azure Notifications Push| [![AzureHubsPushNugetShield]][AzureHubsPushNuget] | [![AzureHubsPushMygetShield]][AzureHubsPushMyget] | Push Integration for Azure Notification Hubs - Support for iOS, Android, & UWP
+|Azure Notifications Push| [![AzureHubPushNugetShield]][AzureHubPushNuget] | [![AzureHubPushMygetShield]][AzureHubPushMyget] | Push Integration for Azure Notification Hubs - Support for iOS, Android, & UWP
 |Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushMygetShield]][FirebasePushMyget] | Push Integration for Google Firebase - Support for iOS & Android
 |SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] | Provides caching, logging, storage, & settings implementations
 |AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | Log errors to AppCenter
@@ -134,7 +134,6 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [SysTextJsonNuget]: https://www.nuget.org/packages/Shiny.Integrations.SysTextJson/
 [SysTextJsonMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.SysTextJson.svg
 [SysTextJsonMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.SysTextJson
-
 
 [PushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.svg
 [PushNuget]: https://www.nuget.org/packages/Shiny.Push/
