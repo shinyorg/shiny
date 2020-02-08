@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -8,7 +9,7 @@ namespace Shiny.Push
     {
         DateTime? CurrentRegistrationTokenDate { get; }
         string? CurrentRegistrationToken { get; }
-        Task<PushAccessState> RequestAccess();
+        Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default);
         Task UnRegister();
     }
 }

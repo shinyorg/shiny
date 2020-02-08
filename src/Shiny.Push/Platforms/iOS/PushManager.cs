@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 using System.Reactive.Linq;
@@ -6,7 +7,6 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
-using Shiny.Logging;
 
 
 namespace Shiny.Push
@@ -20,23 +20,9 @@ namespace Shiny.Push
         }
 
 
-        public override async Task<PushAccessState> RequestAccess()
+        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            // TODO: timeout & cancellation
-            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
-                UNAuthorizationOptions.Alert |
-                UNAuthorizationOptions.Badge |
-                UNAuthorizationOptions.Sound
-            );
-            if (!result.Item1)
-            {
-                Log.Write("PushNotification", result.Item2.LocalizedDescription);
-                return new PushAccessState(AccessState.Unknown, null);
-            }
-            var remoteTask = iOSShinyHost.WhenRegisteredForRemoteNotifications().Take(1).ToTask();
-            UIApplication.SharedApplication.RegisterForRemoteNotifications();
-
-            var deviceToken = await remoteTask;
+            var deviceToken = await this.RequestDeviceToken(cancelToken);
             this.CurrentRegistrationToken = ToTokenString(deviceToken);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
@@ -44,17 +30,31 @@ namespace Shiny.Push
 
 
         public override Task UnRegister()
+            => Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);            
+
+
+        protected virtual async Task<NSData> RequestDeviceToken(CancellationToken cancelToken = default)
         {
-            UIApplication.SharedApplication.UnregisterForRemoteNotifications();
-            return Task.CompletedTask;
+            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
+                UNAuthorizationOptions.Alert |
+                UNAuthorizationOptions.Badge |
+                UNAuthorizationOptions.Sound
+            );
+            if (!result.Item1)
+                throw new Exception(result.Item2.LocalizedDescription);
+
+            var remoteTask = iOSShinyHost.WhenRegisteredForRemoteNotifications().Take(1).ToTask(cancelToken);
+            await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+
+            var data = await remoteTask;
+            return data;
         }
 
 
-        protected static string ToTokenString(NSData deviceToken)
+        protected static string? ToTokenString(NSData deviceToken)
         {
-            var token = "";
-            if (!deviceToken.Description.IsEmpty())            
-                token = deviceToken.Description.Trim('<', '>');
+            var data = deviceToken.ToArray();            
+            var token = BitConverter.ToString(data).Replace("-", "");
 
             return token;
         }

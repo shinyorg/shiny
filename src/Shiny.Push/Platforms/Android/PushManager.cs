@@ -6,6 +6,7 @@ using Firebase.Iid;
 using Firebase.Messaging;
 using Shiny.Settings;
 using Task = System.Threading.Tasks.Task;
+using CancellationToken = System.Threading.CancellationToken;
 
 
 namespace Shiny.Push
@@ -48,27 +49,27 @@ namespace Shiny.Push
         }
 
 
-        public virtual async Task<PushAccessState> RequestAccess()
+        public virtual async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             //int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
             //if (resultCode != ConnectionResult.Success)
             //{
             //    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
-            //        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
-   
-            //FirebaseApp.InitializeApp(this.context.AppContext);
-
+            //        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);            
             this.taskSrc = new TaskCompletionSource<string>();
-            FirebaseInstanceId
-                .Instance
-                .GetInstanceId()
-                .AddOnCompleteListener(this);
+            using (cancelToken.Register(() => this.taskSrc.TrySetCanceled()))
+            {
+                FirebaseInstanceId
+                    .Instance
+                    .GetInstanceId()
+                    .AddOnCompleteListener(this);
 
-            this.CurrentRegistrationToken = await this.taskSrc.Task;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            FirebaseMessaging.Instance.AutoInitEnabled = true;           
+                this.CurrentRegistrationToken = await this.taskSrc.Task;
+                this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                FirebaseMessaging.Instance.AutoInitEnabled = true;
 
-            return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
+                return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
+            }
         }
 
 

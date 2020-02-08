@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Networking.PushNotifications;
 using Shiny.Logging;
@@ -18,7 +19,7 @@ namespace Shiny.Push
         }
 
 
-        public override async Task<PushAccessState> RequestAccess()
+        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
             //channel.ExpirationTime - persist and deal with this
@@ -27,7 +28,9 @@ namespace Shiny.Push
             return new PushAccessState(AccessState.Available, channel.Uri);
         }
 
+
         public override Task UnRegister() => Task.CompletedTask;
+
 
         void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => Log.SafeExecute(async () =>
         {
