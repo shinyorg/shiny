@@ -5,9 +5,10 @@ namespace Shiny.Notifications
 {
     public class AndroidOptions
     {
-        public static string DefaultChannelId { get; set; } = "shinynotificationchannelid";
-        public static string DefaultChannel { get; set; } = "shinynotificationchannel";
-        public static string DefaultSmallIconResourceName { get; set; } = "notification";
+        public static string? DefaultChannelId { get; set; } = "shinynotificationchannelid";
+        public static string? DefaultChannel { get; set; } = "shinynotificationchannel";
+        public static string? DefaultSmallIconResourceName { get; set; } = "notification";
+        public static string? DefaultLargeIconResourceName { get; set; }
         public static string? DefaultColorResourceName { get; set; }
         public static string? DefaultChannelDescription { get; set; }
         public static bool DefaultUseBigTextStyle { get; set; }
@@ -19,11 +20,12 @@ namespace Shiny.Notifications
         public AndroidActivityFlags LaunchActivityFlags { get; set; } = DefaultLaunchActivityFlags;
         public bool Vibrate { get; set; } = DefaultVibrate;
         public int? Priority { get; set; }
-        public string ChannelId { get; set; } = DefaultChannelId;
-        public string Channel { get; set; } = DefaultChannel;
+        public string? ChannelId { get; set; } = DefaultChannelId;
+        public string? Channel { get; set; } = DefaultChannel;
         public string? ChannelDescription { get; set; } = DefaultChannelDescription;
         public AndroidNotificationImportance NotificationImportance { get; set; } = DefaultNotificationImportance;
-        public string SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
+        public string? SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
+        public string? LargeIconResourceName { get; set; } = DefaultLargeIconResourceName;
         public string? ColorResourceName { get; set; } = DefaultColorResourceName;
         public bool OnGoing { get; set; }
         public bool UseBigTextStyle { get; set; } = DefaultUseBigTextStyle;

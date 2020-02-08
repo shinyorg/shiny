@@ -12,6 +12,7 @@
 * [Enhancement][Breaking] New way to set notification sounds which allows you to use system sounds - Notification.CustomSoundFilePath has been removed
 * [Enhancement][Android] AndroidX support on android 10 targets
 * [Enhancement][Android] Use Big Text Style via AndroidOptions argument of notification
+* [Enhancement][Android] Use Large Icons via AndroidOptions argument of notification
 
 ### Shiny.Locations
 * [Fix][Geofences][Android] Status observable now works

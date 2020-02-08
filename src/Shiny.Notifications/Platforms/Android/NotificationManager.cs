@@ -10,6 +10,7 @@ using Shiny.Jobs;
 using Shiny.Logging;
 using Shiny.Settings;
 using Native = Android.App.NotificationManager;
+using Android.Graphics;
 
 #if ANDROIDX
 using AndroidX.Core.App;
@@ -115,10 +116,9 @@ namespace Shiny.Notifications
                 return;
             }
 
-            var iconId = this.GetIconResource(notification);
             var builder = new NotificationCompat.Builder(this.context.AppContext)
                 .SetContentTitle(notification.Title)                
-                .SetSmallIcon(iconId)
+                .SetSmallIcon(this.GetSmallIconResource(notification))
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
@@ -127,7 +127,8 @@ namespace Shiny.Notifications
             else
                 builder.SetContentText(notification.Message);
 
-            this.AddSound(notification, builder);
+            this.TrySetSound(notification, builder);
+            this.TrySetLargeIconResource(notification, builder);
 
             if (!notification.Category.IsEmpty())
             {
@@ -288,7 +289,7 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual int GetIconResource(Notification notification)
+        protected virtual int GetSmallIconResource(Notification notification)
         {
             if (notification.Android.SmallIconResourceName.IsEmpty())
                 return this.context.AppContext.ApplicationInfo.Icon;
@@ -301,7 +302,18 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual void AddSound(Notification notification, NotificationCompat.Builder builder)
+        protected void TrySetLargeIconResource(Notification notification, NotificationCompat.Builder builder)
+        {
+            if (!notification.Android.LargeIconResourceName.IsEmpty())
+                return;
+
+            var iconId = this.context.GetResourceIdByName(notification.Android.LargeIconResourceName);
+            if (iconId > 0)
+                builder.SetLargeIcon(BitmapFactory.DecodeResource(this.context.AppContext.Resources, iconId));
+        }
+
+
+        protected virtual void TrySetSound(Notification notification, NotificationCompat.Builder builder)
         {
             var s = notification.Sound;
             if (!s.Equals(NotificationSound.None))
