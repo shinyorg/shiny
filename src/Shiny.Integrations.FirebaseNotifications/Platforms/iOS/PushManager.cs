@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.InstanceID;
@@ -16,9 +17,9 @@ namespace Shiny.Integrations.FirebaseNotifications
         }
 
 
-        public override async Task<PushAccessState> RequestAccess()
+        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var access = await base.RequestAccess();
+            var access = await base.RequestAccess(cancelToken);
             if (access.Status == AccessState.Available)
             {
                 var s = Messaging.SharedInstance;
