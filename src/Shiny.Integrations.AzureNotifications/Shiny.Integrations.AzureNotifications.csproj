@@ -6,7 +6,7 @@
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
         <Description>Shiny Integration - Microsoft Azure Notification Hubs</Description>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
@@ -20,24 +20,23 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="3.3.0" />
-        <Compile Include="Platforms\Shared\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[3.3.0, 4)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="3.3.0" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" Verion="[3.3.0, 4)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="3.3.0" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[3.3.0, 4)" />
     </ItemGroup>
-
 </Project>

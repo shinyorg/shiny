@@ -1,11 +1,12 @@
 ﻿#if !NETSTANDARD2_0
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Push;
 using Shiny.Push.AzureNotifications;
 using Shiny.Settings;
 using Microsoft.Azure.NotificationHubs;
-using System.Threading;
+
 
 namespace Shiny.Integrations.AzureNotifications
 {
@@ -19,6 +20,7 @@ namespace Shiny.Integrations.AzureNotifications
         public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
 #endif
         {
+            //new SBNotificationHub
             this.hub = new NotificationHubClient(
                 config.ListenerConnectionString,
                 config.HubName,
@@ -54,10 +56,10 @@ namespace Shiny.Integrations.AzureNotifications
             await base.UnRegister();
         }
 
-#if __IOS__
+#if XAMARIN_IOS
         protected virtual async Task<string> CreateRegistration(string accessToken, CancellationToken cancelToken)
         {
-            var reg = await this.hub.CreateAppleNativeRegistrationAsync(accessToken, cancelToken);
+            var reg = await this.hub.CreateAppleNativeAsync(accessToken, cancelToken);
             this.CurrentRegistrationTokenDate = reg.ExpirationTime;
             return reg.RegistrationId;
         }
@@ -68,7 +70,7 @@ namespace Shiny.Integrations.AzureNotifications
             this.CurrentRegistrationTokenDate = reg.ExpirationTime;
             return reg.RegistrationId;
         }
-#elif __ANDROID__
+#else
         protected virtual async Task<string> CreateRegistration(string accessToken, CancellationToken cancelToken)
         {
             var reg = await this.hub.CreateFcmNativeRegistrationAsync(accessToken, cancelToken);
