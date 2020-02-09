@@ -54,7 +54,10 @@ namespace Shiny.Push
         protected static string? ToTokenString(NSData deviceToken)
         {
             var data = deviceToken.ToArray();            
-            var token = BitConverter.ToString(data).Replace("-", "");
+            var token = BitConverter
+                .ToString(data)
+                .Replace("-", "")
+                .Replace("\"", "");
 
             return token;
         }

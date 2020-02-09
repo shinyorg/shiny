@@ -12,7 +12,7 @@ namespace Shiny.Push
         public static void SetRegDate(this ISettings settings, DateTime? dateTime)
             => SetOrRemove(settings, nameof(IPushManager.CurrentRegistrationTokenDate), dateTime);
 
-        static void SetOrRemove(ISettings settings, string key, object? value)
+        static void SetOrRemove<T>(ISettings settings, string key, T value)
         {
             if (value == null)
                 settings.Remove(key);

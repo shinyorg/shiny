@@ -59,7 +59,7 @@ namespace Shiny.Integrations.AzureNotifications
 #if XAMARIN_IOS
         protected virtual async Task<string> CreateRegistration(string accessToken, CancellationToken cancelToken)
         {
-            var reg = await this.hub.CreateAppleNativeAsync(accessToken, cancelToken);
+            var reg = await this.hub.CreateAppleNativeRegistrationAsync(accessToken, cancelToken);
             this.CurrentRegistrationTokenDate = reg.ExpirationTime;
             return reg.RegistrationId;
         }
