@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reactive;
-using System.Reactive.Linq;
 using Windows.Devices.Power;
 using Windows.Foundation;
 using Windows.System.Power;
@@ -10,8 +8,6 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
-        IDisposable dispose;
-
         public bool IsEnergySavingEnabled => PowerManager.EnergySaverStatus == EnergySaverStatus.On;
 
         protected override void OnNpcHookChanged(bool hasSubscribers)
@@ -27,8 +23,6 @@ namespace Shiny.Power
                 Battery.AggregateBattery.ReportUpdated -= this.OnReportUpdated;
             }
         }
-
-
 
 
         public int BatteryLevel
@@ -76,11 +70,11 @@ namespace Shiny.Power
 
         void OnEnergySaverStatusChanged(object sender, object e)
             => this.RaisePropertyChanged(nameof(IsEnergySavingEnabled));
+
         void OnReportUpdated(Battery sender, object args)
         {
             this.RaisePropertyChanged(nameof(this.BatteryLevel));
             this.RaisePropertyChanged(nameof(this.Status));
         }
-
     }
 }
