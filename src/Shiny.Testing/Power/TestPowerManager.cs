@@ -6,7 +6,7 @@ namespace Shiny.Testing.Power
 {
     public class TestPowerManager : NotifyPropertyChanged, IPowerManager
     {
-        public bool InPowerSavingMode { get; set; }
+        public bool IsEnergySavingEnabled { get; set; }
 
 
         PowerState powerState = PowerState.Charged;

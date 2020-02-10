@@ -1,4 +1,5 @@
 ﻿using System;
+using Foundation;
 using WatchKit;
 
 
@@ -8,6 +9,8 @@ namespace Shiny.Power
     {
         IDisposable? timerSub;
 
+
+        public bool IsEnergySavingEnabled => NSProcessInfo.ProcessInfo.LowPowerModeEnabled;
 
         public PowerState Status
         {

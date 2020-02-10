@@ -6,6 +6,7 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : IPowerManager
     {
+        public bool IsEnergySavingEnabled => false;
         public PowerState Status => PowerState.Charged;
         public int BatteryLevel => 100;
 
