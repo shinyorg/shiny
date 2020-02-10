@@ -5,6 +5,7 @@
 
 ### Shiny.Core
 * [Feature] App State Delegate - In your shiny startup, use services.AddAppState<YourAppStateDelegate> that inherits from IAppStateDelegate.  Watch for app start, foreground, & background
+* [Feature] PowerManager now has property/inpc for IsEnergySavingEnabled that checks for ios low power, android doze, & uwp energy saving mode
 * [Enhancement][iOS][Android] Easier boilerplate setup
 * [Enhancement][Android] AndroidX support on android 10 targets - WorkManager replaces JobService under the hood
 

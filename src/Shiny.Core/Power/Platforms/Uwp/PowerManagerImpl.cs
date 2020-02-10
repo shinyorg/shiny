@@ -12,11 +12,14 @@ namespace Shiny.Power
     {
         IDisposable dispose;
 
+        public bool IsEnergySavingEnabled => PowerManager.EnergySaverStatus == EnergySaverStatus.On;
 
         protected override void OnNpcHookChanged(bool hasSubscribers)
         {
             if (hasSubscribers)
             {
+                //PowerManager.EnergySaverStatusChanged +=
+                //Battery.AggregateBattery.ReportUpdated += handler;
                 this.dispose = this.WhenChanged().Subscribe(_ =>
                 {
                     this.RaisePropertyChanged(nameof(this.BatteryLevel));
@@ -25,6 +28,8 @@ namespace Shiny.Power
             }
             else
             {
+                //Battery.AggregateBattery.ReportUpdated -= handler;
+                //PowerManager.EnergySaverStatusChanged -=
                 this.dispose?.Dispose();
             }
         }
@@ -73,7 +78,7 @@ namespace Shiny.Power
         }
 
 
-        IObservable<Unit> WhenChanged() => Observable.Create<Unit>(ob =>
+        IObservable<Unit> WhenBatteryChanged() => Observable.Create<Unit>(ob =>
         {
             var handler = new TypedEventHandler<Battery, object>((sender, args) => ob.OnNext(Unit.Default));
             Battery.AggregateBattery.ReportUpdated += handler;
