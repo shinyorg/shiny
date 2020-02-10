@@ -18,21 +18,17 @@ namespace Shiny.Power
         {
             if (hasSubscribers)
             {
-                //PowerManager.EnergySaverStatusChanged +=
-                //Battery.AggregateBattery.ReportUpdated += handler;
-                this.dispose = this.WhenChanged().Subscribe(_ =>
-                {
-                    this.RaisePropertyChanged(nameof(this.BatteryLevel));
-                    this.RaisePropertyChanged(nameof(this.Status));
-                });
+                PowerManager.EnergySaverStatusChanged += this.OnEnergySaverStatusChanged;
+                Battery.AggregateBattery.ReportUpdated += this.OnReportUpdated;
             }
             else
             {
-                //Battery.AggregateBattery.ReportUpdated -= handler;
-                //PowerManager.EnergySaverStatusChanged -=
-                this.dispose?.Dispose();
+                PowerManager.EnergySaverStatusChanged -= this.OnEnergySaverStatusChanged;
+                Battery.AggregateBattery.ReportUpdated -= this.OnReportUpdated;
             }
         }
+
+
 
 
         public int BatteryLevel
@@ -78,11 +74,13 @@ namespace Shiny.Power
         }
 
 
-        IObservable<Unit> WhenBatteryChanged() => Observable.Create<Unit>(ob =>
+        void OnEnergySaverStatusChanged(object sender, object e)
+            => this.RaisePropertyChanged(nameof(IsEnergySavingEnabled));
+        void OnReportUpdated(Battery sender, object args)
         {
-            var handler = new TypedEventHandler<Battery, object>((sender, args) => ob.OnNext(Unit.Default));
-            Battery.AggregateBattery.ReportUpdated += handler;
-            return () => Battery.AggregateBattery.ReportUpdated -= handler;
-        });
+            this.RaisePropertyChanged(nameof(this.BatteryLevel));
+            this.RaisePropertyChanged(nameof(this.Status));
+        }
+
     }
 }
