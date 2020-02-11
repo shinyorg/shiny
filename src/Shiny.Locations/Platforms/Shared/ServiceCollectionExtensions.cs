@@ -45,6 +45,20 @@ namespace Shiny
 
 
         /// <summary>
+        /// This uses background GPS in realtime broadcasts to monitor geofences - DO NOT USE THIS IF YOU DON"T KNOW WHAT YOU ARE DOING
+        /// It is potentially hostile to battery life
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static bool UseGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+        {
+            services.AddSingleton<IGeofenceDelegate, T>();
+            return services.UseGps<GpsGeofenceDelegate>();
+        }
+
+
+        /// <summary>
         ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
