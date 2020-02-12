@@ -53,6 +53,7 @@ namespace Shiny.Notifications
                         var shinyResponse = new NotificationResponse(notification, x.Response.ActionIdentifier, null);
                         await sdelegate.OnEntry(shinyResponse);
                     }
+                    x.CompletionHandler.Invoke();
                 }));
 
             this.context
@@ -62,6 +63,7 @@ namespace Shiny.Notifications
                 {
                     var shinyNotification = x.Notification.Request.FromNative();
                     await sdelegate.OnReceived(shinyNotification);
+                    x.CompletionHandler(UNNotificationPresentationOptions.Alert);
                 }));
         }
 

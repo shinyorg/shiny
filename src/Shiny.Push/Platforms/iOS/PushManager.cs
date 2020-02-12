@@ -31,7 +31,13 @@ namespace Shiny.Push
             this.context
                 .WhenWillPresentNotification()
                 .Where(x => x.Notification.Request.Trigger is UNPushNotificationTrigger)
-                .Subscribe(x => Log.SafeExecute(() => sdelegate.OnReceived()));
+                .Subscribe(x =>
+                    Log.SafeExecute(() =>
+                    {
+                        sdelegate.OnReceived();
+                        x.CompletionHandler(UNNotificationPresentationOptions.None);
+                    })
+                );
         }
 
 
