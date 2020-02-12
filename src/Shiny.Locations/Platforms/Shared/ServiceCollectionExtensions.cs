@@ -53,8 +53,14 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
         {
+#if NETSTANDARD
+            return false;
+#else
             services.AddSingleton<IGeofenceDelegate, T>();
-            return services.UseGps<GpsGeofenceDelegate>();
+            services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            services.UseGps<GpsGeofenceDelegate>();
+            return true;
+#endif
         }
 
 

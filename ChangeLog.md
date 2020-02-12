@@ -20,6 +20,7 @@
 * [Fix][Geofences][Android] Status check now includes GPS radio checks + permissions
 * [Fix][GPS][BREAKING] RequestAccess, WhenStatusChanged, and GetCurrentStatus all now accept GpsRequest to increase the scope/accuracy of the necessary permission checks
 * [Fix][GPS][Android] RequestAccess now checks for new Android 10 permission for ACCESS_BACKGROUND_LOCATION
+* [Feature] Added full background GPS geofence module - use at own risk
 
 ### Shiny.Integrations.XamarinForms
 * [Feature] Less boilerplate to wire into XF
