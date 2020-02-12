@@ -73,6 +73,9 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
+#if __IOS__
+            services.RegisterIosNotificationContext();
+#endif
             services.RegisterModule(new NotificationModule(
                 null,
                 requestPermissionImmediately,

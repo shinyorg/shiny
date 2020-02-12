@@ -11,6 +11,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
+        <Compile Remove="PushNotificationResponse.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -19,9 +20,9 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Uwp\**\*.cs" />
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
@@ -31,11 +32,11 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />        
         <PackageReference Include="Xamarin.Firebase.Common" Version="[71.1610.0, 72)" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="[71.1740.0, 72)" />
         <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="[71.1620.0, 72)" />
         <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="[71.1601.0, 72)" />
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>

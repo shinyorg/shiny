@@ -10,7 +10,9 @@ namespace Shiny.AppState
         readonly IEnumerable<IAppStateDelegate> delegates;
         public AppStateManager(IEnumerable<IAppStateDelegate> delegates)
             => this.delegates = delegates;
-        
+
+
+        //bool IsAppInForeground { get; }
         public void Start() => this.Execute(x => x.OnStart());
         internal void OnForeground() => this.Execute(x => x.OnForeground());
         internal void OnBackground() => this.Execute(x => x.OnBackground());

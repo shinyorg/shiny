@@ -52,8 +52,8 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
-        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.1.0-rc1" />
-        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.1.0-rc1" />
+        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.1.0-rc3" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.1.0-rc3" />
     </ItemGroup>
     
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">

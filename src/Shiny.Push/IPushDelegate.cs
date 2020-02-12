@@ -6,7 +6,7 @@ namespace Shiny.Push
 {
     public interface IPushDelegate
     {
-        Task OnReceived(string payload);
+        Task OnReceived();
         Task OnTokenChanged(string token);
     }
 }

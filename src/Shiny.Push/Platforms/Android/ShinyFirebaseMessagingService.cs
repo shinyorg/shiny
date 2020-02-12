@@ -12,9 +12,10 @@ namespace Shiny.Push
 
         public override async void OnMessageReceived(RemoteMessage message)
         {
-            await ShinyHost.Container.SafeResolveAndExecute<IPushDelegate>(ndelegate =>
+            await ShinyHost.Container.SafeResolveAndExecute<IPushDelegate>(async ndelegate =>
             {
-                return ndelegate.OnReceived("");
+                //message.Data
+                //return ndelegate.OnReceived("");
                 //var notification = message.GetNotification();
                 //notification.Body;
                 //notification.BodyLocalizationKey

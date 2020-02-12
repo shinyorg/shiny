@@ -11,10 +11,12 @@ namespace Shiny
 {
     public class ShinyPushAutoRegisterAttribute : AutoRegisterAttribute
     {
+        public bool RequestAccessOnStart { get; set; }
+
         public override void Register(IServiceCollection services)
         {
             var implType = this.FindImplementationType(typeof(IPushDelegate), true);
-            services.UsePush(implType);
+            services.UsePush(implType, this.RequestAccessOnStart);
         }
     }
 
@@ -22,7 +24,11 @@ namespace Shiny
     public class ShinyPushAttribute : ServiceModuleAttribute
     {
         public ShinyPushAttribute(Type delegateType) => this.DelegateType = delegateType;
+
         public Type DelegateType { get; }
-        public override void Register(IServiceCollection services) => services.UsePush(this.DelegateType);
+        public bool RequestAccessOnStart { get; set; }
+
+        public override void Register(IServiceCollection services)
+            => services.UsePush(this.DelegateType, this.RequestAccessOnStart);
     }
 }

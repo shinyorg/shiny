@@ -15,7 +15,7 @@ namespace Shiny.Push
         public abstract Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default);
         public abstract Task UnRegister();
 
-        
+                
         public string? CurrentRegistrationToken
         {
             get => this.settings.Get<string?>(nameof(CurrentRegistrationToken));

@@ -2,28 +2,67 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
+using Shiny.Logging;
 
 
 namespace Shiny.Notifications
 {
-    public class NotificationManager : INotificationManager
+    public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         /// <summary>
         /// This requires a special entitlement from Apple that is general disabled for anything but healt & public safety alerts
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
 
+        readonly ShinyNotificationContext context;
         readonly ISettings settings; // this will have problems with data protection
 
 
-        public NotificationManager(ISettings settings)
+        public NotificationManager(ShinyNotificationContext context, ISettings settings)
         {
+            this.context = context;
             this.settings = settings;
-            UNUserNotificationCenter.Current.Delegate = new ShinyNotificationDelegate();
+        }
+
+
+        public void Start()
+        {
+            var sdelegate = this.context.Services.Resolve<INotificationDelegate>();
+            if (sdelegate == null)
+                return;
+
+            this.context
+                .WhenDidReceiveNotificationResponse()
+                .Where(x => !(x.Response.Notification.Request is UNPushNotificationTrigger))
+                .Subscribe(x => Log.SafeExecute(async () =>
+                {
+                    var notification = x.Response.Notification.Request.FromNative();
+
+                    if (x.Response is UNTextInputNotificationResponse textResponse)
+                    {
+                        var shinyResponse = new NotificationResponse(notification, textResponse.ActionIdentifier, textResponse.UserText);
+                        await sdelegate.OnEntry(shinyResponse);
+                    }
+                    else
+                    {
+                        var shinyResponse = new NotificationResponse(notification, x.Response.ActionIdentifier, null);
+                        await sdelegate.OnEntry(shinyResponse);
+                    }
+                }));
+
+            this.context
+                .WhenWillPresentNotification()
+                .Where(x => !(x.Notification.Request is UNPushNotificationTrigger))
+                .Subscribe(x => Log.SafeExecute(async () =>
+                {
+                    var shinyNotification = x.Notification.Request.FromNative();
+                    await sdelegate.OnReceived(shinyNotification);
+                }));
         }
 
 

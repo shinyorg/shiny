@@ -7,16 +7,31 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
+using Shiny.Notifications;
+using Shiny.Logging;
 
 
 namespace Shiny.Push
 {
-    //https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/enhanced-user-notifications?tabs=windows
-    public class PushManager : AbstractPushManager
+    public class PushManager : AbstractPushManager, IShinyStartupTask
     {
-        public PushManager(ISettings settings) : base(settings)
+        readonly ShinyNotificationContext context;
+
+
+        public PushManager(ShinyNotificationContext context, ISettings settings) : base(settings)
         {
-            UNUserNotificationCenter.Current.Delegate = new ShinyPushDelegate();
+            this.context = context;
+        }
+
+
+        public void Start()
+        {
+            var sdelegate = this.context.Services.Resolve<IPushDelegate>();
+
+            this.context
+                .WhenWillPresentNotification()
+                .Where(x => x.Notification.Request.Trigger is UNPushNotificationTrigger)
+                .Subscribe(x => Log.SafeExecute(() => sdelegate.OnReceived()));
         }
 
 

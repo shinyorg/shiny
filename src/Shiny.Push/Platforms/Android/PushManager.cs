@@ -55,7 +55,7 @@ namespace Shiny.Push
             //if (resultCode != ConnectionResult.Success)
             //{
             //    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
-            //        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);            
+            //        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
             this.taskSrc = new TaskCompletionSource<string>();
             using (cancelToken.Register(() => this.taskSrc.TrySetCanceled()))
             {

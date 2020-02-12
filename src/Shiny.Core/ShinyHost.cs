@@ -30,6 +30,13 @@ namespace Shiny
 
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static Lazy<T> LazyResolve<T>() => new Lazy<T>(() => Container.Resolve<T>());
+
+        /// <summary>
         /// Resolve a list of registered services from the container
         /// </summary>
         /// <typeparam name="T"></typeparam>

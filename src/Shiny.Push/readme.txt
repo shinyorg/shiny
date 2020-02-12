@@ -9,6 +9,14 @@ Blog: https://allancritchie.net
 
 Please star this project on GitHub if you use it in your projects
 
+
+-------
+Setup
+-------
+When using Push, notifications is automatically registered without a notificationdelegate to prevent duplication of logic firing.
+
+Push will automatically trigger notifications if they are "not" silent, otherwise they will trigger jobs.
+
 -------
 iOS
 -------
@@ -35,3 +43,9 @@ Ensure the following libraries are installed in your ANDROID HEAD PROJECT
 <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="71.1601.0" />
 
 And follow the setup located here: https://docs.microsoft.com/en-us/xamarin/android/data-cloud/google-messaging/firebase-cloud-messaging
+
+------
+UWP
+------
+
+TODO
