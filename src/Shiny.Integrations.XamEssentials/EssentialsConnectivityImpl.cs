@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using Shiny.Net;
 using Xamarin.Essentials;
 
@@ -8,7 +7,7 @@ namespace Shiny.Integrations.XamEssentials
 {
     public class EssentialsConnectivityImpl : Shiny.Net.SharedConnectivityImpl
     {
-        public NetworkReach Reach
+        public override NetworkReach Reach
         {
             get
             {
@@ -33,7 +32,7 @@ namespace Shiny.Integrations.XamEssentials
             }
         }
 
-        public Shiny.Net.NetworkAccess Access
+        public override Shiny.Net.NetworkAccess Access
         {
             get
             {

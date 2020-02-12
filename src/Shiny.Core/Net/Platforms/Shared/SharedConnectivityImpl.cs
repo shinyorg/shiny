@@ -9,7 +9,7 @@ namespace Shiny.Net
     public class SharedConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
         NetworkReach networkReach = NetworkReach.None;
-        public NetworkReach Reach
+        public virtual NetworkReach Reach
         {
             get => this.networkReach;
             protected set => this.Set(ref this.networkReach, value);
@@ -17,7 +17,7 @@ namespace Shiny.Net
 
 
         NetworkAccess networkAccess = NetworkAccess.None;
-        public NetworkAccess Access
+        public virtual NetworkAccess Access
         {
             get => this.networkAccess;
             protected set => this.Set(ref this.networkAccess, value);
@@ -45,7 +45,6 @@ namespace Shiny.Net
 
         protected virtual void DoDetection()
         {
-
             var nis = NetworkInterface.GetAllNetworkInterfaces().Where(x =>
                 x.OperationalStatus == OperationalStatus.Up &&
                 x.NetworkInterfaceType != NetworkInterfaceType.Loopback
