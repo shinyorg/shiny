@@ -34,7 +34,7 @@ namespace Shiny.Push
 
         void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => Log.SafeExecute(async () =>
         {
-            await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
+            //await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
             //this.CurrentRegistrationToken = e.RawNotification.Ur
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             e.Cancel = true;
