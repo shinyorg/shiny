@@ -57,7 +57,7 @@ namespace Shiny
             return false;
 #else
             services.AddSingleton<IGeofenceDelegate, T>();
-            services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            services.AddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
             services.UseGps<GpsGeofenceDelegate>();
             return true;
 #endif
@@ -106,7 +106,7 @@ namespace Shiny
         /// <param name="requestIfPermissionGranted">This will be called when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
         /// <returns></returns>
 
-        public static bool UseGps(this IServiceCollection services, Type delegateType, Action<GpsRequest> requestIfPermissionGranted = null)
+        public static bool UseGps(this IServiceCollection services, Type? delegateType, Action<GpsRequest>? requestIfPermissionGranted = null)
         {
 #if NETSTANDARD
             return false;
@@ -124,7 +124,7 @@ namespace Shiny
         /// <param name="services">The servicecollection to configure</param>
         /// <param name="requestIfPermissionGranted">This will be called when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
         /// <returns></returns>
-        public static bool UseGps<T>(this IServiceCollection services, Action<GpsRequest> requestIfPermissionGranted = null) where T : class, IGpsDelegate
+        public static bool UseGps<T>(this IServiceCollection services, Action<GpsRequest>? requestIfPermissionGranted = null) where T : class, IGpsDelegate
             => services.UseGps(typeof(T), requestIfPermissionGranted);
     }
 }

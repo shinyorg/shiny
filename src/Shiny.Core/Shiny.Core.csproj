@@ -80,9 +80,4 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="Notifications\Platforms\iOS\ShinyNotificationContext.cs">
-        <SubType>Code</SubType>
-      </None>
-    </ItemGroup>
 </Project>

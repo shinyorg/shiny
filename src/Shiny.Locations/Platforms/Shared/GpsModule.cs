@@ -7,11 +7,11 @@ namespace Shiny.Locations
 {
     class GpsModule : ShinyModule
     {
-        readonly Type delegateType;
-        readonly Action<GpsRequest> requestIfPermissionGranted;
+        readonly Type? delegateType;
+        readonly Action<GpsRequest>? requestIfPermissionGranted;
 
 
-        public GpsModule(Type delegateType, Action<GpsRequest> requestIfPermissionGranted)
+        public GpsModule(Type? delegateType, Action<GpsRequest>? requestIfPermissionGranted)
         {
             this.delegateType = delegateType;
             this.requestIfPermissionGranted = requestIfPermissionGranted;
