@@ -51,6 +51,7 @@ namespace Shiny.Notifications
         }
     }
 
+
     public class WillPresentArgs
     {
         public WillPresentArgs(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)

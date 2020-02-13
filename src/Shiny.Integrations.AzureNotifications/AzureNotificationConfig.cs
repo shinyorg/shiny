@@ -5,14 +5,14 @@ namespace Shiny.Push.AzureNotifications
 {
     public class AzureNotificationConfig
     {
-        public AzureNotificationConfig(string hubName, string listenerConnectionString)
+        public AzureNotificationConfig(string listenerConnectionString, string hubName)
         {
-            this.HubName = hubName;
             this.ListenerConnectionString = listenerConnectionString;
+            this.HubName = hubName;
         }
 
 
-        public string HubName { get; }
         public string ListenerConnectionString { get; }
+        public string HubName { get; }
     }
 }

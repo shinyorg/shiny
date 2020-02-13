@@ -38,33 +38,55 @@ namespace Shiny.Notifications
 
             this.context
                 .WhenDidReceiveNotificationResponse()
-                .Where(x => !(x.Response.Notification.Request is UNPushNotificationTrigger))
-                .Subscribe(x => Log.SafeExecute(async () =>
+                .Where(x => !(x.Response.Notification.Request.Trigger is UNPushNotificationTrigger))
+                .Subscribe(async x =>
                 {
-                    var notification = x.Response.Notification.Request.FromNative();
+                    try
+                    {
+                        var notification = x.Response.Notification.Request.FromNative();
+                        if (notification == null)
+                            return;
 
-                    if (x.Response is UNTextInputNotificationResponse textResponse)
-                    {
-                        var shinyResponse = new NotificationResponse(notification, textResponse.ActionIdentifier, textResponse.UserText);
-                        await sdelegate.OnEntry(shinyResponse);
+                        if (x.Response is UNTextInputNotificationResponse textResponse)
+                        {
+                            var shinyResponse = new NotificationResponse(notification, textResponse.ActionIdentifier, textResponse.UserText);
+                            await sdelegate.OnEntry(shinyResponse);
+                        }
+                        else
+                        {
+                            var shinyResponse = new NotificationResponse(notification, x.Response.ActionIdentifier, null);
+                            await sdelegate.OnEntry(shinyResponse);
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        var shinyResponse = new NotificationResponse(notification, x.Response.ActionIdentifier, null);
-                        await sdelegate.OnEntry(shinyResponse);
+                        Log.Write(ex);
                     }
-                    x.CompletionHandler.Invoke();
-                }));
+                    finally
+                    {
+                        x.CompletionHandler.Invoke();
+                    }
+                });
 
             this.context
                 .WhenWillPresentNotification()
-                .Where(x => !(x.Notification.Request is UNPushNotificationTrigger))
-                .Subscribe(x => Log.SafeExecute(async () =>
+                .Where(x => !(x.Notification.Request.Trigger is UNPushNotificationTrigger))
+                .Subscribe(async x =>
                 {
-                    var shinyNotification = x.Notification.Request.FromNative();
-                    await sdelegate.OnReceived(shinyNotification);
-                    x.CompletionHandler(UNNotificationPresentationOptions.Alert);
-                }));
+                    try
+                    {
+                        var shinyNotification = x.Notification.Request.FromNative();
+                        await sdelegate.OnReceived(shinyNotification);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(ex);
+                    }
+                    finally
+                    {
+                        x.CompletionHandler(UNNotificationPresentationOptions.Alert);
+                    }
+                });
         }
 
 
