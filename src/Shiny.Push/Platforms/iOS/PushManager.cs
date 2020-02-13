@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Foundation;
 using UIKit;
 using UserNotifications;
@@ -15,11 +16,14 @@ namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager, IShinyStartupTask
     {
+        readonly Subject<IPushNotification> pushSubject;
         readonly ShinyNotificationContext context;
 
 
+        // launch options?  UIApplication.LaunchOptionsRemoteNotificationKey
         public PushManager(ShinyNotificationContext context, ISettings settings) : base(settings)
         {
+            this.pushSubject = new Subject<IPushNotification>();
             this.context = context;
         }
 
@@ -37,6 +41,7 @@ namespace Shiny.Push
                     {
                         var push = new PushNotification(x.Notification);
                         await sdelegate.OnReceived(push);
+                        this.pushSubject.OnNext(push);
                     }
                     catch (Exception ex)
                     {
@@ -48,6 +53,9 @@ namespace Shiny.Push
                     }
                 });
         }
+
+
+        public override IObservable<IPushNotification> WhenReceived() => this.pushSubject;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)

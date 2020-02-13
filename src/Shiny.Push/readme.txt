@@ -11,13 +11,6 @@ Please star this project on GitHub if you use it in your projects
 
 
 -------
-Setup
--------
-When using Push, notifications is automatically registered without a notificationdelegate to prevent duplication of logic firing.
-
-Push will automatically trigger notifications if they are "not" silent, otherwise they will trigger jobs.
-
--------
 iOS
 -------
 Follow https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/deprecated/remote-notifications-in-ios

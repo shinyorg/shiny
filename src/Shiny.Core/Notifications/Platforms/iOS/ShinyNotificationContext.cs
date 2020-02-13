@@ -29,6 +29,14 @@ namespace Shiny.Notifications
         public IObservable<DidReceiveNotificationResponseArgs> WhenDidReceiveNotificationResponse() => this.receiveSubj;
 
 
+        //NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler
+        public void DidReceiveRemoteNotification(Action<UNNotificationPresentationOptions> completionHandler)
+        {
+
+        }
+
+
+
         public override void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
             => this.receiveSubj.OnNext(new DidReceiveNotificationResponseArgs(response, completionHandler));
 

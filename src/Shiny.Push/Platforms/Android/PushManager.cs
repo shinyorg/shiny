@@ -14,12 +14,14 @@ namespace Shiny.Push
     public class PushManager : Java.Lang.Object, IOnCompleteListener, IPushManager
     {
         readonly ISettings settings;
+        readonly IMessageBus bus;
         TaskCompletionSource<string>? taskSrc = null;
 
 
-        public PushManager(ISettings settings)
+        public PushManager(ISettings settings, IMessageBus bus)
         {
             this.settings = settings;
+            this.bus = bus;
         }
 
 
@@ -80,5 +82,8 @@ namespace Shiny.Push
             // must be executed off proc
             await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId());
         }
+
+        public IObservable<IPushNotification> WhenReceived()
+            => this.bus.Listener<IPushNotification>();
     }
 }

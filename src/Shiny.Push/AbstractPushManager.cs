@@ -12,6 +12,7 @@ namespace Shiny.Push
         protected AbstractPushManager(ISettings settings) => this.settings = settings;
 
 
+        public abstract IObservable<IPushNotification> WhenReceived();
         public abstract Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default);
         public abstract Task UnRegister();
 

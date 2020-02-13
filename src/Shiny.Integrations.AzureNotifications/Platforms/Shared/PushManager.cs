@@ -19,7 +19,7 @@ namespace Shiny.Integrations.AzureNotifications
 #elif __IOS__
         public PushManager(AzureNotificationConfig config, ISettings settings, Shiny.Notifications.ShinyNotificationContext context) : base(context, settings)
 #else
-        public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
+        public PushManager(AzureNotificationConfig config, ISettings settings, IMessageBus bus) : base(settings, bus)
 #endif
         {
             //new SBNotificationHub
