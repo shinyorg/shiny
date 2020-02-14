@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Foundation;
-using UIKit;
 
 
 namespace Shiny
@@ -84,21 +83,12 @@ namespace Shiny
         }
 
 
-        //public static void Dispatch(this Action action)
-        //{
-        //    if (NSThread.Current.IsMainThread)
-        //        action();
-        //    else
-        //        NSRunLoop.Main.BeginInvokeOnMainThread(action);
-        //}
-
-
         public static bool HasPlistValue(string key, int? ifVersion = null)
         {
             if (ifVersion == null)
                 return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
 #if __IOS__
-            if (UIDevice.CurrentDevice.CheckSystemVersion(ifVersion.Value, 0))
+            if (UIKit.UIDevice.CurrentDevice.CheckSystemVersion(ifVersion.Value, 0))
                 return NSBundle.MainBundle.ObjectForInfoDictionary(key) != null;
 #endif
             return false;
