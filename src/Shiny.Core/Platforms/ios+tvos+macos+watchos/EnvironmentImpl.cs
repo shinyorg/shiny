@@ -4,41 +4,16 @@ using Foundation;
 
 namespace Shiny
 {
-    // this is startable so the properties can be set on the main thread - this is mostly an iOS thing
-    public class EnvironmentImpl : IEnvironment, IShinyStartupTask
+    public class EnvironmentImpl : IEnvironment
     {
-        public EnvironmentImpl()
-        {
-            //this.operatingSystem = UIDevice.CurrentDevice.SystemName;
-            this.AppIdentifier = NSBundle.MainBundle.BundleIdentifier;
-            this.AppVersion = NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
-            this.AppBuild = NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"].ToString();
-#if __IOS__
-            this.OperatingSystem = "iOS";
-            this.OperatingSystemVersion = UIKit.UIDevice.CurrentDevice.SystemVersion;
-#elif __TVSOS__
-            this.OperatingSystem = "tvOS";
-            this.OperatingSystemVersion = UIKit.UIDevice.CurrentDevice.SystemVersion;
-#elif __WATCHOS__
-            this.OperatingSystem = "watchOS";
-            this.OperatingSystemVersion = "1";
-#endif
-        }
-
-
-        public string AppIdentifier { get; }
-        public string AppVersion { get; }
-        public string AppBuild { get; }
+        public string AppIdentifier => NSBundle.MainBundle.BundleIdentifier;
+        public string AppVersion => NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
+        public string AppBuild => NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"].ToString();
 
         public string MachineName { get; } = "";
-        public string OperatingSystem { get; }
-        public string OperatingSystemVersion { get; }
+        public string OperatingSystem => NSProcessInfo.ProcessInfo.OperatingSystemName;
+        public string OperatingSystemVersion => NSProcessInfo.ProcessInfo.OperatingSystemVersionString;
         public string Manufacturer { get; } = "Apple";
         public string Model { get; } = "";
-
-
-        public void Start()
-        {
-        }
     }
 }
