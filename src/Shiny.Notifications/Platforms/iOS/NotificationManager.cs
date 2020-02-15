@@ -36,6 +36,8 @@ namespace Shiny.Notifications
             if (sdelegate == null)
                 return;
 
+            // TODO: somebody has to complete the notification when no delegate is present because push could be listening
+
             this.context
                 .WhenDidReceiveNotificationResponse()
                 .Where(x => !(x.Response.Notification.Request.Trigger is UNPushNotificationTrigger))

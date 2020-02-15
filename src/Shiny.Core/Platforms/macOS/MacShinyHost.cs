@@ -4,6 +4,7 @@ using Shiny.Power;
 using Shiny.IO;
 using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 
 namespace Shiny
@@ -13,12 +14,12 @@ namespace Shiny
         public static void Init(IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
             => InitPlatform(startup, services =>
             {
-                services.AddSingleton<IEnvironment, EnvironmentImpl>();
-                services.AddSingleton<IConnectivity, SharedConnectivityImpl>();
-                services.AddSingleton<IPowerManager, PowerManagerImpl>();
-                //services.AddSingleton<IJobManager, JobManagerImpl>();
-                services.AddSingleton<IFileSystem, FileSystemImpl>();
-                services.AddSingleton<ISettings, SettingsImpl>();
+                services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
+                services.TryAddSingleton<IConnectivity, SharedConnectivityImpl>();
+                services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
+                //services.TryAddSingleton<IJobManager, JobManagerImpl>();
+                services.TryAddSingleton<IFileSystem, FileSystemImpl>();
+                services.TryAddSingleton<ISettings, SettingsImpl>();
                 platformBuild?.Invoke(services);
             });
     }

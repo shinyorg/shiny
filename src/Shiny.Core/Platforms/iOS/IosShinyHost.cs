@@ -46,6 +46,12 @@ namespace Shiny
         public static IObservable<NSData> WhenRegisteredForRemoteNotifications()
             => remoteNotifySubj;
 
+        public static void DidReceiveRemoteNotification()
+        {
+
+        }
+
+
         public static void RegisteredForRemoteNotifications(NSData deviceToken)
             => remoteNotifySubj.OnNext(deviceToken);
 
@@ -54,7 +60,6 @@ namespace Shiny
 
         public static void PerformFetch(Action<UIBackgroundFetchResult> completionHandler)
             => JobManager.OnBackgroundFetch(completionHandler);
-
 
         public static Action<string, Action>? HandleEventsForBackgroundUrlAction { get; set; }
         public static void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
