@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Shiny.Infrastructure;
 using Tizen.Applications;
 
@@ -32,7 +33,22 @@ namespace Shiny.Settings
 
 
         protected override object NativeGet(Type type, string key)
-            => throw new NotImplementedException();
+        {
+            //type = type.Unwrap();
+            if (type == typeof(string))
+                return Preference.Get<string>(key);
+
+            if (type == typeof(long))
+                return Preference.Get<long>(key);
+
+            if (type == typeof(int))
+                return Preference.Get<int>(key);
+
+            if (type == typeof(bool))
+                return Preference.Get<bool>(key);
+
+            throw new ArgumentException("Invalid Type - " + type.FullName);
+        }
 
 
         protected override void NativeRemove(string[] keys)
@@ -42,14 +58,20 @@ namespace Shiny.Settings
                     Preference.Remove(key);
         }
 
+
         protected override void NativeSet(Type type, string key, object value)
             => Preference.Set(key, value);
 
 
         protected override IDictionary<string, string> NativeValues()
         {
-            throw new NotImplementedException();
-            //Preference.Keys
+            var dict = new Dictionary<string, string>(Preference.Keys.Count());
+            foreach (var key in Preference.Keys)
+            {
+                var value = Preference.Get<object>(key);
+                dict.Add(key, value.ToString());
+            }
+            return dict;
         }
     }
 }

@@ -7,9 +7,6 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
-        IDisposable? timerSub;
-
-
         public bool IsEnergySavingEnabled => NSProcessInfo.ProcessInfo.LowPowerModeEnabled;
 
         public PowerState Status
@@ -44,7 +41,6 @@ namespace Shiny.Power
             }
             else
             {
-                this.timerSub?.Dispose();
             }
         }
     }
