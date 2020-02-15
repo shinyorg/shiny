@@ -46,6 +46,7 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\macOS\**\*.cs" />
+        <Reference Include="netstandard" />
     </ItemGroup>
     
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
