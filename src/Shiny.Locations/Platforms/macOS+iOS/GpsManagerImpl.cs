@@ -67,11 +67,11 @@ namespace Shiny.Locations
             access.Assert();
 
             this.gdelegate.Request = request;
+#if __IOS__
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
-
             if (request.ThrottledInterval != null)
                 this.locationManager.AllowDeferredLocationUpdatesUntil(0, request.ThrottledInterval.Value.TotalMilliseconds);
-
+#endif
             switch (request.Priority)
             {
                 case GpsPriority.Highest:
@@ -107,7 +107,9 @@ namespace Shiny.Locations
         {
             if (this.IsListening)
             {
+#if __IOS__
                 this.locationManager.AllowsBackgroundLocationUpdates = false;
+#endif
                 this.locationManager.StopUpdatingLocation();
                 this.IsListening = false;
             }

@@ -6,8 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using CoreLocation;
+#if __IOS__
 using UIKit;
-
+#endif
 
 namespace Shiny.Locations
 {
@@ -58,6 +59,8 @@ namespace Shiny.Locations
             access.Assert();
 
             var native = region.ToNative();
+
+#if __IOS__
             var tcs = new TaskCompletionSource<object>();
             UIApplication.SharedApplication.BeginInvokeOnMainThread(async () =>
             {
@@ -73,6 +76,9 @@ namespace Shiny.Locations
                 }
             });
             await tcs.Task.ConfigureAwait(false);
+#else
+            this.locationManager.StartMonitoring(native);
+#endif
             await this.Repository.Set(region.Identifier, region);
         }
 

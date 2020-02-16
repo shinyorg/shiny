@@ -6,7 +6,7 @@ using Tizen.Sensor;
 
 namespace Shiny.Locations
 {
-    public class MotionActivityImpl : IMotionActivity, IShinyStartupTask
+    public class MotionActivityManagerImpl : IMotionActivityManager, IShinyStartupTask
     {
         readonly InVehicleActivityDetector vehicle;
         readonly WalkingActivityDetector walking;
@@ -14,7 +14,7 @@ namespace Shiny.Locations
         readonly StationaryActivityDetector stationary;
 
 
-        public MotionActivityImpl()
+        public MotionActivityManagerImpl()
         {
             this.vehicle = new InVehicleActivityDetector();
             this.walking = new WalkingActivityDetector();
@@ -34,6 +34,11 @@ namespace Shiny.Locations
             this.walking.Start();
             this.running.Start();
             this.stationary.Start();
+        }
+
+        public async Task<AccessState> RequestPermission()
+        {
+            return AccessState.Available;
         }
 
         public bool IsSupported => true;

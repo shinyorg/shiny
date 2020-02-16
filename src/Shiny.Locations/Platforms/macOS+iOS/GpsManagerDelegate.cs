@@ -25,7 +25,9 @@ namespace Shiny.Locations
 
             else if (!this.deferringUpdates)
             {
+#if __IOS__
                 manager.AllowDeferredLocationUpdatesUntil(0, this.Request.ThrottledInterval.Value.TotalMilliseconds);
+#endif
                 this.deferringUpdates = true;
                 this.InvokeChanges(locations);
             }
