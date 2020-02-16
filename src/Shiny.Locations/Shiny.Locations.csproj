@@ -24,7 +24,9 @@
     </ItemGroup>
     
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
+<!--        <PackageReference Include="System.Reactive" Version="4.3.2" />-->
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Reference Include="netstandard" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*macOS*\**\*.cs" />
     </ItemGroup>
