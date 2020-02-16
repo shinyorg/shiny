@@ -37,6 +37,10 @@ namespace Shiny.Notifications
                 return;
 
             // TODO: somebody has to complete the notification when no delegate is present because push could be listening
+            UNUserNotificationCenter
+                .Current
+                .Delegate = null;
+
 
             this.context
                 .WhenDidReceiveNotificationResponse()

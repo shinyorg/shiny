@@ -1,8 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-#if __IOS__
-using Shiny.Notifications;
-#endif
 
 
 namespace Shiny.Push
@@ -26,9 +23,6 @@ namespace Shiny.Push
 
         public override void Register(IServiceCollection services)
         {
-#if __IOS__
-            services.RegisterIosNotificationContext();
-#endif
             services.AddSingleton(typeof(IPushManager), this.pushManagerType);
             if (delegateType != null)
                 services.AddSingleton(typeof(IPushDelegate), this.delegateType);

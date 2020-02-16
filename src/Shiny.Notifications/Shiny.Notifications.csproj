@@ -39,7 +39,6 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.watchos')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\watchOS\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">

@@ -3,7 +3,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using CoreLocation;
 
-namespace Shiny.Locations
+
+namespace Shiny
 {
     public abstract class ShinyLocationDelegate : CLLocationManagerDelegate
     {

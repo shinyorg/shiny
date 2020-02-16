@@ -3,7 +3,7 @@
     <PropertyGroup>
         <VersionSuffix>beta</VersionSuffix>
         <Description>Shiny Reactive BluetoothLE Plugin for client and gatt server</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.tvos10;xamarin.mac20;monoandroid90;monoandroid10.0;tizen50</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
@@ -36,7 +36,7 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />        
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
@@ -46,5 +46,17 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
     </ItemGroup>
-
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Reference Include="netstandard" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
+    </ItemGroup>
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\tizen\**\*.cs" />        
+    </ItemGroup>
 </Project>
