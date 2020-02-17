@@ -15,14 +15,14 @@ namespace Shiny.Notifications
                     return;
 
                 var sdelegate = ShinyHost.Resolve<INotificationDelegate>();
-                if (x.Response is UNTextInputNotificationResponse textResponse)
+                if (response is UNTextInputNotificationResponse textResponse)
                 {
                     var shinyResponse = new NotificationResponse(notification, textResponse.ActionIdentifier, textResponse.UserText);
                     await sdelegate.OnEntry(shinyResponse);
                 }
                 else
                 {
-                    var shinyResponse = new NotificationResponse(notification, x.Response.ActionIdentifier, null);
+                    var shinyResponse = new NotificationResponse(notification, response.ActionIdentifier, null);
                     await sdelegate.OnEntry(shinyResponse);
                 }
             })
