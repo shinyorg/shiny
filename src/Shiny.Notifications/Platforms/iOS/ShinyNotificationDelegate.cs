@@ -1,5 +1,6 @@
 ﻿using System;
 using UserNotifications;
+using Shiny.Logging;
 
 
 namespace Shiny.Notifications
@@ -29,9 +30,9 @@ namespace Shiny.Notifications
 
 
         public override void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
-            => Log.SafeExecute(() =>
+            => Log.SafeExecute(async () =>
             {
-                var shinyNotification = x.Notification.Request.FromNative();
+                var shinyNotification = notification.Request.FromNative();
                 if (shinyNotification != null)
                 {
                     await ShinyHost

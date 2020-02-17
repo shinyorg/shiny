@@ -17,12 +17,11 @@ namespace Shiny.Integrations.AzureNotifications
 #if WINDOWS_UWP
         public PushManager(AzureNotificationConfig config, IServiceProvider serviceProvider, ISettings settings) : base(serviceProvider, settings)
 #elif __IOS__
-        public PushManager(AzureNotificationConfig config, ISettings settings) : base(context, settings)
+        public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
 #else
         public PushManager(AzureNotificationConfig config, ISettings settings, IMessageBus bus) : base(settings, bus)
 #endif
         {
-            //new SBNotificationHub
             this.hub = new NotificationHubClient(
                 config.ListenerConnectionString,
                 config.HubName,

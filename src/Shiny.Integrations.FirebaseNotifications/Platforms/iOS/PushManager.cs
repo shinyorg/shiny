@@ -5,14 +5,13 @@ using Firebase.CloudMessaging;
 using Firebase.InstanceID;
 using Shiny.Push;
 using Shiny.Settings;
-using Shiny.Notifications;
 
 
 namespace Shiny.Integrations.FirebaseNotifications
 {
     public class PushManager : Shiny.Push.PushManager
     {
-        public PushManager(ShinyNotificationContext context, ISettings settings) : base(context, settings)
+        public PushManager(ISettings settings) : base(settings)
         {
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate();
         }
