@@ -7,7 +7,6 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
-using Shiny.Logging;
 
 
 namespace Shiny.Notifications
@@ -19,80 +18,24 @@ namespace Shiny.Notifications
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
 
-        readonly ShinyNotificationContext context;
         readonly ISettings settings; // this will have problems with data protection
 
 
-        public NotificationManager(ShinyNotificationContext context, ISettings settings)
+        public NotificationManager(ISettings settings)
         {
-            this.context = context;
             this.settings = settings;
         }
 
 
         public void Start()
         {
-            var sdelegate = this.context.Services.Resolve<INotificationDelegate>();
-            if (sdelegate == null)
-                return;
-
-            // TODO: somebody has to complete the notification when no delegate is present because push could be listening
-            UNUserNotificationCenter
-                .Current
-                .Delegate = null;
-
-
-            this.context
-                .WhenDidReceiveNotificationResponse()
-                .Where(x => !(x.Response.Notification.Request.Trigger is UNPushNotificationTrigger))
-                .Subscribe(async x =>
-                {
-                    try
-                    {
-                        var notification = x.Response.Notification.Request.FromNative();
-                        if (notification == null)
-                            return;
-
-                        if (x.Response is UNTextInputNotificationResponse textResponse)
-                        {
-                            var shinyResponse = new NotificationResponse(notification, textResponse.ActionIdentifier, textResponse.UserText);
-                            await sdelegate.OnEntry(shinyResponse);
-                        }
-                        else
-                        {
-                            var shinyResponse = new NotificationResponse(notification, x.Response.ActionIdentifier, null);
-                            await sdelegate.OnEntry(shinyResponse);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    finally
-                    {
-                        x.CompletionHandler.Invoke();
-                    }
-                });
-
-            this.context
-                .WhenWillPresentNotification()
-                .Where(x => !(x.Notification.Request.Trigger is UNPushNotificationTrigger))
-                .Subscribe(async x =>
-                {
-                    try
-                    {
-                        var shinyNotification = x.Notification.Request.FromNative();
-                        await sdelegate.OnReceived(shinyNotification);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    finally
-                    {
-                        x.CompletionHandler(UNNotificationPresentationOptions.Alert);
-                    }
-                });
+            var sdelegate = ShinyHost.Resolve<INotificationDelegate>();
+            if (sdelegate != null)
+            {
+                UNUserNotificationCenter
+                    .Current
+                    .Delegate = new ShinyNotificationDelegate();
+            }
         }
 
 

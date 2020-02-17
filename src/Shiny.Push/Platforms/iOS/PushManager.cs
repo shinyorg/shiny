@@ -8,7 +8,6 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
-using Shiny.Notifications;
 using Shiny.Logging;
 
 
@@ -17,41 +16,39 @@ namespace Shiny.Push
     public class PushManager : AbstractPushManager, IShinyStartupTask
     {
         readonly Subject<IPushNotification> pushSubject;
-        readonly ShinyNotificationContext context;
 
 
         // launch options?  UIApplication.LaunchOptionsRemoteNotificationKey
-        public PushManager(ShinyNotificationContext context, ISettings settings) : base(settings)
+        public PushManager(ISettings settings) : base(settings)
         {
             this.pushSubject = new Subject<IPushNotification>();
-            this.context = context;
         }
 
 
         public void Start()
         {
-            var sdelegate = this.context.Services.Resolve<IPushDelegate>();
+            //var sdelegate = this.context.Services.Resolve<IPushDelegate>();
 
-            this.context
-                .WhenWillPresentNotification()
-                .Where(x => x.Notification.Request.Trigger is UNPushNotificationTrigger)
-                .Subscribe(async x =>
-                {
-                    try
-                    {
-                        var push = new PushNotification(x.Notification);
-                        await sdelegate.OnReceived(push);
-                        this.pushSubject.OnNext(push);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(ex);
-                    }
-                    finally
-                    {
-                        x.CompletionHandler(UNNotificationPresentationOptions.None);
-                    }
-                });
+            //this.context
+            //    .WhenWillPresentNotification()
+            //    .Where(x => x.Notification.Request.Trigger is UNPushNotificationTrigger)
+            //    .Subscribe(async x =>
+            //    {
+            //        try
+            //        {
+            //            var push = new PushNotification(x.Notification);
+            //            await sdelegate.OnReceived(push);
+            //            this.pushSubject.OnNext(push);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Log.Write(ex);
+            //        }
+            //        finally
+            //        {
+            //            x.CompletionHandler(UNNotificationPresentationOptions.None);
+            //        }
+            //    });
         }
 
 

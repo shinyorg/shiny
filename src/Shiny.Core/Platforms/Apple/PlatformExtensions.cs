@@ -161,12 +161,12 @@ namespace Shiny
                 .Take(1)
                 .ToTask();
 
-#if __IOS
+#if __IOS__
             if (background)
                 locationManager.RequestAlwaysAuthorization();
             else
                 locationManager.RequestWhenInUseAuthorization();
-#else
+#elif !__TVOS__
             locationManager.RequestAlwaysAuthorization();
 #endif
 
