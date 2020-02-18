@@ -25,33 +25,6 @@ namespace Shiny.Push
         }
 
 
-        public void Start()
-        {
-            //var sdelegate = this.context.Services.Resolve<IPushDelegate>();
-
-            //this.context
-            //    .WhenWillPresentNotification()
-            //    .Where(x => x.Notification.Request.Trigger is UNPushNotificationTrigger)
-            //    .Subscribe(async x =>
-            //    {
-            //        try
-            //        {
-            //            var push = new PushNotification(x.Notification);
-            //            await sdelegate.OnReceived(push);
-            //            this.pushSubject.OnNext(push);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            Log.Write(ex);
-            //        }
-            //        finally
-            //        {
-            //            x.CompletionHandler(UNNotificationPresentationOptions.None);
-            //        }
-            //    });
-        }
-
-
         public override IObservable<IPushNotification> WhenReceived() => this.pushSubject;
 
 
@@ -88,12 +61,22 @@ namespace Shiny.Push
 
         protected static string? ToTokenString(NSData deviceToken)
         {
-            var data = deviceToken.ToArray();            
-            var token = BitConverter
-                .ToString(data)
-                .Replace("-", "")
-                .Replace("\"", "");
-
+            string? token = null;
+            if (deviceToken.Length > 0)
+            {
+                if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                {
+                    var data = deviceToken.ToArray();
+                    token = BitConverter
+                        .ToString(data)
+                        .Replace("-", "")
+                        .Replace("\"", "");
+                }
+                else if (!deviceToken.Description.IsEmpty())
+                {
+                    token = deviceToken.Description.Trim('<', '>');
+                }
+            }
             return token;
         }
     }
