@@ -13,7 +13,7 @@ using Shiny.Logging;
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager, IShinyStartupTask
+    public class PushManager : AbstractPushManager
     {
         readonly Subject<IPushNotification> pushSubject;
 
