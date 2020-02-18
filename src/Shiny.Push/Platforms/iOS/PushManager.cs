@@ -4,7 +4,7 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
-
+using System.Runtime.InteropServices;
 
 namespace Shiny.Push
 {
@@ -66,7 +66,17 @@ namespace Shiny.Push
 
         public static void RegisteredForRemoteNotifications(NSData deviceToken)
         {
-            if (!deviceToken.Description.IsEmpty())
+            if(UIDevice.CurrentDevice.CheckSystemVersion(13,0))
+            {
+                if(deviceToken.Length > 0)
+                {
+                    var result = new byte[deviceToken.Length];
+                    Marshal.Copy(deviceToken.Bytes, result, 0, (int)deviceToken.Length);
+                    var token = BitConverter.ToString(result).Replace("-", string.Empty);
+                    RemoteTokenTask?.SetResult(token);
+                }
+            }
+            else if (!deviceToken.Description.IsEmpty())
             {
                 var token = deviceToken.Description.Trim('<', '>');
                 RemoteTokenTask?.SetResult(token);
