@@ -7,22 +7,22 @@ using Shiny.Logging;
 
 namespace $safeprojectname$.Infrastructure
 {
-    public class CoreServicesImpl : ICoreServices
+    public class CoreServices
     {
-        public CoreServicesImpl(ILocalize localize,
-                                ILogger logger,
-                                IUserDialogs dialogs,
-                                IConnectivity connectivity)
+        public CoreServices(ILocalize localize,
+                            IAppSettings appSettings,
+                            IUserDialogs dialogs,
+                            IConnectivity connectivity)
         {
             this.Localize = localize;
-            this.Logger = logger;
+            this.AppSettings = appSettings;            
             this.Dialogs = dialogs;
             this.Connectivity = connectivity;
         }
 
 
         public ILocalize Localize { get; }
-        public ILogger Logger { get; }
+        public IAppSettings AppSettings { get; }
         public IUserDialogs Dialogs { get; }
         public IConnectivity Connectivity { get; }
     }

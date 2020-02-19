@@ -1,24 +1,23 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
+using Shiny.Prism;
 using Acr.UserDialogs.Forms;
 using $safeprojectname$.Localization.Resx;
 using $safeprojectname$.Data;
-using $safeprojectname$.AppCenterIntegration;
 
 
-namespace $safeprojectname$.Infrastructure
+namespace $safeprojectname$
 {
-    public class ShinyStartup : Startup
+    public class MyShinyStartup : PrismStartup
     {
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.RegisterModule(new AppCenterModule());
             services.RegisterModule(new DataModule());
 
             services.AddSingleton<IUserDialogs, UserDialogs>();
             services.AddSingleton<ILocalize, ResxLocalize>();
-            services.AddSingleton<ICoreServices, CoreServicesImpl>();
+            services.AddSingleton<CoreServices>();
             services.RegisterStartupTask<GlobalExceptionHandler>();
         }
     }

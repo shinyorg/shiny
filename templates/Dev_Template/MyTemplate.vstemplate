@@ -21,8 +21,8 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="ExtensionsPrism.cs">ExtensionsPrism.cs</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="GlobalExceptionHandler.cs">GlobalExceptionHandler.cs</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="InverseBooleanConverter.cs">InverseBooleanConverter.cs</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="ShinyStartup.cs">ShinyStartup.cs</ProjectItem>
-        <ProjectItem ReplaceParameters="true" TargetFileName="CoreServicesImpl.cs">CoreServicesImpl.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="CoreServices.cs">CoreServices.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="AppSettings.cs">AppSettings.cs</ProjectItem>
       </Folder>
       <Folder Name="Styles" TargetFolderName="Styles">
         <ProjectItem ReplaceParameters="true" TargetFileName="Colors.xaml">Colors.xaml</ProjectItem>
@@ -32,6 +32,7 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="Templates.xaml">Templates.xaml</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="Templates.xaml.cs">Templates.xaml.cs</ProjectItem>
       </Folder>
+      <ProjectItem ReplaceParameters="true" TargetFileName="MyShinyStartup.cs">MyShinyStartup.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml">App.xaml</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="App.xaml.cs">App.xaml.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="AssemblyInfo.cs">AssemblyInfo.cs</ProjectItem>

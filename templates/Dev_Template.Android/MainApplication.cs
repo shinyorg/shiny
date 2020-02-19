@@ -1,7 +1,7 @@
 ﻿using System;
 using Android.App;
 using Android.Runtime;
-using $ext_safeprojectname$.Infrastructure;
+using $ext_safeprojectname$;
 using Shiny;
 
 
@@ -12,18 +12,10 @@ namespace $safeprojectname$
 #else
     [Application(Debuggable = false)]
 #endif
-    public class MainApplication : Application
+    public class MainApplication : ShinyAndroidApplication<MyShinyStartup>
     {
-        public MainApplication() : base() { }
         public MainApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
         {
-        }
-
-
-        public override void OnCreate()
-        {
-            base.OnCreate();
-            AndroidShinyHost.Init(this, new ShinyStartup());
         }
     }
 }
