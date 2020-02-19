@@ -5,7 +5,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace $ext_safeprojectname$.Infrastructure
 {
-    public class AppSettings : IAppSettings
+    public class AppSettings : ReactiveObject, IAppSettings
     {
     }
 }
