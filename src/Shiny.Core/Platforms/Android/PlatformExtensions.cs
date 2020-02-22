@@ -18,8 +18,8 @@ namespace Shiny
         public static void ShinyRequestPermissionsResult(this Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
             => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        public static void ShinyOnCreate(this Activity activity, Intent intent)
-            => AndroidShinyHost.TryProcessIntent(intent);
+        public static void ShinyOnCreate(this Activity activity)
+            => AndroidShinyHost.TryProcessIntent(activity.Intent);
 
         public static void ShinyOnNewIntent(this Activity activity, Intent intent)
             => AndroidShinyHost.TryProcessIntent(intent);
