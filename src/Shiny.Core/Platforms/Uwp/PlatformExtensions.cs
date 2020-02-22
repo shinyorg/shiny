@@ -12,6 +12,9 @@ namespace Shiny
         //    //JobBackgroundTask.PeriodicRunTime
         //}
 
+        public static void ShinyInit(this Application app, IShinyStartup? startup = null, IShinyModule? platformModule = null)
+            => UwpShinyHost.Init(app, startup, platformModule);
+
 
         public static void Dispatch(this Action action)
         {
