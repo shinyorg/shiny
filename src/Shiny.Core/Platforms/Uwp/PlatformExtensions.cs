@@ -12,7 +12,7 @@ namespace Shiny
         //    //JobBackgroundTask.PeriodicRunTime
         //}
 
-        public static void ShinyInit(this Application app, IShinyStartup? startup = null, IShinyModule? platformModule = null)
+        public static void ShinyInit(this Windows.UI.Xaml.Application app, IShinyStartup? startup = null, IShinyModule? platformModule = null)
             => UwpShinyHost.Init(app, startup, platformModule);
 
 
