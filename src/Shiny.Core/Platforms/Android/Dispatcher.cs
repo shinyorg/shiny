@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.Content;
+using Android.OS;
 using Shiny.Logging;
 
 
@@ -20,13 +21,14 @@ namespace Shiny
             });
         }
 
-        //static Handler? handler;
-        //public static void Dispatch(this Action action)
-        //{
-        //    if (handler == null || handler.Looper != Looper.MainLooper)
-        //        handler = new Handler(Looper.MainLooper);
 
-        //    handler.Post(action);
-        //}
+        static Handler? handler;
+        public static void Dispatch(this Action action)
+        {
+            if (handler == null || handler.Looper != Looper.MainLooper)
+                handler = new Handler(Looper.MainLooper);
+
+            handler.Post(action);
+        }
     }
 }
