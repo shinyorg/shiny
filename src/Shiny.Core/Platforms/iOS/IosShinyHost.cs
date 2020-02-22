@@ -46,7 +46,7 @@ namespace Shiny
         public static IObservable<NSData> WhenRegisteredForRemoteNotifications()
             => remoteNotifySubj;
 
-        public static void DidReceiveRemoteNotification()
+        public static void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         {
 
         }

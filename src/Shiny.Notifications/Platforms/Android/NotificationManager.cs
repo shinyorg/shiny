@@ -59,17 +59,20 @@ namespace Shiny.Notifications
             else
                 this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
 #endif
+
+            this.context
+                .WhenIntentReceived()
+                .Subscribe(x => this
+                    .services
+                    .Resolve<AndroidNotificationProcessor>()
+                    .TryProcessIntent(x)
+                 );
             // auto process intent?
             //this.context
             //    .WhenActivityStatusChanged()
             //    .Where(x => x.Status == ActivityState.Created)
             //    .Subscribe(x => TryProcessIntent(x.Activity.Intent));
         }
-
-
-        public static void TryProcessIntent(Intent intent) => ShinyHost
-            .Resolve<AndroidNotificationProcessor>()
-            .TryProcessIntent(intent);
 
 
         public async Task Cancel(int id)

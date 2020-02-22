@@ -43,6 +43,13 @@ namespace Shiny
         }
 
 
+        public static void TryProcessIntent(Intent intent)
+        {
+            if (intent != null)
+                Resolve<AndroidContext>()?.IntentSubject.OnNext(intent);
+        }
+
+
         public static void OnBackground([GeneratedEnum] TrimMemory level)
         {
             if (level == TrimMemory.UiHidden || level == TrimMemory.Complete)

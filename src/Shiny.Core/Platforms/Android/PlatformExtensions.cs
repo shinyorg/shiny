@@ -1,7 +1,11 @@
 ﻿using System;
 using Shiny.Logging;
+using Android.App;
 using Android.OS;
+using Android.Content;
+using Android.Content.PM;
 using Java.Util;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Shiny
@@ -9,6 +13,19 @@ namespace Shiny
     public static class PlatformExtensions
     {
         static Handler? handler;
+
+
+        public static void ShinyInit(this Application app, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
+            => AndroidShinyHost.Init(app, startup, platformBuild);
+
+        public static void ShinyRequestPermissionsResult(this Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
+            => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        public static void ShinyOnCreate(this Activity activity, Intent intent)
+            => AndroidShinyHost.TryProcessIntent(intent);
+
+        public static void ShinyOnNewIntent(this Activity activity, Intent intent)
+            => AndroidShinyHost.TryProcessIntent(intent);
 
 
         public static void Dispatch(this Action action)

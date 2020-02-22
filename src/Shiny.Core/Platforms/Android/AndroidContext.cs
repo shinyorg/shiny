@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Reactive.Subjects;
 using Shiny.Logging;
 using Android.App;
 using Android.Content;
@@ -34,6 +35,10 @@ namespace Shiny
                 return this.topActivity.Current;
             }
         }
+
+
+        internal Subject<Intent> IntentSubject { get; } = new Subject<Intent>();
+        public IObservable<Intent> WhenIntentReceived() => this.IntentSubject;
 
 
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
