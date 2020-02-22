@@ -58,7 +58,7 @@ namespace Shiny.Locations
         });
 
 
-        public async Task StartListener(GpsRequest request)
+        public async Task StartListener(GpsRequest? request = null)
         {
             if (this.IsListening)
                 return;
