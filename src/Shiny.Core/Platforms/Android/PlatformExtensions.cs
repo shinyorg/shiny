@@ -12,9 +12,6 @@ namespace Shiny
 {
     public static class PlatformExtensions
     {
-        static Handler? handler;
-
-
         public static void ShinyInit(this Application app, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
             => AndroidShinyHost.Init(app, startup, platformBuild);
 
@@ -26,15 +23,6 @@ namespace Shiny
 
         public static void ShinyOnNewIntent(this Activity activity, Intent intent)
             => AndroidShinyHost.TryProcessIntent(intent);
-
-
-        public static void Dispatch(this Action action)
-        {
-            if (handler == null || handler.Looper != Looper.MainLooper)
-                handler = new Handler(Looper.MainLooper);
-
-            handler.Post(action);
-        }
 
 
         public static long ToEpochMillis(this DateTime sendTime)

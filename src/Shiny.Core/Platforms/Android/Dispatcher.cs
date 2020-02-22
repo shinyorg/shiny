@@ -19,5 +19,14 @@ namespace Shiny
                 pendingResult.Finish();
             });
         }
+
+        //static Handler? handler;
+        //public static void Dispatch(this Action action)
+        //{
+        //    if (handler == null || handler.Looper != Looper.MainLooper)
+        //        handler = new Handler(Looper.MainLooper);
+
+        //    handler.Post(action);
+        //}
     }
 }

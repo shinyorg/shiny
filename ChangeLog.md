@@ -4,7 +4,7 @@
 ---
 
 ### Shiny.Core
-* [Enhancement] Increased discoverability via new AppDelegate & Android app/activity extension methods
+* [Enhancement] Increased discoverability via new AppDelegate & Android app/activity extension methods.   Simply add the Shiny namespace and type this.Shiny to see all of the points you should be attaching
 * [fix][breaking][uwp] UwpShinyHost.Init now requires the UWP application instance is passed as part of the arguments
 * [Feature] App State Delegate - In your shiny startup, use services.AddAppState<YourAppStateDelegate> that inherits from IAppStateDelegate.  Watch for app start, foreground, & background
 * [Feature] PowerManager now has property/inpc for IsEnergySavingEnabled that checks for ios low power, android doze, & uwp energy saving mode

@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="ReactiveUI" Version="11.1.23" />
+        <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection"  Version="9.3.11" />
     </ItemGroup>
 
     <ItemGroup>
