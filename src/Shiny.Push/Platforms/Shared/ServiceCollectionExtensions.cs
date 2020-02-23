@@ -25,7 +25,8 @@ namespace Shiny
             services.RegisterModule(new PushModule(
                 typeof(PushManager),
                 delegateType,
-                requestAccessOnStart
+                requestAccessOnStart,
+                categories
             ));
             return true;
 #endif
