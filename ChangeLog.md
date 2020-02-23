@@ -26,7 +26,7 @@
 
 ### Shiny.Integrations.XamarinForms
 * [Feature] Less boilerplate to wire into XF
-* [Feature] You can now use the DependencyService to Shiny services in your viewmodels
+* [Feature] Instead of ShinyHost.Resolve, you can now use the XF DependencyService.Get
 
 ### [NEW] Shiny.Push
 * Leaving BETA - while this does work with the push notification mechanics, its primary purpose is to provide

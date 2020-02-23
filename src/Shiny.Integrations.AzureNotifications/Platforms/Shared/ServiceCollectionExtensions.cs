@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Notifications;
 using Shiny.Push;
 using Shiny.Push.AzureNotifications;
 
@@ -12,7 +13,8 @@ namespace Shiny
                                                         Type delegateType,
                                                         string listenerConnectionString,
                                                         string hubName,
-                                                        bool requestAccessOnStart = false)
+                                                        bool requestAccessOnStart = false,
+                                                        params NotificationCategory[] categories)
         {
 #if NETSTANDARD2_0
             return false;
@@ -20,7 +22,8 @@ namespace Shiny
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Integrations.AzureNotifications.PushManager),
                 delegateType,
-                requestAccessOnStart
+                requestAccessOnStart,
+                categories
             ));
             services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
             return true;
@@ -31,13 +34,15 @@ namespace Shiny
         public static bool UsePushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services,
                                                                        string listenerConnectionString,
                                                                        string hubName,
-                                                                       bool requestAccessOnStart = false)
+                                                                       bool requestAccessOnStart = false,
+                                                                       params NotificationCategory[] categories)
             where TPushDelegate : class, IPushDelegate
             => services.UsePushAzureNotificationHubs(
                 typeof(TPushDelegate),
                 listenerConnectionString,
                 hubName,
-                requestAccessOnStart
+                requestAccessOnStart,
+                categories
             );
     }
 }
