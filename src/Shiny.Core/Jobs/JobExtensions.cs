@@ -3,6 +3,7 @@ using Shiny.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
+using Shiny.Logging;
 
 namespace Shiny
 {
@@ -20,13 +21,16 @@ namespace Shiny
         {
             services.RegisterPostBuildAction(async sp =>
             {
-                // what if permission fails?
                 var jobs = sp.GetService<IJobManager>();
                 var access = await jobs.RequestAccess();
                 if (access == AccessState.Available)
                     await jobs.Schedule(jobInfo);
+                else
+                    Log.Write("Jobs", "Job permission failed - " + access);
             });
-            services.RegisterJobAppState(jobInfo, states, foregroundInterval);
+
+            if (states != null || foregroundInterval != null)
+                services.AddAppState(new JobAppStateDelegate(jobInfo.Identifier, states, foregroundInterval));
         }
 
 
@@ -42,33 +46,11 @@ namespace Shiny
                                        InternetAccess requiredNetwork = InternetAccess.None,
                                        JobForegroundRunStates? states = null,
                                        TimeSpan? foregroundInterval = null)
-        {
-            services.RegisterPostBuildAction(async sp =>
+            => services.RegisterJob(new JobInfo(jobType, identifier)
             {
-                // what if permission fails?
-                var jobs = sp.GetService<IJobManager>();
-                var access = await jobs.RequestAccess();
-                if (access == AccessState.Available)
-                {
-                    await jobs.Schedule(new JobInfo(jobType, identifier)
-                    {
-                        RequiredInternetAccess = requiredNetwork,
-                        Repeat = true
-                    });
-                }
-            });
-            services.RegisterJobAppState(jobInfo, states, foregroundInterval);
-        }
-
-
-        static void RegisterJobAppState(this IServiceCollection services,
-                                        JobInfo jobInfo,
-                                        JobForegroundRunStates? states,
-                                        TimeSpan? foregroundInterval)
-        {
-            if (states != null || foregroundInterval != null)
-                services.AddAppState(new JobAppStateDelegate(jobInfo.Identifier, states, foregroundInterval));
-        }
+                RequiredInternetAccess = requiredNetwork,
+                Repeat = true
+            }, states, foregroundInterval);
 
 
         public static void SetParameter<T>(this JobInfo job, string key, T value)
