@@ -66,9 +66,4 @@
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Update="Platforms\Shared\ShinyNotificationDelegate.cs">
-        <SubType></SubType>
-      </Compile>
-    </ItemGroup>
 </Project>

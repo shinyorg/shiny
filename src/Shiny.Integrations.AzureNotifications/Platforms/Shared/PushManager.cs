@@ -15,11 +15,20 @@ namespace Shiny.Integrations.AzureNotifications
         readonly NotificationHubClient hub;
 
 #if WINDOWS_UWP
-        public PushManager(AzureNotificationConfig config, IServiceProvider serviceProvider, ISettings settings) : base(serviceProvider, settings)
+        public PushManager(AzureNotificationConfig config,
+                           IServiceProvider serviceProvider,
+                           ISettings settings) : base(serviceProvider, settings)
 #elif __IOS__
         public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
+#elif __ANDROID__
+        public PushManager(AzureNotificationConfig config,
+                           AndroidContext context,
+                           ISettings settings,
+                           IMessageBus bus) : base(context, settings, bus)
 #else
-        public PushManager(AzureNotificationConfig config, ISettings settings, IMessageBus bus) : base(settings, bus)
+        public PushManager(AzureNotificationConfig config,
+                           ISettings settings,
+                           IMessageBus bus) : base(settings, bus)
 #endif
         {
             this.hub = new NotificationHubClient(

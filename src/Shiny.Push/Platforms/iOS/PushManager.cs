@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
@@ -8,24 +9,23 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
-using Shiny.Logging;
 
 
 namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager
     {
-        readonly Subject<IPushNotification> pushSubject;
+        readonly Subject<IDictionary<string, string>> pushSubject;
 
 
         // launch options?  UIApplication.LaunchOptionsRemoteNotificationKey
         public PushManager(ISettings settings) : base(settings)
         {
-            this.pushSubject = new Subject<IPushNotification>();
+            this.pushSubject = new Subject<IDictionary<string, string>>();
         }
 
 
-        public override IObservable<IPushNotification> WhenReceived() => this.pushSubject;
+        public override IObservable<IDictionary<string, string>> WhenReceived() => this.pushSubject;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)

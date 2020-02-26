@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Subjects;
@@ -11,18 +12,18 @@ namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager
     {
-        readonly Subject<IPushNotification> pushSubject;
+        readonly Subject<IDictionary<string, string>> pushSubject;
         readonly IServiceProvider serviceProvider;
 
 
         public PushManager(IServiceProvider serviceProvider, ISettings settings) : base(settings)
         {
-            this.pushSubject = new Subject<IPushNotification>();
+            this.pushSubject = new Subject<IDictionary<string, string>>();
             this.serviceProvider = serviceProvider;
         }
 
 
-        public override IObservable<IPushNotification> WhenReceived() => this.pushSubject;
+        public override IObservable<IDictionary<string, string>> WhenReceived() => this.pushSubject;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)

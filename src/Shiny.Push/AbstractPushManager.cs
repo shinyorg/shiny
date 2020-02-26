@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Settings;
@@ -12,7 +13,7 @@ namespace Shiny.Push
         protected AbstractPushManager(ISettings settings) => this.settings = settings;
 
 
-        public abstract IObservable<IPushNotification> WhenReceived();
+        public abstract IObservable<IDictionary<string, string>> WhenReceived();
         public abstract Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default);
         public abstract Task UnRegister();
 

@@ -7,19 +7,22 @@ using Firebase.Messaging;
 using Shiny.Settings;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
-
+using Android.Gms.Common;
+using System.Collections.Generic;
 
 namespace Shiny.Push
 {
     public class PushManager : Java.Lang.Object, IOnCompleteListener, IPushManager
     {
+        readonly AndroidContext context;
         readonly ISettings settings;
-        readonly IMessageBus bus;
+        readonly IMessageBus bus;        
         TaskCompletionSource<string>? taskSrc = null;
 
 
-        public PushManager(ISettings settings, IMessageBus bus)
+        public PushManager(AndroidContext context, ISettings settings, IMessageBus bus)
         {
+            this.context = context;
             this.settings = settings;
             this.bus = bus;
         }
@@ -53,11 +56,16 @@ namespace Shiny.Push
 
         public virtual async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            //int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
-            //if (resultCode != ConnectionResult.Success)
-            //{
-            //    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
-            //        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
+            //var resultCode = GoogleApiAvailability
+            //    .Instance
+            //    .IsGooglePlayServicesAvailable(this.context.AppContext);
+
+            //if (resultCode != ConnectionResult.ServiceMissing)
+            //{ 
+            ////{
+            ////    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
+            ////        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
+            //}
             this.taskSrc = new TaskCompletionSource<string>();
             using (cancelToken.Register(() => this.taskSrc.TrySetCanceled()))
             {
@@ -83,7 +91,7 @@ namespace Shiny.Push
             await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId());
         }
 
-        public IObservable<IPushNotification> WhenReceived()
-            => this.bus.Listener<IPushNotification>();
+        public IObservable<IDictionary<string, string>> WhenReceived()
+            => this.bus.Listener<Dictionary<string, string>>(nameof(ShinyFirebaseService));
     }
 }
