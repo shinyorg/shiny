@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>Shiny addon for speech recognition on mobile platforms</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.mac20;monoandroid90;tizen50</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>        
     </PropertyGroup>
 
@@ -22,7 +22,14 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
-
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\macOS\**\*.cs" />
+        <Reference Include="netstandard" />
+    </ItemGroup> 
+    
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
@@ -34,4 +41,11 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\Tizen\**\*.cs" />
+    </ItemGroup> 
+
 </Project>
