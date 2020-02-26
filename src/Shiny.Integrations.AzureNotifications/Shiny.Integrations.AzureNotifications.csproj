@@ -1,7 +1,6 @@
 <Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <VersionSuffix>beta</VersionSuffix>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
         <Description>Shiny Integration - Microsoft Azure Notification Hubs</Description>

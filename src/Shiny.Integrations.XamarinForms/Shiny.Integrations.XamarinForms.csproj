@@ -26,5 +26,4 @@
         <Compile Include="Platforms\Android\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
-
 </Project>

@@ -23,16 +23,19 @@ namespace Shiny
 
         protected virtual void RegisterPlatformServices(IServiceCollection services) {}
 
+        public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+            => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);
+
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
-            => iOSShinyHost.RegisteredForRemoteNotifications(deviceToken);
+            => this.ShinyRegisteredForRemoteNotifications(deviceToken);
 
         public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
-            => iOSShinyHost.FailedToRegisterForRemoteNotifications(error);
+            => this.ShinyFailedToRegisterForRemoteNotifications(error);
 
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-            => iOSShinyHost.PerformFetch(completionHandler);
+            => this.ShinyPerformFetch(completionHandler);
 
         public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
-            => iOSShinyHost.HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
+            => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
     }
 }
