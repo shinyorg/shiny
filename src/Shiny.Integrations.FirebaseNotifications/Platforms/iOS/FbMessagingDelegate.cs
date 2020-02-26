@@ -7,16 +7,22 @@ namespace Shiny.Integrations.FirebaseNotifications
 {
     public class FbMessagingDelegate : NSObject, IMessagingDelegate
     {
-        public void DidReceiveMessage(Messaging messaging, RemoteMessage message)
-        {
+        readonly Action<RemoteMessage> onMessage;
+        readonly Action<string> onToken;
+        
 
+        public FbMessagingDelegate(Action<RemoteMessage> onMessage, Action<string> onToken)
+        {
+            this.onMessage = onMessage;
+            this.onToken = onToken;
         }
+
+
+        public void DidReceiveMessage(Messaging messaging, RemoteMessage message)
+            => this.onMessage(message);
 
 
         public void DidReceiveRegistrationToken(Messaging messaging, string fcmToken)
-        {
-            // TODO: update current token
-            // TODO: fire shiny delegate
-        }
+            => this.onToken(fcmToken);
     }
 }
