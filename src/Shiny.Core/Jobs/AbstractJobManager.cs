@@ -121,7 +121,6 @@ namespace Shiny.Jobs
 
         public async Task Schedule(JobInfo jobInfo)
         {
-            jobInfo.AssertValid();
             this.ResolveJob(jobInfo);
             this.ScheduleNative(jobInfo);
             await this.repository.Set(jobInfo.Identifier, PersistJobInfo.ToPersist(jobInfo));
