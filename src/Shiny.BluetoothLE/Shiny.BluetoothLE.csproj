@@ -37,7 +37,7 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />        
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
@@ -47,17 +47,17 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Reference Include="netstandard" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\tizen\**\*.cs" />        
+        <Compile Include="**\Platforms\tizen\**\*.cs" />
     </ItemGroup>
 </Project>

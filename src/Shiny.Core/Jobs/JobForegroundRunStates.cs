@@ -9,6 +9,9 @@ namespace Shiny.Jobs
         None = 0,
         Started = 1,
         Resumed = 2,
-        Backgrounded = 4
+        Backgrounded = 4,
+        InternetAvailableAny = 8,
+        InternetAvailableWifi = 16,
+        DeviceCharging = 32
     }
 }

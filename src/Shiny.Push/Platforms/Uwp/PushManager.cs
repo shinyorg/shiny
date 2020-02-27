@@ -6,7 +6,8 @@ using System.Reactive.Subjects;
 using Windows.Networking.PushNotifications;
 using Shiny.Logging;
 using Shiny.Settings;
-
+using System.Linq;
+using System.IO.IsolatedStorage;
 
 namespace Shiny.Push
 {
@@ -31,7 +32,7 @@ namespace Shiny.Push
             var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
             //channel.ExpirationTime - persist and deal with this
             channel.PushNotificationReceived += this.OnPushNotification;
-            //this.pushSubject.OnNext(push);
+
 
             return new PushAccessState(AccessState.Available, channel.Uri);
         }
@@ -40,12 +41,25 @@ namespace Shiny.Push
         public override Task UnRegister() => Task.CompletedTask;
 
 
-        void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => Log.SafeExecute(async () =>
+        async void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => await this.serviceProvider.SafeResolveAndExecute<IPushDelegate>(async sdelegate =>
         {
+            //using (var s = new IsolatedStorageFileStream("", System.IO.FileMode.Open))
+            //{
+
+            //}
+            await sdelegate.OnReceived(e
+                .RawNotification
+                .Headers
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Value
+                )
+            );
+            //e.BadgeNotification
             //await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
             //this.CurrentRegistrationToken = e.RawNotification.Ur
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            e.Cancel = true;
+            //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            //e.Cancel = true;
         });
     }
 }

@@ -1,10 +1,15 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Threading.Tasks;
+﻿using System;
 
 
-//namespace Shiny.Infrastructure
-//{
+namespace Shiny.Infrastructure
+{
+    public interface IStore
+    {
+        void Set(string key, object value);
+        object Get(Type objectType, string key);
+        bool Contains(string key);
+    }
+}
 //    public interface IEntity
 //    {
 //        public string Id { get; set; }
