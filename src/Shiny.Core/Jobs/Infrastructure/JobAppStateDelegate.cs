@@ -67,9 +67,12 @@ namespace Shiny.Jobs.Infrastructure
                     nameof(JobAppStateDelegate),
                     async ct =>
                     {
-                        foreach (var job in jobs)
-                            if (!ct.IsCancellationRequested)
-                                await this.jobManager.Run(job.Identifier, ct);
+                        using (ct.Register(() => running = false))
+                        {
+                            foreach (var job in jobs)
+                                if (!ct.IsCancellationRequested)
+                                    await this.jobManager.Run(job.Identifier, ct);
+                        }
                     }
                 );
             }
@@ -92,7 +95,7 @@ namespace Shiny.Jobs.Infrastructure
                 this.powerManager
                     .WhenChargingChanged()
                     .Where(x => x == true)
-                    .Subscribe(x => this.TryRun())
+                    .Subscribe(x => this.TryRun(x => x.Repeat && x.DeviceCharging))
             );
 
             this.connectivity
@@ -100,14 +103,11 @@ namespace Shiny.Jobs.Infrastructure
                 .Where(x => x == true)
                 .Subscribe(x =>
                 {
-                    //if (this.connectivity.Value.IsDirectConnect() && unmeter)
-                    //{
-                    //    this.TryRun();
-                    //}
-                    //else if (any)
-                    //{
-                    //    this.TryRun();
-                    //}
+                    if (this.connectivity.IsDirectConnect())
+                        this.TryRun(x => x.Repeat && (x.RequiredInternetAccess == InternetAccess.Any || x.RequiredInternetAccess == InternetAccess.Unmetered));
+
+                    else
+                        this.TryRun(x => x.Repeat && x.RequiredInternetAccess == InternetAccess.Any);
                 });
         }
     }
