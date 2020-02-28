@@ -72,7 +72,7 @@ namespace Shiny.Net.Http
             var id = cursor.GetLong(Native.ColumnId).ToString();
             var fileSize = cursor.GetLong(Native.ColumnTotalSizeBytes);
             var bytesTransferred = cursor.GetLong(Native.ColumnBytesDownloadedSoFar);
-            var uri = cursor.GetString(Native.ColumnLocalUri);
+            var uri = cursor.GetString(Native.ColumnUri);
             var localPath = cursor.GetString(Native.ColumnDescription); // temp piggybacking
             var nstatus = (DownloadStatus)cursor.GetInt(Native.ColumnStatus);
 
@@ -108,7 +108,6 @@ namespace Shiny.Net.Http
             var reason = (DownloadPausedReason)cursor.GetInt(Native.ColumnReason);
             switch (reason)
             {
-
                 case DownloadPausedReason.QueuedForWifi:
                     return HttpTransferState.PausedByCostedNetwork;
 
