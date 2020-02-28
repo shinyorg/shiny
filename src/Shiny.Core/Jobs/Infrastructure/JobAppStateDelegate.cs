@@ -1,68 +1,79 @@
 ﻿using System;
-using System.Reactive.Linq;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Shiny.Net;
 using Shiny.Power;
 
 
 namespace Shiny.Jobs.Infrastructure
 {
-    public class JobAppStateDelegate : ShinyAppStateDelegate
+    public class JobAppStateDelegate : IAppStateDelegate
     {
-        readonly Lazy<IJobManager> jobManager = ShinyHost.LazyResolve<IJobManager>();
-        readonly Lazy<IPowerManager> powerManager = ShinyHost.LazyResolve<IPowerManager>();
-        readonly Lazy<IConnectivity> connectivity = ShinyHost.LazyResolve<IConnectivity>();
-
-        readonly string jobIdentifier;
-        readonly JobForegroundRunStates? states;
-        readonly TimeSpan? foregroundInterval;
+        public static TimeSpan Interval { get; set; } = TimeSpan.FromSeconds(60);
+        readonly IJobManager jobManager;
+        readonly IPowerManager powerManager;
+        readonly IConnectivity connectivity;
         CompositeDisposable? disposer;
 
 
-        public JobAppStateDelegate(string jobIdentifier,
-                                   JobForegroundRunStates? states,
-                                   TimeSpan? foregroundInterval)
+        public JobAppStateDelegate(IJobManager jobManager,
+                                      IPowerManager powerManager,
+                                      IConnectivity connectivity)
         {
-            this.jobIdentifier = jobIdentifier;
-            this.states = states;
-            this.foregroundInterval = foregroundInterval;
+            this.jobManager = jobManager;
+            this.powerManager = powerManager;
+            this.connectivity = connectivity;
         }
 
 
-        public override void OnBackground()
+        public void OnStart()
         {
-            this.TryRun(JobForegroundRunStates.Backgrounded);
+            this.Set();
+            this.TryRun();
+        }
+
+
+        public void OnForeground()
+        {
+            this.Set();
+            this.TryRun();
+        }
+
+        public void OnBackground()
+        {
             this.disposer?.Dispose();
             this.disposer = null;
+            this.TryRun();
         }
 
 
-        public override void OnForeground()
+        static bool running = false;
+        async Task TryRun(Func<JobInfo, bool>? predicate = null)
         {
-            this.TryRun(JobForegroundRunStates.Resumed);
-            this.Set();
-        }
+            if (running)
+                return;
 
+            running = true;
+            var jobs = await this.jobManager.GetJobs();
+            if (predicate != null)
+                jobs = jobs.Where(predicate);
 
-        public override void OnStart()
-        {
-            this.TryRun(JobForegroundRunStates.Started);
-            this.Set();
-        }
-
-
-        void TryRun(JobForegroundRunStates current)
-        {
-            if (this.states?.HasFlag(current) ?? false)
-                this.TryRun();
-        }
-
-
-        async void TryRun()
-        {
-            var job = await this.jobManager.Value.GetJob(this.jobIdentifier);
-            if (job != null)
-                await this.jobManager.Value.Run(this.jobIdentifier);
+            if (jobs.Any())
+            {
+                this.jobManager.RunTask(
+                    nameof(JobAppStateDelegate),
+                    async ct =>
+                    {
+                        foreach (var job in jobs)
+                            if (!ct.IsCancellationRequested)
+                                await this.jobManager.Run(job.Identifier, ct);
+                    }
+                );
+            }
+            running = false;
         }
 
 
@@ -70,54 +81,34 @@ namespace Shiny.Jobs.Infrastructure
         {
             this.disposer ??= new CompositeDisposable();
 
-            if (this.foregroundInterval != null)
-            {
-                this.disposer.Add
-                (
-                    Observable
-                        .Interval(this.foregroundInterval.Value)
-                        .Subscribe(_ => this.TryRun())
-                );
-            }
+            this.disposer.Add
+            (
+                Observable
+                    .Interval(Interval)
+                    .Subscribe(_ => this.TryRun())
+            );
+            this.disposer.Add
+            (
+                this.powerManager
+                    .WhenChargingChanged()
+                    .Where(x => x == true)
+                    .Subscribe(x => this.TryRun())
+            );
 
-            if (this.states != null)
-            {
-                if (this.states.Value.HasFlag(JobForegroundRunStates.DeviceCharging))
+            this.connectivity
+                .WhenInternetStatusChanged()
+                .Where(x => x == true)
+                .Subscribe(x =>
                 {
-                    this.disposer.Add
-                    (
-                        this.powerManager
-                            .Value
-                            .WhenChargingChanged()
-                            .Where(x => x == true)
-                            .Subscribe(x => this.TryRun())
-                    );
-                }
-
-                var any = this.states.Value.HasFlag(JobForegroundRunStates.InternetAvailableAny);
-                var wifi = this.states.Value.HasFlag(JobForegroundRunStates.InternetAvailableWifi);
-                if (any || wifi)
-                {
-                    this.disposer.Add
-                    (
-                        this.connectivity
-                            .Value
-                            .WhenInternetStatusChanged()
-                            .Where(x => x == true)
-                            .Subscribe(x =>
-                            {
-                                if (this.connectivity.Value.IsDirectConnect() && wifi)
-                                {
-                                    this.TryRun();
-                                }
-                                else if (any)
-                                {
-                                    this.TryRun();
-                                }
-                            })
-                    );
-                }
-            }
+                    //if (this.connectivity.Value.IsDirectConnect() && unmeter)
+                    //{
+                    //    this.TryRun();
+                    //}
+                    //else if (any)
+                    //{
+                    //    this.TryRun();
+                    //}
+                });
         }
     }
 }

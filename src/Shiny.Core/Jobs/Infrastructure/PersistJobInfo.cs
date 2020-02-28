@@ -12,6 +12,7 @@ namespace Shiny.Jobs.Infrastructure
         public bool Repeat { get; set; }
         public bool BatteryNotLow { get; set; }
         public bool DeviceCharging { get; set; }
+        public bool RunOnForeground { get; set; }
         public double? PeriodicTimeSeconds { get; set; }
         public DateTime? LastRunUtc { get; set; }
         public InternetAccess RequiredInternetAccess { get; set; }
@@ -36,6 +37,7 @@ namespace Shiny.Jobs.Infrastructure
                 DeviceCharging = job.DeviceCharging,
                 BatteryNotLow = job.BatteryNotLow,
                 RequiredInternetAccess = job.RequiredInternetAccess,
+                RunOnForeground = job.RunOnForeground,
                 Parameters = job.Parameters
             };
             if (job.PeriodicTimeSeconds != null)
@@ -55,6 +57,7 @@ namespace Shiny.Jobs.Infrastructure
             DeviceCharging = job.DeviceCharging,
             BatteryNotLow = job.BatteryNotLow,
             RequiredInternetAccess = job.RequiredInternetAccess,
+            RunOnForeground = job.RunOnForeground,
             Parameters = job.Parameters
         };
     }

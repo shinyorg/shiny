@@ -30,6 +30,7 @@ namespace Shiny.Jobs
         public bool Repeat { get; set; } = true;
         public bool DeviceCharging { get; set; }
         public bool BatteryNotLow { get; set; }
+        public bool RunOnForeground { get; set; }
 
         /// <summary>
         /// Calling JobManager.Clear will not remove this task

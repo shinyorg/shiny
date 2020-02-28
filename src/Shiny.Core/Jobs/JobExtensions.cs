@@ -5,19 +5,28 @@ using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 using Shiny.Logging;
 
+
 namespace Shiny
 {
     public static class JobExtensions
     {
         /// <summary>
+        /// This will run any jobs marked with RunOnForeground
+        /// </summary>
+        /// <param name="services"></param>
+        public static void UseJobForegroundService(this IServiceCollection services, TimeSpan interval)
+        {
+            JobAppStateDelegate.Interval = interval;
+            services.AddAppState<JobAppStateDelegate>();
+        }
+
+
+        /// <summary>
         /// Register a job on the job manager
         /// </summary>
         /// <param name="services"></param>
         /// <param name="jobInfo"></param>
-        public static void RegisterJob(this IServiceCollection services,
-                                       JobInfo jobInfo,
-                                       JobForegroundRunStates? states = null,
-                                       TimeSpan? foregroundInterval = null)
+        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
         {
             services.RegisterPostBuildAction(async sp =>
             {
@@ -28,9 +37,6 @@ namespace Shiny
                 else
                     Log.Write("Jobs", "Job permission failed - " + access);
             });
-
-            if (states != null || foregroundInterval != null)
-                services.AddAppState(new JobAppStateDelegate(jobInfo.Identifier, states, foregroundInterval));
         }
 
 
@@ -43,14 +49,12 @@ namespace Shiny
         public static void RegisterJob(this IServiceCollection services,
                                        Type jobType,
                                        string? identifier = null,
-                                       InternetAccess requiredNetwork = InternetAccess.None,
-                                       JobForegroundRunStates? states = null,
-                                       TimeSpan? foregroundInterval = null)
+                                       InternetAccess requiredNetwork = InternetAccess.None)
             => services.RegisterJob(new JobInfo(jobType, identifier)
             {
                 RequiredInternetAccess = requiredNetwork,
                 Repeat = true
-            }, states, foregroundInterval);
+            });
 
 
         public static void SetParameter<T>(this JobInfo job, string key, T value)
