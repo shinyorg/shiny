@@ -62,9 +62,11 @@ namespace YourNamespace
 
 3. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
 
+using Shiny;
+
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
 {
-    Shiny.AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+    this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
 
@@ -83,7 +85,8 @@ IOS
 
 * Add the following as the first line in your AppDelegate.cs - FinishedLaunching method
 
-Shiny.iOSShinyHost.Init(new YourStartup());
+using Shiny;
+this.ShinyFinishedLaunching(new YourStartup());
 
 
 ** IOS JOBS **
@@ -116,7 +119,8 @@ UWP
 
 1. Add the following to your App.xaml.cs constructor
 
-Shiny.UwpShinyHost.Init(new YourStartup());
+using Shiny;
+this.ShinyInit(new YourStartup());
 
 
 2. Add the following to your Package.appxmanifest under the <Application><Extensions> node

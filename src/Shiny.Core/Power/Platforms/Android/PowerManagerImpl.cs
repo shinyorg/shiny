@@ -43,7 +43,6 @@ namespace Shiny.Power
                     pm.IsDeviceIdleMode &&
                     !pm.IsIgnoringBatteryOptimizations(this.context.Package.PackageName)
             );
-
         public PowerState Status => this.context.GetIntentValue(Intent.ActionBatteryChanged, ToState);
         public int BatteryLevel => this.context.GetIntentValue(Intent.ActionBatteryChanged, ToLevel);
         
