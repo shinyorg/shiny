@@ -11,6 +11,7 @@ namespace Shiny.Net
 
         public NetworkAccess Access => throw new NotImplementedException();
 
+        public string? CellularCarrier => throw new NotImplementedException();
 
         protected override void OnNpcHookChanged(bool hasSubscribers)
         {

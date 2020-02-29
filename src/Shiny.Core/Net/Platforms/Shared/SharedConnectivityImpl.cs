@@ -24,6 +24,9 @@ namespace Shiny.Net
         }
 
 
+        public string? CellularCarrier => null;
+
+
         protected override void OnNpcHookChanged(bool hasSubscribers)
         {
             if (hasSubscribers)

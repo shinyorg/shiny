@@ -12,6 +12,9 @@ namespace Shiny
 {
     public static class PlatformExtensions
     {
+        public static bool IsNull(this Java.Lang.Object obj)
+            => obj == null || obj.Handle == IntPtr.Zero;
+
         public static void ShinyInit(this Application app, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
             => AndroidShinyHost.Init(app, startup, platformBuild);
 

@@ -1,10 +1,13 @@
 ﻿using System;
-
+using CoreTelephony;
 
 namespace Shiny.Net
 {
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
+        readonly CTTelephonyNetworkInfo cellular = new CTTelephonyNetworkInfo();
+
+
         public NetworkReach Reach
         {
             get
@@ -56,12 +59,32 @@ namespace Shiny.Net
         }
 
 
+        public string? CellularCarrier => this.cellular.SubscriberCellularProvider?.CarrierName;
+        //{
+        //    get
+        //    {
+        //        var tel = new CTTelephonyNetworkInfo();
+        //        //tel.CellularProviderUpdatedEventHandler
+        //        //tel.CurrentRadioAccessTechnology
+        //        //tel.ServiceSubscriberCellularProvidersDidUpdateNotifier
+        //        //tel.ServiceCurrentRadioAccessTechnology
+        //        return tel.SubscriberCellularProvider.CarrierName;
+        //    }
+        //}
+
         protected override void OnNpcHookChanged(bool hasSubscribers)
         {
             if (hasSubscribers)
+            {
                 Reachability.ReachabilityChanged += this.OnReachChanged;
+                this.cellular.CellularProviderUpdatedEventHandler = carrier =>
+                    this.RaisePropertyChanged(nameof(this.CellularCarrier));
+            }
             else
+            {
                 Reachability.ReachabilityChanged -= this.OnReachChanged;
+                this.cellular.CellularProviderUpdatedEventHandler = null;
+            }
         }
 
 

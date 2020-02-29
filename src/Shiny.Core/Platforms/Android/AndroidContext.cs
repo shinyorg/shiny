@@ -40,6 +40,9 @@ namespace Shiny
         internal Subject<Intent> IntentSubject { get; } = new Subject<Intent>();
         public IObservable<Intent> WhenIntentReceived() => this.IntentSubject;
 
+        public T GetSystemService<T>(string key) where T: Java.Lang.Object
+            => (T)this.AppContext.GetSystemService(key);
+
 
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
         {

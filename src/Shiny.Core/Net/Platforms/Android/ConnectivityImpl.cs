@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Android.Content;
 using Android.Net;
+using Android.Telephony;
 
 
 namespace Shiny.Net
@@ -10,7 +11,6 @@ namespace Shiny.Net
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
         readonly AndroidContext context;
-        ConnectivityManager? connectivityMgr;
         IDisposable? netmon;
 
 
@@ -18,6 +18,9 @@ namespace Shiny.Net
         {
             this.context = context;
         }
+
+
+        public string? CellularCarrier => this.Telephone.NetworkOperatorName;
 
 
         NetworkReach reach;
@@ -123,14 +126,28 @@ namespace Shiny.Net
         }
 
 
+        ConnectivityManager? connectivityMgr;
         ConnectivityManager Connectivity
         {
             get
             {
-                if (this.connectivityMgr == null || this.connectivityMgr.Handle == IntPtr.Zero)
-                    this.connectivityMgr = (ConnectivityManager) this.context.AppContext.GetSystemService(Context.ConnectivityService);
+                if (this.connectivityMgr.IsNull())
+                    this.connectivityMgr = this.context.GetSystemService<ConnectivityManager>(Context.ConnectivityService);
 
                 return this.connectivityMgr;
+            }
+        }
+
+
+        TelephonyManager? telManager;
+        TelephonyManager Telephone
+        {
+            get
+            {
+                if (this.telManager.IsNull()
+                    this.telManager = this.context.GetSystemService<TelephonyManager>(Context.TelephonyService);
+
+                return this.telManager;
             }
         }
     }
