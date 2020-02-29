@@ -11,7 +11,10 @@
 * [Enhancement][iOS][Android] Easier boilerplate setup
 * [Enhancement][Android] AndroidX support on android 10 targets - WorkManager replaces JobService under the hood
 * [Enhancement] Message bus name-only void events
+* [Enhancement] Connectivity now exposes cellular carrier
+* [Enhancement] Power Manager now exposes energy saver mode detection
 * [Feature] Ability to run jobs on timers while the application is in the foreground or app state changes (starting, resuming, or backgrounding)
+
 
 ### Shiny.Notifications
 * [Enhancement][Breaking] New way to set notification sounds which allows you to use system sounds - Notification.CustomSoundFilePath has been removed
