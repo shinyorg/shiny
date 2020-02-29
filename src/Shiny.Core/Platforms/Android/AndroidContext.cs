@@ -44,6 +44,13 @@ namespace Shiny
             => (T)this.AppContext.GetSystemService(key);
 
 
+        public TValue GetSystemServiceValue<TValue, TSysType>(string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
+        {
+            using (var type = this.GetSystemService<TSysType>(systemTypeName))
+                return func(type);
+        }
+
+
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
         {
             if (this.topActivity.Current != null)
@@ -72,6 +79,7 @@ namespace Shiny
 
         public bool IsMinApiLevel(int apiLevel)
             => (int)Android.OS.Build.VERSION.SdkInt >= apiLevel;
+
 
         public void FirePermission(int requestCode, string[] permissions, NativePerm[] grantResult)
             => this.PermissionResult?.Invoke(this, new PermissionRequestResult(requestCode, permissions, grantResult));

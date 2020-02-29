@@ -36,15 +36,14 @@ namespace Shiny.Power
         }
 
 
-        public bool IsEnergySavingEnabled
-        {
-            get
-            {
-                
-                using (var pm = (PowerManager)this.context.AppContext.GetSystemService(Context.PowerService))
-                    return pm.IsDeviceIdleMode && !pm.IsIgnoringBatteryOptimizations(this.context.Package.PackageName);
-            }
-        }
+        public bool IsEnergySavingEnabled => this.context
+            .GetSystemServiceValue<bool, PowerManager>(
+                Context.PowerService,
+                pm =>
+                    pm.IsDeviceIdleMode &&
+                    !pm.IsIgnoringBatteryOptimizations(this.context.Package.PackageName)
+            );
+
         public PowerState Status => this.context.GetIntentValue(Intent.ActionBatteryChanged, ToState);
         public int BatteryLevel => this.context.GetIntentValue(Intent.ActionBatteryChanged, ToLevel);
         
