@@ -144,7 +144,7 @@ namespace Shiny.Net
         {
             get
             {
-                if (this.telManager.IsNull()
+                if (this.telManager.IsNull())
                     this.telManager = this.context.GetSystemService<TelephonyManager>(Context.TelephonyService);
 
                 return this.telManager;
