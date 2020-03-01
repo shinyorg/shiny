@@ -15,7 +15,6 @@
 * [Enhancement] Power Manager now exposes energy saver mode detection
 * [Feature] Ability to run jobs on timers while the application is in the foreground or app state changes (starting, resuming, or backgrounding)
 
-
 ### Shiny.Notifications
 * [Enhancement][Breaking] New way to set notification sounds which allows you to use system sounds - Notification.CustomSoundFilePath has been removed
 * [Enhancement][Android] AndroidX support on android 10 targets
@@ -28,6 +27,7 @@
 * [Fix][GPS][BREAKING] RequestAccess, WhenStatusChanged, and GetCurrentStatus all now accept GpsRequest to increase the scope/accuracy of the necessary permission checks
 * [Fix][GPS][Android] RequestAccess now checks for new Android 10 permission for ACCESS_BACKGROUND_LOCATION
 * [Feature] Added full background GPS geofence module - use at own risk
+* [Feature][Android] If Google Play Services is not available, we switch to the GPS direct module
 
 ### Shiny.Integrations.XamarinForms
 * [Feature] Less boilerplate to wire into XF

@@ -52,11 +52,22 @@ namespace Shiny
         /// <param name="services"></param>
         /// <returns></returns>
         public static bool UseGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+            => services.UseGpsDirectGeofencing(typeof(T));
+
+
+        /// <summary>
+        /// This uses background GPS in realtime broadcasts to monitor geofences - DO NOT USE THIS IF YOU DON"T KNOW WHAT YOU ARE DOING
+        /// It is potentially hostile to battery life
+        /// </summary>        
+        /// <param name="services"></param>
+        /// <param name="delegateType"></param>
+        /// <returns></returns>
+        public static bool UseGpsDirectGeofencing(this IServiceCollection services, Type delegateType)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.AddSingleton<IGeofenceDelegate, T>();
+            services.AddSingleton<IGeofenceDelegate>(delegateType);
             services.AddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
             services.UseGps<GpsGeofenceDelegate>();
             return true;

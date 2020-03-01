@@ -2,6 +2,10 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Logging;
+#if __ANDROID__
+using Android.App;
+using Android.Gms.Common;
+#endif
 
 namespace Shiny.Locations
 {
@@ -21,12 +25,30 @@ namespace Shiny.Locations
         public override void Register(IServiceCollection services)
         {
 #if __ANDROID__
-            services.AddSingleton<GeofenceProcessor>();
+            var resultCode = GoogleApiAvailability
+                .Instance
+                .IsGooglePlayServicesAvailable(Application.Context);
+
+            if (resultCode == ConnectionResult.ServiceMissing)
+            {
+                services.UseGpsDirectGeofencing(this.delegateType);
+            }
+            else
+            {
+                services.AddSingleton<GeofenceProcessor>();
+                services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
+                services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            }
+            
 #elif WINDOWS_UWP
             services.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
-#endif
             services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
             services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+#else
+            services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
+            services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+#endif
+
         }
 
 
