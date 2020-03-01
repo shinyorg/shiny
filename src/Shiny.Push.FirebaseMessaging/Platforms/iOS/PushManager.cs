@@ -8,7 +8,7 @@ using Shiny.Push;
 using Shiny.Settings;
 
 
-namespace Shiny.Integrations.FirebaseNotifications
+namespace Shiny.Push.FirebaseMessaging
 {
     public class PushManager : Shiny.Push.PushManager
     {

@@ -3,7 +3,7 @@ using Foundation;
 using Firebase.CloudMessaging;
 
 
-namespace Shiny.Integrations.FirebaseNotifications
+namespace Shiny.Push.FirebaseMessaging
 {
     public class FbMessagingDelegate : NSObject, IMessagingDelegate
     {

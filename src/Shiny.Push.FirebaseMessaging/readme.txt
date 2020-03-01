@@ -1,6 +1,6 @@
--------------------
-Shiny.Push
--------------------
+----------------------------------------
+Shiny.Integrations.FirebaseNotifications
+----------------------------------------
 
 GitHub: https://github.com/shinyorg/Shiny
 Samples: https://github.com/shinyorg/ShinySamples
@@ -9,11 +9,9 @@ Blog: https://allancritchie.net
 
 Please star this project on GitHub if you use it in your projects
 
-
 ---
 iOS
 ---
-https://docs.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-ios-push-notification-apns-get-started
 
 Follow https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/deprecated/remote-notifications-in-ios
 
@@ -31,7 +29,6 @@ public override void FailedToRegisterForRemoteNotifications(UIApplication applic
 ----
 Android
 ---
-https://docs.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm
 
 Ensure the following libraries are installed in your ANDROID HEAD PROJECT
 
@@ -63,9 +60,3 @@ public override void OnRequestPermissionsResult(int requestCode, string[] permis
     this.Shiny.OnRequestPermissionsResult(requestCode, permissions, grantResults);
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
-
-------
-UWP
-------
-
-TODO

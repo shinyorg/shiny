@@ -140,12 +140,12 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [PushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.svg
 [PushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push
 
-[AzureHubPushNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.AzureNotifications.svg
-[AzureHubPushNuget]: https://www.nuget.org/packages/Shiny.Integrations.AzureNotifications/
-[AzureHubPushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.AzureNotifications.svg
-[AzureHubPushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.AzureNotifications
+[AzureHubPushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.AzureNotificationHubs.svg
+[AzureHubPushNuget]: https://www.nuget.org/packages/Shiny.Push.AzureNotificationHubs/
+[AzureHubPushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.AzureNotificationHubs.svg
+[AzureHubPushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.AzureNotificationHubs
 
-[FirebasePushNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.FirebaseNotifications.svg
-[FirebasePushNuget]: https://www.nuget.org/packages/Shiny.Integrations.FirebaseNotifications/
-[FirebasePushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.FirebaseNotifications.svg
-[FirebasePushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.FirebaseNotifications
+[FirebasePushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.FirebaseMessaging.svg
+[FirebasePushNuget]: https://www.nuget.org/packages/Shiny.Push.FirebaseMessaging/
+[FirebasePushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.FirebaseMessaging.svg
+[FirebasePushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.FirebaseMessaging

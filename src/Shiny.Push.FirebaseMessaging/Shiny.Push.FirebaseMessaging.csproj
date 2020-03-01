@@ -1,0 +1,35 @@
+<Project Sdk="MSBuild.Sdk.Extras">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
+        <Description>Shiny Push Integration - Firebase Messaging</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="Platforms\**\*.cs" />
+        <None Include="Platforms\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
+        <PackageReference Include="Xamarin.Firebase.iOS.Core" Version="6.6.0" />
+        <PackageReference Include="Xamarin.Firebase.iOS.CloudMessaging" Version="4.1.1.2" />
+        <PackageReference Include="Xamarin.Firebase.iOS.InstanceID" Version="4.3.0.0" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <Compile Include="Platforms\iOS\**\*.cs" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+</Project>

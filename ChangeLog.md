@@ -38,10 +38,10 @@
     * A wrapper for all push messaging systems - if appcenter dies today, you can be on azure notification hubs tomorrow with 1 line of code change
     * A consistent event structure to work with in the background (delegates - like all other shiny services)
 
-### [NEW] Shiny.Integrations.AzureNotifications
+### [NEW] Shiny.Push.AzureNotificationHubs
 * Wraps the Azure Notification Hubs in an injectable/testable interface (and gives you comfort of being able to swap out mechanisms easily)
 
-### [NEW] Shiny.Integrations.FirebaseNotifications
+### [NEW] Shiny.Push.FirebaseMessaging
 * Wraps the Firebase messaging for Android & iOS
 
 1.0.0

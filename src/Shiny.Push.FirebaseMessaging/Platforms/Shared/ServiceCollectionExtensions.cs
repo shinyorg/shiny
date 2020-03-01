@@ -10,7 +10,7 @@ namespace Shiny
         public static bool UseFirebaseMessaging<TPushDelegate>(this IServiceCollection services) where TPushDelegate : class, IPushDelegate
         {
 #if XAMARIN_IOS
-            services.AddSingleton<IPushManager, Shiny.Integrations.FirebaseNotifications.PushManager>();
+            services.AddSingleton<IPushManager, Shiny.Push.FirebaseMessaging.PushManager>();
             services.AddSingleton<IPushDelegate, TPushDelegate>();
             return true;
 #elif __ANDROID__
