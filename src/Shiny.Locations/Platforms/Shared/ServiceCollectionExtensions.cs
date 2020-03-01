@@ -67,7 +67,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            services.AddSingleton<IGeofenceDelegate>(delegateType);
+            services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
             services.AddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
             services.UseGps<GpsGeofenceDelegate>();
             return true;
