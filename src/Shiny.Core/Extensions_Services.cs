@@ -96,7 +96,17 @@ namespace Shiny
         /// <param name="services"></param>
         /// <returns></returns>
         public static bool IsRegistered<TService>(this IServiceCollection services)
-            => services.Any(x => x.ServiceType == typeof(TService));
+            => services.IsRegistered(typeof(TService));
+
+
+        /// <summary>
+        /// Check if a service type is registered on the service builder
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="serviceType"></typeparam>
+        /// <returns></returns>
+        public static bool IsRegistered(this IServiceCollection services, Type serviceType)
+            => services.Any(x => x.ServiceType == serviceType);
 
 
         /// <summary>
@@ -117,5 +127,28 @@ namespace Shiny
         /// <returns></returns>
         public static bool IsRegistered(this IServiceProvider services, Type serviceType)
             => services.GetService(serviceType) != null;
+
+
+        /// <summary>
+        /// Asserts that a service type is registered on the service builder
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static void AssertNotRegistered<TService>(this IServiceCollection services)
+            => services.AssertNotRegistered(typeof(TService));
+
+
+        /// <summary>
+        /// Asserts that a service type is registered on the service builder
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="serviceType"></param>
+        /// <returns></returns>
+        public static void AssertNotRegistered(this IServiceCollection services, Type serviceType)
+        {
+            if (services.IsRegistered(serviceType))
+                throw new ArgumentException($"Service type '{serviceType.FullName}' is already registered");
+        }
     }
 }
