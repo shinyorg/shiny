@@ -51,6 +51,8 @@ namespace Shiny.Jobs
 
         protected override void ScheduleNative(JobInfo jobInfo)
         {
+            this.CancelNative(jobInfo);
+
             //WorkManager.Initialize(this.context.AppContext, new Configuration())
             var constraints = new Constraints.Builder()
                 .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
