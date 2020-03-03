@@ -11,11 +11,8 @@ namespace Shiny.Jobs
             if (jobType == null)
                 throw new ArgumentException("Job Type not set");
 
-            if (String.IsNullOrWhiteSpace(identifier))
-                throw new ArgumentException("Job identifier defined");
-
-            this.Type = jobType;
             this.Identifier = identifier ?? jobType.AssemblyQualifiedName;
+            this.Type = jobType;            
             this.PeriodicTime = TimeSpan.FromMinutes(15);
         }
 
