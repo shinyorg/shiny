@@ -22,27 +22,18 @@ namespace Shiny.Locations
             this.context = context;
             this.client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);
         }
+        
 
+        public bool IsListening { get; private set; }
 
         public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request)
             => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.GetCurrentStatus(request));
 
-
-        public AccessState GetCurrentStatus(GpsRequest request) => this.context.GetCurrentAccessState(P.AccessFineLocation);
-        public bool IsListening { get; private set; }
-
-
-
+        public AccessState GetCurrentStatus(GpsRequest request)
+            => this.context.GetCurrentLocationAccess(request.UseBackground, true);
+       
         public Task<AccessState> RequestAccess(GpsRequest request)
-        {
-            if (this.context.IsMinApiLevel(29) && request.UseBackground)
-            {
-                return this.context
-                    .RequestAccess("ACCESS_BACKGROUND_LOCATION")
-                    .ToTask();
-            }
-            return this.context.RequestAccess(P.AccessFineLocation).ToTask();
-        }
+            => this.context.RequestLocationAccess(request.UseBackground, true);
 
 
         public IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>

@@ -4,11 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using Android;
 using Android.App;
-using Android.Locations;
-using Android.Content;
 using Android.Gms.Location;
 using Shiny.Infrastructure;
 using Shiny.Logging;
@@ -45,39 +41,15 @@ namespace Shiny.Locations
 
 
         public override AccessState Status
-        {
-            get
-            {
-                if (this.LocationStatus != AccessState.Available)
-                    return this.LocationStatus;
-
-                return this.context.GetCurrentAccessState(Manifest.Permission.AccessFineLocation);
-            }
-        }
+            => this.context.GetCurrentLocationAccess(true, true);
 
 
-        public override async Task<AccessState> RequestAccess()
-        {
-            var locationManager = (LocationManager)this.context.AppContext.GetSystemService(Context.LocationService);
-            if (!locationManager.IsLocationEnabled)
-                return AccessState.Disabled;
-
-            var hasGps = locationManager.IsProviderEnabled(LocationManager.GpsProvider);
-            var hasNet = locationManager.IsProviderEnabled(LocationManager.NetworkProvider);
-            if (!hasGps || !hasNet)
-                return AccessState.Disabled;
-
-            return await this.context
-                .RequestAccess(Manifest.Permission.AccessFineLocation)
-                .ToTask();
-        }
+        public override Task<AccessState> RequestAccess()
+            => this.context.RequestLocationAccess(true, true);
 
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
-            var access = await this.RequestAccess();
-            access.Assert();
-
             await this.Create(region);
             await this.Repository.Set(region.Identifier, region);
         }
@@ -167,24 +139,6 @@ namespace Shiny.Locations
                 PendingIntentFlags.UpdateCurrent
             );
             return this.geofencePendingIntent;
-        }
-
-
-        protected AccessState LocationStatus
-        {
-            get
-            {
-                var locationManager = (LocationManager)this.context.AppContext.GetSystemService(Context.LocationService);
-                if (!locationManager.IsLocationEnabled)
-                    return AccessState.Disabled;
-
-                var hasGps = locationManager.IsProviderEnabled(LocationManager.GpsProvider);
-                var hasNet = locationManager.IsProviderEnabled(LocationManager.NetworkProvider);
-                if (!hasGps || !hasNet)
-                    return AccessState.Disabled;
-
-                return AccessState.Available;
-            }
         }
     }
 }
