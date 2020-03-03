@@ -16,12 +16,20 @@ namespace Shiny.Push
     public class PushManager : AbstractPushManager
     {
         readonly Subject<IDictionary<string, string>> pushSubject;
+        Subject<NSData>? onToken;
 
 
-        // launch options?  UIApplication.LaunchOptionsRemoteNotificationKey
         public PushManager(ISettings settings) : base(settings)
         {
             this.pushSubject = new Subject<IDictionary<string, string>>();
+            iOSShinyHost.RegisterForRemoteNotifications(
+                deviceToken => this.onToken?.OnNext(deviceToken),
+                e => this.onToken?.OnError(new Exception(e.LocalizedDescription)),
+                (nsdict, action) => { }
+            );
+            //UNUserNotificationCenter
+            //    .Current
+            //    .Delegate = new ShinyNotificationDelegate();
         }
 
 
@@ -43,6 +51,9 @@ namespace Shiny.Push
 
         protected virtual async Task<NSData> RequestDeviceToken(CancellationToken cancelToken = default)
         {
+            this.onToken = new Subject<NSData>();
+            var remoteTask = this.onToken.Take(1).ToTask(cancelToken);
+
             var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
                 UNAuthorizationOptions.Alert |
                 UNAuthorizationOptions.Badge |
@@ -51,9 +62,7 @@ namespace Shiny.Push
             if (!result.Item1)
                 throw new Exception(result.Item2.LocalizedDescription);
 
-            var remoteTask = iOSShinyHost.WhenRegisteredForRemoteNotifications().Take(1).ToTask(cancelToken);
             await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.RegisterForRemoteNotifications);
-
             var data = await remoteTask;
             return data;
         }

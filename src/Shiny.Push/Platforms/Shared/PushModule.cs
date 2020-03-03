@@ -30,7 +30,7 @@ namespace Shiny.Push
             if (services.IsRegistered<INotificationManager>())
                 throw new ArgumentException("You cannot use services.UseNotifications yourself when using push");
 
-            services.UseNotifications<ShinyNotificationDelegate>(false, this.categories);
+            //services.UseNotifications<ShinyNotificationDelegate>(false, this.categories);
             services.AddSingleton(typeof(IPushManager), this.pushManagerType);
             if (delegateType != null)
                 services.AddSingleton(typeof(IPushDelegate), this.delegateType);
