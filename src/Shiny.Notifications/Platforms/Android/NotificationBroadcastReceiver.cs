@@ -21,7 +21,7 @@ namespace Shiny.Notifications
     })]
     public class NotificationBroadcastReceiver : BroadcastReceiver
     {
-        public const string ReceiverName = "com.shiny.locations." + nameof(NotificationBroadcastReceiver);
+        public const string ReceiverName = "com.shiny.notifications." + nameof(NotificationBroadcastReceiver);
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
 
 
