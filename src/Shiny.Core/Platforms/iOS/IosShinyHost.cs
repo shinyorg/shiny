@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Subjects;
 using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
@@ -24,15 +23,11 @@ namespace Shiny
                 services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
                 services.TryAddSingleton<IFileSystem, FileSystemImpl>();
                 services.TryAddSingleton<ISettings, SettingsImpl>();
-
                 //if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-                //{
                 //    services.TryAddSingleton<IJobManager, BgTasksJobManager>();
-                //}
                 //else
-                //{
-                services.TryAddSingleton<IJobManager, JobManager>();
-                //}
+                    services.TryAddSingleton<IJobManager, JobManager>();
+                
                 platformBuild?.Invoke(services);
             });
             var app = UIApplication.SharedApplication;
@@ -42,21 +37,29 @@ namespace Shiny
         }
 
 
-        readonly static Subject<NSData> remoteNotifySubj = new Subject<NSData>();
-        public static IObservable<NSData> WhenRegisteredForRemoteNotifications()
-            => remoteNotifySubj;
+        static Action<NSData>? onRegisteredEvent;
+        static Action<NSError>? onFailEvent;
+        static Action<NSDictionary, Action<UIBackgroundFetchResult>>? onNotificationEvent;
+        
 
-        public static void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+        public static void RegisterForRemoteNotifications(Action<NSData> onRegistered,
+                                                          Action<NSError> onFail,
+                                                          Action<NSDictionary, Action<UIBackgroundFetchResult>> onNotification)
         {
-
+            onRegisteredEvent = onRegistered;
+            onFailEvent = onFail;
+            onNotificationEvent = onNotification;
         }
 
 
+        public static void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+            => onNotificationEvent?.Invoke(userInfo, completionHandler);
+
         public static void RegisteredForRemoteNotifications(NSData deviceToken)
-            => remoteNotifySubj.OnNext(deviceToken);
+            => onRegisteredEvent?.Invoke(deviceToken);
 
         public static void FailedToRegisterForRemoteNotifications(NSError error)
-            => remoteNotifySubj.OnError(new Exception(error.LocalizedDescription.ToString()));
+            => onFailEvent?.Invoke(error);
 
         public static void PerformFetch(Action<UIBackgroundFetchResult> completionHandler)
             => JobManager.OnBackgroundFetch(completionHandler);
