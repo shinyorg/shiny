@@ -136,15 +136,15 @@ namespace Shiny
 
 
         int requestCode;
-        public IObservable<AccessState> RequestAccess(string androidPermission) => Observable.Create<AccessState>(ob =>
+        public IObservable<AccessState> RequestAccess(params string[] androidPermissions) => Observable.Create<AccessState>(ob =>
         {
             //if(ActivityCompat.ShouldShowRequestPermissionRationale(this.TopActivity, androidPermission))
-            var currentGrant = this.GetCurrentAccessState(androidPermission);
-            if (currentGrant == AccessState.Available)
-            {
-                ob.Respond(AccessState.Available);
-                return () => { };
-            }
+            //var currentGrant = this.GetCurrentAccessState(androidPermission);
+            //if (currentGrant == AccessState.Available)
+            //{
+            //    ob.Respond(AccessState.Available);
+            //    return () => { };
+            //}
 
             //if (!ActivityCompat.ShouldShowRequestPermissionRationale(this.AppContext, androidPermission))
             //{
@@ -170,13 +170,13 @@ namespace Shiny
 #if !ANDROIDX
                     Android.Support.V4.App.ActivityCompat.RequestPermissions(
                         x.Activity,
-                        new[] { androidPermission },
+                        androidPermissions,
                         current
                     )
 #else
                     AndroidX.Core.App.ActivityCompat.RequestPermissions(
                         x.Activity,
-                        new[] { androidPermission },
+                        androidPermissions,
                         current
                     )
 #endif

@@ -96,6 +96,7 @@ namespace Shiny.Locations
             return state;
         }
 
+
         public override async Task StartMonitoring(GeofenceRegion region)
         {
             this.Assert();
@@ -110,6 +111,7 @@ namespace Shiny.Locations
                 });
             }
         }
+
 
         public override async Task StopAllMonitoring()
         {
