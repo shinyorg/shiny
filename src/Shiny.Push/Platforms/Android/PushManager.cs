@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Gms.Tasks;
 using Android.Runtime;
@@ -7,8 +8,7 @@ using Firebase.Messaging;
 using Shiny.Settings;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
-using Android.Gms.Common;
-using System.Collections.Generic;
+
 
 namespace Shiny.Push
 {
@@ -25,6 +25,13 @@ namespace Shiny.Push
             this.context = context;
             this.settings = settings;
             this.bus = bus;
+
+            this.context
+                .WhenIntentReceived()
+                .Subscribe(x =>
+                {
+                    // catches activity intents
+                });
         }
 
 

@@ -22,17 +22,26 @@ namespace Shiny.Push
         public override async void OnMessageReceived(RemoteMessage message) => await Log.SafeExecute(async () =>
         {
             await this.pushDelegate.Value.OnReceived(message.Data);
-
-            var native = message.GetNotification();
-            await this.notifications.Value.Send(new Notification
-            {
-                Title = native.Title,
-                Message = native.Body
-            });
             this.msgBus.Value.Publish(
                 nameof(ShinyFirebaseService),
                 message.Data
             );
+
+            var native = message.GetNotification();
+            var notification = new Notification
+            {
+                Title = native.Title,
+                Message = native.Body,
+                Category = native.ClickAction,
+            };
+            if (!native.ChannelId.IsEmpty())
+                notification.Android.ChannelId = native.ChannelId;
+
+            if (!native.Icon.IsEmpty())
+                notification.Android.SmallIconResourceName = native.Icon;
+
+            //notification.Android.ColorResourceName = native.Color;
+            await this.notifications.Value.Send(notification);
         });
 
 
