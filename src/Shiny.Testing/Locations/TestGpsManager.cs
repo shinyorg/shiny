@@ -15,7 +15,7 @@ namespace Shiny.Testing.Locations
         public bool IsListening { get; private set; }
 
 
-        AccessState replyStatus;
+        AccessState replyStatus = AccessState.Available;
         public AccessState ReplyStatus
         {
             get => this.replyStatus;
@@ -25,6 +25,14 @@ namespace Shiny.Testing.Locations
                 this.accessSubject.OnNext(value);
             }
         }
+
+
+        public void PingPosition(double latitude, double longitude)
+            => this.ReadingSubject.OnNext(new GpsReading
+            {
+                Position = new Position(latitude, longitude)
+            });
+
 
         public AccessState GetCurrentStatus(GpsRequest request) => this.ReplyStatus;
         public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => this.accessSubject;

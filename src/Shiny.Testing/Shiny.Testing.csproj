@@ -24,4 +24,7 @@
         <ProjectReference Include="..\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Infrastucture\" />
+    </ItemGroup>
 </Project>

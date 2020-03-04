@@ -43,7 +43,7 @@ namespace Shiny.Locations
         }
 
 
-        protected GeofenceState GetState(string geofenceId) 
+        protected GeofenceState GetState(string geofenceId)
             => this.CurrentStates.ContainsKey(geofenceId)
                 ? this.CurrentStates[geofenceId]
                 : GeofenceState.Unknown;
@@ -60,9 +60,9 @@ namespace Shiny.Locations
     public class GpsGeofenceManagerImpl : AbstractGeofenceManager
     {
         static readonly GpsRequest Request = new GpsRequest { UseBackground = true };
-
-
         readonly IGpsManager? gpsManager;
+
+
         public GpsGeofenceManagerImpl(IRepository repository, IGpsManager? gpsManager = null) : base(repository)
             => this.gpsManager = gpsManager;
 
