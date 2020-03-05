@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Gms.Location;
-using P = Android.Manifest.Permission;
 
 
 namespace Shiny.Locations

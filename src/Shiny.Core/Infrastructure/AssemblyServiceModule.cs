@@ -9,8 +9,15 @@ namespace Shiny.Infrastructure
     public class AssemblyServiceModule : ShinyModule
     {
         readonly Assembly[]? assemblies;
+
+
         public AssemblyServiceModule(params Assembly[] assemblies)
-            => this.assemblies ??= AssemblyQueries.GetAssumedUserAssemblies().ToArray();
+        {
+            if (assemblies == null || assemblies.Length == 0)
+                assemblies = AssemblyQueries.GetAssumedUserAssemblies().ToArray();
+
+            this.assemblies = assemblies;
+        }
 
 
         public override void Register(IServiceCollection services)
