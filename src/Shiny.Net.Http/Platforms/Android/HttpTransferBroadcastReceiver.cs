@@ -22,18 +22,17 @@ namespace Shiny.Net.Http
         public static Subject<HttpTransfer> HttpEvents { get; } = new Subject<HttpTransfer>();
 
 
-        public override async void OnReceive(Context context, Intent intent)
+        public override void OnReceive(Context context, Intent intent)
         {
             if (intent.Action != Native.ActionDownloadComplete)
                 return;
 
-            HttpTransfer? transfer = null;
-            var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
-            var native = context.GetManager();
-            var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
-
-            try
+            this.Execute(async () =>
             {
+                HttpTransfer? transfer = null;
+                var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
+                var native = context.GetManager();
+                var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
                 var query = new QueryFilter().Add(id.ToString()).ToNative();
 
                 using (var cursor = native.InvokeQuery(query))
@@ -42,8 +41,9 @@ namespace Shiny.Net.Http
                     {
                         transfer = cursor.ToLib();
                         if (transfer.Value.Exception != null)
+                        {
                             await tdelegate.OnError(transfer.Value, transfer.Value.Exception);
-
+                        }
                         else
                         {
                             var localUri = cursor.GetString(Native.ColumnLocalUri).Replace("file://", String.Empty);
@@ -64,18 +64,8 @@ namespace Shiny.Net.Http
                         HttpEvents.OnNext(transfer.Value);
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-
-                if (transfer != null)
-                {
-                    await tdelegate.OnError(transfer.Value, ex);
-                    HttpEvents.OnNext(transfer.Value);
-                }
-            }
-            native.Remove(id);
+                native.Remove(id);
+            });
         }
     }
 }
