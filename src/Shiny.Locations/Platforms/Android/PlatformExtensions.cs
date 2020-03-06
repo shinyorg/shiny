@@ -52,19 +52,19 @@ namespace Shiny.Locations
             if (status != AccessState.Available)
                 return status;
 
-            var next = fineAccess ? P.AccessFineLocation : P.AccessCoarseLocation;
+            var locationPerm = fineAccess ? P.AccessFineLocation : P.AccessCoarseLocation;
             if (context.IsMinApiLevel(29) && background)
             {
                 return await context
                     .RequestAccess
                     (
                         ACCESS_BACKGROUND_LOCATION,
-                        next
+                        locationPerm
                     )
                     .ToTask();
             }
 
-            return await context.RequestAccess(next).ToTask();
+            return await context.RequestAccess(locationPerm).ToTask();
         }
 
 
