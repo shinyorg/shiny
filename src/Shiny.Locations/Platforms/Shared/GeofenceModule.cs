@@ -11,14 +11,14 @@ namespace Shiny.Locations
 {
     class GeofenceModule : ShinyModule
     {
-        readonly GeofenceRegion[] startingRegions;
         readonly Type delegateType;
+        readonly bool requestPermissionOnStart;
 
 
-        public GeofenceModule(Type delegateType, GeofenceRegion[] regions)
+        public GeofenceModule(Type delegateType, bool requestPermissionOnStart)
         {
-            this.startingRegions = regions;
             this.delegateType = delegateType;
+            this.requestPermissionOnStart = requestPermissionOnStart;
         }
 
 
@@ -55,16 +55,15 @@ namespace Shiny.Locations
         public override async void OnContainerReady(IServiceProvider services)
         {
             base.OnContainerReady(services);
-            if (this.startingRegions.IsEmpty())
+            if (!this.requestPermissionOnStart)
                 return;
 
             try
             {
                 var mgr = services.GetService<IGeofenceManager>();
                 var access = await mgr.RequestAccess();
-                if (access == AccessState.Available)
-                    foreach (var region in this.startingRegions)
-                        await mgr.StartMonitoring(region);
+                if (access != AccessState.Available)
+                    Log.Write("Geofence", "Permission Denied on startup");
             }
             catch (Exception ex)
             {

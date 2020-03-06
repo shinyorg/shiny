@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Locations;
+using Shiny.Logging;
 
 
 namespace Shiny
@@ -11,15 +12,28 @@ namespace Shiny
         ///
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
-        public static bool UseMotionActivity(this IServiceCollection services)
+        public static bool UseMotionActivity(this IServiceCollection services, bool requestPermissionOnStart = false)
         {
+            // TODO: requestPermission
+#if __ANDROID__ || __IOS__
 #if __ANDROID__
             services.AddSingleton<AndroidSqliteDatabase>();
+#endif
             services.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
-            return true;
-#elif __IOS__
-            services.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
+            if (requestPermissionOnStart)
+            {
+                services.RegisterPostBuildAction(async sp =>
+                {
+                    var access = await sp
+                        .GetRequiredService<IMotionActivityManager>()
+                        .RequestPermission();
+
+                    if (access != AccessState.Available)
+                        Log.Write(LocationLogCategory.MotionActivity, "Invalid access - " + access);
+                });
+            }
             return true;
 #else
             return false;
@@ -31,14 +45,32 @@ namespace Shiny
         ///
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="regions"></param>
+        /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
-        public static bool UseGeofencing(this IServiceCollection services, Type geofenceDelegateType, params GeofenceRegion[] regions)
+        public static bool UseGeofencing(this IServiceCollection services, Type geofenceDelegateType, bool requestPermissionOnStart = false)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new GeofenceModule(geofenceDelegateType, regions));
+            services.RegisterModule(new GeofenceModule(geofenceDelegateType, requestPermissionOnStart));
+            return true;
+#endif
+        }
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="requestPermissionOnStart"></param>
+        /// <returns></returns>
+        public static bool UseGeofencing<T>(this IServiceCollection services, bool requestPermissionOnStart = false) where T : class, IGeofenceDelegate
+        {
+#if NETSTANDARD
+            return false;
+#else
+            services.RegisterModule(new GeofenceModule(typeof(T), requestPermissionOnStart));
             return true;
 #endif
         }
@@ -50,9 +82,10 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
+        /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
-        public static bool UseGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
-            => services.UseGpsDirectGeofencing(typeof(T));
+        public static bool UseGpsDirectGeofencing<T>(this IServiceCollection services, bool requestPermissionOnStart = false) where T : class, IGeofenceDelegate
+            => services.UseGpsDirectGeofencing(typeof(T), requestPermissionOnStart);
 
 
         /// <summary>
@@ -61,8 +94,9 @@ namespace Shiny
         /// </summary>        
         /// <param name="services"></param>
         /// <param name="delegateType"></param>
+        /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
-        public static bool UseGpsDirectGeofencing(this IServiceCollection services, Type delegateType)
+        public static bool UseGpsDirectGeofencing(this IServiceCollection services, Type delegateType, bool requestPermissionOnStart = false)
         {
 #if NETSTANDARD
             return false;
@@ -70,24 +104,19 @@ namespace Shiny
             services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
             services.AddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
             services.UseGps<GpsGeofenceDelegate>();
-            return true;
-#endif
-        }
+            if (requestPermissionOnStart)
+            {
+                services.RegisterPostBuildAction(async sp =>
+                {
+                    var access = await sp
+                        .GetRequiredService<IGeofenceManager>()
+                        .RequestAccess();
 
+                    if (access != AccessState.Available)
+                        Log.Write(LocationLogCategory.Geofence, "Invalid access - " + access);
+                });
+            }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="regions"></param>
-        /// <returns></returns>
-        public static bool UseGeofencing<T>(this IServiceCollection services, params GeofenceRegion[] regions) where T : class, IGeofenceDelegate
-        {
-#if NETSTANDARD
-            return false;
-#else
-            services.RegisterModule(new GeofenceModule(typeof(T), regions));
             return true;
 #endif
         }
