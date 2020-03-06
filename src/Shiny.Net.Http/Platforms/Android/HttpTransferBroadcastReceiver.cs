@@ -4,7 +4,6 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Shiny.Logging;
 using Native = Android.App.DownloadManager;
 
 
@@ -14,9 +13,11 @@ namespace Shiny.Net.Http
     [BroadcastReceiver(
         Name = "com.shiny.net.http.HttpTransferBroadcastReceiver",
         Enabled = true,
-        Exported = true
+        Exported = true 
     )]
-    [IntentFilter(new[] { Native.ActionDownloadComplete })]
+    [IntentFilter(new[] {
+        Native.ActionDownloadComplete
+    })]
     public class HttpTransferBroadcastReceiver : BroadcastReceiver
     {
         public static Subject<HttpTransfer> HttpEvents { get; } = new Subject<HttpTransfer>();
@@ -27,12 +28,15 @@ namespace Shiny.Net.Http
             if (intent.Action != Native.ActionDownloadComplete)
                 return;
 
+            var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
+            if (tdelegate == null)
+                return;
+
             this.Execute(async () =>
             {
                 HttpTransfer? transfer = null;
                 var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
-                var native = context.GetManager();
-                var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
+                var native = context.GetService<Native>(Context.DownloadService);
                 var query = new QueryFilter().Add(id.ToString()).ToNative();
 
                 using (var cursor = native.InvokeQuery(query))

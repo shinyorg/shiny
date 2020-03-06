@@ -10,14 +10,8 @@ namespace Shiny.Net.Http
 {
     static class PlatformExtensions
     {
-        static Native downloadManager;
-        public static Native GetManager(this AndroidContext context)
-            => context.AppContext.GetManager();
-
-
         public static string GetString(this ICursor cursor, string column)
             => cursor.GetString(cursor.GetColumnIndex(column));
-
 
         public static int GetInt(this ICursor cursor, string column)
             => cursor.GetInt(cursor.GetColumnIndex(column));
@@ -26,13 +20,8 @@ namespace Shiny.Net.Http
             => cursor.GetLong(cursor.GetColumnIndex(column));
 
 
-        public static Native GetManager(this Context context)
-        {
-            if (downloadManager == null || downloadManager.Handle == IntPtr.Zero)
-                downloadManager = (Native)context.GetSystemService(Context.DownloadService);
-
-            return downloadManager;
-        }
+        public static Native GetManager(this AndroidContext context)
+            => context.GetSystemService<Native>(Context.DownloadService);
 
 
         public static Native.Query ToNative(this QueryFilter filter)
@@ -126,7 +115,8 @@ namespace Shiny.Net.Http
 
         static Exception GetError(ICursor cursor)
         {
-            var error = (DownloadError)cursor.GetInt(Native.ColumnReason);
+            var errorId = cursor.GetInt(Native.ColumnReason);
+            var error = (DownloadError)errorId;
             return new Exception(error.ToString());
         }
     }
