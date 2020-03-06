@@ -4,16 +4,16 @@
 ---
 
 ### Shiny.Core
-* [Enhancement] Increased discoverability via new AppDelegate & Android app/activity extension methods.   Simply add the Shiny namespace and type this.Shiny to see all of the points you should be attaching
-* [fix][breaking][uwp] UwpShinyHost.Init now requires the UWP application instance is passed as part of the arguments
 * [Feature] App State Delegate - In your shiny startup, use services.AddAppState<YourAppStateDelegate> that inherits from IAppStateDelegate.  Watch for app start, foreground, & background
 * [Feature] PowerManager now has property/inpc for IsEnergySavingEnabled that checks for ios low power, android doze, & uwp energy saving mode
+* [Feature] Ability to run jobs on timers while the application is in the foreground or app state changes (starting, resuming, or backgrounding)
+* [Enhancement] Increased discoverability via new AppDelegate & Android app/activity extension methods.   Simply add the Shiny namespace and type this.Shiny to see all of the points you should be attaching
 * [Enhancement][iOS][Android] Easier boilerplate setup
 * [Enhancement][Android] AndroidX support on android 10 targets - WorkManager replaces JobService under the hood
 * [Enhancement] Message bus name-only void events
 * [Enhancement] Connectivity now exposes cellular carrier
 * [Enhancement] Power Manager now exposes energy saver mode detection
-* [Feature] Ability to run jobs on timers while the application is in the foreground or app state changes (starting, resuming, or backgrounding)
+* [fix][breaking][uwp] UwpShinyHost.Init now requires the UWP application instance is passed as part of the arguments
 
 ### Shiny.Notifications
 * [Enhancement][Breaking] New way to set notification sounds which allows you to use system sounds - Notification.CustomSoundFilePath has been removed
@@ -25,8 +25,9 @@
 * [Fix][Geofences][Android] Status observable now works
 * [Fix][Geofences][Android] Status check now includes GPS radio checks + permissions
 * [Fix][GPS][BREAKING] RequestAccess, WhenStatusChanged, and GetCurrentStatus all now accept GpsRequest to increase the scope/accuracy of the necessary permission checks
-* [Fix][GPS][Android] RequestAccess now checks for new Android 10 permission for ACCESS_BACKGROUND_LOCATION
-* [Feature] Added full background GPS geofence module - use at own risk
+* [Fix][GPS][Android] RequestAccess now checks for new Android 10 permission ACCESS_BACKGROUND_LOCATION
+* [Fix][Motion Activity][Android] RequestAccess now checks for new ANdroid permission ACTIVITY_RECOGNITION
+* [Feature] Added full background GPS geofence module - it is not friendly to battery
 * [Feature][Android] If Google Play Services is not available, we switch to the GPS direct module
 
 ### Shiny.Integrations.XamarinForms
