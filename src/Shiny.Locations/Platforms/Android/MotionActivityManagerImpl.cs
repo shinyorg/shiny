@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content.PM;
 using Android.Gms.Location;
 using Shiny.Logging;
 
@@ -42,7 +44,15 @@ namespace Shiny.Locations
         );
 
 
-        public Task<AccessState> RequestPermission() => Task.FromResult(AccessState.Available);
+        public async Task<AccessState> RequestPermission()
+        {
+            if (this.context.IsAtLeastAndroid10())
+            {
+                var result = await this.context.RequestAccess("android.permission.ACTIVITY_RECOGNITION").ToTask();
+                return result;
+            }
+            return AccessState.Available;
+        }
 
 
         public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
