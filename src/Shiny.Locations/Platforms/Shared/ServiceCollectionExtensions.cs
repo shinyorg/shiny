@@ -16,7 +16,6 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseMotionActivity(this IServiceCollection services, bool requestPermissionOnStart = false)
         {
-            // TODO: requestPermission
 #if __ANDROID__ || __IOS__
 #if __ANDROID__
             services.AddSingleton<AndroidSqliteDatabase>();
