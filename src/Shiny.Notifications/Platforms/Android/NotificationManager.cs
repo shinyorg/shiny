@@ -309,7 +309,7 @@ namespace Shiny.Notifications
 
         protected void TrySetLargeIconResource(Notification notification, NotificationCompat.Builder builder)
         {
-            if (!notification.Android.LargeIconResourceName.IsEmpty())
+            if (notification.Android.LargeIconResourceName.IsEmpty())
                 return;
 
             var iconId = this.context.GetResourceIdByName(notification.Android.LargeIconResourceName);
