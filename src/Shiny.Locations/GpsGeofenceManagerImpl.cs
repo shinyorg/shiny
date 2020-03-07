@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
@@ -57,7 +58,7 @@ namespace Shiny.Locations
     }
 
 
-    public class GpsGeofenceManagerImpl : AbstractGeofenceManager
+    public class GpsGeofenceManagerImpl : AbstractGeofenceManager, IShinyStartupTask
     {
         static readonly GpsRequest Request = new GpsRequest { UseBackground = true };
         readonly IGpsManager? gpsManager;
@@ -65,6 +66,14 @@ namespace Shiny.Locations
 
         public GpsGeofenceManagerImpl(IRepository repository, IGpsManager? gpsManager = null) : base(repository)
             => this.gpsManager = gpsManager;
+
+
+        public async void Start()
+        {
+            var restore = await this.GetMonitorRegions();
+            if (restore.Any())
+                this.TryStartGps();
+        }
 
 
         public override AccessState Status => this.gpsManager?.GetCurrentStatus(Request) ?? AccessState.NotSupported;
@@ -101,15 +110,7 @@ namespace Shiny.Locations
         {
             this.Assert();
             await this.Repository.Set(region.Identifier, region);
-
-            if (!this.gpsManager.IsListening)
-            {
-                await this.gpsManager.StartListener(new GpsRequest
-                {
-                    Interval = TimeSpan.FromMinutes(1),
-                    UseBackground = true
-                });
-            }
+            this.TryStartGps();
         }
 
 
@@ -139,7 +140,20 @@ namespace Shiny.Locations
         }
 
 
-        void Assert()
+        protected async void TryStartGps()
+        {
+            if (!this.gpsManager.IsListening)
+            {
+                await this.gpsManager.StartListener(new GpsRequest
+                {
+                    Interval = TimeSpan.FromMinutes(1),
+                    UseBackground = true
+                });
+            }
+        }
+
+
+        protected void Assert()
         {
             if (this.gpsManager == null)
                 throw new ArgumentException("GPS Manager is not available");
