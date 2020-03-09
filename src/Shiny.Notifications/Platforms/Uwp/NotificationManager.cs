@@ -53,7 +53,7 @@ namespace Shiny.Notifications
             var toastContent = new ToastContent
             {
                 Duration = notification.Windows.UseLongDuration ? ToastDuration.Long : ToastDuration.Short,
-                Launch = notification.Payload,
+                //Launch = notification.Payload,
                 ActivationType = ToastActivationType.Background,
                 //ActivationType = ToastActivationType.Foreground,
                 Visual = new ToastVisual
