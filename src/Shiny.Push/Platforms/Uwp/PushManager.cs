@@ -33,7 +33,6 @@ namespace Shiny.Push
             //channel.ExpirationTime - persist and deal with this
             channel.PushNotificationReceived += this.OnPushNotification;
 
-
             return new PushAccessState(AccessState.Available, channel.Uri);
         }
 

@@ -17,7 +17,7 @@ namespace Shiny.Notifications
                 Id = i,
                 Title = native.Content?.Title,
                 Message = native.Content?.Body,
-                Payload = GetPayload(native),
+                Payload = native.Content?.UserInfo?.FromNsDictionary(),
                 BadgeCount = native.Content?.Badge?.Int32Value,
                 Category = native.Content?.CategoryIdentifier
             };
@@ -26,20 +26,6 @@ namespace Shiny.Notifications
                 shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
 
             return shiny;
-        }
-
-
-        static string? GetPayload(UNNotificationRequest request)
-        {
-            var userInfo = request?.Content?.UserInfo;
-            if (userInfo == null)
-                return null;
-
-            var key = new NSString("Payload");
-            if (!userInfo.ContainsKey(key))
-                return null;
-
-            return userInfo[key].ToString();
         }
     }
 }

@@ -27,6 +27,9 @@ namespace Shiny.Notifications
 
         public override void OnReceive(Context context, Intent intent)
         {
+            //if (intent.Action != IntentAction)
+            //    return;
+
             var ndelegate = ShinyHost.Resolve<INotificationDelegate>();
             if (ndelegate == null)
                 return;

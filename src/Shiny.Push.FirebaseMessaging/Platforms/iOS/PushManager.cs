@@ -3,8 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.InstanceID;
-using Shiny.Logging;
-using Shiny.Push;
 using Shiny.Settings;
 
 
@@ -12,23 +10,21 @@ namespace Shiny.Push.FirebaseMessaging
 {
     public class PushManager : Shiny.Push.PushManager
     {
-        readonly Lazy<IPushDelegate> pushDelegate = ShinyHost.LazyResolve<IPushDelegate>();
-
-
-        public PushManager(ISettings settings) : base(settings)
+        public PushManager(ISettings settings, IServiceProvider services)
+            : base(settings, services)
         {
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate
             (
                 async msg =>
                 {
                     var dict = msg.AppData.FromNsDictionary();
-                    await Log.SafeExecute(async () => await this.pushDelegate.Value.OnReceived(dict));
+                    await services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
                 },
                 async token =>
                 {
                     this.CurrentRegistrationToken = token;
                     this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                    await Log.SafeExecute(async () => await this.pushDelegate.Value.OnTokenChanged(token));
+                    await services.SafeResolveAndExecute<IPushDelegate>(x => x.OnTokenChanged(token));
                 }
             );
         }

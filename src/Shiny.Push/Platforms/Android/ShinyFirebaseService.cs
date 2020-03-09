@@ -10,9 +10,10 @@ using Notification = Shiny.Notifications.Notification;
 namespace Shiny.Push
 {
     [Service]
-    [IntentFilter(new[] { "com.google.firebase.MESSAGING_EVENT" })]
+    [IntentFilter(new[] { IntentAction })]
     public class ShinyFirebaseService : FirebaseMessagingService
     {
+        public const string IntentAction = "com.google.firebase.MESSAGING_EVENT";
         readonly Lazy<ISettings> settings = ShinyHost.LazyResolve<ISettings>();
         readonly Lazy<INotificationManager> notifications = ShinyHost.LazyResolve<INotificationManager>();
         readonly Lazy<IPushDelegate> pushDelegate = ShinyHost.LazyResolve<IPushDelegate>();
@@ -28,20 +29,26 @@ namespace Shiny.Push
             );
 
             var native = message.GetNotification();
-            var notification = new Notification
+            if (native != null)
             {
-                Title = native.Title,
-                Message = native.Body,
-                Category = native.ClickAction,
-            };
-            if (!native.ChannelId.IsEmpty())
-                notification.Android.ChannelId = native.ChannelId;
+                var notification = new Notification
+                {
+                    Title = native.Title,
+                    Message = native.Body,
+                    Category = native.ClickAction,
+                    Payload = message.Data
+                };
+                if (!native.ChannelId.IsEmpty())
+                    notification.Android.ChannelId = native.ChannelId;
 
-            if (!native.Icon.IsEmpty())
-                notification.Android.SmallIconResourceName = native.Icon;
+                if (!native.Icon.IsEmpty())
+                    notification.Android.SmallIconResourceName = native.Icon;
 
-            //notification.Android.ColorResourceName = native.Color;
-            await this.notifications.Value.Send(notification);
+                if (!native.Color.IsEmpty())
+                    notification.Android.ColorResourceName = native.Color;
+
+                await this.notifications.Value.Send(notification);
+            }
         });
 
 

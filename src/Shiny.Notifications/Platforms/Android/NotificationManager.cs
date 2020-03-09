@@ -252,8 +252,11 @@ namespace Shiny.Notifications
 
             var notificationString = this.serializer.Serialize(notification);
             launchIntent.PutExtra(AndroidNotificationProcessor.NOTIFICATION_KEY, notificationString);
-            if (!notification.Payload.IsEmpty())
-                launchIntent.PutExtra("Payload", notification.Payload);
+            if (notification.Payload != null)
+            {
+                // TODO: payload!
+                //launchIntent.PutExtra("Payload", notification.Payload);
+            }
 
             PendingIntent pendingIntent;
             if ((notification.Android.LaunchActivityFlags & AndroidActivityFlags.ClearTask) != 0)

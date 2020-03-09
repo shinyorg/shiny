@@ -19,17 +19,27 @@ namespace Shiny.Push
         Subject<NSData>? onToken;
 
 
-        public PushManager(ISettings settings) : base(settings)
+        public PushManager(ISettings settings, IServiceProvider services) : base(settings)
         {
             this.pushSubject = new Subject<IDictionary<string, string>>();
             iOSShinyHost.RegisterForRemoteNotifications(
-                deviceToken => this.onToken?.OnNext(deviceToken),
+                async deviceToken =>
+                {
+                    this.onToken?.OnNext(deviceToken);
+                    await services.SafeResolveAndExecute<IPushDelegate>(x =>
+                    {
+                        var stoken = ToTokenString(deviceToken);
+                        return x.OnTokenChanged(stoken);
+                    });
+                },
                 e => this.onToken?.OnError(new Exception(e.LocalizedDescription)),
-                (nsdict, action) => { }
+                async (nsdict, action) =>
+                {
+                    var dict = nsdict.FromNsDictionary();
+                    await services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
+                    action(UIBackgroundFetchResult.NewData);
+                }
             );
-            //UNUserNotificationCenter
-            //    .Current
-            //    .Delegate = new ShinyNotificationDelegate();
         }
 
 

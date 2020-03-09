@@ -187,12 +187,9 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
 
-            if (!notification.Payload.IsEmpty())
-            {
-                var dict = new NSMutableDictionary();
-                dict.Add(new NSString("Payload"), new NSString(notification.Payload));
-                content.UserInfo = dict;
-            }
+            if (!notification.Payload.IsEmpty())            
+                content.UserInfo = notification.Payload.ToNsDictionary()
+            
             return content;
         }
 

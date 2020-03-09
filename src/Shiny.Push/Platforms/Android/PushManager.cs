@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using Android.Gms.Tasks;
 using Android.Runtime;
 using Firebase.Iid;
@@ -20,25 +21,22 @@ namespace Shiny.Push
         TaskCompletionSource<string>? taskSrc = null;
 
 
-        public PushManager(AndroidContext context, ISettings settings, IMessageBus bus)
+        public PushManager(AndroidContext context,
+                           ISettings settings,
+                           IMessageBus bus)
         {
             this.context = context;
             this.settings = settings;
             this.bus = bus;
-
-            this.context
-                .WhenIntentReceived()
-                .Subscribe(x =>
-                {
-                    // catches activity intents
-                });
         }
 
 
         public void OnComplete(Android.Gms.Tasks.Task task)
         {
             if (!task.IsSuccessful)
+            {
                 this.taskSrc?.TrySetException(task.Exception);
+            }
             else
             {
                 var result = task.Result.JavaCast<IInstanceIdResult>();
@@ -67,6 +65,7 @@ namespace Shiny.Push
             //    .Instance
             //    .IsGooglePlayServicesAvailable(this.context.AppContext);
 
+            //if (resultCode == ConnectionResult.)
             //if (resultCode != ConnectionResult.ServiceMissing)
             //{ 
             ////{
@@ -99,6 +98,6 @@ namespace Shiny.Push
         }
 
         public IObservable<IDictionary<string, string>> WhenReceived()
-            => this.bus.Listener<Dictionary<string, string>>(nameof(ShinyFirebaseService));
+            => this.bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
     }
 }

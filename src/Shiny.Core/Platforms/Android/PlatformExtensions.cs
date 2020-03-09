@@ -49,6 +49,9 @@ namespace Shiny
         public static void ShinyRequestPermissionsResult(this Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
             => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
+        public static void ShinyOnCreate(this Application application, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
+            => AndroidShinyHost.Init(application, startup, platformBuild);
+
         public static void ShinyOnCreate(this Activity activity)
             => AndroidShinyHost.TryProcessIntent(activity.Intent);
 
@@ -57,7 +60,6 @@ namespace Shiny
 
         public static long ToEpochMillis(this DateTime sendTime)
             => new DateTimeOffset(sendTime).ToUnixTimeMilliseconds();
-
 
         public static Guid ToGuid(this byte[] uuidBytes)
         {

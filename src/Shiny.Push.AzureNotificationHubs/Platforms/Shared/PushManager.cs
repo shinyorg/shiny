@@ -19,7 +19,9 @@ namespace Shiny.Integrations.AzureNotifications
                            IServiceProvider serviceProvider,
                            ISettings settings) : base(serviceProvider, settings)
 #elif __IOS__
-        public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
+        public PushManager(AzureNotificationConfig config,
+                           ISettings settings,
+                           IServiceProvider services) : base(settings, services)
 #elif __ANDROID__
         public PushManager(AzureNotificationConfig config,
                            AndroidContext context,
