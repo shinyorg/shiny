@@ -160,7 +160,7 @@ namespace Shiny.Notifications
         public async Task Send(Notification notification)
         {
             if (notification.Id == 0)
-                notification.Id = this.settings.IncrementValue("NotificationId");   
+                notification.Id = this.settings.IncrementValue("NotificationId");
 
             var request = UNNotificationRequest.FromIdentifier(
                 notification.Id.ToString(),
@@ -187,9 +187,9 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
 
-            if (!notification.Payload.IsEmpty())            
-                content.UserInfo = notification.Payload.ToNsDictionary()
-            
+            if (!notification.Payload.IsEmpty())
+                content.UserInfo = notification.Payload.ToNsDictionary();
+
             return content;
         }
 
