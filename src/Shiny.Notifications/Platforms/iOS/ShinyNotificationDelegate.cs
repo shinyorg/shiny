@@ -7,18 +7,23 @@ namespace Shiny.Notifications
 {
     public class ShinyNotificationDelegate : UNUserNotificationCenterDelegate
     {
+        readonly INotificationDelegate sdelegate;
+        public ShinyNotificationDelegate(INotificationDelegate sdelegate)
+            => this.sdelegate = sdelegate;
+
+
         public override void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
             => Log.SafeExecute(async () =>
             {
                 var notification = response.Notification.Request.FromNative();
-                if (notification == null)
-                    return;
-
-                var sdelegate = ShinyHost.Resolve<INotificationDelegate>();
                 if (response is UNTextInputNotificationResponse textResponse)
                 {
-                    var shinyResponse = new NotificationResponse(notification, textResponse.ActionIdentifier, textResponse.UserText);
-                    await sdelegate.OnEntry(shinyResponse);
+                    var shinyResponse = new NotificationResponse(
+                        notification,
+                        textResponse.ActionIdentifier,
+                        textResponse.UserText
+                    );
+                    await this.sdelegate.OnEntry(shinyResponse);
                 }
                 else
                 {
@@ -30,16 +35,9 @@ namespace Shiny.Notifications
 
 
         public override void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
-            => Log.SafeExecute(async () =>
-            {
-                var shinyNotification = notification.Request.FromNative();
-                if (shinyNotification != null)
-                {
-                    await ShinyHost
-                        .Resolve<INotificationDelegate>()
-                        .OnReceived(shinyNotification);
-                }
-            })
+            => Log.SafeExecute(() =>
+                this.sdelegate.OnReceived(notification.Request.FromNative())
+            )
             .ContinueWith(_ => completionHandler(UNNotificationPresentationOptions.Alert));
     }
 }

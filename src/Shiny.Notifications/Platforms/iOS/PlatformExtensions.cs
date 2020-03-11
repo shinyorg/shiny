@@ -1,5 +1,4 @@
 ﻿using System;
-using Foundation;
 using UserNotifications;
 
 
@@ -7,14 +6,13 @@ namespace Shiny.Notifications
 {
     public static class PlatformExtensions
     {
-        public static Notification? FromNative(this UNNotificationRequest native)
+        public static Notification FromNative(this UNNotificationRequest native)
         {
-            if (!Int32.TryParse(native.Identifier, out var i))
-                return null;
+            Int32.TryParse(native.Identifier, out var id);
 
             var shiny = new Notification
             {
-                Id = i,
+                Id = id,
                 Title = native.Content?.Title,
                 Message = native.Content?.Body,
                 Payload = native.Content?.UserInfo?.FromNsDictionary(),

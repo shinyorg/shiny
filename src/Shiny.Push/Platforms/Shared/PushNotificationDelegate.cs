@@ -8,8 +8,14 @@ namespace Shiny.Push
     public class PushNotificationDelegate : INotificationDelegate
     {
         readonly IPushDelegate pushDelegate;
-        public PushNotificationDelegate(IPushDelegate pushDelegate)
-            => this.pushDelegate = pushDelegate;
+        readonly IMessageBus messageBus;
+
+
+        public PushNotificationDelegate(IPushDelegate pushDelegate, IMessageBus messageBus)
+        {
+            this.pushDelegate = pushDelegate;
+            this.messageBus = messageBus;
+        }
 
 
         public Task OnEntry(NotificationResponse response) => this
@@ -20,8 +26,16 @@ namespace Shiny.Push
                 response.Text,
                 response.Notification.Payload
             ));
-       
 
+
+#if __IOS__
+        public async Task OnReceived(Notification notification)
+        {
+            await this.pushDelegate.OnReceived(notification.Payload);
+            this.messageBus.Publish(nameof(PushNotificationDelegate), notification.Payload);
+        }
+#else
         public Task OnReceived(Notification notification) => Task.CompletedTask;
+#endif
     }
 }

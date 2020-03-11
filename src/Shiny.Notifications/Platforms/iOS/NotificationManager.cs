@@ -34,7 +34,7 @@ namespace Shiny.Notifications
             {
                 UNUserNotificationCenter
                     .Current
-                    .Delegate = new ShinyNotificationDelegate();
+                    .Delegate = new ShinyNotificationDelegate(sdelegate);
             }
         }
 

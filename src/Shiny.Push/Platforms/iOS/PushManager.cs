@@ -15,13 +15,16 @@ namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager
     {
-        readonly Subject<IDictionary<string, string>> pushSubject;
+        readonly IMessageBus messageBus;
         Subject<NSData>? onToken;
 
 
-        public PushManager(ISettings settings, IServiceProvider services) : base(settings)
+        public PushManager(ISettings settings,
+                           IMessageBus messageBus,
+                           IServiceProvider services) : base(settings)
         {
-            this.pushSubject = new Subject<IDictionary<string, string>>();
+            this.messageBus = messageBus;
+
             iOSShinyHost.RegisterForRemoteNotifications(
                 async deviceToken =>
                 {
@@ -35,6 +38,7 @@ namespace Shiny.Push
                 e => this.onToken?.OnError(new Exception(e.LocalizedDescription)),
                 async (nsdict, action) =>
                 {
+                    // this will only be fired while in the bg, so don't fire observable
                     var dict = nsdict.FromNsDictionary();
                     await services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
                     action(UIBackgroundFetchResult.NewData);
@@ -43,7 +47,9 @@ namespace Shiny.Push
         }
 
 
-        public override IObservable<IDictionary<string, string>> WhenReceived() => this.pushSubject;
+        public override IObservable<IDictionary<string, string>> WhenReceived() => this
+            .messageBus
+            .Listener<IDictionary<string, string>>(nameof(PushNotificationDelegate));
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
