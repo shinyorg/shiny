@@ -10,8 +10,8 @@ namespace Shiny.Push.FirebaseMessaging
 {
     public class PushManager : Shiny.Push.PushManager
     {
-        public PushManager(ISettings settings, IServiceProvider services)
-            : base(settings, services)
+        public PushManager(ISettings settings, IMessageBus messageBus, IServiceProvider services)
+            : base(settings, messageBus, services)
         {
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate
             (
