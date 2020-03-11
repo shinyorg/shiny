@@ -49,10 +49,12 @@ namespace Shiny
         public static void RegisterJob(this IServiceCollection services,
                                        Type jobType,
                                        string? identifier = null,
-                                       InternetAccess requiredNetwork = InternetAccess.None)
+                                       InternetAccess requiredNetwork = InternetAccess.None,
+                                       bool runInForeground = false)
             => services.RegisterJob(new JobInfo(jobType, identifier)
             {
                 RequiredInternetAccess = requiredNetwork,
+                RunOnForeground = runInForeground,
                 Repeat = true
             });
 
