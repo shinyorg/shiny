@@ -20,8 +20,8 @@ namespace Shiny.Jobs.Infrastructure
 
 
         public JobAppStateDelegate(IJobManager jobManager,
-                                      IPowerManager powerManager,
-                                      IConnectivity connectivity)
+                                   IPowerManager powerManager,
+                                   IConnectivity connectivity)
         {
             this.jobManager = jobManager;
             this.powerManager = powerManager;
@@ -41,6 +41,7 @@ namespace Shiny.Jobs.Infrastructure
             this.Set();
             this.TryRun();
         }
+
 
         public void OnBackground()
         {
@@ -76,6 +77,7 @@ namespace Shiny.Jobs.Infrastructure
                     }
                 );
             }
+            // TODO: wait until they are all done - hmmmm
             running = false;
         }
 
@@ -88,14 +90,17 @@ namespace Shiny.Jobs.Infrastructure
             (
                 Observable
                     .Interval(Interval)
-                    .Subscribe(_ => this.TryRun())
+                    .Subscribe(_ => this.TryRun(x => x.RunOnForeground))
             );
             this.disposer.Add
             (
                 this.powerManager
                     .WhenChargingChanged()
                     .Where(x => x == true)
-                    .Subscribe(x => this.TryRun(x => x.Repeat && x.DeviceCharging))
+                    .Subscribe(x => this.TryRun(x =>
+                        x.RunOnForeground &&
+                        x.DeviceCharging
+                    ))
             );
 
             this.connectivity
@@ -104,10 +109,23 @@ namespace Shiny.Jobs.Infrastructure
                 .Subscribe(x =>
                 {
                     if (this.connectivity.IsDirectConnect())
-                        this.TryRun(x => x.Repeat && (x.RequiredInternetAccess == InternetAccess.Any || x.RequiredInternetAccess == InternetAccess.Unmetered));
-
+                    {
+                        this.TryRun(x =>
+                            x.RunOnForeground &&
+                            x.RunOnForeground &&
+                            (
+                                x.RequiredInternetAccess == InternetAccess.Any ||
+                                x.RequiredInternetAccess == InternetAccess.Unmetered
+                            )
+                        );
+                    }
                     else
-                        this.TryRun(x => x.Repeat && x.RequiredInternetAccess == InternetAccess.Any);
+                    {
+                        this.TryRun(x =>
+                            x.RunOnForeground &&
+                            x.RequiredInternetAccess == InternetAccess.Any
+                        );
+                    }
                 });
         }
     }

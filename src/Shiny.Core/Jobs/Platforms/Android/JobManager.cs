@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Settings;
@@ -6,11 +7,15 @@ using Android;
 using Android.App.Job;
 using Android.Content;
 using Java.Lang;
-using JobBuilder = Android.App.Job.JobInfo.Builder;
 using Shiny.Logging;
+using P = Android.Manifest.Permission;
+using static Android.OS.PowerManager;
 #if ANDROIDX
 using AndroidX.Work;
+#else
+using JobBuilder = Android.App.Job.JobInfo.Builder;
 #endif
+
 
 namespace Shiny.Jobs
 {
@@ -30,22 +35,45 @@ namespace Shiny.Jobs
         }
 
 
-        public override Task<AccessState> RequestAccess()
+        public override Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
+
+
+        public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
         {
-            var permission = AccessState.Available;
-
-            if (!this.context.IsInManifest(Manifest.Permission.AccessNetworkState))
-                permission = AccessState.NotSetup;
-
-            if (!this.context.IsInManifest(Manifest.Permission.BatteryStats))
-                permission = AccessState.NotSetup;
-
-            //if (!this.context.IsInManifest(Manifest.Permission.ReceiveBootCompleted, false))
-            //    permission = AccessState.NotSetup;
-
-            return Task.FromResult(permission);
+            if (!this.context.IsInManifest(P.WakeLock))
+            {
+                base.RunTask(taskName, task);
+            }
+            else
+            {
+                try
+                {
+                    using (var pm = this.context.GetSystemService<Android.OS.PowerManager>(Context.PowerService))
+                    {
+                        using (var wakeLock = pm.NewWakeLock(Android.OS.WakeLockFlags.Partial, "ShinyTask"))
+                        {
+                            try
+                            {
+                                wakeLock.Acquire();
+                                await task(CancellationToken.None).ConfigureAwait(false);
+                            }
+                            catch (System.Exception ex)
+                            {
+                                Log.Write(ex);
+                            }
+                            finally
+                            {
+                                wakeLock.Release();
+                            }
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(ex);
+                }
+            }
         }
-
 
 #if ANDROIDX
 
