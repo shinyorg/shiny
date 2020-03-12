@@ -9,7 +9,6 @@ using Android.Content;
 using Java.Lang;
 using Shiny.Logging;
 using P = Android.Manifest.Permission;
-using static Android.OS.PowerManager;
 #if ANDROIDX
 using AndroidX.Work;
 #else

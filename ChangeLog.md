@@ -36,7 +36,7 @@
 * [Feature] Instead of ShinyHost.Resolve, you can now use the XF DependencyService.Get
 
 ### [NEW] Shiny.Push
-* Leaving BETA - while this does work with the push notification mechanics, its primary purpose is to provide
+* BETA - while this does work with the push notification mechanics, its primary purpose is to provide
     * A wrapper for all push messaging systems - if appcenter dies today, you can be on azure notification hubs tomorrow with 1 line of code change
     * A consistent event structure to work with in the background (delegates - like all other shiny services)
 
