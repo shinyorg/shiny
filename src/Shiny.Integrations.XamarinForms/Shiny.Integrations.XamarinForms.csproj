@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras" ToolsVersion="15.0">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid90</TargetFrameworks>
@@ -10,7 +10,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
-        <PackageReference Include="Xamarin.Forms" Version="4.4.0.991537" />
+        <PackageReference Include="Xamarin.Forms" Version="4.5.0.356" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -26,5 +26,4 @@
         <Compile Include="Platforms\Android\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
-
 </Project>

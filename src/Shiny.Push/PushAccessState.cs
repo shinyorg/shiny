@@ -5,7 +5,7 @@ namespace Shiny.Push
 {
     public struct PushAccessState
     {
-        public PushAccessState(AccessState status, string registrationToken)
+        public PushAccessState(AccessState status, string? registrationToken)
         {
             this.Status = status;
             this.RegistrationToken = registrationToken;
@@ -13,6 +13,6 @@ namespace Shiny.Push
 
 
         public AccessState Status { get; }
-        public string RegistrationToken { get; }
+        public string? RegistrationToken { get; }
     }
 }

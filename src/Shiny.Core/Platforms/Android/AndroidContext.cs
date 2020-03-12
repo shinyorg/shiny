@@ -2,12 +2,11 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Reactive.Subjects;
 using Shiny.Logging;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
 using NativePerm = Android.Content.PM.Permission;
 
 
@@ -36,6 +35,22 @@ namespace Shiny
                 return this.topActivity.Current;
             }
         }
+
+
+        internal Subject<Intent> IntentSubject { get; } = new Subject<Intent>();
+        public IObservable<Intent> WhenIntentReceived() => this.IntentSubject;
+
+        public T GetSystemService<T>(string key) where T: Java.Lang.Object
+            => (T)this.AppContext.GetSystemService(key);
+
+
+        public TValue GetSystemServiceValue<TValue, TSysType>(string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
+        {
+            using (var type = this.GetSystemService<TSysType>(systemTypeName))
+                return func(type);
+        }
+
+
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
         {
             if (this.topActivity.Current != null)
@@ -64,6 +79,7 @@ namespace Shiny
 
         public bool IsMinApiLevel(int apiLevel)
             => (int)Android.OS.Build.VERSION.SdkInt >= apiLevel;
+
 
         public void FirePermission(int requestCode, string[] permissions, NativePerm[] grantResult)
             => this.PermissionResult?.Invoke(this, new PermissionRequestResult(requestCode, permissions, grantResult));
@@ -109,21 +125,26 @@ namespace Shiny
 
         public AccessState GetCurrentAccessState(string androidPermission)
         {
-            var result = ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
+#if !ANDROIDX
+            var result = Android.Support.V4.Content.ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
             return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
+#else
+            var result = AndroidX.Core.Content.ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
+            return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
+#endif
         }
 
 
         int requestCode;
-        public IObservable<AccessState> RequestAccess(string androidPermission) => Observable.Create<AccessState>(ob =>
+        public IObservable<AccessState> RequestAccess(params string[] androidPermissions) => Observable.Create<AccessState>(ob =>
         {
             //if(ActivityCompat.ShouldShowRequestPermissionRationale(this.TopActivity, androidPermission))
-            var currentGrant = this.GetCurrentAccessState(androidPermission);
-            if (currentGrant == AccessState.Available)
-            {
-                ob.Respond(AccessState.Available);
-                return () => { };
-            }
+            //var currentGrant = this.GetCurrentAccessState(androidPermission);
+            //if (currentGrant == AccessState.Available)
+            //{
+            //    ob.Respond(AccessState.Available);
+            //    return () => { };
+            //}
 
             //if (!ActivityCompat.ShouldShowRequestPermissionRationale(this.AppContext, androidPermission))
             //{
@@ -146,11 +167,19 @@ namespace Shiny
             var sub = this.WhenActivityStatusChanged()
                 .Take(1)
                 .Subscribe(x =>
-                    ActivityCompat.RequestPermissions(
+#if !ANDROIDX
+                    Android.Support.V4.App.ActivityCompat.RequestPermissions(
                         x.Activity,
-                        new[] { androidPermission },
+                        androidPermissions,
                         current
                     )
+#else
+                    AndroidX.Core.App.ActivityCompat.RequestPermissions(
+                        x.Activity,
+                        androidPermissions,
+                        current
+                    )
+#endif
                 );
 
 

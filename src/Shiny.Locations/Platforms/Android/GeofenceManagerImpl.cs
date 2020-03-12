@@ -4,10 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using Android.Gms.Location;
-using Android;
 using Android.App;
+using Android.Gms.Location;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 
@@ -38,16 +36,20 @@ namespace Shiny.Locations
         });
 
 
-        public override IObservable<AccessState> WhenAccessStatusChanged() => Observable.Return(AccessState.Available);
-        public override AccessState Status => this.context.GetCurrentAccessState(Manifest.Permission.AccessFineLocation);
-        public override Task<AccessState> RequestAccess() => this.context.RequestAccess(Manifest.Permission.AccessFineLocation).ToTask();
+        public override IObservable<AccessState> WhenAccessStatusChanged()
+            => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.Status);
+
+
+        public override AccessState Status
+            => this.context.GetCurrentLocationAccess(true, true);
+
+
+        public override Task<AccessState> RequestAccess()
+            => this.context.RequestLocationAccess(true, true);
 
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
-            var access = await this.RequestAccess();
-            access.Assert();
-
             await this.Create(region);
             await this.Repository.Set(region.Identifier, region);
         }

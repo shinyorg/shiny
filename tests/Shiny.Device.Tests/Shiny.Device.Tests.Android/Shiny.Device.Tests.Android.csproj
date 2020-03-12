@@ -52,7 +52,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.4.0.991537" />
+    <PackageReference Include="Xamarin.Forms" Version="4.5.0.356" />
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.3" />
@@ -137,6 +137,9 @@
       <Project>{8E87D625-07EA-4CE2-A549-E3A815AB52D6}</Project>
       <Name>Shiny.Device.Tests</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <LinkDescription Include="Linker.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

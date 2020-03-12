@@ -10,14 +10,14 @@
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
-<!--        <PackageIcon>nuget.png</PackageIcon>-->
+        <!--<PackageIcon>nuget.png</PackageIcon>-->
         <PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>
         <PackageReleaseNotes>https://shinylib.net/blog/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         
-        <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">1.0.0</ShinyVersion>        
+        <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">1.1.0</ShinyVersion>        
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
         
@@ -30,27 +30,34 @@
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>               
     </PropertyGroup>
- 
+    
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
+        <DefineConstants>$(DefineConstants);ANDROIDX</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <DefineConstants>$(DefineConstants);__ANDROID__</DefineConstants>
+        <!--
+        <AndroidResgenFile></AndroidResgenFile>
+        <AndroidResgenClass></AndroidResgenClass>
+        -->
+    </PropertyGroup>
+    
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <TargetsToBuild>android;ios;watchos;tvos;uap;tizen</TargetsToBuild>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
         
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">    
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DesignTimeBuild>false</DesignTimeBuild>
         <TargetsToBuild>android;ios;watchos;tvos</TargetsToBuild>
         <TargetsToBuild Condition=" $(OS) == 'WINDOWS_NT' ">uap;tizen;$(TargetsToBuild)</TargetsToBuild>
-        <DebugType Condition=" !$(TargetFramework.StartsWith('monoandroid')) ">portable</DebugType>
-        <DebugType Condition=" $(TargetFramework.StartsWith('monoandroid')) ">Full</DebugType>
+        <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>      
-    
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <UseAndroidX>false</UseAndroidX>
-        <DefineConstants Condition=" $(UseAndroidX) == true ">$(DefineConstants);ANDROIDX</DefineConstants>
-    </PropertyGroup>
-    
+   
     <ItemGroup Condition=" '$(SourceLinkEnabled)' == 'true' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
     </ItemGroup>

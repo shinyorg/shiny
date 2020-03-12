@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reactive;
-using System.Reactive.Linq;
 using Windows.Devices.Power;
 using Windows.Foundation;
 using Windows.System.Power;
@@ -10,22 +8,19 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
-        IDisposable dispose;
-
+        public bool IsEnergySavingEnabled => PowerManager.EnergySaverStatus == EnergySaverStatus.On;
 
         protected override void OnNpcHookChanged(bool hasSubscribers)
         {
             if (hasSubscribers)
             {
-                this.dispose = this.WhenChanged().Subscribe(_ =>
-                {
-                    this.RaisePropertyChanged(nameof(this.BatteryLevel));
-                    this.RaisePropertyChanged(nameof(this.Status));
-                });
+                PowerManager.EnergySaverStatusChanged += this.OnEnergySaverStatusChanged;
+                Battery.AggregateBattery.ReportUpdated += this.OnReportUpdated;
             }
             else
             {
-                this.dispose?.Dispose();
+                PowerManager.EnergySaverStatusChanged -= this.OnEnergySaverStatusChanged;
+                Battery.AggregateBattery.ReportUpdated -= this.OnReportUpdated;
             }
         }
 
@@ -73,11 +68,13 @@ namespace Shiny.Power
         }
 
 
-        IObservable<Unit> WhenChanged() => Observable.Create<Unit>(ob =>
+        void OnEnergySaverStatusChanged(object sender, object e)
+            => this.RaisePropertyChanged(nameof(IsEnergySavingEnabled));
+
+        void OnReportUpdated(Battery sender, object args)
         {
-            var handler = new TypedEventHandler<Battery, object>((sender, args) => ob.OnNext(Unit.Default));
-            Battery.AggregateBattery.ReportUpdated += handler;
-            return () => Battery.AggregateBattery.ReportUpdated -= handler;
-        });
+            this.RaisePropertyChanged(nameof(this.BatteryLevel));
+            this.RaisePropertyChanged(nameof(this.Status));
+        }
     }
 }

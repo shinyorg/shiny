@@ -8,7 +8,8 @@ namespace Shiny.Locations
 {
     [BroadcastReceiver(
         Name = MotionActivityManagerImpl.ReceiverName,
-        Enabled = true
+        Enabled = true,
+        Exported = true
     )]
     [IntentFilter(new[] {
         MotionActivityManagerImpl.IntentAction

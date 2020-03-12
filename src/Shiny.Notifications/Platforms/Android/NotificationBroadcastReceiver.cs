@@ -2,7 +2,11 @@
 using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
+#if ANDROIDX
+using RemoteInput = AndroidX.Core.App.RemoteInput;
+#else
 using RemoteInput = Android.Support.V4.App.RemoteInput;
+#endif
 
 
 namespace Shiny.Notifications
@@ -17,12 +21,15 @@ namespace Shiny.Notifications
     })]
     public class NotificationBroadcastReceiver : BroadcastReceiver
     {
-        public const string ReceiverName = "com.shiny.locations." + nameof(NotificationBroadcastReceiver);
+        public const string ReceiverName = "com.shiny.notifications." + nameof(NotificationBroadcastReceiver);
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
 
 
         public override void OnReceive(Context context, Intent intent)
         {
+            //if (intent.Action != IntentAction)
+            //    return;
+
             var ndelegate = ShinyHost.Resolve<INotificationDelegate>();
             if (ndelegate == null)
                 return;

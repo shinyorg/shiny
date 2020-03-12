@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Foundation;
 using UIKit;
 using UserNotifications;
@@ -8,78 +13,96 @@ using Shiny.Settings;
 
 namespace Shiny.Push
 {
-    //https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/enhanced-user-notifications?tabs=windows
     public class PushManager : AbstractPushManager
     {
-        static TaskCompletionSource<string>? RemoteTokenTask;
+        readonly IMessageBus messageBus;
+        Subject<NSData>? onToken;
 
 
-
-        public PushManager(ISettings settings) : base(settings)
+        public PushManager(ISettings settings,
+                           IMessageBus messageBus,
+                           IServiceProvider services) : base(settings)
         {
-            UNUserNotificationCenter.Current.Delegate = new ShinyPushDelegate();
-        }
+            this.messageBus = messageBus;
 
-
-        public override async Task<PushAccessState> RequestAccess()
-        {
-            // TODO: error on pending request?
-            //if (!UIApplication.SharedApplication.IsRegisteredForRemoteNotifications)
-            //{
-                RemoteTokenTask = new TaskCompletionSource<string>();
-                UIApplication.SharedApplication.RegisterForRemoteNotifications();
-            //}
-
-            var tcs = new TaskCompletionSource<AccessState>();
-            UNUserNotificationCenter.Current.RequestAuthorization(
-                UNAuthorizationOptions.Alert |
-                UNAuthorizationOptions.Badge |
-                UNAuthorizationOptions.Sound,
-                (approved, error) =>
+            iOSShinyHost.RegisterForRemoteNotifications(
+                async deviceToken =>
                 {
-                    if (error != null)
+                    this.onToken?.OnNext(deviceToken);
+                    await services.SafeResolveAndExecute<IPushDelegate>(x =>
                     {
-                        tcs.SetException(new Exception(error.Description));
-                        this.CurrentRegistrationToken = null;
-                        this.CurrentRegistrationTokenDate = null;
-                    }
-                    else
-                    {
-                        var state = approved ? AccessState.Available : AccessState.Denied;
-                        tcs.SetResult(state);
-                    }
+                        var stoken = ToTokenString(deviceToken);
+                        return x.OnTokenChanged(stoken);
+                    });
+                },
+                e => this.onToken?.OnError(new Exception(e.LocalizedDescription)),
+                async (nsdict, action) =>
+                {
+                    // this will only be fired while in the bg, so don't fire observable
+                    var dict = nsdict.FromNsDictionary();
+                    await services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
+                    action(UIBackgroundFetchResult.NewData);
                 }
             );
+        }
 
-            await Task.WhenAll(
-                RemoteTokenTask.Task,
-                tcs.Task
-            );
 
-            this.CurrentRegistrationToken = RemoteTokenTask.Task.Result;
+        public override IObservable<IDictionary<string, string>> WhenReceived() => this
+            .messageBus
+            .Listener<IDictionary<string, string>>(nameof(PushNotificationDelegate));
+
+
+        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+        {
+            var deviceToken = await this.RequestDeviceToken(cancelToken);
+            this.CurrentRegistrationToken = ToTokenString(deviceToken);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-
-            // TODO: timeout?
-            return new PushAccessState(tcs.Task.Result, RemoteTokenTask.Task.Result);
+            return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
         }
 
 
-        public static void RegisteredForRemoteNotifications(NSData deviceToken)
+        public override Task UnRegister()
+            => Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);            
+
+
+        protected virtual async Task<NSData> RequestDeviceToken(CancellationToken cancelToken = default)
         {
-            if (!deviceToken.Description.IsEmpty())
+            this.onToken = new Subject<NSData>();
+            var remoteTask = this.onToken.Take(1).ToTask(cancelToken);
+
+            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
+                UNAuthorizationOptions.Alert |
+                UNAuthorizationOptions.Badge |
+                UNAuthorizationOptions.Sound
+            );
+            if (!result.Item1)
+                throw new Exception(result.Item2.LocalizedDescription);
+
+            await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+            var data = await remoteTask;
+            return data;
+        }
+
+
+        protected static string? ToTokenString(NSData deviceToken)
+        {
+            string? token = null;
+            if (deviceToken.Length > 0)
             {
-                var token = deviceToken.Description.Trim('<', '>');
-                RemoteTokenTask?.SetResult(token);
+                if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                {
+                    var data = deviceToken.ToArray();
+                    token = BitConverter
+                        .ToString(data)
+                        .Replace("-", "")
+                        .Replace("\"", "");
+                }
+                else if (!deviceToken.Description.IsEmpty())
+                {
+                    token = deviceToken.Description.Trim('<', '>');
+                }
             }
-            // TODO: if empty returned? old token vs new token?
-            // TODO: store it in settings?
-        }
-
-
-        public static void FailedToRegisterForRemoteNotifications(NSError error)
-        {
-            Console.WriteLine("Failed to register for remote notifications - " + error.LocalizedDescription);
-            RemoteTokenTask?.SetException(new ArgumentException(error.LocalizedDescription));
+            return token;
         }
     }
 }

@@ -5,17 +5,22 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
-using Android.OS;
-using Android.Support.V4.App;
-using Android.Support.V4.Content;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
 using Shiny.Settings;
 using Native = Android.App.NotificationManager;
+using Android.Graphics;
+
+#if ANDROIDX
+using AndroidX.Core.App;
+using RemoteInput = AndroidX.Core.App.RemoteInput;
+using TaskStackBuilder = AndroidX.Core.App.TaskStackBuilder;
+#else
+using Android.Support.V4.App;
 using RemoteInput = Android.Support.V4.App.RemoteInput;
 using TaskStackBuilder = Android.App.TaskStackBuilder;
-
+#endif
 
 namespace Shiny.Notifications
 {
@@ -28,8 +33,8 @@ namespace Shiny.Notifications
         readonly ISerializer serializer;
         readonly IJobManager jobs;
 
-        NotificationManagerCompat? compatManager;
-        Native? newManager;
+        readonly NotificationManagerCompat? compatManager;
+        readonly Native? newManager;
 
 
         public NotificationManager(AndroidContext context,
@@ -46,26 +51,30 @@ namespace Shiny.Notifications
             this.repository = repository;
             this.settings = settings;
 
+#if ANDROIDX
+            this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
+#else
+            if (this.context.IsMinApiLevel(26))            
+                this.newManager = Native.FromContext(this.context.AppContext);
+            else
+                this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
+#endif
+            if (services.IsRegistered<INotificationDelegate>())
+            {
+                this.context
+                    .WhenIntentReceived()
+                    .Subscribe(x => this
+                        .services
+                        .Resolve<AndroidNotificationProcessor>()
+                        .TryProcessIntent(x)
+                     );
+            }
             // auto process intent?
             //this.context
             //    .WhenActivityStatusChanged()
             //    .Where(x => x.Status == ActivityState.Created)
             //    .Subscribe(x => TryProcessIntent(x.Activity.Intent));
-
-            if (this.context.IsMinApiLevel(26))
-            {
-                this.newManager = Native.FromContext(context.AppContext);
-            }
-            else
-            {
-                this.compatManager = NotificationManagerCompat.From(context.AppContext);
-            }
         }
-
-
-        public static void TryProcessIntent(Intent intent) => ShinyHost
-            .Resolve<AndroidNotificationProcessor>()
-            .TryProcessIntent(intent);
 
 
         public async Task Cancel(int id)
@@ -112,18 +121,24 @@ namespace Shiny.Notifications
                 return;
             }
 
-            var iconId = this.GetIconResource(notification);
             var builder = new NotificationCompat.Builder(this.context.AppContext)
-                .SetContentTitle(notification.Title)
-                .SetContentText(notification.Message)
-                .SetSmallIcon(iconId)
+                .SetContentTitle(notification.Title)                
+                .SetSmallIcon(this.GetSmallIconResource(notification))
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
-            this.AddSound(builder);
+            if (notification.Android.UseBigTextStyle)
+                builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
+            else
+                builder.SetContentText(notification.Message);
+
+            this.TrySetSound(notification, builder);
+            this.TrySetLargeIconResource(notification, builder);
 
             if (!notification.Category.IsEmpty())
+            {
                 this.AddCategory(builder, notification);
+            }
             else
             {
                 var pendingIntent = this.GetLaunchPendingIntent(notification);
@@ -132,7 +147,6 @@ namespace Shiny.Notifications
 
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
-
 
             // disabled until System.Drawing reliable works in Xamarin again
             //if (notification.Android.Color != null)
@@ -151,7 +165,10 @@ namespace Shiny.Notifications
             }
 
             if (notification.Android.Priority != null)
+            {
                 builder.SetPriority(notification.Android.Priority.Value);
+                builder.SetDefaults(NotificationCompat.DefaultAll);
+            }
 
             if (notification.Android.ShowWhen != null)
                 builder.SetShowWhen(notification.Android.ShowWhen.Value);
@@ -175,6 +192,26 @@ namespace Shiny.Notifications
 
         protected virtual void DoNotify(NotificationCompat.Builder builder, Notification notification)
         {
+#if ANDROIDX
+            var channelId = notification.Android.ChannelId;
+
+            if (this.compatManager.GetNotificationChannel(channelId) == null)
+            {
+                var channel = new NotificationChannel(
+                    channelId,
+                    notification.Android.Channel,
+                    notification.Android.NotificationImportance.ToNative()
+                );
+                var d = notification.Android.ChannelDescription;
+                if (!d.IsEmpty())
+                    channel.Description = d;
+
+                this.compatManager.CreateNotificationChannel(channel);
+            }
+
+            builder.SetChannelId(channelId);
+            this.compatManager.Notify(notification.Id, builder.Build());
+#else
             if (this.newManager != null)
             {
                 var channelId = notification.Android.ChannelId;
@@ -196,10 +233,11 @@ namespace Shiny.Notifications
                 builder.SetChannelId(channelId);
                 this.newManager.Notify(notification.Id, builder.Build());
             }
-            else if (this.compatManager != null)
+            else
             {
                 this.compatManager.Notify(notification.Id, builder.Build());
             }
+#endif
         }
 
 
@@ -214,8 +252,11 @@ namespace Shiny.Notifications
 
             var notificationString = this.serializer.Serialize(notification);
             launchIntent.PutExtra(AndroidNotificationProcessor.NOTIFICATION_KEY, notificationString);
-            if (!notification.Payload.IsEmpty())
-                launchIntent.PutExtra("Payload", notification.Payload);
+            if (notification.Payload != null)
+            {
+                // TODO: payload!
+                //launchIntent.PutExtra("Payload", notification.Payload);
+            }
 
             PendingIntent pendingIntent;
             if ((notification.Android.LaunchActivityFlags & AndroidActivityFlags.ClearTask) != 0)
@@ -223,7 +264,11 @@ namespace Shiny.Notifications
                 pendingIntent = TaskStackBuilder
                     .Create(this.context.AppContext)
                     .AddNextIntent(launchIntent)
+#if ANDROIDX
+                    .GetPendingIntent(notification.Id, (int)PendingIntentFlags.OneShot);
+#else
                     .GetPendingIntent(notification.Id, PendingIntentFlags.OneShot);
+#endif
             }
             else
             {
@@ -244,10 +289,15 @@ namespace Shiny.Notifications
             if (colorResourceId <= 0)
                 throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
 
-            return ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+#if ANDROIDX
+            return AndroidX.Core.Content.ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+#else
+            return Android.Support.V4.Content.ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+#endif
         }
 
-        protected virtual int GetIconResource(Notification notification)
+
+        protected virtual int GetSmallIconResource(Notification notification)
         {
             if (notification.Android.SmallIconResourceName.IsEmpty())
                 return this.context.AppContext.ApplicationInfo.Icon;
@@ -260,16 +310,35 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual void AddSound(NotificationCompat.Builder builder)
+        protected void TrySetLargeIconResource(Notification notification, NotificationCompat.Builder builder)
         {
-            if (Notification.CustomSoundFilePath.IsEmpty())
+            if (notification.Android.LargeIconResourceName.IsEmpty())
+                return;
+
+            var iconId = this.context.GetResourceIdByName(notification.Android.LargeIconResourceName);
+            if (iconId > 0)
+                builder.SetLargeIcon(BitmapFactory.DecodeResource(this.context.AppContext.Resources, iconId));
+        }
+
+
+        protected virtual void TrySetSound(Notification notification, NotificationCompat.Builder builder)
+        {
+            var s = notification.Sound;
+            if (!s.Equals(NotificationSound.None))
             {
-                builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
-            }
-            else
-            {
-                var uri = Android.Net.Uri.Parse(Notification.CustomSoundFilePath);
-                builder.SetSound(uri);
+                if (s.Equals(NotificationSound.DefaultSystem))
+                {
+                    builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
+                }
+                else if (s.Equals(NotificationSound.DefaultPriority))
+                {
+                    builder.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri);
+                }
+                else
+                {
+                    var uri = Android.Net.Uri.Parse(s.Path);
+                    builder.SetSound(uri);
+                }
             }
         }
 

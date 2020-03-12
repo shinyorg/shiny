@@ -17,6 +17,9 @@ namespace Shiny.Infrastructure
                 if (name == null)
                     return false;
 
+                if (name.Equals("shiny.test"))
+                    return true;
+
                 if (name.StartsWith("mscorlib"))
                     return false;
 

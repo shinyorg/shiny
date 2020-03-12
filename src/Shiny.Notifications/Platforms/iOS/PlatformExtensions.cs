@@ -1,5 +1,4 @@
 ﻿using System;
-using Foundation;
 using UserNotifications;
 
 
@@ -7,17 +6,16 @@ namespace Shiny.Notifications
 {
     public static class PlatformExtensions
     {
-        public static Notification? FromNative(this UNNotificationRequest native)
+        public static Notification FromNative(this UNNotificationRequest native)
         {
-            if (!Int32.TryParse(native.Identifier, out var i))
-                return null;
+            Int32.TryParse(native.Identifier, out var id);
 
             var shiny = new Notification
             {
-                Id = i,
+                Id = id,
                 Title = native.Content?.Title,
                 Message = native.Content?.Body,
-                Payload = GetPayload(native),
+                Payload = native.Content?.UserInfo?.FromNsDictionary(),
                 BadgeCount = native.Content?.Badge?.Int32Value,
                 Category = native.Content?.CategoryIdentifier
             };
@@ -26,20 +24,6 @@ namespace Shiny.Notifications
                 shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
 
             return shiny;
-        }
-
-
-        static string? GetPayload(UNNotificationRequest request)
-        {
-            var userInfo = request?.Content?.UserInfo;
-            if (userInfo == null)
-                return null;
-
-            var key = new NSString("Payload");
-            if (!userInfo.ContainsKey(key))
-                return null;
-
-            return userInfo[key].ToString();
         }
     }
 }

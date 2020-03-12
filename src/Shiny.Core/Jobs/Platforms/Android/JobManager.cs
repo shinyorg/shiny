@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Settings;
@@ -6,11 +7,14 @@ using Android;
 using Android.App.Job;
 using Android.Content;
 using Java.Lang;
-using JobBuilder = Android.App.Job.JobInfo.Builder;
 using Shiny.Logging;
+using P = Android.Manifest.Permission;
 #if ANDROIDX
 using AndroidX.Work;
+#else
+using JobBuilder = Android.App.Job.JobInfo.Builder;
 #endif
+
 
 namespace Shiny.Jobs
 {
@@ -30,27 +34,52 @@ namespace Shiny.Jobs
         }
 
 
-        public override Task<AccessState> RequestAccess()
+        public override Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
+
+
+        public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
         {
-            var permission = AccessState.Available;
-
-            if (!this.context.IsInManifest(Manifest.Permission.AccessNetworkState))
-                permission = AccessState.NotSetup;
-
-            if (!this.context.IsInManifest(Manifest.Permission.BatteryStats))
-                permission = AccessState.NotSetup;
-
-            //if (!this.context.IsInManifest(Manifest.Permission.ReceiveBootCompleted, false))
-            //    permission = AccessState.NotSetup;
-
-            return Task.FromResult(permission);
+            if (!this.context.IsInManifest(P.WakeLock))
+            {
+                base.RunTask(taskName, task);
+            }
+            else
+            {
+                try
+                {
+                    using (var pm = this.context.GetSystemService<Android.OS.PowerManager>(Context.PowerService))
+                    {
+                        using (var wakeLock = pm.NewWakeLock(Android.OS.WakeLockFlags.Partial, "ShinyTask"))
+                        {
+                            try
+                            {
+                                wakeLock.Acquire();
+                                await task(CancellationToken.None).ConfigureAwait(false);
+                            }
+                            catch (System.Exception ex)
+                            {
+                                Log.Write(ex);
+                            }
+                            finally
+                            {
+                                wakeLock.Release();
+                            }
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(ex);
+                }
+            }
         }
-
 
 #if ANDROIDX
 
         protected override void ScheduleNative(JobInfo jobInfo)
         {
+            this.CancelNative(jobInfo);
+
             //WorkManager.Initialize(this.context.AppContext, new Configuration())
             var constraints = new Constraints.Builder()
                 .SetRequiresBatteryNotLow(jobInfo.BatteryNotLow)
@@ -59,14 +88,11 @@ namespace Shiny.Jobs
                 .Build();
 
             var data = new Data.Builder();
-            //foreach (var parameter in jobInfo.Parameters)
-            //    data.Put(parameter.Key, parameter.Value);
+            data.PutString(ShinyJobWorker.ShinyJobIdentifier, jobInfo.Identifier);
 
             if (jobInfo.Repeat)
             {
-                var request = PeriodicWorkRequest
-                    .Builder
-                    .From<ShinyJobWorker>(TimeSpan.FromMinutes(20))
+                var request = new PeriodicWorkRequest.Builder(typeof(ShinyJobWorker), TimeSpan.FromMinutes(15)) 
                     .SetConstraints(constraints)
                     .SetInputData(data.Build())
                     .Build();
@@ -81,8 +107,14 @@ namespace Shiny.Jobs
             {
                 var worker = new OneTimeWorkRequest.Builder(typeof(ShinyJobWorker))
                     .SetInputData(data.Build())
-                    .SetConstraints(constraints);
+                    .SetConstraints(constraints)
+                    .Build();
 
+                WorkManager.Instance.EnqueueUniqueWork(
+                    jobInfo.Identifier,
+                    ExistingWorkPolicy.Append,
+                    worker
+                );
             }
         }
 
@@ -104,9 +136,7 @@ namespace Shiny.Jobs
         }
 
         protected override void CancelNative(JobInfo jobInfo)
-        {
-            WorkManager.Instance.CancelUniqueWork(jobInfo.Identifier);
-        }
+            => WorkManager.Instance.CancelUniqueWork(jobInfo.Identifier);
 
 
         public override async Task CancelAll()

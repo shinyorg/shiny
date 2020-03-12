@@ -29,6 +29,26 @@ namespace Shiny
         }
 
 
+        public static bool UseNotifications(this IServiceCollection services,
+                                            Type? delegateType,
+                                            bool requestPermissionImmediately = false,
+                                            params NotificationCategory[] notificationCategories)
+            => services.UseNotifications(delegateType, requestPermissionImmediately, notificationCategories);
+
+
+        public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
+                                                                   bool requestPermissionImmediately = false,
+                                                                   params NotificationCategory[] notificationCategories)
+                where TNotificationDelegate : class, INotificationDelegate
+            => services.UseNotifications(
+                typeof(TNotificationDelegate),
+                requestPermissionImmediately,
+                null,
+                null,
+                notificationCategories
+            );
+
+
         public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
                                                                    bool requestPermissionImmediately = false,
                                                                    AndroidOptions? androidConfig = null,
@@ -42,6 +62,7 @@ namespace Shiny
                 uwpConfig,
                 notificationCategories
             );
+
 
         public static bool UseNotifications(this IServiceCollection services,
                                             bool requestPermissionImmediately = false,

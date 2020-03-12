@@ -31,7 +31,7 @@ namespace Shiny.Locations
 
         public bool IsListening => false;
 
-        public AccessState GetCurrentStatus(bool background)
+        public AccessState GetCurrentStatus(GpsRequest request)
         {
             //this.locator.DistanceBasedLocationChanged
             throw new NotImplementedException();
@@ -40,7 +40,7 @@ namespace Shiny.Locations
         public IObservable<IGpsReading> GetLastReading()
             => Observable.Empty<IGpsReading>();
 
-        public Task<AccessState> RequestAccess(bool backgroundMode)
+        public Task<AccessState> RequestAccess(GpsRequest request)
         {
             throw new NotImplementedException();
         }
@@ -59,7 +59,7 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground)
+        public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request)
         {
             throw new NotImplementedException();
         }
@@ -74,6 +74,7 @@ namespace Shiny.Locations
             this.locator.LocationChanged += handler;
             return () => this.locator.LocationChanged -= handler;
         });
+
 
         public void Start()
         {

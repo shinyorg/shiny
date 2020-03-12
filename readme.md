@@ -1,8 +1,9 @@
 ﻿# Shiny for Xamarin & Windows 
 <img src="art/logo.png" width="100" /> 
 
+Shiny is a set of libraries designed to help make device services & backgrounding easy on Xamarin & UWP platforms (with more to come).
 
-Formerly the ACR Plugins
+[Change Log - March 12, 2020](changelog)
 
 * [Samples](https://github.com/shinyorg/shinysamples) - Shows almost every single function point within Shiny
 * [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
@@ -12,8 +13,9 @@ Formerly the ACR Plugins
   * [Geofencing with a Pinch of Notifications - Shiny Style](https://allancritchie.net/posts/shiny-geofencing)
   * [Startup Tasks, Modules, and Stateful Delegates - Shiny Style](https://allancritchie.net/posts/shiny-di)
   * [Beacons - Shiny Style](https://allancritchie.net/posts/shiny-beacons)
-  
-  
+  * [Easy Mode - NO DI](https://allancritchie.net/posts/shiny-easymode)
+
+
 ## Builds
 
 Branch|Status
@@ -47,14 +49,26 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 ## Integrations
 |Project|NuGet|MyGet|Description|
 |-------|-----|-----|-----------|
+|Azure Notifications Push| [![AzureHubPushNugetShield]][AzureHubPushNuget] | [![AzureHubPushMygetShield]][AzureHubPushMyget] | Push Integration for Azure Notification Hubs - Support for iOS, Android, & UWP
+|Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushMygetShield]][FirebasePushMyget] | Push Integration for Google Firebase - Support for iOS & Android
 |SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] | Provides caching, logging, storage, & settings implementations
 |AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | Log errors to AppCenter
 |System.Text.Json Serializer| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | This is the new .NET serializer coming into modern .NET.  This will eventually be standard in Shiny
 |(Android) Current Activity| [![CurrentActivityNugetShield]][CurrentActivityNuget] | [![CurrentActivityMygetShield]][CurrentActivityMyget] | If you use James Montemagno's current top activity plugin, Shiny can use it instead of its internal version
 
+## 3rd Party
+|Project|NuGet|Repo|Description|
+|-------|-----|----|-----------|
+|Shiny.Prism|[![PrismNugetShield]][PrismNuget] | [GitHub](https://github.com/dansiegel/Prism.Container.Extensions) | Prism integration with Shiny maintained by Dan Siegel|
+
 ## Contributors
 * [Allan Ritchie](https://github.com/aritchie) - Project Lead
 * [Emily Stanek](https://github.com/emilystanek) - Logo Designer
+* [Dan Siegel](https://github.com/dansiegel) - Contributor
+* [Keith Dahlby](https://twitter.com/dahlbyk) - Contributor
+
+[PrismNugetShield]: https://img.shields.io/nuget/v/Shiny.Prism.svg
+[PrismNuget]: https://www.nuget.org/packages/Shiny.Prism/
 
 [BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg
 [BeaconsNuget]: https://www.nuget.org/packages/Shiny.Beacons/
@@ -120,3 +134,18 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [SysTextJsonNuget]: https://www.nuget.org/packages/Shiny.Integrations.SysTextJson/
 [SysTextJsonMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.SysTextJson.svg
 [SysTextJsonMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.SysTextJson
+
+[PushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.svg
+[PushNuget]: https://www.nuget.org/packages/Shiny.Push/
+[PushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.svg
+[PushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push
+
+[AzureHubPushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.AzureNotificationHubs.svg
+[AzureHubPushNuget]: https://www.nuget.org/packages/Shiny.Push.AzureNotificationHubs/
+[AzureHubPushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.AzureNotificationHubs.svg
+[AzureHubPushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.AzureNotificationHubs
+
+[FirebasePushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.FirebaseMessaging.svg
+[FirebasePushNuget]: https://www.nuget.org/packages/Shiny.Push.FirebaseMessaging/
+[FirebasePushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.FirebaseMessaging.svg
+[FirebasePushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.FirebaseMessaging

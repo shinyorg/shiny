@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
@@ -8,14 +10,16 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Locations
 {
-    class GpsGeofenceDelegate : IGpsDelegate
+    public class GpsGeofenceDelegate : NotifyPropertyChanged, IGpsDelegate
     {
         readonly IGeofenceManager geofenceManager;
         readonly IGeofenceDelegate geofenceDelegate;
 
+        public Dictionary<string, GeofenceState> CurrentStates { get; set; }
 
         public GpsGeofenceDelegate(IGeofenceManager geofenceManager, IGeofenceDelegate geofenceDelegate)
         {
+            this.CurrentStates = new Dictionary<string, GeofenceState>();
             this.geofenceManager = geofenceManager;
             this.geofenceDelegate = geofenceDelegate;
         }
@@ -23,7 +27,6 @@ namespace Shiny.Locations
 
         public async Task OnReading(IGpsReading reading)
         {
-            // TODO: need previous state
             var geofences = await this.geofenceManager.GetMonitorRegions();
             foreach (var geofence in geofences)
             {
@@ -31,26 +34,55 @@ namespace Shiny.Locations
                     ? GeofenceState.Entered
                     : GeofenceState.Exited;
 
-                await this.geofenceDelegate.OnStatusChanged(state, geofence);
+                var current = this.GetState(geofence.Identifier);
+                if (state != current)
+                {
+                    this.SetState(geofence.Identifier, state);
+                    await this.geofenceDelegate.OnStatusChanged(state, geofence);
+                }
             }
+        }
+
+
+        protected GeofenceState GetState(string geofenceId)
+            => this.CurrentStates.ContainsKey(geofenceId)
+                ? this.CurrentStates[geofenceId]
+                : GeofenceState.Unknown;
+
+
+        protected virtual void SetState(string geofenceId, GeofenceState state)
+        {
+            this.CurrentStates[geofenceId] = state;
+            this.RaisePropertyChanged(nameof(this.CurrentStates));
         }
     }
 
 
-    public class GpsGeofenceManagerImpl : AbstractGeofenceManager
+    public class GpsGeofenceManagerImpl : AbstractGeofenceManager, IShinyStartupTask
     {
+        static readonly GpsRequest Request = new GpsRequest { UseBackground = true };
         readonly IGpsManager? gpsManager;
+
+
         public GpsGeofenceManagerImpl(IRepository repository, IGpsManager? gpsManager = null) : base(repository)
             => this.gpsManager = gpsManager;
 
 
-        public override AccessState Status => this.gpsManager?.GetCurrentStatus(true) ?? AccessState.NotSupported;
+        public async void Start()
+        {
+            var restore = await this.GetMonitorRegions();
+            if (restore.Any())
+                this.TryStartGps();
+        }
+
+
+        public override AccessState Status => this.gpsManager?.GetCurrentStatus(Request) ?? AccessState.NotSupported;
         public override async Task<AccessState> RequestAccess()
         {
             if (this.gpsManager == null)
                 return AccessState.NotSupported;
 
-            return await this.gpsManager.RequestAccess(true);
+            return await this.gpsManager.RequestAccess(new GpsRequest { UseBackground = true });
         }
 
 
@@ -73,20 +105,14 @@ namespace Shiny.Locations
             return state;
         }
 
+
         public override async Task StartMonitoring(GeofenceRegion region)
         {
             this.Assert();
             await this.Repository.Set(region.Identifier, region);
-
-            if (!this.gpsManager.IsListening)
-            {
-                await this.gpsManager.StartListener(new GpsRequest
-                {
-                    Interval = TimeSpan.FromMinutes(1),
-                    UseBackground = true
-                });
-            }
+            this.TryStartGps();
         }
+
 
         public override async Task StopAllMonitoring()
         {
@@ -110,16 +136,29 @@ namespace Shiny.Locations
         public override IObservable<AccessState> WhenAccessStatusChanged()
         {
             this.Assert();
-            return this.gpsManager.WhenAccessStatusChanged(true);
+            return this.gpsManager.WhenAccessStatusChanged(Request);
         }
 
 
-        void Assert()
+        protected async void TryStartGps()
+        {
+            if (!this.gpsManager.IsListening)
+            {
+                await this.gpsManager.StartListener(new GpsRequest
+                {
+                    Interval = TimeSpan.FromMinutes(1),
+                    UseBackground = true
+                });
+            }
+        }
+
+
+        protected void Assert()
         {
             if (this.gpsManager == null)
                 throw new ArgumentException("GPS Manager is not available");
 
-            this.gpsManager.GetCurrentStatus(true).Assert();
+            this.gpsManager.GetCurrentStatus(Request).Assert();
         }
     }
 }

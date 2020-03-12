@@ -15,7 +15,7 @@ namespace Shiny
 {
     public static class ShinyJobManager
     {
-        static IJobManager Current { get; } = ShinyHost.Resolve<IJobManager>();
+        public static IJobManager Current => ShinyHost.Resolve<IJobManager>();
 
         public static bool IsRunning => Current.IsRunning;
         public static IObservable<JobInfo> JobStarted => Current.JobStarted;
@@ -28,24 +28,25 @@ namespace Shiny
         public static Task<JobRunResult> Run(string jobIdentifier, CancellationToken cancelToken = default) => Current.Run(jobIdentifier, cancelToken);
         public static Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default, bool runSequentially = false) => Current.RunAll(cancelToken, runSequentially);
         public static void RunTask(string taskName, Func<CancellationToken, Task> task) => Current.RunTask(taskName, task);
-        public static Task Schedule(JobInfo jobInfo) => Current.Schedule(jobInfo);
+        public static Task Schedule(JobInfo jobInfo) => Current.Schedule(jobInfo);   
     }
 
 
     public static class ShinyFileSystem
     {
-        static IFileSystem Current { get; } = ShinyHost.Resolve<IFileSystem>();
+        public static IFileSystem Current => ShinyHost.Resolve<IFileSystem>();
         public static DirectoryInfo AppData { get => Current.AppData; set => Current.AppData = value; }
         public static DirectoryInfo Cache { get => Current.Cache; set => Current.Cache = value; }
-        public static DirectoryInfo Public { get => Current.Public; set => Current.Public = value; }
+        public static DirectoryInfo Public { get => Current.Public; set => Current.Public = value; }       
     }
 
 
     public static class ShinyPower
     {
-        static IPowerManager Current { get; } = ShinyHost.Resolve<IPowerManager>();
+        public static IPowerManager Current => ShinyHost.Resolve<IPowerManager>();
         public static PowerState Status => Current.Status;
         public static int BatteryLevel => Current.BatteryLevel;
+        public static bool IsEnergySavingEnabled => Current.IsEnergySavingEnabled;
         public static event PropertyChangedEventHandler PropertyChanged
         {
             add => Current.PropertyChanged += value;
@@ -56,9 +57,10 @@ namespace Shiny
 
     public static class ShinyConnectivity
     {
-        static IConnectivity Current { get; } = ShinyHost.Resolve<IConnectivity>();
+        public static IConnectivity Current => ShinyHost.Resolve<IConnectivity>();
         public static NetworkReach Reach => Current.Reach;
         public static NetworkAccess Access => Current.Access;
+        public static string? CellularCarrier => Current.CellularCarrier;
         public static event PropertyChangedEventHandler PropertyChanged
         {
             add => Current.PropertyChanged += value;

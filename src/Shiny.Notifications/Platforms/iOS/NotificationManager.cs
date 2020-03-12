@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using UserNotifications;
@@ -10,15 +11,31 @@ using Shiny.Settings;
 
 namespace Shiny.Notifications
 {
-    public class NotificationManager : INotificationManager
+    public class NotificationManager : INotificationManager, IShinyStartupTask
     {
+        /// <summary>
+        /// This requires a special entitlement from Apple that is general disabled for anything but healt & public safety alerts
+        /// </summary>
+        public static bool UseCriticalAlerts { get; set; }
+
         readonly ISettings settings; // this will have problems with data protection
 
 
         public NotificationManager(ISettings settings)
         {
             this.settings = settings;
-            UNUserNotificationCenter.Current.Delegate = new ShinyNotificationDelegate();
+        }
+
+
+        public void Start()
+        {
+            var sdelegate = ShinyHost.Resolve<INotificationDelegate>();
+            if (sdelegate != null)
+            {
+                UNUserNotificationCenter
+                    .Current
+                    .Delegate = new ShinyNotificationDelegate(sdelegate);
+            }
         }
 
 
@@ -93,11 +110,15 @@ namespace Shiny.Notifications
         public Task<AccessState> RequestAccess()
         {
             var tcs = new TaskCompletionSource<AccessState>();
+            var request = UNAuthorizationOptions.Alert |
+                          UNAuthorizationOptions.Badge |
+                          UNAuthorizationOptions.Sound;
+
+            if (UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0))
+                request |= UNAuthorizationOptions.CriticalAlert;
 
             UNUserNotificationCenter.Current.RequestAuthorization(
-                UNAuthorizationOptions.Alert |
-                UNAuthorizationOptions.Badge |
-                UNAuthorizationOptions.Sound,
+                request,
                 (approved, error) =>
                 {
                     if (error != null)
@@ -141,16 +162,25 @@ namespace Shiny.Notifications
             if (notification.Id == 0)
                 notification.Id = this.settings.IncrementValue("NotificationId");
 
-            var access = await this.RequestAccess();
-            access.Assert();
+            var request = UNNotificationRequest.FromIdentifier(
+                notification.Id.ToString(),
+                this.GetContent(notification),
+                this.GetTrigger(notification)
+            );
+            await UNUserNotificationCenter
+                .Current
+                .AddNotificationRequestAsync(request);
+        }
 
+
+        protected virtual UNNotificationContent GetContent(Notification notification)
+        {
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message                
-                //LaunchImageName = ""
-                //Subtitle = ""
+                Body = notification.Message
             };
+            this.SetSound(notification, content);
             if (!notification.Category.IsEmpty())
                 content.CategoryIdentifier = notification.Category;
 
@@ -158,16 +188,32 @@ namespace Shiny.Notifications
                 content.Badge = notification.BadgeCount.Value;
 
             if (!notification.Payload.IsEmpty())
+                content.UserInfo = notification.Payload.ToNsDictionary();
+
+            return content;
+        }
+
+
+        protected virtual void SetSound(Notification notification, UNMutableNotificationContent content)
+        {
+            var s = notification.Sound;
+            if (!s.Equals(NotificationSound.None))
             {
-                var dict = new NSMutableDictionary();
-                dict.Add(new NSString("Payload"), new NSString(notification.Payload));
-                content.UserInfo = dict;
+                if (s.Equals(NotificationSound.DefaultSystem))
+                    content.Sound = UNNotificationSound.Default;
+                else if (s.Equals(NotificationSound.DefaultPriority))
+                    content.Sound = UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0)
+                        ? UNNotificationSound.DefaultCriticalSound
+                        : UNNotificationSound.Default;
+                else
+                    content.Sound = UNNotificationSound.GetSound(s.Path);
             }
+        }
 
-            if (!Notification.CustomSoundFilePath.IsEmpty())
-                content.Sound = UNNotificationSound.GetSound(Notification.CustomSoundFilePath);
 
-            UNNotificationTrigger trigger = null;
+        protected virtual UNNotificationTrigger? GetTrigger(Notification notification)
+        {
+            UNNotificationTrigger? trigger = null;
             if (notification.ScheduleDate != null)
             {
                 var dt = notification.ScheduleDate.Value.ToLocalTime();
@@ -181,15 +227,7 @@ namespace Shiny.Notifications
                     Second = dt.Second
                 }, false);
             }
-
-            var request = UNNotificationRequest.FromIdentifier(
-                notification.Id.ToString(),
-                content,
-                trigger
-            );
-            await UNUserNotificationCenter
-                .Current
-                .AddNotificationRequestAsync(request);
+            return trigger;
         }
 
 

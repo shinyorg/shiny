@@ -1,88 +1,103 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using Android.Gms.Tasks;
 using Android.Runtime;
 using Firebase.Iid;
 using Firebase.Messaging;
 using Shiny.Settings;
+using Task = System.Threading.Tasks.Task;
+using CancellationToken = System.Threading.CancellationToken;
+
 
 namespace Shiny.Push
 {
     public class PushManager : Java.Lang.Object, IOnCompleteListener, IPushManager
     {
+        readonly AndroidContext context;
         readonly ISettings settings;
+        readonly IMessageBus bus;        
         TaskCompletionSource<string>? taskSrc = null;
 
 
-        public PushManager(ISettings settings) => this.settings = settings;
+        public PushManager(AndroidContext context,
+                           ISettings settings,
+                           IMessageBus bus)
+        {
+            this.context = context;
+            this.settings = settings;
+            this.bus = bus;
+        }
 
 
         public void OnComplete(Android.Gms.Tasks.Task task)
         {
-            if (task.IsSuccessful)
-                this.taskSrc?.TrySetResult(task.Result.JavaCast<IInstanceIdResult>().Token);
-            else
+            if (!task.IsSuccessful)
+            {
                 this.taskSrc?.TrySetException(task.Exception);
+            }
+            else
+            {
+                var result = task.Result.JavaCast<IInstanceIdResult>();
+                this.taskSrc?.TrySetResult(result.Token);
+            }   
         }
 
 
         public string? CurrentRegistrationToken
         {
             get => this.settings.Get<string?>(nameof(CurrentRegistrationToken));
-            private set => this.settings.Set(nameof(CurrentRegistrationToken), value);
+            protected set => this.settings.SetRegToken(value);
         }
 
 
         public DateTime? CurrentRegistrationTokenDate
         {
             get => this.settings.Get<DateTime?>(nameof(CurrentRegistrationTokenDate));
-            private set => this.settings.Set(nameof(CurrentRegistrationTokenDate), value);
+            protected set => this.settings.SetRegDate(value);
         }
 
 
-        //<receiver
-        //    android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver"
-        //    android:exported="false" />
-        //<receiver
-        //    android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
-        //    android:exported="true"
-        //    android:permission="com.google.android.c2dm.permission.SEND">
-        //    <intent-filter>
-        //        <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-        //        <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-        //        <category android:name="${applicationId}" />
-        //    </intent-filter>
-        //</receiver>
-        public async Task<PushAccessState> RequestAccess()
+        public virtual async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            FirebaseMessaging.Instance.AutoInitEnabled = true;
+            //var resultCode = GoogleApiAvailability
+            //    .Instance
+            //    .IsGooglePlayServicesAvailable(this.context.AppContext);
 
-            this.taskSrc = new TaskCompletionSource<string>();
-            FirebaseInstanceId.Instance.GetInstanceId().AddOnCompleteListener(this);
-            var token = await this.taskSrc.Task;
-
-            this.CurrentRegistrationToken = token;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-
-            return new PushAccessState(AccessState.Available, token);
-
-
-            //int resultCode = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
-            //if (resultCode != ConnectionResult.Success)
-            //{
-            //    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
-            //        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
-            //    else
-            //    {
-            //        msgText.Text = "This device is not supported";
-            //        Finish();
-            //    }
-            //    return false;
+            //if (resultCode == ConnectionResult.)
+            //if (resultCode != ConnectionResult.ServiceMissing)
+            //{ 
+            ////{
+            ////    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
+            ////        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
             //}
-            //else
-            //{
-            //    msgText.Text = "Google Play Services is available.";
-            //    return true;
+            this.taskSrc = new TaskCompletionSource<string>();
+            using (cancelToken.Register(() => this.taskSrc.TrySetCanceled()))
+            {
+                FirebaseInstanceId
+                    .Instance
+                    .GetInstanceId()
+                    .AddOnCompleteListener(this);
+
+                this.CurrentRegistrationToken = await this.taskSrc.Task;
+                this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                FirebaseMessaging.Instance.AutoInitEnabled = true;
+
+                return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
+            }
         }
+
+
+        public virtual async Task UnRegister()
+        {
+            FirebaseMessaging.Instance.AutoInitEnabled = false;
+
+            // must be executed off proc
+            await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId());
+        }
+
+        public IObservable<IDictionary<string, string>> WhenReceived()
+            => this.bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
     }
 }

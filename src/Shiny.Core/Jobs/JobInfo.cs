@@ -8,8 +8,11 @@ namespace Shiny.Jobs
     {
         public JobInfo(Type jobType, string? identifier = null)
         {
-            this.Type = jobType;
+            if (jobType == null)
+                throw new ArgumentException("Job Type not set");
+
             this.Identifier = identifier ?? jobType.AssemblyQualifiedName;
+            this.Type = jobType;            
             this.PeriodicTime = TimeSpan.FromMinutes(15);
         }
 
@@ -24,6 +27,7 @@ namespace Shiny.Jobs
         public bool Repeat { get; set; } = true;
         public bool DeviceCharging { get; set; }
         public bool BatteryNotLow { get; set; }
+        public bool RunOnForeground { get; set; }
 
         /// <summary>
         /// Calling JobManager.Clear will not remove this task

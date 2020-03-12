@@ -21,7 +21,7 @@ namespace Shiny.Locations
         }
 
 
-        public AccessState GetCurrentStatus(bool background)
+        public AccessState GetCurrentStatus(GpsRequest request)
         {
             switch (this.geolocator.LocationStatus)
             {
@@ -43,17 +43,17 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => Observable.Create<AccessState>(ob =>
+        public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => Observable.Create<AccessState>(ob =>
         {
             var handler = new TypedEventHandler<Geolocator, StatusChangedEventArgs>((sender, args) =>
-                ob.OnNext(this.GetCurrentStatus(true))
+                ob.OnNext(this.GetCurrentStatus(request))
             );
             this.geolocator.StatusChanged += null;
             return () => this.geolocator.StatusChanged -= null;
         });
 
 
-        public Task<AccessState> RequestAccess(bool background) => Task.FromResult(this.GetCurrentStatus(background));
+        public Task<AccessState> RequestAccess(GpsRequest request) => Task.FromResult(this.GetCurrentStatus(request));
 
         public bool IsListening { get; private set; }
 
@@ -73,7 +73,7 @@ namespace Shiny.Locations
         });
 
 
-        public Task StartListener(GpsRequest request = null)
+        public Task StartListener(GpsRequest? request = null)
         {
             if (!this.IsListening)
             {

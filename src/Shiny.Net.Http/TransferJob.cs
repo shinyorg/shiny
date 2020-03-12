@@ -125,6 +125,7 @@ namespace Shiny.Net.Http
                         file.Name
                     );
                     var message = this.Build(request);
+                    message.Content = content;
                     await this.httpClient
                         .SendAsync(message, ct)
                         .ConfigureAwait(false);

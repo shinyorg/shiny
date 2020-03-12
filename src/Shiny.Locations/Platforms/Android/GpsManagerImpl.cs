@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Gms.Location;
-using P = Android.Manifest.Permission;
 
 
 namespace Shiny.Locations
@@ -22,16 +20,23 @@ namespace Shiny.Locations
             this.context = context;
             this.client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);
         }
+        
 
-
-        public IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => Observable.Return(AccessState.Available); // TODO
-        public AccessState GetCurrentStatus(bool background) => this.context.GetCurrentAccessState(P.AccessFineLocation);
         public bool IsListening { get; private set; }
+
+        public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request)
+            => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.GetCurrentStatus(request));
+
+        public AccessState GetCurrentStatus(GpsRequest request)
+            => this.context.GetCurrentLocationAccess(request.UseBackground, true);
+       
+        public Task<AccessState> RequestAccess(GpsRequest request)
+            => this.context.RequestLocationAccess(request.UseBackground, true);
 
 
         public IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>
         {
-            var access = await this.RequestAccess(false);
+            var access = await this.RequestAccess(new GpsRequest());
             access.Assert();
 
             var location = await this.client.GetLastLocationAsync();
@@ -42,17 +47,13 @@ namespace Shiny.Locations
         });
 
 
-        public Task<AccessState> RequestAccess(bool backgroundMode)
-            => this.context.RequestAccess(P.AccessFineLocation).ToTask();
-
-
-        public async Task StartListener(GpsRequest request)
+        public async Task StartListener(GpsRequest? request = null)
         {
             if (this.IsListening)
                 return;
 
             request = request ?? new GpsRequest();
-            var access = await this.RequestAccess(request.UseBackground);
+            var access = await this.RequestAccess(request);
             access.Assert();
 
             var nativeRequest = LocationRequest

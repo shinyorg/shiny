@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 
 
 namespace Shiny.Power
@@ -22,6 +23,12 @@ namespace Shiny.Power
         public static IObservable<int> WhenBatteryLevelChanged(this IPowerManager power)
             => power.WhenAnyProperty(x => x.BatteryLevel);
 
+
+        public static IObservable<bool> WhenChargingChanged(this IPowerManager power)
+            => power.WhenStatusChanged().Select(x =>
+                x == PowerState.Charged ||
+                x == PowerState.Charging
+            );
 
         /// <summary>
         /// Returns true if any power state indicates the power is plugged in

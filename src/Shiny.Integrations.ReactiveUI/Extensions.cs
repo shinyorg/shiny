@@ -19,6 +19,7 @@ namespace Shiny.Integrations.ReactiveUI
         public static void InstallShiny() => Locator.CurrentMutable.InstallShiny();
 
 
+
         public static IDisposable SubOnMainThread<T>(this IObservable<T> obs, Action<T> onNext)
             => obs
                 .ObserveOn(RxApp.MainThreadScheduler)

@@ -20,5 +20,11 @@ namespace Shiny.Power
         /// Gets the current battery level (scaled in %/percentage - 1-100)
         /// </summary>
         int BatteryLevel { get; }
+
+
+        /// <summary>
+        /// Detects Android Doze or iOS Low Power mode
+        /// </summary>
+        bool IsEnergySavingEnabled { get; }
     }
 }

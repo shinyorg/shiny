@@ -42,28 +42,32 @@ using Android.Runtime;
 
 
 [Application]
-public class YourApplication : Application
+public class YourApplication : ShinyAndroidApplication<YourStartup>
 {
     public YourApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
     {
-    }
-
-
-    public override void OnCreate()
-    {
-        base.OnCreate();
-        Shiny.AndroidShinyHost.Init(this, new YourStartup(), services => {
-            // register any platform specific stuff you need here
-        });
     }
 }
 
 
 2. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
 
+using Shiny;
+public override void OnCreate(Bundle savedInstanceState)
+{
+    this.ShinyOnCreate();
+    base.OnCreate(savedInstanceState);
+}
+
+public override void OnNewIntent(Intent intent)
+{
+    this.ShinyOnNewIntent(intent);
+    base.OnNewIntent(intent);
+}
+
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
 {
-    Shiny.AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+    this.Shiny.OnRequestPermissionsResult(requestCode, permissions, grantResults);
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
 

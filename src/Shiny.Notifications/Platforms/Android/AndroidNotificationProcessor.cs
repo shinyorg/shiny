@@ -1,8 +1,6 @@
 ﻿using System;
 using Android.Content;
-using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
-using Shiny.Logging;
 
 
 namespace Shiny.Notifications

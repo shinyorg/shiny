@@ -17,7 +17,7 @@ namespace Shiny.Locations
 
         public static async Task<AccessState> RequestAccessAndStart(this IGpsManager gps, GpsRequest request)
         {
-            var access = await gps.RequestAccess(request.UseBackground);
+            var access = await gps.RequestAccess(request);
             if (access == AccessState.Available)
                 await gps.StartListener(request);
 

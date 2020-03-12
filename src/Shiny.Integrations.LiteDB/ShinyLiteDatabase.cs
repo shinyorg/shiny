@@ -8,8 +8,8 @@ namespace Shiny
 {
     class ShinyLiteDatabase : LiteDatabase
     {
-        public ShinyLiteDatabase(IFileSystem fileSystem, BsonMapper mapper = null, Logger log = null)
-            : base(Path.Combine(fileSystem.AppData.FullName, "shiny.db"), mapper, log)
+        public ShinyLiteDatabase(IFileSystem fileSystem, BsonMapper? mapper = null)
+            : base(Path.Combine(fileSystem.AppData.FullName, "shiny.db"), mapper)
         {
         }
     }

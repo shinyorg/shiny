@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 
 namespace Shiny.Notifications
 {
@@ -13,7 +13,7 @@ namespace Shiny.Notifications
         /// <summary>
         /// This will be different per platform
         /// </summary>
-        public static string? CustomSoundFilePath { get; set; }
+        public static NotificationSound DefaultSound { get; set; } = NotificationSound.DefaultSystem;
 
         /// <summary>
         /// You do not have to set this - it will be automatically set from the library if you do not supply one
@@ -43,7 +43,7 @@ namespace Shiny.Notifications
         /// <summary>
         /// Additional data you can add to your notification
         /// </summary>
-        public string? Payload { get; set; }
+        public IDictionary<string, string>? Payload { get; set; }
 
         /// <summary>
         /// The value to display on the homescreen badge - set to 0z to remove it
@@ -55,11 +55,16 @@ namespace Shiny.Notifications
         /// <summary>
         /// Options specific to android
         /// </summary>
-        public AndroidOptions? Android { get; set; } = new AndroidOptions();
+        public AndroidOptions Android { get; set; } = new AndroidOptions();
 
         /// <summary>
         /// Options specific to windows (Uwp)
         /// </summary>
-        public UwpOptions? Windows { get; set; } = new UwpOptions();
+        public UwpOptions Windows { get; set; } = new UwpOptions();
+
+        /// <summary>
+        /// The sound you wish to use on your notification - defaults to Notification.DefaultSound
+        /// </summary>
+        public NotificationSound Sound { get; set; } = DefaultSound;
     }
 }
