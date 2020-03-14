@@ -48,5 +48,6 @@
         </ProjectCollection>
            
         <ProjectItem>readme.md</ProjectItem>
+        <ProjectItem>nuget.config</ProjectItem>
     </TemplateContent>
 </VSTemplate>

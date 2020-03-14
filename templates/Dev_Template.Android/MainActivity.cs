@@ -33,7 +33,7 @@ namespace $safeprojectname$
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
-            AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }

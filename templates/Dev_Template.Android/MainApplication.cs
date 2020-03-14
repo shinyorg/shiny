@@ -7,11 +7,7 @@ using Shiny;
 
 namespace $safeprojectname$
 {
-#if DEBUG
-    [Application(Debuggable = true)]
-#else
-    [Application(Debuggable = false)]
-#endif
+    [Application]
     public class MainApplication : ShinyAndroidApplication<MyShinyStartup>
     {
         public MainApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)

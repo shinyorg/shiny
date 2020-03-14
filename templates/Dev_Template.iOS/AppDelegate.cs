@@ -16,7 +16,7 @@ namespace $safeprojectname$
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             // this needs to be loaded before EVERYTHING
-            iOSShinyHost.Init(new ShinyStartup());
+            this.ShinyFinishedLaunching(new ShinyStartup());
 
             Forms.Init();
             Rg.Plugins.Popup.Popup.Init();
@@ -26,15 +26,15 @@ namespace $safeprojectname$
 
 
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
-            => iOSShinyHost.RegisteredForRemoteNotifications(deviceToken);
+            => this.ShinyRegisteredForRemoteNotifications(deviceToken);
 
         public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
-            => iOSShinyHost.FailedToRegisterForRemoteNotifications(error);
+            => this.ShinyFailedToRegisterForRemoteNotifications(error);
 
         public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-            => iOSShinyHost.PerformFetch(completionHandler);
+            => this.ShinyPerformFetch(completionHandler);
 
         public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
-            => iOSShinyHost.HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
+            => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
     }
 }

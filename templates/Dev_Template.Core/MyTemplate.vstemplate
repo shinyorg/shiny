@@ -15,6 +15,7 @@
     <Icon>__TemplateIcon.ico</Icon>
   </TemplateData>
   <TemplateContent>
+    <ProjectItem ReplaceParameters="true" TargetFileName="Constants.cs">Constants.cs</ProjectItem>
     <Project TargetFileName="$safeprojectname$.csproj" File="Dev_Template.Core.csproj" ReplaceParameters="true">
       <ProjectItem ReplaceParameters="true" TargetFileName="ILocalize.cs">ILocalize.cs</ProjectItem>
       <ProjectItem ReplaceParameters="true" TargetFileName="IAppSettings.cs">IAppSettings.cs</ProjectItem>
