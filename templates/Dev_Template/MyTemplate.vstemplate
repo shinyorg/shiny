@@ -23,6 +23,8 @@
         <ProjectItem ReplaceParameters="true" TargetFileName="InverseBooleanConverter.cs">InverseBooleanConverter.cs</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="CoreServices.cs">CoreServices.cs</ProjectItem>
         <ProjectItem ReplaceParameters="true" TargetFileName="AppSettings.cs">AppSettings.cs</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="Strings.resx">Strings.resx</ProjectItem>
+        <ProjectItem ReplaceParameters="true" TargetFileName="ResxLocalize.cs">ResxLocalize.cs</ProjectItem>        
       </Folder>
       <Folder Name="Styles" TargetFolderName="Styles">
         <ProjectItem ReplaceParameters="true" TargetFileName="Colors.xaml">Colors.xaml</ProjectItem>

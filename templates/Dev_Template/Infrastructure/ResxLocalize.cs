@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Resources;
 
-namespace $ext_projectname$.Localization.Resx
+namespace $ext_projectname$.Infrastructure
 {
     public class ResxLocalize : ILocalize
     {
@@ -10,7 +10,7 @@ namespace $ext_projectname$.Localization.Resx
 
         public ResxLocalize()
         {
-            this.resourceManager = new ResourceManager("$ext_projectname$.Localization.Resx.Strings", this.GetType().Assembly);
+            this.resourceManager = new ResourceManager("$ext_projectname$.Infrastructure.Strings", this.GetType().Assembly);
         }
 
 

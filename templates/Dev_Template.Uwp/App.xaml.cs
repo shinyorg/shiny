@@ -18,7 +18,7 @@ namespace $safeprojectname$
         {
             this.InitializeComponent();
             this.Suspending += this.OnSuspending;
-            UwpShinyHost.Init(new ShinyStartup());
+            this.ShinyInit(new ShinyStartup());
         }
 
 
