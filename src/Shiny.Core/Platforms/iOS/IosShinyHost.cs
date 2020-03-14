@@ -23,7 +23,7 @@ namespace Shiny
                 services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
                 services.TryAddSingleton<IFileSystem, FileSystemImpl>();
                 services.TryAddSingleton<ISettings, SettingsImpl>();
-                if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0) && !iOSExtensions.IsSimulator)
+                if (BgTasksJobManager.IsAvailable)
                     services.TryAddSingleton<IJobManager, BgTasksJobManager>();
                 else
                     services.TryAddSingleton<IJobManager, JobManager>();

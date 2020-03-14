@@ -19,6 +19,20 @@ namespace Shiny.Jobs
         }
 
 
+        public static bool IsAvailable
+        {
+            get
+            {
+                var result = (
+                    UIDevice.CurrentDevice.CheckSystemVersion(13, 0) &&
+                    !iOSExtensions.IsSimulator &&
+                    PlatformExtensions.HasBackgroundMode("processing")
+                );
+                return result;
+            }
+        }
+
+
         public override Task<AccessState> RequestAccess()
         {
             var result = AccessState.Available;
