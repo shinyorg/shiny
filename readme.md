@@ -8,6 +8,7 @@ Shiny is a set of libraries designed to help make device services & backgroundin
 * [Samples](https://github.com/shinyorg/shinysamples) - Shows almost every single function point within Shiny
 * [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
   * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
+  * [Shiny 1.1](https://allancritchie.net/posts/shiny11)
   * [Background Jobs - Shiny Style](https://allancritchie.net/posts/shinyjobs)
   * [Settings in a New Light - Shiny Style](https://allancritchie.net/posts/shinysettings)
   * [Geofencing with a Pinch of Notifications - Shiny Style](https://allancritchie.net/posts/shiny-geofencing)
