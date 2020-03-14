@@ -1,5 +1,11 @@
 ﻿# Change Log
 
+1.2.0
+---
+
+### Shiny.Core
+* [Enhancement][iOS] Jobs - now uses iOS 13 background processing
+
 1.1.0
 ---
 

@@ -95,15 +95,30 @@ If you plan to use jobs in iOS, please do the following:
 1. Add this to your AppDelegate.cs
 
 public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-    => Shiny.Jobs.JobManager.OnBackgroundFetch(completionHandler);
+    => this.ShinyPerformFetch(completionHandler);
 
-2. Add the following to your Info.plist
+2a. Add the following to your Info.plist
 
 <key>UIBackgroundModes</key>
 <array>
 	<string>fetch</string>
 </array>
 
+
+2b. Shiny also supported iOS 13 background processing.  Add the following to your Info.plist and Shiny will use it instead
+<key>UIBackgroundModes</key>
+<array>
+	<string>fetch</string>
+    <string>processing</string>
+</array>
+
+<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array>
+	<string>com.shiny.job</string>
+	<string>com.shiny.jobpower</string>
+	<string>com.shiny.jobnet</string>
+	<string>com.shiny.jobpowernet</string>
+</array>
 
 To Test:
 * Use Visual Studio for Mac
