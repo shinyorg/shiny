@@ -6,11 +6,6 @@ using UIKit;
 using Shiny.Infrastructure;
 
 
-//<key>BGTaskSchedulerPermittedIdentifiers</key>
-//<array>
-//	<string>com.xamarin.ColorFeed.refresh</string>
-//	<string>com.xamarin.ColorFeed.cleaning_db</string>
-//</array>
 namespace Shiny.Jobs
 {
     public class BgTasksJobManager : AbstractJobManager
@@ -27,7 +22,10 @@ namespace Shiny.Jobs
         public override Task<AccessState> RequestAccess()
         {
             var result = AccessState.Available;
-            if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))            
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                result = AccessState.NotSupported;
+
+            else if (iOSExtensions.IsSimulator)
                 result = AccessState.NotSupported;
 
             else if (!PlatformExtensions.HasBackgroundMode("processing"))

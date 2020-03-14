@@ -1,13 +1,17 @@
 ﻿using System;
 using Foundation;
 using Microsoft.Extensions.DependencyInjection;
+using ObjCRuntime;
 using UIKit;
 
 
 namespace Shiny
 {
-    public static class InitExtensions
+    public static class iOSExtensions
     {
+        public static bool IsSimulator
+            => Runtime.Arch == Arch.SIMULATOR;
+
         public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
             => iOSShinyHost.Init(startup, platformBuild);
 
