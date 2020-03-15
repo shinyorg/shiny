@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Subjects;
 using Android.App;
 using Android.Content;
@@ -32,15 +33,16 @@ namespace Shiny.Locations
 
             this.Execute(async () =>
             {
-                var gpsDelegate = ShinyHost.Resolve<IGpsDelegate>();
+                var delegates = ShinyHost.Resolve<IEnumerable<IGpsDelegate>>();
                 foreach (var location in result.Locations)
                 {
                     var reading = new GpsReading(location);
+
+                    await delegates
+                        .RunDelegates(x => x.OnReading(reading))
+                        .ConfigureAwait(false);
+                    
                     readingSubject.OnNext(reading);
-                    if (gpsDelegate != null)
-                        await gpsDelegate
-                            .OnReading(reading)
-                            .ConfigureAwait(false);
                 }
             });
         }

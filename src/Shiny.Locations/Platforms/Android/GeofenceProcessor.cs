@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Gms.Location;
@@ -10,18 +11,14 @@ namespace Shiny.Locations
 {
     public class GeofenceProcessor
     {
-        readonly IGeofenceManager geofenceManager;
-        readonly IGeofenceDelegate geofenceDelegate;
+        readonly IEnumerable<IGeofenceDelegate> delegates;
         readonly RepositoryWrapper<GeofenceRegion, GeofenceRegionStore> repository;
 
 
-        public GeofenceProcessor(IRepository repository,
-                                 IGeofenceManager geofenceManager,
-                                 IGeofenceDelegate geofenceDelegate)
+        public GeofenceProcessor(IRepository repository, IEnumerable<IGeofenceDelegate> delegates)
         {
             this.repository = repository.Wrap();
-            this.geofenceManager = geofenceManager;
-            this.geofenceDelegate = geofenceDelegate;
+            this.delegates = delegates;
         }
 
 
@@ -57,21 +54,14 @@ namespace Shiny.Locations
                     }
                     else
                     {
-                        try
-                        {
-                            await this.geofenceDelegate.OnStatusChanged(state, region);
-
-                            if (region.SingleUse)
-                                await this.geofenceManager.StopMonitoring(region.Identifier);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Write(
+                        await this.delegates.RunDelegates(
+                            x => x.OnStatusChanged(state, region),
+                            ex => Log.Write(
                                 ex,
                                 ("RequestId", triggeringGeofence.RequestId),
                                 ("Transition", state.ToString())
-                            );
-                        }
+                            )
+                        );
                     }
                 }
             }

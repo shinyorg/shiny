@@ -4,7 +4,28 @@
 ---
 
 ### Shiny.Core
-* [Enhancement][iOS] Jobs - now uses iOS 13 background processing
+* [Enhancement][Jobs][iOS] Jobs - now uses iOS 13 background processing
+* [Enhancement][Jobs] Job arguments are now like other delegates
+* [Enhancement] Settings now supports secure storage
+* [Enhancement] Setting bindables now support secure storage
+* [Enhancement] New JSON Serializer in favour of JSON.NET
+
+### Shiny.Locations
+* [Enhancement][GPS] Multiple delegate registrations
+* [Enhancement][Geofencing] Multiple delegate registrations
+TODO: UWP
+
+### Shiny.Notifications
+* [Enhancement] Multiple delegate registrations
+
+### Shiny.Push
+* [Enhancement] Multiple delegate registrations
+
+### Shiny.Net.Http
+* [Enhancement] Multiple delegate registrations
+
+### Shiny.Beacons
+* [Enhancement] Multiple delegate registrations
 
 1.1.0
 ---

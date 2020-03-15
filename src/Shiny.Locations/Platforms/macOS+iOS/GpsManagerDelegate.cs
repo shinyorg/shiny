@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -10,7 +11,7 @@ namespace Shiny.Locations
 {
     public class GpsManagerDelegate : ShinyLocationDelegate
     {
-        readonly Lazy<IGpsDelegate> gdelegate = new Lazy<IGpsDelegate>(() => ShinyHost.Resolve<IGpsDelegate>());
+        readonly Lazy<IEnumerable<IGpsDelegate>> delegates = ShinyHost.LazyResolve<IEnumerable<IGpsDelegate>>();
         readonly Subject<IGpsReading> readingSubject = new Subject<IGpsReading>();
         bool deferringUpdates;
 
@@ -42,7 +43,7 @@ namespace Shiny.Locations
         {
             var loc = locations.Last();
             var reading = new GpsReading(loc);
-            this.gdelegate.Value?.OnReading(reading);
+            await this.delegates.Value.RunDelegates(x => x.OnReading(reading));
             this.readingSubject.OnNext(reading);
         });
 
