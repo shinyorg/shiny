@@ -48,7 +48,17 @@ namespace Shiny.Locations
         {
             if (this.context.IsAtLeastAndroid10())
             {
-                var result = await this.context.RequestAccess("android.permission.ACTIVITY_RECOGNITION").ToTask();
+                var result = await this.context
+                    .RequestAccess("android.permission.ACTIVITY_RECOGNITION")
+                    .ToTask();
+
+                if (result == AccessState.Available)
+                {
+                    await this.client.RequestActivityUpdatesAsync(
+                        Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
+                        this.GetPendingIntent()
+                    );
+                }
                 return result;
             }
             return AccessState.Available;

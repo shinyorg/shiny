@@ -8,9 +8,10 @@
 * [Enhancement][Jobs] Job arguments are now like other delegates
 * [Enhancement] Settings now supports secure storage
 * [Enhancement] Setting bindables now support secure storage
-* [Enhancement] New JSON Serializer in favour of JSON.NET
+* [Enhancement] JSON Serializer now uses System.Text.Json instead of JSON.NET
 
 ### Shiny.Locations
+* [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available
 * [Enhancement][GPS] Multiple delegate registrations
 * [Enhancement][Geofencing] Multiple delegate registrations
 TODO: UWP
@@ -21,11 +22,6 @@ TODO: UWP
 ### Shiny.Push
 * [Enhancement] Multiple delegate registrations
 
-### Shiny.Net.Http
-* [Enhancement] Multiple delegate registrations
-
-### Shiny.Beacons
-* [Enhancement] Multiple delegate registrations
 
 1.1.0
 ---
