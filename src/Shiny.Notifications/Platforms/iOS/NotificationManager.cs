@@ -11,7 +11,7 @@ using Shiny.Settings;
 
 namespace Shiny.Notifications
 {
-    public class NotificationManager : INotificationManager, IShinyStartupTask
+    public class NotificationManager : INotificationManager
     {
         /// <summary>
         /// This requires a special entitlement from Apple that is general disabled for anything but healt & public safety alerts
@@ -27,16 +27,16 @@ namespace Shiny.Notifications
         }
 
 
-        public void Start()
-        {
-            var sdelegate = ShinyHost.Resolve<INotificationDelegate>();
-            if (sdelegate != null)
-            {
-                UNUserNotificationCenter
-                    .Current
-                    .Delegate = new ShinyNotificationDelegate(sdelegate);
-            }
-        }
+        //public void Start()
+        //{
+        //    var sdelegate = ShinyHost.Resolve<INotificationDelegate>();
+        //    if (sdelegate != null)
+        //    {
+        //        UNUserNotificationCenter
+        //            .Current
+        //            .Delegate = new ShinyNotificationDelegate(sdelegate);
+        //    }
+        //}
 
 
         public int Badge

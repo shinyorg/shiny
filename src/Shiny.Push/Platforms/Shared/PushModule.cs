@@ -27,9 +27,8 @@ namespace Shiny.Push
 
         public override void Register(IServiceCollection services)
         {
-            if (services.IsRegistered<INotificationManager>())
-                throw new ArgumentException("You cannot use services.UseNotifications yourself when using push");
-
+            // we want this to intercept push, not local notifications
+                // only a problem on ios
             services.UseNotifications<PushNotificationDelegate>(false, this.categories);
             services.AddSingleton(typeof(IPushManager), this.pushManagerType);
             if (delegateType != null)

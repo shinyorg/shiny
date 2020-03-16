@@ -7,6 +7,7 @@ namespace Shiny.Locations
 {
     class GpsModule : ShinyModule
     {
+        static bool added = false;
         readonly Type? delegateType;
         readonly Action<GpsRequest>? requestIfPermissionGranted;
 
@@ -20,6 +21,10 @@ namespace Shiny.Locations
 
         public override void Register(IServiceCollection services)
         {
+            if (added)
+                return;
+
+            added = true;
             if (this.delegateType != null)
                 services.AddSingleton(typeof(IGpsDelegate), this.delegateType);
 

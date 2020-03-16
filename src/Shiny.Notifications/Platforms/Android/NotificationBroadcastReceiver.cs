@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
@@ -30,8 +31,8 @@ namespace Shiny.Notifications
             //if (intent.Action != IntentAction)
             //    return;
 
-            var ndelegate = ShinyHost.Resolve<INotificationDelegate>();
-            if (ndelegate == null)
+            var delegates = ShinyHost.ResolveAll<INotificationDelegate>();
+            if (!delegates.Any())
                 return;
 
             this.Execute(async () =>
@@ -44,12 +45,10 @@ namespace Shiny.Notifications
                 var notification = serializer.Deserialize<Notification>(stringNotification);
                 var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
 
-                ShinyHost
-                    .Resolve<AndroidContext>()
-                    .AppContext
-                    .SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
+                context.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
 
-                await ndelegate.OnEntry(new NotificationResponse(notification, action, text));
+                var response = new NotificationResponse(notification, action, text);
+                await delegates.RunDelegates(x => x.OnEntry(response));
                 await manager.Cancel(notification.Id);
             });
         }
