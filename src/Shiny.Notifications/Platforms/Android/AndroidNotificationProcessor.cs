@@ -10,18 +10,22 @@ namespace Shiny.Notifications
         public const string NOTIFICATION_KEY = "ShinyNotification";
         readonly ISerializer serializer;
         readonly IServiceProvider services;
+        readonly INotificationDelegate? ndelegate;
 
 
-        public AndroidNotificationProcessor(ISerializer serializer, IServiceProvider services)
+        public AndroidNotificationProcessor(ISerializer serializer,
+                                            IServiceProvider services,
+                                            INotificationDelegate? ndelegate = null)
         {
             this.serializer = serializer;
             this.services = services;
+            this.ndelegate = ndelegate;
         }
 
 
         public async void TryProcessIntent(Intent intent)
         {
-            if (intent == null)
+            if (intent == null || this.ndelegate == null)
                 return;
 
             if (!intent.HasExtra(NOTIFICATION_KEY))
