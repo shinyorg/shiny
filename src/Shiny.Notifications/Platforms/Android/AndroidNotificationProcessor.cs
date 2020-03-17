@@ -22,7 +22,7 @@ namespace Shiny.Notifications
 
         public async void TryProcessIntent(Intent intent)
         {
-            if (intent == null)
+            if (intent == null || this.ndelegate == null)
                 return;
 
             if (!intent.HasExtra(NOTIFICATION_KEY))

@@ -7,7 +7,7 @@ namespace Shiny.Notifications
     {
         public static string? DefaultChannelId { get; set; } = "shinynotificationchannelid";
         public static string? DefaultChannel { get; set; } = "shinynotificationchannel";
-        public static string? DefaultSmallIconResourceName { get; set; } = "notification";
+        public static string? DefaultSmallIconResourceName { get; set; }
         public static string? DefaultLargeIconResourceName { get; set; }
         public static string? DefaultColorResourceName { get; set; }
         public static string? DefaultChannelDescription { get; set; }

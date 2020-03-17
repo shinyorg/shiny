@@ -59,16 +59,14 @@ namespace Shiny.Notifications
             else
                 this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
 #endif
-            if (services.IsRegistered<INotificationDelegate>())
-            {
-                this.context
-                    .WhenIntentReceived()
-                    .Subscribe(x => this
-                        .services
-                        .Resolve<AndroidNotificationProcessor>()
-                        .TryProcessIntent(x)
-                     );
-            }
+            this.context
+                .WhenIntentReceived()
+                .Subscribe(x => this
+                    .services
+                    .Resolve<AndroidNotificationProcessor>()
+                    .TryProcessIntent(x)
+                 );
+
             // auto process intent?
             //this.context
             //    .WhenActivityStatusChanged()
@@ -300,8 +298,13 @@ namespace Shiny.Notifications
         protected virtual int GetSmallIconResource(Notification notification)
         {
             if (notification.Android.SmallIconResourceName.IsEmpty())
-                return this.context.AppContext.ApplicationInfo.Icon;
+            {
+                var id = this.context.GetResourceIdByName("notification");
+                if (id > 0)
+                    return id;
 
+                return this.context.AppContext.ApplicationInfo.Icon;
+            }
             var smallIconResourceId = this.context.GetResourceIdByName(notification.Android.SmallIconResourceName);
             if (smallIconResourceId <= 0)
                 throw new ArgumentException($"Icon ResourceId for {notification.Android.SmallIconResourceName} not found");
