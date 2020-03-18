@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Android.Content;
 using Shiny.Infrastructure;
 
@@ -22,7 +23,7 @@ namespace Shiny.Notifications
 
         public async void TryProcessIntent(Intent intent)
         {
-            if (intent == null || this.ndelegate == null)
+            if (intent == null || !this.delegates.Any())
                 return;
 
             if (!intent.HasExtra(NOTIFICATION_KEY))
