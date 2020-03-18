@@ -39,8 +39,13 @@ The following is required for GPS & Geofencing
 -----------------
 Android
 -----------------
+Testing on Android Simulators can be difficult and doesn't always work out of the box!  It is advised to test on devices first.
+
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+<!--Android 10+-->
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
 -----------------
 UWP
