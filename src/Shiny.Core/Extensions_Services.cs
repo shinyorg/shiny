@@ -8,8 +8,18 @@ using Shiny.Logging;
 
 namespace Shiny
 {
+    //public class LazyService<T> : Lazy<T>
+    //{
+    //    public LazyService(IServiceProvider services) : base(() => services.GetRequiredService<T>(), false) { }
+    //}
+
+
     public static class ServiceExtensions
     {
+        //public static void AddLazySingleton<TService, TImpl>(this IServiceCollection services)
+        //    => services.AddSingleton<Lazy<TService>, LazyService<TImpl>>();
+
+
         /// <summary>
         /// Get Service of Type T from the IServiceProvider
         /// </summary>

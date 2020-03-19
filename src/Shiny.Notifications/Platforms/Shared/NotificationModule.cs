@@ -53,6 +53,8 @@ namespace Shiny.Notifications
                 Repeat = true,
                 IsSystemJob = true
             });
+#elif __IOS__
+            services.TryAddSingleton<iOSNotificationDelegate>();
 #elif WINDOWS_UWP
             UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
             {

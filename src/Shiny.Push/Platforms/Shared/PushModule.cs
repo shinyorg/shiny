@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Notifications;
 
 
@@ -27,8 +28,9 @@ namespace Shiny.Push
 
         public override void Register(IServiceCollection services)
         {
-            // we want this to intercept push, not local notifications
-                // only a problem on ios
+#if __IOS__
+            services.TryAddSingleton<iOSNotificationDelegate>();
+#endif
             services.UseNotifications<PushNotificationDelegate>(false, this.categories);
             services.AddSingleton(typeof(IPushManager), this.pushManagerType);
             if (delegateType != null)

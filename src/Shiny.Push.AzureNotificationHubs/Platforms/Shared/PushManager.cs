@@ -2,10 +2,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.NotificationHubs;
 using Shiny.Push;
 using Shiny.Push.AzureNotifications;
 using Shiny.Settings;
-using Microsoft.Azure.NotificationHubs;
+using Shiny.Notifications;
 
 
 namespace Shiny.Integrations.AzureNotifications
@@ -21,8 +22,8 @@ namespace Shiny.Integrations.AzureNotifications
 #elif __IOS__
         public PushManager(AzureNotificationConfig config,
                            ISettings settings,
-                           IMessageBus messageBus,
-                           IServiceProvider services) : base(settings, messageBus, services)
+                           IServiceProvider services,
+                           iOSNotificationDelegate ndelegate) : base(settings, services, ndelegate)
 #elif __ANDROID__
         public PushManager(AzureNotificationConfig config,
                            AndroidContext context,

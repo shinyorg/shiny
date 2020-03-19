@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.InstanceID;
+using Shiny.Notifications;
 using Shiny.Settings;
 
 
@@ -10,8 +11,8 @@ namespace Shiny.Push.FirebaseMessaging
 {
     public class PushManager : Shiny.Push.PushManager
     {
-        public PushManager(ISettings settings, IMessageBus messageBus, IServiceProvider services)
-            : base(settings, messageBus, services)
+        public PushManager(ISettings settings, IServiceProvider services, iOSNotificationDelegate ndelegate)
+            : base(settings, services, ndelegate)
         {
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate
             (

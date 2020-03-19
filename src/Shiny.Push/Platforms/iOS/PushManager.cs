@@ -9,21 +9,51 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
+using Shiny.Notifications;
 
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager
+    public class PushManager : AbstractPushManager, IShinyStartupTask
     {
-        readonly IMessageBus messageBus;
+        readonly iOSNotificationDelegate nativeDelegate;
+        readonly IServiceProvider services;
+        readonly Subject<IDictionary<string, string>> payloadSubj;
         Subject<NSData>? onToken;
 
 
         public PushManager(ISettings settings,
-                           IMessageBus messageBus,
-                           IServiceProvider services) : base(settings)
+                           IServiceProvider services,
+                           iOSNotificationDelegate nativeDelegate) : base(settings)
         {
-            this.messageBus = messageBus;
+            this.services = services;
+            this.nativeDelegate = nativeDelegate;
+
+            this.payloadSubj = new Subject<IDictionary<string, string>>();
+        }
+
+
+        public void Start()
+        {
+            this.nativeDelegate
+                .WhenPresented()
+                .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
+                .Subscribe(x => x.CompletionHandler(UNNotificationPresentationOptions.Alert));
+
+            this.nativeDelegate
+                .WhenResponse()
+                .Where(x => x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
+                .SubscribeAsync(async x =>
+                {
+                    var payload = x.Response.Notification.Request.Content.UserInfo.FromNsDictionary();
+
+                    await this.services
+                        .RunDelegates<IPushDelegate>(x => x.OnReceived(payload))
+                        .ConfigureAwait(false);
+
+                    this.payloadSubj.OnNext(payload);
+                    x.CompletionHandler();
+                });
 
             iOSShinyHost.RegisterForRemoteNotifications(
                 async deviceToken =>
@@ -47,9 +77,7 @@ namespace Shiny.Push
         }
 
 
-        public override IObservable<IDictionary<string, string>> WhenReceived() => this
-            .messageBus
-            .Listener<IDictionary<string, string>>(nameof(PushNotificationDelegate));
+        public override IObservable<IDictionary<string, string>> WhenReceived() => this.payloadSubj;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)

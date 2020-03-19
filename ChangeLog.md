@@ -6,8 +6,6 @@
 ### Shiny.Core
 * [Enhancement][Jobs][iOS] Jobs - now uses iOS 13 background processing
 * [Enhancement][Jobs] Job arguments are now like other delegates
-* [Enhancement] Settings now supports secure storage
-* [Enhancement] Setting bindables now support secure storage
 * [Enhancement] JSON Serializer now uses System.Text.Json instead of JSON.NET
 
 ### Shiny.Locations

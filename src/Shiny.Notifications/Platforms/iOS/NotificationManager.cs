@@ -11,7 +11,7 @@ using Shiny.Settings;
 
 namespace Shiny.Notifications
 {
-    public class NotificationManager : INotificationManager
+    public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         /// <summary>
         /// This requires a special entitlement from Apple that is general disabled for anything but healt & public safety alerts
@@ -19,24 +19,62 @@ namespace Shiny.Notifications
         public static bool UseCriticalAlerts { get; set; }
 
         readonly ISettings settings; // this will have problems with data protection
+        readonly IServiceProvider services;
+        readonly iOSNotificationDelegate nativeDelegate;
 
 
-        public NotificationManager(ISettings settings)
+        public NotificationManager(ISettings settings,
+                                   IServiceProvider services,
+                                   iOSNotificationDelegate nativeDelegate)
         {
             this.settings = settings;
+            this.services = services;
+            this.nativeDelegate = nativeDelegate;
         }
 
 
-        //public void Start()
-        //{
-        //    var sdelegate = ShinyHost.Resolve<INotificationDelegate>();
-        //    if (sdelegate != null)
-        //    {
-        //        UNUserNotificationCenter
-        //            .Current
-        //            .Delegate = new ShinyNotificationDelegate(sdelegate);
-        //    }
-        //}
+        public void Start()
+        {
+            this.nativeDelegate
+                .WhenPresented()
+                .Where(x => !(x.Notification?.Request?.Trigger is UNPushNotificationTrigger))
+                .SubscribeAsync(async x =>
+                {
+                    var shiny = x.Notification.Request.FromNative();
+                    if (shiny != null)
+                    {
+                        await this.services.RunDelegates<INotificationDelegate>(x => x.OnReceived(shiny));
+                        x.CompletionHandler.Invoke(UNNotificationPresentationOptions.Alert);
+                    }
+                });
+
+            this.nativeDelegate
+                .WhenResponse()
+                .Where(x => !(x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger))
+                .SubscribeAsync(async x =>
+                {
+                    var shiny = x.Response.Notification.Request.FromNative();
+                    if (shiny != null)
+                    {
+                        NotificationResponse response = default;
+                        if (x.Response is UNTextInputNotificationResponse textResponse)
+                        {
+                            response = new NotificationResponse(
+                                shiny,
+                                textResponse.ActionIdentifier,
+                                textResponse.UserText
+                            );
+                        }
+                        else
+                        {
+                            response = new NotificationResponse(shiny, x.Response.ActionIdentifier, null);
+                        }
+
+                        await this.services.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
+                        x.CompletionHandler();
+                    }
+                });
+        }
 
 
         public int Badge
