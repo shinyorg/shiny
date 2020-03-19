@@ -14,7 +14,7 @@ namespace Shiny.Tests.Infrastructure
     {
         static IServiceProvider Create(Action<TestSettings> addSettings = null)
         {
-            var serializer = new JsonNetSerializer();
+            var serializer = new ShinySerializer();
             var settings = new TestSettings(serializer);
             addSettings?.Invoke(settings);
 

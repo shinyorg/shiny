@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Shiny.Infrastructure;
 using Shiny.Locations;
+using Shiny.Notifications;
 using Xunit;
 
 
@@ -12,14 +13,45 @@ namespace Shiny.Tests
         protected abstract T Create();
 
 
-        [Fact(Skip = "TODO")]
+        [Fact]
         public virtual void GeofenceRegion()
         {
-            var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromKilometers(99));
+            var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromKilometers(99))
+            {
+                NotifyOnEntry = true,
+                NotifyOnExit = true,
+                SingleUse = true
+            };
+            this.RunTest(start);
+        }
+
+
+        [Fact]
+        public virtual void Notification()
+        {
+            var start = new Notification
+            {
+                Title = "TheTitle",
+                Message = "TheMessage",
+                BadgeCount = 1,
+
+                Sound = NotificationSound.DefaultSystem,
+                Android = new AndroidOptions
+                {
+                    UseBigTextStyle = true
+                }
+            };
+            this.RunTest(start);
+        }
+
+
+        void RunTest<T>(T obj, Action<T> postAction = null)
+        {
             var serializer = this.Create();
-            var value = serializer.Serialize(start);
-            var end = serializer.Deserialize<GeofenceRegion>(value);
-            start.Should().Be(end);
+            var value = serializer.Serialize(obj);
+            var end = serializer.Deserialize<T>(value);
+            obj.Should().Be(end);
+            postAction?.Invoke(end);
         }
     }
 }
