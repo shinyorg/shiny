@@ -46,7 +46,7 @@ namespace Shiny.Push
                         .ConfigureAwait(false);
 
                     this.payloadSubj.OnNext(payload);
-                    x.CompletionHandler(UNNotificationPresentationOptions.Alert);
+                    x.CompletionHandler?.Invoke(UNNotificationPresentationOptions.Alert);
                 });
 
             this.nativeDelegate
@@ -55,7 +55,7 @@ namespace Shiny.Push
                 .SubscribeAsync(async x =>
                 {
                     // TODO: get tap response
-                    x.CompletionHandler();
+                    x.CompletionHandler?.Invoke();
                 });
 
             iOSShinyHost.RegisterForRemoteNotifications(
