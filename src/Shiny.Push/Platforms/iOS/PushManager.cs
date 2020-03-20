@@ -38,20 +38,23 @@ namespace Shiny.Push
             this.nativeDelegate
                 .WhenPresented()
                 .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
-                .Subscribe(x => x.CompletionHandler(UNNotificationPresentationOptions.Alert));
+                .SubscribeAsync(async x =>
+                {
+                    var payload = x.Notification.Request?.Content?.UserInfo?.FromNsDictionary();
+                    await this.services
+                        .RunDelegates<IPushDelegate>(x => x.OnReceived(payload))
+                        .ConfigureAwait(false);
+
+                    this.payloadSubj.OnNext(payload);
+                    x.CompletionHandler(UNNotificationPresentationOptions.Alert);
+                });
 
             this.nativeDelegate
                 .WhenResponse()
                 .Where(x => x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                 .SubscribeAsync(async x =>
                 {
-                    var payload = x.Response.Notification.Request.Content.UserInfo.FromNsDictionary();
-
-                    await this.services
-                        .RunDelegates<IPushDelegate>(x => x.OnReceived(payload))
-                        .ConfigureAwait(false);
-
-                    this.payloadSubj.OnNext(payload);
+                    // TODO: get tap response
                     x.CompletionHandler();
                 });
 

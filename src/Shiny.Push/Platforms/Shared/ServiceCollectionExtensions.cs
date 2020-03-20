@@ -9,14 +9,12 @@ namespace Shiny
     public static class ServiceCollectionExtensions
     {
         public static bool UsePush<TDelegate>(this IServiceCollection services,
-                                              bool requestAccessOnStart = false,
                                               params NotificationCategory[] categories) where TDelegate : class, IPushDelegate
-            => services.UsePush(typeof(TDelegate), requestAccessOnStart, categories);
+            => services.UsePush(typeof(TDelegate), categories);
 
 
         public static bool UsePush(this IServiceCollection services,
                                    Type delegateType,
-                                   bool requestAccessOnStart = false,
                                    params NotificationCategory[] categories)
         {
 #if NETSTANDARD
@@ -25,7 +23,6 @@ namespace Shiny
             services.RegisterModule(new PushModule(
                 typeof(PushManager),
                 delegateType,
-                requestAccessOnStart,
                 categories
             ));
             return true;
