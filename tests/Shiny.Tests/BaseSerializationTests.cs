@@ -26,23 +26,23 @@ namespace Shiny.Tests
         }
 
 
-        [Fact]
-        public virtual void Notification()
-        {
-            var start = new Notification
-            {
-                Title = "TheTitle",
-                Message = "TheMessage",
-                BadgeCount = 1,
+        //[Fact]
+        //public virtual void Notification()
+        //{
+        //    var start = new Notification
+        //    {
+        //        Title = "TheTitle",
+        //        Message = "TheMessage",
+        //        BadgeCount = 1,
 
-                Sound = NotificationSound.DefaultSystem,
-                Android = new AndroidOptions
-                {
-                    UseBigTextStyle = true
-                }
-            };
-            this.RunTest(start);
-        }
+        //        Sound = NotificationSound.DefaultSystem,
+        //        Android = new AndroidOptions
+        //        {
+        //            UseBigTextStyle = true
+        //        }
+        //    };
+        //    this.RunTest(start);
+        //}
 
 
         void RunTest<T>(T obj, Action<T> postAction = null)

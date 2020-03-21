@@ -1,11 +1,11 @@
-﻿using System;
-using Shiny.Infrastructure;
+﻿//using System;
+//using Shiny.Infrastructure;
 
-namespace Shiny.Tests.Infrastructure
-{
-    public class XmlSerializationTests : BaseSerializationTests<XmlSerializerImpl>
-    {
-        protected override XmlSerializerImpl Create()
-            => new XmlSerializerImpl();
-    }
-}
+//namespace Shiny.Tests.Infrastructure
+//{
+//    public class XmlSerializationTests : BaseSerializationTests<XmlSerializerImpl>
+//    {
+//        protected override XmlSerializerImpl Create()
+//            => new XmlSerializerImpl();
+//    }
+//}
