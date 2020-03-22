@@ -22,6 +22,10 @@ namespace Shiny.Integrations.Sqlite
             => this.conn.GetConnection().Get<SettingStore>(key).GetValue();
 
 
+        protected override void NativeClear()
+            => this.conn.GetConnection().DeleteAll<SettingStore>();
+
+
         protected override void NativeRemove(string[] keys)
         {
             foreach (var key in keys)
@@ -34,17 +38,6 @@ namespace Shiny.Integrations.Sqlite
             var store = new SettingStore { Key = key };
             store.SetValue(value);
             this.conn.GetConnection().InsertOrReplace(store);
-        }
-
-
-        protected override IDictionary<string, string> NativeValues()
-        {
-            var dict = new Dictionary<string, string>();
-            var stores = this.conn.GetConnection().Table<SettingStore>().ToList();
-            foreach (var store in stores)
-                dict.Add(store.Key, store.GetValue().ToString());
-
-            return dict;
         }
     }
 }

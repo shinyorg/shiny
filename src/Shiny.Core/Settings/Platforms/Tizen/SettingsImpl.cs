@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Shiny.Infrastructure;
 using Tizen.Applications;
 
@@ -63,15 +61,7 @@ namespace Shiny.Settings
             => Preference.Set(key, value);
 
 
-        protected override IDictionary<string, string> NativeValues()
-        {
-            var dict = new Dictionary<string, string>(Preference.Keys.Count());
-            foreach (var key in Preference.Keys)
-            {
-                var value = Preference.Get<object>(key);
-                dict.Add(key, value.ToString());
-            }
-            return dict;
-        }
+        protected override void NativeClear()
+            => Preference.RemoveAll();
     }
 }

@@ -22,4 +22,9 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="PrefencesSettings.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

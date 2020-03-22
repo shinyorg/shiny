@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -21,7 +20,6 @@ namespace Shiny.Settings
         {
             this.changedSubject = new Subject<SettingChange>();
             this.serializer = serializer;
-            this.KeysNotToClear = new List<string>();
         }
 
 
@@ -29,10 +27,8 @@ namespace Shiny.Settings
         protected abstract object NativeGet(Type type, string key);
         protected abstract void NativeSet(Type type, string key, object value);
         protected abstract void NativeRemove(string[] keys);
-        protected abstract IDictionary<string, string> NativeValues();
+        protected abstract void NativeClear();
         public IObservable<SettingChange> Changed => this.changedSubject;
-        public List<string> KeysNotToClear { get; set; }
-        public virtual IReadOnlyDictionary<string, string>? List { get; protected set; }
 
 
         public virtual object? GetValue(Type type, string key, object? defaultValue = null)
@@ -68,15 +64,6 @@ namespace Shiny.Settings
             {
                 throw new ArgumentException($"Error getting key: {key}", ex);
             }
-        }
-
-
-        public virtual T GetRequired<T>(string key)
-        {
-            if (!this.Contains(key))
-                throw new ArgumentException($"Settings key '{key}' is not set");
-
-            return this.Get<T>(key);
         }
 
 
@@ -145,17 +132,6 @@ namespace Shiny.Settings
         }
 
 
-        public virtual bool SetDefault<T>(string key, T value)
-        {
-            if (this.Contains(key))
-                return false;
-
-            var type = this.UnwrapType(typeof(T));
-            this.NativeSet(type, key, value);
-            return true;
-        }
-
-
         public virtual bool Remove(string key)
         {
             if (!this.Contains(key))
@@ -168,22 +144,13 @@ namespace Shiny.Settings
 
         public virtual void Clear()
         {
-            var keys = this.NativeValues()
-                .Where(x => this.ShouldClear(x.Key))
-                .Select(x => x.Key)
-                .ToArray();
-
-            this.NativeRemove(keys);
+            this.NativeClear();
             this.OnChanged(new SettingChange(SettingChangeAction.Clear, null, null));
         }
 
 
         protected virtual void OnChanged(SettingChange args)
-        {
-            this.changedSubject.OnNext(args);
-            var native = this.NativeValues();
-            this.List = new ReadOnlyDictionary<string, string>(native);
-        }
+            => this.changedSubject.OnNext(args);
 
 
         protected virtual string Serialize(Type type, object value)
@@ -216,10 +183,6 @@ namespace Shiny.Settings
 
             return this.serializer.Deserialize(type, value);
         }
-
-
-        protected virtual bool ShouldClear(string key)
-            => !this.KeysNotToClear.Any(x => x.Equals(key));
 
 
         protected virtual Type UnwrapType(Type type)

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Shiny.Infrastructure;
 using Foundation;
 
@@ -13,22 +11,9 @@ namespace Shiny.Settings
         readonly object syncLock;
 
 
-        public SettingsImpl(ISerializer serializer, string nameSpace = null) : base(serializer)
+        public SettingsImpl(ISerializer serializer, string? nameSpace = null) : base(serializer)
         {
             this.syncLock = new object();
-
-            this.KeysNotToClear = new List<string> {
-                "WebKitKerningAndLigaturesEnabledByDefault",
-                "AppleLanguages",
-                "monodevelop-port",
-                "AppleITunesStoreItemKinds",
-                "AppleLocale",
-                "connection-mode",
-                "AppleKeyboards",
-                "NSLanguages",
-                "UIDisableLegacyTextView",
-                "NSInterfaceStyle"
-            };
             this.prefs = nameSpace == null
                 ? NSUserDefaults.StandardUserDefaults
                 : new NSUserDefaults(nameSpace, NSUserDefaultsType.SuiteName);
@@ -111,12 +96,15 @@ namespace Shiny.Settings
         }
 
 
-        protected override IDictionary<string, string> NativeValues() => this
-            .prefs
-            .ToDictionary()
-            .ToDictionary(
-                x => x.Key.ToString(),
-                x => x.Value.ToString()
-            );
+        protected override void NativeClear()
+        {
+            lock (this.syncLock)
+            {
+                foreach (var key in this.prefs.ToDictionary())
+                    this.prefs.RemoveObject(key.Key.ToString());
+
+                this.prefs.Synchronize();
+            }
+        }
     }
 }

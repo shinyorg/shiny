@@ -7,6 +7,7 @@
 * [Enhancement][Jobs][iOS] Jobs - now uses iOS 13 background processing
 * [Enhancement][Jobs] Job arguments are now like other delegates
 * [Enhancement] JSON Serializer now uses System.Text.Json instead of JSON.NET
+* [BREAKING][Settings] KeysNotClear and Keys enumerable have been removed to make room for more platforms and simplify the API - some methods were moved to extensions
 
 ### Shiny.Locations
 * [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Shiny.Infrastructure;
 using Android.Content;
 using Android.Preferences;
@@ -120,16 +118,8 @@ namespace Shiny.Settings
         }
 
 
-        protected override IDictionary<string, string> NativeValues()
-        {
-            lock (this.syncLock)
-            {
-                return this.GetPrefs().All.ToDictionary(
-                    x => x.Key,
-                    x => x.Value.ToString()
-                );
-            }
-        }
+        protected override void NativeClear()
+            => this.UoW(x => x.Clear());
 
 
         protected ISharedPreferences GetPrefs()
