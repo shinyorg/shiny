@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <PackageReference Include="Xamarin.Essentials" Version="1.5.0" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.5.1" />
         <PackageReference Include="Pharmacist.MSBuild" Version="1.5.15" />
     </ItemGroup>
 
@@ -23,7 +23,19 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="PrefencesSettings.cs">
+      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="PrefencesSettings.cs">
+        <SubType></SubType>
+      </Compile>
+      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="EssentialsConnectivityImpl.cs">
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="ConnectivityImpl.cs">
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="PowerManagerImpl.cs">
+        <SubType></SubType>
+      </Compile>
+      <Compile Update="EnvironmentImpl.cs">
         <SubType></SubType>
       </Compile>
     </ItemGroup>

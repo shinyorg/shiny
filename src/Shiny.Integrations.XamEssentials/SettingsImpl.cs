@@ -4,11 +4,11 @@ using Shiny.Settings;
 using Xamarin.Essentials;
 
 
-namespace Shiny
+namespace Shiny.Integrations.XamEssentials
 {
-    public class PrefencesSettings : AbstractSettings
+    public class SettingsImpl : AbstractSettings
     {
-        public PrefencesSettings(ISerializer serializer) : base(serializer)
+        public SettingsImpl(ISerializer serializer) : base(serializer)
         {
         }
 
@@ -16,14 +16,15 @@ namespace Shiny
         public override bool Contains(string key) => Preferences.ContainsKey(key);
 
         protected override void NativeClear()
-        {
-            throw new NotImplementedException();
-        }
+            => Preferences.Clear();
+
 
         protected override object NativeGet(Type type, string key)
         {
             if (type == typeof(string))
                 return Preferences.Get(key, (string)null);
+
+
 
             throw new ArgumentException("Invalid type");
         }
