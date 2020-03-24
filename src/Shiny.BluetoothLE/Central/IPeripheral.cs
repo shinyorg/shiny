@@ -5,20 +5,6 @@ namespace Shiny.BluetoothLE.Central
 {
     public interface IPeripheral
     {
-        //IObservable<> WriteDescriptor(Guid uuid, byte[] data);
-        //IObservable<> ReadDescriptor(Guid uuid);
-        //IObservable<> ReadCharacteristic(Guid uuid);
-        //IObservable<> WriteCharacteristic(Guid uuid, byte[] data, bool withResponse = true)
-        //IObservable<> WhenValueChanged(Guid uuid, bool useIndicationIfAvailable);
-
-        //IObservable<string> WhenNameChanged();
-        //IObservable<int> WhenRssiChanged();
-
-        /// <summary>
-        /// Returns the native peripheral instance for external use
-        /// </summary>
-        object NativeDevice { get; }
-
         /// <summary>
         /// The peripheral name - note that this is not readable in the background on most platforms
         /// </summary>
@@ -39,7 +25,7 @@ namespace Shiny.BluetoothLE.Central
         /// Connect to a peripheral
         /// </summary>
         /// <param name="config">Connection configuration</param>
-        void Connect(ConnectionConfig config = null);
+        void Connect(ConnectionConfig? config = null);
 
         /// <summary>
         /// Disconnect from the peripheral and cancel persistent connection

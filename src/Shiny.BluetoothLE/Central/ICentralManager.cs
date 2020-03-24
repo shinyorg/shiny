@@ -20,8 +20,8 @@ namespace Shiny.BluetoothLE.Central
         /// <summary>
         /// Get a known peripheral
         /// </summary>
-        /// <param name="deviceId">Peripheral identifier.</param>
-        IObservable<IPeripheral> GetKnownPeripheral(Guid deviceId);
+        /// <param name="peripheralId">Peripheral identifier.</param>
+        IObservable<IPeripheral?> GetKnownPeripheral(Guid peripheralId);
 
         /// <summary>
         /// Returns current status of adapter (on/off/permission)
@@ -45,14 +45,12 @@ namespace Shiny.BluetoothLE.Central
         /// <returns></returns>
         IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null);
 
-
-
         /// <summary>
         /// Start scanning for BluetoothLE peripherals
         /// WARNING: only one scan can be active at a time.  Use IsScanning to check for active scanning
         /// </summary>
         /// <returns></returns>
-        IObservable<IScanResult> Scan(ScanConfig config = null);
+        IObservable<IScanResult> Scan(ScanConfig? config = null);
 
         /// <summary>
         /// Monitor for status changes with adapter (on/off/permissions)

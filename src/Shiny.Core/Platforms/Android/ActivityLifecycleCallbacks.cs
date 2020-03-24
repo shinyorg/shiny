@@ -14,14 +14,14 @@ namespace Shiny
         readonly WeakReference<Activity> current = new WeakReference<Activity>(null);
 
 
-        public Activity Activity
+        public Activity? Activity
         {
             get => this.current.TryGetTarget(out var a) ? a : null;
             set => this.current.SetTarget(value);
         }
 
 
-        void Fire(Activity activity, ActivityState state, Bundle bundle = null) => this.ActivitySubject.OnNext(new ActivityChanged(activity, state, bundle));
+        void Fire(Activity activity, ActivityState state, Bundle? bundle = null) => this.ActivitySubject.OnNext(new ActivityChanged(activity, state, bundle));
 
 
         public void OnActivityCreated(Activity activity, Bundle savedInstanceState)

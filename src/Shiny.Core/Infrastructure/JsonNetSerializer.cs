@@ -6,8 +6,12 @@ namespace Shiny.Infrastructure
 {
     public class JsonNetSerializer : ISerializer
     {
-        public T Deserialize<T>(string value) => JsonConvert.DeserializeObject<T>(value);
-        public object Deserialize(Type objectType, string value) => JsonConvert.DeserializeObject(value, objectType);
-        public string Serialize(object value) => JsonConvert.SerializeObject(value);
+        readonly JsonSerializerSettings? settings;
+        public JsonNetSerializer(JsonSerializerSettings? settings = null) => this.settings = settings;
+
+
+        public T Deserialize<T>(string value) => JsonConvert.DeserializeObject<T>(value, this.settings);
+        public object Deserialize(Type objectType, string value) => JsonConvert.DeserializeObject(value, objectType, this.settings);
+        public string Serialize(object value) => JsonConvert.SerializeObject(value, this.settings);
     }
 }

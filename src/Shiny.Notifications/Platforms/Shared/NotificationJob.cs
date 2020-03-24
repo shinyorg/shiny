@@ -26,7 +26,10 @@ namespace Shiny.Notifications
         {
             var all = await this.repository.GetAll<Notification>();
             var pending = all
-                .Where(x => x.ScheduleDate.Value < DateTimeOffset.UtcNow)
+                .Where(x =>
+                    x.ScheduleDate != null &&
+                    x.ScheduleDate.Value < DateTimeOffset.UtcNow
+                )
                 .ToList();
 
             var anyPending = false;

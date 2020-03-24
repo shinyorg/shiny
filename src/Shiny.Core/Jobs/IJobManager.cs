@@ -25,13 +25,13 @@ namespace Shiny.Jobs
         /// <summary>
         /// Fires just as a job is about to start
         /// </summary>
-        event EventHandler<JobInfo> JobStarted;
+        IObservable<JobInfo> JobStarted { get; }
 
 
         /// <summary>
         /// Fires as each job finishes
         /// </summary>
-        event EventHandler<JobRunResult> JobFinished;
+        IObservable<JobRunResult> JobFinished { get; }
 
 
         /// <summary>
@@ -45,8 +45,9 @@ namespace Shiny.Jobs
         /// This force runs the manager and any registered jobs
         /// </summary>
         /// <param name="cancelToken"></param>
+        /// <param name="runSequentially"></param>
         /// <returns></returns>
-        Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default);
+        Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default, bool runSequentially = false);
 
 
         /// <summary>
@@ -63,7 +64,7 @@ namespace Shiny.Jobs
         /// </summary>
         /// <param name="jobIdentifier"></param>
         /// <returns></returns>
-        Task<JobInfo> GetJob(string jobIdentifier);
+        Task<JobInfo?> GetJob(string jobIdentifier);
 
 
         /// <summary>

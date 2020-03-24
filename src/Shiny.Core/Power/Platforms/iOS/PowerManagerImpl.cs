@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Foundation;
 using UIKit;
 
 
@@ -8,12 +9,14 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
-        CompositeDisposable dispose;
+        CompositeDisposable? dispose;
+
+
+        public bool IsEnergySavingEnabled => NSProcessInfo.ProcessInfo.LowPowerModeEnabled;
 
 
         protected override void OnNpcHookChanged(bool hasSubscribers)
         {
-
             if (hasSubscribers)
             {
                 this.dispose = new CompositeDisposable(
@@ -53,8 +56,7 @@ namespace Shiny.Power
                 }
             }
         }
-
-
+       
 
         IObservable<int> WhenBatteryPercentageChanged() => Observable.Create<int>(ob =>
         {

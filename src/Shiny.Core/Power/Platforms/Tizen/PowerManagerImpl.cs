@@ -5,6 +5,8 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
+        public bool IsEnergySavingEnabled => false;
+
         public PowerState Status
         {
             get

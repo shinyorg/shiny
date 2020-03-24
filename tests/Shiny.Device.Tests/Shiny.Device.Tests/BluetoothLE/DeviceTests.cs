@@ -54,7 +54,7 @@ namespace Shiny.BluetoothLE.Tests
         {
             await this.Setup(false);
             var obs = this.peripheral
-                .WhenReadRssiContinuously()
+                .ReadRssiContinuously()
                 .Take(2)
                 .Timeout(TimeSpan.FromSeconds(30));
 

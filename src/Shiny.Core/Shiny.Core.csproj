@@ -2,38 +2,42 @@
 
     <PropertyGroup>
         <RootNamespace>Shiny</RootNamespace>
-        <Description>The Shiny Core containing all of the major functionality like caching, logging, connectivity, environment, IO, power, settings, and jobs as well as many other utilities</Description>
-        <PackageVersion>1.0.0</PackageVersion>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;monoandroid90</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;tizen50;$(TargetFrameworks)</TargetFrameworks>
+        <Description>The Shiny Core containing all of the major functionality like caching, logging, connectivity, environment, IO, power, settings, application state monitoring, and jobs as well as many other utilities</Description>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;tizen50;monoandroid90;monoandroid10.0</TargetFrameworks>        
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
-        <PackageReference Include="System.Reactive" Version="4.2.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-        <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
+        <PackageReference Include="System.Reactive" Version="4.3.2" />
+        <PackageReference Include="Newtonsoft.Json" Version="[12.0.3, 13)" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
         <Compile Include="**\Platforms\*netcore*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
-
+    
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
         <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <!-- not ready for androidx <PackageReference Include="Xamarin.Android.Arch.Work.Runtime" Version="1.0.0" />-->
-        <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.3" />
-        <PackageReference Include="Xamarin.Build.Download" Version="0.4.11" PrivateAssets="All" />
+        <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.2.0" />
+        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" Version="1.0.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
+        <Compile Include="**\Platforms\Android\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="[4.5.3, 5)" />
+        <PackageReference Include="Xamarin.Android.Support.v4" Version="[28.0.0.3, 29)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
@@ -46,25 +50,28 @@
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
-
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
+        <Compile Include="**\Platforms\Apple\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+    
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
         <Compile Include="**\Platforms\*iOS*\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="[4.5.3, 5)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.tvos')) ">
         <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.watchos')) ">
         <Compile Include="**\Platforms\*watchOS*\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
         <Compile Include="**\Platforms\*macOS*\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Reference Include="netstandard" />
     </ItemGroup>
+
 </Project>

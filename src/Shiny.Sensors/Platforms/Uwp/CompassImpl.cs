@@ -8,22 +8,13 @@ namespace Shiny.Sensors
 {
     public class CompassImpl : ICompass
     {
-        readonly Compass compass;
-
-
-        public CompassImpl()
-        {
-            this.compass = Compass.GetDefault();
-        }
-
-
+        readonly Compass compass = Compass.GetDefault();
         public bool IsAvailable => this.compass != null;
 
 
-        IObservable<CompassReading> readOb;
+        IObservable<CompassReading>? readOb;
         public IObservable<CompassReading> WhenReadingTaken()
-        {
-            this.readOb = this.readOb ?? Observable.Create<CompassReading>(ob =>
+            => this.readOb ??= Observable.Create<CompassReading>(ob =>
             {
                 var handler = new TypedEventHandler<Compass, CompassReadingChangedEventArgs>((sender, args) =>
                 {
@@ -37,9 +28,6 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.readOb;
-        }
 
 
         protected CompassAccuracy FromNative(MagnetometerAccuracy native)

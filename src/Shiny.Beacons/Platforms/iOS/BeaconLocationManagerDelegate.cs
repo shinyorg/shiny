@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reactive.Subjects;
 using CoreLocation;
-using Shiny.Locations;
 
 
 namespace Shiny.Beacons

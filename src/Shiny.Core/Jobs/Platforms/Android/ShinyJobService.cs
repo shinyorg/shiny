@@ -1,4 +1,4 @@
-﻿#if !ANDROID9
+﻿#if !ANDROIDX
 using System;
 using System.Threading;
 using Android.App;
@@ -14,15 +14,14 @@ namespace Shiny.Jobs
     )]
     public class ShinyJobService : JobService
     {
-        CancellationTokenSource cancelSrc;
-
+        readonly CancellationTokenSource cancelSrc = new CancellationTokenSource();
 
         public override bool OnStartJob(JobParameters @params)
         {
-            this.cancelSrc = new CancellationTokenSource();
+            var jobIdentifier = @params.GetShinyJobId();
             ShinyHost
                 .Resolve<IJobManager>()
-                .RunAll(this.cancelSrc.Token)
+                .Run(jobIdentifier, this.cancelSrc.Token)
                 .ContinueWith(x => this.JobFinished(@params, false));
             return true;
         }
@@ -30,7 +29,7 @@ namespace Shiny.Jobs
 
         public override bool OnStopJob(JobParameters @params)
         {
-            this.cancelSrc?.Cancel();
+            this.cancelSrc.Cancel();
             return true;
         }
     }

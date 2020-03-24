@@ -25,8 +25,7 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override object NativeDevice => this.context.NativeDevice;
-        public override void Connect(ConnectionConfig config) => this.context.Connect();
+        public override void Connect(ConnectionConfig? config) => this.context.Connect();
         public override void CancelConnection() => this.context.Disconnect();
         public override ConnectionState Status => this.context.Status;
         public override IObservable<ConnectionState> WhenStatusChanged() => this.context.WhenStatusChanged();
@@ -91,7 +90,7 @@ namespace Shiny.BluetoothLE.Central
             : PairingState.NotPaired;
 
 
-        public IObservable<bool> PairingRequest(string pin = null) => Observable.FromAsync(async token =>
+        public IObservable<bool> PairingRequest() => Observable.FromAsync(async token =>
         {
             var result = await this.context.NativeDevice.DeviceInformation.Pairing.PairAsync(DevicePairingProtectionLevel.None);
             var state = result.Status == DevicePairingResultStatus.Paired;

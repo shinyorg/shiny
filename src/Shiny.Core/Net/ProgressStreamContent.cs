@@ -42,7 +42,7 @@ namespace Shiny.Net
 
             return Task.Run(() =>
             {
-                var buffer = new Byte[this.bufferSize];
+                var buffer = new byte[this.bufferSize];
 
                 using (this.content)
                 {

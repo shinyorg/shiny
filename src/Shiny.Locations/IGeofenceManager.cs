@@ -53,6 +53,6 @@ namespace Shiny.Locations
         /// <param name="region"></param>
         /// <param name="cancelToken"></param>
         /// <returns>Status of geofence</returns>
-        Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default(CancellationToken));
+        Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default);
     }
 }

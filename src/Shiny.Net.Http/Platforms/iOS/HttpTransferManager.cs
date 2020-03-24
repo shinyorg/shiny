@@ -22,10 +22,7 @@ namespace Shiny.Net.Http
             this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;
 
             var s = this.Session; // force load
-            //this.sessionConfig.Discretionary = true;
-            //this.sessionConfig.HttpShouldUsePipelining = true;
-            //this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringCacheData;
-            //this.sessionConfig.ShouldUseExtendedBackgroundIdleMode = true;
+            iOSShinyHost.HandleEventsForBackgroundUrlAction = SetCompletionHandler;
         }
 
 
@@ -74,11 +71,11 @@ namespace Shiny.Net.Http
             => this.sessionDelegate.WhenEventOccurs();
 
 
-        public override Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null)
+        public override Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter? filter = null)
             => this.Session.QueryTransfers(filter);
 
 
-        public override async Task Cancel(QueryFilter filter = null)
+        public override async Task Cancel(QueryFilter? filter = null)
         {
             var tasks = await this.Session.QueryTasks(filter);
             foreach (var task in tasks)
@@ -100,22 +97,19 @@ namespace Shiny.Net.Http
             => $"{Guid.NewGuid()}|{file.FullName}";
 
 
-        NSUrlSession session;
-        internal NSUrlSession Session
-        {
-            get
-            {
-                if (this.session == null)
-                {
-                    this.session = NSUrlSession.FromConfiguration(
-                        this.sessionConfig,
-                        this.sessionDelegate,
-                        new NSOperationQueue()
-                    );
-                }
-                return this.session;
-            }
-            set => this.session = null;
-        }
+
+        //this.sessionConfig.Discretionary = true;
+        //this.sessionConfig.HttpShouldUsePipelining = true;
+        //this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringCacheData;
+        //this.sessionConfig.ShouldUseExtendedBackgroundIdleMode = true;
+        NSUrlSession? session;
+        internal NSUrlSession Session => this.session ??= NSUrlSession.FromConfiguration(
+            this.sessionConfig,
+            this.sessionDelegate,
+            new NSOperationQueue()
+        );
+
+
+        internal void CompleteSession() => this.session = null;
     }
 }

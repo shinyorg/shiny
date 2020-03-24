@@ -7,7 +7,8 @@ namespace Shiny.Net.Http
 {
     class MetricHolder
     {
-        public string Identifier { get; set; }
+        public MetricHolder(string identifier) => this.Identifier = identifier;
+        public string Identifier { get; }
         public long LastBytesTransferred { get; set; }
         public DateTime LastPing { get; set; }
     }
@@ -52,7 +53,7 @@ namespace Shiny.Net.Http
         {
             if (!metrics.ContainsKey(transfer.Identifier))
             {
-                metrics.Add(transfer.Identifier, new MetricHolder
+                metrics.Add(transfer.Identifier, new MetricHolder(transfer.Identifier)
                 {
                     LastBytesTransferred = transfer.BytesTransferred,
                     LastPing = DateTime.UtcNow

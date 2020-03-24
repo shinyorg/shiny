@@ -12,17 +12,11 @@ namespace Shiny.Testing.Notifications
         public int CurrentNotificationId { get; set; } = 1;
         public int CurrentBadge { get; set; }
         public AccessState RequestAccessReply { get; set; } = AccessState.Available;
-        public Notification LastNotification { get; private set; }
+        public Notification? LastNotification { get; private set; }
 
         public Task Cancel(int id) => Task.CompletedTask;
         public Task Clear() => Task.CompletedTask;
-
-        public Task<int> GetBadge() => Task.FromResult(this.CurrentBadge);
-        public Task SetBadge(int value)
-        {
-            this.CurrentBadge = value;
-            return Task.CompletedTask;
-        }
+        public int Badge { get; set; }
         public Task<IEnumerable<Notification>> GetPending() => Task.FromResult(Enumerable.Empty<Notification>());
 
         public Task<AccessState> RequestAccess() => Task.FromResult(this.RequestAccessReply);
@@ -36,5 +30,10 @@ namespace Shiny.Testing.Notifications
         }
 
 
+        public List<NotificationCategory> RegisteredCategories { get; } = new List<NotificationCategory>();
+        public void RegisterCategory(NotificationCategory category)
+        {
+            this.RegisteredCategories.Add(category);
+        }
     }
 }

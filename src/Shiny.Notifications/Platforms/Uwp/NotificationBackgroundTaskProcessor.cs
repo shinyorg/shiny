@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 using Windows.ApplicationModel.Background;
@@ -10,28 +11,59 @@ namespace Shiny.Notifications
     public class NotificationBackgroundTaskProcessor : IBackgroundTaskProcessor
     {
         readonly ISerializer serializer;
-        readonly INotificationDelegate ndelegate;
+        readonly IServiceProvider serviceProvider;
 
 
-        public NotificationBackgroundTaskProcessor(ISerializer serializer, INotificationDelegate ndelegate)
+        public NotificationBackgroundTaskProcessor(ISerializer serializer, IServiceProvider serviceProvider)
         {
             this.serializer = serializer;
-            this.ndelegate = ndelegate;
+            this.serviceProvider = serviceProvider;
         }
 
 
         public async void Process(IBackgroundTaskInstance taskInstance)
         {
             var deferral = taskInstance.GetDeferral();
+            var details = taskInstance.TriggerDetails as ToastNotificationActionTriggerDetail;
+            if (details == null)
+                return;
 
             try
             {
-                var nativeNotifications = await UserNotificationListener.Current.GetNotificationsAsync(NotificationKinds.Toast);
-                foreach (var native in nativeNotifications)
-                {
-                    //native.Notification.Visual.Bindings.
-                }
-                //this.ndelegate.OnEntry()
+                //string arguments = details.Argument;
+                //if (arguments == null || !arguments.Equals("quickReply"))
+                //{
+                //    ToastHelper.PopToast("ERROR", $"Expected arguments to be 'quickReply' but was '{arguments}'.");
+                //    return;
+                //}
+
+                //var result = details.UserInput;
+
+                //if (result.Count != 1)
+                //    ToastHelper.PopToast("ERROR", "ERROR: Expected 1 user input value, but there were " + result.Count);
+
+                //else if (!result.ContainsKey("message"))
+                //    ToastHelper.PopToast("ERROR", "ERROR: Expected a user input value for 'message', but there was none.");
+
+                //else if (!(result["message"] as string).Equals("Windows 10"))
+                //    ToastHelper.PopToast("ERROR", "ERROR: User input value for 'message' was not 'Windows 10'");
+
+                //else
+                //{
+                //    ToastHelper.PopToast("SUCCESS", "This scenario successfully completed. Please mark it as passed.");
+                //}
+
+
+                //var nativeNotifications = await UserNotificationListener.Current.GetNotificationsAsync(NotificationKinds.Toast);
+                //foreach (var native in nativeNotifications)
+                //{
+                //    //native.Notification.Visual.Bindings.
+                //}
+                //var ndelegate = this.serviceProvider.GetService<INotificationDelegate>();
+                //if (ndelegate != null)
+                //{
+                //    ndelegate.OnEntry()
+                //}
             }
             catch (Exception ex)
             {
@@ -45,6 +77,16 @@ namespace Shiny.Notifications
     }
 }
 /*
+ *
+var details = taskInstance.TriggerDetails as ToastNotificationActionTriggerDetail;
+            if (details == null)
+            {
+                ToastHelper.PopToast("ERROR", "TriggerDetails was not ToastNotificationActionTriggerDetail.");
+                return;
+            }
+
+
+
  * // Get the toast binding, if present
 NotificationBinding toastBinding = notif.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
 

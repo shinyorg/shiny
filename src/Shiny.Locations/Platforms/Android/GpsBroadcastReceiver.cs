@@ -9,10 +9,10 @@ namespace Shiny.Locations
 {
     [BroadcastReceiver(
         Name = GpsManagerImpl.ReceiverName,
+        Enabled = true,
         Exported = true
     )]
-    [IntentFilter(new []
-    {
+    [IntentFilter(new [] {
         GpsManagerImpl.IntentAction
     })]
     public class GpsBroadcastReceiver : BroadcastReceiver

@@ -8,5 +8,6 @@ namespace Shiny.Net
     {
         NetworkReach Reach { get; }
         NetworkAccess Access { get; }
+        string? CellularCarrier { get; }
     }
 }

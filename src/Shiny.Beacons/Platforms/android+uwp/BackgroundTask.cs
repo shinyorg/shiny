@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 using Shiny.Infrastructure;
@@ -13,23 +14,20 @@ namespace Shiny.Beacons
     {
         readonly ICentralManager centralManager;
         readonly IBeaconManager beaconManager;
-        readonly IRepository repository;
         readonly IMessageBus messageBus;
         readonly IBeaconDelegate beaconDelegate;
         readonly IDictionary<string, BeaconRegionStatus> states;
-        IDisposable scanSub;
+        IDisposable? scanSub;
 
 
         public BackgroundTask(ICentralManager centralManager,
                               IBeaconManager beaconManager,
                               IMessageBus messageBus,
-                              IRepository repository,
                               IBeaconDelegate beaconDelegate)
         {
             this.centralManager = centralManager;
             this.beaconManager = beaconManager;
             this.messageBus = messageBus;
-            this.repository = repository;
             this.beaconDelegate = beaconDelegate;
             this.states = new Dictionary<string, BeaconRegionStatus>();
         }
@@ -39,7 +37,7 @@ namespace Shiny.Beacons
         {
             Log.Write(BeaconLogCategory.Task, "Starting");
 
-            // TODO: I should record state of the beacon region so I can fire stuff without going into initial state from unknown
+            // I record state of the beacon region so I can fire stuff without going into initial state from unknown
             this.messageBus
                 .Listener<BeaconRegisterEvent>()
                 .Subscribe(ev =>
@@ -59,7 +57,7 @@ namespace Shiny.Beacons
                             break;
 
                         case BeaconRegisterEventType.Update:
-                            // TODO: this actually shouldn't be allowed
+                            // this actually shouldn't be allowed
                             break;
 
                         case BeaconRegisterEventType.Remove:
@@ -82,7 +80,7 @@ namespace Shiny.Beacons
         }
 
 
-        async void StartScan()
+        public async void StartScan()
         {
             if (this.scanSub != null)
                 return;
@@ -95,22 +93,15 @@ namespace Shiny.Beacons
             foreach (var region in regions)
                 this.states.Add(region.Identifier, new BeaconRegionStatus(region));
 
-            try
+            Log.SafeExecute(() =>
             {
                 this.scanSub = this.centralManager
                     .ScanForBeacons(true)
                     .Buffer(TimeSpan.FromSeconds(5))
-                    .Subscribe(
-                        this.CheckStates,
-                        ex => Log.Write(ex)
-                    );
+                    .SubscribeAsyncConcurrent(this.CheckStates);
 
                 Log.Write(BeaconLogCategory.Task, "Scan Started");
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+            });
         }
 
 
@@ -123,7 +114,7 @@ namespace Shiny.Beacons
         }
 
 
-        void StopScan()
+        public void StopScan()
         {
             if (this.scanSub == null)
                 return;
@@ -139,7 +130,7 @@ namespace Shiny.Beacons
         }
 
 
-        void CheckStates(IList<Beacon> beacons)
+        async Task CheckStates(IList<Beacon> beacons)
         {
             var copy = this.GetCopy();
             var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(20)); //TODO: configurable
@@ -159,7 +150,11 @@ namespace Shiny.Beacons
                         {
                             state.IsInRange = true;
                             if (state.Region.NotifyOnEntry)
-                                this.FireDelegate(BeaconRegionState.Entered, state.Region);
+                            {
+                                await Log.SafeExecute(() =>
+                                    this.beaconDelegate.OnStatusChanged(BeaconRegionState.Entered, state.Region)
+                                );
+                            }
                         }
                     }
                 }
@@ -170,21 +165,12 @@ namespace Shiny.Beacons
                 {
                     state.IsInRange = false;
                     if (state.Region.NotifyOnExit)
-                        this.FireDelegate(BeaconRegionState.Exited, state.Region);
+                    {
+                        await Log.SafeExecute(() =>
+                            this.beaconDelegate.OnStatusChanged(BeaconRegionState.Exited, state.Region)
+                        );
+                    }
                 }
-            }
-        }
-
-
-        void FireDelegate(BeaconRegionState newState, BeaconRegion region)
-        {
-            try
-            {
-                this.beaconDelegate.OnStatusChanged(newState, region);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
             }
         }
     }

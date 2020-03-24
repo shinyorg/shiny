@@ -13,11 +13,12 @@ namespace Shiny.Beacons
     {
         readonly ICentralManager centralManager;
         readonly IMessageBus messageBus;
+        IObservable<Beacon>? beaconScanner;
 
 
         public BeaconManager(ICentralManager centralManager,
-                              IMessageBus messageBus,
-                              IRepository repository) : base(repository)
+                             IMessageBus messageBus,
+                             IRepository repository) : base(repository)
         {
             this.centralManager = centralManager;
             this.messageBus = messageBus;
@@ -56,16 +57,10 @@ namespace Shiny.Beacons
         }
 
 
-        IObservable<Beacon> beaconScanner;
-        protected IObservable<Beacon> Scan()
-        {
-            this.beaconScanner = this.beaconScanner ?? this.centralManager
+        protected IObservable<Beacon> Scan() => this.beaconScanner ??= this.centralManager
                 .ScanForBeacons(false)
                 .Publish()
                 .RefCount();
-
-            return this.beaconScanner;
-        }
 
 
         public override IObservable<AccessState> WhenAccessStatusChanged(bool monitoring)

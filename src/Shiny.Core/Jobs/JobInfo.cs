@@ -6,17 +6,33 @@ namespace Shiny.Jobs
 {
     public class JobInfo
     {
-        public string Identifier { get; set; }
-        public Type Type { get; set; }
+        public JobInfo(Type jobType, string? identifier = null)
+        {
+            if (jobType == null)
+                throw new ArgumentException("Job Type not set");
 
-        // TODO: next run time? Date/Time or TimeSpan
-        // TODO: priority?
-        //public bool RunPeriodic { get; set; }
-        //public bool DeviceIdle { get; set; } // this will only work on droid
+            this.Identifier = identifier ?? jobType.AssemblyQualifiedName;
+            this.Type = jobType;            
+            this.PeriodicTime = TimeSpan.FromMinutes(15);
+        }
 
+
+        /// <summary>
+        /// Periodic time works with Android & UWP. Though optional, you must provide some form of criteria for the platforms to trigger your job
+        /// To prevent breaking changes, this is defaulted to 15 minutes which is the minimum value on UWP & Android
+        /// </summary>
+        public TimeSpan? PeriodicTime { get; set; }
+        public string Identifier { get; }
+        public Type Type { get; }
         public bool Repeat { get; set; } = true;
         public bool DeviceCharging { get; set; }
         public bool BatteryNotLow { get; set; }
+        public bool RunOnForeground { get; set; }
+
+        /// <summary>
+        /// Calling JobManager.Clear will not remove this task
+        /// </summary>
+        public bool IsSystemJob { get; set; }
         public InternetAccess RequiredInternetAccess { get; set; } = InternetAccess.None;
         public DateTime? LastRunUtc { get; set; }
         public IDictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();

@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <Description>Shiny addon for all your notification needs</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;tizen50;$(TargetFrameworks)</TargetFrameworks>        
+        <TargetFrameworks>netstandard2.0;tizen50;xamarin.ios10;monoandroid90;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,10 +18,10 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Uwp\**\*.cs" />
-        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="5.1.1" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="[6.0.0, 7)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
@@ -39,20 +39,28 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.watchos')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\watchOS\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\macOS\**\*.cs" />
+        <Reference Include="netstandard" />
     </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
-        <PackageReference Include="Xamarin.Android.Support.Compat" Version="28.0.0.3" />
+        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.1.0" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.1.0" />
+    </ItemGroup>
+    
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\Android\**\*.cs" />
+        <PackageReference Include="Xamarin.Android.Support.Compat" Version="[28.0.0.3, 29)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">

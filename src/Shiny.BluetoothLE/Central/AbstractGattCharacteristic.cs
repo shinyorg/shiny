@@ -1,8 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading;
 
 
 namespace Shiny.BluetoothLE.Central
@@ -22,13 +18,10 @@ namespace Shiny.BluetoothLE.Central
         public bool IsNotifying { get; protected set; }
         public Guid Uuid { get; }
         public CharacteristicProperties Properties { get; }
-        public abstract byte[] Value { get; }
 
         public abstract IObservable<IGattDescriptor> DiscoverDescriptors();
-        public abstract IObservable<CharacteristicGattResult> EnableNotifications(bool enableIndicationsIfAvailable);
-        public abstract IObservable<CharacteristicGattResult> DisableNotifications();
+        public abstract IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable);
         public abstract IObservable<CharacteristicGattResult> Read();
         public abstract IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true);
-        public abstract IObservable<CharacteristicGattResult> WhenNotificationReceived();
     }
 }

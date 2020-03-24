@@ -10,10 +10,9 @@ namespace Shiny.Sensors
         public bool IsAvailable => Accelerometer.IsSupported;
 
 
-        IObservable<MotionReading> observable;
+        IObservable<MotionReading>? observable;
         public IObservable<MotionReading> WhenReadingTaken()
-        {
-            this.observable = this.observable ?? Observable.Create<MotionReading>(ob =>
+            => this.observable ??= Observable.Create<MotionReading>(ob =>
             {
                 var handler = new EventHandler<MagnetometerDataUpdatedEventArgs>((sender, args) =>
                     ob.OnNext(new MotionReading(args.X, args.Y, args.Z))
@@ -34,8 +33,5 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.observable;
-        }
     }
 }

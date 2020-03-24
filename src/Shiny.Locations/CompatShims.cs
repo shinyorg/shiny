@@ -7,22 +7,22 @@ using Shiny.Locations;
 
 namespace Shiny
 {
-    public static class CrossGps
+    public static class ShinyGps
     {
         static IGpsManager Current { get; } = ShinyHost.Resolve<IGpsManager>();
 
         public static bool IsListening => Current.IsListening;
-        public static AccessState GetCurrentStatus(bool background) => Current.GetCurrentStatus(background);
-        public static IObservable<IGpsReading> GetLastReading() => Current.GetLastReading();
-        public static Task<AccessState> RequestAccess(bool backgroundMode) => Current.RequestAccess(backgroundMode);
+        public static AccessState GetCurrentStatus(GpsRequest request) => Current.GetCurrentStatus(request);
+        public static IObservable<IGpsReading?> GetLastReading() => Current.GetLastReading();
+        public static Task<AccessState> RequestAccess(GpsRequest request) => Current.RequestAccess(request);
         public static Task StartListener(GpsRequest request) => Current.StartListener(request);
         public static Task StopListener() => Current.StopListener();
-        public static IObservable<AccessState> WhenAccessStatusChanged(bool forBackground) => Current.WhenAccessStatusChanged(forBackground);
+        public static IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => Current.WhenAccessStatusChanged(request);
         public static IObservable<IGpsReading> WhenReading() => Current.WhenReading();
     }
 
 
-    public static class CrossGeofences
+    public static class ShinyGeofences
     {
         static IGeofenceManager Current { get; } = ShinyHost.Resolve<IGeofenceManager>();
 
@@ -38,7 +38,7 @@ namespace Shiny
     }
 
 
-    public static class CrossMotionActivity
+    public static class ShinyMotionActivity
     {
         static IMotionActivityManager Current { get; } = ShinyHost.Resolve<IMotionActivityManager>();
 

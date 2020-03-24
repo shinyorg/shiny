@@ -13,47 +13,40 @@ using Shiny.Settings;
 
 namespace Shiny
 {
-    public static class CrossJobManager
+    public static class ShinyJobManager
     {
-        static IJobManager Current { get; } = ShinyHost.Resolve<IJobManager>();
+        public static IJobManager Current => ShinyHost.Resolve<IJobManager>();
 
         public static bool IsRunning => Current.IsRunning;
-        public static event EventHandler<JobInfo> JobStarted
-        {
-            add { Current.JobStarted += value; }
-            remove { Current.JobStarted -= value; }
-        }
-        public static event EventHandler<JobRunResult> JobFinished
-        {
-            add => Current.JobFinished += value;
-            remove => Current.JobFinished -= value;
-        }
+        public static IObservable<JobInfo> JobStarted => Current.JobStarted;
+        public static IObservable<JobRunResult> JobFinished => Current.JobFinished;
         public static Task Cancel(string jobName) => Current.Cancel(jobName);
         public static Task CancelAll() => Current.CancelAll();
-        public static Task<JobInfo> GetJob(string jobIdentifier) => Current.GetJob(jobIdentifier);
+        public static Task<JobInfo?> GetJob(string jobIdentifier) => Current.GetJob(jobIdentifier);
         public static Task<IEnumerable<JobInfo>> GetJobs() => Current.GetJobs();
         public static Task<AccessState> RequestAccess() => Current.RequestAccess();
         public static Task<JobRunResult> Run(string jobIdentifier, CancellationToken cancelToken = default) => Current.Run(jobIdentifier, cancelToken);
-        public static Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default) => Current.RunAll(cancelToken);
+        public static Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default, bool runSequentially = false) => Current.RunAll(cancelToken, runSequentially);
         public static void RunTask(string taskName, Func<CancellationToken, Task> task) => Current.RunTask(taskName, task);
-        public static Task Schedule(JobInfo jobInfo) => Current.Schedule(jobInfo);
+        public static Task Schedule(JobInfo jobInfo) => Current.Schedule(jobInfo);   
     }
 
 
-    public static class CrossFileSystem
+    public static class ShinyFileSystem
     {
-        static IFileSystem Current { get; } = ShinyHost.Resolve<IFileSystem>();
+        public static IFileSystem Current => ShinyHost.Resolve<IFileSystem>();
         public static DirectoryInfo AppData { get => Current.AppData; set => Current.AppData = value; }
         public static DirectoryInfo Cache { get => Current.Cache; set => Current.Cache = value; }
-        public static DirectoryInfo Public { get => Current.Public; set => Current.Public = value; }
+        public static DirectoryInfo Public { get => Current.Public; set => Current.Public = value; }       
     }
 
 
-    public static class CrossPower
+    public static class ShinyPower
     {
-        static IPowerManager Current { get; } = ShinyHost.Resolve<IPowerManager>();
+        public static IPowerManager Current => ShinyHost.Resolve<IPowerManager>();
         public static PowerState Status => Current.Status;
         public static int BatteryLevel => Current.BatteryLevel;
+        public static bool IsEnergySavingEnabled => Current.IsEnergySavingEnabled;
         public static event PropertyChangedEventHandler PropertyChanged
         {
             add => Current.PropertyChanged += value;
@@ -62,11 +55,12 @@ namespace Shiny
     }
 
 
-    public static class CrossConnectivity
+    public static class ShinyConnectivity
     {
-        static IConnectivity Current { get; } = ShinyHost.Resolve<IConnectivity>();
+        public static IConnectivity Current => ShinyHost.Resolve<IConnectivity>();
         public static NetworkReach Reach => Current.Reach;
         public static NetworkAccess Access => Current.Access;
+        public static string? CellularCarrier => Current.CellularCarrier;
         public static event PropertyChangedEventHandler PropertyChanged
         {
             add => Current.PropertyChanged += value;
@@ -75,24 +69,20 @@ namespace Shiny
     }
 
 
-    public static class CrossSettings
+    public static class ShinySettings
     {
         static ISettings Current { get; } = ShinyHost.Resolve<ISettings>();
 
         public static List<string> KeysNotToClear => Current.KeysNotToClear;
-        public static IReadOnlyDictionary<string, string> List => Current.List;
-        public static event EventHandler<SettingChangeEventArgs> Changed
-        {
-            add => Current.Changed += value;
-            remove => Current.Changed -= value;
-        }
+        public static IReadOnlyDictionary<string, string>? List => Current.List;
+        public static IObservable<SettingChange> Changed => Current.Changed;
         public static T Bind<T>() where T : INotifyPropertyChanged, new() => Current.Bind<T>();
         public static void Bind(INotifyPropertyChanged obj) => Current.Bind(obj);
         public static void Clear() => Current.Clear();
         public static bool Contains(string key) => Current.Contains(key);
         public static T Get<T>(string key, T defaultValue = default) => Current.Get(key, defaultValue);
         public static T GetRequired<T>(string key) => Current.GetRequired<T>(key);
-        public static object GetValue(Type type, string key, object defaultValue = null) => Current.GetValue(type, key, defaultValue);
+        public static object? GetValue(Type type, string key, object? defaultValue = null) => Current.GetValue(type, key, defaultValue);
         public static bool Remove(string key) => Current.Remove(key);
         public static void Set<T>(string key, T value) => Current.Set(key, value);
         public static bool SetDefault<T>(string key, T value) => Current.SetDefault(key, value);
@@ -101,7 +91,7 @@ namespace Shiny
     }
 
 
-    public static class CrossEnvironment
+    public static class ShinyEnvironment
     {
         static IEnvironment Current { get; } = ShinyHost.Resolve<IEnvironment>();
 

@@ -52,7 +52,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.2.0.848062" />
+    <PackageReference Include="Xamarin.Forms" Version="4.5.0.356" />
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.3" />
@@ -110,7 +110,7 @@
       <Name>Shiny.BluetoothLE</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Shiny.Core\Shiny.Core.csproj">
-      <Project>{84c6a1b8-0a57-4c6f-8738-3d3c03ce6f55}</Project>
+      <Project>{D7F94901-2960-4BA0-ACB2-280761E70AF0}</Project>
       <Name>Shiny.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Shiny.Locations\Shiny.Locations.csproj">
@@ -137,6 +137,9 @@
       <Project>{8E87D625-07EA-4CE2-A549-E3A815AB52D6}</Project>
       <Name>Shiny.Device.Tests</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <LinkDescription Include="Linker.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

@@ -2,47 +2,68 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Logging;
+#if __ANDROID__
+using Android.App;
+using Android.Gms.Common;
+#endif
 
 namespace Shiny.Locations
 {
     class GeofenceModule : ShinyModule
     {
-        readonly GeofenceRegion[] startingRegions;
         readonly Type delegateType;
+        readonly bool requestPermissionOnStart;
 
 
-        public GeofenceModule(Type delegateType, GeofenceRegion[] regions)
+        public GeofenceModule(Type delegateType, bool requestPermissionOnStart)
         {
-            this.startingRegions = regions;
             this.delegateType = delegateType;
+            this.requestPermissionOnStart = requestPermissionOnStart;
         }
 
 
         public override void Register(IServiceCollection services)
         {
 #if __ANDROID__
-            services.AddSingleton<GeofenceProcessor>();
+            var resultCode = GoogleApiAvailability
+                .Instance
+                .IsGooglePlayServicesAvailable(Application.Context);
+
+            if (resultCode == ConnectionResult.ServiceMissing)
+            {
+                services.UseGpsDirectGeofencing(this.delegateType);
+            }
+            else
+            {
+                services.AddSingleton<GeofenceProcessor>();
+                services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
+                services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            }
+            
 #elif WINDOWS_UWP
             services.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
-#endif
             services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
             services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+#else
+            services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
+            services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+#endif
+
         }
 
 
         public override async void OnContainerReady(IServiceProvider services)
         {
             base.OnContainerReady(services);
-            if (this.startingRegions == null)
+            if (!this.requestPermissionOnStart)
                 return;
 
             try
             {
                 var mgr = services.GetService<IGeofenceManager>();
                 var access = await mgr.RequestAccess();
-                if (access == AccessState.Available)
-                    foreach (var region in this.startingRegions)
-                        await mgr.StartMonitoring(region);
+                if (access != AccessState.Available)
+                    Log.Write("Geofence", "Permission Denied on startup");
             }
             catch (Exception ex)
             {

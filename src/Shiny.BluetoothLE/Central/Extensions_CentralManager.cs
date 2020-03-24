@@ -10,11 +10,11 @@ namespace Shiny.BluetoothLE.Central
         /// This will scan until the peripheral a specific peripheral is found, then cancel the scan
         /// </summary>
         /// <param name="centralManager"></param>
-        /// <param name="deviceUuid"></param>
+        /// <param name="peripheralUuid"></param>
         /// <returns></returns>
-        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this ICentralManager centralManager, Guid deviceUuid) => centralManager
+        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this ICentralManager centralManager, Guid peripheralUuid) => centralManager
             .Scan()
-            .Where(x => x.Peripheral.Uuid.Equals(deviceUuid))
+            .Where(x => x.Peripheral.Uuid.Equals(peripheralUuid))
             .Take(1)
             .Select(x => x.Peripheral);
 
@@ -23,14 +23,14 @@ namespace Shiny.BluetoothLE.Central
         /// This will scan until the peripheral a specific peripheral is found, then cancel the scan
         /// </summary>
         /// <param name="centralManager"></param>
-        /// <param name="deviceName"></param>
+        /// <param name="peripheralName"></param>
         /// <param name="includeLocalName"></param>
         /// <returns></returns>
-        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this ICentralManager centralManager, string deviceName, bool includeLocalName = true) => centralManager
+        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this ICentralManager centralManager, string peripheralName, bool includeLocalName = true) => centralManager
             .Scan()
             .Where(x =>
-                x.Peripheral.Name?.Equals(deviceName, StringComparison.OrdinalIgnoreCase) ?? false
-                || (includeLocalName && (x.AdvertisementData?.LocalName?.Equals(deviceName, StringComparison.InvariantCultureIgnoreCase) ?? false))
+                x.Peripheral.Name?.Equals(peripheralName, StringComparison.OrdinalIgnoreCase) ?? false
+                || (includeLocalName && (x.AdvertisementData?.LocalName?.Equals(peripheralName, StringComparison.InvariantCultureIgnoreCase) ?? false))
             )
             .Take(1)
             .Select(x => x.Peripheral);
@@ -42,7 +42,7 @@ namespace Shiny.BluetoothLE.Central
         /// <param name="centralManager"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static IObservable<IPeripheral> ScanForUniquePeripherals(this ICentralManager centralManager, ScanConfig config = null) => centralManager
+        public static IObservable<IPeripheral> ScanForUniquePeripherals(this ICentralManager centralManager, ScanConfig? config = null) => centralManager
             .Scan(config)
             .Distinct(x => x.Peripheral.Uuid)
             .Select(x => x.Peripheral);
@@ -55,7 +55,7 @@ namespace Shiny.BluetoothLE.Central
         /// <param name="restart">Stops any current scan running</param>
         /// <param name="config">ScanConfig parameters you would like to use</param>
         /// <returns></returns>
-        public static IObservable<IScanResult> Scan(this ICentralManager centralManager, ScanConfig config = null, bool restart = false)
+        public static IObservable<IScanResult> Scan(this ICentralManager centralManager, ScanConfig? config = null, bool restart = false)
         {
             if (restart && centralManager.IsScanning)
                 centralManager.StopScan(); // need a pause to wait for scan to end
@@ -72,15 +72,18 @@ namespace Shiny.BluetoothLE.Central
         /// <param name="scanPauseTime"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static IObservable<IScanResult> ScanInterval(this ICentralManager centralManager, TimeSpan scanTime, TimeSpan scanPauseTime, ScanConfig config = null) => Observable.Create<IScanResult>(ob =>
+        public static IObservable<IScanResult> ScanInterval(this ICentralManager centralManager,
+                                                            TimeSpan scanTime,
+                                                            TimeSpan scanPauseTime,
+                                                            ScanConfig? config = null) => Observable.Create<IScanResult>(ob =>
         {
             var scanObs = centralManager.Scan(config).Do(ob.OnNext, ob.OnError);
-            IObservable<long> scanPauseObs = null;
-            IObservable<long> scanStopObs = null;
+            IObservable<long>? scanPauseObs = null;
+            IObservable<long>? scanStopObs = null;
 
-            IDisposable scanSub = null;
-            IDisposable scanStopSub = null;
-            IDisposable scanPauseSub = null;
+            IDisposable? scanSub = null;
+            IDisposable? scanStopSub = null;
+            IDisposable? scanPauseSub = null;
 
             void Scan()
             {

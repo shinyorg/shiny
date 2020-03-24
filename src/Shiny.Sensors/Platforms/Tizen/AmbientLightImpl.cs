@@ -10,10 +10,9 @@ namespace Shiny.Sensors
         public bool IsAvailable => LightSensor.IsSupported;
 
 
-        IObservable<double> observable;
+        IObservable<double>? observable;
         public IObservable<double> WhenReadingTaken()
-        {
-            this.observable = this.observable ?? Observable.Create<double>(ob =>
+            => this.observable ??= Observable.Create<double>(ob =>
             {
                 var handler = new EventHandler<LightSensorDataUpdatedEventArgs>((sender, args) =>
                     ob.OnNext(args.Level)
@@ -34,8 +33,5 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.observable;
-        }
     }
 }

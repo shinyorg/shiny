@@ -1,7 +1,6 @@
 ﻿using System;
 using Android.Content;
 using Shiny.Infrastructure;
-using Shiny.Logging;
 
 
 namespace Shiny.Notifications
@@ -10,35 +9,35 @@ namespace Shiny.Notifications
     {
         public const string NOTIFICATION_KEY = "ShinyNotification";
         readonly ISerializer serializer;
-        readonly INotificationDelegate ndelegate;
+        readonly IServiceProvider services;
+        readonly INotificationDelegate? ndelegate;
 
 
-        public AndroidNotificationProcessor(ISerializer serializer, INotificationDelegate ndelegate)
+        public AndroidNotificationProcessor(ISerializer serializer,
+                                            IServiceProvider services,
+                                            INotificationDelegate? ndelegate = null)
         {
             this.serializer = serializer;
+            this.services = services;
             this.ndelegate = ndelegate;
         }
 
 
         public async void TryProcessIntent(Intent intent)
         {
-            if (intent == null)
+            if (intent == null || this.ndelegate == null)
                 return;
 
             if (!intent.HasExtra(NOTIFICATION_KEY))
                 return;
 
-            try
+            await this.services.SafeResolveAndExecute<INotificationDelegate>(async ndelegate =>
             {
                 var notificationString = intent.GetStringExtra(NOTIFICATION_KEY);
                 var notification = this.serializer.Deserialize<Notification>(notificationString);
-
-                await this.ndelegate.OnEntry(notification);
-            }
-            catch (Exception ex)
-            {
-                Log.Write(ex);
-            }
+                var response = new NotificationResponse(notification, null, null);
+                await ndelegate.OnEntry(response);
+            }, false);
         }
     }
 }

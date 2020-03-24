@@ -16,7 +16,7 @@ namespace Shiny.Notifications
         /// <summary>
         ///
         /// </summary>
-        /// <param name="notification"></param>
-        Task OnEntry(Notification notification);
+        /// <param name="response"></param>
+        Task OnEntry(NotificationResponse response);
     }
 }

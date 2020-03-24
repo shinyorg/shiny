@@ -4,8 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Logging;
-using Shiny.Net;
-using Shiny.Power;
 using UIKit;
 
 
@@ -16,18 +14,19 @@ namespace Shiny.Jobs
         /// <summary>
         /// If you don't know what this does, don't touch it :)
         /// </summary>
-        public static double? BackgroundFetchInterval { get; set;}
+        public static double? BackgroundFetchInterval { get; set; }
 
 
-        public JobManager(IServiceProvider container,
-                          IRepository repository,
-                          IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
+            if (PlatformExtensions.HasBackgroundMode("fetch"))
+                UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum);
+            //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
         }
 
 
-        protected override bool CheckCriteria(JobInfo job) => true;
+        protected override void ScheduleNative(JobInfo jobInfo) { }
+        protected override void CancelNative(JobInfo jobInfo) { }
 
 
         public override Task<AccessState> RequestAccess()
@@ -58,6 +57,7 @@ namespace Shiny.Jobs
 
             return Task.FromResult(grantResult);
         }
+
 
 
         public override async Task<JobRunResult> Run(string jobName, CancellationToken cancelToken)
@@ -115,7 +115,7 @@ namespace Shiny.Jobs
                 {
                     taskId = (int)app.BeginBackgroundTask("RunAll", cancelSrc.Cancel);
                     var results = await jobManager
-                        .RunAll(cancelSrc.Token)
+                        .RunAll(cancelSrc.Token, true)
                         .ConfigureAwait(false);
 
                     if (results.Any(x => x.HasNewData))

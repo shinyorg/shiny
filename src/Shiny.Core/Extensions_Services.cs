@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Jobs;
 using Shiny.Logging;
 
 
@@ -31,7 +30,8 @@ namespace Shiny
             try
             {
                 var service = services.Resolve<T>(requiredService);
-                await execute.Invoke(service).ConfigureAwait(false);
+                if (service != null)
+                    await execute.Invoke(service).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -48,53 +48,6 @@ namespace Shiny
         public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
             => ShinyHost.AddPostBuildAction(action);
 
-
-         /// <summary>
-        /// Register a job on the job manager
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="jobInfo"></param>
-        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-        {
-            jobInfo.AssertValid();
-
-            services.RegisterPostBuildAction(async sp =>
-            {
-                // what if permission fails?
-                var jobs = sp.GetService<IJobManager>();
-                var access = await jobs.RequestAccess();
-                if (access == AccessState.Available)
-                    await jobs.Schedule(jobInfo);
-            });
-        }
-
-
-        /// <summary>
-        /// Registers a job on the job manager
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="jobType"></param>
-        /// <param name="identifier"></param>
-        public static void RegisterJob(this IServiceCollection services,
-                                       Type jobType,
-                                       string identifier = null,
-                                       InternetAccess requiredNetwork = InternetAccess.None)
-            => services.RegisterPostBuildAction(async sp =>
-            {
-                // what if permission fails?
-                var jobs = sp.GetService<IJobManager>();
-                var access = await jobs.RequestAccess();
-                if (access == AccessState.Available)
-                {
-                    await jobs.Schedule(new JobInfo
-                    {
-                        Type = jobType,
-                        Identifier = identifier ?? jobType.GetType().FullName,
-                        RequiredInternetAccess = requiredNetwork,
-                        Repeat = true
-                    });
-                }
-            });
 
         /// <summary>
         /// Attempts to resolve or build an instance from a service provider
@@ -143,7 +96,17 @@ namespace Shiny
         /// <param name="services"></param>
         /// <returns></returns>
         public static bool IsRegistered<TService>(this IServiceCollection services)
-            => services.Any(x => x.ServiceType == typeof(TService));
+            => services.IsRegistered(typeof(TService));
+
+
+        /// <summary>
+        /// Check if a service type is registered on the service builder
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="serviceType"></typeparam>
+        /// <returns></returns>
+        public static bool IsRegistered(this IServiceCollection services, Type serviceType)
+            => services.Any(x => x.ServiceType == serviceType);
 
 
         /// <summary>
@@ -164,5 +127,28 @@ namespace Shiny
         /// <returns></returns>
         public static bool IsRegistered(this IServiceProvider services, Type serviceType)
             => services.GetService(serviceType) != null;
+
+
+        /// <summary>
+        /// Asserts that a service type is registered on the service builder
+        /// </summary>
+        /// <typeparam name="TService"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static void AssertNotRegistered<TService>(this IServiceCollection services)
+            => services.AssertNotRegistered(typeof(TService));
+
+
+        /// <summary>
+        /// Asserts that a service type is registered on the service builder
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="serviceType"></param>
+        /// <returns></returns>
+        public static void AssertNotRegistered(this IServiceCollection services, Type serviceType)
+        {
+            if (services.IsRegistered(serviceType))
+                throw new ArgumentException($"Service type '{serviceType.FullName}' is already registered");
+        }
     }
 }

@@ -12,7 +12,6 @@ namespace Shiny.BluetoothLE.Central.Internals
         Exported = true
     )]
     [IntentFilter(new[] {
-        BluetoothAdapter.ActionStateChanged,
         BluetoothDevice.ActionAclConnected,
         BluetoothDevice.ActionAclDisconnected,
         BluetoothDevice.ActionBondStateChanged,
@@ -21,30 +20,13 @@ namespace Shiny.BluetoothLE.Central.Internals
     })]
     public class ShinyBleCentralBroadcastReceiver : BroadcastReceiver
     {
-        readonly CentralContext context;
-
-
-        public ShinyBleCentralBroadcastReceiver()
-        {
-            this.context = ShinyHost.Resolve<CentralContext>();
-        }
+        readonly Lazy<CentralContext> context = new Lazy<CentralContext>(() => ShinyHost.Resolve<CentralContext>());
 
 
         public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
         {
-            if (intent.Action.Equals(BluetoothAdapter.ActionStateChanged))
-            {
-                var nativeState = (State)Enum.Parse(
-                    typeof(State),
-                    intent.GetStringExtra(BluetoothAdapter.ExtraState)
-                );
-                this.context.ChangeStatus(nativeState);
-            }
-            else
-            {
-                var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
-                this.context.DeviceEvent(intent.Action, device);
-            }
+            var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
+            this.context.Value.DeviceEvent(intent.Action, device);
         });
     }
 }

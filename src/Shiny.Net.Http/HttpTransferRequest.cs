@@ -27,7 +27,7 @@ namespace Shiny.Net.Http
         public FileInfo LocalFile { get; }
         public bool UseMeteredConnection { get; set; }
         public HttpMethod HttpMethod { get; set; } = HttpMethod.Get;
-        public string PostData { get; set; }
+        public string? PostData { get; set; }
         public IDictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
     }
 }

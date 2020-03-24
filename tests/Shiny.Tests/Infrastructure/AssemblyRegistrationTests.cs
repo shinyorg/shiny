@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -30,11 +31,16 @@ namespace Shiny.Tests.Infrastructure
 
     public class AssemblyRegistrationTests
     {
+        [Fact(Skip = "TODO")]
+        public void AutoDetectUserAssemblies() => this.Run();
+
         [Fact]
-        public void Tests()
+        public void SpecificAssembly() => this.Run(this.GetType().Assembly);
+
+        void Run(Assembly assembly = null)
         {
             var services = new ServiceCollection();
-            services.RegisterModule(new AssemblyServiceModule());
+            services.RegisterModule(new AssemblyServiceModule(assembly));
             var sp = services.BuildServiceProvider();
 
             sp.GetService<ITestAssemblyService>().Should().NotBeNull("TestServiceModuleAttribute didn't run");

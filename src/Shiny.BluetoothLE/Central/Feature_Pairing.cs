@@ -15,8 +15,7 @@ namespace Shiny.BluetoothLE.Central
 
     public interface ICanPairPeripherals
     {
-        IObservable<bool> PairingRequest(string pin = null);
-
+        IObservable<bool> PairingRequest();
         PairingState PairingStatus { get; }
     }
 
@@ -35,10 +34,10 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public static IObservable<bool> PairingRequest(this IPeripheral peripheral, string pin = null)
+        public static IObservable<bool>? PairingRequest(this IPeripheral peripheral)
         {
             if (peripheral is ICanPairPeripherals pair)
-                return pair.PairingRequest(pin);
+                return pair.PairingRequest();
 
             return null;
         }

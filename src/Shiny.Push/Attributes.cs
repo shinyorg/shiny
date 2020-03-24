@@ -1,0 +1,34 @@
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny;
+using Shiny.Infrastructure;
+using Shiny.Push;
+
+[assembly: ShinyPushAutoRegister]
+
+
+namespace Shiny
+{
+    public class ShinyPushAutoRegisterAttribute : AutoRegisterAttribute
+    {
+        public bool RequestAccessOnStart { get; set; }
+
+        public override void Register(IServiceCollection services)
+        {
+            var implType = this.FindImplementationType(typeof(IPushDelegate), true);
+            services.UsePush(implType, this.RequestAccessOnStart);
+        }
+    }
+
+
+    public class ShinyPushAttribute : ServiceModuleAttribute
+    {
+        public ShinyPushAttribute(Type delegateType) => this.DelegateType = delegateType;
+
+        public Type DelegateType { get; }
+        public bool RequestAccessOnStart { get; set; }
+
+        public override void Register(IServiceCollection services)
+            => services.UsePush(this.DelegateType, this.RequestAccessOnStart);
+    }
+}

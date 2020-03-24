@@ -8,35 +8,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Logging;
 using Android.Bluetooth;
-using Android.OS;
 using Java.Lang;
 using Exception = System.Exception;
-using System.Collections.Generic;
+
 
 namespace Shiny.BluetoothLE.Central.Internals
 {
     public class DeviceContext
     {
-        readonly GattCallbacks callbacks;
         readonly Subject<BleException> connErrorSubject;
-        CancellationTokenSource cancelSrc;
+        CancellationTokenSource? cancelSrc;
 
 
         public DeviceContext(CentralContext context, BluetoothDevice device)
         {
             this.CentralContext = context;
             this.NativeDevice = device;
-            this.callbacks = new GattCallbacks();
             this.Actions = new ConcurrentQueue<Func<Task>>();
             this.connErrorSubject = new Subject<BleException>();
         }
 
 
-        // TODO: eliminate this
-        public GattCallbacks Callbacks => this.callbacks;
-
+        public GattCallbacks Callbacks { get; } = new GattCallbacks();
         public CentralContext CentralContext { get; }
-        public BluetoothGatt Gatt { get; private set; }
+        public BluetoothGatt? Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
 
         public ConnectionState Status => this
@@ -49,11 +44,8 @@ namespace Shiny.BluetoothLE.Central.Internals
         public ConcurrentQueue<Func<Task>> Actions { get; }
         public IObservable<BleException> ConnectionFailed => this.connErrorSubject; // TODO: need the device
 
-        //public IObservable<ConnectionState> WhenConnectionStatusChanged() => this.callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus());
-        //public IObservable<GattCharacteristicEventArgs> WhenWrite(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicWrite.Where(x => x.Characteristic.Equals(native));
-        //public IObservable<GattCharacteristicEventArgs> WhenRead(BluetoothGattCharacteristic native) => this.callbacks.CharacteristicRead.Where(x => x.Characteristic.Equals(native));
 
-        public void Connect(ConnectionConfig config) => this.InvokeOnMainThread(() =>
+        public void Connect(ConnectionConfig? config) => this.InvokeOnMainThread(() =>
         {
             try
             {
@@ -68,7 +60,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             }
             catch (Exception ex)
             {
-                //Log.Warn("Connection", "Connection to peripheral failed - " + ex);
+                Log.Write(BleLogCategory.Peripheral, "Connection to peripheral failed - " + ex);
                 this.connErrorSubject.OnNext(new BleException("Failed to connect to peripheral", ex));
             }
         });
@@ -148,7 +140,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             }
             catch (Exception ex)
             {
-                Log.Write(BleLogCategory.Device, "Unclean disconnect - " + ex);
+                Log.Write(BleLogCategory.Peripheral, "Unclean disconnect - " + ex);
             }
         }
 
@@ -162,7 +154,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             try
             {
                 this.running = true;
-                Func<Task> outTask = null;
+                Func<Task>? outTask = null;
                 while (this.Actions.TryDequeue(out outTask) && this.running)
                 {
                     await outTask();
@@ -189,7 +181,7 @@ namespace Shiny.BluetoothLE.Central.Internals
             try
             {
                 // somewhat a copy of android-rxbluetoothle
-                if (Build.VERSION.SdkInt >= BuildVersionCodes.N)
+                if (this.CentralContext.Android.IsMinApiLevel(24))
                 {
                     this.Gatt = this.ConnectGattCompat(autoConnect);
                     return;
@@ -205,7 +197,7 @@ namespace Shiny.BluetoothLE.Central.Internals
 
                 if (iBluetoothGatt == null)
                 {
-                    //Log.Debug("Peripheral", "Unable to find getBluetoothGatt object");
+                    Log.Write(BleLogCategory.Peripheral, "Unable to find getBluetoothGatt object");
                     this.Gatt = this.ConnectGattCompat(autoConnect);
                     return;
                 }
@@ -213,7 +205,7 @@ namespace Shiny.BluetoothLE.Central.Internals
                 var bluetoothGatt = this.CreateReflectionGatt(iBluetoothGatt);
                 if (bluetoothGatt == null)
                 {
-                    //Log.Info("Peripheral", "Unable to create GATT object via reflection");
+                    Log.Write(BleLogCategory.Peripheral, "Unable to create GATT object via reflection");
                     this.Gatt = this.ConnectGattCompat(autoConnect);
                     return;
                 }
@@ -222,13 +214,13 @@ namespace Shiny.BluetoothLE.Central.Internals
                 var connectSuccess = this.ConnectUsingReflection(this.Gatt, true);
                 if (!connectSuccess)
                 {
-                    //Log.Error("Peripheral", "Unable to connect using reflection method");
+                    Log.Write(BleLogCategory.Peripheral, "Unable to connect using reflection method");
                     this.Gatt?.Close();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Log.Info("Peripheral", "Defaulting to gatt connect compatible method - " + ex);
+                Log.Write(BleLogCategory.Peripheral, "Defaulting to gatt connect compatible method - " + ex);
                 this.Gatt = this.ConnectGattCompat(autoConnect);
             }
         }
@@ -291,9 +283,13 @@ namespace Shiny.BluetoothLE.Central.Internals
         }
 
 
-        BluetoothGatt ConnectGattCompat(bool autoConnect) => Build.VERSION.SdkInt >= BuildVersionCodes.M
-            ? this.NativeDevice.ConnectGatt(Android.App.Application.Context, autoConnect, this.Callbacks, BluetoothTransports.Le)
-            : this.NativeDevice.ConnectGatt(Android.App.Application.Context, autoConnect, this.Callbacks);
+        BluetoothGatt ConnectGattCompat(bool autoConnect)
+        {
+            var c = this.CentralContext.Android;
+            return c.IsMinApiLevel(23)
+                ? this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks, BluetoothTransports.Le)
+                : this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks);
+        }
 
 
         GattConnectionPriority ToNative(ConnectionPriority priority)

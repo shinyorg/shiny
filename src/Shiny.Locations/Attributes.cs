@@ -9,10 +9,10 @@ namespace Shiny
 {
     public class ShinyGpsAttribute : ServiceModuleAttribute
     {
-        public ShinyGpsAttribute(Type delegateType = null)
+        public ShinyGpsAttribute(Type? delegateType = null)
             => this.DelegateType = delegateType;
 
-        public Type DelegateType { get; set; }
+        public Type? DelegateType { get; set; }
 
         public override void Register(IServiceCollection services)
             => services.UseGps(this.DelegateType);

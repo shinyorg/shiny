@@ -1,28 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>pdbonly</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DebugType>pdbonly</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Acr.UserDialogs" Version="7.0.32" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Acr.UserDialogs" Version="7.1.0.440" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
-    <ProjectReference Include="..\..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
-    <ProjectReference Include="..\..\..\src\Shiny.Core\Shiny.Core.csproj" />
-    <ProjectReference Include="..\..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
-    <ProjectReference Include="..\..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
-    <ProjectReference Include="..\..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
-    <ProjectReference Include="..\..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
-    <ProjectReference Include="..\..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
-    <ProjectReference Include="..\..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
+    </ItemGroup>
 </Project>

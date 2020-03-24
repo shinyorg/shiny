@@ -9,13 +9,13 @@ namespace Shiny.SpeechRecognition
 {
     public class SpeechRecognitionListener : Java.Lang.Object, IRecognitionListener
     {
-        public Action StartOfSpeech { get; set; }
-        public Action EndOfSpeech { get; set; }
-        public Action ReadyForSpeech { get; set; }
-        public Action<SpeechRecognizerError> Error { get; set; }
-        public Action<string> FinalResults { get; set; }
-        public Action<string> PartialResults { get; set; }
-        public Action<float> RmsChanged { get; set; }
+        public Action? StartOfSpeech { get; set; }
+        public Action? EndOfSpeech { get; set; }
+        public Action? ReadyForSpeech { get; set; }
+        public Action<SpeechRecognizerError>? Error { get; set; }
+        public Action<string>? FinalResults { get; set; }
+        public Action<string>? PartialResults { get; set; }
+        public Action<float>? RmsChanged { get; set; }
 
 
         public void OnBeginningOfSpeech()
@@ -73,7 +73,7 @@ namespace Shiny.SpeechRecognition
         }
 
 
-        void SendResults(Bundle bundle, Action<string> action)
+        void SendResults(Bundle bundle, Action<string>? action)
         {
             var matches = bundle.GetStringArrayList(SpeechRecognizer.ResultsRecognition);
             if (matches == null || matches.Count == 0)

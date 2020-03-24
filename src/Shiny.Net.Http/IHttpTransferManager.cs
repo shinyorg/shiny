@@ -17,9 +17,9 @@ namespace Shiny.Net.Http
         //native.SetShowRunningNotification
         Task<HttpTransfer> Enqueue(HttpTransferRequest request);
         Task<HttpTransfer> GetTransfer(string id);
-        Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter filter = null);
+        Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter? filter = null);
         Task Cancel(string id);
-        Task Cancel(QueryFilter filter = null);
+        Task Cancel(QueryFilter? filter = null);
         IObservable<HttpTransfer> WhenUpdated();
     }
 }

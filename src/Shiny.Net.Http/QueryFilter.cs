@@ -8,14 +8,6 @@ namespace Shiny.Net.Http
     {
         public List<string> Ids { get; set; } = new List<string>();
         public DirectionFilter Direction { get; set; } = DirectionFilter.Both;
-        //public HttpTransferStateFilter States { get; set; } = HttpTransferStateFilter.None;
-
-
-        //public QueryFilter SetStates(HttpTransferStateFilter states)
-        //{
-        //    this.States = states;
-        //    return this;
-        //}
 
 
         public QueryFilter SetDirection(DirectionFilter direction)

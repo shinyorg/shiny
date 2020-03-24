@@ -1,87 +1,104 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Threading;
-//using System.Threading.Tasks;
-//using BackgroundTasks;
-//using CoreFoundation;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using BackgroundTasks;
+using UIKit;
+using Shiny.Infrastructure;
 
-//namespace Shiny.Jobs
-//{
-//    public class BgTasksJobManager : IJobManager
-//    {
-//        public bool IsRunning => throw new NotImplementedException();
 
-//        public event EventHandler<JobInfo> JobStarted;
-//        public event EventHandler<JobRunResult> JobFinished;
+namespace Shiny.Jobs
+{
+    public class BgTasksJobManager : AbstractJobManager
+    {
+        public BgTasksJobManager(IServiceProvider container, IRepository repository) : base(container, repository)
+        {
+            this.Register(this.GetIdentifier(false, false));
+            this.Register(this.GetIdentifier(true, false));
+            this.Register(this.GetIdentifier(false, true));
+            this.Register(this.GetIdentifier(true, true));
+        }
 
-//        public Task Cancel(string jobName)
-//        {
-//            throw new NotImplementedException();
-//        }
 
-//        public Task CancelAll()
-//        {
-//            BGTaskScheduler.Shared.CancelAll();
-//            return Task.CompletedTask;
-//        }
+        public static bool IsAvailable
+        {
+            get
+            {
+                var result = (
+                    UIDevice.CurrentDevice.CheckSystemVersion(13, 0) &&
+                    !iOSExtensions.IsSimulator &&
+                    PlatformExtensions.HasBackgroundMode("processing")
+                );
+                return result;
+            }
+        }
 
-//        public Task<JobInfo> GetJob(string jobIdentifier)
-//        {
 
-//            throw new NotImplementedException();
-//        }
+        public override Task<AccessState> RequestAccess()
+        {
+            var result = AccessState.Available;
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                result = AccessState.NotSupported;
 
-//        public Task<IEnumerable<JobInfo>> GetJobs()
-//        {
-//            throw new NotImplementedException();
-//        }
+            else if (iOSExtensions.IsSimulator)
+                result = AccessState.NotSupported;
 
-//        public Task<AccessState> RequestAccess()
-//        {
-//            throw new NotImplementedException();
-//        }
+            else if (!PlatformExtensions.HasBackgroundMode("processing"))
+                result = AccessState.NotSetup;
 
-//        public Task<JobRunResult> Run(string jobIdentifier, CancellationToken cancelToken = default)
-//        {
-//            throw new NotImplementedException();
-//        }
+            return Task.FromResult(result);
+        }
 
-//        public Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default)
-//        {
-//            throw new NotImplementedException();
-//        }
 
-//        public void RunTask(string taskName, Func<CancellationToken, Task> task)
-//        {
-//            throw new NotImplementedException();
-//        }
+        protected override void CancelNative(JobInfo jobInfo)
+            => BGTaskScheduler.Shared.Cancel(jobInfo.Identifier);
 
-//        public Task Schedule(JobInfo jobInfo)
-//        {
-//            //BGProcessingTask
-//            //BGTask
-//            //BGTaskScheduler
-//            //BGAppRefreshTask
-//            //BGAppRefreshTaskRequest
 
-//            var request = new BGProcessingTaskRequest(jobInfo.Identifier)
-//            {
-//                RequiresExternalPower = jobInfo.DeviceCharging,
-//                RequiresNetworkConnectivity = jobInfo.RequiredInternetAccess != InternetAccess.None
-//                //EarliestBeginDate
-//            };
-//            if (!BGTaskScheduler.Shared.Submit(request, out var error))
-//                throw new ArgumentException(error.LocalizedDescription);
-//            //var request = new BGProcessingTaskRequest()
-//            //BGTaskScheduler.Shared.Register(
-//            //    jobInfo.Identifier,
-//            //    DispatchQueue.DefaultGlobalQueue,
-//            //    task =>
-//            //    {
-//            //    }
-//            //);
+        protected override void ScheduleNative(JobInfo jobInfo)
+        {
+            var identifier = this.GetIdentifier(
+                jobInfo.DeviceCharging,
+                jobInfo.RequiredInternetAccess == InternetAccess.Any
+            );
+            var request = new BGProcessingTaskRequest(identifier);
+            request.RequiresExternalPower = jobInfo.DeviceCharging;
+            request.RequiresNetworkConnectivity = jobInfo.RequiredInternetAccess == InternetAccess.Any;
 
-//            return Task.CompletedTask;
-//        }
-//    }
-//}
+            if (!BGTaskScheduler.Shared.Submit(request, out var e))
+                throw new ArgumentException(e.LocalizedDescription.ToString());
+        }
+
+
+        protected void Register(string identifier)
+        {
+            BGTaskScheduler.Shared.Register(
+                identifier,
+                null,
+                async task =>
+                {
+                    var cancelSrc = new CancellationTokenSource();
+                    task.ExpirationHandler = cancelSrc.Cancel;
+
+                    var result = await this.Run(task.Identifier, cancelSrc.Token);
+                    task.SetTaskCompleted(result.Exception != null);
+                }
+            );
+        }
+
+
+        protected string GetIdentifier(bool extPower, bool network)
+        {
+            //"com.shiny.job"
+            //"com.shiny.jobpower"
+            //"com.shiny.jobnet"
+            //"com.shiny.jobpowernet"
+            var id = "com.shiny.job";
+            if (extPower)
+                id += "power";
+
+            if (network)
+                id += "net";
+
+            return id;
+        }
+    }
+}

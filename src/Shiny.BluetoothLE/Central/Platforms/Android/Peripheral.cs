@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Disposables;
 using Shiny.BluetoothLE.Central.Internals;
 using Android.Bluetooth;
-using Android.OS;
 
 
 namespace Shiny.BluetoothLE.Central
@@ -29,11 +26,11 @@ namespace Shiny.BluetoothLE.Central
         }
 
 
-        public override object NativeDevice => this.context.NativeDevice;
+        public BluetoothDevice Native => this.context.NativeDevice;
         public override ConnectionState Status => this.context.Status;
 
 
-        public override void Connect(ConnectionConfig config)
+        public override void Connect(ConnectionConfig? config)
         {
             this.connSubject.OnNext(ConnectionState.Connecting);
             this.context.Connect(config);
@@ -42,6 +39,7 @@ namespace Shiny.BluetoothLE.Central
 
         public override void CancelConnection()
         {
+            //this.connSubject.OnNext(ConnectionState.Disconnecting);
             this.context.Close();
             this.connSubject.OnNext(ConnectionState.Disconnected);
         }
@@ -65,12 +63,19 @@ namespace Shiny.BluetoothLE.Central
 
 
         public override IObservable<ConnectionState> WhenStatusChanged()
-            => this.connSubject.Merge(this.context.Callbacks.ConnectionStateChanged.Select(x => x.NewState.ToStatus()));
+            => this.context
+                .Callbacks
+                .ConnectionStateChanged
+                .Select(x => x.NewState.ToStatus())
+                .StartWith(this.Status)
+                .Merge(this.connSubject);
 
 
         public override IObservable<IGattService> DiscoverServices()
             => Observable.Create<IGattService>(ob =>
             {
+                this.AssertConnection();
+
                 var sub = this.context.Callbacks.ServicesDiscovered.Subscribe(cb =>
                 {
                     foreach (var ns in cb.Gatt.Services)
@@ -90,6 +95,8 @@ namespace Shiny.BluetoothLE.Central
 
         public override IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
         {
+            this.AssertConnection();
+
             var sub = this.context
                 .Callbacks
                 .ReadRemoteRssi
@@ -101,49 +108,37 @@ namespace Shiny.BluetoothLE.Central
                     else
                         ob.OnError(new BleException("Failed to get RSSI - " + cb.Status));
                 });
-                
-            this.context.Gatt?.ReadRemoteRssi();
+
+            this.context.Gatt.ReadRemoteRssi();
             return sub;
-        });
-
-
-        public IObservable<bool> PairingRequest(string pin) => Observable.Create<bool>(ob =>
-        {
-            var composite = new CompositeDisposable();
-
-            if (this.PairingStatus == PairingState.Paired)
-                ob.Respond(true);
-
-            else
-            {
-                if (pin != null && Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat)
-                {
-                    composite.Add(this.context
-                        .CentralContext
-                        .ListenForMe(BluetoothDevice.ActionPairingRequest, this)
-                        .Subscribe(x =>
-                        {
-                            var bytes = ConvertPinToBytes(pin);
-                            this.context.NativeDevice.SetPin(bytes);
-                            this.context.NativeDevice.SetPairingConfirmation(true);
-                        })
-                    );
-                }
-                composite.Add(this.context.CentralContext
-                    .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
-                    .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
-                    .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired))
-                );
-                // execute
-                if (!this.context.NativeDevice.CreateBond())
-                    ob.Respond(false);
-            }
-            return composite;
         });
 
 
         public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
             new GattReliableWriteTransaction(this.context);
+
+
+        public IObservable<bool> PairingRequest() => Observable.Create<bool>(ob =>
+        {
+            IDisposable? sub = null;
+            if (this.PairingStatus == PairingState.Paired)
+            {
+                ob.Respond(true);
+            }
+            else
+            {
+                sub = this.context
+                    .CentralContext
+                    .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
+                    .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
+                    .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired));
+
+                // execute
+                if (!this.context.NativeDevice.CreateBond())
+                    ob.Respond(false);
+            }
+            return () => sub?.Dispose();
+        });
 
 
         public PairingState PairingStatus
@@ -164,12 +159,13 @@ namespace Shiny.BluetoothLE.Central
 
 
         int currentMtu = 20;
-        public IObservable<int> RequestMtu(int size) => Observable.Create<int>(ob =>
+        public IObservable<int> RequestMtu(int size) => this.context.Invoke(Observable.Create<int>(ob =>
         {
+            this.AssertConnection();
             var sub = this.WhenMtuChanged().Skip(1).Take(1).Subscribe(ob.Respond);
             this.context.Gatt.RequestMtu(size);
             return sub;
-        });
+        }));
 
 
         public IObservable<int> WhenMtuChanged() => Observable
@@ -212,21 +208,10 @@ namespace Shiny.BluetoothLE.Central
 
         #region Internals
 
-        public static byte[] ConvertPinToBytes(string pin)
+        void AssertConnection()
         {
-            var bytes = new List<byte>();
-            foreach (var p in pin)
-            {
-                if (!char.IsDigit(p))
-                    throw new ArgumentException("PIN contain invalid value - " + p);
-
-                var value = byte.Parse(p.ToString());
-                if (value > 10)
-                    throw new ArgumentException("Invalid range for PIN value - " + value);
-
-                bytes.Add(value);
-            }
-            return bytes.ToArray();
+            if (this.Status != ConnectionState.Connected)
+                throw new ArgumentException("Peripheral is not connected");
         }
 
 

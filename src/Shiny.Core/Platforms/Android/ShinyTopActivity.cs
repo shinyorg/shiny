@@ -16,7 +16,7 @@ namespace Shiny
         }
 
 
-        public Activity Current => this.callbacks.Activity;
+        public Activity? Current => this.callbacks.Activity;
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => this.callbacks.ActivitySubject;
     }
 }

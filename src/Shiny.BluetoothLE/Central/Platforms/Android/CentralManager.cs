@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Shiny.BluetoothLE.Central.Internals;
 using Android;
 using Android.Bluetooth;
-using Android.Content;
 
 
 namespace Shiny.BluetoothLE.Central
@@ -30,16 +29,16 @@ namespace Shiny.BluetoothLE.Central
         public override bool IsScanning => this.isScanning;
 
 
-        public override IObservable<IPeripheral> GetKnownPeripheral(Guid deviceId)
+        public override IObservable<IPeripheral?> GetKnownPeripheral(Guid peripheralId)
         {
-            var native = this.context.Manager.Adapter.GetRemoteDevice(deviceId
+            var native = this.context.Manager.Adapter.GetRemoteDevice(peripheralId
                 .ToByteArray()
                 .Skip(10)
                 .Take(6)
                 .ToArray()
             );
             if (native == null)
-                return Observable.Return<IPeripheral>(null);
+                return Observable.Return<IPeripheral?>(null);
 
             var device = this.context.GetDevice(native);
             return Observable.Return(device);
@@ -71,7 +70,6 @@ namespace Shiny.BluetoothLE.Central
 
         public override IObservable<IScanResult> Scan(ScanConfig config)
         {
-            // TODO: check permissions first
             if (this.IsScanning)
                 throw new ArgumentException("There is already an active scan");
 

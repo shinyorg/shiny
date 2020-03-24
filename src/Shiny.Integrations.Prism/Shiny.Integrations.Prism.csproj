@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <VersionSuffix>beta</VersionSuffix>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Description>Shiny Integration - Prism</Description>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Prism.Forms" Version="7.2.0.1422" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Prism.Forms" Version="7.2.0.1367" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-  </ItemGroup>
-
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
 </Project>

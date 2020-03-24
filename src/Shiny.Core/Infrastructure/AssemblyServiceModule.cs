@@ -8,9 +8,16 @@ namespace Shiny.Infrastructure
 {
     public class AssemblyServiceModule : ShinyModule
     {
-        readonly Assembly[] assemblies;
-        public AssemblyServiceModule(Assembly[] assemblies = null)
-            => this.assemblies = assemblies ?? AssemblyQueries.GetAssumedUserAssemblies().ToArray();
+        readonly Assembly[]? assemblies;
+
+
+        public AssemblyServiceModule(params Assembly[] assemblies)
+        {
+            if (assemblies == null || assemblies.Length == 0)
+                assemblies = AssemblyQueries.GetAssumedUserAssemblies().ToArray();
+
+            this.assemblies = assemblies;
+        }
 
 
         public override void Register(IServiceCollection services)
@@ -44,7 +51,7 @@ namespace Shiny.Infrastructure
                                 services.AddSingleton(serviceAttribute.ServiceType, serviceAttribute.ImplementationType);
                             break;
                     }
-                    
+
                 }
                 else if (attribute is ServiceModuleAttribute module)
                 {

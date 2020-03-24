@@ -1,28 +1,17 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Shiny.Infrastructure;
-using Shiny.Net;
-using Shiny.Power;
 
 
 namespace Shiny.Jobs
 {
-    public class JobManager : AbstractJobManager
+    public class JobManager : AbstractJobManager, IBackgroundTaskProcessor
     {
-        readonly UwpContext context;
-        public static TimeSpan PeriodicRunTime { get; set; } = TimeSpan.FromMinutes(15);
-
-
-        public JobManager(UwpContext context,
-                          IServiceProvider container,
-                          IRepository repository,
-                          IPowerManager powerManager,
-                          IConnectivity connectivity) : base(container, repository, powerManager, connectivity)
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
-            this.context = context;
-
         }
 
 
@@ -39,35 +28,75 @@ namespace Shiny.Jobs
 
                 default:
                     return AccessState.Denied;
-                    //throw new ArgumentException("Request declined - " + requestStatus);
             }
         }
 
 
-        public override async Task Schedule(JobInfo jobInfo)
+        public async void Process(IBackgroundTaskInstance taskInstance)
         {
-            if (PeriodicRunTime.TotalSeconds < 15)
-                throw new ArgumentException("Background timer cannot be less than 15mins");
-
-            var runMins = Convert.ToUInt32(Math.Round(PeriodicRunTime.TotalMinutes, 0));
-            this.context.RegisterBackground<JobBackgroundTaskProcessor>(new TimeTrigger(runMins, false));
-            await base.Schedule(jobInfo);
+            var deferral = taskInstance.GetDeferral();
+            try
+            {
+                using (var cancelSrc = new CancellationTokenSource())
+                {
+                    taskInstance.Canceled += (sender, args) => cancelSrc.Cancel();
+                    var jobId = taskInstance.Task.Name.Replace("JOB-", String.Empty);
+                    await this.Run(jobId, cancelSrc.Token);
+                }
+            }
+            finally
+            {
+                deferral.Complete();
+            }
         }
 
 
-        public override async Task Cancel(string jobName)
+        protected override void ScheduleNative(JobInfo jobInfo)
         {
-            await base.Cancel(jobName);
-            var jobs = await this.GetJobs();
-            if (!jobs.Any())
-                this.context.UnRegisterBackground<JobBackgroundTaskProcessor>();
+            this.CancelNative(jobInfo);
+
+            var builder = new BackgroundTaskBuilder();
+            builder.Name = GetJobTaskName(jobInfo);
+            builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
+
+            if (jobInfo.PeriodicTime != null)
+            {
+                if (jobInfo.PeriodicTime < TimeSpan.FromMinutes(15))
+                    throw new ArgumentException("You cannot schedule periodic jobs faster than 15 minutes");
+
+                var runMins = Convert.ToUInt32(Math.Round(jobInfo.PeriodicTime.Value.TotalMinutes, 0));
+                builder.SetTrigger(new TimeTrigger(runMins, false));
+            }
+
+            //SystemTriggerType.PowerStateChange
+            // TODO: idle, power change, etc
+            if (jobInfo.RequiredInternetAccess != InternetAccess.None)
+            {
+                var type = jobInfo.RequiredInternetAccess == InternetAccess.Any
+                    ? SystemConditionType.InternetAvailable
+                    : SystemConditionType.FreeNetworkAvailable;
+
+                builder.AddCondition(new SystemCondition(type));
+            }
+            builder.Register();
         }
 
 
-        public override async Task CancelAll()
+        protected override void CancelNative(JobInfo jobInfo) => GetTask("JOB-" + jobInfo.Identifier)?.Unregister(true);
+
+        static string GetJobTaskName(JobInfo job) => "JOB-" + job.Identifier;
+
+        static IBackgroundTaskRegistration GetTask(string taskName)
         {
-            await base.CancelAll();
-            this.context.UnRegisterBackground<JobBackgroundTaskProcessor>();
+            var tasks = BackgroundTaskRegistration
+                .AllTasks
+                .ToList();
+
+            return tasks
+                .Where(x => x.Value.Name.Equals(taskName))
+                .Select(x => x.Value)
+                .FirstOrDefault();
         }
     }
 }
+

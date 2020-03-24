@@ -14,7 +14,8 @@ namespace Shiny.Testing.Beacons
 
 
         AccessState accessStatus = AccessState.Available;
-        public AccessState AccessStatus {
+        public AccessState AccessStatus
+        {
             get => this.accessStatus;
             set
             {

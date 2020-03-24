@@ -20,5 +20,13 @@ namespace Shiny.Testing.Net
             get => this.access;
             set => this.Set(ref this.access, value);
         }
+
+
+        string? carrier = null;
+        public string? CellularCarrier
+        {
+            get => this.carrier;
+            set => this.Set(ref this.carrier, value);
+        }
     }
 }

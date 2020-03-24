@@ -23,7 +23,6 @@ namespace Shiny.BluetoothLE.Central
 
 
         public CBPeripheral Native { get; }
-        public override object NativeDevice => this.Native;
         public override int MtuSize => (int)this
             .Native
             .GetMaximumWriteValueLength(CBCharacteristicWriteType.WithoutResponse);
@@ -197,22 +196,14 @@ namespace Shiny.BluetoothLE.Central
         });
 
 
+        public override string ToString() => this.Uuid.ToString();
         public override int GetHashCode() => this.Native.GetHashCode();
-
-
         public override bool Equals(object obj)
         {
-            var other = obj as Peripheral;
-            if (other == null)
-                return false;
+            if (obj is Peripheral other)
+                return this.Native.Equals(other.Native);
 
-            if (!this.Native.Equals(other.Native))
-                return false;
-
-            return true;
+            return false;
         }
-
-
-        public override string ToString() => this.Uuid.ToString();
     }
 }

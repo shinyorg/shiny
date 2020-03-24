@@ -7,17 +7,20 @@ namespace Shiny.Notifications
 {
     class NotificationModule : ShinyModule
     {
-        readonly Type delegateType;
+        readonly Type? delegateType;
         readonly bool requestPermissionImmediately;
+        readonly NotificationCategory[] notificationCategories;
 
 
-        public NotificationModule(Type delegateType,
+        public NotificationModule(Type? delegateType,
                                   bool requestPermissionImmediately,
-                                  AndroidOptions androidConfig,
-                                  UwpOptions uwpConfig)
+                                  AndroidOptions? androidConfig,
+                                  UwpOptions? uwpConfig,
+                                  NotificationCategory[] notificationCategories)
         {
             this.delegateType = delegateType;
             this.requestPermissionImmediately = requestPermissionImmediately;
+            this.notificationCategories = notificationCategories;
 
             if (androidConfig != null)
             {
@@ -26,8 +29,10 @@ namespace Shiny.Notifications
                 AndroidOptions.DefaultChannelId = androidConfig.ChannelId ?? AndroidOptions.DefaultChannelId;
                 AndroidOptions.DefaultNotificationImportance = androidConfig.NotificationImportance;
                 AndroidOptions.DefaultLaunchActivityFlags = androidConfig.LaunchActivityFlags;
+                AndroidOptions.DefaultShowWhen = androidConfig.ShowWhen;
                 AndroidOptions.DefaultVibrate = androidConfig.Vibrate;
                 AndroidOptions.DefaultSmallIconResourceName = androidConfig.SmallIconResourceName ?? AndroidOptions.DefaultSmallIconResourceName;
+                AndroidOptions.DefaultColorResourceName = androidConfig.ColorResourceName;
             }
             if (uwpConfig != null)
                 UwpOptions.DefaultUseLongDuration = uwpConfig.UseLongDuration;
@@ -42,14 +47,20 @@ namespace Shiny.Notifications
             services.AddSingleton<INotificationManager, NotificationManager>();
 #if __ANDROID__
             services.AddSingleton<AndroidNotificationProcessor>();
-#endif
-
-#if __ANDROID__ || WINDOWS_UWP
-            services.RegisterJob(new Jobs.JobInfo
+            services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
             {
-                Identifier = nameof(NotificationJob),
-                Type = typeof(NotificationJob),
-                Repeat = true
+                Repeat = true,
+                IsSystemJob = true
+            });
+#elif WINDOWS_UWP
+            UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
+            {
+                builder.SetTrigger(new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(Windows.UI.Notifications.NotificationKinds.Toast));
+            });
+            services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
+            {
+                Repeat = true,
+                IsSystemJob = true
             });
 #endif
         }
@@ -58,12 +69,13 @@ namespace Shiny.Notifications
         public override async void OnContainerReady(IServiceProvider services)
         {
             base.OnContainerReady(services);
+            var manager = services.GetRequiredService<INotificationManager>();
+
             if (requestPermissionImmediately)
-            {
-                await services
-                    .GetService<INotificationManager>()
-                    .RequestAccess();
-            }
+                await manager.RequestAccess();
+
+            foreach (var category in this.notificationCategories)
+                manager.RegisterCategory(category);
         }
     }
 }

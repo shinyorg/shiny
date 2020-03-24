@@ -30,7 +30,7 @@ namespace Shiny.Infrastructure
         public Task Remove(string identifier) => this.Repository.Remove<TStore>(identifier);
 
 
-        public async Task<TArgs> Get(string identifier)
+        public async Task<TArgs?> Get(string identifier)
         {
             var store = await this.Repository
                 .Get<TStore>(identifier)

@@ -7,7 +7,15 @@ namespace Shiny.IO
     public class ControlStream : Stream
     {
         readonly Stream innerStream;
-        public ControlStream(Stream innerStream) => this.innerStream = innerStream;
+
+
+        public ControlStream(Stream innerStream)
+        {
+            if (innerStream == null)
+                throw new NullReferenceException("innerStream");
+
+            this.innerStream = innerStream;
+        }
 
 
         public bool IsOperationsCancelled { get; private set; }
@@ -51,9 +59,9 @@ namespace Shiny.IO
         public override void SetLength(long value) => this.innerStream.SetLength(value);
         public override void Flush() => this.innerStream.Flush();
 
-        public event EventHandler<ControlStreamEventArgs> BytesMoved;
-        public event EventHandler<ControlStreamEventArgs> BytesRead;
-        public event EventHandler<ControlStreamEventArgs> BytesWritten;
+        public event EventHandler<ControlStreamEventArgs>? BytesMoved;
+        public event EventHandler<ControlStreamEventArgs>? BytesRead;
+        public event EventHandler<ControlStreamEventArgs>? BytesWritten;
 
         public override int ReadTimeout => this.innerStream.ReadTimeout;
         public override int WriteTimeout => this.innerStream.WriteTimeout;

@@ -8,12 +8,11 @@ namespace Shiny.Sensors
     public class CompassImpl : ICompass
     {
         public bool IsAvailable => CLLocationManager.HeadingAvailable;
+        protected CompassAccuracy FromNative(double value) => value < 0 ? CompassAccuracy.Unreliable : CompassAccuracy.High;
 
-
-        IObservable<CompassReading> readOb;
+        IObservable<CompassReading>? readOb;
         public IObservable<CompassReading> WhenReadingTaken()
-        {
-            this.readOb = this.readOb ?? Observable.Create<CompassReading>(ob =>
+            => this.readOb ??= Observable.Create<CompassReading>(ob =>
             {
                 var handler = new EventHandler<CLHeadingUpdatedEventArgs>((sender, args) =>
                 {
@@ -37,11 +36,5 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.readOb;
-        }
-
-
-        protected CompassAccuracy FromNative(double value) => value < 0 ? CompassAccuracy.Unreliable : CompassAccuracy.High;
     }
 }

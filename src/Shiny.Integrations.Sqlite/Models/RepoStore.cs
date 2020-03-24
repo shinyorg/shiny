@@ -10,8 +10,8 @@ namespace Shiny.Models
         [AutoIncrement]
         public int Id { get; set; }
 
-        public string TypeName { get; set; }
-        public string Key { get; set; }
-        public string Blob { get; set; }
+        public string? TypeName { get; set; }
+        public string? Key { get; set; }
+        public string? Blob { get; set; }
     }
 }

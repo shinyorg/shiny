@@ -8,6 +8,7 @@ namespace Shiny.Locations
 {
     [BroadcastReceiver(
         Name = GeofenceManagerImpl.ReceiverName,
+        Enabled = true,
         Exported = true
     )]
     [IntentFilter(new [] {

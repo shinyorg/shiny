@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Android.Content;
 using Android.Net;
+using Android.Telephony;
 
 
 namespace Shiny.Net
@@ -10,13 +11,16 @@ namespace Shiny.Net
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
         readonly AndroidContext context;
-        IDisposable netmon;
+        IDisposable? netmon;
 
 
         public ConnectivityImpl(AndroidContext context)
         {
             this.context = context;
         }
+
+
+        public string? CellularCarrier => this.Telephone.NetworkOperatorName;
 
 
         NetworkReach reach;
@@ -61,10 +65,8 @@ namespace Shiny.Net
                         Caps: this.Connectivity.GetNetworkCapabilities(x)
                     ))
                     .Where(x =>
-                        x.Info != null &&
-                        x.Caps != null &&
-                        x.Info.IsAvailable &&
-                        x.Info.IsConnectedOrConnecting
+                        (x.Info?.IsAvailable ?? false) &&
+                        (x.Info?.IsConnectedOrConnecting ?? false)
                     );
 
                 var access = NetworkAccess.None;
@@ -124,15 +126,28 @@ namespace Shiny.Net
         }
 
 
-        ConnectivityManager connectivityMgr;
+        ConnectivityManager? connectivityMgr;
         ConnectivityManager Connectivity
         {
             get
             {
-                if (this.connectivityMgr == null || this.connectivityMgr.Handle == IntPtr.Zero)
-                    this.connectivityMgr = (ConnectivityManager) this.context.AppContext.GetSystemService(Context.ConnectivityService);
+                if (this.connectivityMgr.IsNull())
+                    this.connectivityMgr = this.context.GetSystemService<ConnectivityManager>(Context.ConnectivityService);
 
                 return this.connectivityMgr;
+            }
+        }
+
+
+        TelephonyManager? telManager;
+        TelephonyManager Telephone
+        {
+            get
+            {
+                if (this.telManager.IsNull())
+                    this.telManager = this.context.GetSystemService<TelephonyManager>(Context.TelephonyService);
+
+                return this.telManager;
             }
         }
     }

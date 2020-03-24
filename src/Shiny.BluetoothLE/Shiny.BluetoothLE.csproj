@@ -1,9 +1,11 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
+        <VersionSuffix>beta</VersionSuffix>
         <Description>Shiny Reactive BluetoothLE Plugin for client and gatt server</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>        
+<!--        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.tvos10;xamarin.mac20;monoandroid90;monoandroid10.0;tizen50</TargetFrameworks>-->
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,7 +16,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <PackageReference Include="Tmds.DBus" Version="0.7.0" />
+        <PackageReference Include="Tmds.DBus" Version="0.8.0" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -23,9 +25,9 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
@@ -46,4 +48,16 @@
         <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Reference Include="netstandard" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\tizen\**\*.cs" />
+    </ItemGroup>
 </Project>

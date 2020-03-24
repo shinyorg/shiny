@@ -62,11 +62,22 @@ namespace YourNamespace
 
 3. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
 
+using Shiny;
+
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
 {
-    Shiny.AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+    this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
+
+
+Testing on Android
+
+* Open an SDK command prompt
+* run 'adb shell cmd jobscheduler'
+* find your job
+* run 'adb shell cmd jobschedule run XXX'
+
 
 ----------
 IOS
@@ -74,7 +85,8 @@ IOS
 
 * Add the following as the first line in your AppDelegate.cs - FinishedLaunching method
 
-Shiny.iOSShinyHost.Init(new YourStartup());
+using Shiny;
+this.ShinyFinishedLaunching(new YourStartup());
 
 
 ** IOS JOBS **
@@ -83,15 +95,37 @@ If you plan to use jobs in iOS, please do the following:
 1. Add this to your AppDelegate.cs
 
 public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-    => Shiny.Jobs.JobManager.OnBackgroundFetch(completionHandler);
+    => this.ShinyPerformFetch(completionHandler);
 
-2. Add the following to your Info.plist
+2a. Add the following to your Info.plist
 
 <key>UIBackgroundModes</key>
 <array>
 	<string>fetch</string>
 </array>
 
+
+2b. Shiny also supported iOS 13 background processing.  Add the following to your Info.plist and Shiny will use it instead
+<key>UIBackgroundModes</key>
+<array>
+	<string>fetch</string>
+    <string>processing</string>
+</array>
+
+<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array>
+	<string>com.shiny.job</string>
+	<string>com.shiny.jobpower</string>
+	<string>com.shiny.jobnet</string>
+	<string>com.shiny.jobpowernet</string>
+</array>
+
+To Test:
+* Use Visual Studio for Mac
+* Set on debug, deploy to iOS simulator
+* Select your iOS head project
+* Go to toolbar and find "Run"
+* Under run, click "Simulate iOS Background Fetch"
 
 
 ----------
@@ -100,7 +134,8 @@ UWP
 
 1. Add the following to your App.xaml.cs constructor
 
-Shiny.UwpShinyHost.Init(new YourStartup());
+using Shiny;
+this.ShinyInit(new YourStartup());
 
 
 2. Add the following to your Package.appxmanifest under the <Application><Extensions> node

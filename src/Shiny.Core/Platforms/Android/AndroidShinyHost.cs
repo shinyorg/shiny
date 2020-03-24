@@ -8,6 +8,8 @@ using Shiny.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using NativePerm = Android.Content.PM.Permission;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Android.Runtime;
+using Android.Content;
 
 [assembly: UsesPermission(Android.Manifest.Permission.AccessNetworkState)]
 [assembly: UsesPermission(Android.Manifest.Permission.BatteryStats)]
@@ -18,8 +20,8 @@ namespace Shiny
     public class AndroidShinyHost : ShinyHost
     {
         public static void Init(Application androidApp,
-                                IShinyStartup startup = null,
-                                Action<IServiceCollection> platformBuild = null)
+                                IShinyStartup? startup = null,
+                                Action<IServiceCollection>? platformBuild = null)
         {
             InitPlatform(
                 startup,
@@ -38,6 +40,20 @@ namespace Shiny
                     platformBuild?.Invoke(services);
                 }
             );
+        }
+
+
+        public static void TryProcessIntent(Intent intent)
+        {
+            if (intent != null)
+                Resolve<AndroidContext>()?.IntentSubject.OnNext(intent);
+        }
+
+
+        public static void OnBackground([GeneratedEnum] TrimMemory level)
+        {
+            if (level == TrimMemory.UiHidden || level == TrimMemory.Complete)
+                OnBackground();
         }
 
 

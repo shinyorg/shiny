@@ -2,8 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Net;
-using Shiny.Power;
 using Timer = System.Timers.Timer;
 
 
@@ -14,23 +12,20 @@ namespace Shiny.Jobs
         readonly Timer timer;
 
 
-        public JobManager(IServiceProvider container,
-                          IRepository repository,
-                          IPowerManager powerManager,
-                          IConnectivity connectivity,
-                          JobManagerConfig config = null) : base(container, repository, powerManager, connectivity)
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
-            config = config ?? new JobManagerConfig();
-            this.timer = new Timer(config.PeriodInterval.TotalMilliseconds);
+            this.timer = new Timer(TimeSpan.FromSeconds(30).TotalMilliseconds);
             this.timer.Elapsed += async (sender, args) =>
             {
                 this.timer.Stop();
-                await this.RunAll(CancellationToken.None);
+                await this.RunAll(CancellationToken.None, false);
                 this.timer.Start();
             };
         }
 
 
+        protected override void ScheduleNative(JobInfo jobInfo) { }
+        protected override void CancelNative(JobInfo jobInfo) { }
         public override Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
     }
 }

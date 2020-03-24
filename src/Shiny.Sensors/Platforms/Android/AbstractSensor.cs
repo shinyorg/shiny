@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Android.App;
@@ -13,6 +12,7 @@ namespace Shiny.Sensors
     {
 		readonly SensorManager sensorManager;
 		readonly SensorType type;
+        readonly IObservable<T> readOb;
 
 
         protected AbstractSensor(SensorType type)
@@ -20,21 +20,10 @@ namespace Shiny.Sensors
             this.type = type;
 			this.sensorManager = (SensorManager)Application.Context.GetSystemService(Context.SensorService);
 			this.IsAvailable = this.sensorManager.GetSensorList(type).Any();
-        }
 
-
-        protected abstract T ToReading(SensorEvent e);
-
-
-		public bool IsAvailable { get; }
-
-
-        IObservable<T> readOb;
-        public IObservable<T> WhenReadingTaken()
-        {
-            this.readOb = this.readOb ?? Observable.Create<T>(ob =>
+            this.readOb = Observable.Create<T>(ob =>
             {
-				var mgr = new ShinySensorManager(this.sensorManager);
+                var mgr = new ShinySensorManager(this.sensorManager);
                 //var delay = this.ToSensorDelay(this.ReportInterval);
 
                 mgr.Start(this.type, SensorDelay.Fastest, e =>
@@ -46,11 +35,12 @@ namespace Shiny.Sensors
             })
             .Publish()
             .RefCount();
-
-            return this.readOb;
         }
 
 
+        protected abstract T ToReading(SensorEvent e);
+		public bool IsAvailable { get; }
+        public IObservable<T> WhenReadingTaken() => this.readOb;
         //protected SensorDelay ToSensorDelay(TimeSpan timeSpan)
         //{
         //    if (timeSpan.TotalMilliseconds <= 100)

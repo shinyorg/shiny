@@ -15,7 +15,7 @@ namespace Shiny.BluetoothLE.Central
             => ((ICanDoTransactions)peripheral).BeginReliableWriteTransaction();
 
 
-        public static IGattReliableWriteTransaction TryBeginTransaction(this IPeripheral peripheral)
+        public static IGattReliableWriteTransaction? TryBeginTransaction(this IPeripheral peripheral)
         {
             if (peripheral is ICanDoTransactions trans)
                 return trans.BeginReliableWriteTransaction();

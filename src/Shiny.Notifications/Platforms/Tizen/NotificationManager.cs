@@ -17,8 +17,7 @@ namespace Shiny.Notifications
         readonly IRepository repository;
 
 
-        public NotificationManager(ISettings settings,
-                                   IRepository repository)
+        public NotificationManager(ISettings settings, IRepository repository)
         {
             this.settings = settings;
             this.repository = repository;
@@ -40,9 +39,8 @@ namespace Shiny.Notifications
             NativeManager.DeleteAll();
         }
 
-        public Task<int> GetBadge() => Task.FromResult(0);
-        public Task SetBadge(int badge) => Task.CompletedTask;
 
+        public int Badge { get; set; }
 
         public async Task<IEnumerable<Notification>> GetPending()
             => await this.repository.GetAll<Notification>();
@@ -64,6 +62,10 @@ namespace Shiny.Notifications
         }
 
 
+        readonly List<NotificationCategory> registeredCategories = new List<NotificationCategory>();
+        public void RegisterCategory(NotificationCategory category) => this.registeredCategories.Add(category);
+
+
         NativeNot Create(Notification notification)
         {
             //DirectoryInfo info = Application.Current.DirectoryInfo;
@@ -80,18 +82,19 @@ namespace Shiny.Notifications
                 //TimeStamp = time,
                 //Property = DisableAppLaunch
             };
-            if (!Notification.CustomSoundFilePath.IsEmpty())
-            {
-                native.Accessory = new NativeNot.AccessorySet
-                {
-                    //CanVibrate = true,
-                    //LedOnMillisecond = 100,
-                    //LedOffMillisecond = 100,
-                    //SoundOption = AccessoryOption.Custom,
-                    //SoundPath = Path.Combine(this.fileSystem.AppData.FullName, notification.Sound)
-                    SoundPath = Notification.CustomSoundFilePath
-                };
-            }
+
+            //if (!Notification.CustomSoundFilePath.IsEmpty())
+            //{
+            //    native.Accessory = new NativeNot.AccessorySet
+            //    {
+            //        //CanVibrate = true,
+            //        //LedOnMillisecond = 100,
+            //        //LedOffMillisecond = 100,
+            //        //SoundOption = AccessoryOption.Custom,
+            //        //SoundPath = Path.Combine(this.fileSystem.AppData.FullName, notification.Sound)
+            //        SoundPath = Notification.CustomSoundFilePath
+            //    };
+            //}
             return native;
         }
     }
