@@ -120,7 +120,7 @@ namespace Shiny.Notifications
             }
 
             var builder = new NotificationCompat.Builder(this.context.AppContext)
-                .SetContentTitle(notification.Title)                
+                .SetContentTitle(notification.Title)
                 .SetSmallIcon(this.GetSmallIconResource(notification))
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
@@ -133,16 +133,14 @@ namespace Shiny.Notifications
             this.TrySetSound(notification, builder);
             this.TrySetLargeIconResource(notification, builder);
 
-            if (!notification.Category.IsEmpty())
+            if (!notification.Category?.IsEmpty() ?? false)
             {
                 this.AddCategory(builder, notification);
             }
-            else
-            {
-                var pendingIntent = this.GetLaunchPendingIntent(notification);
-                builder.SetContentIntent(pendingIntent);
-            }
-
+            
+            var pendingIntent = this.GetLaunchPendingIntent(notification);
+            builder.SetContentIntent(pendingIntent);
+            
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
 
@@ -241,11 +239,7 @@ namespace Shiny.Notifications
 
         protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string actionId = null)
         {
-            var launchIntent = this
-                .context
-                .AppContext
-                .PackageManager
-                .GetLaunchIntentForPackage(this.context.Package.PackageName)
+            var launchIntent = new Intent(this.context.AppContext, this.context.CurrentActivity.Class)
                 .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
 
             var notificationString = this.serializer.Serialize(notification);
