@@ -17,8 +17,20 @@ namespace Shiny.Locations
         {
             //var hasGps = locationManager.IsProviderEnabled(LocationManager.GpsProvider);
             var lm = context.GetSystemService<LocationManager>(Context.LocationService);
-            if (!lm.IsLocationEnabled)
-                return AccessState.Disabled;
+            
+            if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.P)
+            {
+                if (!lm.IsLocationEnabled)
+                    return AccessState.Disabled;
+            }
+            else
+            {
+                if (!lm.IsProviderEnabled(LocationManager.NetworkProvider) &&
+                    !lm.IsProviderEnabled(LocationManager.GpsProvider))
+                {
+                    return AccessState.Disabled;
+                }
+            }
 
             if (gpsRequired && !lm.IsProviderEnabled(LocationManager.GpsProvider))
                 return AccessState.Disabled;
