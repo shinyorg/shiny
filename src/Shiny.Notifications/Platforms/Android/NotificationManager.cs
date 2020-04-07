@@ -5,6 +5,8 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Media;
+using Android.Support.V4.App;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
@@ -224,6 +226,19 @@ namespace Shiny.Notifications
                     var d = notification.Android.ChannelDescription;
                     if (!d.IsEmpty())
                         channel.Description = d;
+                        
+                    if (!(
+                        notification.Sound.Equals(NotificationSound.None) || 
+                        notification.Sound.Equals(NotificationSound.DefaultSystem) ||
+                        notification.Sound.Equals(NotificationSound.DefaultPriority)))
+                    {
+                        var attributes = new AudioAttributes.Builder()
+                            .SetUsage(AudioUsageKind.NotificationRingtone)
+                            .Build();
+                        var uri = Android.Net.Uri.Parse(notification.Sound.Path);
+                        channel.SetSound(uri, attributes);
+                        channel.EnableVibration(true);
+                    }
 
                     this.newManager.CreateNotificationChannel(channel);
                 }
