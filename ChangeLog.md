@@ -4,19 +4,18 @@
 ---
 
 ### Shiny.Core
-* [Enhancement][Jobs][iOS] Jobs - now uses iOS 13 background processing
 * [Enhancement][Jobs] Job arguments are now like other delegates
-* [Enhancement] JSON Serializer now uses System.Text.Json instead of JSON.NET
 * [BREAKING][Settings] KeysNotClear and Keys enumerable have been removed to make room for more platforms and simplify the API - some methods were moved to extensions
 
 ### Shiny.Locations
 * [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available
+* [Fix][GPS/Geofencing][Android] Properly check everything under Android 8.1
 * [Enhancement][GPS] Multiple delegate registrations
 * [Enhancement][Geofencing] Multiple delegate registrations
-TODO: UWP
 
 ### Shiny.Notifications
 * [Enhancement] Multiple delegate registrations
+* [Fix][UWP] Cancelling notifications was not removing the notification
 
 ### Shiny.Push
 * [Enhancement] Multiple delegate registrations
@@ -29,6 +28,7 @@ TODO: UWP
 * [Feature] App State Delegate - In your shiny startup, use services.AddAppState<YourAppStateDelegate> that inherits from IAppStateDelegate.  Watch for app start, foreground, & background
 * [Feature] PowerManager now has property/inpc for IsEnergySavingEnabled that checks for ios low power, android doze, & uwp energy saving mode
 * [Feature] Ability to run jobs on timers while the application is in the foreground or app state changes (starting, resuming, or backgrounding)
+* [Enhancement][Jobs][iOS] Jobs - now uses iOS 13 background processing
 * [Enhancement] Increased discoverability via new AppDelegate & Android app/activity extension methods.   Simply add the Shiny namespace and type this.Shiny to see all of the points you should be attaching
 * [Enhancement][iOS][Android] Easier boilerplate setup
 * [Enhancement][Android] JobManager.RunTask will now use wakeful locks to run tasks if available
