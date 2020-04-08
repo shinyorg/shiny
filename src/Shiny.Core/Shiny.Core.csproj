@@ -35,7 +35,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="[4.5.3, 5)" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="[4.5.4, 5)" />
         <PackageReference Include="Xamarin.Android.Support.v4" Version="[28.0.0.3, 29)" />
     </ItemGroup>
 
@@ -57,7 +57,7 @@
     
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
         <Compile Include="**\Platforms\*iOS*\**\*.cs" />
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="[4.5.3, 5)" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="[4.5.4, 5)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.tvos')) ">
