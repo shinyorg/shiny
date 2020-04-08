@@ -13,24 +13,15 @@ namespace Shiny.Locations
         public const string ACCESS_BACKGROUND_LOCATION = "android.permission.ACCESS_BACKGROUND_LOCATION";
 
 
-        internal static AccessState GetLocationManagerStatus(this AndroidContext context, bool gpsRequired)
+        internal static AccessState GetLocationManagerStatus(this AndroidContext context, bool gpsRequired, bool networkRequired)
         {
-            //var hasGps = locationManager.IsProviderEnabled(LocationManager.GpsProvider);
             var lm = context.GetSystemService<LocationManager>(Context.LocationService);
-            
-            if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.P)
-            {
-                if (!lm.IsLocationEnabled)
-                    return AccessState.Disabled;
-            }
-            else
-            {
-                if (!lm.IsProviderEnabled(LocationManager.NetworkProvider) &&
-                    !lm.IsProviderEnabled(LocationManager.GpsProvider))
-                {
-                    return AccessState.Disabled;
-                }
-            }
+
+            if (context.IsMinApiLevel(28) && !lm.IsLocationEnabled)
+                return AccessState.Disabled;
+
+            if (networkRequired && !lm.IsProviderEnabled(LocationManager.NetworkProvider))
+                return AccessState.Disabled;
 
             if (gpsRequired && !lm.IsProviderEnabled(LocationManager.GpsProvider))
                 return AccessState.Disabled;
@@ -39,9 +30,9 @@ namespace Shiny.Locations
         }
 
 
-        internal static AccessState GetCurrentLocationAccess(this AndroidContext context, bool background, bool fineAccess)
+        internal static AccessState GetCurrentLocationAccess(this AndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
         {
-            var status = context.GetLocationManagerStatus(false);
+            var status = context.GetLocationManagerStatus(gpsRequired, networkRequired);
             if (status != AccessState.Available)
                 return status;
 
@@ -58,9 +49,9 @@ namespace Shiny.Locations
         }
 
 
-        internal static async Task<AccessState> RequestLocationAccess(this AndroidContext context, bool background, bool fineAccess)
+        internal static async Task<AccessState> RequestLocationAccess(this AndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
         {
-            var status = context.GetLocationManagerStatus(false);
+            var status = context.GetLocationManagerStatus(gpsRequired, networkRequired);
             if (status != AccessState.Available)
                 return status;
 
