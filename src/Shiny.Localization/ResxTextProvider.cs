@@ -25,7 +25,7 @@ namespace Shiny.Localization
 
         public Task<IDictionary<string, string>> GetTextResourcesAsync(CultureInfo cultureInfo, CancellationToken token = default)
         {
-            var localizations = this.resourceManager.GetResourceSet(cultureInfo, true, false)
+            var localizations = this.resourceManager.GetResourceSet(cultureInfo, true, true)
                 ?.Cast<DictionaryEntry>()
                 .ToDictionary(e => e.Key.ToString(), e => e.Value.ToString());
 

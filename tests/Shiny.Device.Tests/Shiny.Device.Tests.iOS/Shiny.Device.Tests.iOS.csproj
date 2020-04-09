@@ -139,6 +139,10 @@
       <Project>{D7F94901-2960-4BA0-ACB2-280761E70AF0}</Project>
       <Name>Shiny.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Shiny.Localization\Shiny.Localization.csproj">
+      <Project>{bd617d0f-1698-496b-be73-6d6c053b9260}</Project>
+      <Name>Shiny.Localization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Shiny.Locations\Shiny.Locations.csproj">
       <Project>{5a0dd7a1-e497-4051-84b0-2e16b015e012}</Project>
       <Name>Shiny.Locations</Name>
