@@ -20,7 +20,7 @@ namespace Shiny.Locations
             this.context = context;
             this.client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);
         }
-        
+
 
         public bool IsListening { get; private set; }
 
@@ -28,10 +28,10 @@ namespace Shiny.Locations
             => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.GetCurrentStatus(request));
 
         public AccessState GetCurrentStatus(GpsRequest request)
-            => this.context.GetCurrentLocationAccess(request.UseBackground, true);
-       
+            => this.context.GetCurrentLocationAccess(request.UseBackground, true, true, false);
+
         public Task<AccessState> RequestAccess(GpsRequest request)
-            => this.context.RequestLocationAccess(request.UseBackground, true);
+            => this.context.RequestLocationAccess(request.UseBackground, true, true, false);
 
 
         public IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Windows.UI.Notifications;
@@ -7,13 +8,15 @@ using Windows.ApplicationModel.Background;
 using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure;
-using System.Linq;
+
 
 namespace Shiny.Notifications
 {
     //https://blogs.msdn.microsoft.com/tiles_and_toasts/2015/07/08/quickstart-sending-a-local-toast-notification-and-handling-activations-from-it-windows-10/
     public class NotificationManager : INotificationManager, IShinyStartupTask
     {
+        public static string GroupName { get; set; } = "Shiny";
+
         readonly ToastNotifier toastNotifier;
         readonly IServiceProvider services;
         readonly IRepository repository;
@@ -116,8 +119,13 @@ namespace Shiny.Notifications
             //if (!Notification.CustomSoundFilePath.IsEmpty())
             //    toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
 
-            var native = new ToastNotification(toastContent.GetXml());
+            var native = new ToastNotification(toastContent.GetXml())
+            {
+                Tag = notification.Id.ToString(),
+                Group = GroupName
+            };
             this.toastNotifier.Show(native);
+
             if (notification.BadgeCount != null)
                 this.Badge = notification.BadgeCount.Value;
 
@@ -141,9 +149,23 @@ namespace Shiny.Notifications
         readonly List<NotificationCategory> registeredCategories = new List<NotificationCategory>();
         public void RegisterCategory(NotificationCategory category) => this.registeredCategories.Add(category);
 
-        public Task Clear() => this.repository.Clear<Notification>();
         public async Task<IEnumerable<Notification>> GetPending() => await this.repository.GetAll<Notification>();
-        public Task Cancel(int id) => this.repository.Remove<Notification>(id.ToString());
+
+
+        public async Task Clear()
+        {
+            ToastNotificationManager.History.RemoveGroup(GroupName);
+            await this.repository.Clear<Notification>();
+        }
+
+
+        public async Task Cancel(int id)
+        {
+            ToastNotificationManager.History.Remove(id.ToString());
+            await this.repository.Remove<Notification>(id.ToString());
+        }
+
+
         public void Start()
         {
             if (this.services.IsRegistered<INotificationDelegate>())
