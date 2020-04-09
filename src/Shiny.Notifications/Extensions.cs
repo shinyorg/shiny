@@ -14,6 +14,14 @@ namespace Shiny.Notifications
             });
 
 
+        public static bool IsCustomSound(this NotificationSound sound)
+            => !(
+                sound.Equals(NotificationSound.None) ||
+                sound.Equals(NotificationSound.DefaultSystem) ||
+                sound.Equals(NotificationSound.DefaultPriority)
+            );
+
+
         public static async Task<NotificationResult> RequestAccessAndSend(this INotificationManager notifications, Notification notification)
         {
             var access = await notifications.RequestAccess();
