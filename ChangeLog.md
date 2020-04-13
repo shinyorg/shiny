@@ -5,6 +5,8 @@
 
 ### Shiny.Core
 * [Enhancement][Jobs] Job arguments are now like other delegates
+* [Enhancement][Jobs][iOS] Background processing JobManager is now smarter with how it deals with misconfiguration
+* [Fix][iOS] NSDictionary fixes
 * [BREAKING][Settings] KeysNotClear and Keys enumerable have been removed to make room for more platforms and simplify the API - some methods were moved to extensions
 
 ### Shiny.Locations
