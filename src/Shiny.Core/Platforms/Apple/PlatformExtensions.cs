@@ -33,11 +33,7 @@ namespace Shiny
 
         public static NSDictionary ToNsDictionary(this IDictionary<string, string> dict)
         {
-            var ns = new NSDictionary();
-            foreach (var pair in dict)
-                ns.SetValueForKey(new NSString(pair.Value), new NSString(pair.Key));
-
-            return ns;
+            return NSDictionary.FromObjectsAndKeys(dict.Values.ToArray(), dict.Keys.ToArray());
         }
 
 
