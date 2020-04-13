@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -30,11 +31,19 @@ namespace Shiny
             return date;
         }
 
+        public static IDictionary<string, string> FromNsDictionary(this NSDictionary ns)
+        {
+            var dict = new Dictionary<string, string>();
+            if (ns != null)
+                foreach (var pair in ns)
+                    dict.Add(pair.Key.ToString(), pair.Value.ToString());
+
+            return dict;
+        }
+
 
         public static NSDictionary ToNsDictionary(this IDictionary<string, string> dict)
-        {
-            return NSDictionary.FromObjectsAndKeys(dict.Values.ToArray(), dict.Keys.ToArray());
-        }
+            =>  NSDictionary.FromObjectsAndKeys(dict.Values.ToArray(), dict.Keys.ToArray());
 
 
         public static bool AssertInfoPlistEntry(string key, bool assert)
@@ -72,16 +81,6 @@ namespace Shiny
             return false;
         }
 
-
-        public static IDictionary<string, string> FromNsDictionary(this NSDictionary ns)
-        {
-            var dict = new Dictionary<string, string>();
-            if (ns != null)
-                foreach (var pair in ns)
-                    dict.Add(pair.Key.ToString(), pair.Value.ToString());
-
-            return dict;
-        }
 
 
         public static bool HasPlistValue(string key, int? ifVersion = null)
