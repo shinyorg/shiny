@@ -58,6 +58,31 @@ namespace Shiny.Jobs
         }
 
 
+        public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
+        {
+            var app = UIApplication.SharedApplication;
+            var taskId = 0;
+            try
+            {
+                using (var cancelSrc = new CancellationTokenSource())
+                {
+                    taskId = (int)app.BeginBackgroundTask(taskName, cancelSrc.Cancel);
+                    this.LogTask(JobState.Start, taskName);
+                    await task(cancelSrc.Token).ConfigureAwait(false);
+                    this.LogTask(JobState.Finish, taskName);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.LogTask(JobState.Error, taskName, ex);
+            }
+            finally
+            {
+                app.EndBackgroundTask(taskId);
+            }
+        }
+
+
         public override Task<AccessState> RequestAccess()
         {
             var result = AccessState.Available;
