@@ -4,18 +4,43 @@ using System.Threading.Tasks;
 using BackgroundTasks;
 using UIKit;
 using Shiny.Infrastructure;
+using Shiny.Logging;
 
 
 namespace Shiny.Jobs
 {
-    public class BgTasksJobManager : AbstractJobManager
+    public class BgTasksJobManager : AbstractJobManager, IShinyStartupTask
     {
+        const string EX_MSG = "Could not register background processing job. Shiny uses background processing when enabled in your info.plist.  Please follow the Shiny readme for Shiny.Core to properly register BGTaskSchedulerPermittedIdentifiers";
+        bool registeredSuccessfully = false;
+
+
         public BgTasksJobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
-            this.Register(this.GetIdentifier(false, false));
-            this.Register(this.GetIdentifier(true, false));
-            this.Register(this.GetIdentifier(false, true));
-            this.Register(this.GetIdentifier(true, true));
+        }
+
+
+        public void Start()
+        {
+            try
+            {
+                this.Register(this.GetIdentifier(false, false));
+                this.Register(this.GetIdentifier(true, false));
+                this.Register(this.GetIdentifier(false, true));
+                this.Register(this.GetIdentifier(true, true));
+                this.registeredSuccessfully = true;
+            }
+            catch (Exception ex)
+            {
+                Log.Write(new Exception(EX_MSG, ex));
+            }
+        }
+
+
+        protected void Assert()
+        {
+            if (!this.registeredSuccessfully)
+                throw new Exception(EX_MSG);
         }
 
 
@@ -55,6 +80,8 @@ namespace Shiny.Jobs
 
         protected override void ScheduleNative(JobInfo jobInfo)
         {
+            this.Assert();
+
             var identifier = this.GetIdentifier(
                 jobInfo.DeviceCharging,
                 jobInfo.RequiredInternetAccess == InternetAccess.Any
