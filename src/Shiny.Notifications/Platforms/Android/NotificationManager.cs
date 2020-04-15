@@ -5,6 +5,8 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Media;
+using Android.Support.V4.App;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
@@ -192,10 +194,11 @@ namespace Shiny.Notifications
         {
 #if ANDROIDX
             var channelId = notification.Android.ChannelId;
+            var channel = this.compatManager.GetNotificationChannel(channelId);
 
-            if (this.compatManager.GetNotificationChannel(channelId) == null)
+            if (channel == null)
             {
-                var channel = new NotificationChannel(
+                channel = new NotificationChannel(
                     channelId,
                     notification.Android.Channel,
                     notification.Android.NotificationImportance.ToNative()
@@ -207,16 +210,28 @@ namespace Shiny.Notifications
                 this.compatManager.CreateNotificationChannel(channel);
             }
 
+            if (notification.Sound.IsCustomSound())
+            {
+                var attributes = new AudioAttributes.Builder()
+                    .SetUsage(AudioUsageKind.NotificationRingtone)
+                    .Build();
+
+                var uri = Android.Net.Uri.Parse(notification.Sound.Path);
+                channel.SetSound(uri, attributes);
+                channel.EnableVibration(notification.Android.Vibrate);
+            }
+
             builder.SetChannelId(channelId);
             this.compatManager.Notify(notification.Id, builder.Build());
 #else
             if (this.newManager != null)
             {
                 var channelId = notification.Android.ChannelId;
+                var channel = this.newManager.GetNotificationChannel(channelId);
 
-                if (this.newManager.GetNotificationChannel(channelId) == null)
+                if (channel == null)
                 {
-                    var channel = new NotificationChannel(
+                    channel = new NotificationChannel(
                         channelId,
                         notification.Android.Channel,
                         notification.Android.NotificationImportance.ToNative()
@@ -227,7 +242,16 @@ namespace Shiny.Notifications
 
                     this.newManager.CreateNotificationChannel(channel);
                 }
+                if (notification.Sound.IsCustomSound())
+                {
+                    var attributes = new AudioAttributes.Builder()
+                        .SetUsage(AudioUsageKind.NotificationRingtone)
+                        .Build();
 
+                    var uri = Android.Net.Uri.Parse(notification.Sound.Path);
+                    channel.SetSound(uri, attributes);
+                    channel.EnableVibration(notification.Android.Vibrate);
+                }
                 builder.SetChannelId(channelId);
                 this.newManager.Notify(notification.Id, builder.Build());
             }
