@@ -17,9 +17,6 @@ namespace Shiny.Localization
 
         public LocalizationManager(IEnumerable<ITextProvider> textProviders)
         {
-            if(textProviders.IsEmpty())
-                throw new ArgumentNullException(nameof(textProviders), "You must register at list one text provider");
-
             this.textProviders = textProviders;
             this.providersLocalizations = new List<IDictionary<string, string>>();
             this.stateChanged = new Subject<LocalizationState>();

@@ -207,14 +207,14 @@ namespace Shiny.Device.Tests.Settings
         }
 
 
-        [Fact]
-        public void ClearPreserveList()
-        {
-            this.Settings.Set("ClearPreserveTest", "Value");
-            this.Settings.KeysNotToClear.Add("ClearPreserveTest");
-            this.Settings.Clear();
-            Assert.True(this.Settings.Get<string>("ClearPreserveTest").Equals("Value"));
-        }
+        //[Fact]
+        //public void ClearPreserveList()
+        //{
+        //    this.Settings.Set("ClearPreserveTest", "Value");
+        //    this.Settings.KeysNotToClear.Add("ClearPreserveTest");
+        //    this.Settings.Clear();
+        //    Assert.True(this.Settings.Get<string>("ClearPreserveTest").Equals("Value"));
+        //}
 
 
         //#if !WINDOWS_UWP

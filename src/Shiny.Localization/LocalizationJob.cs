@@ -16,9 +16,9 @@ namespace Shiny.Localization
 
         public Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            jobInfo.Parameters.TryGetValue(nameof(CultureInfo), out var cultureInfo);
+            jobInfo.Parameters.TryGetValue(nameof(LocalizationOptions.InitializationCulture), out var initializationCulture);
 
-            return this.localizationManager.InitializeAsync((CultureInfo?) cultureInfo, cancelToken);
+            return this.localizationManager.InitializeAsync((CultureInfo?) initializationCulture, cancelToken);
         }
     }
 }

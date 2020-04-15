@@ -27,4 +27,19 @@
         <ProjectReference Include="..\..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Localization\DeviceTextResources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>DeviceTextResources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Localization\DeviceTextResources.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <LastGenOutput>DeviceTextResources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
 </Project>

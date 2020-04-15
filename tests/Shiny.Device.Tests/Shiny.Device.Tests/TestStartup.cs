@@ -1,7 +1,7 @@
-﻿using System;
-using Shiny.BluetoothLE;
-using Shiny.Logging;
+﻿using Shiny.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Device.Tests.Localization;
+using Shiny.Localization;
 
 
 namespace Shiny.Device.Tests
@@ -15,6 +15,8 @@ namespace Shiny.Device.Tests
 
             services.UseBleCentral();
             services.UseBlePeripherals();
+
+            services.UseLocalization<ResxTextProvider<DeviceTextResources>>(optionsBuilder => optionsBuilder.EnableAutoInitialization(false));
         }
     }
 }
