@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +24,9 @@ namespace Shiny.Localization
             this.locker = new SemaphoreSlim(1, 1);
         }
 
-        public IObservable<LocalizationState> OnStateChanged => this.stateChanged;
+        IObservable<LocalizationState> ILocalizationManager.WhenLocalizationStatusChanged() => this.stateChanged;
+
+        public LocalizationState Status { get; private set; }
 
         public virtual async Task<bool> InitializeAsync(CultureInfo? askedCulture = null, CancellationToken token = default)
         {
@@ -32,7 +35,7 @@ namespace Shiny.Localization
             try
             {
                 this.providersLocalizations.Clear();
-                this.stateChanged.OnNext(LocalizationState.Initializing);
+                this.stateChanged.OnNext(this.Status = LocalizationState.Initializing);
 
                 #region Asked culture
 
@@ -85,13 +88,13 @@ namespace Shiny.Localization
 
                 #endregion
 
-                this.stateChanged.OnNext(this.providersLocalizations.IsEmpty() ? LocalizationState.Empty : LocalizationState.Available);
+                this.stateChanged.OnNext(this.Status = this.providersLocalizations.IsEmpty() ? LocalizationState.None : LocalizationState.Some);
 
                 return !this.providersLocalizations.IsEmpty();
             }
             catch (Exception ex)
             {
-                this.stateChanged.OnNext(LocalizationState.Error);
+                this.stateChanged.OnNext(this.Status = LocalizationState.Error);
                 Log.Write(ex);
                 return false;
             }

@@ -4,8 +4,8 @@
     {
         Uninitialized,
         Initializing,
-        Available,
-        Empty,
+        Some,
+        None,
         Error
     }
 }

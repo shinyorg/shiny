@@ -7,7 +7,9 @@ namespace Shiny.Localization
 {
     public interface ILocalizationManager
     {
-        IObservable<LocalizationState> OnStateChanged { get; }
+        IObservable<LocalizationState> WhenLocalizationStatusChanged();
+
+        LocalizationState Status { get; }
 
         Task<bool> InitializeAsync(CultureInfo? cultureInfo = null, CancellationToken token = default);
 

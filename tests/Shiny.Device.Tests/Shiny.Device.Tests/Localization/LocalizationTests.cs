@@ -28,13 +28,21 @@ namespace Shiny.Device.Tests.Localization
         }
 
         [Fact]
+        public async Task StatusTest()
+        {
+            await this.Setup();
+
+            Assert.Equal(LocalizationState.Some, this.localizationManager.Status);
+        }
+
+        [Fact]
         public async Task LocalizationTest()
         {
             await this.Setup();
 
             var localizedValue = this.localizationManager.GetText(nameof(DeviceTextResources.TestKey));
 
-            Assert.Equal(localizedValue, DeviceTextResources.TestKey);
+            Assert.Equal(DeviceTextResources.TestKey, localizedValue);
         }
     }
 }
