@@ -61,20 +61,11 @@ namespace Shiny.Device.Tests.Localization {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à DeviceTestValue.
+        ///   Recherche une chaîne localisée semblable à DeviceTestValue_inv.
         /// </summary>
         public static string DeviceTestKey {
             get {
                 return ResourceManager.GetString("DeviceTestKey", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à TestValueOverriden.
-        /// </summary>
-        public static string TestKey {
-            get {
-                return ResourceManager.GetString("TestKey", resourceCulture);
             }
         }
     }

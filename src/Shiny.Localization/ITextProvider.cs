@@ -8,6 +8,13 @@ namespace Shiny.Localization
     public interface ITextProvider
     {
         /// <summary>
+        /// Get all available cultures from the provider
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        Task<IList<CultureInfo>> GetAvailableCulturesAsync(CancellationToken token = default);
+
+        /// <summary>
         /// Get all text resources from the provider for the specified culture
         /// </summary>
         /// <param name="cultureInfo"></param>

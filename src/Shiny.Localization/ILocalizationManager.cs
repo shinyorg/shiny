@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +12,11 @@ namespace Shiny.Localization
 
         LocalizationState Status { get; }
 
-        Task<bool> InitializeAsync(CultureInfo? cultureInfo = null, CancellationToken token = default);
+        CultureInfo CurrentCulture { get; }
+
+        IList<CultureInfo> AvailableCultures { get; }
+
+        Task<bool> InitializeAsync(CultureInfo? culture = null, CancellationToken token = default);
 
         string GetText(string key);
     }

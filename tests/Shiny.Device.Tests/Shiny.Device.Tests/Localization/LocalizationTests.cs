@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using Shiny.Localization;
 using Xunit.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,12 +19,14 @@ namespace Shiny.Device.Tests.Localization
             this.localizationManager = ShinyHost.Container.GetService<ILocalizationManager>();
         }
 
-        async Task<bool> Setup() => await this.localizationManager.InitializeAsync();
+        async Task<bool> Setup(CultureInfo? culture = null) => await this.localizationManager.InitializeAsync(culture);
 
         [Fact]
         public async Task SetupTest()
         {
             var success = await this.Setup();
+
+            this.output.WriteLine("Localization initialization succeed!");
 
             Assert.True(success);
         }
@@ -32,7 +36,31 @@ namespace Shiny.Device.Tests.Localization
         {
             await this.Setup();
 
+            this.output.WriteLine($"Does '{LocalizationState.Some}' equals '{this.localizationManager.Status}' ?");
+
             Assert.Equal(LocalizationState.Some, this.localizationManager.Status);
+        }
+
+        [Fact]
+        public async Task CurrentCultureTest()
+        {
+            var initializationCulture = CultureInfo.CreateSpecificCulture("es-ES");
+
+            await this.Setup(initializationCulture);
+
+            this.output.WriteLine($"{nameof(this.localizationManager.CurrentCulture)}: {this.localizationManager.CurrentCulture.DisplayName}");
+
+            Assert.Equal(initializationCulture, this.localizationManager.CurrentCulture);
+        }
+
+        [Fact]
+        public async Task AvailableCulturesTest()
+        {
+            await this.Setup();
+
+            this.output.WriteLine($"{nameof(this.localizationManager.AvailableCultures)}: {string.Join(", ", this.localizationManager.AvailableCultures.Select(x => x.DisplayName))}");
+
+            Assert.Contains(CultureInfo.CreateSpecificCulture("es-ES"), this.localizationManager.AvailableCultures);
         }
 
         [Fact]
@@ -40,9 +68,11 @@ namespace Shiny.Device.Tests.Localization
         {
             await this.Setup();
 
-            var localizedValue = this.localizationManager.GetText(nameof(DeviceTextResources.TestKey));
+            var localizedValue = this.localizationManager.GetText(nameof(DeviceTextResources.DeviceTestKey));
 
-            Assert.Equal(DeviceTextResources.TestKey, localizedValue);
+            this.output.WriteLine($"Does '{DeviceTextResources.DeviceTestKey}' equals '{localizedValue}' ?");
+
+            Assert.Equal(DeviceTextResources.DeviceTestKey, localizedValue);
         }
     }
 }

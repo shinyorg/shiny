@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -22,71 +23,53 @@ namespace Shiny.Localization
             this.providersLocalizations = new List<IDictionary<string, string>>();
             this.stateChanged = new Subject<LocalizationState>();
             this.locker = new SemaphoreSlim(1, 1);
+            this.AvailableCultures = new List<CultureInfo>();
         }
 
         IObservable<LocalizationState> ILocalizationManager.WhenLocalizationStatusChanged() => this.stateChanged;
 
         public LocalizationState Status { get; private set; }
 
-        public virtual async Task<bool> InitializeAsync(CultureInfo? askedCulture = null, CancellationToken token = default)
+        public CultureInfo CurrentCulture { get; private set; }
+
+        public IList<CultureInfo> AvailableCultures { get; }
+
+        public virtual async Task<bool> InitializeAsync(CultureInfo? culture = null, CancellationToken token = default)
         {
             await this.locker.WaitAsync(token);
 
             try
             {
                 this.providersLocalizations.Clear();
+                this.AvailableCultures.Clear();
                 this.stateChanged.OnNext(this.Status = LocalizationState.Initializing);
 
-                #region Asked culture
-
-                /*
-                 * Priority 1: Check if potential asked culture is available in each provider
-                 */
-                if (askedCulture != null)
+                foreach (var textProvider in this.textProviders)
                 {
-                    foreach (var textProvider in this.textProviders)
+                    var availableCultures = await textProvider.GetAvailableCulturesAsync(token);
+                    foreach (var availableCulture in availableCultures)
                     {
-                        var localizations = await textProvider.GetTextResourcesAsync(askedCulture, token);
-                        if (!localizations.IsEmpty())
-                            this.providersLocalizations.Add(localizations);
+                        if(this.AvailableCultures.All(x => x.Name != availableCulture.Name))
+                            this.AvailableCultures.Add(availableCulture);
                     }
                 }
 
-                #endregion
-
-                #region UI culture
-
-                /*
-                 * Priority 2: Check if UI culture is available in each provider
-                 */
-                if (!Equals(CultureInfo.CurrentUICulture, askedCulture))
+                if (culture == null || !this.AvailableCultures.Contains(culture))
                 {
-                    foreach (var textProvider in this.textProviders)
-                    {
-                        var localizations = await textProvider.GetTextResourcesAsync(CultureInfo.CurrentUICulture, token);
-                        if (!localizations.IsEmpty())
-                            this.providersLocalizations.Add(localizations);
-                    }
+                    culture = this.AvailableCultures.Contains(CultureInfo.CurrentUICulture)
+                        ? CultureInfo.CurrentUICulture
+                        : CultureInfo.InvariantCulture;
                 }
 
-                #endregion
-
-                #region Invariant culture
-
-                /*
-                 * Priority 3: Check if invariant culture is available in each provider
-                 */
-                if (!Equals(CultureInfo.InvariantCulture, askedCulture) && !Equals(CultureInfo.InvariantCulture, CultureInfo.CurrentUICulture))
+                foreach (var textProvider in this.textProviders)
                 {
-                    foreach (var textProvider in this.textProviders)
-                    {
-                        var localizations = await textProvider.GetTextResourcesAsync(CultureInfo.InvariantCulture, token);
-                        if (!localizations.IsEmpty())
-                            this.providersLocalizations.Add(localizations);
-                    }
+                    var localizations = await textProvider.GetTextResourcesAsync(culture, token);
+                    if (!localizations.IsEmpty())
+                        this.providersLocalizations.Add(localizations);
                 }
 
-                #endregion
+                if (!this.providersLocalizations.IsEmpty())
+                    this.CurrentCulture = culture;
 
                 this.stateChanged.OnNext(this.Status = this.providersLocalizations.IsEmpty() ? LocalizationState.None : LocalizationState.Some);
 
