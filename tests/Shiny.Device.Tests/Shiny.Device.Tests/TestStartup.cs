@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Device.Tests.Localization;
 using Shiny.Localization;
+using Shiny.Localization.Resx;
 
 
 namespace Shiny.Device.Tests

@@ -17,7 +17,7 @@ namespace Shiny.Localization
         public static bool UseLocalization<TTextProvider>(this IServiceCollection services,
             Action<LocalizationOptionsBuilder>? optionsAction = null)
             where TTextProvider : class, ITextProvider =>
-            UseLocalization<TTextProvider, LocalizationManager>(services, optionsAction);
+            services.UseLocalization(typeof(TTextProvider), typeof(LocalizationManager), optionsAction);
 
         /// <summary>
         /// Use localization plugin with a default text provider and a custom localization manager
@@ -30,47 +30,23 @@ namespace Shiny.Localization
         public static bool UseLocalization<TTextProvider, TLocalizationManager>(this IServiceCollection services,
             Action<LocalizationOptionsBuilder>? optionsAction = null)
             where TTextProvider : class, ITextProvider
-            where TLocalizationManager : class, ILocalizationManager
+            where TLocalizationManager : class, ILocalizationManager =>
+            services.UseLocalization(typeof(TTextProvider), typeof(TLocalizationManager), optionsAction);
+
+        /// <summary>
+        /// Use localization plugin with a default text provider and a custom localization manager
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <param name="textProviderType">A default text provider</param>
+        /// <param name="localizationManagerType">A custom localization manager</param>
+        /// <param name="optionsAction">Some options to customize if needed</param>
+        /// <returns></returns>
+        public static bool UseLocalization(this IServiceCollection services, Type textProviderType, Type localizationManagerType,
+            Action<LocalizationOptionsBuilder>? optionsAction = null)
         {
-            // Add default text provider
-            services.AddSingleton<ITextProvider, TTextProvider>();
-
-            // Add extra text providers
-            var options = CreateLocalizationOptions(optionsAction);
-            foreach (var extraTextProvider in options.ExtraTextProviders)
-            {
-                services.AddSingleton(typeof(ITextProvider), extraTextProvider);
-            }
-
-            // Add localization manager
-            services.AddSingleton<ILocalizationManager, TLocalizationManager>();
-
-            // Add initialization job if needed
-            if (options.AutoInitialize)
-            {
-                var initializationJob = new JobInfo(typeof(LocalizationJob))
-                {
-                    Repeat = true,
-                    IsSystemJob = true
-                };
-
-                // Add initialization culture if specified
-                if (options.InitializationCulture != null)
-                    initializationJob.Parameters.Add(nameof(options.InitializationCulture), options.InitializationCulture);
-
-                services.RegisterJob(initializationJob);
-            }
+            services.RegisterModule(new LocalizationModule(textProviderType, localizationManagerType, optionsAction));
 
             return true;
-        }
-
-        static LocalizationOptions CreateLocalizationOptions(Action<LocalizationOptionsBuilder>? optionsAction = null)
-        {
-            var builder = new LocalizationOptionsBuilder(new LocalizationOptions());
-
-            optionsAction?.Invoke(builder);
-
-            return builder.LocalizationOptions;
         }
     }
 }

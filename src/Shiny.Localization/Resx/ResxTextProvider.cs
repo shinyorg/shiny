@@ -6,13 +6,13 @@ using System.Resources;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Shiny.Localization
+namespace Shiny.Localization.Resx
 {
     /// <summary>
     /// Resx text provider
     /// </summary>
     /// <typeparam name="T">Should be a Resx Designer class</typeparam>
-    public class ResxTextProvider<T> : ITextProvider where T : class
+    public class ResxTextProvider<T> : IResxTextProvider<T> where T : class
     {
         readonly ResourceManager resourceManager;
         TaskCompletionSource<IList<CultureInfo>>? availableCulturesTcs;
