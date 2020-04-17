@@ -15,8 +15,10 @@ namespace Shiny.Notifications
         public static AndroidNotificationImportance DefaultNotificationImportance { get; set; } = AndroidNotificationImportance.Default;
         public static bool? DefaultShowWhen { get; set; }
         public static bool DefaultVibrate { get; set; }
+        public static Type? DefaultLaunchActivityType { get; set; }
         public static AndroidActivityFlags DefaultLaunchActivityFlags { get; set; } = AndroidActivityFlags.NewTask | AndroidActivityFlags.ClearTask;
 
+        public Type? LaunchActivityType { get; set; }
         public AndroidActivityFlags LaunchActivityFlags { get; set; } = DefaultLaunchActivityFlags;
         public bool Vibrate { get; set; } = DefaultVibrate;
         public int? Priority { get; set; }

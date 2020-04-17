@@ -260,12 +260,19 @@ namespace Shiny.Notifications
 
         protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
         {
-            var launchIntent = this
-                .context
-                .AppContext
-                .PackageManager
-                .GetLaunchIntentForPackage(this.context.Package.PackageName)
-                .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
+            Intent launchIntent;
+            if (notification.Android?.LaunchActivityType == null)
+            {
+                launchIntent = this.context
+                    .AppContext
+                    .PackageManager
+                    .GetLaunchIntentForPackage(this.context.Package.PackageName)
+                    .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
+            }
+            else
+            {
+                launchIntent = new Intent(this.context.AppContext, notification.Android.LaunchActivityType);
+            }
 
             var notificationString = this.serializer.Serialize(notification);
             launchIntent.PutExtra(AndroidNotificationProcessor.NOTIFICATION_KEY, notificationString);
