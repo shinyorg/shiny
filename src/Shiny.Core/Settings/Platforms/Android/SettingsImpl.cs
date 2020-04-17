@@ -123,6 +123,7 @@ namespace Shiny.Settings
 
 
         protected ISharedPreferences GetPrefs()
-            => PreferenceManager.GetDefaultSharedPreferences(this.context.AppContext);
+            => this.context.AppContext.GetSharedPreferences("Shiny", FileCreationMode.Private);
+            //=> PreferenceManager.GetDefaultSharedPreferences(this.context.AppContext);
     }
 }
