@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,8 +7,7 @@ using System.Reactive.Subjects;
 using Windows.Networking.PushNotifications;
 using Shiny.Logging;
 using Shiny.Settings;
-using System.Linq;
-using System.IO.IsolatedStorage;
+
 
 namespace Shiny.Push
 {
@@ -15,12 +15,21 @@ namespace Shiny.Push
     {
         readonly Subject<IDictionary<string, string>> pushSubject;
         readonly IServiceProvider serviceProvider;
+        //PushNotificationChannel channel;
 
 
         public PushManager(IServiceProvider serviceProvider, ISettings settings) : base(settings)
         {
             this.pushSubject = new Subject<IDictionary<string, string>>();
             this.serviceProvider = serviceProvider;
+
+            //PushNotificationChannelManager
+            //    .CreatePushNotificationChannelForApplicationAsync()
+            //    .AsTask()
+            //    .ContinueWith(x =>
+            //    {
+
+            //    });
         }
 
 
@@ -40,25 +49,23 @@ namespace Shiny.Push
         public override Task UnRegister() => Task.CompletedTask;
 
 
-        async void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => await this.serviceProvider.SafeResolveAndExecute<IPushDelegate>(async sdelegate =>
+        async void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => await this.serviceProvider.SafeResolveAndExecute<IPushDelegate>(async ndelegate =>
         {
-            //using (var s = new IsolatedStorageFileStream("", System.IO.FileMode.Open))
-            //{
-
-            //}
-            await sdelegate.OnReceived(e
-                .RawNotification
-                .Headers
+            var headers = e
+                .RawNotification?
+                .Headers?
                 .ToDictionary(
                     x => x.Key,
                     x => x.Value
-                )
-            );
-            //e.BadgeNotification
-            //await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
-            //this.CurrentRegistrationToken = e.RawNotification.Ur
-            //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            //e.Cancel = true;
+                ) ?? new Dictionary<string, string>(0);
+
+            await ndelegate.OnReceived(headers);
+            this.pushSubject.OnNext(headers);
         });
+                //e.BadgeNotification
+                //await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
+                //this.CurrentRegistrationToken = e.RawNotification.Ur
+                //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                //e.Cancel = true;
     }
 }
