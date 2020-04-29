@@ -1,6 +1,7 @@
 ﻿using Shiny.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Device.Tests.Localization;
+using Shiny.Device.Tests.Localization.OtherResources;
 using Shiny.Localization;
 using Shiny.Localization.Resx;
 
@@ -17,7 +18,9 @@ namespace Shiny.Device.Tests
             services.UseBleCentral();
             services.UseBlePeripherals();
 
-            services.UseLocalization<ResxTextProvider<DeviceTextResources>>(optionsBuilder => optionsBuilder.EnableAutoInitialization(false));
+            services.UseLocalization<ResxTextProvider<OtherTextResources>>(optionsBuilder =>
+                optionsBuilder.EnableAutoInitialization(false)
+                    .AddTextProvider<ResxTextProvider<OtherTextResources>>());
         }
     }
 }

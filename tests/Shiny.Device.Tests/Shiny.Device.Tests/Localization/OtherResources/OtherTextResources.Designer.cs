@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Shiny.Device.Tests.Localization {
+namespace Shiny.Device.Tests.Localization.OtherResources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Shiny.Device.Tests.Localization {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class DeviceTextResources {
+    public class OtherTextResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal DeviceTextResources() {
+        internal OtherTextResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Shiny.Device.Tests.Localization {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Shiny.Device.Tests.Localization.DeviceTextResources", typeof(DeviceTextResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Shiny.Device.Tests.Localization.OtherResources.OtherTextResources", typeof(OtherTextResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,7 +61,16 @@ namespace Shiny.Device.Tests.Localization {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à DeviceTestValue_inv.
+        ///   Recherche une chaîne localisée semblable à OtherOtherTestValue_inv.
+        /// </summary>
+        public static string OtherTestKey {
+            get {
+                return ResourceManager.GetString("OtherTestKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à OtherTestValue_inv.
         /// </summary>
         public static string TestKey {
             get {

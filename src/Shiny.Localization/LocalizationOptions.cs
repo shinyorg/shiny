@@ -5,12 +5,20 @@ using System.Text;
 
 namespace Shiny.Localization
 {
-    public class LocalizationOptions
+    public class LocalizationOptions : ILocalizationOptions
     {
-        public bool AutoInitialize { get; set; } = true;
+        public LocalizationOptions(Type textProviderType, Type localizationManagerType)
+        {
+            this.TextProviders = new Dictionary<Type, CultureInfo?>{ { textProviderType, null } };
+            this.LocalizationManagerType = localizationManagerType;
+        }
 
-        public CultureInfo? InitializationCulture { get; set; }
+        public IDictionary<Type, CultureInfo?> TextProviders { get; }
 
-        public IList<Type> ExtraTextProviders { get; set; } = new List<Type>();
+        public Type LocalizationManagerType { get; internal set; }
+
+        public bool AutoInitialize { get; internal set; } = true;
+
+        public CultureInfo? InitializationCulture { get; internal set; }
     }
 }

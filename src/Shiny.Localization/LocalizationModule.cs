@@ -8,8 +8,6 @@ namespace Shiny.Localization
 {
     public class LocalizationModule : ShinyModule
     {
-        readonly Type textProviderType;
-        readonly Type localizationManagerType;
         readonly LocalizationOptions options;
 
         public LocalizationModule(Type textProviderType, Type localizationManagerType, Action<LocalizationOptionsBuilder>? optionsAction = null)
@@ -20,24 +18,25 @@ namespace Shiny.Localization
             if (!typeof(ILocalizationManager).IsAssignableFrom(localizationManagerType))
                 throw new ArgumentException($"Your localization manager class must inherit from ILocalizationManager interface or derived");
 
-            this.textProviderType = textProviderType;
-            this.localizationManagerType = localizationManagerType;
-            this.options = this.CreateLocalizationOptions(optionsAction);
+            this.options = this.CreateLocalizationOptions(textProviderType, localizationManagerType, optionsAction);
         }
 
         public override void Register(IServiceCollection services)
         {
-            // Add default text provider
-            services.AddSingleton(typeof(ITextProvider), this.textProviderType);
+            // Add localization options
+            services.AddSingleton<ILocalizationOptions>(this.options);
 
-            // Add extra text providers
-            foreach (var extraTextProvider in this.options.ExtraTextProviders)
+            // Add text providers
+            foreach (var textProvider in this.options.TextProviders)
             {
-                services.AddSingleton(typeof(ITextProvider), extraTextProvider);
+                if (!typeof(ITextProvider).IsAssignableFrom(textProvider.Key))
+                    throw new ArgumentException($"Your text provider class must inherit from ITextProvider interface or derived");
+
+                services.AddSingleton(typeof(ITextProvider), textProvider.Key);
             }
 
             // Add localization manager
-            services.AddSingleton(typeof(ITextProvider), this.localizationManagerType);
+            services.AddSingleton(typeof(ILocalizationManager), this.options.LocalizationManagerType);
 
             // Add initialization job if needed
             if (this.options.AutoInitialize)
@@ -56,9 +55,9 @@ namespace Shiny.Localization
             }
         }
 
-        LocalizationOptions CreateLocalizationOptions(Action<LocalizationOptionsBuilder>? optionsAction = null)
+        LocalizationOptions CreateLocalizationOptions(Type textProviderType, Type localizationManagerType, Action<LocalizationOptionsBuilder>? optionsAction = null)
         {
-            var builder = new LocalizationOptionsBuilder(new LocalizationOptions());
+            var builder = new LocalizationOptionsBuilder(new LocalizationOptions(textProviderType, localizationManagerType));
 
             optionsAction?.Invoke(builder);
 

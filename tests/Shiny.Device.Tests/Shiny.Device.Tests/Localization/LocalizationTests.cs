@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Shiny.Localization;
 using Xunit.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Device.Tests.Localization.OtherResources;
 using Xunit;
 
 namespace Shiny.Device.Tests.Localization
@@ -12,6 +13,7 @@ namespace Shiny.Device.Tests.Localization
     {
         readonly ITestOutputHelper output;
         readonly ILocalizationManager localizationManager;
+        bool isInitialized;
 
         public LocalizationTests(ITestOutputHelper output)
         {
@@ -19,7 +21,13 @@ namespace Shiny.Device.Tests.Localization
             this.localizationManager = ShinyHost.Container.GetService<ILocalizationManager>();
         }
 
-        async Task<bool> Setup(CultureInfo? culture = null) => await this.localizationManager.InitializeAsync(culture);
+        async Task<bool> Setup(CultureInfo? culture = null)
+        {
+            if(!this.isInitialized)
+                this.isInitialized = await this.localizationManager.InitializeAsync(culture);
+
+            return this.isInitialized;
+        }
 
         [Fact]
         public async Task SetupTest()
@@ -64,15 +72,27 @@ namespace Shiny.Device.Tests.Localization
         }
 
         [Fact]
-        public async Task LocalizationTest()
+        public async Task DeviceLocalizationTest()
         {
             await this.Setup();
 
-            var localizedValue = this.localizationManager.GetText(nameof(DeviceTextResources.DeviceTestKey));
+            var localizedValue = this.localizationManager.GetText(nameof(DeviceTextResources.TestKey));
 
-            this.output.WriteLine($"Does '{DeviceTextResources.DeviceTestKey}' equals '{localizedValue}' ?");
+            this.output.WriteLine($"Does '{DeviceTextResources.TestKey}' equals '{localizedValue}' ?");
 
-            Assert.Equal(DeviceTextResources.DeviceTestKey, localizedValue);
+            Assert.Equal(DeviceTextResources.TestKey, localizedValue);
+        }
+
+        [Fact]
+        public async Task OtherLocalizationTest()
+        {
+            await this.Setup();
+
+            var localizedValue = this.localizationManager.GetText(nameof(OtherTextResources.OtherTestKey));
+
+            this.output.WriteLine($"Does '{OtherTextResources.OtherTestKey}' equals '{localizedValue}' ?");
+
+            Assert.Equal(OtherTextResources.OtherTestKey, localizedValue);
         }
     }
 }

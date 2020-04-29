@@ -40,36 +40,85 @@ namespace Shiny.Localization
 
             try
             {
+                var foundProvidersLocalizations = new Dictionary<CultureInfo, IList<IDictionary<string, string>>>();
+                var availableCultures = new List<CultureInfo>();
                 this.providersLocalizations.Clear();
                 this.AvailableCultures.Clear();
                 this.stateChanged.OnNext(this.Status = LocalizationState.Initializing);
 
                 foreach (var textProvider in this.textProviders)
                 {
-                    var availableCultures = await textProvider.GetAvailableCulturesAsync(token);
-                    foreach (var availableCulture in availableCultures)
+                    var providerAvailableCultures = await textProvider.GetAvailableCulturesAsync(token);
+                    foreach (var providerAvailableCulture in providerAvailableCultures)
                     {
-                        if(this.AvailableCultures.All(x => x.Name != availableCulture.Name))
-                            this.AvailableCultures.Add(availableCulture);
+                        if(availableCultures.All(x => x.Name != providerAvailableCulture.Name))
+                            availableCultures.Add(providerAvailableCulture);
                     }
                 }
 
-                if (culture == null || !this.AvailableCultures.Contains(culture))
+                if (!availableCultures.IsEmpty())
                 {
-                    culture = this.AvailableCultures.Contains(CultureInfo.CurrentUICulture)
-                        ? CultureInfo.CurrentUICulture
-                        : CultureInfo.InvariantCulture;
-                }
+                    var invariantCulture = availableCultures.FirstOrDefault(x => x.Name == CultureInfo.InvariantCulture.Name);
+                    if (invariantCulture != null)
+                    {
+                        this.AvailableCultures.Add(invariantCulture);
+                        availableCultures.Remove(invariantCulture);
+                    }
 
-                foreach (var textProvider in this.textProviders)
-                {
-                    var localizations = await textProvider.GetTextResourcesAsync(culture, token);
-                    if (!localizations.IsEmpty())
-                        this.providersLocalizations.Add(localizations);
-                }
+                    foreach (var availableCulture in availableCultures.OrderBy(x => x.Name))
+                    {
+                        this.AvailableCultures.Add(availableCulture);
+                    }
 
-                if (!this.providersLocalizations.IsEmpty())
-                    this.CurrentCulture = culture;
+                    if (culture == null)
+                        culture = CultureInfo.CurrentUICulture;
+
+                    foreach (var textProvider in this.textProviders)
+                    {
+                        var currentCulture = culture;
+                        var tryParent = true;
+                        while (tryParent)
+                        {
+                            var localizations = await textProvider.GetTextResourcesAsync(currentCulture, token);
+                            if (!localizations.IsEmpty())
+                            {
+                                if (!foundProvidersLocalizations.TryGetValue(currentCulture, out var currentCultureLocalizations))
+                                {
+                                    currentCultureLocalizations = new List<IDictionary<string, string>>();
+                                    foundProvidersLocalizations.Add(currentCulture, currentCultureLocalizations);
+                                }
+
+                                currentCultureLocalizations.Add(localizations);
+                                tryParent = false;
+                            }
+                            else if (currentCulture.Name == CultureInfo.InvariantCulture.Name)
+                            {
+                                tryParent = false;
+                            }
+                            else
+                            {
+                                currentCulture = currentCulture.Parent;
+                            }
+                        }
+                    }
+
+                    if (!foundProvidersLocalizations.IsEmpty())
+                    {
+                        if (foundProvidersLocalizations.Any(x => x.Key.Name != CultureInfo.InvariantCulture.Name) &&
+                            foundProvidersLocalizations.Any(x => x.Key.Name == CultureInfo.InvariantCulture.Name))
+                            foundProvidersLocalizations.Remove(CultureInfo.InvariantCulture);
+
+                        var foundProvidersLocalizationsOrdered = foundProvidersLocalizations.OrderByDescending(x => x.Key.Name.Length).ToList();
+                        foreach (var foundCultureLocalizations in foundProvidersLocalizationsOrdered)
+                        {
+                            foreach (var foundLocalizations in foundCultureLocalizations.Value)
+                            {
+                                this.providersLocalizations.Add(foundLocalizations);
+                            }
+                        }
+                        this.CurrentCulture = foundProvidersLocalizationsOrdered.First().Key;
+                    } 
+                }
 
                 this.stateChanged.OnNext(this.Status = this.providersLocalizations.IsEmpty() ? LocalizationState.None : LocalizationState.Some);
 
