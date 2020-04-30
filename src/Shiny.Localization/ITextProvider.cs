@@ -8,6 +8,11 @@ namespace Shiny.Localization
     public interface ITextProvider
     {
         /// <summary>
+        /// Culture used as invariant (default = InvariantCulture)
+        /// </summary>
+        CultureInfo? InvariantCulture { get; }
+
+        /// <summary>
         /// Get all available cultures from the provider
         /// </summary>
         /// <param name="token"></param>

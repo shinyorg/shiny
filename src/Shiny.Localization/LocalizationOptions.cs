@@ -19,6 +19,12 @@ namespace Shiny.Localization
 
         public bool AutoInitialize { get; internal set; } = true;
 
+        public bool TryParents { get; internal set; } = true;
+
+        public bool RefreshAvailableCultures { get; internal set; } = false;
+
         public CultureInfo? InitializationCulture { get; internal set; }
+
+        public CultureInfo? DefaultInvariantCulture { get; internal set; }
     }
 }

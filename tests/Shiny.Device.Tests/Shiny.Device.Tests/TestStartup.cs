@@ -19,7 +19,7 @@ namespace Shiny.Device.Tests
             services.UseBlePeripherals();
 
             services.UseLocalization<ResxTextProvider<OtherTextResources>>(optionsBuilder =>
-                optionsBuilder.EnableAutoInitialization(false)
+                optionsBuilder.WithAutoInitialization(false)
                     .AddTextProvider<ResxTextProvider<OtherTextResources>>());
         }
     }

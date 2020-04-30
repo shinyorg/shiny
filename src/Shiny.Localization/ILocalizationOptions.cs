@@ -9,6 +9,9 @@ namespace Shiny.Localization
         IDictionary<Type, CultureInfo?> TextProviders { get; }
         Type LocalizationManagerType { get; }
         bool AutoInitialize { get; }
+        bool TryParents { get; } 
+        bool RefreshAvailableCultures { get; }
         CultureInfo? InitializationCulture { get; }
+        CultureInfo? DefaultInvariantCulture { get; }
     }
 }

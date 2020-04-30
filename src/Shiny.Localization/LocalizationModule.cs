@@ -47,10 +47,6 @@ namespace Shiny.Localization
                     IsSystemJob = true
                 };
 
-                // Add initialization culture if specified
-                if (this.options.InitializationCulture != null)
-                    initializationJob.Parameters.Add(nameof(this.options.InitializationCulture), this.options.InitializationCulture);
-
                 services.RegisterJob(initializationJob);
             }
         }

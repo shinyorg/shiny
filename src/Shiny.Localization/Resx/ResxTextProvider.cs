@@ -15,15 +15,16 @@ namespace Shiny.Localization.Resx
     public class ResxTextProvider<T> : IResxTextProvider<T> where T : class
     {
         readonly ResourceManager resourceManager;
-        readonly CultureInfo? invariantCulture;
         TaskCompletionSource<IList<CultureInfo>>? availableCulturesTcs;
         TaskCompletionSource<IDictionary<string, string>>? textResourcesTcs;
 
         public ResxTextProvider(ILocalizationOptions options)
         {
             this.resourceManager = new ResourceManager(typeof(T));
-            this.invariantCulture = options.TextProviders[this.GetType()];
+            this.InvariantCulture = options.TextProviders[this.GetType()] ?? options.DefaultInvariantCulture;
         }
+
+        public CultureInfo? InvariantCulture { get; }
 
         public Task<IList<CultureInfo>> GetAvailableCulturesAsync(CancellationToken token = default)
         {
@@ -47,7 +48,7 @@ namespace Shiny.Localization.Resx
                         {
                             var rs = this.resourceManager.GetResourceSet(culture, true, false);
                             if (rs != null)
-                                availableCultures.Add(culture.Name == CultureInfo.InvariantCulture.Name && this.invariantCulture != null ? this.invariantCulture : culture);
+                                availableCultures.Add(culture);//Add(culture.Name == CultureInfo.InvariantCulture.Name && this.InvariantCulture != null ? this.InvariantCulture : culture);
                         }
                         catch (CultureNotFoundException e)
                         {
