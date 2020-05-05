@@ -48,7 +48,7 @@ namespace Shiny.Localization.Resx
                         {
                             var rs = this.resourceManager.GetResourceSet(culture, true, false);
                             if (rs != null)
-                                availableCultures.Add(culture);//Add(culture.Name == CultureInfo.InvariantCulture.Name && this.InvariantCulture != null ? this.InvariantCulture : culture);
+                                availableCultures.Add(culture.Name == CultureInfo.InvariantCulture.Name && this.InvariantCulture != null ? this.InvariantCulture : culture);
                         }
                         catch (CultureNotFoundException e)
                         {

@@ -21,7 +21,7 @@ namespace Shiny.Localization
 
         public bool TryParents { get; internal set; } = true;
 
-        public bool RefreshAvailableCultures { get; internal set; } = false;
+        public bool RefreshAvailableCultures { get; internal set; } = true;
 
         public CultureInfo? InitializationCulture { get; internal set; }
 

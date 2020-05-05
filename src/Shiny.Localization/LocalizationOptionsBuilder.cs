@@ -22,10 +22,10 @@ namespace Shiny.Localization
         /// </summary>
         /// <param name="autoInitialize">True to initialize localization on app startup from a background job or False for on demand initialization (default: true)</param>
         /// <param name="tryParents">Try with parent culture up to invariant when the asked one can't be found (default: true)</param>
-        /// <param name="refreshAvailableCultures">Refresh AvailableCultures property during initialization (default: false)</param>
+        /// <param name="refreshAvailableCultures">Refresh AvailableCultures property during initialization (default: true)</param>
         /// <param name="initializationCulture">Culture used for auto initialization</param>
         /// <returns></returns>
-        public virtual LocalizationOptionsBuilder WithAutoInitialization(bool autoInitialize, bool tryParents = true, bool refreshAvailableCultures = false, CultureInfo? initializationCulture = null)
+        public virtual LocalizationOptionsBuilder WithAutoInitialization(bool autoInitialize = true, bool tryParents = true, bool refreshAvailableCultures = true, CultureInfo? initializationCulture = null)
         {
             this.localizationOptions.AutoInitialize = autoInitialize;
             if (autoInitialize)

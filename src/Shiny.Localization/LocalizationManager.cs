@@ -67,7 +67,7 @@ namespace Shiny.Localization
                         availableCultures.Remove(invariantCulture);
                     }
 
-                    foreach (var availableCulture in availableCultures.OrderBy(x => x.Name))
+                    foreach (var availableCulture in availableCultures.OrderBy(x => x.DisplayName))
                     {
                         this.AvailableCultures.Add(availableCulture);
                     }
@@ -106,15 +106,16 @@ namespace Shiny.Localization
 
                 foreach (var textProvider in this.textProviders)
                 {
+                    var textResourcesCulture = culture.Name == textProvider.InvariantCulture?.Name ? CultureInfo.InvariantCulture : culture;
                     var currentCulture = culture;
                     var currentTryParents = tryParents;
                     while (currentTryParents)
                     {
-                        var localizations = await textProvider.GetTextResourcesAsync(currentCulture, token);
+                        var localizations = await textProvider.GetTextResourcesAsync(textResourcesCulture, token);
                         if (!localizations.IsEmpty())
                         {
-                            if (!foundProvidersLocalizations.TryGetValue(currentCulture,
-                                out var currentCultureLocalizations))
+                            var currentCultureLocalizations = foundProvidersLocalizations.FirstOrDefault(x => x.Key.Name == currentCulture.Name).Value;
+                            if (currentCultureLocalizations.IsEmpty())
                             {
                                 currentCultureLocalizations = new List<IDictionary<string, string>>();
                                 foundProvidersLocalizations.Add(currentCulture, currentCultureLocalizations);
@@ -123,13 +124,15 @@ namespace Shiny.Localization
                             currentCultureLocalizations.Add(localizations);
                             currentTryParents = false;
                         }
-                        else if (currentCulture.Name == CultureInfo.InvariantCulture.Name)
+                        else if (textResourcesCulture.Name == CultureInfo.InvariantCulture.Name)
                         {
                             currentTryParents = false;
                         }
                         else
                         {
-                            currentCulture = currentCulture.Parent;
+                            var parentCulture = currentCulture.Parent;
+                            textResourcesCulture = parentCulture.Name == textProvider.InvariantCulture?.Name ? CultureInfo.InvariantCulture : parentCulture;
+                            currentCulture = parentCulture;
                         }
                     }
                 }
