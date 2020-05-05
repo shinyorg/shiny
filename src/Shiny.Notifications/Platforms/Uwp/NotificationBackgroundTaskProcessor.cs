@@ -6,6 +6,7 @@ using Windows.ApplicationModel.Background;
 using Windows.UI.Notifications;
 using Windows.UI.Notifications.Management;
 
+
 namespace Shiny.Notifications
 {
     public class NotificationBackgroundTaskProcessor : IBackgroundTaskProcessor

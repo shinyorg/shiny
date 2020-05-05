@@ -24,6 +24,7 @@ namespace Shiny.Notifications
         readonly ISettings settings;
         readonly BadgeUpdater badgeUpdater;
 
+
         public NotificationManager(IServiceProvider services,
                                    IJobManager jobs,
                                    ISettings settings,
@@ -168,13 +169,12 @@ namespace Shiny.Notifications
 
         public void Start()
         {
-            if (this.services.IsRegistered<INotificationDelegate>())
-            {
-                //this.context.RegisterBackground<NotificationBackgroundTaskProcessor>(
-                //    nameof(NotificationBackgroundTaskProcessor),
-                //    builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
-                //);
-            }
+            //if (this.services.IsRegistered<INotificationDelegate>())
+            //{
+            //    UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(
+            //        builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
+            //    );
+            //}
         }
 
 

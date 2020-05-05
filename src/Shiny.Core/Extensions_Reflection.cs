@@ -125,5 +125,20 @@ namespace Shiny
 
             prop.SetValue(obj, value);
         }
+
+
+        /// <summary>
+        /// Creates and copies values from one object to a newly created object
+        /// </summary>
+        /// <typeparam name="TTo"></typeparam>
+        /// <typeparam name="TFrom"></typeparam>
+        /// <param name="from"></param>
+        /// <returns></returns>
+        public static TTo ReflectTransform<TTo, TFrom>(TFrom from) where TTo : new()
+        {
+            var to = new TTo();
+            from.ReflectCopyTo(to);
+            return to;
+        }
     }
 }
