@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using CoreLocation;
 using Shiny.Infrastructure;
-
+using UIKit;
 
 namespace Shiny.Beacons
 {
@@ -29,9 +29,28 @@ namespace Shiny.Beacons
         public override Task<AccessState> RequestAccess(bool monitoring) => this.manager.RequestAccess(monitoring);
 
 
-        public override IObservable<Beacon> WhenBeaconRanged(BeaconRegion region)
+        public override IObservable<Beacon> WhenBeaconRanged(BeaconRegion region) => UIDevice.CurrentDevice.CheckSystemVersion(13, 0)
+            ? this.WhenRanged(region)
+            : this.WhenRangedClassic(region);
+
+
+        IObservable<Beacon> WhenRangedClassic(BeaconRegion region)
         {
-            var native = region.ToNativeCLBeaconIdentityConstraint();
+            var native = region.ToNative();
+            this.manager.StartRangingBeacons(native);
+
+            return this.gdelegate
+                .WhenBeaconRanged()
+                .Where(region.IsBeaconInRegion)
+                .Finally(() =>
+                    this.manager.StopRangingBeacons(native)
+                );
+        }
+
+
+        IObservable<Beacon> WhenRanged(BeaconRegion region)
+        {
+            var native = region.ToNativeIos13();
             this.manager.StartRangingBeacons(native);
 
             return this.gdelegate
