@@ -31,7 +31,7 @@ namespace Shiny.Beacons
 
         public override IObservable<Beacon> WhenBeaconRanged(BeaconRegion region)
         {
-            var native = region.ToNative();
+            var native = region.ToNativeCLBeaconIdentityConstraint();
             this.manager.StartRangingBeacons(native);
 
             return this.gdelegate

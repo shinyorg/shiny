@@ -30,6 +30,26 @@ namespace Shiny.Beacons
             return native;
         }
 
+        public static CLBeaconIdentityConstraint ToNativeCLBeaconIdentityConstraint(this BeaconRegion region)
+        {
+            if (region.Uuid == null)
+                throw new ArgumentException("You must pass a UUID for the Beacon Region");
+
+            var uuid = region.Uuid.ToNSUuid();
+            CLBeaconIdentityConstraint native;
+
+            if (region.Major > 0 && region.Minor > 0)
+                native = new CLBeaconIdentityConstraint(uuid, region.Major.Value, region.Minor.Value);
+
+            else if (region.Major > 0)
+                native = new CLBeaconIdentityConstraint(uuid, region.Major.Value);
+
+            else
+                native = new CLBeaconIdentityConstraint(uuid);
+
+            return native;
+        }
+
 
         public static Proximity FromNative(this CLProximity proximity)
         {
