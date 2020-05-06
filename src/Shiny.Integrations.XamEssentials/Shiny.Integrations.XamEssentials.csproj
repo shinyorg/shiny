@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <PackageReference Include="Xamarin.Essentials" Version="1.5.2" />
+        <PackageReference Include="Xamarin.Essentials" Version="1.5.3.1" />
         <PackageReference Include="Pharmacist.MSBuild" Version="1.5.15" />
     </ItemGroup>
 
