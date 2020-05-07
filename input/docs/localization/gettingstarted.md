@@ -67,7 +67,7 @@ this.localizationManager.InitializeAsync(culture: null, tryParents: true, refres
 
 - culture: the culture you ask for localization(default: null = CurrentUICulture)
 - tryParents: true to try with parent culture up to invariant when the asked one can't be found (default: true)
-- refreshAvailableCultures: true to refresh AvailableCultures property during initialization (default: true)
+- refreshAvailableCultures: true to refresh AvailableCultures property during initialization (default: false)
 - token: optional cancellation token
 
 ## Options builder
@@ -148,8 +148,19 @@ If ResxTextProvider<YourResourcesDesignerClass> contains the key it wins.
 If not, YourDbTextProviderClass wins if it contains the key.
 If not, nobody wins and the key is returned as a value.
 
-### Mixing all
-You can mix it all:
+### Mixing it all
+You can mix it all together.
+
+Suppose you get this:
+|YourDbSyncTextProviderClass|ResxTextProvider<YourSharedResourcesDesignerClass>|ResxTextProvider<YourMobileResourcesDesignerClass>|
+|--------|--------|-------|
+|Invariant (en)|Invariant (en)|Invariant (en)|
+|French (fr)|French (fr)|French - France (fr-FR)|
+|French - France (fr-FR)|French - France (fr-FR)|Spanish (es)|
+|Spanish (es)|||
+|Italian (it)|||
+
+Now initialization from [Shiny Startup](./startup):
 ```csharp
 
 public override void ConfigureServices(IServiceCollection services)
@@ -164,8 +175,14 @@ public override void ConfigureServices(IServiceCollection services)
 ```
 
 Here I'm saying:
-- YourDbSyncTextProviderClass is my main text provider (kind of priority 1)
+- YourDbSyncTextProviderClass is my main text provider (kind of priority 1), but as it's a database text provider, it could be empty by default
 - Auto initialize with "en" default culture
 - Set "en" culture as invariant culture
 - Add mobile/server shared resx text provider (localized error message handling)
 - Add mobile specific resx text provider (default app localization when the db one has no matching key - e.g. empty at first launch)
+
+So when the app starts, it will be localized with "en" culture wich is the invariant one for each provider
+As it's the first launch, my database is empty so it will load and cache "en" localized resources from YourSharedResourcesDesignerClass first, then from YourMobileResourcesDesignerClass
+At this moment, AvailableCultures should contain English, French, French (France), Spanish.
+Then, somewhere in my loading script, my data service pull resources from remote server into local database.
+From there, I can manualy initialize again the plugin to refresh AvailableCultures wich should now conatin English, French, French (France), Italian, Spanish.
