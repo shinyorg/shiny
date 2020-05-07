@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Jobs;
+using Shiny.Localization;
 
-namespace Shiny.Localization
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
@@ -32,6 +31,21 @@ namespace Shiny.Localization
             where TTextProvider : class, ITextProvider
             where TLocalizationManager : class, ILocalizationManager =>
             services.UseLocalization(typeof(TTextProvider), typeof(TLocalizationManager), optionsAction);
+
+        /// <summary>
+        /// Use localization plugin with a default text provider and a custom localization manager
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <param name="textProviderType">A default text provider</param>
+        /// <param name="optionsAction">Some options to customize if needed</param>
+        /// <returns></returns>
+        public static bool UseLocalization(this IServiceCollection services, Type textProviderType,
+            Action<LocalizationOptionsBuilder>? optionsAction = null)
+        {
+            services.RegisterModule(new LocalizationModule(textProviderType, typeof(LocalizationManager), optionsAction));
+
+            return true;
+        }
 
         /// <summary>
         /// Use localization plugin with a default text provider and a custom localization manager

@@ -1,8 +1,6 @@
 ﻿using Shiny.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Device.Tests.Localization;
 using Shiny.Device.Tests.Localization.OtherResources;
-using Shiny.Localization;
 using Shiny.Localization.Resx;
 
 
