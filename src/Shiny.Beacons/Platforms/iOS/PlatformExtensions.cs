@@ -1,18 +1,25 @@
 ﻿using System;
 using CoreLocation;
+using Foundation;
 
 
 namespace Shiny.Beacons
 {
     public static class PlatformExtensions
     {
-        public static CLBeaconRegion ToNative(this BeaconRegion region)
+        static NSUuid ToNsUuid(BeaconRegion region)
         {
             if (region.Uuid == null)
                 throw new ArgumentException("You must pass a UUID for the Beacon Region");
 
             var uuid = region.Uuid.ToNSUuid();
-            CLBeaconRegion native = null;
+            return uuid;
+        }
+
+        public static CLBeaconRegion ToNative(this BeaconRegion region)
+        {
+            var uuid = ToNsUuid(region);
+            CLBeaconRegion native;
 
             if (region.Major > 0 && region.Minor > 0)
                 native = new CLBeaconRegion(uuid, region.Major.Value, region.Minor.Value, region.Identifier);
@@ -28,6 +35,20 @@ namespace Shiny.Beacons
             native.NotifyOnExit = region.NotifyOnExit;
 
             return native;
+        }
+
+
+        public static CLBeaconIdentityConstraint ToNativeIos13(this BeaconRegion region)
+        {
+            var uuid = ToNsUuid(region);
+
+            if (region.Major > 0 && region.Minor > 0)
+                return new CLBeaconIdentityConstraint(uuid, region.Major.Value, region.Minor.Value);
+
+            if (region.Major > 0)
+                return new CLBeaconIdentityConstraint(uuid, region.Major.Value);
+
+            return new CLBeaconIdentityConstraint(uuid);
         }
 
 

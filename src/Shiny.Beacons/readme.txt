@@ -45,8 +45,14 @@ iOS
 -----------------
 Android
 -----------------
+
+Target Android SDK < 29: 
 Permissions are included via assembly attributes
 
+Android 10+ SDK 29+: 
+Ranging permissions are included via assembly attributes 
+If you use Monitoring (Background detection), you will need to add the following to your AndroidManifest.xml
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
 -----------------
 UWP
