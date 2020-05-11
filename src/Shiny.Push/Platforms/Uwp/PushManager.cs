@@ -14,14 +14,10 @@ namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager, IShinyStartupTask
     {
-        readonly IServiceProvider serviceProvider;
         PushNotificationChannel channel;
 
 
-        public PushManager(IServiceProvider serviceProvider, ISettings settings) : base(settings)
-        {
-            this.serviceProvider = serviceProvider;
-        }
+        public PushManager(ISettings settings) : base(settings) {}
 
 
         public void Start()

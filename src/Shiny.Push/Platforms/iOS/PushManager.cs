@@ -35,6 +35,9 @@ namespace Shiny.Push
 
         public void Start()
         {
+            if (this.IsEnabled)
+                Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+
             this.nativeDelegate
                 .WhenPresented()
                 .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
@@ -80,20 +83,37 @@ namespace Shiny.Push
         }
 
 
+        public bool IsEnabled
+        {
+            get => this.Settings.Get(nameof(IsEnabled), false);
+            private set => this.Settings.Set(nameof(IsEnabled), value);
+        }
+
         public override IObservable<IDictionary<string, string>> WhenReceived() => this.payloadSubj;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             var deviceToken = await this.RequestDeviceToken(cancelToken);
+            this.IsEnabled = true;
             this.CurrentRegistrationToken = ToTokenString(deviceToken);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
         }
 
 
-        public override Task UnRegister()
-            => Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);            
+        public override async Task UnRegister()
+        {
+            await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);
+            this.ClearRegistration();
+        }
+
+
+        protected override void ClearRegistration()
+        {
+            base.ClearRegistration();
+            this.IsEnabled = false;
+        }
 
 
         protected virtual async Task<NSData> RequestDeviceToken(CancellationToken cancelToken = default)
