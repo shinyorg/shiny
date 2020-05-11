@@ -65,7 +65,9 @@ namespace Shiny.Locations
         {
             var regions = await this.Repository.GetAll();
             var regionIds = regions.Select(x => x.Identifier).ToArray();
-            await this.client.RemoveGeofencesAsync(regionIds);
+            if (regionIds.Any())
+                await this.client.RemoveGeofencesAsync(regionIds);
+
             await this.Repository.Clear();
         }
 
