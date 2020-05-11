@@ -6,13 +6,16 @@
 ### Shiny.Core
 * [Enhancement][Jobs] Job arguments are now like other delegates
 * [Enhancement][Jobs][iOS] Background processing JobManager is now smarter with how it deals with misconfiguration
+* [Enhancement][Logging] Global logging parameters via Log.Properties
 * [Fix][iOS] NSDictionary fixes
 * [Fix][Settings][Android] Preferences are now private
+* [Fix][Settings][iOS] Using Preferences with Shiny Settings could cause issues
 * [BREAKING][Settings] KeysNotClear and Keys enumerable have been removed to make room for more platforms and simplify the API - some methods were moved to extensions
 
 ### Shiny.Locations
 * [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available
 * [Fix][GPS/Geofencing][Android] Properly check everything under Android 8.1
+* [Fix][Geofencing][Android] StopAllMonitoring shouldn't error if there are no geofences
 * [Enhancement][GPS] Multiple delegate registrations
 * [Enhancement][Geofencing] Multiple delegate registrations
 

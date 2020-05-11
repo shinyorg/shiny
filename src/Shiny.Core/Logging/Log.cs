@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +46,31 @@ namespace Shiny.Logging
         public static IObservable<LogEvent> WhenEventLogged() => eventSubj;
 
 
+        public static IReadOnlyDictionary<string, string> Properties => new ReadOnlyDictionary<string, string>(properties);
+        static IDictionary<string, string> properties = new Dictionary<string, string>();
+
+
+        public static void SetProperty(string name, string value)
+        {
+            lock (properties)
+                properties[name] = value;
+        }
+
+
+        public static void RemoveProperty(string name)
+        {
+            lock (properties)
+                properties.Remove(name);
+        }
+
+
+        public static void ClearProperties()
+        {
+            lock (properties)
+                properties.Clear();
+        }
+
+
         public static void SafeExecute(Action action)
         {
             try
@@ -72,21 +99,23 @@ namespace Shiny.Logging
 
         public static void Write(Exception exception, params (string Key, string Value)[] parameters)
         {
-            errorSubj.OnNext(new LogError(exception, parameters));
+            var parms = Merge(parameters);
+            errorSubj.OnNext(new LogError(exception, parms));
             foreach (var log in Loggers)
             {
                 if (log.IsCrashEnabled)
-                    DoLog(log.Log, exception, parameters);
+                    DoLog(log.Log, exception, parms);
             }
         }
 
 
         public static void Write(string eventName, string description, params (string Key, string Value)[] parameters)
         {
-            eventSubj.OnNext(new LogEvent(eventName, description, parameters));
+            var parms = Merge(parameters);
+            eventSubj.OnNext(new LogEvent(eventName, description, parms));
             foreach (var log in Loggers)
                 if (log.IsEventsEnabled)
-                    DoLog(log.Log, eventName, description, parameters);
+                    DoLog(log.Log, eventName, description, parms);
         }
 
 
@@ -111,6 +140,20 @@ namespace Shiny.Logging
             {
                 Console.WriteLine($"The logger '{logger.GetType().FullName}' failed with {loggerEx}");
             }
+        }
+
+
+        static (string Key, string Value)[] Merge(params (string Key, string Value)[] parameters)
+        {
+            var dict = new Dictionary<string, (string Key, string Value)>();
+            lock (properties)
+                foreach (var property in properties)
+                    dict[property.Key] = (property.Key, property.Value);
+
+            foreach (var parameter in parameters)
+                dict[parameter.Key] = parameter;
+
+            return dict.Values.ToArray();
         }
 
 
