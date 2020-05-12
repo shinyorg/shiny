@@ -17,7 +17,7 @@ namespace Shiny.Push
     {
         readonly AndroidContext context;
         readonly ISettings settings;
-        readonly IMessageBus bus;        
+        readonly IMessageBus bus;
         TaskCompletionSource<string>? taskSrc = null;
 
 
@@ -41,7 +41,7 @@ namespace Shiny.Push
             {
                 var result = task.Result.JavaCast<IInstanceIdResult>();
                 this.taskSrc?.TrySetResult(result.Token);
-            }   
+            }
         }
 
 
@@ -58,6 +58,7 @@ namespace Shiny.Push
             protected set => this.settings.SetRegDate(value);
         }
 
+        public DateTime? CurrentRegistrationExpiryDate { get; set; }
 
         public virtual async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
@@ -67,7 +68,7 @@ namespace Shiny.Push
 
             //if (resultCode == ConnectionResult.)
             //if (resultCode != ConnectionResult.ServiceMissing)
-            //{ 
+            //{
             ////{
             ////    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
             ////        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);

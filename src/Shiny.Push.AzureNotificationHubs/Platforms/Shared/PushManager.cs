@@ -16,9 +16,7 @@ namespace Shiny.Integrations.AzureNotifications
         readonly NotificationHubClient hub;
 
 #if WINDOWS_UWP
-        public PushManager(AzureNotificationConfig config,
-                           IServiceProvider serviceProvider,
-                           ISettings settings) : base(serviceProvider, settings)
+        public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
 #elif __IOS__
         public PushManager(AzureNotificationConfig config,
                            ISettings settings,
@@ -43,11 +41,26 @@ namespace Shiny.Integrations.AzureNotifications
         }
 
 
+        public string? NativeRegistrationToken
+        {
+            get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
+            protected set => this.Settings.Set(nameof(this.NativeRegistrationToken), value);
+        }
+
+
+        // TODO: if expired or native reg token has changed, re-register with azure notification hubs
+        // TODO: iOS startup should call remote notification
+        // TODO: Start an in-memory timer to refresh if necessary?  Seems overkill
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             var access = await base.RequestAccess();
+
             if (access.Status == AccessState.Available)
             {
+                // TODO: add expiry date variable
+                //if (access.RegistrationToken != this.NativeRegistrationToken)
+                //    return;
+
                 try
                 {
                     this.CurrentRegistrationToken = await this.CreateRegistration(access.RegistrationToken, cancelToken);
@@ -55,8 +68,7 @@ namespace Shiny.Integrations.AzureNotifications
                 }
                 catch
                 {
-                    this.CurrentRegistrationToken = null;
-                    this.CurrentRegistrationTokenDate = null;
+                    this.ClearRegistration();
                     throw;
                 }
             }
