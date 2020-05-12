@@ -16,7 +16,6 @@ namespace Shiny.Push
     public class PushManager : Java.Lang.Object, IOnCompleteListener, IPushManager
     {
         readonly AndroidContext context;
-        readonly ISettings settings;
         readonly IMessageBus bus;
         TaskCompletionSource<string>? taskSrc = null;
 
@@ -26,9 +25,12 @@ namespace Shiny.Push
                            IMessageBus bus)
         {
             this.context = context;
-            this.settings = settings;
+            this.Settings = settings;
             this.bus = bus;
         }
+
+
+        protected ISettings Settings { get; }
 
 
         public void OnComplete(Android.Gms.Tasks.Task task)
@@ -47,15 +49,15 @@ namespace Shiny.Push
 
         public string? CurrentRegistrationToken
         {
-            get => this.settings.Get<string?>(nameof(CurrentRegistrationToken));
-            protected set => this.settings.SetRegToken(value);
+            get => this.Settings.Get<string?>(nameof(CurrentRegistrationToken));
+            protected set => this.Settings.SetRegToken(value);
         }
 
 
         public DateTime? CurrentRegistrationTokenDate
         {
-            get => this.settings.Get<DateTime?>(nameof(CurrentRegistrationTokenDate));
-            protected set => this.settings.SetRegDate(value);
+            get => this.Settings.Get<DateTime?>(nameof(CurrentRegistrationTokenDate));
+            protected set => this.Settings.SetRegDate(value);
         }
 
         public DateTime? CurrentRegistrationExpiryDate { get; set; }
@@ -98,7 +100,15 @@ namespace Shiny.Push
             await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId());
         }
 
+
         public IObservable<IDictionary<string, string>> WhenReceived()
             => this.bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
+
+
+        protected virtual void ClearRegistration()
+        {
+            this.CurrentRegistrationToken = null;
+            this.CurrentRegistrationTokenDate = null;
+        }
     }
 }
