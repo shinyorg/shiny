@@ -6,10 +6,10 @@ using Shiny.Settings;
 
 namespace Shiny.Push
 {
-    static class Extensions
+    public static class Extensions
     {
         public static bool IsTagsSupport(this IPushManager push)
-            => push is IPushTagEnabled;
+            => push is IPushTagSupport;
 
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Shiny.Push
         /// <returns></returns>
         public static Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, string[] tags, bool throwOnFail = false, CancellationToken cancelToken = default)
         {
-            if (pushManager is IPushTagEnabled tagEnabled)
+            if (pushManager is IPushTagSupport tagEnabled)
                 return tagEnabled.RequestAccess(tags, cancelToken);
 
             if (throwOnFail)
@@ -34,15 +34,15 @@ namespace Shiny.Push
 
         public static async Task TryUpdateTags(this IPushManager pushManager, params string[] tags)
         {
-            if (pushManager is IPushTagEnabled tagEnabled)
+            if (pushManager is IPushTagSupport tagEnabled)
                 await tagEnabled.UpdateTags(tags);
         }
 
 
-        public static void SetRegToken(this ISettings settings, string? regToken)
+        internal static void SetRegToken(this ISettings settings, string? regToken)
             => SetOrRemove(settings, nameof(IPushManager.CurrentRegistrationToken), regToken);
 
-        public static void SetRegDate(this ISettings settings, DateTime? dateTime)
+        internal static void SetRegDate(this ISettings settings, DateTime? dateTime)
             => SetOrRemove(settings, nameof(IPushManager.CurrentRegistrationTokenDate), dateTime);
 
         static void SetOrRemove<T>(ISettings settings, string key, T value)

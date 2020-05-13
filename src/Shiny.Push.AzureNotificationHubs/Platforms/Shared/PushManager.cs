@@ -11,7 +11,7 @@ using Shiny.Notifications;
 
 namespace Shiny.Integrations.AzureNotifications
 {
-    public class PushManager : Shiny.Push.PushManager, IPushTagEnabled
+    public class PushManager : Shiny.Push.PushManager, IPushTagSupport
     {
         readonly NotificationHubClient hub;
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.Push
 {
-    public interface IPushTagEnabled
+    public interface IPushTagSupport
     {
         Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default);
         Task UpdateTags(params string[] tags);

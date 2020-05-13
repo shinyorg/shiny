@@ -28,7 +28,7 @@
 ### Shiny.Push
 * [Enhancement] Multiple delegate registrations
 * [Enhancement] Adds ability to see when token expires (if applicable, otherwise null)
-* [Enhancement] Adds ability to register with tags, update tags, and see currently registered tags if the push mechanism supports it.  Check if IPushManager can be cast to IPushTagsEnabled
+* [Enhancement] Adds ability to register with tags, update tags, and see currently registered tags if the push mechanism supports it.  Check if IPushManager can be cast to IPushTagSupport
 
 ### Shiny.Push.AzureNotificationHubs
 * [Enhancement] RequestAccess with new tags support
