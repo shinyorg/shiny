@@ -11,7 +11,7 @@ using Shiny.Notifications;
 
 namespace Shiny.Integrations.AzureNotifications
 {
-    public class PushManager : Shiny.Push.PushManager
+    public class PushManager : Shiny.Push.PushManager, IPushTagEnabled
     {
         readonly NotificationHubClient hub;
 
@@ -48,28 +48,29 @@ namespace Shiny.Integrations.AzureNotifications
         }
 
 
-        // TODO: if expired or native reg token has changed, re-register with azure notification hubs
-        // TODO: iOS startup should call remote notification
-        // TODO: Start an in-memory timer to refresh if necessary?  Seems overkill
-        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+        public override Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => this.RequestAccess(null, cancelToken);
+        public async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
         {
             var access = await base.RequestAccess();
 
             if (access.Status == AccessState.Available)
             {
-                // TODO: add expiry date variable
-                //if (access.RegistrationToken != this.NativeRegistrationToken)
-                //    return;
-
-                try
+                if (!this.IsRefreshNeeded(access))
                 {
-                    this.CurrentRegistrationToken = await this.CreateRegistration(access.RegistrationToken, cancelToken);
                     access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
                 }
-                catch
+                else
                 {
-                    this.ClearRegistration();
-                    throw;
+                    try
+                    {
+                        await this.CreateRegistration(access.RegistrationToken, tags, cancelToken);
+                        access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
+                    }
+                    catch
+                    {
+                        this.ClearRegistration();
+                        throw;
+                    }
                 }
             }
             return access;
@@ -82,26 +83,46 @@ namespace Shiny.Integrations.AzureNotifications
             await base.UnRegister();
         }
 
-#if XAMARIN_IOS
-        protected virtual async Task<string> CreateRegistration(string accessToken, CancellationToken cancelToken)
+
+        protected virtual bool IsRefreshNeeded(PushAccessState nativeToken)
         {
-            var reg = await this.hub.CreateAppleNativeRegistrationAsync(accessToken, cancelToken);
-            this.CurrentRegistrationTokenDate = reg.ExpirationTime;
+            if (this.CurrentRegistrationToken.IsEmpty())
+                return true;
+
+            if (this.NativeRegistrationToken != nativeToken.RegistrationToken)
+                return true;
+
+            if (this.CurrentRegistrationExpiryDate < DateTime.Now)
+                return true;
+
+            return false;
+        }
+
+#if XAMARIN_IOS
+        protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
+        {
+            var reg = await this.hub.CreateAppleNativeRegistrationAsync(accessToken, tags, cancelToken);
+            this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            this.CurrentRegistrationToken = reg.RegistrationId;
             return reg.RegistrationId;
         }
 #elif WINDOWS_UWP
-        protected virtual async Task<string> CreateRegistration(string accessToken, CancellationToken cancelToken)
+        protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
         {
-            var reg = await this.hub.CreateWindowsNativeRegistrationAsync(accessToken, cancelToken);
-            this.CurrentRegistrationTokenDate = reg.ExpirationTime;
+            var reg = await this.hub.CreateWindowsNativeRegistrationAsync(accessToken, tags, cancelToken);
+            this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            this.CurrentRegistrationToken = reg.RegistrationId;
             return reg.RegistrationId;
         }
 #else
-        protected virtual async Task<string> CreateRegistration(string accessToken, CancellationToken cancelToken)
+        protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
         {
-            var reg = await this.hub.CreateFcmNativeRegistrationAsync(accessToken, cancelToken);
-            this.CurrentRegistrationTokenDate = reg.ExpirationTime;
-            return reg.RegistrationId;
+            var reg = await this.hub.CreateFcmNativeRegistrationAsync(accessToken, tags, cancelToken);
+            this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            this.CurrentRegistrationToken = reg.RegistrationId;
         }
 #endif
     }
