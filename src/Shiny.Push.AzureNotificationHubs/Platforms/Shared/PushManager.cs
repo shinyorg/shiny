@@ -100,7 +100,10 @@ namespace Shiny.Integrations.AzureNotifications
             {
                 reg.Tags.Clear();
                 foreach (var tag in tags)
-                    reg.Tags.Add(tag);
+                {
+                    if (!tag.IsEmpty())
+                        reg.Tags.Add(tag);
+                }
 
                 await hub.UpdateRegistrationAsync(reg);
             }
