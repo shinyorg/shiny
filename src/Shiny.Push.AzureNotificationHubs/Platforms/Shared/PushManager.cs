@@ -41,11 +41,19 @@ namespace Shiny.Integrations.AzureNotifications
         }
 
 
+        public string[]? RegisteredTags
+        {
+            get => this.Settings.Get<string[]>(nameof(this.RegisteredTags));
+            private set => this.Settings.Set(nameof(this.RegisteredTags), value);
+        }
+
+
         public string? NativeRegistrationToken
         {
             get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
             protected set => this.Settings.Set(nameof(this.NativeRegistrationToken), value);
         }
+
 
 
         public override Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => this.RequestAccess(null, cancelToken);
@@ -79,8 +87,23 @@ namespace Shiny.Integrations.AzureNotifications
 
         public override async Task UnRegister()
         {
+            this.RegisteredTags = null;
             await this.hub.DeleteRegistrationAsync(this.CurrentRegistrationToken);
             await base.UnRegister();
+        }
+
+
+        public async Task UpdateTags(params string[] tags)
+        {
+            var registrations = await this.hub.GetAllRegistrationsAsync(10);
+            foreach (var reg in registrations)
+            {
+                reg.Tags.Clear();
+                foreach (var tag in tags)
+                    reg.Tags.Add(tag);
+
+                await hub.UpdateRegistrationAsync(reg);
+            }
         }
 
 
@@ -105,7 +128,7 @@ namespace Shiny.Integrations.AzureNotifications
             this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.CurrentRegistrationToken = reg.RegistrationId;
-            return reg.RegistrationId;
+            this.RegisteredTags = tags;
         }
 #elif WINDOWS_UWP
         protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
@@ -114,8 +137,9 @@ namespace Shiny.Integrations.AzureNotifications
             this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.CurrentRegistrationToken = reg.RegistrationId;
-            return reg.RegistrationId;
+            this.RegisteredTags = tags;
         }
+
 #else
         protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
         {
@@ -123,6 +147,7 @@ namespace Shiny.Integrations.AzureNotifications
             this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.CurrentRegistrationToken = reg.RegistrationId;
+            this.RegisteredTags = tags;
         }
 #endif
     }

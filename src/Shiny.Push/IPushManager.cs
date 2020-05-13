@@ -36,7 +36,6 @@ namespace Shiny.Push
         /// <returns></returns>
         Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default);
 
-
         /// <summary>
         /// Unregisters from push notifications
         /// </summary>

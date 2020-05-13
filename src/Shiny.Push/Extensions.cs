@@ -32,6 +32,13 @@ namespace Shiny.Push
         }
 
 
+        public static async Task TryUpdateTags(this IPushManager pushManager, params string[] tags)
+        {
+            if (pushManager is IPushTagEnabled tagEnabled)
+                await tagEnabled.UpdateTags(tags);
+        }
+
+
         public static void SetRegToken(this ISettings settings, string? regToken)
             => SetOrRemove(settings, nameof(IPushManager.CurrentRegistrationToken), regToken);
 
