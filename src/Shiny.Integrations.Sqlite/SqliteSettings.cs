@@ -18,8 +18,8 @@ namespace Shiny.Integrations.Sqlite
             => this.conn.GetConnection().Get<SettingStore>(key) != null;
 
 
-        protected override object NativeGet(Type type, string key)
-            => this.conn.GetConnection().Get<SettingStore>(key).GetValue();
+        protected override object? NativeGet(Type type, string key)
+            => this.conn.GetConnection().Get<SettingStore>(key)?.GetValue();
 
 
         protected override void NativeClear()
