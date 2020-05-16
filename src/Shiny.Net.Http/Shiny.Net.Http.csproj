@@ -22,14 +22,14 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Reference Include="netstandard" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*macOS*\**\*.cs" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />

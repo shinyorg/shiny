@@ -16,6 +16,7 @@
 * [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available
 * [Fix][GPS/Geofencing][Android] Properly check everything under Android 8.1
 * [Fix][Geofencing][Android] StopAllMonitoring shouldn't error if there are no geofences
+* [Enhancement][Android] AndroidX is here
 * [Enhancement][GPS] Multiple delegate registrations
 * [Enhancement][Geofencing] Multiple delegate registrations
 
@@ -26,6 +27,7 @@
 * [Fix][UWP] Cancelling notifications was not removing the notification
 
 ### Shiny.Push
+* [Enhancement][Android] AndroidX is here
 * [Enhancement] Multiple delegate registrations
 * [Enhancement] Adds ability to see when token expires (if applicable, otherwise null)
 * [Enhancement] Adds ability to register with tags, update tags, and see currently registered tags if the push mechanism supports it.  Check if IPushManager can be cast to IPushTagSupport

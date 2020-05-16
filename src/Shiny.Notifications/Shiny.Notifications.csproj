@@ -47,7 +47,7 @@
         <Compile Include="Platforms\macOS\**\*.cs" />
         <Reference Include="netstandard" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
@@ -55,7 +55,7 @@
         <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.1.0" />
         <PackageReference Include="Xamarin.AndroidX.Core" Version="1.2.0" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
