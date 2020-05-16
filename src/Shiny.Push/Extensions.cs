@@ -8,8 +8,22 @@ namespace Shiny.Push
 {
     public static class Extensions
     {
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="push"></param>
+        /// <returns></returns>
         public static bool IsTagsSupport(this IPushManager push)
             => push is IPushTagSupport;
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="push"></param>
+        /// <returns></returns>
+        public static string[]? TryGetTags(this IPushManager push)
+            => (push as IPushTagSupport)?.RegisteredTags;
 
 
         /// <summary>
