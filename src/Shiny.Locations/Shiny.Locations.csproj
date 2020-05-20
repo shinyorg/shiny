@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>Shiny Locations - bringing geofencing and GPS to a background service near you!</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;tizen50;monoandroid90;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;tizen50;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 

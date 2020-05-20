@@ -128,6 +128,7 @@ namespace Shiny.Integrations.AzureNotifications
         protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
         {
             var reg = await this.hub.CreateAppleNativeRegistrationAsync(accessToken, tags, cancelToken);
+            this.NativeRegistrationToken = accessToken;
             this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.CurrentRegistrationToken = reg.RegistrationId;
@@ -137,6 +138,7 @@ namespace Shiny.Integrations.AzureNotifications
         protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
         {
             var reg = await this.hub.CreateWindowsNativeRegistrationAsync(accessToken, tags, cancelToken);
+            this.NativeRegistrationToken = accessToken;
             this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.CurrentRegistrationToken = reg.RegistrationId;
@@ -147,6 +149,7 @@ namespace Shiny.Integrations.AzureNotifications
         protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
         {
             var reg = await this.hub.CreateFcmNativeRegistrationAsync(accessToken, tags, cancelToken);
+            this.NativeRegistrationToken = accessToken;
             this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.CurrentRegistrationToken = reg.RegistrationId;

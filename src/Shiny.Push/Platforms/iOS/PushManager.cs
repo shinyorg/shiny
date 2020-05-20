@@ -35,9 +35,6 @@ namespace Shiny.Push
 
         public void Start()
         {
-            if (this.IsEnabled)
-                Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.RegisterForRemoteNotifications);
-
             this.nativeDelegate
                 .WhenPresented()
                 .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
@@ -80,22 +77,27 @@ namespace Shiny.Push
                     action(UIBackgroundFetchResult.NewData);
                 }
             );
+
+            // this will be on the main thread already
+            if (!this.CurrentRegistrationToken.IsEmpty())
+                UIApplication.SharedApplication.RegisterForRemoteNotifications();
         }
 
-
-        public bool IsEnabled
-        {
-            get => this.Settings.Get(nameof(IsEnabled), false);
-            private set => this.Settings.Set(nameof(IsEnabled), value);
-        }
 
         public override IObservable<IDictionary<string, string>> WhenReceived() => this.payloadSubj;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
+            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
+                UNAuthorizationOptions.Alert |
+                UNAuthorizationOptions.Badge |
+                UNAuthorizationOptions.Sound
+            );
+            if (!result.Item1)
+                return PushAccessState.Denied;
+
             var deviceToken = await this.RequestDeviceToken(cancelToken);
-            this.IsEnabled = true;
             this.CurrentRegistrationToken = ToTokenString(deviceToken);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
@@ -109,26 +111,10 @@ namespace Shiny.Push
         }
 
 
-        protected override void ClearRegistration()
-        {
-            base.ClearRegistration();
-            this.IsEnabled = false;
-        }
-
-
         protected virtual async Task<NSData> RequestDeviceToken(CancellationToken cancelToken = default)
         {
             this.onToken = new Subject<NSData>();
             var remoteTask = this.onToken.Take(1).ToTask(cancelToken);
-
-            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
-                UNAuthorizationOptions.Alert |
-                UNAuthorizationOptions.Badge |
-                UNAuthorizationOptions.Sound
-            );
-            if (!result.Item1)
-                throw new Exception(result.Item2.LocalizedDescription);
-
             await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.RegisterForRemoteNotifications);
             var data = await remoteTask;
             return data;

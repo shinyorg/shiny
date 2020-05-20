@@ -1,7 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid90</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarinios10;monoandroid10.0</TargetFrameworks>
         <Description>Shiny Integration - Xamarin Forms</Description>
         <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
@@ -10,7 +10,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
-        <PackageReference Include="Xamarin.Forms" Version="4.6.0.726" />
+        <PackageReference Include="Xamarin.Forms" Version="4.6.0.800" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">

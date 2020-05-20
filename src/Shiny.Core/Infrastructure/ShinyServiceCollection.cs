@@ -14,15 +14,15 @@ namespace Shiny.Infrastructure.DependencyInjection
         readonly ServiceCollection services = new ServiceCollection();
 
 
-        static bool ImplementsInterface<T>(ServiceDescriptor descriptor)
-        {
-            var typeName = typeof(T).FullName;
-            var doesImpl = descriptor.ServiceType != null && descriptor.ServiceType.GetInterface(typeName) != null;
-            if (!doesImpl)
-                doesImpl = descriptor.ImplementationType != null && descriptor.ImplementationType.GetInterface(typeName) != null;
+        //static bool ImplementsInterface<T>(ServiceDescriptor descriptor)
+        //{
+        //    var typeName = typeof(T).FullName;
+        //    var doesImpl = descriptor.ServiceType != null && descriptor.ServiceType.GetInterface(typeName) != null;
+        //    if (!doesImpl)
+        //        doesImpl = descriptor.ImplementationType != null && descriptor.ImplementationType.GetInterface(typeName) != null;
 
-            return doesImpl;
-        }
+        //    return doesImpl;
+        //}
 
 
         public void RunPostBuildActions(IServiceProvider container)
@@ -46,8 +46,10 @@ namespace Shiny.Infrastructure.DependencyInjection
             }
             else if (service.ImplementationInstance is INotifyPropertyChanged npc)
             {
+                var resolveType = service.ServiceType ?? service.ImplementationInstance.GetType();
+
                 this.services.AddSingleton(
-                    service.ServiceType ?? service.ImplementationInstance.GetType(),
+                    resolveType,
                     sp =>
                     {
                         sp.Resolve<ISettings>(true).Bind(npc);
@@ -56,7 +58,7 @@ namespace Shiny.Infrastructure.DependencyInjection
                 );
             }
             // TODO; this trap IPowerManager as well
-            else if (ImplementsInterface<INotifyPropertyChanged>(service))
+            else if (Implements<INotifyPropertyChanged>(service))
             {
                 var resolveType = service.ServiceType ?? service.ImplementationType;
 
@@ -75,21 +77,38 @@ namespace Shiny.Infrastructure.DependencyInjection
                 this.AddItem(service);
             }
 
-            if (ImplementsInterface<IShinyStartupTask>(service))
+            if (service.ImplementationInstance is IShinyStartupTask task)
+            {
+                services.RegisterPostBuildAction(_ => task.Start());
+            }
+            else if (Implements<IShinyStartupTask>(service))
             {
                 services.RegisterPostBuildAction(sp =>
                 {
-                    if (service.ImplementationInstance != null)
-                    {
-                        ((IShinyStartupTask)service.ImplementationInstance).Start();
-                    }
-                    else
-                    {
-                        var resolveType = service.ServiceType ?? service.ImplementationType;
-                        ((IShinyStartupTask)sp.GetService(resolveType)).Start();
-                    }
+                    var resolveType = service.ServiceType ?? service.ImplementationType;
+                    ((IShinyStartupTask)sp.GetService(resolveType)).Start();
                 });
             }
+        }
+
+
+        static bool Implements<T>(ServiceDescriptor service)
+        {
+            if (service.ImplementationType == null)
+                return false;
+
+            var i = service.ImplementationType.GetInterface(typeof(T).FullName);
+            return i != null;
+        }
+
+
+        static bool IsStartupTask(ServiceDescriptor service)
+        {
+            if (service.ImplementationType == null)
+                return false;
+
+            var i = service.ImplementationType.GetInterface(typeof(IShinyStartupTask).FullName);
+            return i != null;
         }
 
 
