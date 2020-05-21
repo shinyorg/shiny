@@ -8,7 +8,7 @@ namespace Shiny
 {
     public static class ShinyPush
     {
-        static IPushManager Current { get; } = ShinyHost.Resolve<IPushManager>();
+        public static IPushManager Current { get; } = ShinyHost.Resolve<IPushManager>();
 
         public static IObservable<IDictionary<string, string>> WhenReceived() => Current.WhenReceived();
         public static Task<PushAccessState> RequestAccess() => Current.RequestAccess();
