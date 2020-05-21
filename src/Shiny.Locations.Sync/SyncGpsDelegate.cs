@@ -1,9 +1,9 @@
-﻿using Shiny.Locations;
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Shiny.Locations;
 
-namespace Shiny.Services.LocationSync
+
+namespace Shiny.Locations.Sync
 {
     public class SyncGpsDelegate : IGpsDelegate
     {

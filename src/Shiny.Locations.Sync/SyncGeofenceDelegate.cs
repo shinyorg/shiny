@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 
 
-namespace Shiny.Services.LocationSync
+namespace Shiny.Locations.Sync
 {
     public class SyncGeofenceDelegate : IGeofenceDelegate
     {

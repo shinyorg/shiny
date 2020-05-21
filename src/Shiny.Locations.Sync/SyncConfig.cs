@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Services.LocationSync
+namespace Shiny
 {
     public class SyncConfig
     {
