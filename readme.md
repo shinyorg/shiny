@@ -3,7 +3,8 @@
 
 Shiny is a set of libraries designed to help make device services & backgrounding easy on Xamarin & UWP platforms (with more to come).
 
-[Change Log - March 12, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
+[Change Log - May 22, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
+BREAKING INFO - ANDROID - Only AndroidX/10.0 is supported as a major target now
 
 * [Samples](https://github.com/shinyorg/shinysamples) - Shows almost every single function point within Shiny
 * [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:

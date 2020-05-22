@@ -3,6 +3,8 @@
 1.2.0
 ---
 
+[ANDROID][BREAKING] Only AndroidX is supported now!
+
 ### Shiny.Core
 * [Enhancement][Jobs] Job arguments are now like other delegates
 * [Enhancement][Jobs][iOS] Background processing JobManager is now smarter with how it deals with misconfiguration
