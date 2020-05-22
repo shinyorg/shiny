@@ -47,6 +47,7 @@ namespace Shiny.Push
                 if (!native.Color.IsEmpty())
                     notification.Android.ColorResourceName = native.Color;
 
+                // TODO: I have to intercept the response for the IPushDelegate.OnEntry
                 await this.notifications.Value.Send(notification);
             }
         });

@@ -23,6 +23,7 @@ namespace Shiny.Push
 
             if (notification != null)
             {
+                // TODO: push delegate OnEntry?
                 var headers = notification
                     .Headers?
                     .ToDictionary(

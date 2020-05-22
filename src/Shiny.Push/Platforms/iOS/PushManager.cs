@@ -54,8 +54,17 @@ namespace Shiny.Push
                 .Where(x => x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                 .SubscribeAsync(async x =>
                 {
-                    // TODO: get tap response
-                    x.CompletionHandler?.Invoke();
+                    var textReply = (x.Response as UNTextInputNotificationResponse)?.UserText;
+                    var parameters = x.Response.Notification.Request.Content.UserInfo.FromNsDictionary() ?? new Dictionary<string, string>();
+
+                    var args = new PushEntryArgs(
+                        x.Response.Notification.Request.Content.CategoryIdentifier,
+                        x.Response.ActionIdentifier,
+                        textReply,
+                        parameters
+                    );
+                    await this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
+                    x.CompletionHandler();
                 });
 
             iOSShinyHost.RegisterForRemoteNotifications(
