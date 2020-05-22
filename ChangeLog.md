@@ -3,8 +3,6 @@
 1.2.0
 ---
 
-[ANDROID][BREAKING] Only AndroidX is supported now!
-
 ### Shiny.Core
 * [Enhancement][Jobs] Job arguments are now like other delegates
 * [Enhancement][Jobs][iOS] Background processing JobManager is now smarter with how it deals with misconfiguration
@@ -17,7 +15,6 @@
 * [BREAKING][Settings] KeysNotClear and Keys enumerable have been removed to make room for more platforms and simplify the API - some methods were moved to extensions
 
 ### Shiny.Locations
-* [Enhancement][Android] AndroidX is here
 * [Enhancement][GPS] Multiple delegate registrations
 * [Enhancement][Geofencing] Multiple delegate registrations
 * [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available
@@ -31,7 +28,6 @@
 * [Fix][UWP] Cancelling notifications was not removing the notification
 
 ### Shiny.Push
-* [Enhancement][Android] AndroidX is here
 * [Enhancement] Multiple delegate registrations
 * [Enhancement] Adds ability to see when token expires (if applicable, otherwise null)
 * [Enhancement] Adds ability to register with tags, update tags, and see currently registered tags if the push mechanism supports it.  Check if IPushManager can be cast to IPushTagSupport
@@ -39,7 +35,7 @@
 ### Shiny.Push.AzureNotificationHubs
 * [Enhancement] RequestAccess with new tags support
 
-### Shiny.Locations.Sync (New Module)
+### Shiny.Locations.Sync (beta) - New Module
 * This will sync geofence and GPS events to your backend utilizing best practices with background jobs
 
 1.1.0
