@@ -1,7 +1,6 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <VersionSuffix>beta</VersionSuffix>
         <Description>Shiny addon for all your push notification needs</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid9.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>

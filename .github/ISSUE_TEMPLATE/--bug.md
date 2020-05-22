@@ -15,7 +15,7 @@ assignees: ''
  - [ ] Android
  - [ ] UWP
 
- PLATFORMS THAT YOU CANNOT FILE ISSUES ON RIGHT NOW: Tizen, watchOS, tvOS
+ PLATFORMS THAT YOU CANNOT FILE ISSUES ON RIGHT NOW: Tizen, watchOS, tvOS, macOS
 
 ## Feature Library (beta components are not fully done - issues MUST include full reproducible sample and stacktrace or they will be closed without explanation!!!)
 
@@ -23,12 +23,14 @@ assignees: ''
  - [ ] Locations
  - [ ] HTTP Transfers
  - [ ] Notifications
+ - [ ] Push
+ - [ ] Push - Azure Notification Hub
+ - [ ] Push - Firebase (beta)
  - [ ] Sensors
  - [ ] AppCenter Logging Integration
  - [ ] Location Sync (beta)
  - [ ] BluetoothLE (beta)
  - [ ] Beacons (beta)
- - [ ] Push (beta)
  - [ ] SQLite Integration (beta)
 
 
