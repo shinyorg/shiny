@@ -54,9 +54,9 @@ namespace Shiny.Push
 
         public override async void OnNewToken(string token) => await Log.SafeExecute(async () =>
         {
+            await this.pushDelegate.Value.OnTokenChanged(token);
             this.settings.Value.SetRegToken(token);
             this.settings.Value.SetRegDate(DateTime.UtcNow);
-            await this.pushDelegate.Value.OnTokenChanged(token);
         });
     }
 }

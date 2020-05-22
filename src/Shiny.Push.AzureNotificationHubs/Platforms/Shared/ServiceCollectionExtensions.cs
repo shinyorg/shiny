@@ -1,7 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 using Shiny.Notifications;
 using Shiny.Push;
+using Shiny.Push.AzureNotificationHubs;
 using Shiny.Push.AzureNotifications;
 
 
@@ -18,6 +21,9 @@ namespace Shiny
 #if NETSTANDARD2_0
             return false;
 #else
+#if __ANDROID__
+            services.AddSingleton<IPushDelegate, AndroidPushDelegate>();
+#endif
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Integrations.AzureNotifications.PushManager),
                 delegateType,

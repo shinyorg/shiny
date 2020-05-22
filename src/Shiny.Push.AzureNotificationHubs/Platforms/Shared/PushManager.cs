@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
 using Shiny.Push;
+using Shiny.Push.AzureNotificationHubs;
 using Shiny.Push.AzureNotifications;
 using Shiny.Settings;
 
@@ -12,7 +13,7 @@ using Shiny.Settings;
 
 namespace Shiny.Integrations.AzureNotifications
 {
-    public class PushManager : Shiny.Push.PushManager, IPushTagSupport
+    public class PushManager : Shiny.Push.PushManager, IPushTagSupport, IAzurePushManager
     {
         readonly NotificationHubClient hub;
 
@@ -110,6 +111,15 @@ namespace Shiny.Integrations.AzureNotifications
         {
             await this.hub.DeleteInstallationAsync(this.CurrentRegistrationToken);
             await base.UnRegister();
+        }
+
+
+        public async Task UpdateRegistrationToken(string newToken)
+        {
+            // the old token on CurrentRegistrationToken hasn't been updated yet and is updated AFTER the update below
+            var install = await this.hub.GetInstallationAsync(this.CurrentRegistrationToken);
+            install.PushChannel = newToken;
+            await this.hub.CreateOrUpdateInstallationAsync(install);
         }
 
 
