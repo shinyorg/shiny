@@ -57,7 +57,7 @@ namespace Shiny.Caching
             lock (this.syncLock)
             {
                 if (!this.cache.ContainsKey(key))
-                    return default;
+                    return Task.FromResult(default(T));
 
                 return Task.FromResult((T)this.cache[key].Object);
             }
