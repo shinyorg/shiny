@@ -2,11 +2,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.Azure.NotificationHubs;
 using Shiny.Push;
 using Shiny.Push.AzureNotifications;
 using Shiny.Settings;
-using Shiny.Notifications;
 
 
 namespace Shiny.Integrations.AzureNotifications
@@ -21,7 +21,7 @@ namespace Shiny.Integrations.AzureNotifications
         public PushManager(AzureNotificationConfig config,
                            ISettings settings,
                            IServiceProvider services,
-                           iOSNotificationDelegate ndelegate) : base(settings, services, ndelegate)
+                           Shiny.Notifications.iOSNotificationDelegate ndelegate) : base(settings, services, ndelegate)
 #elif __ANDROID__
         public PushManager(AzureNotificationConfig config,
                            AndroidContext context,
@@ -55,7 +55,6 @@ namespace Shiny.Integrations.AzureNotifications
         }
 
 
-
         public override Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => this.RequestAccess(null, cancelToken);
         public async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
         {
@@ -71,7 +70,13 @@ namespace Shiny.Integrations.AzureNotifications
                 {
                     try
                     {
-                        await this.CreateRegistration(access.RegistrationToken, tags, cancelToken);
+                        var reg = await this.CreateAnhToken(access, tags, cancelToken);
+                        this.NativeRegistrationToken = access.RegistrationToken;
+                        this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
+                        this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                        this.CurrentRegistrationToken = reg.RegistrationId;
+                        this.RegisteredTags = tags;
+
                         access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
                     }
                     catch
@@ -87,26 +92,53 @@ namespace Shiny.Integrations.AzureNotifications
 
         public override async Task UnRegister()
         {
-            this.RegisteredTags = null;
             await this.hub.DeleteRegistrationAsync(this.CurrentRegistrationToken);
+            this.RegisteredTags = null;
             await base.UnRegister();
         }
 
 
         public async Task UpdateTags(params string[] tags)
         {
-            var registrations = await this.hub.GetAllRegistrationsAsync(10);
-            foreach (var reg in registrations)
-            {
-                reg.Tags.Clear();
-                foreach (var tag in tags)
-                {
-                    if (!tag.IsEmpty())
-                        reg.Tags.Add(tag);
-                }
+            var reg = await this.GetCurrentAnhToken(CancellationToken.None);
+            reg.Tags?.Clear();
 
-                await hub.UpdateRegistrationAsync(reg);
+            foreach (var tag in tags)
+            {
+                if (!tag.IsEmpty())
+                {
+                    reg.Tags ??= new HashSet<string>();
+                    reg.Tags.Add(tag);
+                }
             }
+
+            await this.hub.UpdateRegistrationAsync(reg);
+            this.RegisteredTags = tags;
+        }
+
+
+        protected virtual Task<RegistrationDescription> GetCurrentAnhToken(CancellationToken cancelToken)
+        {
+            return this.hub.GetRegistrationAsync<RegistrationDescription>(this.CurrentRegistrationToken, cancelToken);
+//#if WINDOWS_UWP
+//            return await this.hub.GetRegistrationAsync<WindowsRegistrationDescription>(this.CurrentRegistrationToken, cancelToken);
+//#elif __IOS__
+//            return await this.hub.GetRegistrationAsync<AppleRegistrationDescription>(this.CurrentRegistrationToken, cancelToken);
+//#elif __ANDROID__
+//            return await this.hub.GetRegistrationAsync<FcmRegistrationDescription>(this.CurrentRegistrationToken, cancelToken);
+//#endif
+        }
+
+
+        protected virtual async Task<RegistrationDescription> CreateAnhToken(PushAccessState access, string[] tags, CancellationToken cancelToken)
+        {
+#if WINDOWS_UWP
+            return await this.hub.CreateWindowsNativeRegistrationAsync(access.RegistrationToken, tags, cancelToken);
+#elif __IOS__
+            return await this.hub.CreateAppleNativeRegistrationAsync(access.RegistrationToken, tags, cancelToken);
+#elif __ANDROID__
+            return await this.hub.CreateFcmNativeRegistrationAsync(access.RegistrationToken, tags, cancelToken);
+#endif
         }
 
 
@@ -123,39 +155,6 @@ namespace Shiny.Integrations.AzureNotifications
 
             return false;
         }
-
-#if XAMARIN_IOS
-        protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
-        {
-            var reg = await this.hub.CreateAppleNativeRegistrationAsync(accessToken, tags, cancelToken);
-            this.NativeRegistrationToken = accessToken;
-            this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            this.CurrentRegistrationToken = reg.RegistrationId;
-            this.RegisteredTags = tags;
-        }
-#elif WINDOWS_UWP
-        protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
-        {
-            var reg = await this.hub.CreateWindowsNativeRegistrationAsync(accessToken, tags, cancelToken);
-            this.NativeRegistrationToken = accessToken;
-            this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            this.CurrentRegistrationToken = reg.RegistrationId;
-            this.RegisteredTags = tags;
-        }
-
-#else
-        protected virtual async Task CreateRegistration(string accessToken, string[] tags, CancellationToken cancelToken)
-        {
-            var reg = await this.hub.CreateFcmNativeRegistrationAsync(accessToken, tags, cancelToken);
-            this.NativeRegistrationToken = accessToken;
-            this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            this.CurrentRegistrationToken = reg.RegistrationId;
-            this.RegisteredTags = tags;
-        }
-#endif
     }
 }
 #endif

@@ -6,19 +6,21 @@
 ### Shiny.Core
 * [Enhancement][Jobs] Job arguments are now like other delegates
 * [Enhancement][Jobs][iOS] Background processing JobManager is now smarter with how it deals with misconfiguration
+* [Enhancement][Jobs] New Extension called RunJobAsTask which allows you to run a job function
 * [Enhancement][Logging] Global logging parameters via Log.Properties
 * [Fix][iOS] NSDictionary fixes
+* [Fix][Cache] Fix await issue in memory cache
 * [Fix][Settings][Android] Preferences are now private
 * [Fix][Settings][iOS] Using Preferences with Shiny Settings could cause issues
 * [BREAKING][Settings] KeysNotClear and Keys enumerable have been removed to make room for more platforms and simplify the API - some methods were moved to extensions
 
 ### Shiny.Locations
-* [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available
-* [Fix][GPS/Geofencing][Android] Properly check everything under Android 8.1
-* [Fix][Geofencing][Android] StopAllMonitoring shouldn't error if there are no geofences
 * [Enhancement][Android] AndroidX is here
 * [Enhancement][GPS] Multiple delegate registrations
 * [Enhancement][Geofencing] Multiple delegate registrations
+* [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available
+* [Fix][GPS/Geofencing][Android] Properly check everything under Android 8.1
+* [Fix][Geofencing][Android] StopAllMonitoring shouldn't error if there are no geofences
 
 ### Shiny.Notifications
 * [Enhancement] Multiple delegate registrations
@@ -35,6 +37,8 @@
 ### Shiny.Push.AzureNotificationHubs
 * [Enhancement] RequestAccess with new tags support
 
+### Shiny.Locations.Sync (New Module)
+* This will sync geofence and GPS events to your backend utilizing best practices with background jobs
 
 1.1.0
 ---
