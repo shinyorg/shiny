@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Locations;
 using Shiny.Locations.Sync;
 
 
@@ -19,7 +20,7 @@ namespace Shiny
             // TODO: register config options
             services.RegisterJob(typeof(SyncJob));
             services.AddSingleton<IGeofenceSyncDelegate, T>();
-            services.UseGeofencing<SyncGeofenceDelegate>(requestPermissionOnStart);
+            services.UseGeofencing<SyncLocationDelegate>(requestPermissionOnStart);
         }
 
 
@@ -32,6 +33,7 @@ namespace Shiny
             where T: class, IGpsSyncDelegate
         {
             //services.RegisterJob(typeof(SyncJob));
+            services.AddSingleton<IGpsDelegate, SyncLocationDelegate>();
             services.AddSingleton<IGpsSyncDelegate, T>();
         }
     }
