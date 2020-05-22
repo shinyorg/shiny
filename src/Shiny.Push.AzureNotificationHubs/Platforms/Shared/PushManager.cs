@@ -1,12 +1,13 @@
 ﻿#if !NETSTANDARD2_0
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Microsoft.Azure.NotificationHubs;
 using Shiny.Push;
 using Shiny.Push.AzureNotifications;
 using Shiny.Settings;
+
 
 
 namespace Shiny.Integrations.AzureNotifications
@@ -14,6 +15,7 @@ namespace Shiny.Integrations.AzureNotifications
     public class PushManager : Shiny.Push.PushManager, IPushTagSupport
     {
         readonly NotificationHubClient hub;
+
 
 #if WINDOWS_UWP
         public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
@@ -70,11 +72,25 @@ namespace Shiny.Integrations.AzureNotifications
                 {
                     try
                     {
-                        var reg = await this.CreateAnhToken(access, tags, cancelToken);
+                        var install = new Installation
+                        {
+                            InstallationId = access.RegistrationToken,
+                            PushChannel = access.RegistrationToken,
+                            Tags = tags?.ToList(),
+#if WINDOWS_UWP
+                            Platform = NotificationPlatform.Wns
+#elif __IOS__
+                            Platform = NotificationPlatform.Apns
+#elif __ANDROID__
+                            Platform = NotificationPlatform.Fcm
+#endif
+                        };
+                        await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken);
+
                         this.NativeRegistrationToken = access.RegistrationToken;
-                        this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
+                        //this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
                         this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                        this.CurrentRegistrationToken = reg.RegistrationId;
+                        this.CurrentRegistrationToken = access.RegistrationToken;
                         this.RegisteredTags = tags;
 
                         access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
@@ -92,53 +108,26 @@ namespace Shiny.Integrations.AzureNotifications
 
         public override async Task UnRegister()
         {
-            await this.hub.DeleteRegistrationAsync(this.CurrentRegistrationToken);
-            this.RegisteredTags = null;
+            await this.hub.DeleteInstallationAsync(this.CurrentRegistrationToken);
             await base.UnRegister();
         }
 
 
         public async Task UpdateTags(params string[] tags)
         {
-            var reg = await this.GetCurrentAnhToken(CancellationToken.None);
-            reg.Tags?.Clear();
+            var install = await this.hub.GetInstallationAsync(this.CurrentRegistrationToken);
+            install.Tags = tags.ToList();
+            await this.hub.CreateOrUpdateInstallationAsync(install);
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
 
-            foreach (var tag in tags)
-            {
-                if (!tag.IsEmpty())
-                {
-                    reg.Tags ??= new HashSet<string>();
-                    reg.Tags.Add(tag);
-                }
-            }
-
-            await this.hub.UpdateRegistrationAsync(reg);
             this.RegisteredTags = tags;
         }
 
 
-        protected virtual Task<RegistrationDescription> GetCurrentAnhToken(CancellationToken cancelToken)
+        protected override void ClearRegistration()
         {
-            return this.hub.GetRegistrationAsync<RegistrationDescription>(this.CurrentRegistrationToken, cancelToken);
-//#if WINDOWS_UWP
-//            return await this.hub.GetRegistrationAsync<WindowsRegistrationDescription>(this.CurrentRegistrationToken, cancelToken);
-//#elif __IOS__
-//            return await this.hub.GetRegistrationAsync<AppleRegistrationDescription>(this.CurrentRegistrationToken, cancelToken);
-//#elif __ANDROID__
-//            return await this.hub.GetRegistrationAsync<FcmRegistrationDescription>(this.CurrentRegistrationToken, cancelToken);
-//#endif
-        }
-
-
-        protected virtual async Task<RegistrationDescription> CreateAnhToken(PushAccessState access, string[] tags, CancellationToken cancelToken)
-        {
-#if WINDOWS_UWP
-            return await this.hub.CreateWindowsNativeRegistrationAsync(access.RegistrationToken, tags, cancelToken);
-#elif __IOS__
-            return await this.hub.CreateAppleNativeRegistrationAsync(access.RegistrationToken, tags, cancelToken);
-#elif __ANDROID__
-            return await this.hub.CreateFcmNativeRegistrationAsync(access.RegistrationToken, tags, cancelToken);
-#endif
+            base.ClearRegistration();
+            this.RegisteredTags = null;
         }
 
 
