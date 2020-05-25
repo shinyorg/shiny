@@ -24,12 +24,14 @@ namespace Shiny.Locations.Sync
             var e = new GpsEvent
             {
                 Id = Guid.NewGuid().ToString(),
+                DateCreated = DateTimeOffset.UtcNow,
+
                 Latitude = reading.Position.Latitude,
                 Longitude = reading.Position.Longitude,
                 Heading = reading.Heading,
                 HeadingAccuracy = reading.HeadingAccuracy,
                 Speed = reading.Speed,
-                PositionAccuracy = reading.PositionAccuracy
+                PositionAccuracy = reading.PositionAccuracy                
             };
             await this.repository.Set(e.Id, e);
             if (!this.jobManager.IsRunning)
@@ -42,9 +44,10 @@ namespace Shiny.Locations.Sync
             var e = new GeofenceEvent
             {
                 Id = Guid.NewGuid().ToString(),
+                DateCreated = DateTimeOffset.UtcNow,
+
                 Identifier = region.Identifier,
-                Entered = newStatus == GeofenceState.Entered,
-                DateCreated = DateTimeOffset.UtcNow
+                Entered = newStatus == GeofenceState.Entered                
             };
             await this.repository.Set(e.Id, e);
             if (!this.jobManager.IsRunning)
