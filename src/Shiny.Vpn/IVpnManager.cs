@@ -7,6 +7,10 @@ namespace Shiny.Vpn
 {
     public interface IVpnManager
     {
-        //Task Connect();
+        Task Connect(VpnConnectionOptions opts);
+        Task Disconnect();
+
+        VpnConnectionState Status { get; }
+        IObservable<VpnConnectionState> WhenStatusChanged();
     }
 }
