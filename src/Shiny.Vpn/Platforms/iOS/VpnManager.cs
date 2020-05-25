@@ -25,14 +25,8 @@ namespace Shiny.Vpn
 
         public Task Connect(VpnConnectionOptions opts)
         {
-            var c = NEVpnManager.SharedManager.Connection;
-            if (!c.StartVpnTunnel(null, out NSError e)) 
-                throw new ArgumentException("Unable to start VPN - " + e.LocalizedDescription);
-            
-
-            //NEVpnManager.SharedManager.Connection.StartVpnTunnel
-            //NEVpnManager.SharedManager.Connection.StopVpnTunnel()
-            //NEVpnManager.SharedManager.Connection.Status == NEVpnStatus.Connected
+            this.SetProtocol(opts);
+            this.StartConnection(opts);
             //NEVpnManager.SharedManager.Enabled
             //NEVpnManager.SharedManager.SaveToPreferencesAsync
             //NEVpnManager.SharedManager.RemoveFromPreferencesAsync
@@ -42,6 +36,7 @@ namespace Shiny.Vpn
 
         public Task Disconnect()
         {
+            NEVpnManager.SharedManager.Connection.StopVpnTunnel();
             return Task.CompletedTask;
         }
 
@@ -54,6 +49,47 @@ namespace Shiny.Vpn
                     ob.OnNext(this.Status)
                 );
                 return () => sub.Dispose();
-            });
+            })
+            .DistinctUntilChanged();
+
+
+        protected virtual void SetProtocol(VpnConnectionOptions opts)
+        {
+            var mgr = NEVpnManager.SharedManager;
+            mgr.Protocol = new NEVpnProtocolIpSec
+            {
+                //AuthenticationMethod = NEVpnIp.Certificate, // Certificate, None, SharedSecret
+                LocalIdentifier = "shiny",
+                RemoteIdentifier = "shiny",
+                //PasswordReference = ""
+                ServerAddress = opts.ServerAddress,
+                SharedSecretReference = NSData.FromString("")
+            };
+            mgr.Protocol = new NEVpnProtocolIke2
+            {
+                //CertificateType = NEVpnIke2CertificateType.ECDSA256,
+                //ServerCertificateCommonName = "",
+                //ServerCertificateIssuerCommonName = "",
+                //PasswordReference
+                AuthenticationMethod = NEVpnIkeAuthenticationMethod.None, // Certificate, None, SharedSecret
+                LocalIdentifier = "shiny",
+                RemoteIdentifier = "shiny",
+                ServerAddress = opts.ServerAddress,
+                SharedSecretReference = NSData.FromString("")
+            };
+        }
+
+
+        protected virtual void StartConnection(VpnConnectionOptions opts)
+        {
+            var native = new NEVpnConnectionStartOptions();
+            var c = NEVpnManager.SharedManager.Connection;
+
+            native.Username = new NSString(opts.UserName);
+            native.Password = new NSString(opts.Password);
+
+            if (!c.StartVpnTunnel(native, out var e))
+                throw new ArgumentException("Unable to start VPN - " + e.LocalizedDescription);
+        }
     }
 }
