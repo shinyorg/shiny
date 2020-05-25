@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Locations;
 using Shiny.Locations.Sync;
 
@@ -14,12 +15,12 @@ namespace Shiny
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
         /// <param name="requestPermissionOnStart"></param>
-        public static void UseGeofenceSync<T>(this IServiceCollection services, bool requestPermissionOnStart = false)
+        public static void UseGeofencingSync<T>(this IServiceCollection services, bool requestPermissionOnStart = false)
             where T: class, IGeofenceSyncDelegate
         {
-            // TODO: register config options
-            services.RegisterJob(typeof(SyncJob));
+            RegJob(services, Constants.GeofenceJobIdentifer);
             services.AddSingleton<IGeofenceSyncDelegate, T>();
+            services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
             services.UseGeofencing<SyncLocationDelegate>(requestPermissionOnStart);
         }
 
@@ -32,9 +33,17 @@ namespace Shiny
         public static void UseGpsSync<T>(this IServiceCollection services)
             where T: class, IGpsSyncDelegate
         {
-            //services.RegisterJob(typeof(SyncJob));
+            RegJob(services, Constants.GpsJobIdentifier);
+            services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
             services.AddSingleton<IGpsDelegate, SyncLocationDelegate>();
             services.AddSingleton<IGpsSyncDelegate, T>();
+        }
+
+
+        static void RegJob(IServiceCollection services, string identifier)
+        {
+            services.UseJobForegroundService(TimeSpan.FromSeconds(30));
+            services.RegisterJob(typeof(SyncJob), identifier, runInForeground: true);
         }
     }
 }
