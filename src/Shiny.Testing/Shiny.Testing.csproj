@@ -6,6 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <Compile Remove="BluetoothLE\**\*.cs" />
+        <None Include="BluetoothLE\**\*.cs" />
+    </ItemGroup>
+    
+    <ItemGroup>
         <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
