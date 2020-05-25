@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <VersionSuffix>beta</VersionSuffix>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid9.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
         <Description>Shiny Push Integration - Firebase Messaging</Description>
     </PropertyGroup>
 
