@@ -127,11 +127,13 @@ namespace Shiny.Jobs
                 null,
                 async task =>
                 {
-                    var cancelSrc = new CancellationTokenSource();
-                    task.ExpirationHandler = cancelSrc.Cancel;
+                    using (var cancelSrc = new CancellationTokenSource())
+                    { 
+                        task.ExpirationHandler = cancelSrc.Cancel;
 
-                    var result = await this.Run(task.Identifier, cancelSrc.Token);
-                    task.SetTaskCompleted(result.Exception != null);
+                        var result = await this.Run(task.Identifier, cancelSrc.Token);
+                        task.SetTaskCompleted(result.Exception != null);
+                    }
                 }
             );
         }
