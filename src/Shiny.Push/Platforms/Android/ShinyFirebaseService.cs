@@ -16,13 +16,12 @@ namespace Shiny.Push
         public const string IntentAction = "com.google.firebase.MESSAGING_EVENT";
         readonly Lazy<ISettings> settings = ShinyHost.LazyResolve<ISettings>();
         readonly Lazy<INotificationManager> notifications = ShinyHost.LazyResolve<INotificationManager>();
-        readonly Lazy<IPushDelegate> pushDelegate = ShinyHost.LazyResolve<IPushDelegate>();
         readonly Lazy<IMessageBus> msgBus = ShinyHost.LazyResolve<IMessageBus>();
 
 
         public override async void OnMessageReceived(RemoteMessage message) => await Log.SafeExecute(async () =>
         {
-            await this.pushDelegate.Value.OnReceived(message.Data);
+            await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data));
             this.msgBus.Value.Publish(
                 nameof(ShinyFirebaseService),
                 message.Data
@@ -55,7 +54,7 @@ namespace Shiny.Push
 
         public override async void OnNewToken(string token) => await Log.SafeExecute(async () =>
         {
-            await this.pushDelegate.Value.OnTokenChanged(token);
+            await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token));
             this.settings.Value.SetRegToken(token);
             this.settings.Value.SetRegDate(DateTime.UtcNow);
         });

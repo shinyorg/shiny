@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>Shiny addon for all your push notification needs</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid9.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
@@ -57,10 +57,10 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <PackageReference Include="Xamarin.Firebase.Common" Version="[71.1610.0, 72)" />
-        <PackageReference Include="Xamarin.Firebase.Messaging" Version="[71.1740.0, 72)" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="[71.1620.0, 72)" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="[71.1601.0, 72)" />
+        <PackageReference Include="Xamarin.Firebase.Common" Version="[71.1610.1, 72)" />
+        <PackageReference Include="Xamarin.Firebase.Messaging" Version="[71.1740.1, 72)" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="[71.1620.2, 72)" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="[71.1601.1, 72)" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
@@ -68,10 +68,10 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <PackageReference Include="Xamarin.Firebase.Common" Version="119.0.0-preview02" />
-        <PackageReference Include="Xamarin.Firebase.Messaging" Version="119.0.1-preview02" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="117.1.0-preview02" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="117.0.0-preview02" />
+        <PackageReference Include="Xamarin.Firebase.Common" Version="119.0.0-preview03" />
+        <PackageReference Include="Xamarin.Firebase.Messaging" Version="119.0.1-preview03" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="117.1.0-preview03" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="117.0.0-preview03" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>

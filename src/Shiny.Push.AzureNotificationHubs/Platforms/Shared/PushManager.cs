@@ -10,7 +10,6 @@ using Shiny.Push.AzureNotifications;
 using Shiny.Settings;
 
 
-
 namespace Shiny.Integrations.AzureNotifications
 {
     public class PushManager : Shiny.Push.PushManager, IPushTagSupport, IAzurePushManager
