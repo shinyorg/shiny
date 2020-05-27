@@ -4,15 +4,15 @@ using Shiny.Infrastructure;
 using Shiny.Jobs;
 
 
-namespace Shiny.Locations.Sync
+namespace Shiny.Locations.Sync.Infrastructure
 {
-    public class SyncLocationDelegate : IGpsDelegate, IGeofenceDelegate
+    public class SyncGpsDelegate : IGpsDelegate
     {
         readonly IJobManager jobManager;
         readonly IRepository repository;
 
 
-        public SyncLocationDelegate(IJobManager jobManager, IRepository repository)
+        public SyncGpsDelegate(IJobManager jobManager, IRepository repository)
         {
             this.jobManager = jobManager;
             this.repository = repository;
@@ -31,27 +31,11 @@ namespace Shiny.Locations.Sync
                 Heading = reading.Heading,
                 HeadingAccuracy = reading.HeadingAccuracy,
                 Speed = reading.Speed,
-                PositionAccuracy = reading.PositionAccuracy                
+                PositionAccuracy = reading.PositionAccuracy
             };
             await this.repository.Set(e.Id, e);
             if (!this.jobManager.IsRunning)
                 await this.jobManager.RunJobAsTask(Constants.GpsJobIdentifier);
-        }
-
-
-        public async Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
-        {
-            var e = new GeofenceEvent
-            {
-                Id = Guid.NewGuid().ToString(),
-                DateCreated = DateTimeOffset.UtcNow,
-
-                Identifier = region.Identifier,
-                Entered = newStatus == GeofenceState.Entered                
-            };
-            await this.repository.Set(e.Id, e);
-            if (!this.jobManager.IsRunning)
-                await this.jobManager.RunJobAsTask(Constants.GeofenceJobIdentifer);
         }
     }
 }

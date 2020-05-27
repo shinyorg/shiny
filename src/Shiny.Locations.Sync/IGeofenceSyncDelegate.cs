@@ -6,6 +6,6 @@ namespace Shiny.Locations.Sync
 {
     public interface IGeofenceSyncDelegate
     {
-        Task Process(GeofenceEvent geofence);
+        Task Process(GeofenceEvent[] geofence);
     }
 }

@@ -6,6 +6,6 @@ namespace Shiny.Locations.Sync
 {
     public interface IGpsSyncDelegate
     {
-        Task Process(GpsEvent gpsEvent);
+        Task Process(GpsEvent[] gpsEvent);
     }
 }
