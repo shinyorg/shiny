@@ -56,19 +56,6 @@ namespace Shiny.Integrations.AzureNotifications
         }
 
 
-        public string[]? RegisteredTags
-        {
-            get => this.Settings.Get<string[]>(nameof(this.RegisteredTags));
-            private set
-            {
-                if (value == null)
-                    this.Settings.Remove(nameof(this.RegisteredTags));
-                else
-                    this.Settings.Set(nameof(this.RegisteredTags), value);
-            }
-        }
-
-
         public string? NativeRegistrationToken
         {
             get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
@@ -163,7 +150,6 @@ namespace Shiny.Integrations.AzureNotifications
         {
             base.ClearRegistration();
             this.InstallationId = null;
-            this.RegisteredTags = null;
         }
 
 
