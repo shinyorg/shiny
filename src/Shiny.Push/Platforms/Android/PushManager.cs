@@ -41,7 +41,10 @@ namespace Shiny.Push
             ////    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
             ////        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
             //}
-            var result = await FirebaseInstanceId.Instance.GetInstanceId().AsAsync<IInstanceIdResult>();
+            var result = await FirebaseInstanceId
+                .Instance
+                .GetInstanceId()
+                .AsAsync<IInstanceIdResult>();
 
             this.CurrentRegistrationToken = result.Token;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
