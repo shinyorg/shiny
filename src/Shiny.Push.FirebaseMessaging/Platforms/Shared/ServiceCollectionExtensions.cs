@@ -19,5 +19,19 @@ namespace Shiny
             return false;
 #endif
         }
+
+
+        public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType)
+        {
+#if XAMARIN_IOS
+            services.AddSingleton<IPushManager, Shiny.Push.FirebaseMessaging.PushManager>();
+            services.AddSingleton(typeof(IPushDelegate), delegateType);
+            return true;
+#elif __ANDROID__
+            return services.UsePush(delegateType);
+#else
+            return false;
+#endif
+        }
     }
 }
