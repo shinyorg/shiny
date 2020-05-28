@@ -3,11 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 
 
-namespace Shiny.Push.AzureNotificationHubs
+namespace Shiny
 {
-    public class ShinyAzureNotificationHubAttribute : ServiceModuleAttribute
+    public class ShinyPushAzureNotificationHubAttribute : ServiceModuleAttribute
     {
-        public ShinyAzureNotificationHubAttribute(Type delegateType, string connectionString, string hubName)
+        public ShinyPushAzureNotificationHubAttribute(Type delegateType, string connectionString, string hubName)
         {
             this.DelegateType = delegateType;
             this.ConnectionString = connectionString;
