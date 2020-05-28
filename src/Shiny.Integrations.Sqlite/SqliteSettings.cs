@@ -15,11 +15,11 @@ namespace Shiny.Integrations.Sqlite
 
 
         public override bool Contains(string key)
-            => this.conn.GetConnection().Get<SettingStore>(key) != null;
+            => this.conn.GetConnection().Find<SettingStore>(key) != null;
 
 
         protected override object? NativeGet(Type type, string key)
-            => this.conn.GetConnection().Get<SettingStore>(key)?.GetValue();
+            => this.conn.GetConnection().Find<SettingStore>(key)?.GetValue();
 
 
         protected override void NativeClear()
