@@ -9,13 +9,14 @@ namespace Shiny.Caching
     public class RepositoryCache : AbstractTimerCache
     {
         readonly IRepository repository;
+        readonly ISerializer serializer;
 
-
-        public RepositoryCache(IRepository repository,
+        public RepositoryCache(IRepository repository, ISerializer serializer,
                                TimeSpan? defaultLifeSpan = null,
                                TimeSpan? cleanUpTimer = null)
         {
             this.repository = repository;
+            this.serializer = serializer;
 
             this.DefaultLifeSpan = defaultLifeSpan ?? TimeSpan.FromMinutes(10);
             this.CleanUpTime = cleanUpTimer ?? TimeSpan.FromSeconds(20);
@@ -28,11 +29,14 @@ namespace Shiny.Caching
 
         public override async Task<T> Get<T>(string key)
         {
-            var cache = await this.repository.Get<CacheItem>(key);
-            if (cache?.Object == null)
+            var item = await this.repository.Get<CacheItem>(key);
+            if (item?.Object == null)
                 return default;
 
-            return (T)cache.Object;
+            if (!(item.Object is T cache))
+                cache = this.serializer.Deserialize<T>(item.Object.ToString());
+
+            return cache;
         }
 
 

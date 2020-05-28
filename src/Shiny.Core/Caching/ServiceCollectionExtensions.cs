@@ -40,7 +40,8 @@ namespace Shiny
             => services.AddSingleton<ICache>(sp =>
             {
                 var repository = sp.GetRequiredService<IRepository>();
-                return new RepositoryCache(repository, defaultLifespan, cleanUpTimer);
+                var serializer = sp.GetRequiredService<ISerializer>();
+                return new RepositoryCache(repository, serializer, defaultLifespan, cleanUpTimer);
             });
     }
 }
