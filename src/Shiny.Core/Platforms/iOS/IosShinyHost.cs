@@ -23,9 +23,9 @@ namespace Shiny
                 services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
                 services.TryAddSingleton<IFileSystem, FileSystemImpl>();
                 services.TryAddSingleton<ISettings, SettingsImpl>();
-                if (BgTasksJobManager.IsAvailable)
-                    services.TryAddSingleton<IJobManager, BgTasksJobManager>();
-                else
+                //if (BgTasksJobManager.IsAvailable)
+                //    services.TryAddSingleton<IJobManager, BgTasksJobManager>();
+                //else
                     services.TryAddSingleton<IJobManager, JobManager>();
 
                 platformBuild?.Invoke(services);
