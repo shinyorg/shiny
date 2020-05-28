@@ -43,17 +43,42 @@ namespace Shiny.Integrations.AzureNotifications
         }
 
 
+        public string? InstallationId
+        {
+            get => this.Settings.Get<string>(nameof(this.InstallationId));
+            private set
+            {
+                if (value == null)
+                    this.Settings.Remove(nameof(this.InstallationId));
+                else
+                    this.Settings.Set(nameof(this.InstallationId), value);
+            }
+        }
+
+
         public string[]? RegisteredTags
         {
             get => this.Settings.Get<string[]>(nameof(this.RegisteredTags));
-            private set => this.Settings.Set(nameof(this.RegisteredTags), value);
+            private set
+            {
+                if (value == null)
+                    this.Settings.Remove(nameof(this.RegisteredTags));
+                else
+                    this.Settings.Set(nameof(this.RegisteredTags), value);
+            }
         }
 
 
         public string? NativeRegistrationToken
         {
             get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
-            protected set => this.Settings.Set(nameof(this.NativeRegistrationToken), value);
+            protected set
+            {
+                if (value == null)
+                    this.Settings.Remove(nameof(this.NativeRegistrationToken));
+                else
+                    this.Settings.Set(nameof(this.NativeRegistrationToken), value);
+            }
         }
 
 
@@ -61,6 +86,8 @@ namespace Shiny.Integrations.AzureNotifications
         public async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
         {
             var access = await base.RequestAccess();
+            if (this.InstallationId == null)
+                this.InstallationId = Guid.NewGuid().ToString().Replace("-", "");
 
             if (access.Status == AccessState.Available)
             {
@@ -74,7 +101,7 @@ namespace Shiny.Integrations.AzureNotifications
                     {
                         var install = new Installation
                         {
-                            InstallationId = access.RegistrationToken,
+                            InstallationId = this.InstallationId,
                             PushChannel = access.RegistrationToken,
                             Tags = tags?.ToList(),
 #if WINDOWS_UWP
@@ -108,15 +135,14 @@ namespace Shiny.Integrations.AzureNotifications
 
         public override async Task UnRegister()
         {
-            await this.hub.DeleteInstallationAsync(this.CurrentRegistrationToken);
+            await this.hub.DeleteInstallationAsync(this.InstallationId);            
             await base.UnRegister();
         }
 
 
         public async Task UpdateRegistrationToken(string newToken)
         {
-            // the old token on CurrentRegistrationToken hasn't been updated yet and is updated AFTER the update below
-            var install = await this.hub.GetInstallationAsync(this.CurrentRegistrationToken);
+            var install = await this.hub.GetInstallationAsync(this.InstallationId);
             install.PushChannel = newToken;
             await this.hub.CreateOrUpdateInstallationAsync(install);
         }
@@ -124,7 +150,7 @@ namespace Shiny.Integrations.AzureNotifications
 
         public async Task UpdateTags(params string[] tags)
         {
-            var install = await this.hub.GetInstallationAsync(this.CurrentRegistrationToken);
+            var install = await this.hub.GetInstallationAsync(this.InstallationId);
             install.Tags = tags.ToList();
             await this.hub.CreateOrUpdateInstallationAsync(install);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
@@ -136,6 +162,7 @@ namespace Shiny.Integrations.AzureNotifications
         protected override void ClearRegistration()
         {
             base.ClearRegistration();
+            this.InstallationId = null;
             this.RegisteredTags = null;
         }
 

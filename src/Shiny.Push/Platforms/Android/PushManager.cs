@@ -94,6 +94,7 @@ namespace Shiny.Push
 
         public virtual async Task UnRegister()
         {
+            this.ClearRegistration();
             FirebaseMessaging.Instance.AutoInitEnabled = false;
 
             // must be executed off proc
