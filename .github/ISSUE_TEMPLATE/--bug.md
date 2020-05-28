@@ -17,7 +17,9 @@ assignees: ''
 
  PLATFORMS THAT YOU CANNOT FILE ISSUES ON RIGHT NOW: Tizen, watchOS, tvOS, macOS
 
-## Feature Library (beta components are not fully done - issues MUST include full reproducible sample and stacktrace or they will be closed without explanation!!!)
+## Feature Library
+
+### beta components are not fully done - issues MUST include full reproducible sample and stacktrace or they will be closed without explanation!!!
 
  - [ ] Core
  - [ ] Locations
@@ -31,7 +33,7 @@ assignees: ''
  - [ ] Location Sync (beta)
  - [ ] BluetoothLE (beta)
  - [ ] Beacons (beta)
- - [ ] SQLite Integration (beta)
+ - [ ] SQLite Integration
 
 
 
