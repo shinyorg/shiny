@@ -3,7 +3,7 @@
 
 namespace Shiny.Tests.Integrations.Sqlite
 {
-    public class SettingsTest
+    public class SqliteSettingsTest
     {
     }
 }

@@ -3,9 +3,9 @@ using System.Linq;
 using Shiny.Infrastructure;
 
 
-namespace Shiny.Tests.Infrastructure
+namespace Shiny.Tests.Repositories
 {
-    public class FileSystemRepositoryTests : BaseRepositoryTests<FileSystemRepositoryImpl>
+    public class FileSystemRepositoryTests : BaseRepositoryTests
     {
         readonly ShinySerializer serializer;
         readonly FileSystemImpl fileSystem;
@@ -20,8 +20,7 @@ namespace Shiny.Tests.Infrastructure
         }
 
 
-
-        protected override FileSystemRepositoryImpl Create() => new FileSystemRepositoryImpl(
+        protected override IRepository Create() => new FileSystemRepositoryImpl(
             this.fileSystem,
             this.serializer
         );

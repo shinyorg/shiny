@@ -6,7 +6,7 @@ using Shiny.Notifications;
 using Xunit;
 
 
-namespace Shiny.Tests
+namespace Shiny.Tests.Serialization
 {
     public abstract class BaseSerializationTests<T> where T : ISerializer
     {

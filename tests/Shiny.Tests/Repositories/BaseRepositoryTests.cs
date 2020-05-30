@@ -3,11 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Shiny.Infrastructure;
-using Shiny.Tests.Infrastructure;
 using Xunit;
 
 
-namespace Shiny.Tests
+namespace Shiny.Tests.Repositories
 {
     public class TestModel
     {
@@ -22,9 +21,9 @@ namespace Shiny.Tests
     }
 
 
-    public abstract class BaseRepositoryTests<T> where T : IRepository
+    public abstract class BaseRepositoryTests
     {
-        protected abstract T Create();
+        protected abstract IRepository Create();
 
 
         [Fact]

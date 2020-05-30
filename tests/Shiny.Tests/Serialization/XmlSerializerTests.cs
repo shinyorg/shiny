@@ -1,7 +1,8 @@
 ﻿//using System;
 //using Shiny.Infrastructure;
 
-//namespace Shiny.Tests.Infrastructure
+
+//namespace Shiny.Tests.Serialization
 //{
 //    public class XmlSerializationTests : BaseSerializationTests<XmlSerializerImpl>
 //    {

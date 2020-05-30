@@ -5,14 +5,16 @@ using Shiny.Logging;
 
 namespace Shiny.Caching
 {
-    public abstract class AbstractTimerCache : AbstractCache
+    public abstract class AbstractTimerCache : AbstractCache, IShinyStartupTask
     {
-        readonly Timer timer;
+        readonly Timer timer = new Timer();
 
 
-        protected AbstractTimerCache()
+        public void Start()
         {
-            this.timer = new Timer();
+            this.timer.Interval = this.CleanUpTime.TotalMilliseconds;
+            this.timer.Elapsed += this.OnTimerElapsed;
+            this.timer.Start();
         }
 
 
@@ -24,14 +26,6 @@ namespace Shiny.Caching
 
 
         protected abstract Task OnTimerElapsed();
-
-
-        protected override void Init()
-        {
-            this.timer.Interval = this.CleanUpTime.TotalMilliseconds;
-            this.timer.Elapsed += this.OnTimerElapsed;
-            this.timer.Start();
-        }
 
 
         async void OnTimerElapsed(object sender, ElapsedEventArgs args)
