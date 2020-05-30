@@ -8,7 +8,6 @@ namespace Shiny.Caching
 {
     public class VoidCache : AbstractCache
     {
-        protected override void Init() { }
         public override Task<T> Get<T>(string key) => Task.FromResult(default(T));
         public override Task Set(string key, object obj, TimeSpan? timeSpan = null) => Task.CompletedTask;
         public override Task Clear() => Task.CompletedTask;
