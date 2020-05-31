@@ -17,9 +17,8 @@ namespace Shiny.Locations.Sync
     public interface ILocationSyncManager
     {
         Task ForceRun(LocationSyncType? syncType = null);
-
-        Task<SyncConfig?> GetConfig(LocationSyncType syncType);
-        Task SetConfig(LocationSyncType syncType, SyncConfig config);
+        //Task<SyncConfig?> GetConfig(LocationSyncType syncType);
+        //Task SetConfig(LocationSyncType syncType, SyncConfig config);
         Task ClearEvents(LocationSyncType? syncType = null);
 
         Task<IList<GeofenceEvent>> GetPendingGeofenceEvents();
@@ -72,27 +71,27 @@ namespace Shiny.Locations.Sync
             : Constants.GpsJobIdentifier;
 
 
-        public async Task<SyncConfig?> GetConfig(LocationSyncType syncType)
-        {
-            var key = GetKey(syncType);
-            var job = await this.jobManager.GetJob(key);
-            if (job == null)
-                return null;
+        //public async Task<SyncConfig?> GetConfig(LocationSyncType syncType)
+        //{
+        //    var key = GetKey(syncType);
+        //    var job = await this.jobManager.GetJob(key);
+        //    if (job == null)
+        //        return null;
 
-            return job.GetParameter<SyncConfig>(Constants.SyncConfigJobParameterKey);
-        }
+        //    return job.GetParameter<SyncConfig>(Constants.SyncConfigJobParameterKey);
+        //}
 
 
-        public async Task SetConfig(LocationSyncType syncType, SyncConfig config)
-        {
-            var key = GetKey(syncType);
-            var job = await this.jobManager.GetJob(key);
-            if (job == null)
-                throw new ArgumentException("LocationSync type is not active");
+        //public async Task SetConfig(LocationSyncType syncType, SyncConfig config)
+        //{
+        //    var key = GetKey(syncType);
+        //    var job = await this.jobManager.GetJob(key);
+        //    if (job == null)
+        //        throw new ArgumentException("LocationSync type is not active");
 
-            job.SetParameter(Constants.SyncConfigJobParameterKey, config);
-            await this.jobManager.Schedule(job);
-        }
+        //    job.SetParameter(Constants.SyncConfigJobParameterKey, config);
+        //    await this.jobManager.Schedule(job);
+        //}
 
 
         public async Task ClearEvents(LocationSyncType? syncType = null)
