@@ -27,15 +27,13 @@ namespace Shiny.Locations.Sync.Infrastructure
                 jobInfo.Repeat = false;
                 return false;
             }
-            var events = await this.repository.GetAll<GeofenceEvent>();
-            foreach (var e in events)
-            {
-                //await this.geofences.Process(e);
-                await this.repository.Remove<GeofenceEvent>(e.Id);
-            }
 
-
-            throw new NotImplementedException();
+            var result = await JobProcessor.Process<GeofenceEvent>(
+                jobInfo,
+                this.repository,
+                pings => this.geofences.Process(pings)
+            );
+            return result;
         }
     }
 }

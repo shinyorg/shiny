@@ -15,7 +15,6 @@ namespace Shiny.Locations.Sync.Infrastructure
 
         public SyncGpsJob(IRepository repository, IGpsSyncDelegate? gps = null)
         {
-            // TODO: what if there are items to be sync'd but no sync delegates?
             this.repository = repository;
             this.gps = gps;
         }
@@ -28,14 +27,12 @@ namespace Shiny.Locations.Sync.Infrastructure
                 jobInfo.Repeat = false;
                 return false;
             }
-            var events = await this.repository.GetAll<GpsEvent>();
-            foreach (var e in events)
-            {
-                //await this.geofences.Process(e);
-                await this.repository.Remove<GpsEvent>(e.Id);
-            }
-
-            return true;
+            var result = await JobProcessor.Process<GpsEvent>(
+                jobInfo, 
+                this.repository, 
+                pings => this.gps.Process(pings)
+            );
+            return result;
         }
     }
 }

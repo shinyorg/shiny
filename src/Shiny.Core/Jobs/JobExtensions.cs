@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 using Shiny.Logging;
-
+using System.Linq;
 
 namespace Shiny
 {
@@ -73,12 +73,14 @@ namespace Shiny
                                        Type jobType,
                                        string? identifier = null,
                                        InternetAccess requiredNetwork = InternetAccess.None,
-                                       bool runInForeground = false)
+                                       bool runInForeground = false,
+                                       params (string Key, object value)[] parameters)
             => services.RegisterJob(new JobInfo(jobType, identifier)
             {
                 RequiredInternetAccess = requiredNetwork,
                 RunOnForeground = runInForeground,
-                Repeat = true
+                Repeat = true,
+                Parameters = parameters?.ToDictionary()
             });
 
 

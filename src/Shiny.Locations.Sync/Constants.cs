@@ -7,5 +7,6 @@ namespace Shiny.Locations.Sync
     {
         public const string GeofenceJobIdentifer = "syncgeofences";
         public const string GpsJobIdentifier = "syncgps";
+        public const string SyncConfigJobParameterKey = "config";
     }
 }

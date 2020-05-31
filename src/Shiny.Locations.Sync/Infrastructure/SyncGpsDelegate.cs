@@ -6,7 +6,7 @@ using Shiny.Jobs;
 
 namespace Shiny.Locations.Sync.Infrastructure
 {
-    public class SyncGpsDelegate : IGpsDelegate
+    public class SyncGpsDelegate : NotifyPropertyChanged, IGpsDelegate
     {
         readonly IJobManager jobManager;
         readonly IRepository repository;
@@ -34,8 +34,26 @@ namespace Shiny.Locations.Sync.Infrastructure
                 PositionAccuracy = reading.PositionAccuracy
             };
             await this.repository.Set(e.Id, e);
-            if (!this.jobManager.IsRunning)
-                await this.jobManager.RunJobAsTask(Constants.GpsJobIdentifier);
+            this.BatchSize++;
+
+            var job = await this.jobManager.GetJob(Constants.GpsJobIdentifier);
+            var config = job.GetParameter<SyncConfig>(Constants.SyncConfigJobParameterKey);
+
+            if (this.BatchSize >= config.BatchSize)
+            {
+                this.BatchSize = 0;
+                Console.WriteLine("GPS Location Sync batch size reached, will attempt to sync");
+                if (this.jobManager.IsRunning)
+                    await this.jobManager.RunJobAsTask(Constants.GpsJobIdentifier);
+            }
+        }
+
+
+        int batchSize;
+        public int BatchSize
+        {
+            get => this.batchSize;
+            set => this.Set(ref this.batchSize, value);
         }
     }
 }

@@ -5,6 +5,7 @@ using Shiny.Locations;
 using Shiny.Locations.Sync;
 using Shiny.Locations.Sync.Infrastructure;
 
+
 namespace Shiny
 {
     public static class ServiceCollectionExtensions
@@ -15,14 +16,23 @@ namespace Shiny
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
         /// <param name="requestPermissionOnStart"></param>
-        public static void UseGeofencingSync<T>(this IServiceCollection services, bool requestPermissionOnStart = false)
+        public static void UseGeofencingSync<T>(this IServiceCollection services, SyncConfig? config = null, bool requestPermissionOnStart = false)
             where T: class, IGeofenceSyncDelegate
         {
-            services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            services.RegisterJob(typeof(SyncGeofenceJob), Constants.GeofenceJobIdentifer, runInForeground: true);
             services.AddSingleton<IGeofenceSyncDelegate, T>();
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
             services.UseGeofencing<SyncGeofenceDelegate>(requestPermissionOnStart);
+            services.UseJobForegroundService(TimeSpan.FromSeconds(30));
+            services.RegisterJob(
+                typeof(SyncGeofenceJob), 
+                Constants.GeofenceJobIdentifer, 
+                runInForeground: true,
+                parameters: ("Config", config ?? new SyncConfig
+                {
+                    BatchSize = 1,
+                    SortMostRecentFirst = true
+                })
+            );
         }
 
 
@@ -31,14 +41,24 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="IGpsSyncDelegate"></typeparam>
         /// <param name="services"></param>
-        public static void UseGpsSync<T>(this IServiceCollection services)
+        public static void UseGpsSync<T>(this IServiceCollection services, SyncConfig? config = null)
             where T: class, IGpsSyncDelegate
         {
-            services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            services.RegisterJob(typeof(SyncGpsJob), Constants.GpsJobIdentifier, runInForeground: true);
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
             services.AddSingleton<IGpsDelegate, SyncGpsDelegate>();
             services.AddSingleton<IGpsSyncDelegate, T>();
+
+            services.UseJobForegroundService(TimeSpan.FromSeconds(30));
+            services.RegisterJob(
+                typeof(SyncGpsJob), 
+                Constants.GpsJobIdentifier, 
+                runInForeground: true,
+                parameters: ("Config", config ?? new SyncConfig 
+                { 
+                    BatchSize = 10,
+                    SortMostRecentFirst = false
+                })
+            );
         }
     }
 }
