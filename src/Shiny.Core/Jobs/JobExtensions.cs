@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 using Shiny.Logging;
-using System.Linq;
+
 
 namespace Shiny
 {
