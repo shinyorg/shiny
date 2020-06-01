@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Jobs;
 
 
 namespace Shiny.Locations.Sync.Infrastructure
@@ -30,13 +31,11 @@ namespace Shiny.Locations.Sync.Infrastructure
             services.AddSingleton(typeof(IGeofenceSyncDelegate), this.delegateType);
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
             services.UseGeofencing<SyncGeofenceDelegate>(this.requestPermissionOnStart);
+            
             services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            services.RegisterJob(
-                typeof(SyncGeofenceJob),
-                Constants.GeofenceJobIdentifer,
-                runInForeground: true,
-                parameters: (Constants.SyncConfigJobParameterKey, this.config)
-            );
+            var job = new JobInfo(typeof(SyncGeofenceJob), Constants.GeofenceJobIdentifer) { RunOnForeground = true };
+            job.SetSyncConfig(this.config);
+            services.RegisterJob(job);
         }
     }
 }

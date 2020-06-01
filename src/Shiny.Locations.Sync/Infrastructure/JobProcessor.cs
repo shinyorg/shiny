@@ -14,7 +14,7 @@ namespace Shiny.Locations.Sync.Infrastructure
     {
         public static async Task<bool> Process<T>(JobInfo jobInfo, IRepository repository, Func<IEnumerable<T>, CancellationToken, Task> process, CancellationToken cancelToken) where T : LocationEvent
         {
-            var config = jobInfo.GetParameter<SyncConfig>(Constants.SyncConfigJobParameterKey);
+            var config = jobInfo.GetSyncConfig();
             var events = await repository.GetAll<T>();
             var list = config.SortMostRecentFirst 
                 ? events.OrderByDescending(x => x.DateCreated) 

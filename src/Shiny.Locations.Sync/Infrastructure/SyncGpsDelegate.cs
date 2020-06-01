@@ -37,7 +37,7 @@ namespace Shiny.Locations.Sync.Infrastructure
             this.BatchSize++;
 
             var job = await this.jobManager.GetJob(Constants.GpsJobIdentifier);
-            var config = job.GetParameter<SyncConfig>(Constants.SyncConfigJobParameterKey);
+            var config = job.GetSyncConfig();
 
             if (this.BatchSize >= config.BatchSize)
             {

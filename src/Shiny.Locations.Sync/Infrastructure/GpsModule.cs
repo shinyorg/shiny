@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Jobs;
 
 
 namespace Shiny.Locations.Sync.Infrastructure
@@ -31,16 +32,9 @@ namespace Shiny.Locations.Sync.Infrastructure
             services.AddSingleton(typeof(IGpsSyncDelegate), this.delegateType);
 
             services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            services.RegisterJob(
-                typeof(SyncGpsJob),
-                Constants.GpsJobIdentifier,
-                runInForeground: true,
-                parameters: (Constants.SyncConfigJobParameterKey, config ?? new SyncConfig
-                {
-                    BatchSize = 10,
-                    SortMostRecentFirst = false
-                })
-            );
+            var job = new JobInfo(typeof(SyncGpsJob), Constants.GpsJobIdentifier) { RunOnForeground = true };
+            job.SetSyncConfig(this.config);
+            services.RegisterJob(job);
 
             if (this.request != null)
                 services.UseGps(null, this.request);
