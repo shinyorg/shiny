@@ -14,17 +14,6 @@ namespace Shiny.Infrastructure.DependencyInjection
         readonly ServiceCollection services = new ServiceCollection();
 
 
-        //static bool ImplementsInterface<T>(ServiceDescriptor descriptor)
-        //{
-        //    var typeName = typeof(T).FullName;
-        //    var doesImpl = descriptor.ServiceType != null && descriptor.ServiceType.GetInterface(typeName) != null;
-        //    if (!doesImpl)
-        //        doesImpl = descriptor.ImplementationType != null && descriptor.ImplementationType.GetInterface(typeName) != null;
-
-        //    return doesImpl;
-        //}
-
-
         public void RunPostBuildActions(IServiceProvider container)
         {
             var actions = ShinyHost.PostBuildActions.ToList();
