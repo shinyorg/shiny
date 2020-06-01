@@ -29,8 +29,9 @@ namespace Shiny.Locations.Sync.Infrastructure
             }
             var result = await JobProcessor.Process<GpsEvent>(
                 jobInfo, 
-                this.repository, 
-                pings => this.gps.Process(pings)
+                this.repository,
+                (pings, ct) => this.gps.Process(pings, ct),
+                cancelToken
             );
             return result;
         }

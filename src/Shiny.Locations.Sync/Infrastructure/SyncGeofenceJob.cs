@@ -31,7 +31,8 @@ namespace Shiny.Locations.Sync.Infrastructure
             var result = await JobProcessor.Process<GeofenceEvent>(
                 jobInfo,
                 this.repository,
-                pings => this.geofences.Process(pings)
+                (pings, ct) => this.geofences.Process(pings, ct),
+                cancelToken
             );
             return result;
         }
