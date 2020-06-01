@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
+using Shiny.Logging;
 
 
 namespace Shiny.Locations.Sync.Infrastructure
@@ -26,11 +27,24 @@ namespace Shiny.Locations.Sync.Infrastructure
             //}
             foreach (var batch in list.Page(config.BatchSize))
             {
-                if (!cancelToken.IsCancellationRequested)
+                var batchProcessed = false;
+
+                // configure how aggressive this need to be?
+                while (!cancelToken.IsCancellationRequested && !batchProcessed)
                 { 
-                    await process(batch, cancelToken);
-                    foreach (var e in batch)
-                        await repository.Remove<T>(e.Id);
+                    try
+                    { 
+                        await process(batch, cancelToken);
+                        batchProcessed = true;
+
+                        foreach (var e in batch)
+                            await repository.Remove<T>(e.Id);
+                    }
+                    catch (Exception ex)
+                    {
+                        await Task.Delay(1000); // TODO: retry time
+                        Log.Write(ex);
+                    }
                 }
             }
             return events.Any();

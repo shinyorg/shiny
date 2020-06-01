@@ -9,45 +9,43 @@ Blog: https://allancritchie.net
 
 Please star this project on GitHub if you use it in your projects
 
+Sync Samples: https://github.com/shinyorg/shinysamples/tree/master/Samples/LocationSync
 
------------------
-iOS
------------------
+---------------------
+Setup
+---------------------
 
-The following is required for Motion Activity
-<key>NSMotionUsageDescription</key>
-<string>Required for pedometer</string>
+Be sure to follow general setup here 
+https://github.com/shinyorg/shiny/blob/master/src/Shiny.Core/readme.txt
+and
+https://github.com/shinyorg/shiny/blob/master/src/Shiny.Locations/readme.txt
 
-The following is required for GPS & Geofencing
-<key>NSLocationAlwaysUsageDescription</key>
-<string>The beacons or geofences or GPS always have you!</string>
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>The beacons or geofences or GPS always have you!</string>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>The beacons or geofences or GPS always have you!</string>
 
-<key>UIBackgroundModes</key>
-<array>
-	<string>location</string>
-</array>
+---------------------
+Shiny Startup
+---------------------
 
------------------
-Android
------------------
-Testing on Android Simulators can be difficult and doesn't always work out of the box!  It is advised to test on devices first.
+services.UseGeofencingSync<LocationSyncDelegates>();
 
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+services.UseGpsSync<LocationSyncDelegates>();
 
-<!--Android 10+-->
-<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
------------------
-UWP
------------------
+---
+Sample Delegate
+---
 
-<Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
-    <BackgroundTasks>
-        <Task Type="location" />
-    </BackgroundTasks>
-</Extension>
+public class LocationSyncDelegates : IGeofenceSyncDelegate, IGpsSyncDelegate
+{
+    public async Task Process(IEnumerable<GpsEvent> events, CancellationToken cancelToken) 
+    {
+        // send to your server here
+        // you don't have to error trap here, shiny will retry it again
+    }
+
+
+    public async Task Process(IEnumerable<GeofenceEvent> events, CancellationToken cancelToken) 
+    {
+        // send to your server here
+        // you don't have to error trap here, shiny will retry it again
+    }
+}
