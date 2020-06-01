@@ -41,7 +41,7 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="IGpsSyncDelegate"></typeparam>
         /// <param name="services"></param>
-        public static void UseGpsSync<T>(this IServiceCollection services, SyncConfig? config = null)
+        public static void UseGpsSync<T>(this IServiceCollection services, GpsRequest? request = null, SyncConfig? config = null)
             where T: class, IGpsSyncDelegate
         {
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
@@ -59,6 +59,11 @@ namespace Shiny
                     SortMostRecentFirst = false
                 })
             );
+
+            if (request != null)
+            {
+                services.UseGps(request);
+            }
         }
     }
 }
