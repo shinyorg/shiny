@@ -24,7 +24,7 @@ namespace Shiny.Vpn
         }
 
 
-        public IObservable<Unit> Connect(VpnConnectionOptions opts)
+        public IObservable<Unit> Connect(VpnConnectionOptions opts) => Observable.Create<Unit>(ob => 
         {
             //NEVpnManager.SharedManager.LoadFromPreferences(_ => { })
             this.SetProtocol(opts);
@@ -32,7 +32,8 @@ namespace Shiny.Vpn
             //NEVpnManager.SharedManager.Enabled
             //NEVpnManager.SharedManager.SaveToPreferencesAsync
             //NEVpnManager.SharedManager.RemoveFromPreferencesAsync
-        }
+            return () => { };
+        });
 
 
         public Task Disconnect()
