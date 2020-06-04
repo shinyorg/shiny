@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 using Shiny.Logging;
-using System.Linq;
+
 
 namespace Shiny
 {
@@ -101,7 +101,7 @@ namespace Shiny
                 return ShinyHost.Container.GetService<ISerializer>().Deserialize<T>(s);
 
             // TODO: Jobject & jarray tend to emerge causing this to fail
-            return defaultValue;
+            return (T)value;
         }
     }
 }

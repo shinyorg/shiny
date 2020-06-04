@@ -16,9 +16,9 @@ namespace Shiny.Locations.Sync
 
     public interface ILocationSyncManager
     {
+        bool IsSyncEnabled { get; set; }
+
         Task ForceRun(LocationSyncType? syncType = null);
-        //Task<SyncConfig?> GetConfig(LocationSyncType syncType);
-        //Task SetConfig(LocationSyncType syncType, SyncConfig config);
         Task ClearEvents(LocationSyncType? syncType = null);
 
         Task<IList<GeofenceEvent>> GetPendingGeofenceEvents();
@@ -26,7 +26,7 @@ namespace Shiny.Locations.Sync
     }
 
 
-    public class LocationSyncManager : ILocationSyncManager
+    public class LocationSyncManager : NotifyPropertyChanged, ILocationSyncManager
     {
         readonly IJobManager jobManager;
         readonly IRepository repository;
@@ -36,6 +36,15 @@ namespace Shiny.Locations.Sync
         {
             this.repository = repository;
             this.jobManager = jobManager;
+            this.enabled = true;
+        }
+
+
+        bool enabled;
+        public bool IsSyncEnabled
+        {
+            get => this.enabled;
+            set => this.Set(ref this.enabled, value);
         }
 
 

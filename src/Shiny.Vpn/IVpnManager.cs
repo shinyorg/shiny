@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Threading.Tasks;
 
 
@@ -7,7 +8,7 @@ namespace Shiny.Vpn
 {
     public interface IVpnManager
     {
-        Task Connect(VpnConnectionOptions opts);
+        IObservable<Unit> Connect(VpnConnectionOptions opts);
         Task Disconnect();
 
         VpnConnectionState Status { get; }

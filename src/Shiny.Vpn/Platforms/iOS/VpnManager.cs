@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Foundation;
@@ -23,15 +24,16 @@ namespace Shiny.Vpn
         }
 
 
-        public Task Connect(VpnConnectionOptions opts)
+        public IObservable<Unit> Connect(VpnConnectionOptions opts) => Observable.Create<Unit>(ob => 
         {
+            //NEVpnManager.SharedManager.LoadFromPreferences(_ => { })
             this.SetProtocol(opts);
             this.StartConnection(opts);
             //NEVpnManager.SharedManager.Enabled
             //NEVpnManager.SharedManager.SaveToPreferencesAsync
             //NEVpnManager.SharedManager.RemoveFromPreferencesAsync
-            return Task.CompletedTask;
-        }
+            return () => { };
+        });
 
 
         public Task Disconnect()
@@ -77,6 +79,17 @@ namespace Shiny.Vpn
                 ServerAddress = opts.ServerAddress,
                 SharedSecretReference = NSData.FromString("")
             };
+
+
+            //var protocol = new NEVpnProtocolIke2
+            //{
+            //    UseExtendedAuthentication = true,
+            //    LocalIdentifier = Constants.LocalId,
+            //    RemoteIdentifier = Constants.RemoteId,
+            //    ServerAddress = Constants.ServerAddress,
+            //    PasswordReference = KeychainHelper.GetRecordsFromKeychain("VPN_Password", Security.SecKind.GenericPassword),
+            //    Username = new NSString("fbvkbqlp"),
+            //};
         }
 
 

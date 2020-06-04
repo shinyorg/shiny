@@ -142,10 +142,10 @@ namespace Shiny
         /// </summary>
         /// <param name="delegateType">The IGpsDelegate to call</param>
         /// <param name="services">The servicecollection to configure</param>
-        /// <param name="requestIfPermissionGranted">This will be called when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
+        /// <param name="requestIfPermissionGranted">This will be used when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
         /// <returns></returns>
 
-        public static bool UseGps(this IServiceCollection services, Type? delegateType, Action<GpsRequest>? requestIfPermissionGranted = null)
+        public static bool UseGps(this IServiceCollection services, Type? delegateType, GpsRequest? requestIfPermissionGranted = null)
         {
 #if NETSTANDARD
             return false;
@@ -161,9 +161,9 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T">The IGpsDelegate to call</typeparam>
         /// <param name="services">The servicecollection to configure</param>
-        /// <param name="requestIfPermissionGranted">This will be called when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
+        /// <param name="requestIfPermissionGranted">This will be used when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
         /// <returns></returns>
-        public static bool UseGps<T>(this IServiceCollection services, Action<GpsRequest>? requestIfPermissionGranted = null) where T : class, IGpsDelegate
+        public static bool UseGps<T>(this IServiceCollection services, GpsRequest? requestIfPermissionGranted = null) where T : class, IGpsDelegate
             => services.UseGps(typeof(T), requestIfPermissionGranted);
     }
 }

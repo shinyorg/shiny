@@ -9,10 +9,10 @@ namespace Shiny.Locations
     {
         static bool added = false;
         readonly Type? delegateType;
-        readonly Action<GpsRequest>? requestIfPermissionGranted;
+        readonly GpsRequest? requestIfPermissionGranted;
 
 
-        public GpsModule(Type? delegateType, Action<GpsRequest>? requestIfPermissionGranted)
+        public GpsModule(Type? delegateType, GpsRequest? requestIfPermissionGranted)
         {
             this.delegateType = delegateType;
             this.requestIfPermissionGranted = requestIfPermissionGranted;
@@ -38,14 +38,12 @@ namespace Shiny.Locations
             if (this.requestIfPermissionGranted != null)
             {
                 var mgr = services.GetService<IGpsManager>();
-                var request = new GpsRequest();
-                this.requestIfPermissionGranted(request);
 
-                var access = await mgr.RequestAccess(request);
+                var access = await mgr.RequestAccess(this.requestIfPermissionGranted);
                 if (access == AccessState.Available)
                 {
-                    request.UseBackground = true;
-                    await mgr.StartListener(request);
+                    this.requestIfPermissionGranted.UseBackground = true;
+                    await mgr.StartListener(this.requestIfPermissionGranted);
                 }
             }
         }

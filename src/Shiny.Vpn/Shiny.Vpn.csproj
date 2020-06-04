@@ -1,8 +1,8 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <VersionSuffix>beta</VersionSuffix>
-        <Description>Shiny addon for VPN functionality</Description>
+        <VersionSuffix>alpha</VersionSuffix>
+        <Description>Shiny addon for VPN functionality (not officially supported yet)</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>

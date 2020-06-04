@@ -6,11 +6,13 @@ namespace Shiny.Notifications
 {
     public static class Extensions
     {
-        public static Task Send(this INotificationManager notifications, string title, string message)
+        public static Task Send(this INotificationManager notifications, string title, string message, string? category = null, DateTime? scheduleDate = null)
             => notifications.Send(new Notification
             {
                 Title = title,
-                Message = message
+                Message = message,
+                Category = category,
+                ScheduleDate = scheduleDate
             });
 
 
@@ -40,12 +42,14 @@ namespace Shiny.Notifications
         /// <param name="title"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static Task<NotificationResult> RequestAccessAndSend(this INotificationManager notifications, string title, string message)
+        public static Task<NotificationResult> RequestAccessAndSend(this INotificationManager notifications, string title, string message, string? category = null, DateTime? scheduleDate = null)
         {
             var notification = new Notification
             {
                 Title = title,
-                Message = message
+                Message = message,
+                Category = category,
+                ScheduleDate = scheduleDate
             };
             return notifications.RequestAccessAndSend(notification);
         }

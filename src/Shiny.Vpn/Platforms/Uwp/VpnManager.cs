@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reactive;
 using System.Threading.Tasks;
+
 
 namespace Shiny.Vpn
 {
@@ -7,7 +9,7 @@ namespace Shiny.Vpn
     {
         public VpnConnectionState Status => throw new NotImplementedException();
 
-        public Task Connect(VpnConnectionOptions opts)
+        public IObservable<Unit> Connect(VpnConnectionOptions opts)
         {
             throw new NotImplementedException();
         }
