@@ -234,18 +234,19 @@ namespace Shiny.Notifications
                     var d = notification.Android.ChannelDescription;
                     if (!d.IsEmpty())
                         channel.Description = d;
+                    
+                    if (notification.Sound.IsCustomSound())
+                    {
+                        var attributes = new AudioAttributes.Builder()
+                            .SetUsage(AudioUsageKind.NotificationRingtone)
+                            .Build();
+
+                        var uri = Android.Net.Uri.Parse(notification.Sound.Path);
+                        channel.SetSound(uri, attributes);
+                        channel.EnableVibration(notification.Android.Vibrate);
+                    }
 
                     this.newManager.CreateNotificationChannel(channel);
-                }
-                if (notification.Sound.IsCustomSound())
-                {
-                    var attributes = new AudioAttributes.Builder()
-                        .SetUsage(AudioUsageKind.NotificationRingtone)
-                        .Build();
-
-                    var uri = Android.Net.Uri.Parse(notification.Sound.Path);
-                    channel.SetSound(uri, attributes);
-                    channel.EnableVibration(notification.Android.Vibrate);
                 }
                 builder.SetChannelId(channelId);
                 this.newManager.Notify(notification.Id, builder.Build());
