@@ -12,7 +12,7 @@ using CancellationToken = System.Threading.CancellationToken;
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager, IPushTagSupport
+    public class PushManager : AbstractPushManager, IPushTagSupport, IAndroidTokenUpdate
     {
         readonly AndroidContext context;
         readonly IMessageBus bus;
@@ -70,7 +70,7 @@ namespace Shiny.Push
             => this.bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
 
 
-        public async Task UpdateTags(params string[] tags)
+        public virtual async Task UpdateTags(params string[] tags)
         {
             if (this.RegisteredTags != null)
             { 
@@ -87,6 +87,15 @@ namespace Shiny.Push
                 }
             }
             this.RegisteredTags = tags;
+        }
+
+
+        public virtual Task UpdateNativePushToken(string token)
+        {
+            this.CurrentRegistrationToken = token;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+
+            return Task.CompletedTask;
         }
     }
 }

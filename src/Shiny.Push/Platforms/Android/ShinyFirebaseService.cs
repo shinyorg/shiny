@@ -14,7 +14,6 @@ namespace Shiny.Push
     public class ShinyFirebaseService : FirebaseMessagingService
     {
         public const string IntentAction = "com.google.firebase.MESSAGING_EVENT";
-        readonly Lazy<ISettings> settings = ShinyHost.LazyResolve<ISettings>();
         readonly Lazy<INotificationManager> notifications = ShinyHost.LazyResolve<INotificationManager>();
         readonly Lazy<IMessageBus> msgBus = ShinyHost.LazyResolve<IMessageBus>();
 
@@ -55,8 +54,7 @@ namespace Shiny.Push
         public override async void OnNewToken(string token) => await Log.SafeExecute(async () =>
         {
             await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token));
-            this.settings.Value.SetRegToken(token);
-            this.settings.Value.SetRegDate(DateTime.UtcNow);
+            await ((IAndroidTokenUpdate)ShinyHost.Resolve<IPushManager>()).UpdateNativePushToken(token);
         });
     }
 }
