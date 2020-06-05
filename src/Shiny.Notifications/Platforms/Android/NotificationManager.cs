@@ -363,7 +363,7 @@ namespace Shiny.Notifications
                 {
                     builder.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri);
                 }
-                else
+                else if (!s.Path.IsEmpty()) // TODO: path isn't serializing well
                 {
                     var uri = Android.Net.Uri.Parse(s.Path);
                     builder.SetSound(uri);

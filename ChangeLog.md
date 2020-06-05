@@ -5,6 +5,7 @@
 
 ### Shiny.Push & Shiny.Push.AzureNotificationHubs
 * [Fix][Android] Token registration issues with azure notification hubs
+* [Fix][Android] Ensure local notifications are registered
 
 1.2.0
 ---

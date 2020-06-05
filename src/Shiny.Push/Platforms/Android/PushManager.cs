@@ -5,9 +5,10 @@ using System.Reactive.Linq;
 using Android.Gms.Extensions;
 using Firebase.Iid;
 using Firebase.Messaging;
-using Shiny.Settings;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
+using Shiny.Settings;
+using Shiny.Notifications;
 
 
 namespace Shiny.Push
@@ -15,14 +16,17 @@ namespace Shiny.Push
     public class PushManager : AbstractPushManager, IPushTagSupport, IAndroidTokenUpdate
     {
         readonly AndroidContext context;
+        readonly INotificationManager notifications;
         readonly IMessageBus bus;
 
 
         public PushManager(AndroidContext context,
+                           INotificationManager notifications,
                            ISettings settings,
                            IMessageBus bus) : base(settings)
         {
             this.context = context;
+            this.notifications = notifications;
             this.bus = bus;
         }
 
@@ -41,6 +45,10 @@ namespace Shiny.Push
             ////    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
             ////        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
             //}
+            var nresult = await this.notifications.RequestAccess();
+            if (nresult != AccessState.Available)
+                return new PushAccessState(nresult, null);
+
             var result = await FirebaseInstanceId
                 .Instance
                 .GetInstanceId()
