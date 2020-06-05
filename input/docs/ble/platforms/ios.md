@@ -22,8 +22,8 @@ To add a description to the Bluetooth request message (on iOS 10 this is require
 On iOS 13, you must also add the following
 
 ```xml
-<key></key>
-<string></string>
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>YOUR CUSTOM MESSAGE</string>
 ```
 
 ## Backgrounding
