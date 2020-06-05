@@ -1,5 +1,11 @@
 ﻿# Change Log
 
+1.2.0 (SP1)
+---
+
+### Shiny.Push & Shiny.Push.AzureNotificationHubs
+* [Fix][Android] Token registration issues with azure notification hubs
+
 1.2.0
 ---
 

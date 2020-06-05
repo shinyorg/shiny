@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Push.AzureNotifications
+namespace Shiny.Push.AzureNotificationHubs
 {
     public class AzureNotificationConfig
     {

@@ -4,15 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
-using Shiny.Push;
-using Shiny.Push.AzureNotificationHubs;
-using Shiny.Push.AzureNotifications;
 using Shiny.Settings;
 
 
-namespace Shiny.Integrations.AzureNotifications
+namespace Shiny.Push.AzureNotificationHubs
 {
-    public class PushManager : Shiny.Push.PushManager, IPushTagSupport, IAzurePushManager
+    public class PushManager : Shiny.Push.PushManager, IPushTagSupport
     {
         readonly NotificationHubClient hub;
 
@@ -73,47 +70,41 @@ namespace Shiny.Integrations.AzureNotifications
         public async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
         {
             var access = await base.RequestAccess();
-            if (this.InstallationId == null)
-                this.InstallationId = Guid.NewGuid().ToString().Replace("-", "");
 
             if (access.Status == AccessState.Available)
             {
-                if (!this.IsRefreshNeeded(access))
+                try
                 {
+                    if (this.InstallationId == null)
+                        this.InstallationId = Guid.NewGuid().ToString().Replace("-", "");
+
+                    var install = new Installation
+                    {
+                        InstallationId = this.InstallationId,
+                        PushChannel = access.RegistrationToken,
+                        Tags = tags?.ToList(),
+#if WINDOWS_UWP
+                        Platform = NotificationPlatform.Wns
+#elif __IOS__
+                        Platform = NotificationPlatform.Apns
+#elif __ANDROID__
+                        Platform = NotificationPlatform.Fcm
+#endif
+                    };
+                    await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken);
+
+                    this.NativeRegistrationToken = access.RegistrationToken;
+                    //this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
+                    this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                    this.CurrentRegistrationToken = access.RegistrationToken;
+                    this.RegisteredTags = tags;
+
                     access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
                 }
-                else
+                catch
                 {
-                    try
-                    {
-                        var install = new Installation
-                        {
-                            InstallationId = this.InstallationId,
-                            PushChannel = access.RegistrationToken,
-                            Tags = tags?.ToList(),
-#if WINDOWS_UWP
-                            Platform = NotificationPlatform.Wns
-#elif __IOS__
-                            Platform = NotificationPlatform.Apns
-#elif __ANDROID__
-                            Platform = NotificationPlatform.Fcm
-#endif
-                        };
-                        await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken);
-
-                        this.NativeRegistrationToken = access.RegistrationToken;
-                        //this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
-                        this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                        this.CurrentRegistrationToken = access.RegistrationToken;
-                        this.RegisteredTags = tags;
-
-                        access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
-                    }
-                    catch
-                    {
-                        this.ClearRegistration();
-                        throw;
-                    }
+                    this.ClearRegistration();
+                    throw;
                 }
             }
             return access;
@@ -122,27 +113,11 @@ namespace Shiny.Integrations.AzureNotifications
 
         public override async Task UnRegister()
         {
+            if (this.InstallationId == null)
+                return;
+
             await this.hub.DeleteInstallationAsync(this.InstallationId);            
             await base.UnRegister();
-        }
-
-
-        public async Task UpdateRegistrationToken(string newToken)
-        {
-            var install = await this.hub.GetInstallationAsync(this.InstallationId);
-            install.PushChannel = newToken;
-            await this.hub.CreateOrUpdateInstallationAsync(install);
-        }
-
-
-        public async Task UpdateTags(params string[] tags)
-        {
-            var install = await this.hub.GetInstallationAsync(this.InstallationId);
-            install.Tags = tags.ToList();
-            await this.hub.CreateOrUpdateInstallationAsync(install);
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-
-            this.RegisteredTags = tags;
         }
 
 
@@ -155,7 +130,7 @@ namespace Shiny.Integrations.AzureNotifications
 
         protected virtual bool IsRefreshNeeded(PushAccessState nativeToken)
         {
-            if (this.CurrentRegistrationToken.IsEmpty())
+            if (this.CurrentRegistrationToken == null)
                 return true;
 
             if (this.NativeRegistrationToken != nativeToken.RegistrationToken)
@@ -166,6 +141,41 @@ namespace Shiny.Integrations.AzureNotifications
 
             return false;
         }
+
+
+#if __ANDROID__
+        public override async Task UpdateTags(params string[] tags)
+#else
+        public async Task UpdateTags(params string[] tags)
+#endif
+        {
+            if (this.InstallationId == null)
+                return;
+
+            var install = await this.hub.GetInstallationAsync(this.InstallationId);
+            install.Tags = tags.ToList();
+            await this.hub.CreateOrUpdateInstallationAsync(install);
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+
+            this.RegisteredTags = tags;
+        }
+
+
+
+#if __ANDROID__
+        public override async Task UpdateNativePushToken(string token)
+        {
+            if (this.InstallationId.IsEmpty())
+                return;
+
+            this.NativeRegistrationToken = token;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+
+            var install = await this.hub.GetInstallationAsync(this.InstallationId);
+            install.PushChannel = token;
+            await this.hub.CreateOrUpdateInstallationAsync(install);            
+        }
+#endif
     }
 }
 #endif

@@ -20,7 +20,7 @@ namespace Shiny.Push
         {
             this.CurrentRegistrationExpiryDate = null;
             this.CurrentRegistrationToken = null;
-            this.CurrentRegistrationExpiryDate = null;
+            this.CurrentRegistrationTokenDate = null;
         }
 
 
