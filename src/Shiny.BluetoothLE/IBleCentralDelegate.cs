@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public interface IBleCentralDelegate : IShinyDelegate
     {

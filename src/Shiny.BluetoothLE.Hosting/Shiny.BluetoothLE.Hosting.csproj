@@ -1,15 +1,13 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <VersionSuffix>beta</VersionSuffix>
-        <Description>Shiny Reactive BluetoothLE Plugin for client and gatt server</Description>
+        <Description>Shiny BluetoothLE Hosting - Advertising and GATT server functionality</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
-<!--        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.tvos10;xamarin.mac20;monoandroid90;monoandroid10.0;tizen50</TargetFrameworks>-->
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
     </ItemGroup>
@@ -24,7 +22,7 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\Uwp\**\*.cs" />
+        <Compile Include="**\Platforms\Uwp\**\*.cs" />        
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
@@ -54,9 +52,5 @@
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\tizen\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Platforms\Shared\ServiceCollectionExtensions.cs" />
     </ItemGroup>
 </Project>

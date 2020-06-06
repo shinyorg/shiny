@@ -1,7 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.BluetoothLE.Central;
-using Shiny.BluetoothLE.Peripherals;
 
 
 namespace Shiny
@@ -15,9 +13,9 @@ namespace Shiny
         /// <param name="config"></param>
         /// <param name="delegateType"></param>
         /// <returns></returns>
-        public static bool UseBleCentral(this IServiceCollection services, Type delegateType, BleCentralConfiguration config = null)
+        public static bool UseBleClient(this IServiceCollection services, Type delegateType, BleCentralConfiguration? config = null)
         {
-            if (services.UseBleCentral(config))
+            if (services.UseBleClient(config))
             {
                 if (delegateType != null)
                     services.AddSingleton(typeof(IBleCentralDelegate), delegateType);
@@ -34,8 +32,8 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static bool UseBleCentral<TCentralDelegate>(this IServiceCollection services, BleCentralConfiguration config = null) where TCentralDelegate : class, IBleCentralDelegate
-            => services.UseBleCentral(typeof(TCentralDelegate), config);
+        public static bool UseBleClient<TCentralDelegate>(this IServiceCollection services, BleCentralConfiguration? config = null) where TCentralDelegate : class, IBleCentralDelegate
+            => services.UseBleClient(typeof(TCentralDelegate), config);
 
 
         /// <summary>
@@ -44,28 +42,12 @@ namespace Shiny
         /// <param name="builder"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static bool UseBleCentral(this IServiceCollection builder, BleCentralConfiguration config = null)
+        public static bool UseBleClient(this IServiceCollection builder, BleCentralConfiguration? config = null)
         {
 #if NETSTANDARD
             return false;
 #else
             builder.RegisterModule(new BleCentralShinyModule(config ?? new BleCentralConfiguration()));
-            return true;
-#endif
-        }
-
-
-        /// <summary>
-        /// Registers the IPeripheralManager service that allows you to be a host BLE device
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
-        public static bool UseBlePeripherals(this IServiceCollection builder)
-        {
-#if NETSTANDARD
-            return false;
-#else
-            builder.AddSingleton<IPeripheralManager, PeripheralManager>();
             return true;
 #endif
         }
