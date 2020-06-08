@@ -1,6 +1,5 @@
 ﻿using System;
 using Android.Bluetooth;
-using Shiny.BluetoothLE.Peripherals;
 using Android.Content;
 using DroidGattStatus = Android.Bluetooth.GattStatus;
 

@@ -19,15 +19,18 @@ namespace Shiny.Push
         }
 
 
+#if __ANDROID__
         public Task OnEntry(NotificationResponse response) => this
-            .delegates
+            .delegates?
             .RunDelegates(x => x.OnEntry(new PushEntryArgs(
                 response.Notification.Category,
                 response.ActionIdentifier,
                 response.Text,
                 response.Notification.Payload
-            )));
-
+            ))) ?? Task.CompletedTask;
+#else
+        public Task OnEntry(NotificationResponse response) => Task.CompletedTask;
+#endif
 
 #if __IOS__
         public async Task OnReceived(Notification notification)
