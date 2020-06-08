@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using CoreBluetooth;
 using Foundation;
@@ -24,9 +25,6 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override byte[] Value => (this.native.Value as NSData)?.ToArray();
-
-
         public override IObservable<DescriptorGattResult> Read() => Observable.Create<DescriptorGattResult>(ob =>
         {
             var handler = new EventHandler<CBDescriptorEventArgs>((sender, args) =>
@@ -34,10 +32,14 @@ namespace Shiny.BluetoothLE
                 if (!this.Equals(args.Descriptor))
                     return;
 
-                if (args.Error == null)
-                    ob.Respond(new DescriptorGattResult(this, this.Value));
-                else
+                
+                if (args.Error != null)
                     ob.OnError(new BleException(args.Error.Description));
+                else
+                { 
+                    var value = args.Descriptor.ToByteArray();
+                    ob.Respond(new DescriptorGattResult(this, value));
+                }
             });
             this.Peripheral.UpdatedValue += handler;
             this.Peripheral.ReadValue(this.native);
@@ -53,10 +55,15 @@ namespace Shiny.BluetoothLE
                 if (!this.Equals(args.Descriptor))
                     return;
 
-                if (args.Error == null)
-                    ob.Respond(new DescriptorGattResult(this, this.Value));
-                else
+                
+                if (args.Error != null)
                     ob.OnError(new BleException(args.Error.Description));
+                
+                else
+                {
+                    var bytes = args.Descriptor.ToByteArray();
+                    ob.Respond(new DescriptorGattResult(this, bytes));
+                }
             });
 
             var nsdata = NSData.FromArray(data);

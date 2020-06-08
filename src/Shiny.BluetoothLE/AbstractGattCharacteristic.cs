@@ -14,7 +14,6 @@ namespace Shiny.BluetoothLE
 
 
         public IGattService Service { get; }
-        public virtual string Description => Dictionaries.GetCharacteristicDescription(this.Uuid);
         public bool IsNotifying { get; protected set; }
         public Guid Uuid { get; }
         public CharacteristicProperties Properties { get; }

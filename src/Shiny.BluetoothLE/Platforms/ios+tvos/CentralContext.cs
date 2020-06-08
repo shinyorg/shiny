@@ -16,7 +16,7 @@ namespace Shiny.BluetoothLE
         readonly IServiceProvider services;
 
 
-        public CentralContext(IServiceProvider services, BleCentralConfiguration config)
+        public CentralContext(IServiceProvider services, BleConfiguration config)
         {
             if (!PlatformExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
                 Console.WriteLine("NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
@@ -66,7 +66,7 @@ namespace Shiny.BluetoothLE
 #if __IOS__
             Dispatcher.ExecuteBackgroundTask(async () =>
             {
-                var del = this.services.Resolve<IBleCentralDelegate>();
+                var del = this.services.Resolve<IBleDelegate>();
 
                 var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
                 for (nuint i = 0; i < peripheralArray.Count; i++)
@@ -112,7 +112,7 @@ namespace Shiny.BluetoothLE
 
             await Log.SafeExecute(async () =>
             {
-                var s = this.services.Resolve<IBleCentralDelegate>();
+                var s = this.services.Resolve<IBleDelegate>();
                 if (s != null)
                     await s.OnAdapterStateChanged(state);
             });

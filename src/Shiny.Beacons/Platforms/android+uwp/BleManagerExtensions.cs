@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Reactive.Linq;
-using Shiny.BluetoothLE.Central;
+using Shiny.BluetoothLE;
 
 
 namespace Shiny.Beacons
 {
-    public static class CentralManagerExtensions
+    public static class BleManagerExtensions
     {
-        public static IObservable<Beacon> ScanForBeacons(this ICentralManager centralManager, bool forMonitoring = false) => centralManager
+        public static IObservable<Beacon> ScanForBeacons(this IBleManager manager, bool forMonitoring = false) => manager
             .Scan(new ScanConfig
             {
                 //AndroidUseScanBatching = true,
@@ -19,7 +19,7 @@ namespace Shiny.Beacons
             .Select(x => x.AdvertisementData.ManufacturerData.Data.Parse(x.Rssi));
 
 
-        public static bool IsBeacon(this IScanResult result)
+        public static bool IsBeacon(this ScanResult result)
         {
             var md = result.AdvertisementData?.ManufacturerData;
 

@@ -11,7 +11,7 @@ using Windows.Devices.Enumeration;
 
 namespace Shiny.BluetoothLE
 {
-    public class CentralManager : AbstractCentralManager,
+    public class CentralManager : AbstractBleManager,
                                   ICanControlAdapterState,
                                   ICanSeePairedPeripherals
     {
@@ -85,12 +85,12 @@ namespace Shiny.BluetoothLE
         );
 
 
-        public override IObservable<IScanResult> Scan(ScanConfig config)
+        public override IObservable<ScanResult> Scan(ScanConfig? config = null)
         {
             if (this.IsScanning)
                 throw new ArgumentException("There is already an active scan");
 
-            return Observable.Create<IScanResult>(ob =>
+            return Observable.Create<ScanResult>(ob =>
             {
                 this.IsScanning = true;
                 this.context.Clear();
@@ -228,7 +228,6 @@ namespace Shiny.BluetoothLE
                 throw new ArgumentException("No bluetooth adapter found");
 
             this.radio = await this.native.GetRadioAsync().AsTask(ct);
-            this.AdapterName = this.radio.Name;
             return this.radio;
         });
 

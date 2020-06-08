@@ -7,7 +7,7 @@ using CoreBluetooth;
 
 namespace Shiny.BluetoothLE
 {
-    public class CentralManager : AbstractCentralManager
+    public class CentralManager : AbstractBleManager
     {
         readonly CentralContext context;
 
@@ -18,7 +18,6 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override string AdapterName => "Default Bluetooth Peripheral";
         public override bool IsScanning => this.context.Manager.IsScanning;
 
 
@@ -86,7 +85,7 @@ namespace Shiny.BluetoothLE
             .StartWith(this.Status);
 
 
-        public override IObservable<IScanResult> Scan(ScanConfig config)
+        public override IObservable<ScanResult> Scan(ScanConfig config)
         {
             config = config ?? new ScanConfig();
 
@@ -100,7 +99,7 @@ namespace Shiny.BluetoothLE
             return this.context
                 .Manager
                 .WhenReady()
-                .Select(_ => Observable.Create<IScanResult>(ob =>
+                .Select(_ => Observable.Create<ScanResult>(ob =>
                 {
                     var scan = this.context
                         .ScanResultReceived

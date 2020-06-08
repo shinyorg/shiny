@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public class ScanConfig
     {

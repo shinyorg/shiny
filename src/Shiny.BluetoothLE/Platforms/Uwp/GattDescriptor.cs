@@ -6,7 +6,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattDescriptor;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public class GattDescriptor : AbstractGattDescriptor
     {
@@ -17,10 +17,6 @@ namespace Shiny.BluetoothLE.Central
         {
             this.native = native;
         }
-
-
-        byte[] value;
-        public override byte[] Value => this.value;
 
 
         public override IObservable<DescriptorGattResult> Write(byte[] data) => Observable.FromAsync(async _ =>
@@ -39,8 +35,8 @@ namespace Shiny.BluetoothLE.Central
             if (result.Status != GattCommunicationStatus.Success)
                 throw new BleException($"Failed to read descriptor - {result.Status}");
 
-            this.value = result.Value?.ToArray();
-            return new DescriptorGattResult(this, this.value);
+            var value = result.Value?.ToArray();
+            return new DescriptorGattResult(this, value);
         });
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
-using Shiny.BluetoothLE.Central.Internals;
+using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
 
 
@@ -19,9 +19,6 @@ namespace Shiny.BluetoothLE
             this.context = context;
             this.native = native;
         }
-
-
-        public override byte[] Value => this.native.GetValue();
 
 
         public override IObservable<DescriptorGattResult> Write(byte[] data) =>

@@ -1,9 +1,9 @@
 ﻿using System;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
-    public class ScanResult : IScanResult
+    public class ScanResult
     {
         public ScanResult(IPeripheral peripheral, int rssi, IAdvertisementData adData)
         {

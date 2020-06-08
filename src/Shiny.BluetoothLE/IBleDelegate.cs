@@ -5,7 +5,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.BluetoothLE
 {
-    public interface IBleCentralDelegate : IShinyDelegate
+    public interface IBleDelegate : IShinyDelegate
     {
         Task OnAdapterStateChanged(AccessState state);
         Task OnConnected(IPeripheral peripheral);

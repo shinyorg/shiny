@@ -2,14 +2,14 @@ using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
-using Shiny.BluetoothLE.Central.Internals;
+using Shiny.BluetoothLE.Internals;
 using Shiny.Logging;
 using Android.Bluetooth;
 using Java.Util;
 using Observable = System.Reactive.Linq.Observable;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public class GattCharacteristic : AbstractGattCharacteristic
     {

@@ -13,11 +13,6 @@ namespace Shiny.BluetoothLE
         Guid Uuid { get; }
 
         /// <summary>
-        /// A general description of what the services if known
-        /// </summary>
-        string Description { get; }
-
-        /// <summary>
         /// This will return a repeatable observable of discovered characteristics
         /// </summary>
         IObservable<IGattCharacteristic> DiscoverCharacteristics();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+
 namespace Shiny.BluetoothLE
 {
     public interface ICanSeePairedPeripherals
@@ -22,7 +23,7 @@ namespace Shiny.BluetoothLE
 
     public static class FeaturePairing
     {
-        public static bool CanViewPairedPeripherals(this ICentralManager centralManager) => centralManager is ICanSeePairedPeripherals;
+        public static bool CanViewPairedPeripherals(this IBleManager centralManager) => centralManager is ICanSeePairedPeripherals;
         public static bool IsPairingRequestsAvailable(this IPeripheral peripheral) => peripheral is ICanPairPeripherals;
 
         public static PairingState? TryGetPairingStatus(this IPeripheral peripheral)

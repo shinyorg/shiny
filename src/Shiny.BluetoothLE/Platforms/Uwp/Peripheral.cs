@@ -8,7 +8,7 @@ using Windows.Devices.Enumeration;
 using Windows.Foundation;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public class Peripheral : AbstractPeripheral,
                               ICanDoTransactions,

@@ -1,7 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.BluetoothLE.Central;
-using Shiny.BluetoothLE.Peripherals;
 
 
 namespace Shiny
@@ -19,7 +17,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            builder.AddSingleton<IPeripheralManager, PeripheralManager>();
+            //builder.AddSingleton<IPeripheralManager, PeripheralManager>();
             return true;
 #endif
         }

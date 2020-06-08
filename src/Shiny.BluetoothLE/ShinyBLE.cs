@@ -1,11 +1,11 @@
 ﻿using System;
-using Shiny.BluetoothLE.Central;
+using Shiny.BluetoothLE;
 
 
 namespace Shiny
 {
     public static class ShinyBLE
     {
-        public static ICentralManager Central { get; } = ShinyHost.Resolve<ICentralManager>();
+        public static IBleManager Central { get; } = ShinyHost.Resolve<IBleManager>();
     }
 }

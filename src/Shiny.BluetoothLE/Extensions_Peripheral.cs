@@ -2,7 +2,7 @@
 using System.Reactive.Linq;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public static class PeripheralExtensions
     {

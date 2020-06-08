@@ -35,7 +35,7 @@ namespace Shiny.BluetoothLE
         public bool? IsConnectable => this.adData.AdvertisementType == BluetoothLEAdvertisementType.ConnectableDirected ||
                                       this.adData.AdvertisementType == BluetoothLEAdvertisementType.ConnectableUndirected;
 
-        public AdvertisementServiceData[] ServiceData { get; } = null;
+        public AdvertisementServiceData[]? ServiceData { get; } = null;
         public ManufacturerData ManufacturerData => this.manufacturerData.Value;
         public Guid[] ServiceUuids => this.serviceUuids.Value;
         public int TxPower => this.txPower.Value;

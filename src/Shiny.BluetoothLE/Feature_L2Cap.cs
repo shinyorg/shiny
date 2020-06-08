@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public interface IL2CapSupport
     {

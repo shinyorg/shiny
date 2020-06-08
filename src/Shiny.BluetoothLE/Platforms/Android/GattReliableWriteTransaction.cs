@@ -1,7 +1,7 @@
 using System;
 using System.Reactive;
 using System.Reactive.Linq;
-using Shiny.BluetoothLE.Central.Internals;
+using Shiny.BluetoothLE.Internals;
 
 
 namespace Shiny.BluetoothLE

@@ -1,14 +1,12 @@
 ﻿using System;
-using System.IO;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public interface IGattCharacteristic
     {
         IGattService Service { get; }
         Guid Uuid { get; }
-        string Description { get; }
         bool IsNotifying { get; }
         CharacteristicProperties Properties { get; }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.BluetoothLE;
 
 
 namespace Shiny
@@ -13,12 +14,12 @@ namespace Shiny
         /// <param name="config"></param>
         /// <param name="delegateType"></param>
         /// <returns></returns>
-        public static bool UseBleClient(this IServiceCollection services, Type delegateType, BleCentralConfiguration? config = null)
+        public static bool UseBleClient(this IServiceCollection services, Type delegateType, BleConfiguration? config = null)
         {
             if (services.UseBleClient(config))
             {
                 if (delegateType != null)
-                    services.AddSingleton(typeof(IBleCentralDelegate), delegateType);
+                    services.AddSingleton(typeof(IBleDelegate), delegateType);
                 return true;
             }
             return false;
@@ -32,7 +33,7 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static bool UseBleClient<TCentralDelegate>(this IServiceCollection services, BleCentralConfiguration? config = null) where TCentralDelegate : class, IBleCentralDelegate
+        public static bool UseBleClient<TCentralDelegate>(this IServiceCollection services, BleConfiguration? config = null) where TCentralDelegate : class, IBleDelegate
             => services.UseBleClient(typeof(TCentralDelegate), config);
 
 
@@ -42,12 +43,12 @@ namespace Shiny
         /// <param name="builder"></param>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static bool UseBleClient(this IServiceCollection builder, BleCentralConfiguration? config = null)
+        public static bool UseBleClient(this IServiceCollection builder, BleConfiguration? config = null)
         {
 #if NETSTANDARD
             return false;
 #else
-            builder.RegisterModule(new BleCentralShinyModule(config ?? new BleCentralConfiguration()));
+            builder.RegisterModule(new BleCentralShinyModule(config));
             return true;
 #endif
         }

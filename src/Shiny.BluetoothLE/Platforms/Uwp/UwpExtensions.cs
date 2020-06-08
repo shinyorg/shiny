@@ -7,7 +7,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Characteristic = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public static class UwpExtensions
     {

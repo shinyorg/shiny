@@ -16,10 +16,10 @@ namespace Shiny.BluetoothLE
 
     public static class Feature_CentralManager
     {
-        public static bool CanControlAdapterState(this ICentralManager centralManager) => centralManager is ICanControlAdapterState;
+        public static bool CanControlAdapterState(this IBleManager centralManager) => centralManager is ICanControlAdapterState;
 
 
-        public static bool TrySetAdapterState(this ICentralManager centralManager, bool enable)
+        public static bool TrySetAdapterState(this IBleManager centralManager, bool enable)
         {
             if (centralManager is ICanControlAdapterState state)
             {

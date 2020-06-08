@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Shiny.BluetoothLE.Central.Internals;
+using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
 
 

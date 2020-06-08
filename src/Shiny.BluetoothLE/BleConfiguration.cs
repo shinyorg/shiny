@@ -3,7 +3,7 @@
 
 namespace Shiny.BluetoothLE
 {
-    public class BleCentralConfiguration
+    public class BleConfiguration
     {
         /// <summary>
         /// Allows you to disable the internal sync queue

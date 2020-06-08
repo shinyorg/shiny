@@ -2,14 +2,14 @@ using System;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Collections.Generic;
-using Shiny.BluetoothLE.Central.Internals;
+using Shiny.BluetoothLE.Internals;
 using Android;
 using Android.Bluetooth;
 
 
 namespace Shiny.BluetoothLE
 {
-    public class CentralManager : AbstractCentralManager,
+    public class CentralManager : AbstractBleManager,
                                   ICanControlAdapterState,
                                   ICanSeePairedPeripherals
     {
@@ -25,7 +25,6 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override string AdapterName => "Default Bluetooth Peripheral";
         public override bool IsScanning => this.isScanning;
 
 
@@ -68,7 +67,7 @@ namespace Shiny.BluetoothLE
             .StartWith(this.Status);
 
 
-        public override IObservable<IScanResult> Scan(ScanConfig config)
+        public override IObservable<ScanResult> Scan(ScanConfig config)
         {
             if (this.IsScanning)
                 throw new ArgumentException("There is already an active scan");

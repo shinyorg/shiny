@@ -16,7 +16,7 @@ namespace Shiny.BluetoothLE.Internals
     {
         readonly ConcurrentDictionary<string, Peripheral> devices;
         readonly Subject<NamedMessage<Peripheral>> peripheralSubject;
-        readonly Lazy<IBleCentralDelegate> sdelegate;
+        readonly Lazy<IBleDelegate> sdelegate;
         readonly IMessageBus messageBus;
         LollipopScanCallback? callbacks;
 
@@ -24,13 +24,13 @@ namespace Shiny.BluetoothLE.Internals
         public CentralContext(IServiceProvider serviceProvider,
                               AndroidContext context,
                               IMessageBus messageBus,
-                              BleCentralConfiguration config)
+                              BleConfiguration config)
         {
             this.Android = context;
             this.Configuration = config;
             this.Manager = context.GetBluetooth();
 
-            this.sdelegate = new Lazy<IBleCentralDelegate>(() => serviceProvider.Resolve<IBleCentralDelegate>());
+            this.sdelegate = new Lazy<IBleDelegate>(() => serviceProvider.Resolve<IBleDelegate>());
             this.devices = new ConcurrentDictionary<string, Peripheral>();
             this.peripheralSubject = new Subject<NamedMessage<Peripheral>>();
             this.messageBus = messageBus;
@@ -51,7 +51,7 @@ namespace Shiny.BluetoothLE.Internals
 
         public IObservable<NamedMessage<Peripheral>> PeripheralEvents => this.peripheralSubject;
 
-        public BleCentralConfiguration Configuration { get; }
+        public BleConfiguration Configuration { get; }
         public BluetoothManager Manager { get; }
         public AndroidContext Android { get; }
 
@@ -109,7 +109,7 @@ namespace Shiny.BluetoothLE.Internals
         }
 
 
-        public IObservable<IScanResult> Scan(ScanConfig config) => Observable.Create<ScanResult>(ob =>
+        public IObservable<ScanResult> Scan(ScanConfig config) => Observable.Create<ScanResult>(ob =>
         {
             this.devices.Clear();
 

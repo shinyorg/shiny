@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using Shiny.BluetoothLE.Central;
+using Shiny.BluetoothLE;
 using Shiny.Infrastructure;
 
 
@@ -11,12 +11,12 @@ namespace Shiny.Beacons
 {
     public class BeaconManager : AbstractBeaconManager
     {
-        readonly ICentralManager centralManager;
+        readonly IBleManager centralManager;
         readonly IMessageBus messageBus;
         IObservable<Beacon>? beaconScanner;
 
 
-        public BeaconManager(ICentralManager centralManager,
+        public BeaconManager(IBleManager centralManager,
                              IMessageBus messageBus,
                              IRepository repository) : base(repository)
         {

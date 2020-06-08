@@ -2,12 +2,16 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using CoreBluetooth;
+using Foundation;
 
 
 namespace Shiny.BluetoothLE
 {
     internal static class iOSExtensions
     {
+        public static byte[] ToByteArray(this CBDescriptor native) => (native.Value as NSData)?.ToArray();
+
+
         public static IObservable<Unit> WhenReady(this CBCentralManager manager) => Observable.Create<Unit>(ob =>
         {
             var context = manager.Delegate as CentralContext;

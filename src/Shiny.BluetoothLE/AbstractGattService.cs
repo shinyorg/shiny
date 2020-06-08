@@ -20,8 +20,6 @@ namespace Shiny.BluetoothLE
         public bool IsPrimary { get; }
 
         public abstract IObservable<IGattCharacteristic> DiscoverCharacteristics();
-
-        public virtual string Description => Dictionaries.GetServiceDescription(this.Uuid);
         public virtual IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
             => this.DiscoverCharacteristics().Where(x => characteristicIds.Any(y => y == x.Uuid));
     }

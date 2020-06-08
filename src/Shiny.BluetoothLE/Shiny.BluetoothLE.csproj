@@ -57,6 +57,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Platforms\Shared\BleCentralShinyModule.cs" />
       <None Remove="Platforms\Shared\ServiceCollectionExtensions.cs" />
     </ItemGroup>
 </Project>

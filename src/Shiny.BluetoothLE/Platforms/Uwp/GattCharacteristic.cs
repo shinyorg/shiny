@@ -8,7 +8,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
     public class GattCharacteristic : AbstractGattCharacteristic
     {

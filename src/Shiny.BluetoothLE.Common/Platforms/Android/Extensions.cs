@@ -1,8 +1,7 @@
 ﻿using System;
 using Android.Bluetooth;
-using Shiny.BluetoothLE.Peripherals;
 using Android.Content;
-using DroidGattStatus = Android.Bluetooth.GattStatus;
+
 
 
 namespace Shiny.BluetoothLE
@@ -66,7 +65,7 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public static DroidGattStatus ToNative(this GattState status)
-            => (DroidGattStatus)Enum.Parse(typeof(DroidGattStatus), status.ToString());
+        //public static DroidGattStatus ToNative(this GattState status)
+        //    => (DroidGattStatus)Enum.Parse(typeof(DroidGattStatus), status.ToString());
     }
 }

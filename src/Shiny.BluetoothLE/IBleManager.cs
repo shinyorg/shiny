@@ -2,15 +2,10 @@
 using System.Collections.Generic;
 
 
-namespace Shiny.BluetoothLE.Central
+namespace Shiny.BluetoothLE
 {
-    public interface ICentralManager
+    public interface IBleManager
     {
-        /// <summary>
-        /// The detected name of the peripheral
-        /// </summary>
-        string AdapterName { get; }
-
         /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
@@ -50,7 +45,7 @@ namespace Shiny.BluetoothLE.Central
         /// WARNING: only one scan can be active at a time.  Use IsScanning to check for active scanning
         /// </summary>
         /// <returns></returns>
-        IObservable<IScanResult> Scan(ScanConfig? config = null);
+        IObservable<ScanResult> Scan(ScanConfig? config = null);
 
         /// <summary>
         /// Monitor for status changes with adapter (on/off/permissions)
