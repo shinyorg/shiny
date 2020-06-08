@@ -25,7 +25,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Common" Version="2.2.5" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Common" Version="2.2.5.1" />
         <PackageReference Include="Xamarin.AndroidX.Room.Runtime" Version="2.2.5" />
         <PackageReference Include="Xamarin.AndroidX.Core" Version="1.2.0" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.3.4.1" />
