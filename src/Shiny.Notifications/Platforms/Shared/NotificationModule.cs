@@ -1,6 +1,7 @@
 ﻿#if !NETSTANDARD
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 
 namespace Shiny.Notifications
@@ -44,7 +45,7 @@ namespace Shiny.Notifications
             if (this.delegateType != null)
                 services.AddSingleton(typeof(INotificationDelegate), this.delegateType);
 
-            services.AddSingleton<INotificationManager, NotificationManager>();
+            services.TryAddSingleton<INotificationManager, NotificationManager>();
 #if __ANDROID__
             services.AddSingleton<AndroidNotificationProcessor>();
             services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
@@ -52,6 +53,8 @@ namespace Shiny.Notifications
                 Repeat = true,
                 IsSystemJob = true
             });
+#elif __IOS__
+            services.TryAddSingleton<iOSNotificationDelegate>();
 #elif WINDOWS_UWP
             UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
             {

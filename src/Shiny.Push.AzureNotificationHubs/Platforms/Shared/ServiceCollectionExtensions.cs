@@ -1,7 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 using Shiny.Notifications;
 using Shiny.Push;
+using Shiny.Push.AzureNotificationHubs;
 using Shiny.Push.AzureNotifications;
 
 
@@ -13,16 +16,17 @@ namespace Shiny
                                                         Type delegateType,
                                                         string listenerConnectionString,
                                                         string hubName,
-                                                        bool requestAccessOnStart = false,
                                                         params NotificationCategory[] categories)
         {
 #if NETSTANDARD2_0
             return false;
 #else
+#if __ANDROID__
+            services.AddSingleton<IPushDelegate, AndroidPushDelegate>();
+#endif
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Integrations.AzureNotifications.PushManager),
                 delegateType,
-                requestAccessOnStart,
                 categories
             ));
             services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
@@ -34,14 +38,12 @@ namespace Shiny
         public static bool UsePushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services,
                                                                        string listenerConnectionString,
                                                                        string hubName,
-                                                                       bool requestAccessOnStart = false,
                                                                        params NotificationCategory[] categories)
             where TPushDelegate : class, IPushDelegate
             => services.UsePushAzureNotificationHubs(
                 typeof(TPushDelegate),
                 listenerConnectionString,
                 hubName,
-                requestAccessOnStart,
                 categories
             );
     }

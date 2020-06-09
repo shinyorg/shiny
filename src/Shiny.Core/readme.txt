@@ -66,7 +66,7 @@ using Shiny;
 
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
 {
-    this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);
+    this.ShinyRequestPermissionsResult(requestCode, permissions, grantResults);
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
 

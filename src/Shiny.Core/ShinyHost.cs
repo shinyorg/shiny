@@ -97,7 +97,7 @@ namespace Shiny
 
             services.TryAddSingleton<IMessageBus, MessageBus>();
             services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
-            services.TryAddSingleton<ISerializer, JsonNetSerializer>();
+            services.TryAddSingleton<ISerializer, ShinySerializer>();
 
             Services = services;
 

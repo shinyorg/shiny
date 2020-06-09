@@ -20,11 +20,27 @@ namespace Shiny.Testing.Infrastucture
 
 
         public Task<bool> Exists<T>(string key) where T : class
-            => Task.FromResult(this.data.ContainsKey(typeof(T)));
+        { 
+            var result = false;
+            if (this.data.ContainsKey(typeof(T)))
+                result = this.data[typeof(T)].ContainsKey(key);
+
+            return Task.FromResult(result);
+        }
 
 
         public Task<T?> Get<T>(string key) where T : class
-            => Task.FromResult(this.data[typeof(T)]?[key] as T);
+        {
+            var result = default(T);
+
+            if (this.data.ContainsKey(typeof(T)))
+            { 
+                var dict = this.data[typeof(T)];
+                if (dict.ContainsKey(key))
+                    result = (T)dict[key];
+            }
+            return Task.FromResult(result);
+        }
 
 
         public Task<IList<T>> GetAll<T>() where T : class

@@ -12,20 +12,20 @@ namespace Shiny
     public static class ServicesCollectionExtensions
     {
         public static void UseAppCenterLogging(this IShinyStartup startup,
-                                               string appSecret = null,
+                                               string? appSecret = null,
                                                bool crashes = true,
                                                bool events = false)
             => UseAppCenterLogging(appSecret, crashes, events);
 
 
         public static void UseAppCenterLogging(this IServiceCollection services,
-                                               string appSecret = null,
+                                               string? appSecret = null,
                                                bool crashes = true,
                                                bool events = false)
             => UseAppCenterLogging(appSecret, crashes, events);
 
 
-        static void UseAppCenterLogging(string appSecret = null,
+        static void UseAppCenterLogging(string? appSecret = null,
                                         bool crashes = true,
                                         bool events = false)
         {

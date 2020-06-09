@@ -11,6 +11,7 @@ namespace Shiny.Locations
 {
     class GeofenceModule : ShinyModule
     {
+        static bool added = false;
         readonly Type delegateType;
         readonly bool requestPermissionOnStart;
 
@@ -24,6 +25,10 @@ namespace Shiny.Locations
 
         public override void Register(IServiceCollection services)
         {
+            if (added)
+                return;
+
+            added = true;
 #if __ANDROID__
             var resultCode = GoogleApiAvailability
                 .Instance

@@ -4,11 +4,12 @@ using UserNotifications;
 
 namespace Shiny.Notifications
 {
-    public static class PlatformExtensions
+    static class PlatformExtensions
     {
-        public static Notification FromNative(this UNNotificationRequest native)
+        public static Notification? FromNative(this UNNotificationRequest native)
         {
-            Int32.TryParse(native.Identifier, out var id);
+            if (!Int32.TryParse(native.Identifier, out var id))
+                return null;
 
             var shiny = new Notification
             {

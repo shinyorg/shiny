@@ -16,7 +16,7 @@ namespace Shiny
         public override void Register(IServiceCollection services)
         {
             var implType = this.FindImplementationType(typeof(IPushDelegate), true);
-            services.UsePush(implType, this.RequestAccessOnStart);
+            services.UsePush(implType);
         }
     }
 
@@ -24,11 +24,8 @@ namespace Shiny
     public class ShinyPushAttribute : ServiceModuleAttribute
     {
         public ShinyPushAttribute(Type delegateType) => this.DelegateType = delegateType;
-
         public Type DelegateType { get; }
-        public bool RequestAccessOnStart { get; set; }
-
         public override void Register(IServiceCollection services)
-            => services.UsePush(this.DelegateType, this.RequestAccessOnStart);
+            => services.UsePush(this.DelegateType);
     }
 }

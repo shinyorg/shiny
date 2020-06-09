@@ -4,8 +4,6 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Push;
-
-
 namespace Shiny.Testing.Push
 {
     public class TestPushManager : IPushManager
@@ -15,6 +13,7 @@ namespace Shiny.Testing.Push
         public AccessState ResultStatus { get; set; } = AccessState.Available;
         public DateTime? CurrentRegistrationTokenDate { get; set; }
         public string? CurrentRegistrationToken { get; set; }
+        public DateTime? CurrentRegistrationExpiryDate { get; set; }
 
         public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => Task.FromResult(new PushAccessState(this.ResultStatus, this.CurrentRegistrationToken));
         public Task UnRegister() => Task.CompletedTask;

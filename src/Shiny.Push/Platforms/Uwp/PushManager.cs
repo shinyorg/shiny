@@ -1,64 +1,73 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Reactive.Subjects;
+using System.Reactive.Linq;
+using Windows.Foundation;
 using Windows.Networking.PushNotifications;
-using Shiny.Logging;
+using Windows.ApplicationModel.Background;
 using Shiny.Settings;
-using System.Linq;
-using System.IO.IsolatedStorage;
+
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager
+    public class PushManager : AbstractPushManager, IShinyStartupTask
     {
-        readonly Subject<IDictionary<string, string>> pushSubject;
-        readonly IServiceProvider serviceProvider;
+        PushNotificationChannel channel;
 
 
-        public PushManager(IServiceProvider serviceProvider, ISettings settings) : base(settings)
+        public PushManager(ISettings settings) : base(settings) {}
+
+
+        public void Start()
         {
-            this.pushSubject = new Subject<IDictionary<string, string>>();
-            this.serviceProvider = serviceProvider;
+            // TODO: if push is enabled, start timer and check channel expiration
+            // if push already registered, start it up automagically here
+            //e.BadgeNotification
+            //await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
+            //this.CurrentRegistrationToken = e.RawNotification.Ur
+            //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            //e.Cancel = true;
+            UwpShinyHost.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
+                builder => builder.SetTrigger(new PushNotificationTrigger())
+            );
         }
 
 
-        public override IObservable<IDictionary<string, string>> WhenReceived() => this.pushSubject;
+        public override IObservable<IDictionary<string, string>> WhenReceived() => Observable.Create<IDictionary<string, string>>(async ob =>
+        {
+            var handler = new TypedEventHandler<PushNotificationChannel, PushNotificationReceivedEventArgs>((sender, args) =>
+            {
+                var headers = args
+                    .RawNotification?
+                    .Headers?
+                    .ToDictionary(
+                        x => x.Key,
+                        x => x.Value
+                    ) ?? new Dictionary<string, string>(0);
+
+                ob.OnNext(headers);
+            });
+            this.channel.PushNotificationReceived += handler;
+            return () => this.channel.PushNotificationReceived -= handler;
+        });
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
             //channel.ExpirationTime - persist and deal with this
-            channel.PushNotificationReceived += this.OnPushNotification;
+
 
             return new PushAccessState(AccessState.Available, channel.Uri);
         }
 
 
-        public override Task UnRegister() => Task.CompletedTask;
-
-
-        async void OnPushNotification(PushNotificationChannel sender, PushNotificationReceivedEventArgs e) => await this.serviceProvider.SafeResolveAndExecute<IPushDelegate>(async sdelegate =>
+        public override Task UnRegister()
         {
-            //using (var s = new IsolatedStorageFileStream("", System.IO.FileMode.Open))
-            //{
-
-            //}
-            await sdelegate.OnReceived(e
-                .RawNotification
-                .Headers
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.Value
-                )
-            );
-            //e.BadgeNotification
-            //await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
-            //this.CurrentRegistrationToken = e.RawNotification.Ur
-            //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            //e.Cancel = true;
-        });
+            this.channel?.Close();
+            return Task.CompletedTask;
+        }
     }
 }

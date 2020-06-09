@@ -7,29 +7,10 @@ namespace Shiny.Caching
 {
     public abstract class AbstractCache : ICache, IDisposable
     {
-        readonly object syncLock = new object();
-        bool init;
-
-        protected abstract void Init();
-
-
-        protected void EnsureInitialized()
-        {
-            if (this.init)
-                return;
-
-            lock (this.syncLock)
-            {
-                this.Init();
-                this.init = true;
-            }
-        }
-
-
         public virtual async Task<T> TryGet<T>(string key, Func<Task<T>> getter, TimeSpan? timeSpan = null)
         {
             var obj = await this.Get<T>(key).ConfigureAwait(false);
-            if (obj == null)
+            if (obj?.Equals(default(T)) ?? true)
             {
                 obj = await getter().ConfigureAwait(false);
                 if (obj != null)
@@ -47,7 +28,7 @@ namespace Shiny.Caching
         public virtual void Dispose() => this.Dispose(true);
 
         public TimeSpan DefaultLifeSpan { get; set; }
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
 
         public abstract Task Set(string key, object obj, TimeSpan? timeSpan = null);
         public abstract Task<IEnumerable<CacheItem>> GetCachedItems();

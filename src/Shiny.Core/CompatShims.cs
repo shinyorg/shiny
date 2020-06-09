@@ -73,15 +73,12 @@ namespace Shiny
     {
         static ISettings Current { get; } = ShinyHost.Resolve<ISettings>();
 
-        public static List<string> KeysNotToClear => Current.KeysNotToClear;
-        public static IReadOnlyDictionary<string, string>? List => Current.List;
         public static IObservable<SettingChange> Changed => Current.Changed;
         public static T Bind<T>() where T : INotifyPropertyChanged, new() => Current.Bind<T>();
         public static void Bind(INotifyPropertyChanged obj) => Current.Bind(obj);
         public static void Clear() => Current.Clear();
         public static bool Contains(string key) => Current.Contains(key);
         public static T Get<T>(string key, T defaultValue = default) => Current.Get(key, defaultValue);
-        public static T GetRequired<T>(string key) => Current.GetRequired<T>(key);
         public static object? GetValue(Type type, string key, object? defaultValue = null) => Current.GetValue(type, key, defaultValue);
         public static bool Remove(string key) => Current.Remove(key);
         public static void Set<T>(string key, T value) => Current.Set(key, value);

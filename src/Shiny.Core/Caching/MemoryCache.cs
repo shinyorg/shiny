@@ -57,7 +57,7 @@ namespace Shiny.Caching
             lock (this.syncLock)
             {
                 if (!this.cache.ContainsKey(key))
-                    return default;
+                    return Task.FromResult(default(T));
 
                 return Task.FromResult((T)this.cache[key].Object);
             }
@@ -80,7 +80,6 @@ namespace Shiny.Caching
                 return Task.CompletedTask;
 
             // I only need this call on set, since it doesn't have to clean until there is actually something there
-            this.EnsureInitialized();
             lock (this.syncLock)
             {
                 var ts = timeSpan ?? this.DefaultLifeSpan;

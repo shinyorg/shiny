@@ -60,7 +60,7 @@ public override void OnNewIntent(Intent intent)
 
 public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
 {
-    this.Shiny.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+    this.ShinyRequestPermissionsResult(requestCode, permissions, grantResults);
     base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 }
 

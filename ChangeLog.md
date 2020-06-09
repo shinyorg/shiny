@@ -4,7 +4,39 @@
 ---
 
 ### Shiny.Core
-* [Enhancement][iOS] Jobs - now uses iOS 13 background processing
+* [Enhancement][Jobs] Job arguments are now like other delegates
+* [Enhancement][Jobs][iOS] Background processing JobManager is now smarter with how it deals with misconfiguration
+* [Enhancement][Jobs] New Extension called RunJobAsTask which allows you to run a job function
+* [Enhancement][Logging] Global logging parameters via Log.Properties
+* [Fix][iOS] NSDictionary fixes
+* [Fix][Cache] Fix await issue in memory cache
+* [Fix][Settings][Android] Preferences are now private
+* [Fix][Settings][iOS] Using Preferences with Shiny Settings could cause issues
+* [BREAKING][Settings] KeysNotClear and Keys enumerable have been removed to make room for more platforms and simplify the API - some methods were moved to extensions
+
+### Shiny.Locations
+* [Enhancement][GPS] Multiple delegate registrations
+* [Enhancement][Geofencing] Multiple delegate registrations
+* [Fix][Motion Activity][Android] Android 10 permission request will now request starting the listener when available
+* [Fix][GPS/Geofencing][Android] Properly check everything under Android 8.1
+* [Fix][Geofencing][Android] StopAllMonitoring shouldn't error if there are no geofences
+
+### Shiny.Notifications
+* [Enhancement] Multiple delegate registrations
+* [Enhancement][Android] Ability to set custom launch activity type
+* [Fix][Android] Pending launch intent is always set regardless of category
+* [Fix][UWP] Cancelling notifications was not removing the notification
+
+### Shiny.Push
+* [Enhancement] Multiple delegate registrations
+* [Enhancement] Adds ability to see when token expires (if applicable, otherwise null)
+* [Enhancement] Adds ability to register with tags, update tags, and see currently registered tags if the push mechanism supports it.  Check if IPushManager can be cast to IPushTagSupport
+
+### Shiny.Push.AzureNotificationHubs
+* [Enhancement] RequestAccess with new tags support
+
+### Shiny.Locations.Sync (beta) - New Module
+* This will sync geofence and GPS events to your backend utilizing best practices with background jobs
 
 1.1.0
 ---
@@ -13,6 +45,7 @@
 * [Feature] App State Delegate - In your shiny startup, use services.AddAppState<YourAppStateDelegate> that inherits from IAppStateDelegate.  Watch for app start, foreground, & background
 * [Feature] PowerManager now has property/inpc for IsEnergySavingEnabled that checks for ios low power, android doze, & uwp energy saving mode
 * [Feature] Ability to run jobs on timers while the application is in the foreground or app state changes (starting, resuming, or backgrounding)
+* [Enhancement][Jobs][iOS] Jobs - now uses iOS 13 background processing
 * [Enhancement] Increased discoverability via new AppDelegate & Android app/activity extension methods.   Simply add the Shiny namespace and type this.Shiny to see all of the points you should be attaching
 * [Enhancement][iOS][Android] Easier boilerplate setup
 * [Enhancement][Android] JobManager.RunTask will now use wakeful locks to run tasks if available

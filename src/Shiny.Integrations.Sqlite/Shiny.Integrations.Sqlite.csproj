@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <VersionSuffix>beta</VersionSuffix>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Description>Shiny Integration - SQLite Plugins for Cache, Logging, Service Repo Layers, and Settings</Description>
         <RootNamespace>Shiny</RootNamespace>
@@ -9,7 +8,7 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <PackageReference Include="sqlite-net-pcl" Version="1.6.292" />
+        <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
     </ItemGroup>
 
     <ItemGroup>

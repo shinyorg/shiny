@@ -7,7 +7,6 @@ using Windows.Storage;
 
 namespace Shiny.Settings
 {
-
     public class SettingsImpl : AbstractSettings
     {
         readonly ApplicationDataContainer container;
@@ -46,12 +45,7 @@ namespace Shiny.Settings
         }
 
 
-        protected override IDictionary<string, string> NativeValues() =>
-            this.container
-                .Values
-                .ToDictionary(
-                    x => x.Key,
-                    x => x.Value.ToString()
-                );
+        protected override void NativeClear()
+            => this.container.Values.Clear();
     }
 }

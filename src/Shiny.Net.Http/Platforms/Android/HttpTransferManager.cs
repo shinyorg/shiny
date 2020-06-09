@@ -9,7 +9,7 @@ using Shiny.Jobs;
 using Android;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
-
+using System.Net.Http;
 
 namespace Shiny.Net.Http
 {
@@ -88,6 +88,9 @@ namespace Shiny.Net.Http
 
         protected override async Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
         {
+            if (request.HttpMethod != HttpMethod.Get)
+                throw new ArgumentException("Only GETs are supported for downloads on Android");
+
             var access = await this.context.RequestAccess(Manifest.Permission.WriteExternalStorage);
             if (access != AccessState.Available)
                 throw new ArgumentException("Invalid access to external storage - " + access);

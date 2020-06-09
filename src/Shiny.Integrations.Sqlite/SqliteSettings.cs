@@ -15,11 +15,15 @@ namespace Shiny.Integrations.Sqlite
 
 
         public override bool Contains(string key)
-            => this.conn.GetConnection().Get<SettingStore>(key) != null;
+            => this.conn.GetConnection().Find<SettingStore>(key) != null;
 
 
-        protected override object NativeGet(Type type, string key)
-            => this.conn.GetConnection().Get<SettingStore>(key).GetValue();
+        protected override object? NativeGet(Type type, string key)
+            => this.conn.GetConnection().Find<SettingStore>(key)?.GetValue();
+
+
+        protected override void NativeClear()
+            => this.conn.GetConnection().DeleteAll<SettingStore>();
 
 
         protected override void NativeRemove(string[] keys)
@@ -34,17 +38,6 @@ namespace Shiny.Integrations.Sqlite
             var store = new SettingStore { Key = key };
             store.SetValue(value);
             this.conn.GetConnection().InsertOrReplace(store);
-        }
-
-
-        protected override IDictionary<string, string> NativeValues()
-        {
-            var dict = new Dictionary<string, string>();
-            var stores = this.conn.GetConnection().Table<SettingStore>().ToList();
-            foreach (var store in stores)
-                dict.Add(store.Key, store.GetValue().ToString());
-
-            return dict;
         }
     }
 }

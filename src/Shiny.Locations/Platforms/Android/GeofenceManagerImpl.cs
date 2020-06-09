@@ -41,11 +41,10 @@ namespace Shiny.Locations
 
 
         public override AccessState Status
-            => this.context.GetCurrentLocationAccess(true, true);
-
+            => this.context.GetCurrentLocationAccess(true, true, true, true);
 
         public override Task<AccessState> RequestAccess()
-            => this.context.RequestLocationAccess(true, true);
+            => this.context.RequestLocationAccess(true, true, true, true);
 
 
         public override async Task StartMonitoring(GeofenceRegion region)
@@ -66,7 +65,9 @@ namespace Shiny.Locations
         {
             var regions = await this.Repository.GetAll();
             var regionIds = regions.Select(x => x.Identifier).ToArray();
-            await this.client.RemoveGeofencesAsync(regionIds);
+            if (regionIds.Any())
+                await this.client.RemoveGeofencesAsync(regionIds);
+
             await this.Repository.Clear();
         }
 

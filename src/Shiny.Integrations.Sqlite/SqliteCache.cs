@@ -29,7 +29,7 @@ namespace Shiny.Integrations.Sqlite
 
         public override async Task<T> Get<T>(string key)
         {
-            var item = await this.conn.GetAsync<CacheStore>(key);
+            var item = await this.conn.FindAsync<CacheStore>(key);
             if (item == null)
                 return default;
 

@@ -9,21 +9,63 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Settings;
+using Shiny.Notifications;
 
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager
+    public class PushManager : AbstractPushManager, IShinyStartupTask
     {
-        readonly IMessageBus messageBus;
+        readonly iOSNotificationDelegate nativeDelegate;
+        readonly IServiceProvider services;
+        readonly Subject<IDictionary<string, string>> payloadSubj;
         Subject<NSData>? onToken;
 
 
         public PushManager(ISettings settings,
-                           IMessageBus messageBus,
-                           IServiceProvider services) : base(settings)
+                           IServiceProvider services,
+                           iOSNotificationDelegate nativeDelegate) : base(settings)
         {
-            this.messageBus = messageBus;
+            this.services = services;
+            this.nativeDelegate = nativeDelegate;
+
+            this.payloadSubj = new Subject<IDictionary<string, string>>();
+        }
+
+
+        public void Start()
+        {
+            this.nativeDelegate
+                .WhenPresented()
+                .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
+                .SubscribeAsync(async x =>
+                {
+                    var payload = x.Notification.Request?.Content?.UserInfo?.FromNsDictionary();
+                    await this.services
+                        .RunDelegates<IPushDelegate>(x => x.OnReceived(payload))
+                        .ConfigureAwait(false);
+
+                    this.payloadSubj.OnNext(payload);
+                    x.CompletionHandler?.Invoke(UNNotificationPresentationOptions.Alert);
+                });
+
+            this.nativeDelegate
+                .WhenResponse()
+                .Where(x => x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
+                .SubscribeAsync(async x =>
+                {
+                    var textReply = (x.Response as UNTextInputNotificationResponse)?.UserText;
+                    var parameters = x.Response.Notification.Request.Content.UserInfo.FromNsDictionary() ?? new Dictionary<string, string>();
+
+                    var args = new PushEntryArgs(
+                        x.Response.Notification.Request.Content.CategoryIdentifier,
+                        x.Response.ActionIdentifier,
+                        textReply,
+                        parameters
+                    );
+                    await this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
+                    x.CompletionHandler();
+                });
 
             iOSShinyHost.RegisterForRemoteNotifications(
                 async deviceToken =>
@@ -44,16 +86,26 @@ namespace Shiny.Push
                     action(UIBackgroundFetchResult.NewData);
                 }
             );
+
+            // this will be on the main thread already
+            if (!this.CurrentRegistrationToken.IsEmpty())
+                UIApplication.SharedApplication.RegisterForRemoteNotifications();
         }
 
 
-        public override IObservable<IDictionary<string, string>> WhenReceived() => this
-            .messageBus
-            .Listener<IDictionary<string, string>>(nameof(PushNotificationDelegate));
+        public override IObservable<IDictionary<string, string>> WhenReceived() => this.payloadSubj;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
+            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
+                UNAuthorizationOptions.Alert |
+                UNAuthorizationOptions.Badge |
+                UNAuthorizationOptions.Sound
+            );
+            if (!result.Item1)
+                return PushAccessState.Denied;
+
             var deviceToken = await this.RequestDeviceToken(cancelToken);
             this.CurrentRegistrationToken = ToTokenString(deviceToken);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
@@ -61,23 +113,17 @@ namespace Shiny.Push
         }
 
 
-        public override Task UnRegister()
-            => Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);            
+        public override async Task UnRegister()
+        {
+            await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);
+            this.ClearRegistration();
+        }
 
 
         protected virtual async Task<NSData> RequestDeviceToken(CancellationToken cancelToken = default)
         {
             this.onToken = new Subject<NSData>();
             var remoteTask = this.onToken.Take(1).ToTask(cancelToken);
-
-            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
-                UNAuthorizationOptions.Alert |
-                UNAuthorizationOptions.Badge |
-                UNAuthorizationOptions.Sound
-            );
-            if (!result.Item1)
-                throw new Exception(result.Item2.LocalizedDescription);
-
             await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.RegisterForRemoteNotifications);
             var data = await remoteTask;
             return data;

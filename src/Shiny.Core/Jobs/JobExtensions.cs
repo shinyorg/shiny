@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
@@ -10,6 +11,28 @@ namespace Shiny
 {
     public static class JobExtensions
     {
+        /// <summary>
+        /// This will run a job from an event/delegate - the same rules as the job running normally still apply
+        /// You don't need to use this if you are using foreground jobs (ie. services.UseJobForegroundService)
+        /// </summary>
+        /// <param name="jobManager"></param>
+        /// <param name="jobIdentifier"></param>
+        /// <returns></returns>
+        public static Task RunJobAsTask(this IJobManager jobManager, string jobIdentifier)
+        {
+            var tcs = new TaskCompletionSource<object>();
+            jobManager.RunTask(jobIdentifier, async ct =>
+            {
+                var result = await jobManager.Run(jobIdentifier, ct);
+                if (result.Success)
+                    tcs.SetResult(null);
+                else
+                    tcs.SetResult(result.Exception);
+            });
+            return tcs.Task;
+        }
+
+
         /// <summary>
         /// This will run any jobs marked with RunOnForeground
         /// </summary>
@@ -50,12 +73,14 @@ namespace Shiny
                                        Type jobType,
                                        string? identifier = null,
                                        InternetAccess requiredNetwork = InternetAccess.None,
-                                       bool runInForeground = false)
+                                       bool runInForeground = false,
+                                       params (string Key, object value)[] parameters)
             => services.RegisterJob(new JobInfo(jobType, identifier)
             {
                 RequiredInternetAccess = requiredNetwork,
                 RunOnForeground = runInForeground,
-                Repeat = true
+                Repeat = true,
+                Parameters = parameters?.ToDictionary()
             });
 
 
@@ -76,7 +101,7 @@ namespace Shiny
                 return ShinyHost.Container.GetService<ISerializer>().Deserialize<T>(s);
 
             // TODO: Jobject & jarray tend to emerge causing this to fail
-            return defaultValue;
+            return (T)value;
         }
     }
 }

@@ -5,6 +5,8 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Media;
+using Android.Support.V4.App;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
@@ -119,11 +121,13 @@ namespace Shiny.Notifications
                 return;
             }
 
+            var pendingIntent = this.GetLaunchPendingIntent(notification);
             var builder = new NotificationCompat.Builder(this.context.AppContext)
                 .SetContentTitle(notification.Title)                
                 .SetSmallIcon(this.GetSmallIconResource(notification))
                 .SetAutoCancel(notification.Android.AutoCancel)
-                .SetOngoing(notification.Android.OnGoing);
+                .SetOngoing(notification.Android.OnGoing)
+                .SetContentIntent(pendingIntent);
 
             if (notification.Android.UseBigTextStyle)
                 builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
@@ -133,15 +137,8 @@ namespace Shiny.Notifications
             this.TrySetSound(notification, builder);
             this.TrySetLargeIconResource(notification, builder);
 
-            if (!notification.Category.IsEmpty())
-            {
-                this.AddCategory(builder, notification);
-            }
-            else
-            {
-                var pendingIntent = this.GetLaunchPendingIntent(notification);
-                builder.SetContentIntent(pendingIntent);
-            }
+            if (!notification.Category.IsEmpty())            
+                this.AddCategory(builder, notification);           
 
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
@@ -192,10 +189,11 @@ namespace Shiny.Notifications
         {
 #if ANDROIDX
             var channelId = notification.Android.ChannelId;
+            var channel = this.compatManager.GetNotificationChannel(channelId);
 
-            if (this.compatManager.GetNotificationChannel(channelId) == null)
+            if (channel == null)
             {
-                var channel = new NotificationChannel(
+                channel = new NotificationChannel(
                     channelId,
                     notification.Android.Channel,
                     notification.Android.NotificationImportance.ToNative()
@@ -207,16 +205,28 @@ namespace Shiny.Notifications
                 this.compatManager.CreateNotificationChannel(channel);
             }
 
+            if (notification.Sound.IsCustomSound())
+            {
+                var attributes = new AudioAttributes.Builder()
+                    .SetUsage(AudioUsageKind.NotificationRingtone)
+                    .Build();
+
+                var uri = Android.Net.Uri.Parse(notification.Sound.Path);
+                channel.SetSound(uri, attributes);
+                channel.EnableVibration(notification.Android.Vibrate);
+            }
+
             builder.SetChannelId(channelId);
             this.compatManager.Notify(notification.Id, builder.Build());
 #else
             if (this.newManager != null)
             {
                 var channelId = notification.Android.ChannelId;
+                var channel = this.newManager.GetNotificationChannel(channelId);
 
-                if (this.newManager.GetNotificationChannel(channelId) == null)
+                if (channel == null)
                 {
-                    var channel = new NotificationChannel(
+                    channel = new NotificationChannel(
                         channelId,
                         notification.Android.Channel,
                         notification.Android.NotificationImportance.ToNative()
@@ -227,7 +237,16 @@ namespace Shiny.Notifications
 
                     this.newManager.CreateNotificationChannel(channel);
                 }
+                if (notification.Sound.IsCustomSound())
+                {
+                    var attributes = new AudioAttributes.Builder()
+                        .SetUsage(AudioUsageKind.NotificationRingtone)
+                        .Build();
 
+                    var uri = Android.Net.Uri.Parse(notification.Sound.Path);
+                    channel.SetSound(uri, attributes);
+                    channel.EnableVibration(notification.Android.Vibrate);
+                }
                 builder.SetChannelId(channelId);
                 this.newManager.Notify(notification.Id, builder.Build());
             }
@@ -239,21 +258,28 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string actionId = null)
+        protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
         {
-            var launchIntent = this
-                .context
-                .AppContext
-                .PackageManager
-                .GetLaunchIntentForPackage(this.context.Package.PackageName)
-                .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
+            Intent launchIntent;
+            if (notification.Android?.LaunchActivityType == null)
+            {
+                launchIntent = this.context
+                    .AppContext
+                    .PackageManager
+                    .GetLaunchIntentForPackage(this.context.Package.PackageName)
+                    .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
+            }
+            else
+            {
+                launchIntent = new Intent(this.context.AppContext, notification.Android.LaunchActivityType);
+            }
 
             var notificationString = this.serializer.Serialize(notification);
             launchIntent.PutExtra(AndroidNotificationProcessor.NOTIFICATION_KEY, notificationString);
             if (notification.Payload != null)
             {
-                // TODO: payload!
-                //launchIntent.PutExtra("Payload", notification.Payload);
+                foreach (var item in notification.Payload)
+                    launchIntent.PutExtra(item.Key, item.Value);
             }
 
             PendingIntent pendingIntent;

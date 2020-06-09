@@ -2,7 +2,7 @@
 using System.Reactive.Subjects;
 using Shiny.Infrastructure;
 using CoreLocation;
-
+using System.Collections.Generic;
 
 namespace Shiny.Locations
 {
@@ -10,7 +10,7 @@ namespace Shiny.Locations
     {
         readonly RepositoryWrapper<GeofenceRegion, GeofenceRegionStore> repository;
         readonly Subject<GeofenceCurrentStatus> stateSubject;
-        readonly Lazy<IGeofenceDelegate> gdelegate = new Lazy<IGeofenceDelegate>(() => ShinyHost.Resolve<IGeofenceDelegate>());
+        readonly Lazy<IEnumerable<IGeofenceDelegate>> delegates = ShinyHost.LazyResolve<IEnumerable<IGeofenceDelegate>>();
 
 
         public GeofenceManagerDelegate()
@@ -50,7 +50,7 @@ namespace Shiny.Locations
                 var geofence = await this.repository.Get(native.Identifier);
                 if (geofence != null)
                 {
-                    await this.gdelegate.Value.OnStatusChanged(status, geofence);
+                    await this.delegates.Value.RunDelegates(x => x.OnStatusChanged(status, geofence));
                     if (geofence.SingleUse)
                     {
                         await this.repository.Remove(geofence.Identifier);

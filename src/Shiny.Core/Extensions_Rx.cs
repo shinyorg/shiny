@@ -7,6 +7,8 @@ using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -27,6 +29,17 @@ namespace Shiny
 
     public static class RxExtensions
     {
+        public static Task WithTimeout(this Task task, TimeSpan ts) => Observable
+            .FromAsync(() => task)
+            .Timeout(ts)
+            .ToTask(CancellationToken.None);
+
+
+        public static Task<T> WithTimeout<T>(this Task<T> task, TimeSpan ts) => Observable
+            .FromAsync(() => task)
+            .Timeout(ts)
+            .ToTask(CancellationToken.None);
+
         /// <summary>
         /// A function from ReactiveUI - useful for non-ui stuff too ;)
         /// </summary>

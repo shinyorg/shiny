@@ -36,6 +36,28 @@ namespace Shiny.Power
         }
 
 
+        ////<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
+        //public void RequestIgnoreBatteryOptimizations()
+        //{
+        //    //Intent intent = new Intent();
+        //    //String packageName = context.getPackageName();
+        //    //PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
+        //    //if (pm.isIgnoringBatteryOptimizations(packageName))
+        //    //    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+        //    //else
+        //    //{
+        //    //    intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+        //    //    intent.setData(Uri.parse("package:" + packageName));
+        //    //}
+        //    //context.startActivity(intent);
+        //    //myIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS); // better
+
+        //    var intent = new Intent("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
+        //    intent.SetData(Android.Net.Uri.Parse("package:" + this.context.Package.PackageName));
+        //    this.context.AppContext.StartActivity(intent);   
+        //}
+
+
         public bool IsEnergySavingEnabled => this.context
             .GetSystemServiceValue<bool, PowerManager>(
                 Context.PowerService,

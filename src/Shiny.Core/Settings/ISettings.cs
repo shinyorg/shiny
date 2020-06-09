@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 
@@ -7,16 +6,6 @@ namespace Shiny.Settings
 {
     public interface ISettings
     {
-        /// <summary>
-        /// Any values in this list will not be removed using clear
-        /// </summary>
-        List<string> KeysNotToClear { get; }
-
-        /// <summary>
-        /// List current values from settings store
-        /// </summary>
-        IReadOnlyDictionary<string, string>? List { get; }
-
         /// <summary>
         /// Monitor setting events (Add, Update, Remove, Clear)
         /// </summary>
@@ -41,14 +30,6 @@ namespace Shiny.Settings
         object? GetValue(Type type, string key, object? defaultValue = null);
 
         /// <summary>
-        /// Enforces that the key is set and returns value
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        T GetRequired<T>(string key);
-
-        /// <summary>
         /// Send any value/object to the settings store
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -62,14 +43,6 @@ namespace Shiny.Settings
         /// <param name="key"></param>
         /// <param name="value"></param>
         void SetValue(string key, object value);
-
-        /// <summary>
-        /// This will only set the value if the setting is not currently set.  Will not fire Changed event
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        bool SetDefault<T>(string key, T value);
 
         /// <summary>
         /// Remove the setting by key

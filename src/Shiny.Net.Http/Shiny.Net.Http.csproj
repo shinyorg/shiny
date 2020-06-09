@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
@@ -22,14 +22,14 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Reference Include="netstandard" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*macOS*\**\*.cs" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />

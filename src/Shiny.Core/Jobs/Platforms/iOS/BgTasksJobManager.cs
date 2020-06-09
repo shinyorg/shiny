@@ -4,18 +4,43 @@ using System.Threading.Tasks;
 using BackgroundTasks;
 using UIKit;
 using Shiny.Infrastructure;
+using Shiny.Logging;
 
 
 namespace Shiny.Jobs
 {
-    public class BgTasksJobManager : AbstractJobManager
+    public class BgTasksJobManager : AbstractJobManager, IShinyStartupTask
     {
+        const string EX_MSG = "Could not register background processing job. Shiny uses background processing when enabled in your info.plist.  Please follow the Shiny readme for Shiny.Core to properly register BGTaskSchedulerPermittedIdentifiers";
+        bool registeredSuccessfully = false;
+
+
         public BgTasksJobManager(IServiceProvider container, IRepository repository) : base(container, repository)
         {
-            this.Register(this.GetIdentifier(false, false));
-            this.Register(this.GetIdentifier(true, false));
-            this.Register(this.GetIdentifier(false, true));
-            this.Register(this.GetIdentifier(true, true));
+        }
+
+
+        public void Start()
+        {
+            try
+            {
+                this.Register(this.GetIdentifier(false, false));
+                this.Register(this.GetIdentifier(true, false));
+                this.Register(this.GetIdentifier(false, true));
+                this.Register(this.GetIdentifier(true, true));
+                this.registeredSuccessfully = true;
+            }
+            catch (Exception ex)
+            {
+                Log.Write(new Exception(EX_MSG, ex));
+            }
+        }
+
+
+        protected void Assert()
+        {
+            if (!this.registeredSuccessfully)
+                throw new Exception(EX_MSG);
         }
 
 
@@ -29,6 +54,31 @@ namespace Shiny.Jobs
                     PlatformExtensions.HasBackgroundMode("processing")
                 );
                 return result;
+            }
+        }
+
+
+        public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
+        {
+            var app = UIApplication.SharedApplication;
+            var taskId = 0;
+            try
+            {
+                using (var cancelSrc = new CancellationTokenSource())
+                {
+                    taskId = (int)app.BeginBackgroundTask(taskName, cancelSrc.Cancel);
+                    this.LogTask(JobState.Start, taskName);
+                    await task(cancelSrc.Token).ConfigureAwait(false);
+                    this.LogTask(JobState.Finish, taskName);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.LogTask(JobState.Error, taskName, ex);
+            }
+            finally
+            {
+                app.EndBackgroundTask(taskId);
             }
         }
 
@@ -55,6 +105,8 @@ namespace Shiny.Jobs
 
         protected override void ScheduleNative(JobInfo jobInfo)
         {
+            this.Assert();
+
             var identifier = this.GetIdentifier(
                 jobInfo.DeviceCharging,
                 jobInfo.RequiredInternetAccess == InternetAccess.Any
@@ -75,11 +127,13 @@ namespace Shiny.Jobs
                 null,
                 async task =>
                 {
-                    var cancelSrc = new CancellationTokenSource();
-                    task.ExpirationHandler = cancelSrc.Cancel;
+                    using (var cancelSrc = new CancellationTokenSource())
+                    { 
+                        task.ExpirationHandler = cancelSrc.Cancel;
 
-                    var result = await this.Run(task.Identifier, cancelSrc.Token);
-                    task.SetTaskCompleted(result.Exception != null);
+                        var result = await this.Run(task.Identifier, cancelSrc.Token);
+                        task.SetTaskCompleted(result.Exception != null);
+                    }
                 }
             );
         }

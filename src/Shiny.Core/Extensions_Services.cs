@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,8 +8,18 @@ using Shiny.Logging;
 
 namespace Shiny
 {
+    //public class LazyService<T> : Lazy<T>
+    //{
+    //    public LazyService(IServiceProvider services) : base(() => services.GetRequiredService<T>(), false) { }
+    //}
+
+
     public static class ServiceExtensions
     {
+        //public static void AddLazySingleton<TService, TImpl>(this IServiceCollection services)
+        //    => services.AddSingleton<Lazy<TService>, LazyService<TImpl>>();
+
+
         /// <summary>
         /// Get Service of Type T from the IServiceProvider
         /// </summary>
@@ -39,6 +50,53 @@ namespace Shiny
             }
         }
 
+
+        public static IEnumerable<T> ResolveAll<T>(this IServiceProvider services)
+            => services.Resolve<IEnumerable<T>>();
+
+
+        public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception> onError = null)
+            => services.ResolveAll<T>().RunDelegates(execute, onError);
+        
+
+        public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, Action<Exception> onError = null)
+        {
+            var tasks = services.Select(async x =>
+            {
+                try
+                {
+                    await execute(x).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    if (onError == null)
+                        Log.Write(ex); 
+                    else
+                        onError(ex);
+                }
+            })
+            .ToList();
+
+            await Task.WhenAll(tasks);
+        }
+
+
+        public static async Task RunResolves<T>(this IServiceProvider services, Func<T, Task> execute)
+        {
+            var resolves = services.Resolve<IEnumerable<T>>();
+            foreach (var resolve in resolves)
+            {
+                try
+                {
+                    // TODO: run in parallel in case delegates have anything long running
+                    await execute(resolve).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+            }
+        }
 
         /// <summary>
         /// Registers a post container build step

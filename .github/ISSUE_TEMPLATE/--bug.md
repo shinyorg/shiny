@@ -7,27 +7,35 @@ assignees: ''
 
 ---
 
-# IF YOU DON'T ANSWER THIS TEMPLATE - THE BOT WILL AUTOMATICALLY CLOSE YOUR ISSUE!
+# IF YOU DON'T ANSWER THIS TEMPLATE - THE BOT WILL AUTOMATICALLY CLOSE YOUR ISSUE!  PLEASE DON'T ASK FOR WORKAROUNDS OR TIMELINES - THIS IS FREE SOURCE CODE
 
 ## Please check all of the platforms you are having the issue on (if platform is not listed, it is not supported)
 
  - [ ] iOS
  - [ ] Android
  - [ ] UWP
- - [ ] watchOS
- - [ ] tvOS
- - [ ] Tizen
- - [ ] .NET Standard
+
+ PLATFORMS THAT YOU CANNOT FILE ISSUES ON RIGHT NOW: Tizen, watchOS, tvOS, macOS
 
 ## Feature Library
 
+### beta components are not fully done - issues MUST include full reproducible sample and stacktrace or they will be closed without explanation!!!
+
  - [ ] Core
- - [ ] BluetoothLE
- - [ ] Beacons
  - [ ] Locations
  - [ ] HTTP Transfers
  - [ ] Notifications
+ - [ ] Push
+ - [ ] Push - Azure Notification Hub
+ - [ ] Push - Firebase (beta)
  - [ ] Sensors
+ - [ ] AppCenter Logging Integration
+ - [ ] Location Sync (beta)
+ - [ ] BluetoothLE (beta)
+ - [ ] Beacons (beta)
+ - [ ] SQLite Integration
+
+
 
 ## Version of Library
 
