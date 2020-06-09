@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Android.Gms.Extensions;
 using Firebase.Iid;
 using Firebase.Messaging;
 using Shiny.Settings;
-using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
+using Task = System.Threading.Tasks.Task;
 
 
 namespace Shiny.Push
@@ -27,32 +27,27 @@ namespace Shiny.Push
         }
 
 
-        public override Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => this.RequestAccess(null, cancelToken);
-        public virtual async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
+        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            //var resultCode = GoogleApiAvailability
-            //    .Instance
-            //    .IsGooglePlayServicesAvailable(this.context.AppContext);
-
-            //if (resultCode == ConnectionResult.)
-            //if (resultCode != ConnectionResult.ServiceMissing)
-            //{
-            ////{
-            ////    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
-            ////        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
-            //}
             var result = await FirebaseInstanceId
-                .Instance
-                .GetInstanceId()
-                .AsAsync<IInstanceIdResult>();
+                        .Instance
+                        .GetInstanceId()
+                        .AsAsync<IInstanceIdResult>();
 
             this.CurrentRegistrationToken = result.Token;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             FirebaseMessaging.Instance.AutoInitEnabled = true;
 
+            return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
+        }
+
+        public virtual async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
+        {
+            var state = await this.RequestAccess(cancelToken);
+
             await this.UpdateTags(tags);
 
-            return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
+            return state;
         }
 
 
@@ -73,14 +68,14 @@ namespace Shiny.Push
         public async Task UpdateTags(params string[] tags)
         {
             if (this.RegisteredTags != null)
-            { 
+            {
                 foreach (var tag in this.RegisteredTags)
                 {
                     await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
                 }
             }
             if (tags != null)
-            { 
+            {
                 foreach (var tag in tags)
                 {
                     await FirebaseMessaging.Instance.SubscribeToTopic(tag);
