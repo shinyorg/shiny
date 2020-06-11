@@ -4,7 +4,7 @@ using Android.Bluetooth;
 using Java.Util;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     public static class Constants
     {

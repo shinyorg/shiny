@@ -2,7 +2,7 @@ using System;
 using Android.Bluetooth;
 
 
-namespace Shiny.BluetoothLE.Peripherals.Internals
+namespace Shiny.BluetoothLE.Hosting.Internals
 {
     public class DescriptorReadEventArgs : GattRequestEventArgs
     {

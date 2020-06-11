@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Bluetooth;
-using Shiny.BluetoothLE.Peripherals.Internals;
+using Shiny.BluetoothLE.Hosting.Internals;
 
 
 namespace Shiny.BluetoothLE.Hosting

@@ -3,7 +3,7 @@ using System.Linq;
 using Android.Bluetooth;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     public class Peripheral : IPeripheral
     {

@@ -2,7 +2,7 @@
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     public class Peripheral : IPeripheral
     {

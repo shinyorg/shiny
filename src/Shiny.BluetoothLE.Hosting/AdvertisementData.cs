@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     public class AdvertisementData
     {

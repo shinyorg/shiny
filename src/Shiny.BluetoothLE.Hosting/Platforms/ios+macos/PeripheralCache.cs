@@ -4,7 +4,7 @@ using System.Linq;
 using CoreBluetooth;
 using Foundation;
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     class PeripheralCache
     {

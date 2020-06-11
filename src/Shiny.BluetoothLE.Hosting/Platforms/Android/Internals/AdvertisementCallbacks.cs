@@ -2,7 +2,7 @@
 using Android.Bluetooth.LE;
 
 
-namespace Shiny.BluetoothLE.Peripherals.Internals
+namespace Shiny.BluetoothLE.Hosting.Internals
 {
     public class AdvertisementCallbacks : AdvertiseCallback
     {

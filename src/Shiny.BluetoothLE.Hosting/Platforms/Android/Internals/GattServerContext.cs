@@ -4,7 +4,7 @@ using Android.Bluetooth;
 using AGattStatus = Android.Bluetooth.GattStatus;
 
 
-namespace Shiny.BluetoothLE.Peripherals.Internals
+namespace Shiny.BluetoothLE.Hosting.Internals
 {
     public class GattServerContext : BluetoothGattServerCallback
     {

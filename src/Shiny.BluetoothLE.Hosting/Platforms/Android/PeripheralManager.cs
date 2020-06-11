@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Shiny.BluetoothLE.Peripherals.Internals;
+using Shiny.BluetoothLE.Hosting.Internals;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
-    public class PeripheralManager : IPeripheralManager
+    public class PeripheralManager : IBleHostingManager
     {
         readonly GattServerContext context;
         readonly Dictionary<Guid, GattService> services;

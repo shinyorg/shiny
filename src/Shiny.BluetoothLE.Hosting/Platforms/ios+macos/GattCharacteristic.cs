@@ -5,7 +5,7 @@ using CoreBluetooth;
 using Foundation;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     public class GattCharacteristic : IGattCharacteristic, IGattCharacteristicBuilder, IDisposable
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     [Flags]
     public enum NotificationOptions

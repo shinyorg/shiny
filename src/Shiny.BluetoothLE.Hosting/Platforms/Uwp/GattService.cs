@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     public class GattService : IGattService, IGattServiceBuilder, IDisposable
     {

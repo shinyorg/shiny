@@ -4,7 +4,7 @@ using System.Linq;
 using CoreBluetooth;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
     public class GattService : IGattService, IGattServiceBuilder, IDisposable
     {

@@ -7,9 +7,9 @@ using Windows.Storage.Streams;
 using Windows.Devices.Bluetooth.Advertisement;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
-    public class PeripheralManager : IPeripheralManager
+    public class PeripheralManager : IBleHostingManager
     {
         readonly BluetoothLEAdvertisementPublisher publisher;
         readonly Dictionary<Guid, GattService> services;

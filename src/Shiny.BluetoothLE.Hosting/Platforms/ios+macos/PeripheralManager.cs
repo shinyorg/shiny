@@ -7,9 +7,9 @@ using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 
 
-namespace Shiny.BluetoothLE.Peripherals
+namespace Shiny.BluetoothLE.Hosting
 {
-    public class PeripheralManager : IPeripheralManager
+    public class PeripheralManager : IBleHostingManager
     {
         readonly CBPeripheralManager manager;
         readonly IDictionary<Guid, GattService> services;
