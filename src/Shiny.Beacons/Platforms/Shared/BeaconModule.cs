@@ -25,7 +25,7 @@ namespace Shiny.Beacons
                 services.AddSingleton(typeof(IBeaconDelegate), this.delegateType);
 
 #if WINDOWS_UWP || __ANDROID__
-            services.UseBleCentral();
+            services.UseBleClient();
             if (this.delegateType != null)
                 services.AddSingleton<BackgroundTask>();
 #endif

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+
 using Android.App;
 using Firebase.Messaging;
 using Shiny.Logging;
@@ -34,7 +36,13 @@ namespace Shiny.Push
                     Title = native.Title,
                     Message = native.Body,
                     Category = native.ClickAction,
-                    Payload = message.Data
+                    //Sound = native.Sound,
+
+                    // recast this as implementation types aren't serializing well
+                    Payload = message.Data?.ToDictionary(
+                        x => x.Key,
+                        x => x.Value
+                    )
                 };
                 if (!native.ChannelId.IsEmpty())
                     notification.Android.ChannelId = native.ChannelId;

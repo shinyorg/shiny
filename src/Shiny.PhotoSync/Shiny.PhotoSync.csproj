@@ -1,0 +1,38 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+
+    <PropertyGroup>
+        <VersionSuffix>alpha</VersionSuffix>
+        <Description>Shiny Photo Gallery Sync</Description>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.txt" />
+        <Compile Remove="Platforms\**\*.cs" />
+        <None Include="Platforms\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <Compile Include="Platforms\iOS\**\*.cs" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />        
+        <Compile Include="Platforms\Android\**\*.cs" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+</Project>

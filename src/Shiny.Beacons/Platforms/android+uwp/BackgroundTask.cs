@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 using Shiny.Infrastructure;
-using Shiny.BluetoothLE.Central;
+using Shiny.BluetoothLE;
 using Shiny.Logging;
 
 
@@ -12,7 +12,7 @@ namespace Shiny.Beacons
 {
     public class BackgroundTask
     {
-        readonly ICentralManager centralManager;
+        readonly IBleManager centralManager;
         readonly IBeaconManager beaconManager;
         readonly IMessageBus messageBus;
         readonly IBeaconDelegate beaconDelegate;
@@ -20,7 +20,7 @@ namespace Shiny.Beacons
         IDisposable? scanSub;
 
 
-        public BackgroundTask(ICentralManager centralManager,
+        public BackgroundTask(IBleManager centralManager,
                               IBeaconManager beaconManager,
                               IMessageBus messageBus,
                               IBeaconDelegate beaconDelegate)

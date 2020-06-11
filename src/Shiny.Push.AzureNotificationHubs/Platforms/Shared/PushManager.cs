@@ -67,10 +67,9 @@ namespace Shiny.Push.AzureNotificationHubs
         }
 
 
-        public override Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => this.RequestAccess(null, cancelToken);
-        public async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
+        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var access = await base.RequestAccess();
+            var access = await base.RequestAccess(cancelToken);
 
             if (access.Status == AccessState.Available)
             {
@@ -83,7 +82,6 @@ namespace Shiny.Push.AzureNotificationHubs
                     {
                         InstallationId = this.InstallationId,
                         PushChannel = access.RegistrationToken,
-                        Tags = tags?.ToList(),
 #if WINDOWS_UWP
                         Platform = NotificationPlatform.Wns
 #elif __IOS__
@@ -98,7 +96,6 @@ namespace Shiny.Push.AzureNotificationHubs
                     //this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
                     this.CurrentRegistrationTokenDate = DateTime.UtcNow;
                     this.CurrentRegistrationToken = access.RegistrationToken;
-                    this.RegisteredTags = tags;
 
                     access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
                 }
@@ -145,9 +142,9 @@ namespace Shiny.Push.AzureNotificationHubs
 
 
 #if __ANDROID__
-        public override async Task UpdateTags(params string[] tags)
+        public override async Task SetTags(params string[] tags)
 #else
-        public async Task UpdateTags(params string[] tags)
+        public async Task SetTags(params string[] tags)
 #endif
         {
             if (this.InstallationId == null)
