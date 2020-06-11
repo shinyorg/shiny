@@ -31,8 +31,7 @@ namespace Shiny.Push
         }
 
 
-        public override Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => this.RequestAccess(null, cancelToken);
-        public virtual async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
+        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             //var resultCode = GoogleApiAvailability
             //    .Instance
@@ -58,8 +57,6 @@ namespace Shiny.Push
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             FirebaseMessaging.Instance.AutoInitEnabled = true;
 
-            await this.UpdateTags(tags);
-
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
         }
 
@@ -78,7 +75,7 @@ namespace Shiny.Push
             => this.bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
 
 
-        public virtual async Task UpdateTags(params string[] tags)
+        public virtual async Task SetTags(params string[] tags)
         {
             if (this.RegisteredTags != null)
             { 

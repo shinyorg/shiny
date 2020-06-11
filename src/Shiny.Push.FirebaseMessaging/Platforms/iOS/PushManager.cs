@@ -9,12 +9,13 @@ using Shiny.Settings;
 
 namespace Shiny.Push.FirebaseMessaging
 {
-    public class PushManager : Shiny.Push.PushManager, IPushTagSupport
+    public class PushManager : Shiny.Push.PushManager, 
+                               IPushTagSupport
     {
         public PushManager(ISettings settings, IServiceProvider services, iOSNotificationDelegate ndelegate)
             : base(settings, services, ndelegate)
         {
-            // TODO: this is currently null
+            Messaging.SharedInstance.AutoInitEnabled = true;
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate
             (
                 async msg =>
@@ -32,21 +33,16 @@ namespace Shiny.Push.FirebaseMessaging
         }
 
 
-        public override Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => this.RequestAccess(null, cancelToken);
-        public async Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default)
+        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             var access = await base.RequestAccess(cancelToken);
             if (access.Status == AccessState.Available)
             {
-                var s = Messaging.SharedInstance;
-                s.ApnsToken = access.RegistrationToken;
-                s.AutoInitEnabled = true;
-                s.ShouldEstablishDirectChannel = true;
+                Messaging.SharedInstance.ApnsToken = access.RegistrationToken;
 
                 var result = await InstanceId.SharedInstance.GetInstanceIdAsync();
                 this.CurrentRegistrationToken = result.Token;
                 this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                await this.UpdateTags(tags);
             }
             return access;
         }
@@ -54,16 +50,12 @@ namespace Shiny.Push.FirebaseMessaging
 
         public override async Task UnRegister()
         {
-            var s = Messaging.SharedInstance;
-            s.AutoInitEnabled = false;
-            s.ShouldEstablishDirectChannel = false;
-
             await InstanceId.SharedInstance.DeleteIdAsync();
             await base.UnRegister();
         }
 
 
-        public async Task UpdateTags(params string[] tags)
+        public async Task SetTags(params string[] tags)
         {
             if (this.RegisteredTags != null)
             {

@@ -31,25 +31,26 @@ namespace Shiny.Push
         /// </summary>
         /// <param name="pushManager"></param>
         /// <param name="tags"></param>
-        /// <param name="throwOnFail"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-        public static Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, string[] tags, bool throwOnFail = false, CancellationToken cancelToken = default)
+        public static async Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, string[] tags, bool throwOnFail = false, CancellationToken cancelToken = default)
         {
+            var result = await pushManager.RequestAccess(cancelToken);
             if (pushManager is IPushTagSupport tagEnabled)
-                return tagEnabled.RequestAccess(tags, cancelToken);
+                await tagEnabled.SetTags(tags);
 
-            if (throwOnFail)
-                throw new ArgumentException("Push mananger is not tag enabled");
-
-            return pushManager.RequestAccess(cancelToken);
+            return result;
         }
 
 
-        public static async Task TryUpdateTags(this IPushManager pushManager, params string[] tags)
+        public static async Task<bool> TrySetTags(this IPushManager pushManager, params string[] tags)
         {
             if (pushManager is IPushTagSupport tagEnabled)
-                await tagEnabled.UpdateTags(tags);
+            { 
+                await tagEnabled.SetTags(tags);
+                return true;
+            }
+            return false;
         }
 
 

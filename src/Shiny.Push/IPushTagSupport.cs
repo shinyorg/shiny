@@ -7,8 +7,7 @@ namespace Shiny.Push
 {
     public interface IPushTagSupport
     {
-        Task<PushAccessState> RequestAccess(string[] tags, CancellationToken cancelToken = default);
-        Task UpdateTags(params string[] tags);
+        Task SetTags(params string[] tags);
         string[]? RegisteredTags { get; }
     }
 }
