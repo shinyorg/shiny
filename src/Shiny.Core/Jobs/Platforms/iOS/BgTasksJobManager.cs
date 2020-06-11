@@ -9,18 +9,13 @@ using Shiny.Logging;
 
 namespace Shiny.Jobs
 {
-    public class BgTasksJobManager : AbstractJobManager, IShinyStartupTask
+    public class BgTasksJobManager : AbstractJobManager
     {
         const string EX_MSG = "Could not register background processing job. Shiny uses background processing when enabled in your info.plist.  Please follow the Shiny readme for Shiny.Core to properly register BGTaskSchedulerPermittedIdentifiers";
         bool registeredSuccessfully = false;
 
 
         public BgTasksJobManager(IServiceProvider container, IRepository repository) : base(container, repository)
-        {
-        }
-
-
-        public void Start()
         {
             try
             {

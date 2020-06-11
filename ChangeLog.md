@@ -3,7 +3,11 @@
 1.2.0 (SP1)
 ---
 
+### Shiny.Core
+* [Fix][iOS] BG Tasks job manager registration issue
+ 
 ### Shiny.Push & Shiny.Push.AzureNotificationHubs
+* [BREAKING] RequestAccess with tags presented issues - there is now SetTags
 * [Fix][Android] Token registration issues with azure notification hubs
 * [Fix][Android] Ensure local notifications are registered
 
