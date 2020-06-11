@@ -2,17 +2,9 @@
 using System.Threading.Tasks;
 
 
-namespace Shiny.PhotoSync
+namespace Shiny.PhotoSync.Infrastructure
 {
-    public interface IPhotoSyncManager
-    {
-        //bool ShowBadgeCount { get; set; }
-        //int QueueCount { get; }
-        Task ClearQueue();
-    }
-
-
-    public class PhotoSyncManager : IPhotoSyncManager
+    public class PhotoSyncManagerImpl : IPhotoSyncManager
     {
         public Task ClearQueue()
         {

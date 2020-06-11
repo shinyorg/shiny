@@ -7,7 +7,7 @@ using Shiny.Net.Http;
 using Shiny.Notifications;
 
 
-namespace Shiny.PhotoSync
+namespace Shiny.PhotoSync.Infrastructure
 {
     public class SyncJob : IJob
     {
@@ -34,8 +34,14 @@ namespace Shiny.PhotoSync
             var photos = await this.scanner.GetPhotosSince(DateTime.Now);
             if (photos?.Any() ?? false)
             { 
-                //foreach (var photo in photos)
-                //    await this.transfers.Enqueue(new HttpTransferRequest("", "", true));
+                foreach (var photo in photos)
+                { 
+                    await this.transfers.Enqueue(new HttpTransferRequest(
+                        this.config.UploadToUri,
+                        photo.FilePath, 
+                        true
+                    ));
+                }
 
                 if (this.config.ShowBadgeCount)
                     this.notifications.Badge = this.notifications.Badge + photos.Count();
