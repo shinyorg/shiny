@@ -3,7 +3,6 @@ using Android.Bluetooth;
 using Android.Content;
 
 
-
 namespace Shiny.BluetoothLE
 {
     public static class Extensions
@@ -63,9 +62,5 @@ namespace Shiny.BluetoothLE
                     return ConnectionState.Disconnected;
             }
         }
-
-
-        //public static DroidGattStatus ToNative(this GattState status)
-        //    => (DroidGattStatus)Enum.Parse(typeof(DroidGattStatus), status.ToString());
     }
 }
