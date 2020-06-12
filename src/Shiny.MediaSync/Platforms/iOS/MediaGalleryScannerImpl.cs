@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AssetsLibrary;
 
-namespace Shiny.PhotoSync.Infrastructure
+
+namespace Shiny.MediaSync.Infrastructure
 {
-    public class PhotoGalleryScannerImpl : IPhotoGalleryScanner
+    public class MediaGalleryScannerImpl : IMediaGalleryScanner
     {
-        public Task<IEnumerable<Photo>> GetPhotosSince(DateTime? date)
+        public Task<IEnumerable<Media>> GetMediaSince(DateTimeOffset date)
         {
             //ALAssetsLibrary.Notifications.
             //ALAssetsLibrary.DisableSharedPhotoStreamsSupport

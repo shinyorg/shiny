@@ -1,5 +1,5 @@
 -----------------
-Shiny.PhotoSync
+Shiny.MediaSync
 -----------------
 
 GitHub: https://github.com/shinyorg/Shiny

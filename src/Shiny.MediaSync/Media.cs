@@ -1,16 +1,17 @@
 ﻿using System;
 
 
-namespace Shiny.PhotoSync
+namespace Shiny.MediaSync
 {
-    public class Photo
+    public class Media
     {
-        public Photo(string filePath)
+        public Media(string filePath)
         {
             this.FilePath = filePath;
         }
 
 
         public string FilePath { get; }
+        public bool IsVideo { get; }
     }
 }

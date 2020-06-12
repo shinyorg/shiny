@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Shiny.PhotoSync.Infrastructure
+
+namespace Shiny.MediaSync.Infrastructure
 {
-    public class PhotoGalleryScannerImpl : IPhotoGalleryScanner
+    public class PhotoGalleryScannerImpl : IMediaGalleryScanner
     {
-        public Task<IEnumerable<Photo>> GetPhotosSince(DateTime? date)
+        public Task<IEnumerable<Media>> GetMediaSince(DateTimeOffset date)
         {
             throw new NotImplementedException();
         }

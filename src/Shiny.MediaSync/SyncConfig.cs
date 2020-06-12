@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.PhotoSync
+namespace Shiny.MediaSync
 {
     public class SyncConfig
     {
@@ -20,7 +20,6 @@ namespace Shiny.PhotoSync
         public string? UploadToUri { get; set; }
         public bool AllowUploadOnMeteredConnection { get; set; }
         public bool ShowBadgeCount { get; set; }
-        public bool NotifyOnStart { get; set; }
-        public bool NotifyOnComplete { get; set; }
+        public bool RequestPermissionOnStart { get; set; }
     }
 }

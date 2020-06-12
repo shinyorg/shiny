@@ -1,35 +1,36 @@
-﻿using System;
+﻿#if !NETSTANDARD
+using System;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.PhotoSync.Infrastructure;
+using Shiny.MediaSync.Infrastructure;
 
 
-namespace Shiny.PhotoSync
+namespace Shiny.MediaSync
 {
-    public class PhotoSyncModule : ShinyModule
+    public class MediaSyncModule : ShinyModule
     {
         readonly SyncConfig config;
         readonly Type delegateType;
 
 
-        public PhotoSyncModule(SyncConfig config, Type delegateType)
+        public MediaSyncModule(SyncConfig config, Type? delegateType)
         {
             this.config = config;
-            this.delegateType = delegateType;
+            this.delegateType = delegateType ?? typeof(PhotoSyncDelegate);
         }
 
 
         public override void Register(IServiceCollection services)
         {
-            services.AddSingleton(typeof(IPhotoSyncDelegate), this.delegateType);
+            services.AddSingleton(typeof(IMediaSyncDelegate), this.delegateType);
             services.AddSingleton(config);
-            services.AddSingleton<IPhotoSyncManager, PhotoSyncManagerImpl>();
+            services.AddSingleton<IMediaSyncManager, MediaSyncManagerImpl>();
             services.RegisterJob(
                 typeof(SyncJob),
                 runInForeground: true
             );
             services.UseNotifications(true);
-            services.UseHttpTransfers<PhotoSyncHttpTransferDelegate>();
-            services.AddSingleton<IPhotoGalleryScanner, PhotoGalleryScannerImpl>();
+            services.UseHttpTransfers<MediaSyncHttpTransferDelegate>();
+            services.AddSingleton<IMediaGalleryScanner, PhotoGalleryScannerImpl>();
         }
 
 
@@ -40,3 +41,4 @@ namespace Shiny.PhotoSync
         }
     }
 }
+#endif
