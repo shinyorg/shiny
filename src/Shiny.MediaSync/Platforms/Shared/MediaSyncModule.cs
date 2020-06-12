@@ -15,7 +15,7 @@ namespace Shiny.MediaSync
         public MediaSyncModule(SyncConfig config, Type? delegateType)
         {
             this.config = config;
-            this.delegateType = delegateType ?? typeof(PhotoSyncDelegate);
+            this.delegateType = delegateType ?? typeof(MediaSyncDelegate);
         }
 
 
@@ -30,7 +30,7 @@ namespace Shiny.MediaSync
             );
             services.UseNotifications(true);
             services.UseHttpTransfers<MediaSyncHttpTransferDelegate>();
-            services.AddSingleton<IMediaGalleryScanner, PhotoGalleryScannerImpl>();
+            services.AddSingleton<IMediaGalleryScanner, MediaGalleryScannerImpl>();
         }
 
 

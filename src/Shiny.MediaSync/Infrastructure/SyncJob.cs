@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Net.Http;
@@ -41,37 +40,50 @@ namespace Shiny.MediaSync.Infrastructure
 
         public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            if (!this.syncManager.IsEnabled)
-                return false;
-
-            // TODO: verify photo access
+            // TODO: verify gallery access
             var lastSync = jobInfo.GetParameter(LastSyncKey, DateTimeOffset.MinValue);
-            var photos = await this.scanner.GetMediaSince(lastSync);
-            if (photos?.Any() ?? false)
-            { 
-                // TODO: ensure it isn't in queue already?  last job swap may not have finished
-                foreach (var photo in photos)
-                    await this.ProcessPhoto(photo);
+            var items = await this.scanner.GetMediaSince(lastSync);
+            if (items?.Any() ?? false)
+            {                 
+                foreach (var item in items)
+                {
+                    var sync = await this.CanProcess(item);
+                    if (sync)
+                        await this.Process(item);
+                }
             }
             jobInfo.SetParameter(LastSyncKey, DateTimeOffset.UtcNow);
             return true;
         }
 
 
-        async Task ProcessPhoto(Media photo)
-        {
-            var result = await this.syncDelegate.CanSync(photo);
-            if (!result)
-                return;
+        async Task<bool> CanProcess(Media media)
+        {            
+            if (!this.syncManager.IsVideoSyncEnabled && media.IsVideo)
+                return false;
 
+            if (!this.syncManager.IsPhotoSyncEnabled && !media.IsVideo)
+                return false;
+
+            // TODO: ensure it isn't in queue already?  last job swap may not have finished
+            //await this.repository.Get<SyncItem>(media)
+            var result = await this.syncDelegate.CanSync(media);
+            if (!result)
+                return false;
+
+            return true;
+        }
+
+        async Task Process(Media media)
+        {
             var suggestedRequest = new HttpTransferRequest(
                 this.syncManager.DefaultUploadUri,
-                photo.FilePath,
+                media.FilePath,
                 true
             );
             suggestedRequest.HttpMethod = HttpMethod.Get;
             suggestedRequest.UseMeteredConnection = this.syncManager.AllowUploadOnMeteredConnection;
-            var request = await this.syncDelegate.PreRequest(suggestedRequest, photo);
+            var request = await this.syncDelegate.PreRequest(suggestedRequest, media);
 
             var transfer = await this.transfers.Enqueue(request);
             await this.repository.Set(
@@ -79,7 +91,7 @@ namespace Shiny.MediaSync.Infrastructure
                 new SyncItem
                 {
                     Id = transfer.Identifier,
-                    FilePath = photo.FilePath,
+                    FilePath = media.FilePath,
                     DateStarted = DateTimeOffset.UtcNow
                 }
             );

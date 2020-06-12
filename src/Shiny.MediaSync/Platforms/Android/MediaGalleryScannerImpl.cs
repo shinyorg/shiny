@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.MediaSync.Infrastructure
 {
-    public class PhotoGalleryScannerImpl : IMediaGalleryScanner
+    public class MediaGalleryScannerImpl : IMediaGalleryScanner
     {
         public Task<IEnumerable<Media>> GetMediaSince(DateTimeOffset date)
         {
