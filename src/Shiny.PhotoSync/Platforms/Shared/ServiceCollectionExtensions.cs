@@ -13,7 +13,6 @@ namespace Shiny
 
 
         public static bool UsePhotoSync(this IServiceCollection services, SyncConfig config, Type delegateType)
-            where TDelegate : class, IPhotoSyncDelegate
         {
 #if NETSTANDARD
             return false;
