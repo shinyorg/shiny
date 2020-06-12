@@ -1,25 +1,24 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.PhotoSync;
-using Shiny.PhotoSync.Infrastructure;
 
 
 namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UsePhotoSync(this IServiceCollection services, SyncConfig config)
+        public static bool UsePhotoSync<TDelegate>(this IServiceCollection services, SyncConfig config)
+            where TDelegate : class, IPhotoSyncDelegate
+            => services.UsePhotoSync(config, typeof(TDelegate));
+
+
+        public static bool UsePhotoSync(this IServiceCollection services, SyncConfig config, Type delegateType)
+            where TDelegate : class, IPhotoSyncDelegate
         {
 #if NETSTANDARD
             return false;
 #else
-            // TODO: this should request access to photo gallery right away
-            services.AddSingleton(config);
-            services.AddSingleton<IPhotoSyncManager, PhotoSyncManagerImpl>();
-            services.RegisterJob(typeof(SyncJob));
-            services.UseNotifications(true);
-            services.UseHttpTransfers<PhotoSyncHttpTransferDelegate>();
-            services.AddSingleton<IPhotoGalleryScanner, PhotoGalleryScannerImpl>();
+            services.RegisterModule(new PhotoSyncModule(config, delegateType));
             return true;
 #endif
         }

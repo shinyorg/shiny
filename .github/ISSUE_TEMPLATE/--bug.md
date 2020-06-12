@@ -31,6 +31,7 @@ assignees: ''
  - [ ] Sensors
  - [ ] AppCenter Logging Integration
  - [ ] Location Sync (beta)
+ - [ ] Photo Sync (alpha)
  - [ ] BluetoothLE (beta)
  - [ ] Beacons (beta)
  - [ ] SQLite Integration

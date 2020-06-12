@@ -14,17 +14,20 @@ namespace Shiny.PhotoSync.Infrastructure
         readonly IPhotoGalleryScanner scanner;
         readonly IHttpTransferManager transfers;
         readonly INotificationManager notifications;
+        readonly IPhotoSyncDelegate syncDelegate;
         readonly SyncConfig config;
 
 
         public SyncJob(IPhotoGalleryScanner scanner, 
                        IHttpTransferManager transfers,
                        INotificationManager notifications,
+                       IPhotoSyncDelegate syncDelegate,
                        SyncConfig config)
         {
             this.scanner = scanner;
             this.transfers = transfers;
             this.notifications = notifications;
+            this.syncDelegate = syncDelegate;
             this.config = config;
         }
 
@@ -35,20 +38,31 @@ namespace Shiny.PhotoSync.Infrastructure
             if (photos?.Any() ?? false)
             { 
                 foreach (var photo in photos)
-                { 
-                    await this.transfers.Enqueue(new HttpTransferRequest(
-                        this.config.UploadToUri,
-                        photo.FilePath, 
-                        true
-                    ));
-                }
-
-                if (this.config.ShowBadgeCount)
-                    this.notifications.Badge = this.notifications.Badge + photos.Count();
-
-                return true;
+                    await this.ProcessPhoto(photo);
             }
-            return false;
+            return true;
+        }
+
+
+        async Task ProcessPhoto(Photo photo)
+        {
+            var result = await this.syncDelegate.CanSync(photo);
+            if (!result)
+                return;
+
+            var headers = await this.syncDelegate.GetUploadHeaders(photo);
+            await this.transfers.Enqueue(new HttpTransferRequest(
+                this.config.UploadToUri,
+                photo.FilePath,
+                true
+            )
+            {
+                Headers = headers,
+                UseMeteredConnection = this.config.AllowUploadOnMeteredConnection
+            });
+
+            if (this.config.ShowBadgeCount)
+                this.notifications.Badge = this.notifications.Badge + 1;
         }
     }
 }

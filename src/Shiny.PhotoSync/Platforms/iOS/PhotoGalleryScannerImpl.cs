@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AssetsLibrary;
 
-
-namespace Shiny.PhotoSync
+namespace Shiny.PhotoSync.Infrastructure
 {
     public class PhotoGalleryScannerImpl : IPhotoGalleryScanner
     {
@@ -31,6 +30,11 @@ namespace Shiny.PhotoSync
             var asset = new ALAsset();
 
             return null;
+        }
+
+        public Task<AccessState> RequestAccess()
+        {
+            throw new NotImplementedException();
         }
     }
 }

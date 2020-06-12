@@ -1,8 +1,7 @@
 ﻿using System;
-
 using Microsoft.Extensions.DependencyInjection;
-
 using Shiny.Infrastructure;
+
 
 namespace Shiny
 {
