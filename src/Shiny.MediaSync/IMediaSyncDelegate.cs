@@ -7,9 +7,9 @@ namespace Shiny.MediaSync
 {
     public interface IMediaSyncDelegate
     {
-        Task<bool> CanSync(Media media);
-        Task<HttpTransferRequest> PreRequest(HttpTransferRequest request, Media media);
-        Task OnSyncCompleted(Media media);
+        Task<bool> CanSync(MediaAsset media);
+        Task<HttpTransferRequest> PreRequest(HttpTransferRequest request, MediaAsset media);
+        Task OnSyncCompleted(MediaAsset media);
         // TODO: return true to requeue?
         //Task<bool> OnSyncError(Media media, Exception exception);
     }
@@ -17,9 +17,9 @@ namespace Shiny.MediaSync
 
     public class MediaSyncDelegate : IMediaSyncDelegate
     {
-        public virtual Task<bool> CanSync(Media media) => Task.FromResult(true);
-        public virtual Task OnSyncCompleted(Media media) => Task.CompletedTask;
-        public virtual Task<HttpTransferRequest> PreRequest(HttpTransferRequest request, Media media)
+        public virtual Task<bool> CanSync(MediaAsset media) => Task.FromResult(true);
+        public virtual Task OnSyncCompleted(MediaAsset media) => Task.CompletedTask;
+        public virtual Task<HttpTransferRequest> PreRequest(HttpTransferRequest request, MediaAsset media)
             => Task.FromResult(request);
     }
 }

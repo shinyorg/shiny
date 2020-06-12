@@ -8,6 +8,6 @@ namespace Shiny.MediaSync.Infrastructure
     public interface IMediaGalleryScanner
     {
         Task<AccessState> RequestAccess();
-        Task<IEnumerable<Media>> GetMediaSince(DateTimeOffset date);
+        Task<IEnumerable<MediaAsset>> Query(MediaTypes mediaTypes, DateTimeOffset date);
     }
 }

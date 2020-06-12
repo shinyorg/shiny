@@ -19,7 +19,6 @@ namespace Shiny.MediaSync.Infrastructure
         readonly INotificationManager notifications;
         readonly IMediaSyncDelegate syncDelegate;
         readonly IRepository repository;
-        const string LastSyncKey = nameof(LastSyncKey);
 
 
         public SyncJob(IMediaSyncManager syncManager,
@@ -41,8 +40,10 @@ namespace Shiny.MediaSync.Infrastructure
         public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
             // TODO: verify gallery access
-            var lastSync = jobInfo.GetParameter(LastSyncKey, DateTimeOffset.MinValue);
-            var items = await this.scanner.GetMediaSince(lastSync);
+            var items = await this.scanner.Query(
+                this.syncManager.SyncTypes, 
+                this.syncManager.SyncFrom
+            );
             if (items?.Any() ?? false)
             {                 
                 foreach (var item in items)
@@ -52,17 +53,14 @@ namespace Shiny.MediaSync.Infrastructure
                         await this.Process(item);
                 }
             }
-            jobInfo.SetParameter(LastSyncKey, DateTimeOffset.UtcNow);
+            this.syncManager.SyncFrom = DateTimeOffset.UtcNow;
             return true;
         }
 
 
-        async Task<bool> CanProcess(Media media)
-        {            
-            if (!this.syncManager.IsVideoSyncEnabled && media.IsVideo)
-                return false;
-
-            if (!this.syncManager.IsPhotoSyncEnabled && !media.IsVideo)
+        async Task<bool> CanProcess(MediaAsset media)
+        {
+            if (!this.syncManager.SyncTypes.HasFlag(media.Type))
                 return false;
 
             // TODO: ensure it isn't in queue already?  last job swap may not have finished
@@ -74,7 +72,7 @@ namespace Shiny.MediaSync.Infrastructure
             return true;
         }
 
-        async Task Process(Media media)
+        async Task Process(MediaAsset media)
         {
             var suggestedRequest = new HttpTransferRequest(
                 this.syncManager.DefaultUploadUri,

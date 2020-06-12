@@ -28,19 +28,11 @@ namespace Shiny.MediaSync.Infrastructure
         }
 
 
-        bool videoSync;
-        public bool IsVideoSyncEnabled
+        MediaTypes syncTypes = MediaTypes.Audio | MediaTypes.Image | MediaTypes.Video;
+        public MediaTypes SyncTypes
         {
-            get => this.videoSync;
-            set => this.Set(ref this.videoSync, value);
-        }
-
-
-        bool photoSync = true;
-        public bool IsPhotoSyncEnabled
-        {
-            get => this.photoSync;
-            set => this.Set(ref this.photoSync, value);
+            get => this.syncTypes;
+            set => this.Set(ref this.syncTypes, value);
         }
 
 
@@ -66,6 +58,14 @@ namespace Shiny.MediaSync.Infrastructure
         {
             get => this.defaultUploadUri;
             set => this.Set(ref this.defaultUploadUri, value);
+        }
+
+
+        DateTimeOffset syncFrom;
+        public DateTimeOffset SyncFrom
+        {
+            get => this.syncFrom;
+            set => this.Set(ref this.syncFrom, value);
         }
 
 

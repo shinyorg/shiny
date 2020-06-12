@@ -1,118 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using AssetsLibrary;
+using Foundation;
+using Photos;
 
 
 namespace Shiny.MediaSync.Infrastructure
 {
     public class MediaGalleryScannerImpl : IMediaGalleryScanner
     {
-        public Task<IEnumerable<Media>> GetMediaSince(DateTimeOffset date)
+        public Task<IEnumerable<MediaAsset>> Query(MediaTypes mediaTypes, DateTimeOffset date)
         {
-            //ALAssetsLibrary.Notifications.
-            //ALAssetsLibrary.DisableSharedPhotoStreamsSupport
-            //ALAssetsLibrary.ChangedNotification
-            //ALAssetsLibrary.AuthorizationStatus
-            //ALAssetsLibrary.DeletedAssetGroupsKey
-            var library = new ALAssetsLibrary();
-            //var del = new ALAssetsLibraryGroupsEnumerationResultsDelegate((group, ref bool value) => {
-            //});
-            //del.(group, success) =>
-            //{
+            var tcs = new TaskCompletionSource<IEnumerable<MediaAsset>>();
+            Task.Run(() =>
+            { 
+                var fetchOptions = new PHFetchOptions
+                {
+                    Predicate = NSPredicate.FromFormat(
+                        $"mediaType == {(int)PHAssetMediaType.Image} || mediaType == {(int)PHAssetMediaType.Video}"
+                    ),
+                    SortDescriptors = new [] { 
+                        new NSSortDescriptor("creationDate", false) 
+                    }
+                };
+                var results = PHAsset
+                    .FetchAssets(fetchOptions)
+                    .OfType<PHAsset>();
 
-            //});
+                var assets = new List<MediaAsset>(results.Count());
+                foreach (var result in results)
+                {
+                    //result.MediaType
+                    //result.Hidden
+                    //result.Duration
+                    //result.LocalIdentifier
+                    //result.Location;
+                    //result.ModificationDate
+                    //result.PixelHeight;
+                    //result.PixelWidth;
+                    //result.CreationDate
 
-            //library.Enumerate(
-            //    ALAssetsGroupType.Library,
-            //    (sender, ref value) => { },
-            //    e => { }
-            //);
-            var asset = new ALAsset();
-
-            return null;
+                    var resources = PHAssetResource.GetAssetResources(result);
+                    foreach (var resource in resources)
+                    {
+                        //assets.Add(new MediaAsset(
+                            
+                        //));
+                        //resource.OriginalFilename
+                    }
+                }
+                tcs.SetResult(assets);
+            });
+            return tcs.Task;
         }
 
-        public Task<AccessState> RequestAccess()
+
+        public async Task<AccessState> RequestAccess()
         {
-            throw new NotImplementedException();
+            var status = PHPhotoLibrary.AuthorizationStatus;
+            if (status == PHAuthorizationStatus.NotDetermined)
+                status = await PHPhotoLibrary.RequestAuthorizationAsync();
+
+            switch (status)
+            {
+                case PHAuthorizationStatus.Authorized:
+                    return AccessState.Available;
+
+                case PHAuthorizationStatus.Denied:
+                    return AccessState.Denied;
+
+                case PHAuthorizationStatus.Restricted:
+                    return AccessState.Restricted;
+
+                default:
+                    throw new ArgumentException("Invalid status - " + status);
+            }
         }
     }
 }
-/*
-#import <UIKit/UIKit.h>
-#include <AssetsLibrary/AssetsLibrary.h> 
-
-@interface getPhotoLibViewController : UIViewController
-{
- ALAssetsLibrary *library;
- NSArray *imageArray;
- NSMutableArray *mutableArray;
-}
-
--(void)allPhotosCollected:(NSArray*)imgArray;
-
- @end 
- 
-
-
-static int count=0;
-
-@implementation getPhotoLibViewController
-
--(void)getAllPictures
-{
- imageArray=[[NSArray alloc] init];
- mutableArray =[[NSMutableArray alloc]init];
- NSMutableArray* assetURLDictionaries = [[NSMutableArray alloc] init];
-
- library = [[ALAssetsLibrary alloc] init];
-
- void (^assetEnumerator)( ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
-  if(result != nil) {
-   if([[result valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypePhoto]) {
-    [assetURLDictionaries addObject:[result valueForProperty:ALAssetPropertyURLs]];
-
-    NSURL *url= (NSURL*) [[result defaultRepresentation]url]; 
-
-    [library assetForURL:url
-             resultBlock:^(ALAsset *asset) {
-              [mutableArray addObject:[UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage]]];
-
-              if ([mutableArray count]==count)
-              {
-               imageArray=[[NSArray alloc] initWithArray:mutableArray];
-               [self allPhotosCollected:imageArray];
-              }
-             }
-            failureBlock:^(NSError *error){ NSLog(@"operation was not successfull!"); } ]; 
-
-   } 
-  }
- };
-
- NSMutableArray *assetGroups = [[NSMutableArray alloc] init];
-
- void (^ assetGroupEnumerator) ( ALAssetsGroup *, BOOL *)= ^(ALAssetsGroup *group, BOOL *stop) {
-  if(group != nil) {
-   [group enumerateAssetsUsingBlock:assetEnumerator];
-   [assetGroups addObject:group];
-   count=[group numberOfAssets];
-  }
- };
-
- assetGroups = [[NSMutableArray alloc] init];
-
- [library enumerateGroupsWithTypes:ALAssetsGroupAll
-                        usingBlock:assetGroupEnumerator
-                      failureBlock:^(NSError *error) {NSLog(@"There is an error");}];
-}
-
--(void)allPhotosCollected:(NSArray*)imgArray
-{
- //write your code here after getting all the photos from library...
- NSLog(@"all pictures are %@",imgArray);
-}
-
-@end
- */
