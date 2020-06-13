@@ -11,6 +11,12 @@
 * [Fix][Android] Token registration issues with azure notification hubs
 * [Fix][Android] Ensure local notifications are registered
 
+### Shiny.Integrations.Sqlite
+* [Fix] Strings not saving properly
+
+### Shiny.MediaSync
+* Initial Beta release - Synchronizes photos, videos, and audio recordings to the server using Shiny best practices
+
 1.2.0
 ---
 

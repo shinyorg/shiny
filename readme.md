@@ -3,7 +3,7 @@
 
 Shiny is a set of libraries designed to help make device services & backgrounding easy on Xamarin & UWP platforms (with more to come).
 
-[Change Log - May 22, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
+[Change Log - June 15, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
 
 * [Samples](https://github.com/shinyorg/shinysamples) - Shows almost every single function point within Shiny
 * [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
@@ -34,8 +34,8 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 
 ## Libraries
 
-|Project|NuGet|MyGet|
-|-------|-----|-----|
+|Project|NuGet|MyGet|Description|
+|-------|-----|-----|-----------|
 |Core | [![CoreNugetShield]][CoreNuget] | [![CoreMygetShield]][CoreMyget] |
 |Beacons | [![BeaconsNugetShield]][BeaconsNuget] | [![BeaconsMygetShield]][BeaconsMyget] |
 |BluetoothLE| [![BleNugetShield]][BleNuget] | [![BleMygetShield]][BleMyget] |
@@ -47,6 +47,12 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |NFC| [![NfcNugetShield]][NfcNuget] | [![NfcMygetShield]][NfcMyget] |
 
 
+## App Services
+|Project|NuGet|MyGet|Description|
+|-------|-----|-----|-----------|
+|Location Sync| [![LocationSyncNugetShield]][LocationSyncNuget] | [![LocationSyncMygetShield]][LocationSyncMyget] | Sync Geofence & GPS data to the server using Shiny best practices
+|Media Sync| [![MediaSyncNugetShield]][MediaSyncNuget] | [![MediaSyncMygetShield]][MediaSyncMyget] | Sync your Android & iOS media gallery to the server using Shiny best practices
+
 ## Integrations
 |Project|NuGet|MyGet|Description|
 |-------|-----|-----|-----------|
@@ -54,8 +60,6 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushMygetShield]][FirebasePushMyget] | Push Integration for Google Firebase - Support for iOS & Android
 |SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] | Provides caching, logging, storage, & settings implementations
 |AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | Log errors to AppCenter
-|System.Text.Json Serializer| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | This is the new .NET serializer coming into modern .NET.  This will eventually be standard in Shiny
-|(Android) Current Activity| [![CurrentActivityNugetShield]][CurrentActivityNuget] | [![CurrentActivityMygetShield]][CurrentActivityMyget] | If you use James Montemagno's current top activity plugin, Shiny can use it instead of its internal version
 
 ## 3rd Party
 |Project|NuGet|Repo|Description|
@@ -150,3 +154,13 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [FirebasePushNuget]: https://www.nuget.org/packages/Shiny.Push.FirebaseMessaging/
 [FirebasePushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.FirebaseMessaging.svg
 [FirebasePushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.FirebaseMessaging
+
+[LocationSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.Locations.Sync.svg
+[LocationSyncNuget]: https://www.nuget.org/packages/Shiny.Locations.Sync/
+[LocationSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Locations.Sync.svg
+[LocationSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Locations.Sync
+
+[MediaSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.MediaSync.svg
+[MediaSyncNuget]: https://www.nuget.org/packages/Shiny.MediaSync/
+[MediaSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.MediaSync.svg
+[MediaSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.MediaSync
