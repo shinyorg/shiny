@@ -11,8 +11,8 @@ namespace Shiny.Models
 
         public bool? BoolValue { get; set; }
         public byte? ByteValue { get; set; }
-        public byte[] BytesValue { get; set; }
-        public string StringValue { get; set; }
+        public byte[]? BytesValue { get; set; }
+        public string? StringValue { get; set; }
         public ushort? UShortValue { get; set; }
         public short? ShortValue { get; set; }
         public uint? UIntValue { get; set; }
@@ -25,7 +25,7 @@ namespace Shiny.Models
         public DateTime? DateTimeValue { get; set; }
 
 
-        public object GetValue()
+        public object? GetValue()
         {
             if (this.StringValue != null)
                 return this.StringValue;
@@ -112,6 +112,9 @@ namespace Shiny.Models
             else if (value is byte[] v12)
                 this.BytesValue = v12;
 
+            else if (value is string v13)
+                this.StringValue = v13;
+
             else if (value is DateTime dt)
                 this.DateTimeValue = dt;
 
@@ -124,6 +127,7 @@ namespace Shiny.Models
 
         public void Reset()
         {
+            this.StringValue = null;
             this.UShortValue = null;
             this.ShortValue = null;
             this.UIntValue = null;
