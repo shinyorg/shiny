@@ -15,11 +15,13 @@ namespace Shiny.MediaSync.Infrastructure
             var tcs = new TaskCompletionSource<IEnumerable<MediaAsset>>();
             Task.Run(() =>
             { 
+                var filter = "creationDate >= %@ && " + GetFilter(mediaTypes);
+
                 var fetchOptions = new PHFetchOptions
                 {
-                    Predicate = NSPredicate.FromFormat(
-                        $"mediaType == {(int)PHAssetMediaType.Image} || mediaType == {(int)PHAssetMediaType.Video}"
-                    ),
+                    IncludeHiddenAssets = false,
+                    IncludeAllBurstAssets = false,
+                    Predicate = NSPredicate.FromFormat(filter, (NSDate)date.LocalDateTime),
                     SortDescriptors = new [] { 
                         new NSSortDescriptor("creationDate", false) 
                     }
@@ -44,10 +46,11 @@ namespace Shiny.MediaSync.Infrastructure
                     var resources = PHAssetResource.GetAssetResources(result);
                     foreach (var resource in resources)
                     {
-                        //assets.Add(new MediaAsset(
-                            
-                        //));
-                        //resource.OriginalFilename
+                        assets.Add(new MediaAsset(
+                            result.LocalIdentifier,
+                            resource.OriginalFilename,
+                            ToMediaType(result.MediaType)
+                        ));
                     }
                 }
                 tcs.SetResult(assets);
@@ -77,5 +80,29 @@ namespace Shiny.MediaSync.Infrastructure
                     throw new ArgumentException("Invalid status - " + status);
             }
         }
+
+
+        static string GetFilter(MediaTypes mediaTypes)
+        {
+            var filters = new List<string>(3);
+            if (mediaTypes.HasFlag(MediaTypes.Image))
+                filters.Add("mediaType == " + (int)PHAssetMediaType.Image);
+            
+            if (mediaTypes.HasFlag(MediaTypes.Audio))
+                filters.Add("mediaType == " + (int)PHAssetMediaType.Audio);
+            
+            if (mediaTypes.HasFlag(MediaTypes.Video))
+                filters.Add("mediaType == " + (int)PHAssetMediaType.Video);
+
+            return String.Join(" || ", filters.ToArray());
+        }
+
+
+        static MediaTypes ToMediaType(PHAssetMediaType type) => type switch
+        {
+            PHAssetMediaType.Audio => MediaTypes.Audio,
+            PHAssetMediaType.Video => MediaTypes.Video,
+            PHAssetMediaType.Image => MediaTypes.Image
+        };
     }
 }
