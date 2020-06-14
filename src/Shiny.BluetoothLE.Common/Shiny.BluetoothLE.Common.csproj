@@ -3,7 +3,6 @@
     <PropertyGroup>
         <VersionSuffix>beta</VersionSuffix>
         <Description>Shiny BluetoothLE - Common components for Hosting and Client</Description>
-        <RootNamespace>Shiny.BluetoothLE</RootNamespace>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
@@ -24,7 +23,7 @@
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">        
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\Android\**\*.cs" />

@@ -26,12 +26,31 @@ namespace Shiny.MediaSync.Infrastructure
                         new NSSortDescriptor("creationDate", false) 
                     }
                 };
-                var results = PHAsset
+                
+                var fetchAssets = PHAsset
                     .FetchAssets(fetchOptions)
-                    .OfType<PHAsset>();
+                    .OfType<PHAsset>()
+                    .ToArray();
 
-                var assets = new List<MediaAsset>(results.Count());
-                foreach (var result in results)
+                var options = new PHAssetResourceRequestOptions
+                {
+                    NetworkAccessAllowed = false
+                };
+
+
+                var imageCache = new PHCachingImageManager();
+                imageCache.StartCaching(
+                    fetchAssets, 
+                    PHImageManager.MaximumSize, 
+                    PHImageContentMode.Default, 
+                    new PHImageRequestOptions
+                    {
+                        NetworkAccessAllowed = false
+                    }
+                );
+
+                var assets = new List<MediaAsset>(fetchAssets.Count());
+                foreach (var asset in fetchAssets)
                 {
                     //result.MediaType
                     //result.Hidden
@@ -41,18 +60,38 @@ namespace Shiny.MediaSync.Infrastructure
                     //result.ModificationDate
                     //result.PixelHeight;
                     //result.PixelWidth;
-                    //result.CreationDate
+                    //result.CreationDate                    
 
-                    var resources = PHAssetResource.GetAssetResources(result);
-                    foreach (var resource in resources)
+                    switch (asset.MediaType)
                     {
-                        assets.Add(new MediaAsset(
-                            result.LocalIdentifier,
-                            resource.OriginalFilename,
-                            ToMediaType(result.MediaType)
-                        ));
+                        case PHAssetMediaType.Image:
+                            imageCache.RequestImageData(
+                                asset,
+                                new PHImageRequestOptions
+                                {
+
+                                },
+                                (data, fn, orientation, dict) => { }
+                            );
+                            break;
+
+                        case PHAssetMediaType.Video:
+                            imageCache.RequestAvAsset(
+                                asset, 
+                                new PHVideoRequestOptions 
+                                { 
+                                    NetworkAccessAllowed = false, 
+                                    DeliveryMode = PHVideoRequestOptionsDeliveryMode.HighQualityFormat 
+                                },
+                                (ass, mix, dict) => { }
+                            );
+                            break;
+
+                        case PHAssetMediaType.Audio:
+                            break;
                     }
                 }
+                imageCache.StopCaching();
                 tcs.SetResult(assets);
             });
             return tcs.Task;
