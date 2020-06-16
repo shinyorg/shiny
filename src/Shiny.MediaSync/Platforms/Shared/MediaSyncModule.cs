@@ -2,6 +2,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.MediaSync.Infrastructure;
+using Shiny.MediaSync.Infrastructure.Sqlite;
 
 
 namespace Shiny.MediaSync
@@ -19,6 +20,9 @@ namespace Shiny.MediaSync
 
         public override void Register(IServiceCollection services)
         {
+            services.AddSingleton<IDataService, SqliteDataService>();
+            services.AddSingleton<ShinySqliteConnection>();
+
             services.AddSingleton(typeof(IMediaSyncDelegate), this.delegateType);
             services.AddSingleton<IMediaSyncManager, MediaSyncManagerImpl>();
             services.RegisterJob(
