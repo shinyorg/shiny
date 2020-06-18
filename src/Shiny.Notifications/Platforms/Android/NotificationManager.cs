@@ -248,7 +248,7 @@ namespace Shiny.Notifications
                     var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
                     channel.SetSound(uri, attributes);
                     channel.EnableVibration(notification.Android.Vibrate);
-                    this.compatManager.CreateNotificationChannel(channel);
+                    this.newManager.CreateNotificationChannel(channel);
                 }
             
                 builder.SetChannelId(channelId);
