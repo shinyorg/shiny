@@ -6,6 +6,9 @@
 ### Shiny.Core
 * [Fix][iOS] BG Tasks job manager registration issue
  
+### Shiny.Notifications
+* [Fix][Android] Sound serialization was not working for scheduled notifications
+
 ### Shiny.Push & Shiny.Push.AzureNotificationHubs
 * [BREAKING] RequestAccess with tags presented issues - there is now SetTags
 * [Fix][Android] Token registration issues with azure notification hubs
@@ -15,7 +18,7 @@
 * [Fix] Strings not saving properly
 
 ### Shiny.MediaSync
-* Initial Beta release - Synchronizes photos, videos, and audio recordings to the server using Shiny best practices
+* Initial Alpha release - Synchronizes photos, videos, and audio recordings to the server using Shiny best practices
 
 1.2.0
 ---
