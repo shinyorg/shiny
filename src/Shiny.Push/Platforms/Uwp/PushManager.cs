@@ -39,6 +39,10 @@ namespace Shiny.Push
         {
             var handler = new TypedEventHandler<PushNotificationChannel, PushNotificationReceivedEventArgs>((sender, args) =>
             {
+                //args.BadgeNotification != null;
+                //args.NotificationType == PushNotificationType.Tile
+                //args.NotificationType == PushNotificationType.Toast;
+                //args.ToastNotification.Data
                 var headers = args
                     .RawNotification?
                     .Headers?

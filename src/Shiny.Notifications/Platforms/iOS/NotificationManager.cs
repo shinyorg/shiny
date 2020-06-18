@@ -234,17 +234,27 @@ namespace Shiny.Notifications
 
         protected virtual void SetSound(Notification notification, UNMutableNotificationContent content)
         {
-            var s = notification.Sound;
-            if (!s.Equals(NotificationSound.None))
+            if (notification.Sound == null)
+                return;
+
+            switch (notification.Sound.Type)
             {
-                if (s.Equals(NotificationSound.DefaultSystem))
-                    content.Sound = UNNotificationSound.Default;
-                else if (s.Equals(NotificationSound.DefaultPriority))
+                case NotificationSoundType.None:
+                    break;
+
+                case NotificationSoundType.Priority:
                     content.Sound = UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0)
                         ? UNNotificationSound.DefaultCriticalSound
                         : UNNotificationSound.Default;
-                else
-                    content.Sound = UNNotificationSound.GetSound(s.Path);
+                    break;
+
+                case NotificationSoundType.Custom:
+                    content.Sound = UNNotificationSound.GetSound(notification.Sound.CustomPath);
+                    break;
+
+                case NotificationSoundType.Default:
+                    content.Sound = UNNotificationSound.Default;
+                    break;
             }
         }
 

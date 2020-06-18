@@ -205,16 +205,18 @@ namespace Shiny.Notifications
                 this.compatManager.CreateNotificationChannel(channel);
             }
 
-            if (notification.Sound.IsCustomSound())
+            if (notification.Sound?.IsCustomSound() ?? false)
             {
                 var attributes = new AudioAttributes.Builder()
                     .SetUsage(AudioUsageKind.NotificationRingtone)
                     .Build();
 
-                var uri = Android.Net.Uri.Parse(notification.Sound.Path);
+                var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
                 channel.SetSound(uri, attributes);
                 channel.EnableVibration(notification.Android.Vibrate);
+                this.compatManager.CreateNotificationChannel(channel);
             }
+            
 
             builder.SetChannelId(channelId);
             this.compatManager.Notify(notification.Id, builder.Build());
@@ -237,16 +239,18 @@ namespace Shiny.Notifications
 
                     this.newManager.CreateNotificationChannel(channel);
                 }
-                if (notification.Sound.IsCustomSound())
+                if (notification.Sound?.IsCustomSound() ?? false)
                 {
                     var attributes = new AudioAttributes.Builder()
                         .SetUsage(AudioUsageKind.NotificationRingtone)
                         .Build();
 
-                    var uri = Android.Net.Uri.Parse(notification.Sound.Path);
+                    var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
                     channel.SetSound(uri, attributes);
                     channel.EnableVibration(notification.Android.Vibrate);
+                    this.compatManager.CreateNotificationChannel(channel);
                 }
+            
                 builder.SetChannelId(channelId);
                 this.newManager.Notify(notification.Id, builder.Build());
             }
@@ -352,22 +356,26 @@ namespace Shiny.Notifications
 
         protected virtual void TrySetSound(Notification notification, NotificationCompat.Builder builder)
         {
-            var s = notification.Sound;
-            if (!s.Equals(NotificationSound.None))
+            if (notification.Sound == null)
+                return;
+
+            switch (notification.Sound.Type)
             {
-                if (s.Equals(NotificationSound.DefaultSystem))
-                {
-                    builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
-                }
-                else if (s.Equals(NotificationSound.DefaultPriority))
-                {
+                case NotificationSoundType.Priority:
                     builder.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri);
-                }
-                else if (!s.Path.IsEmpty()) // TODO: path isn't serializing well
-                {
-                    var uri = Android.Net.Uri.Parse(s.Path);
+                    break;
+
+                case NotificationSoundType.Default:
+                    builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
+                    break;
+
+                case NotificationSoundType.Custom:
+                    var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
                     builder.SetSound(uri);
-                }
+                    break;
+
+                case NotificationSoundType.None:
+                    break;
             }
         }
 

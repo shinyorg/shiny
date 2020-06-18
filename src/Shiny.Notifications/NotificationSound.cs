@@ -3,22 +3,28 @@
 
 namespace Shiny.Notifications
 {
-    public struct NotificationSound
+    public enum NotificationSoundType
     {
-        NotificationSound(string path) => this.Path = path;
-        public string Path { get; }
+        None,
+        Default,
+        Priority,
+        Custom
+    }
 
-        public static NotificationSound None { get; } = new NotificationSound(nameof(None));
-        public static NotificationSound DefaultSystem { get; } = new NotificationSound(nameof(DefaultSystem));
-        public static NotificationSound DefaultPriority { get; } = new NotificationSound(nameof(DefaultPriority));
-        public static NotificationSound FromCustom(string path) => new NotificationSound(path);
 
-        public override int GetHashCode() => this.Path.GetHashCode();
-        public override bool Equals(object obj)
+    public class NotificationSound
+    {
+        public NotificationSoundType Type { get; set; } = NotificationSoundType.None;
+        public string? CustomPath { get; set; }
+
+
+        public static NotificationSound FromCustom(string path) => new NotificationSound
         {
-            if (obj is NotificationSound sound)
-                return this.Path.Equals(sound.Path);
-            return false;
-        }
+            Type = NotificationSoundType.Custom,
+            CustomPath = path
+        };
+
+        public static NotificationSound None { get; } = new NotificationSound { Type = NotificationSoundType.None };
+        public static NotificationSound Default { get; } = new NotificationSound { Type = NotificationSoundType.Default };
     }
 }
