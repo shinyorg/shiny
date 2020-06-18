@@ -17,10 +17,20 @@ namespace Shiny.AppState
         internal void OnForeground() => this.Execute(x => x.OnForeground());
         internal void OnBackground() => this.Execute(x => x.OnBackground());
 
-        void Execute(Action<IAppStateDelegate> execute) => Log.SafeExecute(() =>
+
+        void Execute(Action<IAppStateDelegate> execute)
         {
             foreach (var del in this.delegates)
-                execute(del);
-        });
+            { 
+                try
+                { 
+                    execute(del);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+            }
+        }
     }
 }
