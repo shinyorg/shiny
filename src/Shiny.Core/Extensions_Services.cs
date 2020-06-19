@@ -55,27 +55,28 @@ namespace Shiny
             => services.Resolve<IEnumerable<T>>();
 
 
-        public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception> onError = null)
+        public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)
             => services.ResolveAll<T>().RunDelegates(execute, onError);
         
 
-        public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, Action<Exception> onError = null)
+        public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, Action<Exception>? onError = null)
         {
-            var tasks = services.Select(async x =>
-            {
-                try
+            var tasks = services
+                .Select(async x =>
                 {
-                    await execute(x).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    if (onError == null)
-                        Log.Write(ex); 
-                    else
-                        onError(ex);
-                }
-            })
-            .ToList();
+                    try
+                    {
+                        await execute(x).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (onError == null)
+                            Log.Write(ex); 
+                        else
+                            onError(ex);
+                    }
+                })
+                .ToList();
 
             await Task.WhenAll(tasks);
         }
@@ -83,7 +84,7 @@ namespace Shiny
 
         public static async Task RunResolves<T>(this IServiceProvider services, Func<T, Task> execute)
         {
-            var resolves = services.Resolve<IEnumerable<T>>();
+            var resolves = services.ResolveAll<T>();
             foreach (var resolve in resolves)
             {
                 try
