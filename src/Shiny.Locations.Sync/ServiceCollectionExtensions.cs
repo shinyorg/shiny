@@ -48,6 +48,7 @@ namespace Shiny
         /// <param name="request"></param>
         /// <param name="config"></param>
         public static void UseGpsSync(this IServiceCollection services, Type delegateType, GpsRequest? request = null, SyncConfig? config = null)
+            // TODO: include motion activity data
             => services.RegisterModule(new GpsModule(delegateType, request, config));
     }
 }

@@ -63,8 +63,11 @@ namespace Shiny.MediaSync.Infrastructure
             if (!this.syncManager.SyncTypes.HasFlag(media.Type))
                 return false;
 
-            // TODO: ensure it isn't in queue already?  last job swap may not have finished
-            //await this.repository.Get<SyncItem>(media)
+            // ensure it isn't in queue already?  last job swap may not have finished
+            var item = await this.repository.Get<SyncItem>(media.Identifier);
+            if (item != null && this.transfers.GetTransfer(item.HttpTransferId) != null)
+                return false;
+
             var result = await this.syncDelegate.CanSync(media);
             if (!result)
                 return false;

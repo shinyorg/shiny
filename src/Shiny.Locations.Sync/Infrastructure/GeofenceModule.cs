@@ -30,8 +30,9 @@ namespace Shiny.Locations.Sync.Infrastructure
         {
             services.AddSingleton(typeof(IGeofenceSyncDelegate), this.delegateType);
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
+            services.TryAddSingleton<IDataService, SqliteDataService>();
             services.UseGeofencing<SyncGeofenceDelegate>(this.requestPermissionOnStart);
-            
+
             services.UseJobForegroundService(TimeSpan.FromSeconds(30));
             var job = new JobInfo(typeof(SyncGeofenceJob), Constants.GeofenceJobIdentifer) { RunOnForeground = true };
             job.SetSyncConfig(this.config);

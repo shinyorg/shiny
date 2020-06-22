@@ -28,6 +28,7 @@ namespace Shiny.Locations.Sync.Infrastructure
         public override void Register(IServiceCollection services)
         {
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
+            services.TryAddSingleton<IDataService, SqliteDataService>();
             services.AddSingleton<IGpsDelegate, SyncGpsDelegate>();
             services.AddSingleton(typeof(IGpsSyncDelegate), this.delegateType);
 

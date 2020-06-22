@@ -9,13 +9,13 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class SyncGpsDelegate : NotifyPropertyChanged, IGpsDelegate
     {
         readonly IJobManager jobManager;
-        readonly IRepository repository;
+        readonly IDataService dataService;
 
 
-        public SyncGpsDelegate(IJobManager jobManager, IRepository repository)
+        public SyncGpsDelegate(IJobManager jobManager, IDataService dataService)
         {
             this.jobManager = jobManager;
-            this.repository = repository;
+            this.dataService = dataService;
         }
 
 
@@ -33,27 +33,18 @@ namespace Shiny.Locations.Sync.Infrastructure
                 Speed = reading.Speed,
                 PositionAccuracy = reading.PositionAccuracy
             };
-            await this.repository.Set(e.Id, e);
-            this.BatchSize++;
+            await this.dataService.Create(e);
+            var batchSize = await this.dataService.GetPendingCount<GeofenceEvent>();
 
             var job = await this.jobManager.GetJob(Constants.GpsJobIdentifier);
             var config = job.GetSyncConfig();
 
-            if (this.BatchSize >= config.BatchSize)
+            if (batchSize >= config.BatchSize)
             {
-                this.BatchSize = 0;
                 Console.WriteLine("GPS Location Sync batch size reached, will attempt to sync");
-                if (this.jobManager.IsRunning)
+                if (!this.jobManager.IsRunning)
                     await this.jobManager.RunJobAsTask(Constants.GpsJobIdentifier);
             }
-        }
-
-
-        int batchSize;
-        public int BatchSize
-        {
-            get => this.batchSize;
-            set => this.Set(ref this.batchSize, value);
         }
     }
 }

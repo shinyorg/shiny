@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
 using Shiny.Jobs;
 
 
@@ -10,16 +9,16 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class SyncGeofenceJob : IJob
     {
         readonly ILocationSyncManager syncManager;
-        readonly IRepository repository;
+        readonly IDataService dataService;
         readonly IGeofenceSyncDelegate? geofences;
 
 
         public SyncGeofenceJob(ILocationSyncManager syncManager, 
-                               IRepository repository, 
+                               IDataService dataService, 
                                IGeofenceSyncDelegate? geofences = null)
         {
             this.syncManager = syncManager;
-            this.repository = repository;
+            this.dataService = dataService;
             this.geofences = geofences;
         }
 
@@ -35,7 +34,7 @@ namespace Shiny.Locations.Sync.Infrastructure
             var result = await JobProcessor.Process<GeofenceEvent>(
                 this.syncManager,
                 jobInfo,
-                this.repository,
+                this.dataService,
                 (pings, ct) => this.geofences.Process(pings, ct),
                 cancelToken
             );

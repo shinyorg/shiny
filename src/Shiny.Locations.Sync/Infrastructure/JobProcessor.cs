@@ -14,15 +14,15 @@ namespace Shiny.Locations.Sync.Infrastructure
     {
         public static async Task<bool> Process<T>(ILocationSyncManager syncManager, 
                                                   JobInfo jobInfo, 
-                                                  IRepository repository, 
+                                                  IDataService dataService, 
                                                   Func<IEnumerable<T>, CancellationToken, Task> process, 
-                                                  CancellationToken cancelToken) where T : LocationEvent
+                                                  CancellationToken cancelToken) where T : LocationEvent, new()
         {
             if (!syncManager.IsSyncEnabled)
                 return false;
 
             var config = jobInfo.GetSyncConfig();
-            var events = await repository.GetAll<T>();
+            var events = await dataService.GetAll<T>();
             var list = config.SortMostRecentFirst 
                 ? events.OrderByDescending(x => x.DateCreated) 
                 : events.OrderBy(x => x.DateCreated);
@@ -45,7 +45,7 @@ namespace Shiny.Locations.Sync.Infrastructure
                         batchProcessed = true;
 
                         foreach (var e in batch)
-                            await repository.Remove<T>(e.Id);
+                            await dataService.Remove(e);
                     }
                     catch (Exception ex)
                     {

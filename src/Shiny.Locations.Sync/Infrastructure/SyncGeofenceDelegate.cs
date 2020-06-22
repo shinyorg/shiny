@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
 using Shiny.Jobs;
 
 
@@ -9,13 +8,13 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class SyncGeofenceDelegate : IGeofenceDelegate
     {
         readonly IJobManager jobManager;
-        readonly IRepository repository;
+        readonly IDataService dataService;
 
 
-        public SyncGeofenceDelegate(IJobManager jobManager, IRepository repository)
+        public SyncGeofenceDelegate(IJobManager jobManager, IDataService dataService)
         {
             this.jobManager = jobManager;
-            this.repository = repository;
+            this.dataService = dataService;
         }
 
 
@@ -29,7 +28,7 @@ namespace Shiny.Locations.Sync.Infrastructure
                 Identifier = region.Identifier,
                 Entered = newStatus == GeofenceState.Entered
             };
-            await this.repository.Set(e.Id, e);
+            await this.dataService.Create(e);
             if (!this.jobManager.IsRunning)
                 await this.jobManager.RunJobAsTask(Constants.GeofenceJobIdentifer);
         }

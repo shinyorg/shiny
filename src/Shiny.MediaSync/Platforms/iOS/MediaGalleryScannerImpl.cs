@@ -1,7 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
+using AVFoundation;
+
+using CoreGraphics;
+
 using Foundation;
 using Photos;
 
@@ -32,62 +39,72 @@ namespace Shiny.MediaSync.Infrastructure
                     .OfType<PHAsset>()
                     .ToArray();
 
-                var options = new PHAssetResourceRequestOptions
-                {
-                    NetworkAccessAllowed = false
-                };
-
-
                 var imageCache = new PHCachingImageManager();
                 imageCache.StartCaching(
-                    fetchAssets, 
-                    PHImageManager.MaximumSize, 
-                    PHImageContentMode.Default, 
+                    fetchAssets,
+                    PHImageManager.MaximumSize,
+                    PHImageContentMode.Default,
                     new PHImageRequestOptions
                     {
                         NetworkAccessAllowed = false
                     }
                 );
 
+                //result.MediaType
+                //result.Hidden
+                //result.Duration
+                //result.LocalIdentifier
+                //result.Location;
+                //result.ModificationDate
+                //result.PixelHeight;
+                //result.PixelWidth;
+                //result.CreationDate
                 var assets = new List<MediaAsset>(fetchAssets.Count());
                 foreach (var asset in fetchAssets)
                 {
-                    //result.MediaType
-                    //result.Hidden
-                    //result.Duration
-                    //result.LocalIdentifier
-                    //result.Location;
-                    //result.ModificationDate
-                    //result.PixelHeight;
-                    //result.PixelWidth;
-                    //result.CreationDate                    
-
                     switch (asset.MediaType)
                     {
                         case PHAssetMediaType.Image:
-                            imageCache.RequestImageData(
-                                asset,
-                                new PHImageRequestOptions
+                            asset.RequestContentEditingInput(
+                                new PHContentEditingInputRequestOptions
                                 {
-
+                                    NetworkAccessAllowed = false
                                 },
-                                (data, fn, orientation, dict) => { }
-                            );
-                            break;
-
-                        case PHAssetMediaType.Video:
-                            imageCache.RequestAvAsset(
-                                asset, 
-                                new PHVideoRequestOptions 
-                                { 
-                                    NetworkAccessAllowed = false, 
-                                    DeliveryMode = PHVideoRequestOptionsDeliveryMode.HighQualityFormat 
-                                },
-                                (ass, mix, dict) => { }
+                                (input, info) =>
+                                {
+                                    assets.Add(new MediaAsset(
+                                        asset.LocalIdentifier,
+                                        input.FullSizeImageUrl.ToString(),
+                                        MediaTypes.Image 
+                                    ));
+                                }
                             );
                             break;
 
                         case PHAssetMediaType.Audio:
+                        case PHAssetMediaType.Video:
+                            imageCache.RequestAvAsset(
+                                asset,
+                                new PHVideoRequestOptions
+                                {
+                                    NetworkAccessAllowed = false,
+                                    DeliveryMode = PHVideoRequestOptionsDeliveryMode.HighQualityFormat
+                                },
+                                (ass, mix, dict) =>
+                                {
+                                    if (ass is AVUrlAsset url)
+                                    {
+                                        var path = url.Url.ToString().Replace("file://", String.Empty);
+                                        assets.Add(new MediaAsset(
+                                            asset.LocalIdentifier,
+                                            path,
+                                            asset.MediaType == PHAssetMediaType.Audio
+                                                ? MediaTypes.Audio
+                                                : MediaTypes.Video
+                                        ));
+                                    }
+                                 }
+                            );
                             break;
                     }
                 }

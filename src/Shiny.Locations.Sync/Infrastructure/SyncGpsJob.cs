@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
 using Shiny.Jobs;
 
 
@@ -10,16 +9,16 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class SyncGpsJob : IJob
     {
         readonly ILocationSyncManager syncManager;
-        readonly IRepository repository;
+        readonly IDataService dataService;
         readonly IGpsSyncDelegate? gps;
 
 
-        public SyncGpsJob(ILocationSyncManager syncManager, 
-                          IRepository repository, 
+        public SyncGpsJob(ILocationSyncManager syncManager,
+                          IDataService dataService, 
                           IGpsSyncDelegate? gps = null)
         {
             this.syncManager = syncManager;
-            this.repository = repository;
+            this.dataService = dataService;
             this.gps = gps;
         }
 
@@ -34,7 +33,7 @@ namespace Shiny.Locations.Sync.Infrastructure
             var result = await JobProcessor.Process<GpsEvent>(
                 this.syncManager,
                 jobInfo, 
-                this.repository,
+                this.dataService,
                 (pings, ct) => this.gps.Process(pings, ct),
                 cancelToken
             );
