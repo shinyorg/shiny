@@ -51,16 +51,15 @@ namespace Shiny
         }
 
 
-        public static IEnumerable<T> ResolveAll<T>(this IServiceProvider services)
-            => services.Resolve<IEnumerable<T>>();
-
-
         public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)
-            => services.ResolveAll<T>().RunDelegates(execute, onError);
+            => services.GetServices<T>().RunDelegates(execute, onError);
         
 
         public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, Action<Exception>? onError = null)
         {
+            if (services == null)
+                return;
+
             var tasks = services
                 .Select(async x =>
                 {
@@ -84,7 +83,10 @@ namespace Shiny
 
         public static async Task RunResolves<T>(this IServiceProvider services, Func<T, Task> execute)
         {
-            var resolves = services.ResolveAll<T>();
+            var resolves = services.GetServices<T>();
+            if (resolves == null)
+                return;
+
             foreach (var resolve in resolves)
             {
                 try

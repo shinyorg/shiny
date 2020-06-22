@@ -36,12 +36,14 @@ namespace Shiny
         /// <returns></returns>
         public static Lazy<T> LazyResolve<T>() => new Lazy<T>(() => Container.Resolve<T>());
 
+
         /// <summary>
         /// Resolve a list of registered services from the container
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IEnumerable<T> ResolveAll<T>() => Container.GetServices<T>();
+        public static IEnumerable<T> ResolveAll<T>() 
+            => Container.GetServices<T>() ?? new List<T>(0);
 
 
         /// <summary>

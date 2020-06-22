@@ -72,50 +72,6 @@ namespace Shiny.Tests.Infrastructure
             var service2 = sp.Resolve<IFullService>(true);
             service2.Count.Should().Be(100);
         }
-
-
-        [Fact]
-        public void ResolveManyWithManyRegistered()
-        {
-            var services = new ServiceCollection();
-            services.AddSingleton<InterfaceType, ImplType1>();
-            services.AddSingleton<InterfaceType, ImplType2>();
-            services.AddSingleton<InterfaceType, ImplType3>();
-
-            var container = services.BuildServiceProvider();
-            var impls = container.ResolveAll<InterfaceType>();
-            impls.Should().NotBeNull();
-            impls.Count().Should().Be(3);
-        }
-
-
-        [Fact]
-        public void ResolveManyWithOnlyOneRegistered()
-        {
-            var services = new ServiceCollection();
-            services.AddSingleton<InterfaceType, ImplType1>();
-
-            var container = services.BuildServiceProvider();
-            var impls = container.ResolveAll<InterfaceType>();
-            impls.Should().NotBeNull();
-            impls.Count().Should().Be(1);
-        }
-
-
-        [Fact]
-        public void ResolveManyWithNoneRegistered()
-        {
-            var services = new ServiceCollection();
-            var container = services.BuildServiceProvider();
-            var impls = container.ResolveAll<InterfaceType>();
-            impls.Should().NotBeNull();
-            impls.Count().Should().Be(0);
-        }
     }
-
-    public interface InterfaceType {}
-    public class ImplType1 : InterfaceType { }
-    public class ImplType2 : InterfaceType { }
-    public class ImplType3 : InterfaceType { }
 }
 
