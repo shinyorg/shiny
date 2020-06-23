@@ -2,13 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-
 using AVFoundation;
-
-using CoreGraphics;
-
 using Foundation;
 using Photos;
 
@@ -103,7 +98,7 @@ namespace Shiny.MediaSync.Infrastructure
                                                 : MediaTypes.Video
                                         ));
                                     }
-                                 }
+                                }
                             );
                             break;
                     }
