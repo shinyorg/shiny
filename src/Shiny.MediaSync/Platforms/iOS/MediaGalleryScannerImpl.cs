@@ -12,38 +12,27 @@ namespace Shiny.MediaSync.Infrastructure
 {
     public class MediaGalleryScannerImpl : IMediaGalleryScanner
     {
+        readonly object syncLock = new object();
+
+
         public Task<IEnumerable<MediaAsset>> Query(MediaTypes mediaTypes, DateTimeOffset date)
         {
-            var tcs = new TaskCompletionSource<IEnumerable<MediaAsset>>();
-            Task.Run(() =>
-            { 
-                var filter = "creationDate >= %@ && " + GetFilter(mediaTypes);
-
-                var fetchOptions = new PHFetchOptions
+            lock (this.syncLock)
+            {
+                var tcs = new TaskCompletionSource<IEnumerable<MediaAsset>>();
+                Task.Run(async () =>
                 {
-                    IncludeHiddenAssets = false,
-                    IncludeAllBurstAssets = false,
-                    Predicate = NSPredicate.FromFormat(filter, (NSDate)date.LocalDateTime),
-                    SortDescriptors = new [] { 
-                        new NSSortDescriptor("creationDate", false) 
-                    }
-                };
-                
-                var fetchAssets = PHAsset
-                    .FetchAssets(fetchOptions)
-                    .OfType<PHAsset>()
-                    .ToArray();
-
-                var imageCache = new PHCachingImageManager();
-                imageCache.StartCaching(
-                    fetchAssets,
-                    PHImageManager.MaximumSize,
-                    PHImageContentMode.Default,
-                    new PHImageRequestOptions
-                    {
-                        NetworkAccessAllowed = false
-                    }
-                );
+                    var fetchAssets = GetAssets(date, mediaTypes);
+                    var imageCache = new PHCachingImageManager();
+                    //imageCache.StartCaching(
+                    //    fetchAssets,
+                    //    PHImageManager.MaximumSize,
+                    //    PHImageContentMode.Default,
+                    //    new PHImageRequestOptions
+                    //    {
+                    //        NetworkAccessAllowed = false
+                    //    }
+                    //);
 
                 //result.MediaType
                 //result.Hidden
@@ -55,58 +44,17 @@ namespace Shiny.MediaSync.Infrastructure
                 //result.PixelWidth;
                 //result.CreationDate
                 var assets = new List<MediaAsset>(fetchAssets.Count());
-                foreach (var asset in fetchAssets)
-                {
-                    switch (asset.MediaType)
+                    foreach (var asset in fetchAssets)
                     {
-                        case PHAssetMediaType.Image:
-                            asset.RequestContentEditingInput(
-                                new PHContentEditingInputRequestOptions
-                                {
-                                    NetworkAccessAllowed = false
-                                },
-                                (input, info) =>
-                                {
-                                    assets.Add(new MediaAsset(
-                                        asset.LocalIdentifier,
-                                        input.FullSizeImageUrl.ToString(),
-                                        MediaTypes.Image 
-                                    ));
-                                }
-                            );
-                            break;
-
-                        case PHAssetMediaType.Audio:
-                        case PHAssetMediaType.Video:
-                            imageCache.RequestAvAsset(
-                                asset,
-                                new PHVideoRequestOptions
-                                {
-                                    NetworkAccessAllowed = false,
-                                    DeliveryMode = PHVideoRequestOptionsDeliveryMode.HighQualityFormat
-                                },
-                                (ass, mix, dict) =>
-                                {
-                                    if (ass is AVUrlAsset url)
-                                    {
-                                        var path = url.Url.ToString().Replace("file://", String.Empty);
-                                        assets.Add(new MediaAsset(
-                                            asset.LocalIdentifier,
-                                            path,
-                                            asset.MediaType == PHAssetMediaType.Audio
-                                                ? MediaTypes.Audio
-                                                : MediaTypes.Video
-                                        ));
-                                    }
-                                }
-                            );
-                            break;
+                        var wrap = await GetMediaAsset(imageCache, asset);
+                        if (wrap != null)
+                            assets.Add(wrap);
                     }
-                }
-                imageCache.StopCaching();
-                tcs.SetResult(assets);
-            });
-            return tcs.Task;
+                    //imageCache.StopCaching();
+                    tcs.SetResult(assets);
+                });
+                return tcs.Task;
+            }
         }
 
 
@@ -131,6 +79,88 @@ namespace Shiny.MediaSync.Infrastructure
                     throw new ArgumentException("Invalid status - " + status);
             }
         }
+
+
+        static PHAsset[] GetAssets(DateTimeOffset date, MediaTypes mediaTypes)
+        {
+            var filter = "creationDate >= %@ && " + GetFilter(mediaTypes);
+
+            var fetchOptions = new PHFetchOptions
+            {
+                IncludeHiddenAssets = false,
+                IncludeAllBurstAssets = false,
+                Predicate = NSPredicate.FromFormat(filter, (NSDate)date.LocalDateTime),
+                SortDescriptors = new[] {
+                    new NSSortDescriptor("creationDate", false)
+                }
+            };
+
+            var fetchAssets = PHAsset
+                .FetchAssets(fetchOptions)
+                .OfType<PHAsset>()
+                .ToArray();
+
+            return fetchAssets;
+        }
+
+
+        static Task<MediaAsset?> GetMediaAsset(PHCachingImageManager imageCache, PHAsset asset)
+        {
+            var tcs = new TaskCompletionSource<MediaAsset?>();
+
+            switch (asset.MediaType)
+            {
+                case PHAssetMediaType.Image:
+                    asset.RequestContentEditingInput(
+                        new PHContentEditingInputRequestOptions
+                        {
+                            NetworkAccessAllowed = false
+                        },
+                        (input, info) =>
+                        {
+                            var path = input.FullSizeImageUrl.ToString().Replace("file://", String.Empty);
+                            tcs.SetResult(new MediaAsset(
+                                asset.LocalIdentifier,
+                                path,
+                                MediaTypes.Image
+                            ));
+                        }
+                    );
+                    break;
+
+                case PHAssetMediaType.Audio:
+                case PHAssetMediaType.Video:
+                    imageCache.RequestAvAsset(
+                        asset,
+                        new PHVideoRequestOptions
+                        {
+                            NetworkAccessAllowed = false,
+                            DeliveryMode = PHVideoRequestOptionsDeliveryMode.HighQualityFormat
+                        },
+                        (ass, mix, dict) =>
+                        {
+                            if (ass is AVUrlAsset url)
+                            {
+                                var path = url.Url.ToString().Replace("file://", String.Empty);
+                                tcs.SetResult(new MediaAsset(
+                                    asset.LocalIdentifier,
+                                    path,
+                                    asset.MediaType == PHAssetMediaType.Audio
+                                        ? MediaTypes.Audio
+                                        : MediaTypes.Video
+                                ));
+                            }
+                            else
+                            {
+                                tcs.SetResult(null);
+                            }
+                        }
+                    );
+                    break;
+            }
+            return tcs.Task;
+        }
+
 
 
         static string GetFilter(MediaTypes mediaTypes)
