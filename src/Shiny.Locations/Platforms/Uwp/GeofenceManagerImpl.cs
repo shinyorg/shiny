@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
 using Shiny.Infrastructure;
+using Shiny.Locations.Infrastructure;
 
 
 namespace Shiny.Locations

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETSTANDARD
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Notifications;
@@ -34,3 +35,4 @@ namespace Shiny.Push
         }
     }
 }
+#endif
