@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-
 using Android.App;
 using Firebase.Messaging;
 using Shiny.Logging;

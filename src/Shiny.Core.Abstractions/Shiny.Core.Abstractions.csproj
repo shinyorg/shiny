@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>Shiny</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Reactive" Version="4.4.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.5" />
+    </ItemGroup>
+</Project>

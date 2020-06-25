@@ -3,6 +3,7 @@ using System.Reactive.Subjects;
 using Shiny.Infrastructure;
 using CoreLocation;
 using System.Collections.Generic;
+using Shiny.Locations.Infrastructure;
 
 namespace Shiny.Locations
 {

@@ -4,8 +4,10 @@ using Microsoft.Extensions.Hosting;
 
 namespace Shiny.Hosting
 {
-    public static class Extensions
+    public static partial class Extensions
     {
-        public static void Configure(this IHost host) { }
+        public static void UseShinyUwp(this IHostBuilder builder)
+        {
+        }
     }
 }

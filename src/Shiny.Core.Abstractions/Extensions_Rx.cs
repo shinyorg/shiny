@@ -73,38 +73,7 @@ namespace Shiny
             collection.CollectionChanged += handler;
             return () => collection.CollectionChanged -= handler;
         });
-  //      return Observable.Defer(() => MakeWebRequest())
-  //.RetryWithBackoffStrategy(retryCount: 4, retryOnError: e => e is WebException)
-        //[SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        //public static readonly Func<int, TimeSpan> ExponentialBackoff = n => TimeSpan.FromSeconds(Math.Pow(n, 2));
-        //// this function was taken from a Microsoft repo somewhere - slightly altered
-        //public static IObservable<T> RetryWithBackoffStrategy<T>(
-        //    this IObservable<T> source,
-        //    int retryCount = 3,
-        //    Func<int, TimeSpan> strategy = null,
-        //    Func<Exception, bool> retryOnError = null)
-        //{
-        //    //strategy = strategy ?? ExpontentialBackoff;
 
-        //    if (retryOnError == null)
-        //        retryOnError = e => true;
-
-        //    var attempt = 0;
-
-        //    return Observable
-        //        .Defer(() =>
-        //    {
-        //        return ((++attempt == 1) ? source : source.DelaySubscription(strategy(attempt - 1), scheduler))
-        //            .Select(item => new Tuple<bool, T, Exception>(true, item, null))
-        //            .Catch<Tuple<bool, T, Exception>, Exception>(e => retryOnError(e)
-        //                ? Observable.Throw<Tuple<bool, T, Exception>>(e)
-        //                : Observable.Return(new Tuple<bool, T, Exception>(false, default(T), e)));
-        //    })
-        //    .Retry(retryCount)
-        //    .SelectMany(t => t.Item1
-        //        ? Observable.Return(t.Item2)
-        //        : Observable.Throw<T>(t.Item3));
-        //}
 
 
         /// <summary>

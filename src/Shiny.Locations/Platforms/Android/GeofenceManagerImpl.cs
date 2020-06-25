@@ -8,6 +8,7 @@ using Android.App;
 using Android.Gms.Location;
 using Shiny.Infrastructure;
 using Shiny.Logging;
+using Shiny.Locations.Infrastructure;
 
 
 namespace Shiny.Locations

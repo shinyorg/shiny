@@ -10,7 +10,7 @@
         <None Include="readme.txt" />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.5" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.5" />
     </ItemGroup>
     
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -50,10 +50,6 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <Compile Include="**\Platforms\*iOS*\**\*.cs" />
-    </ItemGroup>
-
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.tvos')) ">
         <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
     </ItemGroup>
@@ -67,9 +63,8 @@
         <Reference Include="netstandard" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Remove="Platforms\Shared\Extensions.cs" />
-      <Compile Remove="Platforms\Uwp\Extensions.cs" />
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
+        <Compile Include="**\Platforms\*ios*\**\*.cs" />
+        <Reference Include="netstandard" />
     </ItemGroup>
-
 </Project>

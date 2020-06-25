@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using CoreLocation;
+using Shiny.Locations.Infrastructure;
 #if __IOS__
 using UIKit;
 #endif

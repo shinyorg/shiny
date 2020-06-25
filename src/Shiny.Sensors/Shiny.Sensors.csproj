@@ -10,6 +10,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
+        <ProjectReference Include="..\Shiny.Sensors.Abstractions\Shiny.Sensors.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">

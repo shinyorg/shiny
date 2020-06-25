@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
+using Shiny.Locations.Infrastructure;
 using Tizen.Location;
 using Tizen.Location.Geofence;
 

@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Locations
+namespace Shiny.Locations.Infrastructure
 {
     public class GeofenceRegionStore
     {

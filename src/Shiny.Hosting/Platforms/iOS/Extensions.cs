@@ -1,11 +1,20 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Extensions.Hosting;
+using Foundation;
 
 
 namespace Shiny.Hosting
 {
-    public static class Extensions
+    public static partial class Extensions
     {
-        public static void Configure(this IHostBuilder hostBuilder) { }
+        public static void UseShinyIos(this IHostBuilder builder)
+        {
+            var contentRoot = NSSearchPath
+                .GetDirectories(NSSearchPathDirectory.LibraryDirectory, NSSearchPathDomain.User)
+                .First();
+
+            builder.UseContentRoot(contentRoot);
+        }
     }
 }

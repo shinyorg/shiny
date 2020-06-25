@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>Shiny.Notifications</RootNamespace>
+        <Description>Shiny Notification Abstractions</Description>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>

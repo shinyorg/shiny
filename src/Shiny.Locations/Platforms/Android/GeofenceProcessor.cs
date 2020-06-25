@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Android.Content;
 using Android.Gms.Location;
 using Shiny.Infrastructure;
+using Shiny.Locations.Infrastructure;
 using Shiny.Logging;
 
 

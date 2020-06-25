@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
 
-namespace Shiny.Locations
+namespace Shiny.Locations.Infrastructure
 {
     public abstract class AbstractGeofenceManager : IGeofenceManager
     {
