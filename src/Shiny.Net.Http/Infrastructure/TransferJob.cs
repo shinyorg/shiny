@@ -9,7 +9,7 @@ using Shiny.Infrastructure;
 using Shiny.Jobs;
 
 
-namespace Shiny.Net.Http
+namespace Shiny.Net.Http.Infrastructure
 {
     public class TransferJob : IJob
     {

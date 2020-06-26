@@ -2,11 +2,12 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <RootNamespace>Shiny.BluetoothLE</RootNamespace>
-        <Description>Shiny BluetoothLE Client Abstractions</Description>
+        <RootNamespace>Shiny.Beacons</RootNamespace>
+        <Description>Shiny Beacon Abstractions</Description>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
     </ItemGroup>
+
 </Project>

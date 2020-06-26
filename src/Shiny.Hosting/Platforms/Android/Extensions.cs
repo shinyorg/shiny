@@ -35,7 +35,7 @@ namespace Shiny.Hosting
             //_hostingEnvironment.ContentRootFileProvider = new PhysicalFileProvider(_hostingEnvironment.ContentRootPath);
             builder.ConfigureServices(services =>
             {
-                services.AddSingleton<IHostLifetime>(app);
+                services.AddSingleton<IHostApplicationLifetime>(app);
 
             });
         }

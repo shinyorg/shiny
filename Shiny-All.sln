@@ -61,8 +61,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "art", "art", "{B092BB14-441
 		art\nuget.png = art\nuget.png
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{105E8691-5840-4DBD-BC8E-C9FDAB1633D6}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.XamarinForms", "src\Shiny.Integrations.XamarinForms\Shiny.Integrations.XamarinForms.csproj", "{1C0DA37D-BD29-4A66-9915-E20C5D0FDD5F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.Sqlite", "src\Shiny.Integrations.Sqlite\Shiny.Integrations.Sqlite.csproj", "{271E5317-66E3-4E0F-A08B-7CE89B395237}"
@@ -121,6 +119,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.Abstractions", "src\Shiny.Push.Abstractions\Shiny.Push.Abstractions.csproj", "{E0864273-E0E8-43E0-A6FC-AA05DB7280C5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Sensors.Abstractions", "src\Shiny.Sensors.Abstractions\Shiny.Sensors.Abstractions.csproj", "{24C187A4-AB80-4BE2-8F80-C6D499B46B58}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Beacons.Abstractions", "src\Shiny.Beacons.Abstractions\Shiny.Beacons.Abstractions.csproj", "{648BF88D-99FE-4903-9198-20605FCAEEE0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2088,6 +2088,62 @@ Global
 		{24C187A4-AB80-4BE2-8F80-C6D499B46B58}.Release|x64.Build.0 = Release|Any CPU
 		{24C187A4-AB80-4BE2-8F80-C6D499B46B58}.Release|x86.ActiveCfg = Release|Any CPU
 		{24C187A4-AB80-4BE2-8F80-C6D499B46B58}.Release|x86.Build.0 = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|Any CPU.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|Any CPU.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|ARM.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|ARM.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|ARM64.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|ARM64.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|x64.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|x64.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|x86.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Ad-Hoc|x86.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|Any CPU.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|Any CPU.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|ARM.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|ARM.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|ARM64.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|ARM64.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|iPhone.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|x64.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|x64.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|x86.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.AppStore|x86.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|ARM.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|x64.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Debug|x86.Build.0 = Debug|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|ARM.ActiveCfg = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|ARM.Build.0 = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|ARM64.Build.0 = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|iPhone.Build.0 = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|x64.ActiveCfg = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|x64.Build.0 = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|x86.ActiveCfg = Release|Any CPU
+		{648BF88D-99FE-4903-9198-20605FCAEEE0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

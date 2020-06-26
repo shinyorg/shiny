@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Infrastructure;
 
 
 namespace Shiny
@@ -32,28 +30,8 @@ namespace Shiny
     }
 
 
-
-    class InternalShinyStartup : ShinyStartup
-    {
-        readonly IShinyModule module;
-        public InternalShinyStartup(IShinyModule module)
-            => this.module = module;
-
-        public override void ConfigureServices(IServiceCollection services)
-            => services.RegisterModule(this.module);
-    }
-
-
     public abstract class ShinyStartup : IShinyStartup
     {
-        public static IShinyStartup FromAssemblyRegistration(params Assembly[] assemblies)
-            => new InternalShinyStartup(new AssemblyServiceModule(assemblies));
-
-
-        public static IShinyStartup AutoRegister()
-            => new InternalShinyStartup(new AutoRegisterModule());
-
-
         /// <summary>
         /// Configure the service collection
         /// </summary>

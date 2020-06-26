@@ -12,6 +12,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
+        <ProjectReference Include="..\Shiny.BluetoothLE.Abstractions\Shiny.BluetoothLE.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -29,6 +30,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\Android\**\*.cs" />
@@ -54,10 +56,5 @@
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\tizen\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Platforms\Shared\BleCentralShinyModule.cs" />
-      <None Remove="Platforms\Shared\ServiceCollectionExtensions.cs" />
     </ItemGroup>
 </Project>

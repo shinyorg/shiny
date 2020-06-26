@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
+using Shiny.Net.Http.Infrastructure;
 
 namespace Shiny.Net.Http
 {

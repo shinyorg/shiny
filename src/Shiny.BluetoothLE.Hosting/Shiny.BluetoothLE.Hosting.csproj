@@ -1,4 +1,4 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <VersionSuffix>beta</VersionSuffix>
@@ -8,8 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
+        <ProjectReference Include="..\Shiny.BluetoothLE.Hosting.Abstractions\Shiny.BluetoothLE.Hosting.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
