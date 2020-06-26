@@ -15,10 +15,12 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Uwp\**\*.cs" />
@@ -32,6 +34,7 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\macOS\**\*.cs" />
@@ -39,18 +42,21 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.tvos')) ">
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\tvOS\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\tizen\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <PackageReference Include="Xamarin.Firebase.Common" Version="[71.1610.1, 72)" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="[71.1740.1, 72)" />
@@ -61,6 +67,7 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <PackageReference Include="Xamarin.Firebase.Common" Version="119.0.0-preview03" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="119.0.1-preview03" />

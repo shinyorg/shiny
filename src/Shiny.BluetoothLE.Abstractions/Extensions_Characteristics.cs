@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 
@@ -15,38 +16,33 @@ namespace Shiny.BluetoothLE
         /// <param name="stream">The stream to send</param>
         public static IObservable<BleWriteSegment> BlobWrite(this IGattCharacteristic ch, Stream stream) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
         {
-            var trans = ch.Service.Peripheral.TryBeginTransaction() ?? new VoidGattReliableWriteTransaction();
-            using (trans)
+            var mtu = ch.Service.Peripheral.MtuSize;
+            var buffer = new byte[mtu];
+            var read = stream.Read(buffer, 0, buffer.Length);
+            var pos = read;
+            var len = Convert.ToInt32(stream.Length);
+
+            while (!ct.IsCancellationRequested && read > 0)
             {
-                var mtu = ch.Service.Peripheral.MtuSize;
-                var buffer = new byte[mtu];
-                var read = stream.Read(buffer, 0, buffer.Length);
-                var pos = read;
-                var len = Convert.ToInt32(stream.Length);
+                await ch
+                    .Write(buffer)
+                    .ToTask(ct)
+                    .ConfigureAwait(false);
 
-                while (!ct.IsCancellationRequested && read > 0)
-                {
-                    await trans
-                        .Write(ch, buffer)
-                        .ToTask(ct)
-                        .ConfigureAwait(false);
+                //if (this.Value != buffer)
+                //{
+                //    trans.Abort();
+                //    throw new GattReliableWriteTransactionException("There was a mismatch response");
+                //}
+                var seg = new BleWriteSegment(buffer, pos, len);
+                ob.OnNext(seg);
 
-                    //if (this.Value != buffer)
-                    //{
-                    //    trans.Abort();
-                    //    throw new GattReliableWriteTransactionException("There was a mismatch response");
-                    //}
-                    var seg = new BleWriteSegment(buffer, pos, len);
-                    ob.OnNext(seg);
-
-                    read = stream.Read(buffer, 0, buffer.Length);
-                    pos += read;
-                }
-                await trans.Commit();
+                read = stream.Read(buffer, 0, buffer.Length);
+                pos += read;
             }
             ob.OnCompleted();
 
-            return trans;
+            return Disposable.Empty;
         });
 
 
