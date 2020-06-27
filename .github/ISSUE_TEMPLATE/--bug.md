@@ -32,7 +32,8 @@ assignees: ''
  - [ ] AppCenter Logging Integration
  - [ ] Location Sync (beta)
  - [ ] Photo Sync (alpha)
- - [ ] BluetoothLE (beta)
+ - [ ] BluetoothLE Client (beta)
+ - [ ] BluetoothLE Hosting (beta)
  - [ ] Beacons (beta)
  - [ ] SQLite Integration
 

@@ -11,6 +11,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
+        <None Remove="Platforms\android+uwp\BeaconMonitoringManager.cs" />
         <ProjectReference Include="..\Shiny.Beacons.Abstractions\Shiny.Beacons.Abstractions.csproj" />
     </ItemGroup>
 

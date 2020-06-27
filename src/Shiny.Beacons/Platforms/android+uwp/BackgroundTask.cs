@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Collections.Generic;
-using Shiny.Infrastructure;
 using Shiny.BluetoothLE;
 using Shiny.Logging;
 
@@ -13,17 +12,17 @@ namespace Shiny.Beacons
     public class BackgroundTask
     {
         readonly IBleManager centralManager;
-        readonly IBeaconManager beaconManager;
+        readonly IBeaconMonitoringManager beaconManager;
         readonly IMessageBus messageBus;
-        readonly IBeaconDelegate beaconDelegate;
+        readonly IBeaconMonitorDelegate beaconDelegate;
         readonly IDictionary<string, BeaconRegionStatus> states;
         IDisposable? scanSub;
 
 
         public BackgroundTask(IBleManager centralManager,
-                              IBeaconManager beaconManager,
+                              IBeaconMonitoringManager beaconManager,
                               IMessageBus messageBus,
-                              IBeaconDelegate beaconDelegate)
+                              IBeaconMonitorDelegate beaconDelegate)
         {
             this.centralManager = centralManager;
             this.beaconManager = beaconManager;
@@ -46,7 +45,9 @@ namespace Shiny.Beacons
                     {
                         case BeaconRegisterEventType.Add:
                             if (this.states.Count == 0)
+                            { 
                                 this.StartScan();
+                            }
                             else
                             {
                                 lock (this.states)

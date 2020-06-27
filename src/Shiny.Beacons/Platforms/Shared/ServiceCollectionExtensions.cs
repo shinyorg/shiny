@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Beacons;
 
@@ -12,12 +13,13 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static bool UseBeacons(this IServiceCollection services)
+        public static bool UseBeaconRanging(this IServiceCollection services)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new BeaconModule(null, null));
+            //services.UseBleClient();
+            services.AddSingleton<IBeaconRangingManager, BeaconRangingManager>();
             return true;
 #endif
         }
@@ -28,17 +30,24 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         /// <param name="delegateType"></param>
-        /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
         /// <returns></returns>
-        public static bool UseBeacons(this IServiceCollection services, Type delegateType, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable)
+        public static bool UseBeaconMonitoring(this IServiceCollection services, Type delegateType)
         {
-#if NETSTANDARD
+#if !__IOS__
             return false;
 #else
             if (delegateType == null)
                 throw new ArgumentException("You can't register monitoring regions without a delegate type");
 
-            services.RegisterModule(new BeaconModule(delegateType, regionsToMonitorWhenPermissionAvailable));
+            //services.RegisterJob(new Shiny.Jobs.JobInfo(typeof(BeaconRegionScanJob))
+            //{
+            //    BatteryNotLow = true,
+            //    //PeriodicTime = TimeSpan.FromSeconds(30),
+            //    IsSystemJob = true
+            //});
+            //services.UseBleClient();
+            services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
+            services.AddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
             return false;
 #endif
         }
@@ -51,7 +60,7 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
         /// <returns></returns>
-        public static bool UseBeacons<T>(this IServiceCollection services, params BeaconRegion[] regionsToMonitorWhenPermissionAvailable) where T : class, IBeaconDelegate
-            => services.UseBeacons(typeof(T), regionsToMonitorWhenPermissionAvailable);
+        public static bool UseBeaconMonitoring<T>(this IServiceCollection services) where T : class, IBeaconMonitorDelegate
+            => services.UseBeaconMonitoring(typeof(T));
     }
 }

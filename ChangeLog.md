@@ -1,5 +1,23 @@
 ﻿# Change Log
 
+2.0.0
+---
+
+### Core
+* New Hosting model based on Microsoft.Extensions.Hosting
+  * [BREAKING] You can now use Microsoft.Extensions.Caching.* for cache needs.  Shiny.Caching has been removed
+* Abstraction libraries have been created to make room for other platform integrations (where applicable outside of Xamarin targets)
+* [BREAKING] Jobs are no longer Scheduled via the job manager.  They can only registered during startup.  Also during startup, existing native jobs are "flushed" to prevent orphaned processes left over
+  * With this change, system job flags are also gone.  
+  * IJob.Run no longer has a boolean return
+
+### Shiny.BluetoothLE and Shiny.BluetoothLE.Hosting
+* [BREAKING] The original library has been split into 2 separate libraries (Client - Shiny.BluetoothLE and Server - Shiny.BluetoothLE.Hosting) with some common ties
+
+### Shiny.Beacons
+* [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
+
+
 1.2.0 (SP1)
 ---
 
@@ -19,6 +37,7 @@
 
 ### Shiny.MediaSync
 * Initial Alpha release - Synchronizes photos, videos, and audio recordings to the server using Shiny best practices
+
 
 1.2.0
 ---

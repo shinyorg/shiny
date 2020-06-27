@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Jobs;
 
+
 namespace Shiny.Beacons
 {
     public class BeaconRegionScanJob : IJob

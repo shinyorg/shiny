@@ -7,13 +7,13 @@ namespace Shiny.Beacons
 {
     public class BeaconLocationManagerDelegate : ShinyLocationDelegate
     {
-        readonly IBeaconDelegate bdelegate;
+        readonly IBeaconMonitorDelegate bdelegate;
         readonly Subject<Beacon> rangeSubject;
 
 
         public BeaconLocationManagerDelegate()
         {
-            this.bdelegate = ShinyHost.Resolve<IBeaconDelegate>();
+            this.bdelegate = ShinyHost.Resolve<IBeaconMonitorDelegate>();
             this.rangeSubject = new Subject<Beacon>();
         }
 

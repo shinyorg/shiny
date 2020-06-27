@@ -4,7 +4,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Beacons
 {
-    public interface IBeaconDelegate : IShinyDelegate
+    public interface IBeaconMonitorDelegate : IShinyDelegate
     {
         Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region);
     }
