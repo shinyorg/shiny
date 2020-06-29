@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <VersionSuffix>alpha</VersionSuffix>
+        <Description>Shiny Trip Tracker</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
+        <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
+    </ItemGroup>
+
+</Project>
