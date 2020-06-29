@@ -1,18 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Shiny.Locations;
+
 
 namespace Shiny.TripTracker.Internals
 {
     public interface IDataService
     {
+        Task<Trip> GetTrip(int tripId);
         Task<IList<Trip>> GetAll();
-        Task<IList<TripCheckin>> GetCheckinsByTrip(Guid tripId);
+        Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId);
         Task Purge();
 
         Task Save(Trip trip);
-        Task Checkin(TripCheckin checkin);
-        Task Remove(Guid tripId);
+        Task Checkin(int tripId, IGpsReading reading);
+        Task Remove(int tripId);
     }
 }

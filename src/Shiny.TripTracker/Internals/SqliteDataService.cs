@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Shiny.IO;
+using Shiny.Locations;
 using SQLite;
 
 
@@ -18,34 +19,46 @@ namespace Shiny.TripTracker.Internals
             this.conn = new SQLiteAsyncConnection(Path.Combine(fileSystem.AppData.FullName, "shinytrip.db"));
         }
 
-        public Task Checkin(TripCheckin checkin)
+
+        public Task Checkin(int tripId, IGpsReading reading) => this.conn.InsertAsync(new TripCheckin
         {
-            throw new NotImplementedException();
+            TripId = tripId,
+            Latitude = reading.Position.Latitude,
+            Longitude = reading.Position.Longitude,
+            Speed = reading.Speed,
+            DateCreated = reading.Timestamp
+        });
+
+
+        public Task<Trip> GetTrip(int tripId) => this.conn.GetAsync<Trip>(tripId);
+
+
+        public async Task<IList<Trip>> GetAll() => await this.conn
+            .Table<Trip>()
+            .ToListAsync();
+
+
+        public async Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId) => await this.conn
+            .Table<TripCheckin>()
+            .OrderBy(x => x.DateCreated)
+            .Where(x => x.TripId == tripId)
+            .ToListAsync();
+
+
+        public async Task Purge() 
+        {
+            await this.conn.DeleteAllAsync<Trip>();
+            await this.conn.DeleteAllAsync<TripCheckin>();
         }
 
-        public Task<IList<Trip>> GetAll()
+
+        public async Task Remove(int tripId)
         {
-            throw new NotImplementedException();
+            await this.conn.ExecuteAsync("DELETE FROM Trips WHERE Id = ?", tripId);
+            await this.conn.ExecuteAsync("DELETE FROM TripCheckins WHERE TripId = ?", tripId);
         }
 
-        public Task<IList<TripCheckin>> GetCheckinsByTrip(Guid tripId)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task Purge()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Remove(Guid tripId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Save(Trip trip)
-        {
-            throw new NotImplementedException();
-        }
+        public Task Save(Trip trip) => this.conn.InsertOrReplaceAsync(trip);
     }
 }
