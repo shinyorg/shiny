@@ -7,6 +7,10 @@ namespace Shiny.TripTracker
 {
     public static class ServiceCollectionExtensions
     {
+        public static bool UseTripTracking<T>(this IServiceCollection services) where T : ITripTrackerDelegate
+            => services.UseTripTracking(typeof(T));
+
+
         public static bool UseTripTracking(this IServiceCollection services, Type? delegateType = null)
         {            
             if (!services.UseMotionActivity())

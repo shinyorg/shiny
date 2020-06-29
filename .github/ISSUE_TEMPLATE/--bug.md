@@ -32,6 +32,7 @@ assignees: ''
  - [ ] AppCenter Logging Integration
  - [ ] Location Sync (beta)
  - [ ] Photo Sync (alpha)
+ - [ ] Trip Tracker (alpha)
  - [ ] BluetoothLE Client (beta)
  - [ ] BluetoothLE Hosting (beta)
  - [ ] Beacons (beta)

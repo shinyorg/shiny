@@ -17,6 +17,9 @@
 ### Shiny.Beacons
 * [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
 
+### Shiny.TripTracking (alpha) - NEW Module
+* A new module for tracking run, walks, and drives!
+
 
 1.2.0 (SP1)
 ---
@@ -35,7 +38,7 @@
 ### Shiny.Integrations.Sqlite
 * [Fix] Strings not saving properly
 
-### Shiny.MediaSync
+### Shiny.MediaSync (alpha) - NEW Module
 * Initial Alpha release - Synchronizes photos, videos, and audio recordings to the server using Shiny best practices
 
 
