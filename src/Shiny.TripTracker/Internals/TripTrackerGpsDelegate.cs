@@ -39,6 +39,7 @@ namespace Shiny.TripTracker.Internals
             if (this.manager.TrackingActivityTypes == null)
                 return;
 
+            // TODO: if the starting trip activity != the current activity, stop current trip and create a new one
             var currentMotion = await this.activityManager.GetCurrentActivity(TimeSpan.FromSeconds(60));
             var track = currentMotion != null && IsTracked(this.manager.TrackingActivityTypes.Value, currentMotion.Types);
 
