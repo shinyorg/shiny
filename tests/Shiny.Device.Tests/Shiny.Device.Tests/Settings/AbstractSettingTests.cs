@@ -18,18 +18,33 @@ namespace Shiny.Device.Tests.Settings
         }
 
 
-        //[Fact(Skip = "TODO")]
-        //public virtual void NullableEnums()
-        //{
-        //    this.Settings.Set("Bool", false);
-        //}
+        // TODO: test flags?
+        [Fact]
+        public virtual void NullableEnums()
+        {
+            var value = this.Settings.Get<MyTestEnum?>(nameof(NullableEnums), null);
+            Assert.Null(value);
+
+            value = this.Settings.Get<MyTestEnum?>(nameof(NullableEnums), MyTestEnum.Bye);
+            Assert.Equal(MyTestEnum.Bye, value);
+
+            this.Settings.Set<MyTestEnum?>(nameof(NullableEnums), MyTestEnum.Hi);
+            value = this.Settings.Get<MyTestEnum?>(nameof(NullableEnums));
+            Assert.Equal(MyTestEnum.Hi, value);
+
+            this.Settings.Set<MyTestEnum?>(nameof(NullableEnums), null);
+            value = this.Settings.Get<MyTestEnum?>(nameof(NullableEnums));
+            Assert.Null(value);
+        }
 
 
-        //[Fact(Skip = "TODO")]
-        //public virtual void SetToNullRemoves()
-        //{
-
-        //}
+        [Fact]
+        public void SetNullRemoves()
+        {
+            this.Settings.Set("SetNullRemoves", "Blah");
+            this.Settings.Set<string>("SetNullRemoves", null);
+            Assert.False(this.Settings.Contains("SetNullRemoves"));
+        }
 
 
         [Fact]
@@ -39,9 +54,9 @@ namespace Shiny.Device.Tests.Settings
             this.Settings.Set("OnSettingChanged", "boo");
             var eventArgs = await task;
 
-            Assert.Equal(eventArgs.Action, SettingChangeAction.Add);
-            Assert.Equal(eventArgs.Key, "OnSettingChanged");
-            Assert.True(eventArgs.Value.Equals("boo"));
+            Assert.Equal(SettingChangeAction.Add, eventArgs.Action);
+            Assert.Equal("OnSettingChanged", eventArgs.Key);
+            Assert.Equal("boo", eventArgs.Value);
         }
 
 
@@ -131,7 +146,7 @@ namespace Shiny.Device.Tests.Settings
             this.Settings.Set("Test", "1");
             this.Settings.Set("Test", "2");
             var r = this.Settings.Get<string>("Test");
-            Assert.True(r.Equals("2"));
+            Assert.Equal("2", r);
         }
 
 
@@ -175,15 +190,6 @@ namespace Shiny.Device.Tests.Settings
 
 
         [Fact]
-        public void SetNullRemoves()
-        {
-            this.Settings.Set("SetNullRemoves", "Blah");
-            this.Settings.Set<string>("SetNullRemoves", null);
-            Assert.False(this.Settings.Contains("SetNullRemoves"));
-        }
-
-
-        [Fact]
         public void NullBools()
         {
             this.Settings.Set<bool?>("SetNullBool", null);
@@ -192,11 +198,11 @@ namespace Shiny.Device.Tests.Settings
 
             this.Settings.Set<bool?>("SetNullBool", true);
             value = this.Settings.Get<bool?>("SetNullBool");
-            Assert.Equal(value, true);
+            Assert.Equal(true, value);
 
             this.Settings.Set<bool?>("SetNullBool", false);
             value = this.Settings.Get<bool?>("SetNullBool");
-            Assert.Equal(value, false);
+            Assert.Equal(false, value);
 
             this.Settings.Set<bool?>("SetNullBool", null);
             value = this.Settings.Get<bool?>("SetNullBool");
@@ -217,17 +223,7 @@ namespace Shiny.Device.Tests.Settings
         {
             Assert.True(this.Settings.SetDefault("TryDefaults", "Initial Value"), "Default value could not be set");
             Assert.False(this.Settings.SetDefault("TryDefaults", "Second Value"), "Default value was set and should not have been");
-            Assert.True(this.Settings.Get<string>("TryDefaults").Equals("Initial Value"));
-        }
-
-
-        [Fact]
-        public void ClearPreserveList()
-        {
-            this.Settings.Set("ClearPreserveTest", "Value");
-            this.Settings.KeysNotToClear.Add("ClearPreserveTest");
-            this.Settings.Clear();
-            Assert.True(this.Settings.Get<string>("ClearPreserveTest").Equals("Value"));
+            Assert.Equal("Initial Value", this.Settings.Get<string>("TryDefaults"));
         }
 
 
@@ -254,7 +250,7 @@ namespace Shiny.Device.Tests.Settings
 
             Assert.True(this.Settings.Contains("TestBind.StringProperty"));
             Assert.False(this.Settings.Contains("TestBind.IgnoredProperty"));
-            Assert.True(this.Settings.Get<string>("TestBind.StringProperty").Equals("Hi"));
+            Assert.Equal("Hi", this.Settings.Get<string>("TestBind.StringProperty"));
         }
 
 
@@ -265,7 +261,7 @@ namespace Shiny.Device.Tests.Settings
             obj.StringProperty = "Binding_Persist";
 
             var obj2 = this.Settings.Bind<TestBind>();
-            Assert.True(obj.StringProperty.Equals(obj2.StringProperty));
+            Assert.Equal(obj2.StringProperty, obj.StringProperty);
         }
     }
 

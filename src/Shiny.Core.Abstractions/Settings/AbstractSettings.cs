@@ -58,6 +58,10 @@ namespace Shiny.Settings
 
                 var type = this.UnwrapType(typeof(T));
                 var value = this.NativeGet(type, key);
+                if (type.IsEnum)
+                    value = Enum.ToObject(type, value);
+                    //value = Enum.Parse(type, value);
+
                 return (T)value;
             }
             catch (Exception ex)
@@ -82,6 +86,9 @@ namespace Shiny.Settings
                         : SettingChangeAction.Add;
 
                     var type = this.UnwrapType(value.GetType());
+                    //if (type.IsEnum)
+                    //    value = value.ToString();
+
                     this.NativeSet(type, key, value);
                     this.OnChanged(new SettingChange(action, key, value));
                 }
@@ -98,6 +105,11 @@ namespace Shiny.Settings
             if (key == null)
                 throw new ArgumentException("Key is null");
 
+            if (value == null)
+            {
+                this.Remove(key);
+                return;
+            }
             try
             {
                 var isDefault = EqualityComparer<T>.Default.Equals(value, default);

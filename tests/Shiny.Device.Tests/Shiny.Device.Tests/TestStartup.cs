@@ -13,8 +13,8 @@ namespace Shiny.Device.Tests
             Log.UseDebug();
             Log.UseConsole();
 
-            services.UseBleCentral();
-            services.UseBlePeripherals();
+            services.UseBleClient();
+            //services.UseBleHosting();
         }
     }
 }

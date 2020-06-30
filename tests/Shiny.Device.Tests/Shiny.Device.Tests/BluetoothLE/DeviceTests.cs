@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Shiny.BluetoothLE.Central;
+using Shiny.BluetoothLE;
 using Shiny.Devices.Tests.BluetoothLE;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -15,13 +15,13 @@ namespace Shiny.BluetoothLE.Tests
 {
     public class DeviceTests : IDisposable
     {
-        readonly ICentralManager manager;
+        readonly IBleManager manager;
         IPeripheral peripheral;
 
 
         public DeviceTests()
         {
-            this.manager = ShinyHost.Container.GetService<ICentralManager>();
+            this.manager = ShinyHost.Container.GetService<IBleManager>();
         }
 
 

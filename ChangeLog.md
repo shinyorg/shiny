@@ -4,6 +4,7 @@
 ---
 
 ### Core
+* [Fix][Settings] Nullable enums and set null to remove
 * New Hosting model based on Microsoft.Extensions.Hosting
   * [BREAKING] You can now use Microsoft.Extensions.Caching.* for cache needs.  Shiny.Caching has been removed
 * Abstraction libraries have been created to make room for other platform integrations (where applicable outside of Xamarin targets)

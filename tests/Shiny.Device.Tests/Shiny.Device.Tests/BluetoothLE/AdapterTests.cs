@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Shiny.BluetoothLE;
-using Shiny.BluetoothLE.Central;
 using Dialogs = Acr.UserDialogs.UserDialogs;
 using Xunit;
 using Xunit.Abstractions;
@@ -15,13 +14,13 @@ namespace Shiny.Devices.Tests.BluetoothLE
     public class AdapterTests
     {
         readonly ITestOutputHelper output;
-        readonly ICentralManager manager;
+        readonly IBleManager manager;
 
 
         public AdapterTests(ITestOutputHelper output)
         {
             this.output = output;
-            this.manager = ShinyHost.Resolve<ICentralManager>();
+            this.manager = ShinyHost.Resolve<IBleManager>();
         }
 
 

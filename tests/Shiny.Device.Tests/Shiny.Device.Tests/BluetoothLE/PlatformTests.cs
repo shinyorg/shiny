@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Xunit;
 using Xunit.Abstractions;
-using Shiny.BluetoothLE.Central;
+using Shiny.BluetoothLE;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -22,7 +22,7 @@ namespace Shiny.Device.Tests.BluetoothLE
     public class PlatformTests
     {
         readonly ITestOutputHelper output;
-        readonly ICentralManager manager;
+        readonly IBleManager manager;
 
 
         public PlatformTests(ITestOutputHelper output)

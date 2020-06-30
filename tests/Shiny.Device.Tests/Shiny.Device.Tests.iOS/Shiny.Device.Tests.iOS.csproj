@@ -163,5 +163,9 @@
       <Project>{8E87D625-07EA-4CE2-A549-E3A815AB52D6}</Project>
       <Name>Shiny.Device.Tests</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj">
+      <Project>{EA4EDE16-DB4A-4559-B1D9-150BA3B60ED8}</Project>
+      <Name>Shiny.Core.Abstractions</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
