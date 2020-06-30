@@ -17,6 +17,10 @@ namespace Shiny.TripTracker.Internals
         public SqliteDataService(IFileSystem fileSystem)
         {
             this.conn = new SQLiteAsyncConnection(Path.Combine(fileSystem.AppData.FullName, "shinytrip.db"));
+
+            var sync = this.conn.GetConnection();
+            sync.CreateTable<Trip>();
+            sync.CreateTable<TripCheckin>();
         }
 
 
