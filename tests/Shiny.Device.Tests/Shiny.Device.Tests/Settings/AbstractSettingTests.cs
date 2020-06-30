@@ -18,6 +18,20 @@ namespace Shiny.Device.Tests.Settings
         }
 
 
+        //[Fact(Skip = "TODO")]
+        //public virtual void NullableEnums()
+        //{
+        //    this.Settings.Set("Bool", false);
+        //}
+
+
+        //[Fact(Skip = "TODO")]
+        //public virtual void SetToNullRemoves()
+        //{
+
+        //}
+
+
         [Fact]
         public async Task OnSettingChanged()
         {

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using Xunit;
+
 
 namespace Shiny.Tests.TripTracker
 {
-    public class TripTrackerDelegateTests
+    public class TripTrackerGpsDelegateTests
     {
         [Fact]
         public async Task NewTripCreated()
         {
-
         }
 
 

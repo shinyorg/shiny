@@ -48,10 +48,12 @@ namespace Shiny.TripTracker.Internals
                 if (!track)
                     return;
 
+                // TODO: need first flag from enum of incoming
                 var trip = new Trip
                 {
                     StartLatitude = reading.Position.Latitude,
                     StartLongitude = reading.Position.Longitude,
+                    TripType = MotionActivityType.Automotive,
                     DateStarted = DateTimeOffset.UtcNow
                 };
                 await this.dataService.Save(trip);
