@@ -7,7 +7,7 @@ namespace Shiny.MediaSync
     public interface IMediaSyncManager
     {
         string DefaultUploadUri { get; set; }
-        MediaTypes SyncTypes { get; set; }
+        MediaTypes? SyncTypes { get; set; }
         bool AllowUploadOnMeteredConnection { get; set; }
         bool ShowBadgeCount { get; set; }
         DateTimeOffset SyncFrom { get; set; }

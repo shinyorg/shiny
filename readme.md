@@ -51,6 +51,7 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |Project|NuGet|MyGet|Description|
 |-------|-----|-----|-----------|
 |Location Sync| [![LocationSyncNugetShield]][LocationSyncNuget] | [![LocationSyncMygetShield]][LocationSyncMyget] | Sync Geofence & GPS data to the server using Shiny best practices
+|Trip Tracker| [![TripTrackerNugetShield]][TripTrackerNuget] | [![TripTrackerMygetShield]][TripTrackerMyget] | Tracks your trips for automotive, cycling, running, and/or walking - includes the distance and all GPS coordinates throughout the trip
 |Media Sync| [![MediaSyncNugetShield]][MediaSyncNuget] | [![MediaSyncMygetShield]][MediaSyncMyget] | Sync your Android & iOS media gallery to the server using Shiny best practices
 
 ## Integrations
@@ -164,3 +165,8 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [MediaSyncNuget]: https://www.nuget.org/packages/Shiny.MediaSync/
 [MediaSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.MediaSync.svg
 [MediaSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.MediaSync
+
+[TripTrackerNugetShield]: https://img.shields.io/nuget/v/Shiny.TripTracker.svg
+[TripTrackerNuget]: https://www.nuget.org/packages/Shiny.TripTracker/
+[TripTrackerMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.TripTracker.svg
+[TripTrackerMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.TripTracker

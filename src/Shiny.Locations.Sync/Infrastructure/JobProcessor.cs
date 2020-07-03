@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
@@ -12,15 +13,11 @@ namespace Shiny.Locations.Sync.Infrastructure
 {
     static class JobProcessor
     {
-        public static async Task<bool> Process<T>(ILocationSyncManager syncManager, 
-                                                  JobInfo jobInfo, 
+        public static async Task<bool> Process<T>(JobInfo jobInfo, 
                                                   IDataService dataService, 
                                                   Func<IEnumerable<T>, CancellationToken, Task> process, 
                                                   CancellationToken cancelToken) where T : LocationEvent, new()
         {
-            if (!syncManager.IsSyncEnabled)
-                return false;
-
             var config = jobInfo.GetSyncConfig();
             var events = await dataService.GetAll<T>();
             var list = config.SortMostRecentFirst 
@@ -32,9 +29,10 @@ namespace Shiny.Locations.Sync.Infrastructure
             //    // TODO: if expired, delete it - could also let processor deal with this
             //    //list = list.Where(x => x.DateCreated.Add(expiryTime) > DateTime.UtcNow);
             //}
+
             foreach (var batch in list.Page(config.BatchSize))
             {
-                var batchProcessed = false;
+                var batchProcessed = false;                
 
                 // configure how aggressive this need to be?
                 while (!cancelToken.IsCancellationRequested && !batchProcessed)

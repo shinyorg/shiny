@@ -9,19 +9,17 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class GpsModule : ShinyModule
     {
         readonly Type delegateType;
-        readonly GpsRequest? request;
-        readonly SyncConfig config;
 
 
-        public GpsModule(Type delegateType, GpsRequest? request, SyncConfig? config)
+        public GpsModule(Type delegateType)
         {
             this.delegateType = delegateType;
-            this.request = request;
-            this.config = config ?? new SyncConfig
-            {
-                BatchSize = 10,
-                SortMostRecentFirst = false
-            };
+            //this.request = request;
+            //this.config = config ?? new SyncConfig
+            //{
+            //    BatchSize = 10,
+            //    SortMostRecentFirst = false
+            //};
         }
 
 
@@ -31,14 +29,14 @@ namespace Shiny.Locations.Sync.Infrastructure
             services.TryAddSingleton<IDataService, SqliteDataService>();
             services.AddSingleton<IGpsDelegate, SyncGpsDelegate>();
             services.AddSingleton(typeof(IGpsSyncDelegate), this.delegateType);
+            services.UseMotionActivity();
+            //services.UseJobForegroundService(TimeSpan.FromSeconds(30));
+            //var job = new JobInfo(typeof(SyncGpsJob), Constants.GpsJobIdentifier) { RunOnForeground = true };
+            //job.SetSyncConfig(this.config);
+            //services.RegisterJob(job);
 
-            services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            var job = new JobInfo(typeof(SyncGpsJob), Constants.GpsJobIdentifier) { RunOnForeground = true };
-            job.SetSyncConfig(this.config);
-            services.RegisterJob(job);
-
-            if (this.request != null)
-                services.UseGps(null, this.request);
+            //if (this.request != null)
+            //    services.UseGps(null, this.request);
         }
     }
 }

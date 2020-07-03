@@ -39,9 +39,12 @@ namespace Shiny.MediaSync.Infrastructure
 
         public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
+            if (this.syncManager.SyncTypes == null)
+                return false;
+
             // TODO: verify gallery access
             var items = await this.scanner.Query(
-                this.syncManager.SyncTypes, 
+                this.syncManager.SyncTypes.Value, 
                 this.syncManager.SyncFrom
             );
             if (items?.Any() ?? false)
@@ -60,7 +63,7 @@ namespace Shiny.MediaSync.Infrastructure
 
         async Task<bool> CanProcess(MediaAsset media)
         {
-            if (!this.syncManager.SyncTypes.HasFlag(media.Type))
+            if (!this.syncManager.SyncTypes?.HasFlag(media.Type) ?? true)
                 return false;
 
             // ensure it isn't in queue already?  last job swap may not have finished

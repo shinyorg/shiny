@@ -18,6 +18,7 @@ namespace Shiny.Locations.Sync.Infrastructure
                                IGeofenceSyncDelegate? geofences = null)
         {
             this.syncManager = syncManager;
+            this.activityManager = activityManager;
             this.dataService = dataService;
             this.geofences = geofences;
         }
@@ -25,14 +26,14 @@ namespace Shiny.Locations.Sync.Infrastructure
 
         public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            if (this.geofences == null)
+            var enabled = await this.syncManager.IsMonitoring(LocationSyncType.Geofence);
+            if (!enabled || this.geofences == null)
             {
                 jobInfo.Repeat = false;
                 return false;
             }
 
             var result = await JobProcessor.Process<GeofenceEvent>(
-                this.syncManager,
                 jobInfo,
                 this.dataService,
                 (pings, ct) => this.geofences.Process(pings, ct),

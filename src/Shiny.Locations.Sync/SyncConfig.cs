@@ -8,8 +8,10 @@ namespace Shiny
         // TODO: only send the latest?
         // sync types - aggressive, normal?
         //public int RetryCount { get; set; } = 0;
+        public bool IncludeMotionActivityEvents { get; set; }
         public bool SortMostRecentFirst { get; set; }
         //public TimeSpan? ExpirationTime { get; set; }
         public int BatchSize { get; set; } = 1;
+        public bool StoreMotionActivity { get; set; }
     }
 }

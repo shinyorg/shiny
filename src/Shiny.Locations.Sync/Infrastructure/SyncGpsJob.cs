@@ -25,13 +25,13 @@ namespace Shiny.Locations.Sync.Infrastructure
 
         public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            if (this.gps == null)
+            var enabled = await this.syncManager.IsMonitoring(LocationSyncType.GPS);
+            if (!enabled || this.gps == null)
             {
                 jobInfo.Repeat = false;
                 return false;
             }
             var result = await JobProcessor.Process<GpsEvent>(
-                this.syncManager,
                 jobInfo, 
                 this.dataService,
                 (pings, ct) => this.gps.Process(pings, ct),

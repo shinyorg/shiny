@@ -9,20 +9,11 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class GeofenceModule : ShinyModule
     {
         readonly Type delegateType;
-        readonly SyncConfig config;
-        readonly bool requestPermissionOnStart;
 
 
-        public GeofenceModule(Type delegateType, bool requestPermissionOnStart, SyncConfig? config)
+        public GeofenceModule(Type delegateType)
         {
             this.delegateType = delegateType;
-            this.requestPermissionOnStart = requestPermissionOnStart;
-
-            this.config = config ?? new SyncConfig
-            {
-                BatchSize = 1,
-                SortMostRecentFirst = false
-            };
         }
 
 
@@ -31,12 +22,12 @@ namespace Shiny.Locations.Sync.Infrastructure
             services.AddSingleton(typeof(IGeofenceSyncDelegate), this.delegateType);
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
             services.TryAddSingleton<IDataService, SqliteDataService>();
-            services.UseGeofencing<SyncGeofenceDelegate>(this.requestPermissionOnStart);
+            services.UseGeofencing<SyncGeofenceDelegate>();
+            services.UseMotionActivity();
 
-            services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            var job = new JobInfo(typeof(SyncGeofenceJob), Constants.GeofenceJobIdentifer) { RunOnForeground = true };
-            job.SetSyncConfig(this.config);
-            services.RegisterJob(job);
+            //services.UseJobForegroundService(TimeSpan.FromSeconds(30));
+            //var job = new JobInfo(typeof(SyncGeofenceJob), Constants.GeofenceJobIdentifer) { RunOnForeground = true };
+            //services.RegisterJob(job);
         }
     }
 }

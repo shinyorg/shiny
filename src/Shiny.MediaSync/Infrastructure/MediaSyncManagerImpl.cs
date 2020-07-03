@@ -28,8 +28,8 @@ namespace Shiny.MediaSync.Infrastructure
         }
 
 
-        MediaTypes syncTypes = MediaTypes.Audio | MediaTypes.Image | MediaTypes.Video;
-        public MediaTypes SyncTypes
+        MediaTypes? syncTypes = null;
+        public MediaTypes? SyncTypes
         {
             get => this.syncTypes;
             set => this.Set(ref this.syncTypes, value);
