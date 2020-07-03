@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="readme.txt" />
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
         <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
@@ -31,7 +31,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />        
+        <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <Compile Include="Platforms\Android\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
