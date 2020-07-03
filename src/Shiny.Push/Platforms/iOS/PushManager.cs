@@ -17,7 +17,6 @@ namespace Shiny.Push
     public class PushManager : AbstractPushManager, IShinyStartupTask
     {
         readonly iOSNotificationDelegate nativeDelegate;
-        readonly IServiceProvider services;
         readonly Subject<IDictionary<string, string>> payloadSubj;
         Subject<NSData>? onToken;
 
@@ -26,14 +25,16 @@ namespace Shiny.Push
                            IServiceProvider services,
                            iOSNotificationDelegate nativeDelegate) : base(settings)
         {
-            this.services = services;
+            this.Services = services;
             this.nativeDelegate = nativeDelegate;
 
             this.payloadSubj = new Subject<IDictionary<string, string>>();
         }
 
 
-        public void Start()
+        protected IServiceProvider Services { get; }
+
+        public virtual void Start()
         {
             this.nativeDelegate
                 .WhenPresented()
@@ -41,7 +42,7 @@ namespace Shiny.Push
                 .SubscribeAsync(async x =>
                 {
                     var payload = x.Notification.Request?.Content?.UserInfo?.FromNsDictionary();
-                    await this.services
+                    await this.Services
                         .RunDelegates<IPushDelegate>(x => x.OnReceived(payload))
                         .ConfigureAwait(false);
 
@@ -63,7 +64,7 @@ namespace Shiny.Push
                         textReply,
                         parameters
                     );
-                    await this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
+                    await this.Services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
                     x.CompletionHandler();
                 });
 
@@ -71,7 +72,7 @@ namespace Shiny.Push
                 async deviceToken =>
                 {
                     this.onToken?.OnNext(deviceToken);
-                    await services.SafeResolveAndExecute<IPushDelegate>(x =>
+                    await Services.SafeResolveAndExecute<IPushDelegate>(x =>
                     {
                         var stoken = ToTokenString(deviceToken);
                         return x.OnTokenChanged(stoken);
@@ -82,7 +83,7 @@ namespace Shiny.Push
                 {
                     // this will only be fired while in the bg, so don't fire observable
                     var dict = nsdict.FromNsDictionary();
-                    await services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
+                    await Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
                     action(UIBackgroundFetchResult.NewData);
                 }
             );

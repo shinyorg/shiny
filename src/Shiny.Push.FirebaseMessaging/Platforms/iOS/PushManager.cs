@@ -9,29 +9,33 @@ using Shiny.Settings;
 
 namespace Shiny.Push.FirebaseMessaging
 {
-    public class PushManager : Shiny.Push.PushManager, 
-                               IPushTagSupport
+    public class PushManager : Shiny.Push.PushManager, IPushTagSupport
     {
-        public PushManager(ISettings settings, IServiceProvider services, iOSNotificationDelegate ndelegate)
-            : base(settings, services, ndelegate)
+        public PushManager(ISettings settings, IServiceProvider services, iOSNotificationDelegate ndelegate) : base(settings, services, ndelegate)
         {
+        }
+
+
+        public override void Start()
+        {
+            base.Start();
+            //Messaging.Notifications.ObserveMessagesDeleted
             Messaging.SharedInstance.AutoInitEnabled = true;
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate
             (
                 async msg =>
                 {
                     var dict = msg.AppData.FromNsDictionary();
-                    await services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
+                    await this.Services.RunDelegates<IPushDelegate>(x => x.OnReceived(dict));
                 },
                 async token =>
                 {
                     this.CurrentRegistrationToken = token;
                     this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                    await services.SafeResolveAndExecute<IPushDelegate>(x => x.OnTokenChanged(token));
+                    await this.Services.RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token));
                 }
             );
         }
-
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
