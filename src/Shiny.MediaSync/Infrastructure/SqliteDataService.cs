@@ -18,5 +18,10 @@ namespace Shiny.MediaSync.Infrastructure
         public Task Create(SyncItem sync) => this.conn.InsertAsync(sync);
         public async Task<IList<SyncItem>> GetAll() => await this.conn.Table<SyncItem>().ToListAsync();
         public Task<SyncItem> GetById(string id) => this.conn.GetAsync<SyncItem>(id);
+        public async Task<bool> Remove(string id)
+        {
+            var count = await this.conn.DeleteAsync<SyncItem>(id);
+            return count > 0;
+        }
     }
 }

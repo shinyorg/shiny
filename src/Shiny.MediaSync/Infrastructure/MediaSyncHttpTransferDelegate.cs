@@ -11,16 +11,16 @@ namespace Shiny.MediaSync.Infrastructure
     {
         readonly IMediaSyncManager syncManager;
         readonly INotificationManager notificationManager;
-        readonly IRepository repository;
+        readonly IDataService dataService;
 
 
         public MediaSyncHttpTransferDelegate(IMediaSyncManager syncManager,
                                              INotificationManager notificationManager,
-                                             IRepository repository)
+                                             IDataService dataService)
         {
             this.syncManager = syncManager;
             this.notificationManager = notificationManager;
-            this.repository = repository;
+            this.dataService = dataService;
         }
 
 
@@ -37,7 +37,7 @@ namespace Shiny.MediaSync.Infrastructure
 
         async Task TryUpdate(HttpTransfer transfer)
         {
-            var result = await repository.Remove<SyncItem>(transfer.Identifier);
+            var result = await this.dataService.Remove(transfer.Identifier);
             if (result && this.syncManager.ShowBadgeCount)
                 this.notificationManager.Badge = this.notificationManager.Badge - 1;
         }
