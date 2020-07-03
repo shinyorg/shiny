@@ -18,7 +18,6 @@ namespace Shiny.Locations.Sync.Infrastructure
                                IGeofenceSyncDelegate? geofences = null)
         {
             this.syncManager = syncManager;
-            this.activityManager = activityManager;
             this.dataService = dataService;
             this.geofences = geofences;
         }
