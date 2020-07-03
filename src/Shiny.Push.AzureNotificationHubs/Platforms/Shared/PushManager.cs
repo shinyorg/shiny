@@ -44,26 +44,14 @@ namespace Shiny.Push.AzureNotificationHubs
         public string? InstallationId
         {
             get => this.Settings.Get<string>(nameof(this.InstallationId));
-            private set
-            {
-                if (value == null)
-                    this.Settings.Remove(nameof(this.InstallationId));
-                else
-                    this.Settings.Set(nameof(this.InstallationId), value);
-            }
+            private set => this.Settings.Set(nameof(this.InstallationId), value);
         }
 
 
         public string? NativeRegistrationToken
         {
             get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
-            protected set
-            {
-                if (value == null)
-                    this.Settings.Remove(nameof(this.NativeRegistrationToken));
-                else
-                    this.Settings.Set(nameof(this.NativeRegistrationToken), value);
-            }
+            protected set => this.Settings.Set(nameof(NativeRegistrationToken), value);
         }
 
 

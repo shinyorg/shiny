@@ -27,14 +27,14 @@ namespace Shiny.Push
         public string? CurrentRegistrationToken
         {
             get => this.Settings.Get<string?>(nameof(this.CurrentRegistrationToken));
-            protected set => this.Settings.SetRegToken(value);
+            protected set => this.Settings.Set(nameof(this.CurrentRegistrationToken), value);
         }
 
 
         public DateTime? CurrentRegistrationTokenDate
         {
             get => this.Settings.Get<DateTime?>(nameof(this.CurrentRegistrationTokenDate));
-            protected set => this.Settings.SetRegDate(value);
+            protected set => this.Settings.Set(nameof(this.CurrentRegistrationTokenDate), value);
         }
 
 
@@ -48,13 +48,7 @@ namespace Shiny.Push
         public string[]? RegisteredTags
         {
             get => this.Settings.Get<string[]?>(nameof(this.RegisteredTags));
-            protected set
-            {
-                if (value == null)
-                    this.Settings.Remove(nameof(this.RegisteredTags));
-                else
-                    this.Settings.Set(nameof(this.RegisteredTags), value);
-            }
+            protected set => this.Settings.Get(nameof(this.RegisteredTags), value);
         }
     }
 }
