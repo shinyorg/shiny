@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
 using Shiny.Net.Http;
 using Shiny.Notifications;
 
@@ -13,18 +12,18 @@ namespace Shiny.MediaSync.Infrastructure
         readonly IMediaGalleryScanner scanner;
         readonly IHttpTransferManager transferManager;
         readonly INotificationManager notificationManager;
-        readonly IRepository repository;
+        readonly IDataService dataService;
 
 
         public MediaSyncManagerImpl(IMediaGalleryScanner scanner,
                                     INotificationManager notificationManager,
                                     IHttpTransferManager transferManager,
-                                    IRepository repository)
+                                    IDataService dataService)
         { 
             this.scanner = scanner;
             this.transferManager = transferManager;
             this.notificationManager = notificationManager;
-            this.repository = repository;
+            this.dataService = dataService;
         }
 
 
@@ -71,7 +70,7 @@ namespace Shiny.MediaSync.Infrastructure
 
         public async Task ClearQueue()
         {
-            var items = await this.repository.GetAll<SyncItem>();
+            var items = await this.dataService.GetAll();
             if (items.Count == 0)
                 return;
 

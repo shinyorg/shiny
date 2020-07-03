@@ -18,7 +18,7 @@ namespace Shiny.MediaSync.Infrastructure
         readonly IHttpTransferManager transfers;
         readonly INotificationManager notifications;
         readonly IMediaSyncDelegate syncDelegate;
-        readonly IRepository repository;
+        readonly IDataService dataService;
 
 
         public SyncJob(IMediaSyncManager syncManager,
@@ -26,14 +26,14 @@ namespace Shiny.MediaSync.Infrastructure
                        IHttpTransferManager transfers,
                        INotificationManager notifications,
                        IMediaSyncDelegate syncDelegate,
-                       IRepository repository)
+                       IDataService dataService)
         {
             this.syncManager = syncManager;
             this.scanner = scanner;
             this.transfers = transfers;
             this.notifications = notifications;
             this.syncDelegate = syncDelegate;
-            this.repository = repository;
+            this.dataService = dataService;
         }
 
 
@@ -67,7 +67,7 @@ namespace Shiny.MediaSync.Infrastructure
                 return false;
 
             // ensure it isn't in queue already?  last job swap may not have finished
-            var item = await this.repository.Get<SyncItem>(media.Identifier);
+            var item = await this.dataService.GetById(media.Identifier);
             if (item != null && this.transfers.GetTransfer(item.HttpTransferId) != null)
                 return false;
 
@@ -90,15 +90,12 @@ namespace Shiny.MediaSync.Infrastructure
             var request = await this.syncDelegate.PreRequest(suggestedRequest, media);
 
             var transfer = await this.transfers.Enqueue(request);
-            await this.repository.Set(
-                transfer.Identifier,
-                new SyncItem
-                {
-                    Id = transfer.Identifier,
-                    FilePath = media.FilePath,
-                    DateStarted = DateTimeOffset.UtcNow
-                }
-            );
+            await this.dataService.Create(new SyncItem
+            {
+                Id = transfer.Identifier,
+                FilePath = media.FilePath,
+                DateStarted = DateTimeOffset.UtcNow
+            });
 
             if (this.syncManager.ShowBadgeCount)
                 this.notifications.Badge = this.notifications.Badge + 1;

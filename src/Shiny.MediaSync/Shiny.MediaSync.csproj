@@ -10,6 +10,7 @@
         <None Include="readme.txt" />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
+        <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
