@@ -1,0 +1,8 @@
+﻿<Project>
+    <ItemGroup>
+        <SourceGenerator Include="$(MSBuildThisFileDirectory)..\bin\$(Configuration)\net461\Shiny.BluetoothLE.RefitClient.Generator.dll"
+                Condition="Exists('$(MSBuildThisFileDirectory)..\bin')" />
+        <SourceGenerator Include="$(MSBuildThisFileDirectory)..\tools\Shiny.BluetoothLE.RefitClient.Generator.dll"
+                Condition="Exists('$(MSBuildThisFileDirectory)..\tools')" />
+    </ItemGroup>
+</Project>

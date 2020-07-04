@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Description>Shiny BluetoothLE Hubs - The "signalr" for BLE</Description>
+        <VersionSuffix>alpha</VersionSuffix>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <ProjectReference Include="..\Shiny.BluetoothLE.Hosting.Abstractions\Shiny.BluetoothLE.Hosting.Abstractions.csproj" />
+    </ItemGroup>
+</Project>
