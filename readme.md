@@ -3,7 +3,7 @@
 
 Shiny is a set of libraries designed to help make device services & backgrounding easy on Xamarin & UWP platforms (with more to come).
 
-[Change Log - June 18, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
+[Change Log - July 5, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
 
 * [Samples](https://github.com/shinyorg/shinysamples) - Shows almost every single function point within Shiny
 * [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
@@ -38,7 +38,8 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |-------|-----|-----|-----------|
 |Core | [![CoreNugetShield]][CoreNuget] | [![CoreMygetShield]][CoreMyget] |
 |Beacons | [![BeaconsNugetShield]][BeaconsNuget] | [![BeaconsMygetShield]][BeaconsMyget] |
-|BluetoothLE| [![BleNugetShield]][BleNuget] | [![BleMygetShield]][BleMyget] |
+|BluetoothLE Client| [![BleNugetShield]][BleNuget] | [![BleMygetShield]][BleMyget] |
+|BluetoothLE Hosting| [![BleHostingNugetShield]][BleHostingNuget] | [![BleHostingMygetShield]][BleHostingMyget] |
 |Locations| [![LocationsNugetShield]][LocationsNuget] | [![LocationsMygetShield]][LocationsMyget] |
 |HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpMygetShield]][HttpMyget] |
 |Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
@@ -67,6 +68,14 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |-------|-----|----|-----------|
 |Shiny.Prism|[![PrismNugetShield]][PrismNuget] | [GitHub](https://github.com/dansiegel/Prism.Container.Extensions) | Prism integration with Shiny maintained by Dan Siegel|
 
+## Roadmap
+* [Considering] VPN Client for Android, iOS, & UWP 
+* [Considering] Exposure Notification API for iOS & Android
+* [In-Progress] New Hosting Model based on Microsoft.Extensions.Hosting
+* [Considering] BluetoothLE Hosting Model similar to SignalR
+* [Considering] Boilerplate Source Generator
+* [Considering] BluetoothLE Client Generator (Similar to Refit for HTTP Client)
+
 ## Contributors
 * [Allan Ritchie](https://github.com/aritchie) - Project Lead
 * [Emily Stanek](https://github.com/emilystanek) - Logo Designer
@@ -90,6 +99,11 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [BleNuget]: https://www.nuget.org/packages/Shiny.BluetoothLE/
 [BleMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.BluetoothLE.svg
 [BleMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.BluetoothLE
+
+[BleHostingNugetShield]: https://img.shields.io/nuget/v/Shiny.BluetoothLE.Hosting.svg
+[BleHostingNuget]: https://www.nuget.org/packages/Shiny.BluetoothLE.Hosting/
+[BleHostingMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.BluetoothLE.Hosting.svg
+[BleHostingMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.BluetoothLE.Hosting
 
 [LocationsNugetShield]: https://img.shields.io/nuget/v/Shiny.Locations.svg
 [LocationsNuget]: https://www.nuget.org/packages/Shiny.Locations/
@@ -130,16 +144,6 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [AppCenterNuget]: https://www.nuget.org/packages/Shiny.Logging.AppCenter/
 [AppCenterMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Logging.AppCenter.svg
 [AppCenterMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Logging.AppCenter
-
-[CurrentActivityNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.CurrentActivityPlugin.svg
-[CurrentActivityNuget]: https://www.nuget.org/packages/Shiny.Integrations.CurrentActivityPlugin/
-[CurrentActivityMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.CurrentActivityPlugin.svg
-[CurrentActivityMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.CurrentActivityPlugin
-
-[SysTextJsonNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.SysTextJson.svg
-[SysTextJsonNuget]: https://www.nuget.org/packages/Shiny.Integrations.SysTextJson/
-[SysTextJsonMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.SysTextJson.svg
-[SysTextJsonMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.SysTextJson
 
 [PushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.svg
 [PushNuget]: https://www.nuget.org/packages/Shiny.Push/
