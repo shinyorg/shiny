@@ -158,6 +158,10 @@
       <Project>{007465d6-5714-4e7e-929d-6f01d04e43b6}</Project>
       <Name>Shiny.BluetoothLE</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj">
+      <Project>{ea4ede16-db4a-4559-b1d9-150ba3b60ed8}</Project>
+      <Name>Shiny.Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Shiny.Core\Shiny.Core.csproj">
       <Project>{84c6a1b8-0a57-4c6f-8738-3d3c03ce6f55}</Project>
       <Name>Shiny.Core</Name>

@@ -34,5 +34,10 @@ namespace Shiny.ExposureNotifications
                 _ => AccessState.Unknown
             };
         }
+
+        public Task StopMonitoring()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

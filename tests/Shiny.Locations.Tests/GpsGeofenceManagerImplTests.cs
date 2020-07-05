@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Moq;
 using Shiny.Locations;
 using Shiny.Testing.Infrastucture;
 using Shiny.Testing.Locations;
