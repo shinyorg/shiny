@@ -22,7 +22,6 @@
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
-        <ProjectReference Include="..\Shiny.Vpn\Shiny.Vpn.csproj" />
     </ItemGroup>
 
 </Project>

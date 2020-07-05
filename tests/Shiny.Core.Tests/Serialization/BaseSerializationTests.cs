@@ -1,9 +1,6 @@
 ﻿using System;
 using FluentAssertions;
 using Shiny.Infrastructure;
-using Shiny.Locations;
-using Shiny.Notifications;
-using Xunit;
 
 
 namespace Shiny.Tests.Serialization
@@ -13,17 +10,17 @@ namespace Shiny.Tests.Serialization
         protected abstract T Create();
 
 
-        [Fact]
-        public virtual void GeofenceRegion()
-        {
-            var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromKilometers(99))
-            {
-                NotifyOnEntry = true,
-                NotifyOnExit = true,
-                SingleUse = true
-            };
-            this.RunTest(start);
-        }
+        //[Fact]
+        //public virtual void GeofenceRegion()
+        //{
+        //    var start = new GeofenceRegion("testing", new Position(59.1, 62.5), Distance.FromKilometers(99))
+        //    {
+        //        NotifyOnEntry = true,
+        //        NotifyOnExit = true,
+        //        SingleUse = true
+        //    };
+        //    this.RunTest(start);
+        //}
 
 
         //[Fact]

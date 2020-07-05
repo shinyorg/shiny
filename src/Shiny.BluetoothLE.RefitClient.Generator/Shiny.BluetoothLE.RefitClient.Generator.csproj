@@ -10,4 +10,8 @@
         <PackageReference Include="Uno.SourceGeneration" Version="2.0.6" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Shiny.BluetoothLE.Abstractions\Shiny.BluetoothLE.Abstractions.csproj" />
+    </ItemGroup>
+
 </Project>

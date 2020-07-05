@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Shiny.BluetoothLE.RefitClient
 {
     [Service("123")]
-    public interface Test
+    public interface ITestClient
     {
         [Characteristic("456")]
         Task Write(object value);

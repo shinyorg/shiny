@@ -11,7 +11,7 @@
         <None Update="build\**" Pack="true" PackagePath="build\%(Filename)%(Extension)" />
         <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="None" />
         <ProjectReference Include="..\Shiny.BluetoothLE.Abstractions\Shiny.BluetoothLE.Abstractions.csproj" />
-        <ProjectReference Include="..\Shiny.BluetoothLE.Generator\Shiny.BluetoothLE.Generator.csproj">
+        <ProjectReference Include="..\Shiny.BluetoothLE.RefitClient.Generator\Shiny.BluetoothLE.RefitClient.Generator.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>
     </ItemGroup>
@@ -22,9 +22,9 @@
 
     <Target Name="BundleGenerators" BeforeTargets="Pack;_LoadPackInputItems">
         <ItemGroup>
-            <None Include="$(SrcFolder)\Shiny.BluetoothLE.RefitClient.Generator\bin\$(Configuration)\**\Shiny.BluetoothLE.RefitClient.Generator.dll" 
-                  Pack="true" 
-                  PackagePath="build\Shiny.BluetoothLE.RefitClient.Generator.dll" 
+            <None Include="$(SrcFolder)\Shiny.BluetoothLE.RefitClient.Generator\bin\$(Configuration)\**\Shiny.BluetoothLE.RefitClient.Generator.dll"
+                  Pack="true"
+                  PackagePath="build\Shiny.BluetoothLE.RefitClient.Generator.dll"
                   Visible="false" />
         </ItemGroup>
     </Target>
