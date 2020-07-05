@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
+    <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
   </ItemGroup>
 
 </Project>
