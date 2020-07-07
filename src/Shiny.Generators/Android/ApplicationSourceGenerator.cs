@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
 

@@ -9,13 +9,10 @@
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <None Update="build\**" Pack="true" PackagePath="build\%(Filename)%(Extension)" />
-        <None Include="..\Shiny.BluetoothLE.RefitClient.Generator\bin\$(Configuration)\**\Shiny.BluetoothLE.RefitClient.Generator.dll"
-              Pack="true"
-              PackagePath="build\Shiny.BluetoothLE.RefitClient.Generator.dll"
-              Visible="false" />
+        <None Include="..\Shiny.BluetoothLE.RefitClient.Generator\bin\$(Configuration)\**\Shiny.BluetoothLE.RefitClient.Generator.dll" Pack="true" PackagePath="build\Shiny.BluetoothLE.RefitClient.Generator.dll" Visible="false" />
+        <None Remove="..\Shiny.BluetoothLE.RefitClient.Generator\bin\Debug\netstandard2.0\**" />
         <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="None" />
         <ProjectReference Include="..\Shiny.BluetoothLE.Abstractions\Shiny.BluetoothLE.Abstractions.csproj" />
-        <ProjectReference Include="..\Shiny.BluetoothLE.RefitClient.Generator\Shiny.BluetoothLE.RefitClient.Generator.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE.RefitClient.Generator\Shiny.BluetoothLE.RefitClient.Generator.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>
