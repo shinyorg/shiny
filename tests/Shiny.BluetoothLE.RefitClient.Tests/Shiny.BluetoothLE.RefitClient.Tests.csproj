@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentAssertions" Version="5.10.3" />
         <PackageReference Include="FluentAssertions.Analyzers" Version="0.11.4" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
         <PackageReference Include="Moq" Version="4.14.5" />
@@ -25,4 +26,5 @@
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.RefitClient\Shiny.BluetoothLE.RefitClient.csproj" />
     </ItemGroup>
 
+    <Import Project="..\..\src\Shiny.BluetoothLE.RefitClient\build\Shiny.BluetoothLE.RefitClient.props" />
 </Project>

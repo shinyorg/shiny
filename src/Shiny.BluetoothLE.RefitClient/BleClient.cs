@@ -1,10 +1,19 @@
 ﻿using System;
-
+using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE.RefitClient
 {
-    public static class BleClient
+    public class BleClient<T>
     {
-        public static T GetInstance<T>() => default(T);
+        public async Task Connect()
+        {
+
+        }
+
+
+        public async Task Disconnect()
+        {
+
+        }
     }
 }

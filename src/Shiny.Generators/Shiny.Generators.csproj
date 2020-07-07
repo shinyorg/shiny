@@ -1,15 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Uno.SourceGeneration" Version="2.0.6" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Uno.RoslynHelpers" Version="1.1.1" />
+        <PackageReference Include="Uno.SourceGeneration" Version="2.0.6" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
+    </ItemGroup>
 
 </Project>

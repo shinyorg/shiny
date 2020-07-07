@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Uno.RoslynHelpers" Version="1.1.1" />
         <PackageReference Include="Uno.SourceGeneration" Version="2.0.6" />
     </ItemGroup>
 
