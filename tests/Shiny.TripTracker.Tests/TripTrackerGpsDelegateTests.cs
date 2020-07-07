@@ -110,7 +110,7 @@ namespace Shiny.TripTracker.Tests
 
 
         [Fact]
-        public async Task TripDistanceCalcuatedProperly()
+        public async Task TripDistanceCalculatedProperly()
         {
         }
     }

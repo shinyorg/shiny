@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Linq;
 using Uno.SourceGeneration;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Threading.Tasks;
 using Uno.RoslynHelpers;
-
+using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE.RefitClient.Generator
 {
@@ -22,18 +19,7 @@ namespace Shiny.BluetoothLE.RefitClient.Generator
             if (bleService == null)
                 return;
 
-            var types = context
-                .Compilation
-                .SyntaxTrees
-                .Select(x => context.Compilation.GetSemanticModel(x))
-                .SelectMany(x => x
-                    .SyntaxTree
-                    .GetRoot()
-                    .DescendantNodes()
-                    .OfType<InterfaceDeclarationSyntax>()
-                    .Select(y => y.GetDeclaredSymbol(x))
-                )
-                .OfType<INamedTypeSymbol>();
+            var types = context.GetAllInterfaceTypes();
 
             foreach (var type in types)
             {
@@ -55,25 +41,27 @@ namespace Shiny.BluetoothLE.RefitClient.Generator
                             }
                             // TODO: if the method is not marked, it is an error since the class can't compile
 
-                            //var attributeData = method.FindAttributeFlattened(bleService);
-                            //if (attributeData != null)
-                            //{
-                            //    var serviceUuid = (string)attributeData.ConstructorArguments[0].Value;
-                            //    var characteristicUuid = (string)attributeData.ConstructorArguments[1].Value;
+                            var attributeData = method.FindAttributeFlattened(bleService);
+                            if (attributeData != null)
+                            {
+                                var serviceUuid = (string)attributeData.ConstructorArguments[0].Value;
+                                var characteristicUuid = (string)attributeData.ConstructorArguments[1].Value;
 
-                            //    if (method.ReturnType is Task)
-                            //    {
-                            //        // write
-                            //    }
-                            //    else if (method.ReturnType is Task<>)
-                            //    {
-                            //        // read
-                            //    }
-                            //    else if (method.ReturnType is IObservable<>)
-                            //    {
-                            //        // notify - what about indicate?
-                            //    }
-                            //}
+                                // TODO: pass in IPeripheral once found
+                                if (method.ReturnType == typeof(Task<>))
+                                {
+                                    // write
+                                }
+                                else if (method.ReturnType == typeof(Task))
+                                {
+                                    // read
+                                }
+                                else if (method.ReturnType  == typeof(IObservable<>))
+                                {
+                                    // notify - what about indicate?
+                                    
+                                }
+                            }
                         }
                     }
                 }
