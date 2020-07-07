@@ -2,16 +2,12 @@
 using Uno.SourceGeneration;
 
 
-namespace Shiny.Generators.iOS
+namespace Shiny.Generators.Generators.iOS
 {
-    public class AppDelegateBoilerplateGenerator : SourceGenerator
+    public static class AppDelegateBoilerplateGenerator
     {
-        public override void Execute(SourceGeneratorContext context)
+        public static void Execute(SourceGeneratorContext context)
         {
-            var shinyStartupSymbol = context.Compilation.GetTypeByMetadataName(typeof(IShinyStartupTask).FullName);
-            if (shinyStartupSymbol is null)
-                return;
-
             // if application exists, error or override? - could also search for attribute?
             var appDelegateClass = context.Compilation.GetTypeByMetadataName("UIKit.UIApplicationDelegate");
             if (appDelegateClass == null)

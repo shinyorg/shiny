@@ -1,40 +1,36 @@
 ﻿using System;
-using System.Linq;
-
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
 
 
-namespace Shiny.Generators
+namespace Shiny.Generators.Generators
 {
-    public class AutoDependencyInjectGenerator : SourceGenerator
+    public static class AutoStartupSourceGenerator
     {
-        public override void Execute(SourceGeneratorContext context)
+        public static void Execute(SourceGeneratorContext context)
         {
-            // TODO: find the autogen assembly attribute?
+            //System.Diagnostics.Debugger.Launch();
+
+            var log = context.GetLogger();
+            if (!context.HasAssemblyAttribute(typeof(AutoShinyStartupAttribute).FullName))
+            {
+                log.Info("Assembly is not setup to auto-build the Shiny Startup");
+                return;
+            }
+            log.Info("Generating Shiny Startup");
+
             // TODO: what about custom attributes?
             // TODO: search through assemblies for shiny IMPLEMENTATIONS, if found, create a startup?
             // TODO: if assembly marked with auto di, create a start class?
             // TODO: hunt for any jobs, modules, or startup tasks and register
 
+            var nameSpace = context.GetProjectInstance().GetPropertyValue("RootNamespace");
             var builder = new IndentedStringBuilder();
-            builder.AppendLineInvariant("using System;");
-            builder.AppendLineInvariant("using Shiny;");
-            builder.AppendLineInvariant("Microsoft.Extensions.DependencyInjection");
+            builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
             
-            var nameSpace = context
-                .GetProjectInstance()
-                .Properties
-                .FirstOrDefault(x => x.Name.Equals(
-                    "rootnamespace", 
-                    StringComparison.InvariantCultureIgnoreCase
-                ));
 
-            using (builder.BlockInvariant($"namespace {nameSpace}"))
-            {
-                builder.Append("protected virtual void CustomConfigureServices(IServiceCollection services) {}");
-
-                using (builder.BlockInvariant("public partial class AppShinyStartup : Shiny.ShinyStartup"))
+            builder.CreateClass(
+                () =>
                 {
                     using (builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
@@ -44,12 +40,14 @@ namespace Shiny.Generators
                         context.RegisterIf(builder, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleClient();");
 
                         context.RegisterIf(builder, "Shiny.Beacons.Beacon", "services.UseBeaconRanging();");
-                        
+
                         // TODO: if a delegate is found
                         //context.RegisterIf(builder, "Shiny.Beacons.Beacon", "services.UseBeaconMonitoring();");
 
-                        context.RegisterIf(builder, "", "");
-                        context.RegisterIf(builder, "", "");
+                        context.RegisterIf(builder, "Shiny.Locations.GpsModule", "services.UseMotionActivity();");
+                        // TODO: geofences and gps
+
+                        context.RegisterIf(builder, "Shiny.Net.Http", "");
                         context.RegisterIf(builder, "", "");
                         // TODO: 2 managers - check and find delegate
                         //context.RegisterIf(builder, "Shiny.Locations.Sync.ILocationSyncManager", "");
@@ -62,8 +60,12 @@ namespace Shiny.Generators
 
                         // TODO: auto find delegates where necessary like "geofencing" and then register the rest
                     }
-                }
-            }
+                },
+                nameSpace, 
+                "AppShinyStartup", 
+                "Shiny.ShinyStartup"
+            );
+
             context.AddCompilationUnit("AppShinyStartup", builder.ToString());
         }
     }

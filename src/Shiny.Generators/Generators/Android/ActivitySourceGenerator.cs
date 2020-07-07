@@ -2,19 +2,12 @@
 using Uno.SourceGeneration;
 
 
-namespace Shiny.Generators
+namespace Shiny.Generators.Generators.Android
 {
-    //[GenerateAfter("Shiny.Generators.StartupSourceGenerator")]
-    public class ActivitySourceGenerator : SourceGenerator
+    public static class ActivitySourceGenerator
     {
-        public override void Execute(SourceGeneratorContext context)
+        public static void Execute(SourceGeneratorContext context)
         {
-            var project = context.GetProjectInstance();
-            var shinyStartupSymbol = context.Compilation.GetTypeByMetadataName(typeof(IShinyStartupTask).FullName);
-
-            if (shinyStartupSymbol is null)
-                return;
-
             //[Activity(
             //    Label = "Shiny",
             //    Icon = "@mipmap/icon",

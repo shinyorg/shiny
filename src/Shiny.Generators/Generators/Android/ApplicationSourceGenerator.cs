@@ -3,17 +3,12 @@ using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
 
 
-namespace Shiny.Generators.Android
+namespace Shiny.Generators.Generators.Android
 {
-    public class ApplicationSourceGenerator : SourceGenerator
+    public static class ApplicationSourceGenerator
     {
-        public override void Execute(SourceGeneratorContext context)
+        public static void Execute(SourceGeneratorContext context)
         {
-            var shinyStartupSymbol = context.Compilation.GetTypeByMetadataName(typeof(IShinyStartupTask).FullName);
-            
-            if (shinyStartupSymbol is null)
-                return;
-
             // if application exists, error or override? - could also search for attribute?
             var appClass = context.Compilation.GetTypeByMetadataName("Android.App.Application");
             if (appClass == null)
