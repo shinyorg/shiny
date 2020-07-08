@@ -26,8 +26,8 @@ namespace Shiny.TripTracker.Internals
         }
 
 
-        int currentTripId;
-        public int CurrentTripId
+        int? currentTripId;
+        public int? CurrentTripId
         {
             get => this.currentTripId;
             set => this.Set(ref this.currentTripId, value);
@@ -43,7 +43,7 @@ namespace Shiny.TripTracker.Internals
             var currentMotion = await this.activityManager.GetCurrentActivity(TimeSpan.FromSeconds(60));
             var track = currentMotion != null && IsTracked(this.manager.TrackingActivityTypes.Value, currentMotion.Types);
 
-            if (this.CurrentTripId == 0)
+            if (this.CurrentTripId == null)
             {
                 if (!track)
                     return;
@@ -59,23 +59,23 @@ namespace Shiny.TripTracker.Internals
                 await this.dataService.Save(trip);
                 this.CurrentTripId = trip.Id;
 
-                await this.dataService.Checkin(this.CurrentTripId, reading);
+                await this.dataService.Checkin(this.CurrentTripId.Value, reading);
                 await this.delegates.RunDelegates(x => x.OnTripStart(trip));
             }
             else
             {
-                await this.dataService.Checkin(this.CurrentTripId, reading);
+                await this.dataService.Checkin(this.CurrentTripId.Value, reading);
 
                 if (!track)
                 {
                     // stop trip
-                    var trip = await this.dataService.GetTrip(this.CurrentTripId);
+                    var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
                     trip.DateFinished = DateTimeOffset.UtcNow;
                     trip.TotalDistanceMeters = await this.CalculateDistanceInMeters();
                     trip.StartLatitude = reading.Position.Longitude;
                     trip.EndLatitude = reading.Position.Latitude;
 
-                    this.CurrentTripId = 0;
+                    this.CurrentTripId = null;
                     await this.dataService.Save(trip);
                     await this.delegates.RunDelegates(x => x.OnTripEnd(trip));
                 }
@@ -87,7 +87,7 @@ namespace Shiny.TripTracker.Internals
         {
             var total = 0d;
             Position? last = null;
-            var checkins = await this.dataService.GetCheckinsByTrip(this.CurrentTripId);
+            var checkins = await this.dataService.GetCheckinsByTrip(this.CurrentTripId.Value);
 
             foreach (var checkin in checkins)
             {
