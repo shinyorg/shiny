@@ -37,7 +37,7 @@ namespace Shiny.Generators.Generators
                         builder.AppendLineInvariant("this.CustomConfigureServices(services)");
 
                         context.RegisterIf(builder, "Shiny.BluetoothLE.IBleManager", "services.UseBleClient();");
-                        context.RegisterIf(builder, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleClient();");
+                        context.RegisterIf(builder, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
 
                         context.RegisterIf(builder, "Shiny.Beacons.Beacon", "services.UseBeaconRanging();");
 

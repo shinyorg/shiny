@@ -4,7 +4,7 @@
 namespace Shiny.BluetoothLE.Hosting.Hubs
 {
     [Service("")]
-    public class TestHub : ShinyBleHub
+    public class TestHub : IShinyBleHub
     {
     }
 }

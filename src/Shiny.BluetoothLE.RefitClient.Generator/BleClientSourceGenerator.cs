@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Uno.RoslynHelpers;
 using System.Threading.Tasks;
 
+
 namespace Shiny.BluetoothLE.RefitClient.Generator
 {
     public class BleClientSourceGenerator : SourceGenerator
