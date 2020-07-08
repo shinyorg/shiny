@@ -19,6 +19,7 @@ namespace Shiny.TripTracker.Tests
         readonly List<TripCheckin> checkins = new List<TripCheckin>();
         MotionActivityType? tracking = MotionActivityType.Automotive;
         MotionActivityType currentMotionType = MotionActivityType.Automotive;
+        Trip? trip;
 
 
         public TripTrackerGpsDelegateTests()
@@ -42,13 +43,18 @@ namespace Shiny.TripTracker.Tests
                     )
                 }));
 
+            this.data
+                .Setup(x => x.Save(It.IsAny<Trip>()))
+                .Callback<Trip>(x =>
+                {
+                    x.Id = 1;
+                    this.trip = x;
+                })
+                .Returns(Task.CompletedTask);
 
             this.data
-                .Setup(x => x.Checkin(
-                    It.IsAny<int>(), 
-                    It.IsAny<IGpsReading>()
-                ))
-                .Returns(Task.CompletedTask);
+                .Setup(x => x.GetTrip(It.IsAny<int>()))
+                .Returns(() => Task.FromResult(this.trip));
 
             this.data
                 .Setup(x => x.GetCheckinsByTrip(It.IsAny<int>()))
@@ -78,40 +84,51 @@ namespace Shiny.TripTracker.Tests
         [Fact]
         public async Task NewTripCreated()
         {
-            Trip? result = null;
-            this.data
-                .Setup(x => x.Save(It.IsAny<Trip>()))
-                .Callback<Trip>(x => result = x)
-                .Returns(Task.CompletedTask);
-
             await this.gpsDelegate.OnReading(GpsReading.Create(1, 1));
-            result.Should().NotBeNull();
-            result.DateFinished.Should().BeNull();
+            this.gpsDelegate.CurrentTripId.Should().NotBeNull();
+            this.gpsDelegate.CurrentTripId.Should().Be(1);
+            this.trip.Should().NotBeNull();
+            this.trip.TripType.HasFlag(MotionActivityType.Automotive).Should().BeTrue();
+            this.trip.DateFinished.Should().BeNull();
         }
 
 
         [Fact]
         public async Task TripClosedWhenActivityChanges()
         {
-            var trip = new Trip
+            this.trip = new Trip
             {
                 Id = 1,
                 TripType = MotionActivityType.Automotive
             };
             this.gpsDelegate.CurrentTripId = 1;
-            this.data
-                .Setup(x => x.GetTrip(It.IsAny<int>()))
-                .Returns(Task.FromResult(trip));
-
             this.currentMotionType = MotionActivityType.Cycling;
             await this.gpsDelegate.OnReading(GpsReading.Create(1, 1));
-            trip.DateFinished.Should().NotBeNull();
+            this.trip.DateFinished.Should().NotBeNull();
         }
 
 
         [Fact]
         public async Task TripDistanceCalculatedProperly()
         {
+            // start new and log trip
+            await this.gpsDelegate.OnReading(GpsReading.Create(43.950534, -79.013066));
+            await this.gpsDelegate.OnReading(GpsReading.Create(43.9378078,-79.0077017));
+            await this.gpsDelegate.OnReading(GpsReading.Create(43.9315338,-79.0046657));
+            await this.gpsDelegate.OnReading(GpsReading.Create(43.9199038,-79.0000827));
+            await this.gpsDelegate.OnReading(GpsReading.Create(43.9123987,-79.0044507));
+            await this.gpsDelegate.OnReading(GpsReading.Create(43.8894793,-78.9998306));
+            await this.gpsDelegate.OnReading(GpsReading.Create(43.8769798,-78.9808417));
+            
+            // finish trip
+            this.currentMotionType = MotionActivityType.Cycling;
+            await this.gpsDelegate.OnReading(GpsReading.Create(43.8744028, -78.9806041));
+
+            // assert
+            this.checkins.Count.Should().Be(8);
+            this.trip.Should().NotBeNull();
+            this.trip.DateFinished.Should().NotBeNull();
+            this.trip.TotalDistanceMeters.Should().Be(9398.357555710918);
         }
     }
 }
