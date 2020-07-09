@@ -1,1 +1,1 @@
-﻿[assembly: Shiny.Generators.AutoShinyStartup]
+﻿[assembly: Shiny.Generators.AutoShinyStartup(true)]

@@ -13,6 +13,7 @@ namespace Shiny.Generators
         {
             //System.Diagnostics.Debugger.Launch();
             AutoStartupSourceGenerator.Execute(context);
+            StaticClassSourceGenerator.Execute(context);
             //AppDelegateBoilerplateGenerator.Execute(context);
             //ApplicationSourceGenerator.Execute(context);
             //ActivitySourceGenerator.Execute(context);

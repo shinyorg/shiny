@@ -15,6 +15,26 @@ namespace Shiny.Generators
         }
 
 
+        public static string GetName(this IPropertySymbol property) => property
+            .Name
+            .Replace("get_", String.Empty)
+            .Replace("set_", String.Empty);
+
+
+        public static string BuildArgString(this IMethodSymbol method, bool includeTypes)
+        {
+            var s = "";
+            foreach (var parameter in method.Parameters)
+            {
+                if (includeTypes)
+                    s += $"{parameter.Type.ToDisplayString()} {parameter.Name}, ";
+                else 
+                    s += $"{parameter.Name}, ";
+            }
+            s = s.TrimEnd(',', ' ');
+            return s;
+        }
+
         public static void RegisterIf(this SourceGeneratorContext context, IndentedStringBuilder builder, string typeNameExists, string registerString)
         {
             var symbol = context.Compilation.GetTypeByMetadataName(typeNameExists);
