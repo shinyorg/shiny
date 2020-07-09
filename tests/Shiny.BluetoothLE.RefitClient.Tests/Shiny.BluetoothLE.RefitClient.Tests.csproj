@@ -20,11 +20,6 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.RefitClient\Shiny.BluetoothLE.RefitClient.csproj" />
     </ItemGroup>
-
-    <Import Project="..\..\src\Shiny.BluetoothLE.RefitClient\build\Shiny.BluetoothLE.RefitClient.props" />
 </Project>

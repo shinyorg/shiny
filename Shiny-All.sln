@@ -151,10 +151,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integration", "integration", "{EF3A010C-6398-4136-B6D0-FE62BE3F7603}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "appservices", "appservices", "{E7E84A7E-3B38-4D52-9334-A09D74018A0D}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.Build.props = tests\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "considering", "considering", "{12F60C26-D91C-4F39-B5D5-4CDBC522580F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Generators.Tests", "tests\Shiny.Generators.Tests\Shiny.Generators.Tests.csproj", "{830A51D5-64DB-459F-8557-E36AC06BC2A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Generators.Tests", "tests\Shiny.Generators.Tests\Shiny.Generators.Tests.csproj", "{830A51D5-64DB-459F-8557-E36AC06BC2A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

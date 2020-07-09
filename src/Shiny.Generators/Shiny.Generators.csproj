@@ -3,17 +3,11 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <IsPackable>false</IsPackable>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
-        <!--<None Include="readme.txt" pack="true" PackagePath="." />-->
-        <None Update="build\**" Pack="true" PackagePath="build\%(Filename)%(Extension)" />
-        <None Include="..\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="build\Shiny.Generators.dll" Visible="false" />
-        <PackageReference Include="Uno.RoslynHelpers" Version="1.1.1" />
-        <PackageReference Include="Uno.SourceGeneration" Version="2.0.6" />
-        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="None" />
+        <PackageReference Include="Uno.Roslyn" Version="1.2.0-dev.18" />
+        <PackageReference Include="Uno.SourceGeneration" Version="2.0.6" PrivateAssets="All" />
     </ItemGroup>
 
-    <Import Project="..\Shiny.Generators\build\Shiny.Generators.props" />
 </Project>

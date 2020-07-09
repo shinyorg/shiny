@@ -16,7 +16,7 @@ namespace Shiny.BluetoothLE.RefitClient.Generator
             var log = context.GetLogger();
             log.Info("RUNNING BLE CLIENT SOURCE GENERATOR");
 
-            var bleService = context.Compilation.GetTypeByMetadataName($"Shiny.BluetoothLE.RefitClient.CharacteristicAttribute");
+            var bleService = context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.CharacteristicAttribute");
             if (bleService == null)
                 return;
 

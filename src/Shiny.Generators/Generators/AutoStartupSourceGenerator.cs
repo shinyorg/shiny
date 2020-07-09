@@ -32,33 +32,36 @@ namespace Shiny.Generators.Generators
             builder.CreateClass(
                 () =>
                 {
+                    builder.AppendLine("protected virtual void CustomConfigureServices(IServiceCollection services) {}");
+                    builder.AppendLine();
+
                     using (builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
-                        builder.AppendLineInvariant("this.CustomConfigureServices(services)");
+                        builder.AppendLineInvariant("this.CustomConfigureServices(services);");
 
                         context.RegisterIf(builder, "Shiny.BluetoothLE.IBleManager", "services.UseBleClient();");
                         context.RegisterIf(builder, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
 
-                        context.RegisterIf(builder, "Shiny.Beacons.Beacon", "services.UseBeaconRanging();");
+                        context.RegisterIf(builder, "Shiny.Beacons.Beacon", "services.UseBeaconRanging(); // TODO: UseBeaconMonitoring<?>");
 
-                        // TODO: if a delegate is found
-                        //context.RegisterIf(builder, "Shiny.Beacons.Beacon", "services.UseBeaconMonitoring();");
+                        context.RegisterIf(builder, "Shiny.Locations.GpsModule", "services.UseMotionActivity(); // TODO: UseGps<?> & UseGeofencing<>");
 
-                        context.RegisterIf(builder, "Shiny.Locations.GpsModule", "services.UseMotionActivity();");
-                        // TODO: geofences and gps
+                        context.RegisterIf(builder, "Shiny.Net.Http", "// TODO: services.UseHttpTransfers();");
 
-                        context.RegisterIf(builder, "Shiny.Net.Http", "");
-                        context.RegisterIf(builder, "", "");
                         // TODO: 2 managers - check and find delegate
-                        //context.RegisterIf(builder, "Shiny.Locations.Sync.ILocationSyncManager", "");
+                        context.RegisterIf(builder, "Shiny.Locations.Sync.ILocationSyncManager", "// TODO: services.UseGpsSync(); or geofence");
 
                         // TODO: optional delegate
-                        //context.RegisterIf(builder, "Shiny.MediaSync.IMediaSyncManager", "services.UseMediaSync()");
+                        context.RegisterIf(builder, "Shiny.MediaSync.IMediaSyncManager", "//TODO: services.UseMediaSync();");
 
                         // TODO: delegate
-                        //context.RegisterIf(builder, "Shiny.TripTracker.ITripTrackerManager", "services.UseTripTracker()");
+                        context.RegisterIf(builder, "Shiny.TripTracker.ITripTrackerManager", "//TODO: services.UseTripTracker();");
 
-                        // TODO: auto find delegates where necessary like "geofencing" and then register the rest
+                        // TODO: what about has assembly instead of type finding?
+                        context.RegisterIf(builder, "Shiny.Sensors.ISensor", "services.UseAllSensors();");
+
+                        // TODO: nfc
+                        // TODO: notifications with or without delegate?
                     }
                 },
                 nameSpace, 

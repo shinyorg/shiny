@@ -11,6 +11,7 @@ namespace Shiny.Generators
     {
         public override void Execute(SourceGeneratorContext context)
         {
+            //System.Diagnostics.Debugger.Launch();
             AutoStartupSourceGenerator.Execute(context);
             //AppDelegateBoilerplateGenerator.Execute(context);
             //ApplicationSourceGenerator.Execute(context);

@@ -11,7 +11,7 @@ namespace Shiny.Generators
         public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName) 
         {
             var attribute = context.Compilation.GetTypeByMetadataName(attributeName);
-            return context.Compilation.Assembly.HasAttributes(attribute);
+            return context.Compilation.Assembly.FindAttributeFlattened(attribute) != null;
         }
 
 
@@ -32,6 +32,9 @@ namespace Shiny.Generators
             builder.AppendLineInvariant("using Shiny;");
             foreach (var ns in nameSpaces)
                 builder.AppendLineInvariant($"using {ns};");
+
+            builder.AppendLine();
+            builder.AppendLine();
         }
 
 
@@ -49,7 +52,7 @@ namespace Shiny.Generators
 
                     cls = cls.TrimEnd(',');
                 }
-                using (builder.BlockInvariant(className))
+                using (builder.BlockInvariant(cls))
                     build();
             }
         }
