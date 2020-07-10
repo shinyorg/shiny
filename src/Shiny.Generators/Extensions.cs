@@ -15,6 +15,10 @@ namespace Shiny.Generators
         }
 
 
+        public static bool IsProperty(this IMethodSymbol method) =>
+            method.Name.StartsWith("get_") || method.Name.StartsWith("set_");
+
+
         public static string GetName(this IPropertySymbol property) => property
             .Name
             .Replace("get_", String.Empty)

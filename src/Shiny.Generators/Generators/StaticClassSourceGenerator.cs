@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
@@ -15,10 +16,13 @@ namespace Shiny.Generators.Generators
             if (attribute == null || (bool)attribute.ConstructorArguments[0].Value == false)
                 return;
 
+            BuildStaticClass(context, "Shiny.Beacons.IBeaconRangingManager", "ShinyBeaconRangingManager", "Shiny.Beacons");
+            BuildStaticClass(context, "Shiny.Beacons.IBeaconMonitoringManager", "ShinyBeaconMonitoringManager", "Shiny.Beacons");
+
             BuildStaticClass(context, "Shiny.BluetoothLE.IBleManager", "ShinyBleManager", "Shiny.BluetoothLE");
+            BuildStaticClass(context, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "ShinyBleHostingManager", "Shiny.BluetoothLE.Hosting");
             BuildStaticClass(context, "Shiny.Net.Http.IHttpTransferManager", "ShinyHttpTransferManager", "Shiny.Net.Http");
 
-            // TODO: beacons - ranging & monitoring
             // TODO: notifications
             // TODO: core - settings, job manager, connectivity, power, 
             // TODO: locations - geofencing, gps, motion activity
@@ -48,10 +52,10 @@ namespace Shiny.Generators.Generators
                 using (builder.BlockInvariant("public static partial class " + genFileName))
                 {
                     builder.AppendLine($"public static {ifTypeName} Current => ShinyHost.Resolve<{ifTypeName}>();");
+                    builder.AppendLine();
 
-                    foreach (var method in type.GetMethods())
+                    foreach (var method in type.GetMethods().Where(x => !x.IsProperty()))
                     {
-                        // TODO: stop pulling properties
                         var argList = method.BuildArgString(true);
                         var argListNoNames = method.BuildArgString(false);
 
@@ -61,7 +65,7 @@ namespace Shiny.Generators.Generators
 
                     foreach (var prop in type.GetProperties())
                     {
-                        var propertyName = prop.ToDisplayString();
+                        var propertyName = prop.GetName();
                         var hasGet = prop.GetMethod?.IsPublic() ?? false;
                         var hasSet = prop.SetMethod?.IsPublic() ?? false;
 
