@@ -11,30 +11,48 @@ namespace Shiny.Generators.Generators
     {
         public static void Execute(SourceGeneratorContext context)
         {
-            var symbol = context.Compilation.GetTypeByMetadataName("Shiny.Generators.AutoShinyStartupAttribute");
+            var symbol = context.Compilation.GetTypeByMetadataName(typeof(GenerateStaticClassesAttribute).FullName);
             var attribute = context.Compilation.Assembly.FindAttributeFlattened(symbol);
-            if (attribute == null || (bool)attribute.ConstructorArguments[0].Value == false)
+            if (attribute == null)
                 return;
 
-            BuildStaticClass(context, "Shiny.Beacons.IBeaconRangingManager", "ShinyBeaconRangingManager", "Shiny.Beacons");
-            BuildStaticClass(context, "Shiny.Beacons.IBeaconMonitoringManager", "ShinyBeaconMonitoringManager", "Shiny.Beacons");
+            BuildStaticClass(context, "Shiny.Jobs.IJobManager", "ShinyJobs", "Shiny.Jobs");
+            BuildStaticClass(context, "Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");
+            //BuildStaticClass(context, "Shiny.Settings.ISettings", "ShinySettings", "Shiny.Settings"); // don't know how to gen generic constraints yet
+            BuildStaticClass(context, "Shiny.Power.IPowerManager", "ShinyPower", "Shiny.Power");
+            BuildStaticClass(context, "Shiny.IO.IFileSystem", "ShinyFileSystem", "Shiny.IO");
 
-            BuildStaticClass(context, "Shiny.BluetoothLE.IBleManager", "ShinyBleManager", "Shiny.BluetoothLE");
-            BuildStaticClass(context, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "ShinyBleHostingManager", "Shiny.BluetoothLE.Hosting");
-            BuildStaticClass(context, "Shiny.Net.Http.IHttpTransferManager", "ShinyHttpTransferManager", "Shiny.Net.Http");
-
-            // TODO: notifications
-            // TODO: core - settings, job manager, connectivity, power, 
-            // TODO: locations - geofencing, gps, motion activity
-            // TODO: nfc
-            // TODO: push
-            // TODO: sensors
+            BuildStaticClass(context, "Shiny.Beacons.IBeaconRangingManager", "ShinyBeaconRanging", "Shiny.Beacons");
+            BuildStaticClass(context, "Shiny.Beacons.IBeaconMonitoringManager", "ShinyBeaconMonitoring", "Shiny.Beacons");
+            BuildStaticClass(context, "Shiny.BluetoothLE.IBleManager", "ShinyBle", "Shiny.BluetoothLE");
+            BuildStaticClass(context, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "ShinyBleHosting", "Shiny.BluetoothLE.Hosting");
+            BuildStaticClass(context, "Shiny.Net.Http.IHttpTransferManager", "ShinyHttpTransfers", "Shiny.Net.Http");
+            BuildStaticClass(context, "Shiny.Notifications.INotificationManager", "ShinyNotifications", "Shiny.Notifications");
+            BuildStaticClass(context, "Shiny.Nfc.INfcManager", "ShinyNfc", "Shiny.Nfc");
+            BuildStaticClass(context, "Shiny.Push.IPushManager", "ShinyPush", "Shiny.Push");
+            BuildStaticClass(context, "Shiny.Locations.IGeofenceManager", "ShinyGeofences", "Shiny.Locations");
+            BuildStaticClass(context, "Shiny.Locations.IGpsManager", "ShinyGps", "Shiny.Locations");
+            BuildStaticClass(context, "Shiny.Locations.IMotionActivityManager", "ShinyMotionActivity", "Shiny.Locations");
             BuildStaticClass(context, "Shiny.SpeechRecognition.ISpeechRecognizer", "ShinySpeechRecognizer", "Shiny.SpeechRecognition");
 
-            // TODO: ble hosting
-            // TODO: location sync
-            // TODO: media manager
-            // TODO: trip tracker
+            // app services
+            BuildStaticClass(context, "Shiny.Locations.Sync.ILocationSyncManager", "ShinyLocationSync", "Shiny.Locations.Sync");
+            BuildStaticClass(context, "Shiny.MediaSync.IMediaSyncManager", "ShinyMediaSync", "Shiny.MediaSync");
+            BuildStaticClass(context, "Shiny.TripTracker.ITripTrackerManager", "ShinyTripTracker", "Shiny.TripTracker");
+
+            // sensors
+            BuildStaticClass(context, "Shiny.Sensors.IAccelerometer", "ShinyAccelerometer", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.IAmbientLight", "ShinyAmbientLight", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.IBarometer", "ShinyBarometer", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.ICompass", "ShinyCompass", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.IGyroscope", "ShinyGyroscope", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.IHeartRateMonitor", "ShinyHeartRate", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.IHumidity", "ShinyHumidity", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.IMagnetometer", "ShinyMagnetometer", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.IPedometer", "ShinyPedometer", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.IProximity", "ShinyProximity", "Shiny.Sensors");
+            BuildStaticClass(context, "Shiny.Sensors.ITemperature", "ShinyTemperature", "Shiny.Sensors");
+
         }
 
 
@@ -54,16 +72,30 @@ namespace Shiny.Generators.Generators
                     builder.AppendLine($"public static {ifTypeName} Current => ShinyHost.Resolve<{ifTypeName}>();");
                     builder.AppendLine();
 
-                    foreach (var method in type.GetMethods().Where(x => !x.IsProperty()))
+                    var methods = type
+                        .GetMembers()
+                        .OfType<IMethodSymbol>()
+                        .Where(x => !x.IsProperty());
+
+                    foreach (var method in methods)
                     {
                         var argList = method.BuildArgString(true);
                         var argListNoNames = method.BuildArgString(false);
 
                         var returnType = method.ReturnType?.ToDisplayString() ?? "void";
-                        builder.AppendLineInvariant($"public static {returnType} {method.Name}({argList}) => Current.{method.Name}({argListNoNames});");
+                        var signature = $"public static {returnType} {method.Name}";
+                        var args = $"Current.{method.Name}";
+
+                        if (method.IsGenericMethod)
+                        {
+                            signature += "<T>";
+                            args += "<T>";
+                        }
+
+                        builder.AppendLineInvariant($"{signature}({argList}) => {args}({argListNoNames});");
                     }
 
-                    foreach (var prop in type.GetProperties())
+                    foreach (var prop in type.GetAllProperties())
                     {
                         var propertyName = prop.GetName();
                         var hasGet = prop.GetMethod?.IsPublic() ?? false;

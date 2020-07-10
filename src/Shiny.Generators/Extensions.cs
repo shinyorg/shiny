@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.FindSymbols;
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
 
@@ -80,5 +84,29 @@ namespace Shiny.Generators
                     build();
             }
         }
+
+
+        public static IEnumerable<INamedTypeSymbol> GetAllInterfaceTypes(this SourceGeneratorContext context) => context
+            .Compilation
+            .SyntaxTrees
+            .Select(x => context.Compilation.GetSemanticModel(x))
+            .SelectMany(x => x
+                .SyntaxTree
+                .GetRoot()
+                .DescendantNodes()
+                .OfType<InterfaceDeclarationSyntax>()
+                .Select(y => y.GetDeclaredSymbol(x))
+            )
+            .OfType<INamedTypeSymbol>();
+
+
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType<T>(this SourceGeneratorContext context)
+            => context.GetAllImplementationsOfType(typeof(T));
+
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type interfaceType)
+            => SymbolFinder.FindImplementationsAsync(context.Compilation.GetTypeByMetadataName(interfaceType.FullName), context.Project.Solution).Result.OfType<INamedTypeSymbol>();
+
+        public static IEnumerable<INamedTypeSymbol> WhereNotShiny(this IEnumerable<INamedTypeSymbol> en) =>
+            en.Where(x => !x.ContainingAssembly.Name.StartsWith("Shiny."));
     }
 }

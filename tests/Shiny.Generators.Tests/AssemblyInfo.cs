@@ -1,1 +1,2 @@
-﻿[assembly: Shiny.Generators.AutoShinyStartup(true)]
+﻿[assembly: Shiny.Generators.GenerateStartup]
+[assembly: Shiny.Generators.GenerateStaticClasses]

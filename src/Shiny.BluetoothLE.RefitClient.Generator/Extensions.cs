@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.FindSymbols;
 using Uno.SourceGeneration;
 
 
-namespace Shiny.BluetoothLE.RefitClient.Generator
+namespace Shiny.Generators
 {
     public static class Extensions
     {

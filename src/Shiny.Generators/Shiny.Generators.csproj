@@ -10,4 +10,8 @@
         <PackageReference Include="Uno.SourceGeneration" Version="2.0.6" PrivateAssets="All" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
+    </ItemGroup>
+
 </Project>

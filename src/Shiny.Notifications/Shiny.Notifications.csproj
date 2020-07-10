@@ -10,17 +10,16 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
+        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="6.1.0" />
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Uwp\**\*.cs" />
@@ -28,27 +27,23 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.tvos')) ">
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\tvOS\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.watchos')) ">
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\macOS\**\*.cs" />
@@ -56,7 +51,6 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
@@ -65,7 +59,6 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
@@ -73,15 +66,8 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Tizen\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="NotificationLogCategory.cs">
-        <SubType></SubType>
-      </Compile>
     </ItemGroup>
 </Project>
