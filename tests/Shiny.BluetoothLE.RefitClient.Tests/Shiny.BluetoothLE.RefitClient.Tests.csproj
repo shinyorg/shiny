@@ -21,5 +21,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.RefitClient\Shiny.BluetoothLE.RefitClient.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj" />
     </ItemGroup>
 </Project>

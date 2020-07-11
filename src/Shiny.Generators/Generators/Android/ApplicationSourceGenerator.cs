@@ -23,7 +23,7 @@ namespace Shiny.Generators.Generators.Android
             // TODO: log error if application already exists?
             var startupClasses = context
                 .GetAllImplementationsOfType<IShinyStartup>()
-                .WhereNotShiny()
+                .WhereNotShinyOrXamarin()
                 .ToList();
 
             var startupClass = startupClasses.FirstOrDefault();

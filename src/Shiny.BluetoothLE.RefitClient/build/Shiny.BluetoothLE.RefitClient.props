@@ -1,5 +1,0 @@
-﻿<Project>
-    <ItemGroup>
-        <SourceGenerator Include="$(MSBuildThisFileDirectory)Shiny.BluetoothLE.RefitClient.Generator.dll" />
-    </ItemGroup>
-</Project>

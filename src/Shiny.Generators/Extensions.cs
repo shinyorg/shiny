@@ -10,7 +10,7 @@ using Uno.SourceGeneration;
 
 namespace Shiny.Generators
 {
-    internal static class Extensions
+    static class Extensions
     {
         public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName) 
         {
@@ -42,6 +42,7 @@ namespace Shiny.Generators
             s = s.TrimEnd(',', ' ');
             return s;
         }
+
 
         public static void RegisterIf(this SourceGeneratorContext context, IndentedStringBuilder builder, string typeNameExists, string registerString)
         {
@@ -103,10 +104,34 @@ namespace Shiny.Generators
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType<T>(this SourceGeneratorContext context)
             => context.GetAllImplementationsOfType(typeof(T));
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type interfaceType)
-            => SymbolFinder.FindImplementationsAsync(context.Compilation.GetTypeByMetadataName(interfaceType.FullName), context.Project.Solution).Result.OfType<INamedTypeSymbol>();
+        
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type type)
+            => context.GetAllImplementationsOfType(type.FullName);
 
-        public static IEnumerable<INamedTypeSymbol> WhereNotShiny(this IEnumerable<INamedTypeSymbol> en) =>
-            en.Where(x => !x.ContainingAssembly.Name.StartsWith("Shiny."));
+
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName)
+        {
+            var symbol = context.Compilation.GetTypeByMetadataName(fullName);
+            return SymbolFinder.FindImplementationsAsync(symbol, context.Project.Solution).Result.OfType<INamedTypeSymbol>();
+        }
+
+
+        //public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName)
+        //{
+        //    context
+        //        .Compilation
+        //        .SyntaxTrees
+        //        .Select(x => context.Compilation.GetSemanticModel(x))
+        //        .SelectMany(x => x
+        //            .SyntaxTree
+        //            .GetRoot()
+        //            .DescendantNodes()
+        //            .Select(y => y.GetDeclaredSymbol(x))
+        //        )
+        //        .OfType<INamedTypeSymbol>();
+        //}
+
+        public static IEnumerable<INamedTypeSymbol> WhereNotShinyOrXamarin(this IEnumerable<INamedTypeSymbol> en) =>
+            en.Where(x => !x.ContainingAssembly.Name.StartsWith("Shiny.") && !x.ContainingAssembly.Name.StartsWith("Xamarin."));
     }
 }

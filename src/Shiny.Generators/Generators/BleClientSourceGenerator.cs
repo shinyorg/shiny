@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Linq;
 using Uno.SourceGeneration;
-using Microsoft.CodeAnalysis;
 using Uno.RoslynHelpers;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 
 
-namespace Shiny.BluetoothLE.RefitClient.Generator
+namespace Shiny.Generators.Generators
 {
-    public class BleClientSourceGenerator : SourceGenerator
+    public static class BleClientSourceGenerator
     {
-        public override void Execute(SourceGeneratorContext context)
+        public static void Execute(SourceGeneratorContext context)
         {
             //System.Diagnostics.Debugger.Launch();
 
@@ -20,7 +21,12 @@ namespace Shiny.BluetoothLE.RefitClient.Generator
             if (bleService == null)
                 return;
 
-            var types = context.GetAllInterfaceTypes();
+            var types = context
+                .GetAllInterfaceTypes()
+                .Where(x => x
+                    .GetMethods()
+                    .Any(y => y.FindAttributeFlattened(bleService) != null)
+                );
 
             foreach (var type in types)
             {

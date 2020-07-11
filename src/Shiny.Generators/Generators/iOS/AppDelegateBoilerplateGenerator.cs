@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
 
@@ -9,31 +11,42 @@ namespace Shiny.Generators.Generators.iOS
     {
         public static void Execute(SourceGeneratorContext context)
         {
-            // if application exists, error or override? - could also search for attribute?
             var appDelegateClass = context.Compilation.GetTypeByMetadataName("UIKit.UIApplicationDelegate");
             if (appDelegateClass == null)
                 return;
+            
+            var appDelegates = context
+                .GetAllImplementationsOfType("UIKit.UIApplicationDelegate")
+                .WhereNotShinyOrXamarin()
+                .ToList();
 
-            // find class in head project that inherits it
-
-            // make sure it is partial
-
-            var builder = new IndentedStringBuilder();
-
-            using (builder.BlockInvariant("namespace ")) // match it
+            //Debugger.Launch();
+            foreach (var appDelegate in appDelegates)
             {
-                using (builder.BlockInvariant("public partial class YourAppDelegate : TheInheritAppDelegateType"))
+                // TODO: make sure it is partial
+                var builder = new IndentedStringBuilder();
+                builder.AppendNamespaces("Foundation", "UIKit");
+
+                using (builder.BlockInvariant($"namespace {appDelegate.ContainingNamespace}"))
                 {
-                    // TODO: could override/inherit user appdelegate to be able to weave in startup
-                    builder.AppendLine("public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);");
-                    builder.AppendLine("public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);");
-                    builder.AppendLine("public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) => this.ShinyRegisteredForRemoteNotifications(deviceToken);");
-                    builder.AppendLine("public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) => this.ShinyFailedToRegisterForRemoteNotifications(error);");
-                    builder.AppendLine("public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyPerformFetch(completionHandler)");
-                    builder.AppendLine("public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler) => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);");
+                    using (builder.BlockInvariant($"public partial class {appDelegate.Name} : {appDelegate.BaseType.ToDisplayString()}"))
+                    {
+                        builder.AppendLineInvariant(
+                            "public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);");
+                        builder.AppendLineInvariant(
+                            "public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);");
+                        builder.AppendLineInvariant(
+                            "public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) => this.ShinyRegisteredForRemoteNotifications(deviceToken);");
+                        builder.AppendLineInvariant(
+                            "public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) => this.ShinyFailedToRegisterForRemoteNotifications(error);");
+                        builder.AppendLineInvariant(
+                            "public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyPerformFetch(completionHandler);");
+                        builder.AppendLineInvariant(
+                            "public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler) => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);");
+                    }
                 }
+                context.AddCompilationUnit(appDelegate.Name, builder.ToString());
             }
-            context.AddCompilationUnit("AppDelegate", builder.ToString());
         }
     }
 }
