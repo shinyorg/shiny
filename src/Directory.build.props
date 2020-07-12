@@ -44,15 +44,12 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <TargetsToBuild>android;ios;watchos;tvos;uap;tizen</TargetsToBuild>
         <DebugType>full</DebugType>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DesignTimeBuild>false</DesignTimeBuild>
-        <TargetsToBuild>android;ios;watchos;tvos</TargetsToBuild>
-        <TargetsToBuild Condition=" $(OS) == 'WINDOWS_NT' ">uap;tizen;$(TargetsToBuild)</TargetsToBuild>
         <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -63,7 +60,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="\icon.png" />
+        <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
     </ItemGroup>
 
 </Project>
