@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
@@ -16,11 +15,10 @@ namespace Shiny.Generators.Generators.iOS
                 return;
             
             var appDelegates = context
-                .GetAllImplementationsOfType("UIKit.UIApplicationDelegate")
-                .WhereNotShinyOrXamarin()
+                .GetAllDerivedClassesForType("UIKit.UIApplicationDelegate")
                 .ToList();
 
-            //Debugger.Launch();
+            //System.Diagnostics.Debugger.Launch();
             foreach (var appDelegate in appDelegates)
             {
                 // TODO: make sure it is partial

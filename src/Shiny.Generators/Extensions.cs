@@ -98,7 +98,8 @@ namespace Shiny.Generators
                 .OfType<InterfaceDeclarationSyntax>()
                 .Select(y => y.GetDeclaredSymbol(x))
             )
-            .OfType<INamedTypeSymbol>();
+            .OfType<INamedTypeSymbol>()
+            .WhereNotSystem();
 
 
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType<T>(this SourceGeneratorContext context)
@@ -112,7 +113,14 @@ namespace Shiny.Generators
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName)
         {
             var symbol = context.Compilation.GetTypeByMetadataName(fullName);
-            return SymbolFinder.FindImplementationsAsync(symbol, context.Project.Solution).Result.OfType<INamedTypeSymbol>();
+            if (symbol == null)
+                return Enumerable.Empty<INamedTypeSymbol>();
+
+            return SymbolFinder
+                .FindImplementationsAsync(symbol, context.Project.Solution)
+                .Result
+                .OfType<INamedTypeSymbol>()
+                .WhereNotSystem();
         }
 
 
@@ -128,10 +136,20 @@ namespace Shiny.Generators
         //            .DescendantNodes()
         //            .Select(y => y.GetDeclaredSymbol(x))
         //        )
-        //        .OfType<INamedTypeSymbol>();
+        //        .OfType<INamedTypeSymbol>()
+        //        .Where(x => x.GetBaseTypes().Where(y => y.I));
         //}
 
-        public static IEnumerable<INamedTypeSymbol> WhereNotShinyOrXamarin(this IEnumerable<INamedTypeSymbol> en) =>
+
+        public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName)
+        {
+            var symbol = context.Compilation.GetTypeByMetadataName(typeName);
+            var result = SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution).Result;
+            return result;
+        }
+
+
+        static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en) =>
             en.Where(x => !x.ContainingAssembly.Name.StartsWith("Shiny.") && !x.ContainingAssembly.Name.StartsWith("Xamarin."));
     }
 }

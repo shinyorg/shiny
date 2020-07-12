@@ -72,9 +72,7 @@ namespace Shiny.Generators.Generators
 
         static void RegisterJobs(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
-            var jobTypes = context
-                .GetAllImplementationsOfType<IJob>()
-                .WhereNotShinyOrXamarin();
+            var jobTypes = context.GetAllImplementationsOfType<IJob>();
 
             foreach (var type in jobTypes)
                 builder.AppendLine($"services.RegisterJob(typeof({type.ToDisplayString()}));");
@@ -85,7 +83,6 @@ namespace Shiny.Generators.Generators
         {
             var types = context
                 .GetAllImplementationsOfType<IShinyStartupTask>()
-                .WhereNotShinyOrXamarin()
                 .Where(x => x.AllInterfaces.Length == 1);
 
             foreach (var task in types)
@@ -95,9 +92,7 @@ namespace Shiny.Generators.Generators
 
         static void RegisterModules(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
-            var types = context
-                .GetAllImplementationsOfType<IShinyModule>()
-                .WhereNotShinyOrXamarin();
+            var types = context.GetAllImplementationsOfType<IShinyModule>();
 
             foreach (var type in types)
                 builder.AppendLine($"services.RegisterModule<{type.ToDisplayString()}>();");
