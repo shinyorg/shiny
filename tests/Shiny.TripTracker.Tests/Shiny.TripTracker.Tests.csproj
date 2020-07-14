@@ -25,4 +25,8 @@
         <ProjectReference Include="..\..\src\Shiny.TripTracker\Shiny.TripTracker.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Update="Uno.SourceGenerationTasks" Version="2.0.13" />
+    </ItemGroup>
+
 </Project>

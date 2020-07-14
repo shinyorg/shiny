@@ -21,4 +21,8 @@
         <ProjectReference Include="..\..\src\Shiny.MediaSync\Shiny.MediaSync.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Update="Uno.SourceGenerationTasks" Version="2.0.13" />
+    </ItemGroup>
+
 </Project>

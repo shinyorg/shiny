@@ -20,6 +20,8 @@ namespace Shiny.Generators.Generators.Android
             var activityAttribute = context.Compilation.GetTypeByMetadataName("Android.App.ActivityAttribute");
             if (activityAttribute == null)
                 return;
+
+            // TODO: get all android activities and stub in shiny?
         }
     }
 }
