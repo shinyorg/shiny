@@ -31,8 +31,19 @@ namespace Shiny.Locations
             this.Timestamp = timestamp;
         }
 
+        /// <summary>
+        /// The motion activity type.
+        /// </summary>
         public MotionActivityType Types { get; }
+
+        /// <summary>
+        /// The confidence of the accuracy.
+        /// </summary>
         public MotionActivityConfidence Confidence { get; }
+
+        /// <summary>
+        /// The time the motion happened.
+        /// </summary>
         public DateTimeOffset Timestamp { get; }
     }
 }
