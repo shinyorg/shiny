@@ -15,10 +15,7 @@ namespace Shiny.Generators.Generators.Android
             // if application exists, error or override? - could also search for attribute?
             var appClass = context.Compilation.GetTypeByMetadataName("Android.App.Application");
             if (appClass == null)
-            {
-                log.Info("Not Android App");
                 return;
-            }
 
             // TODO: log error if application already exists?
             var startupClasses = context
