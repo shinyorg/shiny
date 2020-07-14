@@ -32,7 +32,7 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
+        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
         {
             this.AssertWrite(false);
 
@@ -55,8 +55,14 @@ namespace Shiny.BluetoothLE
             {
                 try
                 {
-                    // TODO: signed write
                     this.native.WriteType = withResponse ? GattWriteType.Default : GattWriteType.NoResponse;
+                    var authSignedWrite = 
+                        this.native.Properties.HasFlag(CharacteristicProperties.AuthenticatedSignedWrites) && 
+                        this.context.NativeDevice.BondState == Bond.Bonded;
+
+                    if (authSignedWrite)
+                        this.native.WriteType |= GattWriteType.Signed;
+
                     this.native.SetValue(value);
                     //if (!this.native.SetValue(value))
                     //ob.OnError(new BleException("Failed to set characteristic value"));
