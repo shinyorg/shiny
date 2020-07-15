@@ -6,7 +6,7 @@ namespace Shiny.Locations
     public class GpsReading : IGpsReading
     {
         readonly Location location;
-
+        DateTime? time;
 
         public GpsReading(Location location)
         {
@@ -14,16 +14,26 @@ namespace Shiny.Locations
             this.Position = new Position(location.Latitude, location.Longitude);
         }
 
-
+        /// <inheritdoc />
         public double Altitude => this.location.Altitude;
+
+        /// <inheritdoc />
         public double Heading => this.location.Bearing;
+
+        /// <inheritdoc />
         public double HeadingAccuracy => this.location.BearingAccuracyDegrees;
+
+        /// <inheritdoc />
         public double Speed => this.location.Speed;
+
+        /// <inheritdoc />
         public Position Position { get; }
+
+        /// <inheritdoc />
         public double PositionAccuracy => this.location.Accuracy;
 
 
-        DateTime? time;
+        /// <inheritdoc />
         public DateTime Timestamp => this.time ??= DateTimeOffset.FromUnixTimeMilliseconds(this.location.Time).UtcDateTime;
     }
 }

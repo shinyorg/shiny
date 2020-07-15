@@ -24,4 +24,8 @@
     <ProjectReference Include="..\..\src\Shiny.Locations.Sync\Shiny.Locations.Sync.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Uno.SourceGenerationTasks" Version="2.0.13" />
+  </ItemGroup>
+
 </Project>

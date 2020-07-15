@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Linq;
+
+using Microsoft.CodeAnalysis;
+
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
 
@@ -22,14 +25,16 @@ namespace Shiny.Generators.Generators.Android
                 .GetAllImplementationsOfType<IShinyStartup>()
                 .ToList();
 
-            var startupClass = startupClasses.FirstOrDefault();
+            INamedTypeSymbol? startupClass = null;
             switch (startupClasses.Count)
             {
                 case 0:
                     log.Warn("No Shiny Startup implementation found");
                     return;
                 
-                case 1: break;
+                case 1:
+                    startupClass = startupClasses.First();
+                    break;
 
                 default:
                     log.Error(startupClasses.Count + " Shiny Startup implementations found");
@@ -62,6 +67,7 @@ namespace Shiny.Generators.Generators.Android
                     }
                 }
             }
+            context.AddCompilationUnit("MainApplication", builder.ToString());
         }
     }
 }

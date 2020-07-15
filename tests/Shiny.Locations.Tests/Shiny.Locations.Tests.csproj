@@ -26,4 +26,8 @@
     <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Uno.SourceGenerationTasks" Version="2.0.13" />
+  </ItemGroup>
+
 </Project>

@@ -112,6 +112,7 @@ namespace Shiny.Generators
 
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName)
         {
+            //System.Diagnostics.Debugger.Launch();
             var symbol = context.Compilation.GetTypeByMetadataName(fullName);
             if (symbol == null)
                 return Enumerable.Empty<INamedTypeSymbol>();

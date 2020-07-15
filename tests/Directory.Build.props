@@ -1,6 +1,6 @@
 <Project>
     <ItemGroup>
-        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="all" />
+        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.13" PrivateAssets="all" />
         <SourceGenerator Include="$(MSBuildThisFileDirectory)..\src\Shiny.Generators\bin\$(Configuration)\netstandard2.0\Shiny.Generators.dll" />
     </ItemGroup>
 </Project>
