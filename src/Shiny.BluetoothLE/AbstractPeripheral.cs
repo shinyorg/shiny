@@ -17,6 +17,7 @@ namespace Shiny.BluetoothLE
         public virtual string Name { get; protected set; }
         public virtual Guid Uuid { get; protected set; }
         public abstract ConnectionState Status { get; }
+        public virtual PairingState PairingStatus { get; }
         public virtual int MtuSize { get; } = 20;
         public virtual IObservable<BleException> WhenConnectionFailed() => Observable.Empty<BleException>();
 

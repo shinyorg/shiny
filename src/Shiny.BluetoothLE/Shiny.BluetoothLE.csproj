@@ -5,7 +5,7 @@
         <Description>Shiny Reactive BluetoothLE Plugin for client and gatt server</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
 <!--        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.tvos10;xamarin.mac20;monoandroid90;monoandroid10.0;tizen50</TargetFrameworks>-->
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.17763;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,6 +25,7 @@
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
+        <PackageReference Include="Microsoft.Toolkit.Uwp.Connectivity" Version="6.1.0"/>
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">

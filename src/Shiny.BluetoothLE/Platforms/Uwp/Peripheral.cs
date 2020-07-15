@@ -2,11 +2,13 @@
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
+using Microsoft.Toolkit.Uwp.Connectivity;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
-
+using Windows.Graphics.Display;
 
 namespace Shiny.BluetoothLE
 {
@@ -15,13 +17,16 @@ namespace Shiny.BluetoothLE
                               ICanPairPeripherals
     {
         readonly DeviceContext context;
+        readonly ObservableBluetoothLEDevice observableDevice;
 
 
         public Peripheral(CentralContext adapterContext, BluetoothLEDevice native)
         {
             this.context = new DeviceContext(adapterContext, this, native);
+            this.observableDevice = new ObservableBluetoothLEDevice(native.DeviceInformation);
             this.Name = native.Name;
             this.Uuid = native.GetDeviceId();
+
         }
 
 
@@ -29,6 +34,10 @@ namespace Shiny.BluetoothLE
         public override void CancelConnection() => this.context.Disconnect();
         public override ConnectionState Status => this.context.Status;
         public override IObservable<ConnectionState> WhenStatusChanged() => this.context.WhenStatusChanged();
+        public override IObservable<int> ReadRssi()
+        {
+            return Observable.Return<int>(0);
+        }
 
 
         public override IObservable<IGattService> GetKnownService(Guid serviceUuid) => Observable.FromAsync(async ct =>
@@ -85,15 +94,64 @@ namespace Shiny.BluetoothLE
         public IGattReliableWriteTransaction BeginReliableWriteTransaction() => new GattReliableWriteTransaction();
 
 
-        public PairingState PairingStatus => this.context.NativeDevice.DeviceInformation.Pairing.IsPaired
+        public override PairingState PairingStatus => this.context.NativeDevice.DeviceInformation.Pairing.IsPaired
             ? PairingState.Paired
             : PairingState.NotPaired;
 
 
-        public IObservable<bool> PairingRequest() => Observable.FromAsync(async token =>
+        public IObservable<bool> PairingRequest(PairingConfiguration? configuration = null) => Observable.FromAsync(async token =>
         {
-            var result = await this.context.NativeDevice.DeviceInformation.Pairing.PairAsync(DevicePairingProtectionLevel.None);
-            var state = result.Status == DevicePairingResultStatus.Paired;
+            var state = false;
+            TypedEventHandler<DeviceInformationCustomPairing, DevicePairingRequestedEventArgs> pairingRequestedHandler = (s, a) => 
+            {
+                switch(a.PairingKind)
+                {
+                    case DevicePairingKinds.ConfirmOnly:
+                        {
+                            a.Accept();
+                        }
+                        break;
+                    case DevicePairingKinds.ProvidePin:
+                        {
+                            var collectPinDeferral = a.GetDeferral();
+                            Task.Run(() =>
+                            {
+                                if (!string.IsNullOrEmpty(configuration?.Pin))
+                                {
+                                    a.Accept(configuration?.Pin);
+                                }
+                                collectPinDeferral.Complete();
+                            });
+                        }
+                        break;
+                    default:
+                        {
+
+                        }
+                        break;
+                }
+            };
+            var pairingKind = DevicePairingKinds.None;
+            if(configuration != null)
+            {
+                if(!string.IsNullOrEmpty(configuration?.Pin))
+                {
+                    pairingKind = DevicePairingKinds.ProvidePin;
+                }
+                this.context.NativeDevice.DeviceInformation.Pairing.Custom.PairingRequested += pairingRequestedHandler;
+                try
+                {
+                    state = (await this.context.NativeDevice.DeviceInformation.Pairing.Custom.PairAsync(pairingKind)).Status == DevicePairingResultStatus.Paired;
+                }
+                finally
+                {
+                    this.context.NativeDevice.DeviceInformation.Pairing.Custom.PairingRequested -= pairingRequestedHandler;
+                }
+            }
+            else
+            {
+                state = (await this.context.NativeDevice.DeviceInformation.Pairing.PairAsync(DevicePairingProtectionLevel.None)).Status == DevicePairingResultStatus.Paired;
+            }
             return state;
         });
     }

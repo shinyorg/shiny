@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattDeviceService;
@@ -47,23 +49,24 @@ namespace Shiny.BluetoothLE
             });
 
 
-        IObservable<IGattCharacteristic> characteristicOb;
         public override IObservable<IGattCharacteristic> DiscoverCharacteristics()
         {
-            this.characteristicOb = this.characteristicOb ?? Observable.Create<IGattCharacteristic>(async ob =>
+            var discoverCharacteristics = new Subject<IGattCharacteristic>();
+            Task.Run(async () => 
             {
-                var result = await this.native.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
-                foreach (var characteristic in result.Characteristics)
+                try
                 {
-                    var wrap = new GattCharacteristic(this.context, characteristic, this);
-                    ob.OnNext(wrap);
+                    var result = await this.native.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
+                    foreach (var characteristic in result.Characteristics)
+                    {
+                        var wrap = new GattCharacteristic(this.context, characteristic, this);
+                        discoverCharacteristics.OnNext(wrap);
+                    }
+                    discoverCharacteristics.OnCompleted();
                 }
-                return Disposable.Empty;
-            })
-            .Replay()
-            .RefCount();
-
-            return this.characteristicOb;
+                catch(Exception ex) { discoverCharacteristics.OnError(ex); }
+            });
+            return discoverCharacteristics.AsObservable();
         }
     }
 }

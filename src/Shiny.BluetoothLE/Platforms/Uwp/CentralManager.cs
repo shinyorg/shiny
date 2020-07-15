@@ -168,7 +168,7 @@ namespace Shiny.BluetoothLE
         .StartWith(this.Status);
 
 
-        public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => this.GetDevices(
+        public override IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => this.GetDevices(
             BluetoothLEDevice.GetDeviceSelectorFromPairingState(true)
         );
 

@@ -4,7 +4,8 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
-
+using Android.Media;
+using Android.Content.Res;
 
 namespace Shiny.BluetoothLE
 {
@@ -118,9 +119,10 @@ namespace Shiny.BluetoothLE
             new GattReliableWriteTransaction(this.context);
 
 
-        public IObservable<bool> PairingRequest() => Observable.Create<bool>(ob =>
+        public IObservable<bool> PairingRequest(PairingConfiguration? configuration = null) => Observable.Create<bool>(ob =>
         {
             IDisposable? sub = null;
+            IDisposable pairingRequestSubscription = null;
             if (this.PairingStatus == PairingState.Paired)
             {
                 ob.Respond(true);
@@ -132,16 +134,30 @@ namespace Shiny.BluetoothLE
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
                     .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
                     .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired));
-
+                pairingRequestSubscription = this.context
+                    .CentralContext
+                    .ListenForMe(BluetoothDevice.ActionPairingRequest, this)
+                    .OfType<Peripheral>()
+                    .Subscribe((p) => 
+                    {
+                        if(!string.IsNullOrEmpty(configuration?.Pin))
+                        {
+                            p.context.NativeDevice.SetPin(System.Text.Encoding.ASCII.GetBytes(configuration?.Pin) );
+                        }
+                    }, (ex)=>pairingRequestSubscription?.Dispose(), ()=>pairingRequestSubscription?.Dispose());
                 // execute
                 if (!this.context.NativeDevice.CreateBond())
                     ob.Respond(false);
             }
-            return () => sub?.Dispose();
+            return () =>
+            {
+                sub?.Dispose();
+                pairingRequestSubscription?.Dispose();
+            };
         });
 
 
-        public PairingState PairingStatus
+        public override PairingState PairingStatus
         {
             get
             {

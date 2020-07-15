@@ -49,7 +49,6 @@ namespace Shiny.BluetoothLE
             }
         }
 
-
         public override void Connect(ConnectionConfig config)
         {
             var arc = config?.AutoConnect ?? true;
