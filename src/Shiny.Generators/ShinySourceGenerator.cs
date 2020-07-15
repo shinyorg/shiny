@@ -11,12 +11,19 @@ namespace Shiny.Generators
     {
         public override void Execute(SourceGeneratorContext context)
         {
+            // shiny
             AutoStartupSourceGenerator.Execute(context);
             StaticClassSourceGenerator.Execute(context);
+            PrismBridgeSourceGenerator.Execute(context);
+
+            // ios
             AppDelegateBoilerplateGenerator.Execute(context);
+
+            // android
             ApplicationSourceGenerator.Execute(context);
             ActivitySourceGenerator.Execute(context);
 
+            // ble
             BleClientSourceGenerator.Execute(context);
         }
     }

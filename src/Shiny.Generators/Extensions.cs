@@ -12,6 +12,12 @@ namespace Shiny.Generators
 {
     static class Extensions
     {
+        //public static bool HasShinyCore(this SourceGeneratorContext context)
+        //    => context.Compilation.GetTypeByMetadataName("Shiny.ShinyHost") != null;
+
+        public static bool HasXamarinForms(this SourceGeneratorContext context)
+            => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
+
         public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName) 
         {
             var attribute = context.Compilation.GetTypeByMetadataName(attributeName);
@@ -98,8 +104,7 @@ namespace Shiny.Generators
                 .OfType<InterfaceDeclarationSyntax>()
                 .Select(y => y.GetDeclaredSymbol(x))
             )
-            .OfType<INamedTypeSymbol>()
-            .WhereNotSystem();
+            .OfType<INamedTypeSymbol>();
 
 
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType<T>(this SourceGeneratorContext context)
@@ -120,8 +125,7 @@ namespace Shiny.Generators
             return SymbolFinder
                 .FindImplementationsAsync(symbol, context.Project.Solution)
                 .Result
-                .OfType<INamedTypeSymbol>()
-                .WhereNotSystem();
+                .OfType<INamedTypeSymbol>();
         }
 
 
@@ -145,12 +149,17 @@ namespace Shiny.Generators
         public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName)
         {
             var symbol = context.Compilation.GetTypeByMetadataName(typeName);
+            if (symbol == null)
+                return Enumerable.Empty<INamedTypeSymbol>();
+
             var result = SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution).Result;
             return result;
         }
 
+        public static IEnumerable<INamedTypeSymbol> WhereNotInAssembly(this IEnumerable<INamedTypeSymbol> en, params string[] names) 
+            => en.Where(x => !names.Any(y => x.ContainingAssembly.Name.StartsWith(y, StringComparison.OrdinalIgnoreCase)));
 
-        static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en) =>
-            en.Where(x => !x.ContainingAssembly.Name.StartsWith("Shiny.") && !x.ContainingAssembly.Name.StartsWith("Xamarin."));
+        public static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en)
+            => en.WhereNotInAssembly("Xamarin.", "Shiny.");
     }
 }
