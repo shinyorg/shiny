@@ -8,7 +8,7 @@ using Shiny.Locations;
 using Xunit;
 
 
-namespace Shiny.Tests.Locations
+namespace Shiny.Locations.Tests
 {
     public class MotionActivityTests
     {

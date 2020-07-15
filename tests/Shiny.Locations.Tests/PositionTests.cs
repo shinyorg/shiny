@@ -1,10 +1,9 @@
 ﻿using System;
-using Shiny.Locations;
 using FluentAssertions;
 using Xunit;
 
 
-namespace Shiny.Tests.Locations
+namespace Shiny.Locations.Tests
 {
     public class PositionTests
     {
