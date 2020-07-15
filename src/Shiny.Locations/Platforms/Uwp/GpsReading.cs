@@ -7,7 +7,6 @@ namespace Shiny.Locations
     {
         readonly Geocoordinate coordinate;
 
-
         public GpsReading(Geocoordinate coordinate) 
         { 
             this.coordinate = coordinate;
@@ -17,13 +16,25 @@ namespace Shiny.Locations
             );
         }
 
-
+        /// <inheritdoc />
         public double Altitude => this.coordinate.Point.Position.Altitude;
+
+        /// <inheritdoc />
         public double Heading => this.coordinate.Heading ?? -1;
+
+        /// <inheritdoc />
         public double HeadingAccuracy => this.coordinate.Accuracy;
+
+        /// <inheritdoc />
         public double Speed => this.coordinate.Speed ?? 0;
+
+        /// <inheritdoc />
         public Position Position { get; }
+
+        /// <inheritdoc />
         public double PositionAccuracy => this.coordinate.Accuracy;
+
+        /// <inheritdoc />
         public DateTime Timestamp => this.coordinate.Timestamp.DateTime;
     }
 }
