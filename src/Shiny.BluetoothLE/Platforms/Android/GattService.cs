@@ -43,16 +43,6 @@ namespace Shiny.BluetoothLE
                 catch (Exception ex) { discoverCharacteristics.OnError(ex); }
             });
             return discoverCharacteristics.AsObservable();
-            /*=> Observable.Create<IGattCharacteristic>(ob =>
-            {
-                foreach (var nch in this.native.Characteristics)
-                {
-                    var wrap = new GattCharacteristic(this, this.context, nch);
-                    ob.OnNext(wrap);
-                }
-                ob.OnCompleted();
-                return Disposable.Empty;
-            });*/
         }
 
         public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)

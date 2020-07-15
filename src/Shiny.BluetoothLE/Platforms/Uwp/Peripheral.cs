@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Microsoft.Toolkit.Uwp.Connectivity;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
@@ -17,13 +16,11 @@ namespace Shiny.BluetoothLE
                               ICanPairPeripherals
     {
         readonly DeviceContext context;
-        readonly ObservableBluetoothLEDevice observableDevice;
 
 
         public Peripheral(CentralContext adapterContext, BluetoothLEDevice native)
         {
             this.context = new DeviceContext(adapterContext, this, native);
-            this.observableDevice = new ObservableBluetoothLEDevice(native.DeviceInformation);
             this.Name = native.Name;
             this.Uuid = native.GetDeviceId();
 
