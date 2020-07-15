@@ -5,7 +5,7 @@ using Shiny.Nfc;
 
 namespace Shiny
 {
-    public static class Extensions
+    public static class ServiceCollectionExtensions
     {
         /// <summary>
         ///
