@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.CodeAnalysis;
 using Shiny.Jobs;
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
@@ -50,19 +51,17 @@ namespace Shiny.Generators.Generators
 
                         // TODO: notifications with or without delegate?
                         context.RegisterIf(builder, "Shiny.Notifications.INotificationManager", "//TODO: services.UseNotifications();");
-
-                        // TODO: 2 managers - check and find delegate
-                        context.RegisterIf(builder, "Shiny.Locations.Sync.ILocationSyncManager", "// TODO: services.UseGpsSync(); or geofence");
-
                         // TODO: optional delegate
                         context.RegisterIf(builder, "Shiny.MediaSync.IMediaSyncManager", "//TODO: services.UseMediaSync();");
 
-                        // TODO: delegate
-                        context.RegisterIf(builder, "Shiny.TripTracker.ITripTrackerManager", "//TODO: services.UseTripTracker();");
+                        RegisterAllDelegate(context, builder, "Shiny.Locations.Sync.IGeofenceSyncDelegate", "services.UseGeofencingSync", true);
+                        RegisterAllDelegate(context, builder, "Shiny.Locations.Sync.IGpsSyncDelegate", "services.UseGpsSync", true);
+                        RegisterAllDelegate(context, builder, "Shiny.TripTracker.ITripTrackerDelegate", "services.UseTripTracker", true);
 
                         RegisterJobs(context, builder);
                         RegisterStartupTasks(context, builder);
                         RegisterModules(context, builder);
+                        RegisterInjects(context, builder);
                     }
                     
                     if (context.HasXamarinForms())
@@ -83,12 +82,28 @@ namespace Shiny.Generators.Generators
         }
 
 
-        static void RegisterAllDelegate(SourceGeneratorContext context, string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall, bool registerFirstOnModule)
+        static void RegisterAllDelegate(SourceGeneratorContext context, IIndentedStringBuilder builder, string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
         {
-            //var impls = context.GetAllImplementationsOfType(delegateTypeName).WhereNotSystem();
+            var impls = context.GetAllImplementationsOfType(delegateTypeName).WhereNotSystem();
+            if (!impls.Any() && oneDelegateRequiredToInstall)
+                return;
 
-            
+            if (oneDelegateRequiredToInstall)
+            {
+                registerStatement += $"<{impls.First().ToDisplayString()}>";
+            }
+            registerStatement += "();";
+            builder.AppendLineInvariant(registerStatement);
+
+            // TODO: for all other impls, register
         }
+
+
+        static void RegisterInjects(SourceGeneratorContext context, IndentedStringBuilder builder)
+        {
+
+        }
+
 
         static void RegisterJobs(SourceGeneratorContext context, IndentedStringBuilder builder)
         {

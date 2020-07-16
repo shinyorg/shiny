@@ -1,17 +1,18 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.TripTracker;
 using Shiny.TripTracker.Internals;
 
 
-namespace Shiny.TripTracker
+namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseTripTracking<T>(this IServiceCollection services) where T : ITripTrackerDelegate
-            => services.UseTripTracking(typeof(T));
+        public static bool UseTripTracker<T>(this IServiceCollection services) where T : ITripTrackerDelegate
+            => services.UseTripTracker(typeof(T));
 
 
-        public static bool UseTripTracking(this IServiceCollection services, Type? delegateType = null)
+        public static bool UseTripTracker(this IServiceCollection services, Type? delegateType = null)
         {            
             if (!services.UseMotionActivity())
                 return false;

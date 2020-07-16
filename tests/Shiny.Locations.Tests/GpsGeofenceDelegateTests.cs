@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
-using Shiny.Locations;
-using Shiny.Testing.Infrastucture;
 using Shiny.Testing.Locations;
 using Xunit;
 
@@ -17,6 +16,7 @@ namespace Shiny.Locations.Tests
 
 
 
+
         public GpsGeofenceDelegateTests()
         {
             this.geofenceManager = new Mock<IGeofenceManager>();
@@ -24,7 +24,7 @@ namespace Shiny.Locations.Tests
                 .Setup(x => x.GetMonitorRegions())
                 .ReturnsAsync(() => new[]
                 {
-                    new GeofenceRegion("", null, null)
+                    new GeofenceRegion("test", new Position(1, 1), Distance.FromKilometers(1))
                 });
             this.geofenceDelegate = new Mock<IGeofenceDelegate>();
             this.gpsDelegate = new GpsGeofenceDelegate(this.geofenceManager.Object, this.geofenceDelegate.Object);
@@ -34,8 +34,8 @@ namespace Shiny.Locations.Tests
         [Fact]
         public async Task EntersGeofence()
         {
-            await this.gpsDelegate.OnReading(new GpsReading());
-
+            this.gpsDelegate.CurrentStates.Should().BeEmpty();
+            await this.gpsDelegate.OnReading(GpsReading.Create(1, 1));
         }
     }
 }
