@@ -40,20 +40,19 @@ namespace Shiny.Generators.Generators
                     {
                         builder.AppendLineInvariant("this.CustomConfigureServices(services);");
 
-                        context.RegisterIf(builder, "Shiny.BluetoothLE.IBleManager", "services.UseBleClient();");
                         context.RegisterIf(builder, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
-                        context.RegisterIf(builder, "Shiny.Beacons.Beacon", "services.UseBeaconRanging(); // TODO: UseBeaconMonitoring<?>");
-                        context.RegisterIf(builder, "Shiny.Locations.IGpsManager", "services.UseMotionActivity(); // TODO: UseGps<?> & UseGeofencing<>");
-                        context.RegisterIf(builder, "Shiny.Net.Http", "// TODO: services.UseHttpTransfers();");
                         context.RegisterIf(builder, "Shiny.Nfc.INfcManager", "services.UseNfc();");
                         context.RegisterIf(builder, "Shiny.Sensors.IAccelerometer", "services.UseAllSensors();");
                         context.RegisterIf(builder, "Shiny.SpeechRecognition.ISpeechRecognizer", "services.UseSpeechRecognition();");
+                        context.RegisterIf(builder, "Shiny.Locations.IGpsManager", "services.UseMotionActivity();");
 
-                        // TODO: notifications with or without delegate?
-                        context.RegisterIf(builder, "Shiny.Notifications.INotificationManager", "//TODO: services.UseNotifications();");
-                        // TODO: optional delegate
-                        context.RegisterIf(builder, "Shiny.MediaSync.IMediaSyncManager", "//TODO: services.UseMediaSync();");
-
+                        RegisterAllDelegate(context, builder, "Shiny.Locations.IGpsDelegate", "services.UseGps", false);
+                        RegisterAllDelegate(context, builder, "Shiny.Locations.IGeofenceDelegate", "services.UseGeofencing", true);
+                        RegisterAllDelegate(context, builder, "Shiny.BluetoothLE.IBleDelegate", "services.UseBleClient", false);
+                        RegisterAllDelegate(context, builder, "Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
+                        RegisterAllDelegate(context, builder, "Shiny.MediaSync.IMediaSyncDelegate", "services.UseMediaSync", false);
+                        RegisterAllDelegate(context, builder, "Shiny.Net.Http.IHttpTransferDelegate", "services.UseHttpTransfers", true);
+                        RegisterAllDelegate(context, builder, "Shiny.Beacons.IBeaconMonitorDelegate", "services.UseBeaconRanging", true);
                         RegisterAllDelegate(context, builder, "Shiny.Locations.Sync.IGeofenceSyncDelegate", "services.UseGeofencingSync", true);
                         RegisterAllDelegate(context, builder, "Shiny.Locations.Sync.IGpsSyncDelegate", "services.UseGpsSync", true);
                         RegisterAllDelegate(context, builder, "Shiny.TripTracker.ITripTrackerDelegate", "services.UseTripTracker", true);
@@ -69,6 +68,7 @@ namespace Shiny.Generators.Generators
                         using (builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
                         {
                             builder.AppendFormatInvariant("Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
+                            builder.AppendLine();
                         }
                     }
                 },
@@ -78,36 +78,48 @@ namespace Shiny.Generators.Generators
             );
 
             context.AddCompilationUnit("AppShinyStartup", builder.ToString());
-            // TODO: inject into XF  DependencyResolver.ResolveUsing(t => ShinyHost.Container.GetService(t));
         }
 
 
         static void RegisterAllDelegate(SourceGeneratorContext context, IIndentedStringBuilder builder, string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
         {
-            var impls = context.GetAllImplementationsOfType(delegateTypeName).WhereNotSystem();
+            var impls = context
+                .GetAllImplementationsOfType(delegateTypeName)
+                .WhereNotSystem()
+                .ToArray();
+
             if (!impls.Any() && oneDelegateRequiredToInstall)
                 return;
 
             if (oneDelegateRequiredToInstall)
-            {
                 registerStatement += $"<{impls.First().ToDisplayString()}>";
-            }
+
             registerStatement += "();";
             builder.AppendLineInvariant(registerStatement);
 
-            // TODO: for all other impls, register
+            if (impls.Length > 1)
+            {
+                var startIndex = oneDelegateRequiredToInstall ? 1 : 0; 
+                for (var i = startIndex; i < impls.Length; i++)
+                {
+                    var impl = impls[i];
+                    builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
+                }
+            }
         }
 
 
         static void RegisterInjects(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
-
+            //context.Compilation.Assembly
         }
 
 
         static void RegisterJobs(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
-            var jobTypes = context.GetAllImplementationsOfType<IJob>().WhereNotSystem();
+            var jobTypes = context
+                .GetAllImplementationsOfType<IJob>()
+                .WhereNotSystem();
 
             foreach (var type in jobTypes)
                 builder.AppendLineInvariant($"services.RegisterJob(typeof({type.ToDisplayString()}));");
@@ -133,13 +145,5 @@ namespace Shiny.Generators.Generators
             foreach (var type in types)
                 builder.AppendLineInvariant($"services.RegisterModule<{type.ToDisplayString()}>();");
         }
-
-
-        //static void RegisterIfAndWithDelegates(SourceGeneratorContext context, IndentedStringBuilder builder, string initialRegisterString, string delegateTypeName)
-        //{
-        //    var delegateType = context.Compilation.GetTypeByMetadataName(delegateTypeName);
-        //    if (delegateType == null)
-        //        return;
-        //}
     }
 }
