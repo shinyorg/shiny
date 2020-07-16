@@ -26,5 +26,11 @@ namespace Shiny.Testing.Locations
 
         /// <inheritdoc />
         public DateTime Timestamp { get; set; }
+
+
+        public static GpsReading Create(double lat, double lng) => new GpsReading
+        {
+            Position = new Position(lat, lng)
+        };
     }
 }
