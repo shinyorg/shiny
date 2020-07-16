@@ -70,6 +70,13 @@ namespace Shiny.Generators.Generators
         }
 
 
+        static void RegisterAllDelegate(SourceGeneratorContext context, string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall, bool registerFirstOnModule)
+        {
+            //var impls = context.GetAllImplementationsOfType(delegateTypeName).WhereNotSystem();
+
+            
+        }
+
         static void RegisterJobs(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
             var jobTypes = context.GetAllImplementationsOfType<IJob>();
