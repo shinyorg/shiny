@@ -16,6 +16,7 @@ namespace Shiny.Generators.Generators.iOS
             
             var appDelegates = context
                 .GetAllDerivedClassesForType("UIKit.UIApplicationDelegate")
+                .WhereNotSystem()
                 .ToList();
 
             //System.Diagnostics.Debugger.Launch();
@@ -48,9 +49,3 @@ namespace Shiny.Generators.Generators.iOS
         }
     }
 }
-//public override bool FinishedLaunching(UIApplication app, NSDictionary options)
-//{
-//    // this needs to be loaded before EVERYTHING
-//    this.ShinyFinishedLaunching(new SampleStartup());
-//    return base.FinishedLaunching(app, options);
-//}

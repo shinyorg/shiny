@@ -9,6 +9,9 @@ namespace Shiny.Generators.Generators
 {
     public static class AutoStartupSourceGenerator
     {
+        public static bool IsGenerated { get; private set; }
+
+
         public static void Execute(SourceGeneratorContext context)
         {
             //System.Diagnostics.Debugger.Launch();
@@ -21,6 +24,7 @@ namespace Shiny.Generators.Generators
             }
             log.Info("Generating Shiny Startup");
 
+            IsGenerated = true;
             var nameSpace = context.GetProjectInstance().GetPropertyValue("RootNamespace");
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
@@ -60,6 +64,14 @@ namespace Shiny.Generators.Generators
                         RegisterStartupTasks(context, builder);
                         RegisterModules(context, builder);
                     }
+                    
+                    if (context.HasXamarinForms())
+                    {
+                        using (builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
+                        {
+                            builder.AppendFormatInvariant("Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
+                        }
+                    }
                 },
                 nameSpace, 
                 "AppShinyStartup", 
@@ -67,6 +79,7 @@ namespace Shiny.Generators.Generators
             );
 
             context.AddCompilationUnit("AppShinyStartup", builder.ToString());
+            // TODO: inject into XF  DependencyResolver.ResolveUsing(t => ShinyHost.Container.GetService(t));
         }
 
 
@@ -79,10 +92,10 @@ namespace Shiny.Generators.Generators
 
         static void RegisterJobs(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
-            var jobTypes = context.GetAllImplementationsOfType<IJob>();
+            var jobTypes = context.GetAllImplementationsOfType<IJob>().WhereNotSystem();
 
             foreach (var type in jobTypes)
-                builder.AppendLine($"services.RegisterJob(typeof({type.ToDisplayString()}));");
+                builder.AppendLineInvariant($"services.RegisterJob(typeof({type.ToDisplayString()}));");
         }
 
 
@@ -90,19 +103,20 @@ namespace Shiny.Generators.Generators
         {
             var types = context
                 .GetAllImplementationsOfType<IShinyStartupTask>()
+                .WhereNotSystem()
                 .Where(x => x.AllInterfaces.Length == 1);
 
             foreach (var task in types)
-                builder.AppendLine($"services.AddSingleton<Shiny.IShinyStartupTask, {task.ToDisplayString()}>();");
+                builder.AppendLineInvariant($"services.AddSingleton<Shiny.IShinyStartupTask, {task.ToDisplayString()}>();");
         }
 
 
         static void RegisterModules(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
-            var types = context.GetAllImplementationsOfType<IShinyModule>();
+            var types = context.GetAllImplementationsOfType<IShinyModule>().WhereNotSystem();
 
             foreach (var type in types)
-                builder.AppendLine($"services.RegisterModule<{type.ToDisplayString()}>();");
+                builder.AppendLineInvariant($"services.RegisterModule<{type.ToDisplayString()}>();");
         }
 
 

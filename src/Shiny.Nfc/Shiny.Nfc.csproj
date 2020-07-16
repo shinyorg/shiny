@@ -1,4 +1,4 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <VersionSuffix>beta</VersionSuffix>
@@ -10,20 +10,24 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
+        <ProjectReference Include="..\Shiny.Nfc.Abstractions\Shiny.Nfc.Abstractions.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\iOS\**\*.cs" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Android\**\*.cs" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
 </Project>
