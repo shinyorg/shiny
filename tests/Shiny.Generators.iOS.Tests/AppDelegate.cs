@@ -4,11 +4,14 @@ using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 
+[assembly: Shiny.Generators.GenerateStartup]
+//[assembly: Shiny.Generators.GenerateStaticClasses]
+
 
 namespace Shiny.Generators.iOS.Tests
 {
-    [Register("AppDelegate")]
-    public partial class AppDelegate : FormsApplicationDelegate
+    [Register("MyAppDelegate")]
+    public partial class MyAppDelegate : FormsApplicationDelegate
     {
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
@@ -22,5 +25,10 @@ namespace Shiny.Generators.iOS.Tests
             //this.LoadApplication(new App());
             return base.FinishedLaunching(app, options);
         }
+
+
+        //public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
+        //{
+        //}
     }
 }

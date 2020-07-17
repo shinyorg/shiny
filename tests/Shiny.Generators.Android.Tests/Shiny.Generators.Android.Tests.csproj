@@ -61,6 +61,10 @@
     <Folder Include="Resources\drawable\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Shiny.Beacons.Abstractions\Shiny.Beacons.Abstractions.csproj">
+      <Project>{648bf88d-99fe-4903-9198-20605fcaeee0}</Project>
+      <Name>Shiny.Beacons.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">
       <Project>{b2e9f094-425f-4899-a979-338c940a917b}</Project>
       <Name>Shiny.Beacons</Name>

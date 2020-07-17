@@ -41,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +49,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Abstractions\Shiny.BluetoothLE.Abstractions.csproj">
+      <Project>{da478932-1a44-4c35-988c-3f47cbc504c1}</Project>
+      <Name>Shiny.BluetoothLE.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
       <Project>{007465d6-5714-4e7e-929d-6f01d04e43b6}</Project>
       <Name>Shiny.BluetoothLE</Name>

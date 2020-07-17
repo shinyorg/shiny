@@ -40,11 +40,11 @@ namespace Shiny.Generators.Generators
                     {
                         builder.AppendLineInvariant("this.CustomConfigureServices(services);");
 
-                        context.RegisterIf(builder, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
-                        context.RegisterIf(builder, "Shiny.Nfc.INfcManager", "services.UseNfc();");
-                        context.RegisterIf(builder, "Shiny.Sensors.IAccelerometer", "services.UseAllSensors();");
-                        context.RegisterIf(builder, "Shiny.SpeechRecognition.ISpeechRecognizer", "services.UseSpeechRecognition();");
-                        context.RegisterIf(builder, "Shiny.Locations.IGpsManager", "services.UseMotionActivity();");
+                        RegisterIf(context, builder, "Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
+                        RegisterIf(context, builder, "Shiny.Nfc.INfcManager", "services.UseNfc();");
+                        RegisterIf(context, builder, "Shiny.Sensors.IAccelerometer", "services.UseAllSensors();");
+                        RegisterIf(context, builder, "Shiny.SpeechRecognition.ISpeechRecognizer", "services.UseSpeechRecognition();");
+                        RegisterIf(context, builder, "Shiny.Locations.IGpsManager", "services.UseMotionActivity();");
 
                         RegisterAllDelegate(context, builder, "Shiny.Locations.IGpsDelegate", "services.UseGps", false);
                         RegisterAllDelegate(context, builder, "Shiny.Locations.IGeofenceDelegate", "services.UseGeofencing", true);
@@ -81,8 +81,23 @@ namespace Shiny.Generators.Generators
         }
 
 
+        static void RegisterIf(SourceGeneratorContext context, IndentedStringBuilder builder, string typeNameExists, string registerString)
+        {
+            var symbol = context.Compilation.GetTypeByMetadataName(typeNameExists);
+            if (symbol != null)
+            {
+                context.GetLogger().Info("Registering in Shiny Startup - " + registerString);
+                builder.AppendLineInvariant(registerString);
+            }
+        }
+
+
         static void RegisterAllDelegate(SourceGeneratorContext context, IIndentedStringBuilder builder, string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
         {
+            var symbol = context.Compilation.GetTypeByMetadataName(delegateTypeName);
+            if (symbol == null)
+                return;
+
             var impls = context
                 .GetAllImplementationsOfType(delegateTypeName)
                 .WhereNotSystem()
@@ -148,7 +163,9 @@ namespace Shiny.Generators.Generators
 
         static void RegisterModules(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
-            var types = context.GetAllImplementationsOfType<IShinyModule>().WhereNotSystem();
+            var types = context
+                .GetAllImplementationsOfType<IShinyModule>()
+                .WhereNotSystem();
 
             foreach (var type in types)
                 builder.AppendLineInvariant($"services.RegisterModule<{type.ToDisplayString()}>();");

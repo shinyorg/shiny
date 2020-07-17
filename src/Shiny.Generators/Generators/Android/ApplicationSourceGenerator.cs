@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Linq;
-
-using Microsoft.CodeAnalysis;
-
 using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
 
@@ -20,26 +16,12 @@ namespace Shiny.Generators.Generators.Android
             if (appClass == null)
                 return;
 
-            // TODO: log error if application already exists?
-            var startupClasses = context
-                .GetAllImplementationsOfType<IShinyStartup>()
-                .ToList();
+            // TODO: log error if android application already exists? only gen it if there isn't an existing one?
 
-            INamedTypeSymbol? startupClass = null;
-            switch (startupClasses.Count)
-            {
-                case 0:
-                    log.Warn("No Shiny Startup implementation found");
-                    return;
-                
-                case 1:
-                    startupClass = startupClasses.First();
-                    break;
-
-                default:
-                    log.Error(startupClasses.Count + " Shiny Startup implementations found");
-                    return;
-            }
+            System.Diagnostics.Debugger.Launch();
+            var startupClass = context.GetShinyStartupSymbol();
+            if (startupClass == null)
+                return;
 
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Runtime");

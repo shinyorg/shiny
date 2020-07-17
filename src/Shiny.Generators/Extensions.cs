@@ -15,8 +15,16 @@ namespace Shiny.Generators
         //public static bool HasShinyCore(this SourceGeneratorContext context)
         //    => context.Compilation.GetTypeByMetadataName("Shiny.ShinyHost") != null;
 
+        public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
+            symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
+
+
+        public static bool HasMethod(this INamedTypeSymbol symbol, string methodName)
+            => symbol.GetTypeMembers(methodName).OfType<IMethodSymbol>().Any();
+
         public static bool HasXamarinForms(this SourceGeneratorContext context)
             => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
+
 
         public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName) 
         {
@@ -47,17 +55,6 @@ namespace Shiny.Generators
             }
             s = s.TrimEnd(',', ' ');
             return s;
-        }
-
-
-        public static void RegisterIf(this SourceGeneratorContext context, IndentedStringBuilder builder, string typeNameExists, string registerString)
-        {
-            var symbol = context.Compilation.GetTypeByMetadataName(typeNameExists);
-            if (symbol != null)
-            {
-                context.GetLogger().Info("Registering in Shiny Startup - " + registerString);
-                builder.AppendLineInvariant(registerString);
-            }
         }
 
 
@@ -129,23 +126,6 @@ namespace Shiny.Generators
         }
 
 
-        //public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName)
-        //{
-        //    context
-        //        .Compilation
-        //        .SyntaxTrees
-        //        .Select(x => context.Compilation.GetSemanticModel(x))
-        //        .SelectMany(x => x
-        //            .SyntaxTree
-        //            .GetRoot()
-        //            .DescendantNodes()
-        //            .Select(y => y.GetDeclaredSymbol(x))
-        //        )
-        //        .OfType<INamedTypeSymbol>()
-        //        .Where(x => x.GetBaseTypes().Where(y => y.I));
-        //}
-
-
         public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName)
         {
             var symbol = context.Compilation.GetTypeByMetadataName(typeName);
@@ -155,6 +135,36 @@ namespace Shiny.Generators
             var result = SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution).Result;
             return result;
         }
+
+
+        public static INamedTypeSymbol? GetShinyStartupSymbol(this SourceGeneratorContext context)
+        {
+            var log = context.GetLogger();
+
+            var startupClasses = context
+                .GetAllImplementationsOfType<IShinyStartup>()
+                .WhereNotSystem()
+                .ToList();
+
+            System.Diagnostics.Debugger.Launch();
+            INamedTypeSymbol? startupClass = null;
+            switch (startupClasses.Count)
+            {
+                case 0:
+                    log.Warn("No Shiny Startup implementation found");
+                    break;
+
+                case 1:
+                    startupClass = startupClasses.First();
+                    break;
+
+                default:
+                    log.Warn(startupClasses.Count + " Shiny Startup implementations found");
+                    break;
+            }
+            return startupClass;
+        }
+
 
         public static IEnumerable<INamedTypeSymbol> WhereNotInAssembly(this IEnumerable<INamedTypeSymbol> en, params string[] names) 
             => en.Where(x => !names.Any(y => x.ContainingAssembly.Name.StartsWith(y, StringComparison.OrdinalIgnoreCase)));
