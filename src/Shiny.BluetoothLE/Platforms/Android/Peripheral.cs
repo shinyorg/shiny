@@ -4,7 +4,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
-using System.Threading.Tasks;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
 
@@ -74,26 +73,28 @@ namespace Shiny.BluetoothLE
                 .Merge(this.connSubject);
 
 
-        public override IObservable<IGattService> DiscoverServices()
-            => Observable.Create<IGattService>(ob =>
+        public override IObservable<IGattService> DiscoverServices() => Observable.Create<IGattService>(ob =>
+        {
+            this.AssertConnection();
+
+            var sub = this.context.Callbacks.ServicesDiscovered.Subscribe(cb =>
             {
-                this.AssertConnection();
+                if (cb.Gatt?.Services == null)
+                    return;
 
-                var sub = this.context.Callbacks.ServicesDiscovered.Subscribe(cb =>
+                foreach (var ns in cb.Gatt.Services)
                 {
-                    foreach (var ns in cb.Gatt.Services)
-                    {
-                        var service = new GattService(this, this.context, ns);
-                        ob.OnNext(service);
-                    }
-                    ob.OnCompleted();
-                });
-
-                //this.context.RefreshServices();
-                this.context.Gatt.DiscoverServices();
-
-                return sub;
+                    var service = new GattService(this, this.context, ns);
+                    ob.OnNext(service);
+                }
+                ob.OnCompleted();
             });
+
+            //this.context.RefreshServices();
+            this.context.Gatt.DiscoverServices();
+
+            return sub;
+        });
 
 
         public override IObservable<int> ReadRssi() => Observable.Create<int>(ob =>

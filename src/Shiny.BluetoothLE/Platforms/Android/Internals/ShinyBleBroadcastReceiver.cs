@@ -7,7 +7,7 @@ using Android.Content;
 namespace Shiny.BluetoothLE.Internals
 {
     [BroadcastReceiver(
-        Name = CentralManager.BroadcastReceiverName,
+        Name = BleManager.BroadcastReceiverName,
         Enabled = true,
         Exported = true
     )]
@@ -18,9 +18,9 @@ namespace Shiny.BluetoothLE.Internals
         BluetoothDevice.ActionNameChanged,
         BluetoothDevice.ActionPairingRequest
     })]
-    public class ShinyBleCentralBroadcastReceiver : BroadcastReceiver
+    public class ShinyBleBroadcastReceiver : BroadcastReceiver
     {
-        readonly Lazy<CentralContext> context = new Lazy<CentralContext>(() => ShinyHost.Resolve<CentralContext>());
+        readonly Lazy<CentralContext> context = ShinyHost.LazyResolve<CentralContext>();
 
 
         public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
