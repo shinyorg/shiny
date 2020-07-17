@@ -4,7 +4,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
-
+using System.Reactive.Subjects;
+using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE
 {
@@ -26,17 +27,23 @@ namespace Shiny.BluetoothLE
 
 
         public override IObservable<IGattCharacteristic> DiscoverCharacteristics()
-            => Observable.Create<IGattCharacteristic>(ob =>
+        {
+            var discoverCharacteristics = new Subject<IGattCharacteristic>();
+            Task.Run(() =>
             {
-                foreach (var nch in this.native.Characteristics)
+                try
                 {
-                    var wrap = new GattCharacteristic(this, this.context, nch);
-                    ob.OnNext(wrap);
+                    foreach (var characteristic in this.native.Characteristics)
+                    {
+                        var wrap = new GattCharacteristic(this, this.context, characteristic);
+                        discoverCharacteristics.OnNext(wrap);
+                    }
+                    discoverCharacteristics.OnCompleted();
                 }
-                ob.OnCompleted();
-                return Disposable.Empty;
+                catch (Exception ex) { discoverCharacteristics.OnError(ex); }
             });
-
+            return discoverCharacteristics.AsObservable();
+        }
 
         public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
             => Observable.Create<IGattCharacteristic>(ob =>

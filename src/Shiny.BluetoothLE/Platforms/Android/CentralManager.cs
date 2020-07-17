@@ -50,7 +50,6 @@ namespace Shiny.BluetoothLE
                 .GetConnectedDevices(ProfileType.Gatt)
                 .Select(this.context.GetDevice));
 
-
         public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async () =>
         {
             var result = await this.context.Android.RequestAccess(Manifest.Permission.AccessCoarseLocation);
@@ -89,7 +88,7 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals()
+        public override IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals()
             => Observable.Return(this.context
                 .Manager
                 .Adapter
