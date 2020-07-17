@@ -1,15 +1,17 @@
 ﻿using System;
 using Shiny.Testing;
+using Xunit;
 
 
 namespace Shiny.Generators.Tests
 {
     public class TestFixture
     {
-        public void Test()
+        [Fact]
+        public void DidGenerate()
         {
             TestShinyHost.Init(new AppShinyStartup());
-            TestShinyHost.Resolve<>()
+            //TestShinyHost.Resolve<>()
             // ensure registrations
         }
     }
