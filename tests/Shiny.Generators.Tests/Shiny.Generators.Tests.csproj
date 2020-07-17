@@ -39,6 +39,7 @@
         <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
         <ProjectReference Include="..\..\src\Shiny.TripTracker\Shiny.TripTracker.csproj" />
     </ItemGroup>
 </Project>

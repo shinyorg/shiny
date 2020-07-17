@@ -111,7 +111,15 @@ namespace Shiny.Generators.Generators
 
         static void RegisterInjects(SourceGeneratorContext context, IndentedStringBuilder builder)
         {
-            //context.Compilation.Assembly
+            var attribute = context.Compilation.GetTypeByMetadataName("Shiny.Generators.ShinyInjectAttribute");
+            var injects = context.Compilation.Assembly.GetAllAttributes().Where(x => x.AttributeClass.Equals(attribute));
+
+            foreach (var inject in injects)
+            {
+                var type1 = (INamedTypeSymbol)inject.ConstructorArguments[0].Value;
+                var type2 = (INamedTypeSymbol)inject.ConstructorArguments[1].Value;
+                builder.AppendLineInvariant($"services.AddSingleton<{type1.ToDisplayString()}, {type2.ToDisplayString()}>();");
+            }
         }
 
 

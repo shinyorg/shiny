@@ -87,6 +87,13 @@ namespace Shiny
         }
 
 
+        protected static void Destroy()
+        {
+            container = null;
+            Services?.Clear();
+            PostBuildActions?.Clear();
+        }
+
         /// <summary>
         /// Setting this before calling build will force the internal service builder to validate scopes of DI registrations (THIS IS SLOW - USE IT FOR DEBUGGING)
         /// </summary>

@@ -52,7 +52,6 @@ namespace Shiny.Generators.Generators
             BuildStaticClass(context, "Shiny.Sensors.IPedometer", "ShinyPedometer", "Shiny.Sensors");
             BuildStaticClass(context, "Shiny.Sensors.IProximity", "ShinyProximity", "Shiny.Sensors");
             BuildStaticClass(context, "Shiny.Sensors.ITemperature", "ShinyTemperature", "Shiny.Sensors");
-
         }
 
 
