@@ -5,10 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny.BluetoothLE
 {
-    public class BleCentralShinyModule : ShinyModule
+    public class BleShinyModule : ShinyModule
     {
         readonly BleConfiguration config;
-        public BleCentralShinyModule(BleConfiguration config) => this.config = config ?? new BleConfiguration();
+        public BleShinyModule(BleConfiguration config) => this.config = config ?? new BleConfiguration();
 
 
         public override void Register(IServiceCollection services)
@@ -19,7 +19,7 @@ namespace Shiny.BluetoothLE
 #else
             services.AddSingleton<CentralContext>();
 #endif
-            services.AddSingleton<IBleManager, CentralManager>();
+            services.AddSingleton<IBleManager, BleManager>();
         }
     }
 }

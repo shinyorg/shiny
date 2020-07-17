@@ -26,24 +26,16 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IGattCharacteristic> DiscoverCharacteristics()
+        public override IObservable<IGattCharacteristic> DiscoverCharacteristics() => Observable.Create<IGattCharacteristic>(ob =>
         {
-            var discoverCharacteristics = new Subject<IGattCharacteristic>();
-            Task.Run(() =>
+            foreach (var characteristic in this.native.Characteristics)
             {
-                try
-                {
-                    foreach (var characteristic in this.native.Characteristics)
-                    {
-                        var wrap = new GattCharacteristic(this, this.context, characteristic);
-                        discoverCharacteristics.OnNext(wrap);
-                    }
-                    discoverCharacteristics.OnCompleted();
-                }
-                catch (Exception ex) { discoverCharacteristics.OnError(ex); }
-            });
-            return discoverCharacteristics.AsObservable();
-        }
+                var wrap = new GattCharacteristic(this, this.context, characteristic);
+                ob.OnNext(wrap);
+            }
+            ob.OnCompleted();
+            return Disposable.Empty;
+        });
 
         public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
             => Observable.Create<IGattCharacteristic>(ob =>

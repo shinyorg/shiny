@@ -1,11 +1,13 @@
 using System;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
+using System.Threading.Tasks;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
-using Android.Media;
-using Android.Content.Res;
+
 
 namespace Shiny.BluetoothLE
 {
@@ -119,45 +121,46 @@ namespace Shiny.BluetoothLE
             new GattReliableWriteTransaction(this.context);
 
 
-        public IObservable<bool> PairingRequest(PairingConfiguration? configuration = null) => Observable.Create<bool>(ob =>
+        public IObservable<bool> PairingRequest(string? pin = null) => Observable.Create<bool>(ob =>
         {
-            IDisposable? sub = null;
-            IDisposable pairingRequestSubscription = null;
+            var disp = new CompositeDisposable();
+
             if (this.PairingStatus == PairingState.Paired)
             {
                 ob.Respond(true);
             }
             else
             {
-                sub = this.context
+                disp.Add(this.context
                     .CentralContext
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
                     .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
-                    .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired));
-                pairingRequestSubscription = this.context
-                    .CentralContext
-                    .ListenForMe(BluetoothDevice.ActionPairingRequest, this)
-                    .OfType<Peripheral>()
-                    .Subscribe((p) => 
-                    {
-                        if(!string.IsNullOrEmpty(configuration?.Pin))
-                        {
-                            p.context.NativeDevice.SetPin(System.Text.Encoding.ASCII.GetBytes(configuration?.Pin) );
-                        }
-                    }, (ex)=>pairingRequestSubscription?.Dispose(), ()=>pairingRequestSubscription?.Dispose());
-                // execute
+                    .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired))
+                );
+
+                if (!pin.IsEmpty())
+                {
+                    var pinBytes = Encoding.ASCII.GetBytes(pin);
+
+                    disp.Add(this.context
+                        .CentralContext
+                        .ListenForMe(BluetoothDevice.ActionPairingRequest, this)
+                        .OfType<Peripheral>()
+                        .Subscribe(
+                            x => this.Native.SetPin(pinBytes),
+                            ob.OnError
+                        )
+                    );
+                }
+
                 if (!this.context.NativeDevice.CreateBond())
                     ob.Respond(false);
             }
-            return () =>
-            {
-                sub?.Dispose();
-                pairingRequestSubscription?.Dispose();
-            };
+            return disp;
         });
 
 
-        public override PairingState PairingStatus
+        public PairingState PairingStatus
         {
             get
             {

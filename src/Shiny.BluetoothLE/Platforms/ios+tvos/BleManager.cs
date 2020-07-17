@@ -7,15 +7,10 @@ using CoreBluetooth;
 
 namespace Shiny.BluetoothLE
 {
-    public class CentralManager : AbstractBleManager
+    public class BleManager : AbstractBleManager
     {
         readonly CentralContext context;
-
-
-        public CentralManager(CentralContext context)
-        {
-            this.context = context;
-        }
+        public BleManager(CentralContext context) => this.context = context;
 
 
         public override bool IsScanning => this.context.Manager.IsScanning;

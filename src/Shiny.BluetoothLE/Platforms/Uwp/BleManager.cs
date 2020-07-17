@@ -11,9 +11,9 @@ using Windows.Devices.Enumeration;
 
 namespace Shiny.BluetoothLE
 {
-    public class CentralManager : AbstractBleManager,
-                                  ICanControlAdapterState,
-                                  ICanSeePairedPeripherals
+    public class BleManager : AbstractBleManager,
+                              ICanControlAdapterState,
+                              ICanSeePairedPeripherals
     {
         readonly CentralContext context;
         readonly Subject<bool> scanSubject;
@@ -21,7 +21,7 @@ namespace Shiny.BluetoothLE
         Radio radio;
 
 
-        public CentralManager(CentralContext context)
+        public BleManager(CentralContext context)
         {
             this.scanSubject = new Subject<bool>();
             this.context = context;

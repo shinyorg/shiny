@@ -21,8 +21,6 @@ namespace Shiny.BluetoothLE
         /// <value>The status.</value>
         ConnectionState Status { get; }
 
-        PairingState PairingStatus { get; }
-
         /// <summary>
         /// Connect to a peripheral
         /// </summary>

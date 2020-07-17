@@ -9,22 +9,17 @@ using Android.Bluetooth;
 
 namespace Shiny.BluetoothLE
 {
-    public class CentralManager : AbstractBleManager,
-                                  ICanControlAdapterState,
-                                  ICanSeePairedPeripherals
+    public class BleManager : AbstractBleManager,
+                              ICanControlAdapterState,
+                              ICanSeePairedPeripherals
     {
         public const string BroadcastReceiverName = "com.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
 
         readonly CentralContext context;
+        public BleManager(CentralContext context) => this.context = context;
+
+
         bool isScanning;
-
-
-        public CentralManager(CentralContext context)
-        {
-            this.context = context;
-        }
-
-
         public override bool IsScanning => this.isScanning;
 
 
@@ -50,6 +45,7 @@ namespace Shiny.BluetoothLE
                 .GetConnectedDevices(ProfileType.Gatt)
                 .Select(this.context.GetDevice));
 
+
         public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async () =>
         {
             var result = await this.context.Android.RequestAccess(Manifest.Permission.AccessCoarseLocation);
@@ -66,7 +62,7 @@ namespace Shiny.BluetoothLE
             .StartWith(this.Status);
 
 
-        public override IObservable<ScanResult> Scan(ScanConfig config)
+        public override IObservable<ScanResult> Scan(ScanConfig? config = null)
         {
             if (this.IsScanning)
                 throw new ArgumentException("There is already an active scan");
@@ -88,13 +84,13 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals()
-            => Observable.Return(this.context
-                .Manager
-                .Adapter
-                .BondedDevices
-                .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le)
-                .Select(this.context.GetDevice));
+        public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => Observable.Return(this.context
+            .Manager
+            .Adapter
+            .BondedDevices
+            .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le)
+            .Select(this.context.GetDevice)
+        );
 
 
         public void SetAdapterState(bool enable)
