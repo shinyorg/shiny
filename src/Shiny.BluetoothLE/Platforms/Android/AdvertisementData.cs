@@ -15,6 +15,9 @@ namespace Shiny.BluetoothLE
 
             this.manufacturerData = new Lazy<ManufacturerData?>(() =>
             {
+                if (this.result.ScanRecord.ManufacturerSpecificData == null || this.result.ScanRecord.ManufacturerSpecificData.Size() == 0)
+                    return null;
+
                 var manufacturerId = (ushort)this.result.ScanRecord.ManufacturerSpecificData.KeyAt(0);
                 if (manufacturerId == 0)
                     return null;
