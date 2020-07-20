@@ -167,9 +167,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Printers.BluetoothLE"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Generators", "Generators", "{013B19D3-3307-4585-871F-DC45197017C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Nfc.Abstractions", "src\Shiny.Nfc.Abstractions\Shiny.Nfc.Abstractions.csproj", "{120B2B96-9BB5-4B5E-9EF4-F1C126ED679F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Nfc.Abstractions", "src\Shiny.Nfc.Abstractions\Shiny.Nfc.Abstractions.csproj", "{120B2B96-9BB5-4B5E-9EF4-F1C126ED679F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.SpeechRecognition.Abstractions", "src\Shiny.SpeechRecognition.Abstractions\Shiny.SpeechRecognition.Abstractions.csproj", "{ED20316B-3CB8-4311-BBE8-DAC81B41E3A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.SpeechRecognition.Abstractions", "src\Shiny.SpeechRecognition.Abstractions\Shiny.SpeechRecognition.Abstractions.csproj", "{ED20316B-3CB8-4311-BBE8-DAC81B41E3A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
