@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE
 {
@@ -36,12 +36,12 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public static IObservable<bool>? TryPairingRequest(this IPeripheral peripheral, string? pin = null)
+        public static IObservable<bool?> TryPairingRequest(this IPeripheral peripheral, string? pin = null)
         {
             if (peripheral is ICanPairPeripherals pair)
-                return pair.PairingRequest(pin);
+                return pair.PairingRequest(pin).Select(x => (bool?)x);
 
-            return null;
+            return Observable.Return<bool?>(null);
         }
     }
 }

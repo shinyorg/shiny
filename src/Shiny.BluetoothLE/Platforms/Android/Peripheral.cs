@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Text;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
 
@@ -135,9 +134,12 @@ namespace Shiny.BluetoothLE
             else
             {
                 PairingRequestPin = pin;
-                disp.Add(this.WhenConnected().Subscribe(x => ob.Respond(true)));
 
-                // if getting an ACL_CONNECTED after a pairing request, pair is good?
+                disp.Add(this.context
+                    .CentralContext
+                    .ListenForMe(ShinyBleBroadcastReceiver.BlePairingFailed, this)
+                    .Subscribe(_ => ob.Respond(false))
+                );
                 disp.Add(this.context
                     .CentralContext
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
@@ -154,7 +156,7 @@ namespace Shiny.BluetoothLE
             }
             return () =>
             {
-                PairingRequestPin = null;
+                //PairingRequestPin = null;
                 disp.Dispose();
             };
         });

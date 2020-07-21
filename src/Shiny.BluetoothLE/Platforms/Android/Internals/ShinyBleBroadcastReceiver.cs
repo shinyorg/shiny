@@ -23,6 +23,7 @@ namespace Shiny.BluetoothLE.Internals
     public class ShinyBleBroadcastReceiver : BroadcastReceiver
     {
         readonly Lazy<CentralContext> shinyContext = ShinyHost.LazyResolve<CentralContext>();
+        public static string BlePairingFailed = nameof(BlePairingFailed);
 
 
         public override void OnReceive(Context context, Intent intent)
@@ -37,11 +38,31 @@ namespace Shiny.BluetoothLE.Internals
 
                     try
                     {
+                        Logging.Log.Write("BlePairing", "Will attempt to auto-pair");
+
                         var pin = this.shinyContext.Value.GetPairingPinRequestForDevice(device);
-                        if (!pin.IsEmpty() && device.SetPin(Encoding.UTF8.GetBytes(pin)))
+                        if (!pin.IsEmpty())
                         {
-                            device.SetPairingConfirmation(true);
-                            this.InvokeAbortBroadcast();
+                            
+                        }
+                        else
+                        { 
+                            Logging.Log.Write("BlePairing", "Sending PIN " + pin);
+                            var bytes = Encoding.UTF8.GetBytes(pin);
+                            if (!device.SetPin(bytes))
+                            {
+                                Logging.Log.Write("BlePairing", "Auto-Pairing PIN failed");
+
+                                this.shinyContext.Value.DeviceEvent(BlePairingFailed, device);
+                            }
+                            else
+                            {
+                                Logging.Log.Write("BlePairing", "Auto-Pairing PIN was sent successfully apparently");
+                                this.InvokeAbortBroadcast();
+                                device.SetPairingConfirmation(true);
+
+                                this.shinyContext.Value.DeviceEvent(BluetoothDevice.ActionBondStateChanged, device);
+                            }
                         }
                     }
                     catch (Exception ex)
