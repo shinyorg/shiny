@@ -26,6 +26,7 @@ namespace Shiny.BluetoothLE
         public static bool CanViewPairedPeripherals(this IBleManager centralManager) => centralManager is ICanSeePairedPeripherals;
         public static bool IsPairingRequestsAvailable(this IPeripheral peripheral) => peripheral is ICanPairPeripherals;
 
+
         public static PairingState? TryGetPairingStatus(this IPeripheral peripheral)
         {
             if (peripheral is ICanPairPeripherals pair)
@@ -35,7 +36,7 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public static IObservable<bool>? PairingRequest(this IPeripheral peripheral, string? pin = null)
+        public static IObservable<bool>? TryPairingRequest(this IPeripheral peripheral, string? pin = null)
         {
             if (peripheral is ICanPairPeripherals pair)
                 return pair.PairingRequest(pin);

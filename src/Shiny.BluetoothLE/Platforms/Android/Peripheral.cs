@@ -118,6 +118,8 @@ namespace Shiny.BluetoothLE
         });
 
 
+        internal string? PairingRequestPin { get; set; }
+
         public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
             new GattReliableWriteTransaction(this.context);
 
@@ -132,32 +134,29 @@ namespace Shiny.BluetoothLE
             }
             else
             {
+                PairingRequestPin = pin;
+                disp.Add(this.WhenConnected().Subscribe(x => ob.Respond(true)));
+
+                // if getting an ACL_CONNECTED after a pairing request, pair is good?
                 disp.Add(this.context
                     .CentralContext
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
                     .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
-                    .Subscribe(x => ob.Respond(this.PairingStatus == PairingState.Paired))
+                    .Subscribe(x =>
+                    {
+                        var result = this.PairingStatus == PairingState.Paired;
+                        ob.Respond(result);
+                    })
                 );
-
-                if (!pin.IsEmpty())
-                {
-                    var pinBytes = Encoding.ASCII.GetBytes(pin);
-
-                    disp.Add(this.context
-                        .CentralContext
-                        .ListenForMe(BluetoothDevice.ActionPairingRequest, this)
-                        .OfType<Peripheral>()
-                        .Subscribe(
-                            x => this.Native.SetPin(pinBytes),
-                            ob.OnError
-                        )
-                    );
-                }
 
                 if (!this.context.NativeDevice.CreateBond())
                     ob.Respond(false);
             }
-            return disp;
+            return () =>
+            {
+                PairingRequestPin = null;
+                disp.Dispose();
+            };
         });
 
 

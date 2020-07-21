@@ -65,22 +65,36 @@ namespace Shiny.BluetoothLE.Internals
                 return;
             }
             this.peripheralSubject.OnNext(new NamedMessage<Peripheral>(eventName, peripheral));
-            //case BluetoothDevice.ActionAclConnected:
-            //case BluetoothDevice.ActionAclDisconnected:
-            //case BluetoothDevice.ActionBondStateChanged:
-            //case BluetoothDevice.ActionNameChanged:
-            //case BluetoothDevice.ActionPairingRequest:
         }
 
 
         public IObservable<IPeripheral> ListenForMe(string eventName, Peripheral me) => this
             .peripheralSubject
             .Where(x =>
-                x.Name.Equals(eventName) &&
-                x.Arg.Native.Address.Equals(me.Native.Address)
-            )
+            {
+                if (!x.Arg.Native.Address.Equals(me.Native.Address))
+                    return false;
+
+                if (!x.Name.Equals(eventName, StringComparison.CurrentCultureIgnoreCase))
+                    return false;
+
+                return true;
+            })
             .Select(x => x.Arg);
 
+
+        public string? GetPairingPinRequestForDevice(BluetoothDevice device)
+        {
+            string? pin = null;
+            var p = this.GetDevice(device);
+            if (p != null)
+            {
+                pin = p.PairingRequestPin;
+                p.PairingRequestPin = null;
+            }
+            return pin;
+        }
+            
 
         public Peripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(
             btDevice.Address,
@@ -171,7 +185,6 @@ namespace Shiny.BluetoothLE.Internals
         {
             switch (scanType)
             {
-                //case BleScanType.Background:
                 case BleScanType.LowPowered:
                     return ScanMode.LowPower;
 
