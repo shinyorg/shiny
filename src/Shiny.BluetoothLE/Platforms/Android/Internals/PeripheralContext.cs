@@ -14,13 +14,13 @@ using Exception = System.Exception;
 
 namespace Shiny.BluetoothLE.Internals
 {
-    public class DeviceContext
+    public class PeripheralContext
     {
         readonly Subject<BleException> connErrorSubject;
         CancellationTokenSource? cancelSrc;
 
 
-        public DeviceContext(CentralContext context, BluetoothDevice device)
+        public PeripheralContext(CentralContext context, BluetoothDevice device)
         {
             this.CentralContext = context;
             this.NativeDevice = device;

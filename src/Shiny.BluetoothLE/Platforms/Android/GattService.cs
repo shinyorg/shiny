@@ -11,12 +11,12 @@ namespace Shiny.BluetoothLE
 {
     public class GattService : AbstractGattService
     {
-        readonly DeviceContext context;
+        readonly PeripheralContext context;
         readonly BluetoothGattService native;
 
 
         public GattService(IPeripheral peripheral,
-                           DeviceContext context,
+                           PeripheralContext context,
                            BluetoothGattService native) : base(peripheral,
                                                                native.Uuid.ToGuid(),
                                                                native.Type == GattServiceType.Primary)

@@ -15,13 +15,13 @@ namespace Shiny.BluetoothLE
     {
         static readonly UUID NotifyDescriptorId = UUID.FromString("00002902-0000-1000-8000-00805f9b34fb");
         readonly BluetoothGattCharacteristic native;
-        readonly DeviceContext context;
+        readonly PeripheralContext context;
         IObservable<CharacteristicGattResult>? notifyOb;
         IObservable<IGattDescriptor>? descriptorOb;
 
 
         public GattCharacteristic(IGattService service,
-                                  DeviceContext context,
+                                  PeripheralContext context,
                                   BluetoothGattCharacteristic native)
                             : base(service,
                                    native.Uuid.ToGuid(),
@@ -56,8 +56,8 @@ namespace Shiny.BluetoothLE
                 try
                 {
                     this.native.WriteType = withResponse ? GattWriteType.Default : GattWriteType.NoResponse;
-                    var authSignedWrite = 
-                        this.native.Properties.HasFlag(CharacteristicProperties.AuthenticatedSignedWrites) && 
+                    var authSignedWrite =
+                        this.native.Properties.HasFlag(CharacteristicProperties.AuthenticatedSignedWrites) &&
                         this.context.NativeDevice.BondState == Bond.Bonded;
 
                     if (authSignedWrite)
@@ -102,7 +102,7 @@ namespace Shiny.BluetoothLE
                 try
                 {
                     if (!this.context.Gatt?.ReadCharacteristic(this.native) ?? false)
-                        ob.OnError(new BleException("Failed to read characteristic"));
+                        throw new BleException("Failed to read characteristic");
                 }
                 catch (Exception ex)
                 {

@@ -8,10 +8,10 @@ namespace Shiny.BluetoothLE
 {
     public class GattReliableWriteTransaction : AbstractGattReliableWriteTransaction
     {
-        readonly DeviceContext context;
+        readonly PeripheralContext context;
 
 
-        public GattReliableWriteTransaction(DeviceContext context)
+        public GattReliableWriteTransaction(PeripheralContext context)
         {
             this.context = context;
             this.context.Gatt.BeginReliableWrite();

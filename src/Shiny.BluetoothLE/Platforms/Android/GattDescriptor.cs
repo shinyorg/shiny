@@ -9,11 +9,11 @@ namespace Shiny.BluetoothLE
     public class GattDescriptor : AbstractGattDescriptor
     {
         readonly BluetoothGattDescriptor native;
-        readonly DeviceContext context;
+        readonly PeripheralContext context;
 
 
         public GattDescriptor(IGattCharacteristic characteristic,
-                              DeviceContext context,
+                              PeripheralContext context,
                               BluetoothGattDescriptor native) : base(characteristic, native.Uuid.ToGuid())
         {
             this.context = context;

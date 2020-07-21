@@ -17,14 +17,14 @@ namespace Shiny.BluetoothLE
 
     {
         readonly Subject<ConnectionState> connSubject;
-        readonly DeviceContext context;
+        readonly PeripheralContext context;
 
 
         public Peripheral(CentralContext centralContext, BluetoothDevice native)
             : base(native.Name, ToDeviceId(native.Address))
         {
             this.connSubject = new Subject<ConnectionState>();
-            this.context = new DeviceContext(centralContext, native);
+            this.context = new PeripheralContext(centralContext, native);
         }
 
 
