@@ -177,10 +177,10 @@ namespace Shiny.BluetoothLE.Internals
         void CreateGatt(bool autoConnect)
         {
             var c = this.CentralContext.Android;
-            if (c.IsMinApiLevel(23))
-                this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks, BluetoothTransports.Le);
-            else
-                this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks);
+            this.Gatt = c.IsMinApiLevel(23)
+                //? this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks, BluetoothTransports.Le)
+                ? this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks, BluetoothTransports.Auto)
+                : this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks);
         }
 
         //void CreateGatt(bool autoConnect)
