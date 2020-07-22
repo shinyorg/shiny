@@ -16,37 +16,37 @@ namespace Shiny.BluetoothLE
 
     {
         readonly Subject<ConnectionState> connSubject;
-        readonly PeripheralContext context;
+        internal PeripheralContext Context { get; }
 
 
         public Peripheral(CentralContext centralContext, BluetoothDevice native)
             : base(native.Name, ToDeviceId(native.Address))
         {
             this.connSubject = new Subject<ConnectionState>();
-            this.context = new PeripheralContext(centralContext, native);
+            this.Context = new PeripheralContext(centralContext, native);
         }
 
 
-        public BluetoothDevice Native => this.context.NativeDevice;
-        public override ConnectionState Status => this.context.Status;
+        public BluetoothDevice Native => this.Context.NativeDevice;
+        public override ConnectionState Status => this.Context.Status;
 
 
         public override void Connect(ConnectionConfig? config)
         {
             this.connSubject.OnNext(ConnectionState.Connecting);
-            this.context.Connect(config);
+            this.Context.Connect(config);
         }
 
 
         public override void CancelConnection()
         {
             //this.connSubject.OnNext(ConnectionState.Disconnecting);
-            this.context.Close();
+            this.Context.Close();
             this.connSubject.OnNext(ConnectionState.Disconnected);
         }
 
 
-        public override IObservable<BleException> WhenConnectionFailed() => this.context.ConnectionFailed;
+        public override IObservable<BleException> WhenConnectionFailed() => this.Context.ConnectionFailed;
 
 
         // android does not have a find "1" service - it must discover all services.... seems shit
@@ -57,14 +57,14 @@ namespace Shiny.BluetoothLE
             .Select(x => x);
 
 
-        public override IObservable<string> WhenNameUpdated() => this.context
+        public override IObservable<string> WhenNameUpdated() => this.Context
             .CentralContext
             .ListenForMe(BluetoothDevice.ActionNameChanged, this)
             .Select(x => x.Name);
 
 
         public override IObservable<ConnectionState> WhenStatusChanged()
-            => this.context
+            => this.Context
                 .Callbacks
                 .ConnectionStateChanged
                 .Select(x => x.NewState.ToStatus())
@@ -76,21 +76,21 @@ namespace Shiny.BluetoothLE
         {
             this.AssertConnection();
 
-            var sub = this.context.Callbacks.ServicesDiscovered.Subscribe(cb =>
+            var sub = this.Context.Callbacks.ServicesDiscovered.Subscribe(cb =>
             {
                 if (cb.Gatt?.Services == null)
                     return;
 
                 foreach (var ns in cb.Gatt.Services)
                 {
-                    var service = new GattService(this, this.context, ns);
+                    var service = new GattService(this, this.Context, ns);
                     ob.OnNext(service);
                 }
                 ob.OnCompleted();
             });
 
             //this.context.RefreshServices();
-            this.context.Gatt.DiscoverServices();
+            this.Context.Gatt.DiscoverServices();
 
             return sub;
         });
@@ -100,7 +100,7 @@ namespace Shiny.BluetoothLE
         {
             this.AssertConnection();
 
-            var sub = this.context
+            var sub = this.Context
                 .Callbacks
                 .ReadRemoteRssi
                 .Take(1)
@@ -112,7 +112,7 @@ namespace Shiny.BluetoothLE
                         ob.OnError(new BleException("Failed to get RSSI - " + cb.Status));
                 });
 
-            this.context.Gatt.ReadRemoteRssi();
+            this.Context.Gatt.ReadRemoteRssi();
             return sub;
         });
 
@@ -120,7 +120,7 @@ namespace Shiny.BluetoothLE
         internal string? PairingRequestPin { get; set; }
 
         public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
-            new GattReliableWriteTransaction(this.context);
+            new GattReliableWriteTransaction(this.Context);
 
 
         public IObservable<bool> PairingRequest(string? pin = null) => Observable.Create<bool>(ob =>
@@ -134,16 +134,15 @@ namespace Shiny.BluetoothLE
             else
             {
                 PairingRequestPin = pin;
-
-                disp.Add(this.context
+                disp.Add(this.Context
                     .CentralContext
-                    .ListenForMe(ShinyBleBroadcastReceiver.BlePairingFailed, this)
+                    .ListenForMe(CentralContext.BlePairingFailed, this)
                     .Subscribe(_ => ob.Respond(false))
                 );
-                disp.Add(this.context
+                disp.Add(this.Context
                     .CentralContext
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
-                    .Where(x => this.context.NativeDevice.BondState != Bond.Bonding)
+                    .Where(x => this.Context.NativeDevice.BondState != Bond.Bonding)
                     .Subscribe(x =>
                     {
                         var result = this.PairingStatus == PairingState.Paired;
@@ -151,14 +150,10 @@ namespace Shiny.BluetoothLE
                     })
                 );
 
-                if (!this.context.NativeDevice.CreateBond())
+                if (!this.Context.NativeDevice.CreateBond())
                     ob.Respond(false);
             }
-            return () =>
-            {
-                //PairingRequestPin = null;
-                disp.Dispose();
-            };
+            return disp;
         });
 
 
@@ -166,7 +161,7 @@ namespace Shiny.BluetoothLE
         {
             get
             {
-                switch (this.context.NativeDevice.BondState)
+                switch (this.Context.NativeDevice.BondState)
                 {
                     case Bond.Bonded:
                         return PairingState.Paired;
@@ -180,17 +175,17 @@ namespace Shiny.BluetoothLE
 
 
         int currentMtu = 20;
-        public IObservable<int> RequestMtu(int size) => this.context.Invoke(Observable.Create<int>(ob =>
+        public IObservable<int> RequestMtu(int size) => this.Context.Invoke(Observable.Create<int>(ob =>
         {
             this.AssertConnection();
             var sub = this.WhenMtuChanged().Skip(1).Take(1).Subscribe(ob.Respond);
-            this.context.Gatt.RequestMtu(size);
+            this.Context.Gatt.RequestMtu(size);
             return sub;
         }));
 
 
         public IObservable<int> WhenMtuChanged() => Observable
-            .Create<int>(ob => this.context
+            .Create<int>(ob => this.Context
                 .Callbacks
                 .MtuChanged
                 .Subscribe(cb =>
@@ -208,7 +203,7 @@ namespace Shiny.BluetoothLE
 
 
         public override int MtuSize => this.currentMtu;
-        public override int GetHashCode() => this.context.NativeDevice.GetHashCode();
+        public override int GetHashCode() => this.Context.NativeDevice.GetHashCode();
 
 
         public override bool Equals(object obj)

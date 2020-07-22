@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Text;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.Content;
 using ScanMode = Android.Bluetooth.LE.ScanMode;
 using Shiny.Logging;
 
@@ -14,15 +16,14 @@ namespace Shiny.BluetoothLE.Internals
 {
     public class CentralContext
     {
+        public const string BlePairingFailed = nameof(BlePairingFailed);
         readonly ConcurrentDictionary<string, Peripheral> devices;
         readonly Subject<NamedMessage<Peripheral>> peripheralSubject;
-        readonly Lazy<IBleDelegate> sdelegate;
         readonly IMessageBus messageBus;
         LollipopScanCallback? callbacks;
 
 
-        public CentralContext(IServiceProvider serviceProvider,
-                              AndroidContext context,
+        public CentralContext(AndroidContext context,
                               IMessageBus messageBus,
                               BleConfiguration config)
         {
@@ -30,16 +31,16 @@ namespace Shiny.BluetoothLE.Internals
             this.Configuration = config;
             this.Manager = context.GetBluetooth();
 
-            this.sdelegate = new Lazy<IBleDelegate>(() => serviceProvider.Resolve<IBleDelegate>());
+            //this.sdelegate = new Lazy<IBleDelegate>(() => serviceProvider.Resolve<IBleDelegate>());
             this.devices = new ConcurrentDictionary<string, Peripheral>();
             this.peripheralSubject = new Subject<NamedMessage<Peripheral>>();
             this.messageBus = messageBus;
 
-            this.StatusChanged
-                .Skip(1)
-                .SubscribeAsync(status => Log.SafeExecute(
-                    async () => await this.sdelegate.Value?.OnAdapterStateChanged(status)
-                ));
+            //this.StatusChanged
+            //    .Skip(1)
+            //    .SubscribeAsync(status => Log.SafeExecute(
+            //        async () => await this.sdelegate.Value?.OnAdapterStateChanged(status)
+            //    ));
         }
 
 
@@ -56,15 +57,46 @@ namespace Shiny.BluetoothLE.Internals
         public AndroidContext Android { get; }
 
 
-        internal void DeviceEvent(string eventName, BluetoothDevice device)
+        internal void DeviceEvent(Intent intent)
         {
+            var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
             var peripheral = this.GetDevice(device);
-            if (eventName.Equals(BluetoothDevice.ActionAclConnected))
+            var action = intent.Action;
+
+            switch (action)
             {
-                this.sdelegate.Value?.OnConnected(peripheral);
-                return;
+                // TODO: probably need these for background things
+                //case BluetoothDevice.ActionAclConnected:
+                //    this.sdelegate.Value?.OnConnected(peripheral);
+                //    break;
+
+                //case BluetoothDevice.ActionAclDisconnected:
+                //    peripheral.Context.Close();
+                //    break;
+
+                case BluetoothDevice.ActionPairingRequest:
+                    var pin = peripheral.PairingRequestPin;
+                    peripheral.PairingRequestPin = null;
+
+                    if (!pin.IsEmpty())
+                    { 
+                        Log.Write("BlePairing", "Will attempt to auto-pair with PIN " + pin);
+                        var bytes = Encoding.UTF8.GetBytes(pin);
+
+                        if (!device.SetPin(bytes))
+                        {
+                            Log.Write("BlePairing", "Auto-Pairing PIN failed");
+                            action = BlePairingFailed;
+                        }
+                        else
+                        {
+                            Log.Write("BlePairing", "Auto-Pairing PIN was sent successfully apparently");
+                            //device.SetPairingConfirmation(true);
+                        }
+                    }
+                    break;
             }
-            this.peripheralSubject.OnNext(new NamedMessage<Peripheral>(eventName, peripheral));
+            this.peripheralSubject.OnNext(new NamedMessage<Peripheral>(action, peripheral));
         }
 
 
