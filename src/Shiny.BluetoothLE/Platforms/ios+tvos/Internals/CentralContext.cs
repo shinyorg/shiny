@@ -8,7 +8,7 @@ using Foundation;
 using Shiny.Logging;
 
 
-namespace Shiny.BluetoothLE
+namespace Shiny.BluetoothLE.Internals
 {
     public class CentralContext : CBCentralManagerDelegate
     {

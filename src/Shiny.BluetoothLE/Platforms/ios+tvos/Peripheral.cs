@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
-using Shiny.Logging;
 using CoreBluetooth;
 using Foundation;
+using Shiny.Logging;
+using Shiny.BluetoothLE.Internals;
 
 
 namespace Shiny.BluetoothLE

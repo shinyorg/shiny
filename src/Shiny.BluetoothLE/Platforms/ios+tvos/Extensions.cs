@@ -3,6 +3,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using CoreBluetooth;
 using Foundation;
+using Shiny.BluetoothLE.Internals;
 
 
 namespace Shiny.BluetoothLE
