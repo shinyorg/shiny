@@ -48,7 +48,11 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async () =>
         {
-            var result = await this.context.Android.RequestAccess(Manifest.Permission.AccessCoarseLocation);
+            var result = this.context.Android.IsAtLeastAndroid10()
+                ? await this.context.Android.RequestAccess(Manifest.Permission.AccessFineLocation, Manifest.Permission.AccessBackgroundLocation)
+                : await this.context.Android.RequestAccess(Manifest.Permission.AccessFineLocation);
+
+            // TODO: check if location is enabled?
             if (result != AccessState.Available)
                 return result;
 
