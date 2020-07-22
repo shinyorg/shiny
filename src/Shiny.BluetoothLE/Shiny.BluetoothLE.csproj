@@ -3,8 +3,7 @@
     <PropertyGroup>
         <VersionSuffix>beta</VersionSuffix>
         <Description>Shiny Reactive BluetoothLE Plugin for client and gatt server</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
-<!--        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.tvos10;xamarin.mac20;monoandroid90;monoandroid10.0;tizen50</TargetFrameworks>-->
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
