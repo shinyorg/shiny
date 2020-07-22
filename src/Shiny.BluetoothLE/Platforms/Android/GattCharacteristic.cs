@@ -45,9 +45,16 @@ namespace Shiny.BluetoothLE
                     Log.Write("BLE-Characteristic", "write event - " + args.Characteristic.Uuid);
 
                     if (args.IsSuccessful)
-                        ob.Respond(new CharacteristicGattResult(this, value, withResponse ? CharacteristicResultType.Write : CharacteristicResultType.WriteWithoutResponse));
-                    else
+                    {
                         ob.OnError(new BleException($"Failed to write characteristic - {args.Status}"));
+                    }
+                    else
+                    { 
+                        var writeType = withResponse
+                            ? CharacteristicResultType.Write
+                            : CharacteristicResultType.WriteWithoutResponse;
+                        ob.Respond(new CharacteristicGattResult(this, value, writeType));
+                    }
                 });
 
             Log.Write("BLE-Characteristic", "Hooking for write response - " + this.Uuid);
@@ -57,7 +64,7 @@ namespace Shiny.BluetoothLE
                 {
                     this.native.WriteType = withResponse ? GattWriteType.Default : GattWriteType.NoResponse;
                     var authSignedWrite =
-                        this.native.Properties.HasFlag(CharacteristicProperties.AuthenticatedSignedWrites) &&
+                        this.native.Properties.HasFlag(GattProperty.SignedWrite) &&
                         this.context.NativeDevice.BondState == Bond.Bonded;
 
                     if (authSignedWrite)
