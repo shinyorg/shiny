@@ -16,7 +16,7 @@ public class YourShinyStartup : Shiny.ShinyStartup
 {
     public override void ConfigureServices(IServiceCollection services)
     {
-        services.UseNfc<YourNfcDelegate>();
+        services.UseNfc();
     }
 }
 
