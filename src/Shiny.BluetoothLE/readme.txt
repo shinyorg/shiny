@@ -17,13 +17,10 @@ public class YourShinyStartup : Shiny.ShinyStartup
     public override void ConfigureServices(IServiceCollection services)
     {
         // for general client functionality
-        services.UseBleCentral();
+        services.UseBleClient();
 
         // for client functionality in the background
-        services.UseBleCentral<YourBleDelegate>();
-
-        // for GATT server
-        services.UseBlePeripherals();
+        services.UseBleClient<YourBleDelegate>();
     }
 }
 
@@ -32,17 +29,11 @@ public class YourShinyStartup : Shiny.ShinyStartup
 iOS
 -----------------
 
-<key>NSBluetoothPeripheralUsageDescription</key>
-<string>Example</string>
-
-<!--iOS 13+-->
 <key>NSBluetoothAlwaysUsageDescription</key>
 <string>Example</string>
-
 <key>UIBackgroundModes</key>
 <array>
 	<string>bluetooth-central</string>
-	<string>bluetooth-peripheral</string>
 </array>
 
 
