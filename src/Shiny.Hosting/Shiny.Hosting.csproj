@@ -1,4 +1,4 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <Description>The Shiny Core containing all of the major functionality like caching, logging, connectivity, environment, IO, power, settings, application state monitoring, and jobs as well as many other utilities</Description>
@@ -10,9 +10,9 @@
         <None Include="readme.txt" />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.5" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.6" />
     </ItemGroup>
-    
+
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
         <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
@@ -21,11 +21,11 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Common" Version="2.2.5" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" Version="2.2.5" />
-        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.2.0" />
-        <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.3.4.1" />
-        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" Version="1.0.0" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Common" Version="2.2.5.1" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" Version="2.2.5.1" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.2.0.1" />
+        <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.3.4.3" />
+        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" Version="1.0.0.1" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
