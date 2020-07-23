@@ -11,23 +11,23 @@ namespace Shiny.Beacons
 {
     public class BackgroundTask
     {
-        readonly IBleManager centralManager;
+        readonly IBleManager bleManager;
         readonly IBeaconMonitoringManager beaconManager;
         readonly IMessageBus messageBus;
-        readonly IBeaconMonitorDelegate beaconDelegate;
+        readonly IServiceProvider serviceProvider;
         readonly IDictionary<string, BeaconRegionStatus> states;
         IDisposable? scanSub;
 
 
-        public BackgroundTask(IBleManager centralManager,
+        public BackgroundTask(IServiceProvider serviceProvider,
+                              IBleManager centralManager,
                               IBeaconMonitoringManager beaconManager,
-                              IMessageBus messageBus,
-                              IBeaconMonitorDelegate beaconDelegate)
+                              IMessageBus messageBus)
         {
-            this.centralManager = centralManager;
+            this.bleManager = centralManager;
             this.beaconManager = beaconManager;
             this.messageBus = messageBus;
-            this.beaconDelegate = beaconDelegate;
+            this.serviceProvider = serviceProvider;
             this.states = new Dictionary<string, BeaconRegionStatus>();
         }
 
@@ -45,7 +45,7 @@ namespace Shiny.Beacons
                     {
                         case BeaconRegisterEventType.Add:
                             if (this.states.Count == 0)
-                            { 
+                            {
                                 this.StartScan();
                             }
                             else
@@ -96,7 +96,7 @@ namespace Shiny.Beacons
 
             Log.SafeExecute(() =>
             {
-                this.scanSub = this.centralManager
+                this.scanSub = this.bleManager
                     .ScanForBeacons(true)
                     .Buffer(TimeSpan.FromSeconds(5))
                     .SubscribeAsyncConcurrent(this.CheckStates);
@@ -152,8 +152,8 @@ namespace Shiny.Beacons
                             state.IsInRange = true;
                             if (state.Region.NotifyOnEntry)
                             {
-                                await Log.SafeExecute(() =>
-                                    this.beaconDelegate.OnStatusChanged(BeaconRegionState.Entered, state.Region)
+                                await this.serviceProvider.RunDelegates<IBeaconMonitorDelegate>(
+                                    x => x.OnStatusChanged(BeaconRegionState.Entered, state.Region)
                                 );
                             }
                         }
@@ -167,8 +167,8 @@ namespace Shiny.Beacons
                     state.IsInRange = false;
                     if (state.Region.NotifyOnExit)
                     {
-                        await Log.SafeExecute(() =>
-                            this.beaconDelegate.OnStatusChanged(BeaconRegionState.Exited, state.Region)
+                        await this.serviceProvider.RunDelegates<IBeaconMonitorDelegate>(
+                            x => x.OnStatusChanged(BeaconRegionState.Exited, state.Region)
                         );
                     }
                 }

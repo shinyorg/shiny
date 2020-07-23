@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Beacons;
 
@@ -18,7 +17,9 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            //services.UseBleClient();
+#if __ANDROID__ || WINDOWS_UWP
+            services.UseBleClient();
+#endif
             services.AddSingleton<IBeaconRangingManager, BeaconRangingManager>();
             return true;
 #endif
@@ -33,19 +34,21 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseBeaconMonitoring(this IServiceCollection services, Type delegateType)
         {
-#if !__IOS__
+#if NETSTANDARD
             return false;
 #else
             if (delegateType == null)
                 throw new ArgumentException("You can't register monitoring regions without a delegate type");
 
+#if __ANDROID__ || WINDOWS_UWP
             //services.RegisterJob(new Shiny.Jobs.JobInfo(typeof(BeaconRegionScanJob))
             //{
             //    BatteryNotLow = true,
             //    //PeriodicTime = TimeSpan.FromSeconds(30),
             //    IsSystemJob = true
             //});
-            //services.UseBleClient();
+            services.UseBleClient();
+#endif
             services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
             services.AddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
             return false;
@@ -58,7 +61,6 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        /// <param name="regionsToMonitorWhenPermissionAvailable"></param>
         /// <returns></returns>
         public static bool UseBeaconMonitoring<T>(this IServiceCollection services) where T : class, IBeaconMonitorDelegate
             => services.UseBeaconMonitoring(typeof(T));
