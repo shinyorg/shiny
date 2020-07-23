@@ -16,7 +16,7 @@ namespace Shiny.Generators.Generators.Android
             //    ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation
             //)]
             //public class MainActivity : FormsAppCompatActivity
-        
+
             var activityAttribute = context.Compilation.GetTypeByMetadataName("Android.App.ActivityAttribute");
             if (activityAttribute == null)
                 return;

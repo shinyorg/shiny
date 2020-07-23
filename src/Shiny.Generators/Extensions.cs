@@ -26,7 +26,7 @@ namespace Shiny.Generators
             => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
 
 
-        public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName) 
+        public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName)
         {
             var attribute = context.Compilation.GetTypeByMetadataName(attributeName);
             return context.Compilation.Assembly.FindAttributeFlattened(attribute) != null;
@@ -50,7 +50,7 @@ namespace Shiny.Generators
             {
                 if (includeTypes)
                     s += $"{parameter.Type.ToDisplayString()} {parameter.Name}, ";
-                else 
+                else
                     s += $"{parameter.Name}, ";
             }
             s = s.TrimEnd(',', ' ');
@@ -107,14 +107,13 @@ namespace Shiny.Generators
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType<T>(this SourceGeneratorContext context)
             => context.GetAllImplementationsOfType(typeof(T));
 
-        
+
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type type)
             => context.GetAllImplementationsOfType(type.FullName);
 
 
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName)
         {
-            //System.Diagnostics.Debugger.Launch();
             var symbol = context.Compilation.GetTypeByMetadataName(fullName);
             if (symbol == null)
                 return Enumerable.Empty<INamedTypeSymbol>();
@@ -146,7 +145,6 @@ namespace Shiny.Generators
                 .WhereNotSystem()
                 .ToList();
 
-            System.Diagnostics.Debugger.Launch();
             INamedTypeSymbol? startupClass = null;
             switch (startupClasses.Count)
             {
@@ -166,7 +164,7 @@ namespace Shiny.Generators
         }
 
 
-        public static IEnumerable<INamedTypeSymbol> WhereNotInAssembly(this IEnumerable<INamedTypeSymbol> en, params string[] names) 
+        public static IEnumerable<INamedTypeSymbol> WhereNotInAssembly(this IEnumerable<INamedTypeSymbol> en, params string[] names)
             => en.Where(x => !names.Any(y => x.ContainingAssembly.Name.StartsWith(y, StringComparison.OrdinalIgnoreCase)));
 
         public static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en)
