@@ -69,6 +69,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <PackageReference Include="Xamarin.Firebase.Datatransport" Version="117.0.5-preview02" />
         <PackageReference Include="Xamarin.Firebase.Common" Version="119.3.0-preview02" />
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="120.1.7-preview02" />
         <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="117.2.1-preview02" />
