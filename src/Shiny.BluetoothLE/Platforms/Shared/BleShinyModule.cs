@@ -1,7 +1,6 @@
 ﻿#if !NETSTANDARD
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.BluetoothLE.Internals;
 
 
 namespace Shiny.BluetoothLE

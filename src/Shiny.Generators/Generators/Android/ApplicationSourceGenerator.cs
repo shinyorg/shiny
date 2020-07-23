@@ -9,7 +9,7 @@ namespace Shiny.Generators.Generators.Android
     {
         public static void Execute(SourceGeneratorContext context)
         {
-            var log = context.GetLogger();
+            //var log = context.GetLogger();
 
             // if application exists, error or override? - could also search for attribute?
             var appClass = context.Compilation.GetTypeByMetadataName("Android.App.Application");
@@ -18,7 +18,7 @@ namespace Shiny.Generators.Generators.Android
 
             // TODO: log error if android application already exists? only gen it if there isn't an existing one?
 
-            System.Diagnostics.Debugger.Launch();
+            //System.Diagnostics.Debugger.Launch();
             var startupClass = context.GetShinyStartupSymbol();
             if (startupClass == null)
                 return;

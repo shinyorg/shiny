@@ -29,7 +29,7 @@ namespace Shiny.Generators.Generators
             var nameSpace = context.GetProjectInstance().GetPropertyValue("RootNamespace");
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
-            
+
             builder.CreateClass(
                 () =>
                 {
@@ -62,7 +62,7 @@ namespace Shiny.Generators.Generators
                         RegisterModules(context, builder);
                         RegisterInjects(context, builder);
                     }
-                    
+
                     if (context.HasXamarinForms())
                     {
                         using (builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
@@ -72,8 +72,8 @@ namespace Shiny.Generators.Generators
                         }
                     }
                 },
-                nameSpace, 
-                "AppShinyStartup", 
+                nameSpace,
+                "AppShinyStartup",
                 "Shiny.ShinyStartup"
             );
 
@@ -114,7 +114,7 @@ namespace Shiny.Generators.Generators
 
             if (impls.Length > 1)
             {
-                var startIndex = oneDelegateRequiredToInstall ? 1 : 0; 
+                var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
                 for (var i = startIndex; i < impls.Length; i++)
                 {
                     var impl = impls[i];

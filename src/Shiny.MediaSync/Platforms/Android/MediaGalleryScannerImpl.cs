@@ -28,7 +28,7 @@ namespace Shiny.MediaSync.Infrastructure
                 var uri = MediaStore.Files.GetContentUri("external");
                 var cursor = this.context.AppContext.ContentResolver.Query(
                     uri,
-                    new [] 
+                    new []
                     {
                         MediaStore.Files.FileColumns.Id,
                         MediaStore.Files.FileColumns.Data,
@@ -39,9 +39,9 @@ namespace Shiny.MediaSync.Infrastructure
                         MediaStore.Files.FileColumns.Parent,
                         MediaStore.Files.FileColumns.DisplayName,
                         MediaStore.Files.FileColumns.Size
-                    }, 
+                    },
                     ToWhereClause(mediaTypes, date),
-                    null, 
+                    null,
                     $"{MediaStore.Files.FileColumns.DateAdded} DESC"
                 );
 
@@ -57,7 +57,7 @@ namespace Shiny.MediaSync.Infrastructure
 
         public Task<AccessState> RequestAccess() => this.context
             .RequestAccess(
-                Permission.ReadExternalStorage, 
+                Permission.ReadExternalStorage,
                 "android.permission.ACCESS_MEDIA_LOCATION"
             )
             .ToTask();
