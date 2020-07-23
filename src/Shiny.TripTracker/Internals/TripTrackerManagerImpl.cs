@@ -36,6 +36,8 @@ namespace Shiny.TripTracker.Internals
 
         public Task<IList<Trip>> GetAllTrips() => this.dataService.GetAll();
         public Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId) => this.dataService.GetCheckinsByTrip(tripId);
+
+        public Task<double> GetTripAverageSpeed(int tripId) => this.dataService.GetTripAverageSpeed(tripId);
         public Task Purge() => this.dataService.Purge();
         public Task Remove(int tripId) => this.dataService.Remove(tripId);
 

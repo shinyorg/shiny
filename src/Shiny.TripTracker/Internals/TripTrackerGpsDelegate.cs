@@ -79,6 +79,10 @@ namespace Shiny.TripTracker.Internals
                     await this.dataService.Save(trip);
                     await this.delegates.RunDelegates(x => x.OnTripEnd(trip));
                 }
+                else
+                {
+                    // TODO: start a new trip and also checkin to that
+                }
             }
         }
 

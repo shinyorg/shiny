@@ -42,6 +42,13 @@ namespace Shiny.TripTracker.Internals
             .ToListAsync();
 
 
+        public Task<double> GetTripAverageSpeed(int tripId)
+            => this.conn.ExecuteScalarAsync<double>(
+                $"SELECT AVG({nameof(TripCheckin.Speed)}) FROM {nameof(TripCheckin)} WHERE {nameof(TripCheckin.TripId)} = ?",
+                tripId
+            );
+
+
         public async Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId) => await this.conn
             .Table<TripCheckin>()
             .OrderBy(x => x.DateCreated)
@@ -58,8 +65,8 @@ namespace Shiny.TripTracker.Internals
 
         public async Task Remove(int tripId)
         {
-            await this.conn.ExecuteAsync("DELETE FROM Trips WHERE Id = ?", tripId);
-            await this.conn.ExecuteAsync("DELETE FROM TripCheckins WHERE TripId = ?", tripId);
+            await this.conn.Table<TripCheckin>().DeleteAsync(x => x.TripId == tripId);
+            await this.conn.Table<Trip>().DeleteAsync(x => x.Id == tripId);
         }
 
 

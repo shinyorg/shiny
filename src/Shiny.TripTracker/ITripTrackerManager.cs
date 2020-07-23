@@ -14,6 +14,7 @@ namespace Shiny.TripTracker
         Task StopTracking();
 
         Task<IList<Trip>> GetAllTrips();
+        Task<double> GetTripAverageSpeed(int tripId);
         Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId);
 
         Task Remove(int tripId);
