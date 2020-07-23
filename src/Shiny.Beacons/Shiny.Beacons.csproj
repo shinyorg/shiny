@@ -3,7 +3,7 @@
     <PropertyGroup>
         <VersionSuffix>beta</VersionSuffix>
         <Description>Shiny Beacons - for those Shiny BLE things you see everywhere</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid90</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
@@ -11,7 +11,6 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
-        <None Remove="Platforms\android+uwp\BeaconMonitoringManager.cs" />
         <ProjectReference Include="..\Shiny.Beacons.Abstractions\Shiny.Beacons.Abstractions.csproj" />
     </ItemGroup>
 
