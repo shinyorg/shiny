@@ -5,7 +5,11 @@ using System.Collections.Generic;
 using Shiny.BluetoothLE.Internals;
 using Android;
 using Android.Bluetooth;
+using Android.App;
 
+[assembly: UsesPermission(Android.Manifest.Permission.AccessFineLocation)]
+[assembly: UsesPermission(Android.Manifest.Permission.AccessCoarseLocation)]
+[assembly: UsesPermission(Android.Manifest.Permission.AccessBackgroundLocation)]
 
 namespace Shiny.BluetoothLE
 {
