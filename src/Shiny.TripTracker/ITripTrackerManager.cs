@@ -8,13 +8,12 @@ namespace Shiny.TripTracker
 {
     public interface ITripTrackerManager
     {
-        MotionActivityType? TrackingActivityTypes { get; }
+        MotionActivityType? TrackingActivityType { get; }
 
-        Task StartTracking(MotionActivityType activityTypes);
+        Task StartTracking(MotionActivityType activityType);
         Task StopTracking();
 
         Task<IList<Trip>> GetAllTrips();
-        Task<double> GetTripAverageSpeed(int tripId);
         Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId);
 
         Task Remove(int tripId);

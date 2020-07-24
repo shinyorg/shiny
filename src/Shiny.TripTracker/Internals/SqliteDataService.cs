@@ -29,6 +29,7 @@ namespace Shiny.TripTracker.Internals
             TripId = tripId,
             Latitude = reading.Position.Latitude,
             Longitude = reading.Position.Longitude,
+            Direction = reading.Heading,
             Speed = reading.Speed,
             DateCreated = reading.Timestamp
         });
@@ -42,7 +43,7 @@ namespace Shiny.TripTracker.Internals
             .ToListAsync();
 
 
-        public Task<double> GetTripAverageSpeed(int tripId)
+        public Task<double> GetTripAverageSpeedInMetersPerHour(int tripId)
             => this.conn.ExecuteScalarAsync<double>(
                 $"SELECT AVG({nameof(TripCheckin.Speed)}) FROM {nameof(TripCheckin)} WHERE {nameof(TripCheckin.TripId)} = ?",
                 tripId
@@ -54,6 +55,24 @@ namespace Shiny.TripTracker.Internals
             .OrderBy(x => x.DateCreated)
             .Where(x => x.TripId == tripId)
             .ToListAsync();
+
+
+        public async Task<double> GetTripTotalDistanceInMeters(int tripId)
+        {
+            var total = 0d;
+            Position? last = null;
+            var checkins = await this.GetCheckinsByTrip(tripId);
+
+            foreach (var checkin in checkins)
+            {
+                var current = new Position(checkin.Latitude, checkin.Longitude);
+                if (last != null)
+                    total += last.GetDistanceTo(current).TotalMeters;
+
+                last = current;
+            }
+            return total;
+        }
 
 
         public async Task Purge() 

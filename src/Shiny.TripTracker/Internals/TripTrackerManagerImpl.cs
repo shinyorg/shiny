@@ -27,17 +27,14 @@ namespace Shiny.TripTracker.Internals
         }
 
 
-        public MotionActivityType? TrackingActivityTypes
+        public MotionActivityType? TrackingActivityType
         {
-            get => this.settings.Get<MotionActivityType?>(nameof(TrackingActivityTypes), null);
-            private set => this.settings.Set(nameof(TrackingActivityTypes), value);
+            get => this.settings.Get<MotionActivityType?>(nameof(TrackingActivityType), null);
+            private set => this.settings.Set(nameof(TrackingActivityType), value);
         }
-
-
         public Task<IList<Trip>> GetAllTrips() => this.dataService.GetAll();
         public Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId) => this.dataService.GetCheckinsByTrip(tripId);
-
-        public Task<double> GetTripAverageSpeed(int tripId) => this.dataService.GetTripAverageSpeed(tripId);
+        public Task<double> GetTripAverageSpeed(int tripId) => this.dataService.GetTripAverageSpeedInMetersPerHour(tripId);
         public Task Purge() => this.dataService.Purge();
         public Task Remove(int tripId) => this.dataService.Remove(tripId);
 
@@ -53,18 +50,21 @@ namespace Shiny.TripTracker.Internals
         }
 
 
-        public async Task StartTracking(MotionActivityType activityTypes) 
+        public async Task StartTracking(MotionActivityType activityType) 
         {
+            if (activityType.ToString().Contains(","))
+                throw new ArgumentException("You cannot track multiple activity types");
+
             (await this.RequestAccess()).Assert();
 
             await this.gpsManager.StartListener(GpsRequest.Realtime(true));
-            this.TrackingActivityTypes = activityTypes;
+            this.TrackingActivityType = activityType;
         }
 
 
         public async Task StopTracking()
         {
-            this.TrackingActivityTypes = null;
+            this.TrackingActivityType = null;
             await this.gpsManager.StopListener();
         }
     }

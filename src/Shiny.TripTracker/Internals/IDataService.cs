@@ -12,7 +12,8 @@ namespace Shiny.TripTracker.Internals
         Task<IList<Trip>> GetAll();
         Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId);
         Task Purge();
-        Task<double> GetTripAverageSpeed(int tripId);
+        Task<double> GetTripTotalDistanceInMeters(int tripId);
+        Task<double> GetTripAverageSpeedInMetersPerHour(int tripId);
 
         Task Save(Trip trip);
         Task Checkin(int tripId, IGpsReading reading);
