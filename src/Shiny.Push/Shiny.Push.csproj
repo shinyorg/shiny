@@ -55,6 +55,7 @@
         <Compile Include="Platforms\tizen\**\*.cs" />
     </ItemGroup>
 
+    <!--
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
@@ -65,6 +66,7 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
+    -->
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />

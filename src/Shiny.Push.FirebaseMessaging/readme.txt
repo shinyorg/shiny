@@ -1,5 +1,5 @@
 ----------------------------------------
-Shiny.Integrations.FirebaseNotifications
+Shiny.Integrations.FirebaseMessaging
 ----------------------------------------
 
 GitHub: https://github.com/shinyorg/Shiny
@@ -32,12 +32,11 @@ Android
 
 Ensure the following libraries are installed in your ANDROID HEAD PROJECT
 
-<PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.3" />
-<PackageReference Include="Xamarin.Firebase.Common" Version="71.1610.0" />
-<PackageReference Include="Xamarin.Firebase.Messaging" Version="71.1740.0" />
-<PackageReference Include="Xamarin.GooglePlayServices.Base" Version="71.1610.0" />
-<PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="71.1620.0" />
-<PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="71.1601.0" />
+<PackageReference Include="Xamarin.Firebase.Datatransport" Version="117.0.5-preview02" />
+<PackageReference Include="Xamarin.Firebase.Common" Version="119.3.0-preview02" />
+<PackageReference Include="Xamarin.Firebase.Messaging" Version="120.1.7-preview02" />
+<PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="117.2.1-preview02" />
+<PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="117.0.2-preview02" />
 
 
 2. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
