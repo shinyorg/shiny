@@ -29,16 +29,16 @@ namespace Shiny.TripTracker.Tests
             this.data = new Mock<IDataService>();
 
             this.manager
-                .Setup(x => x.TrackingActivityTypes)
+                .Setup(x => x.TrackingActivityType)
                 .Returns(() => this.tracking);
 
             this.activityManager
                 .Setup(x => x.Query(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
-                .Returns(() => Task.FromResult<IList<MotionActivityEvent>>(new List<MotionActivityEvent> 
+                .Returns(() => Task.FromResult<IList<MotionActivityEvent>>(new List<MotionActivityEvent>
                 {
                     new MotionActivityEvent(
-                        this.currentMotionType, 
-                        MotionActivityConfidence.High, 
+                        this.currentMotionType,
+                        MotionActivityConfidence.High,
                         DateTimeOffset.UtcNow
                     )
                 }));
@@ -119,7 +119,7 @@ namespace Shiny.TripTracker.Tests
             await this.gpsDelegate.OnReading(GpsReading.Create(43.9123987,-79.0044507));
             await this.gpsDelegate.OnReading(GpsReading.Create(43.8894793,-78.9998306));
             await this.gpsDelegate.OnReading(GpsReading.Create(43.8769798,-78.9808417));
-            
+
             // finish trip
             this.currentMotionType = MotionActivityType.Cycling;
             await this.gpsDelegate.OnReading(GpsReading.Create(43.8744028, -78.9806041));
