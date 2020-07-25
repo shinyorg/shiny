@@ -39,6 +39,20 @@ namespace Shiny
 
 
         /// <summary>
+        /// Creates a new object and copies source values to it (good for data to domain level copy)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static T ReflectCreateTo<T>(this object source) where T : new()
+        {
+            var target = new T();
+            source.ReflectCopyTo(target);
+            return target;
+        }
+
+
+        /// <summary>
         /// Reflects out property information based on the expression value
         /// </summary>
         /// <typeparam name="TSender"></typeparam>
