@@ -9,12 +9,12 @@ namespace Shiny.Locations.Sync.Infrastructure
     {
         readonly IJobManager jobManager;
         readonly IMotionActivityManager activityManager;
-        readonly IDataService dataService;
+        readonly IGpsDataService dataService;
 
 
-        public SyncGpsDelegate(IJobManager jobManager, 
+        public SyncGpsDelegate(IJobManager jobManager,
                                IMotionActivityManager activityManager,
-                               IDataService dataService)
+                               IGpsDataService dataService)
         {
             this.jobManager = jobManager;
             this.activityManager = activityManager;
@@ -44,11 +44,10 @@ namespace Shiny.Locations.Sync.Infrastructure
                 HeadingAccuracy = reading.HeadingAccuracy,
                 Speed = reading.Speed,
                 PositionAccuracy = reading.PositionAccuracy,
-                Activities = activity
+                Activities = activity?.Types
             };
             await this.dataService.Create(e);
-            var batchSize = await this.dataService.GetPendingCount<GeofenceEvent>();
-
+            var batchSize = await this.dataService.GetPendingCount();
 
             if (batchSize >= config.BatchSize)
             {

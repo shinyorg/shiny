@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Jobs;
+using Shiny.Locations.Sync.Infrastructure.Sqlite;
 
 
 namespace Shiny.Locations.Sync.Infrastructure
@@ -9,25 +10,21 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class GeofenceModule : ShinyModule
     {
         readonly Type delegateType;
-
-
-        public GeofenceModule(Type delegateType)
-        {
-            this.delegateType = delegateType;
-        }
+        public GeofenceModule(Type delegateType) => this.delegateType = delegateType;
 
 
         public override void Register(IServiceCollection services)
         {
             services.AddSingleton(typeof(IGeofenceSyncDelegate), this.delegateType);
+            services.TryAddSingleton<SyncSqliteConnection>();
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
-            services.TryAddSingleton<IDataService, SqliteDataService>();
+            services.TryAddSingleton<IGeofenceDataService, GeofenceDataService>();
             services.UseGeofencing<SyncGeofenceDelegate>();
             services.UseMotionActivity();
 
-            //services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            //var job = new JobInfo(typeof(SyncGeofenceJob), Constants.GeofenceJobIdentifer) { RunOnForeground = true };
-            //services.RegisterJob(job);
+            services.UseJobForegroundService(TimeSpan.FromSeconds(30));
+            var job = new JobInfo(typeof(SyncGeofenceJob), Constants.GeofenceJobIdentifer) { RunOnForeground = true };
+            services.RegisterJob(job);
         }
     }
 }

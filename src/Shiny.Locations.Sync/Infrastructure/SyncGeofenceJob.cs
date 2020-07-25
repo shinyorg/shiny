@@ -9,12 +9,12 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class SyncGeofenceJob : IJob
     {
         readonly ILocationSyncManager syncManager;
-        readonly IDataService dataService;
+        readonly IGeofenceDataService dataService;
         readonly IGeofenceSyncDelegate? geofences;
 
 
-        public SyncGeofenceJob(ILocationSyncManager syncManager, 
-                               IDataService dataService, 
+        public SyncGeofenceJob(ILocationSyncManager syncManager,
+                               IGeofenceDataService dataService,
                                IGeofenceSyncDelegate? geofences = null)
         {
             this.syncManager = syncManager;
@@ -32,9 +32,10 @@ namespace Shiny.Locations.Sync.Infrastructure
                 return false;
             }
 
-            var result = await JobProcessor.Process<GeofenceEvent>(
+            var result = await JobProcessor.Process(
                 jobInfo,
-                this.dataService,
+                () => this.dataService.GetAll(),
+                x => this.dataService.Remove(x),
                 (pings, ct) => this.geofences.Process(pings, ct),
                 cancelToken
             );

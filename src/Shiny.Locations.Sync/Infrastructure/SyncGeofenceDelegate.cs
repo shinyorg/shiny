@@ -9,12 +9,12 @@ namespace Shiny.Locations.Sync.Infrastructure
     {
         readonly IJobManager jobManager;
         readonly IMotionActivityManager activityManager;
-        readonly IDataService dataService;
+        readonly IGeofenceDataService dataService;
 
 
-        public SyncGeofenceDelegate(IJobManager jobManager, 
+        public SyncGeofenceDelegate(IJobManager jobManager,
                                     IMotionActivityManager activityManager,
-                                    IDataService dataService)
+                                    IGeofenceDataService dataService)
         {
             this.jobManager = jobManager;
             this.activityManager = activityManager;
@@ -40,7 +40,7 @@ namespace Shiny.Locations.Sync.Infrastructure
 
                 Identifier = region.Identifier,
                 Entered = newStatus == GeofenceState.Entered,
-                Activities = activity
+                Activities = activity?.Types
             };
             await this.dataService.Create(e);
             if (!this.jobManager.IsRunning)

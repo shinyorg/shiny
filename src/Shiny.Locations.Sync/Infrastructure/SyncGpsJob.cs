@@ -9,12 +9,12 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class SyncGpsJob : IJob
     {
         readonly ILocationSyncManager syncManager;
-        readonly IDataService dataService;
+        readonly IGpsDataService dataService;
         readonly IGpsSyncDelegate? gps;
 
 
         public SyncGpsJob(ILocationSyncManager syncManager,
-                          IDataService dataService, 
+                          IGpsDataService dataService,
                           IGpsSyncDelegate? gps = null)
         {
             this.syncManager = syncManager;
@@ -31,9 +31,10 @@ namespace Shiny.Locations.Sync.Infrastructure
                 jobInfo.Repeat = false;
                 return false;
             }
-            var result = await JobProcessor.Process<GpsEvent>(
-                jobInfo, 
-                this.dataService,
+            var result = await JobProcessor.Process(
+                jobInfo,
+                () => this.dataService.GetAll(),
+                x => this.dataService.Remove(x),
                 (pings, ct) => this.gps.Process(pings, ct),
                 cancelToken
             );
