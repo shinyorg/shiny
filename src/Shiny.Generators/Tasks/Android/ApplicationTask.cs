@@ -1,5 +1,4 @@
 ﻿using System;
-using Shiny.Generators.Tasks;
 using Uno.RoslynHelpers;
 
 
@@ -9,32 +8,43 @@ namespace Shiny.Generators.Tasks.Android
     {
         public override void Execute()
         {
+            // TODO: detect Shiny.Core and Android v10
+            // TODO: detect custom application
+            // TODO: user dialogs Init?
+            // TODO: if application implementations already exist and is it partial?
+
             // if application exists, error or override? - could also search for attribute?
             var appClass = this.Context.Compilation.GetTypeByMetadataName("Android.App.Application");
             if (appClass == null)
                 return;
 
-            // TODO: log error if android application already exists? only gen it if there isn't an existing one?
+            //var implementations = this.Context.GetAllImplementationsOfType(appClass);
+            //if (!appClass.IsPartialClass())
+            //    this.Log.Error("Cannot generate Shiny application class since your custom Application is not marked as partial");
+            //// TODO: log error if android application already exists? only gen it if there isn't an existing one?
 
-            var startupClass = this.Context.GetShinyStartupSymbol();
+            var startupClass = this.ShinyContext.GetShinyStartupClassFullName();
             if (startupClass == null)
                 return;
 
+            var ns = this.ShinyContext.GetRootNamespace();
             var builder = new IndentedStringBuilder();
-            builder.AppendNamespaces("Android.App", "Android.Runtime");
+            builder.AppendNamespaces("Android.App", "Android.Content", "Android.Runtime");
 
-            using (builder.BlockInvariant($"namespace {this.Context.Compilation.GlobalNamespace.Name}"))
+            using (builder.BlockInvariant($"namespace {ns}"))
             {
                 builder.AppendLineInvariant("[ApplicationAttribute]");
                 using (builder.BlockInvariant("public partial class AppShinyApplication : Application"))
                 {
-                    builder.AppendLineInvariant("public AppShinyApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) {}");
+                    builder.AppendLine("public AppShinyApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) {}");
+                    builder.AppendLine();
+
                     using (builder.BlockInvariant("public override void OnCreate()"))
                     {
-                        builder.AppendLineInvariant($"this.InitShiny({startupClass.ToDisplayString()});");
+                        builder.AppendLineInvariant($"AndroidShinyHost.Init(this, new {startupClass}());");
 
                         if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null)
-                            builder.AppendLine("Xamarin.Essentials.Platform.Init(this);");
+                            builder.AppendLineInvariant("Xamarin.Essentials.Platform.Init(this);");
 
                         builder.AppendLineInvariant("base.OnCreate();");
                     }

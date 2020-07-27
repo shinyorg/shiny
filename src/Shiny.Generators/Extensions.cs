@@ -30,6 +30,10 @@ namespace Shiny.Generators
             => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
 
 
+        public static bool HasXamarinEssentials(this SourceGeneratorContext context)
+            => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null;
+
+
         public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName)
         {
             var attribute = context.Compilation.GetTypeByMetadataName(attributeName);
@@ -155,12 +159,9 @@ namespace Shiny.Generators
             .OfType<INamedTypeSymbol>();
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType<T>(this SourceGeneratorContext context)
-            => context.GetAllImplementationsOfType(typeof(T));
-
-
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type type)
             => context.GetAllImplementationsOfType(type.FullName);
+
 
 
         public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName)
@@ -169,11 +170,15 @@ namespace Shiny.Generators
             if (symbol == null)
                 return Enumerable.Empty<INamedTypeSymbol>();
 
-            return SymbolFinder
+            return context.GetAllImplementationsOfType(symbol);
+        }
+
+
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, ISymbol symbol)
+            => SymbolFinder
                 .FindImplementationsAsync(symbol, context.Project.Solution)
                 .Result
                 .OfType<INamedTypeSymbol>();
-        }
 
 
         public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName)
@@ -184,40 +189,6 @@ namespace Shiny.Generators
 
             var result = SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution).Result;
             return result;
-        }
-
-
-        public static INamedTypeSymbol? GetShinyStartupSymbol(this SourceGeneratorContext context)
-        {
-            System.Diagnostics.Debugger.Launch();
-
-            //if (AutoStartupTask.IsGenerated)
-            //{
-            //    var nameSpace = context.GetProjectInstance().GetPropertyValue("RootNamespace");
-            //    return context.Compilation.GetTypeByMetadataName($"{nameSpace}.AppShinyStartup");
-            //}
-            var log = context.GetLogger();
-            var startupClasses = context
-                .GetAllImplementationsOfType("Shiny.IShinyStartup")
-                .WhereNotSystem()
-                .ToList();
-
-            INamedTypeSymbol? startupClass = null;
-            switch (startupClasses.Count)
-            {
-                case 0:
-                    log.Warn("No Shiny Startup implementation found");
-                    break;
-
-                case 1:
-                    startupClass = startupClasses.First();
-                    break;
-
-                default:
-                    log.Warn(startupClasses.Count + " Shiny Startup implementations found");
-                    break;
-            }
-            return startupClass;
         }
 
 
