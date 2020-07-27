@@ -1,17 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <IsPackable>false</IsPackable>
+        <IsTool>true</IsTool>
     </PropertyGroup>
 
     <ItemGroup>
+        <Content Include="build/**/*.*">
+            <Pack>true</Pack>
+            <PackagePath>build</PackagePath>
+        </Content>
         <PackageReference Include="Uno.Roslyn" Version="1.2.0-dev.18" />
         <PackageReference Include="Uno.SourceGeneration" Version="2.0.13" PrivateAssets="All" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
+        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.13" PrivateAssets="None" />
+        <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

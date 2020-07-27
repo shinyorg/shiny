@@ -18,12 +18,12 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
         <!--
-        <None Update="build\**" Pack="true" PackagePath="build\%(Filename)%(Extension)" />
-        <PackageReference Include="System.Text.Json" Version="4.7.1" />
-        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="None" />
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>
+        <None Update="build\**" Pack="true" PackagePath="build\%(Filename)%(Extension)" />
+        <PackageReference Include="System.Text.Json" Version="4.7.1" />
+        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="None" />
         -->
     </ItemGroup>
 
@@ -43,20 +43,17 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
-        <!--<ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />-->
         <Compile Include="**\Platforms\Tizen\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <!--<ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />-->
         <ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj" />
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin')) ">
-        <!--<ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />-->
         <Compile Include="**\Platforms\Apple\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>

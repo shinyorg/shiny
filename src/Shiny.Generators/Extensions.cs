@@ -33,7 +33,13 @@ namespace Shiny.Generators
         }
 
 
+        public static bool IsEvent(this IMethodSymbol method) =>
+            //method.Kind == SymbolKind.Event;
+            method.Name.StartsWith("add_") || method.Name.StartsWith("remove_");
+
+
         public static bool IsProperty(this IMethodSymbol method) =>
+            //method.Kind == SymbolKind.Property;
             method.Name.StartsWith("get_") || method.Name.StartsWith("set_");
 
 
@@ -57,6 +63,57 @@ namespace Shiny.Generators
             return s;
         }
 
+
+        public static IEnumerable<IMethodSymbol> GetAllPublicMethods(this ITypeSymbol type)
+        {
+            if (type.IsInterface())
+            {
+                var methods = type
+                    .GetAllInterfacesIncludingThis()
+                    .SelectMany(x => x
+                        .GetMembers()
+                        .OfType<IMethodSymbol>()
+                        .Where(y =>
+                            !y.IsProperty() &&
+                            !y.IsEvent()
+                        )
+                    );
+
+                foreach (var method in methods)
+                    yield return method;
+
+                yield break;
+            }
+            else
+            {
+                var currentType = type;
+
+                while (currentType != null)
+                {
+                    var methods = currentType
+                        .GetMembers()
+                        .OfType<IMethodSymbol>()
+                        .Where(x => x.DeclaredAccessibility == Accessibility.Public)
+                        .Where(x => !x.IsEvent() && !x.IsProperty())
+                        //.Where(x => !x.IsConstructorOrDestructor())
+                        .Where(x => x.Kind == SymbolKind.Method)
+                        .Where(x => !x.IsAbstract)
+                        .ToList();
+
+                    foreach (var method in methods)
+                    {
+                        yield return method;
+                    }
+
+                    //if (!visitHierarchy)
+                    //{
+                    //    break;
+                    //}
+
+                    currentType = currentType.BaseType;
+                }
+            }
+        }
 
         public static void AppendNamespaces(this IndentedStringBuilder builder, params string[] nameSpaces)
         {

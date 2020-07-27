@@ -68,20 +68,19 @@ namespace Shiny.Generators.Generators
             {
                 using (builder.BlockInvariant("public static partial class " + genFileName))
                 {
+                    builder.AppendLine($"public static bool IsAvailable => ShinyHost.Container.IsRegistered<{ifTypeName}>();");
+                    builder.AppendLine();
                     builder.AppendLine($"public static {ifTypeName} Current => ShinyHost.Resolve<{ifTypeName}>();");
                     builder.AppendLine();
 
-                    var methods = type
-                        .GetMembers()
-                        .OfType<IMethodSymbol>()
-                        .Where(x => !x.IsProperty());
+                    var methods = type.GetAllPublicMethods();
 
                     foreach (var method in methods)
                     {
                         var argList = method.BuildArgString(true);
                         var argListNoNames = method.BuildArgString(false);
 
-                        var returnType = method.ReturnType?.ToDisplayString() ?? "void";
+                        var returnType = method.ReturnType.IsVoid() ? "void" : method.ReturnType.ToDisplayString();
                         var signature = $"public static {returnType} {method.Name}";
                         var args = $"Current.{method.Name}";
 
