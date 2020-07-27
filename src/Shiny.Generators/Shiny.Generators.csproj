@@ -13,7 +13,6 @@
         <PackageReference Include="Uno.Roslyn" Version="1.2.0-dev.18" />
         <PackageReference Include="Uno.SourceGeneration" Version="2.0.13" PrivateAssets="All" />
         <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.13" PrivateAssets="None" />
-        <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

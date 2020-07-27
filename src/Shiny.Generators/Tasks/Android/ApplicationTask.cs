@@ -1,32 +1,29 @@
 ﻿using System;
+using Shiny.Generators.Tasks;
 using Uno.RoslynHelpers;
-using Uno.SourceGeneration;
 
 
-namespace Shiny.Generators.Generators.Android
+namespace Shiny.Generators.Tasks.Android
 {
-    public static class ApplicationSourceGenerator
+    public class ApplicationTask : ShinySourceGeneratorTask
     {
-        public static void Execute(SourceGeneratorContext context)
+        public override void Execute()
         {
-            //var log = context.GetLogger();
-
             // if application exists, error or override? - could also search for attribute?
-            var appClass = context.Compilation.GetTypeByMetadataName("Android.App.Application");
+            var appClass = this.Context.Compilation.GetTypeByMetadataName("Android.App.Application");
             if (appClass == null)
                 return;
 
             // TODO: log error if android application already exists? only gen it if there isn't an existing one?
 
-            //System.Diagnostics.Debugger.Launch();
-            var startupClass = context.GetShinyStartupSymbol();
+            var startupClass = this.Context.GetShinyStartupSymbol();
             if (startupClass == null)
                 return;
 
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Runtime");
 
-            using (builder.BlockInvariant($"namespace {context.Compilation.GlobalNamespace.Name}"))
+            using (builder.BlockInvariant($"namespace {this.Context.Compilation.GlobalNamespace.Name}"))
             {
                 builder.AppendLineInvariant("[ApplicationAttribute]");
                 using (builder.BlockInvariant("public partial class AppShinyApplication : Application"))
@@ -36,7 +33,7 @@ namespace Shiny.Generators.Generators.Android
                     {
                         builder.AppendLineInvariant($"this.InitShiny({startupClass.ToDisplayString()});");
 
-                        if (context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null)
+                        if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null)
                             builder.AppendLine("Xamarin.Essentials.Platform.Init(this);");
 
                         builder.AppendLineInvariant("base.OnCreate();");
@@ -49,7 +46,7 @@ namespace Shiny.Generators.Generators.Android
                     }
                 }
             }
-            context.AddCompilationUnit("MainApplication", builder.ToString());
+            this.Context.AddCompilationUnit("MainApplication", builder.ToString());
         }
     }
 }

@@ -1,12 +1,11 @@
 ﻿using System;
-using Uno.SourceGeneration;
 
 
-namespace Shiny.Generators.Generators.Android
+namespace Shiny.Generators.Tasks.Android
 {
-    public static class ActivitySourceGenerator
+    public class ActivityTask : ShinySourceGeneratorTask
     {
-        public static void Execute(SourceGeneratorContext context)
+        public override void Execute()
         {
             //[Activity(
             //    Label = "Shiny",
@@ -17,7 +16,7 @@ namespace Shiny.Generators.Generators.Android
             //)]
             //public class MainActivity : FormsAppCompatActivity
 
-            var activityAttribute = context.Compilation.GetTypeByMetadataName("Android.App.ActivityAttribute");
+            var activityAttribute = this.Context.Compilation.GetTypeByMetadataName("Android.App.ActivityAttribute");
             if (activityAttribute == null)
                 return;
 

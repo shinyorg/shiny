@@ -1,27 +1,26 @@
 ﻿using System;
 using System.Linq;
-using Uno.SourceGeneration;
 using Uno.RoslynHelpers;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
 
-namespace Shiny.Generators.Generators
+namespace Shiny.Generators.Tasks
 {
-    public static class BleClientSourceGenerator
+    public class BleClientTask : ShinySourceGeneratorTask
     {
-        public static void Execute(SourceGeneratorContext context)
+        public override void Execute()
         {
             //System.Diagnostics.Debugger.Launch();
 
-            var log = context.GetLogger();
-            log.Info("RUNNING BLE CLIENT SOURCE GENERATOR");
+            this.Log.Info("RUNNING BLE CLIENT SOURCE GENERATOR");
 
-            var bleService = context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.CharacteristicAttribute");
+            var bleService = this.Context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.CharacteristicAttribute");
             if (bleService == null)
                 return;
 
-            var types = context
+            var types = this
+                .Context
                 .GetAllInterfaceTypes()
                 .Where(x => x
                     .GetMethods()
@@ -66,13 +65,13 @@ namespace Shiny.Generators.Generators
                                 else if (method.ReturnType  == typeof(IObservable<>))
                                 {
                                     // notify - what about indicate?
-                                    
+
                                 }
                             }
                         }
                     }
                 }
-                context.AddCompilationUnit(className, builder.ToString());
+                this.Context.AddCompilationUnit(className, builder.ToString());
             }
         }
     }

@@ -4,14 +4,14 @@ using Uno.RoslynHelpers;
 using Uno.SourceGeneration;
 
 
-namespace Shiny.Generators.Generators
+namespace Shiny.Generators.Tasks
 {
-    public static class PrismBridgeSourceGenerator
+    public class PrismBridgeTask : ShinySourceGeneratorTask
     {
-        public static void Execute(SourceGeneratorContext context)
+        public override void Execute()
         {
-            var log = context.GetLogger();
-            var apps = context.GetAllDerivedClassesForType("Prism.DryIoc.PrismApplication");
+            var log = this.Context.GetLogger();
+            var apps = this.Context.GetAllDerivedClassesForType("Prism.DryIoc.PrismApplication");
 
             switch (apps.Count())
             {
@@ -25,9 +25,9 @@ namespace Shiny.Generators.Generators
                     builder.AppendNamespaces("Prism.Ioc", "Prism.Mvvm", "Prism.DryIoc", "DryIoc");
 
                     using (builder.BlockInvariant("namespace " + app.ContainingNamespace.Name))
-                    { 
+                    {
                         using (builder.BlockInvariant("public partial class " + app.Name))
-                        { 
+                        {
                             using (builder.BlockInvariant("protected override IContainerExtension CreateContainerExtension()"))
                             {
                                 builder.AppendLineInvariant("var container = new Container(this.CreateContainerRules());");
@@ -40,7 +40,7 @@ Shiny.ShinyHost.Populate((serviceType, func, lifetime) =>
         Reuse.Singleton // HACK: I know everything is singleton
     );
 });");
-                                if (!AutoStartupSourceGenerator.IsGenerated)
+                                if (!this.ShinyContext.IsStartupGenerated)
                                 {
                                     builder.AppendLineInvariant("Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => ShinyHost.Container.GetService(t));");
                                     builder.AppendLine();
@@ -50,7 +50,7 @@ Shiny.ShinyHost.Populate((serviceType, func, lifetime) =>
                             }
                         }
                     }
-                    context.AddCompilationUnit(app.Name, builder.ToString());
+                    this.Context.AddCompilationUnit(app.Name, builder.ToString());
                     break;
 
                 default:

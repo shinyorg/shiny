@@ -12,15 +12,19 @@ namespace Shiny.Generators
 {
     static class Extensions
     {
-        //public static bool HasShinyCore(this SourceGeneratorContext context)
-        //    => context.Compilation.GetTypeByMetadataName("Shiny.ShinyHost") != null;
-
         public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
             symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
 
 
         public static bool HasMethod(this INamedTypeSymbol symbol, string methodName)
-            => symbol.GetTypeMembers(methodName).OfType<IMethodSymbol>().Any();
+        {
+            var members = symbol.GetMembers();
+            var exists = members
+                .OfType<IMethodSymbol>()
+                .Any(x => x.Name.Equals(methodName));
+            return exists;
+        }
+
 
         public static bool HasXamarinForms(this SourceGeneratorContext context)
             => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
@@ -34,12 +38,10 @@ namespace Shiny.Generators
 
 
         public static bool IsEvent(this IMethodSymbol method) =>
-            //method.Kind == SymbolKind.Event;
             method.Name.StartsWith("add_") || method.Name.StartsWith("remove_");
 
 
         public static bool IsProperty(this IMethodSymbol method) =>
-            //method.Kind == SymbolKind.Property;
             method.Name.StartsWith("get_") || method.Name.StartsWith("set_");
 
 
@@ -95,20 +97,12 @@ namespace Shiny.Generators
                         .OfType<IMethodSymbol>()
                         .Where(x => x.DeclaredAccessibility == Accessibility.Public)
                         .Where(x => !x.IsEvent() && !x.IsProperty())
-                        //.Where(x => !x.IsConstructorOrDestructor())
                         .Where(x => x.Kind == SymbolKind.Method)
                         .Where(x => !x.IsAbstract)
                         .ToList();
 
                     foreach (var method in methods)
-                    {
                         yield return method;
-                    }
-
-                    //if (!visitHierarchy)
-                    //{
-                    //    break;
-                    //}
 
                     currentType = currentType.BaseType;
                 }
@@ -195,10 +189,16 @@ namespace Shiny.Generators
 
         public static INamedTypeSymbol? GetShinyStartupSymbol(this SourceGeneratorContext context)
         {
-            var log = context.GetLogger();
+            System.Diagnostics.Debugger.Launch();
 
+            //if (AutoStartupTask.IsGenerated)
+            //{
+            //    var nameSpace = context.GetProjectInstance().GetPropertyValue("RootNamespace");
+            //    return context.Compilation.GetTypeByMetadataName($"{nameSpace}.AppShinyStartup");
+            //}
+            var log = context.GetLogger();
             var startupClasses = context
-                .GetAllImplementationsOfType<IShinyStartup>()
+                .GetAllImplementationsOfType("Shiny.IShinyStartup")
                 .WhereNotSystem()
                 .ToList();
 
@@ -223,6 +223,7 @@ namespace Shiny.Generators
 
         public static IEnumerable<INamedTypeSymbol> WhereNotInAssembly(this IEnumerable<INamedTypeSymbol> en, params string[] names)
             => en.Where(x => !names.Any(y => x.ContainingAssembly.Name.StartsWith(y, StringComparison.OrdinalIgnoreCase)));
+
 
         public static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en)
             => en.WhereNotInAssembly("Xamarin.", "Shiny.");
