@@ -9,21 +9,19 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <None Update="build\**" Pack="true" PackagePath="build\%(Filename)%(Extension)" />
-        <None Update="build\**" Pack="true" PackagePath="buildTransitive\%(Filename)%(Extension)" />
+        <None Include="Shiny.Generators.props" pack="true" PackagePath="build/Shiny.Generators.props" />
+        <None Include="Shiny.Generators.props" pack="true" PackagePath="buildTransitive/Shiny.Generators.props" />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="System.Reactive" Version="4.4.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
+        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="None" />
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>
-        <!--
-        <PackageReference Include="System.Text.Json" Version="4.7.1" />
-        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="None" />
-        -->
+        <!--<PackageReference Include="System.Text.Json" Version="4.7.1" />-->
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -74,21 +72,14 @@
         <Reference Include="netstandard" />
     </ItemGroup>
 
+    <Target Name="BundleGenerators" BeforeTargets="Pack;_LoadPackInputItems">
+        <ItemGroup>
+            <None Include="$(SrcFolder)\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="build\Shiny.Generators.dll" Visible="false" />
+            <None Include="$(SrcFolder)\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="buildTransitive\Shiny.Generators.dll" Visible="false" />
+        </ItemGroup>
+    </Target>
+
     <!--<Target Name="BuildGenerators" BeforeTargets="PrepareResources">
         <MSBuild Projects="@(ProjectReference)" Targets="Build" Properties="Configuration=$(Configuration)" />
     </Target>-->
-
-    <Target Name="BundleGenerators" BeforeTargets="Pack;_LoadPackInputItems">
-        <ItemGroup>
-            <None Include="$(SrcFolder)\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll"
-                  Pack="true"
-                  PackagePath="build\Shiny.Generators.dll"
-                  Visible="false" />
-
-            <None Include="$(SrcFolder)\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll"
-                  Pack="true"
-                  PackagePath="buildTransitive\Shiny.Generators.dll"
-                  Visible="false" />
-        </ItemGroup>
-    </Target>
 </Project>
