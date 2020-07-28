@@ -11,8 +11,7 @@ namespace Shiny.Generators.Tests
         public void DidGenerate()
         {
             TestShinyHost.Init(new AppShinyStartup());
-            //TestShinyHost.Resolve<>()
-            // ensure registrations
+            // TODO: ensure registrations are registered (problem is, none will be since this is netstandard project)
         }
     }
 }

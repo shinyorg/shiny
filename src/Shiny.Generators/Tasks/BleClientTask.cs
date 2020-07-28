@@ -12,9 +12,6 @@ namespace Shiny.Generators.Tasks
         public override void Execute()
         {
             //System.Diagnostics.Debugger.Launch();
-
-            this.Log.Info("RUNNING BLE CLIENT SOURCE GENERATOR");
-
             var bleService = this.Context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.CharacteristicAttribute");
             if (bleService == null)
                 return;
@@ -27,6 +24,7 @@ namespace Shiny.Generators.Tasks
                     .Any(y => y.FindAttributeFlattened(bleService) != null)
                 );
 
+            this.Log.Info("RUNNING BLE CLIENT SOURCE GENERATOR");
             foreach (var type in types)
             {
                 var className = type.Name.TrimStart('I');

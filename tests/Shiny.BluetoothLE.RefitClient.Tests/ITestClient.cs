@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Reactive;
 using System.Threading.Tasks;
 
 
@@ -7,37 +7,30 @@ namespace Shiny.BluetoothLE.RefitClient.Tests
 {
     public interface ITestClient
     {
+        //  TODO: only async or observables
+
+        // TODO: transactional (possibly auth signed writes)
+        // write only
         [Characteristic("123", "456")]
-        void Test();
+        Task WriteRaw(byte[] data);
 
-        //[Characteristic("123", "456")]
-        //Task Write(object value);
+        // transactional
+        [Characteristic("123", "456")]
+        IObservable<Unit> WriteRawObservable(byte[] data);  // unit is equivalent to void/write only
 
-        //[Characteristic("123", "456")]
-        //IObservable<object> WriteObservable(object value);
+        // secure reads?
+        [Characteristic("123", "456")]
+        Task<byte[]> ReadRaw();
 
-        //// TODO: return type?
-        //[Characteristic("123", "456")]
-        //IObservable<object> WriteObservableRaw(byte[] value);
+        [Characteristic("123", "456")]
+        IObservable<byte[]> ReadRawObservable();
 
         //// TODO: transactional?
         //[Characteristic("123", "456")]
-        //IObservable<object> WriteStream(Stream stream);
+        //IObservable<Unit or Progress?, transactional> WriteStream(Stream stream);
 
-
-        //[Characteristic("123", "456")]
-        //Task WriteRaw(byte[] bytes);
-
-
-        //[Characteristic("123", "456")]
-        //Task<byte[]> ReadRaw();
-
-        //[Characteristic("123", "456")]
-        //IObservable<byte> ReadObservableRaw();
-
-
-        //[Characteristic("123", "456")]
-        //IObservable<object> Notify();
+        [Characteristic("123", "456")]
+        IObservable<CharacteristicGattResult> Notify();
 
         // TODO: Unit equivalent of void
         // TODO: secure read/writes/notifys?

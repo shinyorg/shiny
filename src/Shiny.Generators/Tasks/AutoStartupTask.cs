@@ -22,17 +22,16 @@ namespace Shiny.Generators.Tasks
 
             this.ShinyContext.IsStartupGenerated = true;
             var nameSpace = this.ShinyContext.GetRootNamespace();
+            var existing = this.Context.Compilation.GetTypeByMetadataName($"{nameSpace}.AppShinyStartup");
 
             this.builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
             this.builder.CreateClass(
                 () =>
                 {
-                    this.builder.AppendLine("protected virtual void CustomConfigureServices(IServiceCollection services) {}");
-                    this.builder.AppendLine();
-
                     using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
-                        this.builder.AppendLineInvariant("this.CustomConfigureServices(services);");
+                        if (existing?.HasMethod("CustomConfigureServices") ?? false)
+                            this.builder.AppendLineInvariant("this.CustomConfigureServices(services);");
 
                         this.RegisterIf("Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
                         this.RegisterIf("Shiny.Nfc.INfcManager", "services.UseNfc();");
