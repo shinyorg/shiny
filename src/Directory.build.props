@@ -34,7 +34,6 @@
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
 
         <SrcFolder>$(MSBuildThisFileDirectory)..\src</SrcFolder>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
