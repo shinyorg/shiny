@@ -9,7 +9,7 @@ namespace Shiny.Generators.Tasks
     {
         public override void Execute()
         {
-            var symbol = this.Context.Compilation.GetTypeByMetadataName(typeof(GenerateStaticClassesAttribute).FullName);
+            var symbol = this.Context.Compilation.GetTypeByMetadataName("Shiny.GenerateStaticClassesAttribute");
             var attribute = this.Context.Compilation.Assembly.FindAttributeFlattened(symbol);
             if (attribute == null)
                 return;

@@ -1,6 +1,5 @@
-﻿using Shiny.Generators;
-using Shiny.Generators.Tests;
+﻿using Shiny.Generators.Tests;
 
-[assembly: Shiny.Generators.GenerateStartup]
-[assembly: Shiny.Generators.GenerateStaticClasses]
-[assembly: Shiny.Generators.ShinyInject(typeof(ITestService), typeof(TestService))]
+[assembly: Shiny.GenerateStartup]
+[assembly: Shiny.GenerateStaticClasses]
+[assembly: Shiny.ShinyInject(typeof(ITestService), typeof(TestService))]

@@ -1,2 +1,2 @@
-﻿[assembly: Shiny.Generators.GenerateStartup]
-[assembly: Shiny.Generators.GenerateStaticClasses]
+﻿[assembly: Shiny.GenerateStartup]
+[assembly: Shiny.GenerateStaticClasses]

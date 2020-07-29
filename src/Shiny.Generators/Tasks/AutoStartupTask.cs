@@ -13,7 +13,7 @@ namespace Shiny.Generators.Tasks
 
         public override void Execute()
         {
-            if (!this.Context.HasAssemblyAttribute(typeof(GenerateStartupAttribute).FullName))
+            if (!this.Context.HasAssemblyAttribute("Shiny.GenerateStartupAttribute"))
             {
                 this.Log.Info("Assembly is not setup to auto-build the Shiny Startup");
                 return;
@@ -28,10 +28,6 @@ namespace Shiny.Generators.Tasks
             this.builder.CreateClass(
                 () =>
                 {
-                    // TODO: what if I want to customize the registration?
-                    // TODO: what if I want Azure Push Notifications over push?
-                    // TODO: what if the UseMethod has required variables like Azure Push Notifications
-                        // TODO: arg types - UseNotifications 
                     using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
                         if (existing?.HasMethod("CustomConfigureServices") ?? false)
@@ -54,6 +50,7 @@ namespace Shiny.Generators.Tasks
                         this.RegisterAllDelegate("Shiny.Locations.Sync.IGpsSyncDelegate", "services.UseGpsSync", true);
                         this.RegisterAllDelegate("Shiny.TripTracker.ITripTrackerDelegate", "services.UseTripTracker", true);
 
+                        this.RegisterPush();
                         this.RegisterJobs();
                         this.RegisterStartupTasks();
                         this.RegisterModules();
@@ -78,22 +75,50 @@ namespace Shiny.Generators.Tasks
         }
 
 
-        void RegisterIf(string typeNameExists, string registerString)
+        void RegisterPush()
+        {
+            var hasAzurePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.AzureNotificationHubs"));
+            if (hasAzurePush)
+            {
+                var rootNs = this.ShinyContext.GetRootNamespace();
+                this.Log.Warn($"Shiny.Push.AzureNotificationHubs cannot be auto-registered due to required configuration parameters.  Make sure to create a `public partial class AppShinyStartup : Shiny.ShinyStartup` in the namespace `{rootNs}` in this project with the rootnamespace and add `void CustomConfigureServices(IServiceCollection services)` to register it");
+            }
+            else
+            {
+                // azure must be manually registered
+                var hasFirebasePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.FirebaseMessaging"));
+                var hasNativePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push"));
+
+                if (hasFirebasePush)
+                {
+                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", false);
+                }
+                else if (hasNativePush)
+                {
+                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", false);
+                }
+            }
+        }
+
+
+        bool RegisterIf(string typeNameExists, string registerString)
         {
             var symbol = this.Context.Compilation.GetTypeByMetadataName(typeNameExists);
             if (symbol != null)
             {
                 this.Log.Info("Registering in Shiny Startup - " + registerString);
                 this.builder.AppendLineInvariant(registerString);
+                return true;
             }
+            return false;
         }
 
 
-        void RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
+        bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
         {
             var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
             if (symbol == null)
-                return;
+                return false;
 
             var impls = this
                 .Context
@@ -102,7 +127,7 @@ namespace Shiny.Generators.Tasks
                 .ToArray();
 
             if (!impls.Any() && oneDelegateRequiredToInstall)
-                return;
+                return false;
 
             if (oneDelegateRequiredToInstall)
                 registerStatement += $"<{impls.First().ToDisplayString()}>";
@@ -119,6 +144,7 @@ namespace Shiny.Generators.Tasks
                     this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
                 }
             }
+            return true;
         }
 
 

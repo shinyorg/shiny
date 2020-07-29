@@ -27,6 +27,7 @@
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Sync\Shiny.Locations.Sync.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />

@@ -4,8 +4,8 @@ using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 
-[assembly: Shiny.Generators.GenerateStartup]
-//[assembly: Shiny.Generators.GenerateStaticClasses]
+[assembly: Shiny.GenerateStartup]
+[assembly: Shiny.GenerateStaticClasses]
 
 
 namespace Shiny.Generators.iOS.Tests

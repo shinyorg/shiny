@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Generators
+namespace Shiny
 {
     [AttributeUsage(AttributeTargets.Assembly)]
     public class GenerateStartupAttribute : Attribute
