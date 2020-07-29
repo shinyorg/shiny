@@ -16,7 +16,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="System.Reactive" Version="4.4.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
-        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.6" PrivateAssets="None" />
+        <PackageReference Include="Uno.SourceGenerationTasks" Version="2.0.13" PrivateAssets="None" />
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
