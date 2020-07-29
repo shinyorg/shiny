@@ -9,8 +9,8 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <None Include="Shiny.Generators.props" pack="true" PackagePath="build/Shiny.Generators.props" />
-        <None Include="Shiny.Generators.props" pack="true" PackagePath="buildTransitive/Shiny.Generators.props" />
+        <None Include="Shiny.Core.props" pack="true" PackagePath="build/Shiny.Core.props" />
+        <None Include="Shiny.Core.props" pack="true" PackagePath="buildTransitive/Shiny.Core.props" />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

@@ -28,6 +28,10 @@ namespace Shiny.Generators.Tasks
             this.builder.CreateClass(
                 () =>
                 {
+                    // TODO: what if I want to customize the registration?
+                    // TODO: what if I want Azure Push Notifications over push?
+                    // TODO: what if the UseMethod has required variables like Azure Push Notifications
+                        // TODO: arg types - UseNotifications 
                     using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
                         if (existing?.HasMethod("CustomConfigureServices") ?? false)
