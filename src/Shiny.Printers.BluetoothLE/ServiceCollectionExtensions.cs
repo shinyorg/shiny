@@ -1,19 +1,18 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Printers;
+using Shiny.Printers.BluetoothLE;
 
 
 namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseBlePrinters(this IServiceCollection services)
+        public static void UseBlePrinters(this IServiceCollection services, BlePrinterConfig config)
         {
-#if NETSTANDARD2_0
-            return false;
-#else
-            //services.AddSingleton<IPrinterManager, ZebraPrinterManager>();
-            return true;
-#endif
+            services.UseBleClient();
+            services.AddSingleton(config);
+            services.AddSingleton<IPrinterManager, BlePrinterManager>();
         }
     }
 }
