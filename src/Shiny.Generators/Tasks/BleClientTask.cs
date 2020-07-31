@@ -55,6 +55,10 @@ namespace Shiny.Generators.Tasks
                                 if (method.ReturnType == typeof(Task<>))
                                 {
                                     // write
+                                    if (method.Parameters.Length > 0)
+                                    {
+                                        // write/read - tx/rx
+                                    }
                                 }
                                 else if (method.ReturnType == typeof(Task))
                                 {
@@ -63,6 +67,10 @@ namespace Shiny.Generators.Tasks
                                 else if (method.ReturnType  == typeof(IObservable<>))
                                 {
                                     // notify - what about indicate?
+                                    if (method.Parameters.Length > 0)
+                                    {
+                                        // write/read - tx/rx
+                                    }
 
                                 }
                             }
