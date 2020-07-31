@@ -5,6 +5,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Foundation;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
 
 
@@ -114,8 +115,14 @@ namespace Shiny.BluetoothLE
         public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable)
         {
             this.notifyOb ??= Observable.Create<CharacteristicGattResult>(
-                ob =>
+                async ob =>
                 {
+                    TypedEventHandler<Native, GattValueChangedEventArgs> handler = (s, a) => 
+                    {
+                        var bytes = a.CharacteristicValue.ToArray();
+                        var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
+                        ob.OnNext(result);
+                    };
                     //        var status = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(value);
                     //        if (status != GattCommunicationStatus.Success)
                     //            throw new BleException($"Failed to write client characteristic configuration descriptor - {status}");
@@ -134,8 +141,20 @@ namespace Shiny.BluetoothLE
                     //        //var trigger = new GattCharacteristicNotificationTrigger(this.native);
                     //        this.Native.ValueChanged += this.OnValueChanged;
                     //        return () => this.Native.ValueChanged -= this.OnValueChanged;
-
-                    return () => { };
+                    var gcs = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                    if (gcs == GattCommunicationStatus.Success)
+                    {
+                        this.Native.ValueChanged += handler;
+                    }
+                    else
+                    {
+                        ob.OnError(new Exception());
+                    }
+                    return () => 
+                    {
+                        this.Native.ValueChanged -= handler;
+                        ob.OnCompleted();
+                    };
                 })
                 .Publish()
                 .RefCount();
@@ -147,7 +166,8 @@ namespace Shiny.BluetoothLE
         internal async Task Disconnect()
         {
             await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
-            this.Native.ValueChanged -= this.OnValueChanged;
+            //this.Native.ValueChanged -= this.OnValueChanged;
+            //notifyOb?.
         }
 
 
