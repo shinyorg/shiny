@@ -29,7 +29,7 @@ namespace Shiny.BluetoothLE.RefitClient
 
     public class BleNotifyAttribute : BleAttribute
     {
-        public BleNotifyAttribute(string serviceUuid, string characteristicUuid) : base(serviceUuid, characteristicUuid)
+        public BleNotifyAttribute(string serviceUuid, string characteristicUuid, bool useIndicationIfAvailable) : base(serviceUuid, characteristicUuid)
         {
         }
     }

@@ -6,6 +6,6 @@ namespace Shiny.BluetoothLE.RefitClient
     public interface IBleDataSerializer
     {
         byte[] Serialize(object obj);
-        object Deserialize(byte[] data);
+        object Deserialize(Type objectType, byte[] data);
     }
 }

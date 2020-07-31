@@ -22,5 +22,6 @@
         </PackageReference>
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.RefitClient\Shiny.BluetoothLE.RefitClient.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
     </ItemGroup>
 </Project>

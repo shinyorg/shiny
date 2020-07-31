@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE.RefitClient.Tests
 {
-    public interface ITestClient
+    public interface ITestClient : IBleClient
     {
         //  TODO: only async or observables
 

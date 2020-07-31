@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentAssertions;
+using Moq;
 using Xunit;
 
 
@@ -10,7 +11,8 @@ namespace Shiny.BluetoothLE.RefitClient.Tests
         [Fact]
         public void GetInstance()
         {
-            var impl = BleClientFactory.GetInstance<ITestClient>();
+            var mock = new Mock<IPeripheral>();
+            var impl = mock.Object.GetClient<ITestClient>();
             impl.Should().NotBeNull();
         }
     }
