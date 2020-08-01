@@ -11,8 +11,8 @@ namespace Shiny.BluetoothLE.RefitClient.Tests
 
         //// TODO: transactional (possibly auth signed writes)
         //// write only
-        //[Characteristic("123", "456")]
-        //Task WriteRaw(byte[] data);
+        [Characteristic("123", "456")]
+        Task WriteRaw(byte[] data);
 
         //// transactional
         //[Characteristic("123", "456")]
