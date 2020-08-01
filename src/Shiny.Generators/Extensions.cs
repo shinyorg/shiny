@@ -26,6 +26,22 @@ namespace Shiny.Generators
         }
 
 
+        public static bool IsGenericAsyncTask(this SourceGeneratorContext context, ITypeSymbol type)
+        {
+            var task = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1").OriginalDefinition;
+            var result = type.Equals(task);
+            return result;
+        }
+
+
+        public static bool IsAsyncTask(this SourceGeneratorContext context, ITypeSymbol type)
+        {
+            var task = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
+            var result = type.Equals(task);
+            return result;
+        }
+
+
         public static bool HasXamarinForms(this SourceGeneratorContext context)
             => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
 
