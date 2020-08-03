@@ -1,12 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <VersionSuffix>beta</VersionSuffix>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-    <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
-  </ItemGroup>
-
+    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
+    </ItemGroup>
 </Project>
