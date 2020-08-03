@@ -131,7 +131,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Beacons.Tests", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE.Hosting.Hubs.Tests", "tests\Shiny.BluetoothLE.Hosting.Hubs.Tests\Shiny.BluetoothLE.Hosting.Hubs.Tests.csproj", "{5CCDD4B6-E9DD-49C4-A17C-BFD0DF4C86D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE.RefitClient.Tests", "tests\Shiny.BluetoothLE.RefitClient.Tests\Shiny.BluetoothLE.RefitClient.Tests.csproj", "{BE5A78B9-3D48-44E3-BCC9-39617469DB9D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.BluetoothLE.RefitClient.Tests", "tests\Shiny.BluetoothLE.RefitClient.Tests\Shiny.BluetoothLE.RefitClient.Tests.csproj", "{BE5A78B9-3D48-44E3-BCC9-39617469DB9D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Core.Tests", "tests\Shiny.Core.Tests\Shiny.Core.Tests.csproj", "{FC2AF259-6085-44A0-8665-982C431074DC}"
 EndProject
@@ -149,7 +149,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "appservices", "appservices"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "considering", "considering", "{12F60C26-D91C-4F39-B5D5-4CDBC522580F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Generators.Tests", "tests\Shiny.Generators.Tests\Shiny.Generators.Tests.csproj", "{830A51D5-64DB-459F-8557-E36AC06BC2A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Generators.Tests", "tests\Shiny.Generators.Tests\Shiny.Generators.Tests.csproj", "{830A51D5-64DB-459F-8557-E36AC06BC2A1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Notifications.Abstractions", "src\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj", "{36F81700-221C-4480-89CD-07C6FB447966}"
 EndProject

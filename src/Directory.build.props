@@ -12,7 +12,6 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
-        <!--<PackageIconUrl>https://raw.githubusercontent.com/shinyorg/shiny/master/art/nuget.png</PackageIconUrl>-->
         <PackageReleaseNotes>https://github.com/shinyorg/shiny/blob/master/ChangeLog.md</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
@@ -23,7 +22,6 @@
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
 
         <!-- disable sourcelink on mono, to workaround https://github.com/dotnet/sourcelink/issues/155 -->
-        <!--Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' AND '$(MSBuildRuntimeType)' == 'Core' -->
         <EnableSourceLink Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">true</EnableSourceLink>
         <DeterministicSourcePaths Condition="'$(EnableSourceLink)' == ''">false</DeterministicSourcePaths>
         <EnableSourceLink Condition=" '$(Configuration)' == 'Release' ">true</EnableSourceLink>

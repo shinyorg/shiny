@@ -25,7 +25,6 @@ namespace Shiny.Generators.Tasks
                 .Where(x => x.AllInterfaces.Any(y => y.Equals(bleClientInterface)))
                 .ToList();
 
-
             this.Log.Info("RUNNING BLE CLIENT SOURCE GENERATOR");
             foreach (var type in types)
                 this.GenerateClient(type);
