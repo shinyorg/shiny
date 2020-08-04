@@ -90,6 +90,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.SpeechRecognition.Abs
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Generators", "src\Shiny.Generators\Shiny.Generators.csproj", "{E5ADBFC8-8EC0-4B3F-96F6-04D76C2FF6C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Snippets", "src\Snippets\Snippets.csproj", "{0E90A3BF-0BD0-47C8-AC40-9910D5660B64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
