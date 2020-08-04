@@ -3,6 +3,12 @@
 1.3.0
 ---
 
+### Generators
+* Auto Startup
+* Static classes
+* Prism Integration
+* Auto boilerplate for iOS and Android
+
 ### Core
 * [Fix][Settings] Nullable enums and set null to remove
 * New Hosting model based on Microsoft.Extensions.Hosting
@@ -14,11 +20,18 @@
 
 ### Shiny.BluetoothLE and Shiny.BluetoothLE.Hosting
 * [BREAKING] The original library has been split into 2 separate libraries (Client - Shiny.BluetoothLE and Server - Shiny.BluetoothLE.Hosting) with some common ties
+* [Client] You don't like RX - there are new async extensions to skip the RX
+
+### Shiny.BluetoothLE.Hosting.Hubs
+* The SignalR for BluetoothLE GATT servers
+
+### Shiny.BluetoothLE.RefitClient
+* Refit for HTTP client is awesome - BEHOLD - the BLE version!
 
 ### Shiny.Beacons
 * [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
 
-### Shiny.TripTracking (alpha) - NEW Module
+### Shiny.TripTracking (beta) - NEW Module
 * A new module for tracking run, walks, and drives!
 
 
