@@ -13,6 +13,7 @@ namespace Shiny.BluetoothLE
     public class GattCharacteristic : AbstractGattCharacteristic
     {
         readonly DeviceContext context;
+        IObserver<CharacteristicGattResult> currentOb;
 
 
         public GattCharacteristic(DeviceContext context,
@@ -33,10 +34,12 @@ namespace Shiny.BluetoothLE
         IObservable<IGattDescriptor> descriptorOb;
         public override IObservable<IGattDescriptor> DiscoverDescriptors()
         {
-            this.descriptorOb = this.descriptorOb ?? Observable.Create<IGattDescriptor>(async ob =>
+            this.descriptorOb ??= Observable.Create<IGattDescriptor>(async ob =>
             {
                 var result = await this.Native.GetDescriptorsAsync(BluetoothCacheMode.Uncached);
-                //if (result.Status != GattCommunicationStatus.Success)
+                if (result.Status != GattCommunicationStatus.Success)
+                    throw new BleException("Unable to request descriptors");
+
                 foreach (var dnative in result.Descriptors)
                 {
                     var descriptor = new GattDescriptor(dnative, this);
@@ -99,9 +102,9 @@ namespace Shiny.BluetoothLE
         public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable)
         {
             this.notifyOb ??= Observable.Create<CharacteristicGattResult>(
-                ob =>
+                async ob =>
                 {
-                    var type = useIndicationIfAvailable && this.CanIndicate()
+                    var type = enableIndicationsIfAvailable && this.CanIndicate()
                         ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
                         : GattClientCharacteristicConfigurationDescriptorValue.Notify;
 
@@ -141,7 +144,6 @@ namespace Shiny.BluetoothLE
             await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
             this.Native.ValueChanged -= this.OnValueChanged;
         }
-
 
 
         void OnValueChanged(Native sender, GattValueChangedEventArgs args)
