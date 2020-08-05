@@ -95,47 +95,39 @@ namespace Shiny.BluetoothLE
         });
 
 
-        //public override IObservable<CharacteristicGattResult> EnableNotifications(bool useIndicationIfAvailable)
-        //{
-        //    var type = useIndicationIfAvailable && this.CanIndicate()
-        //        ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
-        //        : GattClientCharacteristicConfigurationDescriptorValue.Notify;
-
-        //    return this.SetNotify(type);
-        //}
-
-
-        //public override IObservable<CharacteristicGattResult> DisableNotifications() =>
-        //    this.SetNotify(GattClientCharacteristicConfigurationDescriptorValue.None);
-
-
-
         IObservable<CharacteristicGattResult> notifyOb;
         public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable)
         {
             this.notifyOb ??= Observable.Create<CharacteristicGattResult>(
                 ob =>
                 {
-                    //        var status = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(value);
-                    //        if (status != GattCommunicationStatus.Success)
-                    //            throw new BleException($"Failed to write client characteristic configuration descriptor - {status}");
+                    var type = useIndicationIfAvailable && this.CanIndicate()
+                        ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
+                        : GattClientCharacteristicConfigurationDescriptorValue.Notify;
 
-                    //        this.IsNotifying = value != GattClientCharacteristicConfigurationDescriptorValue.None;
-                    //        this.context.SetNotifyCharacteristic(this);
-                    //        return new CharacteristicGattResult(
-                    //            this,
-                    //            null,
-                    //            value == GattClientCharacteristicConfigurationDescriptorValue.None
-                    //                ? CharacteristicResultType.NotificationUnsubscribed
-                    //                : CharacteristicResultType.NotificationSubscribed
-                    //        );
+                    var status = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(type);
+                    if (status != GattCommunicationStatus.Success)
+                        throw new BleException($"Failed to write client characteristic configuration descriptor - {status}");
 
-                    //        this.currentOb = ob;
-                    //        //var trigger = new GattCharacteristicNotificationTrigger(this.native);
-                    //        this.Native.ValueChanged += this.OnValueChanged;
-                    //        return () => this.Native.ValueChanged -= this.OnValueChanged;
+                    this.Native.ValueChanged += this.OnValueChanged;
+                    this.context.SetNotifyCharacteristic(this);
+                    this.IsNotifying = true;
+                    this.currentOb = ob;
 
-                    return () => { };
+                    if (sendHookEvent)
+                    {
+                        ob.OnNext(new CharacteristicGattResult(
+                            this,
+                            null,
+                            CharacteristicResultType.NotificationSubscribed
+                        ));
+                    }
+
+                    return async () =>
+                    {
+                        await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+                        this.Native.ValueChanged -= this.OnValueChanged;
+                    };
                 })
                 .Publish()
                 .RefCount();
@@ -158,7 +150,7 @@ namespace Shiny.BluetoothLE
             {
                 var bytes = args.CharacteristicValue.ToArray();
                 var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
-                //this.currentOb.OnNext(result);
+                this.currentOb.OnNext(result);
             }
         }
     }
