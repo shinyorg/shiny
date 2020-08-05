@@ -1,6 +1,6 @@
 ﻿# Change Log
 
-1.3.0
+2.0.0
 ---
 
 ### Generators
@@ -31,9 +31,15 @@
 ### Shiny.Beacons
 * [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
 
-### Shiny.TripTracking (beta) - NEW Module
+### App Services
+#### Shiny.TripTracking
 * A new module for tracking run, walks, and drives!
 
+#### Shiny.LocationSync
+* Track background GPS and/or geofence events and uses best practices to ensure these events hit your server in a timely fashion
+
+#### Shiny.MediaSync
+* Uploads Videos and Photos from your photo gallery
 
 1.2.0 (SP1)
 ---
