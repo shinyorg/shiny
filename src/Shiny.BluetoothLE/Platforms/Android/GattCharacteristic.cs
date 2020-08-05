@@ -227,11 +227,6 @@ namespace Shiny.BluetoothLE
 
         IObservable<CharacteristicGattResult> DisableNotifications() => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
         {
-            void success()
-            {
-                this.IsNotifying = false;
-                ob.Respond(new CharacteristicGattResult(this, null, CharacteristicResultType.NotificationUnsubscribed));
-            };
             if (!this.context.Gatt.SetCharacteristicNotification(this.native, false))
                 throw new BleException("Could not set characteristic notification value");
 
@@ -239,7 +234,7 @@ namespace Shiny.BluetoothLE
             var descriptor = this.native.GetDescriptor(NotifyDescriptorId);
             if (descriptor == null)
             {
-                success();
+                this.IsNotifying = false;
             }
             else
             {
@@ -247,13 +242,14 @@ namespace Shiny.BluetoothLE
                 sub = wrap
                     .WriteInternal(BluetoothGattDescriptor.DisableNotificationValue.ToArray())
                     .Subscribe(
-                        _ => success(),
-                        ex => success()
+                        _ => this.IsNotifying = false,
+                        ex => this.IsNotifying = false
                     );
             }
 
             return () => sub?.Dispose();
         }));
+
 
         bool NativeEquals(GattCharacteristicEventArgs args)
         {
