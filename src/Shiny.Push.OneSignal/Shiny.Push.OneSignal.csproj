@@ -11,4 +11,7 @@
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Com.OneSignal" Version="3.10.0" />
+    </ItemGroup>
 </Project>
