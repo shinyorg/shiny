@@ -114,52 +114,44 @@ namespace Shiny.BluetoothLE
         IObservable<CharacteristicGattResult> notifyOb;
         public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable)
         {
-            this.notifyOb ??= Observable.Create<CharacteristicGattResult>(
-                async ob =>
-                {
-                    TypedEventHandler<Native, GattValueChangedEventArgs> handler = (s, a) => 
+            lock (this)
+            {
+                this.notifyOb ??= Observable.Create<CharacteristicGattResult>(
+                    async ob =>
                     {
-                        var bytes = a.CharacteristicValue.ToArray();
-                        var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
-                        ob.OnNext(result);
-                    };
-                    //        var status = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(value);
-                    //        if (status != GattCommunicationStatus.Success)
-                    //            throw new BleException($"Failed to write client characteristic configuration descriptor - {status}");
+                        TypedEventHandler<Native, GattValueChangedEventArgs> handler = (s, a) =>
+                        {
+                            var bytes = a.CharacteristicValue.ToArray();
+                            var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
+                            ob.OnNext(result);
+                        };
+                        if ((this.Native.CharacteristicProperties & GattCharacteristicProperties.Notify) == GattCharacteristicProperties.Notify)
+                        {
+                            var gcs = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                            if (gcs == GattCommunicationStatus.Success)
+                            {
+                                this.Native.ValueChanged += handler;
+                            }
+                            else
+                            {
+                                ob.OnError(new BleException($"Characteristic configuration error - {gcs}"));
+                            }
+                        }
+                        else
+                        {
+                            ob.OnError(new BleException($"Notify is not supported - {this.Native.CharacteristicProperties}"));
+                        }
+                        return () =>
+                        {
+                            this.Native.ValueChanged -= handler;
+                            ob.OnCompleted();
+                        };
+                    })
+                    .Publish()
+                    .RefCount();
 
-                    //        this.IsNotifying = value != GattClientCharacteristicConfigurationDescriptorValue.None;
-                    //        this.context.SetNotifyCharacteristic(this);
-                    //        return new CharacteristicGattResult(
-                    //            this,
-                    //            null,
-                    //            value == GattClientCharacteristicConfigurationDescriptorValue.None
-                    //                ? CharacteristicResultType.NotificationUnsubscribed
-                    //                : CharacteristicResultType.NotificationSubscribed
-                    //        );
-
-                    //        this.currentOb = ob;
-                    //        //var trigger = new GattCharacteristicNotificationTrigger(this.native);
-                    //        this.Native.ValueChanged += this.OnValueChanged;
-                    //        return () => this.Native.ValueChanged -= this.OnValueChanged;
-                    var gcs = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
-                    if (gcs == GattCommunicationStatus.Success)
-                    {
-                        this.Native.ValueChanged += handler;
-                    }
-                    else
-                    {
-                        ob.OnError(new Exception());
-                    }
-                    return () => 
-                    {
-                        this.Native.ValueChanged -= handler;
-                        ob.OnCompleted();
-                    };
-                })
-                .Publish()
-                .RefCount();
-
-            return this.notifyOb;
+                return this.notifyOb;
+            }
         }
 
 
@@ -172,7 +164,7 @@ namespace Shiny.BluetoothLE
 
 
 
-        void OnValueChanged(Native sender, GattValueChangedEventArgs args)
+        /*void OnValueChanged(Native sender, GattValueChangedEventArgs args)
         {
             if (sender.Equals(this.Native))
             {
@@ -180,6 +172,6 @@ namespace Shiny.BluetoothLE
                 var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
                 //this.currentOb.OnNext(result);
             }
-        }
+        }*/
     }
 }
