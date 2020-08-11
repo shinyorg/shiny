@@ -9,13 +9,13 @@ using Windows.Devices.Bluetooth.Advertisement;
 
 namespace Shiny.BluetoothLE.Hosting
 {
-    public class PeripheralManager : IBleHostingManager
+    public class BleHostingManager : IBleHostingManager
     {
         readonly BluetoothLEAdvertisementPublisher publisher;
         readonly Dictionary<Guid, GattService> services;
 
 
-        public PeripheralManager()
+        public BleHostingManager()
         {
             this.publisher = new BluetoothLEAdvertisementPublisher();
             this.services = new Dictionary<Guid, GattService>();
