@@ -10,7 +10,7 @@ using Android.Bluetooth.LE;
 
 namespace Shiny.BluetoothLE.Hosting
 {
-    public class PeripheralManager : IBleHostingManager
+    public class BleHostingManager : IBleHostingManager
     {
         readonly GattServerContext context;
         readonly Dictionary<Guid, GattService> services;
@@ -18,7 +18,7 @@ namespace Shiny.BluetoothLE.Hosting
         AdvertisementCallbacks? adCallbacks;
 
 
-        public PeripheralManager(AndroidContext context, IMessageBus messageBus)
+        public BleHostingManager(AndroidContext context, IMessageBus messageBus)
         {
             this.context = new GattServerContext(context);
             this.services = new Dictionary<Guid, GattService>();

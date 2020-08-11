@@ -9,13 +9,13 @@ using CoreBluetooth;
 
 namespace Shiny.BluetoothLE.Hosting
 {
-    public class PeripheralManager : IBleHostingManager
+    public class BleHostingManager : IBleHostingManager
     {
         readonly CBPeripheralManager manager;
         readonly IDictionary<Guid, GattService> services;
 
 
-        public PeripheralManager()
+        public BleHostingManager()
         {
             this.manager = new CBPeripheralManager();
             this.services = new Dictionary<Guid, GattService>();

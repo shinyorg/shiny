@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-
+using Shiny.BluetoothLE.Hosting;
 
 namespace Shiny
 {
@@ -17,7 +17,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            //builder.AddSingleton<IPeripheralManager, PeripheralManager>();
+            builder.AddSingleton<IBleHostingManager, BleHostingManager>();
             return true;
 #endif
         }
