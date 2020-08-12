@@ -1,17 +1,18 @@
 ﻿#if !NETSTANDARD
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Logging;
 #if __ANDROID__
 using Android.App;
 using Android.Gms.Common;
 #endif
 
+
 namespace Shiny.Locations
 {
     class GeofenceModule : ShinyModule
     {
-        static bool added = false;
         readonly Type delegateType;
         readonly bool requestPermissionOnStart;
 
@@ -25,10 +26,6 @@ namespace Shiny.Locations
 
         public override void Register(IServiceCollection services)
         {
-            if (added)
-                return;
-
-            added = true;
 #if __ANDROID__
             var resultCode = GoogleApiAvailability
                 .Instance
@@ -40,18 +37,18 @@ namespace Shiny.Locations
             }
             else
             {
-                services.AddSingleton<GeofenceProcessor>();
-                services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
-                services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+                services.TryAddSingleton<GeofenceProcessor>();
+                services.TryAddSingleton(typeof(IGeofenceDelegate), this.delegateType);
+                services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             }
             
 #elif WINDOWS_UWP
-            services.AddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
-            services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
-            services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            services.TryAddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
+            services.TryAddSingleton(typeof(IGeofenceDelegate), this.delegateType);
+            services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
 #else
-            services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
-            services.AddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            services.TryAddSingleton(typeof(IGeofenceDelegate), this.delegateType);
+            services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
 #endif
 
         }

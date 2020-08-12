@@ -1,13 +1,13 @@
 ﻿#if !NETSTANDARD
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 
 namespace Shiny.Locations
 {
     class GpsModule : ShinyModule
     {
-        static bool added = false;
         readonly Type? delegateType;
         readonly GpsRequest? requestIfPermissionGranted;
 
@@ -21,14 +21,10 @@ namespace Shiny.Locations
 
         public override void Register(IServiceCollection services)
         {
-            if (added)
-                return;
-
-            added = true;
             if (this.delegateType != null)
                 services.AddSingleton(typeof(IGpsDelegate), this.delegateType);
 
-            services.AddSingleton<IGpsManager, GpsManagerImpl>();
+            services.TryAddSingleton<IGpsManager, GpsManagerImpl>();
         }
 
 

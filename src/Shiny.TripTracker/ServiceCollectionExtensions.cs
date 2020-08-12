@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Locations;
 using Shiny.TripTracker;
 using Shiny.TripTracker.Internals;
 
@@ -17,11 +19,12 @@ namespace Shiny
             if (!services.UseMotionActivity())
                 return false;
 
-            if (!services.UseGps<TripTrackerGpsDelegate>())
+            if (!services.UseGps())
                 return false;
 
-            services.AddSingleton<IDataService, SqliteDataService>();
-            services.AddSingleton<ITripTrackerManager, TripTrackerManagerImpl>();
+            services.AddSingleton<IGpsDelegate, TripTrackerGpsDelegate>();
+            services.TryAddSingleton<IDataService, SqliteDataService>();
+            services.TryAddSingleton<ITripTrackerManager, TripTrackerManagerImpl>();
             if (delegateType != null)
                 services.AddSingleton(typeof(ITripTrackerDelegate), delegateType);
 
