@@ -44,7 +44,7 @@ namespace Shiny.BluetoothLE
                 {
                     Log.Write("BLE-Characteristic", "write event - " + args.Characteristic.Uuid);
 
-                    if (args.IsSuccessful)
+                    if (!args.IsSuccessful)
                     {
                         ob.OnError(new BleException($"Failed to write characteristic - {args.Status}"));
                     }
