@@ -55,10 +55,17 @@ namespace Shiny.TripTracker.Internals
             if (activityType.ToString().Contains(","))
                 throw new ArgumentException("You cannot track multiple activity types");
 
+            if (activityType == MotionActivityType.Unknown)
+                throw new ArgumentException("You cannot track an activity type of unknown");
+            
             (await this.RequestAccess()).Assert();
-
-            await this.gpsManager.StartListener(GpsRequest.Realtime(true));
             this.TrackingActivityType = activityType;
+            await this.gpsManager.StartListener(new GpsRequest
+            {
+                Interval = TimeSpan.FromSeconds(10),
+                ThrottledInterval = TimeSpan.FromSeconds(5),
+                UseBackground = true
+            });
         }
 
 

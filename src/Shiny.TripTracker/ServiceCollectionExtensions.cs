@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Locations;
 using Shiny.TripTracker;
 using Shiny.TripTracker.Internals;
@@ -10,11 +9,14 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
+        static bool added = false;
+
+
         public static bool UseTripTracker<T>(this IServiceCollection services) where T : ITripTrackerDelegate
             => services.UseTripTracker(typeof(T));
 
 
-        public static bool UseTripTracker(this IServiceCollection services, Type? delegateType = null)
+        public static bool UseTripTracker(this IServiceCollection services, Type delegateType)
         {            
             if (!services.UseMotionActivity())
                 return false;
@@ -22,11 +24,17 @@ namespace Shiny
             if (!services.UseGps())
                 return false;
 
-            services.AddSingleton<IGpsDelegate, TripTrackerGpsDelegate>();
-            services.TryAddSingleton<IDataService, SqliteDataService>();
-            services.TryAddSingleton<ITripTrackerManager, TripTrackerManagerImpl>();
-            if (delegateType != null)
-                services.AddSingleton(typeof(ITripTrackerDelegate), delegateType);
+            if (delegateType == null)
+                throw new ArgumentException("Trip Tracker Delegate Type not supplied", nameof(delegateType));
+
+            if (!added)
+            {
+                services.AddSingleton<IGpsDelegate, TripTrackerGpsDelegate>();
+                services.AddSingleton<IDataService, SqliteDataService>();
+                services.AddSingleton<ITripTrackerManager, TripTrackerManagerImpl>();
+                added = true;
+            }
+            services.AddSingleton(typeof(ITripTrackerDelegate), delegateType);
 
             return true;
         }

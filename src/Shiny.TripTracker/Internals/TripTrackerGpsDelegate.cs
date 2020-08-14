@@ -39,9 +39,11 @@ namespace Shiny.TripTracker.Internals
             if (this.manager.TrackingActivityType == null)
                 return;
 
-            // watch for sensor blips?
-            var currentMotion = await this.activityManager.GetCurrentActivity(TimeSpan.FromSeconds(60));
+            // TODO: watch for sensor blips?
+            var n = nameof(TripTrackerGpsDelegate);
+            var currentMotion = await this.activityManager.GetCurrentActivity(TimeSpan.FromMinutes(5));
             var track = currentMotion != null && currentMotion.Types.HasFlag(this.manager.TrackingActivityType);
+            Logging.Log.Write(n, $"Current Motion: {currentMotion?.Types.ToString() ?? "Empty"} - Track: {track} - Current: {this.CurrentTripId}");
 
             if (this.CurrentTripId == null)
             {
@@ -81,5 +83,58 @@ namespace Shiny.TripTracker.Internals
                 }
             }
         }
+
+
+        //bool IsTracked(MotionActivityEvent? e)
+        //{
+        //    if (e == null)
+        //        return false;
+
+        //    switch (this.manager.TrackingActivityType)
+        //    {
+        //        case MotionActivityType.Stationary:
+        //            return e.Types.HasFlag(MotionActivityType.Stationary) ||
+        //                   e.Types.HasFlag(MotionActivityType.Unknown);
+
+        //        default:
+        //            return e.Types.HasFlag(this.manager.TrackingActivityType);
+        //    }
+        //}
+
+
+        //bool IsTracked(MotionActivityEvent? e)
+        //{
+        //    var at = TripTrackingType.Cycling;
+        //    if (e == null)
+        //        return false;
+
+        //    switch (at)
+        //    {
+        //        case TripTrackingType.Stationary:
+        //            return e.Types.HasFlag(MotionActivityType.Stationary) ||
+        //                   e.Types.HasFlag(MotionActivityType.Unknown);
+
+        //        case TripTrackingType.Cycling:
+        //            return e.Types.HasFlag(MotionActivityType.Cycling);
+
+        //        case TripTrackingType.Running:
+        //            return e.Types.HasFlag(MotionActivityType.Running);
+
+        //        case TripTrackingType.Walking:
+        //            return e.Types.HasFlag(MotionActivityType.Walking);
+
+        //        case TripTrackingType.Automotive:
+        //            return e.Types.HasFlag(MotionActivityType.Automotive);
+
+        //        case TripTrackingType.Exercise:
+        //            return e.Types.HasFlag(MotionActivityType.Cycling);
+
+        //        case TripTrackingType.OnFoot:
+        //            return e.Types.HasFlag(MotionActivityType.Cycling);
+
+        //        default:
+        //            throw new Exception("Invalid Flag");
+        //    }
+        //}
     }
 }
