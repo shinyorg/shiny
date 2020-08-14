@@ -21,7 +21,7 @@ namespace Shiny.Beacons
         public override StartCommandResult OnStartCommand(Intent? intent, [GeneratedEnum] StartCommandFlags flags, int startId)
         {
             this.task.Value.StartScan();
-            return StartCommandResult.Sticky;
+            return StartCommandResult.NotSticky;
         }
 
 

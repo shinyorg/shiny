@@ -15,8 +15,9 @@ namespace Shiny.Locations
     )]
     public class ShinyLocationService : Service
     {
+        // TODO: persistent notification?
         public override StartCommandResult OnStartCommand(Intent? intent, [GeneratedEnum] StartCommandFlags flags, int startId)
-            => StartCommandResult.Sticky;
+            => StartCommandResult.NotSticky;
 
         public override IBinder? OnBind(Intent? intent) => null;
     }
