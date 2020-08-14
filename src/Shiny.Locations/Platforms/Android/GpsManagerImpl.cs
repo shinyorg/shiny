@@ -64,6 +64,9 @@ namespace Shiny.Locations
             if (request.ThrottledInterval != null)
                 nativeRequest.SetFastestInterval(request.ThrottledInterval.Value.ToMillis());
 
+            if (request.UseBackground)
+                this.context.StartService(typeof(ShinyLocationService), true);
+
             await this.client.RequestLocationUpdatesAsync(
                 nativeRequest,
                 this.GetPendingIntent() // used for background - should switch to LocationCallback for foreground
@@ -78,6 +81,7 @@ namespace Shiny.Locations
                 return;
 
             await this.client.RemoveLocationUpdatesAsync(this.GetPendingIntent());
+            this.context.StopService(typeof(ShinyLocationService));
             this.IsListening = false;
         }
 

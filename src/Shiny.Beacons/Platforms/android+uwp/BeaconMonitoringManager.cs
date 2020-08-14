@@ -1,13 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
-using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
 using Shiny.Infrastructure;
-using Shiny;
-using System.Collections.Generic;
-using Shiny.Beacons;
+
 
 namespace Shiny.Beacons
 {
@@ -16,22 +13,24 @@ namespace Shiny.Beacons
         readonly IRepository repository;
         readonly IBleManager bleManager;
         readonly IMessageBus messageBus;
-        IObservable<Beacon>? beaconScanner;
-
+#if __ANDROID__
+        readonly AndroidContext context;
+#endif
 
         public BeaconMonitoringManager(IBleManager bleManager,
+#if __ANDROID__
+                                       AndroidContext context,
+#endif
                                        IMessageBus messageBus,
                                        IRepository repository)
-            {
+        {
             this.bleManager = bleManager;
+#if __ANDROID__
+            this.context = context;
+#endif
             this.messageBus = messageBus;
             this.repository = repository;
         }
-
-
-        public AccessState GetCurrentStatus(bool background) => this.bleManager.Status;
-        public Task<AccessState> RequestAccess(bool monitoring) => this.bleManager.RequestAccess().ToTask();
-        public IObservable<AccessState> WhenAccessStatusChanged(bool monitoring) => this.bleManager.WhenStatusChanged();
 
 
         public async Task StartMonitoring(BeaconRegion region)
@@ -39,6 +38,9 @@ namespace Shiny.Beacons
             var stored = await this.repository.Set(region.Identifier, region);
             var eventType = stored ? BeaconRegisterEventType.Add : BeaconRegisterEventType.Update;
             this.messageBus.Publish(new BeaconRegisterEvent(eventType, region));
+#if __ANDROID__
+            this.context.StartService(typeof(ShinyBeaconMonitoringService), true);
+#endif
         }
 
 
@@ -49,13 +51,24 @@ namespace Shiny.Beacons
             {
                 await this.repository.Remove<BeaconRegion>(identifier);
                 this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Remove, region));
+
+#if __ANDROID__
+                var regions = await this.repository.GetAll<BeaconRegion>();
+                if (regions.Count == 0)
+                    this.context.StopService(typeof(ShinyBeaconMonitoringService));
+#endif
             }
         }
+
 
         public async Task StopAllMonitoring()
         {
             await this.repository.Clear<BeaconRegion>();
             this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Clear));
+
+#if __ANDROID__
+            this.context.StopService(typeof(ShinyBeaconMonitoringService));
+#endif
         }
 
 

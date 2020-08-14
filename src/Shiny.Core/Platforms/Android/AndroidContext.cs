@@ -69,8 +69,14 @@ namespace Shiny
             .GetPackageInfo(this.AppContext.PackageName, 0);
 
 
-        public void StartService(Type serviceType)
-            => this.AppContext.StartService(new Intent(this.AppContext, serviceType));
+        public void StartService(Type serviceType, bool foreground)
+        {
+            var intent = new Intent(this.AppContext, serviceType);
+            if (foreground && this.IsMinApiLevel(26))
+                this.AppContext.StartForegroundService(intent);
+            else
+                this.AppContext.StartService(intent);
+        }
 
 
         public void StopService(Type serviceType)
