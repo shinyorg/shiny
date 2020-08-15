@@ -33,9 +33,7 @@ namespace Shiny.Generators.Tasks
             {
                 using (builder.BlockInvariant($"public class HubRegistration : global::Shiny.IShinyStartup"))
                 {
-                    builder.AppendLine("readonly IBleHostingManager manager");
-
-
+                    builder.AppendLineInvariant("readonly IBleHostingManager manager");
                     using (builder.BlockInvariant($"public HubRegistration(IBleHostingManager manager)"))
                     {
                         builder.AppendLine("this.manager = manager");

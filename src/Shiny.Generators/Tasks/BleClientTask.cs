@@ -35,7 +35,7 @@ namespace Shiny.Generators.Tasks
         {
             var className = type.Name.TrimStart('I');
             var builder = new IndentedStringBuilder();
-            builder.AppendNamespaces("System.Reactive.Threading");
+            builder.AppendNamespaces("System.Reactive.Threading", "System.Reactive.Threading.Tasks");
 
             using (builder.BlockInvariant($"namespace {type.ContainingNamespace}"))
             {
@@ -48,9 +48,11 @@ namespace Shiny.Generators.Tasks
                         this.ValidateMethod(method);
                         var isReadMethod = this.Context.IsGenericAsyncTask(method.ReturnType);
 
-                        var genMethodSignature = $"public ";
-                        if (isReadMethod)
-                            genMethodSignature += "async ";
+                        //var genMethodSignature = $"public ";
+                        //if (isReadMethod)
+                        //    genMethodSignature += "async ";
+                        var genMethodSignature = $"public async ";
+
 
                         genMethodSignature += $"{method.ReturnType.ToDisplayString()} {method.Name}(";
                         if (method.Parameters.Length == 1)
@@ -70,15 +72,17 @@ namespace Shiny.Generators.Tasks
                             // TODO: CancellationToken, Timeouts?
                             if (isReadMethod)
                             {
+                                builder.AppendLineInvariant($"var ch = await this.Char(Guid.Parse(\"{serviceUuid}\"), Guid.Parse(\"{characteristicUuid}\")).ToTask();");
+
                                 if (method.Parameters.Length == 1)
                                 {
-                                    builder.AppendLineInvariant($"var data = this.Serializer.Serialize({method.Parameters[0].Name});");
-                                    builder.AppendLineInvariant("await this.Peripheral.Write(data);");
+                                    builder.AppendLineInvariant($"var __write = this.Serializer.Serialize({method.Parameters[0].Name});");
+                                    builder.AppendLineInvariant("await ch.Write(__write).ToTask();");
                                     // write/read - tx/rx
                                 }
-                                builder.AppendLineInvariant("var result = await this.Peripheral.Read();");
+                                builder.AppendLineInvariant("var __read = await ch.Read().ToTask();");
 
-                                builder.AppendLineInvariant($"var obj = this.Serializer.Deserialize(null, result);");
+                                builder.AppendLineInvariant($"var obj = this.Serializer.Deserialize(typeof({method.ReturnType.ToDisplayString()}), __read.Data);");
                                 builder.AppendLineInvariant("return obj");
                                 // read
                             }
@@ -88,8 +92,9 @@ namespace Shiny.Generators.Tasks
                                     throw new ArgumentException("Write methods must have a single argument");
 
                                 // write
-                                builder.AppendLineInvariant($"var data = this.Serializer.Serialize({method.Parameters[0].Name});");
-                                builder.AppendLineInvariant("return this.Peripheral.Write(data);");
+                                builder.AppendLineInvariant($"var ch = await this.Char(Guid.Parse(\"{serviceUuid}\"), Guid.Parse(\"{characteristicUuid}\")).ToTask();");
+                                builder.AppendLineInvariant($"var __chdata = this.Serializer.Serialize({method.Parameters[0].Name});");
+                                builder.AppendLineInvariant("return ch.Write(__chdata).ToTask();");
                             }
                             //else if (method.ReturnType  == typeof(IObservable<>))
                             //{
@@ -119,11 +124,11 @@ namespace Shiny.Generators.Tasks
             if (attributeData == null)
                 throw new ArgumentException("BLE Client methods must be marked with the [Shiny.BluetoothLE.RefitClient.CharacteristicAttribute]");
 
-            //if (!Guid.TryParse((string)attributeData.ConstructorArguments[0].Value, out _))
-            //    throw new ArgumentException("Service UUID is not a valid GUID");
+            if (!Guid.TryParse((string)attributeData.ConstructorArguments[0].Value, out _))
+                throw new ArgumentException("Service UUID is not a valid GUID");
 
-            //if (!Guid.TryParse((string)attributeData.ConstructorArguments[1].Value, out _))
-            //    throw new ArgumentException("Characteristic UUID is not a valid GUID");
+            if (!Guid.TryParse((string)attributeData.ConstructorArguments[1].Value, out _))
+                throw new ArgumentException("Characteristic UUID is not a valid GUID");
 
             // TODO: allow tasks with secondary arg as cancellation token
             if (method.Parameters.Length > 1)
