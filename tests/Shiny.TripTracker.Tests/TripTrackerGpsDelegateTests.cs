@@ -17,7 +17,7 @@ namespace Shiny.TripTracker.Tests
         readonly Mock<ITripTrackerManager> manager;
         readonly TripTrackerGpsDelegate gpsDelegate;
         readonly List<TripCheckin> checkins = new List<TripCheckin>();
-        MotionActivityType? tracking = MotionActivityType.Automotive;
+        TripTrackingType? tracking = TripTrackingType.Automotive;
         MotionActivityType currentMotionType = MotionActivityType.Automotive;
         Trip? trip;
 
@@ -29,7 +29,7 @@ namespace Shiny.TripTracker.Tests
             this.data = new Mock<IDataService>();
 
             this.manager
-                .Setup(x => x.TrackingActivityType)
+                .Setup(x => x.TrackingType)
                 .Returns(() => this.tracking);
 
             this.activityManager
@@ -88,7 +88,7 @@ namespace Shiny.TripTracker.Tests
             this.gpsDelegate.CurrentTripId.Should().NotBeNull();
             this.gpsDelegate.CurrentTripId.Should().Be(1);
             this.trip.Should().NotBeNull();
-            this.trip.TripType.HasFlag(MotionActivityType.Automotive).Should().BeTrue();
+            this.trip.Type.HasFlag(TripTrackingType.Automotive).Should().BeTrue();
             this.trip.DateFinished.Should().BeNull();
         }
 
@@ -99,7 +99,7 @@ namespace Shiny.TripTracker.Tests
             this.trip = new Trip
             {
                 Id = 1,
-                TripType = MotionActivityType.Automotive
+                Type = TripTrackingType.Automotive
             };
             this.gpsDelegate.CurrentTripId = 1;
             this.currentMotionType = MotionActivityType.Cycling;
