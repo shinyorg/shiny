@@ -3,43 +3,32 @@
 2.0.0
 ---
 
-### Generators
-* Auto Startup
-* Static classes
-* Prism Integration
-* Auto boilerplate for iOS and Android
 
 ### Core
 * [Fix][Settings] Nullable enums and set null to remove
-* New Hosting model based on Microsoft.Extensions.Hosting
-  * [BREAKING] You can now use Microsoft.Extensions.Caching.* for cache needs.  Shiny.Caching has been removed
-* Abstraction libraries have been created to make room for other platform integrations (where applicable outside of Xamarin targets)
-* [BREAKING] Jobs are no longer Scheduled via the job manager.  They can only registered during startup.  Also during startup, existing native jobs are "flushed" to prevent orphaned processes left over
-  * With this change, system job flags are also gone.  
-  * IJob.Run no longer has a boolean return
+* [FEATURE] Source Generators
+    * Auto Startup - creates the Shiny startup for you based on what Shiny nugets you install.  Simply mark [assembly:Shiny.GenerateStartupAttribute] on the assembly where you want it built
+    * Static classes - creates static classes for all the Shiny nugets you use - Simply add [assembly:Shiny.GenerateStaticClassesAttribute] where you want them created
+    * Prism Integration - If Prism.Forms.DryIoc is detected, Shiny will attempt to wire itself into your PrismApplication to put the Shiny services in the Prism container
+    * Auto boilerplate for iOS and Android - Don't like creating things on AppDelegate or Android, this will auto-magically do it for you and wire up to your startup.
 
-### Shiny.BluetoothLE and Shiny.BluetoothLE.Hosting
+### BluetoothLE
 * [BREAKING] The original library has been split into 2 separate libraries (Client - Shiny.BluetoothLE and Server - Shiny.BluetoothLE.Hosting) with some common ties
 * [Client] You don't like RX - there are new async extensions to skip the RX
+* [Shiny.BluetoothLE.Hosting.Hubs] - The SignalR for BluetoothLE GATT servers
+* [Shiny.BluetoothLE.RefitClient] - Refit for HTTP client is awesome - BEHOLD - the BLE version!
 
-### Shiny.BluetoothLE.Hosting.Hubs
-* The SignalR for BluetoothLE GATT servers
+### Locations
+* [Feature][Android] Now uses foreground service to achieve fast "background" GPS
 
-### Shiny.BluetoothLE.RefitClient
-* Refit for HTTP client is awesome - BEHOLD - the BLE version!
-
-### Shiny.Beacons
+### Beacons
 * [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
+* [Android] Now uses a foreground service to maintain a continuous scan when using beacon monitoring
 
-### App Services
-#### Shiny.TripTracking
-* A new module for tracking run, walks, and drives!
-
-#### Shiny.LocationSync
-* Track background GPS and/or geofence events and uses best practices to ensure these events hit your server in a timely fashion
-
-#### Shiny.MediaSync
-* Uploads Videos and Photos from your photo gallery
+### AppServices (NEW MODULES)
+* [Shiny.TripTracking] - A new module for tracking run, walks, and drives!
+* [Shiny.Locations.Sync] - Track background GPS and/or geofence events and uses best practices to ensure these events hit your server in a timely fashion
+* [Shiny.MediaSync] - Uploads Videos and Photos from your photo gallery
 
 1.2.0 (SP1)
 ---
