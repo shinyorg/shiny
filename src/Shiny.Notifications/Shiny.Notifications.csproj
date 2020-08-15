@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="6.1.0" />
+        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="6.1.1" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Uwp\**\*.cs" />

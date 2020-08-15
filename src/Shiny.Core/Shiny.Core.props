@@ -1,8 +1,12 @@
 ﻿<Project>
     <ItemGroup>
         <SourceGenerator
-            Include="$(SrcFolder)\Shiny.Generators\bin\$(Configuration)\netstandard2.0\Shiny.Generators.dll"
+            Include="$(MSBuildThisFileDirectory)..\bin\$(Configuration)\netstandard2.0\Shiny.Generators.dll"
             Condition="Exists('$(MSBuildThisFileDirectory)..\bin')"
+        />
+        <SourceGenerator
+            Include="$(MSBuildThisFileDirectory)..\tools\Shiny.Generators.dll"
+		    Condition="Exists('$(MSBuildThisFileDirectory)..\tools')"
         />
     </ItemGroup>
 </Project>
