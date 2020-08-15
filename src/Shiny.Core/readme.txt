@@ -140,7 +140,7 @@ this.ShinyInit(new YourStartup());
 
 2. Add the following to your Package.appxmanifest under the <Application><Extensions> node
 
-<Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+<Extension Category="windows.backgroundTasks" EntryPoint="Shiny.ShinyBackgroundTask">
     <BackgroundTasks>
         <Task Type="general"/>
         <Task Type="systemEvent"/>
