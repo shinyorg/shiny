@@ -1,17 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <VersionSuffix>beta</VersionSuffix>
+        <VersionSuffix>alpha</VersionSuffix>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Description>Shiny Push Integration - OneSignal</Description>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
+        <PackageReference Include="Com.OneSignal" Version="3.10.0" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="Com.OneSignal" Version="3.10.0" />
     </ItemGroup>
 </Project>
