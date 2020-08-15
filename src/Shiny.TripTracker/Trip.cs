@@ -1,5 +1,4 @@
 ﻿using System;
-using Shiny.Locations;
 using SQLite;
 
 
@@ -12,7 +11,7 @@ namespace Shiny.TripTracker
         public int Id { get; set; }
         public double TotalDistanceMeters { get; set; }
 
-        public MotionActivityType TripType { get; set; }
+        public TripTrackingType Type { get; set; }
         public DateTimeOffset DateStarted { get; set; }
         public double StartLatitude { get; set; }
         public double StartLongitude { get; set; }

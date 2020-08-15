@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shiny.Locations;
 
 
 namespace Shiny.TripTracker
 {
     public interface ITripTrackerManager
     {
-        MotionActivityType? TrackingActivityType { get; }
+        TripTrackingType? TrackingType { get; }
 
-        Task StartTracking(MotionActivityType activityType);
+        Task StartTracking(TripTrackingType trackingType);
         Task StopTracking();
 
         Task<IList<Trip>> GetAllTrips();

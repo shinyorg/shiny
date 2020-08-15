@@ -11,8 +11,11 @@ namespace Shiny.TripTracker
         Walking,
         Cycling,
 
-        OnFoot = Walking | Running,
-        Exercise = Walking | Running | Cycling,
+        // walking or running
+        OnFoot,
+
+        // walking, running, or cycling
+        Exercise,
 
         Automotive
     }
