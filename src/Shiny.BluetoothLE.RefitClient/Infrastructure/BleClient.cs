@@ -23,9 +23,12 @@ namespace Shiny.BluetoothLE.RefitClient.Infrastructure
         public IBleDataSerializer Serializer { get; set; }
 
 
-        protected IObservable<IGattCharacteristic> Char(Guid serviceUuid, Guid characteristicUuid) => this.Peripheral
+        protected IObservable<IGattCharacteristic> Char(string serviceUuid, string characteristicUuid) => this.Peripheral
             .ConnectWait()
-            .Select(x => x.GetKnownCharacteristics(serviceUuid, characteristicUuid))
+            .Select(x => x.GetKnownCharacteristics(
+                Guid.Parse(serviceUuid),
+                Guid.Parse(characteristicUuid)
+            ))
             .Timeout(TimeSpan.FromSeconds(20))
             .Switch();
     }

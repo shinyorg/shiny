@@ -26,12 +26,24 @@ namespace Shiny.Generators
         }
 
 
-        public static bool IsGenericAsyncTask(this SourceGeneratorContext context, ITypeSymbol type)
+        public static bool IsEqualToType(this SourceGeneratorContext context, ITypeSymbol symbol, string otherTypeName)
         {
-            var task = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1").OriginalDefinition;
-            var result = type.Equals(task);
+            var type = context.Compilation.GetTypeByMetadataName(otherTypeName);
+            var result = symbol.EqualsType(type);
             return result;
         }
+
+
+        public static bool IsStream(this SourceGeneratorContext context, ITypeSymbol symbol)
+            => context.IsEqualToType(symbol, typeof(System.IO.Stream).FullName);
+
+
+        public static bool IsObservable(this SourceGeneratorContext context, ITypeSymbol symbol)
+            => context.IsEqualToType(symbol, "System.IObservable`1");
+
+
+        public static bool IsGenericAsyncTask(this SourceGeneratorContext context, ITypeSymbol symbol)
+            => context.IsEqualToType(symbol, "System.Threading.Tasks.Task`1");
 
 
         public static bool IsAsyncTask(this SourceGeneratorContext context, ITypeSymbol type)
