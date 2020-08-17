@@ -9,7 +9,6 @@ using Android.Runtime;
 namespace Shiny.Locations
 {
     [Service(
-        Name = nameof(ShinyLocationService),
         Enabled = false,
         ForegroundServiceType = ForegroundService.TypeLocation
     )]

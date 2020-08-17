@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Settings;
+using System.Reactive.Subjects;
 using OS = global::Com.OneSignal.OneSignal;
 using Com.OneSignal.Abstractions;
-using System.Reactive.Subjects;
+
 
 namespace Shiny.Push.OneSignal
 {
@@ -32,9 +33,8 @@ namespace Shiny.Push.OneSignal
                 .StartInit(this.config.AppId)
                 .HandleNotificationOpened(async x =>
                 {
-                    //x.action.type == OSNotificationAction.ActionType.
                     var data = x.notification.payload.ToDictionary();
-                    var args = new PushEntryArgs(null, x.action.actionID, null, data);
+                    var args = new PushEntryArgs("onesignal", x.action.actionID, null, data);
                     await this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
                 })
                 .HandleNotificationReceived(async x =>
@@ -50,19 +50,12 @@ namespace Shiny.Push.OneSignal
                 })
                 .InFocusDisplaying(this.config.InFocusDisplay)
                 .EndInit();
-
-            //OS.Current.IdsAvailable(x =>
-            //{
-
-            //});
-
-            //// The promptForPushNotificationsWithUserResponse function will show the iOS push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission (See step 7)
-
         }
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
+            OS.Current.SetSubscription(true);
             OS.Current.RegisterForPushNotifications();
             var ids = await OS.Current.IdsAvailableAsync();
             //OS.Current.SendTags()
@@ -72,7 +65,8 @@ namespace Shiny.Push.OneSignal
 
         public override Task UnRegister()
         {
-            throw new NotImplementedException();
+            OS.Current.SetSubscription(false);
+            return Task.CompletedTask;
         }
 
 
@@ -84,7 +78,13 @@ namespace Shiny.Push.OneSignal
             if (!this.RegisteredTags.IsEmpty())
                 OS.Current.DeleteTags(this.RegisteredTags.ToList());
 
-            //OS.Current.SendTags(tags.ToList());
+            if ((tags?.Length ?? 0) > 0)
+            {
+                OS.Current.SendTags(tags.ToDictionary(
+                    x => x,
+                    _ => "1"
+                ));
+            }
             this.RegisteredTags = tags;
             return Task.CompletedTask;
         }

@@ -4,7 +4,6 @@ using Android.App;
 using Firebase.Messaging;
 using Shiny.Logging;
 using Shiny.Notifications;
-using Shiny.Settings;
 using Notification = Shiny.Notifications.Notification;
 
 

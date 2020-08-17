@@ -9,9 +9,8 @@ using Android.Runtime;
 namespace Shiny.Beacons
 {
     [Service(
-        Name = nameof(ShinyBeaconMonitoringService),
         Enabled = false,
-        ForegroundServiceType = ForegroundService.TypeNone
+        ForegroundServiceType = ForegroundService.TypeLocation
     )]
     public class ShinyBeaconMonitoringService : Service
     {
