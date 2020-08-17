@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Threading.Tasks;
+using Shiny.BluetoothLE.RefitClient;
 
 
 namespace Shiny.BluetoothLE.RefitClient.Tests
@@ -11,7 +12,7 @@ namespace Shiny.BluetoothLE.RefitClient.Tests
 
         //// TODO: transactional (possibly auth signed writes)
         //// write only
-        [Characteristic("A3D7F0FD-7805-4787-843B-C4035E6CD980", "A3D7F0FD-7805-4787-843B-C4035E6CD981")]
+        [BleMethod("A3D7F0FD-7805-4787-843B-C4035E6CD980", "A3D7F0FD-7805-4787-843B-C4035E6CD981")]
         Task WriteRaw(byte[] data);
 
         //[Guid("A3D7F0FD-7805-4787-843B-C4035E6CD983")]

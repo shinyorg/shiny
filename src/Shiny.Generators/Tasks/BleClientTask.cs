@@ -8,18 +8,22 @@ namespace Shiny.Generators.Tasks
 {
     public class BleClientTask : ShinySourceGeneratorTask
     {
-        static INamedTypeSymbol bleAttribute;
-
+        INamedTypeSymbol? bleMethodAttribute;
+        INamedTypeSymbol? bleNotificationAttribute;
+        INamedTypeSymbol? bleClientInterface;
 
         // TODO: https://stackoverflow.com/questions/28240167/correct-way-to-check-the-type-of-an-expression-in-roslyn-analyzer
         public override void Execute()
         {
             //System.Diagnostics.Debugger.Launch();
-            bleAttribute = this.Context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.CharacteristicAttribute");
-            if (bleAttribute == null)
+            this.bleMethodAttribute = this.Context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.BleMethodAttribute");
+            this.bleNotificationAttribute = this.Context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.BleNotificationAttribute");
+            this.bleClientInterface = this.Context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.IBleClient");
+
+            if (this.bleMethodAttribute == null)
                 return;
 
-            var bleClientInterface = this.Context.Compilation.GetTypeByMetadataName("Shiny.BluetoothLE.RefitClient.IBleClient");
+            
             var types = this.Context
                 .GetAllInterfaceTypes()
                 .Where(x => x.AllInterfaces.Any(y => y.Equals(bleClientInterface)))
@@ -64,15 +68,15 @@ namespace Shiny.Generators.Tasks
 
                         using (builder.BlockInvariant(genMethodSignature))
                         {
-                            var attributeData = method.FindAttributeFlattened(bleAttribute);
-                            var serviceUuid = (string)attributeData.ConstructorArguments[0].Value;
-                            var characteristicUuid = (string)attributeData.ConstructorArguments[1].Value;
+                            var attributeData = method.FindAttributeFlattened(this.bleMethodAttribute);
+                            var serviceUuid = $"\"{(string)attributeData.ConstructorArguments[0].Value}\"";
+                            var characteristicUuid = $"\"{(string)attributeData.ConstructorArguments[1].Value}\"";
 
                             // TODO: connect, find service, find characteristic, do operation
                             // TODO: CancellationToken, Timeouts?
                             if (isReadMethod)
                             {
-                                builder.AppendLineInvariant($"var ch = await this.Char(Guid.Parse(\"{serviceUuid}\"), Guid.Parse(\"{characteristicUuid}\")).ToTask();");
+                                builder.AppendLineInvariant($"var ch = await this.Char({serviceUuid}, {characteristicUuid}).ToTask();");
 
                                 if (method.Parameters.Length == 1)
                                 {
@@ -92,7 +96,7 @@ namespace Shiny.Generators.Tasks
                                     throw new ArgumentException("Write methods must have a single argument");
 
                                 // write
-                                builder.AppendLineInvariant($"var ch = await this.Char(Guid.Parse(\"{serviceUuid}\"), Guid.Parse(\"{characteristicUuid}\")).ToTask();");
+                                builder.AppendLineInvariant($"var ch = await this.Char({serviceUuid}, {characteristicUuid})).ToTask();");
                                 builder.AppendLineInvariant($"var __chdata = this.Serializer.Serialize({method.Parameters[0].Name});");
                                 builder.AppendLineInvariant("return ch.Write(__chdata).ToTask();");
                             }
@@ -115,14 +119,54 @@ namespace Shiny.Generators.Tasks
         }
 
 
+        BleClientMethodType DetectMethodType(IMethodSymbol method)
+        {
+            var methodType = BleClientMethodType.None;
+
+            var param = method.Parameters.FirstOrDefault(); // has a write op
+            var isAsyncTask = this.Context.IsGenericAsyncTask(method.ReturnType);
+            var isObservable = this.Context.IsObservable(method.ReturnType);
+
+            if (param == null)
+            {
+                var notifyAttr = method.FindAttributeFlattened(this.bleNotificationAttribute);
+                if (notifyAttr == null)
+                {
+                    // read
+                }
+                else
+                {
+                    // notify
+                    var useIndicationIfAvailable = notifyAttr.ConstructorArguments[2].Value.ToString().ToLower();
+                }
+            }
+            else
+            {
+                // write
+                var isStream = this.Context.IsStream(param.Type);
+
+                // TODO: if stream, must be observable with CharacteristicGattResult as generic out
+                if (!isStream)
+                {
+                    return BleClientMethodType.WriteAsync;
+                }
+
+                return BleClientMethodType.WriteStream;
+            }
+
+
+            return methodType;
+        }
+
+
         void ValidateMethod(IMethodSymbol method)
         {
-            if (method.ReturnType == null)
+            if (method.ReturnType == null || (!this.Context.IsObservable(method.ReturnType) && !this.Context.IsAsyncTask(method.ReturnType)))
                 throw new ArgumentException("BLE Clients must always have a return type of Task, Task<T>, or IObservable<T>");
 
-            var attributeData = method.FindAttributeFlattened(bleAttribute);
+            var attributeData = method.FindAttributeFlattened(this.bleMethodAttribute);
             if (attributeData == null)
-                throw new ArgumentException("BLE Client methods must be marked with the [Shiny.BluetoothLE.RefitClient.CharacteristicAttribute]");
+                throw new ArgumentException("BLE Client methods must be marked with the [Shiny.BluetoothLE.RefitClient.BleMethodAttribute] or [Shiny.BluetoothLE.RefitClient.BleNotificationAttribute]");
 
             if (!Guid.TryParse((string)attributeData.ConstructorArguments[0].Value, out _))
                 throw new ArgumentException("Service UUID is not a valid GUID");
