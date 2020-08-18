@@ -21,7 +21,6 @@
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>
-        <!--<PackageReference Include="System.Text.Json" Version="4.7.1" />-->
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">

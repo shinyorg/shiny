@@ -1,5 +1,4 @@
-﻿#if ANDROIDX
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
@@ -29,7 +28,7 @@ namespace Shiny.Jobs
                 completer.Set(Result.InvokeFailure());
             }
             else
-            { 
+            {
                 ShinyHost
                     .Resolve<IJobManager>()
                     .Run(jobName, this.cancelSource.Token)
@@ -67,4 +66,3 @@ namespace Shiny.Jobs
         }
     }
 }
-#endif
