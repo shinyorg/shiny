@@ -35,10 +35,6 @@
         <SrcFolder>$(MSBuildThisFileDirectory)..\src</SrcFolder>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
-        <DefineConstants>$(DefineConstants);ANDROIDX</DefineConstants>
-    </PropertyGroup>
-
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <DefineConstants>$(DefineConstants);__ANDROID__</DefineConstants>
     </PropertyGroup>

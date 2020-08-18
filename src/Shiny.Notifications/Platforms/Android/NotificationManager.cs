@@ -6,23 +6,16 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Media;
-using Android.Support.V4.App;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
 using Shiny.Settings;
 using Native = Android.App.NotificationManager;
 using Android.Graphics;
-
-#if ANDROIDX
 using AndroidX.Core.App;
 using RemoteInput = AndroidX.Core.App.RemoteInput;
 using TaskStackBuilder = AndroidX.Core.App.TaskStackBuilder;
-#else
-using Android.Support.V4.App;
-using RemoteInput = Android.Support.V4.App.RemoteInput;
-using TaskStackBuilder = Android.App.TaskStackBuilder;
-#endif
+using AndroidX.Core.Content;
 
 namespace Shiny.Notifications
 {
@@ -53,14 +46,7 @@ namespace Shiny.Notifications
             this.repository = repository;
             this.settings = settings;
 
-#if ANDROIDX
             this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
-#else
-            if (this.context.IsMinApiLevel(26))            
-                this.newManager = Native.FromContext(this.context.AppContext);
-            else
-                this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
-#endif
             this.context
                 .WhenIntentReceived()
                 .Subscribe(x => this
@@ -123,7 +109,7 @@ namespace Shiny.Notifications
 
             var pendingIntent = this.GetLaunchPendingIntent(notification);
             var builder = new NotificationCompat.Builder(this.context.AppContext)
-                .SetContentTitle(notification.Title)                
+                .SetContentTitle(notification.Title)
                 .SetSmallIcon(this.GetSmallIconResource(notification))
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing)
@@ -137,8 +123,8 @@ namespace Shiny.Notifications
             this.TrySetSound(notification, builder);
             this.TrySetLargeIconResource(notification, builder);
 
-            if (!notification.Category.IsEmpty())            
-                this.AddCategory(builder, notification);           
+            if (!notification.Category.IsEmpty())
+                this.AddCategory(builder, notification);
 
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
@@ -187,7 +173,6 @@ namespace Shiny.Notifications
 
         protected virtual void DoNotify(NotificationCompat.Builder builder, Notification notification)
         {
-#if ANDROIDX
             var channelId = notification.Android.ChannelId;
             var channel = this.compatManager.GetNotificationChannel(channelId);
 
@@ -216,49 +201,10 @@ namespace Shiny.Notifications
                 channel.EnableVibration(notification.Android.Vibrate);
                 this.compatManager.CreateNotificationChannel(channel);
             }
-            
+
 
             builder.SetChannelId(channelId);
             this.compatManager.Notify(notification.Id, builder.Build());
-#else
-            if (this.newManager != null)
-            {
-                var channelId = notification.Android.ChannelId;
-                var channel = this.newManager.GetNotificationChannel(channelId);
-
-                if (channel == null)
-                {
-                    channel = new NotificationChannel(
-                        channelId,
-                        notification.Android.Channel,
-                        notification.Android.NotificationImportance.ToNative()
-                    );
-                    var d = notification.Android.ChannelDescription;
-                    if (!d.IsEmpty())
-                        channel.Description = d;
-
-                    this.newManager.CreateNotificationChannel(channel);
-                }
-                if (notification.Sound?.IsCustomSound() ?? false)
-                {
-                    var attributes = new AudioAttributes.Builder()
-                        .SetUsage(AudioUsageKind.NotificationRingtone)
-                        .Build();
-
-                    var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
-                    channel.SetSound(uri, attributes);
-                    channel.EnableVibration(notification.Android.Vibrate);
-                    this.newManager.CreateNotificationChannel(channel);
-                }
-            
-                builder.SetChannelId(channelId);
-                this.newManager.Notify(notification.Id, builder.Build());
-            }
-            else
-            {
-                this.compatManager.Notify(notification.Id, builder.Build());
-            }
-#endif
         }
 
 
@@ -292,11 +238,7 @@ namespace Shiny.Notifications
                 pendingIntent = TaskStackBuilder
                     .Create(this.context.AppContext)
                     .AddNextIntent(launchIntent)
-#if ANDROIDX
                     .GetPendingIntent(notification.Id, (int)PendingIntentFlags.OneShot);
-#else
-                    .GetPendingIntent(notification.Id, PendingIntentFlags.OneShot);
-#endif
             }
             else
             {
@@ -317,11 +259,7 @@ namespace Shiny.Notifications
             if (colorResourceId <= 0)
                 throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
 
-#if ANDROIDX
-            return AndroidX.Core.Content.ContextCompat.GetColor(this.context.AppContext, colorResourceId);
-#else
-            return Android.Support.V4.Content.ContextCompat.GetColor(this.context.AppContext, colorResourceId);
-#endif
+            return ContextCompat.GetColor(this.context.AppContext, colorResourceId);
         }
 
 
