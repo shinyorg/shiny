@@ -1,10 +1,12 @@
 using System;
 using System.Linq;
 using System.Reactive.Linq;
+using Android.App;
 using Android.Content;
 using Android.Net;
 using Android.Telephony;
 
+[assembly: UsesPermission(Android.Manifest.Permission.AccessNetworkState)]
 
 namespace Shiny.Net
 {
