@@ -27,7 +27,7 @@ assignees: ''
  - [ ] Notifications
  - [ ] Push
  - [ ] Push - Azure Notification Hub
- - [ ] Push - Firebase (beta)
+ - [ ] Push - Firebase
  - [ ] Sensors
  - [ ] AppCenter Logging Integration
  - [ ] Location Sync (beta)
@@ -35,7 +35,7 @@ assignees: ''
  - [ ] Trip Tracker (alpha)
  - [ ] BluetoothLE Client (beta)
  - [ ] BluetoothLE Hosting (beta)
- - [ ] Beacons (beta)
+ - [ ] Beacons
  - [ ] SQLite Integration
 
 
