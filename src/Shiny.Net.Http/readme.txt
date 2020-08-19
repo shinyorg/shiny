@@ -17,7 +17,7 @@ iOS
 Add the following to your AppDelegate.cs
 
 public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler)
-    => Shiny.Net.Http.HttpTransferManager.SetCompletionHandler(sessionIdentifier, completionHandler);
+    => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
 
 
 -----------------

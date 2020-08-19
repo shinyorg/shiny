@@ -38,7 +38,7 @@ namespace YourNamespace
 ANDROID
 ----------
 
-1. You must set your "Target Android verion" to "Android 9.0 (API Level 28)" or higher
+1. You must set your "Target Android verion" to "Android 10.0 (API Level 29)" or higher
 
 2. Create an application in your android head project
 
@@ -105,7 +105,7 @@ public override void PerformFetch(UIApplication application, Action<UIBackground
 </array>
 
 
-2b. Shiny also supported iOS 13 background processing.  Add the following to your Info.plist and Shiny will use it instead
+2b. Shiny also supports iOS 13 background processing.  Add the following to your Info.plist and Shiny will use it instead
 <key>UIBackgroundModes</key>
 <array>
 	<string>fetch</string>
