@@ -118,8 +118,7 @@ namespace Shiny.Jobs
                         .RunAll(cancelSrc.Token, true)
                         .ConfigureAwait(false);
 
-                    if (results.Any(x => x.HasNewData))
-                        result = UIBackgroundFetchResult.NewData;
+                    result = UIBackgroundFetchResult.NewData;
                 }
             }
             catch (Exception ex)
