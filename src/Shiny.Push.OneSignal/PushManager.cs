@@ -18,7 +18,9 @@ namespace Shiny.Push.OneSignal
         readonly Subject<IDictionary<string, string>> receivedSubj;
 
 
-        public PushManager(OneSignalPushConfig config, ISettings settings, IServiceProvider services) : base(settings)
+        public PushManager(OneSignalPushConfig config,
+                           ISettings settings,
+                           IServiceProvider services) : base(settings)
         {
             this.receivedSubj = new Subject<IDictionary<string, string>>();
             this.config = config;
@@ -33,13 +35,13 @@ namespace Shiny.Push.OneSignal
                 .StartInit(this.config.AppId)
                 .HandleNotificationOpened(async x =>
                 {
-                    var data = x.notification.payload.ToDictionary();
+                    var data = ToDictionary(x.notification.payload);
                     var args = new PushEntryArgs("onesignal", x.action.actionID, null, data);
                     await this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
                 })
                 .HandleNotificationReceived(async x =>
                 {
-                    var data = x.payload.ToDictionary();
+                    var data = ToDictionary(x.payload);
                     await this.services.RunDelegates<IPushDelegate>(x => x.OnReceived(data));
                     this.receivedSubj.OnNext(data);
                 })
@@ -88,5 +90,15 @@ namespace Shiny.Push.OneSignal
             this.RegisteredTags = tags;
             return Task.CompletedTask;
         }
+
+
+        static IDictionary<string, string> ToDictionary(OSNotificationPayload payload)
+            => payload?
+                .additionalData?
+                .ToDictionary(
+                    y => y.Key,
+                    y => y.Value.ToString()
+                )
+                ?? new Dictionary<string, string>(0);
     }
 }
