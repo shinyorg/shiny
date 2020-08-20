@@ -5,14 +5,14 @@ using Android.OS;
 using S = Shiny.Notifications;
 
 
-namespace Shiny.Beacons
+namespace Shiny.Locations
 {
     [Service(
         Enabled = true,
         Exported = true,
         ForegroundServiceType = ForegroundService.TypeLocation
     )]
-    public class ShinyBeaconMonitoringService : Service
+    public class ShinyGpsService : Service
     {
         public static bool IsStarted { get; private set; }
 
@@ -40,7 +40,6 @@ namespace Shiny.Beacons
             }
             IsStarted = true;
 
-            ShinyHost.Container.Resolve<BackgroundTask>().StartScan();
             return StartCommandResult.Sticky;
         }
 
@@ -53,7 +52,6 @@ namespace Shiny.Beacons
             if (context.IsMinApiLevel(26))
                 this.StopForeground(true);
 
-            ShinyHost.Container.Resolve<BackgroundTask>().StopScan();
             base.OnDestroy();
         }
 

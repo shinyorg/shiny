@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Notifications;
 using Shiny.Push;
 
 
@@ -7,28 +8,21 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseFirebaseMessaging<TPushDelegate>(this IServiceCollection services) where TPushDelegate : class, IPushDelegate
-        {
-#if XAMARIN_IOS
-            services.AddSingleton<IPushManager, Shiny.Push.FirebaseMessaging.PushManager>();
-            services.AddSingleton<IPushDelegate, TPushDelegate>();
-            return true;
-#elif __ANDROID__
-            return services.UsePush<TPushDelegate>();
-#else
-            return false;
-#endif
-        }
+        public static bool UseFirebaseMessaging<TPushDelegate>(this IServiceCollection services, params NotificationCategory[] categories) where TPushDelegate : class, IPushDelegate
+            => services.UseFirebaseMessaging(typeof(TPushDelegate), categories);
 
 
-        public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType)
+        public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType, params NotificationCategory[] categories)
         {
 #if XAMARIN_IOS
-            services.AddSingleton<IPushManager, Shiny.Push.FirebaseMessaging.PushManager>();
-            services.AddSingleton(typeof(IPushDelegate), delegateType);
+            services.RegisterModule(new PushModule(
+                typeof(Shiny.Push.FirebaseMessaging.PushManager),
+                delegateType,
+                categories
+            ));
             return true;
 #elif __ANDROID__
-            return services.UsePush(delegateType);
+            return services.UsePush(delegateType, categories);
 #else
             return false;
 #endif

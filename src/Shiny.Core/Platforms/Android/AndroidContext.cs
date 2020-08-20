@@ -94,19 +94,6 @@ namespace Shiny
         public event EventHandler<PermissionRequestResult>? PermissionResult;
 
 
-        //public IObservable<Configuration> WhenConfigurationChanged() => this
-        //    .WhenIntentReceived(Intent.ActionConfigurationChanged)
-        //    .Select(intent => this.AppContext.Resources.Configuration);
-
-
-        //public PendingIntent GetIntentServicePendingIntent()
-        //{
-        //    var intent = new Intent(Application.Context, typeof(CoreIntentService));
-        //    var pendingIntent = PendingIntent.GetService(this.AppContext, 0, intent, PendingIntentFlags.UpdateCurrent);
-        //    return pendingIntent;
-        //}
-
-
         public T GetIntentValue<T>(string intentAction, Func<Intent, T> transform)
         {
             using (var filter = new IntentFilter(intentAction))
@@ -131,13 +118,8 @@ namespace Shiny
 
         public AccessState GetCurrentAccessState(string androidPermission)
         {
-#if !ANDROIDX
-            var result = Android.Support.V4.Content.ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
-            return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
-#else
             var result = AndroidX.Core.Content.ContextCompat.CheckSelfPermission(this.AppContext, androidPermission);
             return result == Permission.Granted ? AccessState.Available : AccessState.Denied;
-#endif
         }
 
 
@@ -173,19 +155,11 @@ namespace Shiny
             var sub = this.WhenActivityStatusChanged()
                 .Take(1)
                 .Subscribe(x =>
-#if !ANDROIDX
-                    Android.Support.V4.App.ActivityCompat.RequestPermissions(
-                        x.Activity,
-                        androidPermissions,
-                        current
-                    )
-#else
                     AndroidX.Core.App.ActivityCompat.RequestPermissions(
                         x.Activity,
                         androidPermissions,
                         current
                     )
-#endif
                 );
 
 

@@ -11,11 +11,11 @@ namespace Shiny.Locations.Sync.Infrastructure
 {
     static class JobProcessor
     {
-        public static async Task<bool> Process<T>(JobInfo jobInfo,
-                                                  Func<Task<List<T>>> data,
-                                                  Func<T, Task> remove,
-                                                  Func<IEnumerable<T>, CancellationToken, Task> process,
-                                                  CancellationToken cancelToken) where T : LocationEvent, new()
+        public static async Task Process<T>(JobInfo jobInfo,
+                                            Func<Task<List<T>>> data,
+                                            Func<T, Task> remove,
+                                            Func<IEnumerable<T>, CancellationToken, Task> process,
+                                            CancellationToken cancelToken) where T : LocationEvent, new()
         {
             var config = jobInfo.GetSyncConfig();
             var events = await data();
@@ -51,7 +51,6 @@ namespace Shiny.Locations.Sync.Infrastructure
                     }
                 }
             }
-            return events.Any();
         }
     }
 }

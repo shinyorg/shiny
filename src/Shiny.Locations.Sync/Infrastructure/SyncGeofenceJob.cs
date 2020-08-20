@@ -23,23 +23,22 @@ namespace Shiny.Locations.Sync.Infrastructure
         }
 
 
-        public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
+        public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
             var enabled = await this.syncManager.IsMonitoring(LocationSyncType.Geofence);
             if (!enabled || this.geofences == null)
             {
                 jobInfo.Repeat = false;
-                return false;
+                return;
             }
 
-            var result = await JobProcessor.Process(
+            await JobProcessor.Process(
                 jobInfo,
                 () => this.dataService.GetAll(),
                 x => this.dataService.Remove(x),
                 (pings, ct) => this.geofences.Process(pings, ct),
                 cancelToken
             );
-            return result;
         }
     }
 }

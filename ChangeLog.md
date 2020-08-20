@@ -5,6 +5,9 @@
 
 
 ### Core
+* [BREAKING] Jobs no longer return Task of bool, they now only return Task
+* [BREAKING][Android] All previous monikers have been removed, only android 10+ targets are supported now, this includes only AndroidX compatibility
+* [BREAKING] Caching has been removed.  Use Microsoft.Extensions.Caching
 * [Fix][Settings] Nullable enums and set null to remove
 * [FEATURE] Source Generators
     * Auto Startup - creates the Shiny startup for you based on what Shiny nugets you install.  Simply mark [assembly:Shiny.GenerateStartupAttribute] on the assembly where you want it built
@@ -21,6 +24,12 @@
 ### Locations
 * [Feature][Android] Now uses foreground service to achieve fast "background" GPS
 
+### Notifications
+* [Feature][Android] More Android specific configuration added
+
+### Push
+* Firebase implementation is now released for iOS and Android  (Shiny.Push.FirebaseMessaging)
+
 ### Beacons
 * [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
 * [Android] Now uses a foreground service to maintain a continuous scan when using beacon monitoring
@@ -29,6 +38,7 @@
 * [Shiny.TripTracking] - A new module for tracking run, walks, and drives!
 * [Shiny.Locations.Sync] - Track background GPS and/or geofence events and uses best practices to ensure these events hit your server in a timely fashion
 * [Shiny.MediaSync] - Uploads Videos and Photos from your photo gallery
+
 
 1.2.0 (SP1)
 ---

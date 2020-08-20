@@ -22,7 +22,7 @@ namespace Shiny.MediaSync.Infrastructure
 
 
         public SyncJob(IMediaSyncManager syncManager,
-                       IMediaGalleryScanner scanner, 
+                       IMediaGalleryScanner scanner,
                        IHttpTransferManager transfers,
                        INotificationManager notifications,
                        IMediaSyncDelegate syncDelegate,
@@ -37,18 +37,18 @@ namespace Shiny.MediaSync.Infrastructure
         }
 
 
-        public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
+        public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
             if (this.syncManager.SyncTypes == null)
-                return false;
+                return;
 
             // TODO: verify gallery access
             var items = await this.scanner.Query(
-                this.syncManager.SyncTypes.Value, 
+                this.syncManager.SyncTypes.Value,
                 this.syncManager.SyncFrom
             );
             if (items?.Any() ?? false)
-            {                 
+            {
                 foreach (var item in items)
                 {
                     var sync = await this.CanProcess(item);
@@ -57,7 +57,6 @@ namespace Shiny.MediaSync.Infrastructure
                 }
             }
             this.syncManager.SyncFrom = DateTimeOffset.UtcNow;
-            return true;
         }
 
 

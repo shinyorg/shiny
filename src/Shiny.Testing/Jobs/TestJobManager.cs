@@ -23,7 +23,7 @@ namespace Shiny.Testing.Jobs
         public Task CancelAll() => Task.CompletedTask;
 
 
-                       public Task<JobInfo> GetJob(string jobIdentifier)
+        public Task<JobInfo> GetJob(string jobIdentifier)
         {
             throw new NotImplementedException();
         }
@@ -46,7 +46,7 @@ namespace Shiny.Testing.Jobs
             this.IsRunning = true;
 
             this.IsRunning = false;
-            return Task.FromResult(new JobRunResult(true, null, null));
+            return Task.FromResult(new JobRunResult(null, null));
         }
 
         public Task<IEnumerable<JobRunResult>> RunAll(CancellationToken cancelToken = default, bool runSequentially = false)

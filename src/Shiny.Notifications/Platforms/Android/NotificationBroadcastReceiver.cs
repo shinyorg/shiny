@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Linq;
 using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
-#if ANDROIDX
 using RemoteInput = AndroidX.Core.App.RemoteInput;
-#else
-using RemoteInput = Android.Support.V4.App.RemoteInput;
-#endif
 
 
 namespace Shiny.Notifications
@@ -26,31 +21,21 @@ namespace Shiny.Notifications
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
 
 
-        public override void OnReceive(Context context, Intent intent)
+        public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
         {
-            //if (intent.Action != IntentAction)
-            //    return;
+            var manager = ShinyHost.Resolve<INotificationManager>();
+            var serializer = ShinyHost.Resolve<ISerializer>();
 
-            var delegates = ShinyHost.ResolveAll<INotificationDelegate>();
-            if (!delegates.Any())
-                return;
+            var stringNotification = intent.GetStringExtra("Notification");
+            var action = intent.GetStringExtra("Action");
+            var notification = serializer.Deserialize<Notification>(stringNotification);
+            var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
 
-            this.Execute(async () =>
-            {
-                var manager = ShinyHost.Resolve<INotificationManager>();
-                var serializer = ShinyHost.Resolve<ISerializer>();
+            context.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
 
-                var stringNotification = intent.GetStringExtra("Notification");
-                var action = intent.GetStringExtra("Action");
-                var notification = serializer.Deserialize<Notification>(stringNotification);
-                var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
-
-                context.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
-
-                var response = new NotificationResponse(notification, action, text);
-                await delegates.RunDelegates(x => x.OnEntry(response));
-                await manager.Cancel(notification.Id);
-            });
-        }
+            var response = new NotificationResponse(notification, action, text);
+            await ShinyHost.Container.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
+            await manager.Cancel(notification.Id);
+        });
     }
 }

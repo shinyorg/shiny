@@ -16,9 +16,8 @@ namespace Shiny.DataSync.Infrastructure
         }
 
 
-        public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
+        public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            return true;
         }
     }
 }

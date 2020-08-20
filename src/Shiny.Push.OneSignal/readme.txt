@@ -1,5 +1,5 @@
 -----------------------
-Shiny.Logging.AppCenter
+Shiny.Push.OneSignal
 -----------------------
 
 GitHub: https://github.com/shinyorg/Shiny
@@ -17,6 +17,6 @@ public class SampleStartup : Startup
 {
     public override void ConfigureServices(IServiceCollection builder)
     {
-        builder.UseAppCenterLogging(Constants.AppCenterTokens, true, false);
+        builder.UseOneSignalPush<YourPushDelegate>(new OneSignalPushConfig("YourAppId")));
     }
 }

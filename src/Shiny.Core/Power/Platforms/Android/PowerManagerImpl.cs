@@ -1,7 +1,9 @@
 using System;
+using Android.App;
 using Android.Content;
 using Android.OS;
 
+[assembly: UsesPermission(Android.Manifest.Permission.BatteryStats)]
 
 namespace Shiny.Power
 {
@@ -54,7 +56,7 @@ namespace Shiny.Power
 
         //    var intent = new Intent("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
         //    intent.SetData(Android.Net.Uri.Parse("package:" + this.context.Package.PackageName));
-        //    this.context.AppContext.StartActivity(intent);   
+        //    this.context.AppContext.StartActivity(intent);
         //}
 
 
@@ -67,7 +69,7 @@ namespace Shiny.Power
             );
         public PowerState Status => this.context.GetIntentValue(Intent.ActionBatteryChanged, ToState);
         public int BatteryLevel => this.context.GetIntentValue(Intent.ActionBatteryChanged, ToLevel);
-        
+
 
         static PowerState ToState(Intent intent)
         {

@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
-using Android.Content.PM;
 using Android.Gms.Location;
 using Shiny.Logging;
 
 
 namespace Shiny.Locations
 {
-    public class MotionActivityManagerImpl : IMotionActivityManager, IShinyStartupTask
+    public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityManager, IShinyStartupTask
     {
         public static TimeSpan TimeSpanBetweenUpdates { get; set; } = TimeSpan.FromSeconds(10);
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
@@ -36,19 +35,35 @@ namespace Shiny.Locations
         }
 
 
-        public void Start() => Log.SafeExecute(() =>
-            this.client.RequestActivityUpdatesAsync(
-                Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
-                this.GetPendingIntent()
-            )
-        );
+        bool started;
+        public bool IsStarted
+        {
+            get => this.started;
+            set => this.Set(ref this.started, value);
+        }
+
+
+        public void Start()
+        {
+            if (this.IsStarted)
+            {
+                Log.SafeExecute(() =>
+                    this.client.RequestActivityUpdatesAsync(
+                        Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
+                        this.GetPendingIntent()
+                    )
+                );
+            }
+        }
 
 
         public async Task<AccessState> RequestPermission()
         {
+            var result = AccessState.Available;
+
             if (this.context.IsAtLeastAndroid10())
             {
-                var result = await this.context
+                result = await this.context
                     .RequestAccess("android.permission.ACTIVITY_RECOGNITION")
                     .ToTask();
 
@@ -59,9 +74,10 @@ namespace Shiny.Locations
                         this.GetPendingIntent()
                     );
                 }
-                return result;
             }
-            return AccessState.Available;
+            this.IsStarted = result == AccessState.Available;
+
+            return result;
         }
 
 

@@ -25,6 +25,9 @@ namespace Shiny.Notifications
         public string? ChannelId { get; set; } = DefaultChannelId;
         public string? Channel { get; set; } = DefaultChannel;
         public string? ChannelDescription { get; set; } = DefaultChannelDescription;
+        public string? ContentInfo { get; set; }
+        public string? Ticker { get; set; }
+        public string? Category { get; set; }
         public AndroidNotificationImportance NotificationImportance { get; set; } = DefaultNotificationImportance;
         public string? SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
         public string? LargeIconResourceName { get; set; } = DefaultLargeIconResourceName;

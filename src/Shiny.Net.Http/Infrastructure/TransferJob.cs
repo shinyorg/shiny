@@ -33,11 +33,11 @@ namespace Shiny.Net.Http.Infrastructure
         }
 
 
-        public async Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken)
+        public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
             var request = await this.repository.Get<HttpTransferStore>(jobInfo.Identifier);
             if (request == null)
-                return false;
+                return;
 
             if (request.UseMeteredConnection || this.connectivity.IsDirectConnect())
             {
@@ -53,14 +53,13 @@ namespace Shiny.Net.Http.Infrastructure
 
                     case HttpTransferState.Error:
                         if (transfer.Exception == null)
-                            return false;
+                            return;
 
                         await this.StopJob(jobInfo);
                         await this.tdelegate.OnError(transfer, transfer.Exception);
                         break;
                 }
             }
-            return true;
         }
 
 

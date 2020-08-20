@@ -17,6 +17,7 @@ namespace Shiny.Beacons
         readonly AndroidContext context;
 #endif
 
+
         public BeaconMonitoringManager(IBleManager bleManager,
 #if __ANDROID__
                                        AndroidContext context,
@@ -39,7 +40,8 @@ namespace Shiny.Beacons
             var eventType = stored ? BeaconRegisterEventType.Add : BeaconRegisterEventType.Update;
             this.messageBus.Publish(new BeaconRegisterEvent(eventType, region));
 #if __ANDROID__
-            this.context.StartService(typeof(ShinyBeaconMonitoringService), true);
+            if (!ShinyBeaconMonitoringService.IsStarted)
+                this.context.StartService(typeof(ShinyBeaconMonitoringService), true);
 #endif
         }
 
@@ -72,7 +74,17 @@ namespace Shiny.Beacons
         }
 
 
-        public Task<AccessState> RequestAccess() => this.bleManager.RequestAccess().ToTask();
+        public async Task<AccessState> RequestAccess()
+        {
+            var access = await this.bleManager.RequestAccess().ToTask();
+#if __ANDROID__
+            if (access == AccessState.Available && this.context.IsMinApiLevel(26))
+                access = await this.context.RequestAccess(Android.Manifest.Permission.ForegroundService).ToTask();
+#endif
+            return access;
+        }
+
+
         public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions() => await this.repository.GetAll<BeaconRegion>();
     }
 }
