@@ -24,6 +24,9 @@
 ### Locations
 * [Feature][Android] Now uses foreground service to achieve fast "background" GPS
 
+### Notifications
+* [Feature][Android] More Android specific configuration added
+
 ### Push
 * Firebase implementation is now released for iOS and Android  (Shiny.Push.FirebaseMessaging)
 
