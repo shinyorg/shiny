@@ -6,16 +6,14 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Media;
+using Android.Graphics;
+using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
 using Shiny.Settings;
-using Native = Android.App.NotificationManager;
-using Android.Graphics;
-using AndroidX.Core.App;
-using RemoteInput = AndroidX.Core.App.RemoteInput;
-using TaskStackBuilder = AndroidX.Core.App.TaskStackBuilder;
-using AndroidX.Core.Content;
+
 
 namespace Shiny.Notifications
 {
@@ -27,9 +25,7 @@ namespace Shiny.Notifications
         readonly ISettings settings;
         readonly ISerializer serializer;
         readonly IJobManager jobs;
-
         readonly NotificationManagerCompat? compatManager;
-        readonly Native? newManager;
 
 
         public NotificationManager(AndroidContext context,
@@ -65,16 +61,14 @@ namespace Shiny.Notifications
 
         public async Task Cancel(int id)
         {
-            this.newManager?.Cancel(id);
-            this.compatManager?.Cancel(id);
+            this.compatManager.Cancel(id);
             await this.repository.Remove<Notification>(id.ToString());
         }
 
 
         public async Task Clear()
         {
-            this.newManager?.CancelAll();
-            this.compatManager?.CancelAll();
+            this.compatManager.CancelAll();
             await this.repository.Clear<Notification>();
         }
 
@@ -85,17 +79,13 @@ namespace Shiny.Notifications
 
         public async Task<AccessState> RequestAccess()
         {
-            if (!this.compatManager?.AreNotificationsEnabled() ?? false)
-                return AccessState.Disabled;
-
-            if (!this.newManager?.AreNotificationsEnabled() ?? false)
+            if (this.compatManager.AreNotificationsEnabled())
                 return AccessState.Disabled;
 
             return await this.jobs.RequestAccess();
         }
 
 
-        //https://stackoverflow.com/questions/45462666/notificationcompat-builder-deprecated-in-android-o
         public async Task Send(Notification notification)
         {
             if (notification.Id == 0)
@@ -107,6 +97,20 @@ namespace Shiny.Notifications
                 return;
             }
 
+            var native = this.CreateNativeNotification(notification);
+            this.compatManager.Notify(notification.Id, native);
+            await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification), false);
+        }
+
+
+        public int Badge { get; set; }
+
+        readonly List<NotificationCategory> registeredCategories = new List<NotificationCategory>();
+        public void RegisterCategory(NotificationCategory category) => this.registeredCategories.Add(category);
+
+
+        public virtual Android.App.Notification CreateNativeNotification(Notification notification)
+        {
             var pendingIntent = this.GetLaunchPendingIntent(notification);
             var builder = new NotificationCompat.Builder(this.context.AppContext)
                 .SetContentTitle(notification.Title)
@@ -114,6 +118,15 @@ namespace Shiny.Notifications
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing)
                 .SetContentIntent(pendingIntent);
+
+            if (!notification.Android.ContentInfo.IsEmpty())
+                builder.SetContentInfo(notification.Android.ContentInfo);
+
+            if (!notification.Android.Ticker.IsEmpty())
+                builder.SetTicker(notification.Android.Ticker);
+
+            if (!notification.Android.Category.IsEmpty())
+                builder.SetCategory(notification.Category);
 
             if (notification.Android.UseBigTextStyle)
                 builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
@@ -129,9 +142,11 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
 
+
             // disabled until System.Drawing reliable works in Xamarin again
             //if (notification.Android.Color != null)
             //    builder.SetColor(notification.Android.Color.Value)
+
             if (!notification.Android.ColorResourceName.IsEmpty())
             {
                 if (this.context.IsMinApiLevel(21))
@@ -160,18 +175,14 @@ namespace Shiny.Notifications
             if (notification.Android.Vibrate)
                 builder.SetVibrate(new long[] { 500, 500 });
 
-            this.DoNotify(builder, notification);
-            await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification), false);
+            this.CreateChannel(notification);
+            builder.SetChannelId(notification.Android.ChannelId);
+
+            return builder.Build();
         }
 
 
-        public int Badge { get; set; }
-
-        readonly List<NotificationCategory> registeredCategories = new List<NotificationCategory>();
-        public void RegisterCategory(NotificationCategory category) => this.registeredCategories.Add(category);
-
-
-        protected virtual void DoNotify(NotificationCompat.Builder builder, Notification notification)
+        protected virtual void CreateChannel(Notification notification)
         {
             var channelId = notification.Android.ChannelId;
             var channel = this.compatManager.GetNotificationChannel(channelId);
@@ -201,12 +212,7 @@ namespace Shiny.Notifications
                 channel.EnableVibration(notification.Android.Vibrate);
                 this.compatManager.CreateNotificationChannel(channel);
             }
-
-
-            builder.SetChannelId(channelId);
-            this.compatManager.Notify(notification.Id, builder.Build());
         }
-
 
         protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
         {
@@ -235,7 +241,7 @@ namespace Shiny.Notifications
             PendingIntent pendingIntent;
             if ((notification.Android.LaunchActivityFlags & AndroidActivityFlags.ClearTask) != 0)
             {
-                pendingIntent = TaskStackBuilder
+                pendingIntent = AndroidX.Core.App.TaskStackBuilder
                     .Create(this.context.AppContext)
                     .AddNextIntent(launchIntent)
                     .GetPendingIntent(notification.Id, (int)PendingIntentFlags.OneShot);

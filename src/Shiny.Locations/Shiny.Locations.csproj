@@ -57,6 +57,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
         <PackageReference Include="Xamarin.AndroidX.Core" Version="1.2.0.1" />
