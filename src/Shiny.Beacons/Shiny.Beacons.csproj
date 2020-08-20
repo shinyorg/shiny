@@ -14,7 +14,7 @@
         <ProjectReference Include="..\Shiny.Beacons.Abstractions\Shiny.Beacons.Abstractions.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">        
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
@@ -27,6 +27,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*Android*\**\*.cs" />
