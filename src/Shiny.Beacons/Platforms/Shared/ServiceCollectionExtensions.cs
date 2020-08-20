@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 using Shiny.Beacons;
 
 
@@ -41,12 +43,7 @@ namespace Shiny
                 throw new ArgumentException("You can't register monitoring regions without a delegate type");
 
 #if __ANDROID__ || WINDOWS_UWP
-            //services.RegisterJob(new Shiny.Jobs.JobInfo(typeof(BeaconRegionScanJob))
-            //{
-            //    BatteryNotLow = true,
-            //    //PeriodicTime = TimeSpan.FromSeconds(30),
-            //    IsSystemJob = true
-            //});
+            services.TryAddSingleton<BackgroundTask>();
             services.UseBleClient();
 #endif
             services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
