@@ -60,7 +60,7 @@
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
-        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.2.0.2" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.3.0" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="117.0.0-preview04" />
     </ItemGroup>
 
