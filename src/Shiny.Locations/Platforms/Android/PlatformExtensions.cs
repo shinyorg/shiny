@@ -62,6 +62,7 @@ namespace Shiny.Locations
                     .RequestAccess
                     (
                         ACCESS_BACKGROUND_LOCATION,
+                        P.ForegroundService,
                         locationPerm
                     )
                     .ToTask();

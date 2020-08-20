@@ -31,6 +31,12 @@ namespace Shiny.Locations
             if (result == null)
                 return;
 
+            //ShinyHost
+            //    .Resolve<AndroidContext>()
+            //    .StartService(
+            //        typeof(ShinyBeaconMonitoringService),
+            //        true
+            //    );
             this.Execute(async () =>
             {
                 var delegates = ShinyHost.Resolve<IEnumerable<IGpsDelegate>>();
@@ -41,7 +47,7 @@ namespace Shiny.Locations
                     await delegates
                         .RunDelegates(x => x.OnReading(reading))
                         .ConfigureAwait(false);
-                    
+
                     readingSubject.OnNext(reading);
                 }
             });
