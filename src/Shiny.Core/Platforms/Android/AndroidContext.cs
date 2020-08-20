@@ -94,19 +94,6 @@ namespace Shiny
         public event EventHandler<PermissionRequestResult>? PermissionResult;
 
 
-        //public IObservable<Configuration> WhenConfigurationChanged() => this
-        //    .WhenIntentReceived(Intent.ActionConfigurationChanged)
-        //    .Select(intent => this.AppContext.Resources.Configuration);
-
-
-        //public PendingIntent GetIntentServicePendingIntent()
-        //{
-        //    var intent = new Intent(Application.Context, typeof(CoreIntentService));
-        //    var pendingIntent = PendingIntent.GetService(this.AppContext, 0, intent, PendingIntentFlags.UpdateCurrent);
-        //    return pendingIntent;
-        //}
-
-
         public T GetIntentValue<T>(string intentAction, Func<Intent, T> transform)
         {
             using (var filter = new IntentFilter(intentAction))
