@@ -94,12 +94,39 @@ namespace Shiny
         public event EventHandler<PermissionRequestResult>? PermissionResult;
 
 
+        //public IObservable<Configuration> WhenConfigurationChanged() => this
+        //    .WhenIntentReceived(Intent.ActionConfigurationChanged)
+        //    .Select(intent => this.AppContext.Resources.Configuration);
+
+
+        //public PendingIntent GetIntentServicePendingIntent()
+        //{
+        //    var intent = new Intent(Application.Context, typeof(CoreIntentService));
+        //    var pendingIntent = PendingIntent.GetService(this.AppContext, 0, intent, PendingIntentFlags.UpdateCurrent);
+        //    return pendingIntent;
+        //}
+
+
         public T GetIntentValue<T>(string intentAction, Func<Intent, T> transform)
         {
             using (var filter = new IntentFilter(intentAction))
             using (var receiver = this.AppContext.RegisterReceiver(null, filter))
                 return transform(receiver);
         }
+
+
+        public IObservable<Intent> WhenIntentReceived(string intentAction)
+            => Observable.Create<Intent>(ob =>
+            {
+                var filter = new IntentFilter();
+                filter.AddAction(intentAction);
+                var receiver = new ObservableBroadcastReceiver
+                {
+                    OnEvent = ob.OnNext
+                };
+                this.AppContext.RegisterReceiver(receiver, filter);
+                return () => this.AppContext.UnregisterReceiver(receiver);
+            });
 
 
         public AccessState GetCurrentAccessState(string androidPermission)
@@ -147,6 +174,7 @@ namespace Shiny
                         current
                     )
                 );
+
 
             return () =>
             {
