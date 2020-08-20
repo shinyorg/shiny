@@ -398,7 +398,7 @@ namespace Shiny.Notifications
         protected virtual NotificationCompat.Action CreateTextReply(Notification notification, NotificationAction action)
         {
             var pendingIntent = this.CreateActionIntent(notification, action);
-            var input = new RemoteInput.Builder("Result")
+            var input = new AndroidX.Core.App.RemoteInput.Builder("Result")
                 .SetLabel(action.Title)
                 .Build();
 
