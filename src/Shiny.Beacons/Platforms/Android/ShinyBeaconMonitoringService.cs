@@ -1,33 +1,59 @@
-﻿using System;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Runtime;
+using S = Shiny.Notifications;
 
 
 namespace Shiny.Beacons
 {
     [Service(
-        Enabled = false,
+        Enabled = true,
+        Exported = true,
         ForegroundServiceType = ForegroundService.TypeLocation
     )]
     public class ShinyBeaconMonitoringService : Service
     {
-        Lazy<BackgroundTask> task = ShinyHost.LazyResolve<BackgroundTask>();
+        public static bool IsStarted { get; private set; }
 
-        // TODO: persistent notification?
-        [return: GeneratedEnum]
-        public override StartCommandResult OnStartCommand(Intent? intent, [GeneratedEnum] StartCommandFlags flags, int startId)
+
+        public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
         {
-            this.task.Value.StartScan();
-            return StartCommandResult.NotSticky;
+            var context = ShinyHost.Resolve<AndroidContext>();
+            if (context.IsMinApiLevel(26))
+            {
+                var notificationManager = (S.NotificationManager)ShinyHost.Resolve<S.INotificationManager>();
+                var native = notificationManager.CreateNativeNotification(new S.Notification
+                {
+                    Title = "Shiny Beacons",
+                    Message = "Shiny beacon monitoring is on",
+                    Android = new S.AndroidOptions
+                    {
+                        ContentInfo = "Shiny Beacons",
+                        OnGoing = true,
+                        //LightColor = Android.Graphics.Color.Blue,
+                        Ticker = "Shiny Beacons",
+                        Category = Notification.CategoryService
+                    }
+                });
+                this.StartForeground(1, native);
+            }
+            IsStarted = true;
+
+            ShinyHost.Container.Resolve<BackgroundTask>().StartScan();
+            return StartCommandResult.Sticky;
         }
 
 
         public override void OnDestroy()
         {
-            this.task.Value.StopScan();
+            IsStarted = false;
+
+            var context = ShinyHost.Resolve<AndroidContext>();
+            if (context.IsMinApiLevel(26))
+                this.StopForeground(true);
+
+            ShinyHost.Container.Resolve<BackgroundTask>().StopScan();
             base.OnDestroy();
         }
 
