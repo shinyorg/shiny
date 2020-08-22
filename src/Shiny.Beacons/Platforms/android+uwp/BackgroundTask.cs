@@ -162,7 +162,7 @@ namespace Shiny.Beacons
             }
             foreach (var state in copy)
             {
-                if (state.IsInRange != null && state.IsInRange.Value && state.LastPing < maxAge)
+                if (state.IsInRange != null && state.IsInRange.Value && state.LastPing > maxAge)
                 {
                     state.IsInRange = false;
                     if (state.Region.NotifyOnExit)

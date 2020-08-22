@@ -8,7 +8,11 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Beacons
 {
+#if __ANDROID__
+    public class BeaconMonitoringManager : NotifyPropertyChanged, IBeaconMonitoringManager, IBeaconMonitoringNotificationConfiguration, IShinyStartupTask
+#else
     public class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyStartupTask
+#endif
     {
         readonly IRepository repository;
         readonly IBleManager bleManager;
@@ -33,6 +37,32 @@ namespace Shiny.Beacons
             this.repository = repository;
         }
 
+#if __ANDROID__
+
+        string? title;
+        public string? Title
+        {
+            get => this.title;
+            set => this.Set(ref this.title, value);
+        }
+
+
+        string? description;
+        public string? Description
+        {
+            get => this.description;
+            set => this.Set(ref this.description, value);
+        }
+
+
+        string? ticker;
+        public string? Ticker
+        {
+            get => this.ticker;
+            set => this.Set(ref this.ticker, value);
+        }
+
+#endif
 
         public async void Start()
         {
@@ -40,6 +70,8 @@ namespace Shiny.Beacons
             var regions = await this.GetMonitoredRegions();
             if (!regions.IsEmpty() && !ShinyBeaconMonitoringService.IsStarted)
                 this.context.StartService(typeof(ShinyBeaconMonitoringService), true);
+#else
+            // TODO: start backgroundtask manually?
 #endif
         }
 

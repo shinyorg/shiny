@@ -23,16 +23,17 @@ namespace Shiny.Beacons
             if (context.IsMinApiLevel(26))
             {
                 var notificationManager = (S.NotificationManager)ShinyHost.Resolve<S.INotificationManager>();
+                var config = notificationManager as IBeaconMonitoringNotificationConfiguration;
                 var native = notificationManager.CreateNativeNotification(new S.Notification
                 {
-                    Title = "Shiny Beacons",
-                    Message = "Shiny beacon monitoring is on",
+                    Title = config?.Title ?? "Shiny Beacons",
+                    Message = config?.Description ?? "Shiny beacon monitoring is on",
                     Android = new S.AndroidOptions
                     {
-                        ContentInfo = "Shiny Beacons",
+                        ContentInfo = config?.Ticker ?? "Shiny Beacons",
                         OnGoing = true,
                         //LightColor = Android.Graphics.Color.Blue,
-                        Ticker = "Shiny Beacons",
+                        Ticker = config?.Ticker ?? "Shiny Beacons",
                         Category = Notification.CategoryService
                     }
                 });
