@@ -7,7 +7,10 @@ using Android.Gms.Location;
 
 namespace Shiny.Locations
 {
-    public class GpsManagerImpl : IGpsManager
+    public class GpsManagerImpl : NotifyPropertyChanged,
+                                  IGpsManager,
+                                  IGpsBackgroundNotificationConfiguration,
+                                  IShinyStartupTask
     {
         public const string ReceiverName = "com.shiny.locations." + nameof(GpsBroadcastReceiver);
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
@@ -22,7 +25,51 @@ namespace Shiny.Locations
         }
 
 
-        public bool IsListening { get; private set; }
+        public async void Start()
+        {
+            if (this.CurrentRequest != null)
+            {
+                if (this.CurrentRequest.UseBackground)
+                    await this.StartListener(this.CurrentRequest);
+                else
+                    this.CurrentRequest = null;
+            }
+        }
+
+
+        string? title;
+        public string? Title
+        {
+            get => this.title;
+            set => this.Set(ref this.title, value);
+        }
+
+
+        string? description;
+        public string? Description
+        {
+            get => this.description;
+            set => this.Set(ref this.description, value);
+        }
+
+
+        string? ticker;
+        public string? Ticker
+        {
+            get => this.ticker;
+            set => this.Set(ref this.ticker, value);
+        }
+
+
+        GpsRequest? request;
+        public GpsRequest? CurrentRequest
+        {
+            get => this.request;
+            set => this.Set(ref this.request, value);
+        }
+
+
+        public bool IsListening => this.CurrentRequest != null;
 
         public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request)
             => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.GetCurrentStatus(request));
@@ -71,7 +118,7 @@ namespace Shiny.Locations
             if (request.UseBackground && !ShinyGpsService.IsStarted)
                 this.context.StartService(typeof(ShinyGpsService), true);
 
-            this.IsListening = true;
+            this.CurrentRequest = request;
         }
 
 
@@ -82,7 +129,7 @@ namespace Shiny.Locations
 
             await this.client.RemoveLocationUpdatesAsync(this.GetPendingIntent());
             this.context.StopService(typeof(ShinyGpsService));
-            this.IsListening = false;
+            this.CurrentRequest = null;
         }
 
 

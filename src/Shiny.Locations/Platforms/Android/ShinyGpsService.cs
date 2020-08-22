@@ -23,16 +23,18 @@ namespace Shiny.Locations
             if (context.IsMinApiLevel(26))
             {
                 var notificationManager = (S.NotificationManager)ShinyHost.Resolve<S.INotificationManager>();
+                var config = ShinyHost.Resolve<IGpsManager>() as IGpsBackgroundNotificationConfiguration;
+
                 var native = notificationManager.CreateNativeNotification(new S.Notification
                 {
-                    Title = "Shiny Beacons",
-                    Message = "Shiny beacon monitoring is on",
+                    Title = config?.Title ?? "Shiny GPS Tracking",
+                    Message = config?.Description ?? "Shiny GPS tracking is running",
                     Android = new S.AndroidOptions
                     {
-                        ContentInfo = "Shiny Beacons",
+                        ContentInfo = config?.Title ?? "Shiny GPS Tracking",
                         OnGoing = true,
                         //LightColor = Android.Graphics.Color.Blue,
-                        Ticker = "Shiny Beacons",
+                        Ticker = config?.Ticker ?? config?.Description ?? "Shiny GPS tracking is running",
                         Category = Notification.CategoryService
                     }
                 });
