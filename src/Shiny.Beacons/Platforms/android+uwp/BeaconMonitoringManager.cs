@@ -8,7 +8,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Beacons
 {
-    public class BeaconMonitoringManager : IBeaconMonitoringManager
+    public class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyStartupTask
     {
         readonly IRepository repository;
         readonly IBleManager bleManager;
@@ -31,6 +31,16 @@ namespace Shiny.Beacons
 #endif
             this.messageBus = messageBus;
             this.repository = repository;
+        }
+
+
+        public async void Start()
+        {
+#if __ANDROID__
+            var regions = await this.GetMonitoredRegions();
+            if (!regions.IsEmpty() && !ShinyBeaconMonitoringService.IsStarted)
+                this.context.StartService(typeof(ShinyBeaconMonitoringService), true);
+#endif
         }
 
 

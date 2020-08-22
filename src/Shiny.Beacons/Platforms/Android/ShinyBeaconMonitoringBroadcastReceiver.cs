@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Android.App;
 using Android.Content;
 
@@ -17,12 +16,8 @@ namespace Shiny.Beacons
     {
         public override void OnReceive(Context? context, Intent? intent)
         {
-            ShinyHost
-                .Resolve<AndroidContext>()
-                .StartService(
-                    typeof(ShinyBeaconMonitoringService),
-                    true
-                );
+            // this broadcastreceiver being registered will cause application to spinup shiny infrastructure
+            // thereby starting the foreground service if beacons are registered
         }
     }
 }

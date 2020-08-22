@@ -14,7 +14,8 @@ namespace Shiny.Locations
         Exported = true
     )]
     [IntentFilter(new [] {
-        GpsManagerImpl.IntentAction
+        GpsManagerImpl.IntentAction,
+        Intent.ActionBootCompleted
     })]
     public class GpsBroadcastReceiver : BroadcastReceiver
     {
@@ -24,6 +25,10 @@ namespace Shiny.Locations
 
         public override void OnReceive(Context context, Intent intent)
         {
+            // TODO: gpsrequest saved
+
+            // if boot completed received & gps background was on, this broadcastreceiver will cause the application to spinup the
+            // shiny infrastructure and thus the GPS background monitoring
             if (!intent.Action.Equals(GpsManagerImpl.IntentAction))
                 return;
 
@@ -31,12 +36,6 @@ namespace Shiny.Locations
             if (result == null)
                 return;
 
-            //ShinyHost
-            //    .Resolve<AndroidContext>()
-            //    .StartService(
-            //        typeof(ShinyBeaconMonitoringService),
-            //        true
-            //    );
             this.Execute(async () =>
             {
                 var delegates = ShinyHost.Resolve<IEnumerable<IGpsDelegate>>();
