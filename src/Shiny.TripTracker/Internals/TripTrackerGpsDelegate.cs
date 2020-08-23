@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Locations;
 
@@ -41,7 +42,7 @@ namespace Shiny.TripTracker.Internals
 
             // TODO: watch for sensor blips?
             var n = nameof(TripTrackerGpsDelegate);
-            var currentMotion = await this.activityManager.GetCurrentActivity(TimeSpan.FromMinutes(5));
+            var currentMotion = await this.GetLastActivity();
             var track = this.IsTracked(currentMotion);
             Logging.Log.Write(n, $"Current Motion: {currentMotion?.Types.ToString() ?? "Empty"} - Track: {track} - Current: {this.CurrentTripId}");
 
@@ -82,6 +83,19 @@ namespace Shiny.TripTracker.Internals
                     await this.delegates.RunDelegates(x => x.OnTripEnd(trip));
                 }
             }
+        }
+
+
+        async Task<MotionActivityEvent> GetLastActivity()
+        {
+
+            if (this.CurrentTripId == null)
+            {
+                return await this.activityManager.GetCurrentActivity(TimeSpan.FromMinutes(5));
+            }
+            var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
+            var results = await this.activityManager.Query(trip.DateStarted);
+            return results.FirstOrDefault();
         }
 
 
