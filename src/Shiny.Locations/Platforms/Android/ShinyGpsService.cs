@@ -38,7 +38,7 @@ namespace Shiny.Locations
                         Category = Notification.CategoryService
                     }
                 });
-                this.StartForeground(1, native);
+                this.StartForeground(2, native);
             }
             IsStarted = true;
 
