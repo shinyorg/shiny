@@ -50,17 +50,21 @@ namespace Shiny.TripTracker.Internals
         }
 
 
-        public async Task StartTracking(TripTrackingType trackingType) 
+        public async Task StartTracking(TripTrackingType trackingType, GpsRequest? request = null) 
         {
             if (this.TrackingType != null)
                 throw new ArgumentException("Trip tracking is already running");
 
             (await this.RequestAccess()).Assert();
             this.TrackingType = trackingType;
+
+
             await this.gpsManager.StartListener(new GpsRequest
             {
-                Interval = TimeSpan.FromSeconds(10),
-                ThrottledInterval = TimeSpan.FromSeconds(5),
+                Interval = request?.Interval ?? TimeSpan.FromSeconds(10),
+                ThrottledInterval = request?.ThrottledInterval ?? TimeSpan.FromSeconds(5),
+                MinimumDistance = request?.MinimumDistance ?? Distance.FromMeters(250),
+                Priority = request?.Priority ?? GpsPriority.Normal,
                 UseBackground = true
             });
         }

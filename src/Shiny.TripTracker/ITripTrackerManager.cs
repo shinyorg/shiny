@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
+using Shiny.Locations;
 
 namespace Shiny.TripTracker
 {
@@ -9,7 +9,7 @@ namespace Shiny.TripTracker
     {
         TripTrackingType? TrackingType { get; }
 
-        Task StartTracking(TripTrackingType trackingType);
+        Task StartTracking(TripTrackingType trackingType, GpsRequest? gpsConfiguration = null);
         Task StopTracking();
 
         Task<IList<Trip>> GetAllTrips();
