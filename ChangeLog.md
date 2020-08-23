@@ -23,6 +23,7 @@
 
 ### Locations
 * [Feature][Android] Now uses foreground service to achieve fast "background" GPS
+* [Feature] Minimum Distance is now supported on Android and iOS
 
 ### Notifications
 * [Feature][Android] More Android specific configuration added

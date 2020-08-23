@@ -13,7 +13,7 @@ namespace Shiny.Locations
         };
 
         /// <summary>
-        /// Determines if background updates should occur - used mostly by iOS
+        /// Determines if background updates should occur
         /// </summary>
         public bool UseBackground { get; set; } = true;
 
@@ -31,5 +31,11 @@ namespace Shiny.Locations
         /// The desired Priority/Accuracy of the GPS lock
         /// </summary>
         public GpsPriority Priority { get; set; } = GpsPriority.Normal;
+
+
+        /// <summary>
+        /// The minimum distance travelled before firing event
+        /// </summary>
+        public Distance? MinimumDistance { get; set; }
     }
 }

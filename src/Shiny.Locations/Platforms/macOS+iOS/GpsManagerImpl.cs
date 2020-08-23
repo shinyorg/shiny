@@ -69,8 +69,16 @@ namespace Shiny.Locations
             this.gdelegate.Request = request;
 #if __IOS__
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
-            if (request.ThrottledInterval != null)
-                this.locationManager.AllowDeferredLocationUpdatesUntil(0, request.ThrottledInterval.Value.TotalMilliseconds);
+            var throttledInterval = request.ThrottledInterval?.TotalMilliseconds ?? 0;
+            var minDistance = request.MinimumDistance?.TotalMeters ?? 0;
+
+            if (throttledInterval > 0 || minDistance > 0)
+            {
+                this.locationManager.AllowDeferredLocationUpdatesUntil(
+                    minDistance,
+                    throttledInterval
+                );
+            }
 #endif
             switch (request.Priority)
             {

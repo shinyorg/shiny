@@ -15,19 +15,23 @@ namespace Shiny.Locations
         readonly Subject<IGpsReading> readingSubject = new Subject<IGpsReading>();
         bool deferringUpdates;
 
-        internal GpsRequest Request { get; set; }
+        internal GpsRequest? Request { get; set; }
 
 
         public IObservable<IGpsReading> WhenGps() => this.readingSubject;
         public override void LocationsUpdated(CLLocationManager manager, CLLocation[] locations)
         {
-            if (this.Request?.ThrottledInterval == null)
+            if (this.Request?.ThrottledInterval == null && this.Request?.MinimumDistance == null)
+            {
                 this.InvokeChanges(locations);
-
+            }
             else if (!this.deferringUpdates)
             {
 #if __IOS__
-                manager.AllowDeferredLocationUpdatesUntil(0, this.Request.ThrottledInterval.Value.TotalMilliseconds);
+                manager.AllowDeferredLocationUpdatesUntil(
+                    this.Request.MinimumDistance?.TotalMeters ?? 0,
+                    this.Request.ThrottledInterval?.TotalMilliseconds ?? 0
+                );
 #endif
                 this.deferringUpdates = true;
                 this.InvokeChanges(locations);

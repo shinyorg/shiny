@@ -111,6 +111,9 @@ namespace Shiny.Locations
             if (request.ThrottledInterval != null)
                 nativeRequest.SetFastestInterval(request.ThrottledInterval.Value.ToMillis());
 
+            if (request.MinimumDistance != null)
+                nativeRequest.SetSmallestDisplacement((float)request.MinimumDistance.TotalMeters);
+
             await this.client.RequestLocationUpdatesAsync(
                 nativeRequest,
                 this.GetPendingIntent() // used for background - should switch to LocationCallback for foreground
