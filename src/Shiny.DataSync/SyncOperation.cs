@@ -3,11 +3,10 @@
 
 namespace Shiny.DataSync
 {
-    public class SyncOperation
+    public enum SyncOperation
     {
-        public string EntityId { get; }
-        public Type EntityType { get; }
-        public DateTimeOffset? DateCompleted { get; }
-        public DateTimeOffset DateCreated { get; }
+        Create,
+        Update,
+        Delete
     }
 }

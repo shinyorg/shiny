@@ -30,9 +30,10 @@ assignees: ''
  - [ ] Push - Firebase
  - [ ] Sensors
  - [ ] AppCenter Logging Integration
- - [ ] Location Sync (beta)
+ - [ ] Location Sync
  - [ ] Photo Sync (alpha)
- - [ ] Trip Tracker (alpha)
+ - [ ] Data Sync (alpha)
+ - [ ] Trip Tracker
  - [ ] BluetoothLE Client (beta)
  - [ ] BluetoothLE Hosting (beta)
  - [ ] Beacons

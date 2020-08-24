@@ -39,6 +39,7 @@
 * [Shiny.TripTracking] - A new module for tracking run, walks, and drives!
 * [Shiny.Locations.Sync] - Track background GPS and/or geofence events and uses best practices to ensure these events hit your server in a timely fashion
 * [Shiny.MediaSync] - Uploads Videos and Photos from your photo gallery
+* [Shiny.DataSync] - Sends data to your server in a reliable fashion (downloads coming soon)
 
 
 1.2.0 (SP1)
