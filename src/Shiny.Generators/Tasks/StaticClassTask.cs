@@ -37,6 +37,7 @@ namespace Shiny.Generators.Tasks
             this.BuildStaticClass("Shiny.Locations.Sync.ILocationSyncManager", "ShinyLocationSync", "Shiny.Locations.Sync");
             this.BuildStaticClass("Shiny.MediaSync.IMediaSyncManager", "ShinyMediaSync", "Shiny.MediaSync");
             this.BuildStaticClass("Shiny.TripTracker.ITripTrackerManager", "ShinyTripTracker", "Shiny.TripTracker");
+            this.BuildStaticClass("Shiny.DataSync.IDataSyncManager", "ShinyDataSync", "Shiny.DataSync");
 
             // sensors
             this.BuildStaticClass("Shiny.Sensors.IAccelerometer", "ShinyAccelerometer", "Shiny.Sensors");
