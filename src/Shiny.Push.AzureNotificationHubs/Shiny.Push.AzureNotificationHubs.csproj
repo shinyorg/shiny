@@ -41,6 +41,6 @@
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[3.3.0, 4)" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[4.0.0, 5)" />
     </ItemGroup>
 </Project>
