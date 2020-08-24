@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 using Shiny.Jobs;
 using Shiny.Logging;
 
+
 namespace Shiny.DataSync.Infrastructure
 {
     public class SyncJob : IJob
     {
+        public static string JobName { get; } = $"{typeof(SyncJob).Namespace}.{typeof(SyncJob).Name}";
         readonly IDataSyncManager manager;
         readonly IDataSyncDelegate sdelegate;
 

@@ -16,10 +16,11 @@ namespace Shiny
 
             services.RegisterJob(
                 typeof(SyncJob),
-                requiredNetwork: syncOnAnyConnection
+                SyncJob.JobName,
+                syncOnAnyConnection
                     ? Jobs.InternetAccess.Any
                     : Jobs.InternetAccess.Unmetered,
-                runInForeground: true
+                true
             );
         }
     }

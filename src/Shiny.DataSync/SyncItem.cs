@@ -1,10 +1,12 @@
 ﻿using System;
+using SQLite;
 
 
 namespace Shiny.DataSync
 {
     public class SyncItem
     {
+        [PrimaryKey]
         public Guid Id { get; set; }
         public string EntityId { get; set; }
         public string TypeName { get; set; }

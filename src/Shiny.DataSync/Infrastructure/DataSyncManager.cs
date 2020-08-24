@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.IO;
+using Shiny.Jobs;
+
 using SQLite;
 
 
@@ -13,13 +15,25 @@ namespace Shiny.DataSync.Infrastructure
     {
         readonly SQLiteAsyncConnection conn;
         readonly ISerializer serializer;
+        readonly IJobManager jobManager;
 
 
-        public DataSyncManager(IFileSystem fileSystem, ISerializer serializer)
+        public DataSyncManager(IFileSystem fileSystem,
+                               ISerializer serializer,
+                               IJobManager jobManager)
         {
             this.conn = new SQLiteAsyncConnection(Path.Combine(fileSystem.AppData.FullName, "shinydatasync.db"));
             this.conn.GetConnection().CreateTable<SyncItem>();
             this.serializer = serializer;
+            this.jobManager = jobManager;
+        }
+
+
+        bool enabled;
+        public bool Enabled
+        {
+            get => this.enabled;
+            set => this.Set(ref this.enabled, value);
         }
 
 
@@ -41,7 +55,10 @@ namespace Shiny.DataSync.Infrastructure
             Timestamp = DateTimeOffset.UtcNow
         });
 
+
         public Task<List<SyncItem>> GetPendingItems() => this.conn.Table<SyncItem>().ToListAsync();
         public Task Remove(Guid syncItemId) => this.conn.DeleteAsync<SyncItem>(syncItemId);
+        public Task ForceRun() => this.jobManager.RunJobAsTask(SyncJob.JobName);
+        public Task ClearPending() => this.conn.DeleteAllAsync<SyncItem>();
     }
 }
