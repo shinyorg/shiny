@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -187,36 +188,47 @@ namespace Shiny.Generators
             .OfType<INamedTypeSymbol>();
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type type)
-            => context.GetAllImplementationsOfType(type.FullName);
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type type, bool thisProjectOnly = false)
+            => context.GetAllImplementationsOfType(type.FullName, thisProjectOnly);
 
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName)
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName, bool thisProjectOnly = false)
         {
             var symbol = context.Compilation.GetTypeByMetadataName(fullName);
             if (symbol == null)
                 return Enumerable.Empty<INamedTypeSymbol>();
 
-            return context.GetAllImplementationsOfType(symbol);
+            return context.GetAllImplementationsOfType(symbol, thisProjectOnly);
         }
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, ISymbol symbol)
-            => SymbolFinder
-                .FindImplementationsAsync(symbol, context.Project.Solution)
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, ISymbol symbol, bool thisProjectOnly = false)
+        {
+            if (!thisProjectOnly)
+            {
+                return SymbolFinder
+                    .FindImplementationsAsync(symbol, context.Project.Solution)
+                    .Result
+                    .OfType<INamedTypeSymbol>();
+            }
+            return SymbolFinder
+                .FindImplementationsAsync(symbol, context.Project.Solution, ImmutableSortedSet.Create(context.Project))
                 .Result
                 .OfType<INamedTypeSymbol>();
+        }
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName)
+        public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName, bool thisProjectOnly = false)
         {
             var symbol = context.Compilation.GetTypeByMetadataName(typeName);
             if (symbol == null)
                 return Enumerable.Empty<INamedTypeSymbol>();
 
-            var result = SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution).Result;
-            return result;
+            if (!thisProjectOnly)
+                return SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution).Result;
+
+            return SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution, ImmutableSortedSet.Create(context.Project)).Result;
         }
 
 

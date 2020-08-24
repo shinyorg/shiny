@@ -12,7 +12,7 @@ namespace Shiny.Generators.Tasks
         public override void Execute()
         {
             var log = this.Context.GetLogger();
-            var apps = this.Context.GetAllDerivedClassesForType("Prism.DryIoc.PrismApplication");
+            var apps = this.Context.GetAllDerivedClassesForType("Prism.DryIoc.PrismApplication", true);
 
             switch (apps.Count())
             {

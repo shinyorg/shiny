@@ -34,56 +34,25 @@ namespace YourNamespace
 }
 
 
+If you don't require a ton of configuration, you can also use the generator option by adding
+
+[assembly: Shiny.GenerateStartupAttribute]
+
 ----------
 ANDROID
 ----------
 
 1. You must set your "Target Android verion" to "Android 10.0 (API Level 29)" or higher
 
-2. Create an application in your android head project
+2. In v1, you required to add an Android application class.  In v2, one is generated for you automatically and will even wireup Xamarin Essentials.
 
-using System;
-using Shiny;
-using Android.App;
-using Android.Runtime;
-
-
-namespace YourNamespace
-{
-    [Application]
-    public class YourApplication : Shiny.ShinyAndroidApplication<YourStartup>
-    {
-        public YourApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
-        {
-        }
-    }
-}
-
-
-3. In your Main/Launch Activity (or every activity where you are going to ask for permissions)
-
-using Shiny;
-
-public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
-{
-    this.ShinyRequestPermissionsResult(requestCode, permissions, grantResults);
-    base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-}
-
-
-Testing on Android
-
-* Open an SDK command prompt
-* run 'adb shell cmd jobscheduler'
-* find your job
-* run 'adb shell cmd jobschedule run XXX'
-
+3. In your Main/Launch Activity (or every activity where you are going to ask for permissions), mark the activities as partial and Shiny will auto-add the necessary method with the exception of ShinyOnCreate in your OnCreate method which you must add manually
 
 ----------
 IOS
 ----------
 
-* Add the following as the first line in your AppDelegate.cs - FinishedLaunching method
+* Add the following as the first line in your AppDelegate.cs, v2 will autogenerate the rest of the methods needed in AppDelegate as long as your class is marked as a partial class.
 
 using Shiny;
 this.ShinyFinishedLaunching(new YourStartup());
@@ -92,12 +61,7 @@ this.ShinyFinishedLaunching(new YourStartup());
 ** IOS JOBS **
 If you plan to use jobs in iOS, please do the following:
 
-1. Add this to your AppDelegate.cs
-
-public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-    => this.ShinyPerformFetch(completionHandler);
-
-2a. Add the following to your Info.plist
+2. Add the following to your Info.plist
 
 <key>UIBackgroundModes</key>
 <array>
