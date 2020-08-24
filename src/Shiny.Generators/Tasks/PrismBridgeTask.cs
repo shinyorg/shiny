@@ -12,9 +12,6 @@ namespace Shiny.Generators.Tasks
         public override void Execute()
         {
             var log = this.Context.GetLogger();
-            var prismAssembly = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => x.Name.Equals("Prism."));
-            var isPrism8 = prismAssembly.Version.Major >= 8;
-
             var apps = this.Context.GetAllDerivedClassesForType("Prism.DryIoc.PrismApplication");
 
             switch (apps.Count())
@@ -27,6 +24,9 @@ namespace Shiny.Generators.Tasks
                     var app = apps.First();
                     var builder = new IndentedStringBuilder();
                     builder.AppendNamespaces("Prism.Ioc", "Prism.Mvvm", "Prism.DryIoc", "DryIoc");
+
+                    var prismAssembly = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => x.Name.Equals("Prism."));
+                    var isPrism8 = (prismAssembly?.Version.Major ?? 7) >= 8;
 
                     using (builder.BlockInvariant("namespace " + app.ContainingNamespace.Name))
                     {
