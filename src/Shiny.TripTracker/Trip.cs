@@ -16,7 +16,7 @@ namespace Shiny.TripTracker
         public double StartLatitude { get; set; }
         public double StartLongitude { get; set; }
         public double AverageSpeedMetersPerHour { get; set; }
-        
+
         public double? EndLatitude { get; set; }
         public double? EndLongitude { get; set; }
         public DateTimeOffset? DateFinished { get; set; }
