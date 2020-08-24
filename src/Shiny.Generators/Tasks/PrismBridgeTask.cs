@@ -12,8 +12,8 @@ namespace Shiny.Generators.Tasks
         public override void Execute()
         {
             var log = this.Context.GetLogger();
-            //var prismAssembly = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => x.Name.Equals("Prism."));
-            //var isPrism8 = prismAssembly.Version.Major >= 8;
+            var prismAssembly = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => x.Name.Equals("Prism."));
+            var isPrism8 = prismAssembly.Version.Major >= 8;
 
             var apps = this.Context.GetAllDerivedClassesForType("Prism.DryIoc.PrismApplication");
 
@@ -36,14 +36,14 @@ namespace Shiny.Generators.Tasks
                             {
                                 builder.AppendLineInvariant("var container = new Container(this.CreateContainerRules());");
 
-                                //if (isPrism8)
-                                //{
-                                //    builder.Append(@"Shiny.ShinyHost.Populate((serviceType, func, lifetime) => container.Register(serviceType, func));");
-                                //}
-                                //else
-                                //{
+                                if (isPrism8)
+                                {
+                                    builder.Append(@"Shiny.ShinyHost.Populate((serviceType, func, lifetime) => container.Register(serviceType, func));");
+                                }
+                                else
+                                {
                                     builder.Append(@"Shiny.ShinyHost.Populate((serviceType, func, lifetime) => container.RegisterDelegate(serviceType, _ => func(), Reuse.Singleton));");
-                                //}
+                                }
 
                                 if (!this.ShinyContext.IsStartupGenerated)
                                 {
