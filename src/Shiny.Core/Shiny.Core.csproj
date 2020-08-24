@@ -11,7 +11,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
-        <None Update="build\**" Pack="true" PackagePath="build\%(Filename)%(Extension)" />
+        <None Include="build\**" Pack="true" PackagePath="build\." />
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="System.Reactive" Version="4.4.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7" />
@@ -78,8 +78,4 @@
                   Visible="false" />
         </ItemGroup>
     </Target>
-
-    <!--<Target Name="BuildGenerators" BeforeTargets="PrepareResources">
-        <MSBuild Projects="@(ProjectReference)" Targets="Build" Properties="Configuration=$(Configuration)" />
-    </Target>-->
 </Project>
