@@ -9,7 +9,7 @@ namespace Shiny
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        ///
+        /// Register to sync geofence data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
@@ -20,7 +20,7 @@ namespace Shiny
 
 
         /// <summary>
-        /// 
+        /// Register to sync geofence data
         /// </summary>
         /// <param name="services"></param>
         /// <param name="delegateType"></param>
@@ -31,7 +31,7 @@ namespace Shiny
 
 
         /// <summary>
-        /// Unlike geofencing, you have to enable the GPS service via services.UseGps()
+        /// Registers to sync GPS data
         /// </summary>
         /// <typeparam name="IGpsSyncDelegate"></typeparam>
         /// <param name="services"></param>
@@ -40,14 +40,13 @@ namespace Shiny
 
 
         /// <summary>
-        /// 
+        /// Registers to sync GPS data
         /// </summary>
         /// <param name="services"></param>
         /// <param name="delegateType"></param>
         /// <param name="request"></param>
         /// <param name="config"></param>
         public static void UseGpsSync(this IServiceCollection services, Type delegateType)
-            // TODO: include motion activity data
             => services.RegisterModule(new GpsModule(delegateType));
     }
 }
