@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>The Shiny Core containing all of the major functionality like caching, logging, connectivity, environment, IO, power, settings, application state monitoring, and jobs as well as many other utilities</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;tizen50;monoandroid9.0;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;tizen50;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
@@ -18,20 +18,14 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid10')) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Common" Version="2.2.5.1" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" Version="2.2.5.1" />
-        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.2.0.1" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Common" Version="2.2.5.2" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" Version="2.2.5.2" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.3.0" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.3.4.3" />
-        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" Version="1.0.0.1" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid9')) ">
-        <Compile Include="**\Platforms\Android\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <PackageReference Include="Xamarin.Android.Support.v4" Version="[28.0.0.3, 29)" />
+        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" Version="1.0.0.2" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
