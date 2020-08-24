@@ -15,8 +15,8 @@ namespace Shiny.TripTracker.Internals
         readonly IEnumerable<ITripTrackerDelegate> delegates;
 
 
-        public TripTrackerGpsDelegate(ITripTrackerManager manager, 
-                                      IMotionActivityManager activityManager, 
+        public TripTrackerGpsDelegate(ITripTrackerManager manager,
+                                      IMotionActivityManager activityManager,
                                       IDataService dataService,
                                       IEnumerable<ITripTrackerDelegate> delegates)
         {
@@ -95,7 +95,9 @@ namespace Shiny.TripTracker.Internals
             }
             var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
             var results = await this.activityManager.Query(trip.DateStarted);
-            return results.FirstOrDefault();
+            return results
+                .Where(x => !x.Types.HasFlag(MotionActivityType.Unknown))
+                .FirstOrDefault();
         }
 
 
