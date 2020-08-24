@@ -35,8 +35,7 @@ namespace Shiny.Push.AzureNotificationHubs
         {
             this.hub = new NotificationHubClient(
                 config.ListenerConnectionString,
-                config.HubName,
-                new NotificationHubClientSettings()
+                config.HubName
             );
         }
 
@@ -102,7 +101,7 @@ namespace Shiny.Push.AzureNotificationHubs
             if (this.InstallationId == null)
                 return;
 
-            await this.hub.DeleteInstallationAsync(this.InstallationId);            
+            await this.hub.DeleteInstallationAsync(this.InstallationId);
             await base.UnRegister();
         }
 
@@ -159,7 +158,7 @@ namespace Shiny.Push.AzureNotificationHubs
 
             var install = await this.hub.GetInstallationAsync(this.InstallationId);
             install.PushChannel = token;
-            await this.hub.CreateOrUpdateInstallationAsync(install);            
+            await this.hub.CreateOrUpdateInstallationAsync(install);
         }
 #endif
     }

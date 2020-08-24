@@ -24,7 +24,7 @@
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[3.3.0, 4)" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[4.0.0, 5)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
@@ -32,7 +32,7 @@
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[3.3.0, 4)" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[4.0.0, 5)" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
