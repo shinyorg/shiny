@@ -14,8 +14,9 @@ namespace Shiny.Generators
         {
             new AutoStartupTask(),
             new StaticClassTask(),
-            new PrismBridgeTask(),
-            new BleClientTask(),
+            //new PrismBridgeTask(),
+            //new BleClientTask(),
+            //new BleHostingHubTask(),
 
             new AppDelegateTask(),
             new ApplicationTask(),
