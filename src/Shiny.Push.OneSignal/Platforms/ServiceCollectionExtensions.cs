@@ -19,7 +19,7 @@ namespace Shiny
 #else
             services.AddSingleton(config);
             services.RegisterModule(new PushModule(
-                typeof(PushManager),
+                typeof(Shiny.Push.OneSignal.PushManager),
                 delegateType,
                 categories
             ));
