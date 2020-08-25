@@ -104,13 +104,12 @@ namespace Shiny.TripTracker.Internals
         bool IsTracked(MotionActivityEvent? e)
         {
             if (e == null)
-                return false;
+                return this.CurrentTripId != null;
 
             switch (this.manager.TrackingType.Value)
             {
                 case TripTrackingType.Stationary:
-                    return e.Types.HasFlag(MotionActivityType.Stationary) ||
-                           e.Types.HasFlag(MotionActivityType.Unknown);
+                    return e.Types.HasFlag(MotionActivityType.Stationary);
 
                 case TripTrackingType.Cycling:
                     return e.Types.HasFlag(MotionActivityType.Cycling);
