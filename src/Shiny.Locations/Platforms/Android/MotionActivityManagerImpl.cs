@@ -6,6 +6,7 @@ using Android.App;
 using Android.Gms.Location;
 using Shiny.Logging;
 
+using static Android.Manifest;
 
 namespace Shiny.Locations
 {
@@ -64,7 +65,7 @@ namespace Shiny.Locations
             if (this.context.IsAtLeastAndroid10())
             {
                 result = await this.context
-                    .RequestAccess("android.permission.ACTIVITY_RECOGNITION")
+                    .RequestAccess(Permission.ActivityRecognition)
                     .ToTask();
 
                 if (result == AccessState.Available)
