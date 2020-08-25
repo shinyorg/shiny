@@ -53,7 +53,7 @@ namespace Shiny
 
         public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)
             => services.GetServices<T>().RunDelegates(execute, onError);
-        
+
 
         public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, Action<Exception>? onError = null)
         {
@@ -70,7 +70,7 @@ namespace Shiny
                     catch (Exception ex)
                     {
                         if (onError == null)
-                            Log.Write(ex); 
+                            Log.Write(ex);
                         else
                             onError(ex);
                     }
@@ -81,25 +81,25 @@ namespace Shiny
         }
 
 
-        public static async Task RunResolves<T>(this IServiceProvider services, Func<T, Task> execute)
-        {
-            var resolves = services.GetServices<T>();
-            if (resolves == null)
-                return;
+        //public static async Task RunResolves<T>(this IServiceProvider services, Func<T, Task> execute)
+        //{
+        //    var resolves = services.GetServices<T>();
+        //    if (resolves == null)
+        //        return;
 
-            foreach (var resolve in resolves)
-            {
-                try
-                {
-                    // TODO: run in parallel in case delegates have anything long running
-                    await execute(resolve).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(ex);
-                }
-            }
-        }
+        //    foreach (var resolve in resolves)
+        //    {
+        //        try
+        //        {
+        //            // TODO: run in parallel in case delegates have anything long running
+        //            await execute(resolve).ConfigureAwait(false);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Log.Write(ex);
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Registers a post container build step
