@@ -5,13 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Settings;
 using System.Reactive.Subjects;
-using OS = global::Com.OneSignal.OneSignal;
+using Microsoft.Extensions.DependencyInjection;
 using Com.OneSignal.Abstractions;
+using OS = global::Com.OneSignal.OneSignal;
 
 
 namespace Shiny.Push.OneSignal
 {
-    public class PushManager : AbstractPushManager, IPushTagSupport, IShinyStartupTask
+    public class PushManager : AbstractPushManager, IShinyStartupTask
     {
         readonly OneSignalPushConfig config;
         readonly IServiceProvider services;
@@ -37,12 +38,12 @@ namespace Shiny.Push.OneSignal
                 {
                     var data = ToDictionary(x.notification.payload);
                     var args = new PushEntryArgs("onesignal", x.action.actionID, null, data);
-                    await this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
+                    await this.RunDelegates(x => x.OnEntry(args));
                 })
                 .HandleNotificationReceived(async x =>
                 {
                     var data = ToDictionary(x.payload);
-                    await this.services.RunDelegates<IPushDelegate>(x => x.OnReceived(data));
+                    await this.RunDelegates(x => x.OnReceived(data));
                     this.receivedSubj.OnNext(data);
                 })
                 .Settings(new Dictionary<string, bool>
@@ -59,7 +60,7 @@ namespace Shiny.Push.OneSignal
         {
             OS.Current.SetSubscription(true);
             OS.Current.RegisterForPushNotifications();
-            var ids = await OS.Current.IdsAvailableAsync();
+            //var ids = await OS.Current.IdsAvailableAsync();
             //OS.Current.SendTags()
             return PushAccessState.Denied;
         }
@@ -75,21 +76,21 @@ namespace Shiny.Push.OneSignal
         public override IObservable<IDictionary<string, string>> WhenReceived() => this.receivedSubj;
 
 
-        public Task SetTags(params string[] tags)
-        {
-            if (!this.RegisteredTags.IsEmpty())
-                OS.Current.DeleteTags(this.RegisteredTags.ToList());
+        //public Task SetTags(params string[] tags)
+        //{
+        //    if (!this.RegisteredTags.IsEmpty())
+        //        OS.Current.DeleteTags(this.RegisteredTags.ToList());
 
-            if ((tags?.Length ?? 0) > 0)
-            {
-                OS.Current.SendTags(tags.ToDictionary(
-                    x => x,
-                    _ => "1"
-                ));
-            }
-            this.RegisteredTags = tags;
-            return Task.CompletedTask;
-        }
+        //    if ((tags?.Length ?? 0) > 0)
+        //    {
+        //        OS.Current.SendTags(tags.ToDictionary(
+        //            x => x,
+        //            _ => "1"
+        //        ));
+        //    }
+        //    this.RegisteredTags = tags;
+        //    return Task.CompletedTask;
+        //}
 
 
         static IDictionary<string, string> ToDictionary(OSNotificationPayload payload)
@@ -100,5 +101,29 @@ namespace Shiny.Push.OneSignal
                     y => y.Value.ToString()
                 )
                 ?? new Dictionary<string, string>(0);
+
+
+        async Task RunDelegates(Func<IPushDelegate, Task> execute)
+        {
+            var delegates = this.services.GetServices<IPushDelegate>();
+            if (delegates == null)
+                return;
+
+            var tasks = delegates
+                .Select(async x =>
+                {
+                    try
+                    {
+                        await execute(x).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        //Shiny.Logging.Log.Write(ex);
+                    }
+                })
+                .ToList();
+
+            await Task.WhenAll(tasks);
+        }
     }
 }

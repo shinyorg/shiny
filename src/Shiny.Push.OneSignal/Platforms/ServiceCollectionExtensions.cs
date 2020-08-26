@@ -17,12 +17,8 @@ namespace Shiny
 #if NETSTANDARD2_0
             return false;
 #else
-            services.AddSingleton(config);
-            services.RegisterModule(new PushModule(
-                typeof(Shiny.Push.OneSignal.PushManager),
-                delegateType,
-                categories
-            ));
+            services.AddSingleton(typeof(IPushManager), typeof(Shiny.Push.OneSignal.PushManager));
+            services.AddSingleton(typeof(IPushDelegate), delegateType);
             return true;
 #endif
         }
