@@ -48,7 +48,7 @@ namespace Shiny.DataSync.Infrastructure
         public Task Save<T>(T entity, SyncOperation operation) where T : ISyncEntity => this.conn.InsertAsync(new SyncItem
         {
             Id = Guid.NewGuid(),
-            EntityId = entity.Id,
+            EntityId = entity.EntityId,
             TypeName = typeof(T).FullName,
             SerializedEntity = this.serializer.Serialize(entity),
             Operation = operation,

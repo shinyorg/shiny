@@ -2,35 +2,38 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Locations;
+using Shiny.Settings;
 
 
 namespace Shiny.TripTracker.Internals
 {
-    public class TripTrackerGpsDelegate : NotifyPropertyChanged, IGpsDelegate
+    public class TripTrackerGpsDelegate : IGpsDelegate
     {
         readonly ITripTrackerManager manager;
         readonly IMotionActivityManager activityManager;
         readonly IDataService dataService;
+        readonly ISettings settings;
         readonly IEnumerable<ITripTrackerDelegate> delegates;
 
 
         public TripTrackerGpsDelegate(ITripTrackerManager manager,
                                       IMotionActivityManager activityManager,
                                       IDataService dataService,
+                                      ISettings settings,
                                       IEnumerable<ITripTrackerDelegate> delegates)
         {
             this.manager = manager;
             this.activityManager = activityManager;
             this.dataService = dataService;
+            this.settings = settings;
             this.delegates = delegates;
         }
 
 
-        int? currentTripId;
-        public int? CurrentTripId
+        int? CurrentTripId
         {
-            get => this.currentTripId;
-            set => this.Set(ref this.currentTripId, value);
+            get => this.settings.CurrentTripId();
+            set => this.settings.CurrentTripId(value);
         }
 
 
@@ -58,9 +61,9 @@ namespace Shiny.TripTracker.Internals
                     DateStarted = DateTimeOffset.UtcNow
                 };
                 await this.dataService.Save(trip);
-                this.CurrentTripId = trip.Id;
+                this.settings.CurrentTripId(trip.Id);
 
-                await this.dataService.Checkin(this.CurrentTripId.Value, reading);
+                await this.dataService.Checkin(trip.Id, reading);
                 await this.delegates.RunDelegates(x => x.OnTripStart(trip));
             }
             else
@@ -77,7 +80,7 @@ namespace Shiny.TripTracker.Internals
                     trip.StartLatitude = reading.Position.Longitude;
                     trip.EndLatitude = reading.Position.Latitude;
 
-                    this.CurrentTripId = null;
+                    this.settings.CurrentTripId(null);
                     await this.dataService.Save(trip);
                     await this.delegates.RunDelegates(x => x.OnTripEnd(trip));
                 }
@@ -88,9 +91,11 @@ namespace Shiny.TripTracker.Internals
         async Task<MotionActivityEvent> GetLastActivity()
         {
             var ts = TimeSpan.FromMinutes(5);
-            if (this.CurrentTripId != null)
+            var currentTripId = this.settings.CurrentTripId();
+
+            if (currentTripId != null)
             {
-                var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
+                var trip = await this.dataService.GetTrip(currentTripId.Value);
                 ts = DateTimeOffset.UtcNow.Subtract(trip.DateStarted);
             }
             return await this.activityManager.GetCurrentActivity(ts);
@@ -100,7 +105,7 @@ namespace Shiny.TripTracker.Internals
         bool IsTracked(MotionActivityEvent? e)
         {
             if (e == null)
-                return this.CurrentTripId != null;
+                return this.settings.CurrentTripId() != null;
 
             switch (this.manager.TrackingType.Value)
             {

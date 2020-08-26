@@ -27,6 +27,13 @@ namespace Shiny.TripTracker.Internals
         }
 
 
+        int? CurrentTripId
+        {
+            get => this.settings.CurrentTripId();
+            set => this.settings.CurrentTripId(value);
+        }
+
+
         public TripTrackingType? TrackingType
         {
             get => this.settings.Get<TripTrackingType?>(nameof(TrackingType), null);
@@ -35,8 +42,21 @@ namespace Shiny.TripTracker.Internals
         public Task<IList<Trip>> GetAllTrips() => this.dataService.GetAll();
         public Task<IList<TripCheckin>> GetCheckinsByTrip(int tripId) => this.dataService.GetCheckinsByTrip(tripId);
         public Task<double> GetTripAverageSpeed(int tripId) => this.dataService.GetTripAverageSpeedInMetersPerHour(tripId);
-        public Task Purge() => this.dataService.Purge();
-        public Task Remove(int tripId) => this.dataService.Remove(tripId);
+
+
+        public Task Purge()
+        {
+            this.CurrentTripId = null;
+            return this.dataService.Purge();
+        }
+
+
+        public async Task Remove(int tripId)
+        {
+            await this.dataService.Remove(tripId);
+            if (this.CurrentTripId == tripId)
+                this.CurrentTripId = null;
+        }
 
 
         public async Task<AccessState> RequestAccess()
@@ -73,6 +93,13 @@ namespace Shiny.TripTracker.Internals
             if (this.TrackingType == null)
                 return;
 
+           if (this.CurrentTripId != null)
+            {
+                var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
+                trip.DateFinished = DateTimeOffset.UtcNow;
+                await this.dataService.Save(trip);
+                this.CurrentTripId = null;
+            }
             this.TrackingType = null;
             await this.gpsManager.StopListener();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Locations;
+using Shiny.Settings;
 using Shiny.TripTracker;
 using Shiny.TripTracker.Internals;
 
@@ -10,6 +11,14 @@ namespace Shiny
     public static class ServiceCollectionExtensions
     {
         static bool added = false;
+
+
+        internal static int? CurrentTripId(this ISettings settings)
+            => settings.Get<int?>(nameof(CurrentTripId));
+
+
+        internal static void CurrentTripId(this ISettings settings, int? value)
+            => settings.Set(nameof(CurrentTripId), value);
 
 
         public static bool UseTripTracker<T>(this IServiceCollection services) where T : ITripTrackerDelegate

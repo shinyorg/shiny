@@ -5,6 +5,6 @@ namespace Shiny.DataSync
 {
     public interface ISyncEntity
     {
-        string Id { get; }
+        string EntityId { get; set; }
     }
 }
