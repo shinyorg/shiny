@@ -16,10 +16,13 @@ namespace Shiny.Locations
         /// <returns></returns>
         public static async Task<MotionActivityEvent> GetCurrentActivity(this IMotionActivityManager activity, TimeSpan? maxAge = null)
         {
-            maxAge = maxAge ?? TimeSpan.FromMinutes(5);
+            maxAge = maxAge ?? TimeSpan.FromMinutes(120);
             var end = DateTimeOffset.UtcNow;
             var start = end.Subtract(maxAge.Value);
-            var result = (await activity.Query(start, end)).OrderBy(x => x.Timestamp).FirstOrDefault();
+            var result = (await activity.Query(start, end))
+                .Where(x => !x.Types.HasFlag(MotionActivityType.Unknown))
+                .OrderBy(x => x.Timestamp)
+                .FirstOrDefault();
             return result;
         }
 

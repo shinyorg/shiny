@@ -23,6 +23,9 @@ namespace Shiny.DataSync.Infrastructure
 
         public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
+            if (!this.manager.Enabled)
+                return;
+
             var items = await this.manager.GetPendingItems();
             foreach (var item in items)
             {

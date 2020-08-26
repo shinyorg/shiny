@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Locations;
 
@@ -88,16 +87,13 @@ namespace Shiny.TripTracker.Internals
 
         async Task<MotionActivityEvent> GetLastActivity()
         {
-
-            if (this.CurrentTripId == null)
+            var ts = TimeSpan.FromMinutes(5);
+            if (this.CurrentTripId != null)
             {
-                return await this.activityManager.GetCurrentActivity(TimeSpan.FromMinutes(5));
+                var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
+                ts = DateTimeOffset.UtcNow.Subtract(trip.DateStarted);
             }
-            var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
-            var results = await this.activityManager.Query(trip.DateStarted);
-            return results
-                .Where(x => !x.Types.HasFlag(MotionActivityType.Unknown))
-                .FirstOrDefault();
+            return await this.activityManager.GetCurrentActivity(ts);
         }
 
 
