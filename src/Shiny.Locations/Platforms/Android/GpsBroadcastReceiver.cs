@@ -25,8 +25,6 @@ namespace Shiny.Locations
 
         public override void OnReceive(Context context, Intent intent)
         {
-            // TODO: gpsrequest saved
-
             // if boot completed received & gps background was on, this broadcastreceiver will cause the application to spinup the
             // shiny infrastructure and thus the GPS background monitoring
             if (!intent.Action.Equals(GpsManagerImpl.IntentAction))
