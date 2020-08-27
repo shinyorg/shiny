@@ -56,7 +56,11 @@ namespace Shiny.DataSync.Infrastructure
         });
 
 
-        public Task<List<SyncItem>> GetPendingItems() => this.conn.Table<SyncItem>().ToListAsync();
+        public Task<List<SyncItem>> GetPendingItems() => this
+            .conn
+            .Table<SyncItem>()
+            .OrderBy(x => x.Timestamp)
+            .ToListAsync();
         public Task Remove(Guid syncItemId) => this.conn.DeleteAsync<SyncItem>(syncItemId);
         public Task ForceRun() => this.jobManager.RunJobAsTask(SyncJob.JobName);
         public Task ClearPending() => this.conn.DeleteAllAsync<SyncItem>();

@@ -40,6 +40,7 @@ namespace Shiny.TripTracker.Internals
 
         public async Task<IList<Trip>> GetAll() => await this.conn
             .Table<Trip>()
+            .OrderBy(x => x.DateFinished)
             .ToListAsync();
 
 
@@ -75,7 +76,7 @@ namespace Shiny.TripTracker.Internals
         }
 
 
-        public async Task Purge() 
+        public async Task Purge()
         {
             await this.conn.DeleteAllAsync<Trip>();
             await this.conn.DeleteAllAsync<TripCheckin>();

@@ -21,7 +21,7 @@ namespace Shiny.Locations
             var start = end.Subtract(maxAge.Value);
             var result = (await activity.Query(start, end))
                 .Where(x => !x.Types.HasFlag(MotionActivityType.Unknown))
-                .OrderBy(x => x.Timestamp)
+                .OrderByDescending(x => x.Timestamp)
                 .FirstOrDefault();
             return result;
         }
