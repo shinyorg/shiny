@@ -36,7 +36,11 @@ namespace Shiny.DataSync.Infrastructure
                 }
                 catch (Exception ex)
                 {
-                    Log.Write(ex);
+                    Log.Write(
+                        DataSyncLogCategory.SyncItemError,
+                        ex.ToString(),
+                        ("EntityId", item.EntityId)
+                    );
                 }
             }
         }
