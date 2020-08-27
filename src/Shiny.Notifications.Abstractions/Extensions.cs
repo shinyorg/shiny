@@ -6,6 +6,17 @@ namespace Shiny.Notifications
 {
     public static class Extensions
     {
+        public static bool TryCreatePersistentNotification(this INotificationManager manager, Notification notification, out IPersistentNotification persistentNotification)
+        {
+            if (manager is IPersistentNotificationManagerExtension persist)
+            {
+                persistentNotification = persist.Create(notification);
+                return true;
+            }
+            return false;
+        }
+
+
         public static Task Send(this INotificationManager notifications, string title, string message, string? category = null, DateTime? scheduleDate = null)
             => notifications.Send(new Notification
             {
