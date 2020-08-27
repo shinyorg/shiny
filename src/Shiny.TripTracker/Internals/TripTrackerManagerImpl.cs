@@ -93,7 +93,7 @@ namespace Shiny.TripTracker.Internals
             if (this.TrackingType == null)
                 return;
 
-           if (this.CurrentTripId != null)
+            if (this.CurrentTripId != null)
             {
                 var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
                 trip.DateFinished = DateTimeOffset.UtcNow;

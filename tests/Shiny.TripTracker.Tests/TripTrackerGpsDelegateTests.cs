@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Shiny.Locations;
+using Shiny.Settings;
 using Shiny.TripTracker.Internals;
 using Xunit;
 
@@ -15,11 +16,13 @@ namespace Shiny.TripTracker.Tests
         readonly Mock<IDataService> data;
         readonly Mock<IMotionActivityManager> activityManager;
         readonly Mock<ITripTrackerManager> manager;
+        readonly Mock<ISettings> settings;
         readonly TripTrackerGpsDelegate gpsDelegate;
         readonly List<TripCheckin> checkins = new List<TripCheckin>();
         TripTrackingType? tracking = TripTrackingType.Automotive;
         MotionActivityType currentMotionType = MotionActivityType.Automotive;
         Trip? trip;
+        int? currentTripId;
 
 
         public TripTrackerGpsDelegateTests()
@@ -31,6 +34,24 @@ namespace Shiny.TripTracker.Tests
             this.manager
                 .Setup(x => x.TrackingType)
                 .Returns(() => this.tracking);
+
+            this.settings
+                .Setup(x => x.Get(It.IsAny<string>(), default(int?)))
+                .Returns<string, int?>((key, def) =>
+                {
+                    if (key == "CurrentTripId")
+                        return this.currentTripId;
+
+                    return null;
+                });
+
+            this.settings
+                .Setup(x => x.Set(It.IsAny<string>(), It.IsAny<int?>()))
+                .Callback<string, int?>((key, value) =>
+                {
+                    if (key == "CurrentTripId")
+                        this.currentTripId = value;
+                });
 
             this.activityManager
                 .Setup(x => x.Query(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
@@ -76,6 +97,7 @@ namespace Shiny.TripTracker.Tests
                 this.manager.Object,
                 this.activityManager.Object,
                 this.data.Object,
+                this.settings.Object,
                 null
             );
         }
@@ -85,8 +107,8 @@ namespace Shiny.TripTracker.Tests
         public async Task NewTripCreated()
         {
             await this.gpsDelegate.OnReading(GpsReading.Create(1, 1));
-            this.gpsDelegate.CurrentTripId.Should().NotBeNull();
-            this.gpsDelegate.CurrentTripId.Should().Be(1);
+            this.currentTripId.Should().NotBeNull();
+            this.currentTripId.Should().Be(1);
             this.trip.Should().NotBeNull();
             this.trip.Type.HasFlag(TripTrackingType.Automotive).Should().BeTrue();
             this.trip.DateFinished.Should().BeNull();
@@ -101,7 +123,7 @@ namespace Shiny.TripTracker.Tests
                 Id = 1,
                 Type = TripTrackingType.Automotive
             };
-            this.gpsDelegate.CurrentTripId = 1;
+            this.currentTripId = 1;
             this.currentMotionType = MotionActivityType.Cycling;
             await this.gpsDelegate.OnReading(GpsReading.Create(1, 1));
             this.trip.DateFinished.Should().NotBeNull();
