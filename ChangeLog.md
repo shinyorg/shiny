@@ -27,6 +27,7 @@
 
 ### Notifications
 * [Feature][Android] More Android specific configuration added
+* [Feature][Android][Uwp] Persistent & Progress notifications
 
 ### Push
 * Firebase implementation is now released for iOS and Android  (Shiny.Push.FirebaseMessaging)
