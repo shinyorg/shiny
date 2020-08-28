@@ -28,6 +28,7 @@
 ### Notifications
 * [Feature][Android] More Android specific configuration added
 * [Feature][Android][Uwp] Persistent & Progress notifications
+* [Feature][Uwp] You can now control the group name per notification
 
 ### Push
 * Firebase implementation is now released for iOS and Android  (Shiny.Push.FirebaseMessaging)

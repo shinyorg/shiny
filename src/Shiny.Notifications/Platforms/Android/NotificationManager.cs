@@ -102,16 +102,13 @@ namespace Shiny.Notifications
 
         public async Task Send(Notification notification)
         {
-            if (notification.Id == 0)
-                notification.Id = this.settings.IncrementValue("NotificationId");
+            var native = this.CreateNativeNotification(notification);
 
             if (notification.ScheduleDate != null)
             {
                 await this.repository.Set(notification.Id.ToString(), notification);
                 return;
             }
-
-            var native = this.CreateNativeNotification(notification);
             this.manager.Notify(notification.Id, native);
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification), false);
         }
@@ -125,6 +122,9 @@ namespace Shiny.Notifications
 
         public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification)
         {
+            if (notification.Id == 0)
+                notification.Id = this.settings.IncrementValue("NotificationId");
+
             var pendingIntent = this.GetLaunchPendingIntent(notification);
             var builder = new NotificationCompat.Builder(this.context.AppContext)
                 .SetContentTitle(notification.Title)
@@ -155,7 +155,6 @@ namespace Shiny.Notifications
 
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
-
 
             // disabled until System.Drawing reliable works in Xamarin again
             //if (notification.Android.Color != null)
