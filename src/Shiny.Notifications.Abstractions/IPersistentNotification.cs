@@ -5,8 +5,9 @@ namespace Shiny.Notifications
 {
     public interface IPersistentNotification : IDisposable
     {
-        string Title { get; set; }
-        double? Progress { get; set; }
+        void SetIndeterministicProgress(bool show);
+        void ClearProgress();
+        void SetProgress(int progress, int total);
         void Dismiss();
     }
 }

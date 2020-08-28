@@ -10,7 +10,3 @@ namespace Shiny.Notifications
         IPersistentNotification Create(Notification notification);
     }
 }
-// TODO: completion text?
-//mBuilder.setProgress(100, incr, false);
-//// Displays the progress bar for the first time.
-//mNotifyManager.notify(id, mBuilder.build());

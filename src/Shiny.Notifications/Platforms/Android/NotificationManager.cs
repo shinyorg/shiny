@@ -17,7 +17,7 @@ using Shiny.Settings;
 
 namespace Shiny.Notifications
 {
-    public class NotificationManager : INotificationManager
+    public class NotificationManager : INotificationManager, IPersistentNotificationManagerExtension
     {
         readonly AndroidContext context;
         readonly IServiceProvider services;
@@ -25,7 +25,7 @@ namespace Shiny.Notifications
         readonly ISettings settings;
         readonly ISerializer serializer;
         readonly IJobManager jobs;
-        readonly NotificationManagerCompat? compatManager;
+        readonly NotificationManagerCompat manager;
 
 
         public NotificationManager(AndroidContext context,
@@ -42,7 +42,7 @@ namespace Shiny.Notifications
             this.repository = repository;
             this.settings = settings;
 
-            this.compatManager = NotificationManagerCompat.From(this.context.AppContext);
+            this.manager = NotificationManagerCompat.From(this.context.AppContext);
             this.context
                 .WhenIntentReceived()
                 .Subscribe(x => this
@@ -59,16 +59,30 @@ namespace Shiny.Notifications
         }
 
 
+        public IPersistentNotification Create(Notification notification)
+        {
+            notification.Android.OnGoing = true;
+            notification.Android.ShowWhen = null;
+            notification.ScheduleDate = null;
+
+            var builder = this.CreateNativeBuilder(notification);
+            var pnotification = new AndroidPersistentNotification(notification.Id, this.manager, builder);
+
+            this.manager.Notify(notification.Id, builder.Build());
+            return pnotification;
+        }
+
+
         public async Task Cancel(int id)
         {
-            this.compatManager.Cancel(id);
+            this.manager.Cancel(id);
             await this.repository.Remove<Notification>(id.ToString());
         }
 
 
         public async Task Clear()
         {
-            this.compatManager.CancelAll();
+            this.manager.CancelAll();
             await this.repository.Clear<Notification>();
         }
 
@@ -79,7 +93,7 @@ namespace Shiny.Notifications
 
         public async Task<AccessState> RequestAccess()
         {
-            if (this.compatManager.AreNotificationsEnabled())
+            if (this.manager.AreNotificationsEnabled())
                 return AccessState.Disabled;
 
             return await this.jobs.RequestAccess();
@@ -98,7 +112,7 @@ namespace Shiny.Notifications
             }
 
             var native = this.CreateNativeNotification(notification);
-            this.compatManager.Notify(notification.Id, native);
+            this.manager.Notify(notification.Id, native);
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification), false);
         }
 
@@ -109,7 +123,7 @@ namespace Shiny.Notifications
         public void RegisterCategory(NotificationCategory category) => this.registeredCategories.Add(category);
 
 
-        public virtual Android.App.Notification CreateNativeNotification(Notification notification)
+        public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification)
         {
             var pendingIntent = this.GetLaunchPendingIntent(notification);
             var builder = new NotificationCompat.Builder(this.context.AppContext)
@@ -178,14 +192,18 @@ namespace Shiny.Notifications
             this.CreateChannel(notification);
             builder.SetChannelId(notification.Android.ChannelId);
 
-            return builder.Build();
+            return builder;
         }
+
+
+        public virtual Android.App.Notification CreateNativeNotification(Notification notification)
+            => this.CreateNativeBuilder(notification).Build();
 
 
         protected virtual void CreateChannel(Notification notification)
         {
             var channelId = notification.Android.ChannelId;
-            var channel = this.compatManager.GetNotificationChannel(channelId);
+            var channel = this.manager.GetNotificationChannel(channelId);
 
             if (channel == null)
             {
@@ -198,7 +216,7 @@ namespace Shiny.Notifications
                 if (!d.IsEmpty())
                     channel.Description = d;
 
-                this.compatManager.CreateNotificationChannel(channel);
+                this.manager.CreateNotificationChannel(channel);
             }
 
             if (notification.Sound?.IsCustomSound() ?? false)
@@ -210,7 +228,7 @@ namespace Shiny.Notifications
                 var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
                 channel.SetSound(uri, attributes);
                 channel.EnableVibration(notification.Android.Vibrate);
-                this.compatManager.CreateNotificationChannel(channel);
+                this.manager.CreateNotificationChannel(channel);
             }
         }
 
