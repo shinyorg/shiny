@@ -51,6 +51,10 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
+    </PropertyGroup>
+
     <ItemGroup Condition=" '$(SourceLinkEnabled)' == 'true' ">
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All"/>
     </ItemGroup>

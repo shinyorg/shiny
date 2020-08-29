@@ -1,3 +1,17 @@
+trigger:
+- master
+- main
+- latest
+- rel/*
+- preview/*
+
+pr:
+- master
+- main
+- latest
+- rel/*
+- preview/*
+
 resources:
 - repo: self
 
@@ -9,11 +23,11 @@ variables:
   BuildConfiguration: 'Release'
 
 trigger:
-  batch: true 
+  batch: true
   branches:
     include: [ master, dev ]
   paths:
-    include: [ src ] 
+    include: [ src ]
 
 pr:
   autoCancel: true
