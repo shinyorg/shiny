@@ -8,7 +8,7 @@ using Shiny.Logging;
 using NC = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
 
 
-namespace Shiny.BluetoothLE
+namespace Shiny.BluetoothLE.Internals
 {
     public class DeviceContext
     {

@@ -14,9 +14,7 @@ namespace Shiny.BluetoothLE
         public override void Register(IServiceCollection services)
         {
             services.AddSingleton(this.config);
-#if __ANDROID__ || __IOS__
             services.AddSingleton<Shiny.BluetoothLE.Internals.CentralContext>();
-#endif
             services.AddSingleton<IBleManager, BleManager>();
         }
     }

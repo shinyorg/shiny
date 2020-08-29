@@ -4,7 +4,7 @@ using System.Linq;
 using Windows.Devices.Bluetooth;
 
 
-namespace Shiny.BluetoothLE
+namespace Shiny.BluetoothLE.Internals
 {
     public class CentralContext
     {

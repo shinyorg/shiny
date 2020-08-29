@@ -7,6 +7,7 @@ using Windows.Devices.Bluetooth.Advertisement;
 using Windows.Devices.Radios;
 using Windows.Foundation;
 using Windows.Devices.Enumeration;
+using Shiny.BluetoothLE.Internals;
 
 
 namespace Shiny.BluetoothLE

@@ -6,6 +6,7 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
+using Shiny.BluetoothLE.Internals;
 
 
 namespace Shiny.BluetoothLE
@@ -100,7 +101,7 @@ namespace Shiny.BluetoothLE
                 return result.Status == DevicePairingResultStatus.Paired;
             }
 
-            var handler = new TypedEventHandler<DeviceInformationCustomPairing, DevicePairingRequestedEventArgs>((sender, args) => 
+            var handler = new TypedEventHandler<DeviceInformationCustomPairing, DevicePairingRequestedEventArgs>((sender, args) =>
             {
                 switch (args.PairingKind)
                 {
@@ -118,14 +119,14 @@ namespace Shiny.BluetoothLE
                 }
             });
 
-            var pairingKind = pin.IsEmpty() 
-                ? DevicePairingKinds.ConfirmOnly 
+            var pairingKind = pin.IsEmpty()
+                ? DevicePairingKinds.ConfirmOnly
                 : DevicePairingKinds.ProvidePin;
 
             try
             {
                 this.context.NativeDevice.DeviceInformation.Pairing.Custom.PairingRequested += handler;
-                var result = await this.context.NativeDevice.DeviceInformation.Pairing.Custom.PairAsync(pairingKind); 
+                var result = await this.context.NativeDevice.DeviceInformation.Pairing.Custom.PairAsync(pairingKind);
                 return result.Status == DevicePairingResultStatus.Paired;
             }
             finally

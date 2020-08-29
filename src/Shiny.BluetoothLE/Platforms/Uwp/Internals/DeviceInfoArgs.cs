@@ -2,7 +2,7 @@
 using Windows.Devices.Enumeration;
 
 
-namespace Shiny.BluetoothLE
+namespace Shiny.BluetoothLE.Internals
 {
     public class DeviceInfoArgs
     {

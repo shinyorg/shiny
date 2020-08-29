@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
+using Shiny.BluetoothLE.Internals;
 
 
 namespace Shiny.BluetoothLE

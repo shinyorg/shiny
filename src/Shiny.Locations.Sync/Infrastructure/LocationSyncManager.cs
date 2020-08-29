@@ -11,16 +11,16 @@ namespace Shiny.Locations.Sync.Infrastructure
     {
         readonly IJobManager jobManager;
         readonly IRepository repository;
-        readonly IMotionActivityManager activityManager;
-        readonly IGeofenceManager geofenceManager;
-        readonly IGpsManager gpsManager;
+        readonly IMotionActivityManager? activityManager;
+        readonly IGeofenceManager? geofenceManager;
+        readonly IGpsManager? gpsManager;
 
 
-        public LocationSyncManager(IRepository repository, 
+        public LocationSyncManager(IRepository repository,
                                    IJobManager jobManager,
-                                   IMotionActivityManager activityManager,
-                                   IGeofenceManager geofenceManager,
-                                   IGpsManager gpsManager)
+                                   IMotionActivityManager? activityManager = null,
+                                   IGeofenceManager? geofenceManager = null,
+                                   IGpsManager? gpsManager = null)
         {
             this.repository = repository;
             this.jobManager = jobManager;
@@ -32,6 +32,9 @@ namespace Shiny.Locations.Sync.Infrastructure
 
         public async Task StartGeofenceMonitoring(GeofenceRegion? region = null, SyncConfig? config = null)
         {
+            if (this.geofenceManager == null)
+                throw new ArgumentException("Geofencing is not supported on this platform");
+
             (await this.geofenceManager.RequestAccess()).Assert();
 
             var jobInfo = new JobInfo(typeof(SyncGeofenceJob));
@@ -42,17 +45,20 @@ namespace Shiny.Locations.Sync.Infrastructure
             });
             await this.jobManager.Schedule(jobInfo);
             if (!(region is null))
-                await this.geofenceManager.StartMonitoring(region);            
+                await this.geofenceManager.StartMonitoring(region);
         }
 
 
         public async Task StartGpsMonitoring(GpsRequest request, SyncConfig? config = null)
         {
+            if (this.gpsManager == null)
+                throw new ArgumentException("GPS Manager is not supported on this platform");
+
             if (this.gpsManager.IsListening)
                 throw new ArgumentException("GPS Manager is already listening");
 
             (await this.gpsManager.RequestAccessAndStart(request)).Assert();
-            
+
             var jobInfo = new JobInfo(typeof(SyncGpsJob));
             jobInfo.SetSyncConfig(config ?? new SyncConfig
             {
@@ -87,8 +93,8 @@ namespace Shiny.Locations.Sync.Infrastructure
 
         public async Task<bool> IsMonitoring(LocationSyncType syncType)
         {
-            var jobId = syncType == LocationSyncType.Geofence 
-                ? nameof(SyncGeofenceJob) 
+            var jobId = syncType == LocationSyncType.Geofence
+                ? nameof(SyncGeofenceJob)
                 : nameof(SyncGpsJob);
 
             var job = await this.jobManager.GetJob(jobId);
@@ -96,7 +102,7 @@ namespace Shiny.Locations.Sync.Infrastructure
         }
 
 
-        public async Task ForceRun(LocationSyncType? syncType = null) 
+        public async Task ForceRun(LocationSyncType? syncType = null)
         {
             switch (syncType)
             {
@@ -118,7 +124,7 @@ namespace Shiny.Locations.Sync.Infrastructure
             }
         }
 
-            
+
         public Task<IList<GeofenceEvent>> GetPendingGeofenceEvents() => this.repository.GetAll<GeofenceEvent>();
         public Task<IList<GpsEvent>> GetPendingGpsEvents() => this.repository.GetAll<GpsEvent>();
 
