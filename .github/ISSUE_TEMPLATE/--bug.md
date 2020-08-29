@@ -32,9 +32,9 @@ assignees: ''
  - [ ] AppCenter Logging Integration
  - [ ] Location Sync
  - [ ] Photo Sync (alpha)
- - [ ] Data Sync (alpha)
+ - [ ] Data Sync
  - [ ] Trip Tracker
- - [ ] BluetoothLE Client (beta)
+ - [ ] BluetoothLE Client
  - [ ] BluetoothLE Hosting (beta)
  - [ ] Beacons
  - [ ] SQLite Integration

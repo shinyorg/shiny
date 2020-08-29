@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <VersionSuffix>alpha</VersionSuffix>
+        <Description>Shiny Data Sync - Uses best pratices to help push data to your server</Description>
     </PropertyGroup>
 
     <ItemGroup>
