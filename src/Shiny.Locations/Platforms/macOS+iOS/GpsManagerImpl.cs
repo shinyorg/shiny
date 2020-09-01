@@ -8,7 +8,7 @@ using CoreLocation;
 
 namespace Shiny.Locations
 {
-    public class GpsManagerImpl : IGpsManager
+    public class GpsManagerImpl : NotifyPropertyChanged, IGpsManager
     {
         readonly CLLocationManager locationManager;
         readonly GpsManagerDelegate gdelegate;
@@ -24,7 +24,13 @@ namespace Shiny.Locations
         public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => this.gdelegate.WhenAccessStatusChanged(request.UseBackground);
         public Task<AccessState> RequestAccess(GpsRequest request) => this.locationManager.RequestAccess(request.UseBackground);
         public AccessState GetCurrentStatus(GpsRequest request) => this.locationManager.GetCurrentStatus(request.UseBackground);
-        public bool IsListening { get; private set; }
+
+        GpsRequest? request;
+        public GpsRequest? CurrentListener
+        {
+            get => this.request;
+            set => this.Set(ref this.request, value);
+        }
 
 
         public IObservable<IGpsReading> GetLastReading() => Observable.FromAsync(async ct =>
@@ -38,10 +44,10 @@ namespace Shiny.Locations
                 .Take(1)
                 .ToTask(ct);
 
-            var wasListening = this.IsListening;
+            var listen = this.CurrentListener;
             try
             {
-                if (!wasListening)
+                if (listen == null)
                 {
                     var access = await this.RequestAccess(new GpsRequest());
                     access.Assert();
@@ -51,7 +57,7 @@ namespace Shiny.Locations
             }
             finally
             {
-                if (!wasListening)
+                if (listen == null)
                     this.locationManager.StopUpdatingLocation();
             }
         });
@@ -59,13 +65,11 @@ namespace Shiny.Locations
 
         public async Task StartListener(GpsRequest request)
         {
-            if (this.IsListening)
+            if (this.CurrentListener != null)
                 return;
 
-            request = request ?? new GpsRequest();
             var access = await this.RequestAccess(request);
             access.Assert();
-
             this.gdelegate.Request = request;
 #if __IOS__
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
@@ -107,19 +111,19 @@ namespace Shiny.Locations
             //if (CLLocationManager.HeadingAvailable)
             //    this.locationManager.StopUpdatingHeading();
             this.locationManager.StartUpdatingLocation();
-            this.IsListening = true;
+            this.CurrentListener = request;
         }
 
 
         public Task StopListener()
         {
-            if (this.IsListening)
+            if (this.CurrentListener != null)
             {
 #if __IOS__
                 this.locationManager.AllowsBackgroundLocationUpdates = false;
 #endif
                 this.locationManager.StopUpdatingLocation();
-                this.IsListening = false;
+                this.CurrentListener = null;
             }
             return Task.CompletedTask;
         }

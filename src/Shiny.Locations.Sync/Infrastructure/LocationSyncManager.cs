@@ -54,7 +54,7 @@ namespace Shiny.Locations.Sync.Infrastructure
             if (this.gpsManager == null)
                 throw new ArgumentException("GPS Manager is not supported on this platform");
 
-            if (this.gpsManager.IsListening)
+            if (this.gpsManager.CurrentListener != null)
                 throw new ArgumentException("GPS Manager is already listening");
 
             (await this.gpsManager.RequestAccessAndStart(request)).Assert();

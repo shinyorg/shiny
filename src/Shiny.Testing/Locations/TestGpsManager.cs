@@ -12,9 +12,6 @@ namespace Shiny.Testing.Locations
         readonly Subject<AccessState> accessSubject = new Subject<AccessState>();
 
 
-        public bool IsListening { get; private set; }
-
-
         AccessState replyStatus = AccessState.Available;
         public AccessState ReplyStatus
         {
@@ -39,31 +36,26 @@ namespace Shiny.Testing.Locations
 
         public IGpsReading? LastGpsReading { get; set; }
         public IObservable<IGpsReading?> GetLastReading() => Observable.Return(this.LastGpsReading);
-
-
         public AccessState RequestAccessReply { get; set; } = AccessState.Available;
         public Task<AccessState> RequestAccess(GpsRequest request) => Task.FromResult(this.RequestAccessReply);
 
 
-        public GpsRequest? LastGpsRequest { get; private set; }
-
-
         public Task StartListener(GpsRequest? request = null)
         {
-            this.IsListening = true;
-            this.LastGpsRequest = request;
+            this.CurrentListener = request ?? GpsRequest.Realtime(false);
             return Task.CompletedTask;
         }
 
 
         public Task StopListener()
         {
-            this.IsListening = false;
+            this.CurrentListener = null;
             return Task.CompletedTask;
         }
 
 
         public Subject<IGpsReading> ReadingSubject { get; } = new Subject<IGpsReading>();
+        public GpsRequest? CurrentListener { get; private set; }
         public IObservable<IGpsReading> WhenReading() => this.ReadingSubject;
     }
 }

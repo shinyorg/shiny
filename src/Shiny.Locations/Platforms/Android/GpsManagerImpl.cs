@@ -27,12 +27,12 @@ namespace Shiny.Locations
 
         public async void Start()
         {
-            if (this.CurrentRequest != null)
+            if (this.CurrentListener != null)
             {
-                if (this.CurrentRequest.UseBackground)
-                    await this.StartListener(this.CurrentRequest);
+                if (this.CurrentListener.UseBackground)
+                    await this.StartListener(this.CurrentListener);
                 else
-                    this.CurrentRequest = null;
+                    this.CurrentListener = null;
             }
         }
 
@@ -62,14 +62,12 @@ namespace Shiny.Locations
 
 
         GpsRequest? request;
-        public GpsRequest? CurrentRequest
+        public GpsRequest? CurrentListener
         {
             get => this.request;
             set => this.Set(ref this.request, value);
         }
 
-
-        public bool IsListening => this.CurrentRequest != null;
 
         public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request)
             => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.GetCurrentStatus(request));
@@ -96,7 +94,7 @@ namespace Shiny.Locations
 
         public async Task StartListener(GpsRequest? request = null)
         {
-            if (this.IsListening)
+            if (this.CurrentListener != null)
                 return;
 
             request = request ?? new GpsRequest();
@@ -121,18 +119,18 @@ namespace Shiny.Locations
             if (request.UseBackground && !ShinyGpsService.IsStarted)
                 this.context.StartService(typeof(ShinyGpsService), true);
 
-            this.CurrentRequest = request;
+            this.CurrentListener = request;
         }
 
 
         public async Task StopListener()
         {
-            if (!this.IsListening)
+            if (this.CurrentListener == null)
                 return;
 
             await this.client.RemoveLocationUpdatesAsync(this.GetPendingIntent());
             this.context.StopService(typeof(ShinyGpsService));
-            this.CurrentRequest = null;
+            this.CurrentListener = null;
         }
 
 

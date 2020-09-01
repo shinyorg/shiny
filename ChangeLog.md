@@ -3,7 +3,6 @@
 2.0.0
 ---
 
-
 ### Core
 * [BREAKING] Jobs no longer return Task of bool, they now only return Task
 * [BREAKING][Android] All previous monikers have been removed, only android 10+ targets are supported now, this includes only AndroidX compatibility
@@ -22,6 +21,7 @@
 * [Shiny.BluetoothLE.RefitClient] - Refit for HTTP client is awesome - BEHOLD - the BLE version!
 
 ### Locations
+* [BREAKING] IsListening is gone in favor of CurrentListener configuration
 * [Feature][Android] Now uses foreground service to achieve fast "background" GPS
 * [Feature] Minimum Distance is now supported on Android and iOS
 

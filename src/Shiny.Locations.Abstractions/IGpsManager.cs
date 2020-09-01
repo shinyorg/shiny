@@ -8,7 +8,7 @@ namespace Shiny.Locations
         /// <summary>
         /// If the device is currently listening to GPS broadcasts
         /// </summary>
-        bool IsListening { get; }
+        GpsRequest? CurrentListener { get; }
 
         /// <summary>
         /// The current status of the GPS manager

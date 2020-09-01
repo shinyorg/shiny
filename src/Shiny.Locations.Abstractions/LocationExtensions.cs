@@ -7,6 +7,14 @@ namespace Shiny.Locations
     public static class LocationExtensions
     {
         /// <summary>
+        /// Returns true if there is a current GPS listener configuration running
+        /// </summary>
+        /// <param name="manager"></param>
+        /// <returns></returns>
+        public static bool IsListening(this IGpsManager manager) => manager.CurrentListener != null;
+
+
+        /// <summary>
         /// Determines if the provided position is inside the region.
         /// </summary>
         /// <param name="region"></param>
@@ -18,6 +26,7 @@ namespace Shiny.Locations
             var inside = distance.TotalMeters <= region.Radius.TotalMeters;
             return inside;
         }
+
 
         /// <summary>
         /// Requests access for GPS and starts listening for changes.

@@ -8,7 +8,7 @@ using Windows.Foundation;
 
 namespace Shiny.Locations
 {
-    public class GpsManagerImpl : IGpsManager
+    public class GpsManagerImpl : NotifyPropertyChanged, IGpsManager
     {
         readonly Geolocator geolocator;
         readonly Subject<IGpsReading> gpsSubject;
@@ -18,6 +18,16 @@ namespace Shiny.Locations
         {
             this.geolocator = new Geolocator();
             this.gpsSubject = new Subject<IGpsReading>();
+        }
+
+
+        public Task<AccessState> RequestAccess(GpsRequest request) => Task.FromResult(this.GetCurrentStatus(request));
+
+        GpsRequest? request;
+        public GpsRequest? CurrentListener
+        {
+            get => this.request;
+            set => this.Set(ref this.request, value);
         }
 
 
@@ -53,9 +63,6 @@ namespace Shiny.Locations
         });
 
 
-        public Task<AccessState> RequestAccess(GpsRequest request) => Task.FromResult(this.GetCurrentStatus(request));
-
-        public bool IsListening { get; private set; }
 
 
         public IObservable<IGpsReading> GetLastReading() => Observable.FromAsync(async ct =>
@@ -75,10 +82,9 @@ namespace Shiny.Locations
 
         public Task StartListener(GpsRequest? request = null)
         {
-            if (!this.IsListening)
+            if (this.CurrentListener != null)
             {
-                this.IsListening = true;
-                request = request ?? new GpsRequest();
+                this.CurrentListener = request ?? new GpsRequest();
 
                 this.geolocator.ReportInterval = Convert.ToUInt32(request.Interval.TotalMilliseconds);
                 this.geolocator.PositionChanged += this.OnPositionChanged;
@@ -89,10 +95,10 @@ namespace Shiny.Locations
 
         public Task StopListener()
         {
-            if (this.IsListening)
+            if (this.CurrentListener != null)
             {
                 this.geolocator.PositionChanged -= this.OnPositionChanged;
-                this.IsListening = false;
+                this.CurrentListener = null;
             }
             return Task.CompletedTask;
         }

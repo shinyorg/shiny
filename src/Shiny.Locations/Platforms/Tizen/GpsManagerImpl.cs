@@ -29,7 +29,8 @@ namespace Shiny.Locations
             this.locator = new Locator(locatorType);
         }
 
-        public bool IsListening => false;
+
+        public GpsRequest? CurrentListener => throw new NotImplementedException();
 
         public AccessState GetCurrentStatus(GpsRequest request)
         {

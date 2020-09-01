@@ -97,7 +97,7 @@ namespace Shiny.Locations
 
         protected async void TryStartGps()
         {
-            if (!this.gpsManager.IsListening)
+            if (this.gpsManager.CurrentListener == null)
             {
                 await this.gpsManager.StartListener(new GpsRequest
                 {
