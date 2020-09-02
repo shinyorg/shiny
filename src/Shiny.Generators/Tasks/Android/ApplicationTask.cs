@@ -43,8 +43,11 @@ namespace Shiny.Generators.Tasks.Android
                     {
                         builder.AppendLineInvariant($"AndroidShinyHost.Init(this, new {startupClass}());");
 
-                        if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null)
+                        if (this.Context.HasXamarinEssentials())
                             builder.AppendLineInvariant("Xamarin.Essentials.Platform.Init(this);");
+
+                        if (this.Context.Compilation.GetTypeByMetadataName("Acr.UserDialogs.UserDialogs") != null)
+                            builder.AppendLineInvariant("Acr.UserDialogs.UserDialogs.Init(this);");
 
                         builder.AppendLineInvariant("base.OnCreate();");
                     }
