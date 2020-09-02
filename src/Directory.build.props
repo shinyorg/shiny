@@ -20,23 +20,9 @@
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
-
-        <!-- disable sourcelink on mono, to workaround https://github.com/dotnet/sourcelink/issues/155 -->
-        <EnableSourceLink Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">true</EnableSourceLink>
-        <DeterministicSourcePaths Condition="'$(EnableSourceLink)' == ''">false</DeterministicSourcePaths>
-        <EnableSourceLink Condition=" '$(Configuration)' == 'Release' ">true</EnableSourceLink>
-        <EnableSourceControlManagerQueries>$(EnableSourceLink)</EnableSourceControlManagerQueries>
-        <IncludeSymbols>True</IncludeSymbols>
-        <IncludeSource>True</IncludeSource>
-        <PublishRepositoryUrl>True</PublishRepositoryUrl>
-        <EmbedUntrackedSources>True</EmbedUntrackedSources>
-        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-
         <SrcFolder>$(MSBuildThisFileDirectory)..\src</SrcFolder>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <DefineConstants>$(DefineConstants);__ANDROID__</DefineConstants>
+        <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
+        <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -49,18 +35,21 @@
         <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
 
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
+        <!-- disable sourcelink on mono, to workaround https://github.com/dotnet/sourcelink/issues/155 -->
+        <EnableSourceLink Condition=" '$(OS)' == 'Windows_NT' ">true</EnableSourceLink>
+        <DeterministicSourcePaths Condition="'$(EnableSourceLink)' == true">false</DeterministicSourcePaths>
+        <EnableSourceControlManagerQueries>$(EnableSourceLink)</EnableSourceControlManagerQueries>
+        <IncludeSymbols>True</IncludeSymbols>
+        <IncludeSource>True</IncludeSource>
+        <PublishRepositoryUrl>True</PublishRepositoryUrl>
+        <EmbedUntrackedSources>True</EmbedUntrackedSources>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
-
-    <ItemGroup Condition=" '$(SourceLinkEnabled)' == 'true' ">
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All"/>
-    </ItemGroup>
 
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
+        <PackageReference Condition=" '$(SourceLinkEnabled)' == 'true' " Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
     </ItemGroup>
 
 </Project>
