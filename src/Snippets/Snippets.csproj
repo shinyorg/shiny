@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MarkdownSnippets.MsBuild" Version="20.0.3">
+        <PackageReference Include="MarkdownSnippets.MsBuild" Version="21.0.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
