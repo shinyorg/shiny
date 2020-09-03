@@ -10,7 +10,6 @@ namespace Shiny.Generators.Tasks.Android
         {
             // TODO: detect Shiny.Core and Android v10
             // TODO: detect custom application
-            // TODO: user dialogs Init?
             // TODO: if application implementations already exist and is it partial?
 
             // if application exists, error or override? - could also search for attribute?
@@ -19,8 +18,11 @@ namespace Shiny.Generators.Tasks.Android
                 return;
 
             //var implementations = this.Context.GetAllImplementationsOfType(appClass);
-            //if (!appClass.IsPartialClass())
-            //    this.Log.Error("Cannot generate Shiny application class since your custom Application is not marked as partial");
+            if (!appClass.IsPartialClass())
+            {
+                this.Log.Warn("Cannot generate Shiny application class since your custom Application is not marked as partial");
+                return;
+            }
             //// TODO: log error if android application already exists? only gen it if there isn't an existing one?
 
             var startupClass = this.ShinyContext.GetShinyStartupClassFullName();
