@@ -93,10 +93,14 @@ namespace Shiny.Notifications
 
         public async Task<AccessState> RequestAccess()
         {
-            if (this.manager.AreNotificationsEnabled())
-                return AccessState.Disabled;
+            var state = AccessState.Available;
 
-            return await this.jobs.RequestAccess();
+            if (this.manager.AreNotificationsEnabled())
+                state = await this.jobs.RequestAccess();
+            else
+                state = AccessState.Disabled;
+
+            return state;
         }
 
 
