@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
-using Shiny.Logging;
 
 
 namespace Shiny.BluetoothLE.Internals
@@ -73,7 +72,7 @@ namespace Shiny.BluetoothLE.Internals
                 {
                     var item = peripheralArray.GetItem<CBPeripheral>(i);
                     var peripheral = this.GetPeripheral(item);
-                    await del.OnConnected(peripheral);
+                    await this.services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
                 }
             });
             // TODO: restore scan? CBCentralManager.RestoredStateScanOptionsKey
@@ -91,11 +90,15 @@ namespace Shiny.BluetoothLE.Internals
 
         public Subject<ScanResult> ScanResultReceived { get; } = new Subject<ScanResult>();
         public override void DiscoveredPeripheral(CBCentralManager central, CBPeripheral peripheral, NSDictionary advertisementData, NSNumber rssi)
-            => this.ScanResultReceived.OnNext(new ScanResult(
+        {
+            var result = new ScanResult(
                 this.GetPeripheral(peripheral),
                 rssi?.Int32Value ?? 0,
                 new AdvertisementData(advertisementData)
-            ));
+            );
+            this.ScanResultReceived.OnNext(result);
+            this.services.RunDelegates<IBleDelegate>(x => x.OnScanResult(result));
+        }
 
 
         public Subject<PeripheralConnectionFailed> FailedConnection { get; } = new Subject<PeripheralConnectionFailed>();
@@ -110,13 +113,8 @@ namespace Shiny.BluetoothLE.Internals
             if (state == AccessState.Unknown)
                 return;
 
-            await Log.SafeExecute(async () =>
-            {
-                var s = this.services.Resolve<IBleDelegate>();
-                if (s != null)
-                    await s.OnAdapterStateChanged(state);
-            });
             this.StateUpdated.OnNext(state);
+            await this.services.RunDelegates<IBleDelegate>(x => x.OnAdapterStateChanged(state));
         }
     }
 }

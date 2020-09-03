@@ -20,15 +20,18 @@ namespace Shiny.BluetoothLE.Internals
         readonly ConcurrentDictionary<string, Peripheral> devices;
         readonly Subject<NamedMessage<Peripheral>> peripheralSubject;
         readonly IMessageBus messageBus;
+        readonly IServiceProvider services;
         LollipopScanCallback? callbacks;
 
 
         public CentralContext(AndroidContext context,
                               IMessageBus messageBus,
+                              IServiceProvider services,
                               BleConfiguration config)
         {
             this.Android = context;
             this.Configuration = config;
+            this.services = services;
             this.Manager = context.GetBluetooth();
 
             //this.sdelegate = new Lazy<IBleDelegate>(() => serviceProvider.Resolve<IBleDelegate>());
@@ -57,7 +60,7 @@ namespace Shiny.BluetoothLE.Internals
         public AndroidContext Android { get; }
 
 
-        internal void DeviceEvent(Intent intent)
+        internal async void DeviceEvent(Intent intent)
         {
             var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
             var peripheral = this.GetDevice(device);
@@ -65,11 +68,11 @@ namespace Shiny.BluetoothLE.Internals
 
             switch (action)
             {
-                // TODO: probably need these for background things
-                //case BluetoothDevice.ActionAclConnected:
-                //    this.sdelegate.Value?.OnConnected(peripheral);
-                //    break;
+                case BluetoothDevice.ActionAclConnected:
+                    await this.services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
+                    break;
 
+                // TODO: background scan?
                 //case BluetoothDevice.ActionAclDisconnected:
                 //    peripheral.Context.Close();
                 //    break;
@@ -79,7 +82,7 @@ namespace Shiny.BluetoothLE.Internals
                     peripheral.PairingRequestPin = null;
 
                     if (!pin.IsEmpty())
-                    { 
+                    {
                         Log.Write("BlePairing", "Will attempt to auto-pair with PIN " + pin);
                         var bytes = Encoding.UTF8.GetBytes(pin);
 
@@ -126,7 +129,7 @@ namespace Shiny.BluetoothLE.Internals
             }
             return pin;
         }
-            
+
 
         public Peripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(
             btDevice.Address,
