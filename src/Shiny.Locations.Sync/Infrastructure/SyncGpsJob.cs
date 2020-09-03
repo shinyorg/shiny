@@ -27,10 +27,8 @@ namespace Shiny.Locations.Sync.Infrastructure
         {
             var enabled = await this.syncManager.IsMonitoring(LocationSyncType.GPS);
             if (!enabled || this.gps == null)
-            {
-                jobInfo.Repeat = false;
                 return;
-            }
+
             await JobProcessor.Process(
                 jobInfo,
                 () => this.dataService.GetAll(),

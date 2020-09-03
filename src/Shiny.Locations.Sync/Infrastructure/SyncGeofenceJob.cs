@@ -27,10 +27,7 @@ namespace Shiny.Locations.Sync.Infrastructure
         {
             var enabled = await this.syncManager.IsMonitoring(LocationSyncType.Geofence);
             if (!enabled || this.geofences == null)
-            {
-                jobInfo.Repeat = false;
                 return;
-            }
 
             await JobProcessor.Process(
                 jobInfo,
