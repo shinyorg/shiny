@@ -37,7 +37,7 @@ assignees: ''
  - [ ] BluetoothLE Client
  - [ ] BluetoothLE Hosting (beta)
  - [ ] Beacons
- - [ ] Beacon Advertiser
+ - [ ] Beacon Advertiser (beta)
  - [ ] SQLite Integration
 
 

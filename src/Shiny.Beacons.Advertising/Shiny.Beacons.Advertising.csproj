@@ -1,6 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <VersionSuffix>beta</VersionSuffix>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Description>Shiny Beacon Advertising - To your device into a BLE beacon!</Description>
     </PropertyGroup>
