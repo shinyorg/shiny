@@ -37,6 +37,9 @@
 * [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
 * [Android] Now uses a foreground service to maintain a continuous scan when using beacon monitoring
 
+### Beacon Advertising (NEW Module)
+* You can now advertise beacons anywhere that is supported by Shiny.BluetoothLE.Hosting
+
 ### AppServices (NEW MODULES)
 * [Shiny.TripTracking] - A new module for tracking run, walks, and drives!
 * [Shiny.Locations.Sync] - Track background GPS and/or geofence events and uses best practices to ensure these events hit your server in a timely fashion

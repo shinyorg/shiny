@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Description>Shiny Beacon Advertising - To your device into a BLE beacon!</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <ProjectReference Include="..\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+    </ItemGroup>
+
+</Project>

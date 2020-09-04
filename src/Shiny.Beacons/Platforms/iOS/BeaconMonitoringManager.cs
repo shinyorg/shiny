@@ -41,7 +41,7 @@ namespace Shiny.Beacons
         {
             var region = await this.repository.Get<BeaconRegion>(identifier);
             if (region != null)
-            { 
+            {
                 await this.repository.Remove<BeaconRegion>(region.Identifier);
                 this.manager.StopMonitoring(region.ToNative());
             }
@@ -60,7 +60,7 @@ namespace Shiny.Beacons
                 this.manager.StopMonitoring(region);
         }
 
-        public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions() 
+        public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
             => await this.repository.GetAll<BeaconRegion>();
     }
 }

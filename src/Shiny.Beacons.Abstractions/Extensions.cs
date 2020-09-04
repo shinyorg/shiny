@@ -75,24 +75,6 @@ namespace Shiny.Beacons
         }
 
 
-        //public static byte[] ToIBeaconPacket(this Beacon beacon, int txpower)
-        //{
-        //    using (var ms = new MemoryStream())
-        //    {
-        //        using (var br = new BinaryWriter(ms))
-        //        {
-        //            br.Write(76);
-        //            br.Write(new byte[] { 0, 0, 0 });
-        //            br.Write(ToBytes(beacon.Uuid));
-        //            br.Write(BitConverter.GetBytes(beacon.Major).Reverse().ToArray());
-        //            br.Write(BitConverter.GetBytes(beacon.Minor).Reverse().ToArray());
-        //            br.Write(txpower);
-        //        }
-
-        //        return ms.ToArray();
-        //    }
-        //}
-
         // 6 meters+ = far
         // 2 meters+ = near
         // 0.5 meters += immediate
