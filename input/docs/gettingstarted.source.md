@@ -10,13 +10,24 @@ RedirectFrom: index
 |-------|-----|-----|
 |Core | [![CoreNugetShield]][CoreNuget] | [![CoreMygetShield]][CoreMyget] |
 |Beacons | [![BeaconsNugetShield]][BeaconsNuget] | [![BeaconsMygetShield]][BeaconsMyget] |
+|Beacon Advertising|||
 |BluetoothLE| [![BleNugetShield]][BleNuget] | [![BleMygetShield]][BleMyget] |
+|BluetoothLE Hosting||||
 |Locations| [![LocationsNugetShield]][LocationsNuget] | [![LocationsMygetShield]][LocationsMyget] |
+|NFC|||
 |HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpMygetShield]][HttpMyget] |
 |Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
 |Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
-|SQLite Integration| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] |
-|AppCenter Logging Integration| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] |
+|Push|||
+|Push - Azure Notification Hubs|||
+|Push - Firebase||||
+|Integrations - SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] |
+|Intgrations - AppCenter| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] |
+
+|App Service - Data Sync|||
+|App Service - Location Sync|||
+|App Service - Media Sync|||
+|App Service - Trip Tracker|||
 
 [BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg
 [BeaconsNuget]: https://www.nuget.org/packages/Shiny.Beacons/
