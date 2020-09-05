@@ -1,2 +1,0 @@
-Title: Beacon Advertising
----

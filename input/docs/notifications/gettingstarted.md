@@ -1,5 +1,6 @@
 Title: Getting Started
 Order: 1
+RedirectFrom: docs/notifications/index
 ---
 
 Notifications are a great way of letting your users know your app just figured something out in the background.  Thus, Shiny needed a decent local notification library.
