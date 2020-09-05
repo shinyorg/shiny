@@ -1,21 +1,33 @@
-Title: Using Shiny without Dependency Injection
+Title: Using Shiny without the boilerplate code
 ---
+
 
 Using Shiny without dependency injection is not only possible, it is quite easy to do.  Do also you like the old plugin style of CrossPlugin.Current?  Then you've come to the right document
 
- Shiny offer a couple different ways of accomplishing this
+Under the hood, you are still using dependency injection and you still need a startup file, BUT, you can have all of the static versions of each service generated in a project of your choice by simply adding the following to your assembly attributes:
 
-1. Using the service locator: Shiny.ShinyHost.Resolve<IShinyService>();
-2. Using the supplied shim for each library (ie. Shiny.CrossGeofences.Current )
-
-
-Also, if you aren't a fan of the boilerplate DI stuff - there are a couple of different ways to accomplish this outside of the standard Shiny startup class
-
-1. Assembly Level Attributes
-2. Auto Registrations
+[assembly: Shiny.GenerateStaticClasses]
 
 
-## Attribute Registrations
+After adding this attribute, perform a build.  The Shiny source generator will now scan for all Shiny nuget packages that are referenced in this project and generate corresponding static classes for the main services.  
+
+```csharp
+// BEFORE
+Shiny.ShinyHost.Resolve<IJobManager>().Run(...);
+
+// AFTER
+JobManager.Run(...);
+```
+
+
+## Startup Genration
+Also, if you aren't a fan of the boilerplate startup files, Shiny can also generate them at build time for you. 
+
+**CAUTION: this comes at a cost of customization to your startup**
+
+
+
+## Attribute Registration 
 
 Attribute registration is pretty simple and allows you to bypass the necessity of creating a Shiny Startup class.  It should be noted that this doesn't save you a lot of code, but it does allow you to put registration in assembly level attributes in essentially any file.  This is very similar to how Xamarin Forms registers things against its DependencyService.
 This will perform at pretty much the same speed as the standard Startup class.

@@ -11,6 +11,27 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.7" />
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
+        <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />
+        <ProjectReference Include="..\Shiny.Beacons.Advertising\Shiny.Beacons.Advertising.csproj" />
+        <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+        <ProjectReference Include="..\Shiny.DataSync\Shiny.DataSync.csproj" />
+        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Sync\Shiny.Locations.Sync.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.MediaSync\Shiny.MediaSync.csproj" />
+        <ProjectReference Include="..\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
+        <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\Shiny.Push.Abstractions\Shiny.Push.Abstractions.csproj" />
+        <ProjectReference Include="..\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
+        <ProjectReference Include="..\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
+        <ProjectReference Include="..\Shiny.TripTracker\Shiny.TripTracker.csproj" />
+        <ProjectReference Include="..\Shiny.Testing\Shiny.Testing.csproj" />
+        <ProjectReference Include="..\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
+        <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
+        <ProjectReference Include="..\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj" />
     </ItemGroup>
 
 </Project>
