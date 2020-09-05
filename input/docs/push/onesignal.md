@@ -2,4 +2,8 @@ Title: One Signal
 Order: 4
 ---
 
-## TDOD
+# Supported Platforms
+|Platform|Version|
+|---|---|
+|iOS|10+|
+|Android|6+|

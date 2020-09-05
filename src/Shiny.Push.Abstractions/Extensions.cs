@@ -33,7 +33,7 @@ namespace Shiny.Push
         /// <param name="tags"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
-        public static async Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, string[] tags, bool throwOnFail = false, CancellationToken cancelToken = default)
+        public static async Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, string[] tags, CancellationToken cancelToken = default)
         {
             var result = await pushManager.RequestAccess(cancelToken);
             if (pushManager is IPushTagSupport tagEnabled)

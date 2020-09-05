@@ -5,74 +5,9 @@ RedirectFrom: index
 
 ## Platform Setup
 
+
  
-|Project|NuGet|MyGet|
-|-------|-----|-----|
-|Core | [![CoreNugetShield]][CoreNuget] | [![CoreMygetShield]][CoreMyget] |
-|Beacons | [![BeaconsNugetShield]][BeaconsNuget] | [![BeaconsMygetShield]][BeaconsMyget] |
-|Beacon Advertising|||
-|BluetoothLE| [![BleNugetShield]][BleNuget] | [![BleMygetShield]][BleMyget] |
-|BluetoothLE Hosting||||
-|Locations| [![LocationsNugetShield]][LocationsNuget] | [![LocationsMygetShield]][LocationsMyget] |
-|NFC|||
-|HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpMygetShield]][HttpMyget] |
-|Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
-|Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
-|Push|||
-|Push - Azure Notification Hubs|||
-|Push - Firebase||||
-|Integrations - SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] |
-|Intgrations - AppCenter| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] |
 
-|App Service - Data Sync|||
-|App Service - Location Sync|||
-|App Service - Media Sync|||
-|App Service - Trip Tracker|||
-
-[BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg
-[BeaconsNuget]: https://www.nuget.org/packages/Shiny.Beacons/
-[BeaconsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Beacons.svg
-[BeaconsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Beacons
-
-[CoreNugetShield]: https://img.shields.io/nuget/v/Shiny.Core.svg
-[CoreNuget]: https://www.nuget.org/packages/Shiny.Core/
-[CoreMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Core.svg
-[CoreMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Core
-
-[BleNugetShield]: https://img.shields.io/nuget/v/Shiny.BluetoothLE.svg
-[BleNuget]: https://www.nuget.org/packages/Shiny.BluetoothLE/
-[BleMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.BluetoothLE.svg
-[BleMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.BluetoothLE
-
-[LocationsNugetShield]: https://img.shields.io/nuget/v/Shiny.Locations.svg
-[LocationsNuget]: https://www.nuget.org/packages/Shiny.Locations/
-[LocationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Locations.svg
-[LocationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Locations
-
-[SensorsNugetShield]: https://img.shields.io/nuget/v/Shiny.Sensors.svg
-[SensorsNuget]: https://www.nuget.org/packages/Shiny.Sensors/
-[SensorsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Sensors.svg
-[SensorsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Sensors
-
-[HttpNugetShield]: https://img.shields.io/nuget/v/Shiny.Net.Http.svg
-[HttpNuget]: https://www.nuget.org/packages/Shiny.Net.Http/
-[HttpMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Net.Http.svg
-[HttpMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Net.Http
-
-[NotificationsNugetShield]: https://img.shields.io/nuget/v/Shiny.Notifications.svg
-[NotificationsNuget]: https://www.nuget.org/packages/Shiny.Notifications/
-[NotificationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Notifications.svg
-[NotificationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Notifications
-
-[SqliteNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.Sqlite.svg
-[SqliteNuget]: https://www.nuget.org/packages/Shiny.Integrations.Sqlite/
-[SqliteMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.Sqlite.svg
-[SqliteMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.Sqlite
-
-[AppCenterNugetShield]: https://img.shields.io/nuget/v/Shiny.Logging.AppCenter.svg
-[AppCenterNuget]: https://www.nuget.org/packages/Shiny.Logging.AppCenter/
-[AppCenterMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Logging.AppCenter.svg
-[AppCenterMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Logging.AppCenter
 
 ## Setup
 
