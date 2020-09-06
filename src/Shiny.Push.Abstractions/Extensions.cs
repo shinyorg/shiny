@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Shiny.Settings;
 
 
 namespace Shiny.Push
@@ -9,7 +7,7 @@ namespace Shiny.Push
     public static class Extensions
     {
         /// <summary>
-        ///
+        /// Returns if tags are supported by this push manager
         /// </summary>
         /// <param name="push"></param>
         /// <returns></returns>
@@ -18,7 +16,7 @@ namespace Shiny.Push
 
 
         /// <summary>
-        ///
+        /// If manager supports tags, it will return them if set, otherwise it will return null
         /// </summary>
         /// <param name="push"></param>
         /// <returns></returns>
@@ -27,15 +25,14 @@ namespace Shiny.Push
 
 
         /// <summary>
-        ///
+        /// If manager supports tags & permission is granted to push, it will set the tags
         /// </summary>
         /// <param name="pushManager"></param>
         /// <param name="tags"></param>
-        /// <param name="cancelToken"></param>
         /// <returns></returns>
-        public static async Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, string[] tags, CancellationToken cancelToken = default)
+        public static async Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, params string[] tags)
         {
-            var result = await pushManager.RequestAccess(cancelToken);
+            var result = await pushManager.RequestAccess();
             if (pushManager is IPushTagSupport tagEnabled)
                 await tagEnabled.SetTags(tags);
 
@@ -43,6 +40,12 @@ namespace Shiny.Push
         }
 
 
+        /// <summary>
+        /// If manager supports tags, it will set the tags
+        /// </summary>
+        /// <param name="pushManager"></param>
+        /// <param name="tags"></param>
+        /// <returns></returns>
         public static async Task<bool> TrySetTags(this IPushManager pushManager, params string[] tags)
         {
             if (pushManager is IPushTagSupport tagEnabled)

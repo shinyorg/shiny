@@ -1,5 +1,5 @@
 Title: Speech Recognition
-Description: Local speech recognition for Xamarin & UWP
+Description: Local speech recognition
 ---
 _Easy to use cross platform speech recognition (speech to text) plugin for Xamarin & UWP_
 

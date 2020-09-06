@@ -40,17 +40,4 @@ The following providers, support tagging
 
 In order to safely support tagging without the need for constantly feature flag or type checking, the following extension methods exist to make life easy
 
-```csharp
-IPushManager push;
-
-bool supported = push.IsTagsSupport();
-
-// tries to set a params list of tags if available
-await push.TrySetTags("tag1", "tag2");
-
-// gets a list of currently set tags
-string[] tags = push.TryGetTags(); 
-
-// requests permission from the user and sets tags if available
-var permissionResult = await push.TryRequestAccessWithTags("tag1", "tag2");
-```
+snippet: PushExtensions.cs
