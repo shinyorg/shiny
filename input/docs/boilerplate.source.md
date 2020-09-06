@@ -1,4 +1,5 @@
-Title: Using Shiny without the boilerplate code
+Title: No Boilerplate Code
+Order: 3
 ---
 
 Using Shiny without dependency injection is not only possible, it is quite easy to do.  Do also you like the old plugin style of CrossPlugin.Current?  Then you've come to the right document

@@ -1,6 +1,5 @@
-Title: Getting Started
-Order: 1
-RedirectFrom: docs/push/index
+Title: Push
+Description: One push provider to rule them all!
 ---
 
 # Push
@@ -8,12 +7,12 @@ Push comes in several different flavours.  The main goal with push was to make i
 
 
 ## Providers
-|Provider|iOS|Android|UWP|NuGet|
-|---|---|---|---|---|---|
-|Native|10+|6+|16299+||
-|Azure Notification Hubs|10+|6+|16299+||
-|Firebase|10+|6|||
-|OneSignal|10+|6|||
+|Provider|iOS|Android|UWP|Server Setup|NuGet|
+|---|---|---|---|---|---|---|
+|Native|10+|6+|16299+|||
+|Azure Notification Hubs|10+|6+|16299+|[Link](https://docs.microsoft.com/en-ca/azure/notification-hubs/)||
+|Firebase|10+|6||||
+|OneSignal|10+|6||||
 
 ## Registration
 Look to each appropriate provider to see setups for each.  

@@ -1,5 +1,5 @@
 Title: Modules, Startable Tasks, and State Restored Services
-Order: 2
+Order: 4
 ---
 
 There are lots of little tidbits that help your Shiny applications really shine.  Below are some great additions to the underlying dependency injection engine that help decouple your applications even further.  
