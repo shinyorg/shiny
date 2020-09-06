@@ -15,7 +15,26 @@ RedirectFrom: index
 
 2. In your shared code project.  Create a Shiny startup file:
 
-snippet: YourShinyStartup.cs
+<!-- snippet: YourShinyStartup.cs -->
+<a id='snippet-YourShinyStartup.cs'></a>
+```cs
+using Microsoft.Extensions.DependencyInjection;
+using Shiny;
+
+namespace YourNamespace
+{
+    public class YourShinyStartup : ShinyStartup
+    {
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            // this is where you'll load things like BLE, GPS, etc - those are covered in other sections
+            // things like the jobs, environment, power, are all installed automatically
+        }
+    }
+}
+```
+<sup><a href='/src/Snippets/YourShinyStartup.cs#L1-L14' title='File snippet `YourShinyStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-YourShinyStartup.cs' title='Navigate to start of snippet `YourShinyStartup.cs`'>anchor</a></sup>
+<!-- endSnippet -->
 
 ### Android
 

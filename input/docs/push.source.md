@@ -21,7 +21,7 @@ snippet: PushStartup.cs
 
 All providers use the native implementations on the platform to some degree, as such, you will always need to call
 
-snippet: PushPermission.cs
+snippet: PushPermissions.cs
 
 ## Background Delegate
 snippet: PushDelegate.cs
