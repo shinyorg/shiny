@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Locations;
 using Shiny.Settings;
 using Shiny.TripTracker;
 using Shiny.TripTracker.Internals;
@@ -21,11 +20,11 @@ namespace Shiny
             => settings.Set(nameof(CurrentTripId), value);
 
 
-        public static bool UseTripTracker<T>(this IServiceCollection services) where T : ITripTrackerDelegate
+        public static bool UseTripTracker<T>(this IServiceCollection services, TripTrackingType? startupTracking = null) where T : ITripTrackerDelegate
             => services.UseTripTracker(typeof(T));
 
 
-        public static bool UseTripTracker(this IServiceCollection services, Type delegateType)
+        public static bool UseTripTracker(this IServiceCollection services, Type delegateType, TripTrackingType? startupTracking = null)
         {            
             if (!services.UseMotionActivity())
                 return false;
@@ -36,15 +35,7 @@ namespace Shiny
             if (delegateType == null)
                 throw new ArgumentException("Trip Tracker Delegate Type not supplied", nameof(delegateType));
 
-            if (!added)
-            {
-                services.AddSingleton<IGpsDelegate, TripTrackerGpsDelegate>();
-                services.AddSingleton<IDataService, SqliteDataService>();
-                services.AddSingleton<ITripTrackerManager, TripTrackerManagerImpl>();
-                added = true;
-            }
-            services.AddSingleton(typeof(ITripTrackerDelegate), delegateType);
-
+            services.RegisterModule(new TripTrackerModule(delegateType, startupTracking));
             return true;
         }
     }
