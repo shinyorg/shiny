@@ -9,18 +9,7 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class GpsModule : ShinyModule
     {
         readonly Type delegateType;
-
-
-        public GpsModule(Type delegateType)
-        {
-            this.delegateType = delegateType;
-            //this.request = request;
-            //this.config = config ?? new SyncConfig
-            //{
-            //    BatchSize = 10,
-            //    SortMostRecentFirst = false
-            //};
-        }
+        public GpsModule(Type delegateType) => this.delegateType = delegateType;
 
 
         public override void Register(IServiceCollection services)
@@ -31,8 +20,12 @@ namespace Shiny.Locations.Sync.Infrastructure
             services.AddSingleton(typeof(IGpsSyncDelegate), this.delegateType);
             services.UseMotionActivity();
             services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            var job = new JobInfo(typeof(SyncGpsJob), Constants.GpsJobIdentifier) { RunOnForeground = true };
-            services.RegisterJob(job);
+            services.RegisterJob(
+                typeof(SyncGpsJob),
+                Constants.GpsJobIdentifier,
+                InternetAccess.Any,
+                true
+            );
         }
     }
 }

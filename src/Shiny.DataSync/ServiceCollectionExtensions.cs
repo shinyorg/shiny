@@ -9,7 +9,7 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static void UseDataSync<TDelegate>(this IServiceCollection services, bool syncOnAnyConnection) where TDelegate : class, IDataSyncDelegate
+        public static void UseDataSync<TDelegate>(this IServiceCollection services, bool syncOnAnyConnection = true) where TDelegate : class, IDataSyncDelegate
         {
             services.AddSingleton<IDataSyncManager, DataSyncManager>();
             services.AddSingleton<IDataSyncDelegate, TDelegate>();

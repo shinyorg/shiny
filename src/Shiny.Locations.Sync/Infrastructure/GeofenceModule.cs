@@ -23,8 +23,12 @@ namespace Shiny.Locations.Sync.Infrastructure
             services.UseMotionActivity();
 
             services.UseJobForegroundService(TimeSpan.FromSeconds(30));
-            var job = new JobInfo(typeof(SyncGeofenceJob), Constants.GeofenceJobIdentifer) { RunOnForeground = true };
-            services.RegisterJob(job);
+            services.RegisterJob(
+                typeof(SyncGeofenceJob),
+                Constants.GeofenceJobIdentifer,
+                InternetAccess.Any,
+                true
+            );
         }
     }
 }

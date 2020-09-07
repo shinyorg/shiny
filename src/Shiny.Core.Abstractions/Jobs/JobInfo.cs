@@ -6,14 +6,15 @@ namespace Shiny.Jobs
 {
     public class JobInfo
     {
-        public JobInfo(Type jobType, string? identifier = null)
+        public JobInfo(Type jobType, string? identifier = null, bool runOnForeground = false)
         {
             if (jobType == null)
                 throw new ArgumentException("Job Type not set");
 
             this.Identifier = identifier ?? jobType.AssemblyQualifiedName;
-            this.Type = jobType;            
+            this.Type = jobType;
             this.PeriodicTime = TimeSpan.FromMinutes(15);
+            this.RunOnForeground = runOnForeground;
         }
 
 
