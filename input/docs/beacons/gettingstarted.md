@@ -43,23 +43,24 @@ public class BeaconRanging
 {
     public void MyMethod()
     {
+        // note, major & minor are optional here, but if you supply minor, you must supply major
         var ranging = ShinyHost.Resolve<IBeaconRangingManager>();
         ranging
             .WhenBeaconRanged(new BeaconRegion(
                 "YourId",
                 Guid.Parse(""),
-                1,
-                1
+                1, // major
+                1 // minor
             ))
             .Subscribe(beacon =>
             {
-
+                // you will get the full details of the beacon seen heree
             });
     }
 }
 
 ```
-<sup><a href='/src/Snippets/BeaconRanging.cs#L1-L23' title='File snippet `BeaconRanging.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconRanging.cs' title='Navigate to start of snippet `BeaconRanging.cs`'>anchor</a></sup>
+<sup><a href='/src/Snippets/BeaconRanging.cs#L1-L24' title='File snippet `BeaconRanging.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconRanging.cs' title='Navigate to start of snippet `BeaconRanging.cs`'>anchor</a></sup>
 <!-- endSnippet -->
 
 <!-- snippet: BeaconMonitorDelegate.cs -->
@@ -73,10 +74,12 @@ public class BeaconMonitorDelegate : IBeaconMonitorDelegate
 {
     public async Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
     {
+        // NOTE: you cannot not see the actual detected beacon here, only the region that was crossed
+        // this is done by the OS to protect privacy of the user
     }
 }
 ```
-<sup><a href='/src/Snippets/BeaconMonitorDelegate.cs#L1-L10' title='File snippet `BeaconMonitorDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconMonitorDelegate.cs' title='Navigate to start of snippet `BeaconMonitorDelegate.cs`'>anchor</a></sup>
+<sup><a href='/src/Snippets/BeaconMonitorDelegate.cs#L1-L12' title='File snippet `BeaconMonitorDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconMonitorDelegate.cs' title='Navigate to start of snippet `BeaconMonitorDelegate.cs`'>anchor</a></sup>
 <!-- endSnippet -->
 
 ### Android & UWP

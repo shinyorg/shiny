@@ -24,25 +24,23 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 
-namespace Snippets
-{
-    public class PushStartup : ShinyStartup
-    {
-        public override void ConfigureServices(IServiceCollection services)
-        {
-            // you can only register one :)
-            // NOTE: these also all take a notification category if you wish to have actions available
-            // on the user notification
-            services.UsePush<PushDelegate>();
 
-            services.UsePushAzureNotificationHubs<PushDelegate>("connection string", "hub name");
-            services.UseFirebaseMessaging<PushDelegate>();
-            services.UseOneSignalPush<PushDelegate>(new Shiny.Push.OneSignal.OneSignalPushConfig("onesignal appId"));
-        }
+public class PushStartup : ShinyStartup
+{
+    public override void ConfigureServices(IServiceCollection services)
+    {
+        // you can only register one :)
+        // NOTE: these also all take a notification category if you wish to have actions available
+        // on the user notification
+        services.UsePush<PushDelegate>();
+
+        services.UsePushAzureNotificationHubs<PushDelegate>("connection string", "hub name");
+        services.UseFirebaseMessaging<PushDelegate>();
+        services.UseOneSignalPush<PushDelegate>(new Shiny.Push.OneSignal.OneSignalPushConfig("onesignal appId"));
     }
 }
 ```
-<sup><a href='/src/Snippets/PushStartup.cs#L1-L21' title='File snippet `PushStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushStartup.cs' title='Navigate to start of snippet `PushStartup.cs`'>anchor</a></sup>
+<sup><a href='/src/Snippets/PushStartup.cs#L1-L19' title='File snippet `PushStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushStartup.cs' title='Navigate to start of snippet `PushStartup.cs`'>anchor</a></sup>
 <!-- endSnippet -->
 
 All providers use the native implementations on the platform to some degree, as such, you will always need to call

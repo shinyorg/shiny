@@ -11,8 +11,8 @@ public class HttpTransferUsage
 
         var yourTransfers = await manager.GetTransfers();
 
-        manager.WhenUpdated().Subscribe(transfer =>
-        {
-        });
+        //manager.WhenUpdated().Subscribe(transfer =>
+        //{
+        //});
     }
 }
