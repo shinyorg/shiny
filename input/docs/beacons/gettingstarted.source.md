@@ -11,73 +11,11 @@ This library deals specifically with iBeacons (Apple's beacon technology).  iBea
 
 First - install the NuGet package into your shared code project: [![NuGet](https://img.shields.io/nuget/v/Shiny.Beacons.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Beacons/)
 
-<!-- snippet: BeaconStartup.cs -->
-<a id='snippet-BeaconStartup.cs'></a>
-```cs
-using Microsoft.Extensions.DependencyInjection;
-using Shiny;
+snippet: BeaconStartup.cs
 
-public class BeaconStartup : ShinyStartup
-{
-    public override void ConfigureServices(IServiceCollection services)
-    {
-        services.UseBeaconRanging();
+snippet: BeaconRanging.cs
 
-        services.UseBeaconMonitoring<BeaconMonitorDelegate>();
-
-        services.UseBeaconAdvertising();
-    }
-}
-```
-<sup><a href='/src/Snippets/BeaconStartup.cs#L1-L14' title='File snippet `BeaconStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconStartup.cs' title='Navigate to start of snippet `BeaconStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
-
-<!-- snippet: BeaconRanging.cs -->
-<a id='snippet-BeaconRanging.cs'></a>
-```cs
-using System;
-using Shiny;
-using Shiny.Beacons;
-
-public class BeaconRanging
-{
-    public void MyMethod()
-    {
-        var ranging = ShinyHost.Resolve<IBeaconRangingManager>();
-        ranging
-            .WhenBeaconRanged(new BeaconRegion(
-                "YourId",
-                Guid.Parse(""),
-                1,
-                1
-            ))
-            .Subscribe(beacon =>
-            {
-
-            });
-    }
-}
-
-```
-<sup><a href='/src/Snippets/BeaconRanging.cs#L1-L23' title='File snippet `BeaconRanging.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconRanging.cs' title='Navigate to start of snippet `BeaconRanging.cs`'>anchor</a></sup>
-<!-- endSnippet -->
-
-<!-- snippet: BeaconMonitorDelegate.cs -->
-<a id='snippet-BeaconMonitorDelegate.cs'></a>
-```cs
-using System.Threading.Tasks;
-using Shiny.Beacons;
-
-
-public class BeaconMonitorDelegate : IBeaconMonitorDelegate
-{
-    public async Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
-    {
-    }
-}
-```
-<sup><a href='/src/Snippets/BeaconMonitorDelegate.cs#L1-L10' title='File snippet `BeaconMonitorDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconMonitorDelegate.cs' title='Navigate to start of snippet `BeaconMonitorDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+snippet: BeaconMonitorDelegate.cs
 
 ### Android & UWP
 Android & UWP piggyback their functionality with Shiny.BluetoothLE.  Use the following links to ensure your setup for those:

@@ -4,6 +4,8 @@ Order: 3
 
 Using Shiny without dependency injection is not only possible, it is quite easy to do.  Do also you like the old plugin style of CrossPlugin.Current?  Then you've come to the right document
 
+In v1 of Shiny, you were required to create an Android application, wire up to your activities, and bolt on to your iOS AppDelegate.
+
 Under the hood, you are still using dependency injection and you still need a startup file, BUT, you can have all of the static versions of each service generated in a project of your choice by simply adding the following to your assembly attributes:
 
 ```csharp

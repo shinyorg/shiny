@@ -25,54 +25,16 @@ Windows UWP|16299+
 1. Install the NuGet package - [![NuGet](https://img.shields.io/nuget/v/Shiny.Net.Http.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Net.Http/)
 
 2. In your [Shiny Startup](./startup) - add the following 
-```csharp
 
-public override void ConfigureServices(IServiceCollection services)
-{
-    services.UseHttpTransfers<YourHttpTransferDelegate>();
-}
-```
+snippet: HttpTransferDelegate.cs
 
-3. Implement a background delegate
-```csharp
-public class YouHttpTransferDelegate : IHttpTransferDelegate
-{
-    // yes - you can inject anything registered with Shiny into the constructor here
+snippet: HttpTransferStartup.cs
 
-    public void OnError(HttpTransfer transfer, Exception ex)
-    {
-    }
+snippet: HttpTransferUsage.cs
 
-
-    public void OnCompleted(HttpTransfer transfer)
-    {
-    }
-}
-```
 
 4. Queue up an upload or download by injecting IHttpTransferManager into your viewmodel
-```csharp
 
-public class YourViewModel
-{
-    public YouViewModel(IHttpTransferManager httpManager)
-    {
-        this.Download = new Command(async () =>
-        {
-
-        });
-
-        this.Upload = new Command(async () => 
-        {
-
-        });
-    }
-
-
-    public ICommand Download { get; }
-    public ICommand Upload { get; }
-}
-```
 
 5. Additional platform setup
     * [Android](android)

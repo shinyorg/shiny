@@ -142,17 +142,31 @@ The following providers, support tagging
 
 In order to safely support tagging without the need for constantly feature flag or type checking, the following extension methods exist to make life easy
 
-```csharp
-IPushManager push;
+<!-- snippet: PushExtensions.cs -->
+<a id='snippet-PushExtensions.cs'></a>
+```cs
+using System.Threading.Tasks;
+using Shiny;
+using Shiny.Push;
 
-bool supported = push.IsTagsSupport();
+public class Extensions
+{
+    public async Task Method()
+    {
+        var push = ShinyHost.Resolve<IPushManager>();
 
-// tries to set a params list of tags if available
-await push.TrySetTags("tag1", "tag2");
+        var supported = push.IsTagsSupport();
 
-// gets a list of currently set tags
-string[] tags = push.TryGetTags(); 
+        // tries to set a params list of tags if available
+        await push.TrySetTags("tag1", "tag2");
 
-// requests permission from the user and sets tags if available
-var permissionResult = await push.TryRequestAccessWithTags("tag1", "tag2");
+        // gets a list of currently set tags
+        var tags = push.TryGetTags();
+
+        // requests permission from the user and sets tags if available
+        var permissionResult = await push.TryRequestAccessWithTags("tag1", "tag2");
+    }
+}
 ```
+<sup><a href='/src/Snippets/PushExtensions.cs#L1-L22' title='File snippet `PushExtensions.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushExtensions.cs' title='Navigate to start of snippet `PushExtensions.cs`'>anchor</a></sup>
+<!-- endSnippet -->
