@@ -22,4 +22,4 @@ This is pretty cool, imagine you want the state of your service preserved across
 
 Simply turn your service implement INotifyPropertyChanged (or the easy Shiny.NotifyPropertyChanged) and register it in your shiny startup and Shiny will take care of the rest
 
-snippet: RestorableServices
+snippet: RestorableServices.cs

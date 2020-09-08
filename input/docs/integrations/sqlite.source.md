@@ -6,14 +6,15 @@ Install from NuGet: [![NuGet](https://img.shields.io/nuget/v/Shiny.Integrations.
 
 The SQLite integration provides several overrides to the built-in modules within Shiny.  
 
-* Caching
 * Storage
 * Settings
 * Logging
 
 ## Registering Them
 
-For the most part, you won't see SQLite after you register it in your Shiny startup.  You are simply swapping "engines" for the "under the hood" stuff. 
+For the most part, you won't see SQLite after you register it in your Shiny startup.  You are simply swapping "engines" for the "under the hood" stuff.  To use the functionality, in your Shiny startup file, add the following
+
+snippet: SqliteStartup.cs
 
 
 ## Why Swap with SQLite
@@ -25,6 +26,6 @@ There are 3 main points to consider when swapping in SQLite
 
 |Feature|Benefit(s)|Sacrific(s)
 |-------|-----|
-|Caching|Your cache values will survive across sessions if the values don't expire.  You will sacrifice performance vs the in-memory provider though. |
 |Storage|The benefit here is that you can use SQLite encryption to potentially protect values|
 |Settings|Same benefits of potential encryption.  However, if you are doing frequent (many changes in a second) writes to settings, you will lose performance|
+|Logging|There is no performance benefits to using this, however, it does centralize the logs for shipping purposes if you want|

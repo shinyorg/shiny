@@ -83,7 +83,7 @@ namespace Shiny.Generators.Tasks.Android
                         {
                             builder.AppendLine("base.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
                             builder.AppendLine();
-                            builder.AppendLine("this.ShinyRequestPermissionsResult(requestCode, permissions, grantResults);");
+                            builder.AppendLine("this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);");
                             builder.AppendLine();
 
                             if (this.Context.HasXamarinEssentials())

@@ -1,4 +1,6 @@
 #recipe Docs
+#n Wyam.Markdown
+#n Wyam.Razor
 #t Samson
 
 //https://github.com/Wyamio/Wyam
@@ -11,6 +13,8 @@ Settings[DocsKeys.Title] = "Shiny";
 Settings[DocsKeys.BaseEditUrl] = "https://github.com/shinyorg/shiny/tree/master/input/";
 Settings[DocsKeys.BlogTitle] = "Releases";
 Settings[DocsKeys.SourceFiles] = "../src/**/{!platforms,!infrastructure,!bin,!obj,!packages,}/**/*.cs";
+//Settings[] = "**/{{!_,}}*.{extension}";
+//Settings[] = "**/{{!_,*.source,}}*.md";
 
 //Settings[DocsKeys.SourceFiles] = null;
 //Settings[DocsKeys.SolutionFiles] = "c:/dev/shiny/Libs.sln";

@@ -34,11 +34,11 @@ namespace Samples.Droid
         //}
 
 
-        protected override void OnNewIntent(Intent intent)
-        {
-            base.OnNewIntent(intent);
-            this.ShinyOnNewIntent(intent);
-        }
+        //protected override void OnNewIntent(Intent intent)
+        //{
+        //    base.OnNewIntent(intent);
+        //    this.ShinyOnNewIntent(intent);
+        //}
 
 
         //public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)

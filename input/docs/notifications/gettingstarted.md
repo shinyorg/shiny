@@ -15,6 +15,12 @@ Notifications are a great way of letting your users know your app just figured s
 |Android|5|
 |UWP|16299|
 
+snippet: NotificationStartup.cs
+
+snippet: NotificationDelegate.cs
+
+snippet: NotificationUsage.cs
+
 # Notifications
 
 ## Send a Notification
