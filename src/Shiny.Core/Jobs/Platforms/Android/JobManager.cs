@@ -3,29 +3,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Settings;
-using Android;
-using Android.App.Job;
 using Android.Content;
 using AndroidX.Work;
-using Java.Lang;
 using Shiny.Logging;
 using P = Android.Manifest.Permission;
+
 
 namespace Shiny.Jobs
 {
     public class JobManager : AbstractJobManager
     {
         readonly AndroidContext context;
-        readonly ISettings settings;
 
 
         public JobManager(AndroidContext context,
                           IServiceProvider container,
-                          IRepository repository,
-                          ISettings settings) : base(container, repository)
+                          IRepository repository) : base(container, repository)
         {
             this.context = context;
-            this.settings = settings;
         }
 
 
@@ -51,7 +46,7 @@ namespace Shiny.Jobs
                                 wakeLock.Acquire();
                                 await task(CancellationToken.None).ConfigureAwait(false);
                             }
-                            catch (System.Exception ex)
+                            catch (Exception ex)
                             {
                                 Log.Write(ex);
                             }
@@ -62,7 +57,7 @@ namespace Shiny.Jobs
                         }
                     }
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     Log.Write(ex);
                 }
@@ -113,19 +108,19 @@ namespace Shiny.Jobs
         }
 
 
-        static AndroidX.Work.NetworkType ToNative(InternetAccess access)
+        static NetworkType ToNative(InternetAccess access)
         {
             switch (access)
             {
                 case InternetAccess.Any:
-                    return AndroidX.Work.NetworkType.Connected;
+                    return NetworkType.Connected;
 
                 case InternetAccess.Unmetered:
-                    return AndroidX.Work.NetworkType.Unmetered;
+                    return NetworkType.Unmetered;
 
                 case InternetAccess.None:
                 default:
-                    return AndroidX.Work.NetworkType.NotRequired;
+                    return NetworkType.NotRequired;
             }
         }
 
