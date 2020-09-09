@@ -1,5 +1,5 @@
 ----------------------------------------
-Shiny.Integrations.FirebaseMessaging
+Shiny.Push.FirebaseMessaging
 ----------------------------------------
 
 GitHub: https://github.com/shinyorg/Shiny
@@ -15,27 +15,13 @@ iOS
 
 Follow https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/deprecated/remote-notifications-in-ios
 
-Route the following methods like so, in your AppDelegate
-
-public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-    => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);
-
-public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
-    => this.ShinyRegisteredForRemoteNotifications(deviceToken);
-
-public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
-    => this.ShinyFailedToRegisterForRemoteNotifications(error);
-
 ----
 Android
 ---
 
 Ensure the following libraries are installed in your ANDROID HEAD PROJECT
 
-<PackageReference Include="Xamarin.Firebase.Datatransport" Version="117.0.5-preview02" />
-<PackageReference Include="Xamarin.Firebase.Common" Version="119.3.0-preview02" />
 <PackageReference Include="Xamarin.Firebase.Messaging" Version="120.1.7-preview02" />
-<PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="117.2.1-preview02" />
 <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="117.0.2-preview02" />
 
 

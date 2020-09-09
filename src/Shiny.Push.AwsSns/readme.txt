@@ -1,5 +1,5 @@
 -------------------------------------
-Shiny.Push.AzureNotificationHubs
+Shiny.Push.AwsSns
 -------------------------------------
 
 GitHub: https://github.com/shinyorg/Shiny
@@ -17,10 +17,7 @@ public class SampleStartup : Startup
 {
     public override void ConfigureServices(IServiceCollection services)
     {
-        services.UsePushAzureNotificationHubs<PushDelegate>(
-            "Your Listener Connection String",
-            "Your Hub Name"
-        );
+        services.UsePushAwsSns<PushDelegate>();
     }
 }
 
@@ -30,6 +27,7 @@ iOS
 https://docs.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-ios-push-notification-apns-get-started
 
 Follow https://docs.microsoft.com/en-us/xamarin/ios/platform/user-notifications/deprecated/remote-notifications-in-ios
+
 
 ----
 Android
