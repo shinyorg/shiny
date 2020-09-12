@@ -25,7 +25,7 @@ namespace Shiny
 
 
         public static bool UseTripTracker(this IServiceCollection services, Type delegateType, TripTrackingType? startupTracking = null)
-        {            
+        {
             if (!services.UseMotionActivity())
                 return false;
 
