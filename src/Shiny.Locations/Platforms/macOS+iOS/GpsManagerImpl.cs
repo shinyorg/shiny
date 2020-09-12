@@ -4,11 +4,12 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CoreLocation;
+using Shiny.Logging;
 
 
 namespace Shiny.Locations
 {
-    public class GpsManagerImpl : NotifyPropertyChanged, IGpsManager
+    public class GpsManagerImpl : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
     {
         readonly CLLocationManager locationManager;
         readonly GpsManagerDelegate gdelegate;
@@ -18,6 +19,25 @@ namespace Shiny.Locations
         {
             this.gdelegate = new GpsManagerDelegate();
             this.locationManager = new CLLocationManager { Delegate = this.gdelegate };
+        }
+
+
+        public async void Start()
+        {
+            if (this.CurrentListener != null)
+            {
+                try
+                {
+                    if (this.CurrentListener.UseBackground)
+                        await this.StartListener(this.CurrentListener);
+                    else
+                        this.CurrentListener = null;
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(ex);
+                }
+            }
         }
 
 
