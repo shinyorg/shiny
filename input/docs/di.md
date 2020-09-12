@@ -52,9 +52,11 @@ This is pretty cool, imagine you want the state of your service preserved across
 
 Simply turn your service implement INotifyPropertyChanged (or the easy Shiny.NotifyPropertyChanged) and register it in your shiny startup and Shiny will take care of the rest
 
-<!-- snippet: RestorableServices -->
-<a id='snippet-restorableservices'></a>
+<!-- snippet: RestorableServices.cs -->
+<a id='snippet-RestorableServices.cs'></a>
 ```cs
+using Shiny;
+
 public class MyBadAssService :
     NotifyPropertyChanged,
     IMyBadAssService,
@@ -73,6 +75,11 @@ public class MyBadAssService :
         this.Count++;
     }
 }
+
+
+public interface IMyBadAssService
+{
+}
 ```
-<sup><a href='/src/Snippets/RestorableServices.cs#L3-L23' title='File snippet `restorableservices` was extracted from'>snippet source</a> | <a href='#snippet-restorableservices' title='Navigate to start of snippet `restorableservices`'>anchor</a></sup>
+<sup><a href='/src/Snippets/RestorableServices.cs#L1-L25' title='File snippet `RestorableServices.cs` was extracted from'>snippet source</a> | <a href='#snippet-RestorableServices.cs' title='Navigate to start of snippet `RestorableServices.cs`'>anchor</a></sup>
 <!-- endSnippet -->
