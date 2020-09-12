@@ -3,7 +3,8 @@ Description: One push provider to rule them all!
 ---
 
 # Push
-Push comes in several different flavours.  The main goal with push was to make it easy to switch between push providers without changing anything besides configuration in your code base.
+Push notifications come in so many flavours these days.  The community needed one way of doing things, but the ability to swap providers in and out at will.  The reason, push providers, aside from native have been dropping
+like flies the last several years.  The latest to go was AppCenter which it turns out the Xamarin community was heavily invested in.  
 
 
 ## Providers
@@ -13,6 +14,7 @@ Push comes in several different flavours.  The main goal with push was to make i
 |Azure Notification Hubs|10+|6+|16299+|[Link](https://docs.microsoft.com/en-ca/azure/notification-hubs/)||
 |Firebase|10+|6||||
 |OneSignal|10+|6||||
+|Amazon|10+|6|||
 
 ## Registration
 Look to each appropriate provider to see setups for each.  
@@ -102,6 +104,7 @@ public class PushDelegate : IPushDelegate
 ```
 <sup><a href='/src/Snippets/PushDelegate.cs#L1-L23' title='File snippet `PushDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushDelegate.cs' title='Navigate to start of snippet `PushDelegate.cs`'>anchor</a></sup>
 <!-- endSnippet -->
+
 
 ## Foreground Monitoring
 It is quite often that you may want to change data due to a silent notification being received.  This is similar to watching a SignalR broadcast, but with observables because RX is awesome and Shiny dies on the RX hill!
