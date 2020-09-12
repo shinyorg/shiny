@@ -29,7 +29,7 @@ namespace Shiny.Locations
                 try
                 {
                     if (this.CurrentListener.UseBackground)
-                        await this.StartListener(this.CurrentListener);
+                        await this.StartListenerInternal(this.CurrentListener);
                     else
                         this.CurrentListener = null;
                 }
@@ -86,8 +86,28 @@ namespace Shiny.Locations
         public async Task StartListener(GpsRequest request)
         {
             if (this.CurrentListener != null)
-                return;
+                throw new ArgumentException("There is already an active GPS listener");
 
+            await this.StartListenerInternal(request);
+        }
+
+
+        public Task StopListener()
+        {
+            if (this.CurrentListener != null)
+            {
+#if __IOS__
+                this.locationManager.AllowsBackgroundLocationUpdates = false;
+#endif
+                this.locationManager.StopUpdatingLocation();
+                this.CurrentListener = null;
+            }
+            return Task.CompletedTask;
+        }
+
+
+        protected virtual async Task StartListenerInternal(GpsRequest request)
+        {
             var access = await this.RequestAccess(request);
             access.Assert();
             this.gdelegate.Request = request;
@@ -133,21 +153,6 @@ namespace Shiny.Locations
             this.locationManager.StartUpdatingLocation();
             this.CurrentListener = request;
         }
-
-
-        public Task StopListener()
-        {
-            if (this.CurrentListener != null)
-            {
-#if __IOS__
-                this.locationManager.AllowsBackgroundLocationUpdates = false;
-#endif
-                this.locationManager.StopUpdatingLocation();
-                this.CurrentListener = null;
-            }
-            return Task.CompletedTask;
-        }
-
 
         public IObservable<IGpsReading> WhenReading() => this.gdelegate.WhenGps();
     }

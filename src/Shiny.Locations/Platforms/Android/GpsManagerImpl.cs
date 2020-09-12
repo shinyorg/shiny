@@ -30,7 +30,7 @@ namespace Shiny.Locations
             if (this.CurrentListener != null)
             {
                 if (this.CurrentListener.UseBackground)
-                    await this.StartListener(this.CurrentListener);
+                    await this.StartListenerInternal(this.CurrentListener);
                 else
                     this.CurrentListener = null;
             }
@@ -97,29 +97,7 @@ namespace Shiny.Locations
             if (this.CurrentListener != null)
                 return;
 
-            request = request ?? new GpsRequest();
-            var access = await this.RequestAccess(request);
-            access.Assert();
-
-            var nativeRequest = LocationRequest
-                .Create()
-                .SetPriority(GetPriority(request.Priority))
-                .SetInterval(request.Interval.ToMillis());
-
-            if (request.ThrottledInterval != null)
-                nativeRequest.SetFastestInterval(request.ThrottledInterval.Value.ToMillis());
-
-            if (request.MinimumDistance != null)
-                nativeRequest.SetSmallestDisplacement((float)request.MinimumDistance.TotalMeters);
-
-            await this.client.RequestLocationUpdatesAsync(
-                nativeRequest,
-                this.GetPendingIntent() // used for background - should switch to LocationCallback for foreground
-            );
-            if (request.UseBackground && !ShinyGpsService.IsStarted)
-                this.context.StartService(typeof(ShinyGpsService), true);
-
-            this.CurrentListener = request;
+            await this.StartListenerInternal(request);
         }
 
 
@@ -149,6 +127,33 @@ namespace Shiny.Locations
             );
         }
 
+
+        protected virtual async Task StartListenerInternal(GpsRequest request)
+        {
+            request = request ?? new GpsRequest();
+            var access = await this.RequestAccess(request);
+            access.Assert();
+
+            var nativeRequest = LocationRequest
+                .Create()
+                .SetPriority(GetPriority(request.Priority))
+                .SetInterval(request.Interval.ToMillis());
+
+            if (request.ThrottledInterval != null)
+                nativeRequest.SetFastestInterval(request.ThrottledInterval.Value.ToMillis());
+
+            if (request.MinimumDistance != null)
+                nativeRequest.SetSmallestDisplacement((float)request.MinimumDistance.TotalMeters);
+
+            await this.client.RequestLocationUpdatesAsync(
+                nativeRequest,
+                this.GetPendingIntent() // used for background - should switch to LocationCallback for foreground
+            );
+            if (request.UseBackground && !ShinyGpsService.IsStarted)
+                this.context.StartService(typeof(ShinyGpsService), true);
+
+            this.CurrentListener = request;
+        }
 
         protected static int GetPriority(GpsPriority priority)
         {

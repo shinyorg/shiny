@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		azure-pipelines.yml = azure-pipelines.yml
+		build.cake = build.cake
 		src\Directory.build.props = src\Directory.build.props
 		global.json = global.json
 		LICENSE.md = LICENSE.md
@@ -93,7 +94,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.DataSync", "src\Shiny
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Beacons.Advertising", "src\Shiny.Beacons.Advertising\Shiny.Beacons.Advertising.csproj", "{3BEB7826-FE50-4281-9355-5083048E9EEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Push.OneSignal", "src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj", "{3F684BAA-2352-48D3-8DDD-665E00C8785F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.OneSignal", "src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj", "{3F684BAA-2352-48D3-8DDD-665E00C8785F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
