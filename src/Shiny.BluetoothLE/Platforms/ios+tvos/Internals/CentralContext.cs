@@ -11,9 +11,9 @@ namespace Shiny.BluetoothLE.Internals
 {
     public class CentralContext : CBCentralManagerDelegate
     {
+        static CBCentralManager staticManager;
         readonly ConcurrentDictionary<string, IPeripheral> peripherals = new ConcurrentDictionary<string, IPeripheral>();
         readonly IServiceProvider services;
-
 
         public CentralContext(IServiceProvider services, BleConfiguration config)
         {
@@ -33,7 +33,21 @@ namespace Shiny.BluetoothLE.Internals
             if (!config.iOSRestoreIdentifier.IsEmpty())
                 opts.RestoreIdentifier = config.iOSRestoreIdentifier;
 
-            this.Manager = new CBCentralManager(this, null, opts);
+            if (config.iOSSharedManagerWithinProcess)
+            {
+                if (staticManager == null)
+                {
+                    staticManager = new CBCentralManager(this, null, opts);
+                }
+                else
+                {
+                    staticManager.Delegate = this;
+                }
+                this.Manager = staticManager;
+            } else
+            {
+                this.Manager = new CBCentralManager(this, null, opts);
+            }
         }
 
 

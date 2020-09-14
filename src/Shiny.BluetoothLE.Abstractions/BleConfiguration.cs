@@ -43,5 +43,10 @@ namespace Shiny.BluetoothLE
         /// CBCentralInitOptions restoration key for background restoration
         /// </summary>
         public string iOSRestoreIdentifier { get; set; } = "shinyble";
+
+        /// <summary>
+        /// Make sure that the CentralContext shares the same instance of CBCentralManager while in the same process
+        /// </summary>
+        public bool iOSSharedManagerWithinProcess { get; set; } = false;
     }
 }
