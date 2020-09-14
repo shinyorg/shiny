@@ -54,12 +54,14 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |Location Sync| [![LocationSyncNugetShield]][LocationSyncNuget] | [![LocationSyncMygetShield]][LocationSyncMyget] | Sync Geofence & GPS data to the server using Shiny best practices
 |Trip Tracker| [![TripTrackerNugetShield]][TripTrackerNuget] | [![TripTrackerMygetShield]][TripTrackerMyget] | Tracks your trips for automotive, cycling, running, and/or walking - includes the distance and all GPS coordinates throughout the trip
 |Media Sync| [![MediaSyncNugetShield]][MediaSyncNuget] | [![MediaSyncMygetShield]][MediaSyncMyget] | Sync your Android & iOS media gallery to the server using Shiny best practices
+|Data Sync| [![DataSyncNugetShield]][DataSyncNuget] | [![DataSyncMygetShield]][DataSyncMyget] | Sync your data to the server using Shiny best practices
 
 ## Integrations
 |Project|NuGet|MyGet|Description|
 |-------|-----|-----|-----------|
 |Azure Notifications Push| [![AzureHubPushNugetShield]][AzureHubPushNuget] | [![AzureHubPushMygetShield]][AzureHubPushMyget] | Push Integration for Azure Notification Hubs - Support for iOS, Android, & UWP
 |Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushMygetShield]][FirebasePushMyget] | Push Integration for Google Firebase - Support for iOS & Android
+|Amazon Web Services| [![AwsPushNugetShield]][AwsPushNuget] | [![AwsPushMygetShield]][AwsPushMyget] | Push Integration for AWS - Support for iOS & Android
 |SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] | Provides caching, logging, storage, & settings implementations
 |AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | Log errors to AppCenter
 
@@ -68,13 +70,6 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 |-------|-----|----|-----------|
 |Shiny.Prism|[![PrismNugetShield]][PrismNuget] | [GitHub](https://github.com/dansiegel/Prism.Container.Extensions) | Prism integration with Shiny maintained by Dan Siegel|
 
-## Roadmap
-* [Considering] VPN Client for Android, iOS, & UWP 
-* [Considering] Exposure Notification API for iOS & Android
-* [In-Progress] New Hosting Model based on Microsoft.Extensions.Hosting
-* [Considering] BluetoothLE Hosting Model similar to SignalR
-* [Considering] Boilerplate Source Generator
-* [Considering] BluetoothLE Client Generator (Similar to Refit for HTTP Client)
 
 ## Contributors
 * [Allan Ritchie](https://github.com/aritchie) - Project Lead
@@ -150,6 +145,11 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [PushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.svg
 [PushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push
 
+[AwsPushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.AwsSns.svg
+[AwsPushNuget]: https://www.nuget.org/packages/Shiny.Push.AwsSns/
+[AwsPushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.AwsSns.svg
+[AwsPushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.AwsSns
+
 [AzureHubPushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.AzureNotificationHubs.svg
 [AzureHubPushNuget]: https://www.nuget.org/packages/Shiny.Push.AzureNotificationHubs/
 [AzureHubPushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.AzureNotificationHubs.svg
@@ -169,6 +169,11 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 [MediaSyncNuget]: https://www.nuget.org/packages/Shiny.MediaSync/
 [MediaSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.MediaSync.svg
 [MediaSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.MediaSync
+
+[DataSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.DataSync.svg
+[DataSyncNuget]: https://www.nuget.org/packages/Shiny.DataSync/
+[DataSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.DataSync.svg
+[DataSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.DataSync
 
 [TripTrackerNugetShield]: https://img.shields.io/nuget/v/Shiny.TripTracker.svg
 [TripTrackerNuget]: https://www.nuget.org/packages/Shiny.TripTracker/
