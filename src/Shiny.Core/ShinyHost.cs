@@ -13,16 +13,6 @@ namespace Shiny
 {
     public abstract class ShinyHost
     {
-        internal static List<Action<IServiceProvider>> PostBuildActions { get; } = new List<Action<IServiceProvider>>();
-
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="action"></param>
-        public static void AddPostBuildAction(Action<IServiceProvider> action) => PostBuildActions.Add(action);
-
-
         /// <summary>
         /// Resolve a specified service from the container
         /// </summary>
@@ -32,7 +22,7 @@ namespace Shiny
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -44,7 +34,7 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IEnumerable<T> ResolveAll<T>() 
+        public static IEnumerable<T> ResolveAll<T>()
             => Container.GetServices<T>() ?? Enumerable.Empty<T>();
 
 
@@ -91,7 +81,6 @@ namespace Shiny
         {
             container = null;
             Services?.Clear();
-            PostBuildActions?.Clear();
         }
 
         /// <summary>
