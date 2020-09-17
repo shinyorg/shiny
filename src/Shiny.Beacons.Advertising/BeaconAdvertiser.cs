@@ -122,3 +122,29 @@ namespace Shiny.Beacons.Advertising
 //              mBuilder.addManufacturerData(224, mManufacturerData.array()); // using google's company ID
 //              mAdvertiseData = mBuilder.build();
 //          }
+
+
+
+
+/*
+ *  if (this.AdvertisedBeacon != null)
+        throw new ArgumentException("You are already advertising a beacon");
+
+    var settings = new AdvertiseSettings.Builder()
+        .SetAdvertiseMode(AdvertiseMode.Balanced)
+        .SetConnectable(false);
+
+    var adData = new AdvertiseData.Builder()
+        .AddManufacturerData(0x004C, beacon.ToIBeaconPacket(10)); // Apple
+
+    this.manager
+        .Adapter
+        .BluetoothLeAdvertiser
+        .StartAdvertising(
+            settings.Build(),
+            adData.Build(),
+            this.adCallbacks
+        );
+
+    this.AdvertisedBeacon = beacon;
+ */

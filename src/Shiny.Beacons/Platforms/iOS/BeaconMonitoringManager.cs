@@ -16,10 +16,10 @@ namespace Shiny.Beacons
         readonly BeaconLocationManagerDelegate gdelegate;
 
 
-        public BeaconMonitoringManager(IRepository repository)
+        public BeaconMonitoringManager(IServiceProvider services, IRepository repository)
         {
             this.repository = repository;
-            this.gdelegate = new BeaconLocationManagerDelegate();
+            this.gdelegate = new BeaconLocationManagerDelegate(services);
             this.manager = new CLLocationManager
             {
                 Delegate = this.gdelegate

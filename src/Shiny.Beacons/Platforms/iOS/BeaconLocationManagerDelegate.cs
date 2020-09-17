@@ -7,13 +7,13 @@ namespace Shiny.Beacons
 {
     public class BeaconLocationManagerDelegate : ShinyLocationDelegate
     {
-        readonly IBeaconMonitorDelegate bdelegate;
+        readonly IServiceProvider services;
         readonly Subject<Beacon> rangeSubject;
 
 
-        public BeaconLocationManagerDelegate()
+        public BeaconLocationManagerDelegate(IServiceProvider services)
         {
-            this.bdelegate = ShinyHost.Resolve<IBeaconMonitorDelegate>();
+            this.services = services;
             this.rangeSubject = new Subject<Beacon>();
         }
 
@@ -28,8 +28,9 @@ namespace Shiny.Beacons
                     native.ProximityUuid.ToGuid(),
                     native.Major.UInt16Value,
                     native.Minor.UInt16Value,
-                    //native.Accuracy,
-                    native.Proximity.FromNative()
+                    native.Proximity.FromNative(),
+                    (int)native.Rssi,
+                    native.Accuracy
                 ));
             }
         }
@@ -49,7 +50,9 @@ namespace Shiny.Beacons
                     native.Major?.UInt16Value,
                     native.Minor?.UInt16Value
                 );
-                await this.bdelegate?.OnStatusChanged(status, beaconRegion);
+                await this.services.RunDelegates<IBeaconMonitorDelegate>(
+                    x => x.OnStatusChanged(status, beaconRegion)
+                );
             }
         });
     }

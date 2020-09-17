@@ -5,12 +5,14 @@ namespace Shiny.Beacons
 {
     public class Beacon : IEquatable<Beacon>
     {
-        public Beacon(Guid uuid, ushort major, ushort minor, Proximity proximity)
+        public Beacon(Guid uuid, ushort major, ushort minor, Proximity proximity, int rssi, double accuracy)
         {
             this.Uuid = uuid;
             this.Major = major;
             this.Minor = minor;
             this.Proximity = proximity;
+            this.Rssi = rssi;
+            this.Accuracy = accuracy;
         }
 
 
@@ -18,6 +20,8 @@ namespace Shiny.Beacons
         public ushort Minor { get; }
         public ushort Major { get; }
         public Proximity Proximity { get; }
+        public int Rssi { get; }
+        public double Accuracy { get; }
 
 
         public override string ToString() => $"[Beacon: Uuid={this.Uuid}, Major={this.Major}, Minor={this.Minor}]";

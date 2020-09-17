@@ -16,6 +16,7 @@ namespace Shiny.Beacons
             return uuid;
         }
 
+
         public static CLBeaconRegion ToNative(this BeaconRegion region)
         {
             var uuid = ToNsUuid(region);

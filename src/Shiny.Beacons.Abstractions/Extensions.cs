@@ -47,17 +47,6 @@ namespace Shiny.Beacons
         /// <param name="rssi">Rssi.</param>
         public static Beacon Parse(this byte[] data, int rssi)
         {
-            //var uuidString = BitConverter.ToString(data, 4, 16).Replace("-", String.Empty);
-            //var uuid = new Guid(uuidString);
-            //var major = BitConverter.ToUInt16(data.Skip(20).Take(2).Reverse().ToArray(), 0);
-            //var minor = BitConverter.ToUInt16(data.Skip(22).Take(2).Reverse().ToArray(), 0);
-            //var txpower = data[24];
-            //var accuracy = CalculateAccuracy(txpower, rssi);
-            //var proximity = CalculateProximity(accuracy);
-
-            //return new Beacon(uuid, major, minor, accuracy, proximity);
-            //Console.WriteLine("Beacon Packet: " + data.ToHex());
-
             if (BitConverter.IsLittleEndian)
             {
                 var uuidString = BitConverter.ToString(data, 2, 16).Replace("-", String.Empty);
@@ -69,7 +58,7 @@ namespace Shiny.Beacons
                 //var proximity = CalculateProximity(accuracy);
                 var proximity = CalculateProximity(txpower, rssi);
 
-                return new Beacon(uuid, major, minor, proximity);
+                return new Beacon(uuid, major, minor, proximity, rssi, 0);
             }
             throw new ArgumentException("TODO");
         }
