@@ -7,7 +7,6 @@ namespace Shiny.Beacons
 {
     public static class Extensions
     {
-
         public static bool TrySetBeaconNotificationConfiguration(this IBeaconMonitoringManager manager, string? title = null, string? description = null, string? tickerText = null)
         {
             var config = manager as IBeaconMonitoringNotificationConfiguration;
@@ -20,6 +19,7 @@ namespace Shiny.Beacons
 
             return true;
         }
+
 
         public static bool IsBeaconInRegion(this BeaconRegion region, Beacon beacon)
         {
@@ -54,11 +54,11 @@ namespace Shiny.Beacons
                 var major = BitConverter.ToUInt16(data.Skip(18).Take(2).Reverse().ToArray(), 0);
                 var minor = BitConverter.ToUInt16(data.Skip(20).Take(2).Reverse().ToArray(), 0);
                 var txpower = data[22];
-                //var accuracy = CalculateAccuracy(txpower, rssi);
+                var accuracy = CalculateAccuracy(txpower, rssi);
                 //var proximity = CalculateProximity(accuracy);
                 var proximity = CalculateProximity(txpower, rssi);
 
-                return new Beacon(uuid, major, minor, proximity, rssi, 0);
+                return new Beacon(uuid, major, minor, proximity, rssi, accuracy);
             }
             throw new ArgumentException("TODO");
         }
@@ -71,17 +71,6 @@ namespace Shiny.Beacons
         public static Proximity CalculateProximity(int txpower, double rssi)
         {
             var distance = Math.Pow(10d, (txpower * -1 - rssi) / 20);
-            Console.WriteLine("Distance: " + distance);
-            //if (accuracy < 0)
-            //    return Proximity.Unknown;
-
-            //if (accuracy < 0.5)
-            //    return Proximity.Immediate;
-
-            //if (accuracy <= 4.0)
-            //    return Proximity.Near;
-
-            //return Proximity.Far;
             if (distance >= 6E-6d)
                 return Proximity.Far;
 
@@ -89,6 +78,25 @@ namespace Shiny.Beacons
                 return Proximity.Near;
 
             return Proximity.Immediate;
+        }
+
+
+        public static double CalculateAccuracy(int txPower, double rssi)
+        {
+            var accuracy = -1.0;
+            if (rssi > 0)
+            {
+                var ratio = rssi * 1.0 / txPower;
+                if (ratio < 1.0)
+                {
+                    accuracy = Math.Pow(ratio, 10);
+                }
+                else
+                {
+                    accuracy = 0.89976 * Math.Pow(ratio, 7.7095) + 0.111;
+                }
+            }
+            return accuracy;
         }
 
 
