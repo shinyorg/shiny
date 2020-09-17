@@ -14,10 +14,10 @@ namespace Shiny
     //}
 
 
-    public static class ServiceCollectionExtensions
+    public static class Extensions_ServiceCollection
     {
         readonly static IDictionary<IServiceCollection, List<IShinyModule>> modules = new Dictionary<IServiceCollection, List<IShinyModule>>();
-        readonly static IDictionary<IServiceCollection, List<Action<IServiceProvider>>> postBuild = new Dictionary<IServiceCollection, List<Action>>();
+        readonly static IDictionary<IServiceCollection, List<Action<IServiceProvider>>> postBuild = new Dictionary<IServiceCollection, List<Action<IServiceProvider>>>();
 
 
 
@@ -47,6 +47,9 @@ namespace Shiny
             var exists = modules.Any(x => x.GetType() == module.GetType());
             if (!exists)
             {
+                if (!modules.ContainsKey(services))
+                    modules.Add(services, new List<IShinyModule>());
+
                 modules[services].Add(module);
             }
         }
@@ -72,13 +75,20 @@ namespace Shiny
             => requiredService ? serviceProvider.GetRequiredService<T>() : serviceProvider.GetService<T>();
 
 
-        public static IServiceProvider BuildShinyContainer(this IServiceCollection services, bool validateScopes)
+        public static IServiceProvider BuildShinyContainer(this IServiceCollection services, bool validateScopes, Func<IServiceCollection, IServiceProvider>? containerBuild)
         {
             var mods = modules[services]?.AsEnumerable() ?? Enumerable.Empty<IShinyModule>();
             foreach (var mod in mods)
                 mod.Register(services);
 
-            var provider = services.CreateServiceProvider(validateScopes);
+            var provider = containerBuild?.Invoke(services) ?? services.BuildServiceProvider(validateScopes);
+            foreach (var mod in mods)
+                mod.OnContainerReady(provider);
+
+            var actions = postBuild[services]?.AsEnumerable() ?? Enumerable.Empty<Action<IServiceProvider>>();
+            foreach (var action in actions)
+                action(provider);
+
             return provider;
         }
     }

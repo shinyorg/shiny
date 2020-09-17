@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -100,9 +101,7 @@ namespace Shiny
             services.TryAddSingleton<ISerializer, ShinySerializer>();
 
             Services = services;
-
-            container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider(ValidateScopes);
-            services.RunPostBuildActions(container);
+            container = services.BuildShinyContainer(ValidateScopes, s => startup?.CreateServiceProvider(s));
             startup?.ConfigureApp(container);
         }
 

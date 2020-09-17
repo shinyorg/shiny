@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    public static class ServiceProviderExtensions
+    public static class Extensions_ServiceProvider
     {
         /// <summary>
         /// Attempts to resolve or build an instance from a service provider

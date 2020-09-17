@@ -32,7 +32,7 @@ namespace Shiny
                 }
             }
         }
-     
+
 
         /// <summary>
         /// Turns a paired key tuple into a dictionary
