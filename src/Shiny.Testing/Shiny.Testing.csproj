@@ -15,6 +15,10 @@
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
+        <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Beacons\" />
+    </ItemGroup>
 </Project>
