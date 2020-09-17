@@ -75,10 +75,13 @@ namespace Shiny
                 ? modules[services]
                 : new List<IShinyModule>(0);
 
+            // modules should run per registration - since the module often registers the delegate and there can be multiples
             foreach (var mod in mods)
                 mod.Register(services);
 
             var provider = containerBuild?.Invoke(services) ?? services.BuildServiceProvider(validateScopes);
+
+            // module events should run once per type (not per registration)
             foreach (var mod in mods)
                 mod.OnContainerReady(provider);
 
