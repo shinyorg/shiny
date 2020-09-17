@@ -30,26 +30,6 @@ namespace Shiny.Tests.Infrastructure
 
 
         [Fact]
-        public void ModuleRunsOnce()
-        {
-            var reg = 0;
-            var post = 0;
-
-            var module = new TestModule(
-                () => reg++,
-                () => post++
-            );
-            Create(null, s =>
-            {
-                s.RegisterModule(module);
-                s.RegisterModule(module);
-            });
-            reg.Should().Be(1);
-            post.Should().Be(1);
-        }
-
-
-        [Fact]
         public void PostBuildRunsOnlyOnItsContainer()
         {
             var reg1 = 0;

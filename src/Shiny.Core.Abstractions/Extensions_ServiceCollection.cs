@@ -42,14 +42,10 @@ namespace Shiny
         /// <param name="module"></param>
         public static void RegisterModule(this IServiceCollection services, IShinyModule module)
         {
-            var exists = modules.Any(x => x.GetType() == module.GetType());
-            if (!exists)
-            {
-                if (!modules.ContainsKey(services))
-                    modules.Add(services, new List<IShinyModule>());
+            if (!modules.ContainsKey(services))
+                modules.Add(services, new List<IShinyModule>());
 
-                modules[services].Add(module);
-            }
+            modules[services].Add(module);
         }
 
 
