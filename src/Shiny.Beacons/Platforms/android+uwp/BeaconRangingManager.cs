@@ -20,6 +20,7 @@ namespace Shiny.Beacons
         public Task<AccessState> RequestAccess() => this.centralManager.RequestAccess().ToTask();
         public IObservable<Beacon> WhenBeaconRanged(BeaconRegion region) => this.beaconScanner ??= this.centralManager
             .ScanForBeacons(false)
+            .Where(region.IsBeaconInRegion)
             .Publish()
             .RefCount();
     }
