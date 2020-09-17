@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -75,9 +73,12 @@ namespace Shiny
             => requiredService ? serviceProvider.GetRequiredService<T>() : serviceProvider.GetService<T>();
 
 
-        public static IServiceProvider BuildShinyContainer(this IServiceCollection services, bool validateScopes, Func<IServiceCollection, IServiceProvider>? containerBuild)
+        public static IServiceProvider BuildShinyServiceProvider(this IServiceCollection services, bool validateScopes, Func<IServiceCollection, IServiceProvider>? containerBuild = null)
         {
-            var mods = modules[services]?.AsEnumerable() ?? Enumerable.Empty<IShinyModule>();
+            var mods = modules.ContainsKey(services)
+                ? modules[services]
+                : new List<IShinyModule>(0);
+
             foreach (var mod in mods)
                 mod.Register(services);
 
@@ -85,7 +86,10 @@ namespace Shiny
             foreach (var mod in mods)
                 mod.OnContainerReady(provider);
 
-            var actions = postBuild[services]?.AsEnumerable() ?? Enumerable.Empty<Action<IServiceProvider>>();
+            var actions = postBuild.ContainsKey(services)
+                ? postBuild[services]
+                : new List<Action<IServiceProvider>>(0);
+
             foreach (var action in actions)
                 action(provider);
 

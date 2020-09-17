@@ -8,10 +8,7 @@ using Shiny.Logging;
 
 namespace Shiny
 {
-
-
-
-    public static class ServiceExtensions
+    public static class ServiceProviderExtensions
     {
         /// <summary>
         ///

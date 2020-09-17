@@ -101,7 +101,7 @@ namespace Shiny
             services.TryAddSingleton<ISerializer, ShinySerializer>();
 
             Services = services;
-            container = services.BuildShinyContainer(ValidateScopes, s => startup?.CreateServiceProvider(s));
+            container = services.BuildShinyServiceProvider(ValidateScopes, s => startup?.CreateServiceProvider(s));
             startup?.ConfigureApp(container);
         }
 

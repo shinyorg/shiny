@@ -12,7 +12,7 @@ namespace Shiny.Tests.Infrastructure
 {
     public class DependencyInjectionTests
     {
-        static IServiceProvider Create(Action<TestSettings> addSettings = null)
+        static IServiceProvider Create(Action<TestSettings> addSettings = null, Action<IServiceCollection> addServices = null)
         {
             var serializer = new ShinySerializer();
             var settings = new TestSettings(serializer);
@@ -22,9 +22,56 @@ namespace Shiny.Tests.Infrastructure
             services.AddSingleton<IFullService, FullService>();
             services.AddSingleton<ISerializer>(serializer);
             services.AddSingleton<ISettings>(settings);
-            var sp = services.BuildServiceProvider();
-            services.RunPostBuildActions(sp);
+            addServices?.Invoke(services);
+
+            var sp = services.BuildShinyServiceProvider(true);
             return sp;
+        }
+
+
+        [Fact]
+        public void ModuleRunsOnce()
+        {
+            var reg = 0;
+            var post = 0;
+
+            var module = new TestModule(
+                () => reg++,
+                () => post++
+            );
+            Create(null, s =>
+            {
+                s.RegisterModule(module);
+                s.RegisterModule(module);
+            });
+            reg.Should().Be(1);
+            post.Should().Be(1);
+        }
+
+
+        [Fact]
+        public void PostBuildRunsOnlyOnItsContainer()
+        {
+            var reg1 = 0;
+            var reg2 = 0;
+            var post1 = 0;
+            var post2 = 0;
+
+            var module1 = new TestModule(
+                () => reg1++,
+                () => post1++
+            );
+            var module2 = new TestModule(
+                () => reg2++,
+                () => post2++
+            );
+            Create(null, s => s.RegisterModule(module1));
+            Create(null, s => s.RegisterModule(module2));
+            reg1.Should().Be(1);
+            reg2.Should().Be(1);
+
+            post1.Should().Be(1);
+            post2.Should().Be(1);
         }
 
 
