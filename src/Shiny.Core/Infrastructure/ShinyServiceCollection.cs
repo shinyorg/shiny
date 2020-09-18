@@ -99,5 +99,6 @@ namespace Shiny.Infrastructure.DependencyInjection
         public bool Remove(ServiceDescriptor item) => this.services.Remove(item);
         public void RemoveAt(int index) => this.services.RemoveAt(index);
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        public override int GetHashCode() => this.services.GetHashCode();
     }
 }

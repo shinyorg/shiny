@@ -6,17 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    //public class LazyService<T> : Lazy<T>
-    //{
-    //    public LazyService(IServiceProvider services) : base(() => services.GetRequiredService<T>(), false) { }
-    //}
-
-
     public static class Extensions_ServiceCollection
     {
-        readonly static IDictionary<IServiceCollection, List<IShinyModule>> modules = new Dictionary<IServiceCollection, List<IShinyModule>>();
-        readonly static IDictionary<IServiceCollection, List<Action<IServiceProvider>>> postBuild = new Dictionary<IServiceCollection, List<Action<IServiceProvider>>>();
-
+        readonly static IDictionary<int, List<IShinyModule>> modules = new Dictionary<int, List<IShinyModule>>();
+        readonly static IDictionary<int, List<Action<IServiceProvider>>> postBuild = new Dictionary<int, List<Action<IServiceProvider>>>();
 
 
         /// <summary>
@@ -26,14 +19,12 @@ namespace Shiny
         /// <param name="action"></param>
         public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
         {
-            if (!postBuild.ContainsKey(services))
-                postBuild.Add(services, new List<Action<IServiceProvider>>());
-            postBuild[services].Add(action);
+            var hash = services.GetHashCode();
+            if (!postBuild.ContainsKey(hash))
+                postBuild.Add(hash, new List<Action<IServiceProvider>>());
+            postBuild[hash].Add(action);
         }
 
-
-        //public static void AddLazySingleton<TService, TImpl>(this IServiceCollection services)
-        //    => services.AddSingleton<Lazy<TService>, LazyService<TImpl>>();
 
         /// <summary>
         /// Register a module (like a category) of services
@@ -42,10 +33,17 @@ namespace Shiny
         /// <param name="module"></param>
         public static void RegisterModule(this IServiceCollection services, IShinyModule module)
         {
-            if (!modules.ContainsKey(services))
-                modules.Add(services, new List<IShinyModule>());
+            var hash = services.GetHashCode();
+            if (!modules.ContainsKey(hash))
+                modules.Add(hash, new List<IShinyModule>());
 
-            modules[services].Add(module);
+            // modules should run per registration - since the module often registers the delegate and there can be multiples
+            // module events should run once per type (not per registration)
+            var exists = modules[hash].Any(x => x.GetType() == module.GetType());
+            modules[hash].Add(module);
+
+            if (!exists)
+                services.RegisterPostBuildAction(module.OnContainerReady);
         }
 
 
@@ -71,26 +69,16 @@ namespace Shiny
 
         public static IServiceProvider BuildShinyServiceProvider(this IServiceCollection services, bool validateScopes, Func<IServiceCollection, IServiceProvider>? containerBuild = null)
         {
-            var mods = modules.ContainsKey(services)
-                ? modules[services]
-                : new List<IShinyModule>(0);
+            var hash = services.GetHashCode();
 
-            // modules should run per registration - since the module often registers the delegate and there can be multiples
-            foreach (var mod in mods)
-                mod.Register(services);
+            if (modules.ContainsKey(hash))
+                foreach (var module in modules[hash])
+                    module.Register(services);
 
             var provider = containerBuild?.Invoke(services) ?? services.BuildServiceProvider(validateScopes);
-
-            // module events should run once per type (not per registration)
-            foreach (var mod in mods)
-                mod.OnContainerReady(provider);
-
-            var actions = postBuild.ContainsKey(services)
-                ? postBuild[services]
-                : new List<Action<IServiceProvider>>(0);
-
-            foreach (var action in actions)
-                action(provider);
+            if (postBuild.ContainsKey(hash))
+                foreach (var action in postBuild[hash])
+                    action(provider);
 
             return provider;
         }
