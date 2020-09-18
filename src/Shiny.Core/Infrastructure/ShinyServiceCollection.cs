@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Settings;
 
@@ -12,16 +11,6 @@ namespace Shiny.Infrastructure.DependencyInjection
     public class ShinyServiceCollection : IServiceCollection
     {
         readonly ServiceCollection services = new ServiceCollection();
-
-
-        public void RunPostBuildActions(IServiceProvider container)
-        {
-            var actions = ShinyHost.PostBuildActions.ToList();
-            foreach (var action in actions)
-                action(container);
-
-            ShinyHost.PostBuildActions.Clear();
-        }
 
 
         void AddItem(ServiceDescriptor descriptor) => ((ICollection<ServiceDescriptor>)this.services).Add(descriptor);
@@ -91,16 +80,6 @@ namespace Shiny.Infrastructure.DependencyInjection
         }
 
 
-        static bool IsStartupTask(ServiceDescriptor service)
-        {
-            if (service.ImplementationType == null)
-                return false;
-
-            var i = service.ImplementationType.GetInterface(typeof(IShinyStartupTask).FullName);
-            return i != null;
-        }
-
-
         public ServiceDescriptor this[int index]
         {
             get => this.services[index];
@@ -120,5 +99,6 @@ namespace Shiny.Infrastructure.DependencyInjection
         public bool Remove(ServiceDescriptor item) => this.services.Remove(item);
         public void RemoveAt(int index) => this.services.RemoveAt(index);
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        public override int GetHashCode() => this.services.GetHashCode();
     }
 }

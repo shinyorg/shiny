@@ -28,6 +28,7 @@ namespace Shiny.TripTracker.Tests
         public TripTrackerGpsDelegateTests()
         {
             this.manager = new Mock<ITripTrackerManager>();
+            this.settings = new Mock<ISettings>();
             this.activityManager = new Mock<IMotionActivityManager>();
             this.data = new Mock<IDataService>();
 

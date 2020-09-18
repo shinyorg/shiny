@@ -11,7 +11,7 @@ namespace Shiny.Tests.Repositories
     public class TestModel
     {
         public string Value1 { get; set; }
-        public Type Value2 { get; set; }
+        public int Value2 { get; set; }
     }
 
 
@@ -30,10 +30,12 @@ namespace Shiny.Tests.Repositories
         public async Task PersistTests()
         {
             var repo1 = this.Create();
+            var num = new Random().Next(1, 9999);
+
             await repo1.Set("value1", new TestModel
             {
                 Value1 = "value1",
-                Value2 = typeof(FileSystemRepositoryTests)
+                Value2 = num
             });
 
             var repo2 = this.Create();
@@ -41,7 +43,7 @@ namespace Shiny.Tests.Repositories
 
             obj.Should().NotBeNull();
             obj.Value1.Should().Be("value1");
-            obj.Value2.Should().Be<FileSystemRepositoryTests>();
+            obj.Value2.Should().Be(num);
         }
 
 
