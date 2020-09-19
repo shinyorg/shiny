@@ -8,8 +8,8 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <PackageReference Include="AWSSDK.CognitoIdentity" Version="3.5.0.16" />
-        <PackageReference Include="AWSSDK.MobileAnalytics" Version="3.5.0.16" />
+        <PackageReference Include="AWSSDK.CognitoIdentity" Version="3.5.0.17" />
+        <PackageReference Include="AWSSDK.MobileAnalytics" Version="3.5.0.17" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
