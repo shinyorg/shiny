@@ -42,7 +42,7 @@ namespace Shiny.Tests.Serialization
         //}
 
 
-        protected void RunTest<U>(U obj, Action<U> postAction = null)
+        protected void RunTest(T obj, Action<T> postAction = null)
         {
             var serializer = this.Create();
             var value = serializer.Serialize(obj);
