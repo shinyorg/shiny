@@ -37,27 +37,6 @@ namespace Shiny.Tests.Infrastructure
 
 
         [Fact]
-        public void RegisterModuleTwiceButEventOnce()
-        {
-            var reg1 = 0;
-            var post1 = 0;
-
-            var module1 = new TestModule(
-                () => reg1++,
-                () => post1++
-            );
-            Create(null, s =>
-            {
-                s.RegisterModule(module1);
-                s.RegisterModule(module1);
-                s.RegisterModule(module1);
-            });
-            reg1.Should().Be(3);
-            post1.Should().Be(1);
-        }
-
-
-        [Fact]
         public void PostBuildRunsOnlyOnItsContainer()
         {
             var reg1 = 0;
