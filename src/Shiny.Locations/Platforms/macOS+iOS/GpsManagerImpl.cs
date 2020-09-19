@@ -113,7 +113,7 @@ namespace Shiny.Locations
             this.gdelegate.Request = request;
 #if __IOS__
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
-            var throttledInterval = request.ThrottledInterval?.TotalMilliseconds ?? 0;
+            var throttledInterval = request.ThrottledInterval?.TotalSeconds ?? 0;
             var minDistance = request.MinimumDistance?.TotalMeters ?? 0;
 
             if (throttledInterval > 0 || minDistance > 0)

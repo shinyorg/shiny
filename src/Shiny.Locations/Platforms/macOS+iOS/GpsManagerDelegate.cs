@@ -30,7 +30,7 @@ namespace Shiny.Locations
 #if __IOS__
                 manager.AllowDeferredLocationUpdatesUntil(
                     this.Request.MinimumDistance?.TotalMeters ?? 0,
-                    this.Request.ThrottledInterval?.TotalMilliseconds ?? 0
+                    this.Request.ThrottledInterval?.TotalSeconds ?? 0
                 );
 #endif
                 this.deferringUpdates = true;
@@ -40,7 +40,9 @@ namespace Shiny.Locations
 
 
         public override void DeferredUpdatesFinished(CLLocationManager manager, NSError error)
-            => this.deferringUpdates = false;
+        {
+            this.deferringUpdates = false;
+        }
 
 
         void InvokeChanges(CLLocation[] locations) => Dispatcher.ExecuteBackgroundTask(async () =>
