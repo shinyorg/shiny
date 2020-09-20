@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Settings;
 
@@ -64,7 +65,11 @@ namespace Shiny.Infrastructure.DependencyInjection
                 services.RegisterPostBuildAction(sp =>
                 {
                     var resolveType = service.ServiceType ?? service.ImplementationType;
-                    ((IShinyStartupTask)sp.GetService(resolveType)).Start();
+                    var impl = sp
+                        .GetServices(resolveType)
+                        .First(x => x.GetType() == service.ImplementationType);
+
+                    ((IShinyStartupTask)impl).Start();
                 });
             }
         }
