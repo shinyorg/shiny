@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android;
+using Android.App;
 using Android.Nfc;
 using Android.Nfc.Tech;
+
+[assembly: UsesFeature("android.permission.NFC")]
 
 
 namespace Shiny.Nfc
@@ -68,18 +71,27 @@ namespace Shiny.Nfc
         });
 
 
+        readonly object syncLock = new object();
         public void OnTagDiscovered(Tag tag)
         {
             try
             {
+                //tag.GetId();
                 var ndef = Ndef.Get(tag);
                 if (ndef != null)
                 {
+                    lock (this.syncLock)
+                    {
+                        if (!ndef.IsConnected)
+                            ndef.Connect();
+                    }
                     //ndef.Type
                     //ndef.IsConnected
                     //ndef.IsWritable
                     var records = new List<NDefRecord>();
-                    foreach (var record in ndef.NdefMessage.GetRecords())
+                    var nativeRecords = ndef.NdefMessage?.GetRecords() ?? Array.Empty<NdefRecord>();
+
+                    foreach (var record in nativeRecords)
                     {
                         records.Add(new NDefRecord
                         {
@@ -109,6 +121,7 @@ namespace Shiny.Nfc
                 this.recordSubj.OnError(ex);
             }
         }
+
 
         public NdefMessage CreateNdefMessage(NfcEvent e)
         {
