@@ -16,33 +16,33 @@ namespace Shiny.Nfc
     //https://developer.android.com/guide/topics/connectivity/nfc/nfc.html
     public class NfcManager : Java.Lang.Object,
                               NfcAdapter.IReaderCallback,
-                              NfcAdapter.ICreateNdefMessageCallback,
-                              NfcAdapter.IOnNdefPushCompleteCallback,
+                              //NfcAdapter.ICreateNdefMessageCallback,
+                              //NfcAdapter.IOnNdefPushCompleteCallback,
                               INfcManager
     {
         readonly AndroidContext context;
         readonly Subject<NDefRecord[]> recordSubj;
-        readonly Subject<PushState> publishSubj;
-        Func<NDefRecord>? recordFunc;
+        //readonly Subject<PushState> publishSubj;
+        //Func<NDefRecord>? recordFunc;
 
 
         public NfcManager(AndroidContext context)
         {
             this.context = context;
             this.recordSubj = new Subject<NDefRecord[]>();
-            this.publishSubj = new Subject<PushState>();
+            //this.publishSubj = new Subject<PushState>();
         }
 
-        public IObservable<PushState> Publish(NDefRecord record) => this.Publish(() => record);
-        public IObservable<PushState> Publish(Func<NDefRecord> pushFunc) => Observable.Create<PushState>(ob =>
-        {
-            this.recordFunc = pushFunc;
-            var adapter = NfcAdapter.GetDefaultAdapter(this.context.AppContext);
-            adapter.SetNdefPushMessage(null, this.context.CurrentActivity);
-            adapter.SetNdefPushMessageCallback(this, this.context.CurrentActivity);
-            adapter.SetOnNdefPushCompleteCallback(this, this.context.CurrentActivity);
-            return this.publishSubj.Subscribe(ob.OnNext);
-        });
+        //public IObservable<PushState> Publish(NDefRecord record) => this.Publish(() => record);
+        //public IObservable<PushState> Publish(Func<NDefRecord> pushFunc) => Observable.Create<PushState>(ob =>
+        //{
+        //    this.recordFunc = pushFunc;
+        //    var adapter = NfcAdapter.GetDefaultAdapter(this.context.AppContext);
+        //    adapter.SetNdefPushMessage(null, this.context.CurrentActivity);
+        //    adapter.SetNdefPushMessageCallback(this, this.context.CurrentActivity);
+        //    adapter.SetOnNdefPushCompleteCallback(this, this.context.CurrentActivity);
+        //    return this.publishSubj.Subscribe(ob.OnNext);
+        //});
 
         public IObservable<AccessState> RequestAccess()
             => this.context.RequestAccess(Manifest.Permission.Nfc);
@@ -81,30 +81,6 @@ namespace Shiny.Nfc
             {
                 adapter.DisableReaderMode(this.context.CurrentActivity);
                 sub?.Dispose();
-            };
-        });
-
-
-        public IObservable<NDefRecord[]> Reader() => Observable.Create<NDefRecord[]>(ob =>
-        {
-            var adapter = NfcAdapter.GetDefaultAdapter(this.context.AppContext);
-            adapter.EnableReaderMode(
-                this.context.CurrentActivity,
-                this,
-                NfcReaderFlags.NfcA |
-                NfcReaderFlags.NfcB |
-                NfcReaderFlags.NfcBarcode |
-                NfcReaderFlags.NfcF |
-                NfcReaderFlags.NfcV |
-                NfcReaderFlags.NoPlatformSounds,
-                new Android.OS.Bundle()
-            );
-            var sub = this.recordSubj.Subscribe(ob.OnNext);
-
-            return () =>
-            {
-                adapter.DisableReaderMode(this.context.CurrentActivity);
-                sub.Dispose();
             };
         });
 
@@ -161,21 +137,21 @@ namespace Shiny.Nfc
         }
 
 
-        public NdefMessage CreateNdefMessage(NfcEvent e)
-        {
-            this.publishSubj.OnNext(PushState.Started);
-            var record = this.recordFunc.Invoke();
-            //NdefRecord.CreateExternal
-            //NdefRecord.CreateExternal()
-            //NdefRecord.CreateMime()
-            //NdefRecord.CreateTextRecord()
-            //NdefRecord.CreateUri()
-            //return new NdefMessage(new NdefRecord());
-            return null;
-        }
+        //public NdefMessage CreateNdefMessage(NfcEvent e)
+        //{
+        //    this.publishSubj.OnNext(PushState.Started);
+        //    var record = this.recordFunc.Invoke();
+        //    //NdefRecord.CreateExternal
+        //    //NdefRecord.CreateExternal()
+        //    //NdefRecord.CreateMime()
+        //    //NdefRecord.CreateTextRecord()
+        //    //NdefRecord.CreateUri()
+        //    //return new NdefMessage(new NdefRecord());
+        //    return null;
+        //}
 
 
-        public void OnNdefPushComplete(NfcEvent e)
-            => this.publishSubj.OnNext(PushState.Completed);
+        //public void OnNdefPushComplete(NfcEvent e)
+        //    => this.publishSubj.OnNext(PushState.Completed);
     }
 }

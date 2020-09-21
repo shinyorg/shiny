@@ -14,7 +14,7 @@ namespace Shiny.Nfc
     public class NfcManager : NFCNdefReaderSessionDelegate, INfcManager
     {
         readonly Subject<NDefRecord[]> recordSubj = new Subject<NDefRecord[]>();
-        readonly Subject<NSError> invalidSubj = new Subject<NSError>(); 
+        readonly Subject<NSError> invalidSubj = new Subject<NSError>();
 
 
         public override void DidDetect(NFCNdefReaderSession session, NFCNdefMessage[] messages)
@@ -61,7 +61,6 @@ namespace Shiny.Nfc
         }
 
 
-        
         public IObservable<NDefRecord[]> SingleRead() => this.DoRead(true);
         public IObservable<NDefRecord[]> ContinuousRead() => this.DoRead(false);
 
@@ -70,7 +69,6 @@ namespace Shiny.Nfc
         {
             var session = new NFCNdefReaderSession(this, DispatchQueue.CurrentQueue, true);
             var cancel = false;
-
 
             var invalidSub = this.invalidSubj.Subscribe(x =>
             {
