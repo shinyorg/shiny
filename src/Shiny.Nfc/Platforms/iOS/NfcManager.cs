@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreFoundation;
 using CoreNFC;
@@ -107,24 +104,22 @@ namespace Shiny.Nfc
             });
 
             session.BeginSession(); // begin initial session
-            var sub = this.recordSubj.Subscribe(
-                x =>
+            var sub = this.recordSubj.Subscribe(x =>
+            {
+                ob.OnNext(x);
+                if (singleRead)
                 {
-                    ob.OnNext(x);
-                    if (singleRead)
-                    {
-                        ob.OnCompleted();
-                    }
-                    else
-                    {
-                        session.InvalidateSession();
-
-                        // begin new session
-                        session = new NFCNdefReaderSession(this, DispatchQueue.CurrentQueue, true);
-                        session.BeginSession();
-                    }
+                    ob.OnCompleted();
                 }
-            );
+                else
+                {
+                    session.InvalidateSession();
+
+                    // begin new session
+                    session = new NFCNdefReaderSession(this, DispatchQueue.CurrentQueue, true);
+                    session.BeginSession();
+                }
+            });
             return () =>
             {
                 cancel = true;
