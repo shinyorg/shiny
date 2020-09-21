@@ -7,6 +7,7 @@ using Android.App;
 using Android.Nfc;
 using Android.Nfc.Tech;
 
+[assembly: UsesPermission(Manifest.Permission.Nfc)]
 [assembly: UsesFeature("android.permission.NFC")]
 
 
@@ -43,8 +44,45 @@ namespace Shiny.Nfc
             return this.publishSubj.Subscribe(ob.OnNext);
         });
 
-        public IObservable<AccessState> RequestAccess(bool forPublishing = false)
+        public IObservable<AccessState> RequestAccess()
             => this.context.RequestAccess(Manifest.Permission.Nfc);
+
+
+        public IObservable<NDefRecord[]> SingleRead() => this.DoRead(true);
+        public IObservable<NDefRecord[]> ContinuousRead() => this.DoRead(false);
+
+
+        protected virtual IObservable<NDefRecord[]> DoRead(bool singleRead) => Observable.Create<NDefRecord[]>(ob =>
+        {
+            var adapter = NfcAdapter.GetDefaultAdapter(this.context.AppContext);
+            adapter.EnableReaderMode(
+                this.context.CurrentActivity,
+                this,
+                NfcReaderFlags.NfcA |
+                NfcReaderFlags.NfcB |
+                NfcReaderFlags.NfcBarcode |
+                NfcReaderFlags.NfcF |
+                NfcReaderFlags.NfcV |
+                NfcReaderFlags.NoPlatformSounds,
+                new Android.OS.Bundle()
+            );
+
+            var sub = this.recordSubj.Subscribe(
+                x =>
+                {
+                    ob.OnNext(x);
+                    if (singleRead)
+                        ob.OnCompleted();
+                },
+                ob.OnError
+            );
+
+            return () =>
+            {
+                adapter.DisableReaderMode(this.context.CurrentActivity);
+                sub?.Dispose();
+            };
+        });
 
 
         public IObservable<NDefRecord[]> Reader() => Observable.Create<NDefRecord[]>(ob =>

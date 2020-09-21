@@ -1,12 +1,19 @@
 ﻿using System;
-using System.Threading.Tasks;
+
 
 namespace Shiny.Nfc
 {
     public interface INfcManager
     {
-        IObservable<AccessState> RequestAccess(bool forBroadcasting = false);
-        //IObservable<object> Broadcast();
-        IObservable<NDefRecord[]> Reader();
+        // TODO: cancel all reads external to methods
+        // TODO: listening status?
+        //IObservable<object> Write();
+
+        IObservable<AccessState> RequestAccess();
+        IObservable<NDefRecord[]> SingleRead();
+        IObservable<NDefRecord[]> ContinuousRead();
+
+        //IObservable<object> WriteUri(string uri);
+        //IObservable<object> Write(NfcPayloadType type, byte[] data);
     }
 }
