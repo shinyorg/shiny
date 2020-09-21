@@ -33,6 +33,9 @@
 ### Push
 * Firebase implementation is now released for iOS and Android  (Shiny.Push.FirebaseMessaging)
 
+### NFC
+* Full release
+
 ### Beacons
 * [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
 * [Android] Now uses a foreground service to maintain a continuous scan when using beacon monitoring

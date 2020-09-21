@@ -25,6 +25,7 @@ assignees: ''
  - [ ] Locations
  - [ ] HTTP Transfers
  - [ ] Notifications
+ - [ ] NFC
  - [ ] Push
  - [ ] Push - Azure Notification Hub
  - [ ] Push - Firebase
