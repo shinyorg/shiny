@@ -3,6 +3,7 @@
     <PropertyGroup>
         <Description>Shiny Near Field Communication (NFC)</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,4 +30,9 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\Uwp\**\*.cs" />
+    </ItemGroup>
 </Project>
