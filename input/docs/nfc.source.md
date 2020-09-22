@@ -9,3 +9,8 @@ Description: Near Field Communication
 |iOS|9|
 |Android|5|
 |UWP|16299|
+
+snippet: NfcStartup.cs
+
+
+snippet: NfcUsage.cs
