@@ -205,6 +205,9 @@ namespace Shiny.Notifications
 
         protected virtual void CreateChannel(Notification notification)
         {
+            if (!this.context.IsMinApiLevel(26))
+                return;
+
             var channelId = notification.Android.ChannelId;
             var channel = this.manager.GetNotificationChannel(channelId);
 
