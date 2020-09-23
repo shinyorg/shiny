@@ -1,5 +1,5 @@
 -------------------------
-Shiny.Mvvm
+Shiny.Bluetooth
 -------------------------
 
 GitHub: https://github.com/shinyorg/Shiny
