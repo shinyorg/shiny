@@ -113,7 +113,7 @@ namespace Shiny.Notifications
                 await this.repository.Set(notification.Id.ToString(), notification);
                 return;
             }
-            this.manager.Notify(notification.Id, native);
+            this.SendNative(notification.Id, native);
             await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification), false);
         }
 
@@ -192,11 +192,18 @@ namespace Shiny.Notifications
             if (notification.Android.Vibrate)
                 builder.SetVibrate(new long[] { 500, 500 });
 
-            this.CreateChannel(notification);
-            builder.SetChannelId(notification.Android.ChannelId);
+            if (this.context.IsMinApiLevel(26))
+            {
+                this.CreateChannel(notification);
+                builder.SetChannelId(notification.Android.ChannelId);
+            }
 
             return builder;
         }
+
+
+        public virtual void SendNative(int id, Android.App.Notification notification)
+            => this.manager.Notify(id, notification);
 
 
         public virtual Android.App.Notification CreateNativeNotification(Notification notification)
@@ -225,7 +232,7 @@ namespace Shiny.Notifications
                 this.manager.CreateNotificationChannel(channel);
             }
 
-            if (notification.Sound?.IsCustomSound() ?? false)
+            if (this.context.IsMinApiLevel(26) && (notification.Sound?.IsCustomSound() ?? false))
             {
                 var attributes = new AudioAttributes.Builder()
                     .SetUsage(AudioUsageKind.NotificationRingtone)

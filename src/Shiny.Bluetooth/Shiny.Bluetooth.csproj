@@ -1,0 +1,43 @@
+<Project Sdk="MSBuild.Sdk.Extras">
+
+    <PropertyGroup>
+        <Description>Shiny Reactive Bluetooth Plugin for client serial operations</Description>
+        <TargetFrameworks>netstandard2.0;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <Compile Remove="**\Platforms\**\*.cs" />
+        <None Include="**\Platforms\**\*.cs" />
+        <ProjectReference Include="..\Shiny.Bluetooth.Abstractions\Shiny.Bluetooth.Abstractions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\Uwp\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\Android\**\*.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Platforms\" />
+      <Folder Include="Platforms\Uwp\" />
+      <Folder Include="Platforms\Android\" />
+      <Folder Include="Platforms\Shared\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Platforms\Shared\ServiceCollectionExtensions.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
+</Project>
