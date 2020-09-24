@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 using Shiny.Locations;
 using Shiny.Logging;
 
@@ -20,7 +22,7 @@ namespace Shiny
 #if __ANDROID__
             services.AddSingleton<AndroidSqliteDatabase>();
 #endif
-            services.AddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
+            services.TryAddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
             if (requestPermissionOnStart)
             {
                 services.RegisterPostBuildAction(async sp =>
@@ -90,7 +92,7 @@ namespace Shiny
         /// <summary>
         /// This uses background GPS in realtime broadcasts to monitor geofences - DO NOT USE THIS IF YOU DON"T KNOW WHAT YOU ARE DOING
         /// It is potentially hostile to battery life
-        /// </summary>        
+        /// </summary>
         /// <param name="services"></param>
         /// <param name="delegateType"></param>
         /// <param name="requestPermissionOnStart"></param>
@@ -101,7 +103,7 @@ namespace Shiny
             return false;
 #else
             services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
-            services.AddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
+            services.TryAddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
             services.UseGps<GpsGeofenceDelegate>();
             if (requestPermissionOnStart)
             {

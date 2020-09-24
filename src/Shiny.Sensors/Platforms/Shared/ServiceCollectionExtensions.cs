@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Sensors;
 
 
@@ -27,7 +28,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            services.AddSingleton<IAccelerometer, AccelerometerImpl>();
+            services.TryAddSingleton<IAccelerometer, AccelerometerImpl>();
             return true;
 #endif
         }
@@ -38,7 +39,7 @@ namespace Shiny
 #if NETSTANDARD || __IOS__ || __WATCHOS__
             return false;
 #else
-            services.AddSingleton<IAmbientLight, AmbientLightImpl>();
+            services.TryAddSingleton<IAmbientLight, AmbientLightImpl>();
             return true;
 #endif
         }
@@ -49,7 +50,7 @@ namespace Shiny
 #if NETSTANDARD || TIZEN
             return false;
 #else
-            services.AddSingleton<IBarometer, BarometerImpl>();
+            services.TryAddSingleton<IBarometer, BarometerImpl>();
             return true;
 #endif
         }
@@ -63,10 +64,10 @@ namespace Shiny
 #elif TIZEN || __WATCHOS__
             services.UseAccelerometer();
             services.UseMagnetometer();
-            services.AddSingleton<ICompass, SharedCompassImpl>();
+            services.TryAddSingleton<ICompass, SharedCompassImpl>();
             return true;
 #else
-            services.AddSingleton<ICompass, CompassImpl>();
+            services.TryAddSingleton<ICompass, CompassImpl>();
             return true;
 #endif
         }
@@ -77,7 +78,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            services.AddSingleton<IGyroscope, GyroscopeImpl>();
+            services.TryAddSingleton<IGyroscope, GyroscopeImpl>();
             return true;
 #endif
         }
@@ -86,7 +87,7 @@ namespace Shiny
         public static bool UseHumidity(this IServiceCollection services)
         {
 #if __ANDROID__ || TIZEN
-            services.AddSingleton<IHumidity, HumidityImpl>();
+            services.TryAddSingleton<IHumidity, HumidityImpl>();
             return true;
 #else
             return false;
@@ -99,7 +100,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            services.AddSingleton<IMagnetometer, MagnetometerImpl>();
+            services.TryAddSingleton<IMagnetometer, MagnetometerImpl>();
             return true;
 #endif
         }
@@ -108,7 +109,7 @@ namespace Shiny
         public static bool UseProximitySensor(this IServiceCollection services)
         {
 #if __IOS__ || __ANDROID__
-            services.AddSingleton<IProximity, ProximityImpl>();
+            services.TryAddSingleton<IProximity, ProximityImpl>();
             return true;
 #else
             return false;
@@ -119,7 +120,7 @@ namespace Shiny
         public static bool UseHeartRateMonitor(this IServiceCollection services)
         {
 #if __ANDROID__ || __WATCHOS__ || TIZEN
-            services.AddSingleton<IHeartRateMonitor, HeartRateMonitorImpl>();
+            services.TryAddSingleton<IHeartRateMonitor, HeartRateMonitorImpl>();
             return true;
 #else
             return false;
@@ -130,7 +131,7 @@ namespace Shiny
         public static bool UsePedometer(this IServiceCollection services)
         {
 #if __ANDROID__ || __IOS__ || __WATCHOS__ || TIZEN
-            services.AddSingleton<IPedometer, PedometerImpl>();
+            services.TryAddSingleton<IPedometer, PedometerImpl>();
             return true;
 #else
             return false;
@@ -141,7 +142,7 @@ namespace Shiny
         public static bool UseTemperature(this IServiceCollection services)
         {
 #if __ANDROID__ || TIZEN
-            services.AddSingleton<ITemperature, TemperatureImpl>();
+            services.TryAddSingleton<ITemperature, TemperatureImpl>();
             return true;
 #else
             return false;

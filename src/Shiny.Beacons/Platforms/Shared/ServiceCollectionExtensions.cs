@@ -21,7 +21,7 @@ namespace Shiny
 #if __ANDROID__ || WINDOWS_UWP
             services.UseBleClient();
 #endif
-            services.AddSingleton<IBeaconRangingManager, BeaconRangingManager>();
+            services.TryAddSingleton<IBeaconRangingManager, BeaconRangingManager>();
             return true;
 #endif
         }
@@ -46,7 +46,7 @@ namespace Shiny
             services.UseBleClient();
 #endif
             services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
-            services.AddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
+            services.TryAddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
             return false;
 #endif
         }

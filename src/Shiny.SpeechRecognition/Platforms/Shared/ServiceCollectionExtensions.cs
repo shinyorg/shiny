@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.SpeechRecognition;
 
 
@@ -14,12 +15,12 @@ namespace Shiny
 #elif __IOS__
             if (UIKit.UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
             {
-                builder.AddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
+                builder.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
                 return true;
             }
             return false;
 #else
-            builder.AddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
+            builder.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
             return true;
 #endif
         }
