@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Net.Http;
+
 
 namespace Shiny
 {
@@ -10,11 +12,9 @@ namespace Shiny
         {
             services.AddSingleton(typeof(IHttpTransferDelegate), transferDelegateType);
 #if NETSTANDARD
-            services.AddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
-#elif WINDOWS_UWP || __IOS__
-            services.AddSingleton<IHttpTransferManager, HttpTransferManager>();
-#elif __ANDROID__
-            services.AddSingleton<IHttpTransferManager, HttpTransferManager>();
+            services.TryAddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
+#elif WINDOWS_UWP || __IOS__ || __ANDROID__
+            services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
 #endif
         }
 

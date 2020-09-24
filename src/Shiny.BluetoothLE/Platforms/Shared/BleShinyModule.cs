@@ -1,7 +1,7 @@
 ﻿#if !NETSTANDARD
 using System;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Shiny.BluetoothLE
 {
@@ -14,8 +14,8 @@ namespace Shiny.BluetoothLE
         public override void Register(IServiceCollection services)
         {
             services.AddSingleton(this.config);
-            services.AddSingleton<Shiny.BluetoothLE.Internals.CentralContext>();
-            services.AddSingleton<IBleManager, BleManager>();
+            services.TryAddSingleton<Internals.CentralContext>();
+            services.TryAddSingleton<IBleManager, BleManager>();
         }
     }
 }

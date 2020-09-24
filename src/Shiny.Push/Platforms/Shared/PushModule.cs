@@ -30,7 +30,7 @@ namespace Shiny.Push
             services.TryAddSingleton<iOSNotificationDelegate>();
 #endif
             services.UseNotifications<PushNotificationDelegate>(false, notificationCategories: this.categories);
-            services.AddSingleton(typeof(IPushManager), this.pushManagerType);
+            services.TryAddSingleton(typeof(IPushManager), this.pushManagerType);
             services.AddSingleton(typeof(IPushDelegate), this.delegateType);
         }
     }

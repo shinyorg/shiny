@@ -41,16 +41,15 @@ namespace Shiny.Locations
                 services.TryAddSingleton(typeof(IGeofenceDelegate), this.delegateType);
                 services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             }
-            
+
 #elif WINDOWS_UWP
             services.TryAddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
-            services.TryAddSingleton(typeof(IGeofenceDelegate), this.delegateType);
             services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
 #else
-            services.TryAddSingleton(typeof(IGeofenceDelegate), this.delegateType);
             services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
 #endif
-
+            // always add the delegate
+            services.AddSingleton(typeof(IGeofenceDelegate), this.delegateType);
         }
 
 
