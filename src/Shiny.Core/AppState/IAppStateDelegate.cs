@@ -9,5 +9,6 @@ namespace Shiny
         void OnStart();
         void OnForeground();
         void OnBackground();
+        //void OnStop();
     }
 }

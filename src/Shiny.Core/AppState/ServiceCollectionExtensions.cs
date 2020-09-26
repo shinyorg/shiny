@@ -20,5 +20,12 @@ namespace Shiny
             services.TryAddSingleton<AppStateManager>();
             services.AddSingleton<IAppStateDelegate>(instance);
         }
+
+
+        public static void AddAppState<T>(this IServiceCollection services, Func<IServiceProvider, T> createInstance) where T : class, IAppStateDelegate
+        {
+            services.TryAddSingleton<AppStateManager>();
+            services.AddSingleton<IAppStateDelegate>(createInstance);
+        }
     }
 }
