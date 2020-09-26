@@ -81,7 +81,7 @@ namespace Shiny.BluetoothLE
             .StartWith(this.Status);
 
 
-        public override IObservable<ScanResult> Scan(ScanConfig config)
+        public override IObservable<ScanResult> Scan(ScanConfig? config = null)
         {
             config = config ?? new ScanConfig();
 

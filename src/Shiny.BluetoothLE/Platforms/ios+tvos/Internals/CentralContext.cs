@@ -81,7 +81,12 @@ namespace Shiny.BluetoothLE.Internals
 
 
         public Subject<CBPeripheral> PeripheralConnected { get; } = new Subject<CBPeripheral>();
-        public override void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral) => this.PeripheralConnected.OnNext(peripheral);
+        public override async void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral)
+        {
+            var p = this.GetPeripheral(peripheral);
+            await this.services.RunDelegates<IBleDelegate>(x => x.OnConnected(p));
+            this.PeripheralConnected.OnNext(peripheral);
+        }
 
 
         public Subject<CBPeripheral> PeripheralDisconnected { get; } = new Subject<CBPeripheral>();
