@@ -1,9 +1,9 @@
-﻿using System;
+﻿//using System;
 
 
-namespace Shiny.Bluetooth
-{
-    public class ShinyBluetoothDevice : IBluetoothDevice
-    {
-    }
-}
+//namespace Shiny.Bluetooth
+//{
+//    public class ShinyBluetoothDevice : IBluetoothDevice
+//    {
+//    }
+//}

@@ -33,13 +33,11 @@ namespace Shiny.Beacons.Advertising
             this.Minor = minor;
             this.TxPower = txpower;
 
-            var adData = new AdvertisementData();
-            //var manuData = new ManufacturerData(76, this.GetBeaconPacket());
-            var manuData = new ManufacturerData { Data = this.GetBeaconPacket() };
-
             await this.manager.StartAdvertising(new AdvertisementData
             {
-                ManufacturerData = manuData
+                //= new ManufacturerData(76, this.GetBeaconPacket());
+                //= new ManufacturerData { Data = this.GetBeaconPacket() };
+                ManufacturerData = this.GetBeaconPacket()
             });
         }
 
@@ -56,13 +54,13 @@ namespace Shiny.Beacons.Advertising
         }
 
 
-        byte[] GetBeaconPacket()
+        ManufacturerData GetBeaconPacket()
         {
             using (var ms = new MemoryStream())
             {
                 using (var br = new BinaryWriter(ms))
                 {
-                    br.Write(76);
+                    //br.Write(76);
                     br.Write(new byte[] { 0, 0, 0 });
                     br.Write(ToBytes(this.Uuid.Value));
                     br.Write(BitConverter.GetBytes(this.Major.Value).Reverse().ToArray());
@@ -70,7 +68,8 @@ namespace Shiny.Beacons.Advertising
                     br.Write(this.TxPower.Value);
                 }
 
-                return ms.ToArray();
+                //return ms.ToArray();
+                return new ManufacturerData(76, ms.ToArray());
             }
         }
 
