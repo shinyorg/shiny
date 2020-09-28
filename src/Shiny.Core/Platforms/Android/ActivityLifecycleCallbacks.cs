@@ -11,7 +11,7 @@ namespace Shiny
     class ActivityLifecycleCallbacks : Java.Lang.Object, Application.IActivityLifecycleCallbacks
     {
         public Subject<ActivityChanged> ActivitySubject { get; } = new Subject<ActivityChanged>();
-        readonly WeakReference<Activity> current = new WeakReference<Activity>(null);
+        readonly WeakReference<Activity?> current = new WeakReference<Activity?>(null);
 
 
         public Activity? Activity
@@ -24,7 +24,7 @@ namespace Shiny
         void Fire(Activity activity, ActivityState state, Bundle? bundle = null) => this.ActivitySubject.OnNext(new ActivityChanged(activity, state, bundle));
 
 
-        public void OnActivityCreated(Activity activity, Bundle savedInstanceState)
+        public void OnActivityCreated(Activity activity, Bundle? savedInstanceState)
         {
             this.Activity = activity;
             this.Fire(activity, ActivityState.Created, savedInstanceState);
@@ -45,7 +45,10 @@ namespace Shiny
         }
 
 
-        public void OnActivityDestroyed(Activity activity) => this.Fire(activity, ActivityState.Destroyed);
+        public void OnActivityDestroyed(Activity activity)
+            => this.Fire(activity, ActivityState.Destroyed);
+
+
         public void OnActivitySaveInstanceState(Activity activity, Bundle outState) => this.Fire(activity, ActivityState.SaveInstanceState, outState);
         public void OnActivityStarted(Activity activity) => this.Fire(activity, ActivityState.Started);
         public void OnActivityStopped(Activity activity) => this.Fire(activity, ActivityState.Stopped);
