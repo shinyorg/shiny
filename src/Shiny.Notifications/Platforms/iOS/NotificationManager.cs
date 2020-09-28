@@ -152,6 +152,16 @@ namespace Shiny.Notifications
                           UNAuthorizationOptions.Badge |
                           UNAuthorizationOptions.Sound;
 
+            // https://medium.com/@shashidharyamsani/implementing-ios-critical-alerts-7d82b4bb5026
+    //        {
+    //“aps” : {
+    //    “sound” : {
+    //        “critical”: 1,
+    //        “name”: “critical - alert - sound.wav”,
+    //        “volume”: 1.0
+    //    }
+    //            }
+    //        }
             if (UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0))
                 request |= UNAuthorizationOptions.CriticalAlert;
 
