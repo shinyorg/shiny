@@ -12,7 +12,7 @@ namespace Shiny.Bluetooth
 #if NETSTANDARD2_0 || __IOS__
             return false;
 #else
-            services.TryAddSingleton<IBluetoothManager, ShinyBluetoothManager>();
+            //services.TryAddSingleton<IBluetoothManager, ShinyBluetoothManager>();
             return true;
 #endif
         }

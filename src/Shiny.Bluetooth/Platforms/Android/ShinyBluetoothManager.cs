@@ -9,5 +9,10 @@
 //        public ShinyBluetoothManager()
 //        {
 //        }
+
+//        public IObservable<IBluetoothDevice> Scan()
+//        {
+//            throw new NotImplementedException();
+//        }
 //    }
 //}

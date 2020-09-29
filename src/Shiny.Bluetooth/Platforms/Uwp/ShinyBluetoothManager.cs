@@ -1,12 +1,12 @@
-﻿using System;
+﻿//using System;
 
 
-namespace Shiny.Bluetooth
-{
-    public class ShinyBluetoothManager : IBluetoothManager
-    {
-    }
-}
+//namespace Shiny.Bluetooth
+//{
+//    public class ShinyBluetoothManager : IBluetoothManager
+//    {
+//    }
+//}
 //public sealed partial class MainPage : Page
 //{
 //    private StreamSocket _socket;
