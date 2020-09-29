@@ -7,18 +7,12 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-    </ItemGroup>
-    
-    <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Beacons\" />
+        <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
     </ItemGroup>
 </Project>
