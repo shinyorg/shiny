@@ -35,9 +35,4 @@
       <Folder Include="Platforms\Android\" />
       <Folder Include="Platforms\Shared\" />
     </ItemGroup>
-    <ItemGroup>
-      <Compile Update="Platforms\Shared\ServiceCollectionExtensions.cs">
-        <SubType></SubType>
-      </Compile>
-    </ItemGroup>
 </Project>
