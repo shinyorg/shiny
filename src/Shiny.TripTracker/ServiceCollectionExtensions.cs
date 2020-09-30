@@ -13,7 +13,7 @@ namespace Shiny
 
 
         internal static int? CurrentTripId(this ISettings settings)
-            => settings.Get<int?>(nameof(CurrentTripId));
+            => settings.Get<int?>(nameof(CurrentTripId), null);
 
 
         internal static void CurrentTripId(this ISettings settings, int? value)

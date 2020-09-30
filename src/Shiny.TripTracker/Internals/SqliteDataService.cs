@@ -90,6 +90,12 @@ namespace Shiny.TripTracker.Internals
         }
 
 
-        public Task Save(Trip trip) => this.conn.InsertOrReplaceAsync(trip);
+        public async Task Save(Trip trip)
+        {
+            if (trip.Id == 0)
+                await this.conn.InsertAsync(trip);
+            else
+                await this.conn.UpdateAsync(trip);
+        }
     }
 }
