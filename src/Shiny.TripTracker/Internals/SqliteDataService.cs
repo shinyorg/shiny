@@ -40,7 +40,7 @@ namespace Shiny.TripTracker.Internals
 
         public async Task<IList<Trip>> GetAll() => await this.conn
             .Table<Trip>()
-            .OrderBy(x => x.DateFinished)
+            .OrderByDescending(x => x.DateFinished)
             .ToListAsync();
 
 
