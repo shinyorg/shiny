@@ -53,8 +53,8 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
-        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.2.0.3" />
-        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.3.0.2" />
+        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.2.0.4" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.3.0.3" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
