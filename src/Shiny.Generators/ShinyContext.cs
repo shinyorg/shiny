@@ -13,7 +13,8 @@ namespace Shiny.Generators
         ISourceGeneratorLogger Log { get; }
         bool IsStartupGenerated { get; set; }
         string GetRootNamespace();
-        string GetShinyStartupClassFullName();
+        string? GetShinyStartupClassFullName();
+        string? GetXamFormsAppClassFullName();
     }
 
 
@@ -26,7 +27,34 @@ namespace Shiny.Generators
         }
 
 
-        public string GetShinyStartupClassFullName()
+        public string? GetXamFormsAppClassFullName()
+        {
+            var classes = this
+                .Context
+                .GetAllImplementationsOfType("Xamarin.Forms.App")
+                .WhereNotSystem()
+                .ToList();
+
+            INamedTypeSymbol? appClass = null;
+            switch (classes.Count)
+            {
+                case 0:
+                    this.Log.Warn("No Xamarin Forms App implementations found");
+                    break;
+
+                case 1:
+                    appClass = classes.First();
+                    break;
+
+                default:
+                    this.Log.Warn(classes.Count + " Xamarin Forms App implementations found");
+                    break;
+            }
+            return appClass?.ToDisplayString();
+        }
+
+
+        public string? GetShinyStartupClassFullName()
         {
             if (this.IsStartupGenerated)
             {

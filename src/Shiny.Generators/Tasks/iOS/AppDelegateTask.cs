@@ -95,8 +95,6 @@ namespace Shiny.Generators.Tasks.iOS
 
         void GenerateFinishedLaunching(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
         {
-            //System.Diagnostics.Debugger.Launch();
-
             var exists = appDelegate.HasMethod("FinishedLaunching");
             if (exists)
             {
@@ -111,10 +109,15 @@ namespace Shiny.Generators.Tasks.iOS
 
                     builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.shinyStartupClassName}());");
 
-                    if (this.Context.HasXamarinForms())
+                    if (appDelegate.Is("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate"))
                     {
-                        // TODO: forms app init?
-                        builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+                        var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
+                        if (appClass != null)
+                        {
+                            // TODO: what if app class has multiple ctor args - skip
+                            builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+                            builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
+                        }
                     }
                     builder.AppendLineInvariant("return base.FinishedLaunching(app, options);");
                 }

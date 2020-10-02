@@ -50,14 +50,18 @@ namespace Shiny.Generators.Tasks.Android
                     {
                         using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                         {
-                            //if (this.Context.HasXamarinForms())
-                            //{
-                            //    // TODO: should only be on MainLauncher
-                            //    builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
-                            //    builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
-                            //    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
-                            //    // TODO: detect and load -       this.LoadApplication(new App());
-                            //}
+                            if (activity.Is("Xamarin.Forms.Platform.Android.FormsAppCompatActivity"))
+                            {
+                                var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
+                                if (appClass != null)
+                                {
+                                    builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
+                                    builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
+                                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
+                                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+                                    builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
+                                }
+                            }
 
                             builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
                             builder.AppendLineInvariant("this.ShinyOnCreate();");
