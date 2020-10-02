@@ -43,6 +43,7 @@ namespace Shiny.TripTracker.Internals
                 return;
 
             // TODO: watch for sensor blips?
+            // TODO: watch for overlap
             var n = nameof(TripTrackerGpsDelegate);
             var currentMotion = await this.GetLastActivity();
             var track = this.IsTracked(currentMotion);
@@ -75,7 +76,7 @@ namespace Shiny.TripTracker.Internals
                     // stop trip
                     var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
                     trip.DateFinished = DateTimeOffset.UtcNow;
-                    trip.AverageSpeedMetersPerHour = await this.dataService.GetTripTotalDistanceInMeters(trip.Id);
+                    trip.AverageSpeedMetersPerHour = await this.dataService.GetTripAverageSpeedInMetersPerHour(trip.Id);
                     trip.TotalDistanceMeters = await this.dataService.GetTripTotalDistanceInMeters(trip.Id);
                     trip.StartLatitude = reading.Position.Longitude;
                     trip.EndLatitude = reading.Position.Latitude;
