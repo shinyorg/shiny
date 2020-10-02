@@ -8,14 +8,14 @@ namespace Shiny.Generators.Tasks.Android
     {
         public override void Execute()
         {
-            // TODO: detect Shiny.Core and Android v10
+            // TODO: detect Android v10
             // TODO: detect custom application
             // TODO: if application implementations already exist and is it partial?
 
             // if application exists, error or override? - could also search for attribute?
             var appClass = this.Context.Compilation.GetTypeByMetadataName("Android.App.Application");
             if (appClass == null)
-                return;
+                return;// TODO: generate from scratch
 
             //var implementations = this.Context.GetAllImplementationsOfType(appClass);
             if (!appClass.IsPartialClass())
