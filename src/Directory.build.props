@@ -35,6 +35,7 @@
         <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IsWindows>False</IsWindows>
 
         <!-- disable sourcelink on mono, to workaround https://github.com/dotnet/sourcelink/issues/155 -->
         <EnableSourceLink Condition=" '$(OS)' == 'Windows_NT' ">true</EnableSourceLink>
@@ -47,9 +48,31 @@
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <IsWindows>True</IsWindows>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
+        <IsWindows>True</IsWindows>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('net461')) ">
+        <IsWindows>True</IsWindows>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
         <PackageReference Condition=" '$(SourceLinkEnabled)' == 'true' " Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
+        <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.17134.1000" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
+        <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.17134.1000" />
     </ItemGroup>
 
     <!--<ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
