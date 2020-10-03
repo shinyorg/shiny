@@ -24,24 +24,17 @@ namespace Shiny.Generators.Tasks.Android
             if (startupClass == null)
                 return;
 
-            var appImpls = this.Context.GetAllImplementationsOfType("Android.App.Application", true);
+            var appImpls = this.Context
+                .GetAllDerivedClassesForType("Android.App.Application", true)
+                .WhereNotSystem()
+                .ToList();
+
             if (!appImpls.Any())
-            {
                 this.GenerateFromScratch(startupClass);
-            }
             else
             {
                 foreach (var impl in appImpls)
-                {
-                    if (impl.IsPartialClass())
-                    {
-                        this.GeneratePartial(impl, startupClass);
-                    }
-                    else
-                    {
-                        this.Log.Warn("Cannot generate Shiny application class since your custom Application is not marked as partial");
-                    }
-                }
+                    this.GeneratePartial(impl, startupClass);
             }
         }
 
@@ -70,14 +63,20 @@ namespace Shiny.Generators.Tasks.Android
 
         void GeneratePartial(INamedTypeSymbol symbol, string startupClassName)
         {
+            var hasOnCreate = symbol.HasMethod("OnCreate");
+            var hasTrim = symbol.HasMethod("OnTrimMemory");
+
+            if (hasOnCreate && hasTrim)
+                return;
+
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Content", "Android.Runtime");
 
-            using (builder.BlockInvariant("namespace " + symbol.ContainingNamespace.Name))
+            using (builder.BlockInvariant("namespace " + symbol.ContainingNamespace.ToDisplayString()))
             {
                 using (builder.BlockInvariant("public partial class " + symbol.Name))
                 {
-                    if (symbol.HasMethod("OnCreate"))
+                    if (hasOnCreate)
                     {
                         this.Log.Warn($"Cannot generate OnCreate method for {symbol.Name} since it already exists.  Make sure to call Shiny.AndroidShinyHost.Init(new YourShinyStartup()); in your OnCreate");
                     }
@@ -86,7 +85,7 @@ namespace Shiny.Generators.Tasks.Android
                         this.AppendOnCreate(builder, startupClassName);
                     }
 
-                    if (symbol.HasMethod("OnTrimMemory"))
+                    if (hasTrim)
                     {
                         this.Log.Warn($"Cannot generate OnTrimMemory method for {symbol.Name} since it already exists.  Make sure to call Shiny.AndroidShinyHost.OnBackground(level); in your OnTrimMemory");
                     }

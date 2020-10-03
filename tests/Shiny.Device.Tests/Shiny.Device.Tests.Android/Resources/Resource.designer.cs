@@ -578,7 +578,6 @@ namespace Shiny.Device.Tests.Droid
 			global::Acr.UserDialogs.Resource.Color.abc_color_highlight_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_color_highlight_material;
 			global::Acr.UserDialogs.Resource.Color.abc_hint_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_dark;
 			global::Acr.UserDialogs.Resource.Color.abc_hint_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_light;
-			global::Acr.UserDialogs.Resource.Color.abc_input_method_navigation_guard = global::Shiny.Device.Tests.Droid.Resource.Color.abc_input_method_navigation_guard;
 			global::Acr.UserDialogs.Resource.Color.abc_primary_text_disable_only_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_dark;
 			global::Acr.UserDialogs.Resource.Color.abc_primary_text_disable_only_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_light;
 			global::Acr.UserDialogs.Resource.Color.abc_primary_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_material_dark;
@@ -2721,8 +2720,162 @@ namespace Shiny.Device.Tests.Droid
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahText = global::Shiny.Device.Tests.Droid.Resource.Styleable.ProgressWheel_ahText;
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.ProgressWheel_ahTextColor;
 			global::AndroidHUD.Resource.Styleable.ProgressWheel_ahTextSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.ProgressWheel_ahTextSize;
+			global::Shiny.Beacons.Resource.Animation.abc_fade_in = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_fade_in;
+			global::Shiny.Beacons.Resource.Animation.abc_fade_out = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_fade_out;
+			global::Shiny.Beacons.Resource.Animation.abc_grow_fade_in_from_bottom = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_grow_fade_in_from_bottom;
+			global::Shiny.Beacons.Resource.Animation.abc_popup_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_popup_enter;
+			global::Shiny.Beacons.Resource.Animation.abc_popup_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_popup_exit;
+			global::Shiny.Beacons.Resource.Animation.abc_shrink_fade_out_from_bottom = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_shrink_fade_out_from_bottom;
+			global::Shiny.Beacons.Resource.Animation.abc_slide_in_bottom = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_slide_in_bottom;
+			global::Shiny.Beacons.Resource.Animation.abc_slide_in_top = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_slide_in_top;
+			global::Shiny.Beacons.Resource.Animation.abc_slide_out_bottom = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_slide_out_bottom;
+			global::Shiny.Beacons.Resource.Animation.abc_slide_out_top = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_slide_out_top;
+			global::Shiny.Beacons.Resource.Animation.abc_tooltip_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_tooltip_enter;
+			global::Shiny.Beacons.Resource.Animation.abc_tooltip_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_tooltip_exit;
+			global::Shiny.Beacons.Resource.Animation.btn_checkbox_to_checked_box_inner_merged_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_checked_box_inner_merged_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_checkbox_to_checked_box_outer_merged_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_checked_box_outer_merged_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_checkbox_to_checked_icon_null_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_checked_icon_null_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_checkbox_to_unchecked_box_inner_merged_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_unchecked_box_inner_merged_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_checkbox_to_unchecked_check_path_merged_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_unchecked_check_path_merged_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_checkbox_to_unchecked_icon_null_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_unchecked_icon_null_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_radio_to_off_mtrl_dot_group_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_off_mtrl_dot_group_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_path_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_path_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_radio_to_on_mtrl_dot_group_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_dot_group_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation;
+			global::Shiny.Beacons.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation;
+			global::Shiny.Beacons.Resource.Animation.fragment_close_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_close_enter;
+			global::Shiny.Beacons.Resource.Animation.fragment_close_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_close_exit;
+			global::Shiny.Beacons.Resource.Animation.fragment_fade_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fade_enter;
+			global::Shiny.Beacons.Resource.Animation.fragment_fade_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fade_exit;
+			global::Shiny.Beacons.Resource.Animation.fragment_fast_out_extra_slow_in = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fast_out_extra_slow_in;
+			global::Shiny.Beacons.Resource.Animation.fragment_open_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_open_enter;
+			global::Shiny.Beacons.Resource.Animation.fragment_open_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_open_exit;
+			global::Shiny.Beacons.Resource.Attribute.actionBarDivider = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarDivider;
+			global::Shiny.Beacons.Resource.Attribute.actionBarItemBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarItemBackground;
+			global::Shiny.Beacons.Resource.Attribute.actionBarPopupTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarPopupTheme;
+			global::Shiny.Beacons.Resource.Attribute.actionBarSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarSize;
+			global::Shiny.Beacons.Resource.Attribute.actionBarSplitStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarSplitStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionBarTabBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarTabBarStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionBarTabStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarTabStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionBarTabTextStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarTabTextStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionBarTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarTheme;
+			global::Shiny.Beacons.Resource.Attribute.actionBarWidgetTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarWidgetTheme;
+			global::Shiny.Beacons.Resource.Attribute.actionButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionDropDownStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionDropDownStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionLayout;
+			global::Shiny.Beacons.Resource.Attribute.actionMenuTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionMenuTextAppearance;
+			global::Shiny.Beacons.Resource.Attribute.actionMenuTextColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionMenuTextColor;
+			global::Shiny.Beacons.Resource.Attribute.actionModeBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeBackground;
+			global::Shiny.Beacons.Resource.Attribute.actionModeCloseButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionModeCloseDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeCloseDrawable;
+			global::Shiny.Beacons.Resource.Attribute.actionModeCopyDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeCopyDrawable;
+			global::Shiny.Beacons.Resource.Attribute.actionModeCutDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeCutDrawable;
+			global::Shiny.Beacons.Resource.Attribute.actionModeFindDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeFindDrawable;
+			global::Shiny.Beacons.Resource.Attribute.actionModePasteDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModePasteDrawable;
+			global::Shiny.Beacons.Resource.Attribute.actionModePopupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModePopupWindowStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionModeSelectAllDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeSelectAllDrawable;
+			global::Shiny.Beacons.Resource.Attribute.actionModeShareDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeShareDrawable;
+			global::Shiny.Beacons.Resource.Attribute.actionModeSplitBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeSplitBackground;
+			global::Shiny.Beacons.Resource.Attribute.actionModeStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionModeWebSearchDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeWebSearchDrawable;
+			global::Shiny.Beacons.Resource.Attribute.actionOverflowButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionOverflowButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionOverflowMenuStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionOverflowMenuStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionProviderClass = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionProviderClass;
+			global::Shiny.Beacons.Resource.Attribute.actionViewClass = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionViewClass;
+			global::Shiny.Beacons.Resource.Attribute.activityChooserViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.activityChooserViewStyle;
+			global::Shiny.Beacons.Resource.Attribute.alertDialogButtonGroupStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.alertDialogButtonGroupStyle;
+			global::Shiny.Beacons.Resource.Attribute.alertDialogCenterButtons = global::Shiny.Device.Tests.Droid.Resource.Attribute.alertDialogCenterButtons;
+			global::Shiny.Beacons.Resource.Attribute.alertDialogStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.alertDialogStyle;
+			global::Shiny.Beacons.Resource.Attribute.alertDialogTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.alertDialogTheme;
+			global::Shiny.Beacons.Resource.Attribute.allowStacking = global::Shiny.Device.Tests.Droid.Resource.Attribute.allowStacking;
 			global::Shiny.Beacons.Resource.Attribute.alpha = global::Shiny.Device.Tests.Droid.Resource.Attribute.alpha;
+			global::Shiny.Beacons.Resource.Attribute.alphabeticModifiers = global::Shiny.Device.Tests.Droid.Resource.Attribute.alphabeticModifiers;
+			global::Shiny.Beacons.Resource.Attribute.arrowHeadLength = global::Shiny.Device.Tests.Droid.Resource.Attribute.arrowHeadLength;
+			global::Shiny.Beacons.Resource.Attribute.arrowShaftLength = global::Shiny.Device.Tests.Droid.Resource.Attribute.arrowShaftLength;
+			global::Shiny.Beacons.Resource.Attribute.autoCompleteTextViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoCompleteTextViewStyle;
+			global::Shiny.Beacons.Resource.Attribute.autoSizeMaxTextSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizeMaxTextSize;
+			global::Shiny.Beacons.Resource.Attribute.autoSizeMinTextSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizeMinTextSize;
+			global::Shiny.Beacons.Resource.Attribute.autoSizePresetSizes = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizePresetSizes;
+			global::Shiny.Beacons.Resource.Attribute.autoSizeStepGranularity = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizeStepGranularity;
+			global::Shiny.Beacons.Resource.Attribute.autoSizeTextType = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizeTextType;
+			global::Shiny.Beacons.Resource.Attribute.background = global::Shiny.Device.Tests.Droid.Resource.Attribute.background;
+			global::Shiny.Beacons.Resource.Attribute.backgroundSplit = global::Shiny.Device.Tests.Droid.Resource.Attribute.backgroundSplit;
+			global::Shiny.Beacons.Resource.Attribute.backgroundStacked = global::Shiny.Device.Tests.Droid.Resource.Attribute.backgroundStacked;
+			global::Shiny.Beacons.Resource.Attribute.backgroundTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.backgroundTint;
+			global::Shiny.Beacons.Resource.Attribute.backgroundTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.backgroundTintMode;
+			global::Shiny.Beacons.Resource.Attribute.barLength = global::Shiny.Device.Tests.Droid.Resource.Attribute.barLength;
+			global::Shiny.Beacons.Resource.Attribute.borderlessButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.borderlessButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.buttonBarButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.buttonBarNegativeButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarNegativeButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.buttonBarNeutralButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarNeutralButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.buttonBarPositiveButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarPositiveButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.buttonBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarStyle;
+			global::Shiny.Beacons.Resource.Attribute.buttonCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonCompat;
+			global::Shiny.Beacons.Resource.Attribute.buttonGravity = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonGravity;
+			global::Shiny.Beacons.Resource.Attribute.buttonIconDimen = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonIconDimen;
+			global::Shiny.Beacons.Resource.Attribute.buttonPanelSideLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonPanelSideLayout;
+			global::Shiny.Beacons.Resource.Attribute.buttonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonStyle;
+			global::Shiny.Beacons.Resource.Attribute.buttonStyleSmall = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonStyleSmall;
+			global::Shiny.Beacons.Resource.Attribute.buttonTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonTint;
+			global::Shiny.Beacons.Resource.Attribute.buttonTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonTintMode;
+			global::Shiny.Beacons.Resource.Attribute.checkboxStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.checkboxStyle;
+			global::Shiny.Beacons.Resource.Attribute.checkedTextViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.checkedTextViewStyle;
+			global::Shiny.Beacons.Resource.Attribute.closeIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.closeIcon;
+			global::Shiny.Beacons.Resource.Attribute.closeItemLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.closeItemLayout;
+			global::Shiny.Beacons.Resource.Attribute.collapseContentDescription = global::Shiny.Device.Tests.Droid.Resource.Attribute.collapseContentDescription;
+			global::Shiny.Beacons.Resource.Attribute.collapseIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.collapseIcon;
+			global::Shiny.Beacons.Resource.Attribute.color = global::Shiny.Device.Tests.Droid.Resource.Attribute.color;
+			global::Shiny.Beacons.Resource.Attribute.colorAccent = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorAccent;
+			global::Shiny.Beacons.Resource.Attribute.colorBackgroundFloating = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorBackgroundFloating;
+			global::Shiny.Beacons.Resource.Attribute.colorButtonNormal = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorButtonNormal;
+			global::Shiny.Beacons.Resource.Attribute.colorControlActivated = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorControlActivated;
+			global::Shiny.Beacons.Resource.Attribute.colorControlHighlight = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorControlHighlight;
+			global::Shiny.Beacons.Resource.Attribute.colorControlNormal = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorControlNormal;
+			global::Shiny.Beacons.Resource.Attribute.colorError = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorError;
+			global::Shiny.Beacons.Resource.Attribute.colorPrimary = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorPrimary;
+			global::Shiny.Beacons.Resource.Attribute.colorPrimaryDark = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorPrimaryDark;
+			global::Shiny.Beacons.Resource.Attribute.colorSwitchThumbNormal = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorSwitchThumbNormal;
+			global::Shiny.Beacons.Resource.Attribute.commitIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.commitIcon;
+			global::Shiny.Beacons.Resource.Attribute.contentDescription = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentDescription;
+			global::Shiny.Beacons.Resource.Attribute.contentInsetEnd = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetEnd;
+			global::Shiny.Beacons.Resource.Attribute.contentInsetEndWithActions = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetEndWithActions;
+			global::Shiny.Beacons.Resource.Attribute.contentInsetLeft = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetLeft;
+			global::Shiny.Beacons.Resource.Attribute.contentInsetRight = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetRight;
+			global::Shiny.Beacons.Resource.Attribute.contentInsetStart = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetStart;
+			global::Shiny.Beacons.Resource.Attribute.contentInsetStartWithNavigation = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetStartWithNavigation;
+			global::Shiny.Beacons.Resource.Attribute.controlBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.controlBackground;
+			global::Shiny.Beacons.Resource.Attribute.customNavigationLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.customNavigationLayout;
+			global::Shiny.Beacons.Resource.Attribute.defaultQueryHint = global::Shiny.Device.Tests.Droid.Resource.Attribute.defaultQueryHint;
+			global::Shiny.Beacons.Resource.Attribute.dialogCornerRadius = global::Shiny.Device.Tests.Droid.Resource.Attribute.dialogCornerRadius;
+			global::Shiny.Beacons.Resource.Attribute.dialogPreferredPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.dialogPreferredPadding;
+			global::Shiny.Beacons.Resource.Attribute.dialogTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.dialogTheme;
+			global::Shiny.Beacons.Resource.Attribute.displayOptions = global::Shiny.Device.Tests.Droid.Resource.Attribute.displayOptions;
+			global::Shiny.Beacons.Resource.Attribute.divider = global::Shiny.Device.Tests.Droid.Resource.Attribute.divider;
+			global::Shiny.Beacons.Resource.Attribute.dividerHorizontal = global::Shiny.Device.Tests.Droid.Resource.Attribute.dividerHorizontal;
+			global::Shiny.Beacons.Resource.Attribute.dividerPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.dividerPadding;
+			global::Shiny.Beacons.Resource.Attribute.dividerVertical = global::Shiny.Device.Tests.Droid.Resource.Attribute.dividerVertical;
+			global::Shiny.Beacons.Resource.Attribute.drawableBottomCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableBottomCompat;
+			global::Shiny.Beacons.Resource.Attribute.drawableEndCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableEndCompat;
+			global::Shiny.Beacons.Resource.Attribute.drawableLeftCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableLeftCompat;
+			global::Shiny.Beacons.Resource.Attribute.drawableRightCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableRightCompat;
+			global::Shiny.Beacons.Resource.Attribute.drawableSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableSize;
+			global::Shiny.Beacons.Resource.Attribute.drawableStartCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableStartCompat;
+			global::Shiny.Beacons.Resource.Attribute.drawableTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableTint;
+			global::Shiny.Beacons.Resource.Attribute.drawableTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableTintMode;
+			global::Shiny.Beacons.Resource.Attribute.drawableTopCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableTopCompat;
+			global::Shiny.Beacons.Resource.Attribute.drawerArrowStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawerArrowStyle;
+			global::Shiny.Beacons.Resource.Attribute.dropdownListPreferredItemHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.dropdownListPreferredItemHeight;
+			global::Shiny.Beacons.Resource.Attribute.dropDownListViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.dropDownListViewStyle;
+			global::Shiny.Beacons.Resource.Attribute.editTextBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.editTextBackground;
+			global::Shiny.Beacons.Resource.Attribute.editTextColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.editTextColor;
+			global::Shiny.Beacons.Resource.Attribute.editTextStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.editTextStyle;
+			global::Shiny.Beacons.Resource.Attribute.elevation = global::Shiny.Device.Tests.Droid.Resource.Attribute.elevation;
+			global::Shiny.Beacons.Resource.Attribute.expandActivityOverflowButtonDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.expandActivityOverflowButtonDrawable;
+			global::Shiny.Beacons.Resource.Attribute.firstBaselineToTopHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.firstBaselineToTopHeight;
 			global::Shiny.Beacons.Resource.Attribute.font = global::Shiny.Device.Tests.Droid.Resource.Attribute.font;
+			global::Shiny.Beacons.Resource.Attribute.fontFamily = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontFamily;
 			global::Shiny.Beacons.Resource.Attribute.fontProviderAuthority = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontProviderAuthority;
 			global::Shiny.Beacons.Resource.Attribute.fontProviderCerts = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontProviderCerts;
 			global::Shiny.Beacons.Resource.Attribute.fontProviderFetchStrategy = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontProviderFetchStrategy;
@@ -2732,15 +2885,322 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Attribute.fontStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontStyle;
 			global::Shiny.Beacons.Resource.Attribute.fontVariationSettings = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Beacons.Resource.Attribute.fontWeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontWeight;
+			global::Shiny.Beacons.Resource.Attribute.gapBetweenBars = global::Shiny.Device.Tests.Droid.Resource.Attribute.gapBetweenBars;
+			global::Shiny.Beacons.Resource.Attribute.goIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.goIcon;
+			global::Shiny.Beacons.Resource.Attribute.height = global::Shiny.Device.Tests.Droid.Resource.Attribute.height;
+			global::Shiny.Beacons.Resource.Attribute.hideOnContentScroll = global::Shiny.Device.Tests.Droid.Resource.Attribute.hideOnContentScroll;
+			global::Shiny.Beacons.Resource.Attribute.homeAsUpIndicator = global::Shiny.Device.Tests.Droid.Resource.Attribute.homeAsUpIndicator;
+			global::Shiny.Beacons.Resource.Attribute.homeLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.homeLayout;
+			global::Shiny.Beacons.Resource.Attribute.icon = global::Shiny.Device.Tests.Droid.Resource.Attribute.icon;
+			global::Shiny.Beacons.Resource.Attribute.iconifiedByDefault = global::Shiny.Device.Tests.Droid.Resource.Attribute.iconifiedByDefault;
+			global::Shiny.Beacons.Resource.Attribute.iconTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.iconTint;
+			global::Shiny.Beacons.Resource.Attribute.iconTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.iconTintMode;
+			global::Shiny.Beacons.Resource.Attribute.imageButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.imageButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.indeterminateProgressStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.indeterminateProgressStyle;
+			global::Shiny.Beacons.Resource.Attribute.initialActivityCount = global::Shiny.Device.Tests.Droid.Resource.Attribute.initialActivityCount;
+			global::Shiny.Beacons.Resource.Attribute.isLightTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.isLightTheme;
+			global::Shiny.Beacons.Resource.Attribute.itemPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.itemPadding;
+			global::Shiny.Beacons.Resource.Attribute.lastBaselineToBottomHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.lastBaselineToBottomHeight;
+			global::Shiny.Beacons.Resource.Attribute.layout = global::Shiny.Device.Tests.Droid.Resource.Attribute.layout;
+			global::Shiny.Beacons.Resource.Attribute.lineHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.lineHeight;
+			global::Shiny.Beacons.Resource.Attribute.listChoiceBackgroundIndicator = global::Shiny.Device.Tests.Droid.Resource.Attribute.listChoiceBackgroundIndicator;
+			global::Shiny.Beacons.Resource.Attribute.listChoiceIndicatorMultipleAnimated = global::Shiny.Device.Tests.Droid.Resource.Attribute.listChoiceIndicatorMultipleAnimated;
+			global::Shiny.Beacons.Resource.Attribute.listChoiceIndicatorSingleAnimated = global::Shiny.Device.Tests.Droid.Resource.Attribute.listChoiceIndicatorSingleAnimated;
+			global::Shiny.Beacons.Resource.Attribute.listDividerAlertDialog = global::Shiny.Device.Tests.Droid.Resource.Attribute.listDividerAlertDialog;
+			global::Shiny.Beacons.Resource.Attribute.listItemLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.listItemLayout;
+			global::Shiny.Beacons.Resource.Attribute.listLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.listLayout;
+			global::Shiny.Beacons.Resource.Attribute.listMenuViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.listMenuViewStyle;
+			global::Shiny.Beacons.Resource.Attribute.listPopupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPopupWindowStyle;
+			global::Shiny.Beacons.Resource.Attribute.listPreferredItemHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemHeight;
+			global::Shiny.Beacons.Resource.Attribute.listPreferredItemHeightLarge = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemHeightLarge;
+			global::Shiny.Beacons.Resource.Attribute.listPreferredItemHeightSmall = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemHeightSmall;
+			global::Shiny.Beacons.Resource.Attribute.listPreferredItemPaddingEnd = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemPaddingEnd;
+			global::Shiny.Beacons.Resource.Attribute.listPreferredItemPaddingLeft = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemPaddingLeft;
+			global::Shiny.Beacons.Resource.Attribute.listPreferredItemPaddingRight = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemPaddingRight;
+			global::Shiny.Beacons.Resource.Attribute.listPreferredItemPaddingStart = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemPaddingStart;
+			global::Shiny.Beacons.Resource.Attribute.logo = global::Shiny.Device.Tests.Droid.Resource.Attribute.logo;
+			global::Shiny.Beacons.Resource.Attribute.logoDescription = global::Shiny.Device.Tests.Droid.Resource.Attribute.logoDescription;
+			global::Shiny.Beacons.Resource.Attribute.maxButtonHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.maxButtonHeight;
+			global::Shiny.Beacons.Resource.Attribute.measureWithLargestChild = global::Shiny.Device.Tests.Droid.Resource.Attribute.measureWithLargestChild;
+			global::Shiny.Beacons.Resource.Attribute.menu = global::Shiny.Device.Tests.Droid.Resource.Attribute.menu;
+			global::Shiny.Beacons.Resource.Attribute.multiChoiceItemLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.multiChoiceItemLayout;
+			global::Shiny.Beacons.Resource.Attribute.navigationContentDescription = global::Shiny.Device.Tests.Droid.Resource.Attribute.navigationContentDescription;
+			global::Shiny.Beacons.Resource.Attribute.navigationIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.navigationIcon;
+			global::Shiny.Beacons.Resource.Attribute.navigationMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.navigationMode;
+			global::Shiny.Beacons.Resource.Attribute.numericModifiers = global::Shiny.Device.Tests.Droid.Resource.Attribute.numericModifiers;
+			global::Shiny.Beacons.Resource.Attribute.overlapAnchor = global::Shiny.Device.Tests.Droid.Resource.Attribute.overlapAnchor;
+			global::Shiny.Beacons.Resource.Attribute.paddingBottomNoButtons = global::Shiny.Device.Tests.Droid.Resource.Attribute.paddingBottomNoButtons;
+			global::Shiny.Beacons.Resource.Attribute.paddingEnd = global::Shiny.Device.Tests.Droid.Resource.Attribute.paddingEnd;
+			global::Shiny.Beacons.Resource.Attribute.paddingStart = global::Shiny.Device.Tests.Droid.Resource.Attribute.paddingStart;
+			global::Shiny.Beacons.Resource.Attribute.paddingTopNoTitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.paddingTopNoTitle;
+			global::Shiny.Beacons.Resource.Attribute.panelBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.panelBackground;
+			global::Shiny.Beacons.Resource.Attribute.panelMenuListTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.panelMenuListTheme;
+			global::Shiny.Beacons.Resource.Attribute.panelMenuListWidth = global::Shiny.Device.Tests.Droid.Resource.Attribute.panelMenuListWidth;
+			global::Shiny.Beacons.Resource.Attribute.popupMenuStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.popupMenuStyle;
+			global::Shiny.Beacons.Resource.Attribute.popupTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.popupTheme;
+			global::Shiny.Beacons.Resource.Attribute.popupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.popupWindowStyle;
+			global::Shiny.Beacons.Resource.Attribute.preserveIconSpacing = global::Shiny.Device.Tests.Droid.Resource.Attribute.preserveIconSpacing;
+			global::Shiny.Beacons.Resource.Attribute.progressBarPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.progressBarPadding;
+			global::Shiny.Beacons.Resource.Attribute.progressBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.progressBarStyle;
+			global::Shiny.Beacons.Resource.Attribute.queryBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.queryBackground;
+			global::Shiny.Beacons.Resource.Attribute.queryHint = global::Shiny.Device.Tests.Droid.Resource.Attribute.queryHint;
+			global::Shiny.Beacons.Resource.Attribute.radioButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.radioButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.ratingBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.ratingBarStyle;
+			global::Shiny.Beacons.Resource.Attribute.ratingBarStyleIndicator = global::Shiny.Device.Tests.Droid.Resource.Attribute.ratingBarStyleIndicator;
+			global::Shiny.Beacons.Resource.Attribute.ratingBarStyleSmall = global::Shiny.Device.Tests.Droid.Resource.Attribute.ratingBarStyleSmall;
+			global::Shiny.Beacons.Resource.Attribute.searchHintIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.searchHintIcon;
+			global::Shiny.Beacons.Resource.Attribute.searchIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.searchIcon;
+			global::Shiny.Beacons.Resource.Attribute.searchViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.searchViewStyle;
+			global::Shiny.Beacons.Resource.Attribute.seekBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.seekBarStyle;
+			global::Shiny.Beacons.Resource.Attribute.selectableItemBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.selectableItemBackground;
+			global::Shiny.Beacons.Resource.Attribute.selectableItemBackgroundBorderless = global::Shiny.Device.Tests.Droid.Resource.Attribute.selectableItemBackgroundBorderless;
+			global::Shiny.Beacons.Resource.Attribute.showAsAction = global::Shiny.Device.Tests.Droid.Resource.Attribute.showAsAction;
+			global::Shiny.Beacons.Resource.Attribute.showDividers = global::Shiny.Device.Tests.Droid.Resource.Attribute.showDividers;
+			global::Shiny.Beacons.Resource.Attribute.showText = global::Shiny.Device.Tests.Droid.Resource.Attribute.showText;
+			global::Shiny.Beacons.Resource.Attribute.showTitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.showTitle;
+			global::Shiny.Beacons.Resource.Attribute.singleChoiceItemLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.singleChoiceItemLayout;
+			global::Shiny.Beacons.Resource.Attribute.spinBars = global::Shiny.Device.Tests.Droid.Resource.Attribute.spinBars;
+			global::Shiny.Beacons.Resource.Attribute.spinnerDropDownItemStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.spinnerDropDownItemStyle;
+			global::Shiny.Beacons.Resource.Attribute.spinnerStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.spinnerStyle;
+			global::Shiny.Beacons.Resource.Attribute.splitTrack = global::Shiny.Device.Tests.Droid.Resource.Attribute.splitTrack;
+			global::Shiny.Beacons.Resource.Attribute.srcCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.srcCompat;
+			global::Shiny.Beacons.Resource.Attribute.state_above_anchor = global::Shiny.Device.Tests.Droid.Resource.Attribute.state_above_anchor;
+			global::Shiny.Beacons.Resource.Attribute.subMenuArrow = global::Shiny.Device.Tests.Droid.Resource.Attribute.subMenuArrow;
+			global::Shiny.Beacons.Resource.Attribute.submitBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.submitBackground;
+			global::Shiny.Beacons.Resource.Attribute.subtitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.subtitle;
+			global::Shiny.Beacons.Resource.Attribute.subtitleTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Attribute.subtitleTextAppearance;
+			global::Shiny.Beacons.Resource.Attribute.subtitleTextColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.subtitleTextColor;
+			global::Shiny.Beacons.Resource.Attribute.subtitleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.subtitleTextStyle;
+			global::Shiny.Beacons.Resource.Attribute.suggestionRowLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.suggestionRowLayout;
+			global::Shiny.Beacons.Resource.Attribute.switchMinWidth = global::Shiny.Device.Tests.Droid.Resource.Attribute.switchMinWidth;
+			global::Shiny.Beacons.Resource.Attribute.switchPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.switchPadding;
+			global::Shiny.Beacons.Resource.Attribute.switchStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.switchStyle;
+			global::Shiny.Beacons.Resource.Attribute.switchTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Attribute.switchTextAppearance;
+			global::Shiny.Beacons.Resource.Attribute.textAllCaps = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAllCaps;
+			global::Shiny.Beacons.Resource.Attribute.textAppearanceLargePopupMenu = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceLargePopupMenu;
+			global::Shiny.Beacons.Resource.Attribute.textAppearanceListItem = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceListItem;
+			global::Shiny.Beacons.Resource.Attribute.textAppearanceListItemSecondary = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceListItemSecondary;
+			global::Shiny.Beacons.Resource.Attribute.textAppearanceListItemSmall = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceListItemSmall;
+			global::Shiny.Beacons.Resource.Attribute.textAppearancePopupMenuHeader = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearancePopupMenuHeader;
+			global::Shiny.Beacons.Resource.Attribute.textAppearanceSearchResultSubtitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceSearchResultSubtitle;
+			global::Shiny.Beacons.Resource.Attribute.textAppearanceSearchResultTitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceSearchResultTitle;
+			global::Shiny.Beacons.Resource.Attribute.textAppearanceSmallPopupMenu = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceSmallPopupMenu;
+			global::Shiny.Beacons.Resource.Attribute.textColorAlertDialogListItem = global::Shiny.Device.Tests.Droid.Resource.Attribute.textColorAlertDialogListItem;
+			global::Shiny.Beacons.Resource.Attribute.textColorSearchUrl = global::Shiny.Device.Tests.Droid.Resource.Attribute.textColorSearchUrl;
+			global::Shiny.Beacons.Resource.Attribute.textLocale = global::Shiny.Device.Tests.Droid.Resource.Attribute.textLocale;
+			global::Shiny.Beacons.Resource.Attribute.theme = global::Shiny.Device.Tests.Droid.Resource.Attribute.theme;
+			global::Shiny.Beacons.Resource.Attribute.thickness = global::Shiny.Device.Tests.Droid.Resource.Attribute.thickness;
+			global::Shiny.Beacons.Resource.Attribute.thumbTextPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.thumbTextPadding;
+			global::Shiny.Beacons.Resource.Attribute.thumbTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.thumbTint;
+			global::Shiny.Beacons.Resource.Attribute.thumbTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.thumbTintMode;
+			global::Shiny.Beacons.Resource.Attribute.tickMark = global::Shiny.Device.Tests.Droid.Resource.Attribute.tickMark;
+			global::Shiny.Beacons.Resource.Attribute.tickMarkTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.tickMarkTint;
+			global::Shiny.Beacons.Resource.Attribute.tickMarkTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.tickMarkTintMode;
+			global::Shiny.Beacons.Resource.Attribute.tint = global::Shiny.Device.Tests.Droid.Resource.Attribute.tint;
+			global::Shiny.Beacons.Resource.Attribute.tintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.tintMode;
+			global::Shiny.Beacons.Resource.Attribute.title = global::Shiny.Device.Tests.Droid.Resource.Attribute.title;
+			global::Shiny.Beacons.Resource.Attribute.titleMargin = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMargin;
+			global::Shiny.Beacons.Resource.Attribute.titleMarginBottom = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMarginBottom;
+			global::Shiny.Beacons.Resource.Attribute.titleMarginEnd = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMarginEnd;
+			global::Shiny.Beacons.Resource.Attribute.titleMargins = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMargins;
+			global::Shiny.Beacons.Resource.Attribute.titleMarginStart = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMarginStart;
+			global::Shiny.Beacons.Resource.Attribute.titleMarginTop = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMarginTop;
+			global::Shiny.Beacons.Resource.Attribute.titleTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleTextAppearance;
+			global::Shiny.Beacons.Resource.Attribute.titleTextColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleTextColor;
+			global::Shiny.Beacons.Resource.Attribute.titleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleTextStyle;
+			global::Shiny.Beacons.Resource.Attribute.toolbarNavigationButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.toolbarNavigationButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.toolbarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.toolbarStyle;
+			global::Shiny.Beacons.Resource.Attribute.tooltipForegroundColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.tooltipForegroundColor;
+			global::Shiny.Beacons.Resource.Attribute.tooltipFrameBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.tooltipFrameBackground;
+			global::Shiny.Beacons.Resource.Attribute.tooltipText = global::Shiny.Device.Tests.Droid.Resource.Attribute.tooltipText;
+			global::Shiny.Beacons.Resource.Attribute.track = global::Shiny.Device.Tests.Droid.Resource.Attribute.track;
+			global::Shiny.Beacons.Resource.Attribute.trackTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.trackTint;
+			global::Shiny.Beacons.Resource.Attribute.trackTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.trackTintMode;
 			global::Shiny.Beacons.Resource.Attribute.ttcIndex = global::Shiny.Device.Tests.Droid.Resource.Attribute.ttcIndex;
+			global::Shiny.Beacons.Resource.Attribute.viewInflaterClass = global::Shiny.Device.Tests.Droid.Resource.Attribute.viewInflaterClass;
+			global::Shiny.Beacons.Resource.Attribute.voiceIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.voiceIcon;
+			global::Shiny.Beacons.Resource.Attribute.windowActionBar = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowActionBar;
+			global::Shiny.Beacons.Resource.Attribute.windowActionBarOverlay = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowActionBarOverlay;
+			global::Shiny.Beacons.Resource.Attribute.windowActionModeOverlay = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowActionModeOverlay;
+			global::Shiny.Beacons.Resource.Attribute.windowFixedHeightMajor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowFixedHeightMajor;
+			global::Shiny.Beacons.Resource.Attribute.windowFixedHeightMinor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowFixedHeightMinor;
+			global::Shiny.Beacons.Resource.Attribute.windowFixedWidthMajor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowFixedWidthMajor;
+			global::Shiny.Beacons.Resource.Attribute.windowFixedWidthMinor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowFixedWidthMinor;
+			global::Shiny.Beacons.Resource.Attribute.windowMinWidthMajor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowMinWidthMajor;
+			global::Shiny.Beacons.Resource.Attribute.windowMinWidthMinor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowMinWidthMinor;
+			global::Shiny.Beacons.Resource.Attribute.windowNoTitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowNoTitle;
+			global::Shiny.Beacons.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Device.Tests.Droid.Resource.Boolean.abc_action_bar_embed_tabs;
+			global::Shiny.Beacons.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Device.Tests.Droid.Resource.Boolean.abc_allow_stacked_button_bar;
+			global::Shiny.Beacons.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Device.Tests.Droid.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Shiny.Beacons.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_alarm_service_default;
 			global::Shiny.Beacons.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_foreground_service_default;
 			global::Shiny.Beacons.Resource.Boolean.enable_system_job_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_job_service_default;
 			global::Shiny.Beacons.Resource.Boolean.workmanager_test_configuration = global::Shiny.Device.Tests.Droid.Resource.Boolean.workmanager_test_configuration;
+			global::Shiny.Beacons.Resource.Color.abc_background_cache_hint_selector_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_background_cache_hint_selector_material_dark;
+			global::Shiny.Beacons.Resource.Color.abc_background_cache_hint_selector_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_background_cache_hint_selector_material_light;
+			global::Shiny.Beacons.Resource.Color.abc_btn_colored_borderless_text_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_btn_colored_borderless_text_material;
+			global::Shiny.Beacons.Resource.Color.abc_btn_colored_text_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_btn_colored_text_material;
+			global::Shiny.Beacons.Resource.Color.abc_color_highlight_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_color_highlight_material;
+			global::Shiny.Beacons.Resource.Color.abc_decor_view_status_guard = global::Shiny.Device.Tests.Droid.Resource.Color.abc_decor_view_status_guard;
+			global::Shiny.Beacons.Resource.Color.abc_decor_view_status_guard_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_decor_view_status_guard_light;
+			global::Shiny.Beacons.Resource.Color.abc_hint_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_dark;
+			global::Shiny.Beacons.Resource.Color.abc_hint_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_light;
+			global::Shiny.Beacons.Resource.Color.abc_primary_text_disable_only_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_dark;
+			global::Shiny.Beacons.Resource.Color.abc_primary_text_disable_only_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_light;
+			global::Shiny.Beacons.Resource.Color.abc_primary_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_material_dark;
+			global::Shiny.Beacons.Resource.Color.abc_primary_text_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_material_light;
+			global::Shiny.Beacons.Resource.Color.abc_search_url_text = global::Shiny.Device.Tests.Droid.Resource.Color.abc_search_url_text;
+			global::Shiny.Beacons.Resource.Color.abc_search_url_text_normal = global::Shiny.Device.Tests.Droid.Resource.Color.abc_search_url_text_normal;
+			global::Shiny.Beacons.Resource.Color.abc_search_url_text_pressed = global::Shiny.Device.Tests.Droid.Resource.Color.abc_search_url_text_pressed;
+			global::Shiny.Beacons.Resource.Color.abc_search_url_text_selected = global::Shiny.Device.Tests.Droid.Resource.Color.abc_search_url_text_selected;
+			global::Shiny.Beacons.Resource.Color.abc_secondary_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_secondary_text_material_dark;
+			global::Shiny.Beacons.Resource.Color.abc_secondary_text_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_secondary_text_material_light;
+			global::Shiny.Beacons.Resource.Color.abc_tint_btn_checkable = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_btn_checkable;
+			global::Shiny.Beacons.Resource.Color.abc_tint_default = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_default;
+			global::Shiny.Beacons.Resource.Color.abc_tint_edittext = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_edittext;
+			global::Shiny.Beacons.Resource.Color.abc_tint_seek_thumb = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_seek_thumb;
+			global::Shiny.Beacons.Resource.Color.abc_tint_spinner = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_spinner;
+			global::Shiny.Beacons.Resource.Color.abc_tint_switch_track = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_switch_track;
+			global::Shiny.Beacons.Resource.Color.accent_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.accent_material_dark;
+			global::Shiny.Beacons.Resource.Color.accent_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.accent_material_light;
+			global::Shiny.Beacons.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.Beacons.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_secondary_text_default_material_light;
+			global::Shiny.Beacons.Resource.Color.background_floating_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.background_floating_material_dark;
+			global::Shiny.Beacons.Resource.Color.background_floating_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.background_floating_material_light;
+			global::Shiny.Beacons.Resource.Color.background_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.background_material_dark;
+			global::Shiny.Beacons.Resource.Color.background_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.background_material_light;
+			global::Shiny.Beacons.Resource.Color.bright_foreground_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_disabled_material_dark;
+			global::Shiny.Beacons.Resource.Color.bright_foreground_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_disabled_material_light;
+			global::Shiny.Beacons.Resource.Color.bright_foreground_inverse_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_inverse_material_dark;
+			global::Shiny.Beacons.Resource.Color.bright_foreground_inverse_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_inverse_material_light;
+			global::Shiny.Beacons.Resource.Color.bright_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_material_dark;
+			global::Shiny.Beacons.Resource.Color.bright_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_material_light;
+			global::Shiny.Beacons.Resource.Color.button_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.button_material_dark;
+			global::Shiny.Beacons.Resource.Color.button_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.button_material_light;
+			global::Shiny.Beacons.Resource.Color.dim_foreground_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.dim_foreground_disabled_material_dark;
+			global::Shiny.Beacons.Resource.Color.dim_foreground_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.dim_foreground_disabled_material_light;
+			global::Shiny.Beacons.Resource.Color.dim_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.dim_foreground_material_dark;
+			global::Shiny.Beacons.Resource.Color.dim_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.dim_foreground_material_light;
+			global::Shiny.Beacons.Resource.Color.error_color_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.error_color_material_dark;
+			global::Shiny.Beacons.Resource.Color.error_color_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.error_color_material_light;
+			global::Shiny.Beacons.Resource.Color.foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.foreground_material_dark;
+			global::Shiny.Beacons.Resource.Color.foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.foreground_material_light;
+			global::Shiny.Beacons.Resource.Color.highlighted_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.highlighted_text_material_dark;
+			global::Shiny.Beacons.Resource.Color.highlighted_text_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.highlighted_text_material_light;
+			global::Shiny.Beacons.Resource.Color.material_blue_grey_800 = global::Shiny.Device.Tests.Droid.Resource.Color.material_blue_grey_800;
+			global::Shiny.Beacons.Resource.Color.material_blue_grey_900 = global::Shiny.Device.Tests.Droid.Resource.Color.material_blue_grey_900;
+			global::Shiny.Beacons.Resource.Color.material_blue_grey_950 = global::Shiny.Device.Tests.Droid.Resource.Color.material_blue_grey_950;
+			global::Shiny.Beacons.Resource.Color.material_deep_teal_200 = global::Shiny.Device.Tests.Droid.Resource.Color.material_deep_teal_200;
+			global::Shiny.Beacons.Resource.Color.material_deep_teal_500 = global::Shiny.Device.Tests.Droid.Resource.Color.material_deep_teal_500;
+			global::Shiny.Beacons.Resource.Color.material_grey_100 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_100;
+			global::Shiny.Beacons.Resource.Color.material_grey_300 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_300;
+			global::Shiny.Beacons.Resource.Color.material_grey_50 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_50;
+			global::Shiny.Beacons.Resource.Color.material_grey_600 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_600;
+			global::Shiny.Beacons.Resource.Color.material_grey_800 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_800;
+			global::Shiny.Beacons.Resource.Color.material_grey_850 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_850;
+			global::Shiny.Beacons.Resource.Color.material_grey_900 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_900;
 			global::Shiny.Beacons.Resource.Color.notification_action_color_filter = global::Shiny.Device.Tests.Droid.Resource.Color.notification_action_color_filter;
 			global::Shiny.Beacons.Resource.Color.notification_icon_bg_color = global::Shiny.Device.Tests.Droid.Resource.Color.notification_icon_bg_color;
+			global::Shiny.Beacons.Resource.Color.primary_dark_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.primary_dark_material_dark;
+			global::Shiny.Beacons.Resource.Color.primary_dark_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.primary_dark_material_light;
+			global::Shiny.Beacons.Resource.Color.primary_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.primary_material_dark;
+			global::Shiny.Beacons.Resource.Color.primary_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.primary_material_light;
+			global::Shiny.Beacons.Resource.Color.primary_text_default_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.primary_text_default_material_dark;
+			global::Shiny.Beacons.Resource.Color.primary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.primary_text_default_material_light;
+			global::Shiny.Beacons.Resource.Color.primary_text_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.primary_text_disabled_material_dark;
+			global::Shiny.Beacons.Resource.Color.primary_text_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.primary_text_disabled_material_light;
+			global::Shiny.Beacons.Resource.Color.ripple_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_dark;
 			global::Shiny.Beacons.Resource.Color.ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_light;
+			global::Shiny.Beacons.Resource.Color.secondary_text_default_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_dark;
 			global::Shiny.Beacons.Resource.Color.secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_light;
+			global::Shiny.Beacons.Resource.Color.secondary_text_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_disabled_material_dark;
+			global::Shiny.Beacons.Resource.Color.secondary_text_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_disabled_material_light;
+			global::Shiny.Beacons.Resource.Color.switch_thumb_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_disabled_material_dark;
+			global::Shiny.Beacons.Resource.Color.switch_thumb_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_disabled_material_light;
+			global::Shiny.Beacons.Resource.Color.switch_thumb_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_material_dark;
+			global::Shiny.Beacons.Resource.Color.switch_thumb_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_material_light;
+			global::Shiny.Beacons.Resource.Color.switch_thumb_normal_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_normal_material_dark;
+			global::Shiny.Beacons.Resource.Color.switch_thumb_normal_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_normal_material_light;
+			global::Shiny.Beacons.Resource.Color.tooltip_background_dark = global::Shiny.Device.Tests.Droid.Resource.Color.tooltip_background_dark;
+			global::Shiny.Beacons.Resource.Color.tooltip_background_light = global::Shiny.Device.Tests.Droid.Resource.Color.tooltip_background_light;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_content_inset_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_content_inset_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_content_inset_with_nav = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_content_inset_with_nav;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_default_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_default_height_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_default_padding_end_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_default_padding_end_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_default_padding_start_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_default_padding_start_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_elevation_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_elevation_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_icon_vertical_padding_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_icon_vertical_padding_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_overflow_padding_end_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_overflow_padding_end_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_overflow_padding_start_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_overflow_padding_start_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_stacked_max_height = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_stacked_max_height;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_stacked_tab_max_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_stacked_tab_max_width;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_subtitle_bottom_margin_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_subtitle_bottom_margin_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_bar_subtitle_top_margin_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_subtitle_top_margin_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_button_min_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_button_min_height_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_button_min_width_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_button_min_width_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_action_button_min_width_overflow_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_button_min_width_overflow_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_alert_dialog_button_bar_height = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_alert_dialog_button_bar_height;
+			global::Shiny.Beacons.Resource.Dimension.abc_alert_dialog_button_dimen = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_alert_dialog_button_dimen;
+			global::Shiny.Beacons.Resource.Dimension.abc_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_button_inset_horizontal_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_button_inset_vertical_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_button_padding_horizontal_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_button_padding_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_button_padding_vertical_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_cascading_menus_min_smallest_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_cascading_menus_min_smallest_width;
+			global::Shiny.Beacons.Resource.Dimension.abc_config_prefDialogWidth = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_config_prefDialogWidth;
+			global::Shiny.Beacons.Resource.Dimension.abc_control_corner_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_control_corner_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_control_inset_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_control_inset_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_control_padding_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_control_padding_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_corner_radius_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_corner_radius_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_fixed_height_major = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_fixed_height_major;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_fixed_height_minor = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_fixed_height_minor;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_fixed_width_major = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_fixed_width_major;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_fixed_width_minor = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_fixed_width_minor;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_list_padding_bottom_no_buttons = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_list_padding_bottom_no_buttons;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_list_padding_top_no_title = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_list_padding_top_no_title;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_min_width_major = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_min_width_major;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_min_width_minor = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_min_width_minor;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_padding_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_padding_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_padding_top_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_padding_top_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_dialog_title_divider_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_title_divider_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_disabled_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_disabled_alpha_material_dark;
+			global::Shiny.Beacons.Resource.Dimension.abc_disabled_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_disabled_alpha_material_light;
+			global::Shiny.Beacons.Resource.Dimension.abc_dropdownitem_icon_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dropdownitem_icon_width;
+			global::Shiny.Beacons.Resource.Dimension.abc_dropdownitem_text_padding_left = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dropdownitem_text_padding_left;
+			global::Shiny.Beacons.Resource.Dimension.abc_dropdownitem_text_padding_right = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dropdownitem_text_padding_right;
+			global::Shiny.Beacons.Resource.Dimension.abc_edit_text_inset_bottom_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_edit_text_inset_bottom_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_edit_text_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_edit_text_inset_horizontal_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_edit_text_inset_top_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_edit_text_inset_top_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_floating_window_z = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_floating_window_z;
+			global::Shiny.Beacons.Resource.Dimension.abc_list_item_height_large_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_list_item_height_large_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_list_item_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_list_item_height_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_list_item_height_small_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_list_item_height_small_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_list_item_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_list_item_padding_horizontal_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_panel_menu_list_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_panel_menu_list_width;
+			global::Shiny.Beacons.Resource.Dimension.abc_progress_bar_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_progress_bar_height_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_search_view_preferred_height = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_search_view_preferred_height;
+			global::Shiny.Beacons.Resource.Dimension.abc_search_view_preferred_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_search_view_preferred_width;
+			global::Shiny.Beacons.Resource.Dimension.abc_seekbar_track_background_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_seekbar_track_background_height_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_seekbar_track_progress_height_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_select_dialog_padding_start_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_switch_padding = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_switch_padding;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_body_1_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_body_1_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_body_2_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_body_2_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_button_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_button_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_caption_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_caption_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_display_1_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_display_1_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_display_2_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_display_2_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_display_3_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_display_3_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_display_4_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_display_4_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_headline_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_headline_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_large_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_large_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_medium_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_medium_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_menu_header_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_menu_header_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_menu_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_menu_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_small_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_small_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_subhead_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_subhead_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_subtitle_material_toolbar = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_subtitle_material_toolbar;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_title_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_title_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_text_size_title_material_toolbar = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_title_material_toolbar;
 			global::Shiny.Beacons.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_horizontal_material;
 			global::Shiny.Beacons.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_vertical_material;
 			global::Shiny.Beacons.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_padding_horizontal_material;
@@ -2748,6 +3208,15 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Dimension.compat_control_corner_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_control_corner_material;
 			global::Shiny.Beacons.Resource.Dimension.compat_notification_large_icon_max_height = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_notification_large_icon_max_height;
 			global::Shiny.Beacons.Resource.Dimension.compat_notification_large_icon_max_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_notification_large_icon_max_width;
+			global::Shiny.Beacons.Resource.Dimension.disabled_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.disabled_alpha_material_dark;
+			global::Shiny.Beacons.Resource.Dimension.disabled_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.disabled_alpha_material_light;
+			global::Shiny.Beacons.Resource.Dimension.highlight_alpha_material_colored = global::Shiny.Device.Tests.Droid.Resource.Dimension.highlight_alpha_material_colored;
+			global::Shiny.Beacons.Resource.Dimension.highlight_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.highlight_alpha_material_dark;
+			global::Shiny.Beacons.Resource.Dimension.highlight_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.highlight_alpha_material_light;
+			global::Shiny.Beacons.Resource.Dimension.hint_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.hint_alpha_material_dark;
+			global::Shiny.Beacons.Resource.Dimension.hint_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.hint_alpha_material_light;
+			global::Shiny.Beacons.Resource.Dimension.hint_pressed_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.hint_pressed_alpha_material_dark;
+			global::Shiny.Beacons.Resource.Dimension.hint_pressed_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.hint_pressed_alpha_material_light;
 			global::Shiny.Beacons.Resource.Dimension.notification_action_icon_size = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_action_icon_size;
 			global::Shiny.Beacons.Resource.Dimension.notification_action_text_size = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_action_text_size;
 			global::Shiny.Beacons.Resource.Dimension.notification_big_circle_margin = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_big_circle_margin;
@@ -2763,6 +3232,108 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Dimension.notification_subtext_size = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_subtext_size;
 			global::Shiny.Beacons.Resource.Dimension.notification_top_pad = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_top_pad;
 			global::Shiny.Beacons.Resource.Dimension.notification_top_pad_large_text = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_top_pad_large_text;
+			global::Shiny.Beacons.Resource.Dimension.tooltip_corner_radius = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_corner_radius;
+			global::Shiny.Beacons.Resource.Dimension.tooltip_horizontal_padding = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_horizontal_padding;
+			global::Shiny.Beacons.Resource.Dimension.tooltip_margin = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_margin;
+			global::Shiny.Beacons.Resource.Dimension.tooltip_precise_anchor_extra_offset = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_precise_anchor_extra_offset;
+			global::Shiny.Beacons.Resource.Dimension.tooltip_precise_anchor_threshold = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_precise_anchor_threshold;
+			global::Shiny.Beacons.Resource.Dimension.tooltip_vertical_padding = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_vertical_padding;
+			global::Shiny.Beacons.Resource.Dimension.tooltip_y_offset_non_touch = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_y_offset_non_touch;
+			global::Shiny.Beacons.Resource.Dimension.tooltip_y_offset_touch = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_y_offset_touch;
+			global::Shiny.Beacons.Resource.Drawable.abc_ab_share_pack_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ab_share_pack_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_action_bar_item_background_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_action_bar_item_background_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_borderless_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_borderless_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_check_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_check_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_check_material_anim = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_check_material_anim;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_check_to_on_mtrl_000 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_check_to_on_mtrl_000;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_check_to_on_mtrl_015 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_check_to_on_mtrl_015;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_colored_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_colored_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_default_mtrl_shape = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_default_mtrl_shape;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_radio_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_radio_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_radio_material_anim = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_radio_material_anim;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_radio_to_on_mtrl_000 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_radio_to_on_mtrl_000;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_radio_to_on_mtrl_015 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_radio_to_on_mtrl_015;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_switch_to_on_mtrl_00001 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_switch_to_on_mtrl_00001;
+			global::Shiny.Beacons.Resource.Drawable.abc_btn_switch_to_on_mtrl_00012 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_switch_to_on_mtrl_00012;
+			global::Shiny.Beacons.Resource.Drawable.abc_cab_background_internal_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_cab_background_internal_bg;
+			global::Shiny.Beacons.Resource.Drawable.abc_cab_background_top_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_cab_background_top_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_cab_background_top_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_cab_background_top_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_control_background_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_control_background_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_dialog_material_background = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_dialog_material_background;
+			global::Shiny.Beacons.Resource.Drawable.abc_edit_text_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_edit_text_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_ab_back_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_ab_back_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_arrow_drop_right_black_24dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_arrow_drop_right_black_24dp;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_clear_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_clear_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_commit_search_api_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_commit_search_api_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_go_search_api_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_go_search_api_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_menu_cut_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_cut_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_menu_overflow_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_overflow_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_menu_paste_mtrl_am_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_paste_mtrl_am_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_search_api_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_black_16dp;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_black_36dp;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_black_48dp;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_half_black_16dp;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_half_black_36dp;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_half_black_48dp;
+			global::Shiny.Beacons.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_voice_search_api_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_item_background_holo_dark;
+			global::Shiny.Beacons.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_item_background_holo_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_divider_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_divider_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_divider_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_divider_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_focused_holo = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_focused_holo;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_longpressed_holo = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_longpressed_holo;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_pressed_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_pressed_holo_dark;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_pressed_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_pressed_holo_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_selector_background_transition_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_background_transition_holo_dark;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_selector_background_transition_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_background_transition_holo_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_selector_disabled_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_disabled_holo_dark;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_selector_disabled_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_disabled_holo_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_selector_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_holo_dark;
+			global::Shiny.Beacons.Resource.Drawable.abc_list_selector_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_holo_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_menu_hardkey_panel_mtrl_mult = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_menu_hardkey_panel_mtrl_mult;
+			global::Shiny.Beacons.Resource.Drawable.abc_popup_background_mtrl_mult = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_popup_background_mtrl_mult;
+			global::Shiny.Beacons.Resource.Drawable.abc_ratingbar_indicator_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ratingbar_indicator_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_ratingbar_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ratingbar_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_ratingbar_small_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ratingbar_small_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_scrubber_control_off_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_control_off_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_000 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_000;
+			global::Shiny.Beacons.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_005 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_005;
+			global::Shiny.Beacons.Resource.Drawable.abc_scrubber_primary_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_primary_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_scrubber_track_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_track_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_seekbar_thumb_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_seekbar_thumb_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_seekbar_tick_mark_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_seekbar_tick_mark_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_seekbar_track_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_seekbar_track_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_spinner_mtrl_am_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_spinner_textfield_background_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_switch_thumb_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_switch_thumb_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_switch_track_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_tab_indicator_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_tab_indicator_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_tab_indicator_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_tab_indicator_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_textfield_activated_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_activated_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_textfield_default_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_default_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_textfield_search_activated_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_search_activated_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
+			global::Shiny.Beacons.Resource.Drawable.abc_textfield_search_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_search_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_cursor_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_cursor_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_vector_test = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_vector_test;
+			global::Shiny.Beacons.Resource.Drawable.btn_checkbox_checked_mtrl = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_checkbox_checked_mtrl;
+			global::Shiny.Beacons.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
+			global::Shiny.Beacons.Resource.Drawable.btn_checkbox_unchecked_mtrl = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_checkbox_unchecked_mtrl;
+			global::Shiny.Beacons.Resource.Drawable.btn_checkbox_unchecked_to_checked_mtrl_animation = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_checkbox_unchecked_to_checked_mtrl_animation;
+			global::Shiny.Beacons.Resource.Drawable.btn_radio_off_mtrl = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_radio_off_mtrl;
+			global::Shiny.Beacons.Resource.Drawable.btn_radio_off_to_on_mtrl_animation = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_radio_off_to_on_mtrl_animation;
+			global::Shiny.Beacons.Resource.Drawable.btn_radio_on_mtrl = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_radio_on_mtrl;
+			global::Shiny.Beacons.Resource.Drawable.btn_radio_on_to_off_mtrl_animation = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_radio_on_to_off_mtrl_animation;
 			global::Shiny.Beacons.Resource.Drawable.notification_action_background = global::Shiny.Device.Tests.Droid.Resource.Drawable.notification_action_background;
 			global::Shiny.Beacons.Resource.Drawable.notification_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.notification_bg;
 			global::Shiny.Beacons.Resource.Drawable.notification_bg_low = global::Shiny.Device.Tests.Droid.Resource.Drawable.notification_bg_low;
@@ -2775,6 +3346,8 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Drawable.notification_template_icon_low_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.notification_template_icon_low_bg;
 			global::Shiny.Beacons.Resource.Drawable.notification_tile_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.notification_tile_bg;
 			global::Shiny.Beacons.Resource.Drawable.notify_panel_notification_icon_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.notify_panel_notification_icon_bg;
+			global::Shiny.Beacons.Resource.Drawable.tooltip_frame_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.tooltip_frame_dark;
+			global::Shiny.Beacons.Resource.Drawable.tooltip_frame_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.tooltip_frame_light;
 			global::Shiny.Beacons.Resource.Id.accessibility_action_clickable_span = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_action_clickable_span;
 			global::Shiny.Beacons.Resource.Id.accessibility_custom_action_0 = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_custom_action_0;
 			global::Shiny.Beacons.Resource.Id.accessibility_custom_action_1 = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_custom_action_1;
@@ -2809,27 +3382,114 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Id.accessibility_custom_action_8 = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_custom_action_8;
 			global::Shiny.Beacons.Resource.Id.accessibility_custom_action_9 = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_custom_action_9;
 			global::Shiny.Beacons.Resource.Id.actions = global::Shiny.Device.Tests.Droid.Resource.Id.actions;
+			global::Shiny.Beacons.Resource.Id.action_bar = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar;
+			global::Shiny.Beacons.Resource.Id.action_bar_activity_content = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_activity_content;
+			global::Shiny.Beacons.Resource.Id.action_bar_container = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_container;
+			global::Shiny.Beacons.Resource.Id.action_bar_root = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_root;
+			global::Shiny.Beacons.Resource.Id.action_bar_spinner = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_spinner;
+			global::Shiny.Beacons.Resource.Id.action_bar_subtitle = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_subtitle;
+			global::Shiny.Beacons.Resource.Id.action_bar_title = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_title;
 			global::Shiny.Beacons.Resource.Id.action_container = global::Shiny.Device.Tests.Droid.Resource.Id.action_container;
+			global::Shiny.Beacons.Resource.Id.action_context_bar = global::Shiny.Device.Tests.Droid.Resource.Id.action_context_bar;
 			global::Shiny.Beacons.Resource.Id.action_divider = global::Shiny.Device.Tests.Droid.Resource.Id.action_divider;
 			global::Shiny.Beacons.Resource.Id.action_image = global::Shiny.Device.Tests.Droid.Resource.Id.action_image;
+			global::Shiny.Beacons.Resource.Id.action_menu_divider = global::Shiny.Device.Tests.Droid.Resource.Id.action_menu_divider;
+			global::Shiny.Beacons.Resource.Id.action_menu_presenter = global::Shiny.Device.Tests.Droid.Resource.Id.action_menu_presenter;
+			global::Shiny.Beacons.Resource.Id.action_mode_bar = global::Shiny.Device.Tests.Droid.Resource.Id.action_mode_bar;
+			global::Shiny.Beacons.Resource.Id.action_mode_bar_stub = global::Shiny.Device.Tests.Droid.Resource.Id.action_mode_bar_stub;
+			global::Shiny.Beacons.Resource.Id.action_mode_close_button = global::Shiny.Device.Tests.Droid.Resource.Id.action_mode_close_button;
 			global::Shiny.Beacons.Resource.Id.action_text = global::Shiny.Device.Tests.Droid.Resource.Id.action_text;
+			global::Shiny.Beacons.Resource.Id.activity_chooser_view_content = global::Shiny.Device.Tests.Droid.Resource.Id.activity_chooser_view_content;
+			global::Shiny.Beacons.Resource.Id.add = global::Shiny.Device.Tests.Droid.Resource.Id.add;
+			global::Shiny.Beacons.Resource.Id.alertTitle = global::Shiny.Device.Tests.Droid.Resource.Id.alertTitle;
+			global::Shiny.Beacons.Resource.Id.ALT = global::Shiny.Device.Tests.Droid.Resource.Id.ALT;
+			global::Shiny.Beacons.Resource.Id.always = global::Shiny.Device.Tests.Droid.Resource.Id.always;
 			global::Shiny.Beacons.Resource.Id.async = global::Shiny.Device.Tests.Droid.Resource.Id.async;
+			global::Shiny.Beacons.Resource.Id.beginning = global::Shiny.Device.Tests.Droid.Resource.Id.beginning;
 			global::Shiny.Beacons.Resource.Id.blocking = global::Shiny.Device.Tests.Droid.Resource.Id.blocking;
+			global::Shiny.Beacons.Resource.Id.bottom = global::Shiny.Device.Tests.Droid.Resource.Id.bottom;
+			global::Shiny.Beacons.Resource.Id.buttonPanel = global::Shiny.Device.Tests.Droid.Resource.Id.buttonPanel;
+			global::Shiny.Beacons.Resource.Id.center_vertical = global::Shiny.Device.Tests.Droid.Resource.Id.center_vertical;
+			global::Shiny.Beacons.Resource.Id.checkbox = global::Shiny.Device.Tests.Droid.Resource.Id.checkbox;
+			global::Shiny.Beacons.Resource.Id.@checked = global::Shiny.Device.Tests.Droid.Resource.Id.@checked;
 			global::Shiny.Beacons.Resource.Id.chronometer = global::Shiny.Device.Tests.Droid.Resource.Id.chronometer;
+			global::Shiny.Beacons.Resource.Id.collapseActionView = global::Shiny.Device.Tests.Droid.Resource.Id.collapseActionView;
+			global::Shiny.Beacons.Resource.Id.content = global::Shiny.Device.Tests.Droid.Resource.Id.content;
+			global::Shiny.Beacons.Resource.Id.contentPanel = global::Shiny.Device.Tests.Droid.Resource.Id.contentPanel;
+			global::Shiny.Beacons.Resource.Id.CTRL = global::Shiny.Device.Tests.Droid.Resource.Id.CTRL;
+			global::Shiny.Beacons.Resource.Id.custom = global::Shiny.Device.Tests.Droid.Resource.Id.custom;
+			global::Shiny.Beacons.Resource.Id.customPanel = global::Shiny.Device.Tests.Droid.Resource.Id.customPanel;
+			global::Shiny.Beacons.Resource.Id.decor_content_parent = global::Shiny.Device.Tests.Droid.Resource.Id.decor_content_parent;
+			global::Shiny.Beacons.Resource.Id.default_activity_button = global::Shiny.Device.Tests.Droid.Resource.Id.default_activity_button;
 			global::Shiny.Beacons.Resource.Id.dialog_button = global::Shiny.Device.Tests.Droid.Resource.Id.dialog_button;
+			global::Shiny.Beacons.Resource.Id.disableHome = global::Shiny.Device.Tests.Droid.Resource.Id.disableHome;
+			global::Shiny.Beacons.Resource.Id.edit_query = global::Shiny.Device.Tests.Droid.Resource.Id.edit_query;
+			global::Shiny.Beacons.Resource.Id.end = global::Shiny.Device.Tests.Droid.Resource.Id.end;
+			global::Shiny.Beacons.Resource.Id.expanded_menu = global::Shiny.Device.Tests.Droid.Resource.Id.expanded_menu;
+			global::Shiny.Beacons.Resource.Id.expand_activities_button = global::Shiny.Device.Tests.Droid.Resource.Id.expand_activities_button;
 			global::Shiny.Beacons.Resource.Id.forever = global::Shiny.Device.Tests.Droid.Resource.Id.forever;
+			global::Shiny.Beacons.Resource.Id.fragment_container_view_tag = global::Shiny.Device.Tests.Droid.Resource.Id.fragment_container_view_tag;
+			global::Shiny.Beacons.Resource.Id.FUNCTION = global::Shiny.Device.Tests.Droid.Resource.Id.FUNCTION;
+			global::Shiny.Beacons.Resource.Id.group_divider = global::Shiny.Device.Tests.Droid.Resource.Id.group_divider;
+			global::Shiny.Beacons.Resource.Id.home = global::Shiny.Device.Tests.Droid.Resource.Id.home;
+			global::Shiny.Beacons.Resource.Id.homeAsUp = global::Shiny.Device.Tests.Droid.Resource.Id.homeAsUp;
 			global::Shiny.Beacons.Resource.Id.icon = global::Shiny.Device.Tests.Droid.Resource.Id.icon;
 			global::Shiny.Beacons.Resource.Id.icon_group = global::Shiny.Device.Tests.Droid.Resource.Id.icon_group;
+			global::Shiny.Beacons.Resource.Id.ifRoom = global::Shiny.Device.Tests.Droid.Resource.Id.ifRoom;
+			global::Shiny.Beacons.Resource.Id.image = global::Shiny.Device.Tests.Droid.Resource.Id.image;
 			global::Shiny.Beacons.Resource.Id.info = global::Shiny.Device.Tests.Droid.Resource.Id.info;
 			global::Shiny.Beacons.Resource.Id.italic = global::Shiny.Device.Tests.Droid.Resource.Id.italic;
 			global::Shiny.Beacons.Resource.Id.line1 = global::Shiny.Device.Tests.Droid.Resource.Id.line1;
 			global::Shiny.Beacons.Resource.Id.line3 = global::Shiny.Device.Tests.Droid.Resource.Id.line3;
+			global::Shiny.Beacons.Resource.Id.listMode = global::Shiny.Device.Tests.Droid.Resource.Id.listMode;
+			global::Shiny.Beacons.Resource.Id.list_item = global::Shiny.Device.Tests.Droid.Resource.Id.list_item;
+			global::Shiny.Beacons.Resource.Id.message = global::Shiny.Device.Tests.Droid.Resource.Id.message;
+			global::Shiny.Beacons.Resource.Id.META = global::Shiny.Device.Tests.Droid.Resource.Id.META;
+			global::Shiny.Beacons.Resource.Id.middle = global::Shiny.Device.Tests.Droid.Resource.Id.middle;
+			global::Shiny.Beacons.Resource.Id.multiply = global::Shiny.Device.Tests.Droid.Resource.Id.multiply;
+			global::Shiny.Beacons.Resource.Id.never = global::Shiny.Device.Tests.Droid.Resource.Id.never;
+			global::Shiny.Beacons.Resource.Id.none = global::Shiny.Device.Tests.Droid.Resource.Id.none;
 			global::Shiny.Beacons.Resource.Id.normal = global::Shiny.Device.Tests.Droid.Resource.Id.normal;
 			global::Shiny.Beacons.Resource.Id.notification_background = global::Shiny.Device.Tests.Droid.Resource.Id.notification_background;
 			global::Shiny.Beacons.Resource.Id.notification_main_column = global::Shiny.Device.Tests.Droid.Resource.Id.notification_main_column;
 			global::Shiny.Beacons.Resource.Id.notification_main_column_container = global::Shiny.Device.Tests.Droid.Resource.Id.notification_main_column_container;
+			global::Shiny.Beacons.Resource.Id.off = global::Shiny.Device.Tests.Droid.Resource.Id.off;
+			global::Shiny.Beacons.Resource.Id.on = global::Shiny.Device.Tests.Droid.Resource.Id.on;
+			global::Shiny.Beacons.Resource.Id.parentPanel = global::Shiny.Device.Tests.Droid.Resource.Id.parentPanel;
+			global::Shiny.Beacons.Resource.Id.progress_circular = global::Shiny.Device.Tests.Droid.Resource.Id.progress_circular;
+			global::Shiny.Beacons.Resource.Id.progress_horizontal = global::Shiny.Device.Tests.Droid.Resource.Id.progress_horizontal;
+			global::Shiny.Beacons.Resource.Id.radio = global::Shiny.Device.Tests.Droid.Resource.Id.radio;
 			global::Shiny.Beacons.Resource.Id.right_icon = global::Shiny.Device.Tests.Droid.Resource.Id.right_icon;
 			global::Shiny.Beacons.Resource.Id.right_side = global::Shiny.Device.Tests.Droid.Resource.Id.right_side;
+			global::Shiny.Beacons.Resource.Id.screen = global::Shiny.Device.Tests.Droid.Resource.Id.screen;
+			global::Shiny.Beacons.Resource.Id.scrollIndicatorDown = global::Shiny.Device.Tests.Droid.Resource.Id.scrollIndicatorDown;
+			global::Shiny.Beacons.Resource.Id.scrollIndicatorUp = global::Shiny.Device.Tests.Droid.Resource.Id.scrollIndicatorUp;
+			global::Shiny.Beacons.Resource.Id.scrollView = global::Shiny.Device.Tests.Droid.Resource.Id.scrollView;
+			global::Shiny.Beacons.Resource.Id.search_badge = global::Shiny.Device.Tests.Droid.Resource.Id.search_badge;
+			global::Shiny.Beacons.Resource.Id.search_bar = global::Shiny.Device.Tests.Droid.Resource.Id.search_bar;
+			global::Shiny.Beacons.Resource.Id.search_button = global::Shiny.Device.Tests.Droid.Resource.Id.search_button;
+			global::Shiny.Beacons.Resource.Id.search_close_btn = global::Shiny.Device.Tests.Droid.Resource.Id.search_close_btn;
+			global::Shiny.Beacons.Resource.Id.search_edit_frame = global::Shiny.Device.Tests.Droid.Resource.Id.search_edit_frame;
+			global::Shiny.Beacons.Resource.Id.search_go_btn = global::Shiny.Device.Tests.Droid.Resource.Id.search_go_btn;
+			global::Shiny.Beacons.Resource.Id.search_mag_icon = global::Shiny.Device.Tests.Droid.Resource.Id.search_mag_icon;
+			global::Shiny.Beacons.Resource.Id.search_plate = global::Shiny.Device.Tests.Droid.Resource.Id.search_plate;
+			global::Shiny.Beacons.Resource.Id.search_src_text = global::Shiny.Device.Tests.Droid.Resource.Id.search_src_text;
+			global::Shiny.Beacons.Resource.Id.search_voice_btn = global::Shiny.Device.Tests.Droid.Resource.Id.search_voice_btn;
+			global::Shiny.Beacons.Resource.Id.select_dialog_listview = global::Shiny.Device.Tests.Droid.Resource.Id.select_dialog_listview;
+			global::Shiny.Beacons.Resource.Id.SHIFT = global::Shiny.Device.Tests.Droid.Resource.Id.SHIFT;
+			global::Shiny.Beacons.Resource.Id.shortcut = global::Shiny.Device.Tests.Droid.Resource.Id.shortcut;
+			global::Shiny.Beacons.Resource.Id.showCustom = global::Shiny.Device.Tests.Droid.Resource.Id.showCustom;
+			global::Shiny.Beacons.Resource.Id.showHome = global::Shiny.Device.Tests.Droid.Resource.Id.showHome;
+			global::Shiny.Beacons.Resource.Id.showTitle = global::Shiny.Device.Tests.Droid.Resource.Id.showTitle;
+			global::Shiny.Beacons.Resource.Id.spacer = global::Shiny.Device.Tests.Droid.Resource.Id.spacer;
+			global::Shiny.Beacons.Resource.Id.split_action_bar = global::Shiny.Device.Tests.Droid.Resource.Id.split_action_bar;
+			global::Shiny.Beacons.Resource.Id.src_atop = global::Shiny.Device.Tests.Droid.Resource.Id.src_atop;
+			global::Shiny.Beacons.Resource.Id.src_in = global::Shiny.Device.Tests.Droid.Resource.Id.src_in;
+			global::Shiny.Beacons.Resource.Id.src_over = global::Shiny.Device.Tests.Droid.Resource.Id.src_over;
+			global::Shiny.Beacons.Resource.Id.submenuarrow = global::Shiny.Device.Tests.Droid.Resource.Id.submenuarrow;
+			global::Shiny.Beacons.Resource.Id.submit_area = global::Shiny.Device.Tests.Droid.Resource.Id.submit_area;
+			global::Shiny.Beacons.Resource.Id.SYM = global::Shiny.Device.Tests.Droid.Resource.Id.SYM;
+			global::Shiny.Beacons.Resource.Id.tabMode = global::Shiny.Device.Tests.Droid.Resource.Id.tabMode;
 			global::Shiny.Beacons.Resource.Id.tag_accessibility_actions = global::Shiny.Device.Tests.Droid.Resource.Id.tag_accessibility_actions;
 			global::Shiny.Beacons.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Device.Tests.Droid.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Beacons.Resource.Id.tag_accessibility_heading = global::Shiny.Device.Tests.Droid.Resource.Id.tag_accessibility_heading;
@@ -2840,9 +3500,62 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Device.Tests.Droid.Resource.Id.tag_unhandled_key_listeners;
 			global::Shiny.Beacons.Resource.Id.text = global::Shiny.Device.Tests.Droid.Resource.Id.text;
 			global::Shiny.Beacons.Resource.Id.text2 = global::Shiny.Device.Tests.Droid.Resource.Id.text2;
+			global::Shiny.Beacons.Resource.Id.textSpacerNoButtons = global::Shiny.Device.Tests.Droid.Resource.Id.textSpacerNoButtons;
+			global::Shiny.Beacons.Resource.Id.textSpacerNoTitle = global::Shiny.Device.Tests.Droid.Resource.Id.textSpacerNoTitle;
 			global::Shiny.Beacons.Resource.Id.time = global::Shiny.Device.Tests.Droid.Resource.Id.time;
 			global::Shiny.Beacons.Resource.Id.title = global::Shiny.Device.Tests.Droid.Resource.Id.title;
+			global::Shiny.Beacons.Resource.Id.titleDividerNoCustom = global::Shiny.Device.Tests.Droid.Resource.Id.titleDividerNoCustom;
+			global::Shiny.Beacons.Resource.Id.title_template = global::Shiny.Device.Tests.Droid.Resource.Id.title_template;
+			global::Shiny.Beacons.Resource.Id.top = global::Shiny.Device.Tests.Droid.Resource.Id.top;
+			global::Shiny.Beacons.Resource.Id.topPanel = global::Shiny.Device.Tests.Droid.Resource.Id.topPanel;
+			global::Shiny.Beacons.Resource.Id.@unchecked = global::Shiny.Device.Tests.Droid.Resource.Id.@unchecked;
+			global::Shiny.Beacons.Resource.Id.uniform = global::Shiny.Device.Tests.Droid.Resource.Id.uniform;
+			global::Shiny.Beacons.Resource.Id.up = global::Shiny.Device.Tests.Droid.Resource.Id.up;
+			global::Shiny.Beacons.Resource.Id.useLogo = global::Shiny.Device.Tests.Droid.Resource.Id.useLogo;
+			global::Shiny.Beacons.Resource.Id.view_tree_saved_state_registry_owner = global::Shiny.Device.Tests.Droid.Resource.Id.view_tree_saved_state_registry_owner;
+			global::Shiny.Beacons.Resource.Id.visible_removing_fragment_view_tag = global::Shiny.Device.Tests.Droid.Resource.Id.visible_removing_fragment_view_tag;
+			global::Shiny.Beacons.Resource.Id.withText = global::Shiny.Device.Tests.Droid.Resource.Id.withText;
+			global::Shiny.Beacons.Resource.Id.wrap_content = global::Shiny.Device.Tests.Droid.Resource.Id.wrap_content;
+			global::Shiny.Beacons.Resource.Integer.abc_config_activityDefaultDur = global::Shiny.Device.Tests.Droid.Resource.Integer.abc_config_activityDefaultDur;
+			global::Shiny.Beacons.Resource.Integer.abc_config_activityShortDur = global::Shiny.Device.Tests.Droid.Resource.Integer.abc_config_activityShortDur;
+			global::Shiny.Beacons.Resource.Integer.cancel_button_image_alpha = global::Shiny.Device.Tests.Droid.Resource.Integer.cancel_button_image_alpha;
+			global::Shiny.Beacons.Resource.Integer.config_tooltipAnimTime = global::Shiny.Device.Tests.Droid.Resource.Integer.config_tooltipAnimTime;
 			global::Shiny.Beacons.Resource.Integer.status_bar_notification_info_maxnum = global::Shiny.Device.Tests.Droid.Resource.Integer.status_bar_notification_info_maxnum;
+			global::Shiny.Beacons.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_0 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_0;
+			global::Shiny.Beacons.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_1 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_1;
+			global::Shiny.Beacons.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_0 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_0;
+			global::Shiny.Beacons.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_1 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_1;
+			global::Shiny.Beacons.Resource.Interpolator.btn_radio_to_off_mtrl_animation_interpolator_0 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_radio_to_off_mtrl_animation_interpolator_0;
+			global::Shiny.Beacons.Resource.Interpolator.btn_radio_to_on_mtrl_animation_interpolator_0 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_radio_to_on_mtrl_animation_interpolator_0;
+			global::Shiny.Beacons.Resource.Interpolator.fast_out_slow_in = global::Shiny.Device.Tests.Droid.Resource.Interpolator.fast_out_slow_in;
+			global::Shiny.Beacons.Resource.Layout.abc_action_bar_title_item = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_bar_title_item;
+			global::Shiny.Beacons.Resource.Layout.abc_action_bar_up_container = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_bar_up_container;
+			global::Shiny.Beacons.Resource.Layout.abc_action_menu_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_menu_item_layout;
+			global::Shiny.Beacons.Resource.Layout.abc_action_menu_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_menu_layout;
+			global::Shiny.Beacons.Resource.Layout.abc_action_mode_bar = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_mode_bar;
+			global::Shiny.Beacons.Resource.Layout.abc_action_mode_close_item_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_mode_close_item_material;
+			global::Shiny.Beacons.Resource.Layout.abc_activity_chooser_view = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_activity_chooser_view;
+			global::Shiny.Beacons.Resource.Layout.abc_activity_chooser_view_list_item = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_activity_chooser_view_list_item;
+			global::Shiny.Beacons.Resource.Layout.abc_alert_dialog_button_bar_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_alert_dialog_button_bar_material;
+			global::Shiny.Beacons.Resource.Layout.abc_alert_dialog_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_alert_dialog_material;
+			global::Shiny.Beacons.Resource.Layout.abc_alert_dialog_title_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_alert_dialog_title_material;
+			global::Shiny.Beacons.Resource.Layout.abc_cascading_menu_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_cascading_menu_item_layout;
+			global::Shiny.Beacons.Resource.Layout.abc_dialog_title_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_dialog_title_material;
+			global::Shiny.Beacons.Resource.Layout.abc_expanded_menu_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_expanded_menu_layout;
+			global::Shiny.Beacons.Resource.Layout.abc_list_menu_item_checkbox = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_list_menu_item_checkbox;
+			global::Shiny.Beacons.Resource.Layout.abc_list_menu_item_icon = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_list_menu_item_icon;
+			global::Shiny.Beacons.Resource.Layout.abc_list_menu_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_list_menu_item_layout;
+			global::Shiny.Beacons.Resource.Layout.abc_list_menu_item_radio = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_list_menu_item_radio;
+			global::Shiny.Beacons.Resource.Layout.abc_popup_menu_header_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_popup_menu_header_item_layout;
+			global::Shiny.Beacons.Resource.Layout.abc_popup_menu_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_popup_menu_item_layout;
+			global::Shiny.Beacons.Resource.Layout.abc_screen_content_include = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_screen_content_include;
+			global::Shiny.Beacons.Resource.Layout.abc_screen_simple = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_screen_simple;
+			global::Shiny.Beacons.Resource.Layout.abc_screen_simple_overlay_action_mode = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_screen_simple_overlay_action_mode;
+			global::Shiny.Beacons.Resource.Layout.abc_screen_toolbar = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_screen_toolbar;
+			global::Shiny.Beacons.Resource.Layout.abc_search_dropdown_item_icons_2line = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_search_dropdown_item_icons_2line;
+			global::Shiny.Beacons.Resource.Layout.abc_search_view = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_search_view;
+			global::Shiny.Beacons.Resource.Layout.abc_select_dialog_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_select_dialog_material;
+			global::Shiny.Beacons.Resource.Layout.abc_tooltip = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_tooltip;
 			global::Shiny.Beacons.Resource.Layout.custom_dialog = global::Shiny.Device.Tests.Droid.Resource.Layout.custom_dialog;
 			global::Shiny.Beacons.Resource.Layout.notification_action = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_action;
 			global::Shiny.Beacons.Resource.Layout.notification_action_tombstone = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_action_tombstone;
@@ -2850,18 +3563,644 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Layout.notification_template_icon_group = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_template_icon_group;
 			global::Shiny.Beacons.Resource.Layout.notification_template_part_chronometer = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_template_part_chronometer;
 			global::Shiny.Beacons.Resource.Layout.notification_template_part_time = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_template_part_time;
+			global::Shiny.Beacons.Resource.Layout.select_dialog_item_material = global::Shiny.Device.Tests.Droid.Resource.Layout.select_dialog_item_material;
+			global::Shiny.Beacons.Resource.Layout.select_dialog_multichoice_material = global::Shiny.Device.Tests.Droid.Resource.Layout.select_dialog_multichoice_material;
+			global::Shiny.Beacons.Resource.Layout.select_dialog_singlechoice_material = global::Shiny.Device.Tests.Droid.Resource.Layout.select_dialog_singlechoice_material;
+			global::Shiny.Beacons.Resource.Layout.support_simple_spinner_dropdown_item = global::Shiny.Device.Tests.Droid.Resource.Layout.support_simple_spinner_dropdown_item;
+			global::Shiny.Beacons.Resource.String.abc_action_bar_home_description = global::Shiny.Device.Tests.Droid.Resource.String.abc_action_bar_home_description;
+			global::Shiny.Beacons.Resource.String.abc_action_bar_up_description = global::Shiny.Device.Tests.Droid.Resource.String.abc_action_bar_up_description;
+			global::Shiny.Beacons.Resource.String.abc_action_menu_overflow_description = global::Shiny.Device.Tests.Droid.Resource.String.abc_action_menu_overflow_description;
+			global::Shiny.Beacons.Resource.String.abc_action_mode_done = global::Shiny.Device.Tests.Droid.Resource.String.abc_action_mode_done;
+			global::Shiny.Beacons.Resource.String.abc_activitychooserview_choose_application = global::Shiny.Device.Tests.Droid.Resource.String.abc_activitychooserview_choose_application;
+			global::Shiny.Beacons.Resource.String.abc_activity_chooser_view_see_all = global::Shiny.Device.Tests.Droid.Resource.String.abc_activity_chooser_view_see_all;
+			global::Shiny.Beacons.Resource.String.abc_capital_off = global::Shiny.Device.Tests.Droid.Resource.String.abc_capital_off;
+			global::Shiny.Beacons.Resource.String.abc_capital_on = global::Shiny.Device.Tests.Droid.Resource.String.abc_capital_on;
+			global::Shiny.Beacons.Resource.String.abc_menu_alt_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_alt_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_menu_ctrl_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_ctrl_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_menu_delete_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_delete_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_menu_enter_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_enter_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_menu_function_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_function_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_menu_meta_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_meta_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_menu_shift_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_shift_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_menu_space_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_space_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_menu_sym_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_sym_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_prepend_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_prepend_shortcut_label;
+			global::Shiny.Beacons.Resource.String.abc_searchview_description_clear = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_clear;
+			global::Shiny.Beacons.Resource.String.abc_searchview_description_query = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_query;
+			global::Shiny.Beacons.Resource.String.abc_searchview_description_search = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_search;
+			global::Shiny.Beacons.Resource.String.abc_searchview_description_submit = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_submit;
+			global::Shiny.Beacons.Resource.String.abc_searchview_description_voice = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_voice;
+			global::Shiny.Beacons.Resource.String.abc_search_hint = global::Shiny.Device.Tests.Droid.Resource.String.abc_search_hint;
+			global::Shiny.Beacons.Resource.String.abc_shareactionprovider_share_with = global::Shiny.Device.Tests.Droid.Resource.String.abc_shareactionprovider_share_with;
+			global::Shiny.Beacons.Resource.String.abc_shareactionprovider_share_with_application = global::Shiny.Device.Tests.Droid.Resource.String.abc_shareactionprovider_share_with_application;
+			global::Shiny.Beacons.Resource.String.abc_toolbar_collapse_description = global::Shiny.Device.Tests.Droid.Resource.String.abc_toolbar_collapse_description;
+			global::Shiny.Beacons.Resource.String.search_menu_title = global::Shiny.Device.Tests.Droid.Resource.String.search_menu_title;
 			global::Shiny.Beacons.Resource.String.status_bar_notification_info_overflow = global::Shiny.Device.Tests.Droid.Resource.String.status_bar_notification_info_overflow;
+			global::Shiny.Beacons.Resource.Style.AlertDialog_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.AlertDialog_AppCompat;
+			global::Shiny.Beacons.Resource.Style.AlertDialog_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.AlertDialog_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Animation_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Animation_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Animation_AppCompat_DropDownUp = global::Shiny.Device.Tests.Droid.Resource.Style.Animation_AppCompat_DropDownUp;
+			global::Shiny.Beacons.Resource.Style.Animation_AppCompat_Tooltip = global::Shiny.Device.Tests.Droid.Resource.Style.Animation_AppCompat_Tooltip;
+			global::Shiny.Beacons.Resource.Style.Base_AlertDialog_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_AlertDialog_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_AlertDialog_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_AlertDialog_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_Animation_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Animation_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_Animation_AppCompat_DropDownUp = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Animation_AppCompat_DropDownUp;
+			global::Shiny.Beacons.Resource.Style.Base_Animation_AppCompat_Tooltip = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Animation_AppCompat_Tooltip;
+			global::Shiny.Beacons.Resource.Style.Base_DialogWindowTitleBackground_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_DialogWindowTitleBackground_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_DialogWindowTitle_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_DialogWindowTitle_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Body1 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Body1;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Body2 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Body2;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Button = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Button;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Caption = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Caption;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Display1 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Display1;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Display2 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Display2;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Display3 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Display3;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Display4 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Display4;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Headline = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Headline;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Large = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Large;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Large_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Large_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Large = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Large;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Small;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Medium = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Medium;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Medium_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Medium_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Menu;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_SearchResult = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_SearchResult;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Subtitle;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Title;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Small;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Small_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Small_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Subhead = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Subhead;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Subhead_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Subhead_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Title;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Title_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Tooltip = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Tooltip;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Menu;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Subtitle;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Title;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Borderless_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Borderless_Colored;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Colored;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_DropDownItem = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_DropDownItem;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Header = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Header;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Large = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Large;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Small;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_Switch = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Switch;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_AppCompat_Widget_TextView_SpinnerItem = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_TextView_SpinnerItem;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
+			global::Shiny.Beacons.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Title;
+			global::Shiny.Beacons.Resource.Style.Base_ThemeOverlay_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_ThemeOverlay_AppCompat_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Base_ThemeOverlay_AppCompat_Dark = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Dark;
+			global::Shiny.Beacons.Resource.Style.Base_ThemeOverlay_AppCompat_Dark_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Dark_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog_Alert;
+			global::Shiny.Beacons.Resource.Style.Base_ThemeOverlay_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_CompactMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_CompactMenu;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_DialogWhenLarge;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Dialog_Alert;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Dialog_FixedSize = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Dialog_FixedSize;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Dialog_MinWidth;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Light_DarkActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_DarkActionBar;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Light_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_DialogWhenLarge;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Light_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_Dialog_Alert;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Light_Dialog_FixedSize = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_Dialog_FixedSize;
+			global::Shiny.Beacons.Resource.Style.Base_Theme_AppCompat_Light_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_Dialog_MinWidth;
+			global::Shiny.Beacons.Resource.Style.Base_V21_ThemeOverlay_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_ThemeOverlay_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_V21_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_Theme_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_V21_Theme_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_Theme_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_V21_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_Theme_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_V21_Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_Theme_AppCompat_Light_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_V22_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V22_Theme_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_V22_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V22_Theme_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_V23_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V23_Theme_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_V23_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V23_Theme_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_V26_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V26_Theme_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_V26_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V26_Theme_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_V26_Widget_AppCompat_Toolbar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V26_Widget_AppCompat_Toolbar;
+			global::Shiny.Beacons.Resource.Style.Base_V28_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V28_Theme_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_V28_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V28_Theme_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_V7_ThemeOverlay_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_ThemeOverlay_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_V7_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Theme_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Base_V7_Theme_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Theme_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_V7_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Theme_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Base_V7_Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Theme_AppCompat_Light_Dialog;
+			global::Shiny.Beacons.Resource.Style.Base_V7_Widget_AppCompat_AutoCompleteTextView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Widget_AppCompat_AutoCompleteTextView;
+			global::Shiny.Beacons.Resource.Style.Base_V7_Widget_AppCompat_EditText = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Widget_AppCompat_EditText;
+			global::Shiny.Beacons.Resource.Style.Base_V7_Widget_AppCompat_Toolbar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Widget_AppCompat_Toolbar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionBar_Solid = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar_Solid;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionBar_TabBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar_TabBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionBar_TabText = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar_TabText;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionBar_TabView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar_TabView;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionButton = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionButton;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionButton_CloseMode = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionButton_CloseMode;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionButton_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionButton_Overflow;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActionMode = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionMode;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ActivityChooserView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActivityChooserView;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_AutoCompleteTextView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_AutoCompleteTextView;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Button = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ButtonBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ButtonBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ButtonBar_AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ButtonBar_AlertDialog;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Button_Borderless = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_Borderless;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Button_Borderless_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_Borderless_Colored;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Button_ButtonBar_AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_ButtonBar_AlertDialog;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Button_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_Colored;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Button_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_Small;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_CompoundButton_CheckBox = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_CompoundButton_CheckBox;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_CompoundButton_RadioButton = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_CompoundButton_RadioButton;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_CompoundButton_Switch = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_CompoundButton_Switch;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle_Common = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle_Common;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_DropDownItem_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_DropDownItem_Spinner;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_EditText = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_EditText;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ImageButton = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ImageButton;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Light_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_Solid = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_Solid;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText_Inverse;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabView;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu_Overflow;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ListMenuView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListMenuView;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ListPopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListPopupWindow;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ListView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListView;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ListView_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListView_DropDown;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ListView_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListView_Menu;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_PopupMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_PopupMenu;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_PopupMenu_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_PopupMenu_Overflow;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_PopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_PopupWindow;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ProgressBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ProgressBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_ProgressBar_Horizontal = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ProgressBar_Horizontal;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_RatingBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_RatingBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_RatingBar_Indicator = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_RatingBar_Indicator;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_RatingBar_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_RatingBar_Small;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_SearchView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_SearchView;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_SearchView_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_SearchView_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_SeekBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_SeekBar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_SeekBar_Discrete = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_SeekBar_Discrete;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Spinner;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Spinner_Underlined = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Spinner_Underlined;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_TextView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_TextView;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_TextView_SpinnerItem = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_TextView_SpinnerItem;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Toolbar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Toolbar;
+			global::Shiny.Beacons.Resource.Style.Base_Widget_AppCompat_Toolbar_Button_Navigation = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Toolbar_Button_Navigation;
+			global::Shiny.Beacons.Resource.Style.Platform_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Platform_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Platform_ThemeOverlay_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_ThemeOverlay_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Platform_ThemeOverlay_AppCompat_Dark = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_ThemeOverlay_AppCompat_Dark;
+			global::Shiny.Beacons.Resource.Style.Platform_ThemeOverlay_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_ThemeOverlay_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Platform_V21_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_V21_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Platform_V21_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_V21_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Platform_V25_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_V25_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Platform_V25_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_V25_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Platform_Widget_AppCompat_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_Widget_AppCompat_Spinner;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_DialogWindowTitle_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_DialogWindowTitle_AppCompat;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_ActionBar_TitleItem = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_ActionBar_TitleItem;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_DialogTitle_Icon = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_DialogTitle_Icon;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_InternalGroup = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_InternalGroup;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Shortcut = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Shortcut;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_SubmenuArrow = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_SubmenuArrow;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Text = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Text;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Title = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Title;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_SearchView_MagIcon = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_SearchView_MagIcon;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon1 = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon1;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon2 = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon2;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Query = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Query;
+			global::Shiny.Beacons.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text;
+			global::Shiny.Beacons.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton = global::Shiny.Device.Tests.Droid.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton;
+			global::Shiny.Beacons.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Body1 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Body1;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Body2 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Body2;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Button = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Button;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Caption = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Caption;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Display1 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Display1;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Display2 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Display2;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Display3 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Display3;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Display4 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Display4;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Headline = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Headline;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Large = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Large;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Large_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Large_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Subtitle;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Title;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Large = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Large;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Medium = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Medium;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Medium_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Medium_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Menu;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_SearchResult_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_SearchResult_Subtitle;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_SearchResult_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_SearchResult_Title;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Small = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Small;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Small_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Small_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Subhead = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Subhead;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Subhead_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Subhead_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Title;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Title_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Tooltip = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Tooltip;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Menu;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_Button = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Button;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_Button_Borderless_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Button_Borderless_Colored;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_Button_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Button_Colored;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_Button_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Button_Inverse;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_DropDownItem = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_DropDownItem;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Header = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Header;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Large = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Large;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Small = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Small;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_Switch = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Switch;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_AppCompat_Widget_TextView_SpinnerItem = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_TextView_SpinnerItem;
 			global::Shiny.Beacons.Resource.Style.TextAppearance_Compat_Notification = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification;
 			global::Shiny.Beacons.Resource.Style.TextAppearance_Compat_Notification_Info = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification_Info;
 			global::Shiny.Beacons.Resource.Style.TextAppearance_Compat_Notification_Line2 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification_Line2;
 			global::Shiny.Beacons.Resource.Style.TextAppearance_Compat_Notification_Time = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification_Time;
 			global::Shiny.Beacons.Resource.Style.TextAppearance_Compat_Notification_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification_Title;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
+			global::Shiny.Beacons.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_ActionBar;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat_Dark = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Dark;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat_Dark_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Dark_ActionBar;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat_DayNight = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_DayNight;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat_DayNight_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_DayNight_ActionBar;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Dialog_Alert;
+			global::Shiny.Beacons.Resource.Style.ThemeOverlay_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_CompactMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_CompactMenu;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_DayNight = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_DayNight_DarkActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_DarkActionBar;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_DayNight_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_Dialog;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_DayNight_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_DialogWhenLarge;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_DayNight_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_Dialog_Alert;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_DayNight_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_Dialog_MinWidth;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_DayNight_NoActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_NoActionBar;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Dialog;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DialogWhenLarge;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Dialog_Alert;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Dialog_MinWidth;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Empty = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Empty;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Light_DarkActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_DarkActionBar;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_Dialog;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Light_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_DialogWhenLarge;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Light_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_Dialog_Alert;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Light_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_Dialog_MinWidth;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_Light_NoActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_NoActionBar;
+			global::Shiny.Beacons.Resource.Style.Theme_AppCompat_NoActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_NoActionBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionBar_Solid = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar_Solid;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionBar_TabBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar_TabBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionBar_TabText = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar_TabText;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionBar_TabView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar_TabView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionButton = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionButton;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionButton_CloseMode = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionButton_CloseMode;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionButton_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionButton_Overflow;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActionMode = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionMode;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ActivityChooserView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActivityChooserView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_AutoCompleteTextView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_AutoCompleteTextView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Button = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ButtonBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ButtonBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ButtonBar_AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ButtonBar_AlertDialog;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Button_Borderless = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_Borderless;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Button_Borderless_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_Borderless_Colored;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Button_ButtonBar_AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_ButtonBar_AlertDialog;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Button_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_Colored;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Button_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_Small;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_CompoundButton_CheckBox = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_CompoundButton_CheckBox;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_CompoundButton_RadioButton = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_CompoundButton_RadioButton;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_CompoundButton_Switch = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_CompoundButton_Switch;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_DrawerArrowToggle = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_DrawerArrowToggle;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_DropDownItem_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_DropDownItem_Spinner;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_EditText = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_EditText;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ImageButton = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ImageButton;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid_Inverse;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar_Inverse;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText_Inverse;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView_Inverse;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionButton = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionButton;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionButton_CloseMode = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionButton_CloseMode;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionButton_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionButton_Overflow;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActionMode_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionMode_Inverse;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ActivityChooserView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActivityChooserView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_AutoCompleteTextView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_AutoCompleteTextView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_DropDownItem_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_DropDownItem_Spinner;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ListPopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ListPopupWindow;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_ListView_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ListView_DropDown;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_PopupMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_PopupMenu;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_PopupMenu_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_PopupMenu_Overflow;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_SearchView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_SearchView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Light_Spinner_DropDown_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_Spinner_DropDown_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ListMenuView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListMenuView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ListPopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListPopupWindow;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ListView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ListView_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListView_DropDown;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ListView_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListView_Menu;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_PopupMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_PopupMenu;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_PopupMenu_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_PopupMenu_Overflow;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_PopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_PopupWindow;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ProgressBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ProgressBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_ProgressBar_Horizontal = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ProgressBar_Horizontal;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_RatingBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_RatingBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_RatingBar_Indicator = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_RatingBar_Indicator;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_RatingBar_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_RatingBar_Small;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_SearchView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_SearchView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_SearchView_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_SearchView_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_SeekBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_SeekBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_SeekBar_Discrete = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_SeekBar_Discrete;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Spinner;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Spinner_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Spinner_DropDown;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Spinner_DropDown_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Spinner_DropDown_ActionBar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Spinner_Underlined = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Spinner_Underlined;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_TextView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_TextView;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_TextView_SpinnerItem = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_TextView_SpinnerItem;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Toolbar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Toolbar;
+			global::Shiny.Beacons.Resource.Style.Widget_AppCompat_Toolbar_Button_Navigation = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Toolbar_Button_Navigation;
 			global::Shiny.Beacons.Resource.Style.Widget_Compat_NotificationActionContainer = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_Compat_NotificationActionContainer;
 			global::Shiny.Beacons.Resource.Style.Widget_Compat_NotificationActionText = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_Compat_NotificationActionText;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar;
+			global::Shiny.Beacons.Resource.Styleable.ActionBarLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBarLayout;
+			global::Shiny.Beacons.Resource.Styleable.ActionBarLayout_android_layout_gravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBarLayout_android_layout_gravity;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_background = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_background;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_backgroundSplit = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_backgroundSplit;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_backgroundStacked = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_backgroundStacked;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_contentInsetEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetEnd;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_contentInsetEndWithActions = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetEndWithActions;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_contentInsetLeft = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetLeft;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_contentInsetRight = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetRight;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_contentInsetStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetStart;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_contentInsetStartWithNavigation = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetStartWithNavigation;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_customNavigationLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_customNavigationLayout;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_displayOptions = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_displayOptions;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_divider = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_divider;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_elevation = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_elevation;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_height = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_height;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_hideOnContentScroll = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_hideOnContentScroll;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_homeAsUpIndicator = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_homeAsUpIndicator;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_homeLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_homeLayout;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_icon = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_icon;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_indeterminateProgressStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_indeterminateProgressStyle;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_itemPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_itemPadding;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_logo = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_logo;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_navigationMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_navigationMode;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_popupTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_popupTheme;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_progressBarPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_progressBarPadding;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_progressBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_progressBarStyle;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_subtitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_subtitle;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_subtitleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_subtitleTextStyle;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_title = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_title;
+			global::Shiny.Beacons.Resource.Styleable.ActionBar_titleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_titleTextStyle;
+			global::Shiny.Beacons.Resource.Styleable.ActionMenuItemView = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMenuItemView;
+			global::Shiny.Beacons.Resource.Styleable.ActionMenuItemView_android_minWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMenuItemView_android_minWidth;
+			global::Shiny.Beacons.Resource.Styleable.ActionMenuView = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMenuView;
+			global::Shiny.Beacons.Resource.Styleable.ActionMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode;
+			global::Shiny.Beacons.Resource.Styleable.ActionMode_background = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_background;
+			global::Shiny.Beacons.Resource.Styleable.ActionMode_backgroundSplit = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_backgroundSplit;
+			global::Shiny.Beacons.Resource.Styleable.ActionMode_closeItemLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_closeItemLayout;
+			global::Shiny.Beacons.Resource.Styleable.ActionMode_height = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_height;
+			global::Shiny.Beacons.Resource.Styleable.ActionMode_subtitleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_subtitleTextStyle;
+			global::Shiny.Beacons.Resource.Styleable.ActionMode_titleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_titleTextStyle;
+			global::Shiny.Beacons.Resource.Styleable.ActivityChooserView = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActivityChooserView;
+			global::Shiny.Beacons.Resource.Styleable.ActivityChooserView_expandActivityOverflowButtonDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActivityChooserView_expandActivityOverflowButtonDrawable;
+			global::Shiny.Beacons.Resource.Styleable.ActivityChooserView_initialActivityCount = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActivityChooserView_initialActivityCount;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog_android_layout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_android_layout;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog_buttonIconDimen = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_buttonIconDimen;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog_buttonPanelSideLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_buttonPanelSideLayout;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog_listItemLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_listItemLayout;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog_listLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_listLayout;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog_multiChoiceItemLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_multiChoiceItemLayout;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog_showTitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_showTitle;
+			global::Shiny.Beacons.Resource.Styleable.AlertDialog_singleChoiceItemLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_singleChoiceItemLayout;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableCompat_android_constantSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_constantSize;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableCompat_android_dither = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_dither;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableCompat_android_enterFadeDuration = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_enterFadeDuration;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableCompat_android_exitFadeDuration = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_exitFadeDuration;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableCompat_android_variablePadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_variablePadding;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableCompat_android_visible = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_visible;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableItem;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableItem_android_drawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableItem_android_drawable;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableItem_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableItem_android_id;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableTransition = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableTransition_android_drawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition_android_drawable;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableTransition_android_fromId = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition_android_fromId;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableTransition_android_reversible = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition_android_reversible;
+			global::Shiny.Beacons.Resource.Styleable.AnimatedStateListDrawableTransition_android_toId = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition_android_toId;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatImageView = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatImageView_android_src = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView_android_src;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatImageView_srcCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView_srcCompat;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatImageView_tint = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView_tint;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatImageView_tintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView_tintMode;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatSeekBar = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatSeekBar_android_thumb = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar_android_thumb;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatSeekBar_tickMark = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar_tickMark;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatSeekBar_tickMarkTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar_tickMarkTint;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatSeekBar_tickMarkTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar_tickMarkTintMode;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextHelper = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextHelper_android_drawableBottom = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableBottom;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextHelper_android_drawableEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableEnd;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextHelper_android_drawableLeft = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableLeft;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextHelper_android_drawableRight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableRight;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextHelper_android_drawableStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableStart;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextHelper_android_drawableTop = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableTop;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextHelper_android_textAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_textAppearance;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_android_textAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_android_textAppearance;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_autoSizeMaxTextSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizeMaxTextSize;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_autoSizeMinTextSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizeMinTextSize;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_autoSizePresetSizes = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizePresetSizes;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_autoSizeStepGranularity = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizeStepGranularity;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_autoSizeTextType = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizeTextType;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_drawableBottomCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableBottomCompat;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_drawableEndCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableEndCompat;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_drawableLeftCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableLeftCompat;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_drawableRightCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableRightCompat;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_drawableStartCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableStartCompat;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_drawableTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableTint;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_drawableTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableTintMode;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_drawableTopCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableTopCompat;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_firstBaselineToTopHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_firstBaselineToTopHeight;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_fontFamily = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_fontFamily;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_fontVariationSettings = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_fontVariationSettings;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_lastBaselineToBottomHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_lastBaselineToBottomHeight;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_lineHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_lineHeight;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_textAllCaps = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_textAllCaps;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTextView_textLocale = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_textLocale;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarDivider = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarDivider;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarItemBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarItemBackground;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarPopupTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarPopupTheme;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarSize;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarSplitStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarSplitStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarTabBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarTabBarStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarTabStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarTabStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarTabTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarTabTextStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarTheme;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionBarWidgetTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarWidgetTheme;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionDropDownStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionDropDownStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionMenuTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionMenuTextAppearance;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeBackground;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeFindDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeFindDrawable;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModePasteDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModePasteDrawable;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModePopupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModePopupWindowStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeSelectAllDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeSelectAllDrawable;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_activityChooserViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_activityChooserViewStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_alertDialogButtonGroupStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_alertDialogButtonGroupStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_alertDialogCenterButtons = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_alertDialogCenterButtons;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_alertDialogStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_alertDialogStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_alertDialogTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_alertDialogTheme;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_android_windowAnimationStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_android_windowAnimationStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_android_windowIsFloating = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_android_windowIsFloating;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_autoCompleteTextViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_autoCompleteTextViewStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_borderlessButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_borderlessButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_buttonBarButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_buttonBarNegativeButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarNegativeButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_buttonBarNeutralButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarNeutralButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_buttonBarPositiveButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarPositiveButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_buttonBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_buttonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_buttonStyleSmall = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonStyleSmall;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_checkboxStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_checkboxStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_checkedTextViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_checkedTextViewStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorAccent = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorAccent;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorBackgroundFloating = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorBackgroundFloating;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorButtonNormal = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorButtonNormal;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorControlActivated = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorControlActivated;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorControlHighlight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorControlHighlight;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorControlNormal = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorControlNormal;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorError = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorError;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorPrimary = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorPrimary;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorPrimaryDark = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorPrimaryDark;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_colorSwitchThumbNormal = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorSwitchThumbNormal;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_controlBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_controlBackground;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_dialogCornerRadius = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dialogCornerRadius;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_dialogPreferredPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dialogPreferredPadding;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_dialogTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dialogTheme;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_dividerHorizontal = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dividerHorizontal;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_dividerVertical = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dividerVertical;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_dropdownListPreferredItemHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dropdownListPreferredItemHeight;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_dropDownListViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dropDownListViewStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_editTextBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_editTextBackground;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_editTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_editTextColor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_editTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_editTextStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_homeAsUpIndicator = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_homeAsUpIndicator;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_imageButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_imageButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listChoiceBackgroundIndicator = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listChoiceBackgroundIndicator;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listChoiceIndicatorMultipleAnimated = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listChoiceIndicatorMultipleAnimated;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listChoiceIndicatorSingleAnimated = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listChoiceIndicatorSingleAnimated;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listDividerAlertDialog = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listDividerAlertDialog;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listMenuViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listMenuViewStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listPopupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPopupWindowStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listPreferredItemHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemHeight;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listPreferredItemHeightLarge = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemHeightLarge;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listPreferredItemHeightSmall = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemHeightSmall;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingEnd;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingLeft = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingLeft;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingRight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingRight;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingStart;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_panelBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_panelBackground;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_panelMenuListTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_panelMenuListTheme;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_panelMenuListWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_panelMenuListWidth;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_popupMenuStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_popupMenuStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_popupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_popupWindowStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_radioButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_radioButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_ratingBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_ratingBarStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_ratingBarStyleIndicator = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_ratingBarStyleIndicator;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_ratingBarStyleSmall = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_ratingBarStyleSmall;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_searchViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_searchViewStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_seekBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_seekBarStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_selectableItemBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_selectableItemBackground;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_selectableItemBackgroundBorderless = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_selectableItemBackgroundBorderless;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_spinnerDropDownItemStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_spinnerDropDownItemStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_spinnerStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_spinnerStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_switchStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_switchStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textAppearanceLargePopupMenu = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceLargePopupMenu;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textAppearanceListItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceListItem;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textAppearanceListItemSecondary = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceListItemSecondary;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textAppearanceListItemSmall = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceListItemSmall;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textAppearancePopupMenuHeader = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearancePopupMenuHeader;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultSubtitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultSubtitle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultTitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultTitle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textAppearanceSmallPopupMenu = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceSmallPopupMenu;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textColorAlertDialogListItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textColorAlertDialogListItem;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_textColorSearchUrl = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textColorSearchUrl;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_toolbarNavigationButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_toolbarNavigationButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_toolbarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_toolbarStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_tooltipForegroundColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_tooltipForegroundColor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_tooltipFrameBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_tooltipFrameBackground;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_viewInflaterClass = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_viewInflaterClass;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowActionBar = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowActionBar;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowActionBarOverlay = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowActionBarOverlay;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowActionModeOverlay = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowActionModeOverlay;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowFixedHeightMajor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowFixedHeightMajor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowFixedHeightMinor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowFixedHeightMinor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowFixedWidthMajor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowFixedWidthMajor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowFixedWidthMinor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowFixedWidthMinor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowMinWidthMajor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowMinWidthMajor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowMinWidthMinor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowMinWidthMinor;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_windowNoTitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowNoTitle;
+			global::Shiny.Beacons.Resource.Styleable.ButtonBarLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ButtonBarLayout;
+			global::Shiny.Beacons.Resource.Styleable.ButtonBarLayout_allowStacking = global::Shiny.Device.Tests.Droid.Resource.Styleable.ButtonBarLayout_allowStacking;
 			global::Shiny.Beacons.Resource.Styleable.ColorStateListItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.ColorStateListItem;
 			global::Shiny.Beacons.Resource.Styleable.ColorStateListItem_alpha = global::Shiny.Device.Tests.Droid.Resource.Styleable.ColorStateListItem_alpha;
 			global::Shiny.Beacons.Resource.Styleable.ColorStateListItem_android_alpha = global::Shiny.Device.Tests.Droid.Resource.Styleable.ColorStateListItem_android_alpha;
 			global::Shiny.Beacons.Resource.Styleable.ColorStateListItem_android_color = global::Shiny.Device.Tests.Droid.Resource.Styleable.ColorStateListItem_android_color;
+			global::Shiny.Beacons.Resource.Styleable.CompoundButton = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton;
+			global::Shiny.Beacons.Resource.Styleable.CompoundButton_android_button = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton_android_button;
+			global::Shiny.Beacons.Resource.Styleable.CompoundButton_buttonCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton_buttonCompat;
+			global::Shiny.Beacons.Resource.Styleable.CompoundButton_buttonTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton_buttonTint;
+			global::Shiny.Beacons.Resource.Styleable.CompoundButton_buttonTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton_buttonTintMode;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle_arrowHeadLength = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_arrowHeadLength;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle_arrowShaftLength = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_arrowShaftLength;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle_barLength = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_barLength;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle_color = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_color;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle_drawableSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_drawableSize;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle_gapBetweenBars = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_gapBetweenBars;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle_spinBars = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_spinBars;
+			global::Shiny.Beacons.Resource.Styleable.DrawerArrowToggle_thickness = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_thickness;
 			global::Shiny.Beacons.Resource.Styleable.FontFamily = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily;
 			global::Shiny.Beacons.Resource.Styleable.FontFamilyFont = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamilyFont;
 			global::Shiny.Beacons.Resource.Styleable.FontFamilyFont_android_font = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamilyFont_android_font;
@@ -2880,6 +4219,13 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Beacons.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Beacons.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Beacons.Resource.Styleable.Fragment = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment;
+			global::Shiny.Beacons.Resource.Styleable.FragmentContainerView = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView;
+			global::Shiny.Beacons.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView_android_name;
+			global::Shiny.Beacons.Resource.Styleable.FragmentContainerView_android_tag = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView_android_tag;
+			global::Shiny.Beacons.Resource.Styleable.Fragment_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_id;
+			global::Shiny.Beacons.Resource.Styleable.Fragment_android_name = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_name;
+			global::Shiny.Beacons.Resource.Styleable.Fragment_android_tag = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_tag;
 			global::Shiny.Beacons.Resource.Styleable.GradientColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor;
 			global::Shiny.Beacons.Resource.Styleable.GradientColorItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColorItem;
 			global::Shiny.Beacons.Resource.Styleable.GradientColorItem_android_color = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColorItem_android_color;
@@ -2896,6 +4242,184 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Beacons.Resource.Styleable.GradientColor_android_startY = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_startY;
 			global::Shiny.Beacons.Resource.Styleable.GradientColor_android_tileMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_tileMode;
 			global::Shiny.Beacons.Resource.Styleable.GradientColor_android_type = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_type;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_android_baselineAligned = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_baselineAligned;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_android_baselineAlignedChildIndex = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_baselineAlignedChildIndex;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_android_gravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_gravity;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_android_orientation = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_orientation;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_android_weightSum = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_weightSum;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_divider = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_divider;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_dividerPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_dividerPadding;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_Layout = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_gravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_gravity;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_height = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_height;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_weight = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_weight;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_width = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_width;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_measureWithLargestChild = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_measureWithLargestChild;
+			global::Shiny.Beacons.Resource.Styleable.LinearLayoutCompat_showDividers = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_showDividers;
+			global::Shiny.Beacons.Resource.Styleable.ListPopupWindow = global::Shiny.Device.Tests.Droid.Resource.Styleable.ListPopupWindow;
+			global::Shiny.Beacons.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset = global::Shiny.Device.Tests.Droid.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset;
+			global::Shiny.Beacons.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset = global::Shiny.Device.Tests.Droid.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset;
+			global::Shiny.Beacons.Resource.Styleable.MenuGroup = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup;
+			global::Shiny.Beacons.Resource.Styleable.MenuGroup_android_checkableBehavior = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_checkableBehavior;
+			global::Shiny.Beacons.Resource.Styleable.MenuGroup_android_enabled = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_enabled;
+			global::Shiny.Beacons.Resource.Styleable.MenuGroup_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_id;
+			global::Shiny.Beacons.Resource.Styleable.MenuGroup_android_menuCategory = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_menuCategory;
+			global::Shiny.Beacons.Resource.Styleable.MenuGroup_android_orderInCategory = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_orderInCategory;
+			global::Shiny.Beacons.Resource.Styleable.MenuGroup_android_visible = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_visible;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_actionLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_actionLayout;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_actionProviderClass = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_actionProviderClass;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_actionViewClass = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_actionViewClass;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_alphabeticModifiers = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_alphabeticModifiers;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_alphabeticShortcut = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_alphabeticShortcut;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_checkable = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_checkable;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_checked = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_checked;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_enabled = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_enabled;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_icon = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_icon;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_id;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_menuCategory = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_menuCategory;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_numericShortcut = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_numericShortcut;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_onClick = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_onClick;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_orderInCategory = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_orderInCategory;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_title = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_title;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_titleCondensed = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_titleCondensed;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_android_visible = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_visible;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_contentDescription = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_contentDescription;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_iconTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_iconTint;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_iconTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_iconTintMode;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_numericModifiers = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_numericModifiers;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_showAsAction = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_showAsAction;
+			global::Shiny.Beacons.Resource.Styleable.MenuItem_tooltipText = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_tooltipText;
+			global::Shiny.Beacons.Resource.Styleable.MenuView = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_android_headerBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_headerBackground;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_android_horizontalDivider = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_horizontalDivider;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_android_itemBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_itemBackground;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_android_itemIconDisabledAlpha = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_itemIconDisabledAlpha;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_android_itemTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_itemTextAppearance;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_android_verticalDivider = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_verticalDivider;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_android_windowAnimationStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_windowAnimationStyle;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_preserveIconSpacing = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_preserveIconSpacing;
+			global::Shiny.Beacons.Resource.Styleable.MenuView_subMenuArrow = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_subMenuArrow;
+			global::Shiny.Beacons.Resource.Styleable.PopupWindow = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindow;
+			global::Shiny.Beacons.Resource.Styleable.PopupWindowBackgroundState = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindowBackgroundState;
+			global::Shiny.Beacons.Resource.Styleable.PopupWindowBackgroundState_state_above_anchor = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindowBackgroundState_state_above_anchor;
+			global::Shiny.Beacons.Resource.Styleable.PopupWindow_android_popupAnimationStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindow_android_popupAnimationStyle;
+			global::Shiny.Beacons.Resource.Styleable.PopupWindow_android_popupBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindow_android_popupBackground;
+			global::Shiny.Beacons.Resource.Styleable.PopupWindow_overlapAnchor = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindow_overlapAnchor;
+			global::Shiny.Beacons.Resource.Styleable.RecycleListView = global::Shiny.Device.Tests.Droid.Resource.Styleable.RecycleListView;
+			global::Shiny.Beacons.Resource.Styleable.RecycleListView_paddingBottomNoButtons = global::Shiny.Device.Tests.Droid.Resource.Styleable.RecycleListView_paddingBottomNoButtons;
+			global::Shiny.Beacons.Resource.Styleable.RecycleListView_paddingTopNoTitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.RecycleListView_paddingTopNoTitle;
+			global::Shiny.Beacons.Resource.Styleable.SearchView = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_android_focusable = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_android_focusable;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_android_imeOptions = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_android_imeOptions;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_android_inputType = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_android_inputType;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_android_maxWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_android_maxWidth;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_closeIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_closeIcon;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_commitIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_commitIcon;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_defaultQueryHint = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_defaultQueryHint;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_goIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_goIcon;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_iconifiedByDefault = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_iconifiedByDefault;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_layout = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_layout;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_queryBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_queryBackground;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_queryHint = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_queryHint;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_searchHintIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_searchHintIcon;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_searchIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_searchIcon;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_submitBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_submitBackground;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_suggestionRowLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_suggestionRowLayout;
+			global::Shiny.Beacons.Resource.Styleable.SearchView_voiceIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_voiceIcon;
+			global::Shiny.Beacons.Resource.Styleable.Spinner = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner;
+			global::Shiny.Beacons.Resource.Styleable.Spinner_android_dropDownWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_android_dropDownWidth;
+			global::Shiny.Beacons.Resource.Styleable.Spinner_android_entries = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_android_entries;
+			global::Shiny.Beacons.Resource.Styleable.Spinner_android_popupBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_android_popupBackground;
+			global::Shiny.Beacons.Resource.Styleable.Spinner_android_prompt = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_android_prompt;
+			global::Shiny.Beacons.Resource.Styleable.Spinner_popupTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_popupTheme;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawableItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawableItem;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawableItem_android_drawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawableItem_android_drawable;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawable_android_constantSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_constantSize;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawable_android_dither = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_dither;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawable_android_enterFadeDuration = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_enterFadeDuration;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawable_android_exitFadeDuration = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_exitFadeDuration;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawable_android_variablePadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_variablePadding;
+			global::Shiny.Beacons.Resource.Styleable.StateListDrawable_android_visible = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_visible;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_android_textOff = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_android_textOff;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_android_textOn = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_android_textOn;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_android_thumb = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_android_thumb;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_showText = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_showText;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_splitTrack = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_splitTrack;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_switchMinWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_switchMinWidth;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_switchPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_switchPadding;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_switchTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_switchTextAppearance;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_thumbTextPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_thumbTextPadding;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_thumbTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_thumbTint;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_thumbTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_thumbTintMode;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_track = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_track;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_trackTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_trackTint;
+			global::Shiny.Beacons.Resource.Styleable.SwitchCompat_trackTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_trackTintMode;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_fontFamily = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_fontFamily;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_shadowColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_shadowColor;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_shadowDx = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_shadowDx;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_shadowDy = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_shadowDy;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_shadowRadius = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_shadowRadius;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_textColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textColor;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_textColorHint = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textColorHint;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_textColorLink = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textColorLink;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_textFontWeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textFontWeight;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_textSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textSize;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_textStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textStyle;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_android_typeface = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_typeface;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_fontFamily = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_fontFamily;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_fontVariationSettings = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_fontVariationSettings;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_textAllCaps = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_textAllCaps;
+			global::Shiny.Beacons.Resource.Styleable.TextAppearance_textLocale = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_textLocale;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_android_gravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_android_gravity;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_android_minHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_android_minHeight;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_buttonGravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_buttonGravity;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_collapseContentDescription = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_collapseContentDescription;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_collapseIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_collapseIcon;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_contentInsetEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetEnd;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_contentInsetEndWithActions = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetEndWithActions;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_contentInsetLeft = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetLeft;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_contentInsetRight = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetRight;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_contentInsetStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetStart;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_contentInsetStartWithNavigation = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetStartWithNavigation;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_logo = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_logo;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_logoDescription = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_logoDescription;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_maxButtonHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_maxButtonHeight;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_menu = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_menu;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_navigationContentDescription = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_navigationContentDescription;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_navigationIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_navigationIcon;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_popupTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_popupTheme;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_subtitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_subtitle;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_subtitleTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_subtitleTextAppearance;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_subtitleTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_subtitleTextColor;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_title = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_title;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_titleMargin = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMargin;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_titleMarginBottom = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMarginBottom;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_titleMarginEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMarginEnd;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_titleMargins = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMargins;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_titleMarginStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMarginStart;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_titleMarginTop = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMarginTop;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_titleTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleTextAppearance;
+			global::Shiny.Beacons.Resource.Styleable.Toolbar_titleTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleTextColor;
+			global::Shiny.Beacons.Resource.Styleable.View = global::Shiny.Device.Tests.Droid.Resource.Styleable.View;
+			global::Shiny.Beacons.Resource.Styleable.ViewBackgroundHelper = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewBackgroundHelper;
+			global::Shiny.Beacons.Resource.Styleable.ViewBackgroundHelper_android_background = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewBackgroundHelper_android_background;
+			global::Shiny.Beacons.Resource.Styleable.ViewBackgroundHelper_backgroundTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewBackgroundHelper_backgroundTint;
+			global::Shiny.Beacons.Resource.Styleable.ViewBackgroundHelper_backgroundTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewBackgroundHelper_backgroundTintMode;
+			global::Shiny.Beacons.Resource.Styleable.ViewStubCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewStubCompat;
+			global::Shiny.Beacons.Resource.Styleable.ViewStubCompat_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewStubCompat_android_id;
+			global::Shiny.Beacons.Resource.Styleable.ViewStubCompat_android_inflatedId = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewStubCompat_android_inflatedId;
+			global::Shiny.Beacons.Resource.Styleable.ViewStubCompat_android_layout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewStubCompat_android_layout;
+			global::Shiny.Beacons.Resource.Styleable.View_android_focusable = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_android_focusable;
+			global::Shiny.Beacons.Resource.Styleable.View_android_theme = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_android_theme;
+			global::Shiny.Beacons.Resource.Styleable.View_paddingEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_paddingEnd;
+			global::Shiny.Beacons.Resource.Styleable.View_paddingStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_paddingStart;
+			global::Shiny.Beacons.Resource.Styleable.View_theme = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_theme;
 			global::Shiny.BluetoothLE.Resource.Attribute.alpha = global::Shiny.Device.Tests.Droid.Resource.Attribute.alpha;
 			global::Shiny.BluetoothLE.Resource.Attribute.font = global::Shiny.Device.Tests.Droid.Resource.Attribute.font;
 			global::Shiny.BluetoothLE.Resource.Attribute.fontProviderAuthority = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontProviderAuthority;
@@ -2912,10 +4436,10 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.BluetoothLE.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_foreground_service_default;
 			global::Shiny.BluetoothLE.Resource.Boolean.enable_system_job_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_job_service_default;
 			global::Shiny.BluetoothLE.Resource.Boolean.workmanager_test_configuration = global::Shiny.Device.Tests.Droid.Resource.Boolean.workmanager_test_configuration;
+			global::Shiny.BluetoothLE.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.BluetoothLE.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.BluetoothLE.Resource.Color.notification_action_color_filter = global::Shiny.Device.Tests.Droid.Resource.Color.notification_action_color_filter;
 			global::Shiny.BluetoothLE.Resource.Color.notification_icon_bg_color = global::Shiny.Device.Tests.Droid.Resource.Color.notification_icon_bg_color;
-			global::Shiny.BluetoothLE.Resource.Color.ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_light;
-			global::Shiny.BluetoothLE.Resource.Color.secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_light;
 			global::Shiny.BluetoothLE.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_horizontal_material;
 			global::Shiny.BluetoothLE.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_vertical_material;
 			global::Shiny.BluetoothLE.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_padding_horizontal_material;
@@ -3087,10 +4611,10 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_foreground_service_default;
 			global::Shiny.Resource.Boolean.enable_system_job_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_job_service_default;
 			global::Shiny.Resource.Boolean.workmanager_test_configuration = global::Shiny.Device.Tests.Droid.Resource.Boolean.workmanager_test_configuration;
+			global::Shiny.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.Resource.Color.notification_action_color_filter = global::Shiny.Device.Tests.Droid.Resource.Color.notification_action_color_filter;
 			global::Shiny.Resource.Color.notification_icon_bg_color = global::Shiny.Device.Tests.Droid.Resource.Color.notification_icon_bg_color;
-			global::Shiny.Resource.Color.ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_light;
-			global::Shiny.Resource.Color.secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_light;
 			global::Shiny.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_horizontal_material;
 			global::Shiny.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_vertical_material;
 			global::Shiny.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_padding_horizontal_material;
@@ -3246,11 +4770,165 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Resource.Styleable.GradientColor_android_startY = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_startY;
 			global::Shiny.Resource.Styleable.GradientColor_android_tileMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_tileMode;
 			global::Shiny.Resource.Styleable.GradientColor_android_type = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_type;
+			global::Shiny.Locations.Resource.Animation.abc_fade_in = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_fade_in;
+			global::Shiny.Locations.Resource.Animation.abc_fade_out = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_fade_out;
+			global::Shiny.Locations.Resource.Animation.abc_grow_fade_in_from_bottom = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_grow_fade_in_from_bottom;
+			global::Shiny.Locations.Resource.Animation.abc_popup_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_popup_enter;
+			global::Shiny.Locations.Resource.Animation.abc_popup_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_popup_exit;
+			global::Shiny.Locations.Resource.Animation.abc_shrink_fade_out_from_bottom = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_shrink_fade_out_from_bottom;
+			global::Shiny.Locations.Resource.Animation.abc_slide_in_bottom = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_slide_in_bottom;
+			global::Shiny.Locations.Resource.Animation.abc_slide_in_top = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_slide_in_top;
+			global::Shiny.Locations.Resource.Animation.abc_slide_out_bottom = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_slide_out_bottom;
+			global::Shiny.Locations.Resource.Animation.abc_slide_out_top = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_slide_out_top;
+			global::Shiny.Locations.Resource.Animation.abc_tooltip_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_tooltip_enter;
+			global::Shiny.Locations.Resource.Animation.abc_tooltip_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.abc_tooltip_exit;
+			global::Shiny.Locations.Resource.Animation.btn_checkbox_to_checked_box_inner_merged_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_checked_box_inner_merged_animation;
+			global::Shiny.Locations.Resource.Animation.btn_checkbox_to_checked_box_outer_merged_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_checked_box_outer_merged_animation;
+			global::Shiny.Locations.Resource.Animation.btn_checkbox_to_checked_icon_null_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_checked_icon_null_animation;
+			global::Shiny.Locations.Resource.Animation.btn_checkbox_to_unchecked_box_inner_merged_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_unchecked_box_inner_merged_animation;
+			global::Shiny.Locations.Resource.Animation.btn_checkbox_to_unchecked_check_path_merged_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_unchecked_check_path_merged_animation;
+			global::Shiny.Locations.Resource.Animation.btn_checkbox_to_unchecked_icon_null_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_checkbox_to_unchecked_icon_null_animation;
+			global::Shiny.Locations.Resource.Animation.btn_radio_to_off_mtrl_dot_group_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_off_mtrl_dot_group_animation;
+			global::Shiny.Locations.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_animation;
+			global::Shiny.Locations.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_path_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_off_mtrl_ring_outer_path_animation;
+			global::Shiny.Locations.Resource.Animation.btn_radio_to_on_mtrl_dot_group_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_dot_group_animation;
+			global::Shiny.Locations.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation;
+			global::Shiny.Locations.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation;
+			global::Shiny.Locations.Resource.Animation.fragment_close_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_close_enter;
+			global::Shiny.Locations.Resource.Animation.fragment_close_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_close_exit;
+			global::Shiny.Locations.Resource.Animation.fragment_fade_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fade_enter;
+			global::Shiny.Locations.Resource.Animation.fragment_fade_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fade_exit;
+			global::Shiny.Locations.Resource.Animation.fragment_fast_out_extra_slow_in = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fast_out_extra_slow_in;
+			global::Shiny.Locations.Resource.Animation.fragment_open_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_open_enter;
+			global::Shiny.Locations.Resource.Animation.fragment_open_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_open_exit;
+			global::Shiny.Locations.Resource.Attribute.actionBarDivider = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarDivider;
+			global::Shiny.Locations.Resource.Attribute.actionBarItemBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarItemBackground;
+			global::Shiny.Locations.Resource.Attribute.actionBarPopupTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarPopupTheme;
+			global::Shiny.Locations.Resource.Attribute.actionBarSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarSize;
+			global::Shiny.Locations.Resource.Attribute.actionBarSplitStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarSplitStyle;
+			global::Shiny.Locations.Resource.Attribute.actionBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarStyle;
+			global::Shiny.Locations.Resource.Attribute.actionBarTabBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarTabBarStyle;
+			global::Shiny.Locations.Resource.Attribute.actionBarTabStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarTabStyle;
+			global::Shiny.Locations.Resource.Attribute.actionBarTabTextStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarTabTextStyle;
+			global::Shiny.Locations.Resource.Attribute.actionBarTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarTheme;
+			global::Shiny.Locations.Resource.Attribute.actionBarWidgetTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarWidgetTheme;
+			global::Shiny.Locations.Resource.Attribute.actionButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.actionDropDownStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionDropDownStyle;
+			global::Shiny.Locations.Resource.Attribute.actionLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionLayout;
+			global::Shiny.Locations.Resource.Attribute.actionMenuTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionMenuTextAppearance;
+			global::Shiny.Locations.Resource.Attribute.actionMenuTextColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionMenuTextColor;
+			global::Shiny.Locations.Resource.Attribute.actionModeBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeBackground;
+			global::Shiny.Locations.Resource.Attribute.actionModeCloseButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.actionModeCloseDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeCloseDrawable;
+			global::Shiny.Locations.Resource.Attribute.actionModeCopyDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeCopyDrawable;
+			global::Shiny.Locations.Resource.Attribute.actionModeCutDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeCutDrawable;
+			global::Shiny.Locations.Resource.Attribute.actionModeFindDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeFindDrawable;
+			global::Shiny.Locations.Resource.Attribute.actionModePasteDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModePasteDrawable;
+			global::Shiny.Locations.Resource.Attribute.actionModePopupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModePopupWindowStyle;
+			global::Shiny.Locations.Resource.Attribute.actionModeSelectAllDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeSelectAllDrawable;
+			global::Shiny.Locations.Resource.Attribute.actionModeShareDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeShareDrawable;
+			global::Shiny.Locations.Resource.Attribute.actionModeSplitBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeSplitBackground;
+			global::Shiny.Locations.Resource.Attribute.actionModeStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeStyle;
+			global::Shiny.Locations.Resource.Attribute.actionModeWebSearchDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionModeWebSearchDrawable;
+			global::Shiny.Locations.Resource.Attribute.actionOverflowButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionOverflowButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.actionOverflowMenuStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionOverflowMenuStyle;
+			global::Shiny.Locations.Resource.Attribute.actionProviderClass = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionProviderClass;
+			global::Shiny.Locations.Resource.Attribute.actionViewClass = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionViewClass;
+			global::Shiny.Locations.Resource.Attribute.activityChooserViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.activityChooserViewStyle;
+			global::Shiny.Locations.Resource.Attribute.alertDialogButtonGroupStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.alertDialogButtonGroupStyle;
+			global::Shiny.Locations.Resource.Attribute.alertDialogCenterButtons = global::Shiny.Device.Tests.Droid.Resource.Attribute.alertDialogCenterButtons;
+			global::Shiny.Locations.Resource.Attribute.alertDialogStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.alertDialogStyle;
+			global::Shiny.Locations.Resource.Attribute.alertDialogTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.alertDialogTheme;
+			global::Shiny.Locations.Resource.Attribute.allowStacking = global::Shiny.Device.Tests.Droid.Resource.Attribute.allowStacking;
 			global::Shiny.Locations.Resource.Attribute.alpha = global::Shiny.Device.Tests.Droid.Resource.Attribute.alpha;
+			global::Shiny.Locations.Resource.Attribute.alphabeticModifiers = global::Shiny.Device.Tests.Droid.Resource.Attribute.alphabeticModifiers;
+			global::Shiny.Locations.Resource.Attribute.arrowHeadLength = global::Shiny.Device.Tests.Droid.Resource.Attribute.arrowHeadLength;
+			global::Shiny.Locations.Resource.Attribute.arrowShaftLength = global::Shiny.Device.Tests.Droid.Resource.Attribute.arrowShaftLength;
+			global::Shiny.Locations.Resource.Attribute.autoCompleteTextViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoCompleteTextViewStyle;
+			global::Shiny.Locations.Resource.Attribute.autoSizeMaxTextSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizeMaxTextSize;
+			global::Shiny.Locations.Resource.Attribute.autoSizeMinTextSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizeMinTextSize;
+			global::Shiny.Locations.Resource.Attribute.autoSizePresetSizes = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizePresetSizes;
+			global::Shiny.Locations.Resource.Attribute.autoSizeStepGranularity = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizeStepGranularity;
+			global::Shiny.Locations.Resource.Attribute.autoSizeTextType = global::Shiny.Device.Tests.Droid.Resource.Attribute.autoSizeTextType;
+			global::Shiny.Locations.Resource.Attribute.background = global::Shiny.Device.Tests.Droid.Resource.Attribute.background;
+			global::Shiny.Locations.Resource.Attribute.backgroundSplit = global::Shiny.Device.Tests.Droid.Resource.Attribute.backgroundSplit;
+			global::Shiny.Locations.Resource.Attribute.backgroundStacked = global::Shiny.Device.Tests.Droid.Resource.Attribute.backgroundStacked;
+			global::Shiny.Locations.Resource.Attribute.backgroundTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.backgroundTint;
+			global::Shiny.Locations.Resource.Attribute.backgroundTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.backgroundTintMode;
+			global::Shiny.Locations.Resource.Attribute.barLength = global::Shiny.Device.Tests.Droid.Resource.Attribute.barLength;
+			global::Shiny.Locations.Resource.Attribute.borderlessButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.borderlessButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.buttonBarButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.buttonBarNegativeButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarNegativeButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.buttonBarNeutralButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarNeutralButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.buttonBarPositiveButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarPositiveButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.buttonBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonBarStyle;
+			global::Shiny.Locations.Resource.Attribute.buttonCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonCompat;
+			global::Shiny.Locations.Resource.Attribute.buttonGravity = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonGravity;
+			global::Shiny.Locations.Resource.Attribute.buttonIconDimen = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonIconDimen;
+			global::Shiny.Locations.Resource.Attribute.buttonPanelSideLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonPanelSideLayout;
 			global::Shiny.Locations.Resource.Attribute.buttonSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonSize;
+			global::Shiny.Locations.Resource.Attribute.buttonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonStyle;
+			global::Shiny.Locations.Resource.Attribute.buttonStyleSmall = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonStyleSmall;
+			global::Shiny.Locations.Resource.Attribute.buttonTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonTint;
+			global::Shiny.Locations.Resource.Attribute.buttonTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.buttonTintMode;
+			global::Shiny.Locations.Resource.Attribute.checkboxStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.checkboxStyle;
+			global::Shiny.Locations.Resource.Attribute.checkedTextViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.checkedTextViewStyle;
 			global::Shiny.Locations.Resource.Attribute.circleCrop = global::Shiny.Device.Tests.Droid.Resource.Attribute.circleCrop;
+			global::Shiny.Locations.Resource.Attribute.closeIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.closeIcon;
+			global::Shiny.Locations.Resource.Attribute.closeItemLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.closeItemLayout;
+			global::Shiny.Locations.Resource.Attribute.collapseContentDescription = global::Shiny.Device.Tests.Droid.Resource.Attribute.collapseContentDescription;
+			global::Shiny.Locations.Resource.Attribute.collapseIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.collapseIcon;
+			global::Shiny.Locations.Resource.Attribute.color = global::Shiny.Device.Tests.Droid.Resource.Attribute.color;
+			global::Shiny.Locations.Resource.Attribute.colorAccent = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorAccent;
+			global::Shiny.Locations.Resource.Attribute.colorBackgroundFloating = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorBackgroundFloating;
+			global::Shiny.Locations.Resource.Attribute.colorButtonNormal = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorButtonNormal;
+			global::Shiny.Locations.Resource.Attribute.colorControlActivated = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorControlActivated;
+			global::Shiny.Locations.Resource.Attribute.colorControlHighlight = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorControlHighlight;
+			global::Shiny.Locations.Resource.Attribute.colorControlNormal = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorControlNormal;
+			global::Shiny.Locations.Resource.Attribute.colorError = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorError;
+			global::Shiny.Locations.Resource.Attribute.colorPrimary = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorPrimary;
+			global::Shiny.Locations.Resource.Attribute.colorPrimaryDark = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorPrimaryDark;
 			global::Shiny.Locations.Resource.Attribute.colorScheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorScheme;
+			global::Shiny.Locations.Resource.Attribute.colorSwitchThumbNormal = global::Shiny.Device.Tests.Droid.Resource.Attribute.colorSwitchThumbNormal;
+			global::Shiny.Locations.Resource.Attribute.commitIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.commitIcon;
+			global::Shiny.Locations.Resource.Attribute.contentDescription = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentDescription;
+			global::Shiny.Locations.Resource.Attribute.contentInsetEnd = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetEnd;
+			global::Shiny.Locations.Resource.Attribute.contentInsetEndWithActions = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetEndWithActions;
+			global::Shiny.Locations.Resource.Attribute.contentInsetLeft = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetLeft;
+			global::Shiny.Locations.Resource.Attribute.contentInsetRight = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetRight;
+			global::Shiny.Locations.Resource.Attribute.contentInsetStart = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetStart;
+			global::Shiny.Locations.Resource.Attribute.contentInsetStartWithNavigation = global::Shiny.Device.Tests.Droid.Resource.Attribute.contentInsetStartWithNavigation;
+			global::Shiny.Locations.Resource.Attribute.controlBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.controlBackground;
+			global::Shiny.Locations.Resource.Attribute.customNavigationLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.customNavigationLayout;
+			global::Shiny.Locations.Resource.Attribute.defaultQueryHint = global::Shiny.Device.Tests.Droid.Resource.Attribute.defaultQueryHint;
+			global::Shiny.Locations.Resource.Attribute.dialogCornerRadius = global::Shiny.Device.Tests.Droid.Resource.Attribute.dialogCornerRadius;
+			global::Shiny.Locations.Resource.Attribute.dialogPreferredPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.dialogPreferredPadding;
+			global::Shiny.Locations.Resource.Attribute.dialogTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.dialogTheme;
+			global::Shiny.Locations.Resource.Attribute.displayOptions = global::Shiny.Device.Tests.Droid.Resource.Attribute.displayOptions;
+			global::Shiny.Locations.Resource.Attribute.divider = global::Shiny.Device.Tests.Droid.Resource.Attribute.divider;
+			global::Shiny.Locations.Resource.Attribute.dividerHorizontal = global::Shiny.Device.Tests.Droid.Resource.Attribute.dividerHorizontal;
+			global::Shiny.Locations.Resource.Attribute.dividerPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.dividerPadding;
+			global::Shiny.Locations.Resource.Attribute.dividerVertical = global::Shiny.Device.Tests.Droid.Resource.Attribute.dividerVertical;
+			global::Shiny.Locations.Resource.Attribute.drawableBottomCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableBottomCompat;
+			global::Shiny.Locations.Resource.Attribute.drawableEndCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableEndCompat;
+			global::Shiny.Locations.Resource.Attribute.drawableLeftCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableLeftCompat;
+			global::Shiny.Locations.Resource.Attribute.drawableRightCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableRightCompat;
+			global::Shiny.Locations.Resource.Attribute.drawableSize = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableSize;
+			global::Shiny.Locations.Resource.Attribute.drawableStartCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableStartCompat;
+			global::Shiny.Locations.Resource.Attribute.drawableTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableTint;
+			global::Shiny.Locations.Resource.Attribute.drawableTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableTintMode;
+			global::Shiny.Locations.Resource.Attribute.drawableTopCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawableTopCompat;
+			global::Shiny.Locations.Resource.Attribute.drawerArrowStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.drawerArrowStyle;
+			global::Shiny.Locations.Resource.Attribute.dropdownListPreferredItemHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.dropdownListPreferredItemHeight;
+			global::Shiny.Locations.Resource.Attribute.dropDownListViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.dropDownListViewStyle;
+			global::Shiny.Locations.Resource.Attribute.editTextBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.editTextBackground;
+			global::Shiny.Locations.Resource.Attribute.editTextColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.editTextColor;
+			global::Shiny.Locations.Resource.Attribute.editTextStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.editTextStyle;
+			global::Shiny.Locations.Resource.Attribute.elevation = global::Shiny.Device.Tests.Droid.Resource.Attribute.elevation;
+			global::Shiny.Locations.Resource.Attribute.expandActivityOverflowButtonDrawable = global::Shiny.Device.Tests.Droid.Resource.Attribute.expandActivityOverflowButtonDrawable;
+			global::Shiny.Locations.Resource.Attribute.firstBaselineToTopHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.firstBaselineToTopHeight;
 			global::Shiny.Locations.Resource.Attribute.font = global::Shiny.Device.Tests.Droid.Resource.Attribute.font;
+			global::Shiny.Locations.Resource.Attribute.fontFamily = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontFamily;
 			global::Shiny.Locations.Resource.Attribute.fontProviderAuthority = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontProviderAuthority;
 			global::Shiny.Locations.Resource.Attribute.fontProviderCerts = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontProviderCerts;
 			global::Shiny.Locations.Resource.Attribute.fontProviderFetchStrategy = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontProviderFetchStrategy;
@@ -3260,14 +4938,201 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Attribute.fontStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontStyle;
 			global::Shiny.Locations.Resource.Attribute.fontVariationSettings = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Locations.Resource.Attribute.fontWeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontWeight;
+			global::Shiny.Locations.Resource.Attribute.gapBetweenBars = global::Shiny.Device.Tests.Droid.Resource.Attribute.gapBetweenBars;
+			global::Shiny.Locations.Resource.Attribute.goIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.goIcon;
+			global::Shiny.Locations.Resource.Attribute.height = global::Shiny.Device.Tests.Droid.Resource.Attribute.height;
+			global::Shiny.Locations.Resource.Attribute.hideOnContentScroll = global::Shiny.Device.Tests.Droid.Resource.Attribute.hideOnContentScroll;
+			global::Shiny.Locations.Resource.Attribute.homeAsUpIndicator = global::Shiny.Device.Tests.Droid.Resource.Attribute.homeAsUpIndicator;
+			global::Shiny.Locations.Resource.Attribute.homeLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.homeLayout;
+			global::Shiny.Locations.Resource.Attribute.icon = global::Shiny.Device.Tests.Droid.Resource.Attribute.icon;
+			global::Shiny.Locations.Resource.Attribute.iconifiedByDefault = global::Shiny.Device.Tests.Droid.Resource.Attribute.iconifiedByDefault;
+			global::Shiny.Locations.Resource.Attribute.iconTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.iconTint;
+			global::Shiny.Locations.Resource.Attribute.iconTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.iconTintMode;
 			global::Shiny.Locations.Resource.Attribute.imageAspectRatio = global::Shiny.Device.Tests.Droid.Resource.Attribute.imageAspectRatio;
 			global::Shiny.Locations.Resource.Attribute.imageAspectRatioAdjust = global::Shiny.Device.Tests.Droid.Resource.Attribute.imageAspectRatioAdjust;
+			global::Shiny.Locations.Resource.Attribute.imageButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.imageButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.indeterminateProgressStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.indeterminateProgressStyle;
+			global::Shiny.Locations.Resource.Attribute.initialActivityCount = global::Shiny.Device.Tests.Droid.Resource.Attribute.initialActivityCount;
+			global::Shiny.Locations.Resource.Attribute.isLightTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.isLightTheme;
+			global::Shiny.Locations.Resource.Attribute.itemPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.itemPadding;
+			global::Shiny.Locations.Resource.Attribute.lastBaselineToBottomHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.lastBaselineToBottomHeight;
+			global::Shiny.Locations.Resource.Attribute.layout = global::Shiny.Device.Tests.Droid.Resource.Attribute.layout;
+			global::Shiny.Locations.Resource.Attribute.lineHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.lineHeight;
+			global::Shiny.Locations.Resource.Attribute.listChoiceBackgroundIndicator = global::Shiny.Device.Tests.Droid.Resource.Attribute.listChoiceBackgroundIndicator;
+			global::Shiny.Locations.Resource.Attribute.listChoiceIndicatorMultipleAnimated = global::Shiny.Device.Tests.Droid.Resource.Attribute.listChoiceIndicatorMultipleAnimated;
+			global::Shiny.Locations.Resource.Attribute.listChoiceIndicatorSingleAnimated = global::Shiny.Device.Tests.Droid.Resource.Attribute.listChoiceIndicatorSingleAnimated;
+			global::Shiny.Locations.Resource.Attribute.listDividerAlertDialog = global::Shiny.Device.Tests.Droid.Resource.Attribute.listDividerAlertDialog;
+			global::Shiny.Locations.Resource.Attribute.listItemLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.listItemLayout;
+			global::Shiny.Locations.Resource.Attribute.listLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.listLayout;
+			global::Shiny.Locations.Resource.Attribute.listMenuViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.listMenuViewStyle;
+			global::Shiny.Locations.Resource.Attribute.listPopupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPopupWindowStyle;
+			global::Shiny.Locations.Resource.Attribute.listPreferredItemHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemHeight;
+			global::Shiny.Locations.Resource.Attribute.listPreferredItemHeightLarge = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemHeightLarge;
+			global::Shiny.Locations.Resource.Attribute.listPreferredItemHeightSmall = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemHeightSmall;
+			global::Shiny.Locations.Resource.Attribute.listPreferredItemPaddingEnd = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemPaddingEnd;
+			global::Shiny.Locations.Resource.Attribute.listPreferredItemPaddingLeft = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemPaddingLeft;
+			global::Shiny.Locations.Resource.Attribute.listPreferredItemPaddingRight = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemPaddingRight;
+			global::Shiny.Locations.Resource.Attribute.listPreferredItemPaddingStart = global::Shiny.Device.Tests.Droid.Resource.Attribute.listPreferredItemPaddingStart;
+			global::Shiny.Locations.Resource.Attribute.logo = global::Shiny.Device.Tests.Droid.Resource.Attribute.logo;
+			global::Shiny.Locations.Resource.Attribute.logoDescription = global::Shiny.Device.Tests.Droid.Resource.Attribute.logoDescription;
+			global::Shiny.Locations.Resource.Attribute.maxButtonHeight = global::Shiny.Device.Tests.Droid.Resource.Attribute.maxButtonHeight;
+			global::Shiny.Locations.Resource.Attribute.measureWithLargestChild = global::Shiny.Device.Tests.Droid.Resource.Attribute.measureWithLargestChild;
+			global::Shiny.Locations.Resource.Attribute.menu = global::Shiny.Device.Tests.Droid.Resource.Attribute.menu;
+			global::Shiny.Locations.Resource.Attribute.multiChoiceItemLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.multiChoiceItemLayout;
+			global::Shiny.Locations.Resource.Attribute.navigationContentDescription = global::Shiny.Device.Tests.Droid.Resource.Attribute.navigationContentDescription;
+			global::Shiny.Locations.Resource.Attribute.navigationIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.navigationIcon;
+			global::Shiny.Locations.Resource.Attribute.navigationMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.navigationMode;
+			global::Shiny.Locations.Resource.Attribute.numericModifiers = global::Shiny.Device.Tests.Droid.Resource.Attribute.numericModifiers;
+			global::Shiny.Locations.Resource.Attribute.overlapAnchor = global::Shiny.Device.Tests.Droid.Resource.Attribute.overlapAnchor;
+			global::Shiny.Locations.Resource.Attribute.paddingBottomNoButtons = global::Shiny.Device.Tests.Droid.Resource.Attribute.paddingBottomNoButtons;
+			global::Shiny.Locations.Resource.Attribute.paddingEnd = global::Shiny.Device.Tests.Droid.Resource.Attribute.paddingEnd;
+			global::Shiny.Locations.Resource.Attribute.paddingStart = global::Shiny.Device.Tests.Droid.Resource.Attribute.paddingStart;
+			global::Shiny.Locations.Resource.Attribute.paddingTopNoTitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.paddingTopNoTitle;
+			global::Shiny.Locations.Resource.Attribute.panelBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.panelBackground;
+			global::Shiny.Locations.Resource.Attribute.panelMenuListTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.panelMenuListTheme;
+			global::Shiny.Locations.Resource.Attribute.panelMenuListWidth = global::Shiny.Device.Tests.Droid.Resource.Attribute.panelMenuListWidth;
+			global::Shiny.Locations.Resource.Attribute.popupMenuStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.popupMenuStyle;
+			global::Shiny.Locations.Resource.Attribute.popupTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.popupTheme;
+			global::Shiny.Locations.Resource.Attribute.popupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.popupWindowStyle;
+			global::Shiny.Locations.Resource.Attribute.preserveIconSpacing = global::Shiny.Device.Tests.Droid.Resource.Attribute.preserveIconSpacing;
+			global::Shiny.Locations.Resource.Attribute.progressBarPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.progressBarPadding;
+			global::Shiny.Locations.Resource.Attribute.progressBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.progressBarStyle;
+			global::Shiny.Locations.Resource.Attribute.queryBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.queryBackground;
+			global::Shiny.Locations.Resource.Attribute.queryHint = global::Shiny.Device.Tests.Droid.Resource.Attribute.queryHint;
+			global::Shiny.Locations.Resource.Attribute.radioButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.radioButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.ratingBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.ratingBarStyle;
+			global::Shiny.Locations.Resource.Attribute.ratingBarStyleIndicator = global::Shiny.Device.Tests.Droid.Resource.Attribute.ratingBarStyleIndicator;
+			global::Shiny.Locations.Resource.Attribute.ratingBarStyleSmall = global::Shiny.Device.Tests.Droid.Resource.Attribute.ratingBarStyleSmall;
 			global::Shiny.Locations.Resource.Attribute.scopeUris = global::Shiny.Device.Tests.Droid.Resource.Attribute.scopeUris;
+			global::Shiny.Locations.Resource.Attribute.searchHintIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.searchHintIcon;
+			global::Shiny.Locations.Resource.Attribute.searchIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.searchIcon;
+			global::Shiny.Locations.Resource.Attribute.searchViewStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.searchViewStyle;
+			global::Shiny.Locations.Resource.Attribute.seekBarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.seekBarStyle;
+			global::Shiny.Locations.Resource.Attribute.selectableItemBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.selectableItemBackground;
+			global::Shiny.Locations.Resource.Attribute.selectableItemBackgroundBorderless = global::Shiny.Device.Tests.Droid.Resource.Attribute.selectableItemBackgroundBorderless;
+			global::Shiny.Locations.Resource.Attribute.showAsAction = global::Shiny.Device.Tests.Droid.Resource.Attribute.showAsAction;
+			global::Shiny.Locations.Resource.Attribute.showDividers = global::Shiny.Device.Tests.Droid.Resource.Attribute.showDividers;
+			global::Shiny.Locations.Resource.Attribute.showText = global::Shiny.Device.Tests.Droid.Resource.Attribute.showText;
+			global::Shiny.Locations.Resource.Attribute.showTitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.showTitle;
+			global::Shiny.Locations.Resource.Attribute.singleChoiceItemLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.singleChoiceItemLayout;
+			global::Shiny.Locations.Resource.Attribute.spinBars = global::Shiny.Device.Tests.Droid.Resource.Attribute.spinBars;
+			global::Shiny.Locations.Resource.Attribute.spinnerDropDownItemStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.spinnerDropDownItemStyle;
+			global::Shiny.Locations.Resource.Attribute.spinnerStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.spinnerStyle;
+			global::Shiny.Locations.Resource.Attribute.splitTrack = global::Shiny.Device.Tests.Droid.Resource.Attribute.splitTrack;
+			global::Shiny.Locations.Resource.Attribute.srcCompat = global::Shiny.Device.Tests.Droid.Resource.Attribute.srcCompat;
+			global::Shiny.Locations.Resource.Attribute.state_above_anchor = global::Shiny.Device.Tests.Droid.Resource.Attribute.state_above_anchor;
+			global::Shiny.Locations.Resource.Attribute.subMenuArrow = global::Shiny.Device.Tests.Droid.Resource.Attribute.subMenuArrow;
+			global::Shiny.Locations.Resource.Attribute.submitBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.submitBackground;
+			global::Shiny.Locations.Resource.Attribute.subtitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.subtitle;
+			global::Shiny.Locations.Resource.Attribute.subtitleTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Attribute.subtitleTextAppearance;
+			global::Shiny.Locations.Resource.Attribute.subtitleTextColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.subtitleTextColor;
+			global::Shiny.Locations.Resource.Attribute.subtitleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.subtitleTextStyle;
+			global::Shiny.Locations.Resource.Attribute.suggestionRowLayout = global::Shiny.Device.Tests.Droid.Resource.Attribute.suggestionRowLayout;
+			global::Shiny.Locations.Resource.Attribute.switchMinWidth = global::Shiny.Device.Tests.Droid.Resource.Attribute.switchMinWidth;
+			global::Shiny.Locations.Resource.Attribute.switchPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.switchPadding;
+			global::Shiny.Locations.Resource.Attribute.switchStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.switchStyle;
+			global::Shiny.Locations.Resource.Attribute.switchTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Attribute.switchTextAppearance;
+			global::Shiny.Locations.Resource.Attribute.textAllCaps = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAllCaps;
+			global::Shiny.Locations.Resource.Attribute.textAppearanceLargePopupMenu = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceLargePopupMenu;
+			global::Shiny.Locations.Resource.Attribute.textAppearanceListItem = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceListItem;
+			global::Shiny.Locations.Resource.Attribute.textAppearanceListItemSecondary = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceListItemSecondary;
+			global::Shiny.Locations.Resource.Attribute.textAppearanceListItemSmall = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceListItemSmall;
+			global::Shiny.Locations.Resource.Attribute.textAppearancePopupMenuHeader = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearancePopupMenuHeader;
+			global::Shiny.Locations.Resource.Attribute.textAppearanceSearchResultSubtitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceSearchResultSubtitle;
+			global::Shiny.Locations.Resource.Attribute.textAppearanceSearchResultTitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceSearchResultTitle;
+			global::Shiny.Locations.Resource.Attribute.textAppearanceSmallPopupMenu = global::Shiny.Device.Tests.Droid.Resource.Attribute.textAppearanceSmallPopupMenu;
+			global::Shiny.Locations.Resource.Attribute.textColorAlertDialogListItem = global::Shiny.Device.Tests.Droid.Resource.Attribute.textColorAlertDialogListItem;
+			global::Shiny.Locations.Resource.Attribute.textColorSearchUrl = global::Shiny.Device.Tests.Droid.Resource.Attribute.textColorSearchUrl;
+			global::Shiny.Locations.Resource.Attribute.textLocale = global::Shiny.Device.Tests.Droid.Resource.Attribute.textLocale;
+			global::Shiny.Locations.Resource.Attribute.theme = global::Shiny.Device.Tests.Droid.Resource.Attribute.theme;
+			global::Shiny.Locations.Resource.Attribute.thickness = global::Shiny.Device.Tests.Droid.Resource.Attribute.thickness;
+			global::Shiny.Locations.Resource.Attribute.thumbTextPadding = global::Shiny.Device.Tests.Droid.Resource.Attribute.thumbTextPadding;
+			global::Shiny.Locations.Resource.Attribute.thumbTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.thumbTint;
+			global::Shiny.Locations.Resource.Attribute.thumbTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.thumbTintMode;
+			global::Shiny.Locations.Resource.Attribute.tickMark = global::Shiny.Device.Tests.Droid.Resource.Attribute.tickMark;
+			global::Shiny.Locations.Resource.Attribute.tickMarkTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.tickMarkTint;
+			global::Shiny.Locations.Resource.Attribute.tickMarkTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.tickMarkTintMode;
+			global::Shiny.Locations.Resource.Attribute.tint = global::Shiny.Device.Tests.Droid.Resource.Attribute.tint;
+			global::Shiny.Locations.Resource.Attribute.tintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.tintMode;
+			global::Shiny.Locations.Resource.Attribute.title = global::Shiny.Device.Tests.Droid.Resource.Attribute.title;
+			global::Shiny.Locations.Resource.Attribute.titleMargin = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMargin;
+			global::Shiny.Locations.Resource.Attribute.titleMarginBottom = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMarginBottom;
+			global::Shiny.Locations.Resource.Attribute.titleMarginEnd = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMarginEnd;
+			global::Shiny.Locations.Resource.Attribute.titleMargins = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMargins;
+			global::Shiny.Locations.Resource.Attribute.titleMarginStart = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMarginStart;
+			global::Shiny.Locations.Resource.Attribute.titleMarginTop = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleMarginTop;
+			global::Shiny.Locations.Resource.Attribute.titleTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleTextAppearance;
+			global::Shiny.Locations.Resource.Attribute.titleTextColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleTextColor;
+			global::Shiny.Locations.Resource.Attribute.titleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.titleTextStyle;
+			global::Shiny.Locations.Resource.Attribute.toolbarNavigationButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.toolbarNavigationButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.toolbarStyle = global::Shiny.Device.Tests.Droid.Resource.Attribute.toolbarStyle;
+			global::Shiny.Locations.Resource.Attribute.tooltipForegroundColor = global::Shiny.Device.Tests.Droid.Resource.Attribute.tooltipForegroundColor;
+			global::Shiny.Locations.Resource.Attribute.tooltipFrameBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.tooltipFrameBackground;
+			global::Shiny.Locations.Resource.Attribute.tooltipText = global::Shiny.Device.Tests.Droid.Resource.Attribute.tooltipText;
+			global::Shiny.Locations.Resource.Attribute.track = global::Shiny.Device.Tests.Droid.Resource.Attribute.track;
+			global::Shiny.Locations.Resource.Attribute.trackTint = global::Shiny.Device.Tests.Droid.Resource.Attribute.trackTint;
+			global::Shiny.Locations.Resource.Attribute.trackTintMode = global::Shiny.Device.Tests.Droid.Resource.Attribute.trackTintMode;
 			global::Shiny.Locations.Resource.Attribute.ttcIndex = global::Shiny.Device.Tests.Droid.Resource.Attribute.ttcIndex;
+			global::Shiny.Locations.Resource.Attribute.viewInflaterClass = global::Shiny.Device.Tests.Droid.Resource.Attribute.viewInflaterClass;
+			global::Shiny.Locations.Resource.Attribute.voiceIcon = global::Shiny.Device.Tests.Droid.Resource.Attribute.voiceIcon;
+			global::Shiny.Locations.Resource.Attribute.windowActionBar = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowActionBar;
+			global::Shiny.Locations.Resource.Attribute.windowActionBarOverlay = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowActionBarOverlay;
+			global::Shiny.Locations.Resource.Attribute.windowActionModeOverlay = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowActionModeOverlay;
+			global::Shiny.Locations.Resource.Attribute.windowFixedHeightMajor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowFixedHeightMajor;
+			global::Shiny.Locations.Resource.Attribute.windowFixedHeightMinor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowFixedHeightMinor;
+			global::Shiny.Locations.Resource.Attribute.windowFixedWidthMajor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowFixedWidthMajor;
+			global::Shiny.Locations.Resource.Attribute.windowFixedWidthMinor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowFixedWidthMinor;
+			global::Shiny.Locations.Resource.Attribute.windowMinWidthMajor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowMinWidthMajor;
+			global::Shiny.Locations.Resource.Attribute.windowMinWidthMinor = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowMinWidthMinor;
+			global::Shiny.Locations.Resource.Attribute.windowNoTitle = global::Shiny.Device.Tests.Droid.Resource.Attribute.windowNoTitle;
+			global::Shiny.Locations.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Device.Tests.Droid.Resource.Boolean.abc_action_bar_embed_tabs;
+			global::Shiny.Locations.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Device.Tests.Droid.Resource.Boolean.abc_allow_stacked_button_bar;
+			global::Shiny.Locations.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Device.Tests.Droid.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Shiny.Locations.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_alarm_service_default;
 			global::Shiny.Locations.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_foreground_service_default;
 			global::Shiny.Locations.Resource.Boolean.enable_system_job_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_job_service_default;
 			global::Shiny.Locations.Resource.Boolean.workmanager_test_configuration = global::Shiny.Device.Tests.Droid.Resource.Boolean.workmanager_test_configuration;
+			global::Shiny.Locations.Resource.Color.abc_background_cache_hint_selector_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_background_cache_hint_selector_material_dark;
+			global::Shiny.Locations.Resource.Color.abc_background_cache_hint_selector_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_background_cache_hint_selector_material_light;
+			global::Shiny.Locations.Resource.Color.abc_btn_colored_borderless_text_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_btn_colored_borderless_text_material;
+			global::Shiny.Locations.Resource.Color.abc_btn_colored_text_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_btn_colored_text_material;
+			global::Shiny.Locations.Resource.Color.abc_color_highlight_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_color_highlight_material;
+			global::Shiny.Locations.Resource.Color.abc_decor_view_status_guard = global::Shiny.Device.Tests.Droid.Resource.Color.abc_decor_view_status_guard;
+			global::Shiny.Locations.Resource.Color.abc_decor_view_status_guard_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_decor_view_status_guard_light;
+			global::Shiny.Locations.Resource.Color.abc_hint_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_dark;
+			global::Shiny.Locations.Resource.Color.abc_hint_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_light;
+			global::Shiny.Locations.Resource.Color.abc_primary_text_disable_only_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_dark;
+			global::Shiny.Locations.Resource.Color.abc_primary_text_disable_only_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_light;
+			global::Shiny.Locations.Resource.Color.abc_primary_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_material_dark;
+			global::Shiny.Locations.Resource.Color.abc_primary_text_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_material_light;
+			global::Shiny.Locations.Resource.Color.abc_search_url_text = global::Shiny.Device.Tests.Droid.Resource.Color.abc_search_url_text;
+			global::Shiny.Locations.Resource.Color.abc_search_url_text_normal = global::Shiny.Device.Tests.Droid.Resource.Color.abc_search_url_text_normal;
+			global::Shiny.Locations.Resource.Color.abc_search_url_text_pressed = global::Shiny.Device.Tests.Droid.Resource.Color.abc_search_url_text_pressed;
+			global::Shiny.Locations.Resource.Color.abc_search_url_text_selected = global::Shiny.Device.Tests.Droid.Resource.Color.abc_search_url_text_selected;
+			global::Shiny.Locations.Resource.Color.abc_secondary_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_secondary_text_material_dark;
+			global::Shiny.Locations.Resource.Color.abc_secondary_text_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_secondary_text_material_light;
+			global::Shiny.Locations.Resource.Color.abc_tint_btn_checkable = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_btn_checkable;
+			global::Shiny.Locations.Resource.Color.abc_tint_default = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_default;
+			global::Shiny.Locations.Resource.Color.abc_tint_edittext = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_edittext;
+			global::Shiny.Locations.Resource.Color.abc_tint_seek_thumb = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_seek_thumb;
+			global::Shiny.Locations.Resource.Color.abc_tint_spinner = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_spinner;
+			global::Shiny.Locations.Resource.Color.abc_tint_switch_track = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_switch_track;
+			global::Shiny.Locations.Resource.Color.accent_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.accent_material_dark;
+			global::Shiny.Locations.Resource.Color.accent_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.accent_material_light;
+			global::Shiny.Locations.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.Locations.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_secondary_text_default_material_light;
+			global::Shiny.Locations.Resource.Color.background_floating_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.background_floating_material_dark;
+			global::Shiny.Locations.Resource.Color.background_floating_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.background_floating_material_light;
+			global::Shiny.Locations.Resource.Color.background_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.background_material_dark;
+			global::Shiny.Locations.Resource.Color.background_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.background_material_light;
+			global::Shiny.Locations.Resource.Color.bright_foreground_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_disabled_material_dark;
+			global::Shiny.Locations.Resource.Color.bright_foreground_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_disabled_material_light;
+			global::Shiny.Locations.Resource.Color.bright_foreground_inverse_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_inverse_material_dark;
+			global::Shiny.Locations.Resource.Color.bright_foreground_inverse_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_inverse_material_light;
+			global::Shiny.Locations.Resource.Color.bright_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_material_dark;
+			global::Shiny.Locations.Resource.Color.bright_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.bright_foreground_material_light;
+			global::Shiny.Locations.Resource.Color.button_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.button_material_dark;
+			global::Shiny.Locations.Resource.Color.button_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.button_material_light;
 			global::Shiny.Locations.Resource.Color.common_google_signin_btn_text_dark = global::Shiny.Device.Tests.Droid.Resource.Color.common_google_signin_btn_text_dark;
 			global::Shiny.Locations.Resource.Color.common_google_signin_btn_text_dark_default = global::Shiny.Device.Tests.Droid.Resource.Color.common_google_signin_btn_text_dark_default;
 			global::Shiny.Locations.Resource.Color.common_google_signin_btn_text_dark_disabled = global::Shiny.Device.Tests.Droid.Resource.Color.common_google_signin_btn_text_dark_disabled;
@@ -3279,10 +5144,130 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Color.common_google_signin_btn_text_light_focused = global::Shiny.Device.Tests.Droid.Resource.Color.common_google_signin_btn_text_light_focused;
 			global::Shiny.Locations.Resource.Color.common_google_signin_btn_text_light_pressed = global::Shiny.Device.Tests.Droid.Resource.Color.common_google_signin_btn_text_light_pressed;
 			global::Shiny.Locations.Resource.Color.common_google_signin_btn_tint = global::Shiny.Device.Tests.Droid.Resource.Color.common_google_signin_btn_tint;
+			global::Shiny.Locations.Resource.Color.dim_foreground_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.dim_foreground_disabled_material_dark;
+			global::Shiny.Locations.Resource.Color.dim_foreground_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.dim_foreground_disabled_material_light;
+			global::Shiny.Locations.Resource.Color.dim_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.dim_foreground_material_dark;
+			global::Shiny.Locations.Resource.Color.dim_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.dim_foreground_material_light;
+			global::Shiny.Locations.Resource.Color.error_color_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.error_color_material_dark;
+			global::Shiny.Locations.Resource.Color.error_color_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.error_color_material_light;
+			global::Shiny.Locations.Resource.Color.foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.foreground_material_dark;
+			global::Shiny.Locations.Resource.Color.foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.foreground_material_light;
+			global::Shiny.Locations.Resource.Color.highlighted_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.highlighted_text_material_dark;
+			global::Shiny.Locations.Resource.Color.highlighted_text_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.highlighted_text_material_light;
+			global::Shiny.Locations.Resource.Color.material_blue_grey_800 = global::Shiny.Device.Tests.Droid.Resource.Color.material_blue_grey_800;
+			global::Shiny.Locations.Resource.Color.material_blue_grey_900 = global::Shiny.Device.Tests.Droid.Resource.Color.material_blue_grey_900;
+			global::Shiny.Locations.Resource.Color.material_blue_grey_950 = global::Shiny.Device.Tests.Droid.Resource.Color.material_blue_grey_950;
+			global::Shiny.Locations.Resource.Color.material_deep_teal_200 = global::Shiny.Device.Tests.Droid.Resource.Color.material_deep_teal_200;
+			global::Shiny.Locations.Resource.Color.material_deep_teal_500 = global::Shiny.Device.Tests.Droid.Resource.Color.material_deep_teal_500;
+			global::Shiny.Locations.Resource.Color.material_grey_100 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_100;
+			global::Shiny.Locations.Resource.Color.material_grey_300 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_300;
+			global::Shiny.Locations.Resource.Color.material_grey_50 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_50;
+			global::Shiny.Locations.Resource.Color.material_grey_600 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_600;
+			global::Shiny.Locations.Resource.Color.material_grey_800 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_800;
+			global::Shiny.Locations.Resource.Color.material_grey_850 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_850;
+			global::Shiny.Locations.Resource.Color.material_grey_900 = global::Shiny.Device.Tests.Droid.Resource.Color.material_grey_900;
 			global::Shiny.Locations.Resource.Color.notification_action_color_filter = global::Shiny.Device.Tests.Droid.Resource.Color.notification_action_color_filter;
 			global::Shiny.Locations.Resource.Color.notification_icon_bg_color = global::Shiny.Device.Tests.Droid.Resource.Color.notification_icon_bg_color;
+			global::Shiny.Locations.Resource.Color.primary_dark_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.primary_dark_material_dark;
+			global::Shiny.Locations.Resource.Color.primary_dark_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.primary_dark_material_light;
+			global::Shiny.Locations.Resource.Color.primary_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.primary_material_dark;
+			global::Shiny.Locations.Resource.Color.primary_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.primary_material_light;
+			global::Shiny.Locations.Resource.Color.primary_text_default_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.primary_text_default_material_dark;
+			global::Shiny.Locations.Resource.Color.primary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.primary_text_default_material_light;
+			global::Shiny.Locations.Resource.Color.primary_text_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.primary_text_disabled_material_dark;
+			global::Shiny.Locations.Resource.Color.primary_text_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.primary_text_disabled_material_light;
+			global::Shiny.Locations.Resource.Color.ripple_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_dark;
 			global::Shiny.Locations.Resource.Color.ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_light;
+			global::Shiny.Locations.Resource.Color.secondary_text_default_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_dark;
 			global::Shiny.Locations.Resource.Color.secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_light;
+			global::Shiny.Locations.Resource.Color.secondary_text_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_disabled_material_dark;
+			global::Shiny.Locations.Resource.Color.secondary_text_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_disabled_material_light;
+			global::Shiny.Locations.Resource.Color.switch_thumb_disabled_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_disabled_material_dark;
+			global::Shiny.Locations.Resource.Color.switch_thumb_disabled_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_disabled_material_light;
+			global::Shiny.Locations.Resource.Color.switch_thumb_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_material_dark;
+			global::Shiny.Locations.Resource.Color.switch_thumb_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_material_light;
+			global::Shiny.Locations.Resource.Color.switch_thumb_normal_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_normal_material_dark;
+			global::Shiny.Locations.Resource.Color.switch_thumb_normal_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.switch_thumb_normal_material_light;
+			global::Shiny.Locations.Resource.Color.tooltip_background_dark = global::Shiny.Device.Tests.Droid.Resource.Color.tooltip_background_dark;
+			global::Shiny.Locations.Resource.Color.tooltip_background_light = global::Shiny.Device.Tests.Droid.Resource.Color.tooltip_background_light;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_content_inset_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_content_inset_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_content_inset_with_nav = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_content_inset_with_nav;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_default_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_default_height_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_default_padding_end_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_default_padding_end_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_default_padding_start_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_default_padding_start_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_elevation_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_elevation_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_icon_vertical_padding_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_icon_vertical_padding_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_overflow_padding_end_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_overflow_padding_end_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_overflow_padding_start_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_overflow_padding_start_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_stacked_max_height = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_stacked_max_height;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_stacked_tab_max_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_stacked_tab_max_width;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_subtitle_bottom_margin_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_subtitle_bottom_margin_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_bar_subtitle_top_margin_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_bar_subtitle_top_margin_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_button_min_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_button_min_height_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_button_min_width_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_button_min_width_material;
+			global::Shiny.Locations.Resource.Dimension.abc_action_button_min_width_overflow_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_action_button_min_width_overflow_material;
+			global::Shiny.Locations.Resource.Dimension.abc_alert_dialog_button_bar_height = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_alert_dialog_button_bar_height;
+			global::Shiny.Locations.Resource.Dimension.abc_alert_dialog_button_dimen = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_alert_dialog_button_dimen;
+			global::Shiny.Locations.Resource.Dimension.abc_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_button_inset_horizontal_material;
+			global::Shiny.Locations.Resource.Dimension.abc_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_button_inset_vertical_material;
+			global::Shiny.Locations.Resource.Dimension.abc_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_button_padding_horizontal_material;
+			global::Shiny.Locations.Resource.Dimension.abc_button_padding_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_button_padding_vertical_material;
+			global::Shiny.Locations.Resource.Dimension.abc_cascading_menus_min_smallest_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_cascading_menus_min_smallest_width;
+			global::Shiny.Locations.Resource.Dimension.abc_config_prefDialogWidth = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_config_prefDialogWidth;
+			global::Shiny.Locations.Resource.Dimension.abc_control_corner_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_control_corner_material;
+			global::Shiny.Locations.Resource.Dimension.abc_control_inset_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_control_inset_material;
+			global::Shiny.Locations.Resource.Dimension.abc_control_padding_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_control_padding_material;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_corner_radius_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_corner_radius_material;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_fixed_height_major = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_fixed_height_major;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_fixed_height_minor = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_fixed_height_minor;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_fixed_width_major = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_fixed_width_major;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_fixed_width_minor = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_fixed_width_minor;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_list_padding_bottom_no_buttons = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_list_padding_bottom_no_buttons;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_list_padding_top_no_title = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_list_padding_top_no_title;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_min_width_major = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_min_width_major;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_min_width_minor = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_min_width_minor;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_padding_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_padding_material;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_padding_top_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_padding_top_material;
+			global::Shiny.Locations.Resource.Dimension.abc_dialog_title_divider_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dialog_title_divider_material;
+			global::Shiny.Locations.Resource.Dimension.abc_disabled_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_disabled_alpha_material_dark;
+			global::Shiny.Locations.Resource.Dimension.abc_disabled_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_disabled_alpha_material_light;
+			global::Shiny.Locations.Resource.Dimension.abc_dropdownitem_icon_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dropdownitem_icon_width;
+			global::Shiny.Locations.Resource.Dimension.abc_dropdownitem_text_padding_left = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dropdownitem_text_padding_left;
+			global::Shiny.Locations.Resource.Dimension.abc_dropdownitem_text_padding_right = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_dropdownitem_text_padding_right;
+			global::Shiny.Locations.Resource.Dimension.abc_edit_text_inset_bottom_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_edit_text_inset_bottom_material;
+			global::Shiny.Locations.Resource.Dimension.abc_edit_text_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_edit_text_inset_horizontal_material;
+			global::Shiny.Locations.Resource.Dimension.abc_edit_text_inset_top_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_edit_text_inset_top_material;
+			global::Shiny.Locations.Resource.Dimension.abc_floating_window_z = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_floating_window_z;
+			global::Shiny.Locations.Resource.Dimension.abc_list_item_height_large_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_list_item_height_large_material;
+			global::Shiny.Locations.Resource.Dimension.abc_list_item_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_list_item_height_material;
+			global::Shiny.Locations.Resource.Dimension.abc_list_item_height_small_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_list_item_height_small_material;
+			global::Shiny.Locations.Resource.Dimension.abc_list_item_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_list_item_padding_horizontal_material;
+			global::Shiny.Locations.Resource.Dimension.abc_panel_menu_list_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_panel_menu_list_width;
+			global::Shiny.Locations.Resource.Dimension.abc_progress_bar_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_progress_bar_height_material;
+			global::Shiny.Locations.Resource.Dimension.abc_search_view_preferred_height = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_search_view_preferred_height;
+			global::Shiny.Locations.Resource.Dimension.abc_search_view_preferred_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_search_view_preferred_width;
+			global::Shiny.Locations.Resource.Dimension.abc_seekbar_track_background_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_seekbar_track_background_height_material;
+			global::Shiny.Locations.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_seekbar_track_progress_height_material;
+			global::Shiny.Locations.Resource.Dimension.abc_select_dialog_padding_start_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Shiny.Locations.Resource.Dimension.abc_switch_padding = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_switch_padding;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_body_1_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_body_1_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_body_2_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_body_2_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_button_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_button_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_caption_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_caption_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_display_1_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_display_1_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_display_2_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_display_2_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_display_3_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_display_3_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_display_4_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_display_4_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_headline_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_headline_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_large_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_large_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_medium_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_medium_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_menu_header_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_menu_header_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_menu_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_menu_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_small_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_small_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_subhead_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_subhead_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_subtitle_material_toolbar = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_subtitle_material_toolbar;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_title_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_title_material;
+			global::Shiny.Locations.Resource.Dimension.abc_text_size_title_material_toolbar = global::Shiny.Device.Tests.Droid.Resource.Dimension.abc_text_size_title_material_toolbar;
 			global::Shiny.Locations.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_horizontal_material;
 			global::Shiny.Locations.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_vertical_material;
 			global::Shiny.Locations.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_padding_horizontal_material;
@@ -3290,6 +5275,15 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Dimension.compat_control_corner_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_control_corner_material;
 			global::Shiny.Locations.Resource.Dimension.compat_notification_large_icon_max_height = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_notification_large_icon_max_height;
 			global::Shiny.Locations.Resource.Dimension.compat_notification_large_icon_max_width = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_notification_large_icon_max_width;
+			global::Shiny.Locations.Resource.Dimension.disabled_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.disabled_alpha_material_dark;
+			global::Shiny.Locations.Resource.Dimension.disabled_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.disabled_alpha_material_light;
+			global::Shiny.Locations.Resource.Dimension.highlight_alpha_material_colored = global::Shiny.Device.Tests.Droid.Resource.Dimension.highlight_alpha_material_colored;
+			global::Shiny.Locations.Resource.Dimension.highlight_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.highlight_alpha_material_dark;
+			global::Shiny.Locations.Resource.Dimension.highlight_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.highlight_alpha_material_light;
+			global::Shiny.Locations.Resource.Dimension.hint_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.hint_alpha_material_dark;
+			global::Shiny.Locations.Resource.Dimension.hint_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.hint_alpha_material_light;
+			global::Shiny.Locations.Resource.Dimension.hint_pressed_alpha_material_dark = global::Shiny.Device.Tests.Droid.Resource.Dimension.hint_pressed_alpha_material_dark;
+			global::Shiny.Locations.Resource.Dimension.hint_pressed_alpha_material_light = global::Shiny.Device.Tests.Droid.Resource.Dimension.hint_pressed_alpha_material_light;
 			global::Shiny.Locations.Resource.Dimension.notification_action_icon_size = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_action_icon_size;
 			global::Shiny.Locations.Resource.Dimension.notification_action_text_size = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_action_text_size;
 			global::Shiny.Locations.Resource.Dimension.notification_big_circle_margin = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_big_circle_margin;
@@ -3305,6 +5299,108 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Dimension.notification_subtext_size = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_subtext_size;
 			global::Shiny.Locations.Resource.Dimension.notification_top_pad = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_top_pad;
 			global::Shiny.Locations.Resource.Dimension.notification_top_pad_large_text = global::Shiny.Device.Tests.Droid.Resource.Dimension.notification_top_pad_large_text;
+			global::Shiny.Locations.Resource.Dimension.tooltip_corner_radius = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_corner_radius;
+			global::Shiny.Locations.Resource.Dimension.tooltip_horizontal_padding = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_horizontal_padding;
+			global::Shiny.Locations.Resource.Dimension.tooltip_margin = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_margin;
+			global::Shiny.Locations.Resource.Dimension.tooltip_precise_anchor_extra_offset = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_precise_anchor_extra_offset;
+			global::Shiny.Locations.Resource.Dimension.tooltip_precise_anchor_threshold = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_precise_anchor_threshold;
+			global::Shiny.Locations.Resource.Dimension.tooltip_vertical_padding = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_vertical_padding;
+			global::Shiny.Locations.Resource.Dimension.tooltip_y_offset_non_touch = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_y_offset_non_touch;
+			global::Shiny.Locations.Resource.Dimension.tooltip_y_offset_touch = global::Shiny.Device.Tests.Droid.Resource.Dimension.tooltip_y_offset_touch;
+			global::Shiny.Locations.Resource.Drawable.abc_ab_share_pack_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ab_share_pack_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_action_bar_item_background_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_action_bar_item_background_material;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_borderless_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_borderless_material;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_check_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_check_material;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_check_material_anim = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_check_material_anim;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_check_to_on_mtrl_000 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_check_to_on_mtrl_000;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_check_to_on_mtrl_015 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_check_to_on_mtrl_015;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_colored_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_colored_material;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_default_mtrl_shape = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_default_mtrl_shape;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_radio_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_radio_material;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_radio_material_anim = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_radio_material_anim;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_radio_to_on_mtrl_000 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_radio_to_on_mtrl_000;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_radio_to_on_mtrl_015 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_radio_to_on_mtrl_015;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_switch_to_on_mtrl_00001 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_switch_to_on_mtrl_00001;
+			global::Shiny.Locations.Resource.Drawable.abc_btn_switch_to_on_mtrl_00012 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_btn_switch_to_on_mtrl_00012;
+			global::Shiny.Locations.Resource.Drawable.abc_cab_background_internal_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_cab_background_internal_bg;
+			global::Shiny.Locations.Resource.Drawable.abc_cab_background_top_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_cab_background_top_material;
+			global::Shiny.Locations.Resource.Drawable.abc_cab_background_top_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_cab_background_top_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_control_background_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_control_background_material;
+			global::Shiny.Locations.Resource.Drawable.abc_dialog_material_background = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_dialog_material_background;
+			global::Shiny.Locations.Resource.Drawable.abc_edit_text_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_edit_text_material;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_ab_back_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_ab_back_material;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_arrow_drop_right_black_24dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_arrow_drop_right_black_24dp;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_clear_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_clear_material;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_commit_search_api_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_commit_search_api_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_go_search_api_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_go_search_api_material;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_copy_mtrl_am_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_menu_cut_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_cut_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_menu_overflow_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_overflow_material;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_menu_paste_mtrl_am_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_paste_mtrl_am_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_search_api_material;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_black_16dp;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_black_36dp;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_black_48dp;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_half_black_16dp;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_half_black_36dp;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_star_half_black_48dp;
+			global::Shiny.Locations.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ic_voice_search_api_material;
+			global::Shiny.Locations.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_item_background_holo_dark;
+			global::Shiny.Locations.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_item_background_holo_light;
+			global::Shiny.Locations.Resource.Drawable.abc_list_divider_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_divider_material;
+			global::Shiny.Locations.Resource.Drawable.abc_list_divider_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_divider_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_list_focused_holo = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_focused_holo;
+			global::Shiny.Locations.Resource.Drawable.abc_list_longpressed_holo = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_longpressed_holo;
+			global::Shiny.Locations.Resource.Drawable.abc_list_pressed_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_pressed_holo_dark;
+			global::Shiny.Locations.Resource.Drawable.abc_list_pressed_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_pressed_holo_light;
+			global::Shiny.Locations.Resource.Drawable.abc_list_selector_background_transition_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_background_transition_holo_dark;
+			global::Shiny.Locations.Resource.Drawable.abc_list_selector_background_transition_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_background_transition_holo_light;
+			global::Shiny.Locations.Resource.Drawable.abc_list_selector_disabled_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_disabled_holo_dark;
+			global::Shiny.Locations.Resource.Drawable.abc_list_selector_disabled_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_disabled_holo_light;
+			global::Shiny.Locations.Resource.Drawable.abc_list_selector_holo_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_holo_dark;
+			global::Shiny.Locations.Resource.Drawable.abc_list_selector_holo_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_list_selector_holo_light;
+			global::Shiny.Locations.Resource.Drawable.abc_menu_hardkey_panel_mtrl_mult = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_menu_hardkey_panel_mtrl_mult;
+			global::Shiny.Locations.Resource.Drawable.abc_popup_background_mtrl_mult = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_popup_background_mtrl_mult;
+			global::Shiny.Locations.Resource.Drawable.abc_ratingbar_indicator_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ratingbar_indicator_material;
+			global::Shiny.Locations.Resource.Drawable.abc_ratingbar_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ratingbar_material;
+			global::Shiny.Locations.Resource.Drawable.abc_ratingbar_small_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_ratingbar_small_material;
+			global::Shiny.Locations.Resource.Drawable.abc_scrubber_control_off_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_control_off_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_000 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_000;
+			global::Shiny.Locations.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_005 = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_control_to_pressed_mtrl_005;
+			global::Shiny.Locations.Resource.Drawable.abc_scrubber_primary_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_primary_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_scrubber_track_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_scrubber_track_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_seekbar_thumb_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_seekbar_thumb_material;
+			global::Shiny.Locations.Resource.Drawable.abc_seekbar_tick_mark_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_seekbar_tick_mark_material;
+			global::Shiny.Locations.Resource.Drawable.abc_seekbar_track_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_seekbar_track_material;
+			global::Shiny.Locations.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_spinner_mtrl_am_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_spinner_textfield_background_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Shiny.Locations.Resource.Drawable.abc_switch_thumb_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_switch_thumb_material;
+			global::Shiny.Locations.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_switch_track_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_tab_indicator_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_tab_indicator_material;
+			global::Shiny.Locations.Resource.Drawable.abc_tab_indicator_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_tab_indicator_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_textfield_activated_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_activated_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_textfield_default_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_default_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_textfield_search_activated_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_search_activated_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
+			global::Shiny.Locations.Resource.Drawable.abc_textfield_search_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_textfield_search_material;
+			global::Shiny.Locations.Resource.Drawable.abc_text_cursor_material = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_cursor_material;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
+			global::Shiny.Locations.Resource.Drawable.abc_vector_test = global::Shiny.Device.Tests.Droid.Resource.Drawable.abc_vector_test;
+			global::Shiny.Locations.Resource.Drawable.btn_checkbox_checked_mtrl = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_checkbox_checked_mtrl;
+			global::Shiny.Locations.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
+			global::Shiny.Locations.Resource.Drawable.btn_checkbox_unchecked_mtrl = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_checkbox_unchecked_mtrl;
+			global::Shiny.Locations.Resource.Drawable.btn_checkbox_unchecked_to_checked_mtrl_animation = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_checkbox_unchecked_to_checked_mtrl_animation;
+			global::Shiny.Locations.Resource.Drawable.btn_radio_off_mtrl = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_radio_off_mtrl;
+			global::Shiny.Locations.Resource.Drawable.btn_radio_off_to_on_mtrl_animation = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_radio_off_to_on_mtrl_animation;
+			global::Shiny.Locations.Resource.Drawable.btn_radio_on_mtrl = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_radio_on_mtrl;
+			global::Shiny.Locations.Resource.Drawable.btn_radio_on_to_off_mtrl_animation = global::Shiny.Device.Tests.Droid.Resource.Drawable.btn_radio_on_to_off_mtrl_animation;
 			global::Shiny.Locations.Resource.Drawable.common_full_open_on_phone = global::Shiny.Device.Tests.Droid.Resource.Drawable.common_full_open_on_phone;
 			global::Shiny.Locations.Resource.Drawable.common_google_signin_btn_icon_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.common_google_signin_btn_icon_dark;
 			global::Shiny.Locations.Resource.Drawable.common_google_signin_btn_icon_dark_focused = global::Shiny.Device.Tests.Droid.Resource.Drawable.common_google_signin_btn_icon_dark_focused;
@@ -3338,6 +5434,8 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Drawable.notification_template_icon_low_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.notification_template_icon_low_bg;
 			global::Shiny.Locations.Resource.Drawable.notification_tile_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.notification_tile_bg;
 			global::Shiny.Locations.Resource.Drawable.notify_panel_notification_icon_bg = global::Shiny.Device.Tests.Droid.Resource.Drawable.notify_panel_notification_icon_bg;
+			global::Shiny.Locations.Resource.Drawable.tooltip_frame_dark = global::Shiny.Device.Tests.Droid.Resource.Drawable.tooltip_frame_dark;
+			global::Shiny.Locations.Resource.Drawable.tooltip_frame_light = global::Shiny.Device.Tests.Droid.Resource.Drawable.tooltip_frame_light;
 			global::Shiny.Locations.Resource.Id.accessibility_action_clickable_span = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_action_clickable_span;
 			global::Shiny.Locations.Resource.Id.accessibility_custom_action_0 = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_custom_action_0;
 			global::Shiny.Locations.Resource.Id.accessibility_custom_action_1 = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_custom_action_1;
@@ -3372,35 +5470,121 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Id.accessibility_custom_action_8 = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_custom_action_8;
 			global::Shiny.Locations.Resource.Id.accessibility_custom_action_9 = global::Shiny.Device.Tests.Droid.Resource.Id.accessibility_custom_action_9;
 			global::Shiny.Locations.Resource.Id.actions = global::Shiny.Device.Tests.Droid.Resource.Id.actions;
+			global::Shiny.Locations.Resource.Id.action_bar = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar;
+			global::Shiny.Locations.Resource.Id.action_bar_activity_content = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_activity_content;
+			global::Shiny.Locations.Resource.Id.action_bar_container = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_container;
+			global::Shiny.Locations.Resource.Id.action_bar_root = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_root;
+			global::Shiny.Locations.Resource.Id.action_bar_spinner = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_spinner;
+			global::Shiny.Locations.Resource.Id.action_bar_subtitle = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_subtitle;
+			global::Shiny.Locations.Resource.Id.action_bar_title = global::Shiny.Device.Tests.Droid.Resource.Id.action_bar_title;
 			global::Shiny.Locations.Resource.Id.action_container = global::Shiny.Device.Tests.Droid.Resource.Id.action_container;
+			global::Shiny.Locations.Resource.Id.action_context_bar = global::Shiny.Device.Tests.Droid.Resource.Id.action_context_bar;
 			global::Shiny.Locations.Resource.Id.action_divider = global::Shiny.Device.Tests.Droid.Resource.Id.action_divider;
 			global::Shiny.Locations.Resource.Id.action_image = global::Shiny.Device.Tests.Droid.Resource.Id.action_image;
+			global::Shiny.Locations.Resource.Id.action_menu_divider = global::Shiny.Device.Tests.Droid.Resource.Id.action_menu_divider;
+			global::Shiny.Locations.Resource.Id.action_menu_presenter = global::Shiny.Device.Tests.Droid.Resource.Id.action_menu_presenter;
+			global::Shiny.Locations.Resource.Id.action_mode_bar = global::Shiny.Device.Tests.Droid.Resource.Id.action_mode_bar;
+			global::Shiny.Locations.Resource.Id.action_mode_bar_stub = global::Shiny.Device.Tests.Droid.Resource.Id.action_mode_bar_stub;
+			global::Shiny.Locations.Resource.Id.action_mode_close_button = global::Shiny.Device.Tests.Droid.Resource.Id.action_mode_close_button;
 			global::Shiny.Locations.Resource.Id.action_text = global::Shiny.Device.Tests.Droid.Resource.Id.action_text;
+			global::Shiny.Locations.Resource.Id.activity_chooser_view_content = global::Shiny.Device.Tests.Droid.Resource.Id.activity_chooser_view_content;
+			global::Shiny.Locations.Resource.Id.add = global::Shiny.Device.Tests.Droid.Resource.Id.add;
 			global::Shiny.Locations.Resource.Id.adjust_height = global::Shiny.Device.Tests.Droid.Resource.Id.adjust_height;
 			global::Shiny.Locations.Resource.Id.adjust_width = global::Shiny.Device.Tests.Droid.Resource.Id.adjust_width;
+			global::Shiny.Locations.Resource.Id.alertTitle = global::Shiny.Device.Tests.Droid.Resource.Id.alertTitle;
+			global::Shiny.Locations.Resource.Id.ALT = global::Shiny.Device.Tests.Droid.Resource.Id.ALT;
+			global::Shiny.Locations.Resource.Id.always = global::Shiny.Device.Tests.Droid.Resource.Id.always;
 			global::Shiny.Locations.Resource.Id.async = global::Shiny.Device.Tests.Droid.Resource.Id.async;
 			global::Shiny.Locations.Resource.Id.auto = global::Shiny.Device.Tests.Droid.Resource.Id.auto;
+			global::Shiny.Locations.Resource.Id.beginning = global::Shiny.Device.Tests.Droid.Resource.Id.beginning;
 			global::Shiny.Locations.Resource.Id.blocking = global::Shiny.Device.Tests.Droid.Resource.Id.blocking;
+			global::Shiny.Locations.Resource.Id.bottom = global::Shiny.Device.Tests.Droid.Resource.Id.bottom;
+			global::Shiny.Locations.Resource.Id.buttonPanel = global::Shiny.Device.Tests.Droid.Resource.Id.buttonPanel;
+			global::Shiny.Locations.Resource.Id.center_vertical = global::Shiny.Device.Tests.Droid.Resource.Id.center_vertical;
+			global::Shiny.Locations.Resource.Id.checkbox = global::Shiny.Device.Tests.Droid.Resource.Id.checkbox;
+			global::Shiny.Locations.Resource.Id.@checked = global::Shiny.Device.Tests.Droid.Resource.Id.@checked;
 			global::Shiny.Locations.Resource.Id.chronometer = global::Shiny.Device.Tests.Droid.Resource.Id.chronometer;
+			global::Shiny.Locations.Resource.Id.collapseActionView = global::Shiny.Device.Tests.Droid.Resource.Id.collapseActionView;
+			global::Shiny.Locations.Resource.Id.content = global::Shiny.Device.Tests.Droid.Resource.Id.content;
+			global::Shiny.Locations.Resource.Id.contentPanel = global::Shiny.Device.Tests.Droid.Resource.Id.contentPanel;
+			global::Shiny.Locations.Resource.Id.CTRL = global::Shiny.Device.Tests.Droid.Resource.Id.CTRL;
+			global::Shiny.Locations.Resource.Id.custom = global::Shiny.Device.Tests.Droid.Resource.Id.custom;
+			global::Shiny.Locations.Resource.Id.customPanel = global::Shiny.Device.Tests.Droid.Resource.Id.customPanel;
 			global::Shiny.Locations.Resource.Id.dark = global::Shiny.Device.Tests.Droid.Resource.Id.dark;
+			global::Shiny.Locations.Resource.Id.decor_content_parent = global::Shiny.Device.Tests.Droid.Resource.Id.decor_content_parent;
+			global::Shiny.Locations.Resource.Id.default_activity_button = global::Shiny.Device.Tests.Droid.Resource.Id.default_activity_button;
 			global::Shiny.Locations.Resource.Id.dialog_button = global::Shiny.Device.Tests.Droid.Resource.Id.dialog_button;
+			global::Shiny.Locations.Resource.Id.disableHome = global::Shiny.Device.Tests.Droid.Resource.Id.disableHome;
+			global::Shiny.Locations.Resource.Id.edit_query = global::Shiny.Device.Tests.Droid.Resource.Id.edit_query;
+			global::Shiny.Locations.Resource.Id.end = global::Shiny.Device.Tests.Droid.Resource.Id.end;
+			global::Shiny.Locations.Resource.Id.expanded_menu = global::Shiny.Device.Tests.Droid.Resource.Id.expanded_menu;
+			global::Shiny.Locations.Resource.Id.expand_activities_button = global::Shiny.Device.Tests.Droid.Resource.Id.expand_activities_button;
 			global::Shiny.Locations.Resource.Id.forever = global::Shiny.Device.Tests.Droid.Resource.Id.forever;
+			global::Shiny.Locations.Resource.Id.fragment_container_view_tag = global::Shiny.Device.Tests.Droid.Resource.Id.fragment_container_view_tag;
+			global::Shiny.Locations.Resource.Id.FUNCTION = global::Shiny.Device.Tests.Droid.Resource.Id.FUNCTION;
+			global::Shiny.Locations.Resource.Id.group_divider = global::Shiny.Device.Tests.Droid.Resource.Id.group_divider;
+			global::Shiny.Locations.Resource.Id.home = global::Shiny.Device.Tests.Droid.Resource.Id.home;
+			global::Shiny.Locations.Resource.Id.homeAsUp = global::Shiny.Device.Tests.Droid.Resource.Id.homeAsUp;
 			global::Shiny.Locations.Resource.Id.icon = global::Shiny.Device.Tests.Droid.Resource.Id.icon;
 			global::Shiny.Locations.Resource.Id.icon_group = global::Shiny.Device.Tests.Droid.Resource.Id.icon_group;
 			global::Shiny.Locations.Resource.Id.icon_only = global::Shiny.Device.Tests.Droid.Resource.Id.icon_only;
+			global::Shiny.Locations.Resource.Id.ifRoom = global::Shiny.Device.Tests.Droid.Resource.Id.ifRoom;
+			global::Shiny.Locations.Resource.Id.image = global::Shiny.Device.Tests.Droid.Resource.Id.image;
 			global::Shiny.Locations.Resource.Id.info = global::Shiny.Device.Tests.Droid.Resource.Id.info;
 			global::Shiny.Locations.Resource.Id.italic = global::Shiny.Device.Tests.Droid.Resource.Id.italic;
 			global::Shiny.Locations.Resource.Id.light = global::Shiny.Device.Tests.Droid.Resource.Id.light;
 			global::Shiny.Locations.Resource.Id.line1 = global::Shiny.Device.Tests.Droid.Resource.Id.line1;
 			global::Shiny.Locations.Resource.Id.line3 = global::Shiny.Device.Tests.Droid.Resource.Id.line3;
+			global::Shiny.Locations.Resource.Id.listMode = global::Shiny.Device.Tests.Droid.Resource.Id.listMode;
+			global::Shiny.Locations.Resource.Id.list_item = global::Shiny.Device.Tests.Droid.Resource.Id.list_item;
+			global::Shiny.Locations.Resource.Id.message = global::Shiny.Device.Tests.Droid.Resource.Id.message;
+			global::Shiny.Locations.Resource.Id.META = global::Shiny.Device.Tests.Droid.Resource.Id.META;
+			global::Shiny.Locations.Resource.Id.middle = global::Shiny.Device.Tests.Droid.Resource.Id.middle;
+			global::Shiny.Locations.Resource.Id.multiply = global::Shiny.Device.Tests.Droid.Resource.Id.multiply;
+			global::Shiny.Locations.Resource.Id.never = global::Shiny.Device.Tests.Droid.Resource.Id.never;
 			global::Shiny.Locations.Resource.Id.none = global::Shiny.Device.Tests.Droid.Resource.Id.none;
 			global::Shiny.Locations.Resource.Id.normal = global::Shiny.Device.Tests.Droid.Resource.Id.normal;
 			global::Shiny.Locations.Resource.Id.notification_background = global::Shiny.Device.Tests.Droid.Resource.Id.notification_background;
 			global::Shiny.Locations.Resource.Id.notification_main_column = global::Shiny.Device.Tests.Droid.Resource.Id.notification_main_column;
 			global::Shiny.Locations.Resource.Id.notification_main_column_container = global::Shiny.Device.Tests.Droid.Resource.Id.notification_main_column_container;
+			global::Shiny.Locations.Resource.Id.off = global::Shiny.Device.Tests.Droid.Resource.Id.off;
+			global::Shiny.Locations.Resource.Id.on = global::Shiny.Device.Tests.Droid.Resource.Id.on;
+			global::Shiny.Locations.Resource.Id.parentPanel = global::Shiny.Device.Tests.Droid.Resource.Id.parentPanel;
+			global::Shiny.Locations.Resource.Id.progress_circular = global::Shiny.Device.Tests.Droid.Resource.Id.progress_circular;
+			global::Shiny.Locations.Resource.Id.progress_horizontal = global::Shiny.Device.Tests.Droid.Resource.Id.progress_horizontal;
+			global::Shiny.Locations.Resource.Id.radio = global::Shiny.Device.Tests.Droid.Resource.Id.radio;
 			global::Shiny.Locations.Resource.Id.right_icon = global::Shiny.Device.Tests.Droid.Resource.Id.right_icon;
 			global::Shiny.Locations.Resource.Id.right_side = global::Shiny.Device.Tests.Droid.Resource.Id.right_side;
+			global::Shiny.Locations.Resource.Id.screen = global::Shiny.Device.Tests.Droid.Resource.Id.screen;
+			global::Shiny.Locations.Resource.Id.scrollIndicatorDown = global::Shiny.Device.Tests.Droid.Resource.Id.scrollIndicatorDown;
+			global::Shiny.Locations.Resource.Id.scrollIndicatorUp = global::Shiny.Device.Tests.Droid.Resource.Id.scrollIndicatorUp;
+			global::Shiny.Locations.Resource.Id.scrollView = global::Shiny.Device.Tests.Droid.Resource.Id.scrollView;
+			global::Shiny.Locations.Resource.Id.search_badge = global::Shiny.Device.Tests.Droid.Resource.Id.search_badge;
+			global::Shiny.Locations.Resource.Id.search_bar = global::Shiny.Device.Tests.Droid.Resource.Id.search_bar;
+			global::Shiny.Locations.Resource.Id.search_button = global::Shiny.Device.Tests.Droid.Resource.Id.search_button;
+			global::Shiny.Locations.Resource.Id.search_close_btn = global::Shiny.Device.Tests.Droid.Resource.Id.search_close_btn;
+			global::Shiny.Locations.Resource.Id.search_edit_frame = global::Shiny.Device.Tests.Droid.Resource.Id.search_edit_frame;
+			global::Shiny.Locations.Resource.Id.search_go_btn = global::Shiny.Device.Tests.Droid.Resource.Id.search_go_btn;
+			global::Shiny.Locations.Resource.Id.search_mag_icon = global::Shiny.Device.Tests.Droid.Resource.Id.search_mag_icon;
+			global::Shiny.Locations.Resource.Id.search_plate = global::Shiny.Device.Tests.Droid.Resource.Id.search_plate;
+			global::Shiny.Locations.Resource.Id.search_src_text = global::Shiny.Device.Tests.Droid.Resource.Id.search_src_text;
+			global::Shiny.Locations.Resource.Id.search_voice_btn = global::Shiny.Device.Tests.Droid.Resource.Id.search_voice_btn;
+			global::Shiny.Locations.Resource.Id.select_dialog_listview = global::Shiny.Device.Tests.Droid.Resource.Id.select_dialog_listview;
+			global::Shiny.Locations.Resource.Id.SHIFT = global::Shiny.Device.Tests.Droid.Resource.Id.SHIFT;
+			global::Shiny.Locations.Resource.Id.shortcut = global::Shiny.Device.Tests.Droid.Resource.Id.shortcut;
+			global::Shiny.Locations.Resource.Id.showCustom = global::Shiny.Device.Tests.Droid.Resource.Id.showCustom;
+			global::Shiny.Locations.Resource.Id.showHome = global::Shiny.Device.Tests.Droid.Resource.Id.showHome;
+			global::Shiny.Locations.Resource.Id.showTitle = global::Shiny.Device.Tests.Droid.Resource.Id.showTitle;
+			global::Shiny.Locations.Resource.Id.spacer = global::Shiny.Device.Tests.Droid.Resource.Id.spacer;
+			global::Shiny.Locations.Resource.Id.split_action_bar = global::Shiny.Device.Tests.Droid.Resource.Id.split_action_bar;
+			global::Shiny.Locations.Resource.Id.src_atop = global::Shiny.Device.Tests.Droid.Resource.Id.src_atop;
+			global::Shiny.Locations.Resource.Id.src_in = global::Shiny.Device.Tests.Droid.Resource.Id.src_in;
+			global::Shiny.Locations.Resource.Id.src_over = global::Shiny.Device.Tests.Droid.Resource.Id.src_over;
 			global::Shiny.Locations.Resource.Id.standard = global::Shiny.Device.Tests.Droid.Resource.Id.standard;
+			global::Shiny.Locations.Resource.Id.submenuarrow = global::Shiny.Device.Tests.Droid.Resource.Id.submenuarrow;
+			global::Shiny.Locations.Resource.Id.submit_area = global::Shiny.Device.Tests.Droid.Resource.Id.submit_area;
+			global::Shiny.Locations.Resource.Id.SYM = global::Shiny.Device.Tests.Droid.Resource.Id.SYM;
+			global::Shiny.Locations.Resource.Id.tabMode = global::Shiny.Device.Tests.Droid.Resource.Id.tabMode;
 			global::Shiny.Locations.Resource.Id.tag_accessibility_actions = global::Shiny.Device.Tests.Droid.Resource.Id.tag_accessibility_actions;
 			global::Shiny.Locations.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Device.Tests.Droid.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Locations.Resource.Id.tag_accessibility_heading = global::Shiny.Device.Tests.Droid.Resource.Id.tag_accessibility_heading;
@@ -3411,11 +5595,64 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Device.Tests.Droid.Resource.Id.tag_unhandled_key_listeners;
 			global::Shiny.Locations.Resource.Id.text = global::Shiny.Device.Tests.Droid.Resource.Id.text;
 			global::Shiny.Locations.Resource.Id.text2 = global::Shiny.Device.Tests.Droid.Resource.Id.text2;
+			global::Shiny.Locations.Resource.Id.textSpacerNoButtons = global::Shiny.Device.Tests.Droid.Resource.Id.textSpacerNoButtons;
+			global::Shiny.Locations.Resource.Id.textSpacerNoTitle = global::Shiny.Device.Tests.Droid.Resource.Id.textSpacerNoTitle;
 			global::Shiny.Locations.Resource.Id.time = global::Shiny.Device.Tests.Droid.Resource.Id.time;
 			global::Shiny.Locations.Resource.Id.title = global::Shiny.Device.Tests.Droid.Resource.Id.title;
+			global::Shiny.Locations.Resource.Id.titleDividerNoCustom = global::Shiny.Device.Tests.Droid.Resource.Id.titleDividerNoCustom;
+			global::Shiny.Locations.Resource.Id.title_template = global::Shiny.Device.Tests.Droid.Resource.Id.title_template;
+			global::Shiny.Locations.Resource.Id.top = global::Shiny.Device.Tests.Droid.Resource.Id.top;
+			global::Shiny.Locations.Resource.Id.topPanel = global::Shiny.Device.Tests.Droid.Resource.Id.topPanel;
+			global::Shiny.Locations.Resource.Id.@unchecked = global::Shiny.Device.Tests.Droid.Resource.Id.@unchecked;
+			global::Shiny.Locations.Resource.Id.uniform = global::Shiny.Device.Tests.Droid.Resource.Id.uniform;
+			global::Shiny.Locations.Resource.Id.up = global::Shiny.Device.Tests.Droid.Resource.Id.up;
+			global::Shiny.Locations.Resource.Id.useLogo = global::Shiny.Device.Tests.Droid.Resource.Id.useLogo;
+			global::Shiny.Locations.Resource.Id.view_tree_saved_state_registry_owner = global::Shiny.Device.Tests.Droid.Resource.Id.view_tree_saved_state_registry_owner;
+			global::Shiny.Locations.Resource.Id.visible_removing_fragment_view_tag = global::Shiny.Device.Tests.Droid.Resource.Id.visible_removing_fragment_view_tag;
 			global::Shiny.Locations.Resource.Id.wide = global::Shiny.Device.Tests.Droid.Resource.Id.wide;
+			global::Shiny.Locations.Resource.Id.withText = global::Shiny.Device.Tests.Droid.Resource.Id.withText;
+			global::Shiny.Locations.Resource.Id.wrap_content = global::Shiny.Device.Tests.Droid.Resource.Id.wrap_content;
+			global::Shiny.Locations.Resource.Integer.abc_config_activityDefaultDur = global::Shiny.Device.Tests.Droid.Resource.Integer.abc_config_activityDefaultDur;
+			global::Shiny.Locations.Resource.Integer.abc_config_activityShortDur = global::Shiny.Device.Tests.Droid.Resource.Integer.abc_config_activityShortDur;
+			global::Shiny.Locations.Resource.Integer.cancel_button_image_alpha = global::Shiny.Device.Tests.Droid.Resource.Integer.cancel_button_image_alpha;
+			global::Shiny.Locations.Resource.Integer.config_tooltipAnimTime = global::Shiny.Device.Tests.Droid.Resource.Integer.config_tooltipAnimTime;
 			global::Shiny.Locations.Resource.Integer.google_play_services_version = global::Shiny.Device.Tests.Droid.Resource.Integer.google_play_services_version;
 			global::Shiny.Locations.Resource.Integer.status_bar_notification_info_maxnum = global::Shiny.Device.Tests.Droid.Resource.Integer.status_bar_notification_info_maxnum;
+			global::Shiny.Locations.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_0 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_0;
+			global::Shiny.Locations.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_1 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_checkbox_checked_mtrl_animation_interpolator_1;
+			global::Shiny.Locations.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_0 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_0;
+			global::Shiny.Locations.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_1 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_checkbox_unchecked_mtrl_animation_interpolator_1;
+			global::Shiny.Locations.Resource.Interpolator.btn_radio_to_off_mtrl_animation_interpolator_0 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_radio_to_off_mtrl_animation_interpolator_0;
+			global::Shiny.Locations.Resource.Interpolator.btn_radio_to_on_mtrl_animation_interpolator_0 = global::Shiny.Device.Tests.Droid.Resource.Interpolator.btn_radio_to_on_mtrl_animation_interpolator_0;
+			global::Shiny.Locations.Resource.Interpolator.fast_out_slow_in = global::Shiny.Device.Tests.Droid.Resource.Interpolator.fast_out_slow_in;
+			global::Shiny.Locations.Resource.Layout.abc_action_bar_title_item = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_bar_title_item;
+			global::Shiny.Locations.Resource.Layout.abc_action_bar_up_container = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_bar_up_container;
+			global::Shiny.Locations.Resource.Layout.abc_action_menu_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_menu_item_layout;
+			global::Shiny.Locations.Resource.Layout.abc_action_menu_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_menu_layout;
+			global::Shiny.Locations.Resource.Layout.abc_action_mode_bar = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_mode_bar;
+			global::Shiny.Locations.Resource.Layout.abc_action_mode_close_item_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_action_mode_close_item_material;
+			global::Shiny.Locations.Resource.Layout.abc_activity_chooser_view = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_activity_chooser_view;
+			global::Shiny.Locations.Resource.Layout.abc_activity_chooser_view_list_item = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_activity_chooser_view_list_item;
+			global::Shiny.Locations.Resource.Layout.abc_alert_dialog_button_bar_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_alert_dialog_button_bar_material;
+			global::Shiny.Locations.Resource.Layout.abc_alert_dialog_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_alert_dialog_material;
+			global::Shiny.Locations.Resource.Layout.abc_alert_dialog_title_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_alert_dialog_title_material;
+			global::Shiny.Locations.Resource.Layout.abc_cascading_menu_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_cascading_menu_item_layout;
+			global::Shiny.Locations.Resource.Layout.abc_dialog_title_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_dialog_title_material;
+			global::Shiny.Locations.Resource.Layout.abc_expanded_menu_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_expanded_menu_layout;
+			global::Shiny.Locations.Resource.Layout.abc_list_menu_item_checkbox = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_list_menu_item_checkbox;
+			global::Shiny.Locations.Resource.Layout.abc_list_menu_item_icon = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_list_menu_item_icon;
+			global::Shiny.Locations.Resource.Layout.abc_list_menu_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_list_menu_item_layout;
+			global::Shiny.Locations.Resource.Layout.abc_list_menu_item_radio = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_list_menu_item_radio;
+			global::Shiny.Locations.Resource.Layout.abc_popup_menu_header_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_popup_menu_header_item_layout;
+			global::Shiny.Locations.Resource.Layout.abc_popup_menu_item_layout = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_popup_menu_item_layout;
+			global::Shiny.Locations.Resource.Layout.abc_screen_content_include = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_screen_content_include;
+			global::Shiny.Locations.Resource.Layout.abc_screen_simple = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_screen_simple;
+			global::Shiny.Locations.Resource.Layout.abc_screen_simple_overlay_action_mode = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_screen_simple_overlay_action_mode;
+			global::Shiny.Locations.Resource.Layout.abc_screen_toolbar = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_screen_toolbar;
+			global::Shiny.Locations.Resource.Layout.abc_search_dropdown_item_icons_2line = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_search_dropdown_item_icons_2line;
+			global::Shiny.Locations.Resource.Layout.abc_search_view = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_search_view;
+			global::Shiny.Locations.Resource.Layout.abc_select_dialog_material = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_select_dialog_material;
+			global::Shiny.Locations.Resource.Layout.abc_tooltip = global::Shiny.Device.Tests.Droid.Resource.Layout.abc_tooltip;
 			global::Shiny.Locations.Resource.Layout.custom_dialog = global::Shiny.Device.Tests.Droid.Resource.Layout.custom_dialog;
 			global::Shiny.Locations.Resource.Layout.notification_action = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_action;
 			global::Shiny.Locations.Resource.Layout.notification_action_tombstone = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_action_tombstone;
@@ -3423,6 +5660,37 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Layout.notification_template_icon_group = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_template_icon_group;
 			global::Shiny.Locations.Resource.Layout.notification_template_part_chronometer = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_template_part_chronometer;
 			global::Shiny.Locations.Resource.Layout.notification_template_part_time = global::Shiny.Device.Tests.Droid.Resource.Layout.notification_template_part_time;
+			global::Shiny.Locations.Resource.Layout.select_dialog_item_material = global::Shiny.Device.Tests.Droid.Resource.Layout.select_dialog_item_material;
+			global::Shiny.Locations.Resource.Layout.select_dialog_multichoice_material = global::Shiny.Device.Tests.Droid.Resource.Layout.select_dialog_multichoice_material;
+			global::Shiny.Locations.Resource.Layout.select_dialog_singlechoice_material = global::Shiny.Device.Tests.Droid.Resource.Layout.select_dialog_singlechoice_material;
+			global::Shiny.Locations.Resource.Layout.support_simple_spinner_dropdown_item = global::Shiny.Device.Tests.Droid.Resource.Layout.support_simple_spinner_dropdown_item;
+			global::Shiny.Locations.Resource.String.abc_action_bar_home_description = global::Shiny.Device.Tests.Droid.Resource.String.abc_action_bar_home_description;
+			global::Shiny.Locations.Resource.String.abc_action_bar_up_description = global::Shiny.Device.Tests.Droid.Resource.String.abc_action_bar_up_description;
+			global::Shiny.Locations.Resource.String.abc_action_menu_overflow_description = global::Shiny.Device.Tests.Droid.Resource.String.abc_action_menu_overflow_description;
+			global::Shiny.Locations.Resource.String.abc_action_mode_done = global::Shiny.Device.Tests.Droid.Resource.String.abc_action_mode_done;
+			global::Shiny.Locations.Resource.String.abc_activitychooserview_choose_application = global::Shiny.Device.Tests.Droid.Resource.String.abc_activitychooserview_choose_application;
+			global::Shiny.Locations.Resource.String.abc_activity_chooser_view_see_all = global::Shiny.Device.Tests.Droid.Resource.String.abc_activity_chooser_view_see_all;
+			global::Shiny.Locations.Resource.String.abc_capital_off = global::Shiny.Device.Tests.Droid.Resource.String.abc_capital_off;
+			global::Shiny.Locations.Resource.String.abc_capital_on = global::Shiny.Device.Tests.Droid.Resource.String.abc_capital_on;
+			global::Shiny.Locations.Resource.String.abc_menu_alt_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_alt_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_menu_ctrl_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_ctrl_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_menu_delete_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_delete_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_menu_enter_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_enter_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_menu_function_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_function_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_menu_meta_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_meta_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_menu_shift_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_shift_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_menu_space_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_space_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_menu_sym_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_menu_sym_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_prepend_shortcut_label = global::Shiny.Device.Tests.Droid.Resource.String.abc_prepend_shortcut_label;
+			global::Shiny.Locations.Resource.String.abc_searchview_description_clear = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_clear;
+			global::Shiny.Locations.Resource.String.abc_searchview_description_query = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_query;
+			global::Shiny.Locations.Resource.String.abc_searchview_description_search = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_search;
+			global::Shiny.Locations.Resource.String.abc_searchview_description_submit = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_submit;
+			global::Shiny.Locations.Resource.String.abc_searchview_description_voice = global::Shiny.Device.Tests.Droid.Resource.String.abc_searchview_description_voice;
+			global::Shiny.Locations.Resource.String.abc_search_hint = global::Shiny.Device.Tests.Droid.Resource.String.abc_search_hint;
+			global::Shiny.Locations.Resource.String.abc_shareactionprovider_share_with = global::Shiny.Device.Tests.Droid.Resource.String.abc_shareactionprovider_share_with;
+			global::Shiny.Locations.Resource.String.abc_shareactionprovider_share_with_application = global::Shiny.Device.Tests.Droid.Resource.String.abc_shareactionprovider_share_with_application;
+			global::Shiny.Locations.Resource.String.abc_toolbar_collapse_description = global::Shiny.Device.Tests.Droid.Resource.String.abc_toolbar_collapse_description;
 			global::Shiny.Locations.Resource.String.common_google_play_services_enable_button = global::Shiny.Device.Tests.Droid.Resource.String.common_google_play_services_enable_button;
 			global::Shiny.Locations.Resource.String.common_google_play_services_enable_text = global::Shiny.Device.Tests.Droid.Resource.String.common_google_play_services_enable_text;
 			global::Shiny.Locations.Resource.String.common_google_play_services_enable_title = global::Shiny.Device.Tests.Droid.Resource.String.common_google_play_services_enable_title;
@@ -3441,18 +5709,613 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.String.common_open_on_phone = global::Shiny.Device.Tests.Droid.Resource.String.common_open_on_phone;
 			global::Shiny.Locations.Resource.String.common_signin_button_text = global::Shiny.Device.Tests.Droid.Resource.String.common_signin_button_text;
 			global::Shiny.Locations.Resource.String.common_signin_button_text_long = global::Shiny.Device.Tests.Droid.Resource.String.common_signin_button_text_long;
+			global::Shiny.Locations.Resource.String.search_menu_title = global::Shiny.Device.Tests.Droid.Resource.String.search_menu_title;
 			global::Shiny.Locations.Resource.String.status_bar_notification_info_overflow = global::Shiny.Device.Tests.Droid.Resource.String.status_bar_notification_info_overflow;
+			global::Shiny.Locations.Resource.Style.AlertDialog_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.AlertDialog_AppCompat;
+			global::Shiny.Locations.Resource.Style.AlertDialog_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.AlertDialog_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Animation_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Animation_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Animation_AppCompat_DropDownUp = global::Shiny.Device.Tests.Droid.Resource.Style.Animation_AppCompat_DropDownUp;
+			global::Shiny.Locations.Resource.Style.Animation_AppCompat_Tooltip = global::Shiny.Device.Tests.Droid.Resource.Style.Animation_AppCompat_Tooltip;
+			global::Shiny.Locations.Resource.Style.Base_AlertDialog_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_AlertDialog_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_AlertDialog_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_AlertDialog_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_Animation_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Animation_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_Animation_AppCompat_DropDownUp = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Animation_AppCompat_DropDownUp;
+			global::Shiny.Locations.Resource.Style.Base_Animation_AppCompat_Tooltip = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Animation_AppCompat_Tooltip;
+			global::Shiny.Locations.Resource.Style.Base_DialogWindowTitleBackground_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_DialogWindowTitleBackground_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_DialogWindowTitle_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_DialogWindowTitle_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Body1 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Body1;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Body2 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Body2;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Button = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Button;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Caption = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Caption;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Display1 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Display1;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Display2 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Display2;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Display3 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Display3;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Display4 = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Display4;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Headline = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Headline;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Large = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Large;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Large_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Large_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Large = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Large;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Light_Widget_PopupMenu_Small;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Medium = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Medium;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Medium_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Medium_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Menu;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_SearchResult = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_SearchResult;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Subtitle;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_SearchResult_Title;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Small;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Small_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Small_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Subhead = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Subhead;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Subhead_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Subhead_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Title;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Title_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Tooltip = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Tooltip;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Menu;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Subtitle;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_ActionMode_Title;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Borderless_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Borderless_Colored;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Colored;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Button_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_DropDownItem = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_DropDownItem;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Header = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Header;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Large = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Large;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_PopupMenu_Small;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_Switch = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_Switch;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_AppCompat_Widget_TextView_SpinnerItem = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_AppCompat_Widget_TextView_SpinnerItem;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
+			global::Shiny.Locations.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Title = global::Shiny.Device.Tests.Droid.Resource.Style.Base_TextAppearance_Widget_AppCompat_Toolbar_Title;
+			global::Shiny.Locations.Resource.Style.Base_ThemeOverlay_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_ThemeOverlay_AppCompat_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_ActionBar;
+			global::Shiny.Locations.Resource.Style.Base_ThemeOverlay_AppCompat_Dark = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Dark;
+			global::Shiny.Locations.Resource.Style.Base_ThemeOverlay_AppCompat_Dark_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Dark_ActionBar;
+			global::Shiny.Locations.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Dialog_Alert;
+			global::Shiny.Locations.Resource.Style.Base_ThemeOverlay_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_ThemeOverlay_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_CompactMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_CompactMenu;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_DialogWhenLarge;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Dialog_Alert;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Dialog_FixedSize = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Dialog_FixedSize;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Dialog_MinWidth;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Light_DarkActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_DarkActionBar;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Light_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_DialogWhenLarge;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Light_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_Dialog_Alert;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Light_Dialog_FixedSize = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_Dialog_FixedSize;
+			global::Shiny.Locations.Resource.Style.Base_Theme_AppCompat_Light_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Theme_AppCompat_Light_Dialog_MinWidth;
+			global::Shiny.Locations.Resource.Style.Base_V21_ThemeOverlay_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_ThemeOverlay_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_V21_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_Theme_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_V21_Theme_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_Theme_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_V21_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_Theme_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_V21_Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V21_Theme_AppCompat_Light_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_V22_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V22_Theme_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_V22_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V22_Theme_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_V23_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V23_Theme_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_V23_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V23_Theme_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_V26_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V26_Theme_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_V26_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V26_Theme_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_V26_Widget_AppCompat_Toolbar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V26_Widget_AppCompat_Toolbar;
+			global::Shiny.Locations.Resource.Style.Base_V28_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V28_Theme_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_V28_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V28_Theme_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_V7_ThemeOverlay_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_ThemeOverlay_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_V7_Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Theme_AppCompat;
+			global::Shiny.Locations.Resource.Style.Base_V7_Theme_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Theme_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_V7_Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Theme_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Base_V7_Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Theme_AppCompat_Light_Dialog;
+			global::Shiny.Locations.Resource.Style.Base_V7_Widget_AppCompat_AutoCompleteTextView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Widget_AppCompat_AutoCompleteTextView;
+			global::Shiny.Locations.Resource.Style.Base_V7_Widget_AppCompat_EditText = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Widget_AppCompat_EditText;
+			global::Shiny.Locations.Resource.Style.Base_V7_Widget_AppCompat_Toolbar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_V7_Widget_AppCompat_Toolbar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionBar_Solid = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar_Solid;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionBar_TabBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar_TabBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionBar_TabText = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar_TabText;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionBar_TabView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionBar_TabView;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionButton = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionButton;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionButton_CloseMode = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionButton_CloseMode;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionButton_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionButton_Overflow;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActionMode = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActionMode;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ActivityChooserView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ActivityChooserView;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_AutoCompleteTextView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_AutoCompleteTextView;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Button = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ButtonBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ButtonBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ButtonBar_AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ButtonBar_AlertDialog;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Button_Borderless = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_Borderless;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Button_Borderless_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_Borderless_Colored;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Button_ButtonBar_AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_ButtonBar_AlertDialog;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Button_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_Colored;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Button_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Button_Small;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_CompoundButton_CheckBox = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_CompoundButton_CheckBox;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_CompoundButton_RadioButton = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_CompoundButton_RadioButton;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_CompoundButton_Switch = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_CompoundButton_Switch;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle_Common = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_DrawerArrowToggle_Common;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_DropDownItem_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_DropDownItem_Spinner;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_EditText = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_EditText;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ImageButton = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ImageButton;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Light_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_Solid = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_Solid;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabText_Inverse;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_ActionBar_TabView;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Light_PopupMenu_Overflow;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ListMenuView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListMenuView;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ListPopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListPopupWindow;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ListView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListView;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ListView_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListView_DropDown;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ListView_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ListView_Menu;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_PopupMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_PopupMenu;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_PopupMenu_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_PopupMenu_Overflow;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_PopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_PopupWindow;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ProgressBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ProgressBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_ProgressBar_Horizontal = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_ProgressBar_Horizontal;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_RatingBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_RatingBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_RatingBar_Indicator = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_RatingBar_Indicator;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_RatingBar_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_RatingBar_Small;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_SearchView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_SearchView;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_SearchView_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_SearchView_ActionBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_SeekBar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_SeekBar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_SeekBar_Discrete = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_SeekBar_Discrete;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Spinner;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Spinner_Underlined = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Spinner_Underlined;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_TextView = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_TextView;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_TextView_SpinnerItem = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_TextView_SpinnerItem;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Toolbar = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Toolbar;
+			global::Shiny.Locations.Resource.Style.Base_Widget_AppCompat_Toolbar_Button_Navigation = global::Shiny.Device.Tests.Droid.Resource.Style.Base_Widget_AppCompat_Toolbar_Button_Navigation;
+			global::Shiny.Locations.Resource.Style.Platform_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_AppCompat;
+			global::Shiny.Locations.Resource.Style.Platform_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Platform_ThemeOverlay_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_ThemeOverlay_AppCompat;
+			global::Shiny.Locations.Resource.Style.Platform_ThemeOverlay_AppCompat_Dark = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_ThemeOverlay_AppCompat_Dark;
+			global::Shiny.Locations.Resource.Style.Platform_ThemeOverlay_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_ThemeOverlay_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Platform_V21_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_V21_AppCompat;
+			global::Shiny.Locations.Resource.Style.Platform_V21_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_V21_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Platform_V25_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_V25_AppCompat;
+			global::Shiny.Locations.Resource.Style.Platform_V25_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_V25_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Platform_Widget_AppCompat_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Platform_Widget_AppCompat_Spinner;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_DialogWindowTitle_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_DialogWindowTitle_AppCompat;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_ActionBar_TitleItem = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_ActionBar_TitleItem;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_DialogTitle_Icon = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_DialogTitle_Icon;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_InternalGroup = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_InternalGroup;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Shortcut = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Shortcut;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_SubmenuArrow = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_SubmenuArrow;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Text = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Text;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Title = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_PopupMenuItem_Title;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_SearchView_MagIcon = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_SearchView_MagIcon;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon1 = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon1;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon2 = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Icon2;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Query = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Query;
+			global::Shiny.Locations.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text = global::Shiny.Device.Tests.Droid.Resource.Style.RtlOverlay_Widget_AppCompat_Search_DropDown_Text;
+			global::Shiny.Locations.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton = global::Shiny.Device.Tests.Droid.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton;
+			global::Shiny.Locations.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.RtlUnderlay_Widget_AppCompat_ActionButton_Overflow;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Body1 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Body1;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Body2 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Body2;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Button = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Button;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Caption = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Caption;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Display1 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Display1;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Display2 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Display2;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Display3 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Display3;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Display4 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Display4;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Headline = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Headline;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Large = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Large;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Large_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Large_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Subtitle;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Light_SearchResult_Title;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Large = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Large;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Light_Widget_PopupMenu_Small;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Medium = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Medium;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Medium_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Medium_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Menu;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_SearchResult_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_SearchResult_Subtitle;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_SearchResult_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_SearchResult_Title;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Small = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Small;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Small_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Small_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Subhead = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Subhead;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Subhead_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Subhead_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Title;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Title_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Tooltip = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Tooltip;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Menu;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Subtitle_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionBar_Title_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Subtitle_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_ActionMode_Title_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_Button = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Button;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_Button_Borderless_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Button_Borderless_Colored;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_Button_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Button_Colored;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_Button_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Button_Inverse;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_DropDownItem = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_DropDownItem;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Header = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Header;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Large = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Large;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Small = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_PopupMenu_Small;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_Switch = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_Switch;
+			global::Shiny.Locations.Resource.Style.TextAppearance_AppCompat_Widget_TextView_SpinnerItem = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_AppCompat_Widget_TextView_SpinnerItem;
 			global::Shiny.Locations.Resource.Style.TextAppearance_Compat_Notification = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification;
 			global::Shiny.Locations.Resource.Style.TextAppearance_Compat_Notification_Info = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification_Info;
 			global::Shiny.Locations.Resource.Style.TextAppearance_Compat_Notification_Line2 = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification_Line2;
 			global::Shiny.Locations.Resource.Style.TextAppearance_Compat_Notification_Time = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification_Time;
 			global::Shiny.Locations.Resource.Style.TextAppearance_Compat_Notification_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Compat_Notification_Title;
+			global::Shiny.Locations.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Widget_AppCompat_ExpandedMenu_Item;
+			global::Shiny.Locations.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Subtitle;
+			global::Shiny.Locations.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title = global::Shiny.Device.Tests.Droid.Resource.Style.TextAppearance_Widget_AppCompat_Toolbar_Title;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_ActionBar;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat_Dark = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Dark;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat_Dark_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Dark_ActionBar;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat_DayNight = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_DayNight;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat_DayNight_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_DayNight_ActionBar;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Dialog_Alert;
+			global::Shiny.Locations.Resource.Style.ThemeOverlay_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.ThemeOverlay_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_CompactMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_CompactMenu;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_DayNight = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_DayNight_DarkActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_DarkActionBar;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_DayNight_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_Dialog;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_DayNight_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_DialogWhenLarge;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_DayNight_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_Dialog_Alert;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_DayNight_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_Dialog_MinWidth;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_DayNight_NoActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DayNight_NoActionBar;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Dialog;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DialogWhenLarge;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Dialog_Alert;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Dialog_MinWidth;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Empty = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Empty;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Light_DarkActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_DarkActionBar;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_Dialog;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Light_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_DialogWhenLarge;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Light_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_Dialog_Alert;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Light_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_Dialog_MinWidth;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_Light_NoActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_NoActionBar;
+			global::Shiny.Locations.Resource.Style.Theme_AppCompat_NoActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_NoActionBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionBar_Solid = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar_Solid;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionBar_TabBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar_TabBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionBar_TabText = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar_TabText;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionBar_TabView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionBar_TabView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionButton = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionButton;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionButton_CloseMode = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionButton_CloseMode;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionButton_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionButton_Overflow;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActionMode = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActionMode;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ActivityChooserView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ActivityChooserView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_AutoCompleteTextView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_AutoCompleteTextView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Button = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ButtonBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ButtonBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ButtonBar_AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ButtonBar_AlertDialog;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Button_Borderless = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_Borderless;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Button_Borderless_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_Borderless_Colored;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Button_ButtonBar_AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_ButtonBar_AlertDialog;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Button_Colored = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_Colored;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Button_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Button_Small;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_CompoundButton_CheckBox = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_CompoundButton_CheckBox;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_CompoundButton_RadioButton = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_CompoundButton_RadioButton;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_CompoundButton_Switch = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_CompoundButton_Switch;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_DrawerArrowToggle = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_DrawerArrowToggle;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_DropDownItem_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_DropDownItem_Spinner;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_EditText = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_EditText;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ImageButton = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ImageButton;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_Solid_Inverse;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabBar_Inverse;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabText_Inverse;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionBar_TabView_Inverse;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionButton = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionButton;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionButton_CloseMode = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionButton_CloseMode;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionButton_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionButton_Overflow;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActionMode_Inverse = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActionMode_Inverse;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ActivityChooserView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ActivityChooserView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_AutoCompleteTextView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_AutoCompleteTextView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_DropDownItem_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_DropDownItem_Spinner;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ListPopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ListPopupWindow;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_ListView_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_ListView_DropDown;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_PopupMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_PopupMenu;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_PopupMenu_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_PopupMenu_Overflow;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_SearchView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_SearchView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Light_Spinner_DropDown_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Light_Spinner_DropDown_ActionBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ListMenuView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListMenuView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ListPopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListPopupWindow;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ListView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ListView_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListView_DropDown;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ListView_Menu = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ListView_Menu;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_PopupMenu = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_PopupMenu;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_PopupMenu_Overflow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_PopupMenu_Overflow;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_PopupWindow = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_PopupWindow;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ProgressBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ProgressBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_ProgressBar_Horizontal = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_ProgressBar_Horizontal;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_RatingBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_RatingBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_RatingBar_Indicator = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_RatingBar_Indicator;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_RatingBar_Small = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_RatingBar_Small;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_SearchView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_SearchView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_SearchView_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_SearchView_ActionBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_SeekBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_SeekBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_SeekBar_Discrete = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_SeekBar_Discrete;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Spinner = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Spinner;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Spinner_DropDown = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Spinner_DropDown;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Spinner_DropDown_ActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Spinner_DropDown_ActionBar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Spinner_Underlined = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Spinner_Underlined;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_TextView = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_TextView;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_TextView_SpinnerItem = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_TextView_SpinnerItem;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Toolbar = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Toolbar;
+			global::Shiny.Locations.Resource.Style.Widget_AppCompat_Toolbar_Button_Navigation = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_AppCompat_Toolbar_Button_Navigation;
 			global::Shiny.Locations.Resource.Style.Widget_Compat_NotificationActionContainer = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_Compat_NotificationActionContainer;
 			global::Shiny.Locations.Resource.Style.Widget_Compat_NotificationActionText = global::Shiny.Device.Tests.Droid.Resource.Style.Widget_Compat_NotificationActionText;
+			global::Shiny.Locations.Resource.Styleable.ActionBar = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar;
+			global::Shiny.Locations.Resource.Styleable.ActionBarLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBarLayout;
+			global::Shiny.Locations.Resource.Styleable.ActionBarLayout_android_layout_gravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBarLayout_android_layout_gravity;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_background = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_background;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_backgroundSplit = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_backgroundSplit;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_backgroundStacked = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_backgroundStacked;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_contentInsetEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetEnd;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_contentInsetEndWithActions = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetEndWithActions;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_contentInsetLeft = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetLeft;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_contentInsetRight = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetRight;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_contentInsetStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetStart;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_contentInsetStartWithNavigation = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_contentInsetStartWithNavigation;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_customNavigationLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_customNavigationLayout;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_displayOptions = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_displayOptions;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_divider = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_divider;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_elevation = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_elevation;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_height = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_height;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_hideOnContentScroll = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_hideOnContentScroll;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_homeAsUpIndicator = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_homeAsUpIndicator;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_homeLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_homeLayout;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_icon = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_icon;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_indeterminateProgressStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_indeterminateProgressStyle;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_itemPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_itemPadding;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_logo = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_logo;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_navigationMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_navigationMode;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_popupTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_popupTheme;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_progressBarPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_progressBarPadding;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_progressBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_progressBarStyle;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_subtitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_subtitle;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_subtitleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_subtitleTextStyle;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_title = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_title;
+			global::Shiny.Locations.Resource.Styleable.ActionBar_titleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionBar_titleTextStyle;
+			global::Shiny.Locations.Resource.Styleable.ActionMenuItemView = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMenuItemView;
+			global::Shiny.Locations.Resource.Styleable.ActionMenuItemView_android_minWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMenuItemView_android_minWidth;
+			global::Shiny.Locations.Resource.Styleable.ActionMenuView = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMenuView;
+			global::Shiny.Locations.Resource.Styleable.ActionMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode;
+			global::Shiny.Locations.Resource.Styleable.ActionMode_background = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_background;
+			global::Shiny.Locations.Resource.Styleable.ActionMode_backgroundSplit = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_backgroundSplit;
+			global::Shiny.Locations.Resource.Styleable.ActionMode_closeItemLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_closeItemLayout;
+			global::Shiny.Locations.Resource.Styleable.ActionMode_height = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_height;
+			global::Shiny.Locations.Resource.Styleable.ActionMode_subtitleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_subtitleTextStyle;
+			global::Shiny.Locations.Resource.Styleable.ActionMode_titleTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActionMode_titleTextStyle;
+			global::Shiny.Locations.Resource.Styleable.ActivityChooserView = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActivityChooserView;
+			global::Shiny.Locations.Resource.Styleable.ActivityChooserView_expandActivityOverflowButtonDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActivityChooserView_expandActivityOverflowButtonDrawable;
+			global::Shiny.Locations.Resource.Styleable.ActivityChooserView_initialActivityCount = global::Shiny.Device.Tests.Droid.Resource.Styleable.ActivityChooserView_initialActivityCount;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog_android_layout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_android_layout;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog_buttonIconDimen = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_buttonIconDimen;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog_buttonPanelSideLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_buttonPanelSideLayout;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog_listItemLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_listItemLayout;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog_listLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_listLayout;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog_multiChoiceItemLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_multiChoiceItemLayout;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog_showTitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_showTitle;
+			global::Shiny.Locations.Resource.Styleable.AlertDialog_singleChoiceItemLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.AlertDialog_singleChoiceItemLayout;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableCompat_android_constantSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_constantSize;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableCompat_android_dither = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_dither;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableCompat_android_enterFadeDuration = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_enterFadeDuration;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableCompat_android_exitFadeDuration = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_exitFadeDuration;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableCompat_android_variablePadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_variablePadding;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableCompat_android_visible = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableCompat_android_visible;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableItem;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableItem_android_drawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableItem_android_drawable;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableItem_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableItem_android_id;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableTransition = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableTransition_android_drawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition_android_drawable;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableTransition_android_fromId = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition_android_fromId;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableTransition_android_reversible = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition_android_reversible;
+			global::Shiny.Locations.Resource.Styleable.AnimatedStateListDrawableTransition_android_toId = global::Shiny.Device.Tests.Droid.Resource.Styleable.AnimatedStateListDrawableTransition_android_toId;
+			global::Shiny.Locations.Resource.Styleable.AppCompatImageView = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView;
+			global::Shiny.Locations.Resource.Styleable.AppCompatImageView_android_src = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView_android_src;
+			global::Shiny.Locations.Resource.Styleable.AppCompatImageView_srcCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView_srcCompat;
+			global::Shiny.Locations.Resource.Styleable.AppCompatImageView_tint = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView_tint;
+			global::Shiny.Locations.Resource.Styleable.AppCompatImageView_tintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatImageView_tintMode;
+			global::Shiny.Locations.Resource.Styleable.AppCompatSeekBar = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar;
+			global::Shiny.Locations.Resource.Styleable.AppCompatSeekBar_android_thumb = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar_android_thumb;
+			global::Shiny.Locations.Resource.Styleable.AppCompatSeekBar_tickMark = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar_tickMark;
+			global::Shiny.Locations.Resource.Styleable.AppCompatSeekBar_tickMarkTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar_tickMarkTint;
+			global::Shiny.Locations.Resource.Styleable.AppCompatSeekBar_tickMarkTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatSeekBar_tickMarkTintMode;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextHelper = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextHelper_android_drawableBottom = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableBottom;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextHelper_android_drawableEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableEnd;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextHelper_android_drawableLeft = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableLeft;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextHelper_android_drawableRight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableRight;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextHelper_android_drawableStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableStart;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextHelper_android_drawableTop = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_drawableTop;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextHelper_android_textAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextHelper_android_textAppearance;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_android_textAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_android_textAppearance;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_autoSizeMaxTextSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizeMaxTextSize;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_autoSizeMinTextSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizeMinTextSize;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_autoSizePresetSizes = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizePresetSizes;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_autoSizeStepGranularity = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizeStepGranularity;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_autoSizeTextType = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_autoSizeTextType;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_drawableBottomCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableBottomCompat;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_drawableEndCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableEndCompat;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_drawableLeftCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableLeftCompat;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_drawableRightCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableRightCompat;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_drawableStartCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableStartCompat;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_drawableTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableTint;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_drawableTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableTintMode;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_drawableTopCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_drawableTopCompat;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_firstBaselineToTopHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_firstBaselineToTopHeight;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_fontFamily = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_fontFamily;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_fontVariationSettings = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_fontVariationSettings;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_lastBaselineToBottomHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_lastBaselineToBottomHeight;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_lineHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_lineHeight;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_textAllCaps = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_textAllCaps;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTextView_textLocale = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTextView_textLocale;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarDivider = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarDivider;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarItemBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarItemBackground;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarPopupTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarPopupTheme;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarSize;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarSplitStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarSplitStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarTabBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarTabBarStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarTabStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarTabStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarTabTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarTabTextStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarTheme;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionBarWidgetTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionBarWidgetTheme;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionDropDownStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionDropDownStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionMenuTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionMenuTextAppearance;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeBackground;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeFindDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeFindDrawable;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModePasteDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModePasteDrawable;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModePopupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModePopupWindowStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeSelectAllDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeSelectAllDrawable;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_activityChooserViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_activityChooserViewStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_alertDialogButtonGroupStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_alertDialogButtonGroupStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_alertDialogCenterButtons = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_alertDialogCenterButtons;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_alertDialogStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_alertDialogStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_alertDialogTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_alertDialogTheme;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_android_windowAnimationStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_android_windowAnimationStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_android_windowIsFloating = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_android_windowIsFloating;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_autoCompleteTextViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_autoCompleteTextViewStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_borderlessButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_borderlessButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_buttonBarButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_buttonBarNegativeButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarNegativeButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_buttonBarNeutralButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarNeutralButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_buttonBarPositiveButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarPositiveButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_buttonBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonBarStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_buttonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_buttonStyleSmall = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_buttonStyleSmall;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_checkboxStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_checkboxStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_checkedTextViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_checkedTextViewStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorAccent = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorAccent;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorBackgroundFloating = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorBackgroundFloating;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorButtonNormal = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorButtonNormal;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorControlActivated = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorControlActivated;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorControlHighlight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorControlHighlight;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorControlNormal = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorControlNormal;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorError = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorError;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorPrimary = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorPrimary;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorPrimaryDark = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorPrimaryDark;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_colorSwitchThumbNormal = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_colorSwitchThumbNormal;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_controlBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_controlBackground;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_dialogCornerRadius = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dialogCornerRadius;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_dialogPreferredPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dialogPreferredPadding;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_dialogTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dialogTheme;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_dividerHorizontal = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dividerHorizontal;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_dividerVertical = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dividerVertical;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_dropdownListPreferredItemHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dropdownListPreferredItemHeight;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_dropDownListViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_dropDownListViewStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_editTextBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_editTextBackground;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_editTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_editTextColor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_editTextStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_editTextStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_homeAsUpIndicator = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_homeAsUpIndicator;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_imageButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_imageButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listChoiceBackgroundIndicator = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listChoiceBackgroundIndicator;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listChoiceIndicatorMultipleAnimated = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listChoiceIndicatorMultipleAnimated;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listChoiceIndicatorSingleAnimated = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listChoiceIndicatorSingleAnimated;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listDividerAlertDialog = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listDividerAlertDialog;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listMenuViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listMenuViewStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listPopupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPopupWindowStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listPreferredItemHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemHeight;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listPreferredItemHeightLarge = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemHeightLarge;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listPreferredItemHeightSmall = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemHeightSmall;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingEnd;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingLeft = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingLeft;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingRight = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingRight;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_listPreferredItemPaddingStart;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_panelBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_panelBackground;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_panelMenuListTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_panelMenuListTheme;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_panelMenuListWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_panelMenuListWidth;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_popupMenuStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_popupMenuStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_popupWindowStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_popupWindowStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_radioButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_radioButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_ratingBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_ratingBarStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_ratingBarStyleIndicator = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_ratingBarStyleIndicator;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_ratingBarStyleSmall = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_ratingBarStyleSmall;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_searchViewStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_searchViewStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_seekBarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_seekBarStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_selectableItemBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_selectableItemBackground;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_selectableItemBackgroundBorderless = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_selectableItemBackgroundBorderless;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_spinnerDropDownItemStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_spinnerDropDownItemStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_spinnerStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_spinnerStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_switchStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_switchStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textAppearanceLargePopupMenu = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceLargePopupMenu;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textAppearanceListItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceListItem;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textAppearanceListItemSecondary = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceListItemSecondary;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textAppearanceListItemSmall = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceListItemSmall;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textAppearancePopupMenuHeader = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearancePopupMenuHeader;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultSubtitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultSubtitle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultTitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceSearchResultTitle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textAppearanceSmallPopupMenu = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textAppearanceSmallPopupMenu;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textColorAlertDialogListItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textColorAlertDialogListItem;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_textColorSearchUrl = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_textColorSearchUrl;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_toolbarNavigationButtonStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_toolbarNavigationButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_toolbarStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_toolbarStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_tooltipForegroundColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_tooltipForegroundColor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_tooltipFrameBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_tooltipFrameBackground;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_viewInflaterClass = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_viewInflaterClass;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowActionBar = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowActionBar;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowActionBarOverlay = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowActionBarOverlay;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowActionModeOverlay = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowActionModeOverlay;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowFixedHeightMajor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowFixedHeightMajor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowFixedHeightMinor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowFixedHeightMinor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowFixedWidthMajor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowFixedWidthMajor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowFixedWidthMinor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowFixedWidthMinor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowMinWidthMajor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowMinWidthMajor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowMinWidthMinor = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowMinWidthMinor;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_windowNoTitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.AppCompatTheme_windowNoTitle;
+			global::Shiny.Locations.Resource.Styleable.ButtonBarLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ButtonBarLayout;
+			global::Shiny.Locations.Resource.Styleable.ButtonBarLayout_allowStacking = global::Shiny.Device.Tests.Droid.Resource.Styleable.ButtonBarLayout_allowStacking;
 			global::Shiny.Locations.Resource.Styleable.ColorStateListItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.ColorStateListItem;
 			global::Shiny.Locations.Resource.Styleable.ColorStateListItem_alpha = global::Shiny.Device.Tests.Droid.Resource.Styleable.ColorStateListItem_alpha;
 			global::Shiny.Locations.Resource.Styleable.ColorStateListItem_android_alpha = global::Shiny.Device.Tests.Droid.Resource.Styleable.ColorStateListItem_android_alpha;
 			global::Shiny.Locations.Resource.Styleable.ColorStateListItem_android_color = global::Shiny.Device.Tests.Droid.Resource.Styleable.ColorStateListItem_android_color;
+			global::Shiny.Locations.Resource.Styleable.CompoundButton = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton;
+			global::Shiny.Locations.Resource.Styleable.CompoundButton_android_button = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton_android_button;
+			global::Shiny.Locations.Resource.Styleable.CompoundButton_buttonCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton_buttonCompat;
+			global::Shiny.Locations.Resource.Styleable.CompoundButton_buttonTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton_buttonTint;
+			global::Shiny.Locations.Resource.Styleable.CompoundButton_buttonTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.CompoundButton_buttonTintMode;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle_arrowHeadLength = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_arrowHeadLength;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle_arrowShaftLength = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_arrowShaftLength;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle_barLength = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_barLength;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle_color = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_color;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle_drawableSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_drawableSize;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle_gapBetweenBars = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_gapBetweenBars;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle_spinBars = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_spinBars;
+			global::Shiny.Locations.Resource.Styleable.DrawerArrowToggle_thickness = global::Shiny.Device.Tests.Droid.Resource.Styleable.DrawerArrowToggle_thickness;
 			global::Shiny.Locations.Resource.Styleable.FontFamily = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily;
 			global::Shiny.Locations.Resource.Styleable.FontFamilyFont = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamilyFont;
 			global::Shiny.Locations.Resource.Styleable.FontFamilyFont_android_font = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamilyFont_android_font;
@@ -3471,6 +6334,13 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Locations.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Locations.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Locations.Resource.Styleable.Fragment = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment;
+			global::Shiny.Locations.Resource.Styleable.FragmentContainerView = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView;
+			global::Shiny.Locations.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView_android_name;
+			global::Shiny.Locations.Resource.Styleable.FragmentContainerView_android_tag = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView_android_tag;
+			global::Shiny.Locations.Resource.Styleable.Fragment_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_id;
+			global::Shiny.Locations.Resource.Styleable.Fragment_android_name = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_name;
+			global::Shiny.Locations.Resource.Styleable.Fragment_android_tag = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_tag;
 			global::Shiny.Locations.Resource.Styleable.GradientColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor;
 			global::Shiny.Locations.Resource.Styleable.GradientColorItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColorItem;
 			global::Shiny.Locations.Resource.Styleable.GradientColorItem_android_color = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColorItem_android_color;
@@ -3487,14 +6357,192 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Locations.Resource.Styleable.GradientColor_android_startY = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_startY;
 			global::Shiny.Locations.Resource.Styleable.GradientColor_android_tileMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_tileMode;
 			global::Shiny.Locations.Resource.Styleable.GradientColor_android_type = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor_android_type;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_android_baselineAligned = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_baselineAligned;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_android_baselineAlignedChildIndex = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_baselineAlignedChildIndex;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_android_gravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_gravity;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_android_orientation = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_orientation;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_android_weightSum = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_android_weightSum;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_divider = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_divider;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_dividerPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_dividerPadding;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_Layout = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_gravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_gravity;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_height = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_height;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_weight = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_weight;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_width = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_Layout_android_layout_width;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_measureWithLargestChild = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_measureWithLargestChild;
+			global::Shiny.Locations.Resource.Styleable.LinearLayoutCompat_showDividers = global::Shiny.Device.Tests.Droid.Resource.Styleable.LinearLayoutCompat_showDividers;
+			global::Shiny.Locations.Resource.Styleable.ListPopupWindow = global::Shiny.Device.Tests.Droid.Resource.Styleable.ListPopupWindow;
+			global::Shiny.Locations.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset = global::Shiny.Device.Tests.Droid.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset;
+			global::Shiny.Locations.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset = global::Shiny.Device.Tests.Droid.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset;
 			global::Shiny.Locations.Resource.Styleable.LoadingImageView = global::Shiny.Device.Tests.Droid.Resource.Styleable.LoadingImageView;
 			global::Shiny.Locations.Resource.Styleable.LoadingImageView_circleCrop = global::Shiny.Device.Tests.Droid.Resource.Styleable.LoadingImageView_circleCrop;
 			global::Shiny.Locations.Resource.Styleable.LoadingImageView_imageAspectRatio = global::Shiny.Device.Tests.Droid.Resource.Styleable.LoadingImageView_imageAspectRatio;
 			global::Shiny.Locations.Resource.Styleable.LoadingImageView_imageAspectRatioAdjust = global::Shiny.Device.Tests.Droid.Resource.Styleable.LoadingImageView_imageAspectRatioAdjust;
+			global::Shiny.Locations.Resource.Styleable.MenuGroup = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup;
+			global::Shiny.Locations.Resource.Styleable.MenuGroup_android_checkableBehavior = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_checkableBehavior;
+			global::Shiny.Locations.Resource.Styleable.MenuGroup_android_enabled = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_enabled;
+			global::Shiny.Locations.Resource.Styleable.MenuGroup_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_id;
+			global::Shiny.Locations.Resource.Styleable.MenuGroup_android_menuCategory = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_menuCategory;
+			global::Shiny.Locations.Resource.Styleable.MenuGroup_android_orderInCategory = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_orderInCategory;
+			global::Shiny.Locations.Resource.Styleable.MenuGroup_android_visible = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuGroup_android_visible;
+			global::Shiny.Locations.Resource.Styleable.MenuItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_actionLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_actionLayout;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_actionProviderClass = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_actionProviderClass;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_actionViewClass = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_actionViewClass;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_alphabeticModifiers = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_alphabeticModifiers;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_alphabeticShortcut = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_alphabeticShortcut;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_checkable = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_checkable;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_checked = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_checked;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_enabled = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_enabled;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_icon = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_icon;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_id;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_menuCategory = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_menuCategory;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_numericShortcut = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_numericShortcut;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_onClick = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_onClick;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_orderInCategory = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_orderInCategory;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_title = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_title;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_titleCondensed = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_titleCondensed;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_android_visible = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_android_visible;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_contentDescription = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_contentDescription;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_iconTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_iconTint;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_iconTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_iconTintMode;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_numericModifiers = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_numericModifiers;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_showAsAction = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_showAsAction;
+			global::Shiny.Locations.Resource.Styleable.MenuItem_tooltipText = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuItem_tooltipText;
+			global::Shiny.Locations.Resource.Styleable.MenuView = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView;
+			global::Shiny.Locations.Resource.Styleable.MenuView_android_headerBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_headerBackground;
+			global::Shiny.Locations.Resource.Styleable.MenuView_android_horizontalDivider = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_horizontalDivider;
+			global::Shiny.Locations.Resource.Styleable.MenuView_android_itemBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_itemBackground;
+			global::Shiny.Locations.Resource.Styleable.MenuView_android_itemIconDisabledAlpha = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_itemIconDisabledAlpha;
+			global::Shiny.Locations.Resource.Styleable.MenuView_android_itemTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_itemTextAppearance;
+			global::Shiny.Locations.Resource.Styleable.MenuView_android_verticalDivider = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_verticalDivider;
+			global::Shiny.Locations.Resource.Styleable.MenuView_android_windowAnimationStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_android_windowAnimationStyle;
+			global::Shiny.Locations.Resource.Styleable.MenuView_preserveIconSpacing = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_preserveIconSpacing;
+			global::Shiny.Locations.Resource.Styleable.MenuView_subMenuArrow = global::Shiny.Device.Tests.Droid.Resource.Styleable.MenuView_subMenuArrow;
+			global::Shiny.Locations.Resource.Styleable.PopupWindow = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindow;
+			global::Shiny.Locations.Resource.Styleable.PopupWindowBackgroundState = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindowBackgroundState;
+			global::Shiny.Locations.Resource.Styleable.PopupWindowBackgroundState_state_above_anchor = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindowBackgroundState_state_above_anchor;
+			global::Shiny.Locations.Resource.Styleable.PopupWindow_android_popupAnimationStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindow_android_popupAnimationStyle;
+			global::Shiny.Locations.Resource.Styleable.PopupWindow_android_popupBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindow_android_popupBackground;
+			global::Shiny.Locations.Resource.Styleable.PopupWindow_overlapAnchor = global::Shiny.Device.Tests.Droid.Resource.Styleable.PopupWindow_overlapAnchor;
+			global::Shiny.Locations.Resource.Styleable.RecycleListView = global::Shiny.Device.Tests.Droid.Resource.Styleable.RecycleListView;
+			global::Shiny.Locations.Resource.Styleable.RecycleListView_paddingBottomNoButtons = global::Shiny.Device.Tests.Droid.Resource.Styleable.RecycleListView_paddingBottomNoButtons;
+			global::Shiny.Locations.Resource.Styleable.RecycleListView_paddingTopNoTitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.RecycleListView_paddingTopNoTitle;
+			global::Shiny.Locations.Resource.Styleable.SearchView = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView;
+			global::Shiny.Locations.Resource.Styleable.SearchView_android_focusable = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_android_focusable;
+			global::Shiny.Locations.Resource.Styleable.SearchView_android_imeOptions = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_android_imeOptions;
+			global::Shiny.Locations.Resource.Styleable.SearchView_android_inputType = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_android_inputType;
+			global::Shiny.Locations.Resource.Styleable.SearchView_android_maxWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_android_maxWidth;
+			global::Shiny.Locations.Resource.Styleable.SearchView_closeIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_closeIcon;
+			global::Shiny.Locations.Resource.Styleable.SearchView_commitIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_commitIcon;
+			global::Shiny.Locations.Resource.Styleable.SearchView_defaultQueryHint = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_defaultQueryHint;
+			global::Shiny.Locations.Resource.Styleable.SearchView_goIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_goIcon;
+			global::Shiny.Locations.Resource.Styleable.SearchView_iconifiedByDefault = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_iconifiedByDefault;
+			global::Shiny.Locations.Resource.Styleable.SearchView_layout = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_layout;
+			global::Shiny.Locations.Resource.Styleable.SearchView_queryBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_queryBackground;
+			global::Shiny.Locations.Resource.Styleable.SearchView_queryHint = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_queryHint;
+			global::Shiny.Locations.Resource.Styleable.SearchView_searchHintIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_searchHintIcon;
+			global::Shiny.Locations.Resource.Styleable.SearchView_searchIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_searchIcon;
+			global::Shiny.Locations.Resource.Styleable.SearchView_submitBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_submitBackground;
+			global::Shiny.Locations.Resource.Styleable.SearchView_suggestionRowLayout = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_suggestionRowLayout;
+			global::Shiny.Locations.Resource.Styleable.SearchView_voiceIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.SearchView_voiceIcon;
 			global::Shiny.Locations.Resource.Styleable.SignInButton = global::Shiny.Device.Tests.Droid.Resource.Styleable.SignInButton;
 			global::Shiny.Locations.Resource.Styleable.SignInButton_buttonSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.SignInButton_buttonSize;
 			global::Shiny.Locations.Resource.Styleable.SignInButton_colorScheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.SignInButton_colorScheme;
 			global::Shiny.Locations.Resource.Styleable.SignInButton_scopeUris = global::Shiny.Device.Tests.Droid.Resource.Styleable.SignInButton_scopeUris;
+			global::Shiny.Locations.Resource.Styleable.Spinner = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner;
+			global::Shiny.Locations.Resource.Styleable.Spinner_android_dropDownWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_android_dropDownWidth;
+			global::Shiny.Locations.Resource.Styleable.Spinner_android_entries = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_android_entries;
+			global::Shiny.Locations.Resource.Styleable.Spinner_android_popupBackground = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_android_popupBackground;
+			global::Shiny.Locations.Resource.Styleable.Spinner_android_prompt = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_android_prompt;
+			global::Shiny.Locations.Resource.Styleable.Spinner_popupTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.Spinner_popupTheme;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawableItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawableItem;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawableItem_android_drawable = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawableItem_android_drawable;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawable_android_constantSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_constantSize;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawable_android_dither = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_dither;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawable_android_enterFadeDuration = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_enterFadeDuration;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawable_android_exitFadeDuration = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_exitFadeDuration;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawable_android_variablePadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_variablePadding;
+			global::Shiny.Locations.Resource.Styleable.StateListDrawable_android_visible = global::Shiny.Device.Tests.Droid.Resource.Styleable.StateListDrawable_android_visible;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_android_textOff = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_android_textOff;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_android_textOn = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_android_textOn;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_android_thumb = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_android_thumb;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_showText = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_showText;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_splitTrack = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_splitTrack;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_switchMinWidth = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_switchMinWidth;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_switchPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_switchPadding;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_switchTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_switchTextAppearance;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_thumbTextPadding = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_thumbTextPadding;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_thumbTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_thumbTint;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_thumbTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_thumbTintMode;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_track = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_track;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_trackTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_trackTint;
+			global::Shiny.Locations.Resource.Styleable.SwitchCompat_trackTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.SwitchCompat_trackTintMode;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_fontFamily = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_fontFamily;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_shadowColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_shadowColor;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_shadowDx = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_shadowDx;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_shadowDy = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_shadowDy;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_shadowRadius = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_shadowRadius;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_textColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textColor;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_textColorHint = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textColorHint;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_textColorLink = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textColorLink;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_textFontWeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textFontWeight;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_textSize = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textSize;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_textStyle = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_textStyle;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_android_typeface = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_android_typeface;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_fontFamily = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_fontFamily;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_fontVariationSettings = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_fontVariationSettings;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_textAllCaps = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_textAllCaps;
+			global::Shiny.Locations.Resource.Styleable.TextAppearance_textLocale = global::Shiny.Device.Tests.Droid.Resource.Styleable.TextAppearance_textLocale;
+			global::Shiny.Locations.Resource.Styleable.Toolbar = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_android_gravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_android_gravity;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_android_minHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_android_minHeight;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_buttonGravity = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_buttonGravity;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_collapseContentDescription = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_collapseContentDescription;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_collapseIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_collapseIcon;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_contentInsetEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetEnd;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_contentInsetEndWithActions = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetEndWithActions;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_contentInsetLeft = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetLeft;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_contentInsetRight = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetRight;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_contentInsetStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetStart;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_contentInsetStartWithNavigation = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_contentInsetStartWithNavigation;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_logo = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_logo;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_logoDescription = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_logoDescription;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_maxButtonHeight = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_maxButtonHeight;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_menu = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_menu;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_navigationContentDescription = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_navigationContentDescription;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_navigationIcon = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_navigationIcon;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_popupTheme = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_popupTheme;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_subtitle = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_subtitle;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_subtitleTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_subtitleTextAppearance;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_subtitleTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_subtitleTextColor;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_title = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_title;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_titleMargin = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMargin;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_titleMarginBottom = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMarginBottom;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_titleMarginEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMarginEnd;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_titleMargins = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMargins;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_titleMarginStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMarginStart;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_titleMarginTop = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleMarginTop;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_titleTextAppearance = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleTextAppearance;
+			global::Shiny.Locations.Resource.Styleable.Toolbar_titleTextColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.Toolbar_titleTextColor;
+			global::Shiny.Locations.Resource.Styleable.View = global::Shiny.Device.Tests.Droid.Resource.Styleable.View;
+			global::Shiny.Locations.Resource.Styleable.ViewBackgroundHelper = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewBackgroundHelper;
+			global::Shiny.Locations.Resource.Styleable.ViewBackgroundHelper_android_background = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewBackgroundHelper_android_background;
+			global::Shiny.Locations.Resource.Styleable.ViewBackgroundHelper_backgroundTint = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewBackgroundHelper_backgroundTint;
+			global::Shiny.Locations.Resource.Styleable.ViewBackgroundHelper_backgroundTintMode = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewBackgroundHelper_backgroundTintMode;
+			global::Shiny.Locations.Resource.Styleable.ViewStubCompat = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewStubCompat;
+			global::Shiny.Locations.Resource.Styleable.ViewStubCompat_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewStubCompat_android_id;
+			global::Shiny.Locations.Resource.Styleable.ViewStubCompat_android_inflatedId = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewStubCompat_android_inflatedId;
+			global::Shiny.Locations.Resource.Styleable.ViewStubCompat_android_layout = global::Shiny.Device.Tests.Droid.Resource.Styleable.ViewStubCompat_android_layout;
+			global::Shiny.Locations.Resource.Styleable.View_android_focusable = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_android_focusable;
+			global::Shiny.Locations.Resource.Styleable.View_android_theme = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_android_theme;
+			global::Shiny.Locations.Resource.Styleable.View_paddingEnd = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_paddingEnd;
+			global::Shiny.Locations.Resource.Styleable.View_paddingStart = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_paddingStart;
+			global::Shiny.Locations.Resource.Styleable.View_theme = global::Shiny.Device.Tests.Droid.Resource.Styleable.View_theme;
 			global::Shiny.Net.Http.Resource.Attribute.alpha = global::Shiny.Device.Tests.Droid.Resource.Attribute.alpha;
 			global::Shiny.Net.Http.Resource.Attribute.font = global::Shiny.Device.Tests.Droid.Resource.Attribute.font;
 			global::Shiny.Net.Http.Resource.Attribute.fontProviderAuthority = global::Shiny.Device.Tests.Droid.Resource.Attribute.fontProviderAuthority;
@@ -3511,10 +6559,10 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Net.Http.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_foreground_service_default;
 			global::Shiny.Net.Http.Resource.Boolean.enable_system_job_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_job_service_default;
 			global::Shiny.Net.Http.Resource.Boolean.workmanager_test_configuration = global::Shiny.Device.Tests.Droid.Resource.Boolean.workmanager_test_configuration;
+			global::Shiny.Net.Http.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.Net.Http.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.Net.Http.Resource.Color.notification_action_color_filter = global::Shiny.Device.Tests.Droid.Resource.Color.notification_action_color_filter;
 			global::Shiny.Net.Http.Resource.Color.notification_icon_bg_color = global::Shiny.Device.Tests.Droid.Resource.Color.notification_icon_bg_color;
-			global::Shiny.Net.Http.Resource.Color.ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_light;
-			global::Shiny.Net.Http.Resource.Color.secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_light;
 			global::Shiny.Net.Http.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_horizontal_material;
 			global::Shiny.Net.Http.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_vertical_material;
 			global::Shiny.Net.Http.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_padding_horizontal_material;
@@ -3694,6 +6742,13 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Notifications.Resource.Animation.btn_radio_to_on_mtrl_dot_group_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_dot_group_animation;
 			global::Shiny.Notifications.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_animation;
 			global::Shiny.Notifications.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation = global::Shiny.Device.Tests.Droid.Resource.Animation.btn_radio_to_on_mtrl_ring_outer_path_animation;
+			global::Shiny.Notifications.Resource.Animation.fragment_close_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_close_enter;
+			global::Shiny.Notifications.Resource.Animation.fragment_close_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_close_exit;
+			global::Shiny.Notifications.Resource.Animation.fragment_fade_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fade_enter;
+			global::Shiny.Notifications.Resource.Animation.fragment_fade_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fade_exit;
+			global::Shiny.Notifications.Resource.Animation.fragment_fast_out_extra_slow_in = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_fast_out_extra_slow_in;
+			global::Shiny.Notifications.Resource.Animation.fragment_open_enter = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_open_enter;
+			global::Shiny.Notifications.Resource.Animation.fragment_open_exit = global::Shiny.Device.Tests.Droid.Resource.Animation.fragment_open_exit;
 			global::Shiny.Notifications.Resource.Attribute.actionBarDivider = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarDivider;
 			global::Shiny.Notifications.Resource.Attribute.actionBarItemBackground = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarItemBackground;
 			global::Shiny.Notifications.Resource.Attribute.actionBarPopupTheme = global::Shiny.Device.Tests.Droid.Resource.Attribute.actionBarPopupTheme;
@@ -3984,9 +7039,10 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Notifications.Resource.Color.abc_btn_colored_borderless_text_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_btn_colored_borderless_text_material;
 			global::Shiny.Notifications.Resource.Color.abc_btn_colored_text_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_btn_colored_text_material;
 			global::Shiny.Notifications.Resource.Color.abc_color_highlight_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_color_highlight_material;
+			global::Shiny.Notifications.Resource.Color.abc_decor_view_status_guard = global::Shiny.Device.Tests.Droid.Resource.Color.abc_decor_view_status_guard;
+			global::Shiny.Notifications.Resource.Color.abc_decor_view_status_guard_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_decor_view_status_guard_light;
 			global::Shiny.Notifications.Resource.Color.abc_hint_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_dark;
 			global::Shiny.Notifications.Resource.Color.abc_hint_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_light;
-			global::Shiny.Notifications.Resource.Color.abc_input_method_navigation_guard = global::Shiny.Device.Tests.Droid.Resource.Color.abc_input_method_navigation_guard;
 			global::Shiny.Notifications.Resource.Color.abc_primary_text_disable_only_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_dark;
 			global::Shiny.Notifications.Resource.Color.abc_primary_text_disable_only_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_light;
 			global::Shiny.Notifications.Resource.Color.abc_primary_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_material_dark;
@@ -4005,6 +7061,8 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Notifications.Resource.Color.abc_tint_switch_track = global::Shiny.Device.Tests.Droid.Resource.Color.abc_tint_switch_track;
 			global::Shiny.Notifications.Resource.Color.accent_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.accent_material_dark;
 			global::Shiny.Notifications.Resource.Color.accent_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.accent_material_light;
+			global::Shiny.Notifications.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.Notifications.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.Notifications.Resource.Color.background_floating_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.background_floating_material_dark;
 			global::Shiny.Notifications.Resource.Color.background_floating_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.background_floating_material_light;
 			global::Shiny.Notifications.Resource.Color.background_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.background_material_dark;
@@ -4368,6 +7426,7 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Notifications.Resource.Id.expanded_menu = global::Shiny.Device.Tests.Droid.Resource.Id.expanded_menu;
 			global::Shiny.Notifications.Resource.Id.expand_activities_button = global::Shiny.Device.Tests.Droid.Resource.Id.expand_activities_button;
 			global::Shiny.Notifications.Resource.Id.forever = global::Shiny.Device.Tests.Droid.Resource.Id.forever;
+			global::Shiny.Notifications.Resource.Id.fragment_container_view_tag = global::Shiny.Device.Tests.Droid.Resource.Id.fragment_container_view_tag;
 			global::Shiny.Notifications.Resource.Id.FUNCTION = global::Shiny.Device.Tests.Droid.Resource.Id.FUNCTION;
 			global::Shiny.Notifications.Resource.Id.group_divider = global::Shiny.Device.Tests.Droid.Resource.Id.group_divider;
 			global::Shiny.Notifications.Resource.Id.home = global::Shiny.Device.Tests.Droid.Resource.Id.home;
@@ -4451,6 +7510,8 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Notifications.Resource.Id.uniform = global::Shiny.Device.Tests.Droid.Resource.Id.uniform;
 			global::Shiny.Notifications.Resource.Id.up = global::Shiny.Device.Tests.Droid.Resource.Id.up;
 			global::Shiny.Notifications.Resource.Id.useLogo = global::Shiny.Device.Tests.Droid.Resource.Id.useLogo;
+			global::Shiny.Notifications.Resource.Id.view_tree_saved_state_registry_owner = global::Shiny.Device.Tests.Droid.Resource.Id.view_tree_saved_state_registry_owner;
+			global::Shiny.Notifications.Resource.Id.visible_removing_fragment_view_tag = global::Shiny.Device.Tests.Droid.Resource.Id.visible_removing_fragment_view_tag;
 			global::Shiny.Notifications.Resource.Id.withText = global::Shiny.Device.Tests.Droid.Resource.Id.withText;
 			global::Shiny.Notifications.Resource.Id.wrap_content = global::Shiny.Device.Tests.Droid.Resource.Id.wrap_content;
 			global::Shiny.Notifications.Resource.Integer.abc_config_activityDefaultDur = global::Shiny.Device.Tests.Droid.Resource.Integer.abc_config_activityDefaultDur;
@@ -4799,6 +7860,7 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Notifications.Resource.Style.Theme_AppCompat_DialogWhenLarge = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_DialogWhenLarge;
 			global::Shiny.Notifications.Resource.Style.Theme_AppCompat_Dialog_Alert = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Dialog_Alert;
 			global::Shiny.Notifications.Resource.Style.Theme_AppCompat_Dialog_MinWidth = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Dialog_MinWidth;
+			global::Shiny.Notifications.Resource.Style.Theme_AppCompat_Empty = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Empty;
 			global::Shiny.Notifications.Resource.Style.Theme_AppCompat_Light = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light;
 			global::Shiny.Notifications.Resource.Style.Theme_AppCompat_Light_DarkActionBar = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_DarkActionBar;
 			global::Shiny.Notifications.Resource.Style.Theme_AppCompat_Light_Dialog = global::Shiny.Device.Tests.Droid.Resource.Style.Theme_AppCompat_Light_Dialog;
@@ -5155,6 +8217,13 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Notifications.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Notifications.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Notifications.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Device.Tests.Droid.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Notifications.Resource.Styleable.Fragment = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment;
+			global::Shiny.Notifications.Resource.Styleable.FragmentContainerView = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView;
+			global::Shiny.Notifications.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView_android_name;
+			global::Shiny.Notifications.Resource.Styleable.FragmentContainerView_android_tag = global::Shiny.Device.Tests.Droid.Resource.Styleable.FragmentContainerView_android_tag;
+			global::Shiny.Notifications.Resource.Styleable.Fragment_android_id = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_id;
+			global::Shiny.Notifications.Resource.Styleable.Fragment_android_name = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_name;
+			global::Shiny.Notifications.Resource.Styleable.Fragment_android_tag = global::Shiny.Device.Tests.Droid.Resource.Styleable.Fragment_android_tag;
 			global::Shiny.Notifications.Resource.Styleable.GradientColor = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColor;
 			global::Shiny.Notifications.Resource.Styleable.GradientColorItem = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColorItem;
 			global::Shiny.Notifications.Resource.Styleable.GradientColorItem_android_color = global::Shiny.Device.Tests.Droid.Resource.Styleable.GradientColorItem_android_color;
@@ -5365,10 +8434,10 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.Sensors.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_foreground_service_default;
 			global::Shiny.Sensors.Resource.Boolean.enable_system_job_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_job_service_default;
 			global::Shiny.Sensors.Resource.Boolean.workmanager_test_configuration = global::Shiny.Device.Tests.Droid.Resource.Boolean.workmanager_test_configuration;
+			global::Shiny.Sensors.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.Sensors.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.Sensors.Resource.Color.notification_action_color_filter = global::Shiny.Device.Tests.Droid.Resource.Color.notification_action_color_filter;
 			global::Shiny.Sensors.Resource.Color.notification_icon_bg_color = global::Shiny.Device.Tests.Droid.Resource.Color.notification_icon_bg_color;
-			global::Shiny.Sensors.Resource.Color.ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_light;
-			global::Shiny.Sensors.Resource.Color.secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_light;
 			global::Shiny.Sensors.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_horizontal_material;
 			global::Shiny.Sensors.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_vertical_material;
 			global::Shiny.Sensors.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_padding_horizontal_material;
@@ -5540,10 +8609,10 @@ namespace Shiny.Device.Tests.Droid
 			global::Shiny.SpeechRecognition.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_foreground_service_default;
 			global::Shiny.SpeechRecognition.Resource.Boolean.enable_system_job_service_default = global::Shiny.Device.Tests.Droid.Resource.Boolean.enable_system_job_service_default;
 			global::Shiny.SpeechRecognition.Resource.Boolean.workmanager_test_configuration = global::Shiny.Device.Tests.Droid.Resource.Boolean.workmanager_test_configuration;
+			global::Shiny.SpeechRecognition.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.SpeechRecognition.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.SpeechRecognition.Resource.Color.notification_action_color_filter = global::Shiny.Device.Tests.Droid.Resource.Color.notification_action_color_filter;
 			global::Shiny.SpeechRecognition.Resource.Color.notification_icon_bg_color = global::Shiny.Device.Tests.Droid.Resource.Color.notification_icon_bg_color;
-			global::Shiny.SpeechRecognition.Resource.Color.ripple_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.ripple_material_light;
-			global::Shiny.SpeechRecognition.Resource.Color.secondary_text_default_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.secondary_text_default_material_light;
 			global::Shiny.SpeechRecognition.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_horizontal_material;
 			global::Shiny.SpeechRecognition.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_inset_vertical_material;
 			global::Shiny.SpeechRecognition.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Device.Tests.Droid.Resource.Dimension.compat_button_padding_horizontal_material;
@@ -6245,7 +9314,6 @@ namespace Shiny.Device.Tests.Droid
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_color_highlight_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_color_highlight_material;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_hint_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_dark;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_hint_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_light;
-			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_input_method_navigation_guard = global::Shiny.Device.Tests.Droid.Resource.Color.abc_input_method_navigation_guard;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_primary_text_disable_only_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_dark;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_primary_text_disable_only_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_light;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_primary_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_material_dark;
@@ -7088,6 +10156,7 @@ namespace Shiny.Device.Tests.Droid
 			global::Xamarin.Forms.Platform.Android.Resource.String.fab_transformation_sheet_behavior = global::Shiny.Device.Tests.Droid.Resource.String.fab_transformation_sheet_behavior;
 			global::Xamarin.Forms.Platform.Android.Resource.String.hide_bottom_view_on_scroll_behavior = global::Shiny.Device.Tests.Droid.Resource.String.hide_bottom_view_on_scroll_behavior;
 			global::Xamarin.Forms.Platform.Android.Resource.String.mtrl_chip_close_icon_content_description = global::Shiny.Device.Tests.Droid.Resource.String.mtrl_chip_close_icon_content_description;
+			global::Xamarin.Forms.Platform.Android.Resource.String.overflow_tab_title = global::Shiny.Device.Tests.Droid.Resource.String.overflow_tab_title;
 			global::Xamarin.Forms.Platform.Android.Resource.String.password_toggle_content_description = global::Shiny.Device.Tests.Droid.Resource.String.password_toggle_content_description;
 			global::Xamarin.Forms.Platform.Android.Resource.String.path_password_eye = global::Shiny.Device.Tests.Droid.Resource.String.path_password_eye;
 			global::Xamarin.Forms.Platform.Android.Resource.String.path_password_eye_mask_strike_through = global::Shiny.Device.Tests.Droid.Resource.String.path_password_eye_mask_strike_through;
@@ -8923,7 +11992,6 @@ namespace Shiny.Device.Tests.Droid
 			global::Xamarin.Forms.Platform.Resource.Color.abc_color_highlight_material = global::Shiny.Device.Tests.Droid.Resource.Color.abc_color_highlight_material;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_hint_foreground_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_dark;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_hint_foreground_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_hint_foreground_material_light;
-			global::Xamarin.Forms.Platform.Resource.Color.abc_input_method_navigation_guard = global::Shiny.Device.Tests.Droid.Resource.Color.abc_input_method_navigation_guard;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_primary_text_disable_only_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_dark;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_primary_text_disable_only_material_light = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_disable_only_material_light;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_primary_text_material_dark = global::Shiny.Device.Tests.Droid.Resource.Color.abc_primary_text_material_dark;
@@ -9766,6 +12834,7 @@ namespace Shiny.Device.Tests.Droid
 			global::Xamarin.Forms.Platform.Resource.String.fab_transformation_sheet_behavior = global::Shiny.Device.Tests.Droid.Resource.String.fab_transformation_sheet_behavior;
 			global::Xamarin.Forms.Platform.Resource.String.hide_bottom_view_on_scroll_behavior = global::Shiny.Device.Tests.Droid.Resource.String.hide_bottom_view_on_scroll_behavior;
 			global::Xamarin.Forms.Platform.Resource.String.mtrl_chip_close_icon_content_description = global::Shiny.Device.Tests.Droid.Resource.String.mtrl_chip_close_icon_content_description;
+			global::Xamarin.Forms.Platform.Resource.String.overflow_tab_title = global::Shiny.Device.Tests.Droid.Resource.String.overflow_tab_title;
 			global::Xamarin.Forms.Platform.Resource.String.password_toggle_content_description = global::Shiny.Device.Tests.Droid.Resource.String.password_toggle_content_description;
 			global::Xamarin.Forms.Platform.Resource.String.path_password_eye = global::Shiny.Device.Tests.Droid.Resource.String.path_password_eye;
 			global::Xamarin.Forms.Platform.Resource.String.path_password_eye_mask_strike_through = global::Shiny.Device.Tests.Droid.Resource.String.path_password_eye_mask_strike_through;
@@ -11155,6 +14224,27 @@ namespace Shiny.Device.Tests.Droid
 			
 			// aapt resource value: 0x7F01001F
 			public const int ExitToRight = 2130771999;
+			
+			// aapt resource value: 0x7F010020
+			public const int fragment_close_enter = 2130772000;
+			
+			// aapt resource value: 0x7F010021
+			public const int fragment_close_exit = 2130772001;
+			
+			// aapt resource value: 0x7F010022
+			public const int fragment_fade_enter = 2130772002;
+			
+			// aapt resource value: 0x7F010023
+			public const int fragment_fade_exit = 2130772003;
+			
+			// aapt resource value: 0x7F010024
+			public const int fragment_fast_out_extra_slow_in = 2130772004;
+			
+			// aapt resource value: 0x7F010025
+			public const int fragment_open_enter = 2130772005;
+			
+			// aapt resource value: 0x7F010026
+			public const int fragment_open_exit = 2130772006;
 			
 			static Animation()
 			{
@@ -12811,430 +15901,439 @@ namespace Shiny.Device.Tests.Droid
 			public const int abc_color_highlight_material = 2131034116;
 			
 			// aapt resource value: 0x7F050005
-			public const int abc_hint_foreground_material_dark = 2131034117;
+			public const int abc_decor_view_status_guard = 2131034117;
 			
 			// aapt resource value: 0x7F050006
-			public const int abc_hint_foreground_material_light = 2131034118;
+			public const int abc_decor_view_status_guard_light = 2131034118;
 			
 			// aapt resource value: 0x7F050007
-			public const int abc_input_method_navigation_guard = 2131034119;
+			public const int abc_hint_foreground_material_dark = 2131034119;
 			
 			// aapt resource value: 0x7F050008
-			public const int abc_primary_text_disable_only_material_dark = 2131034120;
+			public const int abc_hint_foreground_material_light = 2131034120;
 			
 			// aapt resource value: 0x7F050009
-			public const int abc_primary_text_disable_only_material_light = 2131034121;
+			public const int abc_primary_text_disable_only_material_dark = 2131034121;
 			
 			// aapt resource value: 0x7F05000A
-			public const int abc_primary_text_material_dark = 2131034122;
+			public const int abc_primary_text_disable_only_material_light = 2131034122;
 			
 			// aapt resource value: 0x7F05000B
-			public const int abc_primary_text_material_light = 2131034123;
+			public const int abc_primary_text_material_dark = 2131034123;
 			
 			// aapt resource value: 0x7F05000C
-			public const int abc_search_url_text = 2131034124;
+			public const int abc_primary_text_material_light = 2131034124;
 			
 			// aapt resource value: 0x7F05000D
-			public const int abc_search_url_text_normal = 2131034125;
+			public const int abc_search_url_text = 2131034125;
 			
 			// aapt resource value: 0x7F05000E
-			public const int abc_search_url_text_pressed = 2131034126;
+			public const int abc_search_url_text_normal = 2131034126;
 			
 			// aapt resource value: 0x7F05000F
-			public const int abc_search_url_text_selected = 2131034127;
+			public const int abc_search_url_text_pressed = 2131034127;
 			
 			// aapt resource value: 0x7F050010
-			public const int abc_secondary_text_material_dark = 2131034128;
+			public const int abc_search_url_text_selected = 2131034128;
 			
 			// aapt resource value: 0x7F050011
-			public const int abc_secondary_text_material_light = 2131034129;
+			public const int abc_secondary_text_material_dark = 2131034129;
 			
 			// aapt resource value: 0x7F050012
-			public const int abc_tint_btn_checkable = 2131034130;
+			public const int abc_secondary_text_material_light = 2131034130;
 			
 			// aapt resource value: 0x7F050013
-			public const int abc_tint_default = 2131034131;
+			public const int abc_tint_btn_checkable = 2131034131;
 			
 			// aapt resource value: 0x7F050014
-			public const int abc_tint_edittext = 2131034132;
+			public const int abc_tint_default = 2131034132;
 			
 			// aapt resource value: 0x7F050015
-			public const int abc_tint_seek_thumb = 2131034133;
+			public const int abc_tint_edittext = 2131034133;
 			
 			// aapt resource value: 0x7F050016
-			public const int abc_tint_spinner = 2131034134;
+			public const int abc_tint_seek_thumb = 2131034134;
 			
 			// aapt resource value: 0x7F050017
-			public const int abc_tint_switch_track = 2131034135;
+			public const int abc_tint_spinner = 2131034135;
 			
 			// aapt resource value: 0x7F050018
-			public const int accent_material_dark = 2131034136;
+			public const int abc_tint_switch_track = 2131034136;
 			
 			// aapt resource value: 0x7F050019
-			public const int accent_material_light = 2131034137;
+			public const int accent_material_dark = 2131034137;
 			
 			// aapt resource value: 0x7F05001A
-			public const int background_floating_material_dark = 2131034138;
+			public const int accent_material_light = 2131034138;
 			
 			// aapt resource value: 0x7F05001B
-			public const int background_floating_material_light = 2131034139;
+			public const int androidx_core_ripple_material_light = 2131034139;
 			
 			// aapt resource value: 0x7F05001C
-			public const int background_material_dark = 2131034140;
+			public const int androidx_core_secondary_text_default_material_light = 2131034140;
 			
 			// aapt resource value: 0x7F05001D
-			public const int background_material_light = 2131034141;
+			public const int background_floating_material_dark = 2131034141;
 			
 			// aapt resource value: 0x7F05001E
-			public const int bright_foreground_disabled_material_dark = 2131034142;
+			public const int background_floating_material_light = 2131034142;
 			
 			// aapt resource value: 0x7F05001F
-			public const int bright_foreground_disabled_material_light = 2131034143;
+			public const int background_material_dark = 2131034143;
 			
 			// aapt resource value: 0x7F050020
-			public const int bright_foreground_inverse_material_dark = 2131034144;
+			public const int background_material_light = 2131034144;
 			
 			// aapt resource value: 0x7F050021
-			public const int bright_foreground_inverse_material_light = 2131034145;
+			public const int bright_foreground_disabled_material_dark = 2131034145;
 			
 			// aapt resource value: 0x7F050022
-			public const int bright_foreground_material_dark = 2131034146;
+			public const int bright_foreground_disabled_material_light = 2131034146;
 			
 			// aapt resource value: 0x7F050023
-			public const int bright_foreground_material_light = 2131034147;
+			public const int bright_foreground_inverse_material_dark = 2131034147;
 			
 			// aapt resource value: 0x7F050024
-			public const int browser_actions_bg_grey = 2131034148;
+			public const int bright_foreground_inverse_material_light = 2131034148;
 			
 			// aapt resource value: 0x7F050025
-			public const int browser_actions_divider_color = 2131034149;
+			public const int bright_foreground_material_dark = 2131034149;
 			
 			// aapt resource value: 0x7F050026
-			public const int browser_actions_text_color = 2131034150;
+			public const int bright_foreground_material_light = 2131034150;
 			
 			// aapt resource value: 0x7F050027
-			public const int browser_actions_title_color = 2131034151;
+			public const int browser_actions_bg_grey = 2131034151;
 			
 			// aapt resource value: 0x7F050028
-			public const int button_material_dark = 2131034152;
+			public const int browser_actions_divider_color = 2131034152;
 			
 			// aapt resource value: 0x7F050029
-			public const int button_material_light = 2131034153;
+			public const int browser_actions_text_color = 2131034153;
 			
 			// aapt resource value: 0x7F05002A
-			public const int cardview_dark_background = 2131034154;
+			public const int browser_actions_title_color = 2131034154;
 			
 			// aapt resource value: 0x7F05002B
-			public const int cardview_light_background = 2131034155;
+			public const int button_material_dark = 2131034155;
 			
 			// aapt resource value: 0x7F05002C
-			public const int cardview_shadow_end_color = 2131034156;
+			public const int button_material_light = 2131034156;
 			
 			// aapt resource value: 0x7F05002D
-			public const int cardview_shadow_start_color = 2131034157;
+			public const int cardview_dark_background = 2131034157;
 			
 			// aapt resource value: 0x7F05002E
-			public const int colorAccent = 2131034158;
+			public const int cardview_light_background = 2131034158;
 			
 			// aapt resource value: 0x7F05002F
-			public const int colorPrimary = 2131034159;
+			public const int cardview_shadow_end_color = 2131034159;
 			
 			// aapt resource value: 0x7F050030
-			public const int colorPrimaryDark = 2131034160;
+			public const int cardview_shadow_start_color = 2131034160;
 			
 			// aapt resource value: 0x7F050031
-			public const int common_google_signin_btn_text_dark = 2131034161;
+			public const int colorAccent = 2131034161;
 			
 			// aapt resource value: 0x7F050032
-			public const int common_google_signin_btn_text_dark_default = 2131034162;
+			public const int colorPrimary = 2131034162;
 			
 			// aapt resource value: 0x7F050033
-			public const int common_google_signin_btn_text_dark_disabled = 2131034163;
+			public const int colorPrimaryDark = 2131034163;
 			
 			// aapt resource value: 0x7F050034
-			public const int common_google_signin_btn_text_dark_focused = 2131034164;
+			public const int common_google_signin_btn_text_dark = 2131034164;
 			
 			// aapt resource value: 0x7F050035
-			public const int common_google_signin_btn_text_dark_pressed = 2131034165;
+			public const int common_google_signin_btn_text_dark_default = 2131034165;
 			
 			// aapt resource value: 0x7F050036
-			public const int common_google_signin_btn_text_light = 2131034166;
+			public const int common_google_signin_btn_text_dark_disabled = 2131034166;
 			
 			// aapt resource value: 0x7F050037
-			public const int common_google_signin_btn_text_light_default = 2131034167;
+			public const int common_google_signin_btn_text_dark_focused = 2131034167;
 			
 			// aapt resource value: 0x7F050038
-			public const int common_google_signin_btn_text_light_disabled = 2131034168;
+			public const int common_google_signin_btn_text_dark_pressed = 2131034168;
 			
 			// aapt resource value: 0x7F050039
-			public const int common_google_signin_btn_text_light_focused = 2131034169;
+			public const int common_google_signin_btn_text_light = 2131034169;
 			
 			// aapt resource value: 0x7F05003A
-			public const int common_google_signin_btn_text_light_pressed = 2131034170;
+			public const int common_google_signin_btn_text_light_default = 2131034170;
 			
 			// aapt resource value: 0x7F05003B
-			public const int common_google_signin_btn_tint = 2131034171;
+			public const int common_google_signin_btn_text_light_disabled = 2131034171;
 			
 			// aapt resource value: 0x7F05003C
-			public const int design_bottom_navigation_shadow_color = 2131034172;
+			public const int common_google_signin_btn_text_light_focused = 2131034172;
 			
 			// aapt resource value: 0x7F05003D
-			public const int design_default_color_primary = 2131034173;
+			public const int common_google_signin_btn_text_light_pressed = 2131034173;
 			
 			// aapt resource value: 0x7F05003E
-			public const int design_default_color_primary_dark = 2131034174;
+			public const int common_google_signin_btn_tint = 2131034174;
 			
 			// aapt resource value: 0x7F05003F
-			public const int design_error = 2131034175;
+			public const int design_bottom_navigation_shadow_color = 2131034175;
 			
 			// aapt resource value: 0x7F050040
-			public const int design_fab_shadow_end_color = 2131034176;
+			public const int design_default_color_primary = 2131034176;
 			
 			// aapt resource value: 0x7F050041
-			public const int design_fab_shadow_mid_color = 2131034177;
+			public const int design_default_color_primary_dark = 2131034177;
 			
 			// aapt resource value: 0x7F050042
-			public const int design_fab_shadow_start_color = 2131034178;
+			public const int design_error = 2131034178;
 			
 			// aapt resource value: 0x7F050043
-			public const int design_fab_stroke_end_inner_color = 2131034179;
+			public const int design_fab_shadow_end_color = 2131034179;
 			
 			// aapt resource value: 0x7F050044
-			public const int design_fab_stroke_end_outer_color = 2131034180;
+			public const int design_fab_shadow_mid_color = 2131034180;
 			
 			// aapt resource value: 0x7F050045
-			public const int design_fab_stroke_top_inner_color = 2131034181;
+			public const int design_fab_shadow_start_color = 2131034181;
 			
 			// aapt resource value: 0x7F050046
-			public const int design_fab_stroke_top_outer_color = 2131034182;
+			public const int design_fab_stroke_end_inner_color = 2131034182;
 			
 			// aapt resource value: 0x7F050047
-			public const int design_snackbar_background_color = 2131034183;
+			public const int design_fab_stroke_end_outer_color = 2131034183;
 			
 			// aapt resource value: 0x7F050048
-			public const int design_tint_password_toggle = 2131034184;
+			public const int design_fab_stroke_top_inner_color = 2131034184;
 			
 			// aapt resource value: 0x7F050049
-			public const int dim_foreground_disabled_material_dark = 2131034185;
+			public const int design_fab_stroke_top_outer_color = 2131034185;
 			
 			// aapt resource value: 0x7F05004A
-			public const int dim_foreground_disabled_material_light = 2131034186;
+			public const int design_snackbar_background_color = 2131034186;
 			
 			// aapt resource value: 0x7F05004B
-			public const int dim_foreground_material_dark = 2131034187;
+			public const int design_tint_password_toggle = 2131034187;
 			
 			// aapt resource value: 0x7F05004C
-			public const int dim_foreground_material_light = 2131034188;
+			public const int dim_foreground_disabled_material_dark = 2131034188;
 			
 			// aapt resource value: 0x7F05004D
-			public const int error_color_material_dark = 2131034189;
+			public const int dim_foreground_disabled_material_light = 2131034189;
 			
 			// aapt resource value: 0x7F05004E
-			public const int error_color_material_light = 2131034190;
+			public const int dim_foreground_material_dark = 2131034190;
 			
 			// aapt resource value: 0x7F05004F
-			public const int foreground_material_dark = 2131034191;
+			public const int dim_foreground_material_light = 2131034191;
 			
 			// aapt resource value: 0x7F050050
-			public const int foreground_material_light = 2131034192;
+			public const int error_color_material_dark = 2131034192;
 			
 			// aapt resource value: 0x7F050051
-			public const int highlighted_text_material_dark = 2131034193;
+			public const int error_color_material_light = 2131034193;
 			
 			// aapt resource value: 0x7F050052
-			public const int highlighted_text_material_light = 2131034194;
+			public const int foreground_material_dark = 2131034194;
 			
 			// aapt resource value: 0x7F050053
-			public const int launcher_background = 2131034195;
+			public const int foreground_material_light = 2131034195;
 			
 			// aapt resource value: 0x7F050054
-			public const int material_blue_grey_800 = 2131034196;
+			public const int highlighted_text_material_dark = 2131034196;
 			
 			// aapt resource value: 0x7F050055
-			public const int material_blue_grey_900 = 2131034197;
+			public const int highlighted_text_material_light = 2131034197;
 			
 			// aapt resource value: 0x7F050056
-			public const int material_blue_grey_950 = 2131034198;
+			public const int launcher_background = 2131034198;
 			
 			// aapt resource value: 0x7F050057
-			public const int material_deep_teal_200 = 2131034199;
+			public const int material_blue_grey_800 = 2131034199;
 			
 			// aapt resource value: 0x7F050058
-			public const int material_deep_teal_500 = 2131034200;
+			public const int material_blue_grey_900 = 2131034200;
 			
 			// aapt resource value: 0x7F050059
-			public const int material_grey_100 = 2131034201;
+			public const int material_blue_grey_950 = 2131034201;
 			
 			// aapt resource value: 0x7F05005A
-			public const int material_grey_300 = 2131034202;
+			public const int material_deep_teal_200 = 2131034202;
 			
 			// aapt resource value: 0x7F05005B
-			public const int material_grey_50 = 2131034203;
+			public const int material_deep_teal_500 = 2131034203;
 			
 			// aapt resource value: 0x7F05005C
-			public const int material_grey_600 = 2131034204;
+			public const int material_grey_100 = 2131034204;
 			
 			// aapt resource value: 0x7F05005D
-			public const int material_grey_800 = 2131034205;
+			public const int material_grey_300 = 2131034205;
 			
 			// aapt resource value: 0x7F05005E
-			public const int material_grey_850 = 2131034206;
+			public const int material_grey_50 = 2131034206;
 			
 			// aapt resource value: 0x7F05005F
-			public const int material_grey_900 = 2131034207;
+			public const int material_grey_600 = 2131034207;
 			
 			// aapt resource value: 0x7F050060
-			public const int mtrl_bottom_nav_colored_item_tint = 2131034208;
+			public const int material_grey_800 = 2131034208;
 			
 			// aapt resource value: 0x7F050061
-			public const int mtrl_bottom_nav_item_tint = 2131034209;
+			public const int material_grey_850 = 2131034209;
 			
 			// aapt resource value: 0x7F050062
-			public const int mtrl_btn_bg_color_disabled = 2131034210;
+			public const int material_grey_900 = 2131034210;
 			
 			// aapt resource value: 0x7F050063
-			public const int mtrl_btn_bg_color_selector = 2131034211;
+			public const int mtrl_bottom_nav_colored_item_tint = 2131034211;
 			
 			// aapt resource value: 0x7F050064
-			public const int mtrl_btn_ripple_color = 2131034212;
+			public const int mtrl_bottom_nav_item_tint = 2131034212;
 			
 			// aapt resource value: 0x7F050065
-			public const int mtrl_btn_stroke_color_selector = 2131034213;
+			public const int mtrl_btn_bg_color_disabled = 2131034213;
 			
 			// aapt resource value: 0x7F050066
-			public const int mtrl_btn_text_btn_ripple_color = 2131034214;
+			public const int mtrl_btn_bg_color_selector = 2131034214;
 			
 			// aapt resource value: 0x7F050067
-			public const int mtrl_btn_text_color_disabled = 2131034215;
+			public const int mtrl_btn_ripple_color = 2131034215;
 			
 			// aapt resource value: 0x7F050068
-			public const int mtrl_btn_text_color_selector = 2131034216;
+			public const int mtrl_btn_stroke_color_selector = 2131034216;
 			
 			// aapt resource value: 0x7F050069
-			public const int mtrl_btn_transparent_bg_color = 2131034217;
+			public const int mtrl_btn_text_btn_ripple_color = 2131034217;
 			
 			// aapt resource value: 0x7F05006A
-			public const int mtrl_chip_background_color = 2131034218;
+			public const int mtrl_btn_text_color_disabled = 2131034218;
 			
 			// aapt resource value: 0x7F05006B
-			public const int mtrl_chip_close_icon_tint = 2131034219;
+			public const int mtrl_btn_text_color_selector = 2131034219;
 			
 			// aapt resource value: 0x7F05006C
-			public const int mtrl_chip_ripple_color = 2131034220;
+			public const int mtrl_btn_transparent_bg_color = 2131034220;
 			
 			// aapt resource value: 0x7F05006D
-			public const int mtrl_chip_text_color = 2131034221;
+			public const int mtrl_chip_background_color = 2131034221;
 			
 			// aapt resource value: 0x7F05006E
-			public const int mtrl_fab_ripple_color = 2131034222;
+			public const int mtrl_chip_close_icon_tint = 2131034222;
 			
 			// aapt resource value: 0x7F05006F
-			public const int mtrl_scrim_color = 2131034223;
+			public const int mtrl_chip_ripple_color = 2131034223;
 			
 			// aapt resource value: 0x7F050070
-			public const int mtrl_tabs_colored_ripple_color = 2131034224;
+			public const int mtrl_chip_text_color = 2131034224;
 			
 			// aapt resource value: 0x7F050071
-			public const int mtrl_tabs_icon_color_selector = 2131034225;
+			public const int mtrl_fab_ripple_color = 2131034225;
 			
 			// aapt resource value: 0x7F050072
-			public const int mtrl_tabs_icon_color_selector_colored = 2131034226;
+			public const int mtrl_scrim_color = 2131034226;
 			
 			// aapt resource value: 0x7F050073
-			public const int mtrl_tabs_legacy_text_color_selector = 2131034227;
+			public const int mtrl_tabs_colored_ripple_color = 2131034227;
 			
 			// aapt resource value: 0x7F050074
-			public const int mtrl_tabs_ripple_color = 2131034228;
-			
-			// aapt resource value: 0x7F050076
-			public const int mtrl_textinput_default_box_stroke_color = 2131034230;
-			
-			// aapt resource value: 0x7F050077
-			public const int mtrl_textinput_disabled_color = 2131034231;
-			
-			// aapt resource value: 0x7F050078
-			public const int mtrl_textinput_filled_box_default_background_color = 2131034232;
-			
-			// aapt resource value: 0x7F050079
-			public const int mtrl_textinput_hovered_box_stroke_color = 2131034233;
+			public const int mtrl_tabs_icon_color_selector = 2131034228;
 			
 			// aapt resource value: 0x7F050075
-			public const int mtrl_text_btn_text_color_selector = 2131034229;
+			public const int mtrl_tabs_icon_color_selector_colored = 2131034229;
+			
+			// aapt resource value: 0x7F050076
+			public const int mtrl_tabs_legacy_text_color_selector = 2131034230;
+			
+			// aapt resource value: 0x7F050077
+			public const int mtrl_tabs_ripple_color = 2131034231;
+			
+			// aapt resource value: 0x7F050079
+			public const int mtrl_textinput_default_box_stroke_color = 2131034233;
 			
 			// aapt resource value: 0x7F05007A
-			public const int notification_action_color_filter = 2131034234;
+			public const int mtrl_textinput_disabled_color = 2131034234;
 			
 			// aapt resource value: 0x7F05007B
-			public const int notification_icon_bg_color = 2131034235;
+			public const int mtrl_textinput_filled_box_default_background_color = 2131034235;
 			
 			// aapt resource value: 0x7F05007C
-			public const int notification_material_background_media_default_color = 2131034236;
+			public const int mtrl_textinput_hovered_box_stroke_color = 2131034236;
+			
+			// aapt resource value: 0x7F050078
+			public const int mtrl_text_btn_text_color_selector = 2131034232;
 			
 			// aapt resource value: 0x7F05007D
-			public const int primary_dark_material_dark = 2131034237;
+			public const int notification_action_color_filter = 2131034237;
 			
 			// aapt resource value: 0x7F05007E
-			public const int primary_dark_material_light = 2131034238;
+			public const int notification_icon_bg_color = 2131034238;
 			
 			// aapt resource value: 0x7F05007F
-			public const int primary_material_dark = 2131034239;
+			public const int notification_material_background_media_default_color = 2131034239;
 			
 			// aapt resource value: 0x7F050080
-			public const int primary_material_light = 2131034240;
+			public const int primary_dark_material_dark = 2131034240;
 			
 			// aapt resource value: 0x7F050081
-			public const int primary_text_default_material_dark = 2131034241;
+			public const int primary_dark_material_light = 2131034241;
 			
 			// aapt resource value: 0x7F050082
-			public const int primary_text_default_material_light = 2131034242;
+			public const int primary_material_dark = 2131034242;
 			
 			// aapt resource value: 0x7F050083
-			public const int primary_text_disabled_material_dark = 2131034243;
+			public const int primary_material_light = 2131034243;
 			
 			// aapt resource value: 0x7F050084
-			public const int primary_text_disabled_material_light = 2131034244;
+			public const int primary_text_default_material_dark = 2131034244;
 			
 			// aapt resource value: 0x7F050085
-			public const int ripple_material_dark = 2131034245;
+			public const int primary_text_default_material_light = 2131034245;
 			
 			// aapt resource value: 0x7F050086
-			public const int ripple_material_light = 2131034246;
+			public const int primary_text_disabled_material_dark = 2131034246;
 			
 			// aapt resource value: 0x7F050087
-			public const int secondary_text_default_material_dark = 2131034247;
+			public const int primary_text_disabled_material_light = 2131034247;
 			
 			// aapt resource value: 0x7F050088
-			public const int secondary_text_default_material_light = 2131034248;
+			public const int ripple_material_dark = 2131034248;
 			
 			// aapt resource value: 0x7F050089
-			public const int secondary_text_disabled_material_dark = 2131034249;
+			public const int ripple_material_light = 2131034249;
 			
 			// aapt resource value: 0x7F05008A
-			public const int secondary_text_disabled_material_light = 2131034250;
+			public const int secondary_text_default_material_dark = 2131034250;
 			
 			// aapt resource value: 0x7F05008B
-			public const int switch_thumb_disabled_material_dark = 2131034251;
+			public const int secondary_text_default_material_light = 2131034251;
 			
 			// aapt resource value: 0x7F05008C
-			public const int switch_thumb_disabled_material_light = 2131034252;
+			public const int secondary_text_disabled_material_dark = 2131034252;
 			
 			// aapt resource value: 0x7F05008D
-			public const int switch_thumb_material_dark = 2131034253;
+			public const int secondary_text_disabled_material_light = 2131034253;
 			
 			// aapt resource value: 0x7F05008E
-			public const int switch_thumb_material_light = 2131034254;
+			public const int switch_thumb_disabled_material_dark = 2131034254;
 			
 			// aapt resource value: 0x7F05008F
-			public const int switch_thumb_normal_material_dark = 2131034255;
+			public const int switch_thumb_disabled_material_light = 2131034255;
 			
 			// aapt resource value: 0x7F050090
-			public const int switch_thumb_normal_material_light = 2131034256;
+			public const int switch_thumb_material_dark = 2131034256;
 			
 			// aapt resource value: 0x7F050091
-			public const int tooltip_background_dark = 2131034257;
+			public const int switch_thumb_material_light = 2131034257;
 			
 			// aapt resource value: 0x7F050092
-			public const int tooltip_background_light = 2131034258;
+			public const int switch_thumb_normal_material_dark = 2131034258;
+			
+			// aapt resource value: 0x7F050093
+			public const int switch_thumb_normal_material_light = 2131034259;
+			
+			// aapt resource value: 0x7F050094
+			public const int tooltip_background_dark = 2131034260;
+			
+			// aapt resource value: 0x7F050095
+			public const int tooltip_background_light = 2131034261;
 			
 			static Color()
 			{
@@ -14736,440 +17835,449 @@ namespace Shiny.Device.Tests.Droid
 			// aapt resource value: 0x7F080077
 			public const int forever = 2131230839;
 			
+			// aapt resource value: 0x7F080078
+			public const int fragment_container_view_tag = 2131230840;
+			
 			// aapt resource value: 0x7F080002
 			public const int FUNCTION = 2131230722;
 			
-			// aapt resource value: 0x7F080078
-			public const int ghost_view = 2131230840;
-			
 			// aapt resource value: 0x7F080079
-			public const int ghost_view_holder = 2131230841;
+			public const int ghost_view = 2131230841;
 			
 			// aapt resource value: 0x7F08007A
-			public const int group_divider = 2131230842;
+			public const int ghost_view_holder = 2131230842;
 			
 			// aapt resource value: 0x7F08007B
-			public const int home = 2131230843;
+			public const int group_divider = 2131230843;
 			
 			// aapt resource value: 0x7F08007C
-			public const int homeAsUp = 2131230844;
+			public const int home = 2131230844;
 			
 			// aapt resource value: 0x7F08007D
-			public const int icon = 2131230845;
+			public const int homeAsUp = 2131230845;
 			
 			// aapt resource value: 0x7F08007E
-			public const int icon_group = 2131230846;
+			public const int icon = 2131230846;
 			
 			// aapt resource value: 0x7F08007F
-			public const int icon_only = 2131230847;
+			public const int icon_group = 2131230847;
 			
 			// aapt resource value: 0x7F080080
-			public const int ifRoom = 2131230848;
+			public const int icon_only = 2131230848;
 			
 			// aapt resource value: 0x7F080081
-			public const int image = 2131230849;
+			public const int ifRoom = 2131230849;
 			
 			// aapt resource value: 0x7F080082
-			public const int info = 2131230850;
+			public const int image = 2131230850;
 			
 			// aapt resource value: 0x7F080083
-			public const int italic = 2131230851;
+			public const int info = 2131230851;
 			
 			// aapt resource value: 0x7F080084
-			public const int item_touch_helper_previous_elevation = 2131230852;
+			public const int italic = 2131230852;
 			
 			// aapt resource value: 0x7F080085
-			public const int labeled = 2131230853;
+			public const int item_touch_helper_previous_elevation = 2131230853;
 			
 			// aapt resource value: 0x7F080086
-			public const int largeLabel = 2131230854;
+			public const int labeled = 2131230854;
 			
 			// aapt resource value: 0x7F080087
-			public const int left = 2131230855;
+			public const int largeLabel = 2131230855;
 			
 			// aapt resource value: 0x7F080088
-			public const int light = 2131230856;
+			public const int left = 2131230856;
 			
 			// aapt resource value: 0x7F080089
-			public const int line1 = 2131230857;
+			public const int light = 2131230857;
 			
 			// aapt resource value: 0x7F08008A
-			public const int line3 = 2131230858;
+			public const int line1 = 2131230858;
 			
 			// aapt resource value: 0x7F08008B
-			public const int listMode = 2131230859;
+			public const int line3 = 2131230859;
 			
 			// aapt resource value: 0x7F08008C
-			public const int list_item = 2131230860;
+			public const int listMode = 2131230860;
 			
 			// aapt resource value: 0x7F08008D
-			public const int loadingImage = 2131230861;
+			public const int list_item = 2131230861;
 			
 			// aapt resource value: 0x7F08008E
-			public const int loadingProgressBar = 2131230862;
+			public const int loadingImage = 2131230862;
 			
 			// aapt resource value: 0x7F08008F
-			public const int loadingProgressWheel = 2131230863;
+			public const int loadingProgressBar = 2131230863;
 			
 			// aapt resource value: 0x7F080090
-			public const int main_appbar = 2131230864;
+			public const int loadingProgressWheel = 2131230864;
 			
 			// aapt resource value: 0x7F080091
-			public const int main_tablayout = 2131230865;
+			public const int main_appbar = 2131230865;
 			
 			// aapt resource value: 0x7F080092
-			public const int main_toolbar = 2131230866;
+			public const int main_tablayout = 2131230866;
 			
 			// aapt resource value: 0x7F080093
-			public const int main_viewpager = 2131230867;
+			public const int main_toolbar = 2131230867;
 			
 			// aapt resource value: 0x7F080094
-			public const int masked = 2131230868;
+			public const int main_viewpager = 2131230868;
 			
 			// aapt resource value: 0x7F080095
-			public const int media_actions = 2131230869;
+			public const int masked = 2131230869;
 			
 			// aapt resource value: 0x7F080096
-			public const int message = 2131230870;
+			public const int media_actions = 2131230870;
+			
+			// aapt resource value: 0x7F080097
+			public const int message = 2131230871;
 			
 			// aapt resource value: 0x7F080003
 			public const int META = 2131230723;
 			
-			// aapt resource value: 0x7F080097
-			public const int middle = 2131230871;
-			
 			// aapt resource value: 0x7F080098
-			public const int mini = 2131230872;
+			public const int middle = 2131230872;
 			
 			// aapt resource value: 0x7F080099
-			public const int mtrl_child_content_container = 2131230873;
+			public const int mini = 2131230873;
 			
 			// aapt resource value: 0x7F08009A
-			public const int mtrl_internal_children_alpha_tag = 2131230874;
+			public const int mtrl_child_content_container = 2131230874;
 			
 			// aapt resource value: 0x7F08009B
-			public const int multiply = 2131230875;
+			public const int mtrl_internal_children_alpha_tag = 2131230875;
 			
 			// aapt resource value: 0x7F08009C
-			public const int navigation_header_container = 2131230876;
+			public const int multiply = 2131230876;
 			
 			// aapt resource value: 0x7F08009D
-			public const int never = 2131230877;
+			public const int navigation_header_container = 2131230877;
 			
 			// aapt resource value: 0x7F08009E
-			public const int none = 2131230878;
+			public const int never = 2131230878;
 			
 			// aapt resource value: 0x7F08009F
-			public const int normal = 2131230879;
+			public const int none = 2131230879;
 			
 			// aapt resource value: 0x7F0800A0
-			public const int notification_background = 2131230880;
+			public const int normal = 2131230880;
 			
 			// aapt resource value: 0x7F0800A1
-			public const int notification_main_column = 2131230881;
+			public const int notification_background = 2131230881;
 			
 			// aapt resource value: 0x7F0800A2
-			public const int notification_main_column_container = 2131230882;
+			public const int notification_main_column = 2131230882;
 			
 			// aapt resource value: 0x7F0800A3
-			public const int off = 2131230883;
+			public const int notification_main_column_container = 2131230883;
 			
 			// aapt resource value: 0x7F0800A4
-			public const int on = 2131230884;
+			public const int off = 2131230884;
 			
 			// aapt resource value: 0x7F0800A5
-			public const int outline = 2131230885;
+			public const int on = 2131230885;
 			
 			// aapt resource value: 0x7F0800A6
-			public const int parallax = 2131230886;
+			public const int outline = 2131230886;
 			
 			// aapt resource value: 0x7F0800A7
-			public const int parentPanel = 2131230887;
+			public const int parallax = 2131230887;
 			
 			// aapt resource value: 0x7F0800A8
-			public const int parent_matrix = 2131230888;
+			public const int parentPanel = 2131230888;
 			
 			// aapt resource value: 0x7F0800A9
-			public const int pin = 2131230889;
+			public const int parent_matrix = 2131230889;
 			
 			// aapt resource value: 0x7F0800AA
-			public const int progress_circular = 2131230890;
+			public const int pin = 2131230890;
 			
 			// aapt resource value: 0x7F0800AB
-			public const int progress_horizontal = 2131230891;
+			public const int progress_circular = 2131230891;
 			
 			// aapt resource value: 0x7F0800AC
-			public const int radio = 2131230892;
+			public const int progress_horizontal = 2131230892;
 			
 			// aapt resource value: 0x7F0800AD
-			public const int right = 2131230893;
+			public const int radio = 2131230893;
 			
 			// aapt resource value: 0x7F0800AE
-			public const int right_icon = 2131230894;
+			public const int right = 2131230894;
 			
 			// aapt resource value: 0x7F0800AF
-			public const int right_side = 2131230895;
+			public const int right_icon = 2131230895;
 			
 			// aapt resource value: 0x7F0800B0
-			public const int save_non_transition_alpha = 2131230896;
+			public const int right_side = 2131230896;
 			
 			// aapt resource value: 0x7F0800B1
-			public const int save_overlay_view = 2131230897;
+			public const int save_non_transition_alpha = 2131230897;
 			
 			// aapt resource value: 0x7F0800B2
-			public const int screen = 2131230898;
+			public const int save_overlay_view = 2131230898;
 			
 			// aapt resource value: 0x7F0800B3
-			public const int scroll = 2131230899;
-			
-			// aapt resource value: 0x7F0800B7
-			public const int scrollable = 2131230903;
+			public const int screen = 2131230899;
 			
 			// aapt resource value: 0x7F0800B4
-			public const int scrollIndicatorDown = 2131230900;
-			
-			// aapt resource value: 0x7F0800B5
-			public const int scrollIndicatorUp = 2131230901;
-			
-			// aapt resource value: 0x7F0800B6
-			public const int scrollView = 2131230902;
+			public const int scroll = 2131230900;
 			
 			// aapt resource value: 0x7F0800B8
-			public const int search_badge = 2131230904;
+			public const int scrollable = 2131230904;
+			
+			// aapt resource value: 0x7F0800B5
+			public const int scrollIndicatorDown = 2131230901;
+			
+			// aapt resource value: 0x7F0800B6
+			public const int scrollIndicatorUp = 2131230902;
+			
+			// aapt resource value: 0x7F0800B7
+			public const int scrollView = 2131230903;
 			
 			// aapt resource value: 0x7F0800B9
-			public const int search_bar = 2131230905;
+			public const int search_badge = 2131230905;
 			
 			// aapt resource value: 0x7F0800BA
-			public const int search_button = 2131230906;
+			public const int search_bar = 2131230906;
 			
 			// aapt resource value: 0x7F0800BB
-			public const int search_close_btn = 2131230907;
+			public const int search_button = 2131230907;
 			
 			// aapt resource value: 0x7F0800BC
-			public const int search_edit_frame = 2131230908;
+			public const int search_close_btn = 2131230908;
 			
 			// aapt resource value: 0x7F0800BD
-			public const int search_go_btn = 2131230909;
+			public const int search_edit_frame = 2131230909;
 			
 			// aapt resource value: 0x7F0800BE
-			public const int search_mag_icon = 2131230910;
+			public const int search_go_btn = 2131230910;
 			
 			// aapt resource value: 0x7F0800BF
-			public const int search_plate = 2131230911;
+			public const int search_mag_icon = 2131230911;
 			
 			// aapt resource value: 0x7F0800C0
-			public const int search_src_text = 2131230912;
+			public const int search_plate = 2131230912;
 			
 			// aapt resource value: 0x7F0800C1
-			public const int search_voice_btn = 2131230913;
-			
-			// aapt resource value: 0x7F0800C3
-			public const int selected = 2131230915;
+			public const int search_src_text = 2131230913;
 			
 			// aapt resource value: 0x7F0800C2
-			public const int select_dialog_listview = 2131230914;
+			public const int search_voice_btn = 2131230914;
 			
 			// aapt resource value: 0x7F0800C4
-			public const int shellcontent_appbar = 2131230916;
+			public const int selected = 2131230916;
+			
+			// aapt resource value: 0x7F0800C3
+			public const int select_dialog_listview = 2131230915;
 			
 			// aapt resource value: 0x7F0800C5
-			public const int shellcontent_toolbar = 2131230917;
+			public const int shellcontent_appbar = 2131230917;
+			
+			// aapt resource value: 0x7F0800C6
+			public const int shellcontent_toolbar = 2131230918;
 			
 			// aapt resource value: 0x7F080004
 			public const int SHIFT = 2131230724;
 			
-			// aapt resource value: 0x7F0800C6
-			public const int shortcut = 2131230918;
-			
 			// aapt resource value: 0x7F0800C7
-			public const int showCustom = 2131230919;
+			public const int shortcut = 2131230919;
 			
 			// aapt resource value: 0x7F0800C8
-			public const int showHome = 2131230920;
+			public const int showCustom = 2131230920;
 			
 			// aapt resource value: 0x7F0800C9
-			public const int showTitle = 2131230921;
+			public const int showHome = 2131230921;
 			
 			// aapt resource value: 0x7F0800CA
-			public const int sliding_tabs = 2131230922;
+			public const int showTitle = 2131230922;
 			
 			// aapt resource value: 0x7F0800CB
-			public const int smallLabel = 2131230923;
+			public const int sliding_tabs = 2131230923;
 			
 			// aapt resource value: 0x7F0800CC
-			public const int snackbar_action = 2131230924;
+			public const int smallLabel = 2131230924;
 			
 			// aapt resource value: 0x7F0800CD
-			public const int snackbar_text = 2131230925;
+			public const int snackbar_action = 2131230925;
 			
 			// aapt resource value: 0x7F0800CE
-			public const int snap = 2131230926;
+			public const int snackbar_text = 2131230926;
 			
 			// aapt resource value: 0x7F0800CF
-			public const int snapMargins = 2131230927;
+			public const int snap = 2131230927;
 			
 			// aapt resource value: 0x7F0800D0
-			public const int spacer = 2131230928;
+			public const int snapMargins = 2131230928;
 			
 			// aapt resource value: 0x7F0800D1
-			public const int split_action_bar = 2131230929;
+			public const int spacer = 2131230929;
 			
 			// aapt resource value: 0x7F0800D2
-			public const int src_atop = 2131230930;
+			public const int split_action_bar = 2131230930;
 			
 			// aapt resource value: 0x7F0800D3
-			public const int src_in = 2131230931;
+			public const int src_atop = 2131230931;
 			
 			// aapt resource value: 0x7F0800D4
-			public const int src_over = 2131230932;
+			public const int src_in = 2131230932;
 			
 			// aapt resource value: 0x7F0800D5
-			public const int standard = 2131230933;
+			public const int src_over = 2131230933;
 			
 			// aapt resource value: 0x7F0800D6
-			public const int start = 2131230934;
+			public const int standard = 2131230934;
 			
 			// aapt resource value: 0x7F0800D7
-			public const int status_bar_latest_event_content = 2131230935;
+			public const int start = 2131230935;
 			
 			// aapt resource value: 0x7F0800D8
-			public const int stretch = 2131230936;
+			public const int status_bar_latest_event_content = 2131230936;
 			
 			// aapt resource value: 0x7F0800D9
-			public const int submenuarrow = 2131230937;
+			public const int stretch = 2131230937;
 			
 			// aapt resource value: 0x7F0800DA
-			public const int submit_area = 2131230938;
+			public const int submenuarrow = 2131230938;
+			
+			// aapt resource value: 0x7F0800DB
+			public const int submit_area = 2131230939;
 			
 			// aapt resource value: 0x7F080005
 			public const int SYM = 2131230725;
 			
-			// aapt resource value: 0x7F0800DB
-			public const int tabMode = 2131230939;
-			
 			// aapt resource value: 0x7F0800DC
-			public const int tag_accessibility_actions = 2131230940;
+			public const int tabMode = 2131230940;
 			
 			// aapt resource value: 0x7F0800DD
-			public const int tag_accessibility_clickable_spans = 2131230941;
+			public const int tag_accessibility_actions = 2131230941;
 			
 			// aapt resource value: 0x7F0800DE
-			public const int tag_accessibility_heading = 2131230942;
+			public const int tag_accessibility_clickable_spans = 2131230942;
 			
 			// aapt resource value: 0x7F0800DF
-			public const int tag_accessibility_pane_title = 2131230943;
+			public const int tag_accessibility_heading = 2131230943;
 			
 			// aapt resource value: 0x7F0800E0
-			public const int tag_screen_reader_focusable = 2131230944;
+			public const int tag_accessibility_pane_title = 2131230944;
 			
 			// aapt resource value: 0x7F0800E1
-			public const int tag_transition_group = 2131230945;
+			public const int tag_screen_reader_focusable = 2131230945;
 			
 			// aapt resource value: 0x7F0800E2
-			public const int tag_unhandled_key_event_manager = 2131230946;
+			public const int tag_transition_group = 2131230946;
 			
 			// aapt resource value: 0x7F0800E3
-			public const int tag_unhandled_key_listeners = 2131230947;
+			public const int tag_unhandled_key_event_manager = 2131230947;
 			
 			// aapt resource value: 0x7F0800E4
-			public const int text = 2131230948;
+			public const int tag_unhandled_key_listeners = 2131230948;
 			
 			// aapt resource value: 0x7F0800E5
-			public const int text2 = 2131230949;
-			
-			// aapt resource value: 0x7F0800EB
-			public const int textinput_counter = 2131230955;
-			
-			// aapt resource value: 0x7F0800EC
-			public const int textinput_error = 2131230956;
-			
-			// aapt resource value: 0x7F0800ED
-			public const int textinput_helper_text = 2131230957;
+			public const int text = 2131230949;
 			
 			// aapt resource value: 0x7F0800E6
-			public const int textSpacerNoButtons = 2131230950;
+			public const int text2 = 2131230950;
 			
-			// aapt resource value: 0x7F0800E7
-			public const int textSpacerNoTitle = 2131230951;
+			// aapt resource value: 0x7F0800EC
+			public const int textinput_counter = 2131230956;
 			
-			// aapt resource value: 0x7F0800E8
-			public const int textStart = 2131230952;
-			
-			// aapt resource value: 0x7F0800E9
-			public const int textViewStatus = 2131230953;
-			
-			// aapt resource value: 0x7F0800EA
-			public const int text_input_password_toggle = 2131230954;
+			// aapt resource value: 0x7F0800ED
+			public const int textinput_error = 2131230957;
 			
 			// aapt resource value: 0x7F0800EE
-			public const int time = 2131230958;
+			public const int textinput_helper_text = 2131230958;
+			
+			// aapt resource value: 0x7F0800E7
+			public const int textSpacerNoButtons = 2131230951;
+			
+			// aapt resource value: 0x7F0800E8
+			public const int textSpacerNoTitle = 2131230952;
+			
+			// aapt resource value: 0x7F0800E9
+			public const int textStart = 2131230953;
+			
+			// aapt resource value: 0x7F0800EA
+			public const int textViewStatus = 2131230954;
+			
+			// aapt resource value: 0x7F0800EB
+			public const int text_input_password_toggle = 2131230955;
 			
 			// aapt resource value: 0x7F0800EF
-			public const int title = 2131230959;
+			public const int time = 2131230959;
 			
 			// aapt resource value: 0x7F0800F0
-			public const int titleDividerNoCustom = 2131230960;
+			public const int title = 2131230960;
 			
 			// aapt resource value: 0x7F0800F1
-			public const int title_template = 2131230961;
+			public const int titleDividerNoCustom = 2131230961;
 			
 			// aapt resource value: 0x7F0800F2
-			public const int toolbar = 2131230962;
+			public const int title_template = 2131230962;
 			
 			// aapt resource value: 0x7F0800F3
-			public const int top = 2131230963;
+			public const int toolbar = 2131230963;
 			
 			// aapt resource value: 0x7F0800F4
-			public const int topPanel = 2131230964;
+			public const int top = 2131230964;
 			
 			// aapt resource value: 0x7F0800F5
-			public const int touch_outside = 2131230965;
+			public const int topPanel = 2131230965;
 			
 			// aapt resource value: 0x7F0800F6
-			public const int transition_current_scene = 2131230966;
+			public const int touch_outside = 2131230966;
 			
 			// aapt resource value: 0x7F0800F7
-			public const int transition_layout_save = 2131230967;
+			public const int transition_current_scene = 2131230967;
 			
 			// aapt resource value: 0x7F0800F8
-			public const int transition_position = 2131230968;
+			public const int transition_layout_save = 2131230968;
 			
 			// aapt resource value: 0x7F0800F9
-			public const int transition_scene_layoutid_cache = 2131230969;
+			public const int transition_position = 2131230969;
 			
 			// aapt resource value: 0x7F0800FA
-			public const int transition_transform = 2131230970;
+			public const int transition_scene_layoutid_cache = 2131230970;
 			
 			// aapt resource value: 0x7F0800FB
-			public const int @unchecked = 2131230971;
+			public const int transition_transform = 2131230971;
 			
 			// aapt resource value: 0x7F0800FC
-			public const int uniform = 2131230972;
+			public const int @unchecked = 2131230972;
 			
 			// aapt resource value: 0x7F0800FD
-			public const int unlabeled = 2131230973;
+			public const int uniform = 2131230973;
 			
 			// aapt resource value: 0x7F0800FE
-			public const int up = 2131230974;
+			public const int unlabeled = 2131230974;
 			
 			// aapt resource value: 0x7F0800FF
-			public const int useLogo = 2131230975;
+			public const int up = 2131230975;
 			
 			// aapt resource value: 0x7F080100
-			public const int view_offset_helper = 2131230976;
+			public const int useLogo = 2131230976;
 			
 			// aapt resource value: 0x7F080101
-			public const int visible = 2131230977;
+			public const int view_offset_helper = 2131230977;
 			
 			// aapt resource value: 0x7F080102
-			public const int wide = 2131230978;
+			public const int view_tree_saved_state_registry_owner = 2131230978;
 			
 			// aapt resource value: 0x7F080103
-			public const int withText = 2131230979;
+			public const int visible = 2131230979;
 			
 			// aapt resource value: 0x7F080104
-			public const int wrap_content = 2131230980;
+			public const int visible_removing_fragment_view_tag = 2131230980;
+			
+			// aapt resource value: 0x7F080105
+			public const int wide = 2131230981;
+			
+			// aapt resource value: 0x7F080106
+			public const int withText = 2131230982;
+			
+			// aapt resource value: 0x7F080107
+			public const int wrap_content = 2131230983;
 			
 			static Id()
 			{
@@ -15723,25 +18831,28 @@ namespace Shiny.Device.Tests.Droid
 			public const int mtrl_chip_close_icon_content_description = 2131558454;
 			
 			// aapt resource value: 0x7F0D0037
-			public const int password_toggle_content_description = 2131558455;
+			public const int overflow_tab_title = 2131558455;
 			
 			// aapt resource value: 0x7F0D0038
-			public const int path_password_eye = 2131558456;
+			public const int password_toggle_content_description = 2131558456;
 			
 			// aapt resource value: 0x7F0D0039
-			public const int path_password_eye_mask_strike_through = 2131558457;
+			public const int path_password_eye = 2131558457;
 			
 			// aapt resource value: 0x7F0D003A
-			public const int path_password_eye_mask_visible = 2131558458;
+			public const int path_password_eye_mask_strike_through = 2131558458;
 			
 			// aapt resource value: 0x7F0D003B
-			public const int path_password_strike_through = 2131558459;
+			public const int path_password_eye_mask_visible = 2131558459;
 			
 			// aapt resource value: 0x7F0D003C
-			public const int search_menu_title = 2131558460;
+			public const int path_password_strike_through = 2131558460;
 			
 			// aapt resource value: 0x7F0D003D
-			public const int status_bar_notification_info_overflow = 2131558461;
+			public const int search_menu_title = 2131558461;
+			
+			// aapt resource value: 0x7F0D003E
+			public const int status_bar_notification_info_overflow = 2131558462;
 			
 			static String()
 			{
@@ -16353,11 +19464,11 @@ namespace Shiny.Device.Tests.Droid
 			// aapt resource value: 0x7F0E00C6
 			public const int CardView_Light = 2131624134;
 			
-			// aapt resource value: 0x7F0E01FB
-			public const int collectionViewScrollBars = 2131624443;
-			
 			// aapt resource value: 0x7F0E01FC
-			public const int collectionViewTheme = 2131624444;
+			public const int collectionViewScrollBars = 2131624444;
+			
+			// aapt resource value: 0x7F0E01FD
+			public const int collectionViewTheme = 2131624445;
 			
 			// aapt resource value: 0x7F0E00C7
 			public const int MainTheme = 2131624135;
@@ -16710,68 +19821,68 @@ namespace Shiny.Device.Tests.Droid
 			// aapt resource value: 0x7F0E013B
 			public const int TextAppearance_Widget_AppCompat_Toolbar_Title = 2131624251;
 			
-			// aapt resource value: 0x7F0E016C
-			public const int ThemeOverlay_AppCompat = 2131624300;
-			
 			// aapt resource value: 0x7F0E016D
-			public const int ThemeOverlay_AppCompat_ActionBar = 2131624301;
+			public const int ThemeOverlay_AppCompat = 2131624301;
 			
 			// aapt resource value: 0x7F0E016E
-			public const int ThemeOverlay_AppCompat_Dark = 2131624302;
+			public const int ThemeOverlay_AppCompat_ActionBar = 2131624302;
 			
 			// aapt resource value: 0x7F0E016F
-			public const int ThemeOverlay_AppCompat_Dark_ActionBar = 2131624303;
+			public const int ThemeOverlay_AppCompat_Dark = 2131624303;
 			
 			// aapt resource value: 0x7F0E0170
-			public const int ThemeOverlay_AppCompat_DayNight = 2131624304;
+			public const int ThemeOverlay_AppCompat_Dark_ActionBar = 2131624304;
 			
 			// aapt resource value: 0x7F0E0171
-			public const int ThemeOverlay_AppCompat_DayNight_ActionBar = 2131624305;
+			public const int ThemeOverlay_AppCompat_DayNight = 2131624305;
 			
 			// aapt resource value: 0x7F0E0172
-			public const int ThemeOverlay_AppCompat_Dialog = 2131624306;
+			public const int ThemeOverlay_AppCompat_DayNight_ActionBar = 2131624306;
 			
 			// aapt resource value: 0x7F0E0173
-			public const int ThemeOverlay_AppCompat_Dialog_Alert = 2131624307;
+			public const int ThemeOverlay_AppCompat_Dialog = 2131624307;
 			
 			// aapt resource value: 0x7F0E0174
-			public const int ThemeOverlay_AppCompat_Light = 2131624308;
+			public const int ThemeOverlay_AppCompat_Dialog_Alert = 2131624308;
 			
 			// aapt resource value: 0x7F0E0175
-			public const int ThemeOverlay_MaterialComponents = 2131624309;
+			public const int ThemeOverlay_AppCompat_Light = 2131624309;
 			
 			// aapt resource value: 0x7F0E0176
-			public const int ThemeOverlay_MaterialComponents_ActionBar = 2131624310;
+			public const int ThemeOverlay_MaterialComponents = 2131624310;
 			
 			// aapt resource value: 0x7F0E0177
-			public const int ThemeOverlay_MaterialComponents_Dark = 2131624311;
+			public const int ThemeOverlay_MaterialComponents_ActionBar = 2131624311;
 			
 			// aapt resource value: 0x7F0E0178
-			public const int ThemeOverlay_MaterialComponents_Dark_ActionBar = 2131624312;
+			public const int ThemeOverlay_MaterialComponents_Dark = 2131624312;
 			
 			// aapt resource value: 0x7F0E0179
-			public const int ThemeOverlay_MaterialComponents_Dialog = 2131624313;
+			public const int ThemeOverlay_MaterialComponents_Dark_ActionBar = 2131624313;
 			
 			// aapt resource value: 0x7F0E017A
-			public const int ThemeOverlay_MaterialComponents_Dialog_Alert = 2131624314;
+			public const int ThemeOverlay_MaterialComponents_Dialog = 2131624314;
 			
 			// aapt resource value: 0x7F0E017B
-			public const int ThemeOverlay_MaterialComponents_Light = 2131624315;
+			public const int ThemeOverlay_MaterialComponents_Dialog_Alert = 2131624315;
 			
 			// aapt resource value: 0x7F0E017C
-			public const int ThemeOverlay_MaterialComponents_TextInputEditText = 2131624316;
+			public const int ThemeOverlay_MaterialComponents_Light = 2131624316;
 			
 			// aapt resource value: 0x7F0E017D
-			public const int ThemeOverlay_MaterialComponents_TextInputEditText_FilledBox = 2131624317;
+			public const int ThemeOverlay_MaterialComponents_TextInputEditText = 2131624317;
 			
 			// aapt resource value: 0x7F0E017E
-			public const int ThemeOverlay_MaterialComponents_TextInputEditText_FilledBox_Dense = 2131624318;
+			public const int ThemeOverlay_MaterialComponents_TextInputEditText_FilledBox = 2131624318;
 			
 			// aapt resource value: 0x7F0E017F
-			public const int ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox = 2131624319;
+			public const int ThemeOverlay_MaterialComponents_TextInputEditText_FilledBox_Dense = 2131624319;
 			
 			// aapt resource value: 0x7F0E0180
-			public const int ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox_Dense = 2131624320;
+			public const int ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox = 2131624320;
+			
+			// aapt resource value: 0x7F0E0181
+			public const int ThemeOverlay_MaterialComponents_TextInputEditText_OutlinedBox_Dense = 2131624321;
 			
 			// aapt resource value: 0x7F0E013C
 			public const int Theme_AppCompat = 2131624252;
@@ -16813,475 +19924,478 @@ namespace Shiny.Device.Tests.Droid
 			public const int Theme_AppCompat_Dialog_MinWidth = 2131624263;
 			
 			// aapt resource value: 0x7F0E0149
-			public const int Theme_AppCompat_Light = 2131624265;
+			public const int Theme_AppCompat_Empty = 2131624265;
 			
 			// aapt resource value: 0x7F0E014A
-			public const int Theme_AppCompat_Light_DarkActionBar = 2131624266;
+			public const int Theme_AppCompat_Light = 2131624266;
 			
 			// aapt resource value: 0x7F0E014B
-			public const int Theme_AppCompat_Light_Dialog = 2131624267;
-			
-			// aapt resource value: 0x7F0E014E
-			public const int Theme_AppCompat_Light_DialogWhenLarge = 2131624270;
+			public const int Theme_AppCompat_Light_DarkActionBar = 2131624267;
 			
 			// aapt resource value: 0x7F0E014C
-			public const int Theme_AppCompat_Light_Dialog_Alert = 2131624268;
-			
-			// aapt resource value: 0x7F0E014D
-			public const int Theme_AppCompat_Light_Dialog_MinWidth = 2131624269;
+			public const int Theme_AppCompat_Light_Dialog = 2131624268;
 			
 			// aapt resource value: 0x7F0E014F
-			public const int Theme_AppCompat_Light_NoActionBar = 2131624271;
+			public const int Theme_AppCompat_Light_DialogWhenLarge = 2131624271;
+			
+			// aapt resource value: 0x7F0E014D
+			public const int Theme_AppCompat_Light_Dialog_Alert = 2131624269;
+			
+			// aapt resource value: 0x7F0E014E
+			public const int Theme_AppCompat_Light_Dialog_MinWidth = 2131624270;
 			
 			// aapt resource value: 0x7F0E0150
-			public const int Theme_AppCompat_NoActionBar = 2131624272;
+			public const int Theme_AppCompat_Light_NoActionBar = 2131624272;
 			
 			// aapt resource value: 0x7F0E0151
-			public const int Theme_Design = 2131624273;
+			public const int Theme_AppCompat_NoActionBar = 2131624273;
 			
 			// aapt resource value: 0x7F0E0152
-			public const int Theme_Design_BottomSheetDialog = 2131624274;
+			public const int Theme_Design = 2131624274;
 			
 			// aapt resource value: 0x7F0E0153
-			public const int Theme_Design_Light = 2131624275;
+			public const int Theme_Design_BottomSheetDialog = 2131624275;
 			
 			// aapt resource value: 0x7F0E0154
-			public const int Theme_Design_Light_BottomSheetDialog = 2131624276;
+			public const int Theme_Design_Light = 2131624276;
 			
 			// aapt resource value: 0x7F0E0155
-			public const int Theme_Design_Light_NoActionBar = 2131624277;
+			public const int Theme_Design_Light_BottomSheetDialog = 2131624277;
 			
 			// aapt resource value: 0x7F0E0156
-			public const int Theme_Design_NoActionBar = 2131624278;
+			public const int Theme_Design_Light_NoActionBar = 2131624278;
 			
 			// aapt resource value: 0x7F0E0157
-			public const int Theme_MaterialComponents = 2131624279;
+			public const int Theme_Design_NoActionBar = 2131624279;
 			
 			// aapt resource value: 0x7F0E0158
-			public const int Theme_MaterialComponents_BottomSheetDialog = 2131624280;
+			public const int Theme_MaterialComponents = 2131624280;
 			
 			// aapt resource value: 0x7F0E0159
-			public const int Theme_MaterialComponents_Bridge = 2131624281;
+			public const int Theme_MaterialComponents_BottomSheetDialog = 2131624281;
 			
 			// aapt resource value: 0x7F0E015A
-			public const int Theme_MaterialComponents_CompactMenu = 2131624282;
+			public const int Theme_MaterialComponents_Bridge = 2131624282;
 			
 			// aapt resource value: 0x7F0E015B
-			public const int Theme_MaterialComponents_Dialog = 2131624283;
-			
-			// aapt resource value: 0x7F0E015E
-			public const int Theme_MaterialComponents_DialogWhenLarge = 2131624286;
+			public const int Theme_MaterialComponents_CompactMenu = 2131624283;
 			
 			// aapt resource value: 0x7F0E015C
-			public const int Theme_MaterialComponents_Dialog_Alert = 2131624284;
-			
-			// aapt resource value: 0x7F0E015D
-			public const int Theme_MaterialComponents_Dialog_MinWidth = 2131624285;
+			public const int Theme_MaterialComponents_Dialog = 2131624284;
 			
 			// aapt resource value: 0x7F0E015F
-			public const int Theme_MaterialComponents_Light = 2131624287;
+			public const int Theme_MaterialComponents_DialogWhenLarge = 2131624287;
+			
+			// aapt resource value: 0x7F0E015D
+			public const int Theme_MaterialComponents_Dialog_Alert = 2131624285;
+			
+			// aapt resource value: 0x7F0E015E
+			public const int Theme_MaterialComponents_Dialog_MinWidth = 2131624286;
 			
 			// aapt resource value: 0x7F0E0160
-			public const int Theme_MaterialComponents_Light_BottomSheetDialog = 2131624288;
+			public const int Theme_MaterialComponents_Light = 2131624288;
 			
 			// aapt resource value: 0x7F0E0161
-			public const int Theme_MaterialComponents_Light_Bridge = 2131624289;
+			public const int Theme_MaterialComponents_Light_BottomSheetDialog = 2131624289;
 			
 			// aapt resource value: 0x7F0E0162
-			public const int Theme_MaterialComponents_Light_DarkActionBar = 2131624290;
+			public const int Theme_MaterialComponents_Light_Bridge = 2131624290;
 			
 			// aapt resource value: 0x7F0E0163
-			public const int Theme_MaterialComponents_Light_DarkActionBar_Bridge = 2131624291;
+			public const int Theme_MaterialComponents_Light_DarkActionBar = 2131624291;
 			
 			// aapt resource value: 0x7F0E0164
-			public const int Theme_MaterialComponents_Light_Dialog = 2131624292;
-			
-			// aapt resource value: 0x7F0E0167
-			public const int Theme_MaterialComponents_Light_DialogWhenLarge = 2131624295;
+			public const int Theme_MaterialComponents_Light_DarkActionBar_Bridge = 2131624292;
 			
 			// aapt resource value: 0x7F0E0165
-			public const int Theme_MaterialComponents_Light_Dialog_Alert = 2131624293;
-			
-			// aapt resource value: 0x7F0E0166
-			public const int Theme_MaterialComponents_Light_Dialog_MinWidth = 2131624294;
+			public const int Theme_MaterialComponents_Light_Dialog = 2131624293;
 			
 			// aapt resource value: 0x7F0E0168
-			public const int Theme_MaterialComponents_Light_NoActionBar = 2131624296;
+			public const int Theme_MaterialComponents_Light_DialogWhenLarge = 2131624296;
+			
+			// aapt resource value: 0x7F0E0166
+			public const int Theme_MaterialComponents_Light_Dialog_Alert = 2131624294;
+			
+			// aapt resource value: 0x7F0E0167
+			public const int Theme_MaterialComponents_Light_Dialog_MinWidth = 2131624295;
 			
 			// aapt resource value: 0x7F0E0169
-			public const int Theme_MaterialComponents_Light_NoActionBar_Bridge = 2131624297;
+			public const int Theme_MaterialComponents_Light_NoActionBar = 2131624297;
 			
 			// aapt resource value: 0x7F0E016A
-			public const int Theme_MaterialComponents_NoActionBar = 2131624298;
+			public const int Theme_MaterialComponents_Light_NoActionBar_Bridge = 2131624298;
 			
 			// aapt resource value: 0x7F0E016B
-			public const int Theme_MaterialComponents_NoActionBar_Bridge = 2131624299;
+			public const int Theme_MaterialComponents_NoActionBar = 2131624299;
 			
-			// aapt resource value: 0x7F0E0181
-			public const int Widget_AppCompat_ActionBar = 2131624321;
+			// aapt resource value: 0x7F0E016C
+			public const int Theme_MaterialComponents_NoActionBar_Bridge = 2131624300;
 			
 			// aapt resource value: 0x7F0E0182
-			public const int Widget_AppCompat_ActionBar_Solid = 2131624322;
+			public const int Widget_AppCompat_ActionBar = 2131624322;
 			
 			// aapt resource value: 0x7F0E0183
-			public const int Widget_AppCompat_ActionBar_TabBar = 2131624323;
+			public const int Widget_AppCompat_ActionBar_Solid = 2131624323;
 			
 			// aapt resource value: 0x7F0E0184
-			public const int Widget_AppCompat_ActionBar_TabText = 2131624324;
+			public const int Widget_AppCompat_ActionBar_TabBar = 2131624324;
 			
 			// aapt resource value: 0x7F0E0185
-			public const int Widget_AppCompat_ActionBar_TabView = 2131624325;
+			public const int Widget_AppCompat_ActionBar_TabText = 2131624325;
 			
 			// aapt resource value: 0x7F0E0186
-			public const int Widget_AppCompat_ActionButton = 2131624326;
+			public const int Widget_AppCompat_ActionBar_TabView = 2131624326;
 			
 			// aapt resource value: 0x7F0E0187
-			public const int Widget_AppCompat_ActionButton_CloseMode = 2131624327;
+			public const int Widget_AppCompat_ActionButton = 2131624327;
 			
 			// aapt resource value: 0x7F0E0188
-			public const int Widget_AppCompat_ActionButton_Overflow = 2131624328;
+			public const int Widget_AppCompat_ActionButton_CloseMode = 2131624328;
 			
 			// aapt resource value: 0x7F0E0189
-			public const int Widget_AppCompat_ActionMode = 2131624329;
+			public const int Widget_AppCompat_ActionButton_Overflow = 2131624329;
 			
 			// aapt resource value: 0x7F0E018A
-			public const int Widget_AppCompat_ActivityChooserView = 2131624330;
+			public const int Widget_AppCompat_ActionMode = 2131624330;
 			
 			// aapt resource value: 0x7F0E018B
-			public const int Widget_AppCompat_AutoCompleteTextView = 2131624331;
+			public const int Widget_AppCompat_ActivityChooserView = 2131624331;
 			
 			// aapt resource value: 0x7F0E018C
-			public const int Widget_AppCompat_Button = 2131624332;
-			
-			// aapt resource value: 0x7F0E0192
-			public const int Widget_AppCompat_ButtonBar = 2131624338;
-			
-			// aapt resource value: 0x7F0E0193
-			public const int Widget_AppCompat_ButtonBar_AlertDialog = 2131624339;
+			public const int Widget_AppCompat_AutoCompleteTextView = 2131624332;
 			
 			// aapt resource value: 0x7F0E018D
-			public const int Widget_AppCompat_Button_Borderless = 2131624333;
+			public const int Widget_AppCompat_Button = 2131624333;
 			
-			// aapt resource value: 0x7F0E018E
-			public const int Widget_AppCompat_Button_Borderless_Colored = 2131624334;
-			
-			// aapt resource value: 0x7F0E018F
-			public const int Widget_AppCompat_Button_ButtonBar_AlertDialog = 2131624335;
-			
-			// aapt resource value: 0x7F0E0190
-			public const int Widget_AppCompat_Button_Colored = 2131624336;
-			
-			// aapt resource value: 0x7F0E0191
-			public const int Widget_AppCompat_Button_Small = 2131624337;
+			// aapt resource value: 0x7F0E0193
+			public const int Widget_AppCompat_ButtonBar = 2131624339;
 			
 			// aapt resource value: 0x7F0E0194
-			public const int Widget_AppCompat_CompoundButton_CheckBox = 2131624340;
+			public const int Widget_AppCompat_ButtonBar_AlertDialog = 2131624340;
+			
+			// aapt resource value: 0x7F0E018E
+			public const int Widget_AppCompat_Button_Borderless = 2131624334;
+			
+			// aapt resource value: 0x7F0E018F
+			public const int Widget_AppCompat_Button_Borderless_Colored = 2131624335;
+			
+			// aapt resource value: 0x7F0E0190
+			public const int Widget_AppCompat_Button_ButtonBar_AlertDialog = 2131624336;
+			
+			// aapt resource value: 0x7F0E0191
+			public const int Widget_AppCompat_Button_Colored = 2131624337;
+			
+			// aapt resource value: 0x7F0E0192
+			public const int Widget_AppCompat_Button_Small = 2131624338;
 			
 			// aapt resource value: 0x7F0E0195
-			public const int Widget_AppCompat_CompoundButton_RadioButton = 2131624341;
+			public const int Widget_AppCompat_CompoundButton_CheckBox = 2131624341;
 			
 			// aapt resource value: 0x7F0E0196
-			public const int Widget_AppCompat_CompoundButton_Switch = 2131624342;
+			public const int Widget_AppCompat_CompoundButton_RadioButton = 2131624342;
 			
 			// aapt resource value: 0x7F0E0197
-			public const int Widget_AppCompat_DrawerArrowToggle = 2131624343;
+			public const int Widget_AppCompat_CompoundButton_Switch = 2131624343;
 			
 			// aapt resource value: 0x7F0E0198
-			public const int Widget_AppCompat_DropDownItem_Spinner = 2131624344;
+			public const int Widget_AppCompat_DrawerArrowToggle = 2131624344;
 			
 			// aapt resource value: 0x7F0E0199
-			public const int Widget_AppCompat_EditText = 2131624345;
+			public const int Widget_AppCompat_DropDownItem_Spinner = 2131624345;
 			
 			// aapt resource value: 0x7F0E019A
-			public const int Widget_AppCompat_ImageButton = 2131624346;
+			public const int Widget_AppCompat_EditText = 2131624346;
 			
 			// aapt resource value: 0x7F0E019B
-			public const int Widget_AppCompat_Light_ActionBar = 2131624347;
+			public const int Widget_AppCompat_ImageButton = 2131624347;
 			
 			// aapt resource value: 0x7F0E019C
-			public const int Widget_AppCompat_Light_ActionBar_Solid = 2131624348;
+			public const int Widget_AppCompat_Light_ActionBar = 2131624348;
 			
 			// aapt resource value: 0x7F0E019D
-			public const int Widget_AppCompat_Light_ActionBar_Solid_Inverse = 2131624349;
+			public const int Widget_AppCompat_Light_ActionBar_Solid = 2131624349;
 			
 			// aapt resource value: 0x7F0E019E
-			public const int Widget_AppCompat_Light_ActionBar_TabBar = 2131624350;
+			public const int Widget_AppCompat_Light_ActionBar_Solid_Inverse = 2131624350;
 			
 			// aapt resource value: 0x7F0E019F
-			public const int Widget_AppCompat_Light_ActionBar_TabBar_Inverse = 2131624351;
+			public const int Widget_AppCompat_Light_ActionBar_TabBar = 2131624351;
 			
 			// aapt resource value: 0x7F0E01A0
-			public const int Widget_AppCompat_Light_ActionBar_TabText = 2131624352;
+			public const int Widget_AppCompat_Light_ActionBar_TabBar_Inverse = 2131624352;
 			
 			// aapt resource value: 0x7F0E01A1
-			public const int Widget_AppCompat_Light_ActionBar_TabText_Inverse = 2131624353;
+			public const int Widget_AppCompat_Light_ActionBar_TabText = 2131624353;
 			
 			// aapt resource value: 0x7F0E01A2
-			public const int Widget_AppCompat_Light_ActionBar_TabView = 2131624354;
+			public const int Widget_AppCompat_Light_ActionBar_TabText_Inverse = 2131624354;
 			
 			// aapt resource value: 0x7F0E01A3
-			public const int Widget_AppCompat_Light_ActionBar_TabView_Inverse = 2131624355;
+			public const int Widget_AppCompat_Light_ActionBar_TabView = 2131624355;
 			
 			// aapt resource value: 0x7F0E01A4
-			public const int Widget_AppCompat_Light_ActionButton = 2131624356;
+			public const int Widget_AppCompat_Light_ActionBar_TabView_Inverse = 2131624356;
 			
 			// aapt resource value: 0x7F0E01A5
-			public const int Widget_AppCompat_Light_ActionButton_CloseMode = 2131624357;
+			public const int Widget_AppCompat_Light_ActionButton = 2131624357;
 			
 			// aapt resource value: 0x7F0E01A6
-			public const int Widget_AppCompat_Light_ActionButton_Overflow = 2131624358;
+			public const int Widget_AppCompat_Light_ActionButton_CloseMode = 2131624358;
 			
 			// aapt resource value: 0x7F0E01A7
-			public const int Widget_AppCompat_Light_ActionMode_Inverse = 2131624359;
+			public const int Widget_AppCompat_Light_ActionButton_Overflow = 2131624359;
 			
 			// aapt resource value: 0x7F0E01A8
-			public const int Widget_AppCompat_Light_ActivityChooserView = 2131624360;
+			public const int Widget_AppCompat_Light_ActionMode_Inverse = 2131624360;
 			
 			// aapt resource value: 0x7F0E01A9
-			public const int Widget_AppCompat_Light_AutoCompleteTextView = 2131624361;
+			public const int Widget_AppCompat_Light_ActivityChooserView = 2131624361;
 			
 			// aapt resource value: 0x7F0E01AA
-			public const int Widget_AppCompat_Light_DropDownItem_Spinner = 2131624362;
+			public const int Widget_AppCompat_Light_AutoCompleteTextView = 2131624362;
 			
 			// aapt resource value: 0x7F0E01AB
-			public const int Widget_AppCompat_Light_ListPopupWindow = 2131624363;
+			public const int Widget_AppCompat_Light_DropDownItem_Spinner = 2131624363;
 			
 			// aapt resource value: 0x7F0E01AC
-			public const int Widget_AppCompat_Light_ListView_DropDown = 2131624364;
+			public const int Widget_AppCompat_Light_ListPopupWindow = 2131624364;
 			
 			// aapt resource value: 0x7F0E01AD
-			public const int Widget_AppCompat_Light_PopupMenu = 2131624365;
+			public const int Widget_AppCompat_Light_ListView_DropDown = 2131624365;
 			
 			// aapt resource value: 0x7F0E01AE
-			public const int Widget_AppCompat_Light_PopupMenu_Overflow = 2131624366;
+			public const int Widget_AppCompat_Light_PopupMenu = 2131624366;
 			
 			// aapt resource value: 0x7F0E01AF
-			public const int Widget_AppCompat_Light_SearchView = 2131624367;
+			public const int Widget_AppCompat_Light_PopupMenu_Overflow = 2131624367;
 			
 			// aapt resource value: 0x7F0E01B0
-			public const int Widget_AppCompat_Light_Spinner_DropDown_ActionBar = 2131624368;
+			public const int Widget_AppCompat_Light_SearchView = 2131624368;
 			
 			// aapt resource value: 0x7F0E01B1
-			public const int Widget_AppCompat_ListMenuView = 2131624369;
+			public const int Widget_AppCompat_Light_Spinner_DropDown_ActionBar = 2131624369;
 			
 			// aapt resource value: 0x7F0E01B2
-			public const int Widget_AppCompat_ListPopupWindow = 2131624370;
+			public const int Widget_AppCompat_ListMenuView = 2131624370;
 			
 			// aapt resource value: 0x7F0E01B3
-			public const int Widget_AppCompat_ListView = 2131624371;
+			public const int Widget_AppCompat_ListPopupWindow = 2131624371;
 			
 			// aapt resource value: 0x7F0E01B4
-			public const int Widget_AppCompat_ListView_DropDown = 2131624372;
+			public const int Widget_AppCompat_ListView = 2131624372;
 			
 			// aapt resource value: 0x7F0E01B5
-			public const int Widget_AppCompat_ListView_Menu = 2131624373;
+			public const int Widget_AppCompat_ListView_DropDown = 2131624373;
 			
 			// aapt resource value: 0x7F0E01B6
-			public const int Widget_AppCompat_PopupMenu = 2131624374;
+			public const int Widget_AppCompat_ListView_Menu = 2131624374;
 			
 			// aapt resource value: 0x7F0E01B7
-			public const int Widget_AppCompat_PopupMenu_Overflow = 2131624375;
+			public const int Widget_AppCompat_PopupMenu = 2131624375;
 			
 			// aapt resource value: 0x7F0E01B8
-			public const int Widget_AppCompat_PopupWindow = 2131624376;
+			public const int Widget_AppCompat_PopupMenu_Overflow = 2131624376;
 			
 			// aapt resource value: 0x7F0E01B9
-			public const int Widget_AppCompat_ProgressBar = 2131624377;
+			public const int Widget_AppCompat_PopupWindow = 2131624377;
 			
 			// aapt resource value: 0x7F0E01BA
-			public const int Widget_AppCompat_ProgressBar_Horizontal = 2131624378;
+			public const int Widget_AppCompat_ProgressBar = 2131624378;
 			
 			// aapt resource value: 0x7F0E01BB
-			public const int Widget_AppCompat_RatingBar = 2131624379;
+			public const int Widget_AppCompat_ProgressBar_Horizontal = 2131624379;
 			
 			// aapt resource value: 0x7F0E01BC
-			public const int Widget_AppCompat_RatingBar_Indicator = 2131624380;
+			public const int Widget_AppCompat_RatingBar = 2131624380;
 			
 			// aapt resource value: 0x7F0E01BD
-			public const int Widget_AppCompat_RatingBar_Small = 2131624381;
+			public const int Widget_AppCompat_RatingBar_Indicator = 2131624381;
 			
 			// aapt resource value: 0x7F0E01BE
-			public const int Widget_AppCompat_SearchView = 2131624382;
+			public const int Widget_AppCompat_RatingBar_Small = 2131624382;
 			
 			// aapt resource value: 0x7F0E01BF
-			public const int Widget_AppCompat_SearchView_ActionBar = 2131624383;
+			public const int Widget_AppCompat_SearchView = 2131624383;
 			
 			// aapt resource value: 0x7F0E01C0
-			public const int Widget_AppCompat_SeekBar = 2131624384;
+			public const int Widget_AppCompat_SearchView_ActionBar = 2131624384;
 			
 			// aapt resource value: 0x7F0E01C1
-			public const int Widget_AppCompat_SeekBar_Discrete = 2131624385;
+			public const int Widget_AppCompat_SeekBar = 2131624385;
 			
 			// aapt resource value: 0x7F0E01C2
-			public const int Widget_AppCompat_Spinner = 2131624386;
+			public const int Widget_AppCompat_SeekBar_Discrete = 2131624386;
 			
 			// aapt resource value: 0x7F0E01C3
-			public const int Widget_AppCompat_Spinner_DropDown = 2131624387;
+			public const int Widget_AppCompat_Spinner = 2131624387;
 			
 			// aapt resource value: 0x7F0E01C4
-			public const int Widget_AppCompat_Spinner_DropDown_ActionBar = 2131624388;
+			public const int Widget_AppCompat_Spinner_DropDown = 2131624388;
 			
 			// aapt resource value: 0x7F0E01C5
-			public const int Widget_AppCompat_Spinner_Underlined = 2131624389;
+			public const int Widget_AppCompat_Spinner_DropDown_ActionBar = 2131624389;
 			
 			// aapt resource value: 0x7F0E01C6
-			public const int Widget_AppCompat_TextView = 2131624390;
+			public const int Widget_AppCompat_Spinner_Underlined = 2131624390;
 			
 			// aapt resource value: 0x7F0E01C7
-			public const int Widget_AppCompat_TextView_SpinnerItem = 2131624391;
+			public const int Widget_AppCompat_TextView = 2131624391;
 			
 			// aapt resource value: 0x7F0E01C8
-			public const int Widget_AppCompat_Toolbar = 2131624392;
+			public const int Widget_AppCompat_TextView_SpinnerItem = 2131624392;
 			
 			// aapt resource value: 0x7F0E01C9
-			public const int Widget_AppCompat_Toolbar_Button_Navigation = 2131624393;
+			public const int Widget_AppCompat_Toolbar = 2131624393;
 			
 			// aapt resource value: 0x7F0E01CA
-			public const int Widget_Compat_NotificationActionContainer = 2131624394;
+			public const int Widget_AppCompat_Toolbar_Button_Navigation = 2131624394;
 			
 			// aapt resource value: 0x7F0E01CB
-			public const int Widget_Compat_NotificationActionText = 2131624395;
+			public const int Widget_Compat_NotificationActionContainer = 2131624395;
 			
 			// aapt resource value: 0x7F0E01CC
-			public const int Widget_Design_AppBarLayout = 2131624396;
+			public const int Widget_Compat_NotificationActionText = 2131624396;
 			
 			// aapt resource value: 0x7F0E01CD
-			public const int Widget_Design_BottomNavigationView = 2131624397;
+			public const int Widget_Design_AppBarLayout = 2131624397;
 			
 			// aapt resource value: 0x7F0E01CE
-			public const int Widget_Design_BottomSheet_Modal = 2131624398;
+			public const int Widget_Design_BottomNavigationView = 2131624398;
 			
 			// aapt resource value: 0x7F0E01CF
-			public const int Widget_Design_CollapsingToolbar = 2131624399;
+			public const int Widget_Design_BottomSheet_Modal = 2131624399;
 			
 			// aapt resource value: 0x7F0E01D0
-			public const int Widget_Design_FloatingActionButton = 2131624400;
+			public const int Widget_Design_CollapsingToolbar = 2131624400;
 			
 			// aapt resource value: 0x7F0E01D1
-			public const int Widget_Design_NavigationView = 2131624401;
+			public const int Widget_Design_FloatingActionButton = 2131624401;
 			
 			// aapt resource value: 0x7F0E01D2
-			public const int Widget_Design_ScrimInsetsFrameLayout = 2131624402;
+			public const int Widget_Design_NavigationView = 2131624402;
 			
 			// aapt resource value: 0x7F0E01D3
-			public const int Widget_Design_Snackbar = 2131624403;
+			public const int Widget_Design_ScrimInsetsFrameLayout = 2131624403;
 			
 			// aapt resource value: 0x7F0E01D4
-			public const int Widget_Design_TabLayout = 2131624404;
+			public const int Widget_Design_Snackbar = 2131624404;
 			
 			// aapt resource value: 0x7F0E01D5
-			public const int Widget_Design_TextInputLayout = 2131624405;
+			public const int Widget_Design_TabLayout = 2131624405;
 			
 			// aapt resource value: 0x7F0E01D6
-			public const int Widget_MaterialComponents_BottomAppBar = 2131624406;
+			public const int Widget_Design_TextInputLayout = 2131624406;
 			
 			// aapt resource value: 0x7F0E01D7
-			public const int Widget_MaterialComponents_BottomAppBar_Colored = 2131624407;
+			public const int Widget_MaterialComponents_BottomAppBar = 2131624407;
 			
 			// aapt resource value: 0x7F0E01D8
-			public const int Widget_MaterialComponents_BottomNavigationView = 2131624408;
+			public const int Widget_MaterialComponents_BottomAppBar_Colored = 2131624408;
 			
 			// aapt resource value: 0x7F0E01D9
-			public const int Widget_MaterialComponents_BottomNavigationView_Colored = 2131624409;
+			public const int Widget_MaterialComponents_BottomNavigationView = 2131624409;
 			
 			// aapt resource value: 0x7F0E01DA
-			public const int Widget_MaterialComponents_BottomSheet_Modal = 2131624410;
+			public const int Widget_MaterialComponents_BottomNavigationView_Colored = 2131624410;
 			
 			// aapt resource value: 0x7F0E01DB
-			public const int Widget_MaterialComponents_Button = 2131624411;
+			public const int Widget_MaterialComponents_BottomSheet_Modal = 2131624411;
 			
 			// aapt resource value: 0x7F0E01DC
-			public const int Widget_MaterialComponents_Button_Icon = 2131624412;
+			public const int Widget_MaterialComponents_Button = 2131624412;
 			
 			// aapt resource value: 0x7F0E01DD
-			public const int Widget_MaterialComponents_Button_OutlinedButton = 2131624413;
+			public const int Widget_MaterialComponents_Button_Icon = 2131624413;
 			
 			// aapt resource value: 0x7F0E01DE
-			public const int Widget_MaterialComponents_Button_OutlinedButton_Icon = 2131624414;
+			public const int Widget_MaterialComponents_Button_OutlinedButton = 2131624414;
 			
 			// aapt resource value: 0x7F0E01DF
-			public const int Widget_MaterialComponents_Button_TextButton = 2131624415;
+			public const int Widget_MaterialComponents_Button_OutlinedButton_Icon = 2131624415;
 			
 			// aapt resource value: 0x7F0E01E0
-			public const int Widget_MaterialComponents_Button_TextButton_Dialog = 2131624416;
+			public const int Widget_MaterialComponents_Button_TextButton = 2131624416;
 			
 			// aapt resource value: 0x7F0E01E1
-			public const int Widget_MaterialComponents_Button_TextButton_Dialog_Icon = 2131624417;
+			public const int Widget_MaterialComponents_Button_TextButton_Dialog = 2131624417;
 			
 			// aapt resource value: 0x7F0E01E2
-			public const int Widget_MaterialComponents_Button_TextButton_Icon = 2131624418;
+			public const int Widget_MaterialComponents_Button_TextButton_Dialog_Icon = 2131624418;
 			
 			// aapt resource value: 0x7F0E01E3
-			public const int Widget_MaterialComponents_Button_UnelevatedButton = 2131624419;
+			public const int Widget_MaterialComponents_Button_TextButton_Icon = 2131624419;
 			
 			// aapt resource value: 0x7F0E01E4
-			public const int Widget_MaterialComponents_Button_UnelevatedButton_Icon = 2131624420;
+			public const int Widget_MaterialComponents_Button_UnelevatedButton = 2131624420;
 			
 			// aapt resource value: 0x7F0E01E5
-			public const int Widget_MaterialComponents_CardView = 2131624421;
-			
-			// aapt resource value: 0x7F0E01EA
-			public const int Widget_MaterialComponents_ChipGroup = 2131624426;
+			public const int Widget_MaterialComponents_Button_UnelevatedButton_Icon = 2131624421;
 			
 			// aapt resource value: 0x7F0E01E6
-			public const int Widget_MaterialComponents_Chip_Action = 2131624422;
-			
-			// aapt resource value: 0x7F0E01E7
-			public const int Widget_MaterialComponents_Chip_Choice = 2131624423;
-			
-			// aapt resource value: 0x7F0E01E8
-			public const int Widget_MaterialComponents_Chip_Entry = 2131624424;
-			
-			// aapt resource value: 0x7F0E01E9
-			public const int Widget_MaterialComponents_Chip_Filter = 2131624425;
+			public const int Widget_MaterialComponents_CardView = 2131624422;
 			
 			// aapt resource value: 0x7F0E01EB
-			public const int Widget_MaterialComponents_FloatingActionButton = 2131624427;
+			public const int Widget_MaterialComponents_ChipGroup = 2131624427;
+			
+			// aapt resource value: 0x7F0E01E7
+			public const int Widget_MaterialComponents_Chip_Action = 2131624423;
+			
+			// aapt resource value: 0x7F0E01E8
+			public const int Widget_MaterialComponents_Chip_Choice = 2131624424;
+			
+			// aapt resource value: 0x7F0E01E9
+			public const int Widget_MaterialComponents_Chip_Entry = 2131624425;
+			
+			// aapt resource value: 0x7F0E01EA
+			public const int Widget_MaterialComponents_Chip_Filter = 2131624426;
 			
 			// aapt resource value: 0x7F0E01EC
-			public const int Widget_MaterialComponents_NavigationView = 2131624428;
+			public const int Widget_MaterialComponents_FloatingActionButton = 2131624428;
 			
 			// aapt resource value: 0x7F0E01ED
-			public const int Widget_MaterialComponents_Snackbar = 2131624429;
+			public const int Widget_MaterialComponents_NavigationView = 2131624429;
 			
 			// aapt resource value: 0x7F0E01EE
-			public const int Widget_MaterialComponents_Snackbar_FullWidth = 2131624430;
+			public const int Widget_MaterialComponents_Snackbar = 2131624430;
 			
 			// aapt resource value: 0x7F0E01EF
-			public const int Widget_MaterialComponents_TabLayout = 2131624431;
+			public const int Widget_MaterialComponents_Snackbar_FullWidth = 2131624431;
 			
 			// aapt resource value: 0x7F0E01F0
-			public const int Widget_MaterialComponents_TabLayout_Colored = 2131624432;
+			public const int Widget_MaterialComponents_TabLayout = 2131624432;
 			
 			// aapt resource value: 0x7F0E01F1
-			public const int Widget_MaterialComponents_TextInputEditText_FilledBox = 2131624433;
+			public const int Widget_MaterialComponents_TabLayout_Colored = 2131624433;
 			
 			// aapt resource value: 0x7F0E01F2
-			public const int Widget_MaterialComponents_TextInputEditText_FilledBox_Dense = 2131624434;
+			public const int Widget_MaterialComponents_TextInputEditText_FilledBox = 2131624434;
 			
 			// aapt resource value: 0x7F0E01F3
-			public const int Widget_MaterialComponents_TextInputEditText_OutlinedBox = 2131624435;
+			public const int Widget_MaterialComponents_TextInputEditText_FilledBox_Dense = 2131624435;
 			
 			// aapt resource value: 0x7F0E01F4
-			public const int Widget_MaterialComponents_TextInputEditText_OutlinedBox_Dense = 2131624436;
+			public const int Widget_MaterialComponents_TextInputEditText_OutlinedBox = 2131624436;
 			
 			// aapt resource value: 0x7F0E01F5
-			public const int Widget_MaterialComponents_TextInputLayout_FilledBox = 2131624437;
+			public const int Widget_MaterialComponents_TextInputEditText_OutlinedBox_Dense = 2131624437;
 			
 			// aapt resource value: 0x7F0E01F6
-			public const int Widget_MaterialComponents_TextInputLayout_FilledBox_Dense = 2131624438;
+			public const int Widget_MaterialComponents_TextInputLayout_FilledBox = 2131624438;
 			
 			// aapt resource value: 0x7F0E01F7
-			public const int Widget_MaterialComponents_TextInputLayout_OutlinedBox = 2131624439;
+			public const int Widget_MaterialComponents_TextInputLayout_FilledBox_Dense = 2131624439;
 			
 			// aapt resource value: 0x7F0E01F8
-			public const int Widget_MaterialComponents_TextInputLayout_OutlinedBox_Dense = 2131624440;
+			public const int Widget_MaterialComponents_TextInputLayout_OutlinedBox = 2131624440;
 			
 			// aapt resource value: 0x7F0E01F9
-			public const int Widget_MaterialComponents_Toolbar = 2131624441;
+			public const int Widget_MaterialComponents_TextInputLayout_OutlinedBox_Dense = 2131624441;
 			
 			// aapt resource value: 0x7F0E01FA
-			public const int Widget_Support_CoordinatorLayout = 2131624442;
+			public const int Widget_MaterialComponents_Toolbar = 2131624442;
+			
+			// aapt resource value: 0x7F0E01FB
+			public const int Widget_Support_CoordinatorLayout = 2131624443;
 			
 			static Style()
 			{
@@ -18953,6 +22067,32 @@ namespace Shiny.Device.Tests.Droid
 			
 			// aapt resource value: 2
 			public const int ForegroundLinearLayout_foregroundInsidePadding = 2;
+			
+			// aapt resource value: { 0x1010003,0x10100D0,0x10100D1 }
+			public static int[] Fragment = new int[] {
+					16842755,
+					16842960,
+					16842961};
+			
+			// aapt resource value: { 0x1010003,0x10100D1 }
+			public static int[] FragmentContainerView = new int[] {
+					16842755,
+					16842961};
+			
+			// aapt resource value: 0
+			public const int FragmentContainerView_android_name = 0;
+			
+			// aapt resource value: 1
+			public const int FragmentContainerView_android_tag = 1;
+			
+			// aapt resource value: 1
+			public const int Fragment_android_id = 1;
+			
+			// aapt resource value: 0
+			public const int Fragment_android_name = 0;
+			
+			// aapt resource value: 2
+			public const int Fragment_android_tag = 2;
 			
 			// aapt resource value: { 0x101019D,0x101019E,0x10101A1,0x10101A2,0x10101A3,0x10101A4,0x1010201,0x101020B,0x1010510,0x1010511,0x1010512,0x1010513 }
 			public static int[] GradientColor = new int[] {

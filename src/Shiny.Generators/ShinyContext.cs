@@ -27,6 +27,10 @@ namespace Shiny.Generators
         }
 
 
+        public bool IsDebugMode
+            => this.Context.Compilation.GetTypeByMetadataName("Shiny.Generators.DebugMe") != null;
+
+
         public string? GetXamFormsAppClassFullName()
         {
             var classes = this

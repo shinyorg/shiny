@@ -3958,25 +3958,19 @@ namespace Shiny.Generators.Android.Tests
 			public static int view_offset_helper = 2131230967;
 			
 			// aapt resource value: 0x7F0800F8
-			public static int view_tree_lifecycle_owner = 2131230968;
+			public static int view_tree_saved_state_registry_owner = 2131230968;
 			
 			// aapt resource value: 0x7F0800F9
-			public static int view_tree_saved_state_registry_owner = 2131230969;
+			public static int visible = 2131230969;
 			
 			// aapt resource value: 0x7F0800FA
-			public static int view_tree_view_model_store_owner = 2131230970;
+			public static int visible_removing_fragment_view_tag = 2131230970;
 			
 			// aapt resource value: 0x7F0800FB
-			public static int visible = 2131230971;
+			public static int withText = 2131230971;
 			
 			// aapt resource value: 0x7F0800FC
-			public static int visible_removing_fragment_view_tag = 2131230972;
-			
-			// aapt resource value: 0x7F0800FD
-			public static int withText = 2131230973;
-			
-			// aapt resource value: 0x7F0800FE
-			public static int wrap_content = 2131230974;
+			public static int wrap_content = 2131230972;
 			
 			static Id()
 			{

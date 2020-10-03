@@ -21,7 +21,6 @@ namespace Shiny.Generators.Tasks.Android
                 .Context
                 .GetAllDerivedClassesForType(activityType)
                 .WhereNotSystem()
-                .Where(x => !x.ContainingNamespace.Name.StartsWith("Android"))
                 .ToList();
 
             foreach (var activity in activities)

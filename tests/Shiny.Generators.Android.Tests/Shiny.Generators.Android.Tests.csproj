@@ -48,8 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="DebugMe.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="MainApplication.cs" />
+    <Compile Include="MyApplication.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

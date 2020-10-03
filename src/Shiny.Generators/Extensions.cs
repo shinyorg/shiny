@@ -13,8 +13,9 @@ namespace Shiny.Generators
 {
     static class Extensions
     {
-        public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
-            symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
+        // this is only if the partial has a 2+ partials
+        //public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
+        //    symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
 
 
         public static bool HasMethod(this INamedTypeSymbol symbol, string methodName)
@@ -233,10 +234,14 @@ namespace Shiny.Generators
 
 
         public static IEnumerable<INamedTypeSymbol> WhereNotInAssembly(this IEnumerable<INamedTypeSymbol> en, params string[] names)
-            => en.Where(x => !names.Any(y => x.ContainingAssembly.Name.StartsWith(y, StringComparison.OrdinalIgnoreCase)));
+            => en.Where(x => !names.Any(y => x.ContainingAssembly.ToDisplayString().StartsWith(y, StringComparison.InvariantCultureIgnoreCase)));
+
+
+        public static IEnumerable<INamedTypeSymbol> WhereNotNamespace(this IEnumerable<INamedTypeSymbol> en, params string[] names)
+            => en.Where(x => !names.Any(y => x.ContainingNamespace.ToDisplayString().StartsWith(y, StringComparison.InvariantCultureIgnoreCase)));
 
 
         public static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en)
-            => en.WhereNotInAssembly("Xamarin.", "Shiny.");
+            => en.WhereNotInAssembly("Xamarin.", "Shiny.").WhereNotNamespace("Android.");
     }
 }
