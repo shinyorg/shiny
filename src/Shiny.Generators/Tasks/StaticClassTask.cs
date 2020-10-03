@@ -67,7 +67,7 @@ namespace Shiny.Generators.Tasks
             {
                 using (builder.BlockInvariant("public static partial class " + genFileName))
                 {
-                    builder.AppendLine($"public static bool IsAvailable => ShinyHost.Container.IsRegistered<{ifTypeName}>();");
+                    builder.AppendLine($"public static bool IsAvailable => Current != null;");
                     builder.AppendLine();
                     builder.AppendLine($"public static {ifTypeName} Current => ShinyHost.Resolve<{ifTypeName}>();");
                     builder.AppendLine();
