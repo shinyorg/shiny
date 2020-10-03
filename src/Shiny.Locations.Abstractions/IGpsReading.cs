@@ -26,6 +26,11 @@ namespace Shiny.Locations
         double Speed { get; }
 
         /// <summary>
+        /// The accuracy in meters per second for the speed
+        /// </summary>
+        double SpeedAccuracy { get; }
+
+        /// <summary>
         /// The position of the reading.
         /// </summary>
         Position Position { get; }

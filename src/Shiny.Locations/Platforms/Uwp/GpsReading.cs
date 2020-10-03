@@ -28,6 +28,9 @@ namespace Shiny.Locations
         /// <inheritdoc />
         public double Speed => this.coordinate.Speed ?? 0;
 
+        /// <inheritdoc /> 
+        public double SpeedAccuracy => -1; //this.coordinate.SpeedAccuracy;
+
         /// <inheritdoc />
         public Position Position { get; }
 

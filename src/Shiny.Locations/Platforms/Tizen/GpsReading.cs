@@ -20,13 +20,16 @@ namespace Shiny.Locations
         public double HeadingAccuracy => this.location.Accuracy;
 
         /// <inheritdoc />
-        public double Speed => throw new NotImplementedException();
+        public double Speed => this.location.Speed;
 
         /// <inheritdoc />
-        public Position Position => throw new NotImplementedException();
+        public double SpeedAccuracy => -1;
 
         /// <inheritdoc />
-        public double PositionAccuracy => throw new NotImplementedException();
+        public Position Position => new Position(this.location.Latitude, this.location.Longitude);
+
+        /// <inheritdoc />
+        public double PositionAccuracy => this.location.Accuracy;
 
         /// <inheritdoc />
         public DateTime Timestamp => this.location.Timestamp;

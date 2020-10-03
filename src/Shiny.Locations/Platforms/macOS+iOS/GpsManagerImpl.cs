@@ -19,6 +19,11 @@ namespace Shiny.Locations
         {
             this.gdelegate = new GpsManagerDelegate();
             this.locationManager = new CLLocationManager { Delegate = this.gdelegate };
+            //this.locationManager.RequestTemporaryFullAccuracyAuthorizationAsync
+            //this.locationManager.RequestTemporaryFullAccuracyAuthorization("purposeKey")
+            //this.locationManager.ActivityType = CLActivityType.AutomotiveNavigation
+            // iOS 14
+            //this.locationManager.AccuracyAuthorization == CLAccuracyAuthorization.FullAccuracy
         }
 
 

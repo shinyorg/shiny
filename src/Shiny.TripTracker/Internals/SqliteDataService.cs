@@ -23,7 +23,7 @@ namespace Shiny.TripTracker.Internals
             sync.CreateTable<TripCheckin>();
         }
 
-
+         
         public Task Checkin(int tripId, IGpsReading reading) => this.conn.InsertAsync(new TripCheckin
         {
             TripId = tripId,

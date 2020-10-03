@@ -78,7 +78,7 @@ namespace Shiny.TripTracker.Internals
                     trip.DateFinished = DateTimeOffset.UtcNow;
                     trip.AverageSpeedMetersPerHour = await this.dataService.GetTripAverageSpeedInMetersPerHour(trip.Id);
                     trip.TotalDistanceMeters = await this.dataService.GetTripTotalDistanceInMeters(trip.Id);
-                    trip.StartLatitude = reading.Position.Longitude;
+                    trip.EndLongitude = reading.Position.Longitude;
                     trip.EndLatitude = reading.Position.Latitude;
 
                     this.settings.CurrentTripId(null);

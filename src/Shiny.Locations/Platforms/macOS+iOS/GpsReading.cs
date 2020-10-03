@@ -23,7 +23,10 @@ namespace Shiny.Locations
         public double HeadingAccuracy => this.location.VerticalAccuracy;
 
         /// <inheritdoc />
-        public double Speed => this.location.Speed;
+        public double Speed => this.location.Speed; // TODO: speed accuracy
+
+        /// <inheritdoc />
+        public double SpeedAccuracy => this.location.SpeedAccuracy;
 
         /// <inheritdoc />
         public Position Position { get; }
