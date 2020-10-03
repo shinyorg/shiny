@@ -16,6 +16,7 @@
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <IsWindows>False</IsWindows>
 
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
@@ -35,7 +36,6 @@
         <DebugType>portable</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <IsWindows>False</IsWindows>
 
         <!-- disable sourcelink on mono, to workaround https://github.com/dotnet/sourcelink/issues/155 -->
         <EnableSourceLink Condition=" '$(OS)' == 'Windows_NT' ">true</EnableSourceLink>
