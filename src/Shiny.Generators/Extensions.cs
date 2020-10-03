@@ -17,6 +17,40 @@ namespace Shiny.Generators
         //public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
         //    symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
 
+        public static bool IsIosAppProject(this SourceGeneratorContext context)
+            => context.IsProjectType("FEACFBD2-3405-455C-9665-78FE426C6842");
+            //{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
+
+        public static bool IsAndroidAppProject(this SourceGeneratorContext context)
+            => context.IsProjectType("EFBA0AD7-5A72-4C68-AF49-83D382785DCF");
+            //{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
+
+
+        public static bool IsProjectType(this SourceGeneratorContext context, string projectTypeGuid)
+        {
+            var guids = context.GetProjectInstance().GetPropertyValue("ProjectTypeGuids")?.ToUpper();
+            if (guids == null)
+                return false;
+
+            var result = guids.Contains(projectTypeGuid);
+            return result;
+        }
+
+        public static int GetAndroidMajorTarget(this SourceGeneratorContext context)
+        {
+            var target = context.GetProjectInstance().GetPropertyValue("TargetFrameworkVersion");
+            if (target == null)
+                return -1;
+
+            target = target.Replace("v", String.Empty);
+            var len = target.IndexOf(".");
+            var majorString = len > 0
+                ? target.Substring(0, len)
+                : target;
+
+            var v = Int32.Parse(majorString);
+            return v;
+        }
 
         public static bool HasMethod(this INamedTypeSymbol symbol, string methodName)
         {

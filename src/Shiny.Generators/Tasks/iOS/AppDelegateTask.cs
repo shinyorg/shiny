@@ -13,8 +13,7 @@ namespace Shiny.Generators.Tasks.iOS
 
         public override void Execute()
         {
-            var appDelegateClass = this.Context.Compilation.GetTypeByMetadataName("UIKit.UIApplicationDelegate");
-            if (appDelegateClass == null)
+            if (!this.Context.IsIosAppProject())
                 return;
 
             this.shinyStartupClassName = this.ShinyContext.GetShinyStartupClassFullName();
@@ -39,7 +38,6 @@ namespace Shiny.Generators.Tasks.iOS
 
             using (builder.BlockInvariant($"namespace {appDelegate.ContainingNamespace}"))
             {
-                //using (builder.BlockInvariant($"public partial class {appDelegate.Name} : {appDelegate.BaseType.ToDisplayString()}"))
                 using (builder.BlockInvariant($"public partial class {appDelegate.Name}"))
                 {
                     this.GenerateFinishedLaunching(appDelegate, builder);

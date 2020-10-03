@@ -10,6 +10,9 @@ namespace Shiny.Generators.Tasks.Android
     {
         public override void Execute()
         {
+            if (!this.Context.IsAndroidAppProject())
+                return;
+
             this.Iterate("AndroidX.AppCompat.App.AppCompatActivity");
             this.Iterate("Android.Support.V7.App.AppCompatActivity");
         }

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-
 using Microsoft.CodeAnalysis;
-
 using Uno.RoslynHelpers;
-using Uno.SourceGeneration;
+
 
 namespace Shiny.Generators.Tasks.Android
 {
@@ -13,12 +11,13 @@ namespace Shiny.Generators.Tasks.Android
     {
         public override void Execute()
         {
-            // TODO: is android head?
-            // TODO: detect Android v10
+            Debugger.Launch();
+            if (!this.Context.IsAndroidAppProject())
+                return;
 
-            var appClass = this.Context.Compilation.GetTypeByMetadataName("Android.App.Application");
-            if (appClass == null)
-                return; // no android class
+            var major = this.Context.GetAndroidMajorTarget();
+            if (major < 10)
+                this.Log.Error("You must target a minimum major target of Android 10 to use Shiny");
 
             var startupClass = this.ShinyContext.GetShinyStartupClassFullName();
             if (startupClass == null)
