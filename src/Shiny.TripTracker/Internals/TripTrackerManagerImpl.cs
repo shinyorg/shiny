@@ -81,7 +81,7 @@ namespace Shiny.TripTracker.Internals
                 Interval = request?.Interval ?? TimeSpan.FromSeconds(20),
                 ThrottledInterval = request?.ThrottledInterval ?? TimeSpan.FromSeconds(10),
                 MinimumDistance = request?.MinimumDistance ?? Distance.FromMeters(250),
-                Priority = request?.Priority ?? GpsPriority.Normal,
+                Priority = request?.Priority ?? GpsPriority.Highest, // ios needs highest for speed
                 UseBackground = true
             });
             this.TrackingType = trackingType;

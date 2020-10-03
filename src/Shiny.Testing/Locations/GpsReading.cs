@@ -19,6 +19,9 @@ namespace Shiny.Testing.Locations
         public double Speed { get; set; }
 
         /// <inheritdoc />
+        public double SpeedAccuracy { get; set; }
+
+        /// <inheritdoc />
         public Position Position { get; set; }
 
         /// <inheritdoc />
