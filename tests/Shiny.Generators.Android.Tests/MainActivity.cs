@@ -10,7 +10,7 @@ using Xamarin.Forms.Platform.Android;
 using Android.Runtime;
 using Android.Support.V7.App;
 
-namespace Samples.Droid
+namespace Shiny.Generators.Android.Tests
 {
     [Activity(
         Label = "Shiny",

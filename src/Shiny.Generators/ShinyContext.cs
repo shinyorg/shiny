@@ -35,7 +35,7 @@ namespace Shiny.Generators
         {
             var classes = this
                 .Context
-                .GetAllImplementationsOfType("Xamarin.Forms.App")
+                .GetAllDerivedClassesForType("Xamarin.Forms.Application")
                 .WhereNotSystem()
                 .ToList();
 

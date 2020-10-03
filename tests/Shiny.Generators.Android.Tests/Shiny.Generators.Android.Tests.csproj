@@ -51,6 +51,7 @@
     <Compile Include="DebugMe.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MyApplication.cs" />
+    <Compile Include="MyXfApp.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -87,6 +88,12 @@
       <Project>{74207658-2ba6-403b-b608-1b8b4d9fa130}</Project>
       <Name>Shiny.Generators</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\Toolbar.axml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\Tabbar.axml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -11,7 +11,6 @@ namespace Shiny.Generators.Tasks.Android
     {
         public override void Execute()
         {
-            Debugger.Launch();
             if (!this.Context.IsAndroidAppProject())
                 return;
 
