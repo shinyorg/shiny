@@ -91,7 +91,6 @@ namespace Shiny.Generators.Tasks.iOS
         }
 
 
-
         void GenerateFinishedLaunching(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
         {
             var exists = appDelegate.HasMethod("FinishedLaunching");
@@ -129,9 +128,9 @@ namespace Shiny.Generators.Tasks.iOS
                 }
             }
 
-            // ZXing.Net.Mobile
-            if (this.Context.HasZXingNetMobile())
-                builder.AppendLineInvariant("global::ZXing.Net.Mobile.Forms.iOS.Platform.Init();");
+            //// ZXing.Net.Mobile
+            //if (this.Context.HasZXingNetMobile())
+            //    builder.AppendLineInvariant("global::ZXing.Net.Mobile.Forms.iOS.Platform.Init();");
 
             // XF Material
             if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)

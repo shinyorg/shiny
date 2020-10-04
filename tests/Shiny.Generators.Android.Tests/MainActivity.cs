@@ -7,8 +7,7 @@ using Android.OS;
 using Xamarin;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
-using Android.Runtime;
-using Android.Support.V7.App;
+
 
 namespace Shiny.Generators.Android.Tests
 {

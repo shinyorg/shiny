@@ -113,8 +113,8 @@ namespace Shiny.Generators.Tasks.Android
                     if (this.Context.HasXamarinEssentials())
                         builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
 
-                    if (this.Context.HasZXingNetMobile())
-                        builder.AppendLineInvariant("global::ZXing.Net.Mobile.Android.PermissionsHandler.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
+                    //if (this.Context.HasZXingNetMobile())
+                    //    builder.AppendLineInvariant("global::ZXing.Net.Mobile.Android.PermissionsHandler.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
                 }
             }
         }

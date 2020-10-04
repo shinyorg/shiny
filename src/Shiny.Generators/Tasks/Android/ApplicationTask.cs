@@ -108,8 +108,8 @@ namespace Shiny.Generators.Tasks.Android
                 if (this.Context.HasXamarinEssentials())
                     builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");
 
-                if (this.Context.HasZXingNetMobile())
-                    builder.AppendFormatInvariant("global::ZXing.Mobile.MobileBarcodeScanner.Initialize(this);");
+                //if (this.Context.HasZXingNetMobile())
+                //    builder.AppendFormatInvariant("global::ZXing.Mobile.MobileBarcodeScanner.Initialize(this);");
 
                 if (this.Context.Compilation.GetTypeByMetadataName("Acr.UserDialogs.UserDialogs") != null)
                     builder.AppendLineInvariant("global::Acr.UserDialogs.UserDialogs.Init(this);");
