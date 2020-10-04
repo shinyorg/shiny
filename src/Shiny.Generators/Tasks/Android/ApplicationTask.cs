@@ -28,7 +28,9 @@ namespace Shiny.Generators.Tasks.Android
                 .ToList();
 
             if (!appImpls.Any())
+            {
                 this.GenerateFromScratch(startupClass);
+            }
             else
             {
                 foreach (var impl in appImpls)
@@ -101,13 +103,16 @@ namespace Shiny.Generators.Tasks.Android
         {
             using (builder.BlockInvariant("public override void OnCreate()"))
             {
-                builder.AppendLineInvariant($"AndroidShinyHost.Init(this, new {startupClassName}());");
+                builder.AppendLineInvariant($"global::Shiny.AndroidShinyHost.Init(this, new {startupClassName}());");
 
                 if (this.Context.HasXamarinEssentials())
-                    builder.AppendLineInvariant("Xamarin.Essentials.Platform.Init(this);");
+                    builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");
+
+                if (this.Context.HasZXingNetMobile())
+                    builder.AppendFormatInvariant("global::ZXing.Mobile.MobileBarcodeScanner.Initialize(this);");
 
                 if (this.Context.Compilation.GetTypeByMetadataName("Acr.UserDialogs.UserDialogs") != null)
-                    builder.AppendLineInvariant("Acr.UserDialogs.UserDialogs.Init(this);");
+                    builder.AppendLineInvariant("global::Acr.UserDialogs.UserDialogs.Init(this);");
 
                 builder.AppendLineInvariant("base.OnCreate();");
             }

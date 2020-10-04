@@ -91,6 +91,7 @@ namespace Shiny.Generators.Tasks.iOS
         }
 
 
+
         void GenerateFinishedLaunching(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
         {
             var exists = appDelegate.HasMethod("FinishedLaunching");
@@ -107,20 +108,40 @@ namespace Shiny.Generators.Tasks.iOS
 
                     builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.shinyStartupClassName}());");
 
-                    if (appDelegate.Is("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate"))
-                    {
-                        var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
-                        if (appClass != null)
-                        {
-                            // TODO: what if app class has multiple ctor args - skip
-                            builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
-                            builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
-                        }
-                    }
+                    this.TryAppendThirdParty(appDelegate, builder);
                     builder.AppendLineInvariant("return base.FinishedLaunching(app, options);");
                 }
             }
         }
+
+
+        void TryAppendThirdParty(INamedTypeSymbol appDelegate, IIndentedStringBuilder builder)
+        {
+            // Xamarin Forms
+            if (appDelegate.Is("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate"))
+            {
+                var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
+                if (appClass != null)
+                {
+                    // TODO: what if app class has multiple ctor args - skip
+                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+                    builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
+                }
+            }
+
+            // ZXing.Net.Mobile
+            if (this.Context.HasZXingNetMobile())
+                builder.AppendLineInvariant("global::ZXing.Net.Mobile.Forms.iOS.Platform.Init();");
+
+            // XF Material
+            if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
+                builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
+
+            // AiForms.SettingsView
+            if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
+                builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
+        }
+
 
         void AppendMethodIf(INamedTypeSymbol symbol, IndentedStringBuilder builder, string neededLibrary, string methodName, string append)
         {

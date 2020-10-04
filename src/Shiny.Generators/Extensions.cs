@@ -21,6 +21,7 @@ namespace Shiny.Generators
             => context.IsProjectType("FEACFBD2-3405-455C-9665-78FE426C6842");
             //{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
 
+
         public static bool IsAndroidAppProject(this SourceGeneratorContext context)
             => context.IsProjectType("EFBA0AD7-5A72-4C68-AF49-83D382785DCF");
             //{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
@@ -35,6 +36,7 @@ namespace Shiny.Generators
             var result = guids.Contains(projectTypeGuid);
             return result;
         }
+
 
         public static int GetAndroidMajorTarget(this SourceGeneratorContext context)
         {
@@ -51,6 +53,7 @@ namespace Shiny.Generators
             var v = Int32.Parse(majorString);
             return v;
         }
+
 
         public static bool HasMethod(this INamedTypeSymbol symbol, string methodName)
         {
@@ -96,6 +99,10 @@ namespace Shiny.Generators
 
         public static bool HasXamarinEssentials(this SourceGeneratorContext context)
             => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null;
+
+
+        public static bool HasZXingNetMobile(this SourceGeneratorContext context)
+            => context.Compilation.GetTypeByMetadataName("ZXing.Mobile.MobileBarcodeScanner") != null;
 
 
         public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName)

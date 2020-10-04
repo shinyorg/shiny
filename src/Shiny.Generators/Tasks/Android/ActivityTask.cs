@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Uno.RoslynHelpers;
@@ -49,56 +48,90 @@ namespace Shiny.Generators.Tasks.Android
             {
                 using (builder.BlockInvariant($"public partial class {activity.Name}"))
                 {
-                    if (!activity.HasMethod("OnCreate"))
-                    {
-                        using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
-                        {
-                            builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
-                            builder.AppendLineInvariant("this.ShinyOnCreate();");
-                            if (activity.HasMethod("OnCreated"))
-                                builder.AppendLineInvariant("this.OnCreated()");
-
-                            if (activity.Is("Xamarin.Forms.Platform.Android.FormsAppCompatActivity"))
-                            {
-                                var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
-                                if (appClass != null)
-                                {
-                                    builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
-                                    builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
-                                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
-                                    builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
-                                }
-                            }
-                        }
-                    }
-
-                    if (!activity.HasMethod("OnNewIntent"))
-                    {
-                        using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
-                        {
-                            builder.AppendLine("base.OnNewIntent(intent);");
-                            builder.AppendLine();
-                            builder.AppendLine("this.ShinyOnNewIntent(intent);");
-                            builder.AppendLine();
-                        }
-                    }
-
-                    if (!activity.HasMethod("OnRequestPermissionsResult"))
-                    {
-                        using (builder.BlockInvariant("public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)"))
-                        {
-                            builder.AppendLine("base.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
-                            builder.AppendLine();
-                            builder.AppendLine("this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);");
-                            builder.AppendLine();
-
-                            if (this.Context.HasXamarinEssentials())
-                                builder.AppendLineInvariant("Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
-                        }
-                    }
+                    this.TryAppendOnCreate(activity, builder);
+                    this.TryAppendNewIntent(activity, builder);
+                    this.TryAppendRequestPermissionResult(activity, builder);
                 }
             }
             this.Context.AddCompilationUnit(activity.Name, builder.ToString());
+        }
+
+
+        void TryAppendOnCreate(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        {
+            if (!activity.HasMethod("OnCreate"))
+            {
+                using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
+                {
+                    builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
+                    builder.AppendLineInvariant("this.ShinyOnCreate();");
+                    if (activity.HasMethod("OnCreated"))
+                        builder.AppendLineInvariant("this.OnCreated()");
+
+                    this.TryAppendOnCreateThirdParty(activity, builder);
+                }
+            }
+        }
+
+
+        void TryAppendOnCreateThirdParty(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        {
+            // Xamarin Forms
+            if (activity.Is("Xamarin.Forms.Platform.Android.FormsAppCompatActivity"))
+            {
+                var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
+                if (appClass != null)
+                {
+                    builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
+                    builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
+                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
+                    builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
+                }
+            }
+
+            // AiForms.SettingsView
+            if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.Droid.SettingsViewInit") != null)
+                builder.AppendFormatInvariant("global::AiForms.Renderers.Droid.SettingsViewInit.Init();");
+
+            // XF Material
+            if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
+                builder.AppendFormatInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
+        }
+
+
+        void TryAppendRequestPermissionResult(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        {
+            if (!activity.HasMethod("OnRequestPermissionsResult"))
+            {
+                using (builder.BlockInvariant("public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)"))
+                {
+                    builder.AppendLine("base.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
+                    builder.AppendLine();
+                    builder.AppendLine("this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);");
+                    builder.AppendLine();
+
+                    if (this.Context.HasXamarinEssentials())
+                        builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
+
+                    if (this.Context.HasZXingNetMobile())
+                        builder.AppendLineInvariant("global::ZXing.Net.Mobile.Android.PermissionsHandler.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
+                }
+            }
+        }
+
+
+        void TryAppendNewIntent(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        {
+            if (!activity.HasMethod("OnNewIntent"))
+            {
+                using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
+                {
+                    builder.AppendLine("base.OnNewIntent(intent);");
+                    builder.AppendLine();
+                    builder.AppendLine("this.ShinyOnNewIntent(intent);");
+                    builder.AppendLine();
+                }
+            }
         }
     }
 }
