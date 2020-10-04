@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MarkdownSnippets.MsBuild" Version="21.0.7">
+        <PackageReference Include="MarkdownSnippets.MsBuild" Version="21.1.4">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -35,6 +35,7 @@
         <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj" />
         <PackageReference Include="System.Reactive" Version="4.4.1" />
+        <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
     </ItemGroup>
 
 </Project>
