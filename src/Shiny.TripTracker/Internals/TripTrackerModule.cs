@@ -18,11 +18,16 @@ namespace Shiny.TripTracker.Internals
         }
 
 
+        static bool added = false;
         public override void Register(IServiceCollection services)
         {
-            services.AddSingleton<IGpsDelegate, TripTrackerGpsDelegate>();
-            services.AddSingleton<IDataService, SqliteDataService>();
-            services.AddSingleton<ITripTrackerManager, TripTrackerManagerImpl>();
+            if (!added)
+            {
+                services.AddSingleton<IDataService, SqliteDataService>();
+                services.AddSingleton<ITripTrackerManager, TripTrackerManagerImpl>();
+                services.AddSingleton<IGpsDelegate, TripTrackerGpsDelegate>();
+                added = true;
+            }
             services.AddSingleton(typeof(ITripTrackerDelegate), this.delegateType);
         }
 
