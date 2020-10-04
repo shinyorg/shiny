@@ -31,5 +31,8 @@ namespace Shiny.TripTracker.Tests
 
         /// <inheritdoc />
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+
+        /// <inheritdoc />
+        public double SpeedAccuracy { get; set; }
     }
 }
