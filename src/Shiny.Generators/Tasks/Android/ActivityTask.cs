@@ -63,12 +63,12 @@ namespace Shiny.Generators.Tasks.Android
             {
                 using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                 {
-                    builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
+                    this.TryAppendOnCreateThirdParty(activity, builder);
                     builder.AppendLineInvariant("this.ShinyOnCreate();");
                     if (activity.HasMethod("OnCreated"))
-                        builder.AppendLineInvariant("this.OnCreated()");
+                        builder.AppendLineInvariant("this.OnCreated();");
 
-                    this.TryAppendOnCreateThirdParty(activity, builder);
+                    builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
                 }
             }
         }
