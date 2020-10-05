@@ -63,31 +63,41 @@ namespace Shiny.Generators.Tasks.Android
             {
                 using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                 {
+                    // Xamarin Forms
+                    if (activity.Is("Xamarin.Forms.Platform.Android.FormsAppCompatActivity"))
+                    {
+                        var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
+                        if (appClass != null)
+                        {
+                            builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
+                            builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
+                            builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
+                            builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
+                            builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
+                        }
+                    }
+                    else
+                    {
+                        builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
+                        this.AppendShinyOnCreate(activity, builder);
+                    }
                     this.TryAppendOnCreateThirdParty(activity, builder);
-                    builder.AppendLineInvariant("this.ShinyOnCreate();");
-                    if (activity.HasMethod("OnCreated"))
-                        builder.AppendLineInvariant("this.OnCreated();");
-
-                    builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
                 }
             }
         }
 
 
+        void AppendShinyOnCreate(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        {
+            builder.AppendLineInvariant("this.ShinyOnCreate();");
+            if (activity.HasMethod("OnCreated"))
+                builder.AppendLineInvariant("this.OnCreated();");
+        }
+
+
         void TryAppendOnCreateThirdParty(INamedTypeSymbol activity, IIndentedStringBuilder builder)
         {
-            // Xamarin Forms
-            if (activity.Is("Xamarin.Forms.Platform.Android.FormsAppCompatActivity"))
-            {
-                var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
-                if (appClass != null)
-                {
-                    builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
-                    builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
-                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
-                    builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
-                }
-            }
+
 
             // AiForms.SettingsView
             if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.Droid.SettingsViewInit") != null)
