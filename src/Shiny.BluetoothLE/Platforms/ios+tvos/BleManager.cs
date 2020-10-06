@@ -17,39 +17,34 @@ namespace Shiny.BluetoothLE
         public override bool IsScanning => this.context.Manager.IsScanning;
 
 
-        public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
+        public override IObservable<AccessState> RequestAccess(bool forBackground) => Observable.Create<AccessState>(async ob =>
         {
-        //< key > NSBluetoothPeripheralUsageDescription </ key >
-        //< string > Example </ string >
-        //< key > NSBluetoothAlwaysUsageDescription </ key >
-        //< string > Gimmie some BLUETOOTH</ string >
-               //<key>UIBackgroundModes</key>
-               //<array>
-               //    <string>location</ string >
-               //    <string>bluetooth-central</string>
-               //</array>
-               // TODO: if background
-               //if (PlatformExtensions.AssertInfoPlistEntry(""))
-               //{
+            // don't bother with plist checks here - native crash would have taken place if those values were missing
+            IDisposable? disp = null;
 
-               //}
-               // TODO: check info.plist?
-               IDisposable ? disp = null;
-            if (this.context.Manager.State == CBCentralManagerState.Unknown)
+            (await this.RequestAccess(forBackground)).Assert();
+            if (forBackground && !this.context.HasRegisteredDelegates)
             {
-                disp = this.context
-                    .StateUpdated
-                    .Subscribe(_ =>
-                    {
-                        var current = this.context.Manager.State.FromNative();
-                        ob.Respond(current);
-                    });
+                Logging.Log.Write("", "");
+                ob.Respond(AccessState.NotSetup);
             }
             else
             {
-                ob.Respond(this.context.Manager.State.FromNative());
+                if (this.context.Manager.State == CBCentralManagerState.Unknown)
+                {
+                    disp = this.context
+                        .StateUpdated
+                        .Subscribe(_ =>
+                        {
+                            var current = this.context.Manager.State.FromNative();
+                            ob.Respond(current);
+                        });
+                }
+                else
+                {
+                    ob.Respond(this.context.Manager.State.FromNative());
+                }
             }
-
             return () => disp?.Dispose();
         });
 

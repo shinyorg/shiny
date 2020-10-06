@@ -19,7 +19,6 @@ namespace Shiny.Generators.iOS.Tests
                 "SwipeView_Experimental",
                 "Expander_Experimental"
             );
-            //this.LoadApplication(new App());
         }
 
         public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) {}

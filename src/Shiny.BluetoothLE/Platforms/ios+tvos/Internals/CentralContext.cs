@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
+using Shiny.Logging;
 
 
 namespace Shiny.BluetoothLE.Internals
@@ -12,19 +13,17 @@ namespace Shiny.BluetoothLE.Internals
     public class CentralContext : CBCentralManagerDelegate
     {
         readonly ConcurrentDictionary<string, IPeripheral> peripherals = new ConcurrentDictionary<string, IPeripheral>();
-        readonly IServiceProvider services;
 
 
         public CentralContext(IServiceProvider services, BleConfiguration config)
         {
             if (!PlatformExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
-                Console.WriteLine("NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
+                Log.Write("BluetoothLE", "NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
 
             if (!PlatformExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
-                Console.WriteLine("NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
+                Log.Write("BluetoothLE", "NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
 
-            this.services = services;
-
+            this.Services = services;
             var opts = new CBCentralInitOptions
             {
                 ShowPowerAlert = config.iOSShowPowerAlert
@@ -37,7 +36,9 @@ namespace Shiny.BluetoothLE.Internals
         }
 
 
-        public CBCentralManager Manager { get; }
+        public IServiceProvider Services { get; }
+        public CBCentralManager Manager { get; private set; }
+        public bool HasRegisteredDelegates => this.Services.GetService(typeof(BleDelegate)) != null;
 
 
         public IPeripheral GetPeripheral(CBPeripheral peripheral) => this.peripherals.GetOrAdd(
@@ -63,18 +64,19 @@ namespace Shiny.BluetoothLE.Internals
         public override void WillRestoreState(CBCentralManager central, NSDictionary dict)
         {
 #if __IOS__
-            Dispatcher.ExecuteBackgroundTask(async () =>
+            this.Manager = central;
+            Dispatcher.ExecuteBackgroundTask((Func<System.Threading.Tasks.Task>)(async () =>
             {
-                var del = this.services.Resolve<IBleDelegate>();
+                var del = Extensions_ServiceCollection.Resolve<IBleDelegate>(this.Services);
 
                 var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
                 for (nuint i = 0; i < peripheralArray.Count; i++)
                 {
                     var item = peripheralArray.GetItem<CBPeripheral>(i);
                     var peripheral = this.GetPeripheral(item);
-                    await this.services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
+                    await ServiceProviderExtensions.RunDelegates<IBleDelegate>(this.Services, (Func<IBleDelegate, System.Threading.Tasks.Task>)(x => (System.Threading.Tasks.Task)x.OnConnected((IPeripheral)peripheral)));
                 }
-            });
+            }));
             // TODO: restore scan? CBCentralManager.RestoredStateScanOptionsKey
 #endif
         }
@@ -84,7 +86,7 @@ namespace Shiny.BluetoothLE.Internals
         public override async void ConnectedPeripheral(CBCentralManager central, CBPeripheral peripheral)
         {
             var p = this.GetPeripheral(peripheral);
-            await this.services.RunDelegates<IBleDelegate>(x => x.OnConnected(p));
+            await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(p));
             this.PeripheralConnected.OnNext(peripheral);
         }
 
@@ -102,7 +104,7 @@ namespace Shiny.BluetoothLE.Internals
                 new AdvertisementData(advertisementData)
             );
             this.ScanResultReceived.OnNext(result);
-            this.services.RunDelegates<IBleDelegate>(x => x.OnScanResult(result));
+            this.Services.RunDelegates<IBleDelegate>(x => x.OnScanResult(result));
         }
 
 
@@ -119,7 +121,7 @@ namespace Shiny.BluetoothLE.Internals
                 return;
 
             this.StateUpdated.OnNext(state);
-            await this.services.RunDelegates<IBleDelegate>(x => x.OnAdapterStateChanged(state));
+            await this.Services.RunDelegates<IBleDelegate>(x => x.OnAdapterStateChanged(state));
         }
     }
 }

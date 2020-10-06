@@ -46,7 +46,7 @@ namespace Shiny.BluetoothLE
                 .Select(this.context.GetDevice));
 
 
-        public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async () =>
+        public override IObservable<AccessState> RequestAccess(bool forBackground) => Observable.FromAsync(async () =>
         {
             if (!this.context.Android.IsInManifest(Manifest.Permission.Bluetooth))
                 return AccessState.NotSetup;
@@ -54,7 +54,7 @@ namespace Shiny.BluetoothLE
             if (!this.context.Android.IsInManifest(Manifest.Permission.BluetoothAdmin))
                 return AccessState.NotSetup;
 
-            var result = this.context.Android.IsAtLeastAndroid10()
+            var result = this.context.Android.IsAtLeastAndroid10() && forBackground
                 ? await this.context.Android.RequestAccess(Manifest.Permission.AccessBackgroundLocation, Manifest.Permission.AccessFineLocation)
                 : await this.context.Android.RequestAccess(Manifest.Permission.AccessFineLocation);
 

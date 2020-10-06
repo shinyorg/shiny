@@ -21,7 +21,7 @@ namespace Shiny.Printers.BluetoothLE
         }
 
 
-        public Task<AccessState> RequestAccess() => this.bleManager.RequestAccess().ToTask();
+        public Task<AccessState> RequestAccess() => this.bleManager.RequestAccess(false).ToTask();
 
 
         public IObservable<IPrinter> Scan()

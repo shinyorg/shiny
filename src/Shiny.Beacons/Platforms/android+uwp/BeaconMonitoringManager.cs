@@ -118,7 +118,7 @@ namespace Shiny.Beacons
 
         public async Task<AccessState> RequestAccess()
         {
-            var access = await this.bleManager.RequestAccess().ToTask();
+            var access = await this.bleManager.RequestAccess(true).ToTask();
 #if __ANDROID__
             if (access == AccessState.Available && this.context.IsMinApiLevel(26))
                 access = await this.context.RequestAccess(Android.Manifest.Permission.ForegroundService).ToTask();
