@@ -20,30 +20,24 @@ namespace Shiny.BluetoothLE
         public override IObservable<AccessState> RequestAccess(bool forBackground) => Observable.Create<AccessState>(async ob =>
         {
             // don't bother with plist checks here - native crash would have taken place if those values were missing
-            IDisposable? disp = null;
-
             (await this.RequestAccess(forBackground)).Assert();
             if (forBackground && !this.context.HasRegisteredDelegates)
+                throw new ApplicationException("No background delegate registered with Shiny");
+
+            IDisposable? disp = null;
+            if (this.context.Manager.State == CBCentralManagerState.Unknown)
             {
-                Logging.Log.Write("", "");
-                ob.Respond(AccessState.NotSetup);
+                disp = this.context
+                    .StateUpdated
+                    .Subscribe(_ =>
+                    {
+                        var current = this.context.Manager.State.FromNative();
+                        ob.Respond(current);
+                    });
             }
             else
             {
-                if (this.context.Manager.State == CBCentralManagerState.Unknown)
-                {
-                    disp = this.context
-                        .StateUpdated
-                        .Subscribe(_ =>
-                        {
-                            var current = this.context.Manager.State.FromNative();
-                            ob.Respond(current);
-                        });
-                }
-                else
-                {
-                    ob.Respond(this.context.Manager.State.FromNative());
-                }
+                ob.Respond(this.context.Manager.State.FromNative());
             }
             return () => disp?.Dispose();
         });
