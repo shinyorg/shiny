@@ -28,29 +28,18 @@ namespace Shiny.BluetoothLE
             .Native
             .GetMaximumWriteValueLength(CBCharacteristicWriteType.WithoutResponse);
 
-        public override ConnectionState Status
+
+        public override ConnectionState Status => this.Native.State switch
         {
-            get
-            {
-                switch (this.Native.State)
-                {
-                    case CBPeripheralState.Connected:
-                        return ConnectionState.Connected;
+            CBPeripheralState.Connected => ConnectionState.Connected,
+            CBPeripheralState.Connecting => ConnectionState.Connecting,
+            CBPeripheralState.Disconnected => ConnectionState.Disconnected,
+            CBPeripheralState.Disconnecting => ConnectionState.Disconnecting,
+            _ => ConnectionState.Disconnected
+        };
 
-                    case CBPeripheralState.Connecting:
-                        return ConnectionState.Connecting;
 
-                    case CBPeripheralState.Disconnecting:
-                        return ConnectionState.Disconnecting;
-
-                    case CBPeripheralState.Disconnected:
-                    default:
-                        return ConnectionState.Disconnected;
-                }
-            }
-        }
-
-        public override void Connect(ConnectionConfig config)
+        public override void Connect(ConnectionConfig? config = null)
         {
             var arc = config?.AutoConnect ?? true;
             if (arc)

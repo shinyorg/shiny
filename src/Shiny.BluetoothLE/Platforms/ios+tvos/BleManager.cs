@@ -19,8 +19,22 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
         {
-            // TODO: check info.plist?
-            IDisposable disp = null;
+        //< key > NSBluetoothPeripheralUsageDescription </ key >
+        //< string > Example </ string >
+        //< key > NSBluetoothAlwaysUsageDescription </ key >
+        //< string > Gimmie some BLUETOOTH</ string >
+               //<key>UIBackgroundModes</key>
+               //<array>
+               //    <string>location</ string >
+               //    <string>bluetooth-central</string>
+               //</array>
+               // TODO: if background
+               //if (PlatformExtensions.AssertInfoPlistEntry(""))
+               //{
+
+               //}
+               // TODO: check info.plist?
+               IDisposable ? disp = null;
             if (this.context.Manager.State == CBCentralManagerState.Unknown)
             {
                 disp = this.context

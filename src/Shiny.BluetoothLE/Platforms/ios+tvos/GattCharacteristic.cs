@@ -33,26 +33,6 @@ namespace Shiny.BluetoothLE
         }
 
 
-        IObservable<CharacteristicGattResult> WriteWithResponse(byte[] value) => Observable.Create<CharacteristicGattResult>(ob =>
-        {
-            var data = NSData.FromArray(value);
-            var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
-            {
-                if (!this.Equals(args.Characteristic))
-                    return;
-
-                if (args.Error == null)
-                    ob.Respond(new CharacteristicGattResult(this, null, CharacteristicResultType.Write));
-                else
-                    ob.OnError(new BleException(args.Error.Description));
-            });
-            this.Peripheral.WroteCharacteristicValue += handler;
-            this.Peripheral.WriteValue(data, this.NativeCharacteristic, CBCharacteristicWriteType.WithResponse);
-
-            return () => this.Peripheral.WroteCharacteristicValue -= handler;
-        });
-
-
         public override IObservable<CharacteristicGattResult> Read() => Observable.Create<CharacteristicGattResult>(ob =>
         {
             this.AssertRead();
@@ -78,7 +58,7 @@ namespace Shiny.BluetoothLE
         {
             this.AssertNotify();
 
-            this.notifyOb = this.notifyOb ?? Observable.Create<CharacteristicGattResult>(ob =>
+            this.notifyOb ??= Observable.Create<CharacteristicGattResult>(ob =>
             {
                 var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
                 {
@@ -163,6 +143,26 @@ namespace Shiny.BluetoothLE
 
 
         #region Internals
+
+        IObservable<CharacteristicGattResult> WriteWithResponse(byte[] value) => Observable.Create<CharacteristicGattResult>(ob =>
+        {
+            var data = NSData.FromArray(value);
+            var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
+            {
+                if (!this.Equals(args.Characteristic))
+                    return;
+
+                if (args.Error == null)
+                    ob.Respond(new CharacteristicGattResult(this, null, CharacteristicResultType.Write));
+                else
+                    ob.OnError(new BleException(args.Error.Description));
+            });
+            this.Peripheral.WroteCharacteristicValue += handler;
+            this.Peripheral.WriteValue(data, this.NativeCharacteristic, CBCharacteristicWriteType.WithResponse);
+
+            return () => this.Peripheral.WroteCharacteristicValue -= handler;
+        });
+
 
         bool Equals(CBCharacteristic ch)
         {

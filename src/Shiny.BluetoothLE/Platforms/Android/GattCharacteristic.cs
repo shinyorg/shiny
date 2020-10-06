@@ -34,7 +34,7 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
         {
-            this.AssertWrite(false);
+            this.AssertWrite(withResponse);
 
             var sub = this.context
                 .Callbacks
@@ -49,7 +49,7 @@ namespace Shiny.BluetoothLE
                         ob.OnError(new BleException($"Failed to write characteristic - {args.Status}"));
                     }
                     else
-                    { 
+                    {
                         var writeType = withResponse
                             ? CharacteristicResultType.Write
                             : CharacteristicResultType.WriteWithoutResponse;

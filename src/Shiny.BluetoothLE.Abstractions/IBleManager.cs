@@ -9,8 +9,9 @@ namespace Shiny.BluetoothLE
         /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
+        /// <param name="forBackground">Set to true if this scan is to be used in the background</param>
         /// <returns></returns>
-        IObservable<AccessState> RequestAccess();
+        IObservable<AccessState> RequestAccess(bool forBackground);
 
         /// <summary>
         /// Get a known peripheral
