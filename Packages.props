@@ -1,6 +1,4 @@
 <Project>
-
-
     <ItemGroup>
         <PackageReference Update="sqlite-net-pcl" Version="1.7.335" />
         <PackageReference Update="Newtonsoft.Json" Version="12.0.3" />
@@ -12,8 +10,9 @@
         <PackageReference Update="AWSSDK.MobileAnalytics" Version="3.5.0.24" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="  $(TargetFramework.StartsWith('monoandroid')) ">
         <PackageReference Update="Xamarin.AndroidX.Core" Version="1.3.0.3" />
+        <PackageReference Update="Xamarin.AndroidX.Arch.Core.Runtime" Version="2.1.0.6" />
         <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.2.0.4" />
         <PackageReference Update="Xamarin.AndroidX.Concurrent.Futures" Version="1.0.0.5" />
         <PackageReference Update="Xamarin.AndroidX.Room.Common" Version="2.2.5.5" />
@@ -24,23 +23,13 @@
         <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.0.2-preview02" />
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="117.0.0-preview04" />
         <!--
-Severity	Code	Description	Project	File	Line	Suppression State
-Error	NU1107	Version conflict detected for Xamarin.GooglePlayServices.Basement. Install/reference Xamarin.GooglePlayServices.Basement 117.1.0-preview04 directly to project Samples.Android-Debug to resolve this issue.
- Samples.Android-Debug -> Shiny.Locations -> Xamarin.GooglePlayServices.Location 117.0.0-preview04 -> Xamarin.GooglePlayServices.Basement (>= 117.1.0-preview04)
- Samples.Android-Debug -> Shiny.Push -> Xamarin.Firebase.Messaging 32.961.0 -> Xamarin.GooglePlayServices.Basement (= 32.961.0).	Samples.Android-Debug	C:\dev\shinylibs\shinysamples\Samples.Android\Samples.Android-Debug.csproj	1
-
-
-        <PackageReference Include="Xamarin.Android.Support.Core.Utils" Version="28.0.0.3" />
-        <PackageReference Include="Xamarin.Firebase.Messaging" Version="71.1740.4" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="71.1601.4" />
-
         <PackageReference Include="Xamarin.Firebase.Common" Version="119.3.0-preview02" />
         <PackageReference Include="Xamarin.GooglePlayServices.Base" Version="117.2.1-preview02" />
         <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="117.2.1-preview02" />
         -->
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
         <PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.17134.1000" />
         <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="6.1.1" />
