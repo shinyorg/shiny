@@ -69,9 +69,9 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Base" Version="117.2.1-preview02" />
         <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="117.2.1-preview02" />
         -->
-        <PackageReference Include="Xamarin.Firebase.Messaging" Version="120.1.7-preview02" />
-        <PackageReference Include="Xamarin.Firebase.Datatransport" Version="117.0.5-preview02" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="117.0.2-preview02" />
+        <PackageReference Include="Xamarin.Firebase.Messaging" />
+        <PackageReference Include="Xamarin.Firebase.Datatransport" />
+        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>

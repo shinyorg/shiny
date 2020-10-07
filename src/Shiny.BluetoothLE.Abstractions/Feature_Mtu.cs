@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE
 {
@@ -20,12 +20,12 @@ namespace Shiny.BluetoothLE
         public static bool IsMtuRequestsAvailable(this IPeripheral peripheral) => peripheral is ICanRequestMtu;
 
 
-        public static IObservable<int> RequestMtu(this IPeripheral peripheral, int requestSize)
+        public static IObservable<int> TryRequestMtu(this IPeripheral peripheral, int requestSize)
         {
             if (peripheral is ICanRequestMtu mtu)
                 return mtu.RequestMtu(requestSize);
 
-            throw new NotSupportedException("MTU requests are not supported on this platform");
+            return Observable.Return(peripheral.MtuSize);
         }
 
 
@@ -34,7 +34,7 @@ namespace Shiny.BluetoothLE
             if (periperhal is ICanRequestMtu mtu)
                 return mtu.WhenMtuChanged();
 
-            throw new NotSupportedException("MTU requests are not supported on this platform");
+            return Observable.Empty<int>();
         }
     }
 }

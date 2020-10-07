@@ -38,7 +38,7 @@ namespace Shiny.BluetoothLE
 
 
         // TODO: check appmanifest
-        public override IObservable<AccessState> RequestAccess() => Observable.Return(AccessState.Available);
+        public override IObservable<AccessState> RequestAccess(bool forBackground) => Observable.Return(AccessState.Available);
         public override bool IsScanning { get; protected set; }
 
 
@@ -65,7 +65,7 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IPeripheral> GetKnownPeripheral(Guid deviceId) => Observable.FromAsync(async ct =>
+        public override IObservable<IPeripheral?> GetKnownPeripheral(Guid deviceId) => Observable.FromAsync(async ct =>
         {
             var mac = deviceId.ToBluetoothAddress();
             var per = this.context.GetPeripheral(mac);
