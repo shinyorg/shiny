@@ -1,6 +1,7 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
+        <VersionPrefix>beta</VersionPrefix>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <Description>Shiny Push Integration - Amazon Web Services Simple Notifications Service</Description>
     </PropertyGroup>
