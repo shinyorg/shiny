@@ -65,9 +65,9 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IPeripheral?> GetKnownPeripheral(Guid deviceId) => Observable.FromAsync(async ct =>
+        public override IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid) => Observable.FromAsync(async ct =>
         {
-            var mac = deviceId.ToBluetoothAddress();
+            var mac = Guid.Parse(peripheralUuid).ToBluetoothAddress();
             var per = this.context.GetPeripheral(mac);
 
             if (per == null)
@@ -81,7 +81,7 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null) => this.GetDevices(
+        public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null) => this.GetDevices(
             BluetoothLEDevice.GetDeviceSelectorFromConnectionStatus(BluetoothConnectionStatus.Connected)
         );
 
@@ -190,7 +190,7 @@ namespace Shiny.BluetoothLE
                  var adWatcher = new BluetoothLEAdvertisementWatcher();
                  if (config.ServiceUuids != null)
                      foreach (var serviceUuid in config.ServiceUuids)
-                         adWatcher.AdvertisementFilter.Advertisement.ServiceUuids.Add(serviceUuid);
+                         adWatcher.AdvertisementFilter.Advertisement.ServiceUuids.Add(Guid.Parse(serviceUuid));
 
                  switch (config.ScanType)
                  {

@@ -14,7 +14,7 @@ namespace Shiny.BluetoothLE
         readonly Native native;
 
 
-        public GattDescriptor(Native native, IGattCharacteristic characteristic) : base(characteristic, native.Uuid)
+        public GattDescriptor(Native native, IGattCharacteristic characteristic) : base(characteristic, native.Uuid.ToString())
         {
             this.native = native;
         }

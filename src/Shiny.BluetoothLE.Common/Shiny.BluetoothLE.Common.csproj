@@ -6,7 +6,7 @@
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
-    
+
       <ItemGroup>
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
@@ -23,7 +23,7 @@
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">        
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\Android\**\*.cs" />
@@ -39,7 +39,7 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Reference Include="netstandard" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
+        <Compile Include="**\Platforms\*macOS*\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">

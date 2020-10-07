@@ -11,7 +11,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="[4.1.0, 5)" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">

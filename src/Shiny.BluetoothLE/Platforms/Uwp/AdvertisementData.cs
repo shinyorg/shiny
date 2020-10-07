@@ -9,7 +9,7 @@ namespace Shiny.BluetoothLE
     public class AdvertisementData : IAdvertisementData
     {
         readonly BluetoothLEAdvertisementReceivedEventArgs adData;
-        readonly Lazy<Guid[]> serviceUuids;
+        readonly Lazy<string[]> serviceUuids;
         readonly Lazy<ManufacturerData> manufacturerData;
         readonly Lazy<int> txPower;
 
@@ -24,7 +24,7 @@ namespace Shiny.BluetoothLE
                 .Select(x => new ManufacturerData(x.CompanyId, x.Data.ToArray()))
                 .FirstOrDefault()
             );
-            this.serviceUuids = new Lazy<Guid[]>(() => args.Advertisement.ServiceUuids.ToArray());
+            this.serviceUuids = new Lazy<string[]>(() => args.Advertisement.ServiceUuids.Select(x => x.ToString()).ToArray());
             this.txPower = new Lazy<int>(() => args.Advertisement.GetTxPower());
         }
 
@@ -37,7 +37,7 @@ namespace Shiny.BluetoothLE
 
         public AdvertisementServiceData[]? ServiceData { get; } = null;
         public ManufacturerData ManufacturerData => this.manufacturerData.Value;
-        public Guid[] ServiceUuids => this.serviceUuids.Value;
+        public string[] ServiceUuids => this.serviceUuids.Value;
         public int TxPower => this.txPower.Value;
     }
 }

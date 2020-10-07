@@ -13,14 +13,14 @@ namespace Shiny.BluetoothLE.Hosting
         GattServiceProviderResult native;
 
 
-        public GattService(Guid uuid)
+        public GattService(string uuid)
         {
             this.Uuid = uuid;
             this.characteristics = new List<GattCharacteristic>();
         }
 
 
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public bool Primary => false;
 
 
@@ -28,7 +28,7 @@ namespace Shiny.BluetoothLE.Hosting
             this.characteristics.Cast<IGattCharacteristic>().ToList();
 
 
-        public IGattCharacteristic AddCharacteristic(Guid uuid, Action<IGattCharacteristicBuilder> characteristicBuilder)
+        public IGattCharacteristic AddCharacteristic(string uuid, Action<IGattCharacteristicBuilder> characteristicBuilder)
         {
             var ch = new GattCharacteristic(uuid);
             characteristicBuilder(ch);
@@ -39,7 +39,7 @@ namespace Shiny.BluetoothLE.Hosting
 
         public async Task Build()
         {
-            this.native = await GattServiceProvider.CreateAsync(this.Uuid);
+            this.native = await GattServiceProvider.CreateAsync(Guid.Parse(this.Uuid));
             foreach (var ch in this.characteristics)
                 await ch.Build(this.native);
 

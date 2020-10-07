@@ -11,15 +11,8 @@ namespace Shiny.BluetoothLE.Hosting
 {
     public class BleHostingManager : IBleHostingManager
     {
-        readonly BluetoothLEAdvertisementPublisher publisher;
-        readonly Dictionary<Guid, GattService> services;
-
-
-        public BleHostingManager()
-        {
-            this.publisher = new BluetoothLEAdvertisementPublisher();
-            this.services = new Dictionary<Guid, GattService>();
-        }
+        readonly BluetoothLEAdvertisementPublisher publisher = new BluetoothLEAdvertisementPublisher();
+        readonly Dictionary<string, GattService> services = new Dictionary<string, GattService>();
 
 
         public AccessState Status
@@ -62,8 +55,7 @@ namespace Shiny.BluetoothLE.Hosting
 
         public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToList();
         public IObservable<AccessState> WhenStatusChanged() => Observable.Return(AccessState.Available);
-
-        public async Task<IGattService> AddService(Guid uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+        public async Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
         {
             var sb = new GattService(uuid);
             serviceBuilder(sb);
@@ -83,7 +75,7 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public void RemoveService(Guid serviceUuid)
+        public void RemoveService(string serviceUuid)
         {
             if (!this.services.ContainsKey(serviceUuid))
                 return;
@@ -93,7 +85,7 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public Task StartAdvertising(AdvertisementData adData = null)
+        public Task StartAdvertising(AdvertisementData? adData = null)
         {
             this.publisher.Advertisement.Flags = BluetoothLEAdvertisementFlags.ClassicNotSupported;
             this.publisher.Advertisement.ManufacturerData.Clear();
@@ -111,7 +103,7 @@ namespace Shiny.BluetoothLE.Hosting
 
             if (adData?.ServiceUuids != null)
                 foreach (var serviceUuid in adData.ServiceUuids)
-                    this.publisher.Advertisement.ServiceUuids.Add(serviceUuid);
+                    this.publisher.Advertisement.ServiceUuids.Add(Guid.Parse(serviceUuid));
 
             this.publisher.Start();
             return Task.CompletedTask;

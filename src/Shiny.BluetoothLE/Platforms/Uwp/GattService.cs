@@ -16,21 +16,21 @@ namespace Shiny.BluetoothLE
         readonly Native native;
 
 
-        public GattService(DeviceContext context, Native native) : base(context.Peripheral, native.Uuid, false)
+        public GattService(DeviceContext context, Native native) : base(context.Peripheral, native.Uuid.ToString(), false)
         {
             this.context = context;
             this.native = native;
         }
 
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
+        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
             => Observable.Create<IGattCharacteristic>(async ob =>
             {
                 var found = false;
 
                 foreach (var uuid in characteristicIds)
                 {
-                    var result = await this.native.GetCharacteristicsForUuidAsync(uuid, BluetoothCacheMode.Cached);
+                    var result = await this.native.GetCharacteristicsForUuidAsync(Guid.Parse(uuid), BluetoothCacheMode.Cached);
                     if (result.Status == GattCommunicationStatus.Success)
                     {
                         found = true;

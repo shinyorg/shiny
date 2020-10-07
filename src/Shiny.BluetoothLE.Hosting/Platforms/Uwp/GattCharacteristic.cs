@@ -12,14 +12,10 @@ namespace Shiny.BluetoothLE.Hosting
         GattProtectionLevel readProtection = GattProtectionLevel.Plain;
         GattProtectionLevel writeProtection = GattProtectionLevel.Plain;
 
-
-        public GattCharacteristic(Guid uuid)
-        {
-            this.Uuid = uuid;
-        }
+        public GattCharacteristic(string uuid) => this.Uuid = uuid;
 
 
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public CharacteristicProperties Properties => throw new NotImplementedException();
         public IReadOnlyList<IPeripheral> SubscribedCentrals => throw new NotImplementedException();
 
@@ -31,7 +27,7 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public IGattCharacteristicBuilder SetNotification(Action<CharacteristicSubscription> onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
+        public IGattCharacteristicBuilder SetNotification(Action<CharacteristicSubscription>? onSubscribe = null, NotificationOptions options = NotificationOptions.Notify)
         {
             return this;
         }
@@ -79,7 +75,7 @@ namespace Shiny.BluetoothLE.Hosting
             var characteristic = await native
                 .ServiceProvider
                 .Service
-                .CreateCharacteristicAsync(this.Uuid, parameters);
+                .CreateCharacteristicAsync(Guid.Parse(this.Uuid), parameters);
         }
 
         public void Dispose()

@@ -10,6 +10,6 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
-        <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
+        <PackageReference Include="sqlite-net-pcl" />
     </ItemGroup>
 </Project>

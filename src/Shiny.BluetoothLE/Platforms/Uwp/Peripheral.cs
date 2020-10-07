@@ -22,8 +22,7 @@ namespace Shiny.BluetoothLE
         {
             this.context = new DeviceContext(adapterContext, this, native);
             this.Name = native.Name;
-            this.Uuid = native.GetDeviceId();
-
+            this.Uuid = native.GetDeviceId().ToString();
         }
 
 
@@ -32,11 +31,9 @@ namespace Shiny.BluetoothLE
         public override ConnectionState Status => this.context.Status;
         public override IObservable<ConnectionState> WhenStatusChanged() => this.context.WhenStatusChanged();
         public override IObservable<int> ReadRssi() => Observable.Empty<int>();
-
-
-        public override IObservable<IGattService> GetKnownService(Guid serviceUuid) => Observable.FromAsync(async ct =>
+        public override IObservable<IGattService> GetKnownService(string serviceUuid) => Observable.FromAsync(async ct =>
         {
-            var result = await this.context.NativeDevice.GetGattServicesForUuidAsync(serviceUuid, BluetoothCacheMode.Cached);
+            var result = await this.context.NativeDevice.GetGattServicesForUuidAsync(Guid.Parse(serviceUuid), BluetoothCacheMode.Cached);
             if (result.Status != GattCommunicationStatus.Success)
                 throw new ArgumentException("Could not find GATT service - " + result.Status);
 

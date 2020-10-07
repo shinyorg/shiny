@@ -9,7 +9,7 @@
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
-        <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
+        <PackageReference Include="sqlite-net-pcl" />
     </ItemGroup>
 
 </Project>

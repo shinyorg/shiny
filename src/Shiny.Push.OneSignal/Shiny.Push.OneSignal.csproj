@@ -10,7 +10,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
-        <PackageReference Include="Com.OneSignal" Version="3.10.1" />
+        <PackageReference Include="Com.OneSignal" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -26,11 +26,11 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.3" />
-        <PackageReference Include="Xamarin.Android.Support.v7.CardView" Version="28.0.0.3" />
-        <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.3" />
-        <PackageReference Include="Xamarin.Android.Support.Compat" Version="28.0.0.3" />
-        <PackageReference Include="Xamarin.Android.Support.Annotations" Version="28.0.0.3" />
+        <PackageReference Include="Xamarin.Android.Support.v4" />
+        <PackageReference Include="Xamarin.Android.Support.v7.CardView" />
+        <PackageReference Include="Xamarin.Android.Support.CustomTabs" />
+        <PackageReference Include="Xamarin.Android.Support.Compat" />
+        <PackageReference Include="Xamarin.Android.Support.Annotations" />
         <ProjectReference Include="..\Shiny.Push.Abstractions\Shiny.Push.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
         <Compile Include="Platforms\**\*.cs" />

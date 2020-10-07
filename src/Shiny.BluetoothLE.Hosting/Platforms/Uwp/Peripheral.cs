@@ -8,11 +8,11 @@ namespace Shiny.BluetoothLE.Hosting
     {
         public Peripheral(GattSession session)
         {
-            this.Uuid = new Guid(session.DeviceId.Id);
+            this.Uuid = session.DeviceId.Id;
         }
 
 
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public object Context { get; set; }
     }
 }

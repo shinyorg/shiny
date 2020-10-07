@@ -21,7 +21,7 @@ namespace Shiny.BluetoothLE
                                   Native native,
                                   IGattService service)
                             : base(service,
-                                   native.Uuid,
+                                   native.Uuid.ToString(),
                                    (CharacteristicProperties)native.CharacteristicProperties)
         {
             this.context = context;
