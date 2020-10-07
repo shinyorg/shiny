@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using CoreBluetooth;
+using Foundation;
 using Shiny.BluetoothLE.Internals;
 
 
@@ -46,29 +47,29 @@ namespace Shiny.BluetoothLE
         public override AccessState Status => this.context.Manager.State.FromNative();
 
 
-        public override IObservable<IPeripheral> GetKnownPeripheral(Guid deviceId)
+        public override IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid)
         {
-            var uuid = deviceId.ToNSUuid();
+            var uuid = new NSUuid(peripheralUuid);
             var peripheral = this.context
                 .Manager
                 .RetrievePeripheralsWithIdentifiers(uuid)
                 .FirstOrDefault();
 
             if (peripheral == null)
-                return Observable.Return<IPeripheral>(null);
+                return Observable.Return<IPeripheral?>(null);
 
             var device = this.context.GetPeripheral(peripheral);
             return Observable.Return(device);
         }
 
 
-        public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null)
+        public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null)
         {
             if (serviceUuid == null)
                 return Observable.Return(this.context.GetConnectedDevices().ToList());
 
             var list = new List<IPeripheral>();
-            var peripherals = this.context.Manager.RetrieveConnectedPeripherals(serviceUuid.Value.ToCBUuid());
+            var peripherals = this.context.Manager.RetrieveConnectedPeripherals(CBUUID.FromString(serviceUuid));
             foreach (var peripheral in peripherals)
             {
                 var dev = this.context.GetPeripheral(peripheral);
@@ -111,7 +112,7 @@ namespace Shiny.BluetoothLE
                     }
                     else
                     {
-                        var uuids = config.ServiceUuids.Select(o => o.ToCBUuid()).ToArray();
+                        var uuids = config.ServiceUuids.Select(CBUUID.FromString).ToArray();
                         this.context.Manager.ScanForPeripherals(uuids, new PeripheralScanningOptions { AllowDuplicatesKey = true });
                     }
 

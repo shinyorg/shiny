@@ -20,47 +20,34 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public static AccessState FromNative(this State state)
+        public static AccessState FromNative(this State state) => state switch
         {
-            switch (state)
-            {
-                case State.Off:
-                case State.TurningOff:
-                case State.Disconnecting:
-                case State.Disconnected:
-                    return AccessState.Disabled;
+            var x when
+                x == State.Off ||
+                x == State.TurningOff ||
+                x == State.Disconnecting ||
+                x == State.Disconnected
+                    => AccessState.Disabled,
 
-                case State.On:
-                case State.Connected:
-                    return AccessState.Available;
+            var x when
+                x == State.On ||
+                x == State.Connected
+                    => AccessState.Available,
 
-                default:
-                    return AccessState.Unknown;
-            }
-        }
+            _ => AccessState.Unknown
+        };
 
 
         public static BluetoothManager GetBluetooth(this AndroidContext context)
             => (BluetoothManager)context.AppContext.GetSystemService(Context.BluetoothService);
 
 
-        public static ConnectionState ToStatus(this ProfileState state)
+        public static ConnectionState ToStatus(this ProfileState state) => state switch
         {
-            switch (state)
-            {
-                case ProfileState.Connected:
-                    return ConnectionState.Connected;
-
-                case ProfileState.Connecting:
-                    return ConnectionState.Connecting;
-
-                case ProfileState.Disconnecting:
-                    return ConnectionState.Disconnecting;
-
-                case ProfileState.Disconnected:
-                default:
-                    return ConnectionState.Disconnected;
-            }
-        }
+            ProfileState.Connected => ConnectionState.Connected,
+            ProfileState.Connecting => ConnectionState.Connecting,
+            ProfileState.Disconnecting => ConnectionState.Disconnecting,
+            _ => ConnectionState.Disconnected
+        };
     }
 }

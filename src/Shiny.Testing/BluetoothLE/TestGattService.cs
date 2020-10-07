@@ -9,7 +9,7 @@ namespace Shiny.Testing.BluetoothLE
 {
     public class TestGattService : IGattService
     {
-        public TestGattService(IPeripheral peripheral, Guid uuid)
+        public TestGattService(IPeripheral peripheral, string uuid)
         {
             this.Peripheral = peripheral;
             this.Uuid = uuid;
@@ -17,12 +17,12 @@ namespace Shiny.Testing.BluetoothLE
 
 
         public IPeripheral Peripheral { get; }
-        public Guid Uuid { get; }
+        public string Uuid { get; }
 
 
         public List<IGattCharacteristic> Characteristics { get; set; } = new List<IGattCharacteristic>();
         public IObservable<IGattCharacteristic> DiscoverCharacteristics() => this.Characteristics.ToObservable();
-        public IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
+        public IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
             => this.Characteristics.Where(x => characteristicIds.Any(y => y == x.Uuid)).ToObservable();
     }
 }

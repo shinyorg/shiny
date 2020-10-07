@@ -26,8 +26,8 @@ namespace Shiny.BluetoothLE.RefitClient.Infrastructure
         protected IObservable<IGattCharacteristic> Char(string serviceUuid, string characteristicUuid) => this.Peripheral
             .ConnectWait()
             .Select(x => x.GetKnownCharacteristics(
-                Guid.Parse(serviceUuid),
-                Guid.Parse(characteristicUuid)
+                serviceUuid,
+                characteristicUuid
             ))
             .Timeout(TimeSpan.FromSeconds(20))
             .Switch();

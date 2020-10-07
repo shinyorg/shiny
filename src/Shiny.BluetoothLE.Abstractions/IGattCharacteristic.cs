@@ -6,7 +6,7 @@ namespace Shiny.BluetoothLE
     public interface IGattCharacteristic
     {
         IGattService Service { get; }
-        Guid Uuid { get; }
+        string Uuid { get; }
         bool IsNotifying { get; }
         CharacteristicProperties Properties { get; }
 

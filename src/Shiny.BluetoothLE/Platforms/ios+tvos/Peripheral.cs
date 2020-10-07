@@ -16,7 +16,7 @@ namespace Shiny.BluetoothLE
         IDisposable autoReconnectSub;
 
 
-        public Peripheral(CentralContext context, CBPeripheral native) : base(native.Name, native.Identifier.ToGuid())
+        public Peripheral(CentralContext context, CBPeripheral native) : base(native.Name, native.Identifier.ToString())
         {
             this.context = context;
             this.Native = native;
@@ -110,7 +110,7 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override IObservable<IGattService> GetKnownService(Guid serviceUuid)
+        public override IObservable<IGattService> GetKnownService(string serviceUuid)
             => Observable.Create<IGattService>(ob =>
             {
                 var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
@@ -129,7 +129,7 @@ namespace Shiny.BluetoothLE
                     }
                 });
                 this.Native.DiscoveredService += handler;
-                this.Native.DiscoverServices(new[] {serviceUuid.ToCBUuid()});
+                this.Native.DiscoverServices(new[] { CBUUID.FromString(serviceUuid) });
 
                 return () => this.Native.DiscoveredService -= handler;
             });
@@ -138,7 +138,7 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattService> DiscoverServices() => Observable.Create<IGattService>(ob =>
         {
             Log.Write("BluetoothLe-Device", "service discovery hooked for peripheral " + this.Uuid);
-            var services = new Dictionary<Guid, IGattService>();
+            var services = new Dictionary<string, IGattService>();
 
             var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
             {

@@ -4,8 +4,9 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
-using System.Reactive.Subjects;
-using System.Threading.Tasks;
+using Java.Util;
+using Observable = System.Reactive.Linq.Observable;
+
 
 namespace Shiny.BluetoothLE
 {
@@ -18,7 +19,7 @@ namespace Shiny.BluetoothLE
         public GattService(IPeripheral peripheral,
                            PeripheralContext context,
                            BluetoothGattService native) : base(peripheral,
-                                                               native.Uuid.ToGuid(),
+                                                               native.Uuid.ToString(),
                                                                native.Type == GattServiceType.Primary)
         {
             this.context = context;
@@ -37,10 +38,11 @@ namespace Shiny.BluetoothLE
             return Disposable.Empty;
         });
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
+
+        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
             => Observable.Create<IGattCharacteristic>(ob =>
             {
-                var cids = characteristicIds.Select(x => x.ToUuid()).ToArray();
+                var cids = characteristicIds.Select(UUID.FromString).ToArray();
                 foreach (var cid in cids)
                 {
                     var cs = this.native.GetCharacteristic(cid);

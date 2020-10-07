@@ -7,13 +7,13 @@ namespace Shiny.BluetoothLE.Hosting
 {
     public class Peripheral : IPeripheral
     {
-        readonly Lazy<Guid> deviceUuidLazy;
+        readonly Lazy<string> deviceUuidLazy;
 
 
         public Peripheral(BluetoothDevice native)
         {
             this.Native = native;
-            this.deviceUuidLazy = new Lazy<Guid>(() =>
+            this.deviceUuidLazy = new Lazy<string>(() =>
             {
                 var deviceGuid = new byte[16];
                 var mac = native.Address.Replace(":", "");
@@ -24,13 +24,14 @@ namespace Shiny.BluetoothLE.Hosting
                     .ToArray();
 
                 macBytes.CopyTo(deviceGuid, 10);
-                return new Guid(deviceGuid);
+                //return new Guid(deviceGuid);
+                return macBytes.ToString();
             });
         }
 
 
         public BluetoothDevice Native { get; }
-        public Guid Uuid => this.deviceUuidLazy.Value;
+        public string Uuid => this.deviceUuidLazy.Value;
         public object Context { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace Shiny.Testing.BluetoothLE
 {
     public class TestGattCharacteristic : IGattCharacteristic
     {
-        public TestGattCharacteristic(Guid uuid, IGattService service, CharacteristicProperties? props = null)
+        public TestGattCharacteristic(string uuid, IGattService service, CharacteristicProperties? props = null)
         {
             this.Uuid = uuid;
             this.Service = service;
@@ -18,7 +18,7 @@ namespace Shiny.Testing.BluetoothLE
 
 
         public IGattService Service { get; }
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public CharacteristicProperties Properties { get; }
         public bool IsNotifying { get; private set; }
         public List<IGattDescriptor> Descriptors { get; set; } = new List<IGattDescriptor>();

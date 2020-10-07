@@ -10,7 +10,6 @@ namespace Shiny.BluetoothLE
     {
         public static IObservable<Unit> WhenReady(this CBPeripheralManager manager) => Observable.Create<Unit>(ob =>
         {
-            // TODO: put this on the message bus
             var handler = new EventHandler((sender, args) =>
             {
                 if (manager.State == CBPeripheralManagerState.PoweredOn)
@@ -36,16 +35,13 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public static Guid ToGuid(this CBUUID uuid)
-        {
-            var id = uuid.ToString();
-            if (id.Length == 4)
-                id = $"0000{id}-0000-1000-8000-00805f9b34fb";
+        //public static Guid ToGuid(this CBUUID uuid)
+        //{
+        //    var id = uuid.ToString();
+        //    if (id.Length == 4)
+        //        id = $"0000{id}-0000-1000-8000-00805f9b34fb";
 
-            return Guid.ParseExact(id, "d");
-        }
-
-
-        public static CBUUID ToCBUuid(this Guid guid) => CBUUID.FromString(guid.ToString());
+        //    return Guid.ParseExact(id, "d");
+        //}
     }
 }

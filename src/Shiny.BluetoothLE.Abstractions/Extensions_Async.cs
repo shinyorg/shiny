@@ -31,7 +31,7 @@ namespace Shiny.BluetoothLE
                 .ToTask(cancelToken ?? CancellationToken.None);
 
 
-        public static Task<IList<IGattCharacteristic>> GetCharacteristicsAsync(this IPeripheral peripheral, Guid serviceUuid, CancellationToken? cancelToken = null)
+        public static Task<IList<IGattCharacteristic>> GetCharacteristicsAsync(this IPeripheral peripheral, string serviceUuid, CancellationToken? cancelToken = null)
             => peripheral
                 .GetCharacteristicsForService(serviceUuid)
                 .ToList()
@@ -45,7 +45,7 @@ namespace Shiny.BluetoothLE
                 .ToTask(cancelToken ?? CancellationToken.None);
 
 
-        public static Task<IGattCharacteristic> GetKnownCharacteristicAsync(this IPeripheral peripheral, Guid serviceUuid, Guid characteristicUuid, CancellationToken? cancelToken = null)
+        public static Task<IGattCharacteristic> GetKnownCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken? cancelToken = null)
             => peripheral
                 .GetKnownCharacteristics(serviceUuid, characteristicUuid)
                 .Take(1)

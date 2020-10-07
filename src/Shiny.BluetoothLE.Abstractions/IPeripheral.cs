@@ -11,9 +11,9 @@ namespace Shiny.BluetoothLE
         string Name { get; }
 
         /// <summary>
-        /// The peripheral ID - note that this will not be the same per platform
+        /// The peripheral UUID - note that this will not be the same per platform
         /// </summary>
-        Guid Uuid { get; }
+        string Uuid { get; }
 
         /// <summary>
         /// The current connection status
@@ -55,7 +55,7 @@ namespace Shiny.BluetoothLE
         /// </summary>
         /// <param name="serviceUuid"></param>
         /// <returns></returns>
-        IObservable<IGattService> GetKnownService(Guid serviceUuid);
+        IObservable<IGattService> GetKnownService(string serviceUuid);
 
         /// <summary>
         /// Monitor peripheral name changes

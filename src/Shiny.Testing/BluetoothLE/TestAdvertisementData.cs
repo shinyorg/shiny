@@ -10,7 +10,7 @@ namespace Shiny.Testing.BluetoothLE
         public bool? IsConnectable { get; set; } = true;
         public AdvertisementServiceData[]? ServiceData { get; set; }
         public ManufacturerData? ManufacturerData { get; set; }
-        public Guid[]? ServiceUuids { get; set; }
+        public string[]? ServiceUuids { get; set; }
         public int TxPower { get; set; }
     }
 }

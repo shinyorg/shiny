@@ -14,8 +14,8 @@ namespace Shiny.BluetoothLE.Hosting
         Task StartAdvertising(AdvertisementData? adData = null);
         void StopAdvertising();
 
-        Task<IGattService> AddService(Guid uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder);
-        void RemoveService(Guid serviceUuid);
+        Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder);
+        void RemoveService(string serviceUuid);
         void ClearServices();
 
         IReadOnlyList<IGattService> Services { get; }

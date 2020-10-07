@@ -11,15 +11,8 @@ namespace Shiny.BluetoothLE.Hosting
 {
     public class BleHostingManager : IBleHostingManager
     {
-        readonly CBPeripheralManager manager;
-        readonly IDictionary<Guid, GattService> services;
-
-
-        public BleHostingManager()
-        {
-            this.manager = new CBPeripheralManager();
-            this.services = new Dictionary<Guid, GattService>();
-        }
+        readonly CBPeripheralManager manager = new CBPeripheralManager();
+        readonly IDictionary<string, GattService> services = new Dictionary<string, GattService>();
 
 
         public AccessState Status
@@ -68,7 +61,7 @@ namespace Shiny.BluetoothLE.Hosting
             {
                 LocalName = adData?.LocalName,
                 ServicesUUID = this.services
-                    .Select(x => x.Value.Uuid.ToCBUuid())
+                    .Select(x => CBUUID.FromString(x.Value.Uuid))
                     .ToArray()
             });
         }
@@ -77,7 +70,7 @@ namespace Shiny.BluetoothLE.Hosting
         public void StopAdvertising() => this.manager.StopAdvertising();
 
 
-        public Task<IGattService> AddService(Guid uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+        public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
         {
             var service = new GattService(this.manager, uuid, primary);
             serviceBuilder(service);
@@ -87,7 +80,7 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public void RemoveService(Guid serviceUuid)
+        public void RemoveService(string serviceUuid)
         {
             if (!this.services.ContainsKey(serviceUuid))
                 return;

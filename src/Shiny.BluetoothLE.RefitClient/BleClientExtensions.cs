@@ -30,11 +30,11 @@ namespace Shiny.BluetoothLE.RefitClient
         }
 
 
-        public static IObservable<T> ScanForClientPeripherals<T>(this IBleManager bleManager, Guid serviceUuid) where T : IBleClient
+        public static IObservable<T> ScanForClientPeripherals<T>(this IBleManager bleManager, string serviceUuid) where T : IBleClient
             => bleManager
                 .ScanForUniquePeripherals(new ScanConfig
                 {
-                    ServiceUuids = new List<Guid> { serviceUuid }
+                    ServiceUuids = new List<string> { serviceUuid }
                 })
                 .Select(x => x.GetClient<T>());
     }

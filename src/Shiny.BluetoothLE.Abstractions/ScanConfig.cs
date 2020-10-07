@@ -30,6 +30,6 @@ namespace Shiny.BluetoothLE
         /// Filters scan to peripherals that advertise specified service UUIDs
         /// iOS - you must set this to initiate a background scan
         /// </summary>
-        public List<Guid> ServiceUuids { get; set; } = new List<Guid>();
+        public List<string> ServiceUuids { get; set; } = new List<string>();
     }
 }

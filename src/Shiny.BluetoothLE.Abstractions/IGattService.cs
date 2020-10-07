@@ -10,7 +10,7 @@ namespace Shiny.BluetoothLE
         /// <summary>
         /// The service UUID
         /// </summary>
-        Guid Uuid { get; }
+        string Uuid { get; }
 
         /// <summary>
         /// This will return a repeatable observable of discovered characteristics
@@ -22,6 +22,6 @@ namespace Shiny.BluetoothLE
         /// </summary>
         /// <param name="characteristicIds"></param>
         /// <returns></returns>
-        IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds);
+        IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds);
     }
 }

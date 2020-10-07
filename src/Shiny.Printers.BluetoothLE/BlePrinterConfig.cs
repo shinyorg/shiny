@@ -5,7 +5,7 @@ namespace Shiny.Printers
 {
     public class BlePrinterConfig
     {
-        public BlePrinterConfig(Guid scanServiceUuid, Guid serviceUuid, Guid writeCharacteristicUuid)
+        public BlePrinterConfig(string scanServiceUuid, string serviceUuid, string writeCharacteristicUuid)
         {
             this.ScanServiceUuid = scanServiceUuid;
             this.ServiceUuid = serviceUuid;
@@ -13,8 +13,8 @@ namespace Shiny.Printers
         }
 
 
-        public Guid ScanServiceUuid { get; }
-        public Guid ServiceUuid { get; }
-        public Guid WriteCharacteristicUuid { get; }
+        public string ScanServiceUuid { get; }
+        public string ServiceUuid { get; }
+        public string WriteCharacteristicUuid { get; }
     }
 }

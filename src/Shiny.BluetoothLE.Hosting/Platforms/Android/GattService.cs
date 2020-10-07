@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Android.Bluetooth;
+using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 
 
@@ -13,24 +14,27 @@ namespace Shiny.BluetoothLE.Hosting
         readonly List<GattCharacteristic> characteristics;
 
 
-        public GattService(GattServerContext context, Guid uuid, bool primary)
+        public GattService(GattServerContext context, string uuid, bool primary)
         {
             this.context = context;
             var type = primary ? GattServiceType.Primary : GattServiceType.Secondary;
-            this.Native = new BluetoothGattService(uuid.ToUuid(), type);
+            this.Native = new BluetoothGattService(UUID.FromString(uuid), type);
             this.characteristics = new List<GattCharacteristic>();
+
+            this.Uuid = uuid;
+            this.Primary = primary;
         }
 
 
         public BluetoothGattService Native { get; }
 
-        public Guid Uuid => this.Native.Uuid.ToGuid();
-        public bool Primary => this.Native.Type == GattServiceType.Primary;
+        public string Uuid { get; }
+        public bool Primary { get; }
         public IReadOnlyList<IGattCharacteristic> Characteristics =>
             this.characteristics.Cast<IGattCharacteristic>().ToArray();
 
 
-        public IGattCharacteristic AddCharacteristic(Guid uuid, Action<IGattCharacteristicBuilder> characteristicBuilder)
+        public IGattCharacteristic AddCharacteristic(string uuid, Action<IGattCharacteristicBuilder> characteristicBuilder)
         {
             var ch = new GattCharacteristic(this.context, uuid);
             characteristicBuilder(ch);

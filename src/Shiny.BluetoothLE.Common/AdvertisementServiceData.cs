@@ -5,14 +5,14 @@ namespace Shiny.BluetoothLE
 {
     public class AdvertisementServiceData
     {
-        public AdvertisementServiceData(Guid serviceUuid, byte[] data)
+        public AdvertisementServiceData(string serviceUuid, byte[] data)
         {
             this.Uuid = serviceUuid;
             this.Data = data;
         }
 
 
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public byte[] Data { get; }
     }
 }

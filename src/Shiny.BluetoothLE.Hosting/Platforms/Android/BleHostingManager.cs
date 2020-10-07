@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Shiny.BluetoothLE.Hosting.Internals;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Java.Util;
+using Shiny.BluetoothLE.Hosting.Internals;
 
 
 namespace Shiny.BluetoothLE.Hosting
@@ -13,7 +14,7 @@ namespace Shiny.BluetoothLE.Hosting
     public class BleHostingManager : IBleHostingManager
     {
         readonly GattServerContext context;
-        readonly Dictionary<Guid, GattService> services;
+        readonly Dictionary<string, GattService> services;
         readonly IMessageBus messageBus;
         AdvertisementCallbacks? adCallbacks;
 
@@ -21,7 +22,7 @@ namespace Shiny.BluetoothLE.Hosting
         public BleHostingManager(AndroidContext context, IMessageBus messageBus)
         {
             this.context = new GattServerContext(context);
-            this.services = new Dictionary<Guid, GattService>();
+            this.services = new Dictionary<string, GattService>();
             this.messageBus = messageBus;
         }
 
@@ -35,7 +36,7 @@ namespace Shiny.BluetoothLE.Hosting
         public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
 
 
-        public Task<IGattService> AddService(Guid uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+        public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
         {
             var service = new GattService(this.context, uuid, primary);
             serviceBuilder(service);
@@ -52,7 +53,7 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public void RemoveService(Guid serviceUuid)
+        public void RemoveService(string serviceUuid)
         {
             var s = this.services[serviceUuid];
             this.context.Server.RemoveService(s.Native);
@@ -84,7 +85,7 @@ namespace Shiny.BluetoothLE.Hosting
 
                 if (adData.ServiceUuids != null)
                     foreach (var serviceUuid in adData.ServiceUuids)
-                        data.AddServiceUuid(serviceUuid.ToParcelUuid());
+                        data.AddServiceUuid(new Android.OS.ParcelUuid(UUID.FromString(serviceUuid)));
             }
 
             this.context

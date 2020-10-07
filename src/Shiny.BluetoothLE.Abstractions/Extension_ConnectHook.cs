@@ -6,11 +6,11 @@ namespace Shiny.BluetoothLE
 {
     public class ConnectHookArgs
     {
-        public ConnectHookArgs(Guid serviceUuid, params Guid[] characteristicUuids)
+        public ConnectHookArgs(string serviceUuid, params string[] characteristicUuids)
             : this(null, serviceUuid, characteristicUuids) {}
 
 
-        public ConnectHookArgs(ConnectionConfig? config, Guid serviceUuid, params Guid[] characteristicUuids)
+        public ConnectHookArgs(ConnectionConfig? config, string serviceUuid, params string[] characteristicUuids)
         {
             this.Config = config;
             this.ServiceUuid = serviceUuid;
@@ -19,8 +19,8 @@ namespace Shiny.BluetoothLE
 
 
         public ConnectionConfig? Config { get; set; }
-        public Guid ServiceUuid { get; }
-        public Guid[] CharacteristicUuids { get; }
+        public string ServiceUuid { get; }
+        public string[] CharacteristicUuids { get; }
     }
 
 
@@ -33,7 +33,7 @@ namespace Shiny.BluetoothLE
         /// <param name="serviceUuid"></param>
         /// <param name="characteristicUuids"></param>
         /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> ConnectHook(this IPeripheral peripheral, Guid serviceUuid, params Guid[] characteristicUuids) => peripheral.ConnectHook(new ConnectHookArgs(serviceUuid, characteristicUuids));
+        public static IObservable<CharacteristicGattResult> ConnectHook(this IPeripheral peripheral, string serviceUuid, params string[] characteristicUuids) => peripheral.ConnectHook(new ConnectHookArgs(serviceUuid, characteristicUuids));
 
 
         /// <summary>

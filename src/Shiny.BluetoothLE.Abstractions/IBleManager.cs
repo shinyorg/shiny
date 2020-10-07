@@ -16,8 +16,8 @@ namespace Shiny.BluetoothLE
         /// <summary>
         /// Get a known peripheral
         /// </summary>
-        /// <param name="peripheralId">Peripheral identifier.</param>
-        IObservable<IPeripheral?> GetKnownPeripheral(Guid peripheralId);
+        /// <param name="peripheralUuid">Peripheral identifier.</param>
+        IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid);
 
         /// <summary>
         /// Returns current status of adapter (on/off/permission)
@@ -39,7 +39,7 @@ namespace Shiny.BluetoothLE
         /// </summary>
         /// <param name="serviceUuid">(iOS only) Service UUID filter to see peripherals that were connected outside of application</param>
         /// <returns></returns>
-        IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null);
+        IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null);
 
         /// <summary>
         /// Start scanning for BluetoothLE peripherals

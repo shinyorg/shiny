@@ -7,7 +7,7 @@ namespace Shiny.BluetoothLE.Hosting
 {
     public interface IGattCharacteristic
     {
-        Guid Uuid { get; }
+        string Uuid { get; }
         CharacteristicProperties Properties { get; }
         Task Notify(byte[] data, params IPeripheral[] centrals);
         IReadOnlyList<IPeripheral> SubscribedCentrals { get; }

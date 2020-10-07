@@ -13,7 +13,7 @@ namespace Shiny.BluetoothLE
         readonly Lazy<bool> connectable;
         readonly Lazy<ManufacturerData> manufacturerData;
         readonly Lazy<int> txpower;
-        readonly Lazy<Guid[]> serviceUuids;
+        readonly Lazy<string[]> serviceUuids;
         readonly Lazy<AdvertisementServiceData[]> serviceData;
 
 
@@ -47,18 +47,18 @@ namespace Shiny.BluetoothLE
                     Buffer.BlockCopy(rawKey, 0, result, 0, rawKey.Length);
                     Buffer.BlockCopy(rawValue, 0, result, rawKey.Length, rawValue.Length);
 
-                    list.Add(new AdvertisementServiceData(key.ToGuid(), result));
+                    list.Add(new AdvertisementServiceData(key.ToString(), result));
                 }
                 return list.ToArray();
             });
             this.serviceUuids = this.GetLazy(CBAdvertisement.DataServiceUUIDsKey, x =>
             {
                 var array = (NSArray)x;
-                var list = new List<Guid>();
+                var list = new List<string>();
                 for (nuint i = 0; i < array.Count; i++)
                 {
-                    var guid = array.GetItem<CBUUID>(i).ToGuid();
-                    list.Add(guid);
+                    var uuid = array.GetItem<CBUUID>(i).ToString();
+                    list.Add(uuid);
                 }
                 return list.ToArray();
             });
@@ -68,26 +68,23 @@ namespace Shiny.BluetoothLE
         public string LocalName => this.localName.Value;
         public bool? IsConnectable => this.connectable.Value;
         public ManufacturerData ManufacturerData => this.manufacturerData.Value;
-        public Guid[] ServiceUuids => this.serviceUuids.Value;
+        public string[] ServiceUuids => this.serviceUuids.Value;
         public AdvertisementServiceData[] ServiceData => this.serviceData.Value;
         public int TxPower => this.txpower.Value;
 
 
-        protected Lazy<T> GetLazy<T>(NSString key, Func<NSObject, T> transform)
+        protected Lazy<T> GetLazy<T>(NSString key, Func<NSObject, T> transform) => new Lazy<T>(() =>
         {
-            return new Lazy<T>(() =>
-            {
-                var obj = this.GetObject(key);
-                if (obj == null)
-                    return default(T);
+            var obj = this.GetObject(key);
+            if (obj == null)
+                return default;
 
-                var result = transform(obj);
-                return result;
-            });
-        }
+            var result = transform(obj);
+            return result;
+        });
 
 
-        protected NSObject GetObject(NSString key)
+        protected NSObject? GetObject(NSString key)
         {
             if (this.adData == null)
                 return null;

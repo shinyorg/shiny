@@ -13,17 +13,17 @@ namespace Shiny.BluetoothLE
         public CBPeripheral Peripherial { get; }
 
 
-        public GattService(Peripheral peripheral, CBService native) : base(peripheral, native.UUID.ToGuid(), native.Primary)
+        public GattService(Peripheral peripheral, CBService native) : base(peripheral, native.UUID.ToString(), native.Primary)
         {
             this.Peripherial = peripheral.Native;
             this.Service = native;
         }
 
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
+        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
             => Observable.Create<IGattCharacteristic>(ob =>
             {
-                var characteristics = new Dictionary<Guid, IGattCharacteristic>();
+                var characteristics = new Dictionary<string, IGattCharacteristic>();
                 var handler = new EventHandler<CBServiceEventArgs>((sender, args) =>
                 {
                     if (this.Service.Characteristics == null)
@@ -44,7 +44,7 @@ namespace Shiny.BluetoothLE
                     if (characteristics.Count == characteristicIds.Length)
                         ob.OnCompleted();
                 });
-                var uuids = characteristicIds.Select(x => x.ToCBUuid()).ToArray();
+                var uuids = characteristicIds.Select(CBUUID.FromString).ToArray();
                 this.Peripherial.DiscoveredCharacteristic += handler;
                 this.Peripherial.DiscoverCharacteristics(uuids, this.Service);
 
@@ -55,7 +55,7 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattCharacteristic> DiscoverCharacteristics()
             => Observable.Create<IGattCharacteristic>(ob =>
             {
-                var characteristics = new Dictionary<Guid, IGattCharacteristic>();
+                var characteristics = new Dictionary<string, IGattCharacteristic>();
                 var handler = new EventHandler<CBServiceEventArgs>((sender, args) =>
                 {
                     if (this.Service.Characteristics == null)

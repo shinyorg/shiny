@@ -6,7 +6,7 @@ namespace Shiny.BluetoothLE.Hosting
 {
     public interface IGattService
     {
-        Guid Uuid { get; }
+        string Uuid { get; }
         bool Primary { get; }
         IReadOnlyList<IGattCharacteristic> Characteristics { get; }
     }

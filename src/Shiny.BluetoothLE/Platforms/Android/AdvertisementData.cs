@@ -7,18 +7,20 @@ namespace Shiny.BluetoothLE
 {
     public class AdvertisementData : IAdvertisementData
     {
-
         readonly SR result;
+
+
         public AdvertisementData(SR result)
         {
             this.result = result;
 
             this.manufacturerData = new Lazy<ManufacturerData?>(() =>
             {
-                if (this.result.ScanRecord.ManufacturerSpecificData == null || this.result.ScanRecord.ManufacturerSpecificData.Size() == 0)
+                var md = this.result.ScanRecord.ManufacturerSpecificData;
+                if (md == null || md.Size() == 0)
                     return null;
 
-                var manufacturerId = (ushort)this.result.ScanRecord.ManufacturerSpecificData.KeyAt(0);
+                var manufacturerId = (ushort)md.KeyAt(0);
                 if (manufacturerId == 0)
                     return null;
 
@@ -26,19 +28,19 @@ namespace Shiny.BluetoothLE
                 return new ManufacturerData(manufacturerId, data);
             });
 
-            this.serviceUuids = new Lazy<Guid[]>(() =>
+            this.serviceUuids = new Lazy<string[]>(() =>
                 result
                     .ScanRecord
                     .ServiceUuids?
-                    .Select(x => x.Uuid.ToGuid())
-                    .ToArray() ?? Array.Empty<Guid>()
+                    .Select(x => x.Uuid.ToString())
+                    .ToArray() ?? Array.Empty<string>()
             );
 
             this.serviceData = new Lazy<AdvertisementServiceData[]>(() =>
                 result
                     .ScanRecord
                     .ServiceData?
-                    .Select(x => new AdvertisementServiceData(x.Key.Uuid.ToGuid(), x.Value))
+                    .Select(x => new AdvertisementServiceData(x.Key.Uuid.ToString(), x.Value))
                     .ToArray() ?? Array.Empty<AdvertisementServiceData>()
             );
         }
@@ -60,8 +62,8 @@ namespace Shiny.BluetoothLE
         readonly Lazy<ManufacturerData?> manufacturerData;
         public ManufacturerData? ManufacturerData => this.manufacturerData.Value;
 
-        readonly Lazy<Guid[]> serviceUuids;
-        public Guid[] ServiceUuids => this.serviceUuids.Value;
+        readonly Lazy<string[]> serviceUuids;
+        public string[] ServiceUuids => this.serviceUuids.Value;
 
         readonly Lazy<AdvertisementServiceData[]> serviceData;
         public AdvertisementServiceData[] ServiceData => this.serviceData.Value;

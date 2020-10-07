@@ -12,21 +12,23 @@ namespace Shiny.BluetoothLE.Hosting
         readonly IList<GattCharacteristic> characteristics;
 
 
-        public GattService(CBPeripheralManager manager, Guid uuid, bool primary)
+        public GattService(CBPeripheralManager manager, string uuid, bool primary)
         {
             this.manager = manager;
-            this.Native = new CBMutableService(uuid.ToCBUuid(), primary);
+            this.Native = new CBMutableService(CBUUID.FromString(uuid), primary);
             this.characteristics = new List<GattCharacteristic>();
+            this.Uuid = uuid;
+            this.Primary = primary;
         }
 
 
         public CBMutableService Native { get; }
-        public Guid Uuid => this.Native.UUID.ToGuid();
-        public bool Primary => this.Native.Primary;
+        public string Uuid { get; }
+        public bool Primary { get; }
         public IReadOnlyList<IGattCharacteristic> Characteristics => this.characteristics.Cast<IGattCharacteristic>().ToList();
 
 
-        public IGattCharacteristic AddCharacteristic(Guid uuid, Action<IGattCharacteristicBuilder> characteristicBuilder)
+        public IGattCharacteristic AddCharacteristic(string uuid, Action<IGattCharacteristicBuilder> characteristicBuilder)
         {
             var ch = new GattCharacteristic(this.manager, uuid);
             characteristicBuilder(ch);

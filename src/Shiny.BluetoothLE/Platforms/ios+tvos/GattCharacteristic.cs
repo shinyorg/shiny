@@ -17,7 +17,7 @@ namespace Shiny.BluetoothLE
 
 
         public GattCharacteristic(GattService service, CBCharacteristic native)
-            : base(service, native.UUID.ToGuid(), (CharacteristicProperties)(int)native.Properties)
+            : base(service, native.UUID.ToString(), (CharacteristicProperties)(int)native.Properties)
         {
             this.serivceObj = service;
             this.NativeCharacteristic = native;
@@ -91,9 +91,9 @@ namespace Shiny.BluetoothLE
         IObservable<IGattDescriptor> descriptorOb;
         public override IObservable<IGattDescriptor> DiscoverDescriptors()
         {
-            this.descriptorOb = this.descriptorOb ?? Observable.Create<IGattDescriptor>(ob =>
+            this.descriptorOb ??= Observable.Create<IGattDescriptor>(ob =>
             {
-                var descriptors = new Dictionary<Guid, IGattDescriptor>();
+                var descriptors = new Dictionary<string, IGattDescriptor>();
 
                 var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
                 {

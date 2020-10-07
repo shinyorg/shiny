@@ -10,10 +10,10 @@ namespace Shiny.Testing.BluetoothLE
 {
     public class TestPeripheral : IPeripheral
     {
-        public TestPeripheral(Guid uuid) => this.Uuid = uuid;
+        public TestPeripheral(string uuid) => this.Uuid = uuid;
 
         
-        public Guid Uuid { get; }
+        public string Uuid { get; }
 
 
         readonly Subject<string> nameSubj = new Subject<string>();
@@ -55,7 +55,7 @@ namespace Shiny.Testing.BluetoothLE
         public IObservable<IGattService> DiscoverServices()
             => this.Services.ToObservable();
 
-        public IObservable<IGattService> GetKnownService(Guid serviceUuid)
+        public IObservable<IGattService> GetKnownService(string serviceUuid)
             => Observable.Return(this.Services.FirstOrDefault(x => x.Uuid == serviceUuid));
 
 

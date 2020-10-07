@@ -28,7 +28,7 @@ namespace Shiny.Printers.BluetoothLE
         {
             var cfg = new ScanConfig
             {
-                ServiceUuids = new List<Guid>
+                ServiceUuids = new List<string>
                 {
                     this.config.ScanServiceUuid
                 }

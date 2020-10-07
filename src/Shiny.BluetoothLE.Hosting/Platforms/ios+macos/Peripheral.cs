@@ -9,11 +9,11 @@ namespace Shiny.BluetoothLE.Hosting
         public Peripheral(CBCentral central)
         {
             this.Central = central;
-            this.Uuid = central.Identifier.ToGuid();
+            this.Uuid = central.Identifier.ToString();
         }
 
 
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public CBCentral Central { get; }
         public object Context { get; set; }
     }

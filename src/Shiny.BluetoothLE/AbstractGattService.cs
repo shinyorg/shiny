@@ -7,7 +7,7 @@ namespace Shiny.BluetoothLE
 {
     public abstract class AbstractGattService : IGattService
     {
-        protected AbstractGattService(IPeripheral peripheral, Guid uuid, bool primary)
+        protected AbstractGattService(IPeripheral peripheral, string uuid, bool primary)
         {
             this.Peripheral = peripheral;
             this.Uuid = uuid;
@@ -16,11 +16,11 @@ namespace Shiny.BluetoothLE
 
 
         public IPeripheral Peripheral { get; }
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public bool IsPrimary { get; }
 
         public abstract IObservable<IGattCharacteristic> DiscoverCharacteristics();
-        public virtual IObservable<IGattCharacteristic> GetKnownCharacteristics(params Guid[] characteristicIds)
+        public virtual IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
             => this.DiscoverCharacteristics().Where(x => characteristicIds.Any(y => y == x.Uuid));
     }
 }

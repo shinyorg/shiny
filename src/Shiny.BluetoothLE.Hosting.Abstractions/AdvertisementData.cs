@@ -8,6 +8,6 @@ namespace Shiny.BluetoothLE.Hosting
     {
         public string? LocalName { get; set; }
         public ManufacturerData? ManufacturerData { get; set; }
-        public List<Guid>? ServiceUuids { get; set; }
+        public List<string>? ServiceUuids { get; set; }
     }
 }

@@ -33,21 +33,21 @@ namespace Shiny.Testing.BluetoothLE
         public List<IPeripheral> Peripherals { get; set; } = new List<IPeripheral>();
 
 
-        public IObservable<IPeripheral?> GetKnownPeripheral(Guid peripheralId)
+        public IObservable<IPeripheral?> GetKnownPeripheral(string peripheralId)
         {
             var peripheral = this.Peripherals.FirstOrDefault(x => x.Uuid == peripheralId);
             return Observable.Return(peripheral);
         }
 
 
-        public IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null)
+        public IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null)
         {
             var peripherals = this.Peripherals.Where(x => x.IsConnected());
             return Observable.Return(peripherals);
         }
 
 
-        public void ScanResult(Guid peripheralUuid, int rssi, IAdvertisementData adData)
+        public void ScanResult(string peripheralUuid, int rssi, IAdvertisementData adData)
         {
             var peripheral = this.Peripherals.FirstOrDefault(x => x.Uuid == peripheralUuid);
             if (peripheral == null)

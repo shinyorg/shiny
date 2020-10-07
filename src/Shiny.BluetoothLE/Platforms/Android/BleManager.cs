@@ -23,27 +23,29 @@ namespace Shiny.BluetoothLE
         public override bool IsScanning => this.isScanning;
 
 
-        public override IObservable<IPeripheral?> GetKnownPeripheral(Guid peripheralId)
+        public override IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid)
         {
-            var native = this.context.Manager.Adapter.GetRemoteDevice(peripheralId
-                .ToByteArray()
-                .Skip(10)
-                .Take(6)
-                .ToArray()
-            );
-            if (native == null)
-                return Observable.Return<IPeripheral?>(null);
+            //var native = this.context.Manager.Adapter.GetRemoteDevice(peripheralUuid
+            //    .ToByteArray()
+            //    .Skip(10)
+            //    .Take(6)
+            //    .ToArray()
+            //);
+            //if (native == null)
+            //    return Observable.Return<IPeripheral?>(null);
 
-            var device = this.context.GetDevice(native);
-            return Observable.Return(device);
+            //var peripheral = this.context.GetDevice(native);
+            //return Observable.Return(peripheral);
+            return Observable.Return<IPeripheral?>(null);
         }
 
 
-        public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(Guid? serviceUuid = null)
+        public override IObservable<IEnumerable<IPeripheral>> GetConnectedPeripherals(string? serviceUuid = null)
             => Observable.Return(this.context
                 .Manager
                 .GetConnectedDevices(ProfileType.Gatt)
-                .Select(this.context.GetDevice));
+                .Select(this.context.GetDevice)
+            );
 
 
         public override IObservable<AccessState> RequestAccess(bool forBackground) => Observable.FromAsync(async () =>

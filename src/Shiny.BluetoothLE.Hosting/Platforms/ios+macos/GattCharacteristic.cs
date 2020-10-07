@@ -21,7 +21,7 @@ namespace Shiny.BluetoothLE.Hosting
         CBCharacteristicProperties properties = 0;
 
 
-        public GattCharacteristic(CBPeripheralManager manager, Guid uuid)
+        public GattCharacteristic(CBPeripheralManager manager, string uuid)
         {
             this.cache = new PeripheralCache();
             this.manager = manager;
@@ -29,7 +29,7 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public CharacteristicProperties Properties { get; }
         public IReadOnlyList<IPeripheral> SubscribedCentrals => this.cache.Subscribed;
 
@@ -122,7 +122,7 @@ namespace Shiny.BluetoothLE.Hosting
         public void Build(CBMutableService service)
         {
             this.native = new CBMutableCharacteristic(
-                this.Uuid.ToCBUuid(),
+                CBUUID.FromString(this.Uuid),
                 this.properties,
                 null,
                 this.permissions

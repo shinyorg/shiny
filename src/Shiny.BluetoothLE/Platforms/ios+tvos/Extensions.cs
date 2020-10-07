@@ -42,28 +42,18 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public static AccessState FromNative(this CBCentralManagerState state)
+        public static AccessState FromNative(this CBCentralManagerState state) => state switch
         {
-            switch (state)
-            {
-                case CBCentralManagerState.PoweredOff:
-                    return AccessState.Disabled;
+            var x when
+                x == CBCentralManagerState.Resetting ||
+                x == CBCentralManagerState.PoweredOn
+                    => AccessState.Available,
 
-                case CBCentralManagerState.Resetting:
-                case CBCentralManagerState.PoweredOn:
-                    return AccessState.Available;
-
-                case CBCentralManagerState.Unauthorized:
-                    return AccessState.Denied;
-
-                case CBCentralManagerState.Unsupported:
-                    return AccessState.NotSupported;
-
-                case CBCentralManagerState.Unknown:
-                default:
-                    return AccessState.Unknown;
-            }
-        }
+            CBCentralManagerState.PoweredOff => AccessState.Disabled,
+            CBCentralManagerState.Unauthorized => AccessState.Denied,
+            CBCentralManagerState.Unsupported => AccessState.NotSupported,
+            _ => AccessState.Unknown
+        };
 
 
         public static bool IsEqual(this CBPeripheral peripheral, CBPeripheral other)

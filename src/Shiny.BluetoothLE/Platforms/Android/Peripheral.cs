@@ -20,7 +20,7 @@ namespace Shiny.BluetoothLE
 
 
         public Peripheral(CentralContext centralContext, BluetoothDevice native)
-            : base(native.Name, ToDeviceId(native.Address))
+            : base(native.Name, ToDeviceId(native.Address).ToString())
         {
             this.connSubject = new Subject<ConnectionState>();
             this.Context = new PeripheralContext(centralContext, native);
@@ -50,9 +50,9 @@ namespace Shiny.BluetoothLE
 
 
         // android does not have a find "1" service - it must discover all services.... seems shit
-        public override IObservable<IGattService> GetKnownService(Guid serviceUuid) => this
+        public override IObservable<IGattService> GetKnownService(string serviceUuid) => this
             .DiscoverServices()
-            .Where(x => x.Uuid.Equals(serviceUuid))
+            .Where(x => x.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase))
             .Take(1)
             .Select(x => x);
 

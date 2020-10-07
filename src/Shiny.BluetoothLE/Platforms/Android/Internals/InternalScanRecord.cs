@@ -61,7 +61,7 @@ namespace Shiny.BluetoothLE.Internals
             }
             others
                 .Where(x => x.Type.ToString().Contains("Uuid"))
-                .Select(x => x.Data.ToGuid())
+                .Select(x => ToUuid(x.Data))
                 .ToList()
                 .ForEach(sr.ServiceUuids.Add);
 
@@ -69,11 +69,21 @@ namespace Shiny.BluetoothLE.Internals
         }
 
 
+        static string ToUuid(byte[] uuidBytes)
+        {
+            Array.Reverse(uuidBytes);
+            var uuid = BitConverter
+                .ToString(uuidBytes)
+                .Replace("-", String.Empty);
+            return uuid;
+        }
+
+
         public string LocalName { get; private set; }
         public byte[] ManufacturerData { get; private set; }
         public bool IsConnectable { get; private set; }
         public int TxPower { get; private set; }
-        public IList<Guid> ServiceUuids { get; } = new List<Guid>();
+        public IList<string> ServiceUuids { get; } = new List<string>();
         public List<byte[]> ServiceData { get; } = new List<byte[]>();
     }
 

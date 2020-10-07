@@ -5,7 +5,7 @@ namespace Shiny.BluetoothLE
 {
     public abstract class AbstractGattCharacteristic : IGattCharacteristic
     {
-        protected AbstractGattCharacteristic(IGattService service, Guid uuid, CharacteristicProperties properties)
+        protected AbstractGattCharacteristic(IGattService service, string uuid, CharacteristicProperties properties)
         {
             this.Service = service;
             this.Uuid = uuid;
@@ -15,7 +15,7 @@ namespace Shiny.BluetoothLE
 
         public IGattService Service { get; }
         public bool IsNotifying { get; protected set; }
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public CharacteristicProperties Properties { get; }
 
         public abstract IObservable<IGattDescriptor> DiscoverDescriptors();

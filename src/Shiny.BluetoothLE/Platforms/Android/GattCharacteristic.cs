@@ -24,7 +24,7 @@ namespace Shiny.BluetoothLE
                                   PeripheralContext context,
                                   BluetoothGattCharacteristic native)
                             : base(service,
-                                   native.Uuid.ToGuid(),
+                                   native.Uuid.ToString(),
                                    (CharacteristicProperties)(int)native.Properties)
         {
             this.context = context;

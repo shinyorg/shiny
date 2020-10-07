@@ -8,9 +8,11 @@ using System.Text;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.Content;
+using Android.OS;
+using Java.Util;
 using ScanMode = Android.Bluetooth.LE.ScanMode;
 using Shiny.Logging;
-
+using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE.Internals
 {
@@ -175,11 +177,11 @@ namespace Shiny.BluetoothLE.Internals
             var scanFilters = new List<ScanFilter>();
             if (config.ServiceUuids != null && config.ServiceUuids.Count > 0)
             {
-                foreach (var guid in config.ServiceUuids)
+                foreach (var uuid in config.ServiceUuids)
                 {
-                    var uuid = guid.ToParcelUuid();
+                    var parcel = new ParcelUuid(UUID.FromString(uuid));
                     scanFilters.Add(new ScanFilter.Builder()
-                        .SetServiceUuid(uuid)
+                        .SetServiceUuid(parcel)
                         .Build()
                     );
                 }

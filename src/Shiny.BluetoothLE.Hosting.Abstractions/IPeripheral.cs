@@ -7,7 +7,7 @@ namespace Shiny.BluetoothLE.Hosting
     {
         //string Identifier { get; }
         // I can get this on iOS and Droid
-        Guid Uuid { get; }
+        string Uuid { get; }
 
         /// <summary>
         /// You can set any data you want here

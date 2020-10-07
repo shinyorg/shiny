@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Bluetooth;
+using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 
 
@@ -22,7 +23,7 @@ namespace Shiny.BluetoothLE.Hosting
         GattPermission permissions = 0;
 
 
-        public GattCharacteristic(GattServerContext context, Guid uuid)
+        public GattCharacteristic(GattServerContext context, string uuid)
         {
             this.subscribers = new Dictionary<string, IPeripheral>();
             this.disposer = new CompositeDisposable();
@@ -32,7 +33,7 @@ namespace Shiny.BluetoothLE.Hosting
 
 
         public BluetoothGattCharacteristic Native { get; private set; }
-        public Guid Uuid { get; }
+        public string Uuid { get; }
         public CharacteristicProperties Properties { get; }
         public IReadOnlyList<IPeripheral> SubscribedCentrals
         {
@@ -112,7 +113,7 @@ namespace Shiny.BluetoothLE.Hosting
         public void Build()
         {
             this.Native = new BluetoothGattCharacteristic(
-                this.Uuid.ToUuid(),
+                UUID.FromString(this.Uuid),
                 this.properties,
                 this.permissions
             );
