@@ -16,6 +16,7 @@
         <PackageReference Update="Com.OneSignal" Version="3.10.1" />
         <PackageReference Condition=" '$(SourceLinkEnabled)' == 'true' " Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*" PrivateAssets="All" />
 
+        <PackageReference Update="MarkdownSnippets.MsBuild" Version="2.1.4.0" />
         <PackageReference Update="Xamarin.Forms" Version="4.8.0.1451" />
 
         <PackageReference Update="Zebra.Printer.SDK" Version="2.15.2634" />
@@ -54,22 +55,17 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <!--<PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />-->
-        <!--<PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.17134.1000" />-->
+        <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
         <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="[6.1.1, 7)" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('net')) ">
+        <PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.17134.1000" />
     </ItemGroup>
 
     <ItemGroup Condition="  $(TargetFramework.StartsWith('tizen')) ">
         <PackageReference Update="Tizen.NET" Version="5.0.0.14562" ExcludeAssets="Runtime" />
         <PackageReference Update="Tizen.NET.Sdk" Version="1.0.1" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) ">
-        <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.17134.1000" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
-        <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.17134.1000" />
     </ItemGroup>
 
 </Project>
