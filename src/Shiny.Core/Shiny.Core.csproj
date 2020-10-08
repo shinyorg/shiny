@@ -44,7 +44,7 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(IsWindows) ">
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj" />
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
