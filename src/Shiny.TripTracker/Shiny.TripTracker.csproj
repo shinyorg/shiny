@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <VersionSuffix>beta</VersionSuffix>
         <Description>Shiny Trip Tracker</Description>
     </PropertyGroup>
 
