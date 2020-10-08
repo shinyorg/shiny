@@ -29,10 +29,4 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\Android\**\*.cs" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Platforms\" />
-      <Folder Include="Platforms\Uwp\" />
-      <Folder Include="Platforms\Android\" />
-      <Folder Include="Platforms\Shared\" />
-    </ItemGroup>
 </Project>

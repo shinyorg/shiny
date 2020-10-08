@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Zebra.Printer.SDK" Version="2.15.2634" />
+        <PackageReference Include="Zebra.Printer.SDK" />
     </ItemGroup>
 
     <ItemGroup>
