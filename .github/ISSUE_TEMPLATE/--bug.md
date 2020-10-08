@@ -19,7 +19,7 @@ assignees: ''
 
 ## Feature Library
 
-### beta components are not fully done - issues MUST include full reproducible sample and stacktrace or they will be closed without explanation!!!
+### NON-stable components (preview, beta, etc) are not fully done - issues MUST include full reproducible sample and stacktrace or they will be closed without explanation!!!
 
  - [ ] Core
  - [ ] Locations

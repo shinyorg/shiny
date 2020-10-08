@@ -20,7 +20,7 @@
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
-        <VersionSuffix Condition=" $(BUILD_SOURCEBRANCH) == 'dev' ">preview</VersionSuffix>
+        <VersionSuffix Condition=" $(BUILD_SOURCEBRANCHNAME) == 'dev' ">preview</VersionSuffix>
         <SrcFolder>$(MSBuildThisFileDirectory)..\src</SrcFolder>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
@@ -46,14 +46,9 @@
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    </PropertyGroup>
 
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
-        <UseWPF>true</UseWPF>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('net461')) ">
-        <UseWPF>true</UseWPF>
+        <!--netcoreapp or net4-->
+        <UseWPF Condition=" $(TargetFramework.StartsWith('net')) ">true</UseWPF>
     </PropertyGroup>
 
     <ItemGroup>
