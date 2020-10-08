@@ -34,36 +34,36 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 
 ## Libraries
 
-|Project|NuGet|MyGet|Description|
+|Project|NuGet|Preview|Description|
 |-------|-----|-----|-----------|
-|Core | [![CoreNugetShield]][CoreNuget] | [![CoreMygetShield]][CoreMyget] |
-|Beacons | [![BeaconsNugetShield]][BeaconsNuget] | [![BeaconsMygetShield]][BeaconsMyget] |
-|BluetoothLE Client| [![BleNugetShield]][BleNuget] | [![BleMygetShield]][BleMyget] |
-|BluetoothLE Hosting| [![BleHostingNugetShield]][BleHostingNuget] | [![BleHostingMygetShield]][BleHostingMyget] |
-|Locations| [![LocationsNugetShield]][LocationsNuget] | [![LocationsMygetShield]][LocationsMyget] |
-|HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpMygetShield]][HttpMyget] |
-|Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsMygetShield]][SensorsMyget] |
-|Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsMygetShield]][NotificationsMyget] |
-|Push| [![PushNugetShield]][PushNuget] | [![PushMygetShield]][PushMyget] |
-|NFC| [![NfcNugetShield]][NfcNuget] | [![NfcMygetShield]][NfcMyget] |
+|Core | [![CoreNugetShield]][CoreNuget] | [![CorePreviewShield]][CorePreNuget] |
+|Beacons | [![BeaconsNugetShield]][BeaconsNuget] | [![BeaconsPreviewShield]][BeaconsPreNuget] |
+|BluetoothLE Client| [![BleNugetShield]][BleNuget] | [![BlePreviewShield]][BlePreNuget] |
+|BluetoothLE Hosting| [![BleHostingNugetShield]][BleHostingNuget] | [![BleHostingPreviewShield]][BleHostingPreNuget] |
+|Locations| [![LocationsNugetShield]][LocationsNuget] | [![LocationsPreviewShield]][LocationsPreNuget] |
+|HTTP Transfers| [![HttpNugetShield]][HttpNuget] | [![HttpPreviewShield]][HttpPreNuget] |
+|Sensors| [![SensorsNugetShield]][SensorsNuget] | [![SensorsPreviewShield]][SensorsPreNuget] |
+|Notifications| [![NotificationsNugetShield]][NotificationsNuget] | [![NotificationsPreviewShield]][NotificationsPreNuget] |
+|Push| [![PushNugetShield]][PushNuget] | [![PushPreviewShield]][PushPreNuget] |
+|NFC| [![NfcNugetShield]][NfcNuget] | [![NfcPreviewShield]][NfcPreNuget] |
 
 
 ## App Services
 |Project|NuGet|MyGet|Description|
 |-------|-----|-----|-----------|
-|Location Sync| [![LocationSyncNugetShield]][LocationSyncNuget] | [![LocationSyncMygetShield]][LocationSyncMyget] | Sync Geofence & GPS data to the server using Shiny best practices
-|Trip Tracker| [![TripTrackerNugetShield]][TripTrackerNuget] | [![TripTrackerMygetShield]][TripTrackerMyget] | Tracks your trips for automotive, cycling, running, and/or walking - includes the distance and all GPS coordinates throughout the trip
-|Media Sync| [![MediaSyncNugetShield]][MediaSyncNuget] | [![MediaSyncMygetShield]][MediaSyncMyget] | Sync your Android & iOS media gallery to the server using Shiny best practices
-|Data Sync| [![DataSyncNugetShield]][DataSyncNuget] | [![DataSyncMygetShield]][DataSyncMyget] | Sync your data to the server using Shiny best practices
+|Location Sync| [![LocationSyncNugetShield]][LocationSyncNuget] | [![LocationSyncPreviewShield]][LocationSyncPreNuget] | Sync Geofence & GPS data to the server using Shiny best practices
+|Trip Tracker| [![TripTrackerNugetShield]][TripTrackerNuget] | [![TripTrackerPreviewShield]][TripTrackerPreNuget] | Tracks your trips for automotive, cycling, running, and/or walking - includes the distance and all GPS coordinates throughout the trip
+|Media Sync| [![MediaSyncNugetShield]][MediaSyncNuget] | [![MediaSyncPreviewShield]][MediaSyncPreNuget] | Sync your Android & iOS media gallery to the server using Shiny best practices
+|Data Sync| [![DataSyncNugetShield]][DataSyncNuget] | [![DataSyncPreviewShield]][DataSyncPreNuget] | Sync your data to the server using Shiny best practices
 
 ## Integrations
 |Project|NuGet|MyGet|Description|
 |-------|-----|-----|-----------|
-|Azure Notifications Push| [![AzureHubPushNugetShield]][AzureHubPushNuget] | [![AzureHubPushMygetShield]][AzureHubPushMyget] | Push Integration for Azure Notification Hubs - Support for iOS, Android, & UWP
-|Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushMygetShield]][FirebasePushMyget] | Push Integration for Google Firebase - Support for iOS & Android
-|Amazon Web Services| [![AwsPushNugetShield]][AwsPushNuget] | [![AwsPushMygetShield]][AwsPushMyget] | Push Integration for AWS - Support for iOS & Android
-|SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] | Provides caching, logging, storage, & settings implementations
-|AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] | Log errors to AppCenter
+|Azure Notifications Push| [![AzureHubPushNugetShield]][AzureHubPushNuget] | [![AzureHubPushPreviewShield]][AzureHubPushPreNuget] | Push Integration for Azure Notification Hubs - Support for iOS, Android, & UWP
+|Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushPreviewShield]][FirebasePushPreNuget] | Push Integration for Google Firebase - Support for iOS & Android
+|Amazon Web Services| [![AwsPushNugetShield]][AwsPushNuget] | [![AwsPushPreviewShield]][AwsPushPreNuget] | Push Integration for AWS - Support for iOS & Android
+|SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqlitePreviewShield]][SqlitePreNuget] | Provides caching, logging, storage, & settings implementations
+|AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterPreviewShield]][AppCenterPreNuget] | Log errors to AppCenter
 
 ## 3rd Party
 |Project|NuGet|Repo|Description|
@@ -82,100 +82,100 @@ To use the beta MyGet feed, add `https://www.myget.org/F/acrfeed/api/v3/index.js
 
 [BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg
 [BeaconsNuget]: https://www.nuget.org/packages/Shiny.Beacons/
-[BeaconsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Beacons.svg
-[BeaconsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Beacons
+[BeaconsPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Beacons.svg
+[BeaconsPreNuget]: https://www.nuget.org/packages/Shiny.Beacons
 
 [CoreNugetShield]: https://img.shields.io/nuget/v/Shiny.Core.svg
 [CoreNuget]: https://www.nuget.org/packages/Shiny.Core/
-[CoreMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Core.svg
-[CoreMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Core
+[CorePreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Core.svg
+[CorePreNuget]: https://www.nuget.org/packages/Shiny.Core
 
 [BleNugetShield]: https://img.shields.io/nuget/v/Shiny.BluetoothLE.svg
 [BleNuget]: https://www.nuget.org/packages/Shiny.BluetoothLE/
-[BleMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.BluetoothLE.svg
-[BleMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.BluetoothLE
+[BlePreviewShield]: https://img.shields.io/nuget/vpre/Shiny.BluetoothLE.svg
+[BlePreNuget]: https://www.nuget.org/packages/Shiny.BluetoothLE
 
 [BleHostingNugetShield]: https://img.shields.io/nuget/v/Shiny.BluetoothLE.Hosting.svg
 [BleHostingNuget]: https://www.nuget.org/packages/Shiny.BluetoothLE.Hosting/
-[BleHostingMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.BluetoothLE.Hosting.svg
-[BleHostingMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.BluetoothLE.Hosting
+[BleHostingPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.BluetoothLE.Hosting.svg
+[BleHostingPreNuget]: https://www.nuget.org/packages/Shiny.BluetoothLE.Hosting
 
 [LocationsNugetShield]: https://img.shields.io/nuget/v/Shiny.Locations.svg
 [LocationsNuget]: https://www.nuget.org/packages/Shiny.Locations/
-[LocationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Locations.svg
-[LocationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Locations
+[LocationsPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Locations.svg
+[LocationsPreNuget]: https://www.nuget.org/packages/Shiny.Locations
 
 [SensorsNugetShield]: https://img.shields.io/nuget/v/Shiny.Sensors.svg
 [SensorsNuget]: https://www.nuget.org/packages/Shiny.Sensors/
-[SensorsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Sensors.svg
-[SensorsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Sensors
+[SensorsPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Sensors.svg
+[SensorsPreNuget]: https://www.nuget.org/packages/Shiny.Sensors
 
 [HttpNugetShield]: https://img.shields.io/nuget/v/Shiny.Net.Http.svg
 [HttpNuget]: https://www.nuget.org/packages/Shiny.Net.Http/
-[HttpMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Net.Http.svg
-[HttpMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Net.Http
+[HttpPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Net.Http.svg
+[HttpPreNuget]: https://www.nuget.org/packages/Shiny.Net.Http
 
 [NotificationsNugetShield]: https://img.shields.io/nuget/v/Shiny.Notifications.svg
 [NotificationsNuget]: https://www.nuget.org/packages/Shiny.Notifications/
-[NotificationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Notifications.svg
-[NotificationsMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Notifications
+[NotificationsPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Notifications.svg
+[NotificationsPreNuget]: https://www.nuget.org/packages/Shiny.Notifications
 
 [PushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.svg
 [PushNuget]: https://www.nuget.org/packages/Shiny.Push/
-[PushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.svg
-[PushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push
+[PushPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Push.svg
+[PushPreNuget]: https://www.nuget.org/packages/Shiny.Push
 
 [NfcNugetShield]: https://img.shields.io/nuget/v/Shiny.Nfc.svg
 [NfcNuget]: https://www.nuget.org/packages/Shiny.Nfc/
-[NfcMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Nfc.svg
-[NfcMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Nfc
+[NfcPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Nfc.svg
+[NfcPreNuget]: https://www.nuget.org/packages/Shiny.Nfc
 
 [SqliteNugetShield]: https://img.shields.io/nuget/v/Shiny.Integrations.Sqlite.svg
 [SqliteNuget]: https://www.nuget.org/packages/Shiny.Integrations.Sqlite/
-[SqliteMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Integrations.Sqlite.svg
-[SqliteMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Integrations.Sqlite
+[SqlitePreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Integrations.Sqlite.svg
+[SqlitePreNuget]: https://www.nuget.org/packages/Shiny.Integrations.Sqlite
 
 [AppCenterNugetShield]: https://img.shields.io/nuget/v/Shiny.Logging.AppCenter.svg
 [AppCenterNuget]: https://www.nuget.org/packages/Shiny.Logging.AppCenter/
-[AppCenterMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Logging.AppCenter.svg
-[AppCenterMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Logging.AppCenter
+[AppCenterPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Logging.AppCenter.svg
+[AppCenterPreNuget]: https://www.nuget.org/packages/Shiny.Logging.AppCenter
 
 [PushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.svg
 [PushNuget]: https://www.nuget.org/packages/Shiny.Push/
-[PushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.svg
-[PushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push
+[PushPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Push.svg
+[PushPreNuget]: https://www.nuget.org/packages/Shiny.Push
 
 [AwsPushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.AwsSns.svg
 [AwsPushNuget]: https://www.nuget.org/packages/Shiny.Push.AwsSns/
-[AwsPushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.AwsSns.svg
-[AwsPushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.AwsSns
+[AwsPushPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Push.AwsSns.svg
+[AwsPushPreNuget]: https://www.nuget.org/packages/Shiny.Push.AwsSns
 
 [AzureHubPushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.AzureNotificationHubs.svg
 [AzureHubPushNuget]: https://www.nuget.org/packages/Shiny.Push.AzureNotificationHubs/
-[AzureHubPushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.AzureNotificationHubs.svg
-[AzureHubPushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.AzureNotificationHubs
+[AzureHubPushPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Push.AzureNotificationHubs.svg
+[AzureHubPushPreNuget]: https://www.nuget.org/packages/Shiny.Push.AzureNotificationHubs
 
 [FirebasePushNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.FirebaseMessaging.svg
 [FirebasePushNuget]: https://www.nuget.org/packages/Shiny.Push.FirebaseMessaging/
-[FirebasePushMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.FirebaseMessaging.svg
-[FirebasePushMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.FirebaseMessaging
+[FirebasePushPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Push.FirebaseMessaging.svg
+[FirebasePushPreNuget]: https://www.nuget.org/packages/Shiny.Push.FirebaseMessaging
 
 [LocationSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.Locations.Sync.svg
 [LocationSyncNuget]: https://www.nuget.org/packages/Shiny.Locations.Sync/
-[LocationSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Locations.Sync.svg
-[LocationSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Locations.Sync
+[LocationSyncPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.Locations.Sync.svg
+[LocationSyncPreNuget]: https://www.nuget.org/packages/Shiny.Locations.Sync
 
 [MediaSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.MediaSync.svg
 [MediaSyncNuget]: https://www.nuget.org/packages/Shiny.MediaSync/
-[MediaSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.MediaSync.svg
-[MediaSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.MediaSync
+[MediaSyncPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.MediaSync.svg
+[MediaSyncPreNuget]: https://www.nuget.org/packages/Shiny.MediaSync
 
 [DataSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.DataSync.svg
 [DataSyncNuget]: https://www.nuget.org/packages/Shiny.DataSync/
-[DataSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.DataSync.svg
-[DataSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.DataSync
+[DataSyncPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.DataSync.svg
+[DataSyncPreNuget]: https://www.nuget.org/packages/Shiny.DataSync
 
 [TripTrackerNugetShield]: https://img.shields.io/nuget/v/Shiny.TripTracker.svg
 [TripTrackerNuget]: https://www.nuget.org/packages/Shiny.TripTracker/
-[TripTrackerMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.TripTracker.svg
-[TripTrackerMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.TripTracker
+[TripTrackerPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.TripTracker.svg
+[TripTrackerPreNuget]: https://www.nuget.org/packages/Shiny.TripTracker

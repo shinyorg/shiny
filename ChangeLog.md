@@ -32,6 +32,8 @@
 
 ### Push
 * Firebase implementation is now released for iOS and Android  (Shiny.Push.FirebaseMessaging)
+* Amazon Web Services is available for early testing
+* OneSignal is available for testing
 
 ### NFC
 * Full release

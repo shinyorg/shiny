@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">beta</VersionSuffix>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <VersionSuffix>alpha</VersionSuffix>
         <Description>Shiny BluetoothLE Refit</Description>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>

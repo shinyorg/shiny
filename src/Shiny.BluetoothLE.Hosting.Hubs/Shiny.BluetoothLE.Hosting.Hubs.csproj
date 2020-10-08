@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">beta</VersionSuffix>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Description>Shiny BluetoothLE Hubs - The "signalr" for BLE</Description>
         <VersionSuffix>alpha</VersionSuffix>
