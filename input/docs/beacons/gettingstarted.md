@@ -1,3 +1,8 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/beacons/gettingstarted.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: Getting Started
 Order: 1
 RedirectFrom: docs/beacons/index
@@ -12,7 +17,6 @@ This library deals specifically with iBeacons (Apple's beacon technology).  iBea
 First - install the NuGet package into your shared code project: [![NuGet](https://img.shields.io/nuget/v/Shiny.Beacons.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Beacons/)
 
 <!-- snippet: BeaconStartup.cs -->
-<a id='snippet-BeaconStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -28,12 +32,12 @@ public class BeaconStartup : ShinyStartup
         services.UseBeaconAdvertising();
     }
 }
+
 ```
-<sup><a href='/src/Snippets/BeaconStartup.cs#L1-L14' title='File snippet `BeaconStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconStartup.cs' title='Navigate to start of snippet `BeaconStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/BeaconStartup.cs#L1-L15)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: BeaconRanging.cs -->
-<a id='snippet-BeaconRanging.cs'></a>
 ```cs
 using System;
 using Shiny;
@@ -59,12 +63,27 @@ public class BeaconRanging
     }
 }
 
+
 ```
-<sup><a href='/src/Snippets/BeaconRanging.cs#L1-L24' title='File snippet `BeaconRanging.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconRanging.cs' title='Navigate to start of snippet `BeaconRanging.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/BeaconRanging.cs#L1-L25)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: BeaconMonitorDelegate.cs -->
-<a id='snippet-BeaconMonitorDelegate.cs'></a>
+```cs
+using System;
+using System.Threading.Tasks;
+using Shiny.Infrastructure;
+
+namespace Shiny.Beacons
+{
+    public interface IBeaconMonitorDelegate : IShinyDelegate
+    {
+        Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region);
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.Beacons.Abstractions/IBeaconMonitorDelegate.cs#L1-L12)</sup>
 ```cs
 using System.Threading.Tasks;
 using Shiny.Beacons;
@@ -79,8 +98,8 @@ public class BeaconMonitorDelegate : IBeaconMonitorDelegate
     }
 }
 ```
-<sup><a href='/src/Snippets/BeaconMonitorDelegate.cs#L1-L12' title='File snippet `BeaconMonitorDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconMonitorDelegate.cs' title='Navigate to start of snippet `BeaconMonitorDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/BeaconMonitorDelegate.cs#L1-L12)</sup>
+<!-- endsnippet -->
 
 ### Android & UWP
 Android & UWP piggyback their functionality with Shiny.BluetoothLE.  Use the following links to ensure your setup for those:

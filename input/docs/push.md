@@ -1,3 +1,8 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/push.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: Push
 Description: One push provider to rule them all!
 ---
@@ -20,7 +25,6 @@ like flies the last several years.  The latest to go was AppCenter which it turn
 Look to each appropriate provider to see setups for each.  
 
 <!-- snippet: PushStartup.cs -->
-<a id='snippet-PushStartup.cs'></a>
 ```cs
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,13 +46,12 @@ public class PushStartup : ShinyStartup
     }
 }
 ```
-<sup><a href='/src/Snippets/PushStartup.cs#L1-L19' title='File snippet `PushStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushStartup.cs' title='Navigate to start of snippet `PushStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/PushStartup.cs#L1-L19)</sup>
+<!-- endsnippet -->
 
 All providers use the native implementations on the platform to some degree, as such, you will always need to call
 
 <!-- snippet: PushPermissions.cs -->
-<a id='snippet-PushPermissions.cs'></a>
 ```cs
 using System;
 using System.Threading.Tasks;
@@ -70,13 +73,31 @@ public class PushRegistration
         }
     }
 }
+
 ```
-<sup><a href='/src/Snippets/PushPermissions.cs#L1-L20' title='File snippet `PushPermissions.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushPermissions.cs' title='Navigate to start of snippet `PushPermissions.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/PushPermissions.cs#L1-L21)</sup>
+<!-- endsnippet -->
 
 ## Background Delegate
 <!-- snippet: PushDelegate.cs -->
-<a id='snippet-PushDelegate.cs'></a>
+```cs
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+
+namespace Shiny.Push
+{
+    public interface IPushDelegate
+    {
+        Task OnEntry(PushEntryArgs args);
+        Task OnReceived(IDictionary<string, string> data);
+        Task OnTokenChanged(string token);
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.Push.Abstractions/IPushDelegate.cs#L1-L15)</sup>
 ```cs
 using System;
 using System.Collections.Generic;
@@ -102,15 +123,14 @@ public class PushDelegate : IPushDelegate
     }
 }
 ```
-<sup><a href='/src/Snippets/PushDelegate.cs#L1-L23' title='File snippet `PushDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushDelegate.cs' title='Navigate to start of snippet `PushDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/PushDelegate.cs#L1-L23)</sup>
+<!-- endsnippet -->
 
 
 ## Foreground Monitoring
 It is quite often that you may want to change data due to a silent notification being received.  This is similar to watching a SignalR broadcast, but with observables because RX is awesome and Shiny dies on the RX hill!
 
 <!-- snippet: PushForeground.cs -->
-<a id='snippet-PushForeground.cs'></a>
 ```cs
 using System.Reactive.Linq;
 using Shiny;
@@ -130,9 +150,10 @@ public class PushForeground
             });
     }
 }
+
 ```
-<sup><a href='/src/Snippets/PushForeground.cs#L1-L18' title='File snippet `PushForeground.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushForeground.cs' title='Navigate to start of snippet `PushForeground.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/PushForeground.cs#L1-L19)</sup>
+<!-- endsnippet -->
 
 ## Additional Features
 Like other modules in Shiny, there are certain providers that support additional feature sets.  Push really only has 1 extra, tagging.
@@ -144,7 +165,6 @@ The following providers, support tagging
 In order to safely support tagging without the need for constantly feature flag or type checking, the following extension methods exist to make life easy
 
 <!-- snippet: PushExtensions.cs -->
-<a id='snippet-PushExtensions.cs'></a>
 ```cs
 using System.Threading.Tasks;
 using Shiny;
@@ -169,5 +189,5 @@ public class Extensions
     }
 }
 ```
-<sup><a href='/src/Snippets/PushExtensions.cs#L1-L22' title='File snippet `PushExtensions.cs` was extracted from'>snippet source</a> | <a href='#snippet-PushExtensions.cs' title='Navigate to start of snippet `PushExtensions.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/PushExtensions.cs#L1-L22)</sup>
+<!-- endsnippet -->

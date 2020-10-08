@@ -7,7 +7,7 @@ namespace Shiny.BluetoothLE
     public static class PeripheralExtensions
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="peripheral"></param>
         /// <param name="serviceUuid"></param>
@@ -25,13 +25,14 @@ namespace Shiny.BluetoothLE
         /// <param name="serviceUuid"></param>
         /// <param name="characteristicUuids"></param>
         /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, string serviceUuid, string[] characteristicUuids)
+        public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, string serviceUuid, params string[] characteristicUuids)
             => peripheral
                 .WhenConnected()
                 .Select(_ => peripheral.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuids))
                 .Switch()
                 .Select(x => x.Notify())
                 .Merge();
+
 
         /// <summary>
         /// An easy wrapper around checking peripheral status == ConnectionState.Connected

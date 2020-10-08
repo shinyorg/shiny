@@ -1,10 +1,14 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/locations/geofences.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: Geofences
 Order: 2
 ---
 
 
 <!-- snippet: GeofenceStartup.cs -->
-<a id='snippet-GeofenceStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -16,12 +20,146 @@ public class GeofenceStartup : ShinyStartup
         services.UseGeofencing<GeofenceDelegate>();
     }
 }
+
 ```
-<sup><a href='/src/Snippets/GeofenceStartup.cs#L1-L10' title='File snippet `GeofenceStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-GeofenceStartup.cs' title='Navigate to start of snippet `GeofenceStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/GeofenceStartup.cs#L1-L11)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: GeofenceDelegate.cs -->
-<a id='snippet-GeofenceDelegate.cs'></a>
+```cs
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+
+namespace Shiny.Locations
+{
+    public class GpsGeofenceDelegate : NotifyPropertyChanged, IGpsDelegate
+    {
+        readonly IGeofenceManager geofenceManager;
+        readonly IGeofenceDelegate geofenceDelegate;
+        public Dictionary<string, GeofenceState> CurrentStates { get; set; }
+
+
+        public GpsGeofenceDelegate(IGeofenceManager geofenceManager, IGeofenceDelegate geofenceDelegate)
+        {
+            this.CurrentStates = new Dictionary<string, GeofenceState>();
+            this.geofenceManager = geofenceManager;
+            this.geofenceDelegate = geofenceDelegate;
+        }
+
+
+        public async Task OnReading(IGpsReading reading)
+        {
+            var geofences = await this.geofenceManager.GetMonitorRegions();
+            foreach (var geofence in geofences)
+            {
+                var state = geofence.IsPositionInside(reading.Position)
+                    ? GeofenceState.Entered
+                    : GeofenceState.Exited;
+
+                var current = this.GetState(geofence.Identifier);
+                if (state != current)
+                {
+                    this.SetState(geofence.Identifier, state);
+                    await this.geofenceDelegate.OnStatusChanged(state, geofence);
+                }
+            }
+        }
+
+
+        protected GeofenceState GetState(string geofenceId)
+            => this.CurrentStates.ContainsKey(geofenceId)
+                ? this.CurrentStates[geofenceId]
+                : GeofenceState.Unknown;
+
+
+        protected virtual void SetState(string geofenceId, GeofenceState state)
+        {
+            this.CurrentStates[geofenceId] = state;
+            this.RaisePropertyChanged(nameof(this.CurrentStates));
+        }
+    }
+
+}
+
+```
+<sup>[snippet source](/src/Shiny.Locations/GpsGeofenceDelegate.cs#L1-L56)</sup>
+```cs
+using System;
+using System.Threading.Tasks;
+using Shiny.Infrastructure;
+
+
+namespace Shiny.Locations
+{
+    public interface IGeofenceDelegate : IShinyDelegate
+    {
+        /// <summary>
+        /// This is fired when the geofence region status has changed
+        /// </summary>
+        /// <param name="newStatus">The new geofence state.</param>
+        /// <param name="region">The geofence region.</param>
+        Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region);
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.Locations.Abstractions/IGeofenceDelegate.cs#L1-L18)</sup>
+```cs
+using System;
+using System.Threading.Tasks;
+using Shiny.Jobs;
+
+
+namespace Shiny.Locations.Sync.Infrastructure
+{
+    public class SyncGeofenceDelegate : IGeofenceDelegate
+    {
+        readonly IJobManager jobManager;
+        readonly IMotionActivityManager activityManager;
+        readonly IGeofenceDataService dataService;
+
+
+        public SyncGeofenceDelegate(IJobManager jobManager,
+                                    IMotionActivityManager activityManager,
+                                    IGeofenceDataService dataService)
+        {
+            this.jobManager = jobManager;
+            this.activityManager = activityManager;
+            this.dataService = dataService;
+        }
+
+
+        public async Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region)
+        {
+            var job = await this.jobManager.GetJob(Constants.GeofenceJobIdentifer);
+            if (job == null)
+                return;
+
+            var config = job.GetSyncConfig();
+            MotionActivityEvent? activity = null;
+            if (config.IncludeMotionActivityEvents)
+                activity = await this.activityManager.GetCurrentActivity();
+
+            var e = new GeofenceEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DateCreated = DateTimeOffset.UtcNow,
+
+                Identifier = region.Identifier,
+                Entered = newStatus == GeofenceState.Entered,
+                Activities = activity?.Types
+            };
+            await this.dataService.Create(e);
+            if (!this.jobManager.IsRunning)
+                await this.jobManager.RunJobAsTask(Constants.GeofenceJobIdentifer);
+        }
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.Locations.Sync/Infrastructure/SyncGeofenceDelegate.cs#L1-L51)</sup>
 ```cs
 using System.Threading.Tasks;
 using Shiny.Locations;
@@ -32,12 +170,28 @@ public class GeofenceDelegate : IGeofenceDelegate
     {
     }
 }
+
 ```
-<sup><a href='/src/Snippets/GeofenceDelegate.cs#L1-L9' title='File snippet `GeofenceDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-GeofenceDelegate.cs' title='Navigate to start of snippet `GeofenceDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/GeofenceDelegate.cs#L1-L10)</sup>
+```cs
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Shiny.Locations.Sync;
+
+public class LocationSyncGeofenceDelegate : IGeofenceSyncDelegate
+{
+    public Task Process(IEnumerable<GeofenceEvent> geofence, CancellationToken cancelToken)
+    {
+        throw new NotImplementedException();
+    }
+}
+```
+<sup>[snippet source](/src/Snippets/LocationSyncGeofenceDelegate.cs#L1-L13)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: GeofenceUsage.cs -->
-<a id='snippet-GeofenceUsage.cs'></a>
 ```cs
 using System.Threading.Tasks;
 using Shiny;
@@ -70,5 +224,5 @@ public class GeofenceUsage
     }
 }
 ```
-<sup><a href='/src/Snippets/GeofenceUsage.cs#L1-L30' title='File snippet `GeofenceUsage.cs` was extracted from'>snippet source</a> | <a href='#snippet-GeofenceUsage.cs' title='Navigate to start of snippet `GeofenceUsage.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/GeofenceUsage.cs#L1-L30)</sup>
+<!-- endsnippet -->

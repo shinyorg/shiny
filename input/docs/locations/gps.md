@@ -1,3 +1,8 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/locations/gps.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: GPS
 Description: Monitoring GPS
 ---
@@ -6,7 +11,6 @@ Description: Monitoring GPS
 The Global Position System (GPS) on Shiny is actually a bit more complicated than other Shiny modules as it can really "hammer" away on your resources if you set it up wrong.
 
 <!-- snippet: GpsStartup.cs -->
-<a id='snippet-GpsStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,12 +27,242 @@ public class GpsStartup : ShinyStartup
         services.UseGps<GpsDelegate>();
     }
 }
+
 ```
-<sup><a href='/src/Snippets/GpsStartup.cs#L1-L15' title='File snippet `GpsStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-GpsStartup.cs' title='Navigate to start of snippet `GpsStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/GpsStartup.cs#L1-L16)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: GpsDelegate.cs -->
-<a id='snippet-GpsDelegate.cs'></a>
+```cs
+using System;
+using System.Threading.Tasks;
+using Shiny.Infrastructure;
+
+
+namespace Shiny.Locations
+{
+    public interface IGpsDelegate : IShinyDelegate
+    {
+        /// <summary>
+        /// This is fired when the gps reading has changed. 
+        /// </summary>
+        /// <param name="reading">The gps reading.</param>
+        Task OnReading(IGpsReading reading);
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.Locations.Abstractions/IGpsDelegate.cs#L1-L17)</sup>
+```cs
+using System;
+using System.Threading.Tasks;
+using Shiny.Jobs;
+
+
+namespace Shiny.Locations.Sync.Infrastructure
+{
+    public class SyncGpsDelegate : NotifyPropertyChanged, IGpsDelegate
+    {
+        readonly IJobManager jobManager;
+        readonly IMotionActivityManager activityManager;
+        readonly IGpsDataService dataService;
+
+
+        public SyncGpsDelegate(IJobManager jobManager,
+                               IMotionActivityManager activityManager,
+                               IGpsDataService dataService)
+        {
+            this.jobManager = jobManager;
+            this.activityManager = activityManager;
+            this.dataService = dataService;
+        }
+
+
+        public async Task OnReading(IGpsReading reading)
+        {
+            var job = await this.jobManager.GetJob(Constants.GpsJobIdentifier);
+            if (job == null)
+                return;
+
+            var config = job.GetSyncConfig();
+            MotionActivityEvent? activity = null;
+            if (config.IncludeMotionActivityEvents)
+                activity = await this.activityManager.GetCurrentActivity();
+
+            var e = new GpsEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DateCreated = DateTimeOffset.UtcNow,
+
+                Latitude = reading.Position.Latitude,
+                Longitude = reading.Position.Longitude,
+                Heading = reading.Heading,
+                HeadingAccuracy = reading.HeadingAccuracy,
+                Speed = reading.Speed,
+                PositionAccuracy = reading.PositionAccuracy,
+                Activities = activity?.Types
+            };
+            await this.dataService.Create(e);
+            var batchSize = await this.dataService.GetPendingCount();
+
+            if (batchSize >= config.BatchSize)
+            {
+                Console.WriteLine("GPS Location Sync batch size reached, will attempt to sync");
+                if (!this.jobManager.IsRunning)
+                    await this.jobManager.RunJobAsTask(Constants.GpsJobIdentifier);
+            }
+        }
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.Locations.Sync/Infrastructure/SyncGpsDelegate.cs#L1-L61)</sup>
+```cs
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Shiny.Locations;
+using Shiny.Settings;
+
+
+namespace Shiny.TripTracker.Internals
+{
+    public class TripTrackerGpsDelegate : IGpsDelegate
+    {
+        readonly ITripTrackerManager manager;
+        readonly IMotionActivityManager activityManager;
+        readonly IDataService dataService;
+        readonly ISettings settings;
+        readonly IEnumerable<ITripTrackerDelegate> delegates;
+
+
+        public TripTrackerGpsDelegate(ITripTrackerManager manager,
+                                      IMotionActivityManager activityManager,
+                                      IDataService dataService,
+                                      ISettings settings,
+                                      IEnumerable<ITripTrackerDelegate> delegates)
+        {
+            this.manager = manager;
+            this.activityManager = activityManager;
+            this.dataService = dataService;
+            this.settings = settings;
+            this.delegates = delegates;
+        }
+
+
+        int? CurrentTripId
+        {
+            get => this.settings.CurrentTripId();
+            set => this.settings.CurrentTripId(value);
+        }
+
+
+        public async Task OnReading(IGpsReading reading)
+        {
+            if (this.manager.TrackingType == null)
+                return;
+
+            // TODO: watch for sensor blips?
+            // TODO: watch for overlap
+            var n = nameof(TripTrackerGpsDelegate);
+            var currentMotion = await this.GetLastActivity();
+            var track = this.IsTracked(currentMotion);
+            Logging.Log.Write(n, $"Current Motion: {currentMotion?.Types.ToString() ?? "Empty"} - Track: {track} - Current: {this.CurrentTripId}");
+
+            if (this.CurrentTripId == null)
+            {
+                if (!track)
+                    return;
+
+                var trip = new Trip
+                {
+                    StartLatitude = reading.Position.Latitude,
+                    StartLongitude = reading.Position.Longitude,
+                    Type = this.manager.TrackingType.Value,
+                    DateStarted = DateTimeOffset.UtcNow
+                };
+                await this.dataService.Save(trip);
+                this.settings.CurrentTripId(trip.Id);
+
+                await this.dataService.Checkin(trip.Id, reading);
+                await this.delegates.RunDelegates(x => x.OnTripStart(trip));
+            }
+            else
+            {
+                await this.dataService.Checkin(this.CurrentTripId.Value, reading);
+
+                if (!track)
+                {
+                    // stop trip
+                    var trip = await this.dataService.GetTrip(this.CurrentTripId.Value);
+                    trip.DateFinished = DateTimeOffset.UtcNow;
+                    trip.AverageSpeedMetersPerHour = await this.dataService.GetTripAverageSpeedInMetersPerHour(trip.Id);
+                    trip.TotalDistanceMeters = await this.dataService.GetTripTotalDistanceInMeters(trip.Id);
+                    trip.EndLongitude = reading.Position.Longitude;
+                    trip.EndLatitude = reading.Position.Latitude;
+
+                    this.settings.CurrentTripId(null);
+                    await this.dataService.Save(trip);
+                    await this.delegates.RunDelegates(x => x.OnTripEnd(trip));
+                }
+            }
+        }
+
+
+        async Task<MotionActivityEvent> GetLastActivity()
+        {
+            var ts = TimeSpan.FromMinutes(5);
+            var currentTripId = this.settings.CurrentTripId();
+
+            if (currentTripId != null)
+            {
+                var trip = await this.dataService.GetTrip(currentTripId.Value);
+                ts = DateTimeOffset.UtcNow.Subtract(trip.DateStarted);
+            }
+            return await this.activityManager.GetCurrentActivity(ts);
+        }
+
+
+        bool IsTracked(MotionActivityEvent? e)
+        {
+            if (e == null)
+                return this.settings.CurrentTripId() != null;
+
+            switch (this.manager.TrackingType.Value)
+            {
+                case TripTrackingType.Stationary:
+                    return e.Types.HasFlag(MotionActivityType.Stationary);
+
+                case TripTrackingType.Cycling:
+                    return e.Types.HasFlag(MotionActivityType.Cycling);
+
+                case TripTrackingType.Running:
+                    return e.Types.HasFlag(MotionActivityType.Running);
+
+                case TripTrackingType.Walking:
+                    return e.Types.HasFlag(MotionActivityType.Walking);
+
+                case TripTrackingType.Automotive:
+                    return e.Types.HasFlag(MotionActivityType.Automotive);
+
+                case TripTrackingType.Exercise:
+                    return e.Types.HasFlag(MotionActivityType.Cycling) ||
+                           e.Types.HasFlag(MotionActivityType.Running) ||
+                           e.Types.HasFlag(MotionActivityType.Walking);
+
+                case TripTrackingType.OnFoot:
+                    return e.Types.HasFlag(MotionActivityType.Running) ||
+                           e.Types.HasFlag(MotionActivityType.Walking);
+
+                default:
+                    throw new Exception("Invalid Flag");
+            }
+        }
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.TripTracker/Internals/TripTrackerGpsDelegate.cs#L1-L143)</sup>
 ```cs
 using System.Threading.Tasks;
 using Shiny.Locations;
@@ -40,11 +274,26 @@ public class GpsDelegate : IGpsDelegate
     }
 }
 ```
-<sup><a href='/src/Snippets/GpsDelegate.cs#L1-L9' title='File snippet `GpsDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-GpsDelegate.cs' title='Navigate to start of snippet `GpsDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/GpsDelegate.cs#L1-L9)</sup>
+```cs
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Shiny.Locations.Sync;
+
+public class LocationSyncGpsDelegate : IGpsSyncDelegate
+{
+    public Task Process(IEnumerable<GpsEvent> gpsEvent, CancellationToken cancelToken)
+    {
+        throw new NotImplementedException();
+    }
+}
+```
+<sup>[snippet source](/src/Snippets/LocationSyncGpsDelegate.cs#L1-L13)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: GpsUsage.cs -->
-<a id='snippet-GpsUsage.cs'></a>
 ```cs
 using System.Threading.Tasks;
 using Shiny;
@@ -70,5 +319,5 @@ public class GpsUsage
     }
 }
 ```
-<sup><a href='/src/Snippets/GpsUsage.cs#L1-L23' title='File snippet `GpsUsage.cs` was extracted from'>snippet source</a> | <a href='#snippet-GpsUsage.cs' title='Navigate to start of snippet `GpsUsage.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/GpsUsage.cs#L1-L23)</sup>
+<!-- endsnippet -->

@@ -1,9 +1,30 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/appservices/datasync.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: Data Sync
 Order: 3
 ---
 
 <!-- snippet: DataSyncDelegate.cs -->
-<a id='snippet-DataSyncDelegate.cs'></a>
+```cs
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Shiny.DataSync.Infrastructure;
+
+
+namespace Shiny.DataSync
+{
+    public interface IDataSyncDelegate
+    {
+        Task Push(SyncItem item);
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.DataSync/IDataSyncDelegate.cs#L1-L14)</sup>
 ```cs
 using System.Threading.Tasks;
 using Shiny.DataSync;
@@ -17,12 +38,12 @@ public class DataSyncDelegate : IDataSyncDelegate
         // is seen.  Do not trap errors here, errors tell Shiny to try this item again in the next run
     }
 }
+
 ```
-<sup><a href='/src/Snippets/DataSyncDelegate.cs#L1-L12' title='File snippet `DataSyncDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-DataSyncDelegate.cs' title='Navigate to start of snippet `DataSyncDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/DataSyncDelegate.cs#L1-L13)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: DataSyncStartup.cs -->
-<a id='snippet-DataSyncStartup.cs'></a>
 ```cs
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,11 +57,10 @@ public class DataSyncStartup : ShinyStartup
     }
 }
 ```
-<sup><a href='/src/Snippets/DataSyncStartup.cs#L1-L11' title='File snippet `DataSyncStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-DataSyncStartup.cs' title='Navigate to start of snippet `DataSyncStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/DataSyncStartup.cs#L1-L11)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: DataSyncUsage.cs -->
-<a id='snippet-DataSyncUsage.cs'></a>
 ```cs
 using System.Threading.Tasks;
 using Shiny;
@@ -67,5 +87,5 @@ public class DataSyncUsage
     }
 }
 ```
-<sup><a href='/src/Snippets/DataSyncUsage.cs#L1-L24' title='File snippet `DataSyncUsage.cs` was extracted from'>snippet source</a> | <a href='#snippet-DataSyncUsage.cs' title='Navigate to start of snippet `DataSyncUsage.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/DataSyncUsage.cs#L1-L24)</sup>
+<!-- endsnippet -->

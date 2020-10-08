@@ -4,7 +4,7 @@
 namespace Shiny.BluetoothLE.RefitClient
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public abstract class BleMethodAttribute : Attribute
+    public class BleMethodAttribute : Attribute
     {
         public BleMethodAttribute(string serviceUuid, string characteristicUuid) { }
     }

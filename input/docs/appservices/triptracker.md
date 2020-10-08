@@ -1,9 +1,13 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/appservices/triptracker.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: Trip Tracker
 Order: 1
 ---
 
 <!-- snippet: TripTrackerStartup.cs -->
-<a id='snippet-TripTrackerStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -19,11 +23,26 @@ public class TripTrackerStartup : ShinyStartup
     }
 }
 ```
-<sup><a href='/src/Snippets/TripTrackerStartup.cs#L1-L13' title='File snippet `TripTrackerStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-TripTrackerStartup.cs' title='Navigate to start of snippet `TripTrackerStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/TripTrackerStartup.cs#L1-L13)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: TripTrackerDelegate.cs -->
-<a id='snippet-TripTrackerDelegate.cs'></a>
+```cs
+using System;
+using System.Threading.Tasks;
+
+
+namespace Shiny.TripTracker
+{
+    public interface ITripTrackerDelegate
+    {
+        Task OnTripStart(Trip trip);
+        Task OnTripEnd(Trip trip);
+    }
+}
+
+```
+<sup>[snippet source](/src/Shiny.TripTracker/ITripTrackerDelegate.cs#L1-L13)</sup>
 ```cs
 using System.Threading.Tasks;
 using Shiny.TripTracker;
@@ -50,12 +69,12 @@ public class TripTrackerDelegate : ITripTrackerDelegate
         var route = await this.manager.GetCheckinsByTrip(trip.Id);
     }
 }
+
 ```
-<sup><a href='/src/Snippets/TripTrackerDelegate.cs#L1-L25' title='File snippet `TripTrackerDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-TripTrackerDelegate.cs' title='Navigate to start of snippet `TripTrackerDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/TripTrackerDelegate.cs#L1-L26)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: TripTrackerUsage.cs -->
-<a id='snippet-TripTrackerUsage.cs'></a>
 ```cs
 using System;
 using System.Threading.Tasks;
@@ -71,6 +90,7 @@ public class TripTrackerUsage
 
     }
 }
+
 ```
-<sup><a href='/src/Snippets/TripTrackerUsage.cs#L1-L14' title='File snippet `TripTrackerUsage.cs` was extracted from'>snippet source</a> | <a href='#snippet-TripTrackerUsage.cs' title='Navigate to start of snippet `TripTrackerUsage.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/TripTrackerUsage.cs#L1-L15)</sup>
+<!-- endsnippet -->

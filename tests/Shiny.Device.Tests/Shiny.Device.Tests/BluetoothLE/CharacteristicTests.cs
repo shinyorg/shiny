@@ -86,7 +86,7 @@ namespace Shiny.Devices.Tests.BluetoothLE
         public async Task Concurrent_Notifications()
         {
             await this.Setup();
-            var list = new Dictionary<Guid, int>();
+            var list = new Dictionary<string, int>();
 
             var sub = this.characteristics
                 .ToObservable()

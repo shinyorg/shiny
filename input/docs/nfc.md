@@ -1,3 +1,8 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/nfc.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: NFC
 Description: Near Field Communication
 ---
@@ -11,7 +16,6 @@ Description: Near Field Communication
 |UWP|16299|
 
 <!-- snippet: NfcStartup.cs -->
-<a id='snippet-NfcStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -24,12 +28,11 @@ public class NfcStartup : ShinyStartup
     }
 }
 ```
-<sup><a href='/src/Snippets/NfcStartup.cs#L1-L10' title='File snippet `NfcStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-NfcStartup.cs' title='Navigate to start of snippet `NfcStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/NfcStartup.cs#L1-L10)</sup>
+<!-- endsnippet -->
 
 
 <!-- snippet: NfcUsage.cs -->
-<a id='snippet-NfcUsage.cs'></a>
 ```cs
 using Shiny;
 using Shiny.Nfc;
@@ -60,5 +63,5 @@ public class NfcUsage
     }
 }
 ```
-<sup><a href='/src/Snippets/NfcUsage.cs#L1-L28' title='File snippet `NfcUsage.cs` was extracted from'>snippet source</a> | <a href='#snippet-NfcUsage.cs' title='Navigate to start of snippet `NfcUsage.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/NfcUsage.cs#L1-L28)</sup>
+<!-- endsnippet -->

@@ -7,6 +7,6 @@ namespace Shiny.Generators.Tests
 {
     public class TestJob : IJob
     {
-        public Task<bool> Run(JobInfo jobInfo, CancellationToken cancelToken) => throw new NotImplementedException();
+        public Task Run(JobInfo jobInfo, CancellationToken cancelToken) => throw new NotImplementedException();
     }
 }

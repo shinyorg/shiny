@@ -7,7 +7,7 @@
     <ItemGroup>
         <PackageReference Include="MarkdownSnippets.MsBuild" />
         <PackageReference Include="System.Reactive" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\Shiny.Beacons.Advertising\Shiny.Beacons.Advertising.csproj" />

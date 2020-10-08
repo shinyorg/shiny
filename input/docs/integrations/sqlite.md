@@ -1,3 +1,8 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/integrations/sqlite.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: SQLite
 ---
 # INTEGRATIONS - SQLite
@@ -15,7 +20,6 @@ The SQLite integration provides several overrides to the built-in modules within
 For the most part, you won't see SQLite after you register it in your Shiny startup.  You are simply swapping "engines" for the "under the hood" stuff.  To use the functionality, in your Shiny startup file, add the following
 
 <!-- snippet: SqliteStartup.cs -->
-<a id='snippet-SqliteStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -31,9 +35,10 @@ public class SqliteStartup : ShinyStartup
         services.UseSqliteStorage();
     }
 }
+
 ```
-<sup><a href='/src/Snippets/SqliteStartup.cs#L1-L14' title='File snippet `SqliteStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-SqliteStartup.cs' title='Navigate to start of snippet `SqliteStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/SqliteStartup.cs#L1-L15)</sup>
+<!-- endsnippet -->
 
 
 ## Why Swap with SQLite

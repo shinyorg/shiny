@@ -1,3 +1,8 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/integrations/appcenter.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: App Center Logging
 ---
 
@@ -9,7 +14,6 @@ Install from NuGet: [![NuGet](https://img.shields.io/nuget/v/Shiny.Logging.AppCe
 ## Setup
 
 <!-- snippet: AppCenterStartup.cs -->
-<a id='snippet-AppCenterStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -22,5 +26,5 @@ public class AppCenterStartup : ShinyStartup
     }
 }
 ```
-<sup><a href='/src/Snippets/AppCenterStartup.cs#L1-L10' title='File snippet `AppCenterStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-AppCenterStartup.cs' title='Navigate to start of snippet `AppCenterStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/AppCenterStartup.cs#L1-L10)</sup>
+<!-- endsnippet -->

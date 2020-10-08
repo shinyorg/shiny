@@ -1,3 +1,8 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/gettingstarted.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: Getting Started
 Order: 1
 RedirectFrom: index
@@ -16,7 +21,6 @@ RedirectFrom: index
 2. In your shared code project.  Create a Shiny startup file:
 
 <!-- snippet: YourShinyStartup.cs -->
-<a id='snippet-YourShinyStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -33,8 +37,8 @@ namespace YourNamespace
     }
 }
 ```
-<sup><a href='/src/Snippets/YourShinyStartup.cs#L1-L14' title='File snippet `YourShinyStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-YourShinyStartup.cs' title='Navigate to start of snippet `YourShinyStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/YourShinyStartup.cs#L1-L14)</sup>
+<!-- endsnippet -->
 
 ### Android
 At build time, Shiny will attempt to auto-generate an Android application file and wire-up all of the necessary boilerplate to any of your Android activities. 

@@ -1,9 +1,13 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/appservices/locsync.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: Location Sync
 Order: 2
 ---
 
 <!-- snippet: LocationSyncStartup.cs -->
-<a id='snippet-LocationSyncStartup.cs'></a>
 ```cs
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,12 +21,12 @@ public class LocationSyncStartup : ShinyStartup
         //services.UseGeofencingSync<>();
     }
 }
+
 ```
-<sup><a href='/src/Snippets/LocationSyncStartup.cs#L1-L12' title='File snippet `LocationSyncStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-LocationSyncStartup.cs' title='Navigate to start of snippet `LocationSyncStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/LocationSyncStartup.cs#L1-L13)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: LocationSyncGeofenceDelegate.cs -->
-<a id='snippet-LocationSyncGeofenceDelegate.cs'></a>
 ```cs
 using System;
 using System.Collections.Generic;
@@ -38,11 +42,10 @@ public class LocationSyncGeofenceDelegate : IGeofenceSyncDelegate
     }
 }
 ```
-<sup><a href='/src/Snippets/LocationSyncGeofenceDelegate.cs#L1-L13' title='File snippet `LocationSyncGeofenceDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-LocationSyncGeofenceDelegate.cs' title='Navigate to start of snippet `LocationSyncGeofenceDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/LocationSyncGeofenceDelegate.cs#L1-L13)</sup>
+<!-- endsnippet -->
 
 <!-- snippet: LocationSyncGpsDelegate.cs -->
-<a id='snippet-LocationSyncGpsDelegate.cs'></a>
 ```cs
 using System;
 using System.Collections.Generic;
@@ -58,5 +61,5 @@ public class LocationSyncGpsDelegate : IGpsSyncDelegate
     }
 }
 ```
-<sup><a href='/src/Snippets/LocationSyncGpsDelegate.cs#L1-L13' title='File snippet `LocationSyncGpsDelegate.cs` was extracted from'>snippet source</a> | <a href='#snippet-LocationSyncGpsDelegate.cs' title='Navigate to start of snippet `LocationSyncGpsDelegate.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/LocationSyncGpsDelegate.cs#L1-L13)</sup>
+<!-- endsnippet -->

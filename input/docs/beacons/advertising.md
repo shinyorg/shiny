@@ -1,3 +1,8 @@
+<!--
+This file was generate by MarkdownSnippets.
+Source File: /input/docs/beacons/advertising.source.md
+To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
+-->
 Title: Advertising
 ---
 
@@ -13,7 +18,6 @@ Title: Advertising
 # TODO
 
 <!-- snippet: BeaconAdsStartup.cs -->
-<a id='snippet-BeaconAdsStartup.cs'></a>
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -26,7 +30,7 @@ public class BeaconAdsStartup : ShinyStartup
     }
 }
 ```
-<sup><a href='/src/Snippets/BeaconAdsStartup.cs#L1-L10' title='File snippet `BeaconAdsStartup.cs` was extracted from'>snippet source</a> | <a href='#snippet-BeaconAdsStartup.cs' title='Navigate to start of snippet `BeaconAdsStartup.cs`'>anchor</a></sup>
-<!-- endSnippet -->
+<sup>[snippet source](/src/Snippets/BeaconAdsStartup.cs#L1-L10)</sup>
+<!-- endsnippet -->
 
 
