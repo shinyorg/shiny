@@ -23,14 +23,16 @@ namespace Shiny.BluetoothLE
         /// </summary>
         /// <param name="peripheral"></param>
         /// <param name="serviceUuid"></param>
-        /// <param name="characteristicUuids"></param>
+        /// <param name="characteristicUuid"></param>
+        /// <param name="sendHook"></param>
+        /// <param name="useIndicationIfAvailable"></param>
         /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, string serviceUuid, params string[] characteristicUuids)
+        public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, bool sendHook = false, bool useIndicationIfAvailable = false)
             => peripheral
                 .WhenConnected()
-                .Select(_ => peripheral.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuids))
+                .Select(_ => peripheral.WhenKnownCharacteristicsDiscovered(serviceUuid, characteristicUuid))
                 .Switch()
-                .Select(x => x.Notify())
+                .Select(x => x.Notify(sendHook, useIndicationIfAvailable))
                 .Merge();
 
 
