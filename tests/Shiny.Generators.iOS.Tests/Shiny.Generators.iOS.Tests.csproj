@@ -50,7 +50,7 @@
       <Version>4.8.0.1451</Version>
     </PackageReference>
     <PackageReference Include="XF.Material">
-      <Version>1.7.4</Version>
+      <Version>1.7.5</Version>
     </PackageReference>
     <PackageReference Include="AiForms.SettingsView">
       <Version>1.3.3</Version>
