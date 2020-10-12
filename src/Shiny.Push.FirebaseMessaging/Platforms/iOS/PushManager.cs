@@ -42,17 +42,18 @@ namespace Shiny.Push.FirebaseMessaging
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             var access = await base.RequestAccess(cancelToken);
-            if (access.Status == AccessState.Available)
-            {
-                Messaging.SharedInstance.ApnsToken = access.RegistrationToken;
+            if (access.Status != AccessState.Available)
+                return access;
 
-                var result = await InstanceId.SharedInstance.GetInstanceIdAsync();
-                this.CurrentRegistrationToken = result.Token;
-                this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            }
-            return access;
+            Messaging.SharedInstance.ApnsToken = access.RegistrationToken;
+            //Messaging.SharedInstance.RetrieveFcmTokenAsync()
+            var result = await InstanceId.SharedInstance.GetInstanceIdAsync();
+            this.CurrentRegistrationToken = result.Token;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+
+            return new PushAccessState(AccessState.Available, result.Token);
         }
-        
+
 
         public override async Task UnRegister()
         {

@@ -9,7 +9,7 @@ namespace Shiny.Push.FirebaseMessaging
     {
         readonly Action<RemoteMessage> onMessage;
         readonly Action<string> onToken;
-        
+
 
         public FbMessagingDelegate(Action<RemoteMessage> onMessage, Action<string> onToken)
         {
