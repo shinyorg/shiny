@@ -13,31 +13,40 @@ namespace Shiny.BluetoothLE.Internals
     public class CentralContext : CBCentralManagerDelegate
     {
         readonly ConcurrentDictionary<string, IPeripheral> peripherals = new ConcurrentDictionary<string, IPeripheral>();
+        readonly Lazy<CBCentralManager> managerLazy;
 
 
         public CentralContext(IServiceProvider services, BleConfiguration config)
         {
-            if (!PlatformExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
-                Log.Write("BluetoothLE", "NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
-
-            if (!PlatformExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
-                Log.Write("BluetoothLE", "NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
-
             this.Services = services;
-            var opts = new CBCentralInitOptions
+
+            this.managerLazy = new Lazy<CBCentralManager>(() =>
             {
-                ShowPowerAlert = config.iOSShowPowerAlert
-            };
+                if (!PlatformExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
+                    Log.Write("BluetoothLE", "NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
 
-            if (!config.iOSRestoreIdentifier.IsEmpty())
-                opts.RestoreIdentifier = config.iOSRestoreIdentifier;
+                var background = services.GetService(typeof(IBleDelegate)) != null;
+                if (!background)
+                    return new CBCentralManager(this, null);
 
-            this.Manager = new CBCentralManager(this, null, opts);
+                if (!PlatformExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
+                    Log.Write("BluetoothLE", "NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
+
+                var opts = new CBCentralInitOptions
+                {
+                    ShowPowerAlert = config.iOSShowPowerAlert
+                };
+
+                if (!config.iOSRestoreIdentifier.IsEmpty())
+                    opts.RestoreIdentifier = config.iOSRestoreIdentifier;
+
+                return new CBCentralManager(this, null, opts);
+            });
         }
 
 
         public IServiceProvider Services { get; }
-        public CBCentralManager Manager { get; private set; }
+        public CBCentralManager Manager => this.managerLazy.Value;
         public bool HasRegisteredDelegates => this.Services.GetService(typeof(BleDelegate)) != null;
 
 
@@ -64,7 +73,7 @@ namespace Shiny.BluetoothLE.Internals
         public override void WillRestoreState(CBCentralManager central, NSDictionary dict)
         {
 #if __IOS__
-            this.Manager = central;
+            //this.Manager = central;
             Dispatcher.ExecuteBackgroundTask((Func<System.Threading.Tasks.Task>)(async () =>
             {
                 var del = Extensions_ServiceCollection.Resolve<IBleDelegate>(this.Services);

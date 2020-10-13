@@ -22,7 +22,6 @@ namespace Shiny.BluetoothLE.Internals
         readonly ConcurrentDictionary<string, Peripheral> devices;
         readonly Subject<NamedMessage<Peripheral>> peripheralSubject;
         readonly IMessageBus messageBus;
-        readonly IServiceProvider services;
         LollipopScanCallback? callbacks;
 
 
@@ -33,7 +32,7 @@ namespace Shiny.BluetoothLE.Internals
         {
             this.Android = context;
             this.Configuration = config;
-            this.services = services;
+            this.Services = services;
             this.Manager = context.GetBluetooth();
 
             //this.sdelegate = new Lazy<IBleDelegate>(() => serviceProvider.Resolve<IBleDelegate>());
@@ -48,6 +47,8 @@ namespace Shiny.BluetoothLE.Internals
             //    ));
         }
 
+
+        public IServiceProvider Services { get; }
 
         public AccessState Status => this.Manager.GetAccessState();
         public IObservable<AccessState> StatusChanged => this.messageBus
@@ -71,7 +72,7 @@ namespace Shiny.BluetoothLE.Internals
             switch (action)
             {
                 case BluetoothDevice.ActionAclConnected:
-                    await this.services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
+                    await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
                     break;
 
                 // TODO: background scan?

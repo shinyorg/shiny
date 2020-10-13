@@ -14,8 +14,9 @@ namespace Shiny.BluetoothLE
                               ICanSeePairedPeripherals
     {
         public const string BroadcastReceiverName = "com.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
-
         readonly CentralContext context;
+
+
         public BleManager(CentralContext context) => this.context = context;
 
 
@@ -48,7 +49,7 @@ namespace Shiny.BluetoothLE
             );
 
 
-        public override IObservable<AccessState> RequestAccess(bool forBackground) => Observable.FromAsync(async () =>
+        public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async () =>
         {
             if (!this.context.Android.IsInManifest(Manifest.Permission.Bluetooth))
                 return AccessState.NotSetup;
@@ -56,6 +57,7 @@ namespace Shiny.BluetoothLE
             if (!this.context.Android.IsInManifest(Manifest.Permission.BluetoothAdmin))
                 return AccessState.NotSetup;
 
+            var forBackground = this.context.Services.GetService(typeof(IBleDelegate)) != null;
             var result = this.context.Android.IsAtLeastAndroid10() && forBackground
                 ? await this.context.Android.RequestAccess(Manifest.Permission.AccessBackgroundLocation, Manifest.Permission.AccessFineLocation)
                 : await this.context.Android.RequestAccess(Manifest.Permission.AccessFineLocation);

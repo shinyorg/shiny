@@ -26,7 +26,7 @@ namespace Shiny.Testing.BluetoothLE
 
 
         public bool IsScanning { get; private set; }
-        public IObservable<AccessState> RequestAccess(bool forBackground) => Observable.Return(this.Status);
+        public IObservable<AccessState> RequestAccess() => Observable.Return(this.Status);
         public IObservable<AccessState> WhenStatusChanged() => this.statSubj.StartWith(this.Status);
 
 

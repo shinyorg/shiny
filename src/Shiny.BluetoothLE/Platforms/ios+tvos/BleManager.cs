@@ -18,12 +18,8 @@ namespace Shiny.BluetoothLE
         public override bool IsScanning => this.context.Manager.IsScanning;
 
 
-        public override IObservable<AccessState> RequestAccess(bool forBackground) => Observable.Create<AccessState>(async ob =>
+        public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(async ob =>
         {
-            // don't bother with plist checks here - native crash would have taken place if those values were missing
-            if (forBackground && !this.context.HasRegisteredDelegates)
-                throw new ApplicationException("No background delegate registered with Shiny");
-
             IDisposable? disp = null;
             if (this.context.Manager.State == CBCentralManagerState.Unknown)
             {
@@ -86,14 +82,11 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(async ob =>
         {
-            config = config ?? new ScanConfig();
-
+            config ??= new ScanConfig();
             if (this.IsScanning)
                 throw new ArgumentException("There is already an existing scan");
 
-            //if (config.ScanType == BleScanType.Background && (config.ServiceUuids == null || config.ServiceUuids.Count == 0))
-            //    throw new ArgumentException("Background scan type set but not ServiceUUID");
-            (await this.RequestAccess(config.Background)).Assert();
+            (await this.RequestAccess()).Assert();
             this.context.Clear();
             return this.context
                 .Manager

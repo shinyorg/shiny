@@ -7,12 +7,6 @@ namespace Shiny.BluetoothLE
     public class ScanConfig
     {
         /// <summary>
-        /// Set this to true for background scans
-        /// </summary>
-        public bool Background { get; set; }
-
-
-        /// <summary>
         /// Scan types - balanced & low latency are supported only on android
         /// </summary>
         public BleScanType ScanType { get; set; } = BleScanType.Balanced;
