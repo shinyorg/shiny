@@ -37,8 +37,7 @@ namespace Shiny.BluetoothLE
         //}
 
 
-        // TODO: check appmanifest
-        public override IObservable<AccessState> RequestAccess(bool forBackground) => Observable.Return(AccessState.Available);
+        public override IObservable<AccessState> RequestAccess() => Observable.Return(this.Status);
         public override bool IsScanning { get; protected set; }
 
 
