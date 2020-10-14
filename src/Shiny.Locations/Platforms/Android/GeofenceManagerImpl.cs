@@ -50,6 +50,7 @@ namespace Shiny.Locations
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
+            (await this.RequestAccess()).Assert();
             await this.Create(region);
             await this.Repository.Set(region.Identifier, region);
         }

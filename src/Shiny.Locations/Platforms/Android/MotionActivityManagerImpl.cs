@@ -58,7 +58,7 @@ namespace Shiny.Locations
         }
 
 
-        public async Task<AccessState> RequestPermission()
+        public async Task<AccessState> RequestAccess()
         {
             var result = AccessState.Available;
 
@@ -82,8 +82,10 @@ namespace Shiny.Locations
         }
 
 
-        public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
+        public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {
+            (await this.RequestAccess()).Assert();
+
             var st = start.ToUnixTimeSeconds();
             var et = (end ?? DateTimeOffset.UtcNow).ToUnixTimeSeconds();
             var sql = $@"SELECT 
@@ -97,7 +99,7 @@ WHERE
 ORDER BY 
     Timestamp DESC";
 
-            return this.database.RawQuery(
+            return await this.database.RawQuery(
                 sql,
                 cursor =>
                 {

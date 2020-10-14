@@ -82,43 +82,52 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(async ob =>
         {
-            config ??= new ScanConfig();
             if (this.IsScanning)
                 throw new ArgumentException("There is already an existing scan");
 
-            (await this.RequestAccess()).Assert();
-            this.context.Clear();
-            return this.context
-                .Manager
-                .WhenReady()
-                .Select(_ => Observable.Create<ScanResult>(ob =>
-                {
-                    var scan = this.context
-                        .ScanResultReceived
-                        .AsObservable()
-                        .Subscribe(ob.OnNext);
+            IDisposable? sub = null;
+            config ??= new ScanConfig();
+            var status = await this.RequestAccess();
+            if (status != AccessState.Available)
+            {
+                ob.OnError(new PermissionException(BleLogCategory.BluetoothLE, status));
+            }
+            else
+            {
+                this.context.Clear();
+                sub = this.context
+                    .Manager
+                    .WhenReady()
+                    .Select(_ => Observable.Create<ScanResult>(ob =>
+                    {
+                        var scan = this.context
+                            .ScanResultReceived
+                            .AsObservable()
+                            .Subscribe(ob.OnNext);
 
-                    if (config.ServiceUuids == null || config.ServiceUuids.Count == 0)
-                    {
-                        this.context.Manager.ScanForPeripherals(null, new PeripheralScanningOptions { AllowDuplicatesKey = true });
-                    }
-                    else
-                    {
-                        var uuids = config.ServiceUuids.Select(CBUUID.FromString).ToArray();
-                        this.context.Manager.ScanForPeripherals(uuids, new PeripheralScanningOptions { AllowDuplicatesKey = true });
-                    }
+                        if (config.ServiceUuids == null || config.ServiceUuids.Count == 0)
+                        {
+                            this.context.Manager.ScanForPeripherals(null, new PeripheralScanningOptions { AllowDuplicatesKey = true });
+                        }
+                        else
+                        {
+                            var uuids = config.ServiceUuids.Select(CBUUID.FromString).ToArray();
+                            this.context.Manager.ScanForPeripherals(uuids, new PeripheralScanningOptions { AllowDuplicatesKey = true });
+                        }
 
-                    return () =>
-                    {
-                        this.context.Manager.StopScan();
-                        scan.Dispose();
-                    };
-                }))
-                .Switch()
-                .Subscribe(
-                    ob.OnNext,
-                    ob.OnError
-                );
+                        return () =>
+                        {
+                            this.context.Manager.StopScan();
+                            scan.Dispose();
+                        };
+                    }))
+                    .Switch()
+                    .Subscribe(
+                        ob.OnNext,
+                        ob.OnError
+                    );
+            }
+            return () => sub?.Dispose();
         });
 
 

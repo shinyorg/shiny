@@ -76,16 +76,30 @@ namespace Shiny.BluetoothLE
             .StartWith(this.Status);
 
 
-        public override IObservable<ScanResult> Scan(ScanConfig? config = null)
+        public override IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(async ob =>
         {
             if (this.IsScanning)
                 throw new ArgumentException("There is already an active scan");
 
-            this.isScanning = true;
-            return this.context
-                .Scan(config ?? new ScanConfig())
-                .Finally(() => this.isScanning = false);
-        }
+            IDisposable? sub = null;
+            var result = await this.RequestAccess();
+            if (result != AccessState.Available)
+            {
+                ob.OnError(new PermissionException(BleLogCategory.BluetoothLE, result));
+            }
+            else
+            {
+                this.isScanning = true;
+                sub = this.context
+                    .Scan(config ?? new ScanConfig())
+                    .Finally(() => this.isScanning = false)
+                    .Subscribe(
+                        ob.OnNext,
+                        ob.OnError
+                    );
+            }
+            return () => sub?.Dispose();
+        });
 
 
         public override void StopScan()

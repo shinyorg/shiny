@@ -16,7 +16,7 @@ namespace Shiny.Testing.Locations
         public Subject<MotionActivityEvent> ActivitySubject { get; } = new Subject<MotionActivityEvent>();
 
 
-        public Task<AccessState> RequestPermission() => Task.FromResult(this.CurrentStatus);
+        public Task<AccessState> RequestAccess() => Task.FromResult(this.CurrentStatus);
 
         public Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {

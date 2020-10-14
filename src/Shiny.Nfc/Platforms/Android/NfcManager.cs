@@ -52,30 +52,40 @@ namespace Shiny.Nfc
         public IObservable<NDefRecord[]> ContinuousRead() => this.DoRead(false);
 
 
-        protected virtual IObservable<NDefRecord[]> DoRead(bool singleRead) => Observable.Create<NDefRecord[]>(ob =>
+        protected virtual IObservable<NDefRecord[]> DoRead(bool singleRead) => Observable.Create<NDefRecord[]>(async ob =>
         {
+            IDisposable? sub = null;
             var adapter = NfcAdapter.GetDefaultAdapter(this.context.AppContext);
-            adapter.EnableReaderMode(
-                this.context.CurrentActivity,
-                this,
-                NfcReaderFlags.NfcA |
-                NfcReaderFlags.NfcB |
-                NfcReaderFlags.NfcBarcode |
-                NfcReaderFlags.NfcF |
-                NfcReaderFlags.NfcV |
-                NfcReaderFlags.NoPlatformSounds,
-                new Android.OS.Bundle()
-            );
+            var access = await this.RequestAccess();
 
-            var sub = this.recordSubj.Subscribe(
-                x =>
-                {
-                    ob.OnNext(x);
-                    if (singleRead)
-                        ob.OnCompleted();
-                },
-                ob.OnError
-            );
+            if (access != AccessState.Available)
+            {
+                ob.OnError(new PermissionException("NFC", access));
+            }
+            else
+            {
+                adapter.EnableReaderMode(
+                    this.context.CurrentActivity,
+                    this,
+                    NfcReaderFlags.NfcA |
+                    NfcReaderFlags.NfcB |
+                    NfcReaderFlags.NfcBarcode |
+                    NfcReaderFlags.NfcF |
+                    NfcReaderFlags.NfcV |
+                    NfcReaderFlags.NoPlatformSounds,
+                    new Android.OS.Bundle()
+                );
+
+                sub = this.recordSubj.Subscribe(
+                    x =>
+                    {
+                        ob.OnNext(x);
+                        if (singleRead)
+                            ob.OnCompleted();
+                    },
+                    ob.OnError
+                );
+            }
 
             return () =>
             {

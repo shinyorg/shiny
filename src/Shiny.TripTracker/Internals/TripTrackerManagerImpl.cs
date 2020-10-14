@@ -61,7 +61,7 @@ namespace Shiny.TripTracker.Internals
 
         public async Task<AccessState> RequestAccess()
         {
-            var result = await this.motionActivityManager.RequestPermission();
+            var result = await this.motionActivityManager.RequestAccess();
             if (result != AccessState.Available)
                 return result;
 

@@ -14,6 +14,7 @@ using ScanMode = Android.Bluetooth.LE.ScanMode;
 using Shiny.Logging;
 using Observable = System.Reactive.Linq.Observable;
 
+
 namespace Shiny.BluetoothLE.Internals
 {
     public class CentralContext

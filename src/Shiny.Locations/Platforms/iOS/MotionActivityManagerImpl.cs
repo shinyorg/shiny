@@ -11,16 +11,10 @@ namespace Shiny.Locations
 {
     public class MotionActivityManagerImpl : IMotionActivityManager
     {
-        readonly CMMotionActivityManager activityManager;
+        readonly CMMotionActivityManager activityManager = new CMMotionActivityManager();
 
 
-        public MotionActivityManagerImpl()
-        {
-            this.activityManager = new CMMotionActivityManager();
-        }
-
-
-        public async Task<AccessState> RequestPermission()
+        public async Task<AccessState> RequestAccess()
         {
             if (!CMMotionActivityManager.IsActivityAvailable)
                 return AccessState.NotSupported;
@@ -52,6 +46,8 @@ namespace Shiny.Locations
 
         public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {
+            (await this.RequestAccess()).Assert();
+
             end = end ?? DateTimeOffset.UtcNow;
             var results = await this.activityManager.QueryActivityAsync(
                 (NSDate)start.LocalDateTime,
@@ -66,6 +62,8 @@ namespace Shiny.Locations
 
         public IObservable<MotionActivityEvent> WhenActivityChanged() => Observable.Create<MotionActivityEvent>(ob =>
         {
+            (await this.RequestAccess()).Assert();
+
             this.activityManager.StartActivityUpdates(
                 NSOperationQueue.CurrentQueue,
                 target =>

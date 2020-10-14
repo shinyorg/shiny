@@ -81,8 +81,7 @@ namespace Shiny.Locations
 
         public IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>
         {
-            var access = await this.RequestAccess(new GpsRequest());
-            access.Assert();
+            (await this.RequestAccess(new GpsRequest())).Assert();
 
             var location = await this.client.GetLastLocationAsync();
             if (location == null)
@@ -130,9 +129,8 @@ namespace Shiny.Locations
 
         protected virtual async Task StartListenerInternal(GpsRequest request)
         {
-            request = request ?? new GpsRequest();
-            var access = await this.RequestAccess(request);
-            access.Assert();
+            (await this.RequestAccess(new GpsRequest())).Assert();
+            request ??= new GpsRequest();
 
             var nativeRequest = LocationRequest
                 .Create()

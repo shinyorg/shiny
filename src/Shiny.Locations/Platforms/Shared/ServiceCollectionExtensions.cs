@@ -29,7 +29,7 @@ namespace Shiny
                 {
                     var access = await sp
                         .GetRequiredService<IMotionActivityManager>()
-                        .RequestPermission();
+                        .RequestAccess();
 
                     if (access != AccessState.Available)
                         Log.Write(LocationLogCategory.MotionActivity, "Invalid access - " + access);

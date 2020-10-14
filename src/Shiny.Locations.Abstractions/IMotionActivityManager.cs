@@ -7,7 +7,11 @@ namespace Shiny.Locations
 {
     public interface IMotionActivityManager
     {
-        Task<AccessState> RequestPermission();
+        /// <summary>
+        /// Requests access to use the necessary platform infrastructure
+        /// </summary>
+        /// <returns></returns>
+        Task<AccessState> RequestAccess();
 
         /// <summary>
         ///
