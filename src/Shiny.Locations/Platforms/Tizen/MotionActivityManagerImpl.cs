@@ -36,11 +36,7 @@ namespace Shiny.Locations
             this.stationary.Start();
         }
 
-        public async Task<AccessState> RequestPermission()
-        {
-            return AccessState.Available;
-        }
-
+        public Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
         public bool IsSupported => true;
 
 

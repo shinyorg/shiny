@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using CoreMotion;
@@ -60,19 +61,31 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<MotionActivityEvent> WhenActivityChanged() => Observable.Create<MotionActivityEvent>(ob =>
+        public IObservable<MotionActivityEvent> WhenActivityChanged() => Observable.Create<MotionActivityEvent>(async ob =>
         {
-            (await this.RequestAccess()).Assert();
-
-            this.activityManager.StartActivityUpdates(
-                NSOperationQueue.CurrentQueue,
-                target =>
-                {
-                    var e = ToEvent(target);
-                    ob.OnNext(e);
-                }
-            );
-            return () => this.activityManager.StopActivityUpdates();
+            var started = false;
+            var access = await this.RequestAccess();
+            if (access != AccessState.Available)
+            {
+                ob.OnError(new PermissionException("MotionActivity", access));
+            }
+            else
+            {
+                this.activityManager.StartActivityUpdates(
+                    NSOperationQueue.CurrentQueue,
+                    target =>
+                    {
+                        var e = ToEvent(target);
+                        ob.OnNext(e);
+                    }
+                );
+                started = true;
+            }
+            return () =>
+            {
+                if (started)
+                    this.activityManager.StopActivityUpdates();
+            };
         });
 
 
