@@ -31,7 +31,6 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
-    # the 2310+ is to bump the build number due to all the builds from azops but inability to up the run# on gh
     - name: Generate Build Number
       id: buildnumber
       uses: einaregilsson/build-number@v2
