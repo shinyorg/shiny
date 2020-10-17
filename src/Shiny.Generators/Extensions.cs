@@ -101,10 +101,6 @@ namespace Shiny.Generators
             => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null;
 
 
-        public static bool HasZXingNetMobile(this SourceGeneratorContext context)
-            => context.Compilation.GetTypeByMetadataName("ZXing.Mobile.MobileBarcodeScanner") != null;
-
-
         public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName)
         {
             var attribute = context.Compilation.GetTypeByMetadataName(attributeName);
@@ -283,6 +279,17 @@ namespace Shiny.Generators
 
 
         public static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en)
-            => en.WhereNotInAssembly("Xamarin.", "Shiny.").WhereNotNamespace("Android.");
+            => en.WhereNotInAssembly("Xamarin.").Where(x => !IsShinyAssembly(x)).WhereNotNamespace("Android.");
+
+
+        static bool IsShinyAssembly(INamedTypeSymbol symbol)
+        {
+            var name = symbol.ContainingAssembly.ToDisplayString();
+
+            if (name.Equals("Shiny.Framework"))
+                return false;
+
+            return name.StartsWith("Shiny.");
+        }
     }
 }
