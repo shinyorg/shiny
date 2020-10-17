@@ -33,13 +33,15 @@ jobs:
         dotnet-version: 3.1.301
     - name: Build
       run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{ github.run_number }} -property:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
-    - name: Publish to NuGet
-      if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' }}
-      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NugetApiToken }}
-    #- name: Test
-    #  run: dotnet test --no-restore --verbosity normal
+    #- name: Build
+    #  run: dotnet build Build.sln -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{ github.run_number }} -property:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
+    # - name: Test
+    #  run: dotnet test Build.sln --no-build --verbosity normal
     - name: Post NuGet Artifacts
       uses: actions/upload-artifact@v2
       with:
         name: nuget-artifacts
         path: '**/*.nupkg'
+    - name: Publish to NuGet
+      if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' }}
+      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGETAPIKEY }}
