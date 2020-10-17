@@ -279,17 +279,10 @@ namespace Shiny.Generators
 
 
         public static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en)
-            => en.WhereNotInAssembly("Xamarin.").Where(x => !IsShinyAssembly(x)).WhereNotNamespace("Android.");
+            => en.WhereNotInAssembly("Xamarin.").Where(x => !IsShinySystemType(x)).WhereNotNamespace("Android.");
 
 
-        static bool IsShinyAssembly(INamedTypeSymbol symbol)
-        {
-            var name = symbol.ContainingAssembly.ToDisplayString();
-
-            if (name.StartsWith("Shiny.Framework", StringComparison.InvariantCultureIgnoreCase))
-                return false;
-
-            return name.StartsWith("Shiny.");
-        }
+        public static bool IsShinySystemType(this INamedTypeSymbol symbol)
+            => symbol.ContainingAssembly.ToDisplayString().StartsWith("Shiny.");
     }
 }
