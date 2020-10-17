@@ -31,8 +31,9 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+    # the 2310+ is to bump the build number due to all the builds from azops but inability to up the run# on gh
     - name: Build
-      run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{ github.run_number }} -property:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
+      run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{ 2310 + github.run_number }} -property:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
     #- name: Build
     #  run: dotnet build Build.sln -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{ github.run_number }} -property:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
     # - name: Test
