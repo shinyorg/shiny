@@ -14,7 +14,7 @@ namespace Shiny.Notifications
         Task OnReceived(Notification notification);
 
         /// <summary>
-        ///
+        /// This will fire when the user taps on a notification (or responds using a command)
         /// </summary>
         /// <param name="response"></param>
         Task OnEntry(NotificationResponse response);
