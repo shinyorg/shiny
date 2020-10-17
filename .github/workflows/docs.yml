@@ -22,7 +22,7 @@ jobs:
         filename: 'release.zip'
         directory: s/output
         type: zip
-    - name: Post Nuget Artifacts
+    - name: Post Archive Artifact
       uses: actions/upload-artifact@v2
       with:
         name: archive-artifact
