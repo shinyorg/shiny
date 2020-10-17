@@ -27,13 +27,10 @@ namespace Shiny.Locations
 
         public async void Start()
         {
-            if (this.CurrentListener != null)
-            {
-                if (this.CurrentListener.UseBackground)
-                    await this.StartListenerInternal(this.CurrentListener);
-                else
-                    this.CurrentListener = null;
-            }
+            if (this.CurrentListener?.UseBackground ?? false)
+                await this.StartListenerInternal(this.CurrentListener);
+
+            this.CurrentListener = null;
         }
 
 
