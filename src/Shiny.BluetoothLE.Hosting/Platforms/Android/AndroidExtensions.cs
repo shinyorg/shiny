@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Android.Bluetooth;
 
+
 namespace Shiny.BluetoothLE.Hosting
 {
     public static class AndroidExtensions
