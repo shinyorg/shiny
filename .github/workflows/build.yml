@@ -3,8 +3,12 @@ name: .NET Core
 on:
   push:
     branches: [ master, dev, preview ]
+    paths:
+    - "src/**"
   pull_request:
     branches: [ master, dev ]
+    paths:
+    - "src/**"
 
 jobs:
   build:
@@ -24,8 +28,9 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet msbuild -property:Configuration=release -property:BUILD_BUILDNUMBER=$GITHUB_RUN_NUMBER
+      run: dotnet msbuild Build.sln -property:Configuration=release -property:BUILD_BUILDNUMBER=${{ github.run_number }} -property:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
+    - name: Publish to nuget
+      if: ${{ github.ref == 'dev' || github.ref == 'master' }}
+      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NugetApiToken }}
     #- name: Test
     #  run: dotnet test --no-restore --verbosity normal
-    # - name: dotnet publish
-    #  run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key
