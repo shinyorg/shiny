@@ -38,7 +38,7 @@ jobs:
       with:
         token: ${{secrets.github_token}}
     - name: Build
-      run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref }
+      run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
     #- name: Build
     #  run: dotnet build Build.sln -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
     # - name: Test
@@ -50,4 +50,4 @@ jobs:
         path: '**/*.nupkg'
     - name: Publish to NuGet
       if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' }}
-      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGETAPIKEY }}
+      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGETAPIKEY}}
