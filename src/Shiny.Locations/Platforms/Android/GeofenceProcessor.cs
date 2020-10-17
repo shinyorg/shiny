@@ -29,7 +29,6 @@ namespace Shiny.Locations
             if (e == null)
                 return;
 
-            
             if (e.HasError)
             {
                 Log.Write(
