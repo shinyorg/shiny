@@ -286,7 +286,7 @@ namespace Shiny.Generators
         {
             var name = symbol.ContainingAssembly.ToDisplayString();
 
-            if (name.Equals("Shiny.Framework"))
+            if (name.StartsWith("Shiny.Framework", StringComparison.InvariantCultureIgnoreCase))
                 return false;
 
             return name.StartsWith("Shiny.");
