@@ -34,7 +34,7 @@ jobs:
     - name: Build
       run: msbuild Build.sln -t:restore /p:Configuration=release /p:BUILD_BUILDNUMBER=${{ github.run_number }} /p:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
     - name: Publish to nuget
-      if: ${{ github.ref == 'dev' || github.ref == 'master' }}
+      if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' }}
       run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NugetApiToken }}
     #- name: Test
     #  run: dotnet test --no-restore --verbosity normal
