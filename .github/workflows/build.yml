@@ -1,10 +1,20 @@
-name: .NET Core
+name: Build
 
 on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
   push:
     branches: [ master, dev, preview ]
+    paths:
+    - "src/**"
   pull_request:
     branches: [ master, dev ]
+    paths:
+    - "src/**"
 
 jobs:
   build:
@@ -21,11 +31,23 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
-    - name: Install dependencies
-      run: dotnet restore
+    # the 2310+ is to bump the build number due to all the builds from azops but inability to up the run# on gh
+    - name: Generate Build Number
+      id: buildnumber
+      uses: einaregilsson/build-number@v2
+      with:
+        token: ${{secrets.github_token}}
     - name: Build
-      run: dotnet msbuild -property:Configuration=release -property:BUILD_BUILDNUMBER=$GITHUB_RUN_NUMBER
-    #- name: Test
-    #  run: dotnet test --no-restore --verbosity normal
-    # - name: dotnet publish
-    #  run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key
+      run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
+    #- name: Build
+    #  run: dotnet build Build.sln -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
+    # - name: Test
+    #  run: dotnet test Build.sln --no-build --verbosity normal
+    - name: Post NuGet Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: nuget-artifacts
+        path: '**/*.nupkg'
+    - name: Publish to NuGet
+      if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' }}
+      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGETAPIKEY}}

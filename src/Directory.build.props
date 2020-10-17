@@ -17,10 +17,11 @@
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
-        <VersionSuffix Condition=" $(BUILD_SOURCEBRANCHNAME) == 'preview' ">preview</VersionSuffix>
+        <VersionSuffix Condition=" $(BUILD_SOURCEBRANCHNAME) != 'refs/heads/master' ">preview</VersionSuffix>
         <SrcFolder>$(MSBuildThisFileDirectory)..\src</SrcFolder>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>

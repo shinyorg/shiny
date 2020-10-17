@@ -21,8 +21,8 @@ Shiny is a set of libraries designed to help make device services & backgroundin
 
 Branch|Status
 ------|------
-Master|[![Build status](https://dev.azure.com/shinylib/shiny/_apis/build/status/Build?branchName=master)](https://dev.azure.com/shinylib/shiny/_build/latest?definitionId=1)
-Dev|[![Build status](https://dev.azure.com/shinylib/shiny/_apis/build/status/Build?branchName=dev)](https://dev.azure.com/shinylib/shiny/_build/latest?definitionId=1)|
+Master|![Build](https://github.com/shinyorg/shiny/workflows/Build/badge.svg)|
+Dev|![Build](https://github.com/shinyorg/shiny/workflows/Build/badge.svg?branch=dev)|
 
 
 ## NuGet Packages
