@@ -3,7 +3,7 @@
         <PackageReference Update="sqlite-net-pcl" Version="1.7.335" />
         <PackageReference Update="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Update="System.Reactive" Version="4.4.1" />
-        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="3.1.8" />
+        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
         <PackageReference Update="Uno.Roslyn" Version="1.2.0-dev.18" />
         <PackageReference Update="Uno.SourceGeneration" Version="2.0.13" PrivateAssets="All" />
         <PackageReference Update="Uno.SourceGenerationTasks" Version="2.0.13" PrivateAssets="None" />
@@ -34,7 +34,7 @@
         <PackageReference Update="Xamarin.AndroidX.Room.Common" Version="2.2.5.5" />
         <PackageReference Update="Xamarin.AndroidX.Room.Runtime" Version="2.2.5.5" />
         <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.3.4.6" />
-        <PackageReference Update="Xamarin.Firebase.Messaging" Version="119.0.1" />
+        <PackageReference Update="Xamarin.Firebase.Messaging" Version="120.1.0" />
         <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.0.0" />
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="117.0.0" />
 
