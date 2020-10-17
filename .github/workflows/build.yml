@@ -40,7 +40,7 @@ jobs:
     - name: Build
       run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref }
     #- name: Build
-    #  run: dotnet build Build.sln -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{github.run_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
+    #  run: dotnet build Build.sln -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
     # - name: Test
     #  run: dotnet test Build.sln --no-build --verbosity normal
     - name: Post NuGet Artifacts
