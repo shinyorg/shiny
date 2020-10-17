@@ -32,13 +32,13 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Build
-      run: msbuild Build.sln -t:restore /p:Configuration=release /p:BUILD_BUILDNUMBER=${{ github.run_number }} /p:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
-    - name: Publish to nuget
+      run: msbuild Build.sln -t:restore /p:Configuration=Release /p:BUILD_BUILDNUMBER=${{ github.run_number }} /p:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
+    - name: Publish to NuGet
       if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' }}
       run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NugetApiToken }}
     #- name: Test
     #  run: dotnet test --no-restore --verbosity normal
-    - name: Post Nuget Artifacts
+    - name: Post NuGet Artifacts
       uses: actions/upload-artifact@v2
       with:
         name: nuget-artifacts
