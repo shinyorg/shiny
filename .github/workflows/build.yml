@@ -31,10 +31,8 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
-    - name: Install dependencies
-      run: dotnet restore
     - name: Build
-      run: msbuild Build.sln /p:Configuration=release /p:BUILD_BUILDNUMBER=${{ github.run_number }} /p:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
+      run: msbuild Build.sln -t:restore /p:Configuration=release /p:BUILD_BUILDNUMBER=${{ github.run_number }} /p:BUILD_SOURCEBRANCHNAME=${{ github.ref }}
     - name: Publish to nuget
       if: ${{ github.ref == 'dev' || github.ref == 'master' }}
       run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NugetApiToken }}
