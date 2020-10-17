@@ -38,3 +38,7 @@ jobs:
       run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NugetApiToken }}
     #- name: Test
     #  run: dotnet test --no-restore --verbosity normal
+    - uses: actions/upload-artifact@v2
+      with:
+        name: nuget-artifacts
+        path: src/**/*.nupkg
