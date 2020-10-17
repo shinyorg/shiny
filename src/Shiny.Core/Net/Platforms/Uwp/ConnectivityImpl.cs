@@ -8,11 +8,6 @@ namespace Shiny.Net
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
         public string? CellularCarrier => null;
-        //DeviceNetworkInformation.CellularMobileOperator
-        //PhoneCallStore phoneCallStore = await PhoneCallManager.RequestStoreAsync();
-        //Guid lineId = await phoneCallStore.GetDefaultLineAsync();
-        //PhoneLine line = await PhoneLine.FromIdAsync(lineId);
-        //var currentOperatorName = line.NetworkName;
 
 
         public NetworkReach Reach
