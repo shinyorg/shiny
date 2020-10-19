@@ -54,7 +54,7 @@
 
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
-        <PackageReference Condition=" $(TargetFramework.StartsWith('net')) " Include="10.0.17134.1000" />
+        <PackageReference Condition=" $(TargetFramework.StartsWith('net')) " Include="Microsoft.Windows.SDK.Contracts" />
     </ItemGroup>
 
 </Project>
