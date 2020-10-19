@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Shiny.Generators.Tasks;
 using Shiny.Generators.Tasks.iOS;
 using Shiny.Generators.Tasks.Android;
+using System.Threading.Tasks;
 
 
 namespace Shiny.Generators
@@ -20,7 +21,6 @@ namespace Shiny.Generators
 
             new AppDelegateTask(),
             new ApplicationTask(),
-
             new ActivityTask()
         };
 
@@ -29,11 +29,26 @@ namespace Shiny.Generators
         {
             var shinyContext = new ShinyContext(context);
 
+            // always first
+            new AutoStartupTask().Init(shinyContext);
+
+            var tasks = new List<Task>();
             foreach (var task in this.tasks)
             {
-                task.Init(shinyContext);
-                task.Execute();
+                tasks.Add(Task.Run(() =>
+                {
+                    try
+                    {
+                        task.Init(shinyContext);
+                        task.Execute();
+                    }
+                    catch (Exception ex)
+                    {
+                        shinyContext.Log.Warn($"{task.GetType().FullName} Exception - {ex}");
+                    }
+                }));
             }
+            Task.WhenAll(tasks.ToArray()).GetAwaiter().GetResult();
         }
     }
 }

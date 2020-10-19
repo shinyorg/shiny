@@ -27,10 +27,6 @@ namespace Shiny.Generators
         }
 
 
-        public bool IsDebugMode
-            => this.Context.Compilation.GetTypeByMetadataName("Shiny.Generators.DebugMe") != null;
-
-
         public string? GetXamFormsAppClassFullName()
         {
             var classes = this
@@ -52,6 +48,8 @@ namespace Shiny.Generators
 
                 default:
                     this.Log.Warn(classes.Count + " Xamarin Forms App implementations found");
+                    foreach (var cls in classes)
+                        this.Log.Warn(" - " + cls.GetFullName());
                     break;
             }
             return appClass?.ToDisplayString();
@@ -84,6 +82,8 @@ namespace Shiny.Generators
 
                 default:
                     this.Log.Warn(startupClasses.Count + " Shiny Startup implementations found");
+                    foreach (var sc in startupClasses)
+                        this.Log.Warn(" - " + sc.GetFullName());
                     break;
             }
             return startupClass?.ToDisplayString();
