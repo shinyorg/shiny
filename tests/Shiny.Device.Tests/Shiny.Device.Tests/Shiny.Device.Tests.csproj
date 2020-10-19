@@ -11,7 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Acr.UserDialogs" Version="7.1.0.454" />
+        <PackageReference Include="Acr.UserDialogs" Version="7.1.0.462" />
         <PackageReference Include="xunit" Version="2.4.1" />
     </ItemGroup>
 
