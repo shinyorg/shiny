@@ -97,15 +97,13 @@ namespace Shiny.Generators.Tasks.Android
 
         void TryAppendOnCreateThirdParty(INamedTypeSymbol activity, IIndentedStringBuilder builder)
         {
-
-
             // AiForms.SettingsView
             if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.Droid.SettingsViewInit") != null)
-                builder.AppendFormatInvariant("global::AiForms.Renderers.Droid.SettingsViewInit.Init();");
+                builder.AppendLineInvariant("global::AiForms.Renderers.Droid.SettingsViewInit.Init();");
 
             // XF Material
             if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
-                builder.AppendFormatInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
+                builder.AppendLineInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
         }
 
 
@@ -122,9 +120,6 @@ namespace Shiny.Generators.Tasks.Android
 
                     if (this.Context.HasXamarinEssentials())
                         builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
-
-                    //if (this.Context.HasZXingNetMobile())
-                    //    builder.AppendLineInvariant("global::ZXing.Net.Mobile.Android.PermissionsHandler.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
                 }
             }
         }
