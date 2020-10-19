@@ -49,7 +49,7 @@ namespace Shiny.Generators
                 default:
                     this.Log.Warn(classes.Count + " Xamarin Forms App implementations found");
                     foreach (var cls in classes)
-                        this.Log.Warn(" - " + cls.GetFullName());
+                        this.Log.Warn(" - " + cls.ToDisplayString());
                     break;
             }
             return appClass?.ToDisplayString();
@@ -83,7 +83,7 @@ namespace Shiny.Generators
                 default:
                     this.Log.Warn(startupClasses.Count + " Shiny Startup implementations found");
                     foreach (var sc in startupClasses)
-                        this.Log.Warn(" - " + sc.GetFullName());
+                        this.Log.Warn(" - " + sc.ToDisplayString());
                     break;
             }
             return startupClass?.ToDisplayString();
