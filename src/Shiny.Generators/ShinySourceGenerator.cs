@@ -37,8 +37,15 @@ namespace Shiny.Generators
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    task.Init(shinyContext);
-                    task.Execute();
+                    try
+                    {
+                        task.Init(shinyContext);
+                        task.Execute();
+                    }
+                    catch (Exception ex)
+                    {
+                        shinyContext.Log.Warn($"{task.GetType().FullName} Exception - {ex}");
+                    }
                 }));
             }
             Task.WhenAll(tasks.ToArray()).GetAwaiter().GetResult();

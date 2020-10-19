@@ -41,11 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="DebugMe.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-      <PackageReference Include="Acr.UserDialogs" Version="7.1.0.454" />
+    <PackageReference Include="Acr.UserDialogs" Version="7.1.0.454" />
     <PackageReference Include="Xamarin.Forms">
       <Version>4.8.0.1451</Version>
     </PackageReference>
