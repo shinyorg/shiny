@@ -13,10 +13,7 @@ namespace Shiny.Power
         IDisposable? dispose;
 
 
-        public PowerManagerImpl(AndroidContext context)
-        {
-            this.context = context;
-        }
+        public PowerManagerImpl(AndroidContext context) => this.context = context;
 
 
         protected override void OnNpcHookChanged(bool hasSubscribers)
@@ -38,35 +35,12 @@ namespace Shiny.Power
         }
 
 
-        ////<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
-        //public void RequestIgnoreBatteryOptimizations()
-        //{
-        //    //Intent intent = new Intent();
-        //    //String packageName = context.getPackageName();
-        //    //PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
-        //    //if (pm.isIgnoringBatteryOptimizations(packageName))
-        //    //    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-        //    //else
-        //    //{
-        //    //    intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-        //    //    intent.setData(Uri.parse("package:" + packageName));
-        //    //}
-        //    //context.startActivity(intent);
-        //    //myIntent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS); // better
-
-        //    var intent = new Intent("android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS");
-        //    intent.SetData(Android.Net.Uri.Parse("package:" + this.context.Package.PackageName));
-        //    this.context.AppContext.StartActivity(intent);
-        //}
-
-
-        public bool IsEnergySavingEnabled => this.context
-            .GetSystemServiceValue<bool, PowerManager>(
-                Context.PowerService,
-                pm =>
-                    pm.IsDeviceIdleMode &&
-                    !pm.IsIgnoringBatteryOptimizations(this.context.Package.PackageName)
-            );
+        public bool IsEnergySavingEnabled => this.context.GetSystemServiceValue<bool, PowerManager>(
+            Context.PowerService,
+            pm =>
+                pm.IsDeviceIdleMode &&
+                !pm.IsIgnoringBatteryOptimizations(this.context.Package.PackageName)
+        );
         public PowerState Status => this.context.GetIntentValue(Intent.ActionBatteryChanged, ToState);
         public int BatteryLevel => this.context.GetIntentValue(Intent.ActionBatteryChanged, ToLevel);
 
