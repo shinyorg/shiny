@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -32,6 +33,7 @@ namespace Shiny.Generators
             var classes = this
                 .Context
                 .GetAllDerivedClassesForType("Xamarin.Forms.Application")
+                .Where(x => !x.ContainingNamespace.Name.StartsWith("Prism."))
                 .WhereNotSystem()
                 .ToList();
 
@@ -50,6 +52,11 @@ namespace Shiny.Generators
                     this.Log.Warn(classes.Count + " Xamarin Forms App implementations found");
                     foreach (var cls in classes)
                         this.Log.Warn(" - " + cls.ToDisplayString());
+
+                    appClass = this.FindClosestType(classes);
+                    if (appClass != null)
+                        this.Log.Warn($"Found closest type - {appClass.ToDisplayString()}.  IF this is wrong, please override the type where this is being used");
+
                     break;
             }
             return appClass?.ToDisplayString();
@@ -84,9 +91,26 @@ namespace Shiny.Generators
                     this.Log.Warn(startupClasses.Count + " Shiny Startup implementations found");
                     foreach (var sc in startupClasses)
                         this.Log.Warn(" - " + sc.ToDisplayString());
+
+                    startupClass = this.FindClosestType(startupClasses);
+                    if (startupClass != null)
+                        this.Log.Warn($"Found closest type - {startupClass.ToDisplayString()}.  IF this is wrong, please override the type where this is being used");
+
                     break;
             }
             return startupClass?.ToDisplayString();
+        }
+
+
+        public INamedTypeSymbol FindClosestType(List<INamedTypeSymbol> symbols)
+        {
+            var ns = this.GetRootNamespace();
+            var index = ns.IndexOf(".");
+            if (index > -1)
+                ns = ns.Substring(0, index);
+
+            var found = symbols.FirstOrDefault(x => x.ContainingNamespace.Name.StartsWith(ns));
+            return found;
         }
 
 
