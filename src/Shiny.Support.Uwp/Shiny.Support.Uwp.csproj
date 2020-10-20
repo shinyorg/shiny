@@ -1,12 +1,11 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
     <PropertyGroup>
         <TargetFramework>uap10.0.16299</TargetFramework>
-        <RootNamespace>Shiny</RootNamespace>
+        <AssemblyName>Shiny.Support.Uwp</AssemblyName>
+        <RootNamespace>Shiny.Support.Uwp</RootNamespace>
         <Description>Shiny UWP Support Library</Description>
         <OutputType>winmdobj</OutputType>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
-        <!--<TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
-        <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>-->
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
