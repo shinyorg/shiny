@@ -3,10 +3,9 @@
 
 namespace Shiny.Bluetooth
 {
-    public interface IBluetoothManager
+    public interface IBluetoothScanner
     {
         // TODO: scanresult with rssi & service uuids - as well as filters
-
-        // TODO: adapter state
+        IObservable<IBluetoothDevice> Scan();
     }
 }

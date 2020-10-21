@@ -1,12 +1,23 @@
-﻿//using System;
+﻿using System;
+
+using Windows.ApplicationModel.Background;
+using Windows.Devices.Bluetooth.Background;
+using Windows.Devices.Bluetooth.Rfcomm;
 
 
-//namespace Shiny.Bluetooth
-//{
-//    public class ShinyBluetoothManager : IBluetoothManager
-//    {
-//    }
-//}
+namespace Shiny.Bluetooth
+{
+    public class ShinyBluetoothManager : IBluetoothManager, IBluetoothScanner
+    {
+        public IObservable<IBluetoothDevice> Scan()
+        {
+            //await DeviceInformation.FindAllAsync(RfcommDeviceService.GetDeviceSelector(RfcommServiceId.SerialPort));
+            //RfcommConnectionTriggerDetails()
+            //RfcommConnectionTrigger()
+            throw new NotImplementedException();
+        }
+    }
+}
 //public sealed partial class MainPage : Page
 //{
 //    private StreamSocket _socket;
@@ -44,7 +55,7 @@
 
 //            writer.WriteString(msg);
 
-//            // Launch an async task to 
+//            // Launch an async task to
 //            //complete the write operation
 //            var store = writer.StoreAsync().AsTask();
 

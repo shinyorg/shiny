@@ -10,7 +10,5 @@ namespace Shiny.Bluetooth
         IObservable<object> Disconnect();
         IObservable<object> Write(byte[] data);
         IObservable<byte[]> Read();
-
-        // TODO: pairing
     }
 }
