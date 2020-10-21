@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shiny.AppState;
 using Shiny.Infrastructure;
 using Shiny.Infrastructure.DependencyInjection;
 
 
 namespace Shiny
 {
-    public abstract class ShinyHost
+    public static class ShinyHost
     {
         /// <summary>
         /// Resolve a specified service from the container
@@ -78,18 +75,18 @@ namespace Shiny
         }
 
 
-        protected static void Destroy()
-        {
-            container = null;
-            Services?.Clear();
-        }
+        //protected static void Destroy()
+        //{
+        //    container = null;
+        //    Services?.Clear();
+        //}
 
         /// <summary>
         /// Setting this before calling build will force the internal service builder to validate scopes of DI registrations (THIS IS SLOW - USE IT FOR DEBUGGING)
         /// </summary>
         public static bool ValidateScopes { get; set; }
 
-        protected static void InitPlatform(IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
+        public static void Init(IPlatform platform, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
         {
             var services = new ShinyServiceCollection();
 
@@ -109,11 +106,11 @@ namespace Shiny
             startup?.ConfigureApp(container);
         }
 
-        public static void OnForeground()
-            => Container.GetService<AppStateManager>()?.OnForeground();
+        //public static void OnForeground()
+        //    => Container.GetService<AppStateManager>()?.OnForeground();
 
-        public static void OnBackground()
-            => Container.GetService<AppStateManager>()?.OnBackground();
+        //public static void OnBackground()
+        //    => Container.GetService<AppStateManager>()?.OnBackground();
     }
 }
 
