@@ -8,9 +8,9 @@
         <PackageReference Update="Uno.SourceGeneration" Version="2.0.13" PrivateAssets="All" />
         <PackageReference Update="Uno.SourceGenerationTasks" Version="2.0.13" PrivateAssets="None" />
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="[4.1.0, 5)" />
-        <PackageReference Update="AWSSDK.SimpleNotificationService" Version="3.5.0.25" />
-        <PackageReference Update="AWSSDK.CognitoIdentity" Version="3.5.0.25" />
-        <PackageReference Update="AWSSDK.MobileAnalytics" Version="3.5.0.25" />
+        <PackageReference Update="AWSSDK.SimpleNotificationService" Version="3.5.0.30" />
+        <PackageReference Update="AWSSDK.CognitoIdentity" Version="3.5.0.29" />
+        <PackageReference Update="AWSSDK.MobileAnalytics" Version="3.5.0.29" />
         <PackageReference Update="Microsoft.AppCenter.Crashes" Version="3.4.3" />
         <PackageReference Update="Microsoft.AppCenter.Analytics" Version="3.4.3" />
         <PackageReference Update="Com.OneSignal" Version="3.10.1" />
@@ -20,7 +20,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Update="Xamarin.Forms" Version="4.8.0.1534" />
+        <PackageReference Update="Xamarin.Forms" Version="4.8.0.1560" />
 
         <PackageReference Update="Zebra.Printer.SDK" Version="2.15.2634" />
         <PackageReference Update="Xamarin.Firebase.iOS.Core" Version="6.6.6" />
