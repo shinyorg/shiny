@@ -3,7 +3,21 @@
 
 Shiny is a set of libraries designed to help make device services & backgrounding easy on Xamarin & UWP platforms (with more to come).
 
-[Change Log - July 5, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
+These samples make use of:
+* Reactive Programming
+* Dependency Injection
+
+If you don't like any of these or you find them "complex" - Shiny is probably not for you.
+
+If you are looking to just use one part of Shiny, such as notifications, this probably isn't for you.  Shiny brings:
+* Handles all of the cruft like Permissions, main thread traversal, persistent storage and app restarts
+* Your infrastructure to the background
+* Gives a clean & testable API surface for your code
+
+If you think Shiny is too heavy, try wiring all of these things up yourself with all of the above goals in mind. 
+
+
+[Change Log - October 20, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
 
 * [Samples](https://github.com/shinyorg/shinysamples) - Shows almost every single function point within Shiny
 * [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
