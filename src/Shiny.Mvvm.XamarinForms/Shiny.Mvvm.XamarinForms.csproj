@@ -6,7 +6,7 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <PackageReference Include="Xamarin.Forms" Version="4.8.0.1560" />
+        <PackageReference Include="Xamarin.Forms" />
         <ProjectReference Include="..\Shiny.Mvvm\Shiny.Mvvm.csproj" />
     </ItemGroup>
 </Project>
