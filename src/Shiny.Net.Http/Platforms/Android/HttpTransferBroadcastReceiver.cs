@@ -18,7 +18,7 @@ namespace Shiny.Net.Http
     [IntentFilter(new[] {
         Native.ActionDownloadComplete
     })]
-    public class HttpTransferBroadcastReceiver : BroadcastReceiver
+    public class HttpTransferBroadcastReceiver : ShinyBroadcastReceiver
     {
         public static Subject<HttpTransfer> HttpEvents { get; } = new Subject<HttpTransfer>();
 

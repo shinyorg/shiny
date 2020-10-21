@@ -5,6 +5,7 @@ using BackgroundTasks;
 using UIKit;
 using Shiny.Infrastructure;
 using Shiny.Logging;
+using ObjCRuntime;
 
 
 namespace Shiny.Jobs
@@ -45,7 +46,7 @@ namespace Shiny.Jobs
             {
                 var result = (
                     UIDevice.CurrentDevice.CheckSystemVersion(13, 0) &&
-                    !iOSExtensions.IsSimulator &&
+                    Runtime.Arch != Arch.SIMULATOR &&
                     PlatformExtensions.HasBackgroundMode("processing")
                 );
                 return result;
@@ -84,7 +85,7 @@ namespace Shiny.Jobs
             if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
                 result = AccessState.NotSupported;
 
-            else if (iOSExtensions.IsSimulator)
+            else if (Runtime.Arch == Arch.SIMULATOR)
                 result = AccessState.NotSupported;
 
             else if (!PlatformExtensions.HasBackgroundMode("processing"))

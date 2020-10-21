@@ -15,7 +15,7 @@ namespace Shiny.Locations
         GeofenceManagerImpl.IntentAction,
         Permission.ReceiveBootCompleted
     })]
-    public class GeofenceBroadcastReceiver : BroadcastReceiver
+    public class GeofenceBroadcastReceiver : ShinyBroadcastReceiver
     {
         // startup tasks replace this, but this receiver is still used to trigger the wakeup on reboot
         public override void OnReceive(Context context, Intent intent) => this.Execute(() =>

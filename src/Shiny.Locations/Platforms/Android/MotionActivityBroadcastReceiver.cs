@@ -14,7 +14,7 @@ namespace Shiny.Locations
     [IntentFilter(new[] {
         MotionActivityManagerImpl.IntentAction
     })]
-    public class MotionActivityBroadcastReceiver : BroadcastReceiver
+    public class MotionActivityBroadcastReceiver : ShinyBroadcastReceiver
     {
         public const string ReceiverName = nameof(MotionActivityBroadcastReceiver);
         readonly IMessageBus messageBus;

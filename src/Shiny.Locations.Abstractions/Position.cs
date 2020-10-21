@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny
+namespace Shiny.Locations
 {
     public class Position : IEquatable<Position>
     {

@@ -68,25 +68,25 @@ namespace Shiny.Push
                     x.CompletionHandler();
                 });
 
-            iOSShinyHost.RegisterForRemoteNotifications(
-                async deviceToken =>
-                {
-                    this.onToken?.OnNext(deviceToken);
-                    await Services.SafeResolveAndExecute<IPushDelegate>(x =>
-                    {
-                        var stoken = ToTokenString(deviceToken);
-                        return x.OnTokenChanged(stoken);
-                    });
-                },
-                e => this.onToken?.OnError(new Exception(e.LocalizedDescription)),
-                async (nsdict, action) =>
-                {
-                    // this will only be fired while in the bg, so don't fire observable
-                    var dict = nsdict.FromNsDictionary();
-                    await Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
-                    action(UIBackgroundFetchResult.NewData);
-                }
-            );
+            //iOSShinyHost.RegisterForRemoteNotifications(
+            //    async deviceToken =>
+            //    {
+            //        this.onToken?.OnNext(deviceToken);
+            //        await Services.SafeResolveAndExecute<IPushDelegate>(x =>
+            //        {
+            //            var stoken = ToTokenString(deviceToken);
+            //            return x.OnTokenChanged(stoken);
+            //        });
+            //    },
+            //    e => this.onToken?.OnError(new Exception(e.LocalizedDescription)),
+            //    async (nsdict, action) =>
+            //    {
+            //        // this will only be fired while in the bg, so don't fire observable
+            //        var dict = nsdict.FromNsDictionary();
+            //        await Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
+            //        action(UIBackgroundFetchResult.NewData);
+            //    }
+            //);
 
             // this will be on the main thread already
             if (!this.CurrentRegistrationToken.IsEmpty())

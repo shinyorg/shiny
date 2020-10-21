@@ -22,7 +22,8 @@ namespace Shiny.Net.Http
             this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;
 
             var s = this.Session; // force load
-            iOSShinyHost.HandleEventsForBackgroundUrlAction = SetCompletionHandler;
+            // TODO
+            //iOSShinyHost.HandleEventsForBackgroundUrlAction = SetCompletionHandler;
         }
 
 

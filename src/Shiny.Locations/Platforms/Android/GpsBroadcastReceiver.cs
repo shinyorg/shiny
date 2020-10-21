@@ -17,7 +17,7 @@ namespace Shiny.Locations
         GpsManagerImpl.IntentAction,
         Intent.ActionBootCompleted
     })]
-    public class GpsBroadcastReceiver : BroadcastReceiver
+    public class GpsBroadcastReceiver : ShinyBroadcastReceiver
     {
         public static IObservable<IGpsReading> WhenReading() => readingSubject;
         static readonly Subject<IGpsReading> readingSubject = new Subject<IGpsReading>();

@@ -1,11 +1,10 @@
 ﻿using System;
-
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
     public enum PlatformState
     {
-        Start,
         Foreground,
         Background
     }
@@ -15,6 +14,7 @@ namespace Shiny
     {
         //bool Is(string platform);
         //void InvokeOnMainThread(Action action);
+        void Register(IServiceCollection services);
         IObservable<PlatformState> WhenStateChanged();
     }
 }

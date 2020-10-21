@@ -86,16 +86,15 @@ namespace Shiny
         /// </summary>
         public static bool ValidateScopes { get; set; }
 
+
         public static void Init(IPlatform platform, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
         {
             var services = new ShinyServiceCollection();
 
+            platform.Register(services);
             startup?.ConfigureServices(services);
             platformBuild?.Invoke(services);
 
-            services.TryAddSingleton<IMessageBus, MessageBus>();
-            services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
-            services.TryAddSingleton<ISerializer, ShinySerializer>();
 
             Services = services;
             services.BuildShinyServiceProvider(

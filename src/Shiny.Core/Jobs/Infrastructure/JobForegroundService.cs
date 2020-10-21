@@ -10,7 +10,7 @@ using Shiny.Power;
 
 namespace Shiny.Jobs.Infrastructure
 {
-    public class JobAppStateDelegate : IAppStateDelegate
+    public class JobForegroundService : ShinyForegroundService
     {
         public static TimeSpan Interval { get; set; } = TimeSpan.FromSeconds(60);
         readonly IJobManager jobManager;
@@ -19,9 +19,9 @@ namespace Shiny.Jobs.Infrastructure
         CompositeDisposable? disposer;
 
 
-        public JobAppStateDelegate(IJobManager jobManager,
-                                   IPowerManager powerManager,
-                                   IConnectivity connectivity)
+        public JobForegroundService(IJobManager jobManager,
+                                    IPowerManager powerManager,
+                                    IConnectivity connectivity)
         {
             this.jobManager = jobManager;
             this.powerManager = powerManager;
@@ -29,21 +29,21 @@ namespace Shiny.Jobs.Infrastructure
         }
 
 
-        public void OnStart()
+        public override void Start()
         {
             this.Set();
             this.TryRun();
         }
 
 
-        public void OnForeground()
+        public override void OnForeground()
         {
             this.Set();
             this.TryRun();
         }
 
 
-        public void OnBackground()
+        public override void OnBackground()
         {
             this.disposer?.Dispose();
             this.disposer = null;
@@ -65,7 +65,7 @@ namespace Shiny.Jobs.Infrastructure
             if (jobs.Any())
             {
                 this.jobManager.RunTask(
-                    nameof(JobAppStateDelegate),
+                    nameof(JobForegroundService),
                     async ct =>
                     {
                         using (ct.Register(() => running = false))

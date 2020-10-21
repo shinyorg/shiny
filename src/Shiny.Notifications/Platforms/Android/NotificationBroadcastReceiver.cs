@@ -15,7 +15,7 @@ namespace Shiny.Notifications
     [IntentFilter(new[] {
         IntentAction
     })]
-    public class NotificationBroadcastReceiver : BroadcastReceiver
+    public class NotificationBroadcastReceiver : ShinyBroadcastReceiver
     {
         public const string ReceiverName = "com.shiny.notifications." + nameof(NotificationBroadcastReceiver);
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";

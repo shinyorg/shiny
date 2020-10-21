@@ -20,7 +20,7 @@ namespace Shiny
         /// <returns></returns>
         public static Task RunJobAsTask(this IJobManager jobManager, string jobIdentifier)
         {
-            var tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object?>();
             jobManager.RunTask(jobIdentifier, async ct =>
             {
                 var result = await jobManager.Run(jobIdentifier, ct);
@@ -39,8 +39,8 @@ namespace Shiny
         /// <param name="services"></param>
         public static void UseJobForegroundService(this IServiceCollection services, TimeSpan interval)
         {
-            JobAppStateDelegate.Interval = interval;
-            services.AddAppState<JobAppStateDelegate>();
+            JobForegroundService.Interval = interval;
+            services.AddSingleton<JobForegroundService>();
         }
 
 
