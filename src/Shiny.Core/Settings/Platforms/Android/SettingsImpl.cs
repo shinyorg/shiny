@@ -1,8 +1,7 @@
 using System;
 using Shiny.Infrastructure;
 using Android.Content;
-using Android.Preferences;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Settings
 {
@@ -15,6 +14,24 @@ namespace Shiny.Settings
         public SettingsImpl(AndroidContext context, ISerializer serializer) : base(serializer)
         {
             this.context = context;
+        }
+
+
+        public override Task<bool> OpenAppSettings()
+        {
+            var intent = new Intent();
+            intent.SetAction(global::Android.Provider.Settings.ActionApplicationDetailsSettings);
+            intent.AddCategory(Intent.CategoryDefault);
+            intent.SetData(global::Android.Net.Uri.Parse("package:" + this.context.Package.PackageName));
+
+            var flags = ActivityFlags.NewTask | ActivityFlags.NoHistory | ActivityFlags.ExcludeFromRecents;
+            if (this.context.IsMinApiLevel(24))
+                flags |= ActivityFlags.LaunchAdjacent;
+
+            intent.SetFlags(flags);
+
+            this.context.CurrentActivity.StartActivity(intent);
+            return Task.FromResult(true);
         }
 
 
@@ -108,14 +125,11 @@ namespace Shiny.Settings
         }
 
 
-        protected override void NativeRemove(string[] keys)
+        protected override void NativeRemove(string[] keys) => this.UoW(x =>
         {
-            this.UoW(x =>
-            {
-                foreach (var key in keys)
-                    x.Remove(key);
-            });
-        }
+            foreach (var key in keys)
+                x.Remove(key);
+        });
 
 
         protected override void NativeClear()

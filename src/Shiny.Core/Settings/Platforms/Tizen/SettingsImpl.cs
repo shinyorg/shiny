@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Tizen.Applications;
 
@@ -18,6 +19,14 @@ namespace Shiny.Settings
         {
             base.Clear();
             Preference.RemoveAll();
+        }
+
+
+        public override Task<bool> OpenAppSettings()
+        {
+            //Platform.HasPermission(Permissions.LaunchApp);
+            AppControl.SendLaunchRequest(new AppControl { Operation = AppControlOperations.Setting });
+            return Task.FromResult(true);
         }
 
 

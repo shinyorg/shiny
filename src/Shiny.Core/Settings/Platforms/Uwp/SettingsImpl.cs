@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Windows.Storage;
+using Windows.System;
 
 
 namespace Shiny.Settings
@@ -19,6 +19,19 @@ namespace Shiny.Settings
                 : ApplicationData.Current.LocalSettings;
         }
 
+
+        public override async Task<bool> OpenAppSettings()
+        {
+            try
+            {
+                await Launcher.LaunchUriAsync(new Uri("ms-settings:appsfeatures-app"));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         public override bool Contains(string key) => this.container.Values.ContainsKey(key);
 

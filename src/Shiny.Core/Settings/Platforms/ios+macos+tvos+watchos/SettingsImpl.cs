@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Foundation;
 
@@ -15,6 +16,17 @@ namespace Shiny.Settings
         {
             this.nameSpace = nameSpace;
             this.syncLock = new object();
+        }
+
+
+        public override Task<bool> OpenAppSettings()
+        {
+            #if __IOS__ || __TVOS__
+            var result = UIKit.UIApplication.SharedApplication.OpenUrl(new NSUrl(UIKit.UIApplication.OpenSettingsUrlString));
+            return Task.FromResult(result);
+            #else
+            return base.OpenAppSettings();
+            #endif
         }
 
         NSUserDefaults Prefs() => this.nameSpace.IsEmpty()

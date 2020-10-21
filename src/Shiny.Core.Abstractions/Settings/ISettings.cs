@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Settings
 {
@@ -80,5 +80,11 @@ namespace Shiny.Settings
         /// </summary>
         /// <param name="obj"></param>
         void UnBind(INotifyPropertyChanged obj);
+
+        /// <summary>
+        /// Attempts to open the app settings screen if supported
+        /// </summary>
+        /// <returns>Returns true if success, otherwise false</returns>
+        Task<bool> OpenAppSettings();
     }
 }

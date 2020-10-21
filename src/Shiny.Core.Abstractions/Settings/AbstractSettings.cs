@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Reflection;
+using System.Threading.Tasks;
+
 using Shiny.Infrastructure;
 
 
@@ -23,6 +25,7 @@ namespace Shiny.Settings
         }
 
 
+        public virtual Task<bool> OpenAppSettings() => Task.FromResult(false);
         public abstract bool Contains(string key);
         protected abstract object NativeGet(Type type, string key);
         protected abstract void NativeSet(Type type, string key, object value);
