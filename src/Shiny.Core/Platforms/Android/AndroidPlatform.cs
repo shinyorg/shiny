@@ -15,19 +15,14 @@ using Shiny.Settings;
 
 namespace Shiny
 {
-    public class AndroidPlatform : ProcessLifecycleOwner, IPlatform
+    public class AndroidPlatform : Java.Lang.Object, ILifecycleObserver, IPlatform
     {
         readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
 
 
-        public AndroidPlatform(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
-        {
-        }
-
-
         public static void Create(Application app)
         {
-            //ProcessLifecycleOwner.Get().Lifecycle.AddObserver(new AndroidPlatform());
+            ProcessLifecycleOwner.Get().Lifecycle.AddObserver(new AndroidPlatform());
         }
 
 

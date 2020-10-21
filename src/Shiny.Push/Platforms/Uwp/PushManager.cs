@@ -29,9 +29,9 @@ namespace Shiny.Push
             //this.CurrentRegistrationToken = e.RawNotification.Ur
             //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             //e.Cancel = true;
-            UwpShinyHost.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
-                builder => builder.SetTrigger(new PushNotificationTrigger())
-            );
+            //UwpShinyHost.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
+            //    builder => builder.SetTrigger(new PushNotificationTrigger())
+            //);
         }
 
 

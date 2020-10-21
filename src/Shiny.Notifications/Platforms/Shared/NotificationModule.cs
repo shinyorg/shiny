@@ -56,15 +56,16 @@ namespace Shiny.Notifications
 #elif __IOS__
             services.TryAddSingleton<iOSNotificationDelegate>();
 #elif WINDOWS_UWP
-            UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
-            {
-                builder.SetTrigger(new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(Windows.UI.Notifications.NotificationKinds.Toast));
-            });
-            services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
-            {
-                Repeat = true,
-                IsSystemJob = true
-            });
+            // TODO
+            //UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
+            //{
+            //    builder.SetTrigger(new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(Windows.UI.Notifications.NotificationKinds.Toast));
+            //});
+            //services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
+            //{
+            //    Repeat = true,
+            //    IsSystemJob = true
+            //});
 #endif
         }
 
