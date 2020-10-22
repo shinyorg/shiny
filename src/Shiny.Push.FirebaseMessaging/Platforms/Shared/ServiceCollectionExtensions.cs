@@ -14,7 +14,7 @@ namespace Shiny
 
         public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType, params NotificationCategory[] categories)
         {
-#if XAMARIN_IOS
+#if __IOS__
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Push.FirebaseMessaging.PushManager),
                 delegateType,
