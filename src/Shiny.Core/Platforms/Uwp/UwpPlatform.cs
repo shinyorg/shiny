@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Reactive.Linq;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-
 using Shiny.IO;
 using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
 using Shiny.Settings;
-
 using Windows.UI.Xaml;
+
 
 namespace Shiny
 {
@@ -22,6 +20,10 @@ namespace Shiny
 
         public void Register(IServiceCollection services)
         {
+            services.TryAddSingleton<ISerializer, ShinySerializer>();
+            services.TryAddSingleton<IMessageBus, MessageBus>();
+            services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
+
             services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
             services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             services.TryAddSingleton<IPowerManager, PowerManagerImpl>();

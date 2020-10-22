@@ -2,10 +2,10 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.App;
-using Android.Runtime;
 using AndroidX.Lifecycle;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Infrastructure;
 using Shiny.IO;
 using Shiny.Jobs;
 using Shiny.Net;
@@ -42,6 +42,10 @@ namespace Shiny
             services.AddSingleton(this.app);
             services.TryAddSingleton<AndroidContext>();
             services.TryAddSingleton<ITopActivity, ShinyTopActivity>();
+
+            services.TryAddSingleton<ISerializer, ShinySerializer>();
+            services.TryAddSingleton<IMessageBus, MessageBus>();
+            services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
 
             services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
             services.TryAddSingleton<IConnectivity, ConnectivityImpl>();

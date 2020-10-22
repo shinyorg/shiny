@@ -19,15 +19,14 @@ namespace Shiny
         {
             services.TryAddSingleton<ISerializer, ShinySerializer>();
             services.TryAddSingleton<IMessageBus, MessageBus>();
+
             services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
-#if __IOS__
-            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
-#endif
             services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
             services.TryAddSingleton<IFileSystem, FileSystemImpl>();
             services.TryAddSingleton<ISettings, SettingsImpl>();
 
 #if __IOS__
+            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             if (BgTasksJobManager.IsAvailable)
                 services.TryAddSingleton<IJobManager, BgTasksJobManager>();
             else
