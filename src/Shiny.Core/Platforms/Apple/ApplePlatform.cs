@@ -2,12 +2,8 @@
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shiny.Infrastructure;
-using Shiny.IO;
 using Shiny.Jobs;
 using Shiny.Net;
-using Shiny.Power;
-using Shiny.Settings;
 using UIKit;
 
 
@@ -17,14 +13,7 @@ namespace Shiny
     {
         public void Register(IServiceCollection services)
         {
-            services.TryAddSingleton<ISerializer, ShinySerializer>();
-            services.TryAddSingleton<IMessageBus, MessageBus>();
-
-            services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
-            services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
-            services.TryAddSingleton<IFileSystem, FileSystemImpl>();
-            services.TryAddSingleton<ISettings, SettingsImpl>();
-
+            services.RegisterCommonServices();
 #if __IOS__
             services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             if (BgTasksJobManager.IsAvailable)

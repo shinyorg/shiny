@@ -1,0 +1,38 @@
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Infrastructure;
+using Shiny.IO;
+using Shiny.Jobs;
+using Shiny.Net;
+using Shiny.Power;
+using Shiny.Settings;
+
+
+namespace Shiny
+{
+    public static class CommonServiceRegistration
+    {
+        public static void RegisterCommonServices(this IServiceCollection services)
+        {
+            services.TryAddSingleton<ISerializer, ShinySerializer>();
+            services.TryAddSingleton<IMessageBus, MessageBus>();
+            services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
+
+            #if !TIZEN
+            services.TryAddSingleton<IJobManager, JobManager>();
+            #endif
+            services.TryAddSingleton<IFileSystem, FileSystemImpl>();
+
+            #if !NETSTANDARD
+            services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
+            services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
+            services.TryAddSingleton<ISettings, SettingsImpl>();
+
+            #if !__TVOS__ && !__WATCHOS__
+            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
+            #endif
+            #endif
+        }
+    }
+}

@@ -5,12 +5,6 @@ using Android.App;
 using AndroidX.Lifecycle;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shiny.Infrastructure;
-using Shiny.IO;
-using Shiny.Jobs;
-using Shiny.Net;
-using Shiny.Power;
-using Shiny.Settings;
 
 
 namespace Shiny
@@ -26,7 +20,7 @@ namespace Shiny
             this.app = app;
             ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
         }
-        
+
 
         [Lifecycle.Event.OnResume]
         public void OnResume() => this.stateSubj.OnNext(PlatformState.Foreground);
@@ -43,16 +37,7 @@ namespace Shiny
             services.TryAddSingleton<AndroidContext>();
             services.TryAddSingleton<ITopActivity, ShinyTopActivity>();
 
-            services.TryAddSingleton<ISerializer, ShinySerializer>();
-            services.TryAddSingleton<IMessageBus, MessageBus>();
-            services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
-
-            services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
-            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
-            services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
-            services.TryAddSingleton<IJobManager, JobManager>();
-            services.TryAddSingleton<IFileSystem, FileSystemImpl>();
-            services.TryAddSingleton<ISettings, SettingsImpl>();
+            services.RegisterCommonServices();
         }
     }
 }
