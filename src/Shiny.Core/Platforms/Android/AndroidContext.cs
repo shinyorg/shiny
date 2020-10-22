@@ -87,11 +87,11 @@ namespace Shiny
             => (int)Android.OS.Build.VERSION.SdkInt >= apiLevel;
 
 
-        public void FirePermission(int requestCode, string[] permissions, NativePerm[] grantResult)
+        public void OnRequestPermissionsResult(int requestCode, string[] permissions, NativePerm[] grantResult)
             => this.PermissionResult?.Invoke(this, new PermissionRequestResult(requestCode, permissions, grantResult));
 
 
-        public event EventHandler<PermissionRequestResult>? PermissionResult;
+        event EventHandler<PermissionRequestResult>? PermissionResult;
 
 
         public T GetIntentValue<T>(string intentAction, Func<Intent, T> transform)

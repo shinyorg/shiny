@@ -15,7 +15,6 @@
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
         <None Include="build\**" Pack="true" PackagePath="build\." />
-        <None Remove="Platforms\Uwp\UwpPlatform.cs" />
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />

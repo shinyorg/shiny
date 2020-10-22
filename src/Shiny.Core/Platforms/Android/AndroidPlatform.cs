@@ -18,13 +18,15 @@ namespace Shiny
     public class AndroidPlatform : Java.Lang.Object, ILifecycleObserver, IPlatform
     {
         readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
+        readonly Application app;
 
 
-        public static void Create(Application app)
+        public AndroidPlatform(Application app)
         {
-            ProcessLifecycleOwner.Get().Lifecycle.AddObserver(new AndroidPlatform());
+            this.app = app;
+            ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
         }
-
+        
 
         [Lifecycle.Event.OnResume]
         public void OnResume() => this.stateSubj.OnNext(PlatformState.Foreground);
@@ -37,8 +39,8 @@ namespace Shiny
 
         public void Register(IServiceCollection services)
         {
-            //services.AddSingleton(androidApp);
-            //services.TryAddSingleton<AndroidContext>();
+            services.AddSingleton(this.app);
+            services.TryAddSingleton<AndroidContext>();
             services.TryAddSingleton<ITopActivity, ShinyTopActivity>();
 
             services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
@@ -48,40 +50,5 @@ namespace Shiny
             services.TryAddSingleton<IFileSystem, FileSystemImpl>();
             services.TryAddSingleton<ISettings, SettingsImpl>();
         }
-
-
-
-        //public static void ShinyInit(this Application app, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
-        //    => AndroidShinyHost.Init(app, startup, platformBuild);
-
-        //public static void ShinyOnRequestPermissionsResult(this Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
-        //    => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        //public static void ShinyOnCreate(this Application application, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
-        //    => AndroidShinyHost.Init(application, startup, platformBuild);
-
-        //public static void ShinyOnCreate(this Activity activity)
-        //    => AndroidShinyHost.TryProcessIntent(activity.Intent);
-
-        //public static void ShinyOnNewIntent(this Activity activity, Intent intent)
-        //    => AndroidShinyHost.TryProcessIntent(intent);
-
-
-        //public static void TryProcessIntent(Intent intent)
-        //{
-        //    if (intent != null)
-        //        Resolve<AndroidContext>()?.IntentSubject.OnNext(intent);
-        //}
-
-
-        //public static void OnBackground([GeneratedEnum] TrimMemory level)
-        //{
-        //    if (level == TrimMemory.UiHidden || level == TrimMemory.Complete)
-        //        OnBackground();
-        //}
-
-
-        //public static void OnRequestPermissionsResult(int requestCode, string[] permissions, NativePerm[] grantResults)
-        //    => Resolve<AndroidContext>().FirePermission(requestCode, permissions, grantResults);
     }
 }

@@ -91,10 +91,10 @@ namespace Shiny
         {
             var services = new ShinyServiceCollection();
 
+            services.AddSingleton(platform);
             platform.Register(services);
             startup?.ConfigureServices(services);
             platformBuild?.Invoke(services);
-
 
             Services = services;
             services.BuildShinyServiceProvider(
@@ -104,12 +104,6 @@ namespace Shiny
             );
             startup?.ConfigureApp(container);
         }
-
-        //public static void OnForeground()
-        //    => Container.GetService<AppStateManager>()?.OnForeground();
-
-        //public static void OnBackground()
-        //    => Container.GetService<AppStateManager>()?.OnBackground();
     }
 }
 

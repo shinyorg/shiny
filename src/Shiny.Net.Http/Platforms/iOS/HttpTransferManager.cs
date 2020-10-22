@@ -8,7 +8,9 @@ using Foundation;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
+    public class HttpTransferManager : AbstractHttpTransferManager,
+                                       IShinyStartupTask,
+                                       IAppDelegateBackgroundUrlHandler
     {
         readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;
@@ -34,9 +36,11 @@ namespace Shiny.Net.Http
 
 
         static string SessionName => $"{NSBundle.MainBundle.BundleIdentifier}.BackgroundTransferSession";
-        public static void SetCompletionHandler(string sessionName, Action completionHandler)
+        internal void CompleteSession() => this.session = null;
+
+        public void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
         {
-            if (SessionName.Equals(sessionName))
+            if (SessionName.Equals(sessionIdentifier))
                 ShinyUrlSessionDelegate.CompletionHandler = completionHandler;
         }
 
@@ -109,8 +113,5 @@ namespace Shiny.Net.Http
             this.sessionDelegate,
             new NSOperationQueue()
         );
-
-
-        internal void CompleteSession() => this.session = null;
     }
 }

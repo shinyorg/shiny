@@ -16,6 +16,9 @@
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <DebugType>portable</DebugType>
+        <DesignTimeBuild>false</DesignTimeBuild>
+        <DebugSymbols>true</DebugSymbols>
 
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
@@ -27,14 +30,7 @@
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <DebugType>full</DebugType>
-        <DebugSymbols>true</DebugSymbols>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DesignTimeBuild>false</DesignTimeBuild>
-        <DebugType>portable</DebugType>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' "> 
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
 

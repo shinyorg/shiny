@@ -13,8 +13,11 @@ namespace Shiny
             services.AddSingleton(typeof(IHttpTransferDelegate), transferDelegateType);
 #if NETSTANDARD
             services.TryAddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
-#elif WINDOWS_UWP || __IOS__ || __ANDROID__
+#elif WINDOWS_UWP || __ANDROID__
             services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
+#elif __IOS__
+            services.AddSingleton<IHttpTransferManager, HttpTransferManager>();
+            services.AddSingleton(sp => (IAppDelegateBackgroundUrlHandler)sp.Resolve<IHttpTransferManager>());
 #endif
         }
 

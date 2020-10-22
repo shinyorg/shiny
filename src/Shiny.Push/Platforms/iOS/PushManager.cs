@@ -14,7 +14,9 @@ using Shiny.Notifications;
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager, IShinyStartupTask
+    public class PushManager : AbstractPushManager,
+                               IShinyStartupTask,
+                               IAppDelegatePushNotificationHandler
     {
         readonly iOSNotificationDelegate nativeDelegate;
         readonly Subject<IDictionary<string, string>> payloadSubj;
@@ -67,26 +69,6 @@ namespace Shiny.Push
                     await this.Services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
                     x.CompletionHandler();
                 });
-
-            //iOSShinyHost.RegisterForRemoteNotifications(
-            //    async deviceToken =>
-            //    {
-            //        this.onToken?.OnNext(deviceToken);
-            //        await Services.SafeResolveAndExecute<IPushDelegate>(x =>
-            //        {
-            //            var stoken = ToTokenString(deviceToken);
-            //            return x.OnTokenChanged(stoken);
-            //        });
-            //    },
-            //    e => this.onToken?.OnError(new Exception(e.LocalizedDescription)),
-            //    async (nsdict, action) =>
-            //    {
-            //        // this will only be fired while in the bg, so don't fire observable
-            //        var dict = nsdict.FromNsDictionary();
-            //        await Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
-            //        action(UIBackgroundFetchResult.NewData);
-            //    }
-            //);
 
             // this will be on the main thread already
             if (!this.CurrentRegistrationToken.IsEmpty())
@@ -151,5 +133,26 @@ namespace Shiny.Push
             }
             return token;
         }
+
+
+        public async void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            var dict = userInfo.FromNsDictionary();
+            await this.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
+            completionHandler(UIBackgroundFetchResult.NewData);
+        }
+
+
+        public async void RegisteredForRemoteNotifications(NSData deviceToken)
+        {
+            this.onToken?.OnNext(deviceToken);
+            await Services.SafeResolveAndExecute<IPushDelegate>(
+                x => x.OnTokenChanged(ToTokenString(deviceToken))
+            );
+        }
+
+
+        public void FailedToRegisterForRemoteNotifications(NSError error)
+            => this.onToken?.OnError(new Exception(error.LocalizedDescription));
     }
 }
