@@ -13,7 +13,7 @@ namespace Shiny
         //    => Runtime.Arch == Arch.SIMULATOR;
 
         public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
-            => ShinyHost.Init(new iOSPlatform(), startup, platformBuild);
+            => ShinyHost.Init(new ApplePlatform(), startup, platformBuild);
 
         public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) { }
         //=> ShinyHost.DidReceiveRemoteNotification(userInfo, completionHandler);
