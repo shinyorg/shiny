@@ -62,7 +62,7 @@ namespace Shiny.Locations
         {
             var result = AccessState.Available;
 
-            if (this.context.IsAtLeastAndroid10())
+            if (this.context.IsMinApiLevel(29))
             {
                 result = await this.context
                     .RequestAccess(Permission.ActivityRecognition)

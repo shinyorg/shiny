@@ -36,7 +36,7 @@ namespace Shiny.Net.Http
             {
                 HttpTransfer? transfer = null;
                 var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
-                var native = context.GetService<Native>(Context.DownloadService);
+                var native = (Native)context.GetSystemService(Context.DownloadService);
                 var query = new QueryFilter().Add(id.ToString()).ToNative();
 
                 using (var cursor = native.InvokeQuery(query))

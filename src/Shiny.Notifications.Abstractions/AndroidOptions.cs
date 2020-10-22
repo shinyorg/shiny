@@ -36,7 +36,7 @@ namespace Shiny.Notifications
         public bool UseBigTextStyle { get; set; } = DefaultUseBigTextStyle;
         public bool AutoCancel { get; set; } = true;
         public bool? ShowWhen { get; set; } = DefaultShowWhen;
-        public DateTime? When { get; set; }
+        public DateTimeOffset? When { get; set; }
     }
 
 

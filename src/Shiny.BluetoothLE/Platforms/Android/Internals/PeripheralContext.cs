@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Shiny.Logging;
 using Android.Bluetooth;
 using Exception = System.Exception;
-
+using Android.OS;
 
 namespace Shiny.BluetoothLE.Internals
 {
@@ -119,10 +119,11 @@ namespace Shiny.BluetoothLE.Internals
         //}
 
 
+        readonly Handler handler = new Handler(Looper.MainLooper);
         public void InvokeOnMainThread(Action action)
         {
             if (this.CentralContext.Configuration.AndroidShouldInvokeOnMainThread)
-                action.Dispatch();
+                handler.Post(action);
             else
                 action();
         }

@@ -187,7 +187,7 @@ namespace Shiny.Notifications
                 builder.SetShowWhen(notification.Android.ShowWhen.Value);
 
             if (notification.Android.When != null)
-                builder.SetWhen(notification.Android.When.Value.ToEpochMillis());
+                builder.SetWhen(notification.Android.When.Value.ToUnixTimeMilliseconds());
 
             if (notification.Android.Vibrate)
                 builder.SetVibrate(new long[] { 500, 500 });
@@ -353,6 +353,7 @@ namespace Shiny.Notifications
                     break;
             }
         }
+
 
 
         //https://segunfamisa.com/posts/notifications-direct-reply-android-nougat

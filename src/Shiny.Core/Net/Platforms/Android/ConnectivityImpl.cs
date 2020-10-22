@@ -133,7 +133,7 @@ namespace Shiny.Net
         {
             get
             {
-                if (this.connectivityMgr.IsNull())
+                if ((this.connectivityMgr?.Handle ?? IntPtr.Zero) == IntPtr.Zero)
                     this.connectivityMgr = this.context.GetSystemService<ConnectivityManager>(Context.ConnectivityService);
 
                 return this.connectivityMgr;
@@ -146,7 +146,7 @@ namespace Shiny.Net
         {
             get
             {
-                if (this.telManager.IsNull())
+                if ((this.telManager?.Handle ?? IntPtr.Zero) == IntPtr.Zero)
                     this.telManager = this.context.GetSystemService<TelephonyManager>(Context.TelephonyService);
 
                 return this.telManager;
