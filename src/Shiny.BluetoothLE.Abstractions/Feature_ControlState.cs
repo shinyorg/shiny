@@ -1,5 +1,6 @@
 ﻿using System;
-
+using System.Reactive;
+using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE
 {
@@ -10,7 +11,7 @@ namespace Shiny.BluetoothLE
         /// Works only on Android
         /// </summary>
         /// <returns></returns>
-        void SetAdapterState(bool enable);
+        IObservable<Unit> SetAdapterState(bool enable);
     }
 
 
@@ -19,14 +20,15 @@ namespace Shiny.BluetoothLE
         public static bool CanControlAdapterState(this IBleManager centralManager) => centralManager is ICanControlAdapterState;
 
 
-        public static bool TrySetAdapterState(this IBleManager centralManager, bool enable)
+        public static IObservable<bool> TrySetAdapterState(this IBleManager centralManager, bool enable)
         {
+            var result = false;
             if (centralManager is ICanControlAdapterState state)
             {
                 state.SetAdapterState(enable);
-                return true;
+                result = true;
             }
-            return false;
+            return Observable.Return(result);
         }
     }
 }
