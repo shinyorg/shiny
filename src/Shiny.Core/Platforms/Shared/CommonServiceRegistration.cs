@@ -28,10 +28,12 @@ namespace Shiny
             services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
             services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
             services.TryAddSingleton<ISettings, SettingsImpl>();
-
-            #if !__TVOS__ && !__WATCHOS__
-            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             #endif
+
+            #if __TVOS__ || __WATCHOS__ || NETSTANDARD
+            services.TryAddSingleton<IConnectivity, SharedConnectivityImpl>();
+            #else
+            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             #endif
         }
     }
