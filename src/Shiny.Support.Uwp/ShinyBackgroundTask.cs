@@ -2,7 +2,7 @@
 using Windows.ApplicationModel.Background;
 
 
-namespace Shiny
+namespace Shiny.Support.Uwp
 {
     public sealed class ShinyBackgroundTask : IBackgroundTask
     {

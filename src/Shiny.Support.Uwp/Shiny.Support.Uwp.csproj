@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFramework>uap10.0.16299</TargetFramework>
         <AssemblyName>Shiny.Support.Uwp</AssemblyName>
-        <RootNamespace>Shiny</RootNamespace>
+        <RootNamespace>Shiny.Support.Uwp</RootNamespace>
         <Description>Shiny UWP Support Library</Description>
         <OutputType>winmdobj</OutputType>
         <DebugType>pdbonly</DebugType>
