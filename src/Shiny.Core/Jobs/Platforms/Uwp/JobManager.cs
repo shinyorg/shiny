@@ -4,15 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Shiny.Infrastructure;
+using Shiny.Support.Uwp;
 
 
 namespace Shiny.Jobs
 {
     public class JobManager : AbstractJobManager, IBackgroundTaskProcessor
     {
-        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
-        {
-        }
+        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository) {}
 
 
         public override async Task<AccessState> RequestAccess()
