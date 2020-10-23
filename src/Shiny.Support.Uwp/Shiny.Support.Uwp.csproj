@@ -2,19 +2,14 @@
     <PropertyGroup>
         <TargetFramework>uap10.0.16299</TargetFramework>
         <AssemblyName>Shiny.Support.Uwp</AssemblyName>
-        <RootNamespace>Shiny.Support.Uwp</RootNamespace>
+        <RootNamespace>Shiny</RootNamespace>
         <Description>Shiny UWP Support Library</Description>
         <OutputType>winmdobj</OutputType>
+        <DebugType>pdbonly</DebugType>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <DebugType>full</DebugType>
-        <DebugSymbols>true</DebugSymbols>
-    </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <DebugType>pdbonly</DebugType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
