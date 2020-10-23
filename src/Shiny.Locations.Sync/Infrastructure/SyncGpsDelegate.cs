@@ -8,13 +8,13 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class SyncGpsDelegate : NotifyPropertyChanged, IGpsDelegate
     {
         readonly IJobManager jobManager;
-        readonly IMotionActivityManager activityManager;
         readonly IGpsDataService dataService;
+        readonly IMotionActivityManager? activityManager;
 
 
         public SyncGpsDelegate(IJobManager jobManager,
-                               IMotionActivityManager activityManager,
-                               IGpsDataService dataService)
+                               IGpsDataService dataService,
+                               IMotionActivityManager? activityManager = null)
         {
             this.jobManager = jobManager;
             this.activityManager = activityManager;
@@ -30,7 +30,7 @@ namespace Shiny.Locations.Sync.Infrastructure
 
             var config = job.GetSyncConfig();
             MotionActivityEvent? activity = null;
-            if (config.IncludeMotionActivityEvents)
+            if (config.IncludeMotionActivityEvents && this.activityManager != null)
                 activity = await this.activityManager.GetCurrentActivity();
 
             var e = new GpsEvent

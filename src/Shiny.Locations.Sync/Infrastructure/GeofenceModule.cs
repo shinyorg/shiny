@@ -15,13 +15,16 @@ namespace Shiny.Locations.Sync.Infrastructure
 
         public override void Register(IServiceCollection services)
         {
+            if (!services.UseGeofencing<SyncGeofenceDelegate>())
+            {
+                Logging.Log.Write("LocationSync", "Geofencing could not be registered");
+                return;
+            }
+            services.UseMotionActivity();
             services.AddSingleton(typeof(IGeofenceSyncDelegate), this.delegateType);
             services.TryAddSingleton<SyncSqliteConnection>();
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
             services.TryAddSingleton<IGeofenceDataService, GeofenceDataService>();
-            services.UseGeofencing<SyncGeofenceDelegate>();
-            services.UseMotionActivity();
-
             services.UseJobForegroundService(TimeSpan.FromSeconds(30));
             services.RegisterJob(
                 typeof(SyncGeofenceJob),

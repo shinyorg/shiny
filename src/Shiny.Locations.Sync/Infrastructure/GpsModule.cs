@@ -14,11 +14,16 @@ namespace Shiny.Locations.Sync.Infrastructure
 
         public override void Register(IServiceCollection services)
         {
+            if (!services.UseGps<SyncGpsDelegate>())
+            {
+                Logging.Log.Write("LocationSync", "GPS service could not be registered");
+                return;
+            }
+            services.UseMotionActivity();
             services.TryAddSingleton<ILocationSyncManager, LocationSyncManager>();
             services.TryAddSingleton<IGpsDataService, GpsDataService>();
-            services.AddSingleton<IGpsDelegate, SyncGpsDelegate>();
             services.AddSingleton(typeof(IGpsSyncDelegate), this.delegateType);
-            services.UseMotionActivity();
+
             services.UseJobForegroundService(TimeSpan.FromSeconds(30));
             services.RegisterJob(
                 typeof(SyncGpsJob),

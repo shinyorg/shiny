@@ -8,13 +8,13 @@ namespace Shiny.Locations.Sync.Infrastructure
     public class SyncGeofenceDelegate : IGeofenceDelegate
     {
         readonly IJobManager jobManager;
-        readonly IMotionActivityManager activityManager;
         readonly IGeofenceDataService dataService;
+        readonly IMotionActivityManager? activityManager;
 
 
         public SyncGeofenceDelegate(IJobManager jobManager,
-                                    IMotionActivityManager activityManager,
-                                    IGeofenceDataService dataService)
+                                    IGeofenceDataService dataService,
+                                    IMotionActivityManager? activityManager = null)
         {
             this.jobManager = jobManager;
             this.activityManager = activityManager;
@@ -30,7 +30,7 @@ namespace Shiny.Locations.Sync.Infrastructure
 
             var config = job.GetSyncConfig();
             MotionActivityEvent? activity = null;
-            if (config.IncludeMotionActivityEvents)
+            if (config.IncludeMotionActivityEvents && this.activityManager != null)
                 activity = await this.activityManager.GetCurrentActivity();
 
             var e = new GeofenceEvent
