@@ -21,28 +21,11 @@ namespace Shiny.Push
         {
             // TODO: push delegate OnEntry?
             var deferral = taskInstance.GetDeferral();
-            var fire = true;
-            IDictionary<string, string> headers = new Dictionary<string, string>();
+            var headers = PushManager.ExtractHeaders(taskInstance.TriggerDetails);
 
-            if (taskInstance.TriggerDetails is RawNotification raw)
-            {
-                if (raw.Headers != null)
-                    headers = raw.Headers.ToDictionary(x => x.Key, x => x.Value);
-            }
-            else if (taskInstance.TriggerDetails is ToastNotification toast)
-            {
-                if (toast.Data?.Values != null)
-                    headers = toast.Data.Values;
-            }
-            else if (taskInstance.TriggerDetails is TileNotification tile)
-            {
-                headers.Add("Tag", tile.Tag);
-            }
-            else
-            {
-                fire = false;
-            }
-
+            var fire = taskInstance.TriggerDetails is RawNotification ||
+                       taskInstance.TriggerDetails is ToastNotification ||
+                       taskInstance.TriggerDetails is TileNotification tile;
             if (fire)
                 await this.serviceProvider.RunDelegates<IPushDelegate>(x => x.OnReceived(headers));
 

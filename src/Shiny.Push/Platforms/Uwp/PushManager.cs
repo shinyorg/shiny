@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using Windows.Foundation;
 using Windows.Networking.PushNotifications;
 using Windows.ApplicationModel.Background;
+using Windows.UI.Notifications;
 using Shiny.Settings;
 
 
@@ -15,23 +16,16 @@ namespace Shiny.Push
     public class PushManager : AbstractPushManager, IShinyStartupTask
     {
         PushNotificationChannel channel;
-
-
         public PushManager(ISettings settings) : base(settings) {}
 
 
         public void Start()
         {
-            // TODO: if push is enabled, start timer and check channel expiration
-            // if push already registered, start it up automagically here
-            //e.BadgeNotification
-            //await this.serviceProvider.Resolve<IPushDelegate>()?.OnReceived(e.RawNotification.Content);
-            //this.CurrentRegistrationToken = e.RawNotification.Ur
-            //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            //e.Cancel = true;
-            //UwpShinyHost.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
-            //    builder => builder.SetTrigger(new PushNotificationTrigger())
-            //);
+            UwpPlatform.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
+                builder => builder.SetTrigger(new PushNotificationTrigger())
+            );
+            if (this.CurrentRegistrationExpiryDate != null)
+                this.RequestAccess();
         }
 
 
@@ -39,18 +33,7 @@ namespace Shiny.Push
         {
             var handler = new TypedEventHandler<PushNotificationChannel, PushNotificationReceivedEventArgs>((sender, args) =>
             {
-                //args.BadgeNotification != null;
-                //args.NotificationType == PushNotificationType.Tile
-                //args.NotificationType == PushNotificationType.Toast;
-                //args.ToastNotification.Data
-                var headers = args
-                    .RawNotification?
-                    .Headers?
-                    .ToDictionary(
-                        x => x.Key,
-                        x => x.Value
-                    ) ?? new Dictionary<string, string>(0);
-
+                var headers = ExtractHeaders(args);
                 ob.OnNext(headers);
             });
             this.channel.PushNotificationReceived += handler;
@@ -60,10 +43,11 @@ namespace Shiny.Push
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
-            //channel.ExpirationTime - persist and deal with this
-
-
+            this.channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
+            this.CurrentRegistrationExpiryDate = this.channel.ExpirationTime.DateTime.ToUniversalTime();
+            this.CurrentRegistrationToken = this.channel.Uri;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            this.InitializeExpirationTimer();
             return new PushAccessState(AccessState.Available, channel.Uri);
         }
 
@@ -71,7 +55,62 @@ namespace Shiny.Push
         public override Task UnRegister()
         {
             this.channel?.Close();
+            this.expiryTimer?.Dispose();
             return Task.CompletedTask;
+        }
+
+
+        IDisposable expiryTimer;
+        protected virtual void InitializeExpirationTimer()
+        {
+            this.expiryTimer = Observable
+                .Interval(TimeSpan.FromMinutes(15))
+                .Where(x => this.CurrentRegistrationExpiryDate != null && this.CurrentRegistrationExpiryDate < DateTime.UtcNow)
+                .Select(x => Observable.FromAsync(this.RequestAccess))
+                .Subscribe();
+        }
+
+
+        public static IDictionary<string, string> ExtractHeaders(PushNotificationReceivedEventArgs args)
+        {
+            IDictionary<string, string> headers = new Dictionary<string, string>();
+
+            if (args.RawNotification != null)
+            {
+                if (args.RawNotification.Headers != null)
+                    headers = args.RawNotification.Headers.ToDictionary(x => x.Key, x => x.Value);
+            }
+            else if (args.ToastNotification != null)
+            {
+                if (args.ToastNotification.Data?.Values != null)
+                    headers = args.ToastNotification.Data.Values;
+            }
+            else if (args.TileNotification != null)
+            {
+                headers.Add("Tag", args.TileNotification.Tag);
+            }
+            return headers;
+        }
+
+        public static IDictionary<string, string> ExtractHeaders(object args)
+        {
+            IDictionary<string, string> headers = new Dictionary<string, string>();
+
+            if (args is RawNotification raw)
+            {
+                if (raw.Headers != null)
+                    headers = raw.Headers.ToDictionary(x => x.Key, x => x.Value);
+            }
+            else if (args is ToastNotification toast)
+            {
+                if (toast.Data?.Values != null)
+                    headers = toast.Data.Values;
+            }
+            else if (args is TileNotification tile)
+            {
+                headers.Add("Tag", tile.Tag);
+            }
+            return headers;
         }
     }
 }
