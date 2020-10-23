@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Windows.Devices.Bluetooth;
@@ -37,7 +38,11 @@ namespace Shiny.BluetoothLE
         //}
 
 
-        public override IObservable<AccessState> RequestAccess() => Observable.Return(this.Status);
+        public override IObservable<AccessState> RequestAccess() => this.GetRadio()
+            .Catch((ArgumentException ex) => Observable.Return<Radio>(null))
+            .Select(x => x == null ? AccessState.NotSupported : this.Status);
+
+
         public override bool IsScanning { get; protected set; }
 
 
@@ -96,8 +101,7 @@ namespace Shiny.BluetoothLE
                 this.context.Clear();
 
                 var sub = this
-                    .WhenRadioReady()
-                    .Where(rdo => rdo != null)
+                    .GetRadio()
                     .Select(_ => this.CreateScanner(config))
                     .Switch()
                     .Subscribe(
@@ -142,12 +146,12 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<AccessState> WhenStatusChanged() => Observable.Create<AccessState>(ob =>
         {
-            Radio r = null;
+            Radio? r = null;
             var handler = new TypedEventHandler<Radio, object>((sender, args) =>
                 ob.OnNext(this.Status)
             );
             var sub = this
-                .WhenRadioReady()
+                .GetRadio()
                 .Subscribe(
                     rdo =>
                     {
@@ -173,18 +177,20 @@ namespace Shiny.BluetoothLE
         );
 
 
-        public async void SetAdapterState(bool enable)
+        public IObservable<Unit> SetAdapterState(bool enable)
         {
             var state = enable ? RadioState.On : RadioState.Off;
-            await this.radio.SetStateAsync(state);
+            return this.GetRadio()
+                .Select(x => Observable.FromAsync(async () => await this.radio.SetStateAsync(state)))
+                .Select(_ => Unit.Default);
         }
 
 
-        IObservable<BluetoothLEAdvertisementReceivedEventArgs> CreateScanner(ScanConfig config)
+        IObservable<BluetoothLEAdvertisementReceivedEventArgs> CreateScanner(ScanConfig? config)
              => Observable.Create<BluetoothLEAdvertisementReceivedEventArgs>(ob =>
              {
                  this.context.Clear();
-                 config = config ?? new ScanConfig { ScanType = BleScanType.Balanced };
+                 config ??= new ScanConfig { ScanType = BleScanType.Balanced };
 
                  var adWatcher = new BluetoothLEAdvertisementWatcher();
                  if (config.ServiceUuids != null)
@@ -218,7 +224,7 @@ namespace Shiny.BluetoothLE
              });
 
 
-        IObservable<Radio> WhenRadioReady() => Observable.FromAsync(async ct =>
+        IObservable<Radio> GetRadio() => Observable.FromAsync(async ct =>
         {
             if (this.radio != null)
                 return this.radio;

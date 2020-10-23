@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Shiny.BluetoothLE.Internals;
 using Android;
 using Android.Bluetooth;
-
+using System.Reactive;
 
 namespace Shiny.BluetoothLE
 {
@@ -121,13 +121,15 @@ namespace Shiny.BluetoothLE
         );
 
 
-        public void SetAdapterState(bool enable)
+        public IObservable<Unit> SetAdapterState(bool enable)
         {
             if (enable && !BluetoothAdapter.DefaultAdapter.IsEnabled)
                 BluetoothAdapter.DefaultAdapter.Enable();
 
             else if (!enable && BluetoothAdapter.DefaultAdapter.IsEnabled)
                 BluetoothAdapter.DefaultAdapter.Disable();
+
+            return Observable.Return(Unit.Default);
         }
     }
 }
