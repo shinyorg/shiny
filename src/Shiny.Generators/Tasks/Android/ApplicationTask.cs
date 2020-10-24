@@ -53,7 +53,6 @@ namespace Shiny.Generators.Tasks.Android
                     builder.AppendLine();
 
                     this.AppendOnCreate(builder, startupClassName);
-                    this.AppendOnTrimMemory(builder);
                 }
             }
             this.Context.AddCompilationUnit("MainApplication", builder.ToString());
@@ -100,16 +99,6 @@ namespace Shiny.Generators.Tasks.Android
                     builder.AppendLineInvariant("global::Acr.UserDialogs.UserDialogs.Init(this);");
 
                 builder.AppendLineInvariant("base.OnCreate();");
-            }
-        }
-
-
-        void AppendOnTrimMemory(IndentedStringBuilder builder)
-        {
-            using (builder.BlockInvariant("public override void OnTrimMemory([GeneratedEnum] TrimMemory level)"))
-            {
-                builder.AppendLineInvariant("global::Shiny.AndroidShinyHost.OnBackground(level);");
-                builder.AppendLineInvariant("base.OnTrimMemory(level);");
             }
         }
     }
