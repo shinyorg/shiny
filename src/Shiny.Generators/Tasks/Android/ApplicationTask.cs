@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Uno.RoslynHelpers;
@@ -64,9 +63,7 @@ namespace Shiny.Generators.Tasks.Android
         void GeneratePartial(INamedTypeSymbol symbol, string startupClassName)
         {
             var hasOnCreate = symbol.HasMethod("OnCreate");
-            var hasTrim = symbol.HasMethod("OnTrimMemory");
-
-            if (hasOnCreate && hasTrim)
+            if (hasOnCreate)
                 return;
 
             var builder = new IndentedStringBuilder();
@@ -84,15 +81,6 @@ namespace Shiny.Generators.Tasks.Android
                     {
                         this.AppendOnCreate(builder, startupClassName);
                     }
-
-                    if (hasTrim)
-                    {
-                        this.Log.Warn($"Cannot generate OnTrimMemory method for {symbol.Name} since it already exists.  Make sure to call Shiny.AndroidShinyHost.OnBackground(level); in your OnTrimMemory");
-                    }
-                    else
-                    {
-                        this.AppendOnTrimMemory(builder);
-                    }
                 }
             }
             this.Context.AddCompilationUnit(symbol.Name, builder.ToString());
@@ -103,7 +91,7 @@ namespace Shiny.Generators.Tasks.Android
         {
             using (builder.BlockInvariant("public override void OnCreate()"))
             {
-                builder.AppendLineInvariant($"global::Shiny.AndroidShinyHost.Init(this, new {startupClassName}());");
+                builder.AppendLineInvariant($"this.ShinyOnCreate(new {startupClassName}());");
 
                 if (this.Context.HasXamarinEssentials())
                     builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");
