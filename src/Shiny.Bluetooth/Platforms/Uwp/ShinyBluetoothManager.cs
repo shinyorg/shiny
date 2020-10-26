@@ -14,6 +14,7 @@ namespace Shiny.Bluetooth
             //await DeviceInformation.FindAllAsync(RfcommDeviceService.GetDeviceSelector(RfcommServiceId.SerialPort));
             //RfcommConnectionTriggerDetails()
             //RfcommConnectionTrigger()
+            //await RfcommDeviceService.FromIdAsync(device.Id);
             throw new NotImplementedException();
         }
     }
