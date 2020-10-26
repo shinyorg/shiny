@@ -18,13 +18,20 @@ namespace Shiny
         static bool hydrated = false;
         readonly Application app;
 
-        //private UwpPlatform() { }
-        public UwpPlatform(Application app) => this.app = app;
+        public UwpPlatform(Application app)
+        {
+            this.app = app;
+
+        }
 
 
         public void Register(IServiceCollection services)
         {
             services.RegisterCommonServices();
+            services.RegisterPostBuildAction(_ =>
+            {
+                // TODO: serialize services to appdata
+            });
             // TODO: the modules and startup aren't piped through here, so I can't hydate/dehydrate calls
             // FROM INIT
             //    if (!hydrated)

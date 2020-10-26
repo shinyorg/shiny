@@ -9,12 +9,5 @@
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     </ItemGroup>
-    <ItemGroup>
-      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="ShinyHost.cs">
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="Infrastructure\ShinyServiceCollection.cs">
-        <SubType>Code</SubType>
-      </Compile>
-    </ItemGroup>
+
 </Project>
