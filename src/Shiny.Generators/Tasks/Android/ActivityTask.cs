@@ -63,6 +63,9 @@ namespace Shiny.Generators.Tasks.Android
             {
                 using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                 {
+                    if (activity.HasMethod("OnCreating"))
+                        builder.AppendLineInvariant("this.OnCreating(savedInstanceState);");
+
                     // Xamarin Forms
                     if (activity.Is("Xamarin.Forms.Platform.Android.FormsAppCompatActivity"))
                     {
@@ -91,7 +94,7 @@ namespace Shiny.Generators.Tasks.Android
         {
             builder.AppendLineInvariant("this.ShinyOnCreate();");
             if (activity.HasMethod("OnCreated"))
-                builder.AppendLineInvariant("this.OnCreated();");
+                builder.AppendLineInvariant("this.OnCreated(savedInstanceState);");
         }
 
 
@@ -104,6 +107,10 @@ namespace Shiny.Generators.Tasks.Android
             // XF Material
             if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
                 builder.AppendLineInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
+
+            // RG Plugins
+            if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
+                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this, savedInstanceState)");
         }
 
 
