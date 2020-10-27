@@ -110,7 +110,7 @@ namespace Shiny.Generators.Tasks.Android
 
             // RG Plugins
             if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this, savedInstanceState)");
+                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);");
         }
 
 
