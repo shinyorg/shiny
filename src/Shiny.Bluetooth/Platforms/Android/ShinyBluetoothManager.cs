@@ -12,6 +12,20 @@ namespace Shiny.Bluetooth
         {
         }
 
+        public AccessState Status => throw new NotImplementedException();
+
+        public bool IsScanning => throw new NotImplementedException();
+
+        public IObservable<IBluetoothDevice> GetConnectedDevices()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IObservable<AccessState> RequestAccess()
+        {
+            throw new NotImplementedException();
+        }
+
         public IObservable<IBluetoothDevice> Scan() => Observable.Create<IBluetoothDevice>(ob =>
         {
             var ad = BluetoothAdapter.DefaultAdapter;

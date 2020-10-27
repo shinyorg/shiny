@@ -8,3 +8,6 @@ Docs: https://shinylib.net
 Blog: https://allancritchie.net
 
 Please star this project on GitHub if you use it in your projects
+
+
+Classic Bluetooth for your Xamarin Projects

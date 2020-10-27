@@ -5,11 +5,21 @@ namespace Shiny.Bluetooth
 {
     public interface IBluetoothManager
     {
-        //IObservable<AccessState> RequestAccess();
-        //IObservable<IBluetoothDevice> GetConnectedDevices();
+        /// <summary>
+        /// Requests user permissions (if not answered already) and checks device status
+        /// </summary>
+        /// <returns></returns>
+        IObservable<AccessState> RequestAccess();
 
-        // TODO: scanresult with rssi & service uuids - as well as filters
+        /// <summary>
+        /// Returns a list of connected devices
+        /// </summary>
+        /// <returns></returns>
+        IObservable<IBluetoothDevice> GetConnectedDevices();
 
-        // TODO: adapter state
+        /// <summary>
+        /// Current Feature/Adapter Status
+        /// </summary>
+        AccessState Status { get; }
     }
 }
