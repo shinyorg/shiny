@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Gms.Location;
@@ -17,18 +18,10 @@ namespace Shiny.Locations
     public class MotionActivityBroadcastReceiver : ShinyBroadcastReceiver
     {
         public const string ReceiverName = nameof(MotionActivityBroadcastReceiver);
-        readonly IMessageBus messageBus;
-        readonly AndroidSqliteDatabase database;
+        readonly Lazy<AndroidSqliteDatabase> database = ShinyHost.LazyResolve<AndroidSqliteDatabase>();
 
 
-        public MotionActivityBroadcastReceiver()
-        {
-            this.messageBus = ShinyHost.Resolve<IMessageBus>();
-            this.database = ShinyHost.Resolve<AndroidSqliteDatabase>();
-        }
-
-
-        public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
+        protected override async Task OnReceiveAsync(Context? context, Intent? intent)
         {
             // DELETE FROM motion_activity WHERE Timestamp < DateTimeOffset.UtcNow.AddDays(-30).Ticks
             if (!ActivityRecognitionResult.HasResult(intent))
@@ -66,11 +59,11 @@ namespace Shiny.Locations
             var confidence = this.ToConfidence(result.MostProbableActivity.Confidence);
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-            await this.database.ExecuteNonQuery(
+            await this.database.Value.ExecuteNonQuery(
                 $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
             );
-            this.messageBus.Publish(new MotionActivityEvent(type, confidence, DateTimeOffset.UtcNow));
-        });
+            this.Publish(new MotionActivityEvent(type, confidence, DateTimeOffset.UtcNow));
+        }
 
 
         protected virtual MotionActivityConfidence ToConfidence(int value)

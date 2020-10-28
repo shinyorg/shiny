@@ -8,10 +8,22 @@ namespace Shiny
 {
     public abstract class ShinyBroadcastReceiver : BroadcastReceiver
     {
-        protected virtual void Execute(Func<Task> task)
+        readonly Lazy<IMessageBus> messageBus = ShinyHost.LazyResolve<IMessageBus>();
+
+
+        protected void Publish<T>(T args) => this.messageBus.Value.Publish(args);
+        protected void Publish<T>(string name, T args) => this.messageBus.Value.Publish(name, args);
+        protected void Publish(string name) => this.messageBus.Value.Publish(name);
+
+        protected T Resolve<T>() => ShinyHost.Resolve<T>();
+        protected Lazy<T> ResolveLazy<T>() => ShinyHost.LazyResolve<T>();
+
+
+        protected abstract Task OnReceiveAsync(Context? context, Intent? intent);
+        public override void OnReceive(Context? context, Intent? intent)
         {
             var pendingResult = this.GoAsync();
-            task().ContinueWith(x =>
+            this.OnReceiveAsync(context, intent).ContinueWith(x =>
             {
                 if (x.IsFaulted)
                     Log.Write(x.Exception);
