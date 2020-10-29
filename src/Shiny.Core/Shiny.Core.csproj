@@ -8,6 +8,7 @@
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' AND $(IncludeNet5) == true ">net5.0-windows;$(TargetFrameworks)</TargetFrameworks>
         <!--<TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;netcoreapp3.0;net461;$(TargetFrameworks)</TargetFrameworks>-->
+        <TargetsForTfmSpecificBuildOutput Condition=" $(TargetFramework.StartsWith('uap')) ">$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     </PropertyGroup>
 
     <ItemGroup>
@@ -48,7 +49,10 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) OR $(TargetFramework.Contains('windows')) ">
-        <ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj" />
+        <ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj">
+            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+            <IncludeAssets>Shiny.Support.Uwp.*</IncludeAssets>
+        </ProjectReference>
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
@@ -80,7 +84,14 @@
 
     <Target Name="BundleGenerators" BeforeTargets="Pack;_LoadPackInputItems">
         <ItemGroup>
-            <None Include="$(SrcFolder)\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="build\Shiny.Generators.dll" Visible="false" />
+            <None Include="..\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="build\Shiny.Generators.dll" Visible="false" />
+            <!--<None Include="..\Shiny.Support.Uwp\bin\$(Configuration)\**\Shiny.Support.Uwp.*" Pack="true" PackagePath="lib\" />-->
+        </ItemGroup>
+    </Target>
+
+    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
+        <ItemGroup>
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
         </ItemGroup>
     </Target>
 </Project>

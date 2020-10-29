@@ -17,7 +17,6 @@
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <DebugType>portable</DebugType>
-        <DesignTimeBuild>false</DesignTimeBuild>
         <DebugSymbols>true</DebugSymbols>
 
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -25,27 +24,24 @@
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
         <VersionSuffix Condition=" $(BUILD_SOURCEBRANCHNAME) != 'refs/heads/master' ">preview</VersionSuffix>
-        <SrcFolder>$(MSBuildThisFileDirectory)..\src</SrcFolder>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' "> 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
 
-        <!-- disable sourcelink on mono, to workaround https://github.com/dotnet/sourcelink/issues/155 -->
-        <EnableSourceLink Condition=" '$(OS)' == 'Windows_NT' ">true</EnableSourceLink>
-        <DeterministicSourcePaths Condition="'$(EnableSourceLink)' == true">false</DeterministicSourcePaths>
-        <EnableSourceControlManagerQueries>$(EnableSourceLink)</EnableSourceControlManagerQueries>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">
         <IncludeSymbols>True</IncludeSymbols>
         <IncludeSource>True</IncludeSource>
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
-        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
         <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
     </ItemGroup>
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+
 using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
@@ -21,7 +23,7 @@ namespace Shiny.Notifications
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
 
 
-        public override void OnReceive(Context context, Intent intent) => this.Execute(async () =>
+        protected override async Task OnReceiveAsync(Context? context, Intent? intent)
         {
             var manager = ShinyHost.Resolve<INotificationManager>();
             var serializer = ShinyHost.Resolve<ISerializer>();
@@ -36,6 +38,6 @@ namespace Shiny.Notifications
             var response = new NotificationResponse(notification, action, text);
             await ShinyHost.Container.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
             await manager.Cancel(notification.Id);
-        });
+        }
     }
 }

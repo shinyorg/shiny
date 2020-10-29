@@ -33,15 +33,5 @@ namespace Shiny.BluetoothLE
             }
             return () => manager.StateUpdated -= handler;
         });
-
-
-        //public static Guid ToGuid(this CBUUID uuid)
-        //{
-        //    var id = uuid.ToString();
-        //    if (id.Length == 4)
-        //        id = $"0000{id}-0000-1000-8000-00805f9b34fb";
-
-        //    return Guid.ParseExact(id, "d");
-        //}
     }
 }

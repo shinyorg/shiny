@@ -4,13 +4,13 @@
         <AssemblyName>Shiny.Support.Uwp</AssemblyName>
         <RootNamespace>Shiny.Support.Uwp</RootNamespace>
         <Description>Shiny UWP Support Library</Description>
+        <IsPackable>false</IsPackable>
         <OutputType>winmdobj</OutputType>
         <DebugType>pdbonly</DebugType>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 </Project>

@@ -11,7 +11,7 @@ namespace Shiny.BluetoothLE.Internals
         Enabled = true,
         Exported = true
     )]
-    [IntentFilter(new[] {    
+    [IntentFilter(new[] {
         BluetoothDevice.ActionNameChanged,
         BluetoothDevice.ActionBondStateChanged,
         BluetoothDevice.ActionPairingRequest
