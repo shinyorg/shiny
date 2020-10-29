@@ -80,7 +80,8 @@
 
     <Target Name="BundleGenerators" BeforeTargets="Pack;_LoadPackInputItems">
         <ItemGroup>
-            <None Include="$(SrcFolder)\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="build\Shiny.Generators.dll" Visible="false" />
+            <None Include="..\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="build\Shiny.Generators.dll" Visible="false" />
+            <None Include="..\Shiny.Support.Uwp\bin\$(Configuration)\**\Shiny.Support.Uwp.*" Pack="true" PackagePath="lib\" />
         </ItemGroup>
     </Target>
 </Project>

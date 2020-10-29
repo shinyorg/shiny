@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
+
+using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Support.Uwp;
 using Windows.ApplicationModel.Background;
@@ -28,9 +30,11 @@ namespace Shiny
         public void Register(IServiceCollection services)
         {
             services.RegisterCommonServices();
-            services.RegisterPostBuildAction(_ =>
+            services.RegisterPostBuildAction(sp =>
             {
-                // TODO: serialize services to appdata
+                // what about post register tasks in modules?
+                var value = sp.Resolve<ISerializer>().Serialize(ShinyHost.Services);
+
             });
             // TODO: the modules and startup aren't piped through here, so I can't hydate/dehydrate calls
             // FROM INIT
