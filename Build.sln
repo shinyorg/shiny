@@ -7,6 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.github\workflows\build.yml = .github\workflows\build.yml
+		ChangeLog.md = ChangeLog.md
 		src\Directory.build.props = src\Directory.build.props
 		src\Directory.Build.targets = src\Directory.Build.targets
 		.github\workflows\docs.yml = .github\workflows\docs.yml

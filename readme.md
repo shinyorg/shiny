@@ -17,7 +17,7 @@ If you are looking to just use one part of Shiny, such as notifications, this pr
 If you think Shiny is too heavy, try wiring all of these things up yourself with all of the above goals in mind. 
 
 
-[Change Log - October 20, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
+[Change Log - October 29, 2020](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
 
 * [Samples](https://github.com/shinyorg/shinysamples) - Shows almost every single function point within Shiny
 * [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
@@ -62,8 +62,9 @@ Dev|![Build](https://github.com/shinyorg/shiny/workflows/Build/badge.svg?branch=
 |-------|-----|-----|-----------|
 |Location Sync| [![LocationSyncNugetShield]][LocationSyncNuget] | [![LocationSyncPreviewShield]][LocationSyncPreNuget] | Sync Geofence & GPS data to the server using Shiny best practices
 |Trip Tracker| [![TripTrackerNugetShield]][TripTrackerNuget] | [![TripTrackerPreviewShield]][TripTrackerPreNuget] | Tracks your trips for automotive, cycling, running, and/or walking - includes the distance and all GPS coordinates throughout the trip
-|Media Sync| [![MediaSyncNugetShield]][MediaSyncNuget] | [![MediaSyncPreviewShield]][MediaSyncPreNuget] | Sync your Android & iOS media gallery to the server using Shiny best practices
 |Data Sync| [![DataSyncNugetShield]][DataSyncNuget] | [![DataSyncPreviewShield]][DataSyncPreNuget] | Sync your data to the server using Shiny best practices
+
+<!--|Media Sync| [![MediaSyncNugetShield]][MediaSyncNuget] | [![MediaSyncPreviewShield]][MediaSyncPreNuget] | Sync your Android & iOS media gallery to the server using Shiny best practices-->
 
 ## Integrations
 |Project|NuGet|MyGet|Description|

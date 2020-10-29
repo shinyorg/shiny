@@ -32,7 +32,7 @@
 
 ### Push
 * Firebase implementation is now released for iOS and Android  (Shiny.Push.FirebaseMessaging)
-* Amazon Web Services is available for early testing
+* Amazon Web Services is available for testing
 * OneSignal is available for testing
 
 ### NFC
@@ -42,13 +42,9 @@
 * [BREAKING] Beacons are now separated into 2 different injection points, services.UseBeaconMonitoring()/IBeaconMonitoringManager and services.UseBeaconRanging()/IBeaconRangingManager
 * [Android] Now uses a foreground service to maintain a continuous scan when using beacon monitoring
 
-### Beacon Advertising (NEW Module)
-* You can now advertise beacons anywhere that is supported by Shiny.BluetoothLE.Hosting
-
 ### AppServices (NEW MODULES)
 * [Shiny.TripTracking] - A new module for tracking run, walks, and drives!
 * [Shiny.Locations.Sync] - Track background GPS and/or geofence events and uses best practices to ensure these events hit your server in a timely fashion
-* [Shiny.MediaSync] - Uploads Videos and Photos from your photo gallery
 * [Shiny.DataSync] - Sends data to your server in a reliable fashion (downloads coming soon)
 
 
