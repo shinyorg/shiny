@@ -17,8 +17,6 @@
 ### BluetoothLE
 * [BREAKING] The original library has been split into 2 separate libraries (Client - Shiny.BluetoothLE and Server - Shiny.BluetoothLE.Hosting) with some common ties
 * [Client] You don't like RX - there are new async extensions to skip the RX
-* [Shiny.BluetoothLE.Hosting.Hubs] - The SignalR for BluetoothLE GATT servers
-* [Shiny.BluetoothLE.RefitClient] - Refit for HTTP client is awesome - BEHOLD - the BLE version!
 
 ### Locations
 * [BREAKING] IsListening is gone in favor of CurrentListener configuration
