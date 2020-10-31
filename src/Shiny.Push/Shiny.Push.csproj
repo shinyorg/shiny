@@ -61,6 +61,8 @@
 
         <PackageReference Include="Xamarin.Firebase.Messaging" />
         <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
+        <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct" />
+        <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
