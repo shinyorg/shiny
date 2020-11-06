@@ -23,10 +23,10 @@ namespace Shiny.Beacons
         {
             var md = result.AdvertisementData?.ManufacturerData;
 
-            if (md == null || md.Data == null || md.Data.Length != 23)
+            if (md == null || md.Data == null)
                 return false;
 
-            if (md.CompanyId != 76)
+            if (md.CompanyId != 76) // only Apple standard iBeacons
                 return false;
 
             return md.Data.IsBeaconPacket();

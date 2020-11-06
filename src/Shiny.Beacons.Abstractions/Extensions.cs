@@ -100,16 +100,14 @@ namespace Shiny.Beacons
         }
 
 
-        public static bool IsBeaconPacket(this byte[] data, bool skipManufacturerByte = true)
+        public static bool IsBeaconPacket(this byte[] data)
         {
-            if (data == null)
+            // room for iBeacon type code (2) + proximity uuid (16) + major (2) + minor (2) + measured power (1) + optional mfg reserved (1)
+            if (data.Length < 23 && data.Length > 24)
                 return false;
 
-            if (data.Length != 23)
-                return false;
-
-            // apple manufacturerID - https://www.bluetooth.com/specifications/assigned-numbers/company-Identifiers
-            if (!skipManufacturerByte && data[0] != 76)
+            // iBeacon type code
+            if (data[0] != 0x02 || data[1] != 0x15)
                 return false;
 
             return true;
