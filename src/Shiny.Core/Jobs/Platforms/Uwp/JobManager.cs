@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Shiny.Infrastructure;
-using Shiny.Support.Uwp;
 
 
 namespace Shiny.Jobs
@@ -56,7 +55,7 @@ namespace Shiny.Jobs
 
             var builder = new BackgroundTaskBuilder();
             builder.Name = GetJobTaskName(jobInfo);
-            builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
+            builder.TaskEntryPoint = UwpPlatform.BackgroundTaskName;
 
             if (jobInfo.PeriodicTime != null)
             {

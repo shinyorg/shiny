@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Reactive.Linq;
 using Microsoft.Extensions.DependencyInjection;
-
 using Shiny.Infrastructure;
 using Shiny.Jobs;
-using Shiny.Support.Uwp;
+//using Shiny.Support.Uwp;
 using Windows.ApplicationModel.Background;
 using Windows.Storage;
 using Windows.UI.Xaml;
@@ -15,15 +14,19 @@ namespace Shiny
 {
     public class UwpPlatform : IPlatform
     {
+        public static string BackgroundTaskName => "TODO"; //typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
+
         const string STARTUP_KEY = "ShinyStartupTypeName";
         const string MODULE_KEY = "ShinyPlatformModuleTypeName";
         static bool hydrated = false;
         readonly Application app;
 
+
+        private UwpPlatform() { }
+
         public UwpPlatform(Application app)
         {
             this.app = app;
-
         }
 
 
@@ -102,12 +105,12 @@ namespace Shiny
             var taskName = typeof(TService).AssemblyQualifiedName;
             if (GetTask(taskName) == null)
             {
-                var builder = new BackgroundTaskBuilder();
-                builder.Name = taskName;
-                builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
+                //var builder = new BackgroundTaskBuilder();
+                //builder.Name = taskName;
+                //builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
 
-                builderAction?.Invoke(builder);
-                builder.Register();
+                //builderAction?.Invoke(builder);
+                //builder.Register();
             }
         }
 
