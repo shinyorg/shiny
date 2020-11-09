@@ -6,7 +6,7 @@
         <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;tizen50;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(IncludeNet5) == true ">net5.0;net5.0-ios;net5.0-watchos;net5.0-tvos;net5.0-android;$(TargetFrameworks)</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' AND $(IncludeNet5) == true ">net5.0-windows;$(TargetFrameworks)</TargetFrameworks>
+        <!--<TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' AND $(IncludeNet5) == true ">net5.0-windows;$(TargetFrameworks)</TargetFrameworks>-->
         <!--<TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;netcoreapp3.0;net461;$(TargetFrameworks)</TargetFrameworks>-->
         <TargetsForTfmSpecificBuildOutput Condition=" $(TargetFramework.StartsWith('uap')) ">$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     </PropertyGroup>
@@ -49,10 +49,10 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) OR $(TargetFramework.Contains('windows')) ">
-        <ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj">
+        <!--<ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj">
             <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
             <IncludeAssets>Shiny.Support.Uwp.*</IncludeAssets>
-        </ProjectReference>
+        </ProjectReference>-->
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
