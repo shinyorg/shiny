@@ -16,29 +16,18 @@ namespace Shiny
     {
         public static string BackgroundTaskName => "TODO"; //typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
 
-        const string STARTUP_KEY = "ShinyStartupTypeName";
-        const string MODULE_KEY = "ShinyPlatformModuleTypeName";
-        static bool hydrated = false;
+        //const string STARTUP_KEY = "ShinyStartupTypeName";
+        //static bool hydrated = false;
         readonly Application app;
 
 
-        private UwpPlatform() { }
-
-        public UwpPlatform(Application app)
-        {
-            this.app = app;
-        }
+        //private UwpPlatform() { }
+        public UwpPlatform(Application app) => this.app = app;
 
 
         public void Register(IServiceCollection services)
         {
             services.RegisterCommonServices();
-            services.RegisterPostBuildAction(sp =>
-            {
-                // what about post register tasks in modules?
-                var value = sp.Resolve<ISerializer>().Serialize(ShinyHost.Services);
-
-            });
             // TODO: the modules and startup aren't piped through here, so I can't hydate/dehydrate calls
             // FROM INIT
             //    if (!hydrated)
@@ -75,14 +64,12 @@ namespace Shiny
 
         public static void BackgroundRun(IBackgroundTaskInstance taskInstance)
         {
-            if (!hydrated)
-            {
-                var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
-                var module = Hydrate<IShinyModule>(MODULE_KEY);
-
-                // TODO: ShinyHost.Init(new UwpPlatform(), startup, module);
-                //InternalInit(startup, module, true);
-            }
+            //if (!hydrated)
+            //{
+            //    // TODO: I need to know what the startup type is!
+            //    //var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
+            //    //ShinyHost.Init(new UwpPlatform(), startup);
+            //}
             if (taskInstance.Task.Name.StartsWith("JOB-"))
             {
                 ShinyHost
@@ -105,12 +92,12 @@ namespace Shiny
             var taskName = typeof(TService).AssemblyQualifiedName;
             if (GetTask(taskName) == null)
             {
-                //var builder = new BackgroundTaskBuilder();
-                //builder.Name = taskName;
-                //builder.TaskEntryPoint = typeof(ShinyBackgroundTask).FullName;
+                var builder = new BackgroundTaskBuilder();
+                builder.Name = taskName;
+                builder.TaskEntryPoint = BackgroundTaskName;
 
-                //builderAction?.Invoke(builder);
-                //builder.Register();
+                builderAction?.Invoke(builder);
+                builder.Register();
             }
         }
 
