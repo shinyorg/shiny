@@ -33,7 +33,7 @@ jobs:
         dotnet-version: 3.1.301
     - name: Generate Build Number
       id: buildnumber
-      uses: einaregilsson/build-number@v2
+      uses: einaregilsson/build-number@v3
       with:
         token: ${{secrets.github_token}}
     - name: Build
