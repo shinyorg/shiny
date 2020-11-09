@@ -43,12 +43,21 @@ namespace Shiny.BluetoothLE
             => Observable.Create<IGattCharacteristic>(ob =>
             {
                 var cids = characteristicIds.Select(UUID.FromString).ToArray();
+                var found = false;
+
                 foreach (var cid in cids)
                 {
                     var cs = this.native.GetCharacteristic(cid);
-                    var characteristic = new GattCharacteristic(this, this.context, cs);
-                    ob.OnNext(characteristic);
+                    if (cs != null)
+                    {
+                        found = true;
+                        var characteristic = new GattCharacteristic(this, this.context, cs);
+                        ob.OnNext(characteristic);
+                    }
                 }
+                if (!found)
+                    throw new ArgumentException("No characteristics found for UUID list");
+
                 ob.OnCompleted();
 
                 return Disposable.Empty;
