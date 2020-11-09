@@ -132,13 +132,17 @@ namespace Shiny.Generators.Tasks.iOS
             //if (this.Context.HasZXingNetMobile())
             //    builder.AppendLineInvariant("global::ZXing.Net.Mobile.Forms.iOS.Platform.Init();");
 
-            // XF Material
+            // XF Material or RG Popups
             if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
                 builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
+            else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
+                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init();");
 
             // AiForms.SettingsView
             if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
                 builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
+
+
         }
 
 

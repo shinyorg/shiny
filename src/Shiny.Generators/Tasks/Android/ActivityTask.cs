@@ -107,9 +107,7 @@ namespace Shiny.Generators.Tasks.Android
             // XF Material
             if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
                 builder.AppendLineInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
-
-            // RG Plugins
-            if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
+            else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
                 builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);");
         }
 
