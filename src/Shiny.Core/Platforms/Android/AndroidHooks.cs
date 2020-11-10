@@ -15,7 +15,7 @@ namespace Shiny
                 .OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
         public static void ShinyOnCreate(this Application application, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
-            => ShinyHost.Init(new AndroidPlatform(application), startup, platformBuild);
+            => ShinyHost.Init(new AndroidPlatformInitializer(application), startup, platformBuild);
 
         public static void ShinyOnCreate(this Activity activity)
             => activity.ShinyOnNewIntent(activity.Intent);

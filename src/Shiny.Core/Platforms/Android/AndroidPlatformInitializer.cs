@@ -9,13 +9,13 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Shiny
 {
-    public class AndroidPlatform : Java.Lang.Object, ILifecycleObserver, IPlatform
+    public class AndroidPlatformInitializer : Java.Lang.Object, ILifecycleObserver, IPlatformInitializer
     {
         readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
         readonly Application app;
 
 
-        public AndroidPlatform(Application app)
+        public AndroidPlatformInitializer(Application app)
         {
             this.app = app;
             ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);

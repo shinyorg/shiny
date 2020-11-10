@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    public class TizenPlatform : IPlatform
+    public class TizenPlatformInitializer : IPlatformInitializer
     {
         public void Register(IServiceCollection services)
         {

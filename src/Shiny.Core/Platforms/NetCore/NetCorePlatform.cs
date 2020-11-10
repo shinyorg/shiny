@@ -3,7 +3,7 @@
 
 namespace Shiny
 {
-    public class NetCorePlatform : IPlatform
+    public class NetCorePlatformInitializer : IPlatformInitializer
     {
         public void Register(IServiceCollection services)
         {

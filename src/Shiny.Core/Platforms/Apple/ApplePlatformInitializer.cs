@@ -9,7 +9,7 @@ using UIKit;
 
 namespace Shiny
 {
-    public class ApplePlatform : IPlatform
+    public class ApplePlatformInitializer : IPlatformInitializer
     {
         public void Register(IServiceCollection services)
         {

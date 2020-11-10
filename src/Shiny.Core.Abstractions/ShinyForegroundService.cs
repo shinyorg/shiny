@@ -8,7 +8,7 @@ namespace Shiny
         public ShinyForegroundService()
         {
             ShinyHost
-                .Resolve<IPlatform>()
+                .Resolve<IPlatformInitializer>()
                 .WhenStateChanged()
                 .Subscribe(state =>
                 {

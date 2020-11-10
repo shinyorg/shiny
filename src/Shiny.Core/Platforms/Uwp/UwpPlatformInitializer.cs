@@ -12,7 +12,7 @@ using Windows.UI.Xaml;
 
 namespace Shiny
 {
-    public class UwpPlatform : IPlatform
+    public class UwpPlatformInitializer : IPlatformInitializer
     {
         public static string BackgroundTaskName => "TODO"; //typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
 
@@ -22,7 +22,7 @@ namespace Shiny
 
 
         //private UwpPlatform() { }
-        public UwpPlatform(Application app) => this.app = app;
+        public UwpPlatformInitializer(Application app) => this.app = app;
 
 
         public void Register(IServiceCollection services)

@@ -87,7 +87,7 @@ namespace Shiny
         public static bool ValidateScopes { get; set; }
 
 
-        public static void Init(IPlatform platform, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
+        public static void Init(IPlatformInitializer platform, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
         {
             var services = new ShinyServiceCollection();
 

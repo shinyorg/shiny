@@ -55,7 +55,7 @@ namespace Shiny.Jobs
 
             var builder = new BackgroundTaskBuilder();
             builder.Name = GetJobTaskName(jobInfo);
-            builder.TaskEntryPoint = UwpPlatform.BackgroundTaskName;
+            builder.TaskEntryPoint = UwpPlatformInitializer.BackgroundTaskName;
 
             if (jobInfo.PeriodicTime != null)
             {

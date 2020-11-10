@@ -15,7 +15,7 @@ namespace Shiny.Device.Tests.Droid
         MainLauncher = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation
     )]
-    public class MainActivity : RunnerActivity
+    public partial class MainActivity : RunnerActivity
     {
         protected override void OnCreate(Bundle bundle)
         {
@@ -42,9 +42,5 @@ namespace Shiny.Device.Tests.Droid
 
             base.OnCreate(bundle);
         }
-
-
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
-            => AndroidShinyHost.OnRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

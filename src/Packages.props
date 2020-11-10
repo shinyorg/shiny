@@ -5,8 +5,12 @@
         <PackageReference Update="System.Reactive" Version="4.4.1" />
         <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="3.1.9" />
         <PackageReference Update="Uno.Roslyn" Version="1.2.0-dev.18" />
+        <!--
         <PackageReference Update="Uno.SourceGeneration" Version="2.0.13" />
         <PackageReference Update="Uno.SourceGenerationTasks" Version="2.0.13" />
+        -->
+        <PackageReference Update="Uno.SourceGeneration" Version="3.0.0-dev.18" />
+        <PackageReference Update="Uno.SourceGenerationTasks" Version="3.0.0-dev.18" />
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="[4.1.0, 5)" />
         <PackageReference Update="AWSSDK.SimpleNotificationService" Version="3.5.1.3" />
         <PackageReference Update="AWSSDK.CognitoIdentity" Version="3.5.0.34" />

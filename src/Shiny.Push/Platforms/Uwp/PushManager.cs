@@ -21,7 +21,7 @@ namespace Shiny.Push
 
         public void Start()
         {
-            UwpPlatform.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
+            UwpPlatformInitializer.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
                 builder => builder.SetTrigger(new PushNotificationTrigger())
             );
             if (this.CurrentRegistrationExpiryDate != null)

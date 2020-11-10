@@ -8,7 +8,5 @@ public class BeaconStartup : ShinyStartup
         services.UseBeaconRanging();
 
         services.UseBeaconMonitoring<BeaconMonitorDelegate>();
-
-        services.UseBeaconAdvertising();
     }
 }

@@ -93,7 +93,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.DataSync", "src\Shiny
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.OneSignal", "src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj", "{3F684BAA-2352-48D3-8DDD-665E00C8785F}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CodeGenHelpers", "src\CodeGenHelpers\src\CodeGenHelpers\CodeGenHelpers.shproj", "{E4203C5E-F42E-4B04-9F25-8DFC60BBAC07}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		src\CodeGenHelpers\src\CodeGenHelpers\CodeGenHelpers.projitems*{e4203c5e-f42e-4b04-9f25-8dfc60bbac07}*SharedItemsImports = 13
+		src\CodeGenHelpers\src\CodeGenHelpers\CodeGenHelpers.projitems*{e5adbfc8-8ec0-4b3f-96f6-04d76c2ff6c7}*SharedItemsImports = 5
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
 		Ad-Hoc|ARM = Ad-Hoc|ARM

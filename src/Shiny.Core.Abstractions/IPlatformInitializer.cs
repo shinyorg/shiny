@@ -10,7 +10,7 @@ namespace Shiny
     }
 
 
-    public interface IPlatform
+    public interface IPlatformInitializer
     {
         //bool Is(string platform);
         //void InvokeOnMainThread(Action action);
