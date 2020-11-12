@@ -18,19 +18,20 @@
         <RepositoryType>git</RepositoryType>
         <DebugType>portable</DebugType>
         <DebugSymbols>true</DebugSymbols>
-
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <!--<SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
         <VersionSuffix Condition=" $(BUILD_SOURCEBRANCHNAME) != 'refs/heads/master' ">preview</VersionSuffix>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!--<EmbedAllSources>true</EmbedAllSources>-->
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">
