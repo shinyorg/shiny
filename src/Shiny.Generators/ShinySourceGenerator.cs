@@ -1,23 +1,21 @@
 ﻿using System;
-using Uno.SourceGeneration;
 using System.Collections.Generic;
 using Shiny.Generators.Tasks;
 using Shiny.Generators.Tasks.iOS;
 using Shiny.Generators.Tasks.Android;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 
 
 namespace Shiny.Generators
 {
-    public class ShinySourceGenerator : SourceGenerator
+    public class ShinySourceGenerator : ISourceGenerator
     {
         readonly IList<ShinySourceGeneratorTask> tasks = new List<ShinySourceGeneratorTask>
         {
             new AutoStartupTask(),
             new StaticClassTask(),
             //new PrismBridgeTask(),
-            //new BleClientTask(),
-            //new BleHostingHubTask(),
 
             new AppDelegateTask(),
             new ApplicationTask(),
@@ -25,7 +23,7 @@ namespace Shiny.Generators
         };
 
 
-        public override void Execute(SourceGeneratorContext context)
+        public void Execute(GeneratorExecutionContext context)
         {
             var shinyContext = new ShinyContext(context);
 
@@ -50,5 +48,6 @@ namespace Shiny.Generators
             }
             Task.WhenAll(tasks.ToArray()).GetAwaiter().GetResult();
         }
+        public void Initialize(GeneratorInitializationContext context) => throw new NotImplementedException();
     }
 }

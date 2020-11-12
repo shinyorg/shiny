@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Uno.SourceGeneration;
 
 
 namespace Shiny.Generators
 {
     public interface IShinyContext
     {
-        SourceGeneratorContext Context { get; }
-        ISourceGeneratorLogger Log { get; }
+        GeneratorExecutionContext Context { get; }
         bool IsStartupGenerated { get; set; }
         string GetRootNamespace();
         string? GetShinyStartupClassFullName();
@@ -21,10 +18,9 @@ namespace Shiny.Generators
 
     public class ShinyContext : IShinyContext
     {
-        public ShinyContext(SourceGeneratorContext context)
+        public ShinyContext(GeneratorExecutionContext context)
         {
             this.Context = context;
-            this.Log = context.GetLogger();
         }
 
 
@@ -114,8 +110,7 @@ namespace Shiny.Generators
         }
 
 
-        public SourceGeneratorContext Context { get; private set; }
-        public ISourceGeneratorLogger Log { get; private set; }
+        public GeneratorExecutionContext Context { get; private set; }
         public bool IsStartupGenerated { get; set; }
         public string GetRootNamespace() => this.Context.GetProjectInstance().GetPropertyValue("RootNamespace");
     }

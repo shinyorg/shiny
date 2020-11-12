@@ -8,11 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Uno.Roslyn" />
-        <PackageReference Include="Uno.SourceGeneration" />
-        <PackageReference Include="Uno.SourceGenerationTasks" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0-5.final" />
+        <PackageReference Include="Microsoft.NetCore.Analyzers">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
-
-    <Import Project="..\CodeGenHelpers\src\CodeGenHelpers\CodeGenHelpers.projitems" Label="Shared" />
 
 </Project>

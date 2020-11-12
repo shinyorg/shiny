@@ -5,9 +5,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.FindSymbols;
-using Uno.RoslynHelpers;
-using Uno.SourceGeneration;
-
 
 namespace Shiny.Generators
 {
@@ -17,17 +14,17 @@ namespace Shiny.Generators
         //public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
         //    symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
 
-        public static bool IsIosAppProject(this SourceGeneratorContext context)
+        public static bool IsIosAppProject(this GeneratorExecutionContext context)
             => context.IsProjectType("FEACFBD2-3405-455C-9665-78FE426C6842");
             //{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
 
 
-        public static bool IsAndroidAppProject(this SourceGeneratorContext context)
+        public static bool IsAndroidAppProject(this GeneratorExecutionContext context)
             => context.IsProjectType("EFBA0AD7-5A72-4C68-AF49-83D382785DCF");
             //{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
 
 
-        public static bool IsProjectType(this SourceGeneratorContext context, string projectTypeGuid)
+        public static bool IsProjectType(this GeneratorExecutionContext context, string projectTypeGuid)
         {
             var guids = context.GetProjectInstance().GetPropertyValue("ProjectTypeGuids")?.ToUpper();
             if (guids == null)
@@ -38,7 +35,7 @@ namespace Shiny.Generators
         }
 
 
-        public static int GetAndroidMajorTarget(this SourceGeneratorContext context)
+        public static int GetAndroidMajorTarget(this GeneratorExecutionContext context)
         {
             var target = context.GetProjectInstance().GetPropertyValue("TargetFrameworkVersion");
             if (target == null)
@@ -65,7 +62,7 @@ namespace Shiny.Generators
         }
 
 
-        public static bool IsEqualToType(this SourceGeneratorContext context, ITypeSymbol symbol, string otherTypeName)
+        public static bool IsEqualToType(this GeneratorExecutionContext context, ITypeSymbol symbol, string otherTypeName)
         {
             var type = context.Compilation.GetTypeByMetadataName(otherTypeName);
             var result = symbol.EqualsType(type);
@@ -73,19 +70,19 @@ namespace Shiny.Generators
         }
 
 
-        public static bool IsStream(this SourceGeneratorContext context, ITypeSymbol symbol)
+        public static bool IsStream(this GeneratorExecutionContext context, ITypeSymbol symbol)
             => context.IsEqualToType(symbol, typeof(System.IO.Stream).FullName);
 
 
-        public static bool IsObservable(this SourceGeneratorContext context, ITypeSymbol symbol)
+        public static bool IsObservable(this GeneratorExecutionContext context, ITypeSymbol symbol)
             => context.IsEqualToType(symbol, "System.IObservable`1");
 
 
-        public static bool IsGenericAsyncTask(this SourceGeneratorContext context, ITypeSymbol symbol)
+        public static bool IsGenericAsyncTask(this GeneratorExecutionContext context, ITypeSymbol symbol)
             => context.IsEqualToType(symbol, "System.Threading.Tasks.Task`1");
 
 
-        public static bool IsAsyncTask(this SourceGeneratorContext context, ITypeSymbol type)
+        public static bool IsAsyncTask(this GeneratorExecutionContext context, ITypeSymbol type)
         {
             var task = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
             var result = type.Equals(task);
@@ -93,15 +90,15 @@ namespace Shiny.Generators
         }
 
 
-        public static bool HasXamarinForms(this SourceGeneratorContext context)
+        public static bool HasXamarinForms(this GeneratorExecutionContext context)
             => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
 
 
-        public static bool HasXamarinEssentials(this SourceGeneratorContext context)
+        public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
             => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null;
 
 
-        public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName)
+        public static bool HasAssemblyAttribute(this GeneratorExecutionContext context, string attributeName)
         {
             var attribute = context.Compilation.GetTypeByMetadataName(attributeName);
             return context.Compilation.Assembly.FindAttributeFlattened(attribute) != null;
@@ -212,7 +209,7 @@ namespace Shiny.Generators
         }
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllInterfaceTypes(this SourceGeneratorContext context) => context
+        public static IEnumerable<INamedTypeSymbol> GetAllInterfaceTypes(this GeneratorExecutionContext context) => context
             .Compilation
             .SyntaxTrees
             .Select(x => context.Compilation.GetSemanticModel(x))
@@ -226,12 +223,12 @@ namespace Shiny.Generators
             .OfType<INamedTypeSymbol>();
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type type, bool thisProjectOnly = false)
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this GeneratorExecutionContext context, Type type, bool thisProjectOnly = false)
             => context.GetAllImplementationsOfType(type.FullName, thisProjectOnly);
 
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName, bool thisProjectOnly = false)
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this GeneratorExecutionContext context, string fullName, bool thisProjectOnly = false)
         {
             var symbol = context.Compilation.GetTypeByMetadataName(fullName);
             if (symbol == null)
@@ -241,7 +238,7 @@ namespace Shiny.Generators
         }
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, ISymbol symbol, bool thisProjectOnly = false)
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this GeneratorExecutionContext context, ISymbol symbol, bool thisProjectOnly = false)
         {
             if (!thisProjectOnly)
             {
@@ -257,7 +254,7 @@ namespace Shiny.Generators
         }
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName, bool thisProjectOnly = false)
+        public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this GeneratorExecutionContext context, string typeName, bool thisProjectOnly = false)
         {
             var symbol = context.Compilation.GetTypeByMetadataName(typeName);
             if (symbol == null)
