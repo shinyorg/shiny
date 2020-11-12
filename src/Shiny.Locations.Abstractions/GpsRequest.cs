@@ -12,6 +12,12 @@ namespace Shiny.Locations
             UseBackground = backgroundMode
         };
 
+        public static GpsRequest Default => new GpsRequest
+        {
+            Priority = GpsPriority.Normal,
+            UseBackground = false
+        };
+
         /// <summary>
         /// Determines if background updates should occur
         /// </summary>
