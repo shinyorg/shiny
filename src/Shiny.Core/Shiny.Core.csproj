@@ -21,9 +21,9 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Uno.SourceGenerationTasks" />
         <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
-        <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj">
-            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-        </ProjectReference>
+        <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) OR $(TargetFramework) == 'net5.0' ">
@@ -82,16 +82,4 @@
         <Reference Include="netstandard" />
     </ItemGroup>
 
-    <Target Name="BundleGenerators" BeforeTargets="Pack;_LoadPackInputItems">
-        <ItemGroup>
-            <None Include="..\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="build\Shiny.Generators.dll" Visible="false" />
-            <None Include="..\Shiny.Support.Uwp\bin\$(Configuration)\**\Shiny.Support.Uwp.*" Pack="true" PackagePath="lib\" />
-        </ItemGroup>
-    </Target>
-
-    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
-        <ItemGroup>
-            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))"/>
-        </ItemGroup>
-    </Target>
 </Project>
