@@ -9,12 +9,12 @@ using Microsoft.CodeAnalysis;
 
 namespace Shiny.Generators
 {
-    public class ShinySourceGenerator : ISourceGenerator
+    [Generator]
+    public class ShinyCoreGenerator : ISourceGenerator
     {
         readonly IList<ShinySourceGeneratorTask> tasks = new List<ShinySourceGeneratorTask>
         {
             new AutoStartupTask(),
-            new StaticClassTask(),
             //new PrismBridgeTask(),
 
             new AppDelegateTask(),
@@ -25,6 +25,9 @@ namespace Shiny.Generators
 
         public void Execute(GeneratorExecutionContext context)
         {
+            var workspace = Microsoft.CodeAnalysis.Workspace.GetWorkspaceRegistration(context);
+            //workspace.Workspace.Kind == WorkspaceKind.MSBuild
+            //workspace.Workspace.CurrentSolution.Projects.
             var shinyContext = new ShinyContext(context);
 
             // always first
@@ -48,6 +51,10 @@ namespace Shiny.Generators
             }
             Task.WhenAll(tasks.ToArray()).GetAwaiter().GetResult();
         }
-        public void Initialize(GeneratorInitializationContext context) => throw new NotImplementedException();
+
+
+        public void Initialize(GeneratorInitializationContext context)
+        {
+        }
     }
 }

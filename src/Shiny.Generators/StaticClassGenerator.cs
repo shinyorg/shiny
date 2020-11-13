@@ -1,16 +1,19 @@
 ﻿using System;
 using Microsoft.CodeAnalysis;
-using Uno.RoslynHelpers;
 
 
 namespace Shiny.Generators.Tasks
 {
-    public class StaticClassTask : ShinySourceGeneratorTask
+    [Generator]
+    public class StaticClassGenerator : ISourceGenerator
     {
-        public override void Execute()
+        public void Initialize(GeneratorInitializationContext context) {}
+
+
+        public void Execute(GeneratorExecutionContext context)
         {
-            var symbol = this.Context.Compilation.GetTypeByMetadataName("Shiny.GenerateStaticClassesAttribute");
-            var attribute = this.Context.Compilation.Assembly.FindAttributeFlattened(symbol);
+            var symbol = context.Compilation.GetTypeByMetadataName("Shiny.GenerateStaticClassesAttribute");
+            var attribute = context.Compilation.Assembly.FindAttributeFlattened(symbol);
             if (attribute == null)
                 return;
 
@@ -56,7 +59,7 @@ namespace Shiny.Generators.Tasks
 
         void BuildStaticClass(string ifTypeName, string genFileName, string namespaces)
         {
-            var type = this.Context.Compilation.GetTypeByMetadataName(ifTypeName);
+            var type = context.Compilation.GetTypeByMetadataName(ifTypeName);
             if (type == null)
                 return;
 
@@ -116,7 +119,7 @@ namespace Shiny.Generators.Tasks
                     }
                 }
             }
-            this.Context.AddCompilationUnit(genFileName, builder.ToString());
+            context.AddCompilationUnit(genFileName, builder.ToString());
         }
     }
 }
