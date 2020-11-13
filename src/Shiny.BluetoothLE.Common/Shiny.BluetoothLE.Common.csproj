@@ -7,7 +7,7 @@
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
-      <ItemGroup>
+    <ItemGroup>
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
     </ItemGroup>
