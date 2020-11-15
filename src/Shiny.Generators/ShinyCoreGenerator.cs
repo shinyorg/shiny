@@ -25,7 +25,7 @@ namespace Shiny.Generators
 
         public void Execute(GeneratorExecutionContext context)
         {
-            var workspace = Microsoft.CodeAnalysis.Workspace.GetWorkspaceRegistration(context);
+            var workspace = Workspace.GetWorkspaceRegistration(context.Compilation.);
             //workspace.Workspace.Kind == WorkspaceKind.MSBuild
             //workspace.Workspace.CurrentSolution.Projects.
             var shinyContext = new ShinyContext(context);

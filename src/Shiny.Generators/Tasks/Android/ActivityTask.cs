@@ -52,7 +52,7 @@ namespace Shiny.Generators.Tasks.Android
                     this.TryAppendRequestPermissionResult(activity, builder);
                 }
             }
-            this.Context.AddCompilationUnit(activity.Name, builder.ToString());
+            this.Context.AddSource(activity.Name, builder.ToString());
         }
 
 

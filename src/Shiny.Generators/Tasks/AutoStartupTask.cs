@@ -71,7 +71,7 @@ namespace Shiny.Generators.Tasks
                 "Shiny.ShinyStartup"
             );
 
-            this.Context.AddCompilationUnit("AppShinyStartup", this.builder.ToString());
+            this.Context.AddSource("AppShinyStartup", this.builder.ToString());
         }
 
 

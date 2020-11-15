@@ -86,7 +86,7 @@ namespace Shiny.Generators.Tasks.iOS
                     );
                 }
             }
-            this.Context.AddCompilationUnit(appDelegate.Name, builder.ToString());
+            this.Context.AddSource(appDelegate.Name, builder.ToString());
         }
 
 
