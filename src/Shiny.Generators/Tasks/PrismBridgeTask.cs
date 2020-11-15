@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Uno.RoslynHelpers;
-using Uno.SourceGeneration;
 
 
 namespace Shiny.Generators.Tasks
@@ -11,13 +9,12 @@ namespace Shiny.Generators.Tasks
     {
         public override void Execute()
         {
-            var log = this.Context.GetLogger();
             var apps = this.Context.GetAllDerivedClassesForType("Prism.DryIoc.PrismApplication", true);
 
             switch (apps.Count())
             {
                 case 0:
-                    log.Info("Prism.DryIoc.PrismApplication not found");
+                    this.Log.Info("Prism.DryIoc.PrismApplication not found");
                     break;
 
                 case 1:
@@ -55,11 +52,11 @@ namespace Shiny.Generators.Tasks
                             }
                         }
                     }
-                    this.Context.AddCompilationUnit(app.Name, builder.ToString());
+                    this.Context.AddSource(app.Name, builder.ToString());
                     break;
 
                 default:
-                    log.Warn("More than 1 PrismApplication found");
+                    this.Log.Warn("More than 1 PrismApplication found");
                     break;
             }
         }

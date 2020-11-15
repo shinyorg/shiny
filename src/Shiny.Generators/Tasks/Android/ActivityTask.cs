@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Uno.RoslynHelpers;
 
 
 namespace Shiny.Generators.Tasks.Android
@@ -57,7 +56,7 @@ namespace Shiny.Generators.Tasks.Android
         }
 
 
-        void TryAppendOnCreate(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        void TryAppendOnCreate(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
             if (!activity.HasMethod("OnCreate"))
             {
@@ -90,7 +89,7 @@ namespace Shiny.Generators.Tasks.Android
         }
 
 
-        void AppendShinyOnCreate(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        void AppendShinyOnCreate(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
             builder.AppendLineInvariant("this.ShinyOnCreate();");
             if (activity.HasMethod("OnCreated"))
@@ -98,7 +97,7 @@ namespace Shiny.Generators.Tasks.Android
         }
 
 
-        void TryAppendOnCreateThirdParty(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        void TryAppendOnCreateThirdParty(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
             // AiForms.SettingsView
             if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.Droid.SettingsViewInit") != null)
@@ -112,7 +111,7 @@ namespace Shiny.Generators.Tasks.Android
         }
 
 
-        void TryAppendRequestPermissionResult(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        void TryAppendRequestPermissionResult(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
             if (!activity.HasMethod("OnRequestPermissionsResult"))
             {
@@ -130,7 +129,7 @@ namespace Shiny.Generators.Tasks.Android
         }
 
 
-        void TryAppendNewIntent(INamedTypeSymbol activity, IIndentedStringBuilder builder)
+        void TryAppendNewIntent(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
             if (!activity.HasMethod("OnNewIntent"))
             {

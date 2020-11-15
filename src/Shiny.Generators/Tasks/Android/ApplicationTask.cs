@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Uno.RoslynHelpers;
 
 
 namespace Shiny.Generators.Tasks.Android
@@ -55,7 +54,7 @@ namespace Shiny.Generators.Tasks.Android
                     this.AppendOnCreate(builder, startupClassName);
                 }
             }
-            this.Context.AddCompilationUnit("MainApplication", builder.ToString());
+            this.Context.AddSource("MainApplication", builder.ToString());
         }
 
 
@@ -82,7 +81,7 @@ namespace Shiny.Generators.Tasks.Android
                     }
                 }
             }
-            this.Context.AddCompilationUnit(symbol.Name, builder.ToString());
+            this.Context.AddSource(symbol.Name, builder.ToString());
         }
 
 

@@ -7,6 +7,7 @@ namespace Shiny.Generators.Tasks
     public abstract class ShinySourceGeneratorTask
     {
         protected IShinyContext ShinyContext { get; private set; }
+        protected ILogger Log => this.ShinyContext.Log;
         protected GeneratorExecutionContext Context => this.ShinyContext.Context;
 
 

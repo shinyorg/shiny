@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Uno.RoslynHelpers;
 
 
 namespace Shiny.Generators.Tasks.iOS
@@ -114,7 +113,7 @@ namespace Shiny.Generators.Tasks.iOS
         }
 
 
-        void TryAppendThirdParty(INamedTypeSymbol appDelegate, IIndentedStringBuilder builder)
+        void TryAppendThirdParty(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
         {
             // Xamarin Forms
             if (appDelegate.Is("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate"))
