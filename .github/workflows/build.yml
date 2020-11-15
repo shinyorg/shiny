@@ -27,6 +27,8 @@ jobs:
       with:
         vs-version: '[16.7,16.8)'
     - uses: actions/checkout@v2
+      with:
+        submodules: true
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

@@ -26,6 +26,7 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) OR $(TargetFramework) == 'net5.0' ">
+        <PackageReference Include="Microsoft.Net.Compilers.Toolset" />
         <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>

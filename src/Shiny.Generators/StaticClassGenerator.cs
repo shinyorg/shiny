@@ -10,8 +10,10 @@ namespace Shiny.Generators.Tasks
         public void Initialize(GeneratorInitializationContext context) {}
 
 
+        GeneratorExecutionContext context;
         public void Execute(GeneratorExecutionContext context)
         {
+            this.context = context;
             var symbol = context.Compilation.GetTypeByMetadataName("Shiny.GenerateStaticClassesAttribute");
             var attribute = context.Compilation.Assembly.FindAttributeFlattened(symbol);
             if (attribute == null)

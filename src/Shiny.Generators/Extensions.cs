@@ -14,6 +14,15 @@ namespace Shiny.Generators
         // this is only if the partial has a 2+ partials
         //public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
         //    symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
+        public static string Indent(this string value, int level)
+        {
+            var newValue = "";
+            for (var i = 0; i < level; i++)
+                newValue += "\t";
+
+            newValue += value;
+            return newValue;
+        }
 
         public static bool IsIosAppProject(this GeneratorExecutionContext context)
             => context.IsProjectType("FEACFBD2-3405-455C-9665-78FE426C6842");
