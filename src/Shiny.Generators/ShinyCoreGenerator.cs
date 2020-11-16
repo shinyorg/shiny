@@ -25,7 +25,11 @@ namespace Shiny.Generators
 
         public void Execute(GeneratorExecutionContext context)
         {
-            var workspace = Workspace.GetWorkspaceRegistration(context.Compilation.);
+            // retreive the populated receiver
+            if (!(context.SyntaxReceiver is ShinySyntaxReceiver receiver))
+                return;
+
+            //var workspace = Workspace.GetWorkspaceRegistration(context.Compilation.);
             //workspace.Workspace.Kind == WorkspaceKind.MSBuild
             //workspace.Workspace.CurrentSolution.Projects.
             var shinyContext = new ShinyContext(context);
@@ -55,6 +59,9 @@ namespace Shiny.Generators
 
         public void Initialize(GeneratorInitializationContext context)
         {
+            // Register a syntax receiver that will be created for each generation pass
+            //context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
+            context.RegisterForSyntaxNotifications(() => new ShinySyntaxReceiver());
         }
     }
 }

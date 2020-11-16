@@ -140,8 +140,6 @@ namespace Shiny.Generators.Tasks.iOS
             // AiForms.SettingsView
             if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
                 builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
-
-
         }
 
 
