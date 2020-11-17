@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+        <!--<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />-->
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
-        <PackageReference Include="Microsoft.NetCore.Analyzers">
+        <!--<PackageReference Include="Microsoft.NetCore.Analyzers">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-        </PackageReference>
+        </PackageReference>-->
     </ItemGroup>
 
 </Project>

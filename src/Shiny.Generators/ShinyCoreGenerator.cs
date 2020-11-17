@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shiny.Generators.Tasks;
-using Shiny.Generators.Tasks.iOS;
-using Shiny.Generators.Tasks.Android;
+//using Shiny.Generators.Tasks.iOS;
+//using Shiny.Generators.Tasks.Android;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 
@@ -14,12 +14,12 @@ namespace Shiny.Generators
     {
         readonly IList<ShinySourceGeneratorTask> tasks = new List<ShinySourceGeneratorTask>
         {
-            new AutoStartupTask(),
-            //new PrismBridgeTask(),
+            //new AutoStartupTask(),
+            ////new PrismBridgeTask(),
 
-            new AppDelegateTask(),
-            new ApplicationTask(),
-            new ActivityTask()
+            //new AppDelegateTask(),
+            //new ApplicationTask(),
+            //new ActivityTask()
         };
 
 
@@ -32,10 +32,10 @@ namespace Shiny.Generators
             //var workspace = Workspace.GetWorkspaceRegistration(context.Compilation.);
             //workspace.Workspace.Kind == WorkspaceKind.MSBuild
             //workspace.Workspace.CurrentSolution.Projects.
-            var shinyContext = new ShinyContext(context);
+            IShinyContext shinyContext = null; // new ShinyContext(context);
 
             // always first
-            new AutoStartupTask().Init(shinyContext);
+            //new AutoStartupTask().Init(shinyContext);
 
             var tasks = new List<Task>();
             foreach (var task in this.tasks)

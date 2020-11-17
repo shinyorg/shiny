@@ -2,4 +2,4 @@
 
 [assembly: Shiny.GenerateStartup]
 [assembly: Shiny.GenerateStaticClasses]
-[assembly: Shiny.ShinyInject(typeof(ITestService), typeof(TestService))]
+//[assembly: Shiny.ShinyInject(typeof(ITestService), typeof(TestService))]
