@@ -49,7 +49,7 @@ namespace Shiny.Generators
                     }
                     catch (Exception ex)
                     {
-                        shinyContext.Log.Warn($"{task.GetType().FullName} Exception - {ex}");
+                        //shinyContext.Log.Warn($"{task.GetType().FullName} Exception - {ex}");
                     }
                 }));
             }
@@ -60,7 +60,6 @@ namespace Shiny.Generators
         public void Initialize(GeneratorInitializationContext context)
         {
             // Register a syntax receiver that will be created for each generation pass
-            //context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
             context.RegisterForSyntaxNotifications(() => new ShinySyntaxReceiver());
         }
     }

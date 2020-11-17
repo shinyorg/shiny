@@ -18,7 +18,7 @@
         <RepositoryType>git</RepositoryType>
         <DebugType>portable</DebugType>
         <DebugSymbols>true</DebugSymbols>
-        <!--<SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>

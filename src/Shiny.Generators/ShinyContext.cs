@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Xml;
+
 using Microsoft.CodeAnalysis;
 
 
@@ -10,23 +13,40 @@ namespace Shiny.Generators
     {
         GeneratorExecutionContext Context { get; }
         bool IsStartupGenerated { get; set; }
+        Document CurrentDocument { get; }
         string GetRootNamespace();
         string? GetShinyStartupClassFullName();
         string? GetXamFormsAppClassFullName();
-        ILogger Log { get; }
+        bool IsProjectType(string projectTypeGuid);
     }
 
 
     public class ShinyContext : IShinyContext
     {
+        readonly Lazy<object> msbuildLazy;
+
+
         public ShinyContext(GeneratorExecutionContext context)
         {
             this.Context = context;
-            this.Log = new ConsoleLogger();
+            this.msbuildLazy = new Lazy<object>(() =>
+            {
+                //var workspace = MSBuildWorkspace.Create();
+                //using (var xmlReader = XmlReader.Create(File.OpenRead(project.FilePath));
+                //ProjectRootElement root = ProjectRootElement.Create(xmlReader, new ProjectCollection(), preserveFormatting: true);
+                //MSBuildProject msbuildProject = new MSBuildProject(root);
+                return null;
+            });
         }
 
 
-        public ILogger Log { get; }
+        public Document CurrentDocument => ShinySyntaxReceiver.CurrentDocument;
+        //public MSBuildProject
+
+        public bool IsProjectType(string projectTypeGuid)
+        {
+        }
+
 
         public string? GetXamFormsAppClassFullName()
         {

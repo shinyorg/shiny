@@ -6,9 +6,15 @@ namespace Shiny.Generators
 {
     public class ShinySyntaxReceiver : ISyntaxReceiver
     {
+        internal static Document CurrentDocument { get; private set; }
+
+
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            //syntaxNode.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind);
+            var container = syntaxNode.SyntaxTree.GetText().Container;
+            var ws = Workspace.GetWorkspaceRegistration(container);
+            var documentId = ws.Workspace.GetDocumentIdInCurrentContext(container);
+            CurrentDocument = ws.Workspace.CurrentSolution.GetDocument(documentId);
         }
     }
 }

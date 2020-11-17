@@ -6,11 +6,8 @@
         <Description>Shiny UWP Support Library</Description>
         <IsPackable>false</IsPackable>
         <OutputType>winmdobj</OutputType>
-        <DebugType>pdbonly</DebugType>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 </Project>

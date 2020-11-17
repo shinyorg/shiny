@@ -9,11 +9,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
         <PackageReference Include="Prism.DryIoc.Forms" Version="8.0.0.1909" />
-        <PackageReference Include="Xamarin.Forms" Version="4.8.0.1451" />
+        <PackageReference Include="Xamarin.Forms" Version="4.8.0.1687" />
         <PackageReference Include="xunit" Version="2.4.1" />
-        <PackageReference Update="Uno.SourceGenerationTasks" Version="3.0.0-dev.18" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

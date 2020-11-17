@@ -34,32 +34,32 @@ namespace Shiny.Generators
             //{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
 
 
-        public static bool IsProjectType(this GeneratorExecutionContext context, string projectTypeGuid)
-        {
-            var guids = context.GetProjectInstance().GetPropertyValue("ProjectTypeGuids")?.ToUpper();
-            if (guids == null)
-                return false;
+        //public static bool IsProjectType(this GeneratorExecutionContext context, string projectTypeGuid)
+        //{
+        //    var guids = context.GetProjectInstance().GetPropertyValue("ProjectTypeGuids")?.ToUpper();
+        //    if (guids == null)
+        //        return false;
 
-            var result = guids.Contains(projectTypeGuid);
-            return result;
-        }
+        //    var result = guids.Contains(projectTypeGuid);
+        //    return result;
+        //}
 
 
-        public static int GetAndroidMajorTarget(this GeneratorExecutionContext context)
-        {
-            var target = context.GetProjectInstance().GetPropertyValue("TargetFrameworkVersion");
-            if (target == null)
-                return -1;
+        //public static int GetAndroidMajorTarget(this GeneratorExecutionContext context)
+        //{
+        //    var target = context.GetProjectInstance().GetPropertyValue("TargetFrameworkVersion");
+        //    if (target == null)
+        //        return -1;
 
-            target = target.Replace("v", String.Empty);
-            var len = target.IndexOf(".");
-            var majorString = len > 0
-                ? target.Substring(0, len)
-                : target;
+        //    target = target.Replace("v", String.Empty);
+        //    var len = target.IndexOf(".");
+        //    var majorString = len > 0
+        //        ? target.Substring(0, len)
+        //        : target;
 
-            var v = Int32.Parse(majorString);
-            return v;
-        }
+        //    var v = Int32.Parse(majorString);
+        //    return v;
+        //}
 
 
         public static bool HasMethod(this INamedTypeSymbol symbol, string methodName)

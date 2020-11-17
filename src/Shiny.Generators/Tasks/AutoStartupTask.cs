@@ -150,15 +150,15 @@ namespace Shiny.Generators.Tasks
 
         void RegisterInjects()
         {
-            var attribute = this.Context.Compilation.GetTypeByMetadataName("Shiny.Generators.ShinyInjectAttribute");
-            var injects = this.Context.Compilation.Assembly.GetAllAttributes().Where(x => x.AttributeClass.Equals(attribute));
+            //var attribute = this.Context.Compilation.GetTypeByMetadataName("Shiny.Generators.ShinyInjectAttribute");
+            //var injects = this.Context.Compilation.Assembly.GetAllAttributes().Where(x => x.AttributeClass.Equals(attribute));
 
-            foreach (var inject in injects)
-            {
-                var type1 = (INamedTypeSymbol)inject.ConstructorArguments[0].Value;
-                var type2 = (INamedTypeSymbol)inject.ConstructorArguments[1].Value;
-                this.builder.AppendLineInvariant($"services.AddSingleton<{type1.ToDisplayString()}, {type2.ToDisplayString()}>();");
-            }
+            //foreach (var inject in injects)
+            //{
+            //    var type1 = (INamedTypeSymbol)inject.ConstructorArguments[0].Value;
+            //    var type2 = (INamedTypeSymbol)inject.ConstructorArguments[1].Value;
+            //    this.builder.AppendLineInvariant($"services.AddSingleton<{type1.ToDisplayString()}, {type2.ToDisplayString()}>();");
+            //}
         }
 
 
