@@ -25,13 +25,13 @@ namespace Shiny.Generators
             return newValue;
         }
 
-        public static bool IsIosAppProject(this GeneratorExecutionContext context)
-            => context.IsProjectType("FEACFBD2-3405-455C-9665-78FE426C6842");
-        //{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
+        //public static bool IsIosAppProject(this GeneratorExecutionContext context)
+        //    => context.IsProjectType("FEACFBD2-3405-455C-9665-78FE426C6842");
+        ////{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
 
 
-        public static bool IsAndroidAppProject(this GeneratorExecutionContext context)
-            => context.IsProjectType("EFBA0AD7-5A72-4C68-AF49-83D382785DCF");
+        //public static bool IsAndroidAppProject(this GeneratorExecutionContext context)
+        //    => context.IsProjectType("EFBA0AD7-5A72-4C68-AF49-83D382785DCF");
         //{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
 
 
@@ -275,18 +275,18 @@ namespace Shiny.Generators
         }
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllInterfaceTypes(this GeneratorExecutionContext context) => context
-            .Compilation
-            .SyntaxTrees
-            .Select(x => context.Compilation.GetSemanticModel(x))
-            .SelectMany(x => x
-                .SyntaxTree
-                .GetRoot()
-                .DescendantNodes()
-                .OfType<InterfaceDeclarationSyntax>()
-                .Select(y => y.GetDeclaredSymbol(x))
-            )
-            .OfType<INamedTypeSymbol>();
+        //public static IEnumerable<INamedTypeSymbol> GetAllInterfaceTypes(this GeneratorExecutionContext context) => context
+        //    .Compilation
+        //    .SyntaxTrees
+        //    .Select(x => context.Compilation.GetSemanticModel(x))
+        //    .SelectMany(x => x
+        //        .SyntaxTree
+        //        .GetRoot()
+        //        .DescendantNodes()
+        //        .OfType<InterfaceDeclarationSyntax>()
+        //        //.Select(y => y.GetDeclaredSymbol(x))
+        //    )
+        //    .OfType<INamedTypeSymbol>();
 
 
         //public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this GeneratorExecutionContext context, Type type, bool thisProjectOnly = false)

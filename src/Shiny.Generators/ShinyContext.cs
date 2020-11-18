@@ -10,12 +10,13 @@ namespace Shiny.Generators
     public interface IShinyContext
     {
         GeneratorExecutionContext Context { get; }
+        string? GetMSBuildProperty(string name, string? defaultValue = null);
         bool IsStartupGenerated { get; set; }
         Document CurrentDocument { get; }
         string GetRootNamespace();
         string? GetShinyStartupClassFullName();
         string? GetXamFormsAppClassFullName();
-        bool IsProjectType(string projectTypeGuid);
+        //bool IsProjectType(string projectTypeGuid);
     }
 
 
@@ -41,16 +42,15 @@ namespace Shiny.Generators
         public Document CurrentDocument => ShinySyntaxReceiver.CurrentDocument;
         //public MSBuildProject
 
-        public bool IsProjectType(string projectTypeGuid)
-        {
-            return false;
-        }
+        //public bool IsProjectType(string projectTypeGuid)
+        //{
+        //    return false;
+        //}
 
 
         public string? GetXamFormsAppClassFullName()
         {
             var classes = this
-                .Context
                 .GetAllDerivedClassesForType("Xamarin.Forms.Application")
                 .Where(x => !x.ContainingNamespace.Name.StartsWith("Prism."))
                 .WhereNotSystem()
@@ -60,7 +60,7 @@ namespace Shiny.Generators
             switch (classes.Count)
             {
                 case 0:
-                    this.Log.Warn("No Xamarin Forms App implementations found");
+                    //this.Log.Warn("No Xamarin Forms App implementations found");
                     break;
 
                 case 1:
@@ -68,13 +68,13 @@ namespace Shiny.Generators
                     break;
 
                 default:
-                    this.Log.Warn(classes.Count + " Xamarin Forms App implementations found");
-                    foreach (var cls in classes)
-                        this.Log.Warn(" - " + cls.ToDisplayString());
+                    //this.Log.Warn(classes.Count + " Xamarin Forms App implementations found");
+                    //foreach (var cls in classes)
+                    //    this.Log.Warn(" - " + cls.ToDisplayString());
 
-                    appClass = this.FindClosestType(classes);
-                    if (appClass != null)
-                        this.Log.Warn($"Found closest type - {appClass.ToDisplayString()}.  IF this is wrong, please override the type where this is being used");
+                    //appClass = this.FindClosestType(classes);
+                    //if (appClass != null)
+                    //    this.Log.Warn($"Found closest type - {appClass.ToDisplayString()}.  IF this is wrong, please override the type where this is being used");
 
                     break;
             }
@@ -90,7 +90,6 @@ namespace Shiny.Generators
                 return $"{ns}.AppShinyStartup";
             }
             var startupClasses = this
-                .Context
                 .GetAllImplementationsOfType("Shiny.IShinyStartup")
                 .WhereNotSystem()
                 .ToList();
@@ -99,7 +98,7 @@ namespace Shiny.Generators
             switch (startupClasses.Count)
             {
                 case 0:
-                    this.Log.Warn("No Shiny Startup implementation found");
+                    //this.Log.Warn("No Shiny Startup implementation found");
                     break;
 
                 case 1:
@@ -148,6 +147,27 @@ namespace Shiny.Generators
 
         public GeneratorExecutionContext Context { get; private set; }
         public bool IsStartupGenerated { get; set; }
-        public string GetRootNamespace() => this.Context.GetProjectInstance().GetPropertyValue("RootNamespace");
+        public string? GetRootNamespace() => this.GetMSBuildProperty("RootNamespace");
+
+
+
+        public string? GetMSBuildProperty(string name, string? defaultValue = null)
+        {
+            this.Context.AnalyzerConfigOptions.GlobalOptions.TryGetValue($"build_property.{name}", out var value);
+            return value ?? defaultValue;
+        }
+
+
+        string[] GetMSBuildItems(string name) => this.Context
+            .AdditionalFiles
+            .Where(x =>
+                this.Context
+                    .AnalyzerConfigOptions
+                    .GetOptions(x)
+                    .TryGetValue("build_metadata.AdditionalFiles.SourceItemGroup", out var sourceItemGroup)
+                && sourceItemGroup == name
+            )
+            .Select(x => x.Path)
+            .ToArray();
     }
 }

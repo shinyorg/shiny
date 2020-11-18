@@ -25,6 +25,9 @@ namespace Shiny.Generators
 
         public void Execute(GeneratorExecutionContext context)
         {
+            if (context.Compilation.Language != LanguageNames.CSharp)
+                return;
+
             // retreive the populated receiver
             if (!(context.SyntaxReceiver is ShinySyntaxReceiver receiver))
                 return;
@@ -32,7 +35,7 @@ namespace Shiny.Generators
             //var workspace = Workspace.GetWorkspaceRegistration(context.Compilation.);
             //workspace.Workspace.Kind == WorkspaceKind.MSBuild
             //workspace.Workspace.CurrentSolution.Projects.
-            IShinyContext shinyContext = null; // new ShinyContext(context);
+            var shinyContext = new ShinyContext(context);
 
             // always first
             //new AutoStartupTask().Init(shinyContext);
