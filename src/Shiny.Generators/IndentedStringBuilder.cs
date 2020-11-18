@@ -7,7 +7,8 @@ namespace Shiny.Generators
 {
     public class DisposableAction : IDisposable
     {
-        public Action Action { get; init; }
+        public DisposableAction(Action action) => this.Action = action;
+        public Action Action { get; }
         public void Dispose() => this.Action();
     }
 
@@ -21,7 +22,7 @@ namespace Shiny.Generators
         public virtual IDisposable Indent(int count = 1)
         {
             this.CurrentLevel += count;
-            return new DisposableAction { Action = () => CurrentLevel -= count };
+            return new DisposableAction(() => this.CurrentLevel -= count);
         }
 
         public virtual IDisposable Block(int count = 1)
@@ -32,15 +33,12 @@ namespace Shiny.Generators
             this.Append("{".Indent(current));
             this.AppendLine();
 
-            return new DisposableAction
+            return new DisposableAction(() =>
             {
-                Action = () =>
-                {
-                    this.CurrentLevel -= count;
-                    Append("}".Indent(current));
-                    this.AppendLine();
-                }
-            };
+                this.CurrentLevel -= count;
+                this.Append("}".Indent(current));
+                this.AppendLine();
+            });
         }
 
         public void AppendLine(IFormatProvider formatProvider, string pattern, params object[] replacements)
