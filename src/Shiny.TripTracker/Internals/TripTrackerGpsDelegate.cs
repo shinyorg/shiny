@@ -134,6 +134,12 @@ namespace Shiny.TripTracker.Internals
                     return e.Types.HasFlag(MotionActivityType.Running) ||
                            e.Types.HasFlag(MotionActivityType.Walking);
 
+                case TripTrackingType.AllMovement:
+                    return e.Types.HasFlag(MotionActivityType.Cycling) ||
+                           e.Types.HasFlag(MotionActivityType.Running) ||
+                           e.Types.HasFlag(MotionActivityType.Walking) ||
+                           e.Types.HasFlag(MotionActivityType.Automotive);
+
                 default:
                     throw new Exception("Invalid Flag");
             }
