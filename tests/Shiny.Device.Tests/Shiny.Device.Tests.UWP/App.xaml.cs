@@ -7,9 +7,14 @@ namespace Shiny.Device.Tests.Uwp
 {
     sealed partial class App : RunnerApplication
     {
-        protected override void OnInitializeRunner()
+        public App()
         {
             this.ShinyInit(new TestStartup());
+        }
+
+
+        protected override void OnInitializeRunner()
+        {
             this.AddTestAssembly(this.GetType().GetTypeInfo().Assembly);
         }
     }
