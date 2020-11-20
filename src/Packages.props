@@ -11,9 +11,9 @@
         <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="[4.1.0, 5)" />
 
-        <PackageReference Update="AWSSDK.SimpleNotificationService" Version="3.5.1.8" />
-        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="3.4.3" />
-        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="3.4.3" />
+        <PackageReference Update="AWSSDK.SimpleNotificationService" Version="3.5.1.10" />
+        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.0.0" />
+        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.0.0" />
 
         <PackageReference Update="Xamarin.Firebase.iOS.Core" Version="6.10.4" />
         <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="4.7.1" />
@@ -31,7 +31,7 @@
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="120.1.7" />
         <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.0.2" />
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="117.0.0" />
-        <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="2.2.3" />
+        <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="2.3.0" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="2.2.3" />
 
         <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
