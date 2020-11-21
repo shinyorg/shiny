@@ -28,14 +28,14 @@ namespace Shiny.Generators
         public ShinyContext(GeneratorExecutionContext context)
         {
             this.Context = context;
-            this.msbuildLazy = new Lazy<object>(() =>
-            {
-                //var workspace = MSBuildWorkspace.Create();
-                //using (var xmlReader = XmlReader.Create(File.OpenRead(project.FilePath));
-                //ProjectRootElement root = ProjectRootElement.Create(xmlReader, new ProjectCollection(), preserveFormatting: true);
-                //MSBuildProject msbuildProject = new MSBuildProject(root);
-                return null;
-            });
+            //this.msbuildLazy = new Lazy<object>(() =>
+            //{
+            //    //var workspace = MSBuildWorkspace.Create();
+            //    //using (var xmlReader = XmlReader.Create(File.OpenRead(project.FilePath));
+            //    //ProjectRootElement root = ProjectRootElement.Create(xmlReader, new ProjectCollection(), preserveFormatting: true);
+            //    //MSBuildProject msbuildProject = new MSBuildProject(root);
+            //    return null;
+            //});
         }
 
 
@@ -158,16 +158,16 @@ namespace Shiny.Generators
         }
 
 
-        string[] GetMSBuildItems(string name) => this.Context
-            .AdditionalFiles
-            .Where(x =>
-                this.Context
-                    .AnalyzerConfigOptions
-                    .GetOptions(x)
-                    .TryGetValue("build_metadata.AdditionalFiles.SourceItemGroup", out var sourceItemGroup)
-                && sourceItemGroup == name
-            )
-            .Select(x => x.Path)
-            .ToArray();
+        //string[] GetMSBuildItems(string name) => this.Context
+        //    .AdditionalFiles
+        //    .Where(x =>
+        //        this.Context
+        //            .AnalyzerConfigOptions
+        //            .GetOptions(x)
+        //            .TryGetValue("build_metadata.AdditionalFiles.SourceItemGroup", out var sourceItemGroup)
+        //        && sourceItemGroup == name
+        //    )
+        //    .Select(x => x.Path)
+        //    .ToArray();
     }
 }
