@@ -21,6 +21,7 @@ namespace Shiny.Generators.Tests
         // test for methods
         // test with/out XF
         // test for auto-init of 3rd party
+        // ensure appdelegate methods are generated only when necessary!
 
         // TODO: build android
         // test for finding custom shiny startup
@@ -39,7 +40,9 @@ namespace Shiny.Generators.Tests
         [Fact]
         public void Test()
         {
-            this.DoGenerate(@"
+            var assembly = new AssemblyGenerator();
+
+            assembly.AddSource(@"
 namespace Foo
 {
     class C
@@ -53,25 +56,12 @@ namespace Foo
         }
 
 
-        void DoGenerate(string source)
+        void DoGenerate(AssemblyGenerator assembly)
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(source);
-
-            //var references = new List<MetadataReference>();
-            //Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            //foreach (var assembly in assemblies)
-            //{
-            //    if (!assembly.IsDynamic)
-            //    {
-            //        references.Add(MetadataReference.CreateFromFile(assembly.Location));
-            //    }
-            //}
-
             // https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.generatordriver?view=roslyn-dotnet
             var driver = CSharpGeneratorDriver.Create(new ShinyCoreGenerator());
-            //driver.RunGenerators(CSharpCompilation.Create("Test.dll"));
             driver.RunGeneratorsAndUpdateCompilation(
-                CSharpCompilation.Create("Test.dll"),
+                assembly.Create("Test.dll"),
                 out var outputCompilation,
                 out var diags
             );
