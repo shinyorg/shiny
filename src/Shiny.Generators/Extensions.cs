@@ -158,14 +158,23 @@ namespace Shiny.Generators
 
 
         public static AttributeData FindAttributeFlattened(this ISymbol symbol, INamedTypeSymbol attributeClassSymbol)
-            => symbol.GetAllAttributes().FirstOrDefault(a => a.AttributeClass == attributeClassSymbol);
+        {
+            var attrs = symbol.GetAllAttributes();
+            foreach (var attr in attrs)
+            {
+                if (attr.AttributeClass == attributeClassSymbol) // TODO: this is failing
+                    return attr;
+            }
+            return null;
+        }
 
 
         public static IEnumerable<AttributeData> GetAllAttributes(this ISymbol symbol)
         {
             while (symbol != null)
             {
-                foreach (var attribute in symbol.GetAttributes())
+                var attributes = symbol.GetAttributes();
+                foreach (var attribute in attributes)
                     yield return attribute;
 
                 symbol = (symbol as INamedTypeSymbol)?.BaseType;
