@@ -157,12 +157,17 @@ namespace Shiny.Generators
         }
 
 
-        public static AttributeData FindAttributeFlattened(this ISymbol symbol, INamedTypeSymbol attributeClassSymbol)
+        public static bool IsEqual(this ISymbol symbol, ISymbol compare)
+        {
+            return symbol.Name.Equals(symbol.Name);
+        }
+
+        public static AttributeData? FindAttributeFlattened(this ISymbol symbol, INamedTypeSymbol attributeClassSymbol)
         {
             var attrs = symbol.GetAllAttributes();
             foreach (var attr in attrs)
             {
-                if (attr.AttributeClass == attributeClassSymbol) // TODO: this is failing
+                if (attr.AttributeClass?.IsEqual(attributeClassSymbol) ?? false)
                     return attr;
             }
             return null;
@@ -180,6 +185,26 @@ namespace Shiny.Generators
                 symbol = (symbol as INamedTypeSymbol)?.BaseType;
             }
         }
+
+
+        public static IEnumerable<IPropertySymbol> GetAllProperties(this INamedTypeSymbol symbol)
+        {
+            while (symbol != null)
+            {
+                var properties = symbol.GetMembers().Where(x => x.Kind == SymbolKind.Property);
+                foreach (var property in properties)
+                    yield return (IPropertySymbol)property;
+
+                symbol = symbol?.BaseType;
+            }
+        }
+
+
+        public static bool IsPublic(this ITypeSymbol symbol)
+            => symbol.DeclaredAccessibility == Accessibility.Public;
+
+        public static bool IsPublic(this IMethodSymbol symbol)
+            => symbol.DeclaredAccessibility == Accessibility.Public;
 
 
         public static bool IsInterface(this ITypeSymbol type)

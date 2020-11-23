@@ -80,46 +80,46 @@ namespace Shiny.Generators.Tasks
 
                     var methods = type.GetAllPublicMethods();
 
-                    //foreach (var method in methods)
-                    //{
-                    //    var argList = method.BuildArgString(true);
-                    //    var argListNoNames = method.BuildArgString(false);
+                    foreach (var method in methods)
+                    {
+                        var argList = method.BuildArgString(true);
+                        var argListNoNames = method.BuildArgString(false);
 
-                    //    var returnType = method.ReturnType.IsVoid() ? "void" : method.ReturnType.ToDisplayString();
-                    //    var signature = $"public static {returnType} {method.Name}";
-                    //    var args = $"Current.{method.Name}";
+                        var returnType = method.ReturnsVoid ? "void" : method.ReturnType.ToDisplayString();
+                        var signature = $"public static {returnType} {method.Name}";
+                        var args = $"Current.{method.Name}";
 
-                    //    if (method.IsGenericMethod)
-                    //    {
-                    //        signature += "<T>";
-                    //        args += "<T>";
-                    //    }
+                        if (method.IsGenericMethod)
+                        {
+                            signature += "<T>";
+                            args += "<T>";
+                        }
 
-                    //    builder.AppendLineInvariant($"{signature}({argList}) => {args}({argListNoNames});");
-                    //}
+                        builder.AppendLineInvariant($"{signature}({argList}) => {args}({argListNoNames});");
+                    }
 
-                    //foreach (var prop in type.GetAllProperties())
-                    //{
-                    //    var propertyName = prop.GetName();
-                    //    var hasGet = prop.GetMethod?.IsPublic() ?? false;
-                    //    var hasSet = prop.SetMethod?.IsPublic() ?? false;
+                    foreach (var prop in type.GetAllProperties())
+                    {
+                        var propertyName = prop.GetName();
+                        var hasGet = prop.GetMethod?.IsPublic() ?? false;
+                        var hasSet = prop.SetMethod?.IsPublic() ?? false;
 
-                    //    if (hasGet && !hasSet)
-                    //    {
-                    //        builder.AppendLineInvariant($"public static {prop.Type.ToDisplayString()} {propertyName} => Current.{propertyName};");
-                    //    }
-                    //    else
-                    //    {
-                    //        using (builder.BlockInvariant($"public static {prop.Type.ToDisplayString()} {propertyName}"))
-                    //        {
-                    //            if (hasGet)
-                    //                builder.AppendLineInvariant($"get => Current.{propertyName};");
+                        if (hasGet && !hasSet)
+                        {
+                            builder.AppendLineInvariant($"public static {prop.Type.ToDisplayString()} {propertyName} => Current.{propertyName};");
+                        }
+                        else
+                        {
+                            using (builder.BlockInvariant($"public static {prop.Type.ToDisplayString()} {propertyName}"))
+                            {
+                                if (hasGet)
+                                    builder.AppendLineInvariant($"get => Current.{propertyName};");
 
-                    //            if (hasSet)
-                    //                builder.AppendLineInvariant($"set => Current.{propertyName} = value;");
-                    //        }
-                    //    }
-                    //}
+                                if (hasSet)
+                                    builder.AppendLineInvariant($"set => Current.{propertyName} = value;");
+                            }
+                        }
+                    }
                 }
             }
             context.AddSource(genFileName, builder.ToString());

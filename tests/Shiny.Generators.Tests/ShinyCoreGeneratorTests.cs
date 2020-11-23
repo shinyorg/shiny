@@ -46,13 +46,14 @@ namespace Shiny.Generators.Tests
 namespace Foo
 {
     class C
+    {
+        void M()
         {
-            void M()
-            {
-            }
         }
-    }"
+    }
+}"
             );
+            this.DoGenerate(assembly);
         }
 
 

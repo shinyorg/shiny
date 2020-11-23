@@ -17,7 +17,7 @@ namespace Shiny.Generators.Tests
 
 
         [Fact]
-        public void GenerateCoreClasses()
+        public void GenerateStaticClasses()
         {
             var assembly = new AssemblyGenerator();
             assembly.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute]");

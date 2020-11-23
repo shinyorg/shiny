@@ -11,10 +11,10 @@ namespace Shiny.Generators
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            var container = syntaxNode.SyntaxTree.GetText().Container;
-            var ws = Workspace.GetWorkspaceRegistration(container);
-            var documentId = ws.Workspace.GetDocumentIdInCurrentContext(container);
-            CurrentDocument = ws.Workspace.CurrentSolution.GetDocument(documentId);
+            //var container = syntaxNode.SyntaxTree.GetText().Container;
+            //var ws = Workspace.GetWorkspaceRegistration(container);
+            //var documentId = ws.Workspace.GetDocumentIdInCurrentContext(container);
+            //CurrentDocument = ws.Workspace.CurrentSolution.GetDocument(documentId);
         }
     }
 }
