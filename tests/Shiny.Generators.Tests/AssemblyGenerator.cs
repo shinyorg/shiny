@@ -36,6 +36,7 @@ namespace Shiny.Generators.Tests
             if (ass == null)
                 throw new ArgumentException($"Assembly '{assemblyName}' not found at '{path}'");
 
+
             var reference = MetadataReference.CreateFromFile(ass.Location);
             this.references.Add(reference);
         }
@@ -44,11 +45,12 @@ namespace Shiny.Generators.Tests
         public CSharpCompilation Create(string assemblyName)
         {
             this.AddReference("Shiny.Core");
-            return CSharpCompilation.Create(
-                assemblyName,
-                this.sources,
-                this.references
-            );
+            var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
+            return CSharpCompilation
+                .Create(localPath)
+                .WithReferences(this.references)
+                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                .AddSyntaxTrees(this.sources);
         }
     }
 }
