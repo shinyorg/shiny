@@ -16,7 +16,7 @@ namespace Shiny.Generators.Tasks
         {
             this.context = context;
             var symbol = context.Compilation.GetTypeByMetadataName("Shiny.GenerateStaticClassesAttribute");
-            var attribute = context.Compilation.Assembly.FindAttributeFlattened(symbol);
+            var attribute = context.Compilation.Assembly.FindAttributeFlattened(symbol); // TODO: this is not finding
             if (attribute == null)
                 return;
 

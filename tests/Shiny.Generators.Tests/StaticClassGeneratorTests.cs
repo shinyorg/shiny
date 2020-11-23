@@ -20,6 +20,7 @@ namespace Shiny.Generators.Tests
         public void GenerateCoreClasses()
         {
             var assembly = new AssemblyGenerator();
+            assembly.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute]");
 
             var driver = CSharpGeneratorDriver.Create(new StaticClassGenerator());
             driver.RunGeneratorsAndUpdateCompilation(
@@ -32,12 +33,9 @@ namespace Shiny.Generators.Tests
                 diags.Any(x => x.Severity == DiagnosticSeverity.Error),
                 "Failed: " + diags.FirstOrDefault()?.GetMessage()
             );
-            var output = outputCompilation
-                .SyntaxTrees
-                .LastOrDefault()?
-                .ToString();
 
-            this.output.WriteLine(output ?? "NO OUTPUT");
+            foreach (var syntaxTree in outputCompilation.SyntaxTrees)
+                this.output.WriteLine(syntaxTree.ToString());
         }
     }
 }
