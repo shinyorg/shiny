@@ -15,9 +15,7 @@ namespace Shiny.Generators
         readonly IList<ShinySourceGeneratorTask> tasks = new List<ShinySourceGeneratorTask>
         {
             ////new PrismBridgeTask(),
-            //new AppDelegateTask(),
-            //new ApplicationTask(),
-            //new ActivityTask()
+
         };
 
 
@@ -27,8 +25,8 @@ namespace Shiny.Generators
                 return;
 
             // retreive the populated receiver
-            if (!(context.SyntaxReceiver is ShinySyntaxReceiver receiver))
-                return;
+            //if (!(context.SyntaxReceiver is ShinySyntaxReceiver receiver))
+            //    return;
 
             //var workspace = Workspace.GetWorkspaceRegistration(context.Compilation.);
             //workspace.Workspace.Kind == WorkspaceKind.MSBuild
@@ -39,11 +37,15 @@ namespace Shiny.Generators
             var autoStartup = new AutoStartupTask();
             this.RunTask(autoStartup, shinyContext).GetAwaiter().GetResult();
 
-            var tasks = new List<Task>();
-            foreach (var task in this.tasks)
-                tasks.Add(this.RunTask(task, shinyContext));
-
-            Task.WhenAll(tasks.ToArray()).GetAwaiter().GetResult();
+            //Task
+            //    .WhenAll(
+            //        this.RunTask(new AppDelegateTask(), shinyContext),
+            //        this.RunTask(new ApplicationTask(), shinyContext),
+            //        this.RunTask(new ActivityTask(), shinyContext),
+            //        shinyContext.Context.CancellationToken
+            //    )
+            //    .GetAwaiter()
+            //    .GetResult();
         }
 
 

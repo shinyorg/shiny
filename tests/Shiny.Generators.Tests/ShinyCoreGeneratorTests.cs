@@ -11,8 +11,14 @@ namespace Shiny.Generators.Tests
     public class ShinyCoreGeneratorTests
     {
         readonly ITestOutputHelper output;
+        readonly AssemblyGenerator generator;
+
         public ShinyCoreGeneratorTests(ITestOutputHelper output)
-            => this.output = output;
+        {
+            this.generator = new AssemblyGenerator();
+
+            this.output = output;
+        }
 
 
         // TODO: build xam ios libs, add appdelegate
@@ -38,45 +44,15 @@ namespace Shiny.Generators.Tests
         // test for xam forms auto init
 
         [Fact]
-        public void Test()
+        public void AutoStartupCore()
         {
-            var assembly = new AssemblyGenerator();
-
-            assembly.AddSource(@"
-namespace Foo
-{
-    class C
-    {
-        void M()
-        {
-        }
-    }
-}"
+            this.generator.AddSource(@"[assembly:Shiny.GenerateStartupAttribute]");
+            this.generator.DoGenerate(
+                this.output,
+                "",
+                new ShinyCoreGenerator(),
+                ""
             );
-            this.DoGenerate(assembly);
-        }
-
-
-        void DoGenerate(AssemblyGenerator assembly)
-        {
-            // https://docs.microsoft.com/en-us/dotnet/api/microsoft.codeanalysis.generatordriver?view=roslyn-dotnet
-            var driver = CSharpGeneratorDriver.Create(new ShinyCoreGenerator());
-            driver.RunGeneratorsAndUpdateCompilation(
-                assembly.Create("Test.dll"),
-                out var outputCompilation,
-                out var diags
-            );
-
-            Assert.False(
-                diags.Any(x => x.Severity == DiagnosticSeverity.Error),
-                "Failed: " + diags.FirstOrDefault()?.GetMessage()
-            );
-            var output = outputCompilation
-                .SyntaxTrees
-                .LastOrDefault()?
-                .ToString();
-
-            this.output.WriteLine(output ?? "NO OUTPUT");
         }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Shiny.Generators.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using FluentAssertions;
 
 
 namespace Shiny.Generators.Tests
@@ -12,32 +13,29 @@ namespace Shiny.Generators.Tests
     public class StaticClassGeneratorTests
     {
         readonly ITestOutputHelper output;
+        readonly AssemblyGenerator generator;
+
+
         public StaticClassGeneratorTests(ITestOutputHelper output)
-            => this.output = output;
+        {
+            this.output = output;
+            this.generator = new AssemblyGenerator();
+        }
 
 
         [Fact]
-        public void GenerateStaticClasses()
+        public void CoreClasses()
         {
-            var assembly = new AssemblyGenerator();
-            assembly.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute]");
-
-            var driver = CSharpGeneratorDriver.Create(new StaticClassGenerator());
-            var inputCompilation = assembly.Create("Test.dll");
-
-            driver.RunGeneratorsAndUpdateCompilation(
-                inputCompilation,
-                out var outputCompilation,
-                out var diags
+            this.generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute]");
+            this.generator.DoGenerate(
+                this.output,
+                nameof(CoreClasses),
+                new StaticClassGenerator(),
+                "CoreClasses.ShinyJobs",
+                "CoreClasses.ShinyConnectivity",
+                "CoreClasses.ShinyPower",
+                "CoreClasses.ShinyFileSystem"
             );
-
-            Assert.False(
-                diags.Any(x => x.Severity == DiagnosticSeverity.Error),
-                "Failed: " + diags.FirstOrDefault()?.GetMessage()
-            );
-
-            foreach (var syntaxTree in outputCompilation.SyntaxTrees)
-                this.output.WriteLine(syntaxTree.ToString());
         }
     }
 }

@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+
 
 namespace Shiny.Generators.Tests
 {
@@ -25,7 +24,7 @@ namespace Shiny.Generators.Tests
         }
 
 
-        public void AddReference(string assemblyName)
+        public void AddReference(string assemblyName, bool autoAddAbstraction = true)
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName);
             var ass = AppDomain
@@ -36,32 +35,18 @@ namespace Shiny.Generators.Tests
             if (ass == null)
                 throw new ArgumentException($"Assembly '{assemblyName}' not found at '{path}'");
 
+            if (autoAddAbstraction)
+                this.AddReference(assemblyName + ".Abstractions", false);
+
             var reference = MetadataReference.CreateFromFile(ass.Location);
             this.references.Add(reference);
         }
 
 
-//# Searching a type in all available assemblies
-//        The method GetTypeByMetadataName returns null if a type is defined in 2 different assemblies.So, if you want to get all types that match a full name, you have to look at all assemblies and call GetTypeByMetadataName per assembly.
-
-//public static IEnumerable<INamedTypeSymbol> GetTypesByMetadataName(this Compilation compilation, string typeMetadataName)
-//        {
-//            return compilation.References
-//                .Select(compilation.GetAssemblyOrModuleSymbol)
-//                .OfType<IAssemblySymbol>()
-//                .Select(assemblySymbol => assemblySymbol.GetTypeByMetadataName(typeMetadataName))
-//                .Where(t => t != null);
-//        }
         public CSharpCompilation Create(string assemblyName)
         {
-            this.AddReference("Shiny.Core");
-            //this.AddReference(typeof(object).Assembly.Location);
-
+            this.AddReference("Shiny.Core", true);
             var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
-            //Assembly ass;
-            //ass.GetReferencedAssemblies()
-            //ass.ToMetadataReference();
-
             return CSharpCompilation
                 .Create(localPath)
                 .WithReferences(this.references)

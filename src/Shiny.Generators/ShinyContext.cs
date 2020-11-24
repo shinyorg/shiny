@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+
 using Microsoft.CodeAnalysis;
 
 
@@ -8,6 +11,7 @@ namespace Shiny.Generators
     {
         GeneratorExecutionContext Context { get; }
         string? GetMSBuildProperty(string name, string? defaultValue = null);
+        INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName);
         //bool IsStartupGenerated { get; set; }
         //Document CurrentDocument { get; }
         string? RootNamespace { get; }
@@ -19,21 +23,35 @@ namespace Shiny.Generators
 
     public class ShinyContext : IShinyContext
     {
+        readonly IAssemblySymbol[] shinyAssemblies;
+
+
         public ShinyContext(GeneratorExecutionContext context)
         {
             this.Context = context;
-            //this.msbuildLazy = new Lazy<object>(() =>
-            //{
-            //    //var workspace = MSBuildWorkspace.Create();
-            //    //using (var xmlReader = XmlReader.Create(File.OpenRead(project.FilePath));
-            //    //ProjectRootElement root = ProjectRootElement.Create(xmlReader, new ProjectCollection(), preserveFormatting: true);
-            //    //MSBuildProject msbuildProject = new MSBuildProject(root);
-            //    return null;
-            //});
+
+            this.shinyAssemblies = context
+                .Compilation
+                .References
+                .Where(x =>
+                    x.Display != null &&
+                    x.Properties.Kind == MetadataImageKind.Assembly &&
+                    (
+                        Regex.IsMatch(x.Display, "Shiny.(.*).dll") ||
+                        x.Display.EndsWith("Xamarin.Forms.dll")
+                    )
+                )
+                .Select(context.Compilation.GetAssemblyOrModuleSymbol)
+                .OfType<IAssemblySymbol>()
+                .ToArray();
         }
 
 
-        public Document CurrentDocument => ShinySyntaxReceiver.CurrentDocument;
+        public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.shinyAssemblies
+            .Select(x => x.GetTypeByMetadataName(fullyQualifiedMetadataName))
+            .FirstOrDefault();
+
+        //public Document CurrentDocument => ShinySyntaxReceiver.CurrentDocument;
         //public MSBuildProject
 
         //public bool IsProjectType(string projectTypeGuid)
@@ -141,7 +159,8 @@ namespace Shiny.Generators
 
         public GeneratorExecutionContext Context { get; private set; }
         //public bool IsStartupGenerated { get; set; }
-        public string? RootNamespace => this.GetMSBuildProperty("RootNamespace");
+        //public string? RootNamespace => this.GetMSBuildProperty("RootNamespace") ?? this.Context.Compilation.Assembly.ToDisplayString();
+        public string? RootNamespace => this.Context.Compilation.Assembly.ToDisplayString();
 
 
 

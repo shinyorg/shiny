@@ -73,13 +73,12 @@ namespace Shiny.Generators
         public IDisposable BlockInvariant(string pattern, params object[] parameters)
             => this.Block(CultureInfo.InvariantCulture, pattern, parameters);
 
-        public virtual void Append(string text) => this.builder.Append(text);
-
-        public virtual void AppendFormat(IFormatProvider formatProvider, string pattern, params object[] replacements)
-            => this.AppendFormat(formatProvider, pattern.Indent(this.CurrentLevel), replacements);
-
         public void AppendLine() => this.builder.AppendLine();
-        public void AppendLine(string text) => this.Append(text.Indent(this.CurrentLevel));
+        public void AppendLine(string text) => this.builder.AppendLine(text.Indent(this.CurrentLevel));
+        public virtual void Append(string text) => this.builder.Append(text);
+        public virtual void AppendFormat(IFormatProvider formatProvider, string pattern, params object[] replacements)
+            => this.builder.AppendFormat(formatProvider, pattern.Indent(this.CurrentLevel), replacements);
+
         public override string ToString() => this.builder.ToString();
     }
 }

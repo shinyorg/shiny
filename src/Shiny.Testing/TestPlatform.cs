@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny.Testing
 {
-    public class TestPlatform : IPlatformInitializer
+    public class TestPlatform : IPlatform
     {
         public virtual void Register(IServiceCollection services)
         {
