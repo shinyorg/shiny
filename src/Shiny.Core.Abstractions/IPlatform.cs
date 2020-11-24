@@ -1,9 +1,17 @@
 ﻿using System;
 
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    public interface IEnvironment
+    public enum PlatformState
+    {
+        Foreground,
+        Background
+    }
+
+
+    public interface IPlatform
     {
         string AppIdentifier { get; }
         string AppVersion { get; }
@@ -15,7 +23,9 @@ namespace Shiny
         string Manufacturer { get; }
         string Model { get; }
 
-        //void IsVersionOrHigher(int version - string version, use switch)
-        //bool HasHardware(bluetooth, network, etc)
+        //void InvokeOnMainThread(Action action);
+        IObservable<PlatformState> WhenStateChanged();
+
+        void Register(IServiceCollection services);
     }
 }

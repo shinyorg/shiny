@@ -12,6 +12,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="**\Platforms\**\*.cs" />
         <None Include="**\Platforms\**\*.cs" />
+        <None Remove="Platforms\Uwp\UwpPlatform.cs" />
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />

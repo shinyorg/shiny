@@ -75,27 +75,25 @@ namespace Shiny
         }
 
 
-        //protected static void Destroy()
-        //{
-        //    container = null;
-        //    Services?.Clear();
-        //}
-
         /// <summary>
         /// Setting this before calling build will force the internal service builder to validate scopes of DI registrations (THIS IS SLOW - USE IT FOR DEBUGGING)
         /// </summary>
         public static bool ValidateScopes { get; set; }
 
 
-        public static void Init(IPlatformInitializer platform, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
+        public static void Init(IPlatform platform, IShinyStartup? startup = null)
         {
             var services = new ShinyServiceCollection();
-
             services.AddSingleton(platform);
-            platform.Register(services);
-            startup?.ConfigureServices(services);
-            platformBuild?.Invoke(services);
 
+            if (startup != null)
+            {
+                if (platform is IShinyStartupInitializer startupInitializer)
+                    startupInitializer.Initialize(startup, services);
+                else
+                    startup.ConfigureServices(services);
+            }
+            platform.Register(services);
             Services = services;
             services.BuildShinyServiceProvider(
                 ValidateScopes,

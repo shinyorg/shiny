@@ -1,46 +1,64 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Reactive.Subjects;
-using Shiny.Logging;
+using System.Threading;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using NativePerm = Android.Content.PM.Permission;
+using AndroidX.Core.App;
+using AndroidX.Lifecycle;
+using Microsoft.Extensions.DependencyInjection;
+using B = global::Android.OS.Build;
+using Shiny.Logging;
+
 
 
 namespace Shiny
 {
-    public class AndroidContext
+    public class AndroidPlatformInitializer : Java.Lang.Object, ILifecycleObserver, IAndroidContext, IPlatform, IStartupInitializer
     {
-        readonly ITopActivity topActivity;
+        readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
+        readonly Application app;
+        readonly ActivityLifecycleCallbacks callbacks;
 
 
-        public AndroidContext(Application app, ITopActivity topActivity)
+        public AndroidPlatformInitializer(Application app)
         {
-            this.AppContext = app;
-            this.topActivity = topActivity;
+            this.app = app;
+            this.callbacks = new ActivityLifecycleCallbacks();
+            this.app.RegisterActivityLifecycleCallbacks(this.callbacks);
+            ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
         }
 
 
-        public Application AppContext { get; }
-        public Activity CurrentActivity
-        {
-            get
-            {
-                if (this.topActivity.Current == null)
-                    throw new ApplicationException("TopActivity could not be found - are you calling this before an activity has been created or resumed?");
+        public Activity? CurrentActivity => this.callbacks.Activity;
+        public IObservable<ActivityChanged> WhenActivityChanged() => this.callbacks.ActivitySubject;
+        [Lifecycle.Event.OnResume] public void OnResume() => this.stateSubj.OnNext(PlatformState.Foreground);
+        [Lifecycle.Event.OnPause] public void OnPause() => this.stateSubj.OnNext(PlatformState.Background);
+        public IObservable<PlatformState> WhenStateChanged() => this.stateSubj.OnErrorResumeNext(Observable.Empty<PlatformState>());
 
-                return this.topActivity.Current;
-            }
+        public void Register(IServiceCollection services)
+        {
+            services.AddSingleton<IAndroidContext>(this);
+            services.RegisterCommonServices();
         }
 
 
+        public string AppIdentifier => this.app.PackageName;
+        public string AppVersion => this.Package.VersionName;
+        public string AppBuild => this.Package.VersionCode.ToString();
+
+        public string MachineName => "Android";
+        public string OperatingSystem => B.VERSION.Release;
+        public string OperatingSystemVersion => B.VERSION.Sdk;
+        public string Manufacturer => B.Manufacturer;
+        public string Model => B.Model;
+
+
+        public Application AppContext => this.app;
         internal Subject<Intent> IntentSubject { get; } = new Subject<Intent>();
         public IObservable<Intent> WhenIntentReceived() => this.IntentSubject;
-
-        public T GetSystemService<T>(string key) where T: Java.Lang.Object
+        public T GetSystemService<T>(string key) where T : Java.Lang.Object
             => (T)this.AppContext.GetSystemService(key);
 
 
@@ -53,11 +71,10 @@ namespace Shiny
 
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
         {
-            if (this.topActivity.Current != null)
-                ob.Respond(new ActivityChanged(this.topActivity.Current, ActivityState.Created, null));
+            if (this.CurrentActivity != null)
+                ob.Respond(new ActivityChanged(this.CurrentActivity, ActivityState.Created, null));
 
             return this
-                .topActivity
                 .WhenActivityStatusChanged()
                 .Subscribe(x => ob.Respond(x));
         });
@@ -84,10 +101,10 @@ namespace Shiny
 
 
         public bool IsMinApiLevel(int apiLevel)
-            => (int)Android.OS.Build.VERSION.SdkInt >= apiLevel;
+            => (int)B.VERSION.SdkInt >= apiLevel;
 
 
-        public void OnRequestPermissionsResult(int requestCode, string[] permissions, NativePerm[] grantResult)
+        public void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResult)
             => this.PermissionResult?.Invoke(this, new PermissionRequestResult(requestCode, permissions, grantResult));
 
 
@@ -155,7 +172,7 @@ namespace Shiny
             var sub = this.WhenActivityStatusChanged()
                 .Take(1)
                 .Subscribe(x =>
-                    AndroidX.Core.App.ActivityCompat.RequestPermissions(
+                    ActivityCompat.RequestPermissions(
                         x.Activity,
                         androidPermissions,
                         current

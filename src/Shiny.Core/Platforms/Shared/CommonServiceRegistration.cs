@@ -25,7 +25,6 @@ namespace Shiny
             services.TryAddSingleton<IFileSystem, FileSystemImpl>();
 
             #if !NETSTANDARD
-            services.TryAddSingleton<IEnvironment, EnvironmentImpl>();
             services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
             services.TryAddSingleton<ISettings, SettingsImpl>();
             #endif
