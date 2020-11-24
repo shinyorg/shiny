@@ -23,8 +23,10 @@ namespace Shiny.Generators.Tests
             assembly.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute]");
 
             var driver = CSharpGeneratorDriver.Create(new StaticClassGenerator());
+            var inputCompilation = assembly.Create("Test.dll");
+
             driver.RunGeneratorsAndUpdateCompilation(
-                assembly.Create("Test.dll"),
+                inputCompilation,
                 out var outputCompilation,
                 out var diags
             );

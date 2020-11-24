@@ -36,16 +36,32 @@ namespace Shiny.Generators.Tests
             if (ass == null)
                 throw new ArgumentException($"Assembly '{assemblyName}' not found at '{path}'");
 
-
             var reference = MetadataReference.CreateFromFile(ass.Location);
             this.references.Add(reference);
         }
 
 
+//# Searching a type in all available assemblies
+//        The method GetTypeByMetadataName returns null if a type is defined in 2 different assemblies.So, if you want to get all types that match a full name, you have to look at all assemblies and call GetTypeByMetadataName per assembly.
+
+//public static IEnumerable<INamedTypeSymbol> GetTypesByMetadataName(this Compilation compilation, string typeMetadataName)
+//        {
+//            return compilation.References
+//                .Select(compilation.GetAssemblyOrModuleSymbol)
+//                .OfType<IAssemblySymbol>()
+//                .Select(assemblySymbol => assemblySymbol.GetTypeByMetadataName(typeMetadataName))
+//                .Where(t => t != null);
+//        }
         public CSharpCompilation Create(string assemblyName)
         {
             this.AddReference("Shiny.Core");
+            //this.AddReference(typeof(object).Assembly.Location);
+
             var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
+            //Assembly ass;
+            //ass.GetReferencedAssemblies()
+            //ass.ToMetadataReference();
+
             return CSharpCompilation
                 .Create(localPath)
                 .WithReferences(this.references)

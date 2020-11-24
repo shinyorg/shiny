@@ -1,3 +1,0 @@
-[submodule "src/CodeGenHelpers"]
-	path = src/CodeGenHelpers
-	url = https://github.com/dansiegel/CodeGenHelpers

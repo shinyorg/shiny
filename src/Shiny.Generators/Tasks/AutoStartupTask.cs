@@ -188,15 +188,15 @@ namespace Shiny.Generators.Tasks
         //        }
 
 
-        void RegisterModules()
-        {
-            var types = this
-                .ShinyContext
-                .GetAllImplementationsOfType("Shiny.IShinyModule")
-                .WhereNotSystem();
+        //void RegisterModules()
+        //{
+        //    var types = this
+        //        .ShinyContext
+        //        .GetAllImplementationsOfType("Shiny.IShinyModule")
+        //        .WhereNotSystem();
 
-            foreach (var type in types)
-                this.builder.AppendLineInvariant($"services.RegisterModule<{type.ToDisplayString()}>();");
-        }
+        //    foreach (var type in types)
+        //        this.builder.AppendLineInvariant($"services.RegisterModule<{type.ToDisplayString()}>();");
+        //}
     }
 }

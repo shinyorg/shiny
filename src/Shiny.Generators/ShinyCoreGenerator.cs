@@ -34,8 +34,6 @@ namespace Shiny.Generators
             //workspace.Workspace.Kind == WorkspaceKind.MSBuild
             //workspace.Workspace.CurrentSolution.Projects.
             var shinyContext = new ShinyContext(context);
-            Console.WriteLine(context.Compilation.Assembly.GlobalNamespace.Name);
-            Console.WriteLine(context.Compilation.AssemblyName);
 
             // always first
             var autoStartup = new AutoStartupTask();
