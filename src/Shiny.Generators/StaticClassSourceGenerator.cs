@@ -1,12 +1,11 @@
-﻿using System;
-
+﻿using System;s
 using Microsoft.CodeAnalysis;
 
 
 namespace Shiny.Generators.Tasks
 {
     [Generator]
-    public class StaticClassGenerator : ISourceGenerator
+    public class StaticClassSourceGenerator : ISourceGenerator
     {
         IShinyContext? shinyContext;
 

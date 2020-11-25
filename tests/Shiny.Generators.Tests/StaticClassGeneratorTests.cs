@@ -30,7 +30,7 @@ namespace Shiny.Generators.Tests
             this.generator.DoGenerate(
                 this.output,
                 nameof(CoreClasses),
-                new StaticClassGenerator(),
+                new StaticClassSourceGenerator(),
                 "CoreClasses.ShinyJobs",
                 "CoreClasses.ShinyConnectivity",
                 "CoreClasses.ShinyPower",
