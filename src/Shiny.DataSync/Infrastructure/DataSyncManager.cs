@@ -18,11 +18,11 @@ namespace Shiny.DataSync.Infrastructure
         readonly IJobManager jobManager;
 
 
-        public DataSyncManager(IFileSystem fileSystem,
+        public DataSyncManager(IPlatform platform,
                                ISerializer serializer,
                                IJobManager jobManager)
         {
-            this.conn = new SQLiteAsyncConnection(Path.Combine(fileSystem.AppData.FullName, "shinydatasync.db"));
+            this.conn = new SQLiteAsyncConnection(Path.Combine(platform.AppData.FullName, "shinydatasync.db"));
             this.conn.GetConnection().CreateTable<SyncItem>();
             this.serializer = serializer;
             this.jobManager = jobManager;

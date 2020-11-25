@@ -12,14 +12,11 @@ namespace Shiny.Net
 {
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
-        readonly AndroidContext context;
+        readonly IAndroidContext context;
         IDisposable? netmon;
 
 
-        public ConnectivityImpl(AndroidContext context)
-        {
-            this.context = context;
-        }
+        public ConnectivityImpl(IAndroidContext context) => this.context = context;
 
 
         public string? CellularCarrier => this.Telephone.NetworkOperatorName;

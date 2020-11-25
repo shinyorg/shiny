@@ -2,7 +2,6 @@
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Shiny
@@ -11,11 +10,11 @@ namespace Shiny
     {
         public static void ShinyOnRequestPermissionsResult(this Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
             => ShinyHost
-                .Resolve<AndroidContext>()
+                .Resolve<IAndroidContext>()
                 .OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        public static void ShinyOnCreate(this Application application, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
-            => ShinyHost.Init(new AndroidPlatformInitializer(application), startup, platformBuild);
+        public static void ShinyOnCreate(this Application application, IShinyStartup? startup = null)
+            => ShinyHost.Init(new AndroidPlatform(application), startup);
 
         public static void ShinyOnCreate(this Activity activity)
             => activity.ShinyOnNewIntent(activity.Intent);
@@ -23,7 +22,7 @@ namespace Shiny
         public static void ShinyOnNewIntent(this Activity activity, Intent intent)
         {
             if (intent != null)
-                ShinyHost.Resolve<AndroidContext>()?.IntentSubject.OnNext(intent);
+                ShinyHost.Resolve<IAndroidContext>()?.OnNewIntent(intent);
         }
     }
 }

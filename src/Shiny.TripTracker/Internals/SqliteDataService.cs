@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Shiny.IO;
 using Shiny.Locations;
 using SQLite;
 
@@ -14,16 +13,16 @@ namespace Shiny.TripTracker.Internals
         readonly SQLiteAsyncConnection conn;
 
 
-        public SqliteDataService(IFileSystem fileSystem)
+        public SqliteDataService(IPlatform platform)
         {
-            this.conn = new SQLiteAsyncConnection(Path.Combine(fileSystem.AppData.FullName, "shinytrip.db"));
+            this.conn = new SQLiteAsyncConnection(Path.Combine(platform.AppData.FullName, "shinytrip.db"));
 
             var sync = this.conn.GetConnection();
             sync.CreateTable<Trip>();
             sync.CreateTable<TripCheckin>();
         }
 
-         
+
         public Task Checkin(int tripId, IGpsReading reading) => this.conn.InsertAsync(new TripCheckin
         {
             TripId = tripId,

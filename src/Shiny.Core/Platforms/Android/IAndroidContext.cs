@@ -12,6 +12,7 @@ namespace Shiny
         Activity CurrentActivity { get; }
         PackageInfo Package { get; }
         IObservable<ActivityChanged> WhenActivityChanged();
+        void OnNewIntent(Intent intent);
 
         Intent CreateIntent<T>(params string[] actions);
         AccessState GetCurrentAccessState(string androidPermission);

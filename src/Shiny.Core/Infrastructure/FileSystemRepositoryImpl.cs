@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Shiny.IO;
 
 
 namespace Shiny.Infrastructure
@@ -11,13 +10,13 @@ namespace Shiny.Infrastructure
     public class FileSystemRepositoryImpl : IRepository
     {
         readonly IDictionary<Type, Dictionary<string, object>> memory;
-        readonly IFileSystem fileSystem;
+        readonly IPlatform platform;
         readonly ISerializer serializer;
 
 
-        public FileSystemRepositoryImpl(IFileSystem fileSystem, ISerializer serializer)
+        public FileSystemRepositoryImpl(IPlatform platform, ISerializer serializer)
         {
-            this.fileSystem = fileSystem;
+            this.platform = platform;
             this.serializer = serializer;
             this.memory = new Dictionary<Type, Dictionary<string, object>>();
         }
@@ -108,13 +107,13 @@ namespace Shiny.Infrastructure
         });
 
 
-        FileInfo[] GetTypeFiles(Type type) => this.fileSystem.AppData.GetFiles($"{type.Name}_*.core");
+        FileInfo[] GetTypeFiles(Type type) => this.platform.AppData.GetFiles($"{type.Name}_*.core");
 
 
         string GetPath(Type type, string key)
         {
             var fileName = $"{type.Name}_{key}.core";
-            var path = Path.Combine(this.fileSystem.AppData.FullName, fileName);
+            var path = Path.Combine(this.platform.AppData.FullName, fileName);
             return path;
         }
 

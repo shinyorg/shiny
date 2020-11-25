@@ -10,27 +10,37 @@ using AndroidX.Lifecycle;
 using Microsoft.Extensions.DependencyInjection;
 using B = global::Android.OS.Build;
 using Shiny.Logging;
-
-
+using Shiny.Infrastructure;
+using System.IO;
 
 namespace Shiny
 {
-    public class AndroidPlatformInitializer : Java.Lang.Object, ILifecycleObserver, IAndroidContext, IPlatform, IStartupInitializer
+    public class AndroidPlatform : Java.Lang.Object, ILifecycleObserver, IAndroidContext, IPlatform
     {
         readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
+        readonly Subject<Intent> intentSubject = new Subject<Intent>();
         readonly Application app;
         readonly ActivityLifecycleCallbacks callbacks;
 
 
-        public AndroidPlatformInitializer(Application app)
+        public AndroidPlatform(Application app)
         {
             this.app = app;
             this.callbacks = new ActivityLifecycleCallbacks();
             this.app.RegisterActivityLifecycleCallbacks(this.callbacks);
             ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
+
+            this.AppData = new DirectoryInfo(this.AppContext.FilesDir.AbsolutePath);
+            this.Cache = new DirectoryInfo(this.AppContext.CacheDir.AbsolutePath);
+            var publicDir = this.app.GetExternalFilesDir(null);
+            if (publicDir != null)
+                this.Public = new DirectoryInfo(publicDir.AbsolutePath);
         }
 
 
+        public DirectoryInfo AppData { get; }
+        public DirectoryInfo Cache { get; }
+        public DirectoryInfo Public { get; }
         public Activity? CurrentActivity => this.callbacks.Activity;
         public IObservable<ActivityChanged> WhenActivityChanged() => this.callbacks.ActivitySubject;
         [Lifecycle.Event.OnResume] public void OnResume() => this.stateSubj.OnNext(PlatformState.Foreground);
@@ -55,9 +65,9 @@ namespace Shiny
         public string Model => B.Model;
 
 
+        public void OnNewIntent(Intent intent) => this.intentSubject.OnNext(intent);
         public Application AppContext => this.app;
-        internal Subject<Intent> IntentSubject { get; } = new Subject<Intent>();
-        public IObservable<Intent> WhenIntentReceived() => this.IntentSubject;
+        public IObservable<Intent> WhenIntentReceived() => this.intentSubject;
         public T GetSystemService<T>(string key) where T : Java.Lang.Object
             => (T)this.AppContext.GetSystemService(key);
 

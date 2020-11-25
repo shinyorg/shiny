@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny.Infrastructure
 {
-    public interface IShinyStartupInitializer
+    public interface IStartupInitializer
     {
         void Initialize(IShinyStartup startup, IServiceCollection services);
     }

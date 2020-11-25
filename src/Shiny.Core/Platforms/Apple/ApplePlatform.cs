@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.IO;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Jobs;
@@ -12,6 +14,19 @@ namespace Shiny
 {
     public class ApplePlatform : IPlatform
     {
+        public ApplePlatform()
+        {
+            this.AppData = ToDirectory(NSSearchPathDirectory.LibraryDirectory);
+            this.Public = ToDirectory(NSSearchPathDirectory.DocumentDirectory);
+            this.Cache = ToDirectory(NSSearchPathDirectory.CachesDirectory);
+        }
+
+        static DirectoryInfo ToDirectory(NSSearchPathDirectory dir) => new DirectoryInfo(NSSearchPath.GetDirectories(dir, NSSearchPathDomain.User).First());
+
+
+        public DirectoryInfo AppData { get; }
+        public DirectoryInfo Cache { get; }
+        public DirectoryInfo Public { get; }
         public string AppIdentifier => NSBundle.MainBundle.BundleIdentifier;
         public string AppVersion => NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
         public string AppBuild => NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"].ToString();

@@ -9,8 +9,8 @@ namespace Shiny
 {
     public static class iOSHooks
     {
-        public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null, Action<IServiceCollection>? platformBuild = null)
-            => ShinyHost.Init(new ApplePlatform(), startup, platformBuild);
+        public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null)
+            => ShinyHost.Init(new ApplePlatform(), startup);
 
         public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
             => ShinyHost.Container.RunDelegates<IAppDelegatePushNotificationHandler>(x => x.DidReceiveRemoteNotification(userInfo, completionHandler));

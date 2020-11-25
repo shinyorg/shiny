@@ -8,7 +8,7 @@ namespace Shiny.Locations.Sync.Infrastructure.Sqlite
 {
     public class SyncSqliteConnection : SQLiteAsyncConnection
     {
-        public SyncSqliteConnection(IFileSystem fileSystem) : base(Path.Combine(fileSystem.AppData.FullName, "shinylocsync.db"), true)
+        public SyncSqliteConnection(IPlatform platform) : base(Path.Combine(platform.AppData.FullName, "shinylocsync.db"), true)
         {
             var conn = this.GetConnection();
             conn.CreateTable<SqliteGeofenceEvent>();

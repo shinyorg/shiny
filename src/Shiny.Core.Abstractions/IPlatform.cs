@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +14,10 @@ namespace Shiny
 
     public interface IPlatform
     {
+        DirectoryInfo AppData { get; }
+        DirectoryInfo Cache { get; }
+        DirectoryInfo Public { get; }
+
         string AppIdentifier { get; }
         string AppVersion { get; }
         string AppBuild { get; }

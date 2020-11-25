@@ -22,7 +22,6 @@ namespace Shiny
             #if !TIZEN
             services.TryAddSingleton<IJobManager, JobManager>();
             #endif
-            services.TryAddSingleton<IFileSystem, FileSystemImpl>();
 
             #if !NETSTANDARD
             services.TryAddSingleton<IPowerManager, PowerManagerImpl>();

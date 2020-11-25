@@ -8,13 +8,11 @@ namespace Shiny.Settings
     public class SettingsImpl : AbstractSettings
     {
         readonly object syncLock = new object();
-        readonly AndroidContext context;
+        readonly IAndroidContext context;
 
 
-        public SettingsImpl(AndroidContext context, ISerializer serializer) : base(serializer)
-        {
-            this.context = context;
-        }
+        public SettingsImpl(IAndroidContext context, ISerializer serializer) : base(serializer)
+            => this.context = context;
 
 
         public override Task<bool> OpenAppSettings()

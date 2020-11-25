@@ -88,7 +88,7 @@ namespace Shiny
 
             if (startup != null)
             {
-                if (platform is IShinyStartupInitializer startupInitializer)
+                if (platform is IStartupInitializer startupInitializer)
                     startupInitializer.Initialize(startup, services);
                 else
                     startup.ConfigureServices(services);

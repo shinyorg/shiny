@@ -9,7 +9,7 @@ namespace Shiny.Integrations.Sqlite
 {
     public class ShinySqliteConnection : SQLiteAsyncConnection
     {
-        public ShinySqliteConnection(IFileSystem fileSystem) : base(Path.Combine(fileSystem.AppData.FullName, "shiny.db"))
+        public ShinySqliteConnection(IPlatform platform) : base(Path.Combine(platform.AppData.FullName, "shiny.db"))
         {
             var conn = this.GetConnection();
             conn.CreateTable<LogStore>();
