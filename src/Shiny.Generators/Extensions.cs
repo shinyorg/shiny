@@ -100,19 +100,26 @@ namespace Shiny.Generators
         //}
 
 
-        public static bool HasXamarinForms(this GeneratorExecutionContext context)
-            => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
+        //public static bool HasXamarinForms(this GeneratorExecutionContext context)
+        //    => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
 
 
-        public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
-            => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null;
+        //public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
+        //    => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null;
 
 
-        public static bool HasAssemblyAttribute(this GeneratorExecutionContext context, string attributeName)
+        public static AttributeData? GetCurrentAssemblyAttribute(this GeneratorExecutionContext context, string attributeTypeName)
         {
-            var attribute = context.Compilation.GetTypeByMetadataName(attributeName);
-            return context.Compilation.Assembly.FindAttributeFlattened(attribute) != null;
+            var attribute = context.Compilation.GetTypeByMetadataName(attributeTypeName);
+            if (attribute == null)
+                return null;
+
+            return context.Compilation.Assembly.FindAttributeFlattened(attribute);
         }
+
+
+        public static bool CurrentAssemblyHasAttribute(this GeneratorExecutionContext context, string attributeTypeName)
+            => context.GetCurrentAssemblyAttribute(attributeTypeName) != null;
 
 
         public static bool IsEvent(this IMethodSymbol method) => method.Kind == SymbolKind.Event;
@@ -177,7 +184,8 @@ namespace Shiny.Generators
 
 
         public static bool IsEqual(this ISymbol symbol, ISymbol compare)
-            => SymbolEqualityComparer.Default.Equals(symbol, compare);
+            => symbol.Name == compare.Name;
+            //=> SymbolEqualityComparer.Default.Equals(symbol, compare);
 
 
         public static AttributeData? FindAttributeFlattened(this ISymbol symbol, INamedTypeSymbol attributeClassSymbol)

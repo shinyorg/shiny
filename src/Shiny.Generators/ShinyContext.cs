@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-
 using Microsoft.CodeAnalysis;
 
 
@@ -10,11 +9,9 @@ namespace Shiny.Generators
     public interface IShinyContext
     {
         GeneratorExecutionContext Context { get; }
-        string? GetMSBuildProperty(string name, string? defaultValue = null);
         INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName);
         //bool IsStartupGenerated { get; set; }
         //Document CurrentDocument { get; }
-        string? RootNamespace { get; }
         //string? GetShinyStartupClassFullName();
         //string? GetXamFormsAppClassFullName();
         //bool IsProjectType(string projectTypeGuid);
@@ -159,28 +156,5 @@ namespace Shiny.Generators
 
         public GeneratorExecutionContext Context { get; private set; }
         //public bool IsStartupGenerated { get; set; }
-        //public string? RootNamespace => this.GetMSBuildProperty("RootNamespace") ?? this.Context.Compilation.Assembly.ToDisplayString();
-        public string? RootNamespace => this.Context.Compilation.Assembly.ToDisplayString();
-
-
-
-        public string? GetMSBuildProperty(string name, string? defaultValue = null)
-        {
-            this.Context.AnalyzerConfigOptions.GlobalOptions.TryGetValue($"build_property.{name}", out var value);
-            return value ?? defaultValue;
-        }
-
-
-        //string[] GetMSBuildItems(string name) => this.Context
-        //    .AdditionalFiles
-        //    .Where(x =>
-        //        this.Context
-        //            .AnalyzerConfigOptions
-        //            .GetOptions(x)
-        //            .TryGetValue("build_metadata.AdditionalFiles.SourceItemGroup", out var sourceItemGroup)
-        //        && sourceItemGroup == name
-        //    )
-        //    .Select(x => x.Path)
-        //    .ToArray();
     }
 }

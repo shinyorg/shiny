@@ -26,7 +26,7 @@ namespace Shiny.Generators.Tests
         [Fact]
         public void CoreClasses()
         {
-            this.generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute]");
+            this.generator.AddSource("[assembly:Shiny.GenerateStaticClasses(\"CoreClasses\")]");
             this.generator.DoGenerate(
                 this.output,
                 nameof(CoreClasses),

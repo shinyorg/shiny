@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+
 using Microsoft.CodeAnalysis;
 
 
@@ -8,6 +10,7 @@ namespace Shiny.Generators.Tasks
     public class StaticClassSourceGenerator : ISourceGenerator
     {
         IShinyContext? shinyContext;
+        string? useNamespace;
 
         public void Initialize(GeneratorInitializationContext context) { }
 
@@ -15,9 +18,11 @@ namespace Shiny.Generators.Tasks
         public void Execute(GeneratorExecutionContext context)
         {
             this.shinyContext = new ShinyContext(context);
-            if (!this.shinyContext.Context.HasAssemblyAttribute("Shiny.GenerateStaticClassesAttribute"))
+            var attribute = shinyContext.Context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
+            if (attribute == null)
                 return;
 
+            this.useNamespace = attribute.ConstructorArguments[0].Value.ToString();
             this.BuildStaticClass("Shiny.Jobs.IJobManager", "ShinyJobs", "Shiny.Jobs");
             this.BuildStaticClass("Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");
             //this.BuildStaticClass("Shiny.Settings.ISettings", "ShinySettings", "Shiny.Settings"); // don't know how to gen generic constraints yet
@@ -67,7 +72,7 @@ namespace Shiny.Generators.Tasks
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces(namespaces);
 
-            using (builder.BlockInvariant("namespace " + this.shinyContext.RootNamespace))
+            using (builder.BlockInvariant("namespace " + this.useNamespace))
             {
                 using (builder.BlockInvariant("public static partial class " + genFileName))
                 {
