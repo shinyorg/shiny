@@ -15,12 +15,12 @@ namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager, IPushTagSupport, IAndroidTokenUpdate
     {
-        readonly AndroidContext context;
+        readonly IAndroidContext context;
         readonly INotificationManager notifications;
         readonly IMessageBus bus;
 
 
-        public PushManager(AndroidContext context,
+        public PushManager(IAndroidContext context,
                            INotificationManager notifications,
                            ISettings settings,
                            IMessageBus bus) : base(settings)
@@ -78,14 +78,14 @@ namespace Shiny.Push
         public virtual async Task SetTags(params string[] tags)
         {
             if (this.RegisteredTags != null)
-            { 
+            {
                 foreach (var tag in this.RegisteredTags)
                 {
                     await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
                 }
             }
             if (tags != null)
-            { 
+            {
                 foreach (var tag in tags)
                 {
                     await FirebaseMessaging.Instance.SubscribeToTopic(tag);

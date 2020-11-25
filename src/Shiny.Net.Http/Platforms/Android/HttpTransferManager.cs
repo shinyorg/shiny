@@ -4,22 +4,23 @@ using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Net.Http;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Android;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
-using System.Net.Http;
+
 
 namespace Shiny.Net.Http
 {
     public class HttpTransferManager : HttpClientHttpTransferManager
     {
-        readonly AndroidContext context;
+        readonly IAndroidContext context;
         IObservable<HttpTransfer>? httpObs;
 
 
-        public HttpTransferManager(AndroidContext context,
+        public HttpTransferManager(IAndroidContext context,
                                    IJobManager jobManager,
                                    IMessageBus messageBus,
                                    IRepository repository) : base(jobManager, messageBus, repository)

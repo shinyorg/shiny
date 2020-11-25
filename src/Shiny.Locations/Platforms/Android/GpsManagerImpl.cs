@@ -14,11 +14,11 @@ namespace Shiny.Locations
     {
         public const string ReceiverName = "com.shiny.locations." + nameof(GpsBroadcastReceiver);
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
-        readonly AndroidContext context;
+        readonly IAndroidContext context;
         readonly FusedLocationProviderClient client;
 
 
-        public GpsManagerImpl(AndroidContext context)
+        public GpsManagerImpl(IAndroidContext context)
         {
             this.context = context;
             this.client = LocationServices.GetFusedLocationProviderClient(this.context.AppContext);

@@ -8,14 +8,14 @@ namespace Shiny.BluetoothLE.Hosting.Internals
 {
     public class GattServerContext : BluetoothGattServerCallback
     {
-        public GattServerContext(AndroidContext context)
+        public GattServerContext(IAndroidContext context)
         {
             this.Context = context;
             this.Manager = context.GetBluetooth();
         }
 
 
-        public AndroidContext Context { get; }
+        public IAndroidContext Context { get; }
         public BluetoothManager Manager { get; }
         // subscribed device list
 

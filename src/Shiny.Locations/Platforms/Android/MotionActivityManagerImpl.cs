@@ -19,13 +19,13 @@ namespace Shiny.Locations
         public static int MediumConfidenceValue { get; set; } = 40;
 
         readonly ActivityRecognitionClient client;
-        readonly AndroidContext context;
+        readonly IAndroidContext context;
         readonly AndroidSqliteDatabase database;
         readonly IMessageBus messageBus;
         PendingIntent? pendingIntent;
 
 
-        public MotionActivityManagerImpl(AndroidContext context,
+        public MotionActivityManagerImpl(IAndroidContext context,
                                          AndroidSqliteDatabase database,
                                          IMessageBus messageBus)
         {

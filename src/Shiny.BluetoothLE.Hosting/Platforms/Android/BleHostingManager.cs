@@ -19,7 +19,7 @@ namespace Shiny.BluetoothLE.Hosting
         AdvertisementCallbacks? adCallbacks;
 
 
-        public BleHostingManager(AndroidContext context, IMessageBus messageBus)
+        public BleHostingManager(IAndroidContext context, IMessageBus messageBus)
         {
             this.context = new GattServerContext(context);
             this.services = new Dictionary<string, GattService>();

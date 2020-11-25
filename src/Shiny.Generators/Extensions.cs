@@ -145,21 +145,39 @@ namespace Shiny.Generators
         }
 
 
-        public static bool Is(this INamedTypeSymbol symbol, string typeName)
+        public static bool Implements(this INamedTypeSymbol symbol, ITypeSymbol type)
+            => symbol.AllInterfaces.Any(i => type.Equals(i));
+
+
+        public static bool Inherits(this INamedTypeSymbol symbol, ITypeSymbol type)
         {
-            while (symbol != null && symbol.Name != "Object")
+            var current = symbol;
+            while (current != null)
             {
-                if (symbol.ToDisplayString() == typeName)
+                if (type.Equals(current))
                     return true;
 
-                symbol = symbol?.BaseType;
+                current = current.BaseType;
             }
             return false;
         }
 
 
+        //public static bool Is(this INamedTypeSymbol symbol, string typeName)
+        //{
+        //    while (symbol != null && symbol.Name != "Object")
+        //    {
+        //        if (symbol.ToDisplayString() == typeName)
+        //            return true;
+
+        //        symbol = symbol?.BaseType;
+        //    }
+        //    return false;
+        //}
+
+
         public static bool IsEqual(this ISymbol symbol, ISymbol compare)
-            => symbol.Name.Equals(compare.Name);
+            => SymbolEqualityComparer.Default.Equals(symbol, compare);
 
 
         public static AttributeData? FindAttributeFlattened(this ISymbol symbol, INamedTypeSymbol attributeClassSymbol)
@@ -205,7 +223,7 @@ namespace Shiny.Generators
             if (type.IsInterface())
             {
                 var methods = type
-                    .GetAllInterfaces(true)
+                    .AllInterfaces
                     .SelectMany(x => x
                         .GetMembers()
                         .OfType<IMethodSymbol>()
@@ -243,25 +261,6 @@ namespace Shiny.Generators
 
                     currentType = currentType?.BaseType;
                 }
-            }
-        }
-
-
-        public static IEnumerable<INamedTypeSymbol> GetAllInterfaces(this ITypeSymbol symbol, bool includeCurrent = true)
-        {
-            if (includeCurrent && symbol.TypeKind == TypeKind.Interface)
-                yield return (INamedTypeSymbol)symbol;
-
-            while (symbol != null && symbol.Name != "Object")
-            {
-                foreach (var intf in symbol.Interfaces)
-                {
-                    yield return intf;
-                    foreach (var innerInterface in intf.GetAllInterfaces())
-                        yield return innerInterface;
-                }
-
-                symbol = symbol.BaseType;
             }
         }
 

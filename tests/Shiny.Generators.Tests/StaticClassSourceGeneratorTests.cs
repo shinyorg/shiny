@@ -10,13 +10,13 @@ using FluentAssertions;
 
 namespace Shiny.Generators.Tests
 {
-    public class StaticClassGeneratorTests
+    public class StaticClassSourceGeneratorTests
     {
         readonly ITestOutputHelper output;
         readonly AssemblyGenerator generator;
 
 
-        public StaticClassGeneratorTests(ITestOutputHelper output)
+        public StaticClassSourceGeneratorTests(ITestOutputHelper output)
         {
             this.output = output;
             this.generator = new AssemblyGenerator();

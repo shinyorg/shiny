@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 namespace Shiny.Generators
 {
     [Generator]
-    public class AppDelegateSourceGenerator : ISourceGenerator
+    public class iOSAppDelegateSourceGenerator : ISourceGenerator
     {
         public void Execute(GeneratorExecutionContext context)
         {
