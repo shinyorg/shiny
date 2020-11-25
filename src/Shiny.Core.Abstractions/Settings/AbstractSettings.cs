@@ -122,7 +122,7 @@ namespace Shiny.Settings
 
                 if (isDefault)
                 {
-                    if (typeof(T).IsNullable())
+                    if (IsNullable(typeof(T)))
                     {
                         this.Remove(key);
                     }
@@ -168,6 +168,10 @@ namespace Shiny.Settings
             => this.changedSubject.OnNext(args);
 
 
+        protected static bool IsNullable(Type type)
+            => Nullable.GetUnderlyingType(type) != null;
+
+
         protected virtual string Serialize(Type type, object value)
         {
             if (type == typeof(string))
@@ -194,7 +198,7 @@ namespace Shiny.Settings
                 return DateTimeOffset.Parse(value);
 
             if (this.IsStringifyType(type))
-                return Convert.ChangeType(value, type, System.Globalization.CultureInfo.InvariantCulture);
+                return Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
 
             return this.serializer.Deserialize(type, value);
         }

@@ -76,7 +76,7 @@ namespace Shiny.BluetoothLE.Internals
             //this.Manager = central;
             Dispatcher.ExecuteBackgroundTask((Func<System.Threading.Tasks.Task>)(async () =>
             {
-                var del = Extensions_ServiceCollection.Resolve<IBleDelegate>(this.Services);
+                var del = Extensions_DI.Resolve<IBleDelegate>(this.Services);
 
                 var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
                 for (nuint i = 0; i < peripheralArray.Count; i++)
