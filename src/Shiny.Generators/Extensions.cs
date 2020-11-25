@@ -114,7 +114,13 @@ namespace Shiny.Generators
             if (attribute == null)
                 return null;
 
-            return context.Compilation.Assembly.FindAttributeFlattened(attribute);
+            var assemblyAttributes = context.Compilation.Assembly.GetAttributes();
+            var attributeData = assemblyAttributes
+                .Where(x => x.AttributeClass.Name == attribute.Name)
+                .FirstOrDefault();
+
+            // TODO: why is the constructor arg not coming in?
+            return attributeData;
         }
 
 
@@ -170,30 +176,12 @@ namespace Shiny.Generators
         }
 
 
-        //public static bool Is(this INamedTypeSymbol symbol, string typeName)
-        //{
-        //    while (symbol != null && symbol.Name != "Object")
-        //    {
-        //        if (symbol.ToDisplayString() == typeName)
-        //            return true;
-
-        //        symbol = symbol?.BaseType;
-        //    }
-        //    return false;
-        //}
-
-
-        public static bool IsEqual(this ISymbol symbol, ISymbol compare)
-            => symbol.Name == compare.Name;
-            //=> SymbolEqualityComparer.Default.Equals(symbol, compare);
-
-
         public static AttributeData? FindAttributeFlattened(this ISymbol symbol, INamedTypeSymbol attributeClassSymbol)
         {
             var attrs = symbol.GetAllAttributes();
             foreach (var attr in attrs)
             {
-                if (attr.AttributeClass?.IsEqual(attributeClassSymbol) ?? false)
+                if (attr.AttributeClass.Name == attributeClassSymbol.Name)
                     return attr;
             }
             return null;

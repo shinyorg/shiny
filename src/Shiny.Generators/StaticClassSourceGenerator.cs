@@ -103,6 +103,7 @@ namespace Shiny.Generators.Tasks
 
                     foreach (var prop in type.GetAllProperties())
                     {
+                        //var propertyName = prop.ToDisplayString();
                         var propertyName = prop.GetName();
                         var hasGet = prop.GetMethod?.IsPublic() ?? false;
                         var hasSet = prop.SetMethod?.IsPublic() ?? false;
