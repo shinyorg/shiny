@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.FindSymbols;
 
 
 namespace Shiny.Generators
@@ -98,14 +96,6 @@ namespace Shiny.Generators
         //    var result = type.Equals(task);
         //    return result;
         //}
-
-
-        //public static bool HasXamarinForms(this GeneratorExecutionContext context)
-        //    => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
-
-
-        //public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
-        //    => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null;
 
 
         public static AttributeData? GetCurrentAssemblyAttribute(this GeneratorExecutionContext context, string attributeTypeName)

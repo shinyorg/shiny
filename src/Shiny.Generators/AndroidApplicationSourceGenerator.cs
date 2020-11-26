@@ -14,14 +14,30 @@ namespace Shiny.Generators
             if (shinyApplicationAttribute == null)
                 return;
 
-            var attributeData = context
-                .Compilation
-                .Assembly
-                .GetAttributes()
-                .FirstOrDefault(x => x.AttributeClass.Equals(shinyApplicationAttribute));
+            var androidApplication = context.Compilation.GetTypeByMetadataName("Android.");
+            var shinyContext = new ShinyContext(context);
 
-            if (attributeData == null)
-                return;
+            // find any android applications in scope
+            var androidApplications = shinyContext
+                .AllTypeSymbols
+                .Where(x =>
+                    x.ContainingAssembly.Equals(context.Compilation.Assembly) &&
+                    x.Inherits(androidApplication)
+                )
+                .ToList();
+
+            foreach (var androidApp in androidApplications)
+            {
+
+            }
+            //var attributeData = context
+            //    .Compilation
+            //    .Assembly
+            //    .GetAttributes()
+            //    .FirstOrDefault(x => x.AttributeClass.Equals(shinyApplicationAttribute));
+
+            //if (attributeData == null)
+            //    return;
 
             // TODO: does an application exist already?  If so, throw error
         }

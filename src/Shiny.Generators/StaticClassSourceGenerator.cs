@@ -17,11 +17,11 @@ namespace Shiny.Generators.Tasks
 
         public void Execute(GeneratorExecutionContext context)
         {
-            this.shinyContext = new ShinyContext(context);
-            var attribute = shinyContext.Context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
+            var attribute = context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
             if (attribute == null)
                 return;
 
+            this.shinyContext = new ShinyContext(context);
             this.useNamespace = attribute.ConstructorArguments[0].Value.ToString();
             this.BuildStaticClass("Shiny.Jobs.IJobManager", "ShinyJobs", "Shiny.Jobs");
             this.BuildStaticClass("Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");

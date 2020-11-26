@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
 
@@ -10,41 +10,29 @@ namespace Shiny.Generators
     {
         GeneratorExecutionContext Context { get; }
         INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName);
-        //bool IsStartupGenerated { get; set; }
-        //Document CurrentDocument { get; }
+        IList<INamedTypeSymbol> AllTypeSymbols { get; }
         //string? GetShinyStartupClassFullName();
         //string? GetXamFormsAppClassFullName();
-        //bool IsProjectType(string projectTypeGuid);
     }
 
 
     public class ShinyContext : IShinyContext
     {
-        readonly IAssemblySymbol[] shinyAssemblies;
+        readonly ShinySymbolVisitor symbolVisitor;
 
 
         public ShinyContext(GeneratorExecutionContext context)
         {
             this.Context = context;
-
-            this.shinyAssemblies = context
-                .Compilation
-                .References
-                .Where(x =>
-                    x.Display != null &&
-                    x.Properties.Kind == MetadataImageKind.Assembly &&
-                    (
-                        Regex.IsMatch(x.Display, "Shiny.(.*).dll") ||
-                        x.Display.EndsWith("Xamarin.Forms.dll")
-                    )
-                )
-                .Select(context.Compilation.GetAssemblyOrModuleSymbol)
-                .OfType<IAssemblySymbol>()
-                .ToArray();
+            this.symbolVisitor = new ShinySymbolVisitor();
+            this.symbolVisitor.Visit(context.Compilation.GlobalNamespace);
         }
 
 
-        public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.shinyAssemblies
+        public IList<INamedTypeSymbol> AllTypeSymbols => this.symbolVisitor.TypeSymbols;
+
+        public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.symbolVisitor
+            .ShinyAssemblies
             .Select(x => x.GetTypeByMetadataName(fullyQualifiedMetadataName))
             .FirstOrDefault();
 
