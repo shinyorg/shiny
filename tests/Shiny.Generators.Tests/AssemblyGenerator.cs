@@ -43,8 +43,8 @@ namespace Shiny.Generators.Tests
 
         public CSharpCompilation Create(string assemblyName)
         {
+            this.AddReference("Shiny");
             this.AddReference("Shiny.Core");
-            this.AddReference("Shiny.Core.Abstractions");
             var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
             return CSharpCompilation
                 .Create(localPath)

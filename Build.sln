@@ -93,7 +93,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.OneSignal", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Generators.Tests", "tests\Shiny.Generators.Tests\Shiny.Generators.Tests.csproj", "{B1E194BA-9099-45B9-9332-57FA5C054A77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny", "src\Shiny\Shiny.csproj", "{BB97F1E8-3303-4CB9-90E8-722C7518BE19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny", "src\Shiny\Shiny.csproj", "{BB97F1E8-3303-4CB9-90E8-722C7518BE19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Main", "Main", "{CB53BD4C-AD85-445E-8254-B6643904B60B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2314,6 +2316,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{84C6A1B8-0A57-4C6F-8738-3D3C03CE6F55} = {CB53BD4C-AD85-445E-8254-B6643904B60B}
+		{A63AAB61-C520-4B21-96C9-A3C28E26C859} = {CB53BD4C-AD85-445E-8254-B6643904B60B}
+		{E5ADBFC8-8EC0-4B3F-96F6-04D76C2FF6C7} = {CB53BD4C-AD85-445E-8254-B6643904B60B}
+		{B1E194BA-9099-45B9-9332-57FA5C054A77} = {CB53BD4C-AD85-445E-8254-B6643904B60B}
+		{BB97F1E8-3303-4CB9-90E8-722C7518BE19} = {CB53BD4C-AD85-445E-8254-B6643904B60B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {135D86AF-4EC4-4AA0-BD06-75C410F3EA08}

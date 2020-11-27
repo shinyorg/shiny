@@ -17,7 +17,7 @@ namespace Shiny.Generators.Tests
             this.output = output;
             this.generator = new AssemblyGenerator();
             this.generator.AddReference("Mono.Android");
-        }  
+        }
 
 
         // TODO: build android
@@ -40,7 +40,7 @@ namespace Shiny.Generators.Tests
         {
             this.generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
-namespace Test 
+namespace Test
 {
     public class TestApplication : Android.App.Application
     {
