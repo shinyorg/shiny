@@ -5,8 +5,4 @@
         <RootNamespace>Shiny.Locations</RootNamespace>
         <Description>Shiny Locations Abstractions</Description>
     </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
-    </ItemGroup>
 </Project>

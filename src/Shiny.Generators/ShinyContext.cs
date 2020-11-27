@@ -38,6 +38,7 @@ namespace Shiny.Generators
         }
 
 
+        public GeneratorExecutionContext Context { get; private set; }
         public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.shinyAssemblies
             .Value
             .Select(x => x.GetTypeByMetadataName(fullyQualifiedMetadataName))
@@ -142,7 +143,6 @@ namespace Shiny.Generators
         //}
 
 
-        public GeneratorExecutionContext Context { get; private set; }
         //public bool IsStartupGenerated { get; set; }
     }
 }

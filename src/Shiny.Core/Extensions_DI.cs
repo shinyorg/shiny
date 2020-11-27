@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Shiny.Logging;
 
 
 namespace Shiny
@@ -48,7 +50,7 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         /// <param name="module"></param>
-        public static void RegisterModule(this IServiceCollection services, IShinyModule module)
+        public static void RegisterModule(this IServiceCollection services, ShinyModule module)
         {
             module.Register(services);
             services.RegisterPostBuildAction(module.OnContainerReady);
@@ -61,7 +63,7 @@ namespace Shiny
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
         public static void RegisterModule<T>(this IServiceCollection services)
-            where T : IShinyModule, new() => services.RegisterModule(new T());
+            where T : ShinyModule, new() => services.RegisterModule(new T());
 
 
         /// <summary>
@@ -89,6 +91,79 @@ namespace Shiny
                     action(provider);
 
             return provider;
+        }
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="services"></param>
+        public static async Task SafeResolveAndExecute<T>(this IServiceProvider services, Func<T, Task> execute, bool requiredService = true)
+        {
+            try
+            {
+                var service = services.Resolve<T>(requiredService);
+                if (service != null)
+                    await execute.Invoke(service).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(ex);
+            }
+        }
+
+
+        public static void RunDelegates<T>(this IServiceProvider serviceProvider, Action<T> execute, Action<Exception>? onError = null)
+        {
+            var services = serviceProvider.GetServices<T>();
+            if (services == null)
+                return;
+
+            foreach (var service in services)
+            {
+                try
+                {
+                    execute(service);
+                }
+                catch (Exception ex)
+                {
+                    if (onError == null)
+                        Log.Write(ex);
+                    else
+                        onError(ex);
+                }
+            }
+        }
+
+
+        public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)
+            => services.GetServices<T>().RunDelegates(execute, onError);
+
+
+        public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, Action<Exception>? onError = null)
+        {
+            if (services == null)
+                return;
+
+            var tasks = services
+                .Select(async x =>
+                {
+                    try
+                    {
+                        await execute(x).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (onError == null)
+                            Log.Write(ex);
+                        else
+                            onError(ex);
+                    }
+                })
+                .ToList();
+
+            await Task.WhenAll(tasks);
         }
     }
 }
