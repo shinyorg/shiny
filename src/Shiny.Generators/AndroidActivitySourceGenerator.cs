@@ -9,6 +9,12 @@ namespace Shiny.Generators
     {
         public void Execute(GeneratorExecutionContext context)
         {
+            var symbol = context.Compilation.GetTypeByMetadataName("");
+
+            //context
+            //    .Compilation
+            //    .SyntaxTrees
+            //    .Select(x => context.Compilation.GetSemanticModel(x))
 
         }
 

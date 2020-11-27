@@ -85,8 +85,8 @@ namespace Shiny.Generators.Tasks
 
                     foreach (var method in methods)
                     {
-                        var argList = method.BuildArgString(true);
-                        var argListNoNames = method.BuildArgString(false);
+                        var argList = BuildArgString(method, true);
+                        var argListNoNames = BuildArgString(method, false);
 
                         var returnType = method.ReturnsVoid ? "void" : method.ReturnType.ToDisplayString();
                         var signature = $"public static {returnType} {method.Name}";
@@ -103,7 +103,6 @@ namespace Shiny.Generators.Tasks
 
                     foreach (var prop in type.GetAllProperties())
                     {
-                        //var propertyName = prop.ToDisplayString();
                         var propertyName = prop.GetName();
                         var hasGet = prop.GetMethod?.IsPublic() ?? false;
                         var hasSet = prop.SetMethod?.IsPublic() ?? false;
@@ -127,6 +126,21 @@ namespace Shiny.Generators.Tasks
                 }
             }
             this.shinyContext.Context.AddSource(genFileName, builder.ToString());
+        }
+
+
+        static string BuildArgString(IMethodSymbol method, bool includeTypes)
+        {
+            var s = "";
+            foreach (var parameter in method.Parameters)
+            {
+                if (includeTypes)
+                    s += $"{parameter.Type.ToDisplayString()} {parameter.Name}, ";
+                else
+                    s += $"{parameter.Name}, ";
+            }
+            s = s.TrimEnd(',', ' ');
+            return s;
         }
     }
 }

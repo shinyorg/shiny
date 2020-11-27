@@ -23,8 +23,17 @@
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup Condition=" $(OS) == 'WINDOWS_NT' ">
+        <Reference Include="c:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v10.0\Mono.Android.dll" />
+        <Reference Include="c:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\Xamarin.iOS\v1.0\Xamarin.iOS.dll" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(OS) != 'WINDOWS_NT' ">
+
+    </ItemGroup>
+
     <ItemGroup>
-        <!--<CompilerVisibleProperty Include="RootNamespace" />-->
+
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />

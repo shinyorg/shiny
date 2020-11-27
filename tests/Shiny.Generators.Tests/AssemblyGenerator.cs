@@ -24,7 +24,8 @@ namespace Shiny.Generators.Tests
         }
 
 
-        public void AddReference(string assemblyName, bool autoAddAbstraction = true)
+
+        public void AddReference(string assemblyName)
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName);
             var ass = AppDomain
@@ -35,9 +36,6 @@ namespace Shiny.Generators.Tests
             if (ass == null)
                 throw new ArgumentException($"Assembly '{assemblyName}' not found at '{path}'");
 
-            if (autoAddAbstraction)
-                this.AddReference(assemblyName + ".Abstractions", false);
-
             var reference = MetadataReference.CreateFromFile(ass.Location);
             this.references.Add(reference);
         }
@@ -45,7 +43,8 @@ namespace Shiny.Generators.Tests
 
         public CSharpCompilation Create(string assemblyName)
         {
-            this.AddReference("Shiny.Core", true);
+            this.AddReference("Shiny.Core");
+            this.AddReference("Shiny.Core.Abstractions");
             var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
             return CSharpCompilation
                 .Create(localPath)

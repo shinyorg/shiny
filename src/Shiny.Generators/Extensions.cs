@@ -8,18 +8,38 @@ namespace Shiny.Generators
 {
     static class Extensions
     {
-        // this is only if the partial has a 2+ partials
-        //public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
-        //    symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
-        public static string Indent(this string value, int level)
+        public static AttributeData? GetClassAttributeData(this Compilation compilation, ITypeSymbol symbol, string attributeTypeName)
         {
-            var newValue = "";
-            for (var i = 0; i < level; i++)
-                newValue += "\t";
+            var attributeType = compilation.GetTypeByMetadataName(attributeTypeName);
+            if (attributeType == null)
+                return null;
 
-            newValue += value;
-            return newValue;
+            return symbol
+                .GetAllAttributes()
+                .FirstOrDefault(x => x.AttributeClass.Name == attributeType.Name);
         }
+
+
+        public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbols(this IAssemblySymbol assembly)
+        {
+            var stack = new Stack<INamespaceSymbol>();
+            stack.Push(assembly.GlobalNamespace);
+
+            while (stack.Count > 0)
+            {
+                var @namespace = stack.Pop();
+
+                foreach (var member in @namespace.GetMembers())
+                {
+                    if (member is INamespaceSymbol memberAsNamespace)
+                        stack.Push(memberAsNamespace);
+
+                    else if (member is INamedTypeSymbol symbol)
+                        yield return symbol;
+                }
+            }
+        }
+
 
         //public static bool IsIosAppProject(this GeneratorExecutionContext context)
         //    => context.IsProjectType("FEACFBD2-3405-455C-9665-78FE426C6842");
@@ -69,35 +89,6 @@ namespace Shiny.Generators
         }
 
 
-        //public static bool IsEqualToType(this GeneratorExecutionContext context, ITypeSymbol symbol, string otherTypeName)
-        //{
-        //    var type = context.Compilation.GetTypeByMetadataName(otherTypeName);
-        //    var result = symbol.EqualsType(type);
-        //    var result = true;
-        //    return result;
-        //}
-
-
-        //public static bool IsStream(this GeneratorExecutionContext context, ITypeSymbol symbol)
-        //    => context.IsEqualToType(symbol, typeof(System.IO.Stream).FullName);
-
-
-        //public static bool IsObservable(this GeneratorExecutionContext context, ITypeSymbol symbol)
-        //    => context.IsEqualToType(symbol, "System.IObservable`1");
-
-
-        //public static bool IsGenericAsyncTask(this GeneratorExecutionContext context, ITypeSymbol symbol)
-        //    => context.IsEqualToType(symbol, "System.Threading.Tasks.Task`1");
-
-
-        //public static bool IsAsyncTask(this GeneratorExecutionContext context, ITypeSymbol type)
-        //{
-        //    var task = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
-        //    var result = type.Equals(task);
-        //    return result;
-        //}
-
-
         public static AttributeData? GetCurrentAssemblyAttribute(this GeneratorExecutionContext context, string attributeTypeName)
         {
             var attribute = context.Compilation.GetTypeByMetadataName(attributeTypeName);
@@ -131,21 +122,6 @@ namespace Shiny.Generators
             .Name
             .Replace("get_", String.Empty)
             .Replace("set_", String.Empty);
-
-
-        public static string BuildArgString(this IMethodSymbol method, bool includeTypes)
-        {
-            var s = "";
-            foreach (var parameter in method.Parameters)
-            {
-                if (includeTypes)
-                    s += $"{parameter.Type.ToDisplayString()} {parameter.Name}, ";
-                else
-                    s += $"{parameter.Name}, ";
-            }
-            s = s.TrimEnd(',', ' ');
-            return s;
-        }
 
 
         public static bool Implements(this INamedTypeSymbol symbol, ITypeSymbol type)

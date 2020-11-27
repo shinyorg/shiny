@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Linq;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Shiny.Generators.Tasks;
 using Xunit;
 using Xunit.Abstractions;
-using FluentAssertions;
 
 
 namespace Shiny.Generators.Tests

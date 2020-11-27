@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
 
@@ -10,7 +10,6 @@ namespace Shiny.Generators
     {
         GeneratorExecutionContext Context { get; }
         INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName);
-        IList<INamedTypeSymbol> AllTypeSymbols { get; }
         //string? GetShinyStartupClassFullName();
         //string? GetXamFormsAppClassFullName();
     }
@@ -18,31 +17,32 @@ namespace Shiny.Generators
 
     public class ShinyContext : IShinyContext
     {
-        readonly ShinySymbolVisitor symbolVisitor;
+        readonly Lazy<IAssemblySymbol[]> shinyAssemblies;
 
 
         public ShinyContext(GeneratorExecutionContext context)
         {
             this.Context = context;
-            this.symbolVisitor = new ShinySymbolVisitor();
-            this.symbolVisitor.Visit(context.Compilation.GlobalNamespace);
+            this.shinyAssemblies = new Lazy<IAssemblySymbol[]>(() => context
+                .Compilation
+                .References
+                .Where(x =>
+                    x.Display != null &&
+                    x.Properties.Kind == MetadataImageKind.Assembly &&
+                    Regex.IsMatch(x.Display, "Shiny.(.*).dll")
+                )
+                .Select(context.Compilation.GetAssemblyOrModuleSymbol)
+                .OfType<IAssemblySymbol>()
+                .ToArray()
+            );
         }
 
 
-        public IList<INamedTypeSymbol> AllTypeSymbols => this.symbolVisitor.TypeSymbols;
-
-        public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.symbolVisitor
-            .ShinyAssemblies
+        public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.shinyAssemblies
+            .Value
             .Select(x => x.GetTypeByMetadataName(fullyQualifiedMetadataName))
             .FirstOrDefault();
 
-        //public Document CurrentDocument => ShinySyntaxReceiver.CurrentDocument;
-        //public MSBuildProject
-
-        //public bool IsProjectType(string projectTypeGuid)
-        //{
-        //    return false;
-        //}
 
 
         //public string? GetXamFormsAppClassFullName()

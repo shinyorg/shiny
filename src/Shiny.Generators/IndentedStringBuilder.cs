@@ -25,6 +25,7 @@ namespace Shiny.Generators
             return new DisposableAction(() => this.CurrentLevel -= count);
         }
 
+
         public virtual IDisposable Block(int count = 1)
         {
             var current = CurrentLevel;
@@ -80,5 +81,19 @@ namespace Shiny.Generators
             => this.builder.AppendFormat(formatProvider, pattern.Indent(this.CurrentLevel), replacements);
 
         public override string ToString() => this.builder.ToString();
+    }
+
+
+    static class StringExtensions
+    {
+        internal static string Indent(this string value, int level)
+        {
+            var newValue = "";
+            for (var i = 0; i < level; i++)
+                newValue += "\t";
+
+            newValue += value;
+            return newValue;
+        }
     }
 }
