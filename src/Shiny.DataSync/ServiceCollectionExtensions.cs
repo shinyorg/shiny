@@ -17,8 +17,8 @@ namespace Shiny
             services.RegisterJob(new JobInfo(typeof(SyncJob), SyncJob.JobName)
             {
                 RequiredInternetAccess = syncOnAnyConnection
-                    ? Jobs.InternetAccess.Any
-                    : Jobs.InternetAccess.Unmetered,
+                    ? InternetAccess.Any
+                    : InternetAccess.Unmetered,
                 RunOnForeground = true,
                 IsSystemJob = true,
                 BatteryNotLow = true
