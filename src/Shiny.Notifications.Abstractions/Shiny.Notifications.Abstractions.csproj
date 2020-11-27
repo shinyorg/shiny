@@ -6,4 +6,8 @@
         <Description>Shiny Notification Abstractions</Description>
     </PropertyGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
 </Project>

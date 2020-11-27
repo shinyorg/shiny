@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
 
 
 namespace Shiny.Locations
 {
-    public interface IGpsDelegate : IShinyDelegate
+    public interface IGpsDelegate
     {
         /// <summary>
         /// This is fired when the gps reading has changed.

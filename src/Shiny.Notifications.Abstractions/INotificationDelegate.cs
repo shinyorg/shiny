@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
 
 
 namespace Shiny.Notifications
 {
-    public interface INotificationDelegate : IShinyDelegate
+    public interface INotificationDelegate
     {
         /// <summary>
         /// This event will fire when the notification

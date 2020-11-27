@@ -11,7 +11,7 @@ namespace Shiny
 {
     public static class ServicesCollectionExtensions
     {
-        public static void UseAppCenterLogging(this IShinyStartup startup,
+        public static void UseAppCenterLogging(this ShinyStartup startup,
                                                string? appSecret = null,
                                                bool crashes = true,
                                                bool events = false)

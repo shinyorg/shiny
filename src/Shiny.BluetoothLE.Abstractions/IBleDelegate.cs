@@ -5,7 +5,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.BluetoothLE
 {
-    public interface IBleDelegate : IShinyDelegate
+    public interface IBleDelegate
     {
         /// <summary>
         /// Fires when the adapter state changes - foreground or background

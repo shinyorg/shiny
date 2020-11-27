@@ -74,7 +74,7 @@ namespace Shiny.BluetoothLE.Internals
         {
 #if __IOS__
             //this.Manager = central;
-            Dispatcher.ExecuteBackgroundTask((Func<System.Threading.Tasks.Task>)(async () =>
+            Dispatcher.ExecuteBackgroundTask(async () =>
             {
                 var del = Extensions_DI.Resolve<IBleDelegate>(this.Services);
 
@@ -83,9 +83,9 @@ namespace Shiny.BluetoothLE.Internals
                 {
                     var item = peripheralArray.GetItem<CBPeripheral>(i);
                     var peripheral = this.GetPeripheral(item);
-                    await ServiceProviderExtensions.RunDelegates<IBleDelegate>(this.Services, (Func<IBleDelegate, System.Threading.Tasks.Task>)(x => (System.Threading.Tasks.Task)x.OnConnected((IPeripheral)peripheral)));
+                    await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
                 }
-            }));
+            });
             // TODO: restore scan? CBCentralManager.RestoredStateScanOptionsKey
 #endif
         }

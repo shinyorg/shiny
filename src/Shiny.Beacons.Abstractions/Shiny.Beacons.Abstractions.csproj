@@ -6,4 +6,7 @@
         <Description>Shiny Beacon Abstractions</Description>
     </PropertyGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
 </Project>
