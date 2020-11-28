@@ -24,5 +24,6 @@
         <ProjectReference Include="..\..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
+        <ProjectReference Include="..\..\..\src\Shiny\Shiny.csproj" />
     </ItemGroup>
 </Project>

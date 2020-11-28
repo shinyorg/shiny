@@ -6,6 +6,6 @@ namespace Shiny.Infrastructure
 {
     public interface IStartupInitializer
     {
-        void Initialize(ShinyStartup startup, IServiceCollection services);
+        void Initialize(IShinyStartup startup, IServiceCollection services);
     }
 }

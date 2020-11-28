@@ -6,29 +6,12 @@ using Microsoft.CodeAnalysis;
 namespace Shiny.Generators
 {
     [Generator]
-    public class iOSAppDelegateSourceGenerator : ISourceGenerator
+    public class iOSAppDelegateSourceGenerator : ShinyApplicationSourceGenerator
     {
-        public void Execute(GeneratorExecutionContext context)
+        public iOSAppDelegateSourceGenerator() : base("UIKit.UIApplicationDelegate")
         {
-            var appDelegateType = context.Compilation.GetTypeByMetadataName("UIKit.UIApplicationDelegate");
-            if (appDelegateType != null)
-                return;
-
-            var shinyAppDelegateAttribute = context.Compilation.GetTypeByMetadataName("Shiny.ShinyAppDelegateAttribute");
-
-            // TODO: find appdelegates with attribute
-            var attributeData = appDelegateType
-                .GetAttributes()
-                .FirstOrDefault(x => x.AttributeClass.Equals(shinyAppDelegateAttribute));
-
-            if (attributeData != null)
-            {
-
-            }
         }
 
-
-        public void Initialize(GeneratorInitializationContext context) { }
 
 
         void BuildDelegate(INamedTypeSymbol appDelegate)

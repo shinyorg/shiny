@@ -4,7 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny
 {
-    public abstract class ShinyStartup
+    public interface IShinyStartup
+    {
+        void ConfigureServices(IServiceCollection services);
+        IServiceProvider CreateServiceProvider(IServiceCollection services);
+    }
+
+
+    public abstract class ShinyStartup : IShinyStartup
     {
         /// <summary>
         /// Configure the service collection
@@ -19,15 +26,5 @@ namespace Shiny
         /// <param name="services"></param>
         /// <returns></returns>
         public virtual IServiceProvider CreateServiceProvider(IServiceCollection services) => null;
-
-
-        /// <summary>
-        /// After the container is built, but before the application is started
-        /// You should not spend more than a second at most here
-        /// </summary>
-        /// <param name="provider"></param>
-        public virtual void ConfigureApp(IServiceProvider provider)
-        {
-        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-
 using Microsoft.CodeAnalysis;
 
 
@@ -42,9 +41,7 @@ namespace Shiny.Generators
                 .ToList();
 
             foreach (var activity in activities)
-            {
-                //this.GenerateActivity(activity);
-            }
+                this.GenerateActivity(activity);
         }
 
 
@@ -68,7 +65,7 @@ namespace Shiny.Generators
                     this.TryAppendRequestPermissionResult(activity, builder);
                 }
             }
-            //this.Context.AddSource(activity.Name, builder.ToString());
+            this.context.AddSource(activity.Name, builder.ToString());
         }
 
 
@@ -78,6 +75,8 @@ namespace Shiny.Generators
             {
                 using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                 {
+                    builder.AppendLineInvariant("this.ShinyOnCreate();");
+
                     if (activity.HasMethod("OnCreating"))
                         builder.AppendLineInvariant("this.OnCreating(savedInstanceState);");
 
@@ -102,14 +101,6 @@ namespace Shiny.Generators
                     //this.TryAppendOnCreateThirdParty(activity, builder);
                 }
             }
-        }
-
-
-        void AppendShinyOnCreate(INamedTypeSymbol activity, IndentedStringBuilder builder)
-        {
-            builder.AppendLineInvariant("this.ShinyOnCreate();");
-            if (activity.HasMethod("OnCreated"))
-                builder.AppendLineInvariant("this.OnCreated(savedInstanceState);");
         }
 
 

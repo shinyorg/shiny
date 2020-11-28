@@ -79,7 +79,7 @@ namespace Shiny
         public void Register(IServiceCollection services) => services.RegisterCommonServices();
 
 
-        public void Initialize(ShinyStartup startup, IServiceCollection services)
+        public void Initialize(IShinyStartup startup, IServiceCollection services)
         {
             startup.ConfigureServices(services);
             Dehydrate(STARTUP_KEY, startup);
@@ -90,7 +90,7 @@ namespace Shiny
         {
             if (!hydrated)
             {
-                var startup = Hydrate<ShinyStartup>(STARTUP_KEY);
+                var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
                 ShinyHost.Init(new UwpPlatform(), startup);
             }
             if (taskInstance.Task.Name.StartsWith("JOB-"))

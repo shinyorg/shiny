@@ -1,6 +1,5 @@
 ﻿using System;
 using Foundation;
-using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using UIKit;
 
@@ -9,7 +8,7 @@ namespace Shiny
 {
     public static class iOSHooks
     {
-        public static void ShinyFinishedLaunching(this UIApplicationDelegate app, ShinyStartup? startup = null)
+        public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null)
             => ShinyHost.Init(new ApplePlatform(), startup);
 
         public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)

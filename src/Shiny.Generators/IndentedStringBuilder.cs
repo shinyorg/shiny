@@ -28,7 +28,24 @@ namespace Shiny.Generators
 
         public virtual IDisposable Block(int count = 1)
         {
-            var current = CurrentLevel;
+            var current = this.CurrentLevel;
+
+            this.CurrentLevel += count;
+            this.Append("{".Indent(current));
+            this.AppendLine();
+
+            return new DisposableAction(() =>
+            {
+                this.CurrentLevel -= count;
+                this.Append("}".Indent(current));
+                this.AppendLine();
+            });
+        }
+
+
+        public virtual IDisposable Block(string value, int count = 1)
+        {
+            var current = this.CurrentLevel;
 
             this.CurrentLevel += count;
             this.Append("{".Indent(current));
