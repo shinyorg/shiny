@@ -11,17 +11,12 @@ namespace Shiny.Generators
         GeneratorExecutionContext Context { get; }
         INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName);
         void GenerateAndAddShinyStartup();
-        bool HasXamarinForms { get; }
-        bool HasXamarinEssentials { get; }
-        //string? GetShinyStartupClassFullName();
-        //string? GetXamFormsAppClassFullName();
     }
 
 
     public class ShinyContext : IShinyContext
     {
         readonly Lazy<IAssemblySymbol[]> shinyAssemblies;
-        readonly Lazy<bool> xamForms;
         readonly Lazy<bool> xamEssentials;
 
 
@@ -40,15 +35,15 @@ namespace Shiny.Generators
                 .OfType<IAssemblySymbol>()
                 .ToArray()
             );
-
+            this.xamEssentials = new Lazy<bool>(() =>
+            {
+                return false;
+            });
         }
 
 
         public GeneratorExecutionContext Context { get; private set; }
 
-        public bool HasXamarinForms => throw new NotImplementedException();
-
-        public bool HasXamarinEssentials => throw new NotImplementedException();
 
         public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.shinyAssemblies
             .Value

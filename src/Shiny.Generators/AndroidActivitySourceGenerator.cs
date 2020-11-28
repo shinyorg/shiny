@@ -80,24 +80,22 @@ namespace Shiny.Generators
                     if (activity.HasMethod("OnCreating"))
                         builder.AppendLineInvariant("this.OnCreating(savedInstanceState);");
 
-                    //// Xamarin Forms
-                    //if (activity.Is("Xamarin.Forms.Platform.Android.FormsAppCompatActivity"))
-                    //{
-                    //    var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
-                    //    if (appClass != null)
-                    //    {
-                    //        builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
-                    //        builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
-                    //        builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
-                    //        builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
-                    //        builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
-                    //    this.AppendShinyOnCreate(activity, builder);
-                    //}
+
+                    // TODO: ensure xf app is set?
+                    var xfFormsActivityType = context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.Android.FormsAppCompatActivity");
+                    if (xfFormsActivityType != null && activity.Inherits(xfFormsActivityType))
+                    {
+                        // do XF stuff
+                        builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
+                        builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
+                        builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
+                        builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
+                        //builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
+                    }
+                    else
+                    {
+                        builder.AppendFormatInvariant("base.OnCreate(savedInstanceState);");
+                    }
                     //this.TryAppendOnCreateThirdParty(activity, builder);
                 }
             }
@@ -129,8 +127,8 @@ namespace Shiny.Generators
                     builder.AppendLine("this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);");
                     builder.AppendLine();
 
-                    //if (this.Context.HasXamarinEssentials())
-                    //    builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
+                    if (this.context.HasXamarinEssentials())
+                        builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);");
                 }
             }
         }

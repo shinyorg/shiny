@@ -22,7 +22,7 @@ namespace Shiny.Generators
             {
                 using (builder.BlockInvariant($"public partial class {appDelegate.Name}"))
                 {
-                    //this.GenerateFinishedLaunching(appDelegate, builder);
+                    this.GenerateFinishedLaunching(appDelegate, builder);
 
                     this.AppendMethodIf(
                         appDelegate,
@@ -69,7 +69,7 @@ namespace Shiny.Generators
                     );
                 }
             }
-            //this.Context.AddSource(appDelegate.Name, builder.ToString());
+            this.AddSource(builder.ToString(), appDelegate.Name);
         }
 
 
@@ -87,82 +87,58 @@ namespace Shiny.Generators
                 builder.AppendLineInvariant(append);
             }
         }
+
+
+        void GenerateFinishedLaunching(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
+        {
+            var exists = appDelegate.HasMethod("FinishedLaunching");
+            if (exists)
+            {
+                //this.Log.Warn($"Shiny generator could not add AppDelegate.FinishedLaunching since it already exists.  You can remove this method and add 'OnFinishedLaunching' to do any additional custom setup");
+            }
+            else
+            {
+                using (builder.BlockInvariant("public override bool FinishedLaunching(UIApplication app, NSDictionary options)"))
+                {
+                    if (appDelegate.HasMethod("OnFinishedLaunching"))
+                        builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
+
+                    //builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.shinyStartupClassName}());");
+
+                    //this.TryAppendThirdParty(appDelegate, builder);
+                    builder.AppendLineInvariant("return base.FinishedLaunching(app, options);");
+                }
+            }
+        }
+
+
+        //        void TryAppendThirdParty(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
+        //        {
+        //            // Xamarin Forms
+        //            if (appDelegate.Is("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate"))
+        //            {
+        //                var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
+        //                if (appClass != null)
+        //                {
+        //                    // TODO: what if app class has multiple ctor args - skip
+        //                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+        //                    builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
+        //                }
+        //            }
+
+        //            //// ZXing.Net.Mobile
+        //            //if (this.Context.HasZXingNetMobile())
+        //            //    builder.AppendLineInvariant("global::ZXing.Net.Mobile.Forms.iOS.Platform.Init();");
+
+        //            // XF Material or RG Popups
+        //            if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
+        //                builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
+        //            else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
+        //                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init();");
+
+        //            // AiForms.SettingsView
+        //            if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
+        //                builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
+        //        }
     }
 }
-
-//        public override void Execute()
-//        {
-//            if (!this.Context.IsIosAppProject())
-//                return;
-
-//            this.shinyStartupClassName = this.ShinyContext.GetShinyStartupClassFullName();
-//            if (this.shinyStartupClassName == null)
-//                return;
-
-//            var appDelegates = this
-//                .Context
-//                .GetAllDerivedClassesForType("UIKit.UIApplicationDelegate")
-//                .WhereNotSystem()
-//                .ToList();
-
-//            foreach (var appDelegate in appDelegates)
-//                this.BuildDelegate(appDelegate);
-//        }
-
-
-
-
-
-//        void GenerateFinishedLaunching(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
-//        {
-//            var exists = appDelegate.HasMethod("FinishedLaunching");
-//            if (exists)
-//            {
-//                this.Log.Warn($"Shiny generator could not add AppDelegate.FinishedLaunching since it already exists.  You can remove this method and add 'OnFinishedLaunching' to do any additional custom setup");
-//            }
-//            else
-//            {
-//                using (builder.BlockInvariant("public override bool FinishedLaunching(UIApplication app, NSDictionary options)"))
-//                {
-//                    if (appDelegate.HasMethod("OnFinishedLaunching"))
-//                        builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
-
-//                    builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.shinyStartupClassName}());");
-
-//                    this.TryAppendThirdParty(appDelegate, builder);
-//                    builder.AppendLineInvariant("return base.FinishedLaunching(app, options);");
-//                }
-//            }
-//        }
-
-
-//        void TryAppendThirdParty(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
-//        {
-//            // Xamarin Forms
-//            if (appDelegate.Is("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate"))
-//            {
-//                var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
-//                if (appClass != null)
-//                {
-//                    // TODO: what if app class has multiple ctor args - skip
-//                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
-//                    builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
-//                }
-//            }
-
-//            //// ZXing.Net.Mobile
-//            //if (this.Context.HasZXingNetMobile())
-//            //    builder.AppendLineInvariant("global::ZXing.Net.Mobile.Forms.iOS.Platform.Init();");
-
-//            // XF Material or RG Popups
-//            if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
-//                builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
-//            else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-//                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init();");
-
-//            // AiForms.SettingsView
-//            if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
-//                builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
-//        }
-
-

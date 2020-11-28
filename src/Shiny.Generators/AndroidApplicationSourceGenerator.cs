@@ -31,7 +31,7 @@ namespace Shiny.Generators
                     builder.AppendLine("public MainApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) {}");
                     builder.AppendLine();
 
-                    //this.AppendOnCreate(builder, startupClassName);
+                    this.AppendOnCreate(builder, null);
                 }
             }
             this.AddSource(builder.ToString(), ApplicationName);
@@ -43,13 +43,13 @@ namespace Shiny.Generators
         {
             using (builder.BlockInvariant("public override void OnCreate()"))
             {
-                builder.AppendLineInvariant($"this.ShinyOnCreate(new {startupClassName}());");
+                //builder.AppendLineInvariant($"this.ShinyOnCreate(new {startupClassName}());");
 
-                //if (this.Context.HasXamarinEssentials())
-                //    builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");
+                if (this.Context.Context.HasXamarinEssentials())
+                    builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");
 
-                //if (this.Context.Compilation.GetTypeByMetadataName("Acr.UserDialogs.UserDialogs") != null)
-                //    builder.AppendLineInvariant("global::Acr.UserDialogs.UserDialogs.Init(this);");
+                if (this.Context.Context.Compilation.GetTypeByMetadataName("Acr.UserDialogs.UserDialogs") != null)
+                    builder.AppendLineInvariant("global::Acr.UserDialogs.UserDialogs.Init(this);");
 
                 builder.AppendLineInvariant("base.OnCreate();");
             }

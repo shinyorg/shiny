@@ -30,6 +30,18 @@ namespace Shiny.Generators
             .FirstOrDefault(x => x.AttributeClass.Name == attributeSymbol.Name);
 
 
+        public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
+        {
+            var hasXamEssentials = false;
+            var type = context.Compilation.GetTypeByMetadataName("");
+            if (type == null)
+            {
+
+            }
+            return hasXamEssentials;
+        }
+
+
         public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbols(this IAssemblySymbol assembly)
         {
             var stack = new Stack<INamespaceSymbol>();
