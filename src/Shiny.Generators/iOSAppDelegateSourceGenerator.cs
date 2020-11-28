@@ -13,8 +13,7 @@ namespace Shiny.Generators
         }
 
 
-
-        void BuildDelegate(INamedTypeSymbol appDelegate)
+        protected override void Process(INamedTypeSymbol appDelegate)
         {
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Foundation", "UIKit");
@@ -57,7 +56,7 @@ namespace Shiny.Generators
                     this.AppendMethodIf(
                         appDelegate,
                         builder,
-                        "Shiny.Core",
+                        "Shiny",
                         "PerformFetch",
                         "public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyPerformFetch(completionHandler);"
                     );

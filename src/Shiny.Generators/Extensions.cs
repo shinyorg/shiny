@@ -8,6 +8,13 @@ namespace Shiny.Generators
 {
     static class Extensions
     {
+        public static void Source(this GeneratorExecutionContext context, string sourceText, string? fileName = null)
+        {
+            fileName ??= Guid.NewGuid().ToString();
+            context.AddSource(fileName, sourceText);
+        }
+
+
         public static AttributeData? GetClassAttributeData(this Compilation compilation, ITypeSymbol symbol, string attributeTypeName)
         {
             var attributeType = compilation.GetTypeByMetadataName(attributeTypeName);

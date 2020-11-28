@@ -9,6 +9,8 @@ namespace Shiny.Generators
     {
         readonly string osApplicationTypeName;
         protected ShinyApplicationSourceGenerator(string osApplicationTypeName) => this.osApplicationTypeName = osApplicationTypeName;
+        protected IShinyContext? Context { get; private set; }
+        protected void AddSource(string sourceText, string? fileName = null) => this.Context.Context.Source(sourceText, fileName);
 
 
         public virtual void Execute(GeneratorExecutionContext context)
@@ -28,15 +30,15 @@ namespace Shiny.Generators
                 .Where(x => x.Inherits(appType))
                 .ToList();
 
-            var shinyContext = new ShinyContext(context);
+            this.Context = new ShinyContext(context);
             foreach (var appClass in appClasses)
-                this.Process(shinyContext, appClass);
+                this.Process(appClass);
         }
 
 
         public virtual void Initialize(GeneratorInitializationContext context) { }
 
 
-        protected abstract void Process(IShinyContext context, INamedTypeSymbol osAppTypeSymbol);
+        protected abstract void Process(INamedTypeSymbol osAppTypeSymbol);
     }
 }

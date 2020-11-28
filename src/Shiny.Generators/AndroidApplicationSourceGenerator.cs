@@ -7,10 +7,13 @@ namespace Shiny.Generators
     [Generator]
     public class AndroidApplicationSourceGenerator : ShinyApplicationSourceGenerator
     {
-        public AndroidApplicationSourceGenerator() : base("Android.App.Application") { }
+        const string AndroidApplicationTypeName = "Android.App.Application";
+        const string ApplicationName = "MainApplication";
+
+        public AndroidApplicationSourceGenerator() : base(AndroidApplicationTypeName) { }
 
 
-        protected override void Process(IShinyContext context, INamedTypeSymbol osAppTypeSymbol)
+        protected override void Process(INamedTypeSymbol osAppTypeSymbol)
         {
             // TODO: should we try to change it or error right here?
             // TODO: what if not partial?  why did user mark the assembly then?
@@ -22,8 +25,8 @@ namespace Shiny.Generators
             // TODO: I need the root namespace... could just use the assembly globalnamespace?
             using (builder.BlockInvariant($"namespace "))
             {
-                builder.AppendLineInvariant("[ApplicationAttribute]");
-                using (builder.BlockInvariant("public partial class MainApplication : Application"))
+                builder.AppendLineInvariant("[Android.App.ApplicationAttribute]");
+                using (builder.BlockInvariant($"public partial class {ApplicationName} : global::{AndroidApplicationTypeName}"))
                 {
                     builder.AppendLine("public MainApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) {}");
                     builder.AppendLine();
@@ -31,7 +34,7 @@ namespace Shiny.Generators
                     //this.AppendOnCreate(builder, startupClassName);
                 }
             }
-            //this.Context.AddSource("MainApplication", builder.ToString());
+            this.AddSource(builder.ToString(), ApplicationName);
         }
 
 

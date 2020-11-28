@@ -16,6 +16,8 @@ namespace Shiny.Generators.Tests
         {
             this.output = output;
             this.generator = new AssemblyGenerator();
+            this.generator.AddReference("Shiny");
+            this.generator.AddReference("Shiny.Core");
         }
 
 
@@ -23,10 +25,13 @@ namespace Shiny.Generators.Tests
         public void CoreClasses()
         {
             this.generator.AddSource("[assembly:Shiny.GenerateStaticClasses(\"CoreClasses\")]");
-            this.generator.DoGenerate(
-                this.output,
+            var compile = this.generator.DoGenerate(
                 nameof(CoreClasses),
-                new StaticClassSourceGenerator(),
+                new StaticClassSourceGenerator()
+            );
+            this.output.WriteSyntaxTrees(compile);
+
+            compile.AssertTypesExist(
                 "CoreClasses.ShinyJobs",
                 "CoreClasses.ShinyConnectivity",
                 "CoreClasses.ShinyPower",

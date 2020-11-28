@@ -17,6 +17,8 @@ namespace Shiny.Generators.Tests
             this.output = output;
             this.generator = new AssemblyGenerator();
             this.generator.AddReference("Mono.Android");
+            this.generator.AddReference("Shiny");
+            this.generator.AddReference("Shiny.Core");
         }
 
 
@@ -39,6 +41,7 @@ namespace Shiny.Generators.Tests
         public void Test()
         {
             this.generator.AddSource(@"
+[assembly: Shiny.GenerateStartupAttribute]
 [assembly: Shiny.ShinyApplicationAttribute]
 namespace Test
 {
@@ -47,11 +50,13 @@ namespace Test
     }
 }
 ");
-            this.generator.DoGenerate(
-                this.output,
+            var compile = this.generator.DoGenerate(
                 nameof(Test),
                 new AndroidApplicationSourceGenerator()
             );
+            this.output.WriteSyntaxTrees(compile);
+
+            //compile.AssertTypesExist("");
         }
     }
 }

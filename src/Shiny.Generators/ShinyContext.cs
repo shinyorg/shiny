@@ -11,6 +11,8 @@ namespace Shiny.Generators
         GeneratorExecutionContext Context { get; }
         INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName);
         void GenerateAndAddShinyStartup();
+        bool HasXamarinForms { get; }
+        bool HasXamarinEssentials { get; }
         //string? GetShinyStartupClassFullName();
         //string? GetXamFormsAppClassFullName();
     }
@@ -19,6 +21,8 @@ namespace Shiny.Generators
     public class ShinyContext : IShinyContext
     {
         readonly Lazy<IAssemblySymbol[]> shinyAssemblies;
+        readonly Lazy<bool> xamForms;
+        readonly Lazy<bool> xamEssentials;
 
 
         public ShinyContext(GeneratorExecutionContext context)
@@ -36,11 +40,15 @@ namespace Shiny.Generators
                 .OfType<IAssemblySymbol>()
                 .ToArray()
             );
+
         }
 
 
         public GeneratorExecutionContext Context { get; private set; }
 
+        public bool HasXamarinForms => throw new NotImplementedException();
+
+        public bool HasXamarinEssentials => throw new NotImplementedException();
 
         public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.shinyAssemblies
             .Value

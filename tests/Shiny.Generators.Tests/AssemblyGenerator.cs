@@ -43,14 +43,31 @@ namespace Shiny.Generators.Tests
 
         public CSharpCompilation Create(string assemblyName)
         {
-            this.AddReference("Shiny");
-            this.AddReference("Shiny.Core");
             var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
             return CSharpCompilation
                 .Create(localPath)
                 .WithReferences(this.references)
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
                 .AddSyntaxTrees(this.sources);
+        }
+
+
+        public Compilation DoGenerate(string dllName, ISourceGenerator sourceGenerator, params string[] assertTypes)
+        {
+            var driver = CSharpGeneratorDriver.Create(sourceGenerator);
+            var inputCompilation = this.Create(dllName);
+
+            driver.RunGeneratorsAndUpdateCompilation(
+                inputCompilation,
+                out var outputCompilation,
+                out var diags
+            );
+            foreach (var diag in diags)
+            {
+                if (diag.Severity == DiagnosticSeverity.Error)
+                    throw new ArgumentException(diag.GetMessage());
+            }
+            return outputCompilation;
         }
     }
 }

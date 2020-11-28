@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Xunit.Abstractions;
 
 
@@ -10,28 +8,18 @@ namespace Shiny.Generators.Tests
 {
     public static class Extensions
     {
-        internal static void DoGenerate(this AssemblyGenerator generator, ITestOutputHelper output, string dllName, ISourceGenerator sourceGenerator, params string[] assertTypes)
+        public static void WriteSyntaxTrees(this ITestOutputHelper testOutput, Compilation compile)
         {
-            var driver = CSharpGeneratorDriver.Create(sourceGenerator);
-            var inputCompilation = generator.Create(dllName);
+            foreach (var syntaxTree in compile.SyntaxTrees)
+                testOutput.WriteLine(syntaxTree.ToString());
+        }
 
-            driver.RunGeneratorsAndUpdateCompilation(
-                inputCompilation,
-                out var outputCompilation,
-                out var diags
-            );
 
-            diags
-                .Any(x => x.Severity == DiagnosticSeverity.Error)
-                .Should()
-                .BeFalse(diags.FirstOrDefault()?.GetMessage());
-
-            foreach (var syntaxTree in outputCompilation.SyntaxTrees)
-                output.WriteLine(syntaxTree.ToString());
-
+        public static void AssertTypesExist(this Compilation compile, params string[] assertTypes)
+        {
             foreach (var assert in assertTypes)
             {
-                var type = outputCompilation.GetTypeByMetadataName(assert);
+                var type = compile.GetTypeByMetadataName(assert);
                 type.Should().NotBeNull($"Metadata type '{assert}' was not found");
             }
         }
