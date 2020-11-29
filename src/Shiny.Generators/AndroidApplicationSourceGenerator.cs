@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 
@@ -13,8 +15,12 @@ namespace Shiny.Generators
         public AndroidApplicationSourceGenerator() : base(AndroidApplicationTypeName) { }
 
 
-        protected override void Process(INamedTypeSymbol osAppTypeSymbol)
+        protected override void Process(IEnumerable<INamedTypeSymbol> osAppTypeSymbols)
         {
+            if (osAppTypeSymbols.Any())
+                return;
+
+            // TODO: this is supposed to run when there are NO android apps
             // TODO: should we try to change it or error right here?
             // TODO: what if not partial?  why did user mark the assembly then?
 

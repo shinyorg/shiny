@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -13,7 +14,11 @@ namespace Shiny.Generators
         }
 
 
-        protected override void Process(INamedTypeSymbol appDelegate)
+        protected override void Process(IEnumerable<INamedTypeSymbol> osAppTypeSymbols)
+            => osAppTypeSymbols.ToList().ForEach(this.Process);
+
+
+        void Process(INamedTypeSymbol appDelegate)
         {
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Foundation", "UIKit");

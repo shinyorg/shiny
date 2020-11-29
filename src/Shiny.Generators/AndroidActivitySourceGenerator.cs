@@ -80,7 +80,6 @@ namespace Shiny.Generators
                     if (activity.HasMethod("OnCreating"))
                         builder.AppendLineInvariant("this.OnCreating(savedInstanceState);");
 
-
                     // TODO: ensure xf app is set?
                     var xfFormsActivityType = context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.Android.FormsAppCompatActivity");
                     if (xfFormsActivityType != null && activity.Inherits(xfFormsActivityType))
