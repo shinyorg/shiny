@@ -20,16 +20,14 @@ namespace Shiny.Generators
             if (osAppTypeSymbols.Any())
                 return;
 
-            // TODO: this is supposed to run when there are NO android apps
-            // TODO: should we try to change it or error right here?
+            // TODO: this is supposed to run when there are NO android apps - should we try to change it or error right here?
             // TODO: what if not partial?  why did user mark the assembly then?
 
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Content", "Android.Runtime");
+            var nameSpace = this.Context.Context.Compilation.Assembly.GlobalNamespace.Name;
 
-            // TODO: startup class is either being added here or generated on the application
-            // TODO: I need the root namespace... could just use the assembly globalnamespace?
-            using (builder.BlockInvariant($"namespace "))
+            using (builder.BlockInvariant($"namespace " + nameSpace))
             {
                 builder.AppendLineInvariant("[Android.App.ApplicationAttribute]");
                 using (builder.BlockInvariant($"public partial class {ApplicationName} : global::{AndroidApplicationTypeName}"))
@@ -37,7 +35,7 @@ namespace Shiny.Generators
                     builder.AppendLine("public MainApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) {}");
                     builder.AppendLine();
 
-                    this.AppendOnCreate(builder, null);
+                    this.AppendOnCreate(builder);
                 }
             }
             this.AddSource(builder.ToString(), ApplicationName);
@@ -45,11 +43,11 @@ namespace Shiny.Generators
 
 
 
-        void AppendOnCreate(IndentedStringBuilder builder, string startupClassName)
+        void AppendOnCreate(IndentedStringBuilder builder)
         {
             using (builder.BlockInvariant("public override void OnCreate()"))
             {
-                //builder.AppendLineInvariant($"this.ShinyOnCreate(new {startupClassName}());");
+                builder.AppendLineInvariant($"this.ShinyOnCreate(new {this.ShinyConfig.ShinyStartupTypeName}());");
 
                 if (this.Context.Context.HasXamarinEssentials())
                     builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");

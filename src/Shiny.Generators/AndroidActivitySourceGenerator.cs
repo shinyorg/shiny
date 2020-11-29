@@ -9,6 +9,8 @@ namespace Shiny.Generators
     public class AndroidActivitySourceGenerator : ISourceGenerator
     {
         GeneratorExecutionContext context;
+        ShinyApplicationValues values;
+
 
         public void Execute(GeneratorExecutionContext context)
         {
@@ -17,6 +19,7 @@ namespace Shiny.Generators
 
             if (attributeData != null)
             {
+                this.values = new ShinyApplicationValues(attributeData);
                 this.Iterate("AndroidX.AppCompat.App.AppCompatActivity");
                 this.Iterate("Android.Support.V7.App.AppCompatActivity");
             }
@@ -76,24 +79,25 @@ namespace Shiny.Generators
                 using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                 {
                     builder.AppendLineInvariant("this.ShinyOnCreate();");
-
                     if (activity.HasMethod("OnCreating"))
                         builder.AppendLineInvariant("this.OnCreating(savedInstanceState);");
 
-                    // TODO: ensure xf app is set?
-                    var xfFormsActivityType = context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.Android.FormsAppCompatActivity");
-                    if (xfFormsActivityType != null && activity.Inherits(xfFormsActivityType))
+                    if (String.IsNullOrWhiteSpace(this.values.XamarinFormsAppTypeName.IsEmpty()))
                     {
-                        // do XF stuff
-                        builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
-                        builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
-                        builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
-                        builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
-                        //builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
+                        builder.AppendFormatInvariant("base.OnCreate(savedInstanceState);");
                     }
                     else
                     {
-                        builder.AppendFormatInvariant("base.OnCreate(savedInstanceState);");
+                        var xfFormsActivityType = context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.Android.FormsAppCompatActivity");
+                        if (xfFormsActivityType != null && activity.Inherits(xfFormsActivityType))
+                        {
+                            // do XF stuff
+                            builder.AppendLineInvariant("TabLayoutResource = Resource.Layout.Tabbar;");
+                            builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
+                            builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
+                            builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
+                            builder.AppendLineInvariant($"this.LoadApplication(new {this.values.XamarinFormsAppTypeName}());");
+                        }
                     }
                     //this.TryAppendOnCreateThirdParty(activity, builder);
                 }

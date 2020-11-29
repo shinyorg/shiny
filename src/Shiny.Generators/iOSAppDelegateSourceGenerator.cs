@@ -108,42 +108,34 @@ namespace Shiny.Generators
                     if (appDelegate.HasMethod("OnFinishedLaunching"))
                         builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
 
-                    //builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.shinyStartupClassName}());");
+                    builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.ShinyConfig.ShinyStartupTypeName}());");
 
-                    //this.TryAppendThirdParty(appDelegate, builder);
+                    this.TryAppendThirdParty(appDelegate, builder);
                     builder.AppendLineInvariant("return base.FinishedLaunching(app, options);");
                 }
             }
         }
 
 
-        //        void TryAppendThirdParty(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
-        //        {
-        //            // Xamarin Forms
-        //            if (appDelegate.Is("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate"))
-        //            {
-        //                var appClass = this.ShinyContext.GetXamFormsAppClassFullName();
-        //                if (appClass != null)
-        //                {
-        //                    // TODO: what if app class has multiple ctor args - skip
-        //                    builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
-        //                    builder.AppendLineInvariant($"this.LoadApplication(new {appClass}());");
-        //                }
-        //            }
+        void TryAppendThirdParty(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
+        {
+            var xfFormsDelegate = this.Context.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate");
+            if (xfFormsDelegate != null && appDelegate.Inherits(xfFormsDelegate))
+            {
+                // do XF stuff
+                builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+                builder.AppendLineInvariant($"this.LoadApplication(new {this.ShinyConfig.XamarinFormsAppTypeName}());");
+            }
 
-        //            //// ZXing.Net.Mobile
-        //            //if (this.Context.HasZXingNetMobile())
-        //            //    builder.AppendLineInvariant("global::ZXing.Net.Mobile.Forms.iOS.Platform.Init();");
+            //// XF Material or RG Popups
+            //if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
+            //    builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
+            //else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
+            //    builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init();");
 
-        //            // XF Material or RG Popups
-        //            if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
-        //                builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
-        //            else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-        //                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init();");
-
-        //            // AiForms.SettingsView
-        //            if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
-        //                builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
-        //        }
+            //// AiForms.SettingsView
+            //if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
+            //    builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
+        }
     }
 }

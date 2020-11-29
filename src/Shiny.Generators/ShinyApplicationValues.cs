@@ -20,6 +20,7 @@ namespace Shiny.Generators
         public string? XamarinFormsAppTypeName { get; set; }
         public bool ExcludeShinyUserModules { get; set; }
         public bool ExcludeShinyUserJobs { get; set; }
+        //public bool ExcludeXamarinEssentialsRegistration
 
         static T To<T>(AttributeData data, string key, T defaultValue)
             => (T)data
