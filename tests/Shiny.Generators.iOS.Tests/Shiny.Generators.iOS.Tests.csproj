@@ -44,7 +44,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Acr.UserDialogs" Version="7.1.0.466" />
+    <PackageReference Include="Acr.UserDialogs" Version="7.1.0.468" />
     <PackageReference Include="Xamarin.Forms">
       <Version>4.8.0.1451</Version>
     </PackageReference>
