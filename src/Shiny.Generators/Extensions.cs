@@ -31,15 +31,7 @@ namespace Shiny.Generators
 
 
         public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
-        {
-            var hasXamEssentials = false;
-            var type = context.Compilation.GetTypeByMetadataName("");
-            if (type == null)
-            {
-
-            }
-            return hasXamEssentials;
-        }
+            => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.AppInfo") != null;
 
 
         public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbols(this IAssemblySymbol assembly)
@@ -89,10 +81,6 @@ namespace Shiny.Generators
         }
 
 
-        public static bool CurrentAssemblyHasAttribute(this GeneratorExecutionContext context, string attributeTypeName)
-            => context.GetCurrentAssemblyAttribute(attributeTypeName) != null;
-
-
         public static bool IsEvent(this IMethodSymbol method) => method.Kind == SymbolKind.Event;
         public static bool IsProperty(this IMethodSymbol method) => method.Kind == SymbolKind.Property;
         public static bool IsPublic(this ITypeSymbol symbol)
@@ -106,6 +94,21 @@ namespace Shiny.Generators
             .Name
             .Replace("get_", String.Empty)
             .Replace("set_", String.Empty);
+
+
+
+        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this IAssemblySymbol assembly, ITypeSymbol symbol, bool checkAllReferences = false)
+        {
+            return assembly
+                .GetAllTypeSymbols()
+                .Where(x => x.Implements(symbol))
+                .ToList();
+
+            if (checkAllReferences)
+            {
+                foreach (var assembly in assembly)
+            }
+        }
 
 
         public static bool Implements(this INamedTypeSymbol symbol, ITypeSymbol type)
@@ -259,17 +262,6 @@ namespace Shiny.Generators
 
         //public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this GeneratorExecutionContext context, Type type, bool thisProjectOnly = false)
         //    => context.GetAllImplementationsOfType(type.FullName, thisProjectOnly);
-
-
-
-        //public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this IShinyContext context, string fullName, bool thisProjectOnly = false)
-        //{
-        //    var symbol = context.Context.Compilation.GetTypeByMetadataName(fullName);
-        //    if (symbol == null)
-        //        return Enumerable.Empty<INamedTypeSymbol>();
-
-        //    return context.GetAllImplementationsOfType(symbol, thisProjectOnly);
-        //}
 
 
         //public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this IShinyContext context, ISymbol symbol, bool thisProjectOnly = false)

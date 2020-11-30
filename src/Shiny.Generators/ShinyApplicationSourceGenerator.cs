@@ -68,10 +68,7 @@ namespace Shiny.Generators
                 {
                     using (builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
-                        //if (existing?.HasMethod("CustomConfigureServices") ?? false)
-                        //    this.builder.AppendLineInvariant("this.CustomConfigureServices(services);");
-
-                        //    this.RegisterIf("Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
+                        this.RegisterIf("Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
                         //    this.RegisterIf("Shiny.Nfc.INfcManager", "services.UseNfc();");
                         //    this.RegisterIf("Shiny.Sensors.IAccelerometer", "services.UseAllSensors();");
                         //    this.RegisterIf("Shiny.SpeechRecognition.ISpeechRecognizer", "services.UseSpeechRecognition();");
@@ -127,16 +124,17 @@ namespace Shiny.Generators
 
                 if (hasFirebasePush)
                 {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", false);
+                    //this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", false);
                 }
                 else if (hasNativePush)
                 {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", false);
+                    //this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", false);
                 }
             }
+        }
 
 
-            bool RegisterIf(string typeNameExists, string registerString)
+        bool RegisterIf(string typeNameExists, string registerString)
         {
             var symbol = this.Context.Context.Compilation.GetTypeByMetadataName(typeNameExists);
             if (symbol != null)
@@ -183,16 +181,20 @@ namespace Shiny.Generators
         //}
 
 
-        //void RegisterJobs()
-        //{
-        //    var jobTypes = this
-        //        .Context
-        //        .GetAllImplementationsOfType("Shiny.Jobs.IJob")
-        //        .WhereNotSystem();
+        void RegisterJobs()
+        {
+            var jobTypes = this
+                .Context
+                .Context
+                .Compilation
+                .Assembly
+                
+                .GetAllImplementationsOfType("Shiny.Jobs.IJob")
+                .WhereNotSystem();
 
-        //    foreach (var type in jobTypes)
-        //        this.builder.AppendLineInvariant($"services.RegisterJob(typeof({type.ToDisplayString()}));");
-        //}
+            foreach (var type in jobTypes)
+                this.builder.AppendLineInvariant($"services.RegisterJob(typeof({type.ToDisplayString()}));");
+        }
 
 
         //void RegisterStartupTasks()
