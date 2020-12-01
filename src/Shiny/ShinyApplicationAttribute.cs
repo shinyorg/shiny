@@ -22,13 +22,19 @@ namespace Shiny
         /// <summary>
         /// Setting this to true will skip scanning for modules to install when a shiny startup file is being generated
         /// </summary>
-        public bool ExcludeShinyUserModules { get; set; }
+        public bool ExcludeModules { get; set; }
 
 
         /// <summary>
         /// Setting this to true will skip scanning for jobs to register when a shiny startup file is being generated
         /// </summary>
-        public bool ExcludeShinyUserJobs { get; set; }
+        public bool ExcludeJobs { get; set; }
+
+
+        /// <summary>
+        /// Setting this to true will skip scanning for startup tasks to register when a shiny file is being generated
+        /// </summary>
+        public bool ExcludeStartupTasks { get; set; }
     }
 }
 /*

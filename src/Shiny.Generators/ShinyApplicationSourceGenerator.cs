@@ -54,47 +54,49 @@ namespace Shiny.Generators
         protected abstract void Process(IEnumerable<INamedTypeSymbol> osAppTypeSymbols);
 
 
+        IndentedStringBuilder builder;
         protected void GenerateStartup()
         {
             var nameSpace = this.Context.Context.Compilation.Assembly.GlobalNamespace.Name;
-            //var hasPush = this.shinyAssemblies.Value.Any(x => x.Name.StartsWith("Shiny.Push"));
+            this.builder = new IndentedStringBuilder();
+            this.builder.AppendNamespaces("Shiny");
 
-            var builder = new IndentedStringBuilder();
-            builder.AppendNamespaces("Shiny");
-
-            using (builder.BlockInvariant("namespace " + nameSpace))
+            using (this.builder.BlockInvariant("namespace " + nameSpace))
             {
-                using (builder.BlockInvariant("public class " + GENERATED_STARTUP_TYPE_NAME))
+                using (this.builder.BlockInvariant("public class " + GENERATED_STARTUP_TYPE_NAME))
                 {
-                    using (builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
+                    using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
                         //if (existing?.HasMethod("CustomConfigureServices") ?? false)
                         //    this.builder.AppendLineInvariant("this.CustomConfigureServices(services);");
 
-                        //    this.RegisterIf("Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
-                        //    this.RegisterIf("Shiny.Nfc.INfcManager", "services.UseNfc();");
-                        //    this.RegisterIf("Shiny.Sensors.IAccelerometer", "services.UseAllSensors();");
-                        //    this.RegisterIf("Shiny.SpeechRecognition.ISpeechRecognizer", "services.UseSpeechRecognition();");
-                        //    this.RegisterIf("Shiny.Locations.IGpsManager", "services.UseMotionActivity();");
+                        this.RegisterIf("Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
+                        this.RegisterIf("Shiny.Nfc.INfcManager", "services.UseNfc();");
+                        this.RegisterIf("Shiny.Sensors.IAccelerometer", "services.UseAllSensors();");
+                        this.RegisterIf("Shiny.SpeechRecognition.ISpeechRecognizer", "services.UseSpeechRecognition();");
+                        this.RegisterIf("Shiny.Locations.IGpsManager", "services.UseMotionActivity();");
 
-                        //    this.RegisterAllDelegate("Shiny.Locations.IGpsDelegate", "services.UseGps", false);
-                        //    this.RegisterAllDelegate("Shiny.Locations.IGeofenceDelegate", "services.UseGeofencing", true);
-                        //    this.RegisterAllDelegate("Shiny.BluetoothLE.IBleDelegate", "services.UseBleClient", false);
-                        //    this.RegisterAllDelegate("Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
-                        //    this.RegisterAllDelegate("Shiny.MediaSync.IMediaSyncDelegate", "services.UseMediaSync", false);
-                        //    this.RegisterAllDelegate("Shiny.Net.Http.IHttpTransferDelegate", "services.UseHttpTransfers", true);
-                        //    this.RegisterAllDelegate("Shiny.Beacons.IBeaconMonitorDelegate", "services.UseBeaconRanging", true);
-                        //    this.RegisterAllDelegate("Shiny.Locations.Sync.IGeofenceSyncDelegate", "services.UseGeofencingSync", true);
-                        //    this.RegisterAllDelegate("Shiny.Locations.Sync.IGpsSyncDelegate", "services.UseGpsSync", true);
-                        //    this.RegisterAllDelegate("Shiny.TripTracker.ITripTrackerDelegate", "services.UseTripTracker", true);
-                        //    this.RegisterAllDelegate("Shiny.DataSync.IDataSyncDelegate", "services.UseDataSync", true);
+                        this.RegisterAllDelegate("Shiny.Locations.IGpsDelegate", "services.UseGps", false);
+                        this.RegisterAllDelegate("Shiny.Locations.IGeofenceDelegate", "services.UseGeofencing", true);
+                        this.RegisterAllDelegate("Shiny.BluetoothLE.IBleDelegate", "services.UseBleClient", false);
+                        this.RegisterAllDelegate("Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
+                        this.RegisterAllDelegate("Shiny.Net.Http.IHttpTransferDelegate", "services.UseHttpTransfers", true);
+                        this.RegisterAllDelegate("Shiny.Beacons.IBeaconMonitorDelegate", "services.UseBeaconRanging", true);
+                        this.RegisterAllDelegate("Shiny.Locations.Sync.IGeofenceSyncDelegate", "services.UseGeofencingSync", true);
+                        this.RegisterAllDelegate("Shiny.Locations.Sync.IGpsSyncDelegate", "services.UseGpsSync", true);
+                        this.RegisterAllDelegate("Shiny.TripTracker.ITripTrackerDelegate", "services.UseTripTracker", true);
+                        this.RegisterAllDelegate("Shiny.DataSync.IDataSyncDelegate", "services.UseDataSync", true);
 
-                        //    this.RegisterPush();
-                        //    this.RegisterJobs();
-                        //    this.RegisterStartupTasks();
-                        //    this.RegisterModules();
-                        //    this.RegisterInjects();
-                        //}
+                        this.RegisterPush();
+
+                        if (this.ShinyConfig.ExcludeJobs)
+                            this.RegisterJobs();
+
+                        if (this.ShinyConfig.ExcludeModules)
+                            this.RegisterModules();
+
+                        if (this.ShinyConfig.ExcludeStartupTasks)
+                            this.RegisterStartupTasks();
 
                         //if (this.Context.HasXamarinForms())
                         //{
@@ -107,7 +109,7 @@ namespace Shiny.Generators
                     }
                 }
             }
-            this.Context.Context.Source(builder.ToString(), GENERATED_STARTUP_TYPE_NAME);
+            this.Context.Context.Source(this.builder.ToString(), GENERATED_STARTUP_TYPE_NAME);
         }
 
 
@@ -134,89 +136,97 @@ namespace Shiny.Generators
                     this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", false);
                 }
             }
+        }
 
 
-            bool RegisterIf(string typeNameExists, string registerString)
+        bool RegisterIf(string typeNameExists, string registerString)
         {
             var symbol = this.Context.Context.Compilation.GetTypeByMetadataName(typeNameExists);
             if (symbol != null)
             {
                 //this.Log.Info("Registering in Shiny Startup - " + registerString);
-                //this.builder.AppendLineInvariant(registerString);
+                this.builder.AppendLineInvariant(registerString);
                 return true;
             }
             return false;
         }
 
 
-        //bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
-        //{
-        //    var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
-        //    if (symbol == null)
-        //        return false;
+            bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
+            {
+                var symbol = this.Context.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
+                if (symbol == null)
+                    return false;
 
-        //    var impls = this
-        //        .Context
-        //        .GetAllImplementationsOfType(delegateTypeName)
-        //        .WhereNotSystem()
-        //        .ToArray();
-
-        //    if (!impls.Any() && oneDelegateRequiredToInstall)
-        //        return false;
-
-        //    if (oneDelegateRequiredToInstall)
-        //        registerStatement += $"<{impls.First().ToDisplayString()}>";
-
-        //    registerStatement += "();";
-        //    this.builder.AppendLineInvariant(registerStatement);
-
-        //    if (impls.Length > 1)
-        //    {
-        //        var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
-        //        for (var i = startIndex; i < impls.Length; i++)
-        //        {
-        //            var impl = impls[i];
-        //            this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
-        //        }
-        //    }
-        //    return true;
-        //}
+                var impls = this.Context
+                    .Context
+                    .Compilation
+                    .Assembly
+                    .GetAllTypeSymbols()
+                    .Where(x => x.Inherits(symbol))
+                    .ToList();
 
 
-        //void RegisterJobs()
-        //{
-        //    var jobTypes = this
-        //        .Context
-        //        .GetAllImplementationsOfType("Shiny.Jobs.IJob")
-        //        .WhereNotSystem();
+                if (!impls.Any() && oneDelegateRequiredToInstall)
+                    return false;
 
-        //    foreach (var type in jobTypes)
-        //        this.builder.AppendLineInvariant($"services.RegisterJob(typeof({type.ToDisplayString()}));");
-        //}
+                if (oneDelegateRequiredToInstall)
+                    registerStatement += $"<{impls.First().ToDisplayString()}>";
 
+                registerStatement += "();";
+                this.builder.AppendLineInvariant(registerStatement);
 
-        //void RegisterStartupTasks()
-        //{
-        //    var types = this
-        //        .Context
-        //        .GetAllImplementationsOfType("Shiny.IShinyStartupTask")
-        //        .WhereNotSystem()
-        //        .Where(x => x.AllInterfaces.Length == 1);
-
-        //    foreach (var task in types)
-        //        this.builder.AppendLineInvariant($"services.AddSingleton<Shiny.IShinyStartupTask, {task.ToDisplayString()}>();");
-        //}
+                if (impls.Count > 1)
+                {
+                    var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
+                    for (var i = startIndex; i < impls.Count; i++)
+                    {
+                        var impl = impls[i];
+                        this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
+                    }
+                }
+                return true;
+            }
 
 
-        //void RegisterModules()
-        //{
-        //    var types = this
-        //        .Context
-        //        .GetAllImplementationsOfType("Shiny.IShinyModule")
-        //        .WhereNotSystem();
+        void RegisterJobs() => this.RegisterTypes(
+            "Shiny.Jobs.IJob",
+            false,
+            x => this.builder.AppendLineInvariant($"services.RegisterJob(typeof({x.ToDisplayString()}));")
+        );
 
-        //    foreach (var type in types)
-        //        this.builder.AppendLineInvariant($"services.RegisterModule<{type.ToDisplayString()}>();");
-        //}
+
+        void RegisterStartupTasks() => this.RegisterTypes(
+            "Shiny.IShinyStartupTask",
+            false,
+            x => this.builder.AppendLineInvariant($"services.AddSingleton<{x.ToDisplayString()}>();")
+        );
+
+
+        void RegisterModules() => this.RegisterTypes(
+            "Shiny.ShinyModule",
+            true,
+            x => this.builder.AppendLineInvariant($"services.RegisterModule<{x.ToDisplayString()}>();")
+        );
+
+
+        void RegisterTypes(string searchType, bool inherits, Action<INamedTypeSymbol> action)
+        {
+            var symbol = this.Context.Context.Compilation.GetTypeByMetadataName("Shiny.Jobs.IJob");
+            var jobTypes = this
+                .Context
+                .Context
+                .Compilation
+                .Assembly
+                .GetAllTypeSymbols()
+                // Where not system
+                .Where(x => inherits
+                    ? x.Inherits(symbol)
+                    : x.Implements(symbol)
+                );
+
+            foreach (var type in jobTypes)
+                this.builder.AppendLineInvariant($"services.RegisterJob(typeof({type.ToDisplayString()}));");
+        }
     }
 }

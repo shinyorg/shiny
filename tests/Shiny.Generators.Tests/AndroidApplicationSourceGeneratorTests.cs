@@ -40,16 +40,7 @@ namespace Shiny.Generators.Tests
         [Fact]
         public void Test()
         {
-            this.generator.AddSource(@"
-[assembly: Shiny.GenerateStartupAttribute]
-[assembly: Shiny.ShinyApplicationAttribute]
-namespace Test
-{
-    public class TestApplication : Android.App.Application
-    {
-    }
-}
-");
+            this.generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
             var compile = this.generator.DoGenerate(
                 nameof(Test),
                 new AndroidApplicationSourceGenerator()

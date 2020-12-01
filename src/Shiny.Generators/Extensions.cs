@@ -31,15 +31,7 @@ namespace Shiny.Generators
 
 
         public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
-        {
-            var hasXamEssentials = false;
-            var type = context.Compilation.GetTypeByMetadataName("");
-            if (type == null)
-            {
-
-            }
-            return hasXamEssentials;
-        }
+            => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.AppInfo") != null;
 
 
         public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbols(this IAssemblySymbol assembly)

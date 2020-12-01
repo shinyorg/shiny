@@ -82,7 +82,7 @@ namespace Shiny.Generators
                     if (activity.HasMethod("OnCreating"))
                         builder.AppendLineInvariant("this.OnCreating(savedInstanceState);");
 
-                    if (String.IsNullOrWhiteSpace(this.values.XamarinFormsAppTypeName.IsEmpty()))
+                    if (String.IsNullOrWhiteSpace(this.values.XamarinFormsAppTypeName))
                     {
                         builder.AppendFormatInvariant("base.OnCreate(savedInstanceState);");
                     }
