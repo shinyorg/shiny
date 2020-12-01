@@ -86,26 +86,26 @@ namespace Shiny.Generators
                         this.RegisterAllDelegate("Shiny.Locations.Sync.IGpsSyncDelegate", "services.UseGpsSync", true);
                         this.RegisterAllDelegate("Shiny.TripTracker.ITripTrackerDelegate", "services.UseTripTracker", true);
                         this.RegisterAllDelegate("Shiny.DataSync.IDataSyncDelegate", "services.UseDataSync", true);
-
                         this.RegisterPush();
 
-                        if (this.ShinyConfig.ExcludeJobs)
+                        if (!this.ShinyConfig.ExcludeJobs)
                             this.RegisterJobs();
 
-                        if (this.ShinyConfig.ExcludeModules)
+                        if (!this.ShinyConfig.ExcludeModules)
                             this.RegisterModules();
 
-                        if (this.ShinyConfig.ExcludeStartupTasks)
+                        if (!this.ShinyConfig.ExcludeStartupTasks)
                             this.RegisterStartupTasks();
 
-                        //if (this.Context.HasXamarinForms())
-                        //{
-                        //    using (this.builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
-                        //    {
-                        //        this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
-                        //        this.builder.AppendLine();
-                        //    }
-                        //}
+                        var xamFormsType = this.Context.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Forms");
+                        if (xamFormsType != null)
+                        {
+                            using (this.builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
+                            {
+                                this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
+                                this.builder.AppendLine();
+                            }
+                        }
                     }
                 }
             }

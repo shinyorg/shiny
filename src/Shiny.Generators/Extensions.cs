@@ -97,18 +97,21 @@ namespace Shiny.Generators
 
 
 
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this IAssemblySymbol assembly, ITypeSymbol symbol, bool checkAllReferences = false)
-        {
-            return assembly
-                .GetAllTypeSymbols()
-                .Where(x => x.Implements(symbol))
-                .ToList();
+        //public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this IAssemblySymbol assembly, ITypeSymbol symbol, bool checkAllReferences = false)
+        //{
+        //    return assembly
+        //        .GetAllTypeSymbols()
+        //        .Where(x => x.Implements(symbol))
+        //        .ToList();
 
-            if (checkAllReferences)
-            {
-                foreach (var assembly in assembly)
-            }
-        }
+        //    if (checkAllReferences)
+        //    {
+        //        foreach (var assembly in assembly)
+        //        {
+
+        //        }
+        //    }
+        //}
 
 
         public static bool Implements(this INamedTypeSymbol symbol, ITypeSymbol type)

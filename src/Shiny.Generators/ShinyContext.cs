@@ -37,7 +37,6 @@ namespace Shiny.Generators
 
 
         public GeneratorExecutionContext Context { get; private set; }
-        //public bool HasPush => this.shinyAssemblies.Value.Any(x => x.Name.Contains("Shiny.Push"));
 
 
         public INamedTypeSymbol? GetShinyType(string fullyQualifiedMetadataName) => this.shinyAssemblies
