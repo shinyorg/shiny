@@ -19,13 +19,27 @@ namespace Shiny.Generators.Tests
             this.generator.AddReference("Xamarin.iOS");
             this.generator.AddReference("Shiny");
             this.generator.AddReference("Shiny.Core");
+            this.generator.AddReference("Shiny.Push");
+            this.generator.AddReference("Shiny.Push.Abstractions");
         }
 
 
         [Fact]
         public void Test()
         {
-
+            this.generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+namespace MyTest 
+{
+    public partial class TestAppDelegate : UIKit.UIApplicationDelegate 
+    {
+    }
+}");
+            var compile = this.generator.DoGenerate(
+                nameof(Test),
+                new iOSAppDelegateSourceGenerator()
+            );
+            this.output.WriteSyntaxTrees(compile);
         }
 
         // TODO: build xam ios libs, add appdelegate

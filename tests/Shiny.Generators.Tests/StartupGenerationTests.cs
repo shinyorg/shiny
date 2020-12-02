@@ -1,7 +1,7 @@
 ﻿using System;
-
 using Xunit;
 using Xunit.Abstractions;
+
 
 namespace Shiny.Generators.Tests
 {
