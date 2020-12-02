@@ -31,6 +31,7 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IncludeGenerators>true</IncludeGenerators>
         <!--<EmbedAllSources>true</EmbedAllSources>-->
     </PropertyGroup>
 

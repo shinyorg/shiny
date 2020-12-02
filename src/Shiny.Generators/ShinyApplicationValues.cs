@@ -24,10 +24,15 @@ namespace Shiny.Generators
         //public bool ExcludeXamarinEssentialsRegistration
 
         static T To<T>(AttributeData data, string key, T defaultValue)
-            => (T)data
+        {
+            var query = data
                 .NamedArguments
-                .Where(x => x.Key == key)
-                .Select(x => x.Value)
-                .FirstOrDefault().Value ?? defaultValue;
+                .Where(x => x.Key == key);
+
+            if (!query.Any())
+                return defaultValue;
+
+            return (T)query.First().Value.Value ?? defaultValue;
+        }
     }
 }

@@ -74,7 +74,7 @@ namespace Shiny.Generators
                     );
                 }
             }
-            this.AddSource(builder.ToString(), appDelegate.Name);
+            this.Context.Source(builder.ToString(), appDelegate.Name);
         }
 
 
@@ -119,7 +119,7 @@ namespace Shiny.Generators
 
         void TryAppendThirdParty(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
         {
-            var xfFormsDelegate = this.Context.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate");
+            var xfFormsDelegate = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate");
             if (xfFormsDelegate != null && appDelegate.Inherits(xfFormsDelegate))
             {
                 // do XF stuff

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-
 using Microsoft.CodeAnalysis;
 
 
@@ -9,7 +7,7 @@ namespace Shiny.Generators.Tasks
     [Generator]
     public class StaticClassSourceGenerator : ISourceGenerator
     {
-        IShinyContext? shinyContext;
+        GeneratorExecutionContext context;
         string? useNamespace;
 
         public void Initialize(GeneratorInitializationContext context) { }
@@ -17,11 +15,11 @@ namespace Shiny.Generators.Tasks
 
         public void Execute(GeneratorExecutionContext context)
         {
+            this.context = context;
             var attribute = context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
             if (attribute == null)
                 return;
 
-            this.shinyContext = new ShinyContext(context);
             this.useNamespace = attribute.ConstructorArguments[0].Value.ToString();
             this.BuildStaticClass("Shiny.Jobs.IJobManager", "ShinyJobs", "Shiny.Jobs");
             this.BuildStaticClass("Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");
@@ -65,7 +63,7 @@ namespace Shiny.Generators.Tasks
 
         void BuildStaticClass(string ifTypeName, string genFileName, string namespaces)
         {
-            var type = this.shinyContext.GetShinyType(ifTypeName);
+            var type = this.context.Compilation.GetTypeByMetadataName(ifTypeName);
             if (type == null)
                 return;
 
@@ -125,7 +123,7 @@ namespace Shiny.Generators.Tasks
                     }
                 }
             }
-            this.shinyContext.Context.AddSource(genFileName, builder.ToString());
+            this.context.Source(genFileName, builder.ToString());
         }
 
 

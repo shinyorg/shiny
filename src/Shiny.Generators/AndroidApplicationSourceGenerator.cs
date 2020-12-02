@@ -25,7 +25,7 @@ namespace Shiny.Generators
 
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Content", "Android.Runtime");
-            var nameSpace = this.Context.Context.Compilation.Assembly.GlobalNamespace.Name;
+            var nameSpace = this.Context.Compilation.Assembly.GlobalNamespace.Name;
 
             using (builder.BlockInvariant($"namespace " + nameSpace))
             {
@@ -38,7 +38,7 @@ namespace Shiny.Generators
                     this.AppendOnCreate(builder);
                 }
             }
-            this.AddSource(builder.ToString(), ApplicationName);
+            this.Context.Source(builder.ToString(), ApplicationName);
         }
 
 
@@ -49,10 +49,10 @@ namespace Shiny.Generators
             {
                 builder.AppendLineInvariant($"this.ShinyOnCreate(new {this.ShinyConfig.ShinyStartupTypeName}());");
 
-                if (this.Context.Context.HasXamarinEssentials())
+                if (this.Context.HasXamarinEssentials())
                     builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");
 
-                if (this.Context.Context.Compilation.GetTypeByMetadataName("Acr.UserDialogs.UserDialogs") != null)
+                if (this.Context.Compilation.GetTypeByMetadataName("Acr.UserDialogs.UserDialogs") != null)
                     builder.AppendLineInvariant("global::Acr.UserDialogs.UserDialogs.Init(this);");
 
                 builder.AppendLineInvariant("base.OnCreate();");

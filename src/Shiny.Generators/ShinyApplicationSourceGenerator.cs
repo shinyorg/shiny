@@ -12,13 +12,13 @@ namespace Shiny.Generators
         readonly string osApplicationTypeName;
 
         protected ShinyApplicationSourceGenerator(string osApplicationTypeName) => this.osApplicationTypeName = osApplicationTypeName;
-        protected IShinyContext? Context { get; private set; }
-        protected void AddSource(string sourceText, string? fileName = null) => this.Context.Context.Source(sourceText, fileName);
+        protected GeneratorExecutionContext Context { get; private set; }
         internal ShinyApplicationValues ShinyConfig { get; private set; }
 
 
         public virtual void Execute(GeneratorExecutionContext context)
         {
+            this.Context = context;
             var shinyAppAttributeData = context.GetCurrentAssemblyAttribute(Constants.ShinyApplicationAttributeTypeName);
             if (shinyAppAttributeData == null)
                 return;
@@ -28,7 +28,6 @@ namespace Shiny.Generators
                 return;
 
             this.ShinyConfig = new ShinyApplicationValues(shinyAppAttributeData);
-            this.Context = new ShinyContext(context);
 
             // TODO: search current assembly for one first
             if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
@@ -57,13 +56,13 @@ namespace Shiny.Generators
         IndentedStringBuilder builder;
         protected void GenerateStartup()
         {
-            var nameSpace = this.Context.Context.Compilation.Assembly.GlobalNamespace.Name;
+            var nameSpace = this.Context.Compilation.Assembly.GlobalNamespace.Name;
             this.builder = new IndentedStringBuilder();
             this.builder.AppendNamespaces("Shiny");
 
             using (this.builder.BlockInvariant("namespace " + nameSpace))
             {
-                using (this.builder.BlockInvariant("public class " + GENERATED_STARTUP_TYPE_NAME))
+                using (this.builder.BlockInvariant($"public class {GENERATED_STARTUP_TYPE_NAME} : Shiny.ShinyStartup"))
                 {
                     using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
@@ -97,7 +96,7 @@ namespace Shiny.Generators
                         if (!this.ShinyConfig.ExcludeStartupTasks)
                             this.RegisterStartupTasks();
 
-                        var xamFormsType = this.Context.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Forms");
+                        var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Forms");
                         if (xamFormsType != null)
                         {
                             using (this.builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
@@ -109,13 +108,13 @@ namespace Shiny.Generators
                     }
                 }
             }
-            this.Context.Context.Source(this.builder.ToString(), GENERATED_STARTUP_TYPE_NAME);
+            this.Context.Source(this.builder.ToString(), GENERATED_STARTUP_TYPE_NAME);
         }
 
 
         void RegisterPush()
         {
-            var hasAzurePush = this.Context.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.AzureNotificationHubs"));
+            var hasAzurePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.AzureNotificationHubs"));
             if (hasAzurePush)
             {
                 //var rootNs = this.Context.Context.GetRootNamespace();
@@ -124,8 +123,8 @@ namespace Shiny.Generators
             else
             {
                 // azure must be manually registered
-                var hasFirebasePush = this.Context.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.FirebaseMessaging"));
-                var hasNativePush = this.Context.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push"));
+                var hasFirebasePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.FirebaseMessaging"));
+                var hasNativePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push"));
 
                 if (hasFirebasePush)
                 {
@@ -141,7 +140,7 @@ namespace Shiny.Generators
 
         bool RegisterIf(string typeNameExists, string registerString)
         {
-            var symbol = this.Context.Context.Compilation.GetTypeByMetadataName(typeNameExists);
+            var symbol = this.Context.Compilation.GetTypeByMetadataName(typeNameExists);
             if (symbol != null)
             {
                 //this.Log.Info("Registering in Shiny Startup - " + registerString);
@@ -154,12 +153,11 @@ namespace Shiny.Generators
 
             bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
             {
-                var symbol = this.Context.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
+                var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
                 if (symbol == null)
                     return false;
 
                 var impls = this.Context
-                    .Context
                     .Compilation
                     .Assembly
                     .GetAllTypeSymbols()
@@ -212,9 +210,8 @@ namespace Shiny.Generators
 
         void RegisterTypes(string searchType, bool inherits, Action<INamedTypeSymbol> action)
         {
-            var symbol = this.Context.Context.Compilation.GetTypeByMetadataName("Shiny.Jobs.IJob");
+            var symbol = this.Context.Compilation.GetTypeByMetadataName("Shiny.Jobs.IJob");
             var jobTypes = this
-                .Context
                 .Context
                 .Compilation
                 .Assembly
