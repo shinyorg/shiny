@@ -10,6 +10,7 @@ namespace Shiny.Generators
     {
         const string GENERATED_STARTUP_TYPE_NAME = "AppShinyStartup";
         readonly string osApplicationTypeName;
+        List<INamedTypeSymbol> allSymbols;
 
         protected ShinyApplicationSourceGenerator(string osApplicationTypeName) => this.osApplicationTypeName = osApplicationTypeName;
         protected GeneratorExecutionContext Context { get; private set; }
@@ -56,6 +57,12 @@ namespace Shiny.Generators
         IndentedStringBuilder builder;
         protected void GenerateStartup()
         {
+            this.allSymbols = this.Context
+                .GetAllAssemblies()
+                .Where(x => !x.Name.StartsWith("Shiny") && !x.Name.StartsWith("Xamarin."))
+                .SelectMany(x => x.GetAllTypeSymbols())
+                .ToList();
+
             var nameSpace = this.Context.Compilation.Assembly.GlobalNamespace.Name;
             this.builder = new IndentedStringBuilder();
             this.builder.AppendNamespaces("Shiny");
@@ -158,9 +165,9 @@ namespace Shiny.Generators
                     return false;
 
                 var impls = this.Context
-                    .Compilation
-                    .Assembly
-                    .GetAllTypeSymbols()
+                    .GetAllAssemblies()
+
+                    .SelectMany(x => x.GetAllTypeSymbols())
                     .Where(x => x.Inherits(symbol))
                     .ToList();
 
@@ -212,11 +219,7 @@ namespace Shiny.Generators
         {
             var symbol = this.Context.Compilation.GetTypeByMetadataName("Shiny.Jobs.IJob");
             var jobTypes = this
-                .Context
-                .Compilation
-                .Assembly
-                .GetAllTypeSymbols()
-                // Where not system
+                .allSymbols
                 .Where(x => inherits
                     ? x.Inherits(symbol)
                     : x.Implements(symbol)

@@ -34,6 +34,15 @@ namespace Shiny.Generators
             => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.AppInfo") != null;
 
 
+        public static IEnumerable<IAssemblySymbol> GetAllAssemblies(this GeneratorExecutionContext context)
+        {
+            yield return context.Compilation.Assembly;
+            foreach (var reference in context.Compilation.References)
+                if (reference.Properties.Kind == MetadataImageKind.Assembly)
+                    yield return (IAssemblySymbol)context.Compilation.GetAssemblyOrModuleSymbol(reference);
+        }
+
+
         public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbols(this IAssemblySymbol assembly)
         {
             var stack = new Stack<INamespaceSymbol>();
@@ -50,6 +59,13 @@ namespace Shiny.Generators
 
                     else if (member is INamedTypeSymbol symbol)
                         yield return symbol;
+
+                    else if (member is IAssemblySymbol reference)
+                    {
+                        var symbols = reference.GetAllTypeSymbols();
+                        foreach (var s in symbols)
+                            yield return s;
+                    }
                 }
             }
         }

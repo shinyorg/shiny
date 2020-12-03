@@ -5,7 +5,7 @@ using Xunit.Abstractions;
 
 namespace Shiny.Generators.Tests
 {
-    public class StartupGenerationTests
+    public class StartupGenerationTests : IDisposable
     {
         readonly ITestOutputHelper output;
         readonly AssemblyGenerator generator;
@@ -20,6 +20,7 @@ namespace Shiny.Generators.Tests
             this.generator.AddReference("Shiny.Core");
         }
 
+        public void Dispose() => throw new NotImplementedException();
 
         [Fact]
         public void Test()
@@ -29,9 +30,15 @@ namespace Shiny.Generators.Tests
                 nameof(Test),
                 new AndroidApplicationSourceGenerator()
             );
-            this.output.WriteSyntaxTrees(compile);
+
 
             //compile.AssertTypesExist("");
+        }
+
+
+        public void TestJobDetection()
+        {
+
         }
     }
 }
