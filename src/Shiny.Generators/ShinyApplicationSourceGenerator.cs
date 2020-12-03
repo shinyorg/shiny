@@ -63,7 +63,7 @@ namespace Shiny.Generators
                 .SelectMany(x => x.GetAllTypeSymbols())
                 .ToList();
 
-            var nameSpace = this.Context.Compilation.Assembly.GlobalNamespace.Name;
+            var nameSpace = this.Context.Compilation.Assembly.ToDisplayString();
             this.builder = new IndentedStringBuilder();
             this.builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
 
@@ -159,39 +159,36 @@ namespace Shiny.Generators
         }
 
 
-            bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
+        bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
+        {
+            var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
+            if (symbol == null)
+                return false;
+
+            var impls = this.allSymbols
+                .Where(x => x.Inherits(symbol))
+                .ToList();
+
+            if (!impls.Any() && oneDelegateRequiredToInstall)
+                return false;
+
+            if (oneDelegateRequiredToInstall)
+                registerStatement += $"<{impls.First().ToDisplayString()}>";
+
+            registerStatement += "();";
+            this.builder.AppendLineInvariant(registerStatement);
+
+            if (impls.Count > 1)
             {
-                var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
-                if (symbol == null)
-                    return false;
-
-                var impls = this.Context
-                    .GetAllAssemblies()
-
-                    .SelectMany(x => x.GetAllTypeSymbols())
-                    .Where(x => x.Inherits(symbol))
-                    .ToList();
-
-                if (!impls.Any() && oneDelegateRequiredToInstall)
-                    return false;
-
-                if (oneDelegateRequiredToInstall)
-                    registerStatement += $"<{impls.First().ToDisplayString()}>";
-
-                registerStatement += "();";
-                this.builder.AppendLineInvariant(registerStatement);
-
-                if (impls.Count > 1)
+                var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
+                for (var i = startIndex; i < impls.Count; i++)
                 {
-                    var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
-                    for (var i = startIndex; i < impls.Count; i++)
-                    {
-                        var impl = impls[i];
-                        this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
-                    }
+                    var impl = impls[i];
+                    this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
                 }
-                return true;
             }
+            return true;
+        }
 
 
         void RegisterJobs() => this.RegisterTypes(

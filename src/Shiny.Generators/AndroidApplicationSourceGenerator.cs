@@ -29,7 +29,7 @@ namespace Shiny.Generators
 
             using (builder.BlockInvariant($"namespace " + nameSpace))
             {
-                builder.AppendLineInvariant("[Android.App.ApplicationAttribute]");
+                builder.AppendLineInvariant("[global::Android.App.ApplicationAttribute]");
                 using (builder.BlockInvariant($"public partial class {ApplicationName} : global::{AndroidApplicationTypeName}"))
                 {
                     builder.AppendLine("public MainApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) {}");

@@ -31,6 +31,7 @@ namespace Shiny.Generators.Tests
         // test for permissions
         // test for init
         // test for partial
+        // test xamessentials
 
 
         // TODO: auto startup
