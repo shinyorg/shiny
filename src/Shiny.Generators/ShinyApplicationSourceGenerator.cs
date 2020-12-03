@@ -65,16 +65,17 @@ namespace Shiny.Generators
 
             var nameSpace = this.Context.Compilation.Assembly.GlobalNamespace.Name;
             this.builder = new IndentedStringBuilder();
-            this.builder.AppendNamespaces("Shiny");
+            this.builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
 
             using (this.builder.BlockInvariant("namespace " + nameSpace))
             {
-                using (this.builder.BlockInvariant($"public class {GENERATED_STARTUP_TYPE_NAME} : Shiny.ShinyStartup"))
+                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.ShinyStartup"))
                 {
+                    this.builder.AppendLine("partial void AdditionalConfigureServices(IServiceCollection services);");
+
                     using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
                     {
-                        //if (existing?.HasMethod("CustomConfigureServices") ?? false)
-                        //    this.builder.AppendLineInvariant("this.CustomConfigureServices(services);");
+                        this.builder.AppendLine("this.AdditionalConfigureServices(services);");
 
                         this.RegisterIf("Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
                         this.RegisterIf("Shiny.Nfc.INfcManager", "services.UseNfc();");
