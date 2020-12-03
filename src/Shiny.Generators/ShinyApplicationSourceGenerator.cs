@@ -172,7 +172,6 @@ namespace Shiny.Generators
                     .Where(x => x.Inherits(symbol))
                     .ToList();
 
-
                 if (!impls.Any() && oneDelegateRequiredToInstall)
                     return false;
 
@@ -218,16 +217,16 @@ namespace Shiny.Generators
 
         void RegisterTypes(string searchType, bool inherits, Action<INamedTypeSymbol> action)
         {
-            var symbol = this.Context.Compilation.GetTypeByMetadataName("Shiny.Jobs.IJob");
-            var jobTypes = this
+            var symbol = this.Context.Compilation.GetTypeByMetadataName(searchType);
+            var types = this
                 .allSymbols
                 .Where(x => inherits
                     ? x.Inherits(symbol)
                     : x.Implements(symbol)
                 );
 
-            foreach (var type in jobTypes)
-                this.builder.AppendLineInvariant($"services.RegisterJob(typeof({type.ToDisplayString()}));");
+            foreach (var type in types)
+                action(type);
         }
     }
 }
