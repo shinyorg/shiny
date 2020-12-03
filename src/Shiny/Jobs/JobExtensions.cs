@@ -56,7 +56,7 @@ namespace Shiny
                 var jobs = sp.GetService<IJobManager>();
                 var access = await jobs.RequestAccess();
                 if (access == AccessState.Available)
-                    await jobs.Schedule(jobInfo);
+                    await jobs.Register(jobInfo);
                 else
                     Log.Write("Jobs", "Job permission failed - " + access);
             });

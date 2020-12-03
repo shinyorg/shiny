@@ -119,7 +119,7 @@ namespace Shiny.Jobs
         public IObservable<JobRunResult> JobFinished => this.jobFinished;
 
 
-        public async Task Schedule(JobInfo jobInfo)
+        public async Task Register(JobInfo jobInfo)
         {
             this.ResolveJob(jobInfo);
             this.ScheduleNative(jobInfo);

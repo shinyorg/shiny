@@ -78,7 +78,7 @@ namespace Shiny.Jobs
         /// Create a new job
         /// </summary>
         /// <param name="jobInfo"></param>
-        Task Schedule(JobInfo jobInfo);
+        Task Register(JobInfo jobInfo);
 
 
         /// <summary>

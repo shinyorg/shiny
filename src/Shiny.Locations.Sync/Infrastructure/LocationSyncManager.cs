@@ -43,7 +43,7 @@ namespace Shiny.Locations.Sync.Infrastructure
                 BatchSize = 1,
                 SortMostRecentFirst = true
             });
-            await this.jobManager.Schedule(jobInfo);
+            await this.jobManager.Register(jobInfo);
             if (!(region is null))
                 await this.geofenceManager.StartMonitoring(region);
         }
@@ -65,7 +65,7 @@ namespace Shiny.Locations.Sync.Infrastructure
                 BatchSize = 10,
                 SortMostRecentFirst = false
             });
-            await this.jobManager.Schedule(jobInfo);
+            await this.jobManager.Register(jobInfo);
             await this.gpsManager.StartListener(request);
         }
 
