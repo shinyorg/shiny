@@ -30,19 +30,22 @@ namespace Shiny.Generators
 
             this.ShinyConfig = new ShinyApplicationValues(shinyAppAttributeData);
 
-            // TODO: search current assembly for one first
-            if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
-            {
-                this.GenerateStartup();
-                this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
-            }
-
             var appClasses = context
                 .Compilation
                 .Assembly
                 .GetAllTypeSymbols()
                 .Where(x => x.Inherits(appType))
                 .ToList();
+
+            if (appClasses.Count == 0)
+                throw new ArgumentException("No app classes found in this assembly!");
+
+            if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
+            {
+                var nameSpace = appClasses.FirstOrDefault()?.ContainingNamespace.Name;
+                this.GenerateStartup(nameSpace);
+                this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
+            }
 
             this.Process(appClasses);
         }
@@ -55,7 +58,7 @@ namespace Shiny.Generators
 
 
         IndentedStringBuilder builder;
-        protected void GenerateStartup()
+        void GenerateStartup(string nameSpace)
         {
             this.allSymbols = this.Context
                 .GetAllAssemblies()
@@ -63,7 +66,6 @@ namespace Shiny.Generators
                 .SelectMany(x => x.GetAllTypeSymbols())
                 .ToList();
 
-            var nameSpace = this.Context.Compilation.Assembly.ToDisplayString();
             this.builder = new IndentedStringBuilder();
             this.builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
 
