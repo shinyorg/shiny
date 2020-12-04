@@ -209,6 +209,23 @@ namespace Shiny.Notifications
         public virtual Android.App.Notification CreateNativeNotification(Notification notification)
             => this.CreateNativeBuilder(notification).Build();
 
+        // Construct a raw resource path of the form
+        // "android.resource://<PKG_NAME>/raw/<RES_NAME>", e.g.
+        // "android.resource://com.shiny.sample/raw/notification"
+        private Android.Net.Uri GetSoundResourceUri(string soundResourceName)
+        {
+            // Strip file extension and leading slash from resource name to allow users
+            // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
+            soundResourceName = soundResourceName.TrimStart('/').Split('.').First();
+            var resourceId = this.context.GetRawResourceIdByName(soundResourceName);
+            var resources = this.context.AppContext.Resources;
+            return new Android.Net.Uri.Builder()
+                .Scheme(ContentResolver.SchemeAndroidResource)
+                .Authority(resources.GetResourcePackageName(resourceId))
+                .AppendPath(resources.GetResourceTypeName(resourceId))
+                .AppendPath(resources.GetResourceEntryName(resourceId))
+                .Build();
+        }
 
         protected virtual void CreateChannel(Notification notification)
         {
@@ -229,18 +246,18 @@ namespace Shiny.Notifications
                 if (!d.IsEmpty())
                     channel.Description = d;
 
-                this.manager.CreateNotificationChannel(channel);
-            }
+                // Set initial sound attributes for channel when it is created
+                if (notification.Sound?.IsCustomSound() ?? false)
+                {
+                    var attributes = new AudioAttributes.Builder()
+                        .SetUsage(AudioUsageKind.NotificationRingtone)
+                        .Build();
 
-            if (this.context.IsMinApiLevel(26) && (notification.Sound?.IsCustomSound() ?? false))
-            {
-                var attributes = new AudioAttributes.Builder()
-                    .SetUsage(AudioUsageKind.NotificationRingtone)
-                    .Build();
+                    var uri = GetSoundResourceUri(notification.Sound.CustomPath);
+                    channel.SetSound(uri, attributes);
+                    channel.EnableVibration(notification.Android.Vibrate);
+                }
 
-                var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
-                channel.SetSound(uri, attributes);
-                channel.EnableVibration(notification.Android.Vibrate);
                 this.manager.CreateNotificationChannel(channel);
             }
         }
@@ -345,7 +362,7 @@ namespace Shiny.Notifications
                     break;
 
                 case NotificationSoundType.Custom:
-                    var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
+                    var uri = GetSoundResourceUri(notification.Sound.CustomPath);
                     builder.SetSound(uri);
                     break;
 

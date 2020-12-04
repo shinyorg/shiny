@@ -40,5 +40,15 @@ namespace Shiny
                 "drawable",
                 context.AppContext.PackageName
             );
+
+        // Expects raw resource name like "notify_sound" or "raw/notify_sound"
+        internal static int GetRawResourceIdByName(this AndroidContext context, string rawName) => context
+            .AppContext
+            .Resources
+            .GetIdentifier(
+                rawName,
+                "raw",
+                context.AppContext.PackageName
+            );
     }
 }
