@@ -33,8 +33,7 @@ namespace Shiny.Push
                 {
                     Title = native.Title,
                     Message = native.Body,
-                    Category = native.ClickAction,
-                    //Sound = native.Sound,
+                    Channel = native.ClickAction,
 
                     // recast this as implementation types aren't serializing well
                     Payload = message.Data?.ToDictionary(
@@ -42,8 +41,8 @@ namespace Shiny.Push
                         x => x.Value
                     )
                 };
-                if (!native.ChannelId.IsEmpty())
-                    notification.Android.ChannelId = native.ChannelId;
+                //if (!native.ChannelId.IsEmpty())
+                //    notification.Android.ChannelId = native.ChannelId;
 
                 if (!native.Icon.IsEmpty())
                     notification.Android.SmallIconResourceName = native.Icon;

@@ -32,6 +32,9 @@ namespace Shiny.Notifications
             this.nativeDelegate = nativeDelegate;
         }
 
+        public NotificationManager()
+        {
+        }
 
         public void Start()
         {
@@ -228,9 +231,9 @@ namespace Shiny.Notifications
                 Title = notification.Title,
                 Body = notification.Message
             };
-            this.SetSound(notification, content);
-            if (!notification.Category.IsEmpty())
-                content.CategoryIdentifier = notification.Category;
+            //this.SetSound(notification, content);
+            //if (!notification.Category.IsEmpty())
+            //    content.CategoryIdentifier = notification.Category;
 
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
@@ -242,31 +245,31 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual void SetSound(Notification notification, UNMutableNotificationContent content)
-        {
-            if (notification.Sound == null)
-                return;
+        //protected virtual void SetSound(Notification notification, UNMutableNotificationContent content)
+        //{
+        //    if (notification.Sound == null)
+        //        return;
 
-            switch (notification.Sound.Type)
-            {
-                case NotificationSoundType.None:
-                    break;
+        //    switch (notification.Sound.Type)
+        //    {
+        //        case NotificationSoundType.None:
+        //            break;
 
-                case NotificationSoundType.Priority:
-                    content.Sound = UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0)
-                        ? UNNotificationSound.DefaultCriticalSound
-                        : UNNotificationSound.Default;
-                    break;
+        //        case NotificationSoundType.Priority:
+        //            content.Sound = UseCriticalAlerts && UIDevice.CurrentDevice.CheckSystemVersion(12, 0)
+        //                ? UNNotificationSound.DefaultCriticalSound
+        //                : UNNotificationSound.Default;
+        //            break;
 
-                case NotificationSoundType.Custom:
-                    content.Sound = UNNotificationSound.GetSound(notification.Sound.CustomPath);
-                    break;
+        //        case NotificationSoundType.Custom:
+        //            content.Sound = UNNotificationSound.GetSound(notification.Sound.CustomPath);
+        //            break;
 
-                case NotificationSoundType.Default:
-                    content.Sound = UNNotificationSound.Default;
-                    break;
-            }
-        }
+        //        case NotificationSoundType.Default:
+        //            content.Sound = UNNotificationSound.Default;
+        //            break;
+        //    }
+        //}
 
 
         protected virtual UNNotificationTrigger? GetTrigger(Notification notification)
@@ -296,5 +299,7 @@ namespace Shiny.Notifications
             UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
             UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
         });
+        public void CreateChannel(Channel channel) => throw new NotImplementedException();
+        public void DeleteChannel(string identifier) => throw new NotImplementedException();
     }
 }

@@ -11,8 +11,7 @@ namespace Shiny
     {
         public static bool UseOneSignalPush(this IServiceCollection services,
                                             Type delegateType,
-                                            OneSignalPushConfig config,
-                                            params NotificationCategory[] categories)
+                                            OneSignalPushConfig config)
         {
 #if NETSTANDARD2_0
             return false;
@@ -24,14 +23,11 @@ namespace Shiny
         }
 
 
-        public static bool UseOneSignalPush<TPushDelegate>(this IServiceCollection services,
-                                                           OneSignalPushConfig config,
-                                                           params NotificationCategory[] categories)
+        public static bool UseOneSignalPush<TPushDelegate>(this IServiceCollection services, OneSignalPushConfig config)
             where TPushDelegate : class, IPushDelegate
             => services.UseOneSignalPush(
                 typeof(TPushDelegate),
-                config,
-                categories
+                config
             );
     }
 }

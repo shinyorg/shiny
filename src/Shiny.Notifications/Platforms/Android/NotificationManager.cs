@@ -325,6 +325,9 @@ namespace Shiny.Notifications
                 builder.SetLargeIcon(BitmapFactory.DecodeResource(this.context.AppContext.Resources, iconId));
         }
 
+        public void CreateChannel(Channel channel) => throw new NotImplementedException();
+        public void DeleteChannel(string identifier) => throw new NotImplementedException();
+
 
         //protected virtual void TrySetSound(Notification notification, NotificationCompat.Builder builder)
         //{

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Windows.UI.Notifications;
 using Microsoft.Toolkit.Uwp.Notifications;
-using Windows.ApplicationModel.Background;
 using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure;
@@ -80,9 +79,6 @@ namespace Shiny.Notifications
         //}
 
 
-        readonly List<NotificationCategory> registeredCategories = new List<NotificationCategory>();
-        public void RegisterCategory(NotificationCategory category) => this.registeredCategories.Add(category);
-
         public async Task<IEnumerable<Notification>> GetPending() => await this.repository.GetAll<Notification>();
 
 
@@ -131,7 +127,7 @@ namespace Shiny.Notifications
 
             var toastContent = new ToastContent
             {
-                Duration = notification.Windows.UseLongDuration ? ToastDuration.Long : ToastDuration.Short,
+                //Duration = notification.Windows.UseLongDuration ? ToastDuration.Long : ToastDuration.Short,
                 //Launch = notification.Payload,
                 ActivationType = ToastActivationType.Background,
                 //ActivationType = ToastActivationType.Foreground,
@@ -161,44 +157,44 @@ namespace Shiny.Notifications
                     }
                 }
             };
-            if (!notification.Category.IsEmpty())
-            {
-                var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
+            //if (!notification.Category.IsEmpty())
+            //{
+            //    var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
 
-                var nativeActions = new ToastActionsCustom();
+            //    var nativeActions = new ToastActionsCustom();
 
-                foreach (var action in category.Actions)
-                {
-                    switch (action.ActionType)
-                    {
-                        case NotificationActionType.OpenApp:
-                            nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
-                            {
-                                //ActivationType = ToastActivationType.Foreground
-                                ActivationType = ToastActivationType.Background
-                            });
-                            break;
+            //    foreach (var action in category.Actions)
+            //    {
+            //        switch (action.ActionType)
+            //        {
+            //            case NotificationActionType.OpenApp:
+            //                nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
+            //                {
+            //                    //ActivationType = ToastActivationType.Foreground
+            //                    ActivationType = ToastActivationType.Background
+            //                });
+            //                break;
 
-                        case NotificationActionType.None:
-                        case NotificationActionType.Destructive:
-                            nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
-                            {
-                                ActivationType = ToastActivationType.Background
-                            });
-                            break;
+            //            case NotificationActionType.None:
+            //            case NotificationActionType.Destructive:
+            //                nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
+            //                {
+            //                    ActivationType = ToastActivationType.Background
+            //                });
+            //                break;
 
-                        case NotificationActionType.TextReply:
-                            nativeActions.Inputs.Add(new ToastTextBox(action.Identifier)
-                            {
-                                Title = notification.Title
-                                //DefaultInput = "",
-                                //PlaceholderContent = ""
-                            });
-                            break;
-                    }
-                }
-                toastContent.Actions = nativeActions;
-            }
+            //            case NotificationActionType.TextReply:
+            //                nativeActions.Inputs.Add(new ToastTextBox(action.Identifier)
+            //                {
+            //                    Title = notification.Title
+            //                    //DefaultInput = "",
+            //                    //PlaceholderContent = ""
+            //                });
+            //                break;
+            //        }
+            //    }
+            //    toastContent.Actions = nativeActions;
+            //}
 
             //if (!Notification.CustomSoundFilePath.IsEmpty())
             //    toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
@@ -206,9 +202,13 @@ namespace Shiny.Notifications
             var native = new ToastNotification(toastContent.GetXml())
             {
                 Tag = notification.Id.ToString(),
-                Group = notification.Windows.GroupName
+                Group = "TODO"
+                //Group = notification.Windows.GroupName
             };
             return native;
         }
+
+        public void CreateChannel(Channel channel) => throw new NotImplementedException();
+        public void DeleteChannel(string identifier) => throw new NotImplementedException();
     }
 }

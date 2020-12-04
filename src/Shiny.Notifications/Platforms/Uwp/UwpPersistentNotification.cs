@@ -56,7 +56,8 @@ namespace Shiny.Notifications
                 .Update(
                     data,
                     this.notification.Id.ToString(),
-                    this.notification.Windows.GroupName
+                    "TODO"
+                    //this.notification.Windows.GroupName
                 );
         }
     }
