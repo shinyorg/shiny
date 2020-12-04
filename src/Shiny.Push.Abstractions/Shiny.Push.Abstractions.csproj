@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj" />
-        <ProjectReference Include="..\Shiny.Sensors.Abstractions\Shiny.Sensors.Abstractions.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 </Project>

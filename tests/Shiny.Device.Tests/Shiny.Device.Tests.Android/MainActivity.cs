@@ -19,14 +19,7 @@ namespace Shiny.Device.Tests.Droid
     {
         protected override void OnCreate(Bundle bundle)
         {
-            //UserDialogs.Init(this);
             //Acr.Logging.Log.ToDebug();
-
-            //this.RequestPermissions(new[]
-            //{
-            //    Manifest.Permission.AccessCoarseLocation,
-            //    Manifest.Permission.BluetoothPrivileged
-            //}, 0);
 
             //UserDialogs.Init(() => this);
             //this.AddTestAssembly(typeof(BluetoothLE.Tests.DeviceTests).Assembly);

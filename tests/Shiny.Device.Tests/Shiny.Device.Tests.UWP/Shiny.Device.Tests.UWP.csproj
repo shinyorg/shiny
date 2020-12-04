@@ -143,7 +143,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1451" />
+    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1687" />
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
     <PackageReference Include="xunit.runner.devices">
       <Version>2.5.25</Version>
@@ -157,10 +157,6 @@
     <ProjectReference Include="..\..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
       <Project>{007465d6-5714-4e7e-929d-6f01d04e43b6}</Project>
       <Name>Shiny.BluetoothLE</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj">
-      <Project>{ea4ede16-db4a-4559-b1d9-150ba3b60ed8}</Project>
-      <Name>Shiny.Core.Abstractions</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Shiny.Core\Shiny.Core.csproj">
       <Project>{84c6a1b8-0a57-4c6f-8738-3d3c03ce6f55}</Project>
@@ -177,6 +173,10 @@
     <ProjectReference Include="..\..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
       <Project>{34905983-1f79-4b74-9bb0-d1dc7d24b8bf}</Project>
       <Name>Shiny.SpeechRecognition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Shiny\Shiny.csproj">
+      <Project>{5b569bcc-b60c-4224-babc-77dd1f193f4b}</Project>
+      <Name>Shiny</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shiny.Device.Tests\Shiny.Device.Tests.csproj">
       <Project>{14B36205-6EB0-487E-9BE0-1C99B882A3D5}</Project>

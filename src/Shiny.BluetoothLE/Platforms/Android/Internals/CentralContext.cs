@@ -26,7 +26,7 @@ namespace Shiny.BluetoothLE.Internals
         LollipopScanCallback? callbacks;
 
 
-        public CentralContext(AndroidContext context,
+        public CentralContext(IAndroidContext context,
                               IMessageBus messageBus,
                               IServiceProvider services,
                               BleConfiguration config)
@@ -61,7 +61,7 @@ namespace Shiny.BluetoothLE.Internals
 
         public BleConfiguration Configuration { get; }
         public BluetoothManager Manager { get; }
-        public AndroidContext Android { get; }
+        public IAndroidContext Android { get; }
 
 
         internal async void DeviceEvent(Intent intent)

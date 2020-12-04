@@ -19,7 +19,7 @@ namespace Shiny.Locations
 
         public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
         {
-            var context = ShinyHost.Resolve<AndroidContext>();
+            var context = ShinyHost.Resolve<IAndroidContext>();
             if (context.IsMinApiLevel(26))
             {
                 var notificationManager = (S.NotificationManager)ShinyHost.Resolve<S.INotificationManager>();
@@ -50,7 +50,7 @@ namespace Shiny.Locations
         {
             IsStarted = false;
 
-            var context = ShinyHost.Resolve<AndroidContext>();
+            var context = ShinyHost.Resolve<IAndroidContext>();
             if (context.IsMinApiLevel(26))
                 this.StopForeground(true);
 

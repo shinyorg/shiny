@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Linq;
 using Shiny.Infrastructure;
-
+using Shiny.Testing;
 
 namespace Shiny.Tests.Repositories
 {
     public class FileSystemRepositoryTests : BaseRepositoryTests
     {
+        readonly TestPlatform platform;
         readonly ShinySerializer serializer;
-        readonly FileSystemImpl fileSystem;
 
 
         public FileSystemRepositoryTests()
         {
             this.serializer = new ShinySerializer();
-            this.fileSystem = new FileSystemImpl();
+            this.platform = new TestPlatform();
 
-            this.fileSystem.AppData.GetFiles("*.core").ToList().ForEach(x => x.Delete());
+            this.platform.AppData.GetFiles("*.core").ToList().ForEach(x => x.Delete());
         }
 
 
         protected override IRepository Create() => new FileSystemRepositoryImpl(
-            this.fileSystem,
+            this.platform,
             this.serializer
         );
     }

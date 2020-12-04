@@ -52,19 +52,19 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1451" />
+    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1687" />
     <PackageReference Include="xunit.runner.devices">
       <Version>2.5.25</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
+    <Compile Include="MainApplication.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
-    <None Include="Assets\AboutAssets.txt" />
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +86,7 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\launcher_foreground.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Assets\" />
     <Folder Include="Resources\drawable-hdpi\" />
     <Folder Include="Resources\drawable-xhdpi\" />
     <Folder Include="Resources\drawable-xxhdpi\" />
@@ -125,13 +126,13 @@
       <Project>{34905983-1f79-4b74-9bb0-d1dc7d24b8bf}</Project>
       <Name>Shiny.SpeechRecognition</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Shiny\Shiny.csproj">
+      <Project>{5b569bcc-b60c-4224-babc-77dd1f193f4b}</Project>
+      <Name>Shiny</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Shiny.Device.Tests\Shiny.Device.Tests.csproj">
       <Project>{8E87D625-07EA-4CE2-A549-E3A815AB52D6}</Project>
       <Name>Shiny.Device.Tests</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Shiny.Core.Abstractions\Shiny.Core.Abstractions.csproj">
-      <Project>{EA4EDE16-DB4A-4559-B1D9-150BA3B60ED8}</Project>
-      <Name>Shiny.Core.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

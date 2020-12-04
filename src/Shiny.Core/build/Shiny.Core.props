@@ -1,5 +1,0 @@
-﻿<Project>
-    <ItemGroup>
-        <SourceGenerator Include="$(MSBuildThisFileDirectory)Shiny.Generators.dll" />
-    </ItemGroup>
-</Project>

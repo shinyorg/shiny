@@ -19,7 +19,7 @@ namespace Shiny.Notifications
 {
     public class NotificationManager : INotificationManager, IPersistentNotificationManagerExtension
     {
-        readonly AndroidContext context;
+        readonly IAndroidContext context;
         readonly IServiceProvider services;
         readonly IRepository repository;
         readonly ISettings settings;
@@ -28,7 +28,7 @@ namespace Shiny.Notifications
         readonly NotificationManagerCompat manager;
 
 
-        public NotificationManager(AndroidContext context,
+        public NotificationManager(IAndroidContext context,
                                    IServiceProvider services,
                                    ISerializer serializer,
                                    IJobManager jobs,

@@ -64,7 +64,7 @@ namespace Shiny.Testing.Jobs
         }
 
 
-        public Task Schedule(JobInfo jobInfo)
+        public Task Register(JobInfo jobInfo)
         {
             throw new NotImplementedException();
         }

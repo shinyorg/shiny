@@ -17,6 +17,8 @@ namespace Shiny.TripTracker
         // walking, running, or cycling
         Exercise,
 
-        Automotive
+        Automotive,
+
+        AllMovement
     }
 }

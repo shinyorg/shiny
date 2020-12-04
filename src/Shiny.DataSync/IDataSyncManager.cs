@@ -16,6 +16,8 @@ namespace Shiny.DataSync
         DateTimeOffset? LastSync { get; }
         bool Enabled { get; set; }
 
+        //int CountThreshold { get; set; }
+        //TimeSpan MaxTimeThreshold { get; set; }
         //bool ItemsMustSyncBeforeProgressing { get; }
     }
 }

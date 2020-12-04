@@ -23,7 +23,7 @@ namespace Shiny
         }
 
 
-        internal static int GetColorByName(this AndroidContext context, string colorName) => context
+        internal static int GetColorByName(this IAndroidContext context, string colorName) => context
             .AppContext
             .Resources
             .GetIdentifier(
@@ -32,7 +32,7 @@ namespace Shiny
                 context.AppContext.PackageName
             );
 
-        internal static int GetResourceIdByName(this AndroidContext context, string iconName) => context
+        internal static int GetResourceIdByName(this IAndroidContext context, string iconName) => context
             .AppContext
             .Resources
             .GetIdentifier(

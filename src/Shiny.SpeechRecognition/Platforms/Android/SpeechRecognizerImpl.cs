@@ -11,11 +11,11 @@ namespace Shiny.SpeechRecognition
 {
     public class SpeechRecognizerImpl : AbstractSpeechRecognizer
     {
-        readonly AndroidContext context;
+        readonly IAndroidContext context;
         readonly object syncLock = new object();
 
 
-        public SpeechRecognizerImpl(AndroidContext context) => this.context = context;
+        public SpeechRecognizerImpl(IAndroidContext context) => this.context = context;
 
         public override async Task<AccessState> RequestAccess()
         {

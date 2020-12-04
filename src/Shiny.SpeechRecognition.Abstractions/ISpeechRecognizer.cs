@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+
 namespace Shiny.SpeechRecognition
 {
     public interface ISpeechRecognizer

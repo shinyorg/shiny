@@ -8,11 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Uno.Roslyn" />
-        <PackageReference Include="Uno.SourceGeneration" />
-        <PackageReference Include="Uno.SourceGenerationTasks" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
     </ItemGroup>
-
-    <Import Project="..\CodeGenHelpers\src\CodeGenHelpers\CodeGenHelpers.projitems" Label="Shared" />
 
 </Project>

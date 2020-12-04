@@ -2,7 +2,7 @@
     <PropertyGroup>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>9.0</LangVersion>
         <Nullable>enable</Nullable>
         <ContinuousIntegrationBuild>$(ContinuousIntegrationBuild)</ContinuousIntegrationBuild>
         <DisableExtraReferences>False</DisableExtraReferences>
@@ -18,7 +18,7 @@
         <RepositoryType>git</RepositoryType>
         <DebugType>portable</DebugType>
         <DebugSymbols>true</DebugSymbols>
-        <!--<SymbolPackageFormat>snupkg</SymbolPackageFormat>-->
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
@@ -31,6 +31,7 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IncludeGenerators>true</IncludeGenerators>
         <!--<EmbedAllSources>true</EmbedAllSources>-->
     </PropertyGroup>
 

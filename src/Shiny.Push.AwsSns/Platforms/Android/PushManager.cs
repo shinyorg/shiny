@@ -7,7 +7,7 @@ namespace Shiny.Push.AwsSns
 {
     public class PushManager : Shiny.Push.PushManager
     {
-        public PushManager(AndroidContext context, INotificationManager notifications, ISettings settings, IMessageBus bus) : base(context, notifications, settings, bus)
+        public PushManager(IAndroidContext context, INotificationManager notifications, ISettings settings, IMessageBus bus) : base(context, notifications, settings, bus)
         {
         }
     }

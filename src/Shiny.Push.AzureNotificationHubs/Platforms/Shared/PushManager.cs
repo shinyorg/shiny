@@ -23,7 +23,7 @@ namespace Shiny.Push.AzureNotificationHubs
                            Shiny.Notifications.iOSNotificationDelegate ndelegate) : base(settings, services, ndelegate)
 #elif __ANDROID__
         public PushManager(AzureNotificationConfig config,
-                           AndroidContext context,
+                           IAndroidContext context,
                            Shiny.Notifications.INotificationManager notifications,
                            ISettings settings,
                            IMessageBus bus) : base(context, notifications, settings, bus)

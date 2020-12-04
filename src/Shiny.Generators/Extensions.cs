@@ -1,57 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.FindSymbols;
-using Uno.RoslynHelpers;
-using Uno.SourceGeneration;
 
 
 namespace Shiny.Generators
 {
     static class Extensions
     {
-        // this is only if the partial has a 2+ partials
-        //public static bool IsPartialClass(this INamedTypeSymbol symbol) =>
-        //    symbol.Locations.Length > 1 || symbol.DeclaringSyntaxReferences.Length > 1;
-
-        public static bool IsIosAppProject(this SourceGeneratorContext context)
-            => context.IsProjectType("FEACFBD2-3405-455C-9665-78FE426C6842");
-            //{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
-
-
-        public static bool IsAndroidAppProject(this SourceGeneratorContext context)
-            => context.IsProjectType("EFBA0AD7-5A72-4C68-AF49-83D382785DCF");
-            //{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}
-
-
-        public static bool IsProjectType(this SourceGeneratorContext context, string projectTypeGuid)
+        public static void Source(this GeneratorExecutionContext context, string sourceText, string? fileName = null)
         {
-            var guids = context.GetProjectInstance().GetPropertyValue("ProjectTypeGuids")?.ToUpper();
-            if (guids == null)
-                return false;
-
-            var result = guids.Contains(projectTypeGuid);
-            return result;
+            fileName ??= Guid.NewGuid().ToString();
+            context.AddSource(fileName, sourceText);
         }
 
 
-        public static int GetAndroidMajorTarget(this SourceGeneratorContext context)
+        public static AttributeData? GetClassAttributeData(this Compilation compilation, ITypeSymbol symbol, string attributeTypeName)
         {
-            var target = context.GetProjectInstance().GetPropertyValue("TargetFrameworkVersion");
-            if (target == null)
-                return -1;
+            var attributeType = compilation.GetTypeByMetadataName(attributeTypeName);
+            if (attributeType == null)
+                return null;
 
-            target = target.Replace("v", String.Empty);
-            var len = target.IndexOf(".");
-            var majorString = len > 0
-                ? target.Substring(0, len)
-                : target;
+            return symbol.GetClassAttributeData(attributeType);
+        }
 
-            var v = Int32.Parse(majorString);
-            return v;
+
+        public static AttributeData? GetClassAttributeData(this ITypeSymbol symbol, ITypeSymbol attributeSymbol) => symbol
+            .GetAllAttributes()
+            .FirstOrDefault(x => x.AttributeClass.Name == attributeSymbol.Name);
+
+
+        public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
+            => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.AppInfo") != null;
+
+
+        public static IEnumerable<IAssemblySymbol> GetAllAssemblies(this GeneratorExecutionContext context)
+        {
+            yield return context.Compilation.Assembly;
+            foreach (var reference in context.Compilation.References)
+                if (reference.Properties.Kind == MetadataImageKind.Assembly)
+                    yield return (IAssemblySymbol)context.Compilation.GetAssemblyOrModuleSymbol(reference);
+        }
+
+
+        public static IEnumerable<INamedTypeSymbol> GetAllTypeSymbols(this IAssemblySymbol assembly)
+        {
+            var stack = new Stack<INamespaceSymbol>();
+            stack.Push(assembly.GlobalNamespace);
+
+            while (stack.Count > 0)
+            {
+                var @namespace = stack.Pop();
+
+                foreach (var member in @namespace.GetMembers())
+                {
+                    if (member is INamespaceSymbol memberAsNamespace)
+                        stack.Push(memberAsNamespace);
+
+                    else if (member is INamedTypeSymbol symbol)
+                        yield return symbol;
+
+                    else if (member is IAssemblySymbol reference)
+                    {
+                        var symbols = reference.GetAllTypeSymbols();
+                        foreach (var s in symbols)
+                            yield return s;
+                    }
+                }
+            }
         }
 
 
@@ -65,56 +81,30 @@ namespace Shiny.Generators
         }
 
 
-        public static bool IsEqualToType(this SourceGeneratorContext context, ITypeSymbol symbol, string otherTypeName)
+        public static AttributeData? GetCurrentAssemblyAttribute(this GeneratorExecutionContext context, string attributeTypeName)
         {
-            var type = context.Compilation.GetTypeByMetadataName(otherTypeName);
-            var result = symbol.EqualsType(type);
-            return result;
+            var attribute = context.Compilation.GetTypeByMetadataName(attributeTypeName);
+            if (attribute == null)
+                return null;
+
+            var assemblyAttributes = context.Compilation.Assembly.GetAttributes();
+            var attributeData = assemblyAttributes
+                .Where(x => x.AttributeClass.Name == attribute.Name)
+                .FirstOrDefault();
+
+            // TODO: why is the constructor arg not coming in?
+            return attributeData;
         }
 
 
-        public static bool IsStream(this SourceGeneratorContext context, ITypeSymbol symbol)
-            => context.IsEqualToType(symbol, typeof(System.IO.Stream).FullName);
-
-
-        public static bool IsObservable(this SourceGeneratorContext context, ITypeSymbol symbol)
-            => context.IsEqualToType(symbol, "System.IObservable`1");
-
-
-        public static bool IsGenericAsyncTask(this SourceGeneratorContext context, ITypeSymbol symbol)
-            => context.IsEqualToType(symbol, "System.Threading.Tasks.Task`1");
-
-
-        public static bool IsAsyncTask(this SourceGeneratorContext context, ITypeSymbol type)
-        {
-            var task = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
-            var result = type.Equals(task);
-            return result;
-        }
-
-
-        public static bool HasXamarinForms(this SourceGeneratorContext context)
-            => context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Application") != null;
-
-
-        public static bool HasXamarinEssentials(this SourceGeneratorContext context)
-            => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.Platform") != null;
-
-
-        public static bool HasAssemblyAttribute(this SourceGeneratorContext context, string attributeName)
-        {
-            var attribute = context.Compilation.GetTypeByMetadataName(attributeName);
-            return context.Compilation.Assembly.FindAttributeFlattened(attribute) != null;
-        }
-
-
-        public static bool IsEvent(this IMethodSymbol method) =>
-            method.Name.StartsWith("add_") || method.Name.StartsWith("remove_");
-
-
-        public static bool IsProperty(this IMethodSymbol method) =>
-            method.Name.StartsWith("get_") || method.Name.StartsWith("set_");
-
+        public static bool IsEvent(this IMethodSymbol method) => method.Kind == SymbolKind.Event;
+        public static bool IsProperty(this IMethodSymbol method) => method.Kind == SymbolKind.Property;
+        public static bool IsPublic(this ITypeSymbol symbol)
+            => symbol.DeclaredAccessibility == Accessibility.Public;
+        public static bool IsPublic(this IMethodSymbol symbol)
+            => symbol.DeclaredAccessibility == Accessibility.Public;
+        public static bool IsInterface(this ITypeSymbol type)
+            => type.TypeKind == TypeKind.Interface;
 
         public static string GetName(this IPropertySymbol property) => property
             .Name
@@ -122,18 +112,59 @@ namespace Shiny.Generators
             .Replace("set_", String.Empty);
 
 
-        public static string BuildArgString(this IMethodSymbol method, bool includeTypes)
+        public static bool Implements(this INamedTypeSymbol symbol, ITypeSymbol type)
+            => symbol.AllInterfaces.Any(i => type.Equals(i));
+
+
+        public static bool Inherits(this INamedTypeSymbol symbol, ITypeSymbol type)
         {
-            var s = "";
-            foreach (var parameter in method.Parameters)
+            var current = symbol;
+            while (current != null)
             {
-                if (includeTypes)
-                    s += $"{parameter.Type.ToDisplayString()} {parameter.Name}, ";
-                else
-                    s += $"{parameter.Name}, ";
+                if (type.Equals(current))
+                    return true;
+
+                current = current.BaseType;
             }
-            s = s.TrimEnd(',', ' ');
-            return s;
+            return false;
+        }
+
+
+        public static AttributeData? FindAttributeFlattened(this ISymbol symbol, INamedTypeSymbol attributeClassSymbol)
+        {
+            var attrs = symbol.GetAllAttributes();
+            foreach (var attr in attrs)
+            {
+                if (attr.AttributeClass.Name == attributeClassSymbol.Name)
+                    return attr;
+            }
+            return null;
+        }
+
+
+        public static IEnumerable<AttributeData> GetAllAttributes(this ISymbol symbol)
+        {
+            while (symbol != null && symbol.Name != "Object")
+            {
+                var attributes = symbol.GetAttributes();
+                foreach (var attribute in attributes)
+                    yield return attribute;
+
+                symbol = (symbol as INamedTypeSymbol)?.BaseType;
+            }
+        }
+
+
+        public static IEnumerable<IPropertySymbol> GetAllProperties(this INamedTypeSymbol symbol)
+        {
+            while (symbol != null && symbol.Name != "Object")
+            {
+                var properties = symbol.GetMembers().Where(x => x.Kind == SymbolKind.Property);
+                foreach (var property in properties)
+                    yield return (IPropertySymbol)property;
+
+                symbol = symbol?.BaseType;
+            }
         }
 
 
@@ -142,11 +173,12 @@ namespace Shiny.Generators
             if (type.IsInterface())
             {
                 var methods = type
-                    .GetAllInterfacesIncludingThis()
+                    .AllInterfaces
                     .SelectMany(x => x
                         .GetMembers()
                         .OfType<IMethodSymbol>()
                         .Where(y =>
+                            x.IsPublic() &&
                             !y.IsProperty() &&
                             !y.IsEvent()
                         )
@@ -166,19 +198,22 @@ namespace Shiny.Generators
                     var methods = currentType
                         .GetMembers()
                         .OfType<IMethodSymbol>()
-                        .Where(x => x.DeclaredAccessibility == Accessibility.Public)
-                        .Where(x => !x.IsEvent() && !x.IsProperty())
-                        .Where(x => x.Kind == SymbolKind.Method)
-                        .Where(x => !x.IsAbstract)
+                        .Where(x =>
+                            x.IsPublic() &&
+                            x.IsAbstract &&
+                            !x.IsEvent() &&
+                            !x.IsProperty()
+                        )
                         .ToList();
 
                     foreach (var method in methods)
                         yield return method;
 
-                    currentType = currentType.BaseType;
+                    currentType = currentType?.BaseType;
                 }
             }
         }
+
 
         public static void AppendNamespaces(this IndentedStringBuilder builder, params string[] nameSpaces)
         {
@@ -190,95 +225,5 @@ namespace Shiny.Generators
             builder.AppendLine();
             builder.AppendLine();
         }
-
-
-        public static void CreateClass(this IndentedStringBuilder builder, Action build, string nameSpace, string className, params string[] inherit)
-        {
-            using (builder.BlockInvariant("namespace " + nameSpace))
-            {
-                var cls = "public partial class " + className;
-
-                if (inherit.Length > 0)
-                {
-                    cls += " :";
-                    foreach (var i in inherit)
-                        cls += $" {i},";
-
-                    cls = cls.TrimEnd(',');
-                }
-                using (builder.BlockInvariant(cls))
-                    build();
-            }
-        }
-
-
-        public static IEnumerable<INamedTypeSymbol> GetAllInterfaceTypes(this SourceGeneratorContext context) => context
-            .Compilation
-            .SyntaxTrees
-            .Select(x => context.Compilation.GetSemanticModel(x))
-            .SelectMany(x => x
-                .SyntaxTree
-                .GetRoot()
-                .DescendantNodes()
-                .OfType<InterfaceDeclarationSyntax>()
-                .Select(y => y.GetDeclaredSymbol(x))
-            )
-            .OfType<INamedTypeSymbol>();
-
-
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, Type type, bool thisProjectOnly = false)
-            => context.GetAllImplementationsOfType(type.FullName, thisProjectOnly);
-
-
-
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, string fullName, bool thisProjectOnly = false)
-        {
-            var symbol = context.Compilation.GetTypeByMetadataName(fullName);
-            if (symbol == null)
-                return Enumerable.Empty<INamedTypeSymbol>();
-
-            return context.GetAllImplementationsOfType(symbol, thisProjectOnly);
-        }
-
-
-        public static IEnumerable<INamedTypeSymbol> GetAllImplementationsOfType(this SourceGeneratorContext context, ISymbol symbol, bool thisProjectOnly = false)
-        {
-            if (!thisProjectOnly)
-            {
-                return SymbolFinder
-                    .FindImplementationsAsync(symbol, context.Project.Solution)
-                    .Result
-                    .OfType<INamedTypeSymbol>();
-            }
-            return SymbolFinder
-                .FindImplementationsAsync(symbol, context.Project.Solution, ImmutableSortedSet.Create(context.Project))
-                .Result
-                .OfType<INamedTypeSymbol>();
-        }
-
-
-        public static IEnumerable<INamedTypeSymbol> GetAllDerivedClassesForType(this SourceGeneratorContext context, string typeName, bool thisProjectOnly = false)
-        {
-            var symbol = context.Compilation.GetTypeByMetadataName(typeName);
-            if (symbol == null)
-                return Enumerable.Empty<INamedTypeSymbol>();
-
-            if (!thisProjectOnly)
-                return SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution).Result;
-
-            return SymbolFinder.FindDerivedClassesAsync(symbol, context.Project.Solution, ImmutableSortedSet.Create(context.Project)).Result;
-        }
-
-
-        public static IEnumerable<INamedTypeSymbol> WhereNotInAssembly(this IEnumerable<INamedTypeSymbol> en, params string[] names)
-            => en.Where(x => !names.Any(y => x.ContainingAssembly.ToDisplayString().StartsWith(y, StringComparison.InvariantCultureIgnoreCase)));
-
-
-        public static IEnumerable<INamedTypeSymbol> WhereNotNamespace(this IEnumerable<INamedTypeSymbol> en, params string[] names)
-            => en.Where(x => !names.Any(y => x.ContainingNamespace.ToDisplayString().StartsWith(y, StringComparison.InvariantCultureIgnoreCase)));
-
-
-        public static IEnumerable<INamedTypeSymbol> WhereNotSystem(this IEnumerable<INamedTypeSymbol> en)
-            => en.WhereNotInAssembly("Xamarin.", "Shiny.").WhereNotNamespace("Android.");
     }
 }
