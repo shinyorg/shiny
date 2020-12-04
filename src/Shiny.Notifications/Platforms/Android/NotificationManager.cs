@@ -120,9 +120,6 @@ namespace Shiny.Notifications
 
         public int Badge { get; set; }
 
-        readonly List<NotificationCategory> registeredCategories = new List<NotificationCategory>();
-        public void RegisterCategory(NotificationCategory category) => this.registeredCategories.Add(category);
-
 
         public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification)
         {
