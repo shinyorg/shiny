@@ -15,14 +15,6 @@ namespace Shiny
         }
 
 
-        internal static NotificationImportance ToNative(this AndroidNotificationImportance import)
-        {
-            var intValue = (int) import;
-            var native = (NotificationImportance) intValue;
-            return native;
-        }
-
-
         internal static int GetColorByName(this IAndroidContext context, string colorName) => context
             .AppContext
             .Resources

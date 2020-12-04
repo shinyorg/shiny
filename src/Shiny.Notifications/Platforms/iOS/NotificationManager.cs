@@ -90,59 +90,59 @@ namespace Shiny.Notifications
         }
 
 
-        public void RegisterCategory(NotificationCategory category)
-        {
-            var actions = new List<UNNotificationAction>();
-            foreach (var action in category.Actions)
-            {
-                switch (action.ActionType)
-                {
-                    case NotificationActionType.TextReply:
-                        actions.Add(UNTextInputNotificationAction.FromIdentifier(
-                            action.Identifier,
-                            action.Title,
-                            UNNotificationActionOptions.None,
-                            action.Title,
-                            String.Empty
-                        ));
-                        break;
+        //public void RegisterCategory(NotificationCategory category)
+        //{
+        //    var actions = new List<UNNotificationAction>();
+        //    foreach (var action in category.Actions)
+        //    {
+        //        switch (action.ActionType)
+        //        {
+        //            case NotificationActionType.TextReply:
+        //                actions.Add(UNTextInputNotificationAction.FromIdentifier(
+        //                    action.Identifier,
+        //                    action.Title,
+        //                    UNNotificationActionOptions.None,
+        //                    action.Title,
+        //                    String.Empty
+        //                ));
+        //                break;
 
-                    case NotificationActionType.Destructive:
-                        actions.Add(UNNotificationAction.FromIdentifier(
-                            action.Identifier,
-                            action.Title,
-                            UNNotificationActionOptions.Destructive
-                        ));
-                        break;
+        //            case NotificationActionType.Destructive:
+        //                actions.Add(UNNotificationAction.FromIdentifier(
+        //                    action.Identifier,
+        //                    action.Title,
+        //                    UNNotificationActionOptions.Destructive
+        //                ));
+        //                break;
 
-                    case NotificationActionType.OpenApp:
-                        actions.Add(UNNotificationAction.FromIdentifier(
-                            action.Identifier,
-                            action.Title,
-                            UNNotificationActionOptions.Foreground
-                        ));
-                        break;
+        //            case NotificationActionType.OpenApp:
+        //                actions.Add(UNNotificationAction.FromIdentifier(
+        //                    action.Identifier,
+        //                    action.Title,
+        //                    UNNotificationActionOptions.Foreground
+        //                ));
+        //                break;
 
-                    case NotificationActionType.None:
-                        actions.Add(UNNotificationAction.FromIdentifier(
-                            action.Identifier,
-                            action.Title,
-                            UNNotificationActionOptions.None
-                        ));
-                        break;
-                }
-            }
+        //            case NotificationActionType.None:
+        //                actions.Add(UNNotificationAction.FromIdentifier(
+        //                    action.Identifier,
+        //                    action.Title,
+        //                    UNNotificationActionOptions.None
+        //                ));
+        //                break;
+        //        }
+        //    }
 
-            var native = UNNotificationCategory.FromIdentifier(
-                category.Identifier,
-                actions.ToArray(),
-                new string[] { "" },
-                UNNotificationCategoryOptions.None
-            );
+        //    var native = UNNotificationCategory.FromIdentifier(
+        //        category.Identifier,
+        //        actions.ToArray(),
+        //        new string[] { "" },
+        //        UNNotificationCategoryOptions.None
+        //    );
 
-            var set = new NSSet<UNNotificationCategory>(new[] { native });
-            UNUserNotificationCenter.Current.SetNotificationCategories(set);
-        }
+        //    var set = new NSSet<UNNotificationCategory>(new[] { native });
+        //    UNUserNotificationCenter.Current.SetNotificationCategories(set);
+        //}
 
 
         public Task<AccessState> RequestAccess()

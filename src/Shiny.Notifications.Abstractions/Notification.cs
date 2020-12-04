@@ -51,10 +51,5 @@ namespace Shiny.Notifications
         /// Options specific to android
         /// </summary>
         public AndroidOptions Android { get; set; } = new AndroidOptions();
-
-        /// <summary>
-        /// Options specific to windows (Uwp)
-        /// </summary>
-        public UwpOptions Windows { get; set; } = new UwpOptions();
     }
 }

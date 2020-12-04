@@ -18,9 +18,7 @@ namespace Shiny
         public static bool UseNotifications(this IServiceCollection services,
                                             Type? delegateType,
                                             bool requestPermissionImmediately = false,
-                                            AndroidOptions? androidConfig = null,
-                                            UwpOptions? uwpConfig = null,
-                                            params NotificationCategory[] notificationCategories)
+                                            AndroidOptions? androidConfig = null)
         {
 #if NETSTANDARD
             return false;
@@ -28,9 +26,7 @@ namespace Shiny
             services.RegisterModule(new NotificationModule(
                 delegateType,
                 requestPermissionImmediately,
-                androidConfig,
-                uwpConfig,
-                notificationCategories
+                androidConfig
             ));
             return true;
 #endif
@@ -39,44 +35,34 @@ namespace Shiny
 
         public static bool UseNotifications(this IServiceCollection services,
                                             Type? delegateType,
-                                            bool requestPermissionImmediately = false,
-                                            params NotificationCategory[] notificationCategories)
-            => services.UseNotifications(delegateType, requestPermissionImmediately, notificationCategories);
+                                            bool requestPermissionImmediately = false)
+            => services.UseNotifications(delegateType, requestPermissionImmediately);
 
 
         public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
-                                                                   bool requestPermissionImmediately = false,
-                                                                   params NotificationCategory[] notificationCategories)
+                                                                   bool requestPermissionImmediately = false)
                 where TNotificationDelegate : class, INotificationDelegate
             => services.UseNotifications(
                 typeof(TNotificationDelegate),
                 requestPermissionImmediately,
-                null,
-                null,
-                notificationCategories
+                null
             );
 
 
         public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
                                                                    bool requestPermissionImmediately = false,
-                                                                   AndroidOptions? androidConfig = null,
-                                                                   UwpOptions? uwpConfig = null,
-                                                                   params NotificationCategory[] notificationCategories)
+                                                                   AndroidOptions? androidConfig = null)
                 where TNotificationDelegate : class, INotificationDelegate
             => services.UseNotifications(
                 typeof(TNotificationDelegate),
                 requestPermissionImmediately,
-                androidConfig,
-                uwpConfig,
-                notificationCategories
+                androidConfig
             );
 
 
         public static bool UseNotifications(this IServiceCollection services,
                                             bool requestPermissionImmediately = false,
-                                            AndroidOptions? androidConfig = null,
-                                            UwpOptions? uwpConfig = null,
-                                            params NotificationCategory[] notificationCategories)
+                                            AndroidOptions? androidConfig = null)
         {
 #if NETSTANDARD
             return false;
@@ -84,9 +70,7 @@ namespace Shiny
             services.RegisterModule(new NotificationModule(
                 null,
                 requestPermissionImmediately,
-                androidConfig,
-                uwpConfig,
-                notificationCategories
+                androidConfig
             ));
             return true;
 #endif

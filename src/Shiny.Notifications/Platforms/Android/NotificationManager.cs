@@ -140,19 +140,19 @@ namespace Shiny.Notifications
             if (!notification.Android.Ticker.IsEmpty())
                 builder.SetTicker(notification.Android.Ticker);
 
-            if (!notification.Android.Category.IsEmpty())
-                builder.SetCategory(notification.Category);
+            //if (!notification.Android.Category.IsEmpty())
+            //    builder.SetCategory(notification.Category);
 
             if (notification.Android.UseBigTextStyle)
                 builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
             else
                 builder.SetContentText(notification.Message);
 
-            this.TrySetSound(notification, builder);
             this.TrySetLargeIconResource(notification, builder);
 
-            if (!notification.Category.IsEmpty())
-                this.AddCategory(builder, notification);
+            //this.TrySetSound(notification, builder);
+            //if (!notification.Category.IsEmpty())
+            //    this.AddCategory(builder, notification);
 
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
@@ -189,11 +189,11 @@ namespace Shiny.Notifications
             if (notification.Android.Vibrate)
                 builder.SetVibrate(new long[] { 500, 500 });
 
-            if (this.context.IsMinApiLevel(26))
-            {
-                this.CreateChannel(notification);
-                builder.SetChannelId(notification.Android.ChannelId);
-            }
+            //if (this.context.IsMinApiLevel(26))
+            //{
+            //    this.CreateChannel(notification);
+            //    builder.SetChannelId(notification.Android.ChannelId);
+            //}
 
             return builder;
         }
@@ -207,40 +207,40 @@ namespace Shiny.Notifications
             => this.CreateNativeBuilder(notification).Build();
 
 
-        protected virtual void CreateChannel(Notification notification)
-        {
-            if (!this.context.IsMinApiLevel(26))
-                return;
+        //protected virtual void CreateChannel(Notification notification)
+        //{
+        //    if (!this.context.IsMinApiLevel(26))
+        //        return;
 
-            var channelId = notification.Android.ChannelId;
-            var channel = this.manager.GetNotificationChannel(channelId);
+        //    var channelId = notification.Android.ChannelId;
+        //    var channel = this.manager.GetNotificationChannel(channelId);
 
-            if (channel == null)
-            {
-                channel = new NotificationChannel(
-                    channelId,
-                    notification.Android.Channel,
-                    notification.Android.NotificationImportance.ToNative()
-                );
-                var d = notification.Android.ChannelDescription;
-                if (!d.IsEmpty())
-                    channel.Description = d;
+        //    if (channel == null)
+        //    {
+        //        channel = new NotificationChannel(
+        //            channelId,
+        //            notification.Android.Channel,
+        //            notification.Android.NotificationImportance.ToNative()
+        //        );
+        //        var d = notification.Android.ChannelDescription;
+        //        if (!d.IsEmpty())
+        //            channel.Description = d;
 
-                this.manager.CreateNotificationChannel(channel);
-            }
+        //        this.manager.CreateNotificationChannel(channel);
+        //    }
 
-            if (this.context.IsMinApiLevel(26) && (notification.Sound?.IsCustomSound() ?? false))
-            {
-                var attributes = new AudioAttributes.Builder()
-                    .SetUsage(AudioUsageKind.NotificationRingtone)
-                    .Build();
+        //    if (this.context.IsMinApiLevel(26) && (notification.Sound?.IsCustomSound() ?? false))
+        //    {
+        //        var attributes = new AudioAttributes.Builder()
+        //            .SetUsage(AudioUsageKind.NotificationRingtone)
+        //            .Build();
 
-                var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
-                channel.SetSound(uri, attributes);
-                channel.EnableVibration(notification.Android.Vibrate);
-                this.manager.CreateNotificationChannel(channel);
-            }
-        }
+        //        var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
+        //        channel.SetSound(uri, attributes);
+        //        channel.EnableVibration(notification.Android.Vibrate);
+        //        this.manager.CreateNotificationChannel(channel);
+        //    }
+        //}
 
         protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
         {
@@ -326,118 +326,118 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual void TrySetSound(Notification notification, NotificationCompat.Builder builder)
-        {
-            if (notification.Sound == null)
-                return;
+        //protected virtual void TrySetSound(Notification notification, NotificationCompat.Builder builder)
+        //{
+        //    if (notification.Sound == null)
+        //        return;
 
-            switch (notification.Sound.Type)
-            {
-                case NotificationSoundType.Priority:
-                    builder.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri);
-                    break;
+        //    switch (notification.Sound.Type)
+        //    {
+        //        case NotificationSoundType.Priority:
+        //            builder.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri);
+        //            break;
 
-                case NotificationSoundType.Default:
-                    builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
-                    break;
+        //        case NotificationSoundType.Default:
+        //            builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
+        //            break;
 
-                case NotificationSoundType.Custom:
-                    var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
-                    builder.SetSound(uri);
-                    break;
+        //        case NotificationSoundType.Custom:
+        //            var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
+        //            builder.SetSound(uri);
+        //            break;
 
-                case NotificationSoundType.None:
-                    break;
-            }
-        }
+        //        case NotificationSoundType.None:
+        //            break;
+        //    }
+        //}
 
 
 
         //https://segunfamisa.com/posts/notifications-direct-reply-android-nougat
-        protected virtual void AddCategory(NotificationCompat.Builder builder, Notification notification)
-        {
-            if (notification.Category.IsEmpty() || !this.context.IsMinApiLevel(24))
-                return;
+        //protected virtual void AddCategory(NotificationCompat.Builder builder, Notification notification)
+        //{
+        //    if (notification.Category.IsEmpty() || !this.context.IsMinApiLevel(24))
+        //        return;
 
-            var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
-            if (category == null)
-            {
-                Log.Write(NotificationLogCategory.Notifications, "No notification category found for " + notification.Category);
-            }
-            else
-            {
-                var notificationString = this.serializer.Serialize(notification);
+        //    var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
+        //    if (category == null)
+        //    {
+        //        Log.Write(NotificationLogCategory.Notifications, "No notification category found for " + notification.Category);
+        //    }
+        //    else
+        //    {
+        //        var notificationString = this.serializer.Serialize(notification);
 
-                foreach (var action in category.Actions)
-                {
-                    switch (action.ActionType)
-                    {
-                        case NotificationActionType.OpenApp:
-                            break;
+        //        foreach (var action in category.Actions)
+        //        {
+        //            switch (action.ActionType)
+        //            {
+        //                case NotificationActionType.OpenApp:
+        //                    break;
 
-                        case NotificationActionType.TextReply:
-                            var textReplyAction = this.CreateTextReply(notification, action);
-                            builder.AddAction(textReplyAction);
-                            break;
+        //                case NotificationActionType.TextReply:
+        //                    var textReplyAction = this.CreateTextReply(notification, action);
+        //                    builder.AddAction(textReplyAction);
+        //                    break;
 
-                        case NotificationActionType.None:
-                        case NotificationActionType.Destructive:
-                            var destAction = this.CreateAction(notification, action);
-                            builder.AddAction(destAction);
-                            break;
+        //                case NotificationActionType.None:
+        //                case NotificationActionType.Destructive:
+        //                    var destAction = this.CreateAction(notification, action);
+        //                    builder.AddAction(destAction);
+        //                    break;
 
-                        default:
-                            throw new ArgumentException("Invalid action type");
-                    }
-                }
-            }
-        }
-
-
-        static int counter = 100;
-        protected virtual PendingIntent CreateActionIntent(Notification notification, NotificationAction action)
-        {
-            var intent = this.context.CreateIntent<NotificationBroadcastReceiver>(NotificationBroadcastReceiver.IntentAction);
-            var content = this.serializer.Serialize(notification);
-            intent
-                .PutExtra("Notification", content)
-                .PutExtra("Action", action.Identifier);
-
-            counter++;
-            var pendingIntent = PendingIntent.GetBroadcast(
-                this.context.AppContext,
-                counter,
-                intent,
-                PendingIntentFlags.UpdateCurrent
-            );
-            return pendingIntent;
-        }
+        //                default:
+        //                    throw new ArgumentException("Invalid action type");
+        //            }
+        //        }
+        //    }
+        //}
 
 
-        protected virtual NotificationCompat.Action CreateAction(Notification notification, NotificationAction action)
-        {
-            var pendingIntent = this.CreateActionIntent(notification, action);
-            var iconId = this.context.GetResourceIdByName(action.Identifier);
-            var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
+        //static int counter = 100;
+        //protected virtual PendingIntent CreateActionIntent(Notification notification, NotificationAction action)
+        //{
+        //    var intent = this.context.CreateIntent<NotificationBroadcastReceiver>(NotificationBroadcastReceiver.IntentAction);
+        //    var content = this.serializer.Serialize(notification);
+        //    intent
+        //        .PutExtra("Notification", content)
+        //        .PutExtra("Action", action.Identifier);
 
-            return nativeAction;
-        }
+        //    counter++;
+        //    var pendingIntent = PendingIntent.GetBroadcast(
+        //        this.context.AppContext,
+        //        counter,
+        //        intent,
+        //        PendingIntentFlags.UpdateCurrent
+        //    );
+        //    return pendingIntent;
+        //}
 
 
-        protected virtual NotificationCompat.Action CreateTextReply(Notification notification, NotificationAction action)
-        {
-            var pendingIntent = this.CreateActionIntent(notification, action);
-            var input = new AndroidX.Core.App.RemoteInput.Builder("Result")
-                .SetLabel(action.Title)
-                .Build();
+        //protected virtual NotificationCompat.Action CreateAction(Notification notification, NotificationAction action)
+        //{
+        //    var pendingIntent = this.CreateActionIntent(notification, action);
+        //    var iconId = this.context.GetResourceIdByName(action.Identifier);
+        //    var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
 
-            var iconId = this.context.GetResourceIdByName(action.Identifier);
-            var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
-                .SetAllowGeneratedReplies(true)
-                .AddRemoteInput(input)
-                .Build();
+        //    return nativeAction;
+        //}
 
-            return nativeAction;
-        }
+
+        //protected virtual NotificationCompat.Action CreateTextReply(Notification notification, NotificationAction action)
+        //{
+        //    var pendingIntent = this.CreateActionIntent(notification, action);
+        //    var input = new AndroidX.Core.App.RemoteInput.Builder("Result")
+        //        .SetLabel(action.Title)
+        //        .Build();
+
+        //    var iconId = this.context.GetResourceIdByName(action.Identifier);
+        //    var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
+        //        .SetAllowGeneratedReplies(true)
+        //        .AddRemoteInput(input)
+        //        .Build();
+
+        //    return nativeAction;
+        //}
     }
 }

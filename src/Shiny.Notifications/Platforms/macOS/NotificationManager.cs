@@ -14,7 +14,6 @@ namespace Shiny.Notifications
     {
         readonly ISettings settings;
 
-        
 
         public NotificationManager(ISettings settings)
         {
@@ -30,7 +29,7 @@ namespace Shiny.Notifications
             //set
             //{
             //    this.settings.Set("Badge", value);
-                
+
             //    //Dispatcher.InvokeOnMainThreadAsync(() =>
             //        NSApplication.SharedApplication. = value
             //    //);
