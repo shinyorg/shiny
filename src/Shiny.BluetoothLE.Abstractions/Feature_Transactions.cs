@@ -39,6 +39,7 @@ namespace Shiny.BluetoothLE
                 var read = stream.Read(buffer, 0, buffer.Length);
                 var pos = read;
                 var len = Convert.ToInt32(stream.Length);
+                var remaining = 0;
 
                 while (!ct.IsCancellationRequested && read > 0)
                 {
@@ -54,6 +55,13 @@ namespace Shiny.BluetoothLE
                     //}
                     var seg = new BleWriteSegment(buffer, pos, len);
                     ob.OnNext(seg);
+
+                    remaining = len - pos;
+                    if (remaining > 0 && remaining < mtu)
+                    {
+                        // readjust buffer -- we don't want to send extra garbage 
+                        buffer = new byte[remaining];
+                    }
 
                     read = stream.Read(buffer, 0, buffer.Length);
                     pos += read;
