@@ -30,23 +30,18 @@ namespace Shiny.Generators
 
             this.ShinyConfig = new ShinyApplicationValues(shinyAppAttributeData);
 
+            if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
+            {
+                this.GenerateStartup(this.Context.Compilation.Assembly.GlobalNamespace.Name);
+                this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
+            }
+
             var appClasses = context
                 .Compilation
                 .Assembly
                 .GetAllTypeSymbols()
                 .Where(x => x.Inherits(appType))
                 .ToList();
-
-            if (appClasses.Count == 0)
-                throw new ArgumentException("No app classes found in this assembly!");
-
-            if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
-            {
-                var nameSpace = appClasses.FirstOrDefault()?.ContainingNamespace.Name;
-                this.GenerateStartup(nameSpace);
-                this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
-            }
-
             this.Process(appClasses);
         }
 
@@ -138,11 +133,11 @@ namespace Shiny.Generators
 
                 if (hasFirebasePush)
                 {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", false);
+                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", true);
                 }
                 else if (hasNativePush)
                 {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", false);
+                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", true);
                 }
             }
         }
@@ -168,16 +163,13 @@ namespace Shiny.Generators
                 return false;
 
             var impls = this.allSymbols
-                .Where(x => x.Inherits(symbol))
+                .Where(x => x.Implements(symbol))
                 .ToList();
 
-            if (!impls.Any() && oneDelegateRequiredToInstall)
+            if (!impls.Any())
                 return false;
 
-            if (oneDelegateRequiredToInstall)
-                registerStatement += $"<{impls.First().ToDisplayString()}>";
-
-            registerStatement += "();";
+            registerStatement += $"<{impls.First().ToDisplayString()}>()";
             this.builder.AppendLineInvariant(registerStatement);
 
             if (impls.Count > 1)

@@ -18,7 +18,6 @@ namespace Shiny.Generators.Tests
 
         public void AddSource(string sourceText)
         {
-            
             var source = SourceText.From(sourceText, Encoding.UTF8);
             var tree = CSharpSyntaxTree.ParseText(source);
             this.sources.Add(tree);

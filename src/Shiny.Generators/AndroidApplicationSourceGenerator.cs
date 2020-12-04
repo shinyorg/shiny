@@ -12,6 +12,7 @@ namespace Shiny.Generators
         const string AndroidApplicationTypeName = "Android.App.Application";
         const string ApplicationName = "MainApplication";
 
+
         public AndroidApplicationSourceGenerator() : base(AndroidApplicationTypeName) { }
 
 
@@ -23,9 +24,9 @@ namespace Shiny.Generators
             // TODO: this is supposed to run when there are NO android apps - should we try to change it or error right here?
             // TODO: what if not partial?  why did user mark the assembly then?
 
+            var nameSpace = this.Context.Compilation.Assembly.GlobalNamespace.Name;
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Content", "Android.Runtime");
-            var nameSpace = this.Context.Compilation.Assembly.GlobalNamespace.Name;
 
             using (builder.BlockInvariant($"namespace " + nameSpace))
             {
