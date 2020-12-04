@@ -32,7 +32,7 @@ namespace Shiny.Generators
 
             if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
             {
-                this.GenerateStartup(this.Context.Compilation.Assembly.GlobalNamespace.Name);
+                this.GenerateStartup(this.Context.Compilation.AssemblyName);
                 this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
             }
 

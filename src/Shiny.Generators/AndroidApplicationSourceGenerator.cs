@@ -24,11 +24,11 @@ namespace Shiny.Generators
             // TODO: this is supposed to run when there are NO android apps - should we try to change it or error right here?
             // TODO: what if not partial?  why did user mark the assembly then?
 
-            var nameSpace = this.Context.Compilation.Assembly.GlobalNamespace.Name;
+            var nameSpace = this.Context.Compilation.AssemblyName;
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Content", "Android.Runtime");
 
-            using (builder.BlockInvariant($"namespace " + nameSpace))
+            using (builder.BlockInvariant("namespace " + nameSpace))
             {
                 builder.AppendLineInvariant("[global::Android.App.ApplicationAttribute]");
                 using (builder.BlockInvariant($"public partial class {ApplicationName} : global::{AndroidApplicationTypeName}"))

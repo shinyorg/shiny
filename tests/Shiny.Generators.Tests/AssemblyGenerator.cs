@@ -43,9 +43,10 @@ namespace Shiny.Generators.Tests
 
         public CSharpCompilation Create(string assemblyName)
         {
-            var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
+            //var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
             return CSharpCompilation
-                .Create(localPath)
+                //.Create(localPath)
+                .Create(assemblyName)
                 .WithReferences(this.references)
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
                 .AddSyntaxTrees(this.sources);
