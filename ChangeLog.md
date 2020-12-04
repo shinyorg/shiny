@@ -11,7 +11,6 @@
 * [FEATURE] Source Generators
     * Auto Startup - creates the Shiny startup for you based on what Shiny nugets you install.  Simply mark [assembly:Shiny.GenerateStartupAttribute] on the assembly where you want it built
     * Static classes - creates static classes for all the Shiny nugets you use - Simply add [assembly:Shiny.GenerateStaticClassesAttribute] where you want them created
-    * Prism Integration - If Prism.Forms.DryIoc is detected, Shiny will attempt to wire itself into your PrismApplication to put the Shiny services in the Prism container
     * Auto boilerplate for iOS and Android - Don't like creating things on AppDelegate or Android, this will auto-magically do it for you and wire up to your startup.
 
 ### BluetoothLE
@@ -24,9 +23,9 @@
 * [Feature] Minimum Distance is now supported on Android and iOS
 
 ### Notifications
+* [BREAKING][Feature] Channels - this exists to fit with the Android channels model and iOS category model
 * [Feature][Android] More Android specific configuration added
 * [Feature][Android][Uwp] Persistent & Progress notifications
-* [Feature][Uwp] You can now control the group name per notification
 
 ### Push
 * Firebase implementation is now released for iOS and Android  (Shiny.Push.FirebaseMessaging)
