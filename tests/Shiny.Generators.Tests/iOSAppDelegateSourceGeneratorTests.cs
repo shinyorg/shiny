@@ -2,14 +2,16 @@
 using Xunit;
 using FluentAssertions;
 using Xunit.Abstractions;
+using Microsoft.CodeAnalysis;
 
 
 namespace Shiny.Generators.Tests
 {
-    public class iOSAppDelegateSourceGeneratorTests
+    public class iOSAppDelegateSourceGeneratorTests : IDisposable
     {
         readonly ITestOutputHelper output;
         readonly AssemblyGenerator generator;
+        Compilation compile;
 
 
         public iOSAppDelegateSourceGeneratorTests(ITestOutputHelper output)
@@ -24,6 +26,13 @@ namespace Shiny.Generators.Tests
         }
 
 
+        public void Dispose()
+        {
+            if (this.compile != null)
+                this.output.WriteSyntaxTrees(this.compile);
+        }
+
+
         [Fact]
         public void Test()
         {
@@ -35,11 +44,10 @@ namespace MyTest
     {
     }
 }");
-            var compile = this.generator.DoGenerate(
+            this.compile = this.generator.DoGenerate(
                 nameof(Test),
                 new iOSAppDelegateSourceGenerator()
             );
-            this.output.WriteSyntaxTrees(compile);
         }
 
         // TODO: build xam ios libs, add appdelegate
