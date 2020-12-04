@@ -1,7 +1,6 @@
 ﻿using System;
-
+using FluentAssertions;
 using Microsoft.CodeAnalysis;
-
 using Xunit;
 using Xunit.Abstractions;
 
@@ -54,9 +53,9 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace MyTest 
+namespace MyTest
 {
-    public class DetectionJob : Shiny.Jobs.IJob 
+    public class DetectionJob : Shiny.Jobs.IJob
     {
         public async Task Run(JobInfo jobInfo, CancellationToken cancelToken) {}
     }
@@ -68,9 +67,39 @@ namespace MyTest
         }
 
 
+        [Fact]
+        public void ExistingStartupDetectionSameAssembly()
+        {
+            this.generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+
+namespace MyTest
+{
+    public class ExistingStartup : Shiny.ShinyStartup
+    {
+         public override void ConfigureServices(IServiceCollection services) {}
+    }
+}");
+            this.compilation = this.generator.DoGenerate(
+                nameof(TestJobDetection),
+                new AndroidActivitySourceGenerator()
+            );
+
+            this.compilation.GetTypeByMetadataName("MyTest.AppShinyStartup").Should().BeNull("it shouldn't have been auto-generated");
+            this.compilation.GetTypeByMetadataName("MyTest.ExistingStartup").Should().NotBeNull("it was created");
+        }
+
+        public void ExistingStartupDefined()
+        {
+        }
+
+
         public void TestModuleDetection()
         {
-
         }
 
 
