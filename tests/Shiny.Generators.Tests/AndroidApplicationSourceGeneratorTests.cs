@@ -1,8 +1,8 @@
 ﻿using System;
-using Xunit;
+using System.Linq;
 using FluentAssertions;
+using Xunit;
 using Xunit.Abstractions;
-using Microsoft.CodeAnalysis;
 
 
 namespace Shiny.Generators.Tests
@@ -21,13 +21,8 @@ namespace Shiny.Generators.Tests
         // test for auto-init of 3rd party
         // test for activity
         // test for permissions
-        // test for init
         // test for partial
         // test xamessentials
-
-
-        // TODO: auto startup
-        // add shiny libs one by one to ensure output (push has some special considerations)
         // test for xam forms auto init
 
         [Fact]
@@ -35,6 +30,13 @@ namespace Shiny.Generators.Tests
         {
             this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
             this.RunGenerator();
+            this.Compilation.SyntaxTrees.Count().Should().Be(3);
+            this.Compilation
+                .SyntaxTrees
+                .Select(x => x.ToString())
+                .Any(x => x.Contains("this.ShinyOnCreate(new AppShinyStartup());"))
+                .Should()
+                .BeTrue("Registration not found");
         }
     }
 }

@@ -25,7 +25,8 @@ namespace Shiny.Generators.Tests
         public void Dispose()
         {
             if (this.Compilation != null)
-                this.Output.WriteSyntaxTrees(this.Compilation);
+                foreach (var syntaxTree in this.Compilation.SyntaxTrees)
+                    this.Output.WriteLine(syntaxTree.ToString());
         }
 
 

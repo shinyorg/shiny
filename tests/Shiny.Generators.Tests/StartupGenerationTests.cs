@@ -1,52 +1,30 @@
 ﻿using System;
 using FluentAssertions;
-using Microsoft.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 
 
 namespace Shiny.Generators.Tests
 {
-    public class StartupGenerationTests : IDisposable
+    public class StartupGenerationTests : AbstractSourceGeneratorTests<AndroidApplicationSourceGenerator>
     {
-        readonly ITestOutputHelper output;
-        readonly AssemblyGenerator generator;
-        Compilation compilation;
-
-
-        public StartupGenerationTests(ITestOutputHelper output)
+        public StartupGenerationTests(ITestOutputHelper output) : base(output, "Mono.Android", "Shiny", "Shiny.Core")
         {
-            this.output = output;
-            this.generator = new AssemblyGenerator();
-            this.generator.AddReference("Mono.Android");
-            this.generator.AddReference("Shiny");
-            this.generator.AddReference("Shiny.Core");
-        }
-
-
-        public void Dispose()
-        {
-            if (this.compilation != null)
-                this.output.WriteSyntaxTrees(this.compilation);
         }
 
 
         [Fact]
         public void Test()
         {
-            this.generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
-            this.compilation = this.generator.DoGenerate(
-                nameof(Test),
-                new AndroidApplicationSourceGenerator()
-            );
-            //compile.AssertTypesExist(""); // android app, shiny startup
+            this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
+            this.RunGenerator();
         }
 
 
         [Fact]
         public void JobDetection()
         {
-            this.generator.AddSource(@"
+            this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
 using System;
 using System.Threading;
@@ -60,17 +38,15 @@ namespace MyTest
         public async Task Run(JobInfo jobInfo, CancellationToken cancelToken) {}
     }
 }");
-            this.compilation = this.generator.DoGenerate(
-                nameof(JobDetection),
-                new AndroidApplicationSourceGenerator()
-            );
+            this.RunGenerator();
+            // TODO: find job
         }
 
 
         [Fact]
         public void ExistingStartupDetectionSameAssembly()
         {
-            this.generator.AddSource(@"
+            this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
 using System;
 using System.Threading;
@@ -81,16 +57,13 @@ namespace MyTest
 {
     public class ExistingStartup : Shiny.ShinyStartup
     {
-         public override void ConfigureServices(IServiceCollection services) {}
+        public override void ConfigureServices(IServiceCollection services) {}
     }
 }");
-            this.compilation = this.generator.DoGenerate(
-                nameof(ExistingStartupDetectionSameAssembly),
-                new AndroidApplicationSourceGenerator()
-            );
+            this.RunGenerator();
 
-            this.compilation.GetTypeByMetadataName("MyTest.AppShinyStartup").Should().BeNull("it shouldn't have been auto-generated");
-            this.compilation.GetTypeByMetadataName("MyTest.ExistingStartup").Should().NotBeNull("it was created");
+            this.Compilation.GetTypeByMetadataName("MyTest.AppShinyStartup").Should().BeNull("it shouldn't have been auto-generated");
+            this.Compilation.GetTypeByMetadataName("MyTest.ExistingStartup").Should().NotBeNull("it was created");
         }
 
 
@@ -112,9 +85,9 @@ namespace MyTest
         [Fact]
         public void DelegateDetection()
         {
-            this.generator.AddReference("Shiny.Locations");
-            this.generator.AddReference("Shiny.Locations.Abstractions");
-            this.generator.AddSource(@"
+            this.Generator.AddReference("Shiny.Locations");
+            this.Generator.AddReference("Shiny.Locations.Abstractions");
+            this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
 namespace Test
 {
@@ -123,10 +96,9 @@ namespace Test
         public Task OnReading(IGpsReading reading) => throw new NotImplementedException();
     }
 }");
-            this.compilation = this.generator.DoGenerate(
-                nameof(DelegateDetection),
-                new AndroidApplicationSourceGenerator()
-            );
+            this.RunGenerator();
+
+            // TODO: find generator
         }
     }
 }
