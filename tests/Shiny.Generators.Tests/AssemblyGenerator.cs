@@ -24,6 +24,12 @@ namespace Shiny.Generators.Tests
         }
 
 
+        public void AddReferences(params string[] assemblies)
+        {
+            foreach (var assembly in assemblies)
+                this.AddReference(assembly);
+        }
+
 
         public void AddReference(string assemblyName)
         {

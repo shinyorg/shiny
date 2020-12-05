@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Shiny.Generators
 {
-    static class Extensions
+    public static class Extensions
     {
         public static void Source(this GeneratorExecutionContext context, string sourceText, string? fileName = null)
         {

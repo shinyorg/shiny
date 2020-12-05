@@ -28,35 +28,7 @@ namespace Shiny.Generators
                 using (builder.BlockInvariant($"public partial class {appDelegate.Name}"))
                 {
                     this.GenerateFinishedLaunching(appDelegate, builder);
-
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Shiny.Push",
-                        "ReceivedRemoteNotification",
-                        "public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);"
-                    );
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Shiny.Push",
-                        "DidReceiveRemoteNotification",
-                        "public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);"
-                    );
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Shiny.Push",
-                        "RegisteredForRemoteNotifications",
-                        "public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) => this.ShinyRegisteredForRemoteNotifications(deviceToken);"
-                    );
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Shiny.Push",
-                        "RegisteredForRemoteNotifications",
-                        "public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) => this.ShinyFailedToRegisterForRemoteNotifications(error);"
-                    );
+                    this.TryAppendPush(builder);
 
                     this.AppendMethodIf(
                         appDelegate,
@@ -78,8 +50,31 @@ namespace Shiny.Generators
         }
 
 
+        void TryAppendPush(IndentedStringBuilder builder)
+        {
+            var hasPush = this.Context
+                .Compilation
+                .ReferencedAssemblyNames
+                .Any(x =>
+                    x.Name.StartsWith("Shiny.Push") &&
+                    !x.Name.Equals("Shiny.Push.Abstractions")
+                );
+
+            if (hasPush)
+            {
+                builder.AppendLineInvariant("public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) => this.ShinyRegisteredForRemoteNotifications(deviceToken);");
+                builder.AppendLineInvariant("public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);");
+                builder.AppendLineInvariant("public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);");
+                builder.AppendLineInvariant("public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) => this.ShinyFailedToRegisterForRemoteNotifications(error);");
+            }
+        }
+
         void AppendMethodIf(INamedTypeSymbol symbol, IndentedStringBuilder builder, string neededLibrary, string methodName, string append)
         {
+            var hasAssembly = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals(neededLibrary));
+            if (!hasAssembly)
+                return;
+
             var exists = symbol.HasMethod(methodName);
 
             if (exists)
