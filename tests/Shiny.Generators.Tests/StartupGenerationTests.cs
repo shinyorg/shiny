@@ -44,7 +44,7 @@ namespace Shiny.Generators.Tests
 
 
         [Fact]
-        public void TestJobDetection()
+        public void JobDetection()
         {
             this.generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
@@ -61,8 +61,8 @@ namespace MyTest
     }
 }");
             this.compilation = this.generator.DoGenerate(
-                nameof(TestJobDetection),
-                new AndroidActivitySourceGenerator()
+                nameof(JobDetection),
+                new AndroidApplicationSourceGenerator()
             );
         }
 
@@ -85,27 +85,48 @@ namespace MyTest
     }
 }");
             this.compilation = this.generator.DoGenerate(
-                nameof(TestJobDetection),
-                new AndroidActivitySourceGenerator()
+                nameof(ExistingStartupDetectionSameAssembly),
+                new AndroidApplicationSourceGenerator()
             );
 
             this.compilation.GetTypeByMetadataName("MyTest.AppShinyStartup").Should().BeNull("it shouldn't have been auto-generated");
             this.compilation.GetTypeByMetadataName("MyTest.ExistingStartup").Should().NotBeNull("it was created");
         }
 
+
         public void ExistingStartupDefined()
         {
         }
 
 
-        public void TestModuleDetection()
+        public void ModuleDetection()
         {
         }
 
 
-        public void TestStartupTaskDetection()
+        public void StartupTaskDetection()
         {
+        }
 
+
+        [Fact]
+        public void DelegateDetection()
+        {
+            this.generator.AddReference("Shiny.Locations");
+            this.generator.AddReference("Shiny.Locations.Abstractions");
+            this.generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+namespace Test
+{
+    public class TestGpsDelegate : Shiny.Locations.IGpsDelegate
+    {
+        public Task OnReading(IGpsReading reading) => throw new NotImplementedException();
+    }
+}");
+            this.compilation = this.generator.DoGenerate(
+                nameof(DelegateDetection),
+                new AndroidApplicationSourceGenerator()
+            );
         }
     }
 }

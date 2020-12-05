@@ -8,22 +8,18 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UsePush<TDelegate>(this IServiceCollection services,
-                                              params NotificationCategory[] categories) where TDelegate : class, IPushDelegate
-            => services.UsePush(typeof(TDelegate), categories);
+        public static bool UsePush<TDelegate>(this IServiceCollection services) where TDelegate : class, IPushDelegate
+            => services.UsePush(typeof(TDelegate));
 
 
-        public static bool UsePush(this IServiceCollection services,
-                                   Type delegateType,
-                                   params NotificationCategory[] categories)
+        public static bool UsePush(this IServiceCollection services, Type delegateType)
         {
 #if NETSTANDARD
             return false;
 #else
             services.RegisterModule(new PushModule(
                 typeof(PushManager),
-                delegateType,
-                categories
+                delegateType
             ));
             return true;
 #endif

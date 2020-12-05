@@ -18,7 +18,6 @@ namespace Shiny.Generators.Tests
 
         public void AddSource(string sourceText)
         {
-            
             var source = SourceText.From(sourceText, Encoding.UTF8);
             var tree = CSharpSyntaxTree.ParseText(source);
             this.sources.Add(tree);
@@ -44,9 +43,10 @@ namespace Shiny.Generators.Tests
 
         public CSharpCompilation Create(string assemblyName)
         {
-            var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
+            //var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
             return CSharpCompilation
-                .Create(localPath)
+                //.Create(localPath)
+                .Create(assemblyName)
                 .WithReferences(this.references)
                 .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
                 .AddSyntaxTrees(this.sources);

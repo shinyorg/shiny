@@ -30,23 +30,18 @@ namespace Shiny.Generators
 
             this.ShinyConfig = new ShinyApplicationValues(shinyAppAttributeData);
 
+            if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
+            {
+                this.GenerateStartup(this.Context.Compilation.AssemblyName);
+                this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
+            }
+
             var appClasses = context
                 .Compilation
                 .Assembly
                 .GetAllTypeSymbols()
                 .Where(x => x.Inherits(appType))
                 .ToList();
-
-            if (appClasses.Count == 0)
-                throw new ArgumentException("No app classes found in this assembly!");
-
-            if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
-            {
-                var nameSpace = appClasses.FirstOrDefault()?.ContainingNamespace.Name;
-                this.GenerateStartup(nameSpace);
-                this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
-            }
-
             this.Process(appClasses);
         }
 
@@ -71,11 +66,11 @@ namespace Shiny.Generators
 
             using (this.builder.BlockInvariant("namespace " + nameSpace))
             {
-                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.ShinyStartup"))
+                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.IShinyStartup"))
                 {
                     this.builder.AppendLine("partial void AdditionalConfigureServices(IServiceCollection services);");
 
-                    using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
+                    using (this.builder.BlockInvariant("public void ConfigureServices(IServiceCollection services)"))
                     {
                         this.builder.AppendLine("this.AdditionalConfigureServices(services);");
 
@@ -105,15 +100,15 @@ namespace Shiny.Generators
 
                         if (!this.ShinyConfig.ExcludeStartupTasks)
                             this.RegisterStartupTasks();
+                    }
 
+                    using (this.builder.BlockInvariant("public void ConfigureApp(IServiceProvider provider)"))
+                    {
                         var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Forms");
                         if (xamFormsType != null)
                         {
-                            using (this.builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
-                            {
-                                this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
-                                this.builder.AppendLine();
-                            }
+                            this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
+                            this.builder.AppendLine();
                         }
                     }
                 }
@@ -138,11 +133,11 @@ namespace Shiny.Generators
 
                 if (hasFirebasePush)
                 {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", false);
+                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", true);
                 }
                 else if (hasNativePush)
                 {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", false);
+                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", true);
                 }
             }
         }
@@ -168,16 +163,13 @@ namespace Shiny.Generators
                 return false;
 
             var impls = this.allSymbols
-                .Where(x => x.Inherits(symbol))
+                .Where(x => x.Implements(symbol))
                 .ToList();
 
-            if (!impls.Any() && oneDelegateRequiredToInstall)
+            if (!impls.Any())
                 return false;
 
-            if (oneDelegateRequiredToInstall)
-                registerStatement += $"<{impls.First().ToDisplayString()}>";
-
-            registerStatement += "();";
+            registerStatement += $"<{impls.First().ToDisplayString()}>()";
             this.builder.AppendLineInvariant(registerStatement);
 
             if (impls.Count > 1)

@@ -113,11 +113,19 @@ namespace Shiny.Generators
 
 
         public static bool Implements(this INamedTypeSymbol symbol, ITypeSymbol type)
-            => symbol.AllInterfaces.Any(i => type.Equals(i));
+        {
+            if (!type.IsInterface())
+                throw new ArgumentException("Symbol is not an interface");
+
+            return symbol.AllInterfaces.Any(i => type.Equals(i));
+        }
 
 
         public static bool Inherits(this INamedTypeSymbol symbol, ITypeSymbol type)
         {
+            if (type.IsInterface())
+                throw new ArgumentException("Type cannot be an interface");
+
             var current = symbol;
             while (current != null)
             {

@@ -23,7 +23,7 @@ namespace Shiny.Push
         public Task OnEntry(NotificationResponse response) => this
             .delegates?
             .RunDelegates(x => x.OnEntry(new PushEntryArgs(
-                response.Notification.Category,
+                response.Notification.Channel,
                 response.ActionIdentifier,
                 response.Text,
                 response.Notification.Payload
