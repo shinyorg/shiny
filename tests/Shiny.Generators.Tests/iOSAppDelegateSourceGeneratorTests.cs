@@ -70,6 +70,21 @@ namespace MyTest
         }
 
 
+        [Fact]
+        public void NoPushEventsGenerated()
+        {
+            this.Generator.AddReference("Shiny.Push.Abstractions");
+            this.Generator.AddSource(StandardAppDelegate);
+            this.RunGenerator();
+
+            var appDelegate = this.GetDefaultAppDelegate();
+            appDelegate.HasMethod("ReceivedRemoteNotification").Should().BeFalse("ReceivedRemoteNotification");
+            appDelegate.HasMethod("DidReceiveRemoteNotification").Should().BeFalse("DidReceiveRemoteNotification");
+            appDelegate.HasMethod("RegisteredForRemoteNotifications").Should().BeFalse("RegisteredForRemoteNotifications");
+            appDelegate.HasMethod("FailedToRegisterForRemoteNotifications").Should().BeFalse("FailedToRegisterForRemoteNotifications");
+        }
+
+
         INamedTypeSymbol GetDefaultAppDelegate()
         {
             var appDelegate = this.Compilation.GetTypeByMetadataName(StandardAppDelegateClassName);
