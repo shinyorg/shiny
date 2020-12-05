@@ -66,11 +66,11 @@ namespace Shiny.Generators
 
             using (this.builder.BlockInvariant("namespace " + nameSpace))
             {
-                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.ShinyStartup"))
+                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.IShinyStartup"))
                 {
                     this.builder.AppendLine("partial void AdditionalConfigureServices(IServiceCollection services);");
 
-                    using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
+                    using (this.builder.BlockInvariant("public void ConfigureServices(IServiceCollection services)"))
                     {
                         this.builder.AppendLine("this.AdditionalConfigureServices(services);");
 
@@ -100,15 +100,15 @@ namespace Shiny.Generators
 
                         if (!this.ShinyConfig.ExcludeStartupTasks)
                             this.RegisterStartupTasks();
+                    }
 
+                    using (this.builder.BlockInvariant("public void ConfigureApp(IServiceProvider provider)"))
+                    {
                         var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Forms");
                         if (xamFormsType != null)
                         {
-                            using (this.builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
-                            {
-                                this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
-                                this.builder.AppendLine();
-                            }
+                            this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
+                            this.builder.AppendLine();
                         }
                     }
                 }
