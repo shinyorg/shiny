@@ -18,6 +18,7 @@ namespace Shiny.Notifications
             this.toastNotifications = ToastNotificationManager.CreateToastNotifier();
         }
 
+
         public void ClearProgress()
         {
         }
@@ -56,8 +57,7 @@ namespace Shiny.Notifications
             this.toastNotifications.Update(
                 data,
                 this.notification.Id.ToString(),
-                "TODO"
-                //this.notification.Windows.GroupName
+                notification.Channel
             );
         }
     }

@@ -7,29 +7,22 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Shiny.Jobs;
 using Shiny.Settings;
 using Shiny.Infrastructure;
-
+using Windows.ApplicationModel.Background;
 
 namespace Shiny.Notifications
 {
     public class NotificationManager : INotificationManager, IPersistentNotificationManagerExtension
     {
-        readonly IServiceProvider services;
-        readonly IRepository repository;
+        readonly ShinyCoreServices services;
         readonly IJobManager jobs;
-        readonly ISettings settings;
         readonly BadgeUpdater badgeUpdater;
 
 
-        public NotificationManager(IServiceProvider services,
-                                   IJobManager jobs,
-                                   ISettings settings,
-                                   IRepository repository)
+        public NotificationManager(ShinyCoreServices services, IJobManager jobs)
         {
             this.badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
             this.services = services;
             this.jobs = jobs;
-            this.settings = settings;
-            this.repository = repository;
         }
 
 
@@ -54,7 +47,7 @@ namespace Shiny.Notifications
             var native = this.CreateNativeNotification(notification, false);
             if (notification.ScheduleDate != null)
             {
-                await this.repository.Set(notification.Id.ToString(), notification);
+                await this.services.Repository.Set(notification.Id.ToString(), notification);
                 return;
             }
 
@@ -62,7 +55,7 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 this.Badge = notification.BadgeCount.Value;
 
-            await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
+            await this.services.Services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
         }
 
 
@@ -79,43 +72,43 @@ namespace Shiny.Notifications
         //}
 
 
-        public async Task<IEnumerable<Notification>> GetPending() => await this.repository.GetAll<Notification>();
+        public async Task<IEnumerable<Notification>> GetPending() => await this.services.Repository.GetAll<Notification>();
 
 
         public async Task Clear()
         {
             ToastNotificationManager.History.Clear();
-            await this.repository.Clear<Notification>();
+            await this.services.Repository.Clear<Notification>();
         }
 
 
         public async Task Cancel(int id)
         {
             ToastNotificationManager.History.Remove(id.ToString());
-            await this.repository.Remove<Notification>(id.ToString());
+            await this.services.Repository.Remove<Notification>(id.ToString());
         }
 
 
-        //public void Start()
-        //{
-        //    //if (this.services.IsRegistered<INotificationDelegate>())
-        //    //{
-        //    //    UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(
-        //    //        builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
-        //    //    );
-        //    //}
-        //}
+        public void Start()
+        {
+            if (this.services.Services.GetService(typeof(INotificationDelegate)) != null)
+            {
+                UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(
+                    builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
+                );
+            }
+        }
 
 
         const string BADGE_KEY = "ShinyNotificationBadge";
         public int Badge
         {
-            get => this.settings.Get(BADGE_KEY, 0);
+            get => this.services.Settings.Get(BADGE_KEY, 0);
             set
             {
                 var badge = new BadgeNumericContent((uint)value);
                 this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
-                this.settings.Set(BADGE_KEY, value);
+                this.services.Settings.Set(BADGE_KEY, value);
             }
         }
 
@@ -123,7 +116,7 @@ namespace Shiny.Notifications
         public ToastNotification CreateNativeNotification(Notification notification, bool includeProgressBar)
         {
             if (notification.Id == 0)
-                notification.Id = this.settings.IncrementValue("NotificationId");
+                notification.Id = this.services.Settings.IncrementValue("NotificationId");
 
             var toastContent = new ToastContent
             {
@@ -202,13 +195,20 @@ namespace Shiny.Notifications
             var native = new ToastNotification(toastContent.GetXml())
             {
                 Tag = notification.Id.ToString(),
-                Group = "TODO"
-                //Group = notification.Windows.GroupName
+                Group = notification.Channel
             };
             return native;
         }
 
-        public void CreateChannel(Channel channel) => throw new NotImplementedException();
-        public void DeleteChannel(string identifier) => throw new NotImplementedException();
+        public async Task CreateChannel(Channel channel)
+        {
+
+        }
+
+
+        public async Task DeleteChannel(string identifier)
+        {
+            //this.repository.Remove<Channe>
+        }
     }
 }

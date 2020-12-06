@@ -60,11 +60,11 @@ namespace Shiny.Notifications
                 //{
                 //    //native.Notification.Visual.Bindings.
                 //}
-                //var ndelegate = this.serviceProvider.GetService<INotificationDelegate>();
-                //if (ndelegate != null)
-                //{
-                //    ndelegate.OnEntry()
-                //}
+                var ndelegate = this.serviceProvider.GetService<INotificationDelegate>();
+                if (ndelegate != null)
+                {
+                    //ndelegate.OnEntry()
+                }
             }
             catch (Exception ex)
             {
@@ -78,33 +78,6 @@ namespace Shiny.Notifications
     }
 }
 /*
- *
-var details = taskInstance.TriggerDetails as ToastNotificationActionTriggerDetail;
-            if (details == null)
-            {
-                ToastHelper.PopToast("ERROR", "TriggerDetails was not ToastNotificationActionTriggerDetail.");
-                return;
-            }
-
-
-
- * // Get the toast binding, if present
-NotificationBinding toastBinding = notif.Notification.Visual.GetBinding(KnownNotificationBindings.ToastGeneric);
-
-if (toastBinding != null)
-{
-    // And then get the text elements from the toast binding
-    IReadOnlyList<AdaptiveNotificationText> textElements = toastBinding.GetTextElements();
-
-    // Treat the first text element as the title text
-    string titleText = textElements.FirstOrDefault()?.Text;
-
-    // We'll treat all subsequent text elements as body text,
-    // joining them together via newlines.
-    string bodyText = string.Join("\n", textElements.Skip(1).Select(t => t.Text));
-}
-
-
 // Get the listener
 UserNotificationListener listener = UserNotificationListener.Current;
 

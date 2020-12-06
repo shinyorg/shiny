@@ -12,41 +12,33 @@ using AndroidX.Core.Content;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Logging;
-using Shiny.Settings;
 
 
 namespace Shiny.Notifications
 {
     public class NotificationManager : INotificationManager, IPersistentNotificationManagerExtension
     {
-        readonly IAndroidContext context;
-        readonly IServiceProvider services;
-        readonly IRepository repository;
-        readonly ISettings settings;
+        readonly ShinyCoreServices services;
         readonly ISerializer serializer;
         readonly IJobManager jobs;
         readonly NotificationManagerCompat manager;
 
 
-        public NotificationManager(IAndroidContext context,
-                                   IServiceProvider services,
+        public NotificationManager(ShinyCoreServices services,
                                    ISerializer serializer,
-                                   IJobManager jobs,
-                                   IRepository repository,
-                                   ISettings settings)
+                                   IJobManager jobs)
         {
-            this.context = context;
             this.services = services;
             this.serializer = serializer;
             this.jobs = jobs;
-            this.repository = repository;
-            this.settings = settings;
 
-            this.manager = NotificationManagerCompat.From(this.context.AppContext);
-            this.context
+            this.manager = NotificationManagerCompat.From(this.services.Android.AppContext);
+            this.services
+                .Android
                 .WhenIntentReceived()
                 .Subscribe(x => this
                     .services
+                    .Services
                     .Resolve<AndroidNotificationProcessor>()
                     .TryProcessIntent(x)
                  );
@@ -76,19 +68,19 @@ namespace Shiny.Notifications
         public async Task Cancel(int id)
         {
             this.manager.Cancel(id);
-            await this.repository.Remove<Notification>(id.ToString());
+            await this.services.Repository.Remove<Notification>(id.ToString());
         }
 
 
         public async Task Clear()
         {
             this.manager.CancelAll();
-            await this.repository.Clear<Notification>();
+            await this.services.Repository.Clear<Notification>();
         }
 
 
         public async Task<IEnumerable<Notification>> GetPending()
-            => await this.repository.GetAll<Notification>();
+            => await this.services.Repository.GetAll<Notification>();
 
 
         public async Task<AccessState> RequestAccess()
@@ -110,11 +102,11 @@ namespace Shiny.Notifications
 
             if (notification.ScheduleDate != null)
             {
-                await this.repository.Set(notification.Id.ToString(), notification);
+                await this.services.Repository.Set(notification.Id.ToString(), notification);
                 return;
             }
             this.SendNative(notification.Id, native);
-            await this.services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification), false);
+            await this.services.Services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification), false);
         }
 
 
@@ -124,10 +116,10 @@ namespace Shiny.Notifications
         public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification)
         {
             if (notification.Id == 0)
-                notification.Id = this.settings.IncrementValue("NotificationId");
+                notification.Id = this.services.Settings.IncrementValue("NotificationId");
 
             var pendingIntent = this.GetLaunchPendingIntent(notification);
-            var builder = new NotificationCompat.Builder(this.context.AppContext)
+            var builder = new NotificationCompat.Builder(this.services.Android.AppContext)
                 .SetContentTitle(notification.Title)
                 .SetSmallIcon(this.GetSmallIconResource(notification))
                 .SetAutoCancel(notification.Android.AutoCancel)
@@ -163,7 +155,7 @@ namespace Shiny.Notifications
 
             if (!notification.Android.ColorResourceName.IsEmpty())
             {
-                if (this.context.IsMinApiLevel(21))
+                if (this.services.Android.IsMinApiLevel(21))
                 {
                     var color = this.GetColor(notification.Android.ColorResourceName);
                     builder.SetColor(color);
@@ -247,15 +239,16 @@ namespace Shiny.Notifications
             Intent launchIntent;
             if (notification.Android?.LaunchActivityType == null)
             {
-                launchIntent = this.context
+                launchIntent = this.services
+                    .Android
                     .AppContext
                     .PackageManager
-                    .GetLaunchIntentForPackage(this.context.Package.PackageName)
+                    .GetLaunchIntentForPackage(this.services.Android.Package.PackageName)
                     .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
             }
             else
             {
-                launchIntent = new Intent(this.context.AppContext, notification.Android.LaunchActivityType);
+                launchIntent = new Intent(this.services.Android.AppContext, notification.Android.LaunchActivityType);
             }
 
             var notificationString = this.serializer.Serialize(notification);
@@ -270,14 +263,14 @@ namespace Shiny.Notifications
             if ((notification.Android.LaunchActivityFlags & AndroidActivityFlags.ClearTask) != 0)
             {
                 pendingIntent = AndroidX.Core.App.TaskStackBuilder
-                    .Create(this.context.AppContext)
+                    .Create(this.services.Android.AppContext)
                     .AddNextIntent(launchIntent)
                     .GetPendingIntent(notification.Id, (int)PendingIntentFlags.OneShot);
             }
             else
             {
                 pendingIntent = PendingIntent.GetActivity(
-                    this.context.AppContext,
+                    this.services.Android.AppContext,
                     notification.Id,
                     launchIntent,
                     PendingIntentFlags.OneShot
@@ -289,11 +282,11 @@ namespace Shiny.Notifications
 
         protected virtual int GetColor(string colorResourceName)
         {
-            var colorResourceId = this.context.GetColorByName(colorResourceName);
+            var colorResourceId = this.services.Android.GetColorByName(colorResourceName);
             if (colorResourceId <= 0)
                 throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
 
-            return ContextCompat.GetColor(this.context.AppContext, colorResourceId);
+            return ContextCompat.GetColor(this.services.Android.AppContext, colorResourceId);
         }
 
 
@@ -301,13 +294,13 @@ namespace Shiny.Notifications
         {
             if (notification.Android.SmallIconResourceName.IsEmpty())
             {
-                var id = this.context.GetResourceIdByName("notification");
+                var id = this.services.Android.GetResourceIdByName("notification");
                 if (id > 0)
                     return id;
 
-                return this.context.AppContext.ApplicationInfo.Icon;
+                return this.services.Android.AppContext.ApplicationInfo.Icon;
             }
-            var smallIconResourceId = this.context.GetResourceIdByName(notification.Android.SmallIconResourceName);
+            var smallIconResourceId = this.services.Android.GetResourceIdByName(notification.Android.SmallIconResourceName);
             if (smallIconResourceId <= 0)
                 throw new ArgumentException($"Icon ResourceId for {notification.Android.SmallIconResourceName} not found");
 
@@ -320,13 +313,15 @@ namespace Shiny.Notifications
             if (notification.Android.LargeIconResourceName.IsEmpty())
                 return;
 
-            var iconId = this.context.GetResourceIdByName(notification.Android.LargeIconResourceName);
+            var iconId = this.services.Android.GetResourceIdByName(notification.Android.LargeIconResourceName);
             if (iconId > 0)
-                builder.SetLargeIcon(BitmapFactory.DecodeResource(this.context.AppContext.Resources, iconId));
+                builder.SetLargeIcon(BitmapFactory.DecodeResource(this.services.Android.AppContext.Resources, iconId));
         }
 
         public void CreateChannel(Channel channel) => throw new NotImplementedException();
         public void DeleteChannel(string identifier) => throw new NotImplementedException();
+        Task INotificationManager.CreateChannel(Channel channel) => throw new NotImplementedException();
+        Task INotificationManager.DeleteChannel(string identifier) => throw new NotImplementedException();
 
 
         //protected virtual void TrySetSound(Notification notification, NotificationCompat.Builder builder)

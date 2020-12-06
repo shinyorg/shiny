@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using UserNotifications;
-using Shiny.Settings;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.Notifications
@@ -18,23 +18,17 @@ namespace Shiny.Notifications
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
 
-        readonly ISettings settings; // this will have problems with data protection
-        readonly IServiceProvider services;
+        readonly ShinyCoreServices services;
         readonly iOSNotificationDelegate nativeDelegate;
 
 
-        public NotificationManager(ISettings settings,
-                                   IServiceProvider services,
-                                   iOSNotificationDelegate nativeDelegate)
+        public NotificationManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate)
         {
-            this.settings = settings;
+            this.services = services;
             this.services = services;
             this.nativeDelegate = nativeDelegate;
         }
 
-        public NotificationManager()
-        {
-        }
 
         public void Start()
         {
@@ -46,7 +40,7 @@ namespace Shiny.Notifications
                     var shiny = x.Notification.Request.FromNative();
                     if (shiny != null)
                     {
-                        await this.services.RunDelegates<INotificationDelegate>(x => x.OnReceived(shiny));
+                        await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnReceived(shiny));
                         x.CompletionHandler.Invoke(UNNotificationPresentationOptions.Alert);
                     }
                 });
@@ -73,7 +67,7 @@ namespace Shiny.Notifications
                             response = new NotificationResponse(shiny, x.Response.ActionIdentifier, null);
                         }
 
-                        await this.services.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
+                        await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
                         x.CompletionHandler();
                     }
                 });
@@ -82,10 +76,10 @@ namespace Shiny.Notifications
 
         public int Badge
         {
-            get => this.settings.Get("Badge", 0);
+            get => this.services.Settings.Get("Badge", 0);
             set
             {
-                this.settings.Set("Badge", value);
+                this.services.Settings.Set("Badge", value);
                 Dispatcher.InvokeOnMainThreadAsync(() =>
                     UIApplication.SharedApplication.ApplicationIconBadgeNumber = value
                 );
@@ -95,56 +89,7 @@ namespace Shiny.Notifications
 
         //public void RegisterCategory(NotificationCategory category)
         //{
-        //    var actions = new List<UNNotificationAction>();
-        //    foreach (var action in category.Actions)
-        //    {
-        //        switch (action.ActionType)
-        //        {
-        //            case NotificationActionType.TextReply:
-        //                actions.Add(UNTextInputNotificationAction.FromIdentifier(
-        //                    action.Identifier,
-        //                    action.Title,
-        //                    UNNotificationActionOptions.None,
-        //                    action.Title,
-        //                    String.Empty
-        //                ));
-        //                break;
 
-        //            case NotificationActionType.Destructive:
-        //                actions.Add(UNNotificationAction.FromIdentifier(
-        //                    action.Identifier,
-        //                    action.Title,
-        //                    UNNotificationActionOptions.Destructive
-        //                ));
-        //                break;
-
-        //            case NotificationActionType.OpenApp:
-        //                actions.Add(UNNotificationAction.FromIdentifier(
-        //                    action.Identifier,
-        //                    action.Title,
-        //                    UNNotificationActionOptions.Foreground
-        //                ));
-        //                break;
-
-        //            case NotificationActionType.None:
-        //                actions.Add(UNNotificationAction.FromIdentifier(
-        //                    action.Identifier,
-        //                    action.Title,
-        //                    UNNotificationActionOptions.None
-        //                ));
-        //                break;
-        //        }
-        //    }
-
-        //    var native = UNNotificationCategory.FromIdentifier(
-        //        category.Identifier,
-        //        actions.ToArray(),
-        //        new string[] { "" },
-        //        UNNotificationCategoryOptions.None
-        //    );
-
-        //    var set = new NSSet<UNNotificationCategory>(new[] { native });
-        //    UNUserNotificationCenter.Current.SetNotificationCategories(set);
         //}
 
 
@@ -211,7 +156,7 @@ namespace Shiny.Notifications
         public async Task Send(Notification notification)
         {
             if (notification.Id == 0)
-                notification.Id = this.settings.IncrementValue("NotificationId");
+                notification.Id = this.services.Settings.IncrementValue("NotificationId");
 
             var request = UNNotificationRequest.FromIdentifier(
                 notification.Id.ToString(),
@@ -299,7 +244,71 @@ namespace Shiny.Notifications
             UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
             UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
         });
-        public void CreateChannel(Channel channel) => throw new NotImplementedException();
-        public void DeleteChannel(string identifier) => throw new NotImplementedException();
+
+
+        public async Task CreateChannel(Channel channel)
+        {
+            //    var actions = new List<UNNotificationAction>();
+            //    foreach (var action in category.Actions)
+            //    {
+            //        switch (action.ActionType)
+            //        {
+            //            case NotificationActionType.TextReply:
+            //                actions.Add(UNTextInputNotificationAction.FromIdentifier(
+            //                    action.Identifier,
+            //                    action.Title,
+            //                    UNNotificationActionOptions.None,
+            //                    action.Title,
+            //                    String.Empty
+            //                ));
+            //                break;
+
+            //            case NotificationActionType.Destructive:
+            //                actions.Add(UNNotificationAction.FromIdentifier(
+            //                    action.Identifier,
+            //                    action.Title,
+            //                    UNNotificationActionOptions.Destructive
+            //                ));
+            //                break;
+
+            //            case NotificationActionType.OpenApp:
+            //                actions.Add(UNNotificationAction.FromIdentifier(
+            //                    action.Identifier,
+            //                    action.Title,
+            //                    UNNotificationActionOptions.Foreground
+            //                ));
+            //                break;
+
+            //            case NotificationActionType.None:
+            //                actions.Add(UNNotificationAction.FromIdentifier(
+            //                    action.Identifier,
+            //                    action.Title,
+            //                    UNNotificationActionOptions.None
+            //                ));
+            //                break;
+            //        }
+            //    }
+
+            //    var native = UNNotificationCategory.FromIdentifier(
+            //        category.Identifier,
+            //        actions.ToArray(),
+            //        new string[] { "" },
+            //        UNNotificationCategoryOptions.None
+            //    );
+
+            //    var set = new NSSet<UNNotificationCategory>(new[] { native });
+            //    UNUserNotificationCenter.Current.SetNotificationCategories(set);
+        }
+
+
+        public async Task DeleteChannel(string identifier)
+        {
+            var categories = await UNUserNotificationCenter.Current.GetNotificationCategoriesAsync();
+            var newCategories = categories
+                .ToArray()
+                .Where(x => x.Identifier.Equals(identifier, StringComparison.InvariantCultureIgnoreCase))
+                .Select(x => new NSSet());
+            //UNUserNotificationCenter.Current.SetNotificationCategories()
+        }
     }
 }
