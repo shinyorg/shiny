@@ -9,9 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="readme.txt" />
-        <Compile Remove="**\Platforms\**\*.cs" />
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <None Include="**\Platforms\**\*.cs" />
+        <Compile Remove="**\Platforms\**\*.cs" />
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
