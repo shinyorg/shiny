@@ -169,7 +169,7 @@ namespace Shiny.Generators
             if (!impls.Any())
                 return false;
 
-            registerStatement += $"<{impls.First().ToDisplayString()}>()";
+            registerStatement += $"<{impls.First().ToDisplayString()}>();";
             this.builder.AppendLineInvariant(registerStatement);
 
             if (impls.Count > 1)

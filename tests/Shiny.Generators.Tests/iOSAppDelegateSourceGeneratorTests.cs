@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Linq;
 using Xunit;
 using FluentAssertions;
 using Xunit.Abstractions;
 using Microsoft.CodeAnalysis;
 
+
 namespace Shiny.Generators.Tests
 {
     public class iOSAppDelegateSourceGeneratorTests : AbstractSourceGeneratorTests<iOSAppDelegateSourceGenerator>
     {
-        // TODO: build xam ios libs, add appdelegate
-        // test for finding custom shiny startup
-        // test with/out XF
-        // test for auto-init of 3rd party
+        // TODO: test for auto-init of 3rd party (Xam Essentials)
+
+
         const string StandardAppDelegateClassName = "MyTest.TestAppDelegate";
         const string StandardAppDelegate = @"
 [assembly: Shiny.ShinyApplicationAttribute]
@@ -22,6 +23,60 @@ namespace MyTest
     }
 }";
         public iOSAppDelegateSourceGeneratorTests(ITestOutputHelper output) : base(output, "Xamarin.iOS", "Shiny", "Shiny.Core") { }
+
+
+        [Fact]
+        public void XamarinFormsIntegratedOnFinishedLaunching()
+        {
+            this.Generator.AddReference("Xamarin.Forms");
+            this.Generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute(XamarinFormsAppTypeName = ""Tests.MyXfApp"")]
+
+namespace Tests
+{
+    public partial void MyTestAppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
+    {
+    }
+
+    public class MyXfApp : global::Xamarin.Forms.Application
+    {
+    }
+}
+");
+            this.RunGenerator();
+            this.CompilationHasContent("this.LoadApplication(new Tests.MyXfApp());", "Xamarin.Forms LoadApplication should have been applied");
+            this.CompilationHasContent("global::Xamarin.Forms.Forms.Init();", "Xamarin.Forms.Forms.Init should have been applied");
+        }
+
+
+        [Fact]
+        public void ShinyStartupSpecifiedWrong()
+        {
+            this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute(ShinyStartupTypeName = \"Tests.WrongName\")]");
+            this.RunGenerator();
+            // TODO: should error!
+        }
+
+
+        [Fact]
+        public void ShinyStartupSpecified()
+        {
+            this.Generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute(ShinyStartupTypeName = ""Tests.MyShinyApp"")]
+namespace Tests
+{
+    public partial void MyTestAppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
+    {
+    }
+
+    public class MyShinyApp : global::Shiny.ShinyStartup
+    {
+        public override void ConfigureServices(global::Microsoft.Extensions.DependencyInjection.IServiceCollection services) {}
+    }
+}");
+            this.RunGenerator();
+            this.CompilationHasContent("this.ShinyFinishedLaunching(new global::Tests.MyShinyApp());", "iOS FinishedLaunching should have startup specified");
+        }
 
 
         [Fact]
@@ -91,5 +146,9 @@ namespace MyTest
             appDelegate.Should().NotBeNull("AppDelegate type not found");
             return appDelegate;
         }
+
+
+        void CompilationHasContent(string content, string because)
+            => this.Compilation.SyntaxTrees.Any(x => x.ToString().Contains(content)).Should().BeTrue(because);
     }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -10,16 +8,24 @@ namespace Shiny.Generators.Tests
 {
     public class StartupGenerationTests : AbstractSourceGeneratorTests<AndroidApplicationSourceGenerator>
     {
-        public StartupGenerationTests(ITestOutputHelper output) : base(output, "Mono.Android", "Shiny", "Shiny.Core")
+        public StartupGenerationTests(ITestOutputHelper output) : base(output, "Mono.Android", "Shiny", "Shiny.Core") {}
+
+
+        [Fact]
+        public void Standard()
         {
+            this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
+            this.RunGenerator();
         }
 
 
         [Fact]
-        public void Test()
+        public void DetectsAndWiresInXfDependencyService()
         {
+            this.Generator.AddReference("Xamarin.Forms");
             this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
             this.RunGenerator();
+            this.Compilation.AssertHasContent("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
         }
 
 
@@ -50,32 +56,6 @@ namespace MyTest
 
 
         [Fact]
-        public void ExistingStartupDetectionSameAssembly()
-        {
-            this.Generator.AddSource(@"
-[assembly: Shiny.ShinyApplicationAttribute]
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-
-namespace MyTest
-{
-    public class ExistingStartup : Shiny.ShinyStartup
-    {
-        public override void ConfigureServices(IServiceCollection services) {}
-    }
-}");
-            this.RunGenerator();
-
-            this.Compilation
-                .GetTypeByMetadataName("MyTest.AppShinyStartup")
-                .Should()
-                .BeNull("it shouldn't have been auto-generated");
-        }
-
-
-        [Fact]
         public void StartupTaskDetection()
         {
             this.Generator.AddSource(@"
@@ -93,9 +73,7 @@ namespace MyTest
     }
 }");
             this.RunGenerator();
-            this.Compilation
-                .SyntaxTrees
-                .Any(x => x.ToString().Contains("services.AddSingleton<MyTest.MyStartupTask>();"));
+            this.Compilation.AssertHasContent("services.AddSingleton<MyTest.MyStartupTask>();");
         }
 
 
@@ -116,11 +94,8 @@ namespace MyTest
     }
 }");
             this.RunGenerator();
-            this.Compilation
-                .SyntaxTrees
-                .Any(x => x.ToString().Contains("services.RegisterModule<MyTest.MyModule>();"));
+            this.Compilation.AssertHasContent("services.RegisterModule<MyTest.MyModule>();");
         }
-
 
 
         [Fact]
@@ -139,9 +114,7 @@ namespace Test
 }");
             this.RunGenerator();
 
-            this.Compilation
-                .SyntaxTrees
-                .Any(x => x.ToString().Contains("services.UseGps<Test.TestGpsDelegate>();"));
+            this.Compilation.AssertHasContent("services.UseGps<Test.TestGpsDelegate>();");
         }
     }
 }
