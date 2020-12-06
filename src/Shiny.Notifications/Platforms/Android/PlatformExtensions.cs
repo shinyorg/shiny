@@ -15,6 +15,15 @@ namespace Shiny
         }
 
 
+        internal static NotificationImportance ToNative(this ChannelImportance importance) => importance switch
+        {
+            ChannelImportance.Critical => NotificationImportance.Max,
+            ChannelImportance.High => NotificationImportance.High,
+            ChannelImportance.Normal => NotificationImportance.Default,
+            ChannelImportance.Low => NotificationImportance.Low
+        };
+
+
         internal static int GetColorByName(this IAndroidContext context, string colorName) => context
             .AppContext
             .Resources

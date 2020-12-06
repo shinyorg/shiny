@@ -85,12 +85,10 @@ namespace Shiny.Notifications
 
         public async Task<AccessState> RequestAccess()
         {
-            var state = AccessState.Available;
+            var state = AccessState.Disabled;
 
             if (this.manager.AreNotificationsEnabled())
                 state = await this.jobs.RequestAccess();
-            else
-                state = AccessState.Disabled;
 
             return state;
         }
@@ -199,41 +197,6 @@ namespace Shiny.Notifications
             => this.CreateNativeBuilder(notification).Build();
 
 
-        //protected virtual void CreateChannel(Notification notification)
-        //{
-        //    if (!this.context.IsMinApiLevel(26))
-        //        return;
-
-        //    var channelId = notification.Android.ChannelId;
-        //    var channel = this.manager.GetNotificationChannel(channelId);
-
-        //    if (channel == null)
-        //    {
-        //        channel = new NotificationChannel(
-        //            channelId,
-        //            notification.Android.Channel,
-        //            notification.Android.NotificationImportance.ToNative()
-        //        );
-        //        var d = notification.Android.ChannelDescription;
-        //        if (!d.IsEmpty())
-        //            channel.Description = d;
-
-        //        this.manager.CreateNotificationChannel(channel);
-        //    }
-
-        //    if (this.context.IsMinApiLevel(26) && (notification.Sound?.IsCustomSound() ?? false))
-        //    {
-        //        var attributes = new AudioAttributes.Builder()
-        //            .SetUsage(AudioUsageKind.NotificationRingtone)
-        //            .Build();
-
-        //        var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
-        //        channel.SetSound(uri, attributes);
-        //        channel.EnableVibration(notification.Android.Vibrate);
-        //        this.manager.CreateNotificationChannel(channel);
-        //    }
-        //}
-
         protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
         {
             Intent launchIntent;
@@ -318,78 +281,76 @@ namespace Shiny.Notifications
                 builder.SetLargeIcon(BitmapFactory.DecodeResource(this.services.Android.AppContext.Resources, iconId));
         }
 
-        public void CreateChannel(Channel channel) => throw new NotImplementedException();
-        public void DeleteChannel(string identifier) => throw new NotImplementedException();
-        Task INotificationManager.CreateChannel(Channel channel) => throw new NotImplementedException();
-        Task INotificationManager.DeleteChannel(string identifier) => throw new NotImplementedException();
+
+        public async Task CreateChannel(Channel channel)
+        {
+            var native = new NotificationChannel(
+                channel.Identifier,
+                channel.Description,
+                channel.Importance.ToNative()
+            );
+            //        var attributes = new AudioAttributes.Builder()
+            //            .SetUsage(AudioUsageKind.NotificationRingtone)
+            //            .Build();
+
+            //        var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
+            //        channel.SetSound(uri, attributes);
+            //        channel.EnableVibration(notification.Android.Vibrate);
+            //        this.manager.CreateNotificationChannel(channel);
+
+            //    switch (notification.Sound.Type)
+            //    {
+            //        case NotificationSoundType.Priority:
+            //            builder.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri);
+            //            break;
+
+            //        case NotificationSoundType.Default:
+            //            builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
+            //            break;
+
+            //        case NotificationSoundType.Custom:
+            //            var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
+            //            builder.SetSound(uri);
+            //            break;
+
+            //        case NotificationSoundType.None:
+            //            break;
+            //    }
+
+            //        var notificationString = this.serializer.Serialize(notification);
+
+            //        foreach (var action in category.Actions)
+            //        {
+            //            switch (action.ActionType)
+            //            {
+            //                case NotificationActionType.OpenApp:
+            //                    break;
+
+            //                case NotificationActionType.TextReply:
+            //                    var textReplyAction = this.CreateTextReply(notification, action);
+            //                    builder.AddAction(textReplyAction);
+            //                    break;
+
+            //                case NotificationActionType.None:
+            //                case NotificationActionType.Destructive:
+            //                    var destAction = this.CreateAction(notification, action);
+            //                    builder.AddAction(destAction);
+            //                    break;
+
+            //                default:
+            //                    throw new ArgumentException("Invalid action type");
+            //            }
+            //        }
+            this.manager.CreateNotificationChannel(native);
+            await this.services.Repository.Set(channel.Identifier, null);
+        }
 
 
-        //protected virtual void TrySetSound(Notification notification, NotificationCompat.Builder builder)
-        //{
-        //    if (notification.Sound == null)
-        //        return;
-
-        //    switch (notification.Sound.Type)
-        //    {
-        //        case NotificationSoundType.Priority:
-        //            builder.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri);
-        //            break;
-
-        //        case NotificationSoundType.Default:
-        //            builder.SetSound(Android.Provider.Settings.System.DefaultNotificationUri);
-        //            break;
-
-        //        case NotificationSoundType.Custom:
-        //            var uri = Android.Net.Uri.Parse(notification.Sound.CustomPath);
-        //            builder.SetSound(uri);
-        //            break;
-
-        //        case NotificationSoundType.None:
-        //            break;
-        //    }
-        //}
-
-
-
-        //https://segunfamisa.com/posts/notifications-direct-reply-android-nougat
-        //protected virtual void AddCategory(NotificationCompat.Builder builder, Notification notification)
-        //{
-        //    if (notification.Category.IsEmpty() || !this.context.IsMinApiLevel(24))
-        //        return;
-
-        //    var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
-        //    if (category == null)
-        //    {
-        //        Log.Write(NotificationLogCategory.Notifications, "No notification category found for " + notification.Category);
-        //    }
-        //    else
-        //    {
-        //        var notificationString = this.serializer.Serialize(notification);
-
-        //        foreach (var action in category.Actions)
-        //        {
-        //            switch (action.ActionType)
-        //            {
-        //                case NotificationActionType.OpenApp:
-        //                    break;
-
-        //                case NotificationActionType.TextReply:
-        //                    var textReplyAction = this.CreateTextReply(notification, action);
-        //                    builder.AddAction(textReplyAction);
-        //                    break;
-
-        //                case NotificationActionType.None:
-        //                case NotificationActionType.Destructive:
-        //                    var destAction = this.CreateAction(notification, action);
-        //                    builder.AddAction(destAction);
-        //                    break;
-
-        //                default:
-        //                    throw new ArgumentException("Invalid action type");
-        //            }
-        //        }
-        //    }
-        //}
+        public async Task DeleteChannel(string identifier)
+        {
+            this.manager.DeleteNotificationChannel(identifier);
+            //await this.services.Repository.Remove<Channel>(channel.Identifier);
+        }
 
 
         //static int counter = 100;
