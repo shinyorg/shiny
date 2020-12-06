@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -39,7 +41,11 @@ namespace MyTest
     }
 }");
             this.RunGenerator();
-            // TODO: find job
+
+            this.Compilation
+                .GetTypeByMetadataName("MyTest.DetectionJob")
+                .Should()
+                .NotBeNull();
         }
 
 
@@ -62,24 +68,59 @@ namespace MyTest
 }");
             this.RunGenerator();
 
-            this.Compilation.GetTypeByMetadataName("MyTest.AppShinyStartup").Should().BeNull("it shouldn't have been auto-generated");
-            this.Compilation.GetTypeByMetadataName("MyTest.ExistingStartup").Should().NotBeNull("it was created");
+            this.Compilation
+                .GetTypeByMetadataName("MyTest.AppShinyStartup")
+                .Should()
+                .BeNull("it shouldn't have been auto-generated");
         }
 
 
-        public void ExistingStartupDefined()
-        {
-        }
-
-
-        public void ModuleDetection()
-        {
-        }
-
-
+        [Fact]
         public void StartupTaskDetection()
         {
+            this.Generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+
+namespace MyTest
+{
+    public class MyStartupTask : Shiny.IShinyStartupTask
+    {
+        public void Start() {}
+    }
+}");
+            this.RunGenerator();
+            this.Compilation
+                .SyntaxTrees
+                .Any(x => x.ToString().Contains("services.AddSingleton<MyTest.MyStartupTask>();"));
         }
+
+
+        [Fact]
+        public void ModuleDetection()
+        {
+            this.Generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+using System;
+using Microsoft.Extensions.DependencyInjection;
+
+
+namespace MyTest
+{
+    public class MyModule : Shiny.ShinyModule
+    {
+        public override void Register(IServiceCollection services) {}
+    }
+}");
+            this.RunGenerator();
+            this.Compilation
+                .SyntaxTrees
+                .Any(x => x.ToString().Contains("services.RegisterModule<MyTest.MyModule>();"));
+        }
+
 
 
         [Fact]
@@ -98,7 +139,9 @@ namespace Test
 }");
             this.RunGenerator();
 
-            // TODO: find generator
+            this.Compilation
+                .SyntaxTrees
+                .Any(x => x.ToString().Contains("services.UseGps<Test.TestGpsDelegate>();"));
         }
     }
 }
