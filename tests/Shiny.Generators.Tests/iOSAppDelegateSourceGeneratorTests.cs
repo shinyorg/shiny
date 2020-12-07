@@ -25,7 +25,7 @@ namespace MyTest
         public iOSAppDelegateSourceGeneratorTests(ITestOutputHelper output) : base(output, "Xamarin.iOS", "Shiny", "Shiny.Core") { }
 
 
-        [Fact]
+        [Fact(Skip = "iOS Xamarin.Forms lib needs to be included")]
         public void XamarinFormsIntegratedOnFinishedLaunching()
         {
             this.Generator.AddReference("Xamarin.Forms");

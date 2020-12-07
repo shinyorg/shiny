@@ -104,7 +104,7 @@ namespace Shiny.Generators
 
                     using (this.builder.BlockInvariant("public void ConfigureApp(IServiceProvider provider)"))
                     {
-                        var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Forms");
+                        var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Internals.DependencyResolver");
                         if (xamFormsType != null)
                         {
                             this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
@@ -117,27 +117,42 @@ namespace Shiny.Generators
         }
 
 
+        static readonly string[] PushCannotGenerateRegister = new []
+        {
+            "Shiny.Push.AzureNotificationHubs",
+            "Shiny.Push.Aws",
+            "Shiny.Push.OneSignal"
+        };
+        static readonly Dictionary<string, string> PushRegisters = new Dictionary<string, string>
+        {
+            { "Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging" },
+            { "Shiny.Push", "services.UsePush" }
+        };
+
         void RegisterPush()
         {
-            var hasAzurePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.AzureNotificationHubs"));
-            if (hasAzurePush)
+            var cannotRegister = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
+            if (cannotRegister != null)
             {
-                //var rootNs = this.Context.Context.GetRootNamespace();
-                //this.Log.Warn($"Shiny.Push.AzureNotificationHubs cannot be auto-registered due to required configuration parameters.  Make sure to create a `public partial class AppShinyStartup : Shiny.ShinyStartup` in the namespace `{rootNs}` in this project with the rootnamespace and add `void CustomConfigureServices(IServiceCollection services)` to register it");
+                this.Context.ReportDiagnostic(Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "ShinyPush",
+                        $"{cannotRegister.Name} cannot be registered with auto-generation due to required configuration",
+                        null,
+                        "Push",
+                        DiagnosticSeverity.Warning,
+                        true
+                    ),
+                    Location.None)
+                );
             }
             else
             {
-                // azure must be manually registered
-                var hasFirebasePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.FirebaseMessaging"));
-                var hasNativePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push"));
-
-                if (hasFirebasePush)
+                var register = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushRegisters.ContainsKey(x.Name));
+                if (register != null)
                 {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", true);
-                }
-                else if (hasNativePush)
-                {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", true);
+                    var registerStatement = PushRegisters[register.Name];
+                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", registerStatement, true);
                 }
             }
         }
@@ -166,6 +181,7 @@ namespace Shiny.Generators
                 .Where(x => x.Implements(symbol))
                 .ToList();
 
+            // TODO: error
             if (!impls.Any())
                 return false;
 

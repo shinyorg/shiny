@@ -47,20 +47,17 @@ namespace Shiny.Generators.Tests
         }
 
 
-        public CSharpCompilation Create(string assemblyName)
-        {
-            //var localPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyName + ".dll");
-            return CSharpCompilation
-                //.Create(localPath)
-                .Create(assemblyName)
-                .WithReferences(this.references)
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                .AddSyntaxTrees(this.sources);
-        }
+        public CSharpCompilation Create(string assemblyName) => CSharpCompilation
+            .Create(assemblyName)
+            .WithReferences(this.references)
+            .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+            .AddSyntaxTrees(this.sources);
 
 
-        public Compilation DoGenerate(string dllName, ISourceGenerator sourceGenerator, params string[] assertTypes)
+        public Compilation DoGenerate(string dllName, ISourceGenerator sourceGenerator)
         {
+            //var meta = MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
+            //this.references.Add(meta);
             var driver = CSharpGeneratorDriver.Create(sourceGenerator);
             var inputCompilation = this.Create(dllName);
 

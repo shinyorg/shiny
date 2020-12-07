@@ -18,7 +18,7 @@ namespace Shiny.Generators.Tests
             this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
             this.RunGenerator();
             this.Compilation.SyntaxTrees.Count().Should().Be(3);
-            this.Compilation.AssertHasContent("this.ShinyOnCreate(new AppShinyStartup());", "Registration not found");
+            this.Compilation.AssertContent("this.ShinyOnCreate(new AppShinyStartup());", "Registration not found");
         }
 
 
@@ -28,7 +28,7 @@ namespace Shiny.Generators.Tests
             this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
             this.Generator.AddReference("Xamarin.Essentials");
             this.RunGenerator();
-            this.Compilation.AssertHasContent("global::Xamarin.Essentials.Platform.Init(this);");
+            this.Compilation.AssertContent("global::Xamarin.Essentials.Platform.Init(this);");
         }
     }
 }
