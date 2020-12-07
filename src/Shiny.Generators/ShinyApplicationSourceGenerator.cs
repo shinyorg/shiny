@@ -60,6 +60,7 @@ namespace Shiny.Generators
                 .GetAllAssemblies()
                 .Where(x => !x.Name.StartsWith("Shiny") && !x.Name.StartsWith("Xamarin."))
                 .SelectMany(x => x.GetAllTypeSymbols())
+                .Where(x => !x.IsAbstract && x.IsPublic())
                 .ToList();
 
             this.builder = new IndentedStringBuilder();
@@ -101,6 +102,9 @@ namespace Shiny.Generators
 
                         if (!this.ShinyConfig.ExcludeStartupTasks)
                             this.RegisterStartupTasks();
+
+                        if (!this.ShinyConfig.ExcludeServices)
+                            this.RegisterServices();
                     }
 
                     using (this.builder.BlockInvariant("public void ConfigureApp(IServiceProvider provider)"))
@@ -199,6 +203,28 @@ namespace Shiny.Generators
                 }
             }
             return true;
+        }
+
+
+        void RegisterServices()
+        {
+            foreach (var symbol in this.allSymbols)
+            {
+                var attrs = symbol.GetAttributes();
+                var hasService = attrs.Any(x => x.AttributeClass.Name.Equals("Shiny.ShinyServiceAttribute"));
+                if (hasService)
+                {
+                    if (!symbol.AllInterfaces.Any())
+                    {
+                        this.builder.AppendLineInvariant($"services.AddSingleton<{symbol.ToDisplayString()}>();");
+                    }
+                    else
+                    {
+                        foreach (var @interface in symbol.AllInterfaces)
+                            this.builder.AppendLineInvariant($"services.AddSingleton<{@interface.ToDisplayString()}, {symbol.ToDisplayString()}>();");
+                    }
+                }
+            }
         }
 
 

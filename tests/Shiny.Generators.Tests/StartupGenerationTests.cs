@@ -157,5 +157,33 @@ namespace Test
 
             this.Compilation.AssertContent("services.UseGps<Test.TestGpsDelegate>();");
         }
+
+
+        [Fact]
+        public void ServiceRegistration()
+        {
+            this.Generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+namespace Test
+{
+    public interface ITest1 {}
+    public interface ITest2 {}
+
+    [Shiny.ShinyServiceAttribute]
+    public class Test1 : ITest1 {}
+
+    [Shiny.ShinyServiceAttribute]
+    public class Test2 : ITest1, ITest2 {}
+
+    [Shiny.ShinyServiceAttribute]
+    public class Test3 {}
+}
+");
+            this.RunGenerator();
+            this.Compilation.AssertContent("services.AddSingleton<Test.ITest1, Test.Test1>()", "should be registered with ITest1 interface");
+            this.Compilation.AssertContent("services.AddSingleton<Test.ITest1, Test.Test2>()", "should be registered with ITest1 interface");
+            this.Compilation.AssertContent("services.AddSingleton<Test.ITest2, Test.Test2>()", "should be registered with ITest2 interface");
+            this.Compilation.AssertContent("services.AddSingleton<Test.Test3>()", "should be registered with no interfaces");
+        }
     }
 }

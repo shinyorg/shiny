@@ -35,13 +35,11 @@ namespace Shiny
         /// Setting this to true will skip scanning for startup tasks to register when a shiny file is being generated
         /// </summary>
         public bool ExcludeStartupTasks { get; set; }
+
+
+        /// <summary>
+        /// Will exclude scanning for classes marked with [Shiny.ShinyServiceAttribute]
+        /// </summary>
+        public bool ExcludeServices { get; set; }
     }
 }
-/*
- * Can inherit forms appdelegate or mvx... whatever
-public partial class MyShinyAppDelegate
-{
-    ... use delegate type name from
-    ... wire in normal stuff
-}
-*/
