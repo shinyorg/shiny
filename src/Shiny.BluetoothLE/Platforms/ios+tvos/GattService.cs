@@ -35,7 +35,7 @@ namespace Shiny.BluetoothLE
                     foreach (var nch in this.Service.Characteristics)
                     {
                         var ch = new GattCharacteristic(this, nch);
-                        if (!characteristics.ContainsKey(ch.Uuid) && characteristicIds.Any(x => ch.Uuid == x))
+                        if (!characteristics.ContainsKey(ch.Uuid))
                         {
                             characteristics.Add(ch.Uuid, ch);
                             ob.OnNext(ch);
