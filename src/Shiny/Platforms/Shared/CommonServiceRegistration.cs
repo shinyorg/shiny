@@ -14,6 +14,7 @@ namespace Shiny
     {
         public static void RegisterCommonServices(this IServiceCollection services)
         {
+            services.AddSingleton<ShinyCoreServices>();
             services.TryAddSingleton<ISerializer, ShinySerializer>();
             services.TryAddSingleton<IMessageBus, MessageBus>();
             services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
