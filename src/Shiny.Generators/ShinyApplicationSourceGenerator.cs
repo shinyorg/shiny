@@ -14,7 +14,7 @@ namespace Shiny.Generators
 
         protected ShinyApplicationSourceGenerator(string osApplicationTypeName) => this.osApplicationTypeName = osApplicationTypeName;
         protected GeneratorExecutionContext Context { get; private set; }
-        internal ShinyApplicationValues ShinyConfig { get; private set; }
+        public ShinyApplicationValues ShinyConfig { get; set; }
 
 
         public virtual void Execute(GeneratorExecutionContext context)
@@ -28,7 +28,8 @@ namespace Shiny.Generators
             if (appType == null)
                 return;
 
-            this.ShinyConfig = new ShinyApplicationValues(shinyAppAttributeData);
+            // allow for testing
+            this.ShinyConfig ??= new ShinyApplicationValues(shinyAppAttributeData);
 
             if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
             {

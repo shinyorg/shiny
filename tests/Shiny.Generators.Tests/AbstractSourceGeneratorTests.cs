@@ -32,11 +32,14 @@ namespace Shiny.Generators.Tests
 
         protected virtual void RunGenerator([CallerMemberName] string? compileAssemblyName = null)
         {
-            var sourceGenerator = new T();
+            var sourceGenerator = this.Create();
             this.Compilation = this.Generator.DoGenerate(
                 compileAssemblyName,
                 sourceGenerator
             );
         }
+
+
+        protected virtual T Create() => new T();
     }
 }

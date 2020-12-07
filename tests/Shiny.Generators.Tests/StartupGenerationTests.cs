@@ -11,6 +11,13 @@ namespace Shiny.Generators.Tests
         public StartupGenerationTests(ITestOutputHelper output) : base(output, "Mono.Android", "Shiny", "Shiny.Core") {}
 
 
+        ShinyApplicationValues generatorConfig = new ShinyApplicationValues();
+        protected override AndroidApplicationSourceGenerator Create() => new AndroidApplicationSourceGenerator
+        {
+            ShinyConfig = this.generatorConfig
+        };
+
+
         [Fact]
         public void Standard()
         {

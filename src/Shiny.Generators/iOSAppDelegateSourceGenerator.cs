@@ -98,11 +98,10 @@ namespace Shiny.Generators
             }
             else
             {
+                builder.AppendLineInvariant("partial void OnFinishedLaunching();");
                 using (builder.BlockInvariant("public override bool FinishedLaunching(UIApplication app, NSDictionary options)"))
                 {
-                    if (appDelegate.HasMethod("OnFinishedLaunching"))
-                        builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
-
+                    builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
                     builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.ShinyConfig.ShinyStartupTypeName}());");
 
                     this.TryAppendThirdParty(appDelegate, builder);

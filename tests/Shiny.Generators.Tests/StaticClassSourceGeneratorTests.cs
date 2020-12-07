@@ -7,6 +7,7 @@ using Xunit.Abstractions;
 
 namespace Shiny.Generators.Tests
 {
+    // assembly attributes aren't being picked up in the test harness
     public class StaticClassSourceGeneratorTests : AbstractSourceGeneratorTests<StaticClassSourceGenerator>
     {
         public StaticClassSourceGeneratorTests(ITestOutputHelper output) : base(output, "Shiny", "Shiny.Core") { }
@@ -15,14 +16,13 @@ namespace Shiny.Generators.Tests
         [Fact]
         public void CoreClasses()
         {
-            this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"CoreClasses\")]");
+            this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
             this.RunGenerator();
 
             this.AssertTypes(
-                "CoreClasses.ShinyJobs",
-                "CoreClasses.ShinyConnectivity",
-                "CoreClasses.ShinyPower",
-                "CoreClasses.ShinyFileSystem"
+                "Tests.ShinyJobs",
+                "Tests.ShinyConnectivity",
+                "Tests.ShinyPower"
             );
         }
 
@@ -31,12 +31,14 @@ namespace Shiny.Generators.Tests
         public void BleClient()
         {
             this.Generator.AddReferences("Shiny.BluetoothLE", "Shiny.BluetoothLE.Abstractions");
-            this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"BleTests\")]");
+            this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
             this.RunGenerator();
 
-            this.AssertTypes("BleTests.ShinyBleManager");
+            this.AssertTypes("Tests.ShinyBle");
         }
 
+
+        protected override StaticClassSourceGenerator Create() => new StaticClassSourceGenerator("Tests");
 
         void AssertTypes(params string[] types)
         {

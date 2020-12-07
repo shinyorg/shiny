@@ -5,8 +5,9 @@ using Microsoft.CodeAnalysis;
 
 namespace Shiny.Generators
 {
-    internal class ShinyApplicationValues
+    public class ShinyApplicationValues
     {
+        public ShinyApplicationValues() { }
         public ShinyApplicationValues(AttributeData data)
         {
             this.ShinyStartupTypeName = To<string>(data, nameof(ShinyStartupTypeName), null);

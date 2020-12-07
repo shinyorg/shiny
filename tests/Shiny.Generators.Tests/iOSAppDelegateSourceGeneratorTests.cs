@@ -25,9 +25,17 @@ namespace MyTest
         public iOSAppDelegateSourceGeneratorTests(ITestOutputHelper output) : base(output, "Xamarin.iOS", "Shiny", "Shiny.Core") { }
 
 
+        ShinyApplicationValues generatorConfig = new ShinyApplicationValues();
+        protected override iOSAppDelegateSourceGenerator Create() => new iOSAppDelegateSourceGenerator
+        {
+            ShinyConfig = this.generatorConfig
+        };
+
+
         [Fact(Skip = "iOS Xamarin.Forms lib needs to be included")]
         public void XamarinFormsIntegratedOnFinishedLaunching()
         {
+            this.generatorConfig.XamarinFormsAppTypeName = "Tests.MyXfApp";
             this.Generator.AddReference("Xamarin.Forms");
             this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute(XamarinFormsAppTypeName = ""Tests.MyXfApp"")]
@@ -52,6 +60,7 @@ namespace Tests
         [Fact]
         public void ShinyStartupSpecifiedWrong()
         {
+            this.generatorConfig.XamarinFormsAppTypeName = "Tests.WrongName";
             this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute(ShinyStartupTypeName = \"Tests.WrongName\")]");
             this.RunGenerator();
             // TODO: should error!
@@ -61,21 +70,19 @@ namespace Tests
         [Fact]
         public void ShinyStartupSpecified()
         {
+            this.generatorConfig.ShinyStartupTypeName = "Tests.MyShinyApp";
+            this.Generator.AddSource(StandardAppDelegate);
             this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute(ShinyStartupTypeName = ""Tests.MyShinyApp"")]
 namespace Tests
 {
-    public partial void MyTestAppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
-    {
-    }
-
     public class MyShinyApp : global::Shiny.ShinyStartup
     {
         public override void ConfigureServices(global::Microsoft.Extensions.DependencyInjection.IServiceCollection services) {}
     }
 }");
             this.RunGenerator();
-            this.CompilationHasContent("this.ShinyFinishedLaunching(new global::Tests.MyShinyApp());", "iOS FinishedLaunching should have startup specified");
+            this.CompilationHasContent("this.ShinyFinishedLaunching(new Tests.MyShinyApp());", "iOS FinishedLaunching should have startup specified");
         }
 
 

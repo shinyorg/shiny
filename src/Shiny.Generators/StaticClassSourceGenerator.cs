@@ -10,17 +10,24 @@ namespace Shiny.Generators.Tasks
         GeneratorExecutionContext context;
         string? useNamespace;
 
+        public StaticClassSourceGenerator() { }
+        public StaticClassSourceGenerator(string nameSpace) => this.useNamespace = nameSpace;
+
+
         public void Initialize(GeneratorInitializationContext context) { }
 
 
         public void Execute(GeneratorExecutionContext context)
         {
             this.context = context;
-            var attribute = context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
-            if (attribute == null)
-                return;
+            if (this.useNamespace == null)
+            {
+                var attribute = context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
+                if (attribute == null)
+                    return;
 
-            this.useNamespace = attribute.ConstructorArguments[0].Value.ToString();
+                this.useNamespace = attribute.ConstructorArguments[0].Value.ToString();
+            }
             this.BuildStaticClass("Shiny.Jobs.IJobManager", "ShinyJobs", "Shiny.Jobs");
             this.BuildStaticClass("Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");
             //this.BuildStaticClass("Shiny.Settings.ISettings", "ShinySettings", "Shiny.Settings"); // don't know how to gen generic constraints yet
@@ -123,7 +130,7 @@ namespace Shiny.Generators.Tasks
                     }
                 }
             }
-            this.context.Source(genFileName, builder.ToString());
+            this.context.Source(builder.ToString(), genFileName);
         }
 
 
