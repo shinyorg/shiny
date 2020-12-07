@@ -121,7 +121,9 @@ namespace Shiny.BluetoothLE
                     foreach (var native in this.Native.Services)
                     {
                         var service = new GattService(this, native);
-                        if (service.Uuid.Equals(serviceUuid))
+                        // do we really need to compare strings here, when DiscoverServices should
+                        //  only return the one service (if found)
+                        if (service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase))
                         {
                             ob.Respond(service);
                             break;
