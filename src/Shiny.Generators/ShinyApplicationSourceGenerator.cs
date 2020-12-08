@@ -148,8 +148,8 @@ namespace Shiny.Generators
                         DiagnosticSeverity.Warning,
                         true
                     ),
-                    Location.None)
-                );
+                    Location.None
+                ));
             }
             else
             {

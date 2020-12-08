@@ -79,8 +79,19 @@ namespace Shiny.Generators
 
             if (exists)
             {
-                // could check if the library is actually referenced?
-                //this.Log.Warn($"Shiny generator could not add AppDelegate boilerplate method '{methodName}' because it already exists.  If you are using a '{neededLibrary}' that this is required, make sure you manually wire it up");
+                this.Context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "ShinyAppDelegateFinishedLaunchingExists",
+                            "ShinyAppDelegate",
+                            null,
+                            "Shiny",
+                            DiagnosticSeverity.Warning,
+                            true
+                        ),
+                        Location.None
+                    )
+                );
             }
             else
             {
@@ -94,7 +105,24 @@ namespace Shiny.Generators
             var exists = appDelegate.HasMethod("FinishedLaunching");
             if (exists)
             {
-                //this.Log.Warn($"Shiny generator could not add AppDelegate.FinishedLaunching since it already exists.  You can remove this method and add 'OnFinishedLaunching' to do any additional custom setup");
+                this.Context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "ShinyAppDelegateFinishedLaunchingExists",
+                            "ShinyAppDelegate",
+                            null,
+                            "Shiny",
+                            DiagnosticSeverity.Warning,
+                            true
+                        ),
+                        appDelegate
+                            .GetMembers()
+                            .OfType<IMethodSymbol>()
+                            .FirstOrDefault(x => x.Name.Equals("FinishedLaunching"))?
+                            .Locations
+                            .FirstOrDefault() ?? Location.None
+                    )
+                );
             }
             else
             {
@@ -120,16 +148,6 @@ namespace Shiny.Generators
                 builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
                 builder.AppendLineInvariant($"this.LoadApplication(new {this.ShinyConfig.XamarinFormsAppTypeName}());");
             }
-
-            //// XF Material or RG Popups
-            //if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
-            //    builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
-            //else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-            //    builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init();");
-
-            //// AiForms.SettingsView
-            //if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
-            //    builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
         }
     }
 }
