@@ -43,7 +43,7 @@ namespace Shiny
             );
 
         // Expects raw resource name like "notify_sound" or "raw/notify_sound"
-        internal static int GetRawResourceIdByName(this AndroidContext context, string rawName) => context
+        internal static int GetRawResourceIdByName(this IAndroidContext context, string rawName) => context
             .AppContext
             .Resources
             .GetIdentifier(

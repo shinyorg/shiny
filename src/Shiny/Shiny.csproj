@@ -1,7 +1,6 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <RootNamespace>Shiny</RootNamespace>
         <Description>The Shiny containing all of the major functionality like hosting, logging, connectivity, environment, IO, power, settings, application state monitoring, and jobs as well as many other utilities</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;tizen50;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
