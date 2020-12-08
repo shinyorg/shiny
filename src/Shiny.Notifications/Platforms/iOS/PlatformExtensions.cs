@@ -18,7 +18,7 @@ namespace Shiny.Notifications
                 Message = native.Content?.Body,
                 Payload = native.Content?.UserInfo?.FromNsDictionary(),
                 BadgeCount = native.Content?.Badge?.Int32Value,
-                Category = native.Content?.CategoryIdentifier
+                Channel = native.Content?.CategoryIdentifier
             };
 
             if (native.Trigger is UNCalendarNotificationTrigger calendar)

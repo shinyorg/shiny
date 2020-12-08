@@ -45,6 +45,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
         <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
+        <Compile Include="$(MSBuildThisFileDirectory)CSharp9Hack.cs" />
     </ItemGroup>
 
     <!--Windows Stuff-->

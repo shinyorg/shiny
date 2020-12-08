@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentAssertions;
 using Shiny.Generators.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -6,37 +7,48 @@ using Xunit.Abstractions;
 
 namespace Shiny.Generators.Tests
 {
-    public class StaticClassSourceGeneratorTests
+    // assembly attributes aren't being picked up in the test harness
+    public class StaticClassSourceGeneratorTests : AbstractSourceGeneratorTests<StaticClassSourceGenerator>
     {
-        readonly ITestOutputHelper output;
-        readonly AssemblyGenerator generator;
-
-
-        public StaticClassSourceGeneratorTests(ITestOutputHelper output)
-        {
-            this.output = output;
-            this.generator = new AssemblyGenerator();
-            this.generator.AddReference("Shiny");
-            this.generator.AddReference("Shiny.Core");
-        }
+        public StaticClassSourceGeneratorTests(ITestOutputHelper output) : base(output, "Shiny", "Shiny.Core") { }
 
 
         [Fact]
         public void CoreClasses()
         {
-            this.generator.AddSource("[assembly:Shiny.GenerateStaticClasses(\"CoreClasses\")]");
-            var compile = this.generator.DoGenerate(
-                nameof(CoreClasses),
-                new StaticClassSourceGenerator()
-            );
-            this.output.WriteSyntaxTrees(compile);
+            this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
+            this.RunGenerator();
 
-            compile.AssertTypesExist(
-                "CoreClasses.ShinyJobs",
-                "CoreClasses.ShinyConnectivity",
-                "CoreClasses.ShinyPower",
-                "CoreClasses.ShinyFileSystem"
+            this.AssertTypes(
+                "Tests.ShinyJobs",
+                "Tests.ShinyConnectivity",
+                "Tests.ShinyPower"
             );
+        }
+
+
+        [Fact]
+        public void BleClient()
+        {
+            this.Generator.AddReferences("Shiny.BluetoothLE", "Shiny.BluetoothLE.Abstractions");
+            this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
+            this.RunGenerator();
+
+            this.AssertTypes("Tests.ShinyBle");
+        }
+
+
+        protected override StaticClassSourceGenerator Create() => new StaticClassSourceGenerator("Tests");
+
+        void AssertTypes(params string[] types)
+        {
+            foreach (var type in types)
+            {
+                this.Compilation
+                    .GetTypeByMetadataName(type)
+                    .Should()
+                    .NotBeNull(type + " static not created");
+            }
         }
     }
 }

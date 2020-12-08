@@ -14,7 +14,7 @@ namespace Shiny.Generators
 
         protected ShinyApplicationSourceGenerator(string osApplicationTypeName) => this.osApplicationTypeName = osApplicationTypeName;
         protected GeneratorExecutionContext Context { get; private set; }
-        internal ShinyApplicationValues ShinyConfig { get; private set; }
+        public ShinyApplicationValues ShinyConfig { get; set; }
 
 
         public virtual void Execute(GeneratorExecutionContext context)
@@ -28,7 +28,14 @@ namespace Shiny.Generators
             if (appType == null)
                 return;
 
-            this.ShinyConfig = new ShinyApplicationValues(shinyAppAttributeData);
+            // allow for testing
+            this.ShinyConfig ??= new ShinyApplicationValues(shinyAppAttributeData);
+
+            if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
+            {
+                this.GenerateStartup(this.Context.Compilation.AssemblyName);
+                this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
+            }
 
             var appClasses = context
                 .Compilation
@@ -36,17 +43,6 @@ namespace Shiny.Generators
                 .GetAllTypeSymbols()
                 .Where(x => x.Inherits(appType))
                 .ToList();
-
-            if (appClasses.Count == 0)
-                throw new ArgumentException("No app classes found in this assembly!");
-
-            if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
-            {
-                var nameSpace = appClasses.FirstOrDefault()?.ContainingNamespace.Name;
-                this.GenerateStartup(nameSpace);
-                this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
-            }
-
             this.Process(appClasses);
         }
 
@@ -64,6 +60,7 @@ namespace Shiny.Generators
                 .GetAllAssemblies()
                 .Where(x => !x.Name.StartsWith("Shiny") && !x.Name.StartsWith("Xamarin."))
                 .SelectMany(x => x.GetAllTypeSymbols())
+                .Where(x => !x.IsAbstract && x.IsPublic())
                 .ToList();
 
             this.builder = new IndentedStringBuilder();
@@ -71,11 +68,11 @@ namespace Shiny.Generators
 
             using (this.builder.BlockInvariant("namespace " + nameSpace))
             {
-                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.ShinyStartup"))
+                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.IShinyStartup"))
                 {
                     this.builder.AppendLine("partial void AdditionalConfigureServices(IServiceCollection services);");
 
-                    using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services)"))
+                    using (this.builder.BlockInvariant("public void ConfigureServices(IServiceCollection services)"))
                     {
                         this.builder.AppendLine("this.AdditionalConfigureServices(services);");
 
@@ -106,14 +103,17 @@ namespace Shiny.Generators
                         if (!this.ShinyConfig.ExcludeStartupTasks)
                             this.RegisterStartupTasks();
 
-                        var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Forms");
+                        if (!this.ShinyConfig.ExcludeServices)
+                            this.RegisterServices();
+                    }
+
+                    using (this.builder.BlockInvariant("public void ConfigureApp(IServiceProvider provider)"))
+                    {
+                        var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Internals.DependencyResolver");
                         if (xamFormsType != null)
                         {
-                            using (this.builder.BlockInvariant("public override void ConfigureApp(IServiceProvider provider)"))
-                            {
-                                this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
-                                this.builder.AppendLine();
-                            }
+                            this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
+                            this.builder.AppendLine();
                         }
                     }
                 }
@@ -122,27 +122,42 @@ namespace Shiny.Generators
         }
 
 
+        static readonly string[] PushCannotGenerateRegister = new []
+        {
+            "Shiny.Push.AzureNotificationHubs",
+            "Shiny.Push.Aws",
+            "Shiny.Push.OneSignal"
+        };
+        static readonly Dictionary<string, string> PushRegisters = new Dictionary<string, string>
+        {
+            { "Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging" },
+            { "Shiny.Push", "services.UsePush" }
+        };
+
         void RegisterPush()
         {
-            var hasAzurePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.AzureNotificationHubs"));
-            if (hasAzurePush)
+            var cannotRegister = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
+            if (cannotRegister != null)
             {
-                //var rootNs = this.Context.Context.GetRootNamespace();
-                //this.Log.Warn($"Shiny.Push.AzureNotificationHubs cannot be auto-registered due to required configuration parameters.  Make sure to create a `public partial class AppShinyStartup : Shiny.ShinyStartup` in the namespace `{rootNs}` in this project with the rootnamespace and add `void CustomConfigureServices(IServiceCollection services)` to register it");
+                this.Context.ReportDiagnostic(Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        "ShinyPush",
+                        $"{cannotRegister.Name} cannot be registered with auto-generation due to required configuration",
+                        null,
+                        "Push",
+                        DiagnosticSeverity.Warning,
+                        true
+                    ),
+                    Location.None
+                ));
             }
             else
             {
-                // azure must be manually registered
-                var hasFirebasePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push.FirebaseMessaging"));
-                var hasNativePush = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Equals("Shiny.Push"));
-
-                if (hasFirebasePush)
+                var register = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushRegisters.ContainsKey(x.Name));
+                if (register != null)
                 {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UseFirebaseMessaging", false);
-                }
-                else if (hasNativePush)
-                {
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", "services.UsePush", false);
+                    var registerStatement = PushRegisters[register.Name];
+                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", registerStatement, true);
                 }
             }
         }
@@ -168,16 +183,14 @@ namespace Shiny.Generators
                 return false;
 
             var impls = this.allSymbols
-                .Where(x => x.Inherits(symbol))
+                .Where(x => x.Implements(symbol))
                 .ToList();
 
-            if (!impls.Any() && oneDelegateRequiredToInstall)
+            // TODO: error
+            if (!impls.Any())
                 return false;
 
-            if (oneDelegateRequiredToInstall)
-                registerStatement += $"<{impls.First().ToDisplayString()}>";
-
-            registerStatement += "();";
+            registerStatement += $"<{impls.First().ToDisplayString()}>();";
             this.builder.AppendLineInvariant(registerStatement);
 
             if (impls.Count > 1)
@@ -190,6 +203,28 @@ namespace Shiny.Generators
                 }
             }
             return true;
+        }
+
+
+        void RegisterServices()
+        {
+            foreach (var symbol in this.allSymbols)
+            {
+                var attrs = symbol.GetAttributes();
+                var hasService = attrs.Any(x => x.AttributeClass.Name.Equals("Shiny.ShinyServiceAttribute"));
+                if (hasService)
+                {
+                    if (!symbol.AllInterfaces.Any())
+                    {
+                        this.builder.AppendLineInvariant($"services.AddSingleton<{symbol.ToDisplayString()}>();");
+                    }
+                    else
+                    {
+                        foreach (var @interface in symbol.AllInterfaces)
+                            this.builder.AppendLineInvariant($"services.AddSingleton<{@interface.ToDisplayString()}, {symbol.ToDisplayString()}>();");
+                    }
+                }
+            }
         }
 
 

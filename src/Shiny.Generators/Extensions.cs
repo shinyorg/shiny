@@ -1,18 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 
 namespace Shiny.Generators
 {
-    static class Extensions
+    public static class Extensions
     {
         public static void Source(this GeneratorExecutionContext context, string sourceText, string? fileName = null)
         {
             fileName ??= Guid.NewGuid().ToString();
             context.AddSource(fileName, sourceText);
         }
+
+
+        public static bool IsPartialClass(this ISymbol symbol) => symbol
+            .DeclaringSyntaxReferences
+            .Select(reference => reference.GetSyntax(CancellationToken.None))
+            .OfType<ClassDeclarationSyntax>()
+            .Any(node => node.Modifiers.Any(SyntaxKind.PartialKeyword));
 
 
         public static AttributeData? GetClassAttributeData(this Compilation compilation, ITypeSymbol symbol, string attributeTypeName)
@@ -113,11 +123,19 @@ namespace Shiny.Generators
 
 
         public static bool Implements(this INamedTypeSymbol symbol, ITypeSymbol type)
-            => symbol.AllInterfaces.Any(i => type.Equals(i));
+        {
+            if (!type.IsInterface())
+                throw new ArgumentException("Symbol is not an interface");
+
+            return symbol.AllInterfaces.Any(i => type.Equals(i));
+        }
 
 
         public static bool Inherits(this INamedTypeSymbol symbol, ITypeSymbol type)
         {
+            if (type.IsInterface())
+                throw new ArgumentException("Type cannot be an interface");
+
             var current = symbol;
             while (current != null)
             {
@@ -154,6 +172,93 @@ namespace Shiny.Generators
             }
         }
 
+
+        //public static bool Is(this INamedTypeSymbol symbol, string typeName)
+        //{
+        //    while (symbol != null && symbol.Name != "Object")
+        //    {
+        //        if (symbol.ToDisplayString() == typeName)
+        //            return true;
+
+        //        symbol = symbol?.BaseType;
+        //    }
+
+        //    return false;
+        //}
+
+
+        ///// <summary>
+        ///// Returns the element type of the IEnumerable, if any.
+        ///// </summary>
+        ///// <param name="resolvedType"></param>
+        ///// <returns></returns>
+        //public static ITypeSymbol EnumerableOf(this ITypeSymbol resolvedType)
+        //{
+        //    var intf = resolvedType
+        //        .GetAllInterfaces(includeCurrent: true)
+        //        .FirstOrDefault(i => i.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable", StringComparison.OrdinalIgnoreCase));
+
+        //    return intf?.TypeArguments.First();
+        //}
+
+        //public static IEnumerable<INamedTypeSymbol> GetAllInterfaces(this ITypeSymbol symbol, bool includeCurrent = true)
+        //{
+        //    if (symbol != null)
+        //    {
+        //        if (includeCurrent && symbol.TypeKind == TypeKind.Interface)
+        //        {
+        //            yield return (INamedTypeSymbol)symbol;
+        //        }
+
+        //        do
+        //        {
+        //            foreach (var intf in symbol.Interfaces)
+        //            {
+        //                yield return intf;
+
+        //                foreach (var innerInterface in intf.GetAllInterfaces())
+        //                {
+        //                    yield return innerInterface;
+        //                }
+        //            }
+
+        //            symbol = symbol.BaseType;
+
+        //            if (symbol == null)
+        //            {
+        //                break;
+        //            }
+
+        //        } while (symbol.Name != "Object");
+        //    }
+        //}
+
+        //public static bool IsNullable(this ITypeSymbol type)
+        //{
+        //    return ((type as INamedTypeSymbol)?.IsGenericType ?? false)
+        //        && type.OriginalDefinition.ToDisplayString().Equals("System.Nullable<T>", StringComparison.OrdinalIgnoreCase);
+        //}
+
+        //public static bool IsNullable(this ITypeSymbol type, out ITypeSymbol nullableType)
+        //{
+        //    if (type.IsNullable())
+        //    {
+        //        nullableType = ((INamedTypeSymbol)type).TypeArguments.First();
+        //        return true;
+        //    }
+        //    else
+        //    {
+        //        nullableType = null;
+        //        return false;
+        //    }
+        //}
+
+        //public static ITypeSymbol NullableOf(this ITypeSymbol type)
+        //{
+        //    return type.IsNullable()
+        //        ? ((INamedTypeSymbol)type).TypeArguments.First()
+        //        : null;
+        //}
 
         public static IEnumerable<IPropertySymbol> GetAllProperties(this INamedTypeSymbol symbol)
         {

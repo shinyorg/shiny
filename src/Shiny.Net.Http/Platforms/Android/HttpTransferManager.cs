@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Shiny.Infrastructure;
-using Shiny.Jobs;
 using Android;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
@@ -16,24 +15,18 @@ namespace Shiny.Net.Http
 {
     public class HttpTransferManager : HttpClientHttpTransferManager
     {
-        readonly IAndroidContext context;
         IObservable<HttpTransfer>? httpObs;
 
 
-        public HttpTransferManager(IAndroidContext context,
-                                   IJobManager jobManager,
-                                   IMessageBus messageBus,
-                                   IRepository repository) : base(jobManager, messageBus, repository)
-        {
-            this.context = context;
-        }
+        public HttpTransferManager(ShinyCoreServices services) : base(services) {}
 
 
         public override async Task Cancel(string identifier)
         {
             await base.Cancel(identifier);
             if (Int64.TryParse(identifier, out var id))
-                this.context
+                this.Services
+                    .Android
                     .GetManager()
                     .Remove(id);
         }
@@ -60,7 +53,7 @@ namespace Shiny.Net.Http
                         .Interval(TimeSpan.FromSeconds(2))
                         .Subscribe(_ =>
                         {
-                            using (var cursor = this.context.GetManager().InvokeQuery(query))
+                            using (var cursor = this.Services.Android.GetManager().InvokeQuery(query))
                             {
                                 while (cursor.MoveToNext())
                                 {
@@ -92,11 +85,11 @@ namespace Shiny.Net.Http
             if (request.HttpMethod != HttpMethod.Get)
                 throw new ArgumentException("Only GETs are supported for downloads on Android");
 
-            var access = await this.context.RequestAccess(Manifest.Permission.WriteExternalStorage);
+            var access = await this.Services.Android.RequestAccess(Manifest.Permission.WriteExternalStorage);
             if (access != AccessState.Available)
                 throw new ArgumentException("Invalid access to external storage - " + access);
 
-            access = await this.context.RequestAccess(Manifest.Permission.ReadExternalStorage);
+            access = await this.Services.Android.RequestAccess(Manifest.Permission.ReadExternalStorage);
             if (access != AccessState.Available)
                 throw new ArgumentException("Invalid access to external storage - " + access);
 
@@ -112,7 +105,7 @@ namespace Shiny.Net.Http
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
 
-            var id = this.context.GetManager().Enqueue(native);
+            var id = this.Services.Android.GetManager().Enqueue(native);
             return new HttpTransfer(
                 id.ToString(),
                 request.Uri,
@@ -134,7 +127,7 @@ namespace Shiny.Net.Http
         IEnumerable<HttpTransfer> GetAll(QueryFilter filter)
         {
             var query = filter.ToNative();
-            using (var cursor = this.context.GetManager().InvokeQuery(query))
+            using (var cursor = this.Services.Android.GetManager().InvokeQuery(query))
                 while (cursor.MoveToNext())
                     yield return cursor.ToLib();
         }

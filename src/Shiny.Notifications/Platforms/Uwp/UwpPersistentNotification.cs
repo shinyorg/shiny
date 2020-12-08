@@ -7,6 +7,7 @@ namespace Shiny.Notifications
 {
     public class UwpPersistentNotification : IPersistentNotification
     {
+        readonly ToastNotifier toastNotifications;
         readonly Notification notification;
         int sequence = 1;
 
@@ -14,7 +15,9 @@ namespace Shiny.Notifications
         public UwpPersistentNotification(Notification notification)
         {
             this.notification = notification;
+            this.toastNotifications = ToastNotificationManager.CreateToastNotifier();
         }
+
 
         public void ClearProgress()
         {
@@ -46,18 +49,16 @@ namespace Shiny.Notifications
             // Assign new values
             // Note that you only need to assign values that changed. In this example
             // we don't assign progressStatus since we don't need to change it
-            data.Values["progressValue"] = "0.7";
-            data.Values["progressValueString"] = "18/26 songs";
-            data.Values["progressStatus"] = "Downloading...";
+            //data.Values["progressValue"] = progress / total;
+            //data.Values["progressValueString"] = "18/26 songs";
+            //data.Values["progressStatus"] = "Downloading...";
 
             // Update the existing notification's data by using tag/group
-            ToastNotificationManager
-                .CreateToastNotifier()
-                .Update(
-                    data,
-                    this.notification.Id.ToString(),
-                    this.notification.Windows.GroupName
-                );
+            this.toastNotifications.Update(
+                data,
+                this.notification.Id.ToString(),
+                notification.Channel
+            );
         }
     }
 }

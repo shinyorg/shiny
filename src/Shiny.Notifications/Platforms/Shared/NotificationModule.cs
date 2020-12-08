@@ -10,33 +10,24 @@ namespace Shiny.Notifications
     {
         readonly Type? delegateType;
         readonly bool requestPermissionImmediately;
-        readonly NotificationCategory[] notificationCategories;
 
 
         public NotificationModule(Type? delegateType,
                                   bool requestPermissionImmediately,
-                                  AndroidOptions? androidConfig,
-                                  UwpOptions? uwpConfig,
-                                  NotificationCategory[] notificationCategories)
+                                  AndroidOptions? androidConfig = null,
+                                  Channel[]? channels = null)
         {
             this.delegateType = delegateType;
             this.requestPermissionImmediately = requestPermissionImmediately;
-            this.notificationCategories = notificationCategories;
 
             if (androidConfig != null)
             {
-                AndroidOptions.DefaultChannel = androidConfig.ChannelDescription ?? AndroidOptions.DefaultChannel;
-                AndroidOptions.DefaultChannelDescription = androidConfig.ChannelDescription ?? AndroidOptions.DefaultChannelDescription;
-                AndroidOptions.DefaultChannelId = androidConfig.ChannelId ?? AndroidOptions.DefaultChannelId;
-                AndroidOptions.DefaultNotificationImportance = androidConfig.NotificationImportance;
                 AndroidOptions.DefaultLaunchActivityFlags = androidConfig.LaunchActivityFlags;
                 AndroidOptions.DefaultShowWhen = androidConfig.ShowWhen;
                 AndroidOptions.DefaultVibrate = androidConfig.Vibrate;
                 AndroidOptions.DefaultSmallIconResourceName = androidConfig.SmallIconResourceName ?? AndroidOptions.DefaultSmallIconResourceName;
                 AndroidOptions.DefaultColorResourceName = androidConfig.ColorResourceName;
             }
-            if (uwpConfig != null)
-                UwpOptions.DefaultUseLongDuration = uwpConfig.UseLongDuration;
         }
 
 
@@ -56,16 +47,10 @@ namespace Shiny.Notifications
 #elif __IOS__
             services.TryAddSingleton<iOSNotificationDelegate>();
 #elif WINDOWS_UWP
-            // TODO
-            //UwpShinyHost.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
-            //{
-            //    builder.SetTrigger(new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(Windows.UI.Notifications.NotificationKinds.Toast));
-            //});
-            //services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
-            //{
-            //    Repeat = true,
-            //    IsSystemJob = true
-            //});
+            UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
+            {
+                builder.SetTrigger(new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(Windows.UI.Notifications.NotificationKinds.Toast));
+            });
 #endif
         }
 
@@ -77,9 +62,6 @@ namespace Shiny.Notifications
 
             if (requestPermissionImmediately)
                 await manager.RequestAccess();
-
-            foreach (var category in this.notificationCategories)
-                manager.RegisterCategory(category);
         }
     }
 }

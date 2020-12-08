@@ -1,52 +1,79 @@
 ﻿using System;
 using FluentAssertions;
-using Microsoft.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 
 
 namespace Shiny.Generators.Tests
 {
-    public class StartupGenerationTests : IDisposable
+    public class StartupGenerationTests : AbstractSourceGeneratorTests<AndroidApplicationSourceGenerator>
     {
-        readonly ITestOutputHelper output;
-        readonly AssemblyGenerator generator;
-        Compilation compilation;
+        public StartupGenerationTests(ITestOutputHelper output) : base(output, "Mono.Android", "Shiny", "Shiny.Core") {}
 
 
-        public StartupGenerationTests(ITestOutputHelper output)
+        ShinyApplicationValues generatorConfig = new ShinyApplicationValues();
+        protected override AndroidApplicationSourceGenerator Create() => new AndroidApplicationSourceGenerator
         {
-            this.output = output;
-            this.generator = new AssemblyGenerator();
-            this.generator.AddReference("Mono.Android");
-            this.generator.AddReference("Shiny");
-            this.generator.AddReference("Shiny.Core");
-        }
+            ShinyConfig = this.generatorConfig
+        };
 
 
-        public void Dispose()
+        [Fact]
+        public void Standard()
         {
-            if (this.compilation != null)
-                this.output.WriteSyntaxTrees(this.compilation);
+            this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
+            this.RunGenerator();
         }
 
 
         [Fact]
-        public void Test()
+        public void DetectsAndWiresInXfDependencyService()
         {
-            this.generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
-            this.compilation = this.generator.DoGenerate(
-                nameof(Test),
-                new AndroidApplicationSourceGenerator()
-            );
-            //compile.AssertTypesExist(""); // android app, shiny startup
+            this.Generator.AddReference("Xamarin.Forms.Core");
+            this.Generator.AddReference("Xamarin.Forms.Platform");
+            this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
+            this.RunGenerator();
+            this.Compilation.AssertContent("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
+        }
+
+
+        [Theory]
+        [InlineData("Shiny.Push", "services.UsePush<Test.TestPushDelegate>()")]
+        [InlineData("Shiny.Push.AzureNotificationHubs", null)]
+        [InlineData("Shiny.Push.OneSignal", null)]
+        [InlineData("Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging<Test.TestPushDelegate>()")]
+        public void PushRegistration(string lib, string startupRegExpected)
+        {
+            this.Generator.AddReference(lib);
+            this.Generator.AddReference("Shiny.Push.Abstractions");
+            this.Generator.AddSource(@"
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+[assembly: Shiny.ShinyApplicationAttribute]
+namespace Test
+{
+    public class TestPushDelegate : Shiny.Push.IPushDelegate
+    {
+        public async Task OnEntry(PushEntryArgs args) {}
+        public async Task OnReceived(IDictionary<string, string> data) {}
+        public async Task OnTokenChanged(string token) {}
+    }
+}");
+            this.RunGenerator();
+
+            if (startupRegExpected == null)
+                this.Compilation.AssertContent("services.Push", "Push should not be registered", false);
+            else
+                this.Compilation.AssertContent(startupRegExpected);
         }
 
 
         [Fact]
-        public void TestJobDetection()
+        public void JobDetection()
         {
-            this.generator.AddSource(@"
+            this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
 using System;
 using System.Threading;
@@ -60,17 +87,19 @@ namespace MyTest
         public async Task Run(JobInfo jobInfo, CancellationToken cancelToken) {}
     }
 }");
-            this.compilation = this.generator.DoGenerate(
-                nameof(TestJobDetection),
-                new AndroidActivitySourceGenerator()
-            );
+            this.RunGenerator();
+
+            this.Compilation
+                .GetTypeByMetadataName("MyTest.DetectionJob")
+                .Should()
+                .NotBeNull();
         }
 
 
         [Fact]
-        public void ExistingStartupDetectionSameAssembly()
+        public void StartupTaskDetection()
         {
-            this.generator.AddSource(@"
+            this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
 using System;
 using System.Threading;
@@ -79,33 +108,82 @@ using System.Threading.Tasks;
 
 namespace MyTest
 {
-    public class ExistingStartup : Shiny.ShinyStartup
+    public class MyStartupTask : Shiny.IShinyStartupTask
     {
-         public override void ConfigureServices(IServiceCollection services) {}
+        public void Start() {}
     }
 }");
-            this.compilation = this.generator.DoGenerate(
-                nameof(TestJobDetection),
-                new AndroidActivitySourceGenerator()
-            );
-
-            this.compilation.GetTypeByMetadataName("MyTest.AppShinyStartup").Should().BeNull("it shouldn't have been auto-generated");
-            this.compilation.GetTypeByMetadataName("MyTest.ExistingStartup").Should().NotBeNull("it was created");
-        }
-
-        public void ExistingStartupDefined()
-        {
+            this.RunGenerator();
+            this.Compilation.AssertContent("services.AddSingleton<MyTest.MyStartupTask>();");
         }
 
 
-        public void TestModuleDetection()
+        [Fact]
+        public void ModuleDetection()
         {
+            this.Generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+using System;
+using Microsoft.Extensions.DependencyInjection;
+
+
+namespace MyTest
+{
+    public class MyModule : Shiny.ShinyModule
+    {
+        public override void Register(IServiceCollection services) {}
+    }
+}");
+            this.RunGenerator();
+            this.Compilation.AssertContent("services.RegisterModule<MyTest.MyModule>();");
         }
 
 
-        public void TestStartupTaskDetection()
+        [Fact]
+        public void DelegateDetection()
         {
+            this.Generator.AddReference("Shiny.Locations");
+            this.Generator.AddReference("Shiny.Locations.Abstractions");
+            this.Generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+namespace Test
+{
+    public class TestGpsDelegate : Shiny.Locations.IGpsDelegate
+    {
+        public Task OnReading(IGpsReading reading) => throw new NotImplementedException();
+    }
+}");
+            this.RunGenerator();
 
+            this.Compilation.AssertContent("services.UseGps<Test.TestGpsDelegate>();");
+        }
+
+
+        [Fact]
+        public void ServiceRegistration()
+        {
+            this.Generator.AddSource(@"
+[assembly: Shiny.ShinyApplicationAttribute]
+namespace Test
+{
+    public interface ITest1 {}
+    public interface ITest2 {}
+
+    [Shiny.ShinyServiceAttribute]
+    public class Test1 : ITest1 {}
+
+    [Shiny.ShinyServiceAttribute]
+    public class Test2 : ITest1, ITest2 {}
+
+    [Shiny.ShinyServiceAttribute]
+    public class Test3 {}
+}
+");
+            this.RunGenerator();
+            this.Compilation.AssertContent("services.AddSingleton<Test.ITest1, Test.Test1>()", "should be registered with ITest1 interface");
+            this.Compilation.AssertContent("services.AddSingleton<Test.ITest1, Test.Test2>()", "should be registered with ITest1 interface");
+            this.Compilation.AssertContent("services.AddSingleton<Test.ITest2, Test.Test2>()", "should be registered with ITest2 interface");
+            this.Compilation.AssertContent("services.AddSingleton<Test.Test3>()", "should be registered with no interfaces");
         }
     }
 }

@@ -5,14 +5,10 @@ namespace Shiny.Notifications
 {
     public class AndroidOptions
     {
-        public static string? DefaultChannelId { get; set; } = "shinynotificationchannelid";
-        public static string? DefaultChannel { get; set; } = "shinynotificationchannel";
         public static string? DefaultSmallIconResourceName { get; set; }
         public static string? DefaultLargeIconResourceName { get; set; }
         public static string? DefaultColorResourceName { get; set; }
-        public static string? DefaultChannelDescription { get; set; }
         public static bool DefaultUseBigTextStyle { get; set; }
-        public static AndroidNotificationImportance DefaultNotificationImportance { get; set; } = AndroidNotificationImportance.Default;
         public static bool? DefaultShowWhen { get; set; }
         public static bool DefaultVibrate { get; set; }
         public static Type? DefaultLaunchActivityType { get; set; }
@@ -22,13 +18,9 @@ namespace Shiny.Notifications
         public AndroidActivityFlags LaunchActivityFlags { get; set; } = DefaultLaunchActivityFlags;
         public bool Vibrate { get; set; } = DefaultVibrate;
         public int? Priority { get; set; }
-        public string? ChannelId { get; set; } = DefaultChannelId;
-        public string? Channel { get; set; } = DefaultChannel;
-        public string? ChannelDescription { get; set; } = DefaultChannelDescription;
         public string? ContentInfo { get; set; }
         public string? Ticker { get; set; }
         public string? Category { get; set; }
-        public AndroidNotificationImportance NotificationImportance { get; set; } = DefaultNotificationImportance;
         public string? SmallIconResourceName { get; set; } = DefaultSmallIconResourceName;
         public string? LargeIconResourceName { get; set; } = DefaultLargeIconResourceName;
         public string? ColorResourceName { get; set; } = DefaultColorResourceName;
@@ -70,15 +62,5 @@ namespace Shiny.Notifications
         GrantReadUriPermission = 1,
         GrantWriteUriPermission = 2,
         IncludeStoppedPackages = 32
-    }
-
-
-    public enum AndroidNotificationImportance
-    {
-        Min = 1,
-        Low = 2,
-        Default = 3,
-        High = 4,
-        Max = 5
     }
 }

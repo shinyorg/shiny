@@ -8,10 +8,17 @@ namespace Shiny.Notifications
     public interface INotificationManager
     {
         /// <summary>
-        /// Adds a notification category that you can set on your notification.Category
+        /// Create channel
         /// </summary>
-        /// <param name="category"></param>
-        void RegisterCategory(NotificationCategory category);
+        /// <param name="channel"></param>
+        Task CreateChannel(Channel channel);
+
+
+        /// <summary>
+        /// Delete channel
+        /// </summary>
+        /// <param name="identifier"></param>
+        Task DeleteChannel(string identifier);
 
 
         /// <summary>

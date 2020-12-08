@@ -1,34 +1,21 @@
 ﻿using System;
 using Xunit;
-using FluentAssertions;
 using Xunit.Abstractions;
 
 
 namespace Shiny.Generators.Tests
 {
-    public class AndroidActivitySourceGeneratorTests
+    public class AndroidActivitySourceGeneratorTests : AbstractSourceGeneratorTests<AndroidActivitySourceGenerator>
     {
-        readonly ITestOutputHelper output;
-        readonly AssemblyGenerator generator;
-
-
-        public AndroidActivitySourceGeneratorTests(ITestOutputHelper output)
-        {
-            this.output = output;
-            this.generator = new AssemblyGenerator();
-            this.generator.AddReference("Mono.Android");
-            this.generator.AddReference("Shiny");
-            this.generator.AddReference("Shiny.Core");
-        }
+        // TODO: Xam Essentials
+        // TODO: Shiny Hooks
+        // TODO: Xam Forms Init/LoadApplication
+        public AndroidActivitySourceGeneratorTests(ITestOutputHelper output) : base(output, "Mono.Android", "Shiny", "Shiny.Core") { }
 
 
         [Fact]
         public void Test()
         {
-            this.generator.AddSource(@"
-[assembly:Shiny.GenerateStartupAttribute]
-[assembly:Shiny.ShinyApplicationAttribute]
-");
         }
     }
 }

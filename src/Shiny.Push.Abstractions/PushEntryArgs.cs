@@ -6,18 +6,18 @@ namespace Shiny.Push
 {
     public class PushEntryArgs
     {
-        public PushEntryArgs(string? categoryIdentifier,
+        public PushEntryArgs(string? channel,
                              string? actionIdentifier,
                              string? textReply,
                              IDictionary<string, string> userInfo)
         {
-            this.CategoryIdentifier = categoryIdentifier;
+            this.Channel = channel;
             this.ActionIdentifier = actionIdentifier;
             this.TextReply = textReply;
             this.UserInfo = userInfo;
         }
 
-        public string? CategoryIdentifier { get; }
+        public string? Channel { get; }
         public string? ActionIdentifier { get; }
         public string? TextReply { get; }
         public IDictionary<string, string> UserInfo { get; }

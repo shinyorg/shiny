@@ -28,35 +28,7 @@ namespace Shiny.Generators
                 using (builder.BlockInvariant($"public partial class {appDelegate.Name}"))
                 {
                     this.GenerateFinishedLaunching(appDelegate, builder);
-
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Shiny.Push",
-                        "ReceivedRemoteNotification",
-                        "public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);"
-                    );
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Shiny.Push",
-                        "DidReceiveRemoteNotification",
-                        "public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);"
-                    );
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Shiny.Push",
-                        "RegisteredForRemoteNotifications",
-                        "public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) => this.ShinyRegisteredForRemoteNotifications(deviceToken);"
-                    );
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Shiny.Push",
-                        "RegisteredForRemoteNotifications",
-                        "public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) => this.ShinyFailedToRegisterForRemoteNotifications(error);"
-                    );
+                    this.TryAppendPush(builder);
 
                     this.AppendMethodIf(
                         appDelegate,
@@ -78,14 +50,48 @@ namespace Shiny.Generators
         }
 
 
+        void TryAppendPush(IndentedStringBuilder builder)
+        {
+            var hasPush = this.Context
+                .Compilation
+                .ReferencedAssemblyNames
+                .Any(x =>
+                    x.Name.StartsWith("Shiny.Push") &&
+                    !x.Name.Equals("Shiny.Push.Abstractions")
+                );
+
+            if (hasPush)
+            {
+                builder.AppendLineInvariant("public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) => this.ShinyRegisteredForRemoteNotifications(deviceToken);");
+                builder.AppendLineInvariant("public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);");
+                builder.AppendLineInvariant("public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);");
+                builder.AppendLineInvariant("public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) => this.ShinyFailedToRegisterForRemoteNotifications(error);");
+            }
+        }
+
         void AppendMethodIf(INamedTypeSymbol symbol, IndentedStringBuilder builder, string neededLibrary, string methodName, string append)
         {
+            var hasAssembly = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals(neededLibrary));
+            if (!hasAssembly)
+                return;
+
             var exists = symbol.HasMethod(methodName);
 
             if (exists)
             {
-                // could check if the library is actually referenced?
-                //this.Log.Warn($"Shiny generator could not add AppDelegate boilerplate method '{methodName}' because it already exists.  If you are using a '{neededLibrary}' that this is required, make sure you manually wire it up");
+                this.Context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "ShinyAppDelegateFinishedLaunchingExists",
+                            "ShinyAppDelegate",
+                            null,
+                            "Shiny",
+                            DiagnosticSeverity.Warning,
+                            true
+                        ),
+                        Location.None
+                    )
+                );
             }
             else
             {
@@ -99,15 +105,31 @@ namespace Shiny.Generators
             var exists = appDelegate.HasMethod("FinishedLaunching");
             if (exists)
             {
-                //this.Log.Warn($"Shiny generator could not add AppDelegate.FinishedLaunching since it already exists.  You can remove this method and add 'OnFinishedLaunching' to do any additional custom setup");
+                this.Context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "ShinyAppDelegateFinishedLaunchingExists",
+                            "ShinyAppDelegate",
+                            null,
+                            "Shiny",
+                            DiagnosticSeverity.Warning,
+                            true
+                        ),
+                        appDelegate
+                            .GetMembers()
+                            .OfType<IMethodSymbol>()
+                            .FirstOrDefault(x => x.Name.Equals("FinishedLaunching"))?
+                            .Locations
+                            .FirstOrDefault() ?? Location.None
+                    )
+                );
             }
             else
             {
+                builder.AppendLineInvariant("partial void OnFinishedLaunching();");
                 using (builder.BlockInvariant("public override bool FinishedLaunching(UIApplication app, NSDictionary options)"))
                 {
-                    if (appDelegate.HasMethod("OnFinishedLaunching"))
-                        builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
-
+                    builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
                     builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.ShinyConfig.ShinyStartupTypeName}());");
 
                     this.TryAppendThirdParty(appDelegate, builder);
@@ -126,16 +148,6 @@ namespace Shiny.Generators
                 builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
                 builder.AppendLineInvariant($"this.LoadApplication(new {this.ShinyConfig.XamarinFormsAppTypeName}());");
             }
-
-            //// XF Material or RG Popups
-            //if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
-            //    builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
-            //else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-            //    builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init();");
-
-            //// AiForms.SettingsView
-            //if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
-            //    builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
         }
     }
 }
