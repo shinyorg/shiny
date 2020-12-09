@@ -22,6 +22,12 @@ namespace Shiny.Notifications
 
 
         /// <summary>
+        /// Gets list of channels
+        /// </summary>
+        /// <returns></returns>
+        Task<IList<Channel>> GetChannels();
+
+        /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
         /// <returns></returns>
