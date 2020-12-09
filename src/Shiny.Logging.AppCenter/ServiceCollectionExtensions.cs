@@ -11,38 +11,31 @@ namespace Shiny
 {
     public static class ServicesCollectionExtensions
     {
-        public static void UseAppCenterLogging(this IShinyStartup startup,
-                                               string? appSecret = null,
-                                               bool crashes = true,
-                                               bool events = false)
-            => UseAppCenterLogging(appSecret, crashes, events);
-
-
         public static void UseAppCenterLogging(this IServiceCollection services,
-                                               string? appSecret = null,
+                                               string appSecret,
                                                bool crashes = true,
-                                               bool events = false)
+                                               bool events = true)
             => UseAppCenterLogging(appSecret, crashes, events);
 
 
-        static void UseAppCenterLogging(string? appSecret = null,
-                                        bool crashes = true,
-                                        bool events = false)
+        static void UseAppCenterLogging(string appSecret,
+                                        bool crashes,
+                                        bool events)
         {
             if (!crashes && !events)
                 return;
 
             if (!appSecret.IsEmpty())
-            {
-                var list = new List<Type>(2);
-                if (crashes)
-                    list.Add(typeof(Crashes));
+                throw new ArgumentException("AppCenter secret was not set");
 
-                if (events)
-                    list.Add(typeof(Analytics));
+            var list = new List<Type>(2);
+            if (crashes)
+                list.Add(typeof(Crashes));
 
-                AppCenter.Start(appSecret, list.ToArray());
-            }
+            if (events)
+                list.Add(typeof(Analytics));
+
+            AppCenter.Start(appSecret, list.ToArray());
             Log.AddLogger(new AppCenterLogger(), crashes, events);
         }
     }
