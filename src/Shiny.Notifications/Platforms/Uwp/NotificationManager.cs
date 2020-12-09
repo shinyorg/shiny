@@ -1,28 +1,24 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Windows.UI.Notifications;
 using Microsoft.Toolkit.Uwp.Notifications;
-using Shiny.Jobs;
-using Shiny.Settings;
-using Shiny.Infrastructure;
 using Windows.ApplicationModel.Background;
+using Shiny.Infrastructure;
+
 
 namespace Shiny.Notifications
 {
     public class NotificationManager : INotificationManager, IPersistentNotificationManagerExtension
     {
         readonly ShinyCoreServices services;
-        readonly IJobManager jobs;
         readonly BadgeUpdater badgeUpdater;
 
 
-        public NotificationManager(ShinyCoreServices services, IJobManager jobs)
+        public NotificationManager(ShinyCoreServices services)
         {
             this.badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
             this.services = services;
-            this.jobs = jobs;
         }
 
 
@@ -39,7 +35,7 @@ namespace Shiny.Notifications
 
 
         public Task<AccessState> RequestAccess()
-            => this.jobs.RequestAccess();
+            => this.services.Jobs.RequestAccess();
 
 
         public async Task Send(Notification notification)
@@ -200,15 +196,14 @@ namespace Shiny.Notifications
             return native;
         }
 
-        public async Task CreateChannel(Channel channel)
-        {
-
-        }
+        public Task CreateChannel(Channel channel)
+            => this.services.Repository.SetChannel(channel);
 
 
-        public async Task DeleteChannel(string identifier)
-        {
-            //this.repository.Remove<Channe>
-        }
+        public Task DeleteChannel(string identifier)
+            => this.services.Repository.DeleteChannel(identifier);
+
+        public Task<IList<Channel>> GetChannels()
+            => this.services.Repository.GetChannels();
     }
 }

@@ -10,14 +10,14 @@ namespace Shiny.Notifications
         public static string? DefaultColorResourceName { get; set; }
         public static bool DefaultUseBigTextStyle { get; set; }
         public static bool? DefaultShowWhen { get; set; }
-        public static bool DefaultVibrate { get; set; }
+        //public static bool DefaultVibrate { get; set; }
         public static Type? DefaultLaunchActivityType { get; set; }
         public static AndroidActivityFlags DefaultLaunchActivityFlags { get; set; } = AndroidActivityFlags.NewTask | AndroidActivityFlags.ClearTask;
 
         public Type? LaunchActivityType { get; set; }
         public AndroidActivityFlags LaunchActivityFlags { get; set; } = DefaultLaunchActivityFlags;
-        public bool Vibrate { get; set; } = DefaultVibrate;
-        public int? Priority { get; set; }
+        //public bool Vibrate { get; set; } = DefaultVibrate;
+        //public int? Priority { get; set; }
         public string? ContentInfo { get; set; }
         public string? Ticker { get; set; }
         public string? Category { get; set; }

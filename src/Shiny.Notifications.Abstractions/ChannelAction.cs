@@ -5,17 +5,9 @@ namespace Shiny.Notifications
 {
     public class ChannelAction
     {
-        public ChannelAction(string identifier, string title, NotificationActionType actionType = NotificationActionType.None)
-        {
-            this.Identifier = identifier;
-            this.Title = title;
-            this.ActionType = actionType;
-        }
-
-
-        public string Identifier { get; }
-        public string Title { get;  }
-        public NotificationActionType ActionType { get; }
+        public string Identifier { get; set; }
+        public string Title { get; set; }
+        public NotificationActionType ActionType { get; set; } = NotificationActionType.None;
     }
 
 

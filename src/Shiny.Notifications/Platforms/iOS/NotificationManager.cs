@@ -25,7 +25,6 @@ namespace Shiny.Notifications
         public NotificationManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate)
         {
             this.services = services;
-            this.services = services;
             this.nativeDelegate = nativeDelegate;
         }
 
@@ -251,19 +250,19 @@ namespace Shiny.Notifications
 
         public async Task CreateChannel(Channel channel)
         {
-            await this.services.Repository.Set(channel.Identifier, channel);
+            await this.services.Repository.SetChannel(channel);
             await this.SetCategories();
         }
 
 
         public async Task DeleteChannel(string identifier)
         {
-            await this.DeleteChannel(identifier);
+            await this.services.Repository.DeleteChannel(identifier);
             await this.SetCategories();
         }
 
 
-        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetAll<Channel>();
+        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
 
 
         async Task SetCategories()

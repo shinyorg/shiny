@@ -13,15 +13,9 @@ namespace Shiny.Notifications
     //https://developer.tizen.org/development/guides/.net-application/alarms
     public class NotificationManager : INotificationManager
     {
-        readonly ISettings settings;
-        readonly IRepository repository;
-
-
-        public NotificationManager(ISettings settings, IRepository repository)
-        {
-            this.settings = settings;
-            this.repository = repository;
-        }
+        readonly ShinyCoreServices services;
+        public NotificationManager(ShinyCoreServices services)
+            => this.services = services;
 
 
         public async Task Cancel(int id)
