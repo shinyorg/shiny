@@ -52,10 +52,7 @@ namespace Shiny
 
 
 #if __WATCHOS__
-        public IObservable<PlatformState> WhenStateChanged()
-        {
-            throw new NotImplementedException();
-        }
+        public IObservable<PlatformState> WhenStateChanged() => Observable.Empty<PlatformState>();
 #else
         public IObservable<PlatformState> WhenStateChanged() => Observable.Create<PlatformState>(ob =>
         {

@@ -35,6 +35,8 @@ namespace Shiny.Generators
             if (activityType == null)
                 return;
 
+            //if (!activityType.IsPartialClass())
+
             var activities = this
                 .context
                 .Compilation
