@@ -32,7 +32,7 @@ namespace Shiny.Notifications
                     .Services
                     .Resolve<AndroidNotificationProcessor>()
                     .TryProcessIntent(x)
-                 );
+                );
 
             // auto process intent?
             //this.context
@@ -54,6 +54,10 @@ namespace Shiny.Notifications
             this.manager.Notify(notification.Id, builder.Build());
             return pnotification;
         }
+
+
+        public Android.App.Notification CreateNativeNotification(Notification notification) =>
+            this.CreateNativeBuilder(notification).Build();
 
 
         public async Task Cancel(int id)
