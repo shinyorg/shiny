@@ -29,15 +29,24 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+
     - name: Generate Build Number
       id: buildnumber
       uses: einaregilsson/build-number@v3
       with:
         token: ${{secrets.github_token}}
+
+    - name: Setup VSWhere.exe
+      uses: warrenbuckley/Setup-VSWhere@v1
+
+    - name: VSWhere MSBuild
+      run: vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
+
     - name: Build
       run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
     #- name: Build

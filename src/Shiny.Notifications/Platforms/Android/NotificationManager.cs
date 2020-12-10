@@ -8,7 +8,6 @@ using Android.Media;
 using Android.Graphics;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
-using Shiny.Notifications.Infrastructure;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 
@@ -154,11 +153,11 @@ namespace Shiny.Notifications
                 }
             }
 
-            if (notification.Android.Priority != null)
-            {
-                builder.SetPriority(notification.Android.Priority.Value);
-                builder.SetDefaults(NotificationCompat.DefaultAll);
-            }
+            //if (notification.Android.Priority != null)
+            //{
+            //    builder.SetPriority(notification.Android.Priority.Value);
+            //    builder.SetDefaults(NotificationCompat.DefaultAll);
+            //}
 
             if (notification.Android.ShowWhen != null)
                 builder.SetShowWhen(notification.Android.ShowWhen.Value);
@@ -166,8 +165,8 @@ namespace Shiny.Notifications
             if (notification.Android.When != null)
                 builder.SetWhen(notification.Android.When.Value.ToUnixTimeMilliseconds());
 
-            if (notification.Android.Vibrate)
-                builder.SetVibrate(new long[] { 500, 500 });
+            //if (notification.Android.Vibrate)
+            //    builder.SetVibrate(new long[] { 500, 500 });
 
             return builder;
         }

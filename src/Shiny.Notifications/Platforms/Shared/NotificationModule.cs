@@ -24,7 +24,7 @@ namespace Shiny.Notifications
             {
                 AndroidOptions.DefaultLaunchActivityFlags = androidConfig.LaunchActivityFlags;
                 AndroidOptions.DefaultShowWhen = androidConfig.ShowWhen;
-                AndroidOptions.DefaultVibrate = androidConfig.Vibrate;
+                //AndroidOptions.DefaultVibrate = androidConfig.Vibrate;
                 AndroidOptions.DefaultSmallIconResourceName = androidConfig.SmallIconResourceName ?? AndroidOptions.DefaultSmallIconResourceName;
                 AndroidOptions.DefaultColorResourceName = androidConfig.ColorResourceName;
             }
