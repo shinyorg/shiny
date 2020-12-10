@@ -22,8 +22,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    #- name: Add msbuild to PATH
-    #  uses: microsoft/setup-msbuild@v1.0.2
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
     #  with:
     #    vs-version: '[16.7,16.8)'
     - uses: actions/checkout@v2
@@ -41,18 +41,9 @@ jobs:
       with:
         token: ${{secrets.github_token}}
 
-    - name: Setup VSWhere.exe
-      uses: warrenbuckley/Setup-VSWhere@v1
-
-    - name: VSWhere MSBuild
-      run: vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
-
     - name: Build
       run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
-    #- name: Build
-    #  run: dotnet build Build.sln -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
-    # - name: Test
-    #  run: dotnet test Build.sln --no-build --verbosity normal
+
     - name: Post NuGet Artifacts
       uses: actions/upload-artifact@v2
       with:
