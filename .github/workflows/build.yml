@@ -11,6 +11,7 @@ on:
     branches: [ master, dev, preview ]
     paths:
     - "src/**"
+    - ".github/workflows/**"
   pull_request:
     branches: [ master, dev ]
     paths:
