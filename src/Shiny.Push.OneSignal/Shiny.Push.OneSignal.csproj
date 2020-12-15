@@ -8,30 +8,10 @@
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
-        <None Include="Platforms\**\*.cs" />
         <PackageReference Include="Com.OneSignal" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include="..\Shiny\Shiny.csproj" />
         <ProjectReference Include="..\Shiny.Push.Abstractions\Shiny.Push.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
-        <Compile Include="Platforms\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <ProjectReference Include="..\Shiny.Push.Abstractions\Shiny.Push.Abstractions.csproj" />
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
-        <Compile Include="Platforms\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <PackageReference Include="Xamarin.Android.Support.v4" />
-        <PackageReference Include="Xamarin.Android.Support.v7.CardView" />
-        <PackageReference Include="Xamarin.Android.Support.CustomTabs" />
-        <PackageReference Include="Xamarin.Android.Support.Compat" />
-        <PackageReference Include="Xamarin.Android.Support.Annotations" />
-        <ProjectReference Include="..\Shiny.Push.Abstractions\Shiny.Push.Abstractions.csproj" />
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
-        <Compile Include="Platforms\**\*.cs" />
-    </ItemGroup>
 </Project>

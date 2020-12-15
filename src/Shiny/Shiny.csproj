@@ -17,8 +17,7 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj"
                           ReferenceOutputAssembly="false"
-                          OutputItemType="Analyzer"
-                          Condition=" '$(IncludeGenerators)' == 'true' "/>
+                          OutputItemType="Analyzer" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
