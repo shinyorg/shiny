@@ -37,7 +37,6 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeGenerators>true</IncludeGenerators>
-        <!--<EmbedAllSources>true</EmbedAllSources>-->
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">
