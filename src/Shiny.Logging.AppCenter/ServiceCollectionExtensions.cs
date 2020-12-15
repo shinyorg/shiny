@@ -25,7 +25,7 @@ namespace Shiny
             if (!crashes && !events)
                 return;
 
-            if (!appSecret.IsEmpty())
+            if (appSecret.IsEmpty())
                 throw new ArgumentException("AppCenter secret was not set");
 
             var list = new List<Type>(2);
