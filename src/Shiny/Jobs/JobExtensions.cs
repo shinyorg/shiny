@@ -100,7 +100,6 @@ namespace Shiny
             if (value is string s && typeof(T) != typeof(string))
                 return ShinyHost.Container.GetService<ISerializer>().Deserialize<T>(s);
 
-            // TODO: Jobject & jarray tend to emerge causing this to fail
             return (T)value;
         }
     }
