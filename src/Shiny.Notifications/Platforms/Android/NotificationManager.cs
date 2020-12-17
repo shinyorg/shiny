@@ -188,35 +188,39 @@ namespace Shiny.Notifications
                 channel.Description,
                 channel.Importance.ToNative()
             );
-            var attributes = new AudioAttributes.Builder()
-                .SetUsage(AudioUsageKind.Notification)
-                .Build();
+            var attrBuilder = new AudioAttributes.Builder();
 
-            var hasSound = false;
+
+            Android.Net.Uri uri = null;
             if (!channel.CustomSoundPath.IsEmpty())
             {
-                hasSound = true;
-                //             var uri = GetSoundResourceUri(notification.Sound.CustomPath);
-                //             channel.SetSound(uri, attributes);
+                //uri = this.GetSoundResourceUri(channel.CustomSoundPath);
             }
+            // TODO: vibrate
             switch (channel.Importance)
             {
                 case ChannelImportance.Critical:
-                case ChannelImportance.High:
-                    //channel.EnableVibration(notification.Android.Vibrate);
-                    if (!hasSound)
-                        native.SetSound(Android.Provider.Settings.System.DefaultAlarmAlertUri, attributes);
+                    attrBuilder
+                        .SetUsage(AudioUsageKind.Alarm)
+                        .SetFlags(AudioFlags.AudibilityEnforced);
 
+                    uri ??= Android.Provider.Settings.System.DefaultAlarmAlertUri;
+                    break;
+
+                case ChannelImportance.High:
+                    uri ??= Android.Provider.Settings.System.DefaultAlarmAlertUri;
                     break;
 
                 case ChannelImportance.Normal:
-                    if (!hasSound)
-                        native.SetSound(Android.Provider.Settings.System.DefaultNotificationUri, attributes);
+                    uri ??= Android.Provider.Settings.System.DefaultNotificationUri;
                     break;
 
                 case ChannelImportance.Low:
                     break;
             }
+            if (uri != null)
+                native.SetSound(uri, attrBuilder.Build());
+
             this.manager.CreateNotificationChannel(native);
             this.services.Repository.SetChannel(channel);
         }
