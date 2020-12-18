@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj"
                           ReferenceOutputAssembly="false"

@@ -1,6 +1,6 @@
------
-Shiny
------
+----------
+Shiny.Core
+----------
 
 GitHub: https://github.com/shinyorg/Shiny
 Samples: https://github.com/shinyorg/ShinySamples
