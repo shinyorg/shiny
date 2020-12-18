@@ -9,8 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Com.OneSignal.Abstractions;
 using OS = global::Com.OneSignal.OneSignal;
 
-[assembly: Shiny.Push.ShinyPushLibrary]
-
 
 namespace Shiny.Push.OneSignal
 {

@@ -12,13 +12,13 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
-        <ProjectReference Include="..\Shiny\Shiny.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <ProjectReference Include="..\Shiny\Shiny.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <PackageReference Include="Xamarin.Firebase.iOS.Core" />
         <PackageReference Include="Xamarin.Firebase.iOS.CloudMessaging" />
         <PackageReference Include="Xamarin.Firebase.iOS.InstanceID" />
@@ -29,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <ProjectReference Include="..\Shiny\Shiny.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>

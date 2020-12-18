@@ -1,4 +1,3 @@
 <Project>
     <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.0.79" />
-    <!--<Sdk Name="MSBuild.Sdk.Extras" Version="2.1.2" />-->
 </Project>

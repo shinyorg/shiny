@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
 using Shiny.Settings;
 
-[assembly: Shiny.Push.ShinyPushLibrary]
 
 namespace Shiny.Push.AzureNotificationHubs
 {

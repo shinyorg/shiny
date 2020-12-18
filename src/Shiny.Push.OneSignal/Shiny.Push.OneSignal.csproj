@@ -9,9 +9,8 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <PackageReference Include="Com.OneSignal" />
-        <ProjectReference Include="..\Shiny\Shiny.csproj" />
-        <ProjectReference Include="..\Shiny.Push.Abstractions\Shiny.Push.Abstractions.csproj" />
-        <ProjectReference Include="..\Shiny.Notifications.Abstractions\Shiny.Notifications.Abstractions.csproj" />
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
     </ItemGroup>
 
 </Project>

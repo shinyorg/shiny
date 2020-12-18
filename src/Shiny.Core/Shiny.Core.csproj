@@ -1,13 +1,81 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <RootNamespace>Shiny</RootNamespace>
+        <Description>The Shiny containing all of the major functionality like hosting, logging, connectivity, environment, IO, power, settings, application state monitoring, and jobs as well as many other utilities</Description>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;tizen50;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.16299;$(TargetFrameworks)</TargetFrameworks>
+        <TargetsForTfmSpecificBuildOutput Condition=" $(TargetFramework.StartsWith('uap')) ">$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <None Include="**\Platforms\**\*.cs" />
+        <Compile Remove="**\Platforms\**\*.cs" />
+
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="Newtonsoft.Json" />
     </ItemGroup>
 
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.Contains('android')) ">
+        <Compile Include="**\Platforms\Android\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <PackageReference Include="Xamarin.AndroidX.Core" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
+        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Common" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" />
+        <PackageReference Include="Xamarin.AndroidX.Work.Runtime" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
+        <Compile Include="**\Platforms\Tizen\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj">
+            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+            <IncludeAssets>Shiny.Support.Uwp.*</IncludeAssets>
+        </ProjectReference>
+        <Compile Include="**\Platforms\Uwp\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.Contains('ios')) ">
+        <Compile Include="**\Platforms\Apple\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\*iOS*\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.Contains('tvos')) ">
+        <Compile Include="**\Platforms\Apple\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.Contains('watchos')) ">
+        <Compile Include="**\Platforms\Apple\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\*watchOS*\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('mac')) ">
+        <Compile Include="**\Platforms\Apple\**\*.cs" />
+        <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <Compile Include="**\Platforms\*macOS*\**\*.cs" />
+        <Reference Include="netstandard" />
+    </ItemGroup>
+
+    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
+        <ItemGroup>
+            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+        </ItemGroup>
+    </Target>
 </Project>

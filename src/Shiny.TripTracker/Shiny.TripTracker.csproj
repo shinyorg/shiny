@@ -8,6 +8,7 @@
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
         <PackageReference Include="sqlite-net-pcl" />
     </ItemGroup>
 

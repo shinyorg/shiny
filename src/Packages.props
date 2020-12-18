@@ -28,9 +28,11 @@
         <PackageReference Update="Xamarin.AndroidX.Room.Common" Version="2.2.5.6" />
         <PackageReference Update="Xamarin.AndroidX.Room.Runtime" Version="2.2.5.6" />
         <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.4.0.1" />
-        <PackageReference Update="Xamarin.Firebase.Messaging" Version="120.2.4" />
+        
         <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.2.0" />
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="117.0.0" />
+        
+        <PackageReference Update="Xamarin.Firebase.Messaging" Version="120.2.4" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="2.3.1" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="2.2.5" />
 

@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Notifications;
 using Shiny.Push;
 
-[assembly: Shiny.Push.ShinyPushLibrary]
 
 namespace Shiny
 {
