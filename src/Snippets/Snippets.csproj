@@ -25,7 +25,6 @@
         <ProjectReference Include="..\Shiny.Push.Abstractions\Shiny.Push.Abstractions.csproj" />
         <ProjectReference Include="..\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
         <ProjectReference Include="..\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
-        <ProjectReference Include="..\Shiny.TripTracker\Shiny.TripTracker.csproj" />
         <ProjectReference Include="..\Shiny.Testing\Shiny.Testing.csproj" />
         <ProjectReference Include="..\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />

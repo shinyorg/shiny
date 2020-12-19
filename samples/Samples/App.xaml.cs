@@ -73,7 +73,7 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Notifications.MainPage>("Notifications");
             containerRegistry.RegisterForNavigation<Notifications.ChannelListPage>("NotificationChannels");
             containerRegistry.RegisterForNavigation<Notifications.ChannelCreatePage>("NotificationChannelCreate");
-            
+
             containerRegistry.RegisterForNavigation<Sensors.MainPage>("Sensors");
             containerRegistry.RegisterForNavigation<Sensors.CompassPage>("Compass");
 
@@ -81,10 +81,6 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Logging.LoggingPage>("Logs");
             containerRegistry.RegisterForNavigation<AccessPage>("Access");
             containerRegistry.RegisterForNavigation<Settings.MainPage>("Settings");
-
-            containerRegistry.RegisterForNavigation<LocationSync.MainPage>("LocationSync");
-            containerRegistry.RegisterForNavigation<TripTracker.MainPage>("TripTracker");
-            containerRegistry.RegisterForNavigation<DataSync.MainPage>("DataSync");
         }
 
 

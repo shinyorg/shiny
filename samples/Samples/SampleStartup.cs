@@ -1,6 +1,5 @@
 ﻿using System;
 using Samples.Settings;
-using Samples.ShinyDelegates;
 using Samples.Infrastructure;
 using Samples.Jobs;
 using Samples.HttpTransfers;
@@ -8,10 +7,7 @@ using Samples.Beacons;
 using Samples.BluetoothLE;
 using Samples.Geofences;
 using Samples.Gps;
-using Samples.Notifications;
 using Samples.Push;
-using Samples.DataSync;
-using Samples.TripTracker;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 using Shiny.Notifications;
@@ -87,12 +83,6 @@ namespace Samples
                 Constants.AnhListenerConnectionString,
                 Constants.AnhHubName
             );
-
-            //// app services
-            services.UseGeofencingSync<LocationSyncDelegates>();
-            services.UseGpsSync<LocationSyncDelegates>();
-            services.UseTripTracker<SampleTripTrackerDelegate>();
-            services.UseDataSync<SampleDataSyncDelegate>(true);
         }
     }
 }

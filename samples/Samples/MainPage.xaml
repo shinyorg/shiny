@@ -50,11 +50,6 @@
                         <TextCell Text="Jobs" Command="{Binding Navigate}" CommandParameter="Nav/Jobs" />
                         <TextCell Text="Settings" Command="{Binding Navigate}" CommandParameter="Nav/Settings" />
                     </TableSection>
-                    <TableSection Title="App Services">
-                        <TextCell Text="Trip Tracker" Command="{Binding Navigate}" CommandParameter="Nav/TripTracker" />
-                        <TextCell Text="Location Sync" Command="{Binding Navigate}" CommandParameter="Nav/LocationSync" />
-                        <TextCell Text="Data Sync" Command="{Binding Navigate}" CommandParameter="Nav/DataSync" />
-                    </TableSection>
                 </TableRoot>
             </TableView>
         </ContentPage>

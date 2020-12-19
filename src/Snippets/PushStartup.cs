@@ -14,6 +14,5 @@ public class PushStartup : ShinyStartup
 
         services.UsePushAzureNotificationHubs<PushDelegate>("connection string", "hub name");
         services.UseFirebaseMessaging<PushDelegate>();
-        services.UseOneSignalPush<PushDelegate>(new Shiny.Push.OneSignal.OneSignalPushConfig("onesignal appId"));
     }
 }
