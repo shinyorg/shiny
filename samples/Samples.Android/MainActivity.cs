@@ -8,7 +8,9 @@ using Xamarin.Forms;
 using Android.OS;
 using Android.Runtime;
 
-//[assembly: ShinyApplication(ShinyStartupTypeName = "Samples.SampleStartup")]
+#if GENERATE_BOILERPLATE
+[assembly: ShinyApplication(ShinyStartupTypeName = "Samples.SampleStartup")]
+#endif
 
 namespace Samples.Droid
 {
@@ -21,6 +23,8 @@ namespace Samples.Droid
     )]
     public partial class MainActivity : FormsAppCompatActivity
     {
+#if GENERATE_BOILERPLATE
+#else
         protected override void OnCreate(Bundle savedInstanceState)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
@@ -53,5 +57,6 @@ namespace Samples.Droid
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+#endif
     }
 }

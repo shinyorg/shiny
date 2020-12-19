@@ -64,7 +64,6 @@
                 <PackageReference Include="Shiny" />
             </ItemGroup>
         </When>
-
         <When Condition="'$(DebugLocal)' == 'true'">
             <ItemGroup>
                 <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />

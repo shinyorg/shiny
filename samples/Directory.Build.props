@@ -2,5 +2,6 @@
     <PropertyGroup>
         <DebugLocal>true</DebugLocal>
         <GenerateBoilerplate>false</GenerateBoilerplate>
+        <DefineConstants Condition="'$(GenerateBoilerplate)'=='true'">GENERATE_BOILERPLATE;$(DefineConstants)</DefineConstants>
     </PropertyGroup>
 </Project>

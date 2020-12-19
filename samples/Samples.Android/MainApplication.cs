@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !GENERATE_BOILERPLATE
+using System;
 using Android.App;
 using Android.Runtime;
 using Shiny;
@@ -19,3 +20,4 @@ namespace Samples.Droid
         }
     }
 }
+#endif
