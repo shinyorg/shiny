@@ -177,11 +177,6 @@
     </ProjectReference>
   </ItemGroup>
   <Choose>
-    <When Condition="'$(GenerateBoilerplate)' == 'true'">
-      <ItemGroup>
-        <PackageReference Include="Shiny" />
-      </ItemGroup>
-    </When>
     <When Condition="'$(DebugLocal)' == 'true'">
       <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">
@@ -230,6 +225,11 @@
         </ProjectReference>
       </ItemGroup>
     </When>
+      <Otherwise>
+          <ItemGroup>
+              <PackageReference Include="Shiny" />
+          </ItemGroup>
+      </Otherwise>
   </Choose>
   <ItemGroup>
     <None Include="Samples.UWP-Debug_TemporaryKey.pfx" />

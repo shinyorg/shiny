@@ -184,12 +184,7 @@
         <Reference Include="Xamarin.iOS" />
     </ItemGroup>
     <Choose>
-        <When Condition="'$(GenerateBoilerplate)' == 'true'">
-            <ItemGroup>
-                <PackageReference Include="Shiny" />
-            </ItemGroup>
-        </When>
-        <When Condition="'$(DebugLocal)' == 'true'">
+        <When Condition="'$(DebugLocal)'=='true'">
             <ItemGroup>
                 <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
                 <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
@@ -204,6 +199,11 @@
                 <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
             </ItemGroup>
         </When>
+        <Otherwise>
+            <ItemGroup>
+                <PackageReference Include="Shiny" />
+            </ItemGroup>
+        </Otherwise>
     </Choose>
 
     <ItemGroup>
