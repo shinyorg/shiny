@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<linker>
+    <assembly fullname="Shiny.Core">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Beacons">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.BluetoothLE">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Integrations.Sqlite">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Locations">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Net.Http">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Nfc">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Notifications">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Push">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Push.AzureNotificationHubs">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.Sensors">
+        <namespace fullname="*" />
+    </assembly>
+    <assembly fullname="Shiny.SpeechRecognition">
+        <namespace fullname="*" />
+    </assembly>
+</linker>

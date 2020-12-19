@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+	xmlns="http://xamarin.com/schemas/2014/forms"
+	xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+	x:Class="Samples.Beacons.MonitoringPage"
+    Title="Monitoring">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Command="{Binding Add}" />
+    </ContentPage.ToolbarItems>
+
+	<ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ListView ItemsSource="{Binding Regions}" Grid.Row="0">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Text}" Detail="{Binding Detail}">
+                            <TextCell.ContextActions>
+                                <MenuItem Text="Remove"
+                                          Command="{Binding PrimaryCommand}"
+                                          IsDestructive="True" />
+                            </TextCell.ContextActions>
+                        </TextCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Button Text="Stop All Monitoring"
+                    Command="{Binding StopAllMonitoring}"
+                    Grid.Row="1"/>
+        </Grid>
+	</ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,6 @@
+<Project>
+    <PropertyGroup>
+        <DebugLocal>true</DebugLocal>
+        <GenerateBoilerplate>false</GenerateBoilerplate>
+    </PropertyGroup>
+</Project>

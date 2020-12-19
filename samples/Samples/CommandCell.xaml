@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.CommandCell">
+    <ContentView.Content>
+        <SwipeView>
+            <SwipeView.RightItems>
+                <SwipeItems Mode="Reveal">
+                    <SwipeItem Text="{Binding SecondaryCommandText}"
+                               Command="{Binding SecondaryCommand}"
+                               BackgroundColor="{Binding SecondaryCommandColor}" />
+
+                    <SwipeItem Text="{Binding PrimaryCommandText}"
+                               BackgroundColor="{Binding PrimaryCommandColor}"
+                               Command="{Binding PrimaryCommand}" />
+                </SwipeItems>
+            </SwipeView.RightItems>
+            <StackLayout>
+                <Label Text="{Binding Text}"
+                       FontSize="Body"
+                       LineBreakMode="TailTruncation" />
+
+                <Label Text="{Binding Detail}"
+                       FontSize="Caption"
+                       LineBreakMode="TailTruncation" />
+
+                <BoxView HorizontalOptions="FillAndExpand"
+                         VerticalOptions="Center"
+                         BackgroundColor="Gainsboro"
+                         HeightRequest="1" />
+            </StackLayout>
+        </SwipeView>
+    </ContentView.Content>
+</ContentView>

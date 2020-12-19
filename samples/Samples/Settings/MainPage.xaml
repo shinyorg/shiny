@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:settings="clr-namespace:Samples.Settings"
+            x:Class="Samples.Settings.MainPage"
+            Title="Settings">
+    <TabbedPage.Children>
+        <settings:BindPage />
+        <settings:BasicPage />
+    </TabbedPage.Children>
+</TabbedPage>

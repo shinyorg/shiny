@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:locationsync="clr-namespace:Samples.LocationSync" 
+             xmlns:samples="clr-namespace:Samples"
+             mc:Ignorable="d"
+             x:DataType="locationsync:PendingQueueViewModel"
+             x:Class="Samples.LocationSync.PendingQueuePage">
+
+    <ContentPage.Content>
+        <RefreshView IsRefreshing="{Binding IsBusy}"
+                     Command="{Binding Load}">
+            <CollectionView ItemsSource="{Binding Items}">
+
+                <CollectionView.EmptyView>
+                    <Label Text="Nothing in the Pending Queue"
+                           Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="samples:CommandItem">
+                        <samples:CommandCell Text="{Binding Text}"
+                                             Detail="{Binding Detail}" />
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+    </ContentPage.Content>
+</ContentPage>

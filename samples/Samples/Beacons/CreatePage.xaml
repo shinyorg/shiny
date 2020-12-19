@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sample="clr-namespace:Samples.Beacons"
+             x:DataType="sample:CreateViewModel"
+             x:Class="Samples.Beacons.CreatePage"
+             Style="{StaticResource ContentPage}"
+             Title="Create Beacon Region">
+
+    <ContentPage.Content>
+        <TableView Intent="Form">
+            <TableSection Title="Filter">
+                <EntryCell Label="Identifier"
+                           Text="{Binding Identifier}" />
+
+                <EntryCell Label="Uuid"
+                           Text="{Binding Uuid}"
+                           Keyboard="Text" />
+
+                <EntryCell Label="Major"
+                           Text="{Binding Major}"
+                           Keyboard="Numeric" />
+
+                <EntryCell Label="Minor"
+                           Text="{Binding Minor}"
+                           Keyboard="Numeric"
+                           IsEnabled="{Binding IsMajorSet}" />
+            </TableSection>
+
+            <TableSection Title="Monitoring">
+                <SwitchCell Text="Entry"
+                            On="{Binding NotifyOnEntry}"
+                            IsEnabled="{Binding IsMonitoringSupported}" />
+
+                <SwitchCell Text="Exit"
+                            On="{Binding NotifyOnExit}"
+                            IsEnabled="{Binding IsMonitoringSupported}" />
+            </TableSection>
+
+            <TableSection>
+                <TextCell Text="Estimote Defaults" Command="{Binding EstimoteDefaults}" />
+            </TableSection>
+
+            <TableSection>
+                <TextCell x:Name="MonitorButton"
+                          Text="Start Monitor"
+                          Command="{Binding StartMonitoring}" />
+
+                <TextCell Text="Start Ranging"
+                          Command="{Binding StartRanging}" />
+            </TableSection>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

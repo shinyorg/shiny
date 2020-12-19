@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:locationsync="clr-namespace:Samples.LocationSync"
+             mc:Ignorable="d"
+             x:DataType="locationsync:SyncItemsViewModel"
+             x:Class="Samples.LocationSync.SyncItemsPage">
+
+    <ContentPage.Content>
+        <RefreshView IsRefreshing="{Binding IsBusy}"
+                     Command="{Binding Load}">
+            <CollectionView ItemsSource="{Binding Events}">
+                
+                <CollectionView.EmptyView>
+                    <Label Text="No Items To Sync"
+                           Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
+                
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="locationsync:ItemViewModel">
+                        <StackLayout>
+                            <Label Text="{Binding Description}" />
+                            <Label Text="{Binding Details}" />
+                            <Label Text="{Binding DateCreated, StringFormat='Created: {0}'}" />
+                            <BoxView Style="{StaticResource HR}" />
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </ContentPage.Content>
+</ContentPage>

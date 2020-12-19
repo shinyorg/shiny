@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Settings.BasicPage"
+             Title="Basic">
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Text="Open App Settings" Command="{Binding OpenAppSettings}" />
+
+            <Label Text="The text below will be remembered across sessions" />
+
+            <Label Text="Check" />
+            <Switch IsToggled="{Binding IsChecked}" />
+
+            <Label Text="Your Text" />
+            <Entry Text="{Binding YourText}" />
+
+            <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0}'}" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

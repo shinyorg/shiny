@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Speech.DictationPage"
+             Title="Dictation">
+
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout>
+                <Label Text="Continuous Dictation" />
+                <Switch IsToggled="{Binding UseContinuous}" />
+            </StackLayout>
+            <Button Text="Start Listening" Command="{Binding ToggleListen}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsListening}" Value="True">
+                        <Setter Property="Text" Value="Stop Listening" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsListening}" Value="False">
+                        <Setter Property="Text" Value="Start Listening" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Label Text="{Binding Text}" IsEnabled="false" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

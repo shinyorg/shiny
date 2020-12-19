@@ -1,0 +1,42 @@
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:notifications="clr-namespace:Samples.Notifications"
+            SelectedTabColor="#C2E812"
+            UnselectedTabColor="#4BA677"
+            x:Class="Samples.Notifications.MainPage"
+            Title="Notifications">
+
+    <TabbedPage.Children>
+        <notifications:CreatePage Title="Create">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf4ad;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </notifications:CreatePage>
+
+        <notifications:ChannelListPage Title="Channels" />
+
+        <notifications:PendingPage Title="Pending">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf03a;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </notifications:PendingPage>
+
+        <notifications:BadgePage Title="Badges">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf2c1;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </notifications:BadgePage>
+
+        <notifications:PersistentNotificationPage Title="Persistent" />
+
+        <notifications:LogPage Title="Logs">
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf017;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </notifications:LogPage>
+    </TabbedPage.Children>
+</TabbedPage>

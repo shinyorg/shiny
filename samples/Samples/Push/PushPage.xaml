@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+            xmlns:pushnotifications="clr-namespace:Samples.Push"
+            mc:Ignorable="d"
+            x:Class="Samples.Push.PushPage"
+            SelectedTabColor="#C2E812"
+            UnselectedTabColor="#4BA677"
+            BarTextColor="White"
+            Title="Push">
+
+    <TabbedPage.Children>
+        <pushnotifications:SetupPage>
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf013;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </pushnotifications:SetupPage>
+        <pushnotifications:EventListPage>
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf017;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </pushnotifications:EventListPage>
+    </TabbedPage.Children>
+</TabbedPage>

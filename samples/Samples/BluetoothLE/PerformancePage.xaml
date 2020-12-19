@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.BluetoothLE.PerformancePage"
+             Title="BLE Performance">
+
+    <ContentPage.Content>
+        <TableView>
+            <TableRoot>
+                <TableSection Title="Setup">
+                    <TextCell Text="Status"
+                              Detail="{Binding Status}" />
+                    <EntryCell Label="Peripheral Name"
+                               Text="{Binding PeripheralName}"
+                               IsEnabled="{Binding IsRunning, Converter={StaticResource Not}}" />
+                    <EntryCell Label="Service UUID"
+                               Text="{Binding ServiceUuid}"
+                               IsEnabled="{Binding IsRunning, Converter={StaticResource Not}}" />
+                    <EntryCell Label="Characteristic UUID"
+                               Text="{Binding CharacteristicUuid}"
+                               IsEnabled="{Binding IsRunning, Converter={StaticResource Not}}" />
+                </TableSection>
+
+                <TableSection Title="Android">
+                    <SwitchCell Text="Synchronize"
+                                On="{Binding AndroidUseInternalSyncQueue}"
+                                IsEnabled="{Binding IsAndroid}" />
+
+                    <SwitchCell Text="Main Thread"
+                                On="{Binding AndroidUseMainThread}"
+                                IsEnabled="{Binding IsAndroid}" />
+                </TableSection>
+
+                <TableSection Title="Tests">
+                    <TextCell Text="Write" Command="{Binding WriteTest}" />
+                    <TextCell Text="Write No Response" Command="{Binding WriteWithoutResponseTest}" />
+                    <TextCell Text="Read" Command="{Binding ReadTest}" />
+                </TableSection>
+
+                <TableSection Title="Status">
+                    <TextCell Text="{Binding Info}" />
+                    <TextCell Text="MTU" Detail="{Binding MTU}" />
+                    <TextCell Text="Packets" Detail="{Binding Packets}" />
+                    <TextCell Text="Errors" Detail="{Binding Errors}" />
+                    <TextCell Text="Speed (per second)" Detail="{Binding Speed}" />
+                </TableSection>
+
+                <TableSection>
+                    <TextCell Text="Stop Test" Command="{Binding Stop}" />
+                </TableSection>
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

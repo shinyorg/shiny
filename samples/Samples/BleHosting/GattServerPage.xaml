@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ble="clr-namespace:Samples.BleHosting"
+             x:Class="Samples.BleHosting.GattServerPage"
+             x:DataType="ble:GattServerViewModel"
+             Title="GATT Server">
+    <ContentPage.Content>
+        <TableView>
+            <TableRoot>
+                <TableSection Title="Info">
+                    <TextCell Text="Local Name" Detail="ShinyTest" />
+                </TableSection>
+
+                <TableSection Title="Read/Write (A495FF21-C5B1-4B44-B512-1370F02D74DE)">
+                    <TextCell Text="Last Write Time" Detail="{Binding LastWriteTime}" />
+                    <TextCell Text="Last Write Value" Detail="{Binding LastWriteValue}" />
+                    <TextCell Text="Last Read Time" Detail="{Binding LastReadTime}" />
+                    <TextCell Text="Last Read Value" Detail="{Binding LastReadValue}" />
+                </TableSection>
+
+                <TableSection Title="Subscription (A495FF22-C5B1-4B44-B512-1370F02D74DE)">
+                    <TextCell Text="Subscribers" Detail="{Binding SubscribersSimple}" />
+                    <TextCell Text="Last Value" Detail="{Binding SubscriberLastValue}" />
+                </TableSection>
+
+                <TableSection Title="Read/Write Perf (A495FF23-C5B1-4B44-B512-1370F02D74DE)">
+                    <TextCell Text="Writes" Detail="{Binding SpeedWrites}" />
+                    <TextCell Text="Reads" Detail="{Binding SpeedReads}" />
+                    <TextCell Text="Speed" Detail="{Binding TransferSpeed}" />
+                </TableSection>
+
+                <TableSection Title="Subscription Perf (A495FF24-C5B1-4B44-B512-1370F02D74DE)">
+                    <TextCell Text="Subscribers" Detail="{Binding SubscribersPerf}" />
+                    <TextCell Text="Pushes" Detail="{Binding SubscriberPushes}" />
+                    <TextCell Text="Speed" Detail="{Binding SubscriberSpeed}" />
+                </TableSection>
+
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

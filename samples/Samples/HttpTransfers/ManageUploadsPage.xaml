@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.HttpTransfers.ManageUploadsPage"
+             Title="Manage Uploads">
+    <ContentPage.Content>
+        <StackLayout>
+            <Frame IsVisible="{Binding IsBusy}"
+                   BorderColor="Black"
+                   BackgroundColor="{StaticResource Primary}">
+                <StackLayout Orientation="Horizontal">
+                    <ActivityIndicator IsRunning="true" Color="Black" />
+                    <Label Text="Generating File" />
+                </StackLayout>
+            </Frame>
+            <TableView Intent="Form">
+                <TableRoot>
+                    <TableSection Title="Database">
+                        <EntryCell Label="Records" Text="{Binding RecordsToCreate}" Keyboard="Numeric" />
+                        <TextCell Text="Create DB" Command="{Binding CreateDatabase}" />
+                        <TextCell Text="Delete DB" Command="{Binding Delete}" CommandParameter="upload.db" />
+                    </TableSection>
+
+                    <TableSection Title="Random">
+                        <EntryCell Label="Size (MB)" Text="{Binding SizeInMegabytes}" Keyboard="Numeric" />
+                        <TextCell Text="Create Random" Command="{Binding CreateRandom}" />
+                        <TextCell Text="Delete Random" Command="{Binding Delete}" CommandParameter="upload.random" />
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

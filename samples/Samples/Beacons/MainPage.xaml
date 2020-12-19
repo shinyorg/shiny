@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:sample="clr-namespace:Samples.Beacons;assembly=Samples"
+            x:Class="Samples.Beacons.MainPage"
+            SelectedTabColor="#C2E812"
+            UnselectedTabColor="#4BA677"
+            Title="Beacons"
+            NavigationPage.BackButtonTitle="Back">
+
+    <sample:RangingPage>
+        <ContentPage.IconImageSource>
+            <FontImageSource Glyph="&#xf294;"
+                             FontFamily="FAS" />
+        </ContentPage.IconImageSource>
+    </sample:RangingPage>
+
+    <sample:MonitoringPage>
+        <ContentPage.IconImageSource>
+            <FontImageSource Glyph="&#xf7e6;"
+                             FontFamily="FAS" />
+        </ContentPage.IconImageSource>
+    </sample:MonitoringPage>
+
+    <sample:LogsPage>
+        <ContentPage.IconImageSource>
+            <FontImageSource Glyph="&#xf7e6;"
+                             FontFamily="FAS" />
+        </ContentPage.IconImageSource>
+    </sample:LogsPage>
+</TabbedPage>

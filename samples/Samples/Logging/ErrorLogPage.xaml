@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Logging.ErrorLogPage"
+             Title="Errors">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear" Command="{Binding Clear}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="No Errors have been logged"
+                   Style="{StaticResource NoDataLabel}"
+                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}" />
+
+            <ListView ItemsSource="{Binding Logs}"
+                      RefreshCommand="{Binding Load}"
+                      IsRefreshing="{Binding IsBusy}"
+                      IsVisible="{Binding HasLogs}"
+                      IsPullToRefreshEnabled="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Text}"
+                                  Detail="{Binding Detail}"
+                                  Command="{Binding PrimaryCommand}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

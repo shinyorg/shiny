@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl" />
+    <PackageReference Include="ZNetCS.AspNetCore.ResumingFileResults" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Samples.SqliteGenerator\Samples.SqliteGenerator.csproj" />
+  </ItemGroup>
+
+</Project>

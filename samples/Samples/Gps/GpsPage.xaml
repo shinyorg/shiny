@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:gps="clr-namespace:Samples.Gps"
+             x:DataType="gps:GpsViewModel"
+             x:Class="Samples.Gps.GpsPage"
+             Title="Setup">
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TableView Grid.Row="0" Intent="Form">
+                <TableRoot>
+                    <TableSection>
+                        <TextCell Text="Access" Detail="{Binding Access}" Command="{Binding RequestAccess}" />
+                        <TextCell Text="Get Current Position" Command="{Binding GetCurrentPosition}" />
+                    </TableSection>
+
+                    <TableSection>
+                        <TextCell Text="Latitude" Detail="{Binding Latitude}" />
+                        <TextCell Text="Longitude" Detail="{Binding Longitude}" />
+                        <TextCell Text="Altitude" Detail="{Binding Altitude}" />
+                        <TextCell Text="Accuracy" Detail="{Binding PositionAccuracy}" />
+                    </TableSection>
+
+                    <TableSection>
+                        <TextCell Text="Speed (m/s)" Detail="{Binding Speed}" />
+                        <TextCell Text="Heading" Detail="{Binding Heading}" />
+                        <TextCell Text="Accuracy" Detail="{Binding HeadingAccuracy}" />
+                    </TableSection>
+
+                    <TableSection Title="Listening">
+                        <TextCell Text="Use Realtime Values"
+                                  Command="{Binding UseRealtime}" />
+
+                        <SwitchCell Text="Background"
+                                    On="{Binding UseBackground}" />
+
+                        <TextCell Text="Priority/Accuracy"
+                                  Detail="{Binding Priority}"
+                                  Command="{Binding SelectPriority}"/>
+
+                        <TextCell Text="The OS will try to provide values at this speed if available (but faster if it can)" />
+                        <EntryCell Label="Desired Interval (secs)"
+                                   Text="{Binding DesiredInterval}"
+                                   Keyboard="Numeric" />
+
+                        <TextCell Text="The OS will not ping your delegate faster than this value" />
+                        <EntryCell Label="Throttled Interval (secs)"
+                                   Text="{Binding ThrottledInterval}"
+                                   Keyboard="Numeric" />
+
+                        <EntryCell Label="Minimum Distance (meters)"
+                                   Text="{Binding MinimumDistanceMeters}"
+                                   Keyboard="Numeric" />
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+
+            <Button Text="{Binding ListenerText}"
+                    Command="{Binding ToggleUpdates}"
+                    Grid.Row="1" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

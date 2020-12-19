@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+	         x:Class="Samples.Beacons.RangingPage"
+	         Title="Ranging">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Set Region" Command="{Binding SetRegion}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Text="{Binding ScanText}"
+                    Command="{Binding ScanToggle}"
+                    IsVisible="{Binding IsRegionSet}" />
+
+            <StackLayout IsVisible="{Binding IsRegionSet}">
+                <Label Text="{Binding Uuid, StringFormat='UUID: {0}'}" />
+                <Label Text="{Binding Major, StringFormat='Major: {0}'}" IsVisible="{Binding IsMajorSet}" />
+                <Label Text="{Binding Uuid, StringFormat='Minor: {0}'}" IsVisible="{Binding IsMinorSet}" />
+            </StackLayout>
+
+            <ListView ItemsSource="{Binding Beacons}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Identifier}" Detail="{Binding Proximity}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+	</ContentPage.Content>
+</ContentPage>

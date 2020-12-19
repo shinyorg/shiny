@@ -1,0 +1,24 @@
+{
+  "images": [
+    {
+      "scale": "1x",
+      "idiom": "universal",
+      "filename": "arrow.png"
+    },
+    {
+      "scale": "2x",
+      "idiom": "universal",
+      "filename": "arrow@2x.png"
+    },
+    {
+      "scale": "3x",
+      "idiom": "universal",
+      "filename": "arrow@3x.png"
+    }
+  ],
+  "properties": {},
+  "info": {
+    "version": 1,
+    "author": ""
+  }
+}

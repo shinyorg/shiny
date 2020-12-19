@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ds="clr-namespace:Samples.DataSync"
+             xmlns:samples="clr-namespace:Samples"
+             x:DataType="ds:MainViewModel"
+             x:Class="Samples.DataSync.MainPage"
+             Title="Data Sync">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear"
+                     Command="{Binding Clear}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Frame BackgroundColor="Gainsboro"
+                   BorderColor="Black">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Button Text="Force Run"
+                            Command="{Binding ForceRun}"
+                            Grid.Column="0"
+                            Grid.Row="0" />
+
+                    <Button Text="Generate Test Item"
+                            Command="{Binding GenerateTestItem}"
+                            Grid.Column="1"
+                            Grid.Row="0" />
+
+                    <Label Text="Sync Enabled"
+                           Grid.Column="0"
+                           Grid.Row="1" />
+
+                    <CheckBox IsChecked="{Binding IsSyncEnabled}"
+                              Grid.Column="1"
+                              Grid.Row="1" />
+
+                    <Label Text="Allow Data To Sync in Delegate"
+                           Grid.Column="0"
+                           Grid.Row="2" />
+
+                    <CheckBox IsChecked="{Binding AllowOutgoing}"
+                              Grid.Column="1"
+                              Grid.Row="2" />
+                </Grid>
+            </Frame>
+            
+            <CollectionView ItemsSource="{Binding SyncEvents}">
+                <CollectionView.EmptyView>
+                    <Label Text="Nothing in the Pending Queue"
+                           Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="samples:CommandItem">
+                        <samples:CommandCell Text="{Binding Text}"
+                                             Detail="{Binding Detail}"
+                                             PrimaryCommand="{Binding PrimaryCommand}"
+                                             PrimaryCommandText="View"
+                                             SecondaryCommand="{Binding SecondaryCommand}"
+                                             SecondaryCommandColor="Red"
+                                             SecondaryCommandText="Remove" />
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

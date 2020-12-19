@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"             
+             xmlns:locationsync="clr-namespace:Samples.LocationSync"
+             mc:Ignorable="d"
+             x:DataType="locationsync:ActionsViewModel"
+             x:Class="Samples.LocationSync.ActionsPage">
+    
+    <ContentPage.Content>
+        <TableView Intent="Form">
+            <TableRoot>
+                <TableSection>
+                    <SwitchCell Text="Delegate Test Crash Enabled" On="{Binding IsSyncDelegateCrashEnabled}" />
+                </TableSection>
+
+                <TableSection Title="Geofences">
+                    <SwitchCell Text="Enabled" On="{Binding IsGeofenceSyncEnabled}" />
+                    <TextCell Text="Process" Command="{Binding ProcessGeofences}" />
+                    <TextCell Text="Clear" Command="{Binding ClearGeofences}" />
+                </TableSection>
+
+                <TableSection Title="GPS">
+                    <SwitchCell Text="Enabled" On="{Binding IsGpsSyncEnabled}" />
+                    <TextCell Text="Process" Command="{Binding ProcessGps}" />
+                    <TextCell Text="Clear" Command="{Binding ClearGps}" />
+                </TableSection>
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

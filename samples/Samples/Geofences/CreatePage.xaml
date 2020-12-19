@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Geofences.CreatePage"
+             Style="{StaticResource ContentPage}"
+             Title="Create">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Create" Command="{Binding CreateGeofence}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <TableView Intent="Form">
+            <TableSection>
+                <TextCell Text="Access"
+                          Detail="{Binding AccessStatus}"
+                          Command="{Binding RequestAccess}" />
+
+                <EntryCell Label="Identifier"
+                           Text="{Binding Identifier}" />
+
+                <EntryCell Label="Latitude"
+                           Text="{Binding CenterLatitude, Converter={StaticResource Double}}"
+                           Keyboard="Numeric" />
+
+                <EntryCell Label="Longitude"
+                           Text="{Binding CenterLongitude, Converter={StaticResource Double}}"
+                           Keyboard="Numeric" />
+
+                <EntryCell Label="Radius (meters)"
+                           Text="{Binding RadiusMeters}"
+                           Keyboard="Numeric" />
+            </TableSection>
+
+            <TableSection>
+                <SwitchCell Text="Notify On Entry" On="{Binding NotifyOnEntry}" />
+                <SwitchCell Text="Notify On Exit" On="{Binding NotifyOnExit}" />
+                <SwitchCell Text="Single Use" On="{Binding SingleUse}" />
+            </TableSection>
+
+            <TableSection>
+                <TextCell Text="Set Current Position" Command="{Binding SetCurrentLocation}" />
+            </TableSection>
+
+            <TableSection Title="Quick Entries">
+                <TextCell Text="Apple HQ" Command="{Binding AddAppleHQ}" />
+                <TextCell Text="CN Tower, Toronto, Canada" Command="{Binding AddCnTower}" />
+            </TableSection>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

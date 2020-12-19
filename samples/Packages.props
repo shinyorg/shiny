@@ -1,0 +1,54 @@
+<Project>
+
+    <PropertyGroup>
+        <LatestShinyBuild>2.0.0.2373-preview</LatestShinyBuild>
+        <XamarinFormsVersion>4.8.0.1687</XamarinFormsVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Shiny" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Core" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Beacons" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.BluetoothLE" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.BluetoothLE.Hosting" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.DataSync" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Integrations.Sqlite" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Locations" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Locations.Sync" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Logging.AppCenter" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Net.Http" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Nfc" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Notifications" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Push" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Push.AzureNotificationHubs" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Push.FirebaseMessaging" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Sensors" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.SpeechRecognition" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.Testing" Version="$(LatestShinyBuild)" />
+        <PackageReference Update="Shiny.TripTracker" Version="$(LatestShinyBuild)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.1" />
+        <PackageReference Update="System.Reactive" Version="5.0.0" />
+        <PackageReference Update="Bogus" Version="32.0.1" />
+        <PackageReference Update="Humanizer" Version="2.8.25" />
+        <PackageReference Update="Prism.DryIoc.Forms" Version="8.0.0.1909" />
+        <PackageReference Update="ReactiveUI.Fody" Version="13.0.1" />
+        <PackageReference Update="sqlite-net-pcl" Version="1.7.335" />
+        <PackageReference Update="XF.Material" Version="1.7.7" />
+        <PackageReference Update="Xamarin.Forms" Version="$(XamarinFormsVersion)" />
+        <PackageReference Update="Xamarin.Essentials" Version="1.5.3.2" />
+        <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
+        <PackageReference Update="Meadow.Foundation" Version="0.10.8" />
+        <PackageReference Update="Tizen.NET" Version="5.0.0.14562" ExcludeAssets="Runtime" />
+        <PackageReference Update="Tizen.NET.Sdk" Version="1.0.1" />
+        <PackageReference Update="Xamarin.Forms.Platform.WPF" Version="$(XamarinFormsVersion)" />
+        <PackageReference Update="Xamarin.Forms.Platform.GTK" Version="$(XamarinFormsVersion)" />
+    </ItemGroup>
+
+</Project>

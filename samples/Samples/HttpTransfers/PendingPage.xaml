@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.HttpTransfers.PendingPage"
+             Title="Pending">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Create" Command="{Binding Create}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ListView ItemsSource="{Binding Transfers}"
+                      RowHeight="150"
+                      Grid.Row="0">
+
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <ViewCell.ContextActions>
+                                <MenuItem Text="Cancel"
+                                          Command="{Binding Cancel}"
+                                          IsDestructive="True" />
+                            </ViewCell.ContextActions>
+
+                            <ViewCell.View>
+                                <Grid Padding="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1*" />
+                                        <ColumnDefinition Width="1*" />
+                                        <ColumnDefinition Width="1*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <Label Text="{Binding Uri}"
+                                           FontAttributes="Bold"
+                                           Grid.Row="0"
+                                           Grid.ColumnSpan="3" />
+
+                                    <Label Text="{Binding Status, StringFormat='Status: {0}'}"
+                                           Grid.Row="1"
+                                           Grid.Column="0" />
+
+                                    <Label Grid.Row="1" Grid.Column="0" />
+
+                                    <Label Text="{Binding IsUpload, StringFormat='Upload: {0}'}"
+                                           Grid.Row="1"
+                                           Grid.Column="3" />
+
+                                    <Label Text="{Binding PercentCompleteText}"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           Grid.Column="0"
+                                           Grid.Row="2"/>
+
+                                    <Label Text="{Binding TransferSpeed}"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           Grid.Column="1"
+                                           Grid.Row="2" />
+
+                                    <Label Text="{Binding EstimateTimeRemaining}"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           Grid.Column="2"
+                                           Grid.Row="2" />
+
+                                    <ProgressBar Progress="{Binding PercentComplete}"
+                                                 HorizontalOptions="FillAndExpand"
+                                                 VerticalOptions="Center"
+                                                 Grid.Column="0"
+                                                 Grid.ColumnSpan="3"
+                                                 Grid.Row="3" />
+                                </Grid>
+                            </ViewCell.View>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Button Text="Cancel All Tasks"
+                    Command="{Binding CancelAll}"
+                    Grid.Row="1" />
+        </Grid>
+    </ContentPage.Content>
+
+</ContentPage>

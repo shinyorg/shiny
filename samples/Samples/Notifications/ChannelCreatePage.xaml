@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Notifications.ChannelCreatePage"
+             Title="Create Channel">
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TableView Grid.Row="0">
+                <TableRoot>
+                    <TableSection Title="Channel Info">
+                        <EntryCell Label="Identifier" Text="{Binding Identifier}" />
+                        <EntryCell Label="Description" Text="{Binding Description}" />
+                        <!--Sound, Importance-->
+                    </TableSection>
+
+                    <TableSection Title="Action 1">
+                        <SwitchCell Text="Use"
+                                    On="{Binding UseAction1}" />
+                        <EntryCell Label="Identifier"
+                                   Text="{Binding Action1Identifier}"
+                                   IsEnabled="{Binding UseAction1}" />
+                        <TextCell Text="Action Type"
+                                  Command="{Binding PickAction}"
+                                  CommandParameter="1"
+                                  IsEnabled="{Binding UseAction1}" />
+                    </TableSection>
+
+                    <TableSection>
+                        <SwitchCell Text="Use"
+                                    On="{Binding UseAction2}" />
+                        <EntryCell Label="Identifier"
+                                   Text="{Binding Action2Identifier}"
+                                   IsEnabled="{Binding UseAction2}" />
+                        <TextCell Text="Action Type"
+                                  Command="{Binding PickAction}"
+                                  CommandParameter="2"
+                                  IsEnabled="{Binding UseAction2}" />
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+
+            <StackLayout Grid.Row="1">
+                <Button Text="Create"
+                        Command="{Binding Create}" />
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:push="clr-namespace:Samples.Push"
+             mc:Ignorable="d"
+             x:DataType="push:SetupViewModel"
+             x:Class="Samples.Push.SetupPage"
+             Title="Setup">
+
+    <ContentPage.Content>
+        <TableView Intent="Form">
+            <TableRoot>
+                <TableSection Title="Registration">
+                    <TextCell Text="Status" 
+                              Detail="{Binding AccessStatus}"
+                              Command="{Binding RequestAccess}" />
+                    <TextCell Text="Un-Register" 
+                              Command="{Binding UnRegister}" />
+                </TableSection>
+
+                <TableSection Title="Tags">
+                    <SwitchCell Text="Tags Support" 
+                                On="{Binding IsTagsSupported}" 
+                                IsEnabled="False" />
+                    <EntryCell Label="Tag" 
+                               Text="{Binding Tag}"
+                               IsEnabled="{Binding IsTagsSupported}" />
+                    <TextCell Text="Update Tag" 
+                              Command="{Binding UpdateTag}" />
+                </TableSection>
+
+                <TableSection Title="Info">
+                    <TextCell Text="Implementation"
+                              Detail="{Binding Implementation}" />
+                    <TextCell Text="Registration Token" 
+                              Detail="{Binding RegToken}" />
+                    <TextCell Text="Registration Date" 
+                              Detail="{Binding RegDate}" />
+                    <TextCell Text="ExpiryDate" 
+                              Detail="{Binding ExpiryDate}" />
+                </TableSection>
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Beacons.LogsPage"
+             Title="Logs">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Clear" Command="{Binding Clear}" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="No Beacon Events"
+                   Style="{StaticResource NoDataLabel}"
+                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}" />
+
+            <ListView ItemsSource="{Binding Logs}"
+                      RefreshCommand="{Binding Load}"
+                      IsRefreshing="{Binding IsBusy}"
+                      IsVisible="{Binding HasLogs}"
+                      IsPullToRefreshEnabled="True">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout>
+                                <Label Style="{DynamicResource ListItemTextStyle}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <FormattedString.Spans>
+                                                <Span Text="{Binding Entered, StringFormat='Entered: {0}'}" />
+                                                <Span Text=" - " />
+                                                <Span Text="{Binding Identifier}" />
+                                                <Span Text=" @ " />
+                                                <Span Text="{Binding Date, StringFormat='{0:ddd MMM d, h:m:ss tt}'}" />
+                                            </FormattedString.Spans>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label Style="{DynamicResource ListItemDetailTextStyle}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <FormattedString.Spans>
+                                                <Span Text="{Binding Uuid}" />
+                                                <Span Text=" / " />
+                                                <Span Text="{Binding Major}" />
+                                                <Span Text=" / " />
+                                                <Span Text="{Binding Minor}" />
+                                            </FormattedString.Spans>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+
+</ContentPage>

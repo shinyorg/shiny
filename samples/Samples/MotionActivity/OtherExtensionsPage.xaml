@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:motionactivity="clr-namespace:Samples.MotionActivity"
+             x:DataType="motionactivity:OtherExtensionsViewModel"
+             mc:Ignorable="d"
+             x:Class="Samples.MotionActivity.OtherExtensionsPage"
+             Title="Extensions">
+
+    <ContentPage.Content>
+        <TableView>
+            <TableRoot>
+                <TableSection>
+                    <TextCell Text="Current Activity" Detail="{Binding CurrentText}" />
+                    <SwitchCell Text="Auto" On="{Binding IsCurrentAuto}" />
+                    <SwitchCell Text="Stationary" On="{Binding IsCurrentStationary}" />
+                </TableSection>
+            </TableRoot>
+        </TableView>
+    </ContentPage.Content>
+</ContentPage>

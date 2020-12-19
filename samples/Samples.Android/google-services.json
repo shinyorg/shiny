@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "29585461192",
+    "firebase_url": "https://handy-cell-143420.firebaseio.com",
+    "project_id": "handy-cell-143420",
+    "storage_bucket": "handy-cell-143420.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29585461192:android:d3057a2065cb0297313afd",
+        "android_client_info": {
+          "package_name": "com.shiny.sample"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29585461192-76rucjrejqdfeln8t505gbaafh01tk5v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZv4VUpwHSsnenr_o7kIOfVRsFhL-0neo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29585461192-76rucjrejqdfeln8t505gbaafh01tk5v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

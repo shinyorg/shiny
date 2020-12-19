@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<MasterDetailPage xmlns="http://xamarin.com/schemas/2014/forms"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+                  xmlns:samples="clr-namespace:Samples"
+                  ios:Page.UseSafeArea="true"
+                  ios:Page.LargeTitleDisplay="Always"
+                  x:DataType="samples:MainViewModel"
+                  x:Class="Samples.MainPage"
+                  Title="Shiny"
+                  IsPresented="{Binding IsPresented}">
+
+    <MasterDetailPage.Master>
+        <ContentPage Title="Menu">
+            <TableView Intent="Menu">
+                <TableRoot>
+                    <TableSection>
+                        <TextCell Text="Welcome" Command="{Binding Navigate}" CommandParameter="Nav/Welcome" />
+                        <TextCell Text="Access" Command="{Binding Navigate}" CommandParameter="Nav/Access" />
+                        <TextCell Text="Logging" Command="{Binding Navigate}" CommandParameter="Nav/Logs" />
+                        <TextCell Text="Delegate Notifications" Command="{Binding Navigate}" CommandParameter="Nav/DelegateNotifications" />
+                    </TableSection>
+                    <TableSection Title="Bluetooth">
+                        <TextCell Text="Central" Command="{Binding Navigate}" CommandParameter="Nav/BleCentral" />
+                        <TextCell Text="Perf Tests" Command="{Binding Navigate}" CommandParameter="Nav/BlePerformance" />
+                        <TextCell Text="Extensions" Command="{Binding Navigate}" CommandParameter="Nav/BleExtensions" />
+                        <TextCell Text="Hosting" Command="{Binding Navigate}" CommandParameter="Nav/BleHosting" />
+                    </TableSection>
+                    <TableSection Title="Locations">
+                        <TextCell Text="GPS" Command="{Binding Navigate}" CommandParameter="Nav/Gps"  />
+                        <TextCell Text="Geofencing" Command="{Binding Navigate}" CommandParameter="Nav/Geofencing" />
+                        <TextCell Text="Beacons" Command="{Binding Navigate}" CommandParameter="Nav/Beacons" />
+                        <TextCell Text="Motion Activity" Command="{Binding Navigate}" CommandParameter="Nav/MotionActivity" />
+                    </TableSection>
+                    <TableSection Title="Notifications">
+                        <TextCell Text="Local" Command="{Binding Navigate}" CommandParameter="Nav/Notifications" />
+                        <TextCell Text="Push" Command="{Binding Navigate}" CommandParameter="Nav/Push" />
+                    </TableSection>
+                    <TableSection Title="Other">
+                        <TextCell Text="HTTP Transfers" Command="{Binding Navigate}" CommandParameter="Nav/HttpTransfers" />
+                        <TextCell Text="NFC" Command="{Binding Navigate}" CommandParameter="Nav/Nfc" />
+                        <TextCell Text="Speech Recognition" Command="{Binding Navigate}" CommandParameter="Nav/SpeechRecognition"  />
+                    </TableSection>
+                    <TableSection Title="Sensors">
+                        <TextCell Text="All" Command="{Binding Navigate}" CommandParameter="Nav/Sensors" />
+                        <TextCell Text="Compass" Command="{Binding Navigate}" CommandParameter="Nav/Compass" />
+                    </TableSection>
+                    <TableSection Title="Core">
+                        <TextCell Text="Platform" Command="{Binding Navigate}" CommandParameter="Nav/Platform" />
+                        <TextCell Text="Jobs" Command="{Binding Navigate}" CommandParameter="Nav/Jobs" />
+                        <TextCell Text="Settings" Command="{Binding Navigate}" CommandParameter="Nav/Settings" />
+                    </TableSection>
+                    <TableSection Title="App Services">
+                        <TextCell Text="Trip Tracker" Command="{Binding Navigate}" CommandParameter="Nav/TripTracker" />
+                        <TextCell Text="Location Sync" Command="{Binding Navigate}" CommandParameter="Nav/LocationSync" />
+                        <TextCell Text="Data Sync" Command="{Binding Navigate}" CommandParameter="Nav/DataSync" />
+                    </TableSection>
+                </TableRoot>
+            </TableView>
+        </ContentPage>
+    </MasterDetailPage.Master>
+
+</MasterDetailPage>
