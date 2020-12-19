@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ReactiveUI;
 using Samples.Infrastructure;
 using Shiny;
@@ -10,6 +12,24 @@ namespace Samples
 {
     public static class Extensions
     {
+        public static Task PickEnumValue<T>(this IDialogs dialogs, string title, Action<T> action)
+        {
+            var keys = Enum.GetNames(typeof(T));
+            var actions = new List<(string Key, Action Action)>(keys.Length);
+
+            foreach (var key in keys)
+            {
+                var value = (T)Enum.Parse(typeof(T), key);
+                actions.Add((key, () => action(value)));
+            }
+            return dialogs.ActionSheet(title, false, actions.ToArray());
+        }
+
+
+        public static ICommand PickEnumValueCommand<T>(this IDialogs dialogs, string title, Action<T> action, IObservable<bool>? canExecute = null) =>
+            ReactiveCommand.CreateFromTask(() => dialogs.PickEnumValue(title, action), canExecute);
+
+
         public static async Task<bool> RequestAccess(this IDialogs dialogs, Func<Task<AccessState>> request)
         {
             var access = await request();

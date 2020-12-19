@@ -15,7 +15,9 @@
                     <TableSection Title="Channel Info">
                         <EntryCell Label="Identifier" Text="{Binding Identifier}" />
                         <EntryCell Label="Description" Text="{Binding Description}" />
-                        <!--Sound, Importance-->
+                        <TextCell Text="Importance"
+                                  Detail="{Binding Importance}"
+                                  Command="{Binding PickImportance}" />
                     </TableSection>
 
                     <TableSection Title="Action 1">
@@ -25,9 +27,8 @@
                                    Text="{Binding Action1Identifier}"
                                    IsEnabled="{Binding UseAction1}" />
                         <TextCell Text="Action Type"
-                                  Command="{Binding PickAction}"
-                                  CommandParameter="1"
-                                  IsEnabled="{Binding UseAction1}" />
+                                  Detail="{Binding Action1Type}"
+                                  Command="{Binding PickAction1Type}" />
                     </TableSection>
 
                     <TableSection>
@@ -37,7 +38,7 @@
                                    Text="{Binding Action2Identifier}"
                                    IsEnabled="{Binding UseAction2}" />
                         <TextCell Text="Action Type"
-                                  Command="{Binding PickAction}"
+                                  Command="{Binding PickActionType}"
                                   CommandParameter="2"
                                   IsEnabled="{Binding UseAction2}" />
                     </TableSection>

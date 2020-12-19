@@ -16,7 +16,7 @@ namespace Samples.Notifications
                                     INotificationManager notifications,
                                     IDialogs dialogs)
         {
-            this.Create = navigator.NavigateCommand("ChannelCreate");
+            this.Create = navigator.NavigateCommand("NotificationChannelCreate");
 
             this.LoadChannels = ReactiveCommand.CreateFromTask(async () =>
             {

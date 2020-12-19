@@ -1,8 +1,9 @@
 using System;
+using System.Linq;
 using System.Windows.Input;
-using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using Xamarin.Forms;
 using ReactiveUI;
@@ -10,6 +11,7 @@ using ReactiveUI.Fody.Helpers;
 using Shiny.Notifications;
 using Shiny;
 using Samples.Infrastructure;
+using Prism.Navigation;
 
 
 namespace Samples.Notifications
@@ -19,9 +21,12 @@ namespace Samples.Notifications
         readonly INotificationManager notificationManager;
 
 
-        public CreateViewModel(INotificationManager notificationManager, IDialogs dialogs)
+        public CreateViewModel(INavigationService navigator,
+                               INotificationManager notificationManager,
+                               IDialogs dialogs)
         {
             this.notificationManager = notificationManager;
+            this.NavToChannels = navigator.NavigateCommand("NotificationChannels");
 
             this.WhenAnyValue
             (
@@ -36,10 +41,8 @@ namespace Samples.Notifications
                 x.Item2.Minutes,
                 x.Item2.Seconds)
             )
-            .Subscribe(x => this.ScheduledTime = x)
+            .ToPropertyEx(this, x => x.ScheduledTime)
             .DisposeWith(this.DestroyWith);
-
-            //.ToPropertyEx(this, x => x.ScheduledTime);
 
             this.SelectedDate = DateTime.Now;
             this.SelectedTime = DateTime.Now.TimeOfDay.Add(TimeSpan.FromMinutes(10));
@@ -93,11 +96,10 @@ namespace Samples.Notifications
                 Title = title,
                 Message = message,
                 BadgeCount = this.BadgeCount,
-                ScheduleDate = scheduleDate
-                //Category = this.UseActions ? "Test" : null,
-                //Sound = this.GetSound()
+                ScheduleDate = scheduleDate,
+                Channel = this.Channel
             };
-            if (Int32.TryParse(this.Identifier, out int id))
+            if (Int32.TryParse(this.Identifier, out var id))
             {
                 notification.Id = id;
             }
@@ -107,71 +109,50 @@ namespace Samples.Notifications
                     { nameof(this.Payload), this.Payload }
                 };
             }
-            //if (!this.AndroidChannel.IsEmpty())
-            //{
-            //    notification.Android.ChannelId = this.AndroidChannel;
-            //    notification.Android.Channel = this.AndroidChannel;
-            //}
-            //if (this.UseAndroidHighPriority)
-            //{
-            //    notification.Android.Priority = 9;
-            //    notification.Android.NotificationImportance = AndroidNotificationImportance.Max;
-            //}
+
             //notification.Android.Vibrate = this.UseAndroidVibrate;
             notification.Android.UseBigTextStyle = this.UseAndroidBigTextStyle;
 
-            await notificationManager.Send(notification);
+            await this.notificationManager.Send(notification);
             this.Reset();
         }
 
-
-        //NotificationSound GetSound()
-        //{
-        //    switch (this.SelectedSoundType)
-        //    {
-        //        case "Default"  : return NotificationSound.Default;
-        //        //case "Priority" : return NotificationSound.Default;
-        //        case "Custom"   : return NotificationSound.FromCustom("notification.mp3");
-        //        default         : return NotificationSound.None;
-        //    }
-        //}
-
+        public ICommand NavToChannels { get; }
         public ICommand PermissionCheck { get; }
         public ICommand Send { get; }
         public ICommand SendNow { get; }
         public ICommand StartChat { get; }
 
+        public DateTime ScheduledTime { [ObservableAsProperty] get; }
         [Reactive] public string Identifier { get; set; }
         [Reactive] public string NotificationTitle { get; set;} = "Test Title";
         [Reactive] public string NotificationMessage { get; set; } = "Test Message";
-        //public DateTime ScheduledTime { [ObservableAsProperty] get; }
-        [Reactive] public DateTime ScheduledTime { get; private set; }
         [Reactive] public bool UseActions { get; set; } = true;
         [Reactive] public DateTime SelectedDate { get; set; }
         [Reactive] public TimeSpan SelectedTime { get; set; }
         [Reactive] public int BadgeCount { get; set; }
         [Reactive] public string Payload { get; set; }
-        [Reactive] public string AndroidChannel { get; set; }
         [Reactive] public bool UseAndroidVibrate { get; set; }
         [Reactive] public bool UseAndroidBigTextStyle { get; set; }
         [Reactive] public bool UseAndroidHighPriority { get; set; }
+        [Reactive] public string Channel { get; set; }
+        [Reactive] public string[] Channels { get; private set; }
+
         public bool IsAndroid => Device.RuntimePlatform == Device.Android;
 
-        public string[] SoundTypes { get; } = new[]
+
+        public async override void OnAppearing()
         {
-            "None",
-            "Default",
-            "Custom"
-            //"Priority"
-        };
-        [Reactive] public string SelectedSoundType { get; set; } = "None";
+            base.OnAppearing();
+            this.Channels = (await this.notificationManager.GetChannels())
+                .Select(x => x.Identifier)
+                .ToArray();
+        }
 
 
         void Reset()
         {
             this.Identifier = String.Empty;
-            //this.NotificationTitle = String.Empty;
-            //this.NotificationMessage = String.Empty;
             this.Payload = String.Empty;
         }
     }

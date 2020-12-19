@@ -6,7 +6,8 @@
              Title="Channels">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Create" Command="{Binding Create}" />
+        <ToolbarItem Text="Create"
+                     Command="{Binding Create}" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>

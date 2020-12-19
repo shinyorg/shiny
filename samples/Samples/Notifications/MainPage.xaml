@@ -14,8 +14,6 @@
             </ContentPage.IconImageSource>
         </notifications:CreatePage>
 
-        <notifications:ChannelListPage Title="Channels" />
-
         <notifications:PendingPage Title="Pending">
             <ContentPage.IconImageSource>
                 <FontImageSource Glyph="&#xf03a;"

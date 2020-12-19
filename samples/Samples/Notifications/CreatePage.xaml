@@ -6,6 +6,11 @@
              x:Class="Samples.Notifications.CreatePage"
              x:DataType="notifications:CreateViewModel"
              Title="Create">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Channels" Command="{Binding NavToChannels}" />
+    </ContentPage.ToolbarItems>
+
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>

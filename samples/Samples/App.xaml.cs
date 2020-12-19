@@ -65,14 +65,15 @@ namespace Samples
 
             containerRegistry.RegisterForNavigation<Push.PushPage>("Push");
             containerRegistry.RegisterForNavigation<Nfc.NfcPage>("Nfc");
+            containerRegistry.RegisterForNavigation<Speech.MainPage>("SpeechRecognition");
 
             containerRegistry.RegisterForNavigation<Jobs.MainPage>("Jobs");
             containerRegistry.RegisterForNavigation<Jobs.CreatePage>("CreateJob");
 
             containerRegistry.RegisterForNavigation<Notifications.MainPage>("Notifications");
-            containerRegistry.RegisterForNavigation<Notifications.ChannelCreatePage>("ChannelCreate");
-            containerRegistry.RegisterForNavigation<Speech.MainPage>("SpeechRecognition");
-
+            containerRegistry.RegisterForNavigation<Notifications.ChannelListPage>("NotificationChannels");
+            containerRegistry.RegisterForNavigation<Notifications.ChannelCreatePage>("NotificationChannelCreate");
+            
             containerRegistry.RegisterForNavigation<Sensors.MainPage>("Sensors");
             containerRegistry.RegisterForNavigation<Sensors.CompassPage>("Compass");
 

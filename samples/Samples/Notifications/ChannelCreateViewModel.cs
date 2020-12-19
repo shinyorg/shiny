@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive;
 using System.Windows.Input;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -18,41 +19,132 @@ namespace Samples.Notifications
                 () => manager.CreateChannel(this.ToChannel()),
                 this.WhenAny(
                     x => x.Identifier,
-                    x => !x.GetValue().IsEmpty()
+                    x => x.Description,
+                    (id, desc) =>
+                        !id.GetValue().IsEmpty() &&
+                        !desc.GetValue().IsEmpty()
+                )
+            );
+
+            this.PickImportance = dialogs.PickEnumValueCommand<ChannelImportance>(
+                "Importance",
+                x => this.Importance = x.ToString()
+            );
+
+            this.PickActionType1 = dialogs.PickEnumValueCommand<NotificationActionType>(
+                "Action Type",
+                x => this.Action1ActionType = x.ToString(),
+               this.WhenAny(
+                    x => x.UseAction1,
+                    x => x.GetValue()
+                )
+            );
+            this.PickActionType2 = dialogs.PickEnumValueCommand<NotificationActionType>(
+                "Action Type",
+                x => this.Action1ActionType = x.ToString(),
+                this.WhenAny(
+                    x => x.UseAction2,
+                    x => x.GetValue()
                 )
             );
         }
 
 
         public ICommand Create { get; }
-        public ICommand PickActionType { get; }
+        public ICommand PickActionType1 { get; }
+        public ICommand PickActionType2 { get; }
+        public ICommand PickImportance { get; }
 
         [Reactive] public string Identifier { get; set; }
         [Reactive] public string Description { get; set; }
+        [Reactive] public string Importance { get; private set; } = ChannelImportance.Normal.ToString();
         [Reactive] public string Sound { get; set; }
-        [Reactive] public int Importance { get; set; }
 
         [Reactive] public bool UseAction1 { get; set; }
         [Reactive] public string Action1Identifier { get; set; }
-        [Reactive] public string Action1Description { get; set; }
-        [Reactive] public int Action1ActionType { get; set; }
+        [Reactive] public string Action1Title { get; set; }
+        [Reactive] public string Action1ActionType { get; private set; } = NotificationActionType.None.ToString();
 
         [Reactive] public bool UseAction2 { get; set; }
         [Reactive] public string Action2Identifier { get; set; }
         [Reactive] public string Action2Title { get; set; }
-        [Reactive] public int Action2ActionType { get; set; }
+        [Reactive] public string Action2ActionType { get; private set; } = NotificationActionType.None.ToString();
 
+        //if (!this.AndroidChannel.IsEmpty())
+        //{
+        //    notification.Android.ChannelId = this.AndroidChannel;
+        //    notification.Android.Channel = this.AndroidChannel;
+        //}
+        //if (this.UseAndroidHighPriority)
+        //{
+        //    notification.Android.Priority = 9;
+        //    notification.Android.NotificationImportance = AndroidNotificationImportance.Max;
+        //}
+
+        //NotificationSound GetSound()
+        //{
+        //    switch (this.SelectedSoundType)
+        //    {
+        //        case "Default"  : return NotificationSound.Default;
+        //        //case "Priority" : return NotificationSound.Default;
+        //        case "Custom"   : return NotificationSound.FromCustom("notification.mp3");
+        //        default         : return NotificationSound.None;
+        //    }
+        //}
+
+        //public string[] SoundTypes { get; } = new[]
+        //   {
+        //    "None",
+        //    "Default",
+        //    "Custom"
+        //    //"Priority"
+        //};
+        //[Reactive] public string SelectedSoundType { get; set; } = "None";
 
         Channel ToChannel()
         {
             var channel = new Channel
             {
                 Identifier = this.Identifier,
-                Description = this.Description
-                //Importance = ChannelImportance.Normal
+                Description = this.Description,
+                Importance = (ChannelImportance)Enum.Parse(typeof(ChannelImportance), this.Importance)
             };
+
+            if (this.UseAction1)
+            {
+                channel.Actions.Add(new ChannelAction
+                {
+                    Identifier = this.Action1Identifier,
+                    Title = this.Action1Title,
+                    ActionType = (NotificationActionType)Enum.Parse(typeof(NotificationActionType), this.Action1ActionType)
+                });
+            }
+            if (this.UseAction2)
+            {
+                channel.Actions.Add(new ChannelAction
+                {
+                    Identifier = this.Action2Identifier,
+                    Title = this.Action2Title,
+                    ActionType = (NotificationActionType)Enum.Parse(typeof(NotificationActionType), this.Action2ActionType)
+                });
+            }
 
             return channel;
         }
+
+        //bool ValidateAction(strin)
+
+
+        (string Key, Action Action) GetActionType(NotificationActionType actionType, string arg) =>
+        (
+            actionType.ToString(),
+            () =>
+            {
+                if (arg == "1")
+                    this.Action1ActionType = actionType.ToString();
+                else
+                    this.Action2ActionType = actionType.ToString();
+            }
+        );
     }
 }
