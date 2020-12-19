@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <LatestShinyBuild>2.0.0.2373-preview</LatestShinyBuild>
-        <XamarinFormsVersion>4.8.0.1687</XamarinFormsVersion>
+        <XamarinFormsVersion>4.8.0.1821</XamarinFormsVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -31,10 +31,10 @@
     <ItemGroup>
         <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.1" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />
-        <PackageReference Update="Bogus" Version="32.0.1" />
+        <PackageReference Update="Bogus" Version="32.0.2" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.0.0.1909" />
-        <PackageReference Update="ReactiveUI.Fody" Version="13.0.1" />
+        <PackageReference Update="ReactiveUI.Fody" Version="13.0.27" />
         <PackageReference Update="sqlite-net-pcl" Version="1.7.335" />
         <PackageReference Update="XF.Material" Version="1.7.7" />
         <PackageReference Update="Xamarin.Forms" Version="$(XamarinFormsVersion)" />
