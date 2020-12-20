@@ -33,7 +33,6 @@
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.TripTracker\Shiny.TripTracker.csproj" />
     </ItemGroup>
 
     <ItemGroup>
