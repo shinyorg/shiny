@@ -55,10 +55,7 @@ namespace Shiny.Generators
             var hasPush = this.Context
                 .Compilation
                 .ReferencedAssemblyNames
-                .Any(x =>
-                    x.Name.StartsWith("Shiny.Push") &&
-                    !x.Name.Equals("Shiny.Push.Abstractions")
-                );
+                .Any(x => x.Name.StartsWith("Shiny.Push"));
 
             if (hasPush)
             {

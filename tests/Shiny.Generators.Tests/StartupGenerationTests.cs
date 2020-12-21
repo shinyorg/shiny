@@ -40,12 +40,11 @@ namespace Shiny.Generators.Tests
         [Theory]
         [InlineData("Shiny.Push", "services.UsePush<Test.TestPushDelegate>()")]
         [InlineData("Shiny.Push.AzureNotificationHubs", null)]
-        [InlineData("Shiny.Push.OneSignal", null)]
         [InlineData("Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging<Test.TestPushDelegate>()")]
         public void PushRegistration(string lib, string startupRegExpected)
         {
             this.Generator.AddReference(lib);
-            this.Generator.AddReference("Shiny.Push.Abstractions");
+            this.Generator.AddReference("Shiny.Push");
             this.Generator.AddSource(@"
 using System;
 using System.Collections.Generic;

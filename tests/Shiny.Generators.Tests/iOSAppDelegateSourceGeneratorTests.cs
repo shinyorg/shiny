@@ -116,11 +116,10 @@ namespace Tests
         [InlineData("Shiny.Push")]
         [InlineData("Shiny.Push.AzureNotificationHubs")]
         [InlineData("Shiny.Push.FirebaseMessaging")]
-        [InlineData("Shiny.Push.OneSignal")]
         public void PushEventsGenerated(string libraryToInclude)
         {
             this.Generator.AddReference(libraryToInclude);
-            this.Generator.AddReference("Shiny.Push.Abstractions");
+            this.Generator.AddReference("Shiny.Push");
             this.Generator.AddSource(StandardAppDelegate);
             this.RunGenerator();
 
@@ -135,7 +134,7 @@ namespace Tests
         [Fact]
         public void NoPushEventsGenerated()
         {
-            this.Generator.AddReference("Shiny.Push.Abstractions");
+            this.Generator.AddReference("Shiny.Push");
             this.Generator.AddSource(StandardAppDelegate);
             this.RunGenerator();
 
