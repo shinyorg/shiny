@@ -24,7 +24,7 @@ namespace Shiny.Generators
         public bool ExcludeJobs { get; set; }
         public bool ExcludeStartupTasks { get; set; }
         public bool ExcludeServices { get; set; }
-        //public bool ExcludeXamarinEssentialsRegistration
+
 
         static T To<T>(AttributeData data, string key, T defaultValue)
         {
