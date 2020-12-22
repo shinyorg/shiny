@@ -90,7 +90,7 @@ namespace Shiny.Generators
                     }
                     else
                     {
-                        var xfFormsActivityType = context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.Android.FormsAppCompatActivity");
+                        var xfFormsActivityType = this.context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.Android.FormsAppCompatActivity");
                         if (xfFormsActivityType != null && activity.Inherits(xfFormsActivityType))
                         {
                             // do XF stuff
@@ -101,24 +101,25 @@ namespace Shiny.Generators
                             builder.AppendLineInvariant($"this.LoadApplication(new {this.values.XamarinFormsAppTypeName}());");
                         }
                     }
-                    //this.TryAppendOnCreateThirdParty(activity, builder);
+                    this.TryAppendOnCreateThirdParty(activity, builder);
                 }
             }
         }
 
 
-        //void TryAppendOnCreateThirdParty(INamedTypeSymbol activity, IndentedStringBuilder builder)
-        //{
-        //    // AiForms.SettingsView
-        //    if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.Droid.SettingsViewInit") != null)
-        //        builder.AppendLineInvariant("global::AiForms.Renderers.Droid.SettingsViewInit.Init();");
+        void TryAppendOnCreateThirdParty(INamedTypeSymbol activity, IndentedStringBuilder builder)
+        {
 
-        //    // XF Material
-        //    if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
-        //        builder.AppendLineInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
-        //    else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-        //        builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);");
-        //}
+            // AiForms.SettingsView
+            if (this.context.Compilation.GetTypeByMetadataName("AiForms.Renderers.Droid.SettingsViewInit") != null)
+                builder.AppendLineInvariant("global::AiForms.Renderers.Droid.SettingsViewInit.Init();");
+
+            // XF Material
+            if (this.context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
+                builder.AppendLineInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
+            else if (this.context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
+                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);");
+        }
 
 
         void TryAppendRequestPermissionResult(INamedTypeSymbol activity, IndentedStringBuilder builder)

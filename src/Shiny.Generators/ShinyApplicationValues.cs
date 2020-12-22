@@ -13,6 +13,7 @@ namespace Shiny.Generators
             this.ShinyStartupTypeName = To<string>(data, nameof(ShinyStartupTypeName), null);
             this.XamarinFormsAppTypeName = To<string>(data, nameof(XamarinFormsAppTypeName), null);
             this.ExcludeJobs = To(data, nameof(ExcludeJobs), false);
+            this.ExcludeThirdParty = To(data, nameof(ExcludeThirdParty), false);
             this.ExcludeModules = To(data, nameof(ExcludeModules), false);
             this.ExcludeStartupTasks = To(data, nameof(ExcludeStartupTasks), false);
             this.ExcludeServices = To(data, nameof(ExcludeServices), false);
@@ -22,6 +23,7 @@ namespace Shiny.Generators
         public string? XamarinFormsAppTypeName { get; set; }
         public bool ExcludeModules { get; set; }
         public bool ExcludeJobs { get; set; }
+        public bool ExcludeThirdParty { get; set; }
         public bool ExcludeStartupTasks { get; set; }
         public bool ExcludeServices { get; set; }
 
