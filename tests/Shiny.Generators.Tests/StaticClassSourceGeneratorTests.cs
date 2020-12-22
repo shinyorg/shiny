@@ -30,7 +30,7 @@ namespace Shiny.Generators.Tests
         [Fact]
         public void BleClient()
         {
-            this.Generator.AddReferences("Shiny.BluetoothLE", "Shiny.BluetoothLE.Abstractions");
+            this.Generator.AddReferences("Shiny.BluetoothLE");
             this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
             this.RunGenerator();
 

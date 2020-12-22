@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Reactive;
 using System.Windows.Input;
+
+using Prism.Navigation;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Infrastructure;
@@ -12,11 +15,17 @@ namespace Samples.Notifications
 {
     public class ChannelCreateViewModel : ViewModel
     {
-        public ChannelCreateViewModel(INotificationManager manager, IDialogs dialogs)
+        public ChannelCreateViewModel(INavigationService navigator,
+                                      INotificationManager manager,
+                                      IDialogs dialogs)
         {
             this.Create = ReactiveCommand.CreateFromTask
             (
-                () => manager.CreateChannel(this.ToChannel()),
+                async () =>
+                {
+                    await manager.CreateChannel(this.ToChannel());
+                    await navigator.GoBack();
+                },
                 this.WhenAny(
                     x => x.Identifier,
                     x => x.Description,

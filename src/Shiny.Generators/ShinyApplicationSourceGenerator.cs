@@ -125,8 +125,7 @@ namespace Shiny.Generators
         static readonly string[] PushCannotGenerateRegister = new []
         {
             "Shiny.Push.AzureNotificationHubs",
-            "Shiny.Push.Aws",
-            "Shiny.Push.OneSignal"
+            "Shiny.Push.Aws"
         };
         static readonly Dictionary<string, string> PushRegisters = new Dictionary<string, string>
         {

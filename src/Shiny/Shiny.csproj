@@ -12,4 +12,13 @@
                           ReferenceOutputAssembly="false"
                           OutputItemType="Analyzer" />
     </ItemGroup>
+
+    <Target Name="BundleGenerators" BeforeTargets="Pack;_LoadPackInputItems">
+        <ItemGroup>
+            <None Include="..\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll"
+                  Pack="true"
+                  PackagePath="analyzers\dotnet\cs\Shiny.Generators.dll"
+                  Visible="false" />
+        </ItemGroup>
+    </Target>
 </Project>
