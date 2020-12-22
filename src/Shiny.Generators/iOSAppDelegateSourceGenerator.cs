@@ -138,6 +138,7 @@ namespace Shiny.Generators
 
         void TryAppendThirdParty(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
         {
+
             var xfFormsDelegate = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate");
             if (xfFormsDelegate != null && appDelegate.Inherits(xfFormsDelegate))
             {
@@ -145,6 +146,19 @@ namespace Shiny.Generators
                 builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
                 builder.AppendLineInvariant($"this.LoadApplication(new {this.ShinyConfig.XamarinFormsAppTypeName}());");
             }
+
+            if (this.ShinyConfig.ExcludeThirdParty)
+                return;
+
+            // AiForms.SettingsView
+            if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
+                builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
+
+            // XF Material & RG Popup
+            if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.iOS.Material") != null)
+                builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
+            else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
+                builder.AppendLineInvariant("Rg.Plugins.Popup.Popup.Init();");
         }
     }
 }
