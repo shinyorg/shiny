@@ -123,7 +123,7 @@ namespace Shiny.Generators
             }
             else
             {
-                builder.AppendLineInvariant("partial void OnFinishedLaunching();");
+                builder.AppendLineInvariant("partial void OnFinishedLaunching(UIApplication app, NSDictionary options);");
                 using (builder.BlockInvariant("public override bool FinishedLaunching(UIApplication app, NSDictionary options)"))
                 {
                     builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
