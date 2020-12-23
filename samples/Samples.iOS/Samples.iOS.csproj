@@ -102,6 +102,10 @@
     <AppExtensionDebugBundleId />
     <LaunchForBackgroundFetch>false</LaunchForBackgroundFetch>
   </PropertyGroup>
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(OutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
@@ -188,6 +192,10 @@
   <ItemGroup>
     <PackageReference Include="Xamarin.Essentials" />
     <PackageReference Include="Xamarin.Forms" />
+    <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj">
+      <Project>{9fc4a830-1b20-4073-a1c4-ee3a52781dfd}</Project>
+      <Name>Shiny.Generators</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Samples\Samples.csproj">
       <Name>Samples</Name>
     </ProjectReference>
@@ -242,6 +250,9 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\notification.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ProjectExtensions>
