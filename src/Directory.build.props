@@ -32,7 +32,6 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <!--<IncludeGenerators>true</IncludeGenerators>-->
         <IncludeSymbols>True</IncludeSymbols>
         <IncludeSource>True</IncludeSource>
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
