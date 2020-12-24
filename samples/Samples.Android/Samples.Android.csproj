@@ -52,7 +52,7 @@
   </PropertyGroup>
     <PropertyGroup>
         <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
-        <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+        <CompilerGeneratedFilesOutputPath>$(OutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
@@ -65,6 +65,8 @@
     <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj">
       <Project>{9fc4a830-1b20-4073-a1c4-ee3a52781dfd}</Project>
       <Name>Shiny.Generators</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
       <Project>{5F695791-BDE8-4D92-84BE-F6D7D91DAD8F}</Project>

@@ -9,6 +9,7 @@ using Shiny;
     ShinyStartupTypeName = "Samples.SampleStartup",
     XamarinFormsAppTypeName = "Samples.App"
 )]
+[assembly: ShinyGeneratorDebug]
 
 
 namespace Samples.iOS

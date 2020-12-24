@@ -195,6 +195,8 @@
     <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj">
       <Project>{9fc4a830-1b20-4073-a1c4-ee3a52781dfd}</Project>
       <Name>Shiny.Generators</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
     <ProjectReference Include="..\Samples\Samples.csproj">
       <Name>Samples</Name>

@@ -10,6 +10,7 @@ using Android.OS;
     ShinyStartupTypeName = "Samples.SampleStartup",
     XamarinFormsAppTypeName = "Samples.App"
 )]
+[assembly: ShinyGeneratorDebug]
 
 
 namespace Samples.Droid

@@ -15,11 +15,31 @@ namespace Shiny.Generators
 
 
         protected override void Process(IEnumerable<INamedTypeSymbol> osAppTypeSymbols)
-            => osAppTypeSymbols.ToList().ForEach(this.Process);
+        {
+            var list = osAppTypeSymbols.ToList();
+
+            if (list.Any())
+            {
+                osAppTypeSymbols.ToList().ForEach(this.Process);
+            }
+            else
+            {
+                this.Context.Log(
+                    "SHINY004",
+                    "No AppDelegate Found"
+                );
+            }
+        }
 
 
         void Process(INamedTypeSymbol appDelegate)
         {
+            this.Context.Log(
+                "SHINY003",
+                $"Generating AppDelegate Boilerplate for '{appDelegate.ToDisplayString()}'",
+                DiagnosticSeverity.Info
+            );
+
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Foundation", "UIKit");
 
@@ -46,7 +66,8 @@ namespace Shiny.Generators
                     );
                 }
             }
-            this.Context.Source(builder.ToString(), appDelegate.Name);
+            var source = builder.ToString();
+            this.Context.Source(source, appDelegate.Name);
         }
 
 
@@ -66,6 +87,7 @@ namespace Shiny.Generators
             }
         }
 
+
         void AppendMethodIf(INamedTypeSymbol symbol, IndentedStringBuilder builder, string neededLibrary, string methodName, string append)
         {
             var hasAssembly = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals(neededLibrary));
@@ -76,18 +98,9 @@ namespace Shiny.Generators
 
             if (exists)
             {
-                this.Context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "ShinyAppDelegateFinishedLaunchingExists",
-                            "ShinyAppDelegate",
-                            null,
-                            "Shiny",
-                            DiagnosticSeverity.Warning,
-                            true
-                        ),
-                        Location.None
-                    )
+                this.Context.Log(
+                    "SHINY002",
+                    $"Method '{methodName}' already exists on your appdelegate, make sure you call the Shiny hook for this"
                 );
             }
             else
@@ -102,23 +115,16 @@ namespace Shiny.Generators
             var exists = appDelegate.HasMethod("FinishedLaunching");
             if (exists)
             {
-                this.Context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "ShinyAppDelegateFinishedLaunchingExists",
-                            "ShinyAppDelegate",
-                            null,
-                            "Shiny",
-                            DiagnosticSeverity.Warning,
-                            true
-                        ),
-                        appDelegate
-                            .GetMembers()
-                            .OfType<IMethodSymbol>()
-                            .FirstOrDefault(x => x.Name.Equals("FinishedLaunching"))?
-                            .Locations
-                            .FirstOrDefault() ?? Location.None
-                    )
+                this.Context.Log(
+                    "SHINY001",
+                    "FinishedLaunching already exists on your appdelegate.  Make sure to call the this.ShinyFinishedLaunching(new YourStartup());",
+                    DiagnosticSeverity.Warning,
+                    appDelegate
+                        .GetMembers()
+                        .OfType<IMethodSymbol>()
+                        .FirstOrDefault(x => x.Name.Equals("FinishedLaunching"))?
+                        .Locations
+                        .FirstOrDefault()
                 );
             }
             else
