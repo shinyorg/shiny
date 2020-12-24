@@ -200,6 +200,7 @@
     </ProjectReference>
     <ProjectReference Include="..\Samples\Samples.csproj">
       <Name>Samples</Name>
+      <Project>{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
       <Project>{5F695791-BDE8-4D92-84BE-F6D7D91DAD8F}</Project>
@@ -248,6 +249,10 @@
     <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
       <Project>{4F89D195-482E-4B5F-B97F-1647BE5C7716}</Project>
       <Name>Shiny.SpeechRecognition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
+      <Project>{4273A168-9E9E-4E46-A6D6-96A3B788321F}</Project>
+      <Name>Shiny.BluetoothLE.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

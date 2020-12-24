@@ -116,6 +116,10 @@
       <Project>{4F89D195-482E-4B5F-B97F-1647BE5C7716}</Project>
       <Name>Shiny.SpeechRecognition</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
+      <Project>{4273A168-9E9E-4E46-A6D6-96A3B788321F}</Project>
+      <Name>Shiny.BluetoothLE.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xamarin.Essentials" />
