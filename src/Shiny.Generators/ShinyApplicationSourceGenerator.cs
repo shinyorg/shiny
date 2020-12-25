@@ -19,6 +19,8 @@ namespace Shiny.Generators
 
         public virtual void Execute(GeneratorExecutionContext context)
         {
+            context.TryDebug();
+
             this.Context = context;
             var shinyAppAttributeData = context.GetCurrentAssemblyAttribute(Constants.ShinyApplicationAttributeTypeName);
             if (shinyAppAttributeData == null)

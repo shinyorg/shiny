@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Microsoft.CodeAnalysis;
@@ -11,6 +12,34 @@ namespace Shiny.Generators
 {
     public static class Extensions
     {
+        public static void Log(this GeneratorExecutionContext context, string id, string message, DiagnosticSeverity severity = DiagnosticSeverity.Warning, Location? location = null)
+        {
+            location ??= Location.None;
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    new DiagnosticDescriptor(
+                        id,
+                        message,
+                        null,
+                        "Shiny",
+                        severity,
+                        true
+                    ),
+                    location
+                )
+            );
+        }
+
+
+        public static void TryDebug(this GeneratorExecutionContext context)
+        {
+            //Debugger.IsAttached && 
+            var debug = context.Compilation.Assembly.GetTypeByMetadataName("Shiny.ShinyGeneratorDebugAttribute") != null;
+            if (debug)
+                Debugger.Launch();
+        }
+
+
         public static void Source(this GeneratorExecutionContext context, string sourceText, string? fileName = null)
         {
             fileName ??= Guid.NewGuid().ToString();

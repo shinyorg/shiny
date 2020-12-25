@@ -43,21 +43,21 @@ namespace Shiny.Generators
         }
 
 
-        public virtual IDisposable Block(string value, int count = 1)
-        {
-            var current = this.CurrentLevel;
+        //public virtual IDisposable Block(string value, int count = 1)
+        //{
+        //    var current = this.CurrentLevel;
 
-            this.CurrentLevel += count;
-            this.Append("{".Indent(current));
-            this.AppendLine();
+        //    this.CurrentLevel += count;
+        //    this.Append("{".Indent(current));
+        //    this.AppendLine();
 
-            return new DisposableAction(() =>
-            {
-                this.CurrentLevel -= count;
-                this.Append("}".Indent(current));
-                this.AppendLine();
-            });
-        }
+        //    return new DisposableAction(() =>
+        //    {
+        //        this.CurrentLevel -= count;
+        //        this.Append("}".Indent(current));
+        //        this.AppendLine();
+        //    });
+        //}
 
         public void AppendLine(IFormatProvider formatProvider, string pattern, params object[] replacements)
         {

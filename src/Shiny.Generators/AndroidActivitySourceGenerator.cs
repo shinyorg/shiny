@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -14,6 +15,7 @@ namespace Shiny.Generators
 
         public void Execute(GeneratorExecutionContext context)
         {
+            context.TryDebug();
             this.context = context;
             var attributeData = context.GetCurrentAssemblyAttribute(Constants.ShinyApplicationAttributeTypeName);
 

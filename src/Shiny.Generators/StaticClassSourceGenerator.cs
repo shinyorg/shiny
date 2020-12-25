@@ -19,6 +19,7 @@ namespace Shiny.Generators.Tasks
 
         public void Execute(GeneratorExecutionContext context)
         {
+            context.TryDebug();
             this.context = context;
             if (this.useNamespace == null)
             {

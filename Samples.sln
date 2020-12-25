@@ -5,7 +5,6 @@ VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{3D16168F-A0F7-4B3F-BBF2-2AB1338B8840}"
 	ProjectSection(SolutionItems) = preProject
-		samples\Directory.Build.props = samples\Directory.Build.props
 		samples\Directory.Build.targets = samples\Directory.Build.targets
 		samples\Packages.props = samples\Packages.props
 	EndProjectSection
