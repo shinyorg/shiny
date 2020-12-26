@@ -84,7 +84,8 @@ namespace Shiny
                 ob.Respond(new ActivityChanged(this.CurrentActivity, ActivityState.Created, null));
 
             return this
-                .WhenActivityStatusChanged()
+                .callbacks
+                .ActivitySubject
                 .Subscribe(x => ob.Respond(x));
         });
 
