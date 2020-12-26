@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{ED578FCA-6
 		src\Directory.Build.targets = src\Directory.Build.targets
 		src\global.json = src\global.json
 		src\Packages.props = src\Packages.props
-		..\sponsors\README.md = ..\sponsors\README.md
+		readme.md = readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny", "src\Shiny\Shiny.csproj", "{5F695791-BDE8-4D92-84BE-F6D7D91DAD8F}"
