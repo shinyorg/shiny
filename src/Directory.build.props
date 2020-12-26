@@ -2,7 +2,7 @@
     <PropertyGroup>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>9.0</LangVersion>
         <Nullable>enable</Nullable>
         <DisableExtraReferences>False</DisableExtraReferences>
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
@@ -25,6 +25,10 @@
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
     <PropertyGroup Condition="'$(TF_BUILD)' == 'true' OR '$(GITHUB_ACTIONS)' == 'true'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
@@ -43,11 +47,6 @@
         <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
         <!--<Compile Include="$(MSBuildThisFileDirectory)CSharp9Hack.cs" />-->
     </ItemGroup>
-
-    <!--Windows Stuff-->
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
-        <UseWPF>true</UseWPF>
-    </PropertyGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
         <PackageReference Include="Microsoft.Windows.SDK.Contracts" />

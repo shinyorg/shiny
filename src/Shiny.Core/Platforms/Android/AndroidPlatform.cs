@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -10,8 +11,7 @@ using AndroidX.Lifecycle;
 using Microsoft.Extensions.DependencyInjection;
 using B = global::Android.OS.Build;
 using Shiny.Logging;
-using Shiny.Infrastructure;
-using System.IO;
+
 
 namespace Shiny
 {
@@ -46,7 +46,6 @@ namespace Shiny
         [Lifecycle.Event.OnResume] public void OnResume() => this.stateSubj.OnNext(PlatformState.Foreground);
         [Lifecycle.Event.OnPause] public void OnPause() => this.stateSubj.OnNext(PlatformState.Background);
         public IObservable<PlatformState> WhenStateChanged() => this.stateSubj.OnErrorResumeNext(Observable.Empty<PlatformState>());
-
         public void Register(IServiceCollection services)
         {
             services.AddSingleton<IAndroidContext>(this);
@@ -85,7 +84,8 @@ namespace Shiny
                 ob.Respond(new ActivityChanged(this.CurrentActivity, ActivityState.Created, null));
 
             return this
-                .WhenActivityStatusChanged()
+                .callbacks
+                .ActivitySubject
                 .Subscribe(x => ob.Respond(x));
         });
 

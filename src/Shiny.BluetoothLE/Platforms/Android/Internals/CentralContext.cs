@@ -10,8 +10,9 @@ using Android.Bluetooth.LE;
 using Android.Content;
 using Android.OS;
 using Java.Util;
-using ScanMode = Android.Bluetooth.LE.ScanMode;
 using Shiny.Logging;
+using Shiny.Infrastructure;
+using ScanMode = Android.Bluetooth.LE.ScanMode;
 using Observable = System.Reactive.Linq.Observable;
 
 
@@ -22,25 +23,18 @@ namespace Shiny.BluetoothLE.Internals
         public const string BlePairingFailed = nameof(BlePairingFailed);
         readonly ConcurrentDictionary<string, Peripheral> devices;
         readonly Subject<NamedMessage<Peripheral>> peripheralSubject;
-        readonly IMessageBus messageBus;
+        readonly ShinyCoreServices services;
         LollipopScanCallback? callbacks;
 
 
-        public CentralContext(IAndroidContext context,
-                              IMessageBus messageBus,
-                              IServiceProvider services,
-                              BleConfiguration config)
+        public CentralContext(ShinyCoreServices services, BleConfiguration config)
         {
-            this.Android = context;
             this.Configuration = config;
-            this.Services = services;
-            this.Manager = context.GetBluetooth();
+            this.services = services;
 
-            //this.sdelegate = new Lazy<IBleDelegate>(() => serviceProvider.Resolve<IBleDelegate>());
             this.devices = new ConcurrentDictionary<string, Peripheral>();
             this.peripheralSubject = new Subject<NamedMessage<Peripheral>>();
-            this.messageBus = messageBus;
-
+            this.Manager = services.Android.GetBluetooth();
             //this.StatusChanged
             //    .Skip(1)
             //    .SubscribeAsync(status => Log.SafeExecute(
@@ -49,10 +43,10 @@ namespace Shiny.BluetoothLE.Internals
         }
 
 
-        public IServiceProvider Services { get; }
-
+        public IServiceProvider Services => this.services.Services;
         public AccessState Status => this.Manager.GetAccessState();
-        public IObservable<AccessState> StatusChanged => this.messageBus
+        public IObservable<AccessState> StatusChanged => this.services
+            .Bus
             .Listener<State>()
             .Select(x => x.FromNative())
             .StartWith(this.Status);
@@ -61,7 +55,7 @@ namespace Shiny.BluetoothLE.Internals
 
         public BleConfiguration Configuration { get; }
         public BluetoothManager Manager { get; }
-        public IAndroidContext Android { get; }
+        public IAndroidContext Android => this.services.Android;
 
 
         internal async void DeviceEvent(Intent intent)
