@@ -26,18 +26,19 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid)
         {
-            //var native = this.context.Manager.Adapter.GetRemoteDevice(peripheralUuid
-            //    .ToByteArray()
-            //    .Skip(10)
-            //    .Take(6)
-            //    .ToArray()
-            //);
-            //if (native == null)
-            //    return Observable.Return<IPeripheral?>(null);
+            var address = Guid
+                .Parse(peripheralUuid)
+                .ToByteArray()
+                .Skip(10)
+                .Take(6)
+                .ToArray();
 
-            //var peripheral = this.context.GetDevice(native);
-            //return Observable.Return(peripheral);
-            return Observable.Return<IPeripheral?>(null);
+            var native = this.context.Manager.Adapter.GetRemoteDevice(address);
+            if (native == null)
+                return Observable.Return<IPeripheral?>(null);
+
+            var peripheral = this.context.GetDevice(native);
+            return Observable.Return(peripheral);
         }
 
 
@@ -62,7 +63,6 @@ namespace Shiny.BluetoothLE
                 ? await this.context.Android.RequestAccess(Manifest.Permission.AccessBackgroundLocation, Manifest.Permission.AccessFineLocation)
                 : await this.context.Android.RequestAccess(Manifest.Permission.AccessFineLocation);
 
-            // TODO: check if location is enabled?
             if (result != AccessState.Available)
                 return result;
 
@@ -76,39 +76,29 @@ namespace Shiny.BluetoothLE
             .StartWith(this.Status);
 
 
-        public override IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(async ob =>
+        public override IObservable<ScanResult> Scan(ScanConfig? config = null)
         {
             if (this.IsScanning)
                 throw new ArgumentException("There is already an active scan");
 
-            IDisposable? sub = null;
-            var result = await this.RequestAccess();
-            if (result != AccessState.Available)
-            {
-                ob.OnError(new PermissionException(BleLogCategory.BluetoothLE, result));
-            }
-            else
-            {
-                this.isScanning = true;
-                sub = this.context
-                    .Scan(config ?? new ScanConfig())
-                    .Finally(() => this.isScanning = false)
-                    .Subscribe(
-                        ob.OnNext,
-                        ob.OnError
-                    );
-            }
-            return () => sub?.Dispose();
-        });
+            return this
+                .RequestAccess()
+                .Do(access =>
+                {
+                    if (access != AccessState.Available)
+                        throw new PermissionException(BleLogCategory.BluetoothLE, access);
+
+                    this.IsScanning = true;
+                })
+                .SelectMany(_ => this.context.Scan(config ?? new ScanConfig()))
+                .Finally(() => this.IsScanning = false);
+        }
 
 
         public override void StopScan()
         {
-            if (!this.IsScanning)
-                return;
-
-            this.isScanning = false;
             this.context.StopScan();
+            this.isScanning = false;
         }
 
 

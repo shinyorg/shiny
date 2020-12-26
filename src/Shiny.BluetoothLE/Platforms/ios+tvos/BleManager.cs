@@ -18,7 +18,7 @@ namespace Shiny.BluetoothLE
         public override bool IsScanning => this.context.Manager.IsScanning;
 
 
-        public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(async ob =>
+        public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
         {
             IDisposable? disp = null;
             if (this.context.Manager.State == CBCentralManagerState.Unknown)
@@ -80,55 +80,39 @@ namespace Shiny.BluetoothLE
             .StartWith(this.Status);
 
 
-        public override IObservable<ScanResult> Scan(ScanConfig? config = null) => Observable.Create<ScanResult>(async ob =>
+        public override IObservable<ScanResult> Scan(ScanConfig? config = null)
         {
             if (this.IsScanning)
                 throw new ArgumentException("There is already an existing scan");
 
-            IDisposable? sub = null;
-            config ??= new ScanConfig();
-            var status = await this.RequestAccess();
-            if (status != AccessState.Available)
-            {
-                ob.OnError(new PermissionException(BleLogCategory.BluetoothLE, status));
-            }
-            else
-            {
-                this.context.Clear();
-                sub = this.context
-                    .Manager
-                    .WhenReady()
-                    .Select(_ => Observable.Create<ScanResult>(ob =>
+            return this.RequestAccess()
+                .Do(access =>
+                {
+                    if (access != AccessState.Available)
+                        throw new PermissionException(BleLogCategory.BluetoothLE, access);
+
+                    this.IsScanning = true;
+                })
+                .SelectMany(_ =>
+                {
+                    config ??= new ScanConfig();
+                    if (config.ServiceUuids == null || config.ServiceUuids.Count == 0)
                     {
-                        var scan = this.context
-                            .ScanResultReceived
-                            .AsObservable()
-                            .Subscribe(ob.OnNext);
-
-                        if (config.ServiceUuids == null || config.ServiceUuids.Count == 0)
-                        {
-                            this.context.Manager.ScanForPeripherals(null, new PeripheralScanningOptions { AllowDuplicatesKey = true });
-                        }
-                        else
-                        {
-                            var uuids = config.ServiceUuids.Select(CBUUID.FromString).ToArray();
-                            this.context.Manager.ScanForPeripherals(uuids, new PeripheralScanningOptions { AllowDuplicatesKey = true });
-                        }
-
-                        return () =>
-                        {
-                            this.context.Manager.StopScan();
-                            scan.Dispose();
-                        };
-                    }))
-                    .Switch()
-                    .Subscribe(
-                        ob.OnNext,
-                        ob.OnError
-                    );
-            }
-            return () => sub?.Dispose();
-        });
+                        this.context.Manager.ScanForPeripherals(null, new PeripheralScanningOptions { AllowDuplicatesKey = true });
+                    }
+                    else
+                    {
+                        var uuids = config.ServiceUuids.Select(CBUUID.FromString).ToArray();
+                        this.context.Manager.ScanForPeripherals(uuids, new PeripheralScanningOptions { AllowDuplicatesKey = true });
+                    }
+                    return this.context.ScanResultReceived;
+                })
+                .Finally(() =>
+                {
+                    this.context.Manager.StopScan();
+                    this.IsScanning = false;
+                });
+        }
 
 
         public override void StopScan() => this.context.Manager.StopScan();

@@ -17,6 +17,9 @@ namespace Samples.BluetoothLE
 {
     public class AdapterViewModel : ViewModel
     {
+        IDisposable? scanSub;
+
+
         public AdapterViewModel(INavigationService navigator,
                                 IDialogs dialogs,
                                 IBleManager? bleManager = null)
@@ -54,14 +57,14 @@ namespace Samples.BluetoothLE
                     }
                     if (this.IsScanning)
                     {
-                        this.Deactivate();
+                        this.StopScan();
                     }
                     else
                     {
-                        this.IsScanning = true;
                         this.Peripherals.Clear();
+                        this.IsScanning = true;
 
-                        bleManager
+                        this.scanSub = bleManager
                             .Scan()
                             .Buffer(TimeSpan.FromSeconds(1))
                             .SubOnMainThread(
@@ -93,8 +96,7 @@ namespace Samples.BluetoothLE
                                     }
                                 },
                                 ex => dialogs.Alert(ex.ToString(), "ERROR")
-                            )
-                            .DisposeWith(this.DeactivateWith);
+                            );
                     }
                 }
             );
@@ -107,5 +109,20 @@ namespace Samples.BluetoothLE
         public ObservableCollection<PeripheralItemViewModel> Peripherals { get; } = new ObservableCollection<PeripheralItemViewModel>();
         [Reactive] public PeripheralItemViewModel SelectedPeripheral { get; set; }
         [Reactive] public bool IsScanning { get; private set; }
+
+
+        //public override void OnDisappearing()
+        //{
+        //    base.OnDisappearing();
+        //    this.StopScan();
+        //}
+
+
+        void StopScan()
+        {
+            this.scanSub?.Dispose();
+            this.scanSub = null;
+            this.IsScanning = false;
+        }
     }
 }
