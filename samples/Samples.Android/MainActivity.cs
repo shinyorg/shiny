@@ -24,13 +24,10 @@ namespace Samples.Droid
     )]
     public partial class MainActivity : FormsAppCompatActivity
     {
-        void OnCreated(Bundle savedInstanceState)
-        {
-            Forms.SetFlags(
-                "SwipeView_Experimental",
-                "Expander_Experimental",
-                "RadioButton_Experimental"
-            );
-        }
+        partial void OnPreCreate(Bundle savedInstanceState) => Forms.SetFlags(
+            "SwipeView_Experimental",
+            "Expander_Experimental",
+            "RadioButton_Experimental"
+        );
     }
 }

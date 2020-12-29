@@ -17,10 +17,10 @@ namespace Samples.iOS
     [Register("AppDelegate")]
     public partial class AppDelegate : FormsApplicationDelegate
     {
-        //void Init(UIApplication app, NSDictionary options) => Forms.SetFlags(
-        //    "SwipeView_Experimental",
-        //    "Expander_Experimental",
-        //    "RadioButton_Experimental"
-        //);
+        partial void OnPreFinishedLaunching(UIApplication app, NSDictionary options) => Forms.SetFlags(
+            "SwipeView_Experimental",
+            "Expander_Experimental",
+            "RadioButton_Experimental"
+        );
     }
 }

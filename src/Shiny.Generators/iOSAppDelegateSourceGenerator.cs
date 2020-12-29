@@ -129,13 +129,15 @@ namespace Shiny.Generators
             }
             else
             {
-                //builder.AppendLineInvariant("partial void OnFinishedLaunching(UIApplication app, NSDictionary options);");
+                builder.AppendLineInvariant("partial void OnPreFinishedLaunching(UIApplication app, NSDictionary options);");
+                builder.AppendLineInvariant("partial void OnPostFinishedLaunching(UIApplication app, NSDictionary options);");
                 using (builder.BlockInvariant("public override bool FinishedLaunching(UIApplication app, NSDictionary options)"))
                 {
-                    //builder.AppendLineInvariant("this.OnFinishedLaunching(app, options);");
+                    builder.AppendLineInvariant("this.OnPreFinishedLaunching(app, options);");
                     builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.ShinyConfig.ShinyStartupTypeName}());");
 
                     this.TryAppendThirdParty(appDelegate, builder);
+                    builder.AppendLineInvariant("this.OnPostFinishedLaunching(app, options);");
                     builder.AppendLineInvariant("return base.FinishedLaunching(app, options);");
                 }
             }
