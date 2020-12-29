@@ -4,7 +4,7 @@
              xmlns:notifications="clr-namespace:Samples.Notifications"
              x:DataType="notifications:PersistentNotificationViewModel"
              x:Class="Samples.Notifications.PersistentNotificationPage"
-             Title="Persistent">
+             Title="Persistent Notification">
 
     <ContentPage.Content>
         <StackLayout>

@@ -33,8 +33,10 @@
                         <TextCell Text="Motion Activity" Command="{Binding Navigate}" CommandParameter="Nav/MotionActivity" />
                     </TableSection>
                     <TableSection Title="Notifications">
-                        <TextCell Text="Local" Command="{Binding Navigate}" CommandParameter="Nav/Notifications" />
                         <TextCell Text="Push" Command="{Binding Navigate}" CommandParameter="Nav/Push" />
+                        <TextCell Text="Local" Command="{Binding Navigate}" CommandParameter="Nav/Notifications" />
+                        <TextCell Text="Persistent" Command="{Binding Navigate}" CommandParameter="Nav/PersistentNotification" />
+                        <TextCell Text="Badges" Command="{Binding Navigate}" CommandParameter="Nav/Badges" />
                     </TableSection>
                     <TableSection Title="Other">
                         <TextCell Text="HTTP Transfers" Command="{Binding Navigate}" CommandParameter="Nav/HttpTransfers" />

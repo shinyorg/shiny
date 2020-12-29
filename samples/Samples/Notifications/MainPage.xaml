@@ -21,15 +21,6 @@
             </ContentPage.IconImageSource>
         </notifications:PendingPage>
 
-        <notifications:BadgePage Title="Badges">
-            <ContentPage.IconImageSource>
-                <FontImageSource Glyph="&#xf2c1;"
-                                 FontFamily="FAS" />
-            </ContentPage.IconImageSource>
-        </notifications:BadgePage>
-
-        <notifications:PersistentNotificationPage Title="Persistent" />
-
         <notifications:LogPage Title="Logs">
             <ContentPage.IconImageSource>
                 <FontImageSource Glyph="&#xf017;"
