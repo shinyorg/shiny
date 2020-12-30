@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -38,6 +37,13 @@ namespace Shiny.Generators
                 return;
 
             //if (!activityType.IsPartialClass())
+            //{
+            //    this.context.Log(
+            //        "SHINY010",
+            //        $"Activity '{activityTypeName}' is not marked as partial, you must manually call the Shiny hooks yourself"
+            //    );
+            //    return;
+            //}
 
             var activities = this
                 .context
@@ -78,13 +84,21 @@ namespace Shiny.Generators
 
         void TryAppendOnCreate(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
-            if (!activity.HasMethod("OnCreate"))
+            if (activity.HasMethod("OnCreate"))
             {
+                this.context.Log(
+                    "SHINY005",
+                    $"OnCreate already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnCreate hook for this"
+                );
+            }
+            else
+            {
+                builder.AppendFormatInvariant("partial void OnPreCreate(Bundle savedInstanceState);");
+                builder.AppendFormatInvariant("partial void OnPostCreate(Bundle savedInstanceState);");
                 using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                 {
                     builder.AppendLineInvariant("this.ShinyOnCreate();");
-                    if (activity.HasMethod("OnCreating"))
-                        builder.AppendLineInvariant("this.OnCreating(savedInstanceState);");
+                    builder.AppendLineInvariant("this.OnPreCreate(savedInstanceState);");
 
                     if (String.IsNullOrWhiteSpace(this.values.XamarinFormsAppTypeName))
                     {
@@ -104,6 +118,7 @@ namespace Shiny.Generators
                         }
                     }
                     this.TryAppendOnCreateThirdParty(activity, builder);
+                    builder.AppendLineInvariant("this.OnPostCreate(savedInstanceState);");
                 }
             }
         }
@@ -126,7 +141,14 @@ namespace Shiny.Generators
 
         void TryAppendRequestPermissionResult(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
-            if (!activity.HasMethod("OnRequestPermissionsResult"))
+            if (activity.HasMethod("OnRequestPermissionsResult"))
+            {
+                this.context.Log(
+                    "SHINY005",
+                    $"OnRequestPermissionsResult already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnPermissionsResult hook for this"
+                );
+            }
+            else
             {
                 using (builder.BlockInvariant("public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)"))
                 {
@@ -144,8 +166,15 @@ namespace Shiny.Generators
 
         void TryAppendNewIntent(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
-            if (!activity.HasMethod("OnNewIntent"))
+            if (activity.HasMethod("OnNewIntent"))
             {
+                this.context.Log(
+                    "SHINY006",
+                    $"OnNewIntent already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnNewIntent hook for this"
+                );
+            }
+            else
+            { 
                 using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
                 {
                     builder.AppendLine("base.OnNewIntent(intent);");

@@ -40,7 +40,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Core", "src\Shiny.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE.Common", "src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj", "{4273A168-9E9E-4E46-A6D6-96A3B788321F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE.Hosting", "src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj", "{01ADE171-31D3-49B2-8223-67DCBFE8C601}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.BluetoothLE.Hosting", "src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj", "{01ADE171-31D3-49B2-8223-67DCBFE8C601}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Generators", "src\Shiny.Generators\Shiny.Generators.csproj", "{9FC4A830-1B20-4073-A1C4-EE3A52781DFD}"
 EndProject

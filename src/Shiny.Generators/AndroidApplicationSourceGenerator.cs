@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+//using Microsoft.CodeAnalysis.CSharp;
+//using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 
 namespace Shiny.Generators
@@ -24,6 +26,30 @@ namespace Shiny.Generators
             // TODO: this is supposed to run when there are NO android apps - should we try to change it or error right here?
             // TODO: what if not partial?  why did user mark the assembly then?
             var nameSpace = this.Context.Compilation.AssemblyName;
+
+            //var source = CompilationUnit()
+            //    .AddUsings(
+            //        UsingDirective(IdentifierName("System")),
+            //        UsingDirective(IdentifierName("Shiny"))
+            //    )
+            //    .AddMembers(
+            //        NamespaceDeclaration(IdentifierName(nameSpace)).AddMembers(
+            //            ClassDeclaration(ApplicationName)
+            //                .AddModifiers(
+            //                    Token(SyntaxKind.PublicKeyword),
+            //                    Token(SyntaxKind.PartialKeyword)
+            //                )
+            //                .AddAttributeLists(
+            //                    AttributeList(SingletonSeparatedList(
+            //                        Attribute(IdentifierName("Android.App.ApplicationAttribute"))
+            //                    ))
+            //                )
+            //                .AddMembers(
+            //                    ConstructorDeclaration(
+            //                )
+            //        )
+            //    );
+
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Content", "Android.Runtime");
 

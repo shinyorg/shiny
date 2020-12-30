@@ -56,26 +56,26 @@ namespace Samples
             containerRegistry.RegisterForNavigation<BluetoothLE.PeripheralPage>("Peripheral");
             containerRegistry.RegisterForNavigation<BluetoothLE.CentralExtensionsPage>("BleExtensions");
             containerRegistry.RegisterForNavigation<BluetoothLE.PerformancePage>("BlePerformance");
-
             containerRegistry.RegisterForNavigation<BleHosting.GattServerPage>("BleHosting");
 
             containerRegistry.RegisterForNavigation<HttpTransfers.MainPage>("HttpTransfers");
             containerRegistry.RegisterForNavigation<HttpTransfers.CreatePage>("CreateTransfer");
             containerRegistry.RegisterForNavigation<HttpTransfers.ManageUploadsPage>("ManageUploads");
 
-            containerRegistry.RegisterForNavigation<Push.PushPage>("Push");
+            containerRegistry.RegisterForNavigation<Sensors.MainPage>("Sensors");
+            containerRegistry.RegisterForNavigation<Sensors.CompassPage>("Compass");
+
             containerRegistry.RegisterForNavigation<Nfc.NfcPage>("Nfc");
             containerRegistry.RegisterForNavigation<Speech.MainPage>("SpeechRecognition");
-
             containerRegistry.RegisterForNavigation<Jobs.MainPage>("Jobs");
             containerRegistry.RegisterForNavigation<Jobs.CreatePage>("CreateJob");
 
+            containerRegistry.RegisterForNavigation<Push.PushPage>("Push");
             containerRegistry.RegisterForNavigation<Notifications.MainPage>("Notifications");
             containerRegistry.RegisterForNavigation<Notifications.ChannelListPage>("NotificationChannels");
             containerRegistry.RegisterForNavigation<Notifications.ChannelCreatePage>("NotificationChannelCreate");
-
-            containerRegistry.RegisterForNavigation<Sensors.MainPage>("Sensors");
-            containerRegistry.RegisterForNavigation<Sensors.CompassPage>("Compass");
+            containerRegistry.RegisterForNavigation<Notifications.PersistentNotificationPage>("PersistentNotification");
+            containerRegistry.RegisterForNavigation<Notifications.BadgePage>("Badges");
 
             containerRegistry.RegisterForNavigation<PlatformPage>("Platform");
             containerRegistry.RegisterForNavigation<Logging.LoggingPage>("Logs");

@@ -2,7 +2,7 @@
     <PropertyGroup>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
-        <LangVersion>9.0</LangVersion>
+        <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <DisableExtraReferences>False</DisableExtraReferences>
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
