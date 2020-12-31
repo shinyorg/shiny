@@ -1,9 +1,5 @@
 <Project>
 
-    <PropertyGroup>
-        <XamarinFormsVersion></XamarinFormsVersion>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Update="Xamarin.Forms" Version="4.8.0.1821" />
         <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.1" />
