@@ -11,14 +11,17 @@ using AndroidX.Lifecycle;
 using Microsoft.Extensions.DependencyInjection;
 using B = global::Android.OS.Build;
 using Shiny.Logging;
-
+using System.Reactive.Disposables;
 
 namespace Shiny
 {
     public class AndroidPlatform : Java.Lang.Object, ILifecycleObserver, IAndroidContext, IPlatform
     {
+        int requestCode;
         readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
         readonly Subject<Intent> intentSubject = new Subject<Intent>();
+        readonly Subject<PermissionRequestResult> permissionSubject = new Subject<PermissionRequestResult>();
+        readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new Subject<(int RequestCode, Result Result, Intent Intent)>();
         readonly Application app;
         readonly ActivityLifecycleCallbacks callbacks;
 
@@ -63,7 +66,7 @@ namespace Shiny
         public string Manufacturer => B.Manufacturer;
         public string Model => B.Model;
 
-
+        public void OnActivityResult(int requestCode, Result resultCode, Intent data) => this.activityResultSubject.OnNext((requestCode, resultCode, data));
         public void OnNewIntent(Intent intent) => this.intentSubject.OnNext(intent);
         public Application AppContext => this.app;
         public IObservable<Intent> WhenIntentReceived() => this.intentSubject;
@@ -115,10 +118,7 @@ namespace Shiny
 
 
         public void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResult)
-            => this.PermissionResult?.Invoke(this, new PermissionRequestResult(requestCode, permissions, grantResult));
-
-
-        event EventHandler<PermissionRequestResult>? PermissionResult;
+            => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResult));
 
 
         public T GetIntentValue<T>(string intentAction, Func<Intent, T> transform)
@@ -150,7 +150,20 @@ namespace Shiny
         }
 
 
-        int requestCode;
+        public IObservable<(Result result, Intent data)> RequestResult(Action<int, Activity> request) => Observable.Create<(Result result, Intent data)>(ob =>
+        {
+            var current = Interlocked.Increment(ref this.requestCode);
+            var sub = this.activityResultSubject
+                .Where(x => x.RequestCode == current)
+                .Subscribe(x => ob.Respond((x.Result, x.Intent)));
+
+            request(current, this.CurrentActivity);
+
+            return sub;
+        });
+
+
+        
         public IObservable<AccessState> RequestAccess(params string[] androidPermissions) => Observable.Create<AccessState>(ob =>
         {
             //if(ActivityCompat.ShouldShowRequestPermissionRationale(this.TopActivity, androidPermission))
@@ -167,19 +180,20 @@ namespace Shiny
             //    return () => { };
             //}
 
+            var comp = new CompositeDisposable();
             var current = Interlocked.Increment(ref this.requestCode);
+            comp.Add(this
+                .permissionSubject
+                .Where(x => x.RequestCode == current)
+                .Subscribe(result =>
+                {
+                    var state = result.IsSuccess() ? AccessState.Available : AccessState.Denied;
+                    ob.OnNext(state);
+                })
+            );
 
-            var handler = new EventHandler<PermissionRequestResult>((sender, result) =>
-            {
-                if (result.RequestCode != current)
-                    return;
-
-                var state = result.IsSuccess() ? AccessState.Available : AccessState.Denied;
-                ob.Respond(state);
-            });
-            this.PermissionResult += handler;
-
-            var sub = this.WhenActivityStatusChanged()
+            comp.Add(this
+                .WhenActivityStatusChanged()
                 .Take(1)
                 .Subscribe(x =>
                     ActivityCompat.RequestPermissions(
@@ -187,14 +201,9 @@ namespace Shiny
                         androidPermissions,
                         current
                     )
-                );
-
-
-            return () =>
-            {
-                this.PermissionResult -= handler;
-                sub?.Dispose();
-            };
+                )
+            );
+            return comp;
         });
 
 

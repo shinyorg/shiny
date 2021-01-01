@@ -8,17 +8,12 @@
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj"
-                          ReferenceOutputAssembly="false"
-                          OutputItemType="Analyzer" />
+        <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>
 
     <Target Name="BundleGenerators" BeforeTargets="Pack;_LoadPackInputItems">
         <ItemGroup>
-            <None Include="..\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll"
-                  Pack="true"
-                  PackagePath="analyzers\dotnet\cs\Shiny.Generators.dll"
-                  Visible="false" />
+            <None Include="..\Shiny.Generators\bin\$(Configuration)\**\Shiny.Generators.dll" Pack="true" PackagePath="analyzers\dotnet\cs\Shiny.Generators.dll" Visible="false" />
         </ItemGroup>
     </Target>
 </Project>

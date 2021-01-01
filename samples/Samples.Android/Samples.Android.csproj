@@ -69,7 +69,7 @@
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
-      <Project>{6FF47CE9-2EBF-410E-AECF-E09D65651A23}</Project>
+      <Project>{B133232E-1A21-438D-8B40-F771D65BED1C}</Project>
       <Name>Shiny</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj">

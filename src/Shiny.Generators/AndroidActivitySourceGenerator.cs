@@ -75,6 +75,7 @@ namespace Shiny.Generators
                 {
                     this.TryAppendOnCreate(activity, builder);
                     this.TryAppendNewIntent(activity, builder);
+                    this.TryAppendActivityResult(activity, builder);
                     this.TryAppendRequestPermissionResult(activity, builder);
                 }
             }
@@ -136,6 +137,28 @@ namespace Shiny.Generators
                 builder.AppendLineInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
             else if (this.context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
                 builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);");
+        }
+
+
+        void TryAppendActivityResult(INamedTypeSymbol activity, IndentedStringBuilder builder)
+        {
+            if (activity.HasMethod("OnActivityResult"))
+            {
+                this.context.Log(
+                    "SHINY005",
+                    $"OnActivityResult already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnActivityResult hook for this"
+                );
+            }
+            else
+            {
+                using (builder.BlockInvariant("protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)"))
+                {
+                    builder.AppendLine("base.OnActivityResult(requestCode, resultCode, data);");
+                    builder.AppendLine();
+                    builder.AppendLine("this.ShinyOnActivityResult(requestCode, resultCode, data);");
+                    builder.AppendLine();
+                }
+            }
         }
 
 
