@@ -60,7 +60,7 @@ namespace Shiny
         public string AppVersion => this.Package.VersionName;
         public string AppBuild => this.Package.VersionCode.ToString();
 
-        public string MachineName => "Android";
+        public string MachineName => B.GetSerial();
         public string OperatingSystem => B.VERSION.Release;
         public string OperatingSystemVersion => B.VERSION.Sdk;
         public string Manufacturer => B.Manufacturer;
@@ -150,7 +150,7 @@ namespace Shiny
         }
 
 
-        public IObservable<(Result result, Intent data)> RequestResult(Action<int, Activity> request) => Observable.Create<(Result result, Intent data)>(ob =>
+        public IObservable<(Result result, Intent data)> RequestActivityResult(Action<int, Activity> request) => Observable.Create<(Result result, Intent data)>(ob =>
         {
             var current = Interlocked.Increment(ref this.requestCode);
             var sub = this.activityResultSubject
