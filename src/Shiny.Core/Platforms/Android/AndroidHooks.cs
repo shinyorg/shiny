@@ -13,7 +13,7 @@ namespace Shiny
                 .Resolve<IAndroidContext>()
                 .OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        public static void ShinyOnActivityResult(int requestCode, Result resultCode, Intent data)
+        public static void ShinyOnActivityResult(this Activity activity, int requestCode, Result resultCode, Intent data)
             => ShinyHost
                 .Resolve<IAndroidContext>()
                 .OnActivityResult(requestCode, resultCode, data);
