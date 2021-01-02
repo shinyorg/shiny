@@ -1,5 +1,6 @@
 Title: App Services
 Description: Specialized services combining multiple Shiny services to make simple, flexible, and AMAZING APIs
+Order: 10
 ---
 
 App Services take the multiple Shiny services to make true, business applicable APIs for your creative apps.  

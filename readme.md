@@ -44,6 +44,7 @@ PReview|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/prev
 
 |Project|NuGet|Preview|Description|
 |-------|-----|-----|-----------|
+|Core + Generators | [![ShinyNugetShield]][ShinyNuget] | [![ShinyPreviewShield]][ShinyPreNuget] |
 |Core | [![CoreNugetShield]][CoreNuget] | [![CorePreviewShield]][CorePreNuget] |
 |Beacons | [![BeaconsNugetShield]][BeaconsNuget] | [![BeaconsPreviewShield]][BeaconsPreNuget] |
 |BluetoothLE Client| [![BleNugetShield]][BleNuget] | [![BlePreviewShield]][BlePreNuget] |
@@ -57,8 +58,8 @@ PReview|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/prev
 
 
 ## Integrations
-|Project|NuGet|MyGet|Description|
-|-------|-----|-----|-----------|
+|Project|NuGet|Preview|Description|
+|-------|-----|-------|-----------|
 |Azure Notifications Push| [![AzureHubPushNugetShield]][AzureHubPushNuget] | [![AzureHubPushPreviewShield]][AzureHubPushPreNuget] | Push Integration for Azure Notification Hubs - Support for iOS, Android, & UWP
 |Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushPreviewShield]][FirebasePushPreNuget] | Push Integration for Google Firebase - Support for iOS & Android
 |SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqlitePreviewShield]][SqlitePreNuget] | Provides caching, logging, storage, & settings implementations
@@ -75,6 +76,11 @@ PReview|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/prev
 * [Emily Stanek](https://github.com/emilystanek) - Logo Designer
 * [Dan Siegel](https://github.com/dansiegel) - Contributor
 * [Keith Dahlby](https://twitter.com/dahlbyk) - Contributor
+
+[ShinyNugetShield]: https://img.shields.io/nuget/v/Shiny.svg?style=for-the-badge
+[ShinyNuget]: https://www.nuget.org/packages/Shiny/
+[ShinyPreviewShield]: https://img.shields.io/nuget/vpre/Shiny.svg?style=for-the-badge
+[ShinyPreNuget]: https://www.nuget.org/packages/Shiny
 
 [PrismNugetShield]: https://img.shields.io/nuget/v/Shiny.Prism.svg?style=for-the-badge
 [PrismNuget]: https://www.nuget.org/packages/Shiny.Prism/

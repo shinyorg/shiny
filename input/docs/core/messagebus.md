@@ -1,3 +1,3 @@
-Title: RX Message Bus
+Title: Message Bus
 ---
 TODO
