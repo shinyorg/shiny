@@ -1,13 +1,7 @@
-<!--
-This file was generate by MarkdownSnippets.
-Source File: /input/docs/appservices/datasync.source.md
-To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
--->
 Title: Data Sync
 Order: 3
 ---
 
-<!-- snippet: DataSyncDelegate.cs -->
 ```cs
 using System;
 using System.Collections.Generic;
@@ -24,7 +18,7 @@ namespace Shiny.DataSync
 }
 
 ```
-<sup>[snippet source](/src/Shiny.DataSync/IDataSyncDelegate.cs#L1-L14)</sup>
+
 ```cs
 using System.Threading.Tasks;
 using Shiny.DataSync;
@@ -40,10 +34,7 @@ public class DataSyncDelegate : IDataSyncDelegate
 }
 
 ```
-<sup>[snippet source](/src/Snippets/DataSyncDelegate.cs#L1-L13)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: DataSyncStartup.cs -->
 ```cs
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,10 +48,7 @@ public class DataSyncStartup : ShinyStartup
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/DataSyncStartup.cs#L1-L11)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: DataSyncUsage.cs -->
 ```cs
 using System.Threading.Tasks;
 using Shiny;
@@ -87,5 +75,3 @@ public class DataSyncUsage
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/DataSyncUsage.cs#L1-L24)</sup>
-<!-- endsnippet -->

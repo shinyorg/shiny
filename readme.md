@@ -16,11 +16,10 @@ If you are looking to just use one part of Shiny, such as notifications, this pr
 
 If you think Shiny is too heavy, try wiring all of these things up yourself with all of the above goals in mind. 
 
-
-[Change Log - January 1, 2021](https://github.com/shinyorg/shiny/blob/master/ChangeLog.md)
-
+* [Documentation](https://shinylib.net)
+* [Change Log](https://shinylib.net/blog)
 * [Samples](https://github.com/shinyorg/shiny/samples) - Shows almost every single function point within Shiny
-* [Beautiful Docs](https://shinylib.net) are in the works - for now, take a look here:
+* Blog Posts
   * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
   * [Background Jobs - Shiny Style](https://allancritchie.net/posts/shinyjobs)
   * [Settings in a New Light - Shiny Style](https://allancritchie.net/posts/shinysettings)

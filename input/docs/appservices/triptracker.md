@@ -1,13 +1,7 @@
-<!--
-This file was generate by MarkdownSnippets.
-Source File: /input/docs/appservices/triptracker.source.md
-To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
--->
 Title: Trip Tracker
 Order: 1
 ---
 
-<!-- snippet: TripTrackerStartup.cs -->
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -23,10 +17,7 @@ public class TripTrackerStartup : ShinyStartup
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/TripTrackerStartup.cs#L1-L13)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: TripTrackerDelegate.cs -->
 ```cs
 using System;
 using System.Threading.Tasks;
@@ -42,7 +33,7 @@ namespace Shiny.TripTracker
 }
 
 ```
-<sup>[snippet source](/src/Shiny.TripTracker/ITripTrackerDelegate.cs#L1-L13)</sup>
+
 ```cs
 using System.Threading.Tasks;
 using Shiny.TripTracker;
@@ -71,10 +62,7 @@ public class TripTrackerDelegate : ITripTrackerDelegate
 }
 
 ```
-<sup>[snippet source](/src/Snippets/TripTrackerDelegate.cs#L1-L26)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: TripTrackerUsage.cs -->
 ```cs
 using System;
 using System.Threading.Tasks;
@@ -92,5 +80,3 @@ public class TripTrackerUsage
 }
 
 ```
-<sup>[snippet source](/src/Snippets/TripTrackerUsage.cs#L1-L15)</sup>
-<!-- endsnippet -->

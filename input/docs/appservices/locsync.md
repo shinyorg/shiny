@@ -1,13 +1,7 @@
-<!--
-This file was generate by MarkdownSnippets.
-Source File: /input/docs/appservices/locsync.source.md
-To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
--->
 Title: Location Sync
 Order: 2
 ---
 
-<!-- snippet: LocationSyncStartup.cs -->
 ```cs
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,10 +17,7 @@ public class LocationSyncStartup : ShinyStartup
 }
 
 ```
-<sup>[snippet source](/src/Snippets/LocationSyncStartup.cs#L1-L13)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: LocationSyncGeofenceDelegate.cs -->
 ```cs
 using System;
 using System.Collections.Generic;
@@ -42,10 +33,7 @@ public class LocationSyncGeofenceDelegate : IGeofenceSyncDelegate
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/LocationSyncGeofenceDelegate.cs#L1-L13)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: LocationSyncGpsDelegate.cs -->
 ```cs
 using System;
 using System.Collections.Generic;
@@ -61,5 +49,3 @@ public class LocationSyncGpsDelegate : IGpsSyncDelegate
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/LocationSyncGpsDelegate.cs#L1-L13)</sup>
-<!-- endsnippet -->
