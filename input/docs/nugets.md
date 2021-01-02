@@ -17,13 +17,8 @@ Order: 2
 |Push| [![PushNugetShield]][PushNuget] | [![PushMygetShield]][PushMyget] |
 |Push - Azure Notification Hubs| [![PushAzureNugetShield]][PushAzureNuget] | [![PushAzureMygetShield]][PushAzureMyget] |
 Push - Firebase| [![PushFirebaseNugetShield]][PushFirebaseNuget] | [![PushFirebaseMygetShield]][PushFirebaseMyget] |
-Push - One Signal| [![PushOneNugetShield]][PushOneNuget] | [![PushOneMygetShield]][PushOneMyget] |
 |Integrations - SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqliteMygetShield]][SqliteMyget] |
 |Integrations - AppCenter| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterMygetShield]][AppCenterMyget] |
-|App Service - Data Sync| [![DataSyncNugetShield]][DataSyncNuget] | [![DataSyncMygetShield]][DataSyncMyget] |
-|App Service - Location Sync| [![LocSyncNugetShield]][LocSyncNuget] | [![LocSyncMygetShield]][LocSyncMyget] |
-|App Service - Media Sync| [![MediaSyncNugetShield]][MediaSyncNuget] | [![MediaSyncMygetShield]][MediaSyncMyget] |
-|App Service - Trip Tracker| [![TripTrackerNugetShield]][TripTrackerNuget] | [![TripTrackerMygetShield]][TripTrackerMyget] |
 
 [BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg
 [BeaconsNuget]: https://www.nuget.org/packages/Shiny.Beacons/
@@ -65,12 +60,6 @@ Push - One Signal| [![PushOneNugetShield]][PushOneNuget] | [![PushOneMygetShield
 [PushFirebaseMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.FirebaseMessaging.svg
 [PushFirebaseMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.FirebaseMessaging
 
-[PushOneNugetShield]: https://img.shields.io/nuget/v/Shiny.Push.OnSignal.svg
-[PushOneNuget]: https://www.nuget.org/packages/Shiny.Push.OnSignal/
-[PushOneMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Push.OnSignal.svg
-[PushOneMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Push.OnSignal
-
-
 [LocationsNugetShield]: https://img.shields.io/nuget/v/Shiny.Locations.svg
 [LocationsNuget]: https://www.nuget.org/packages/Shiny.Locations/
 [LocationsMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Locations.svg
@@ -105,24 +94,3 @@ Push - One Signal| [![PushOneNugetShield]][PushOneNuget] | [![PushOneMygetShield
 [AppCenterNuget]: https://www.nuget.org/packages/Shiny.Logging.AppCenter/
 [AppCenterMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Logging.AppCenter.svg
 [AppCenterMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Logging.AppCenter
-
-[DataSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.DataSync.svg
-[DataSyncNuget]: https://www.nuget.org/packages/Shiny.DataSync/
-[DataSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.DataSync.svg
-[DataSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.DataSync
-
-[LocSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.Locations.Sync.svg
-[LocSyncNuget]: https://www.nuget.org/packages/Shiny.Locations.Sync/
-[LocSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.Locations.Sync.svg
-[LocSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.Locations.Sync
-
-[MediaSyncNugetShield]: https://img.shields.io/nuget/v/Shiny.MediaSync.svg
-[MediaSyncNuget]: https://www.nuget.org/packages/Shiny.MediaSync/
-[MediaSyncMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.MediaSync.svg
-[MediaSyncMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.MediaSync
-
-
-[TripTrackerNugetShield]: https://img.shields.io/nuget/v/Shiny.TripTracker.svg
-[TripTrackerNuget]: https://www.nuget.org/packages/Shiny.TripTracker/
-[TripTrackerMygetShield]: https://img.shields.io/myget/acrfeed/vpre/Shiny.TripTracker.svg
-[TripTrackerMyget]: https://www.myget.org/feed/acrfeed/package/nuget/Shiny.TripTracker

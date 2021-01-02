@@ -1,14 +1,8 @@
-<!--
-This file was generate by MarkdownSnippets.
-Source File: /input/docs/locations/geofences.source.md
-To change this file edit the source file and then re-run the generation using either the dotnet global tool (https://github.com/SimonCropp/MarkdownSnippets#markdownsnippetstool) or using the api (https://github.com/SimonCropp/MarkdownSnippets#running-as-a-unit-test).
--->
 Title: Geofences
 Order: 2
 ---
 
 
-<!-- snippet: GeofenceStartup.cs -->
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -22,10 +16,7 @@ public class GeofenceStartup : ShinyStartup
 }
 
 ```
-<sup>[snippet source](/src/Snippets/GeofenceStartup.cs#L1-L11)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: GeofenceDelegate.cs -->
 ```cs
 using System;
 using System.Collections.Generic;
@@ -84,7 +75,7 @@ namespace Shiny.Locations
 }
 
 ```
-<sup>[snippet source](/src/Shiny.Locations/GpsGeofenceDelegate.cs#L1-L56)</sup>
+
 ```cs
 using System;
 using System.Threading.Tasks;
