@@ -13,18 +13,24 @@ Please note that this framework uses background fetch on iOS.  Be aware of the f
 1. Install From [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
 
 2. In your AppDelegate.cs, add the following:
-```csharp
 
-public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler)
-{
-    JobManager.OnBackgroundFetch(completionHandler);
-}
+```csharp
+public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler) 
+    => this.ShinyPerformFetch(completionHandler);
 ```
 
 3. Add the following to your info.plist
 ```xml
 <key>UIBackgroundModes</key>
 <array>
-	<string>fetch</string>
+    <string>fetch</string>
+    <string>processing</string>
+</array>
+<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array>
+    <string>com.shiny.job</string>
+    <string>com.shiny.jobpower</string>
+    <string>com.shiny.jobnet</string>
+    <string>com.shiny.jobpowernet</string>
 </array>
 ```

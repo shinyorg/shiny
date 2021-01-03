@@ -63,9 +63,7 @@ namespace YourNamespace
 ## Android Application
 The Android application is generated in full.  Shiny also auto-wires in Xamarin Essentials and ACR User Dialogs.  If you want source gen to happen on your custom application class, you will also need to make sure that you class is marked as partial.
 
-|Method|Shiny Wire-In|Purpose|
-OnCreate|Shiny.AndroidShinyHost.Init|This spins up all of the Shiny infrastructure on Android
-OnTrimMemory|Shiny.AndroidShinyHost.OnBackground|This runs appstate which is used internally by jobs
+Unlike most traditional Xamarin Native & Forms applications on Android, Shiny does require a true Android Application class.
 
 Here is an example of what Shiny generates
 ```cs

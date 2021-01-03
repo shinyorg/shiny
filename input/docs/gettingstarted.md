@@ -1,6 +1,5 @@
 Title: Getting Started
 Order: 1
-RedirectFrom: index
 ---
 
 ## Platform Setup
@@ -15,7 +14,6 @@ RedirectFrom: index
 
 2. In your shared code project.  Create a Shiny startup file:
 
-<!-- snippet: YourShinyStartup.cs -->
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -32,16 +30,14 @@ namespace YourNamespace
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/YourShinyStartup.cs#L1-L14)</sup>
-<!-- endsnippet -->
 
-### Android
-At build time, Shiny will attempt to auto-generate an Android application file and wire-up all of the necessary boilerplate to any of your Android activities. 
+As another alternative, you can have Shiny generate a startup file automatically at compile time.
+
+### Android & iOS
+
+The best option is to install the [![ShinyNugetShield]][ShinyNuget] in your head Android project.  The next thing is to add an [assembly: Shiny.ShinyApplication] to any class in the same head project.  This will tell Shiny to generate not only all the necessary boilerplate (Android application and all activities that are marked as partial - and the AppDelegate on iOS), but also generate all of the startup configuration to register services with Shiny.
 
 
-### iOS
-
-At build time, Shiny will attempt to auto-generate all of the necessary boilerplate into your AppDelegate. 
 
 
 ### UWP
@@ -64,10 +60,7 @@ this.ShinyInit(new YourStartup());
 </Extension>
 ```
 
+Out of the box, Shiny automatically adds all of the services for Jobs, file system, power monitoring, and settings (as well as several other services need by the Shiny internals)
 
-Out of the box, Shiny automatically pushes the following on to the service container
-
-* IEnvironment
-* IPowerManager
-* IJobManager
-* ISettings
+[ShinyNugetShield]: https://img.shields.io/nuget/v/Shiny.svg?style=for-the-badge
+[ShinyNuget]: https://www.nuget.org/packages/Shiny/

@@ -37,6 +37,8 @@
         <string>Samples</string>
         <key>XSAppIconAssets</key>
         <string>Assets.xcassets/AppIcon.appiconset</string>
+        <key>UIUserInterfaceStyle</key>
+        <string>Light</string>        
         <key>UIBackgroundModes</key>
         <array>
             <string>audio</string>
@@ -48,9 +50,6 @@
             <string>remote-notification</string>
             <string>processing</string>
         </array>
-
-        <key>UIUserInterfaceStyle</key>
-        <string>Light</string>
         <key>BGTaskSchedulerPermittedIdentifiers</key>
         <array>
             <string>com.shiny.job</string>

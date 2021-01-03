@@ -19,7 +19,7 @@ After adding this attribute, perform a build.  The Shiny source generator will n
 Shiny.ShinyHost.Resolve<IJobManager>().Run(...);
 
 // AFTER
-JobManager.Run(...);
+ShinyJobManager.Run(...);
 ```
 
 
@@ -29,7 +29,8 @@ Also, if you aren't a fan of the boilerplate startup files, Shiny can also gener
 **CAUTION: this comes at a cost of customization to your startup**
 
 ```csharp
-[assembly: Shiny.GenerateStartupClass]
+[assembly: Shiny.ShinyApplication(
+)]
 ```
 
 That being said, source generation can often get in the way of customizations your application requires.  Please read the section [Customizing Startup](customizingstartup)

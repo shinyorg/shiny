@@ -1,4 +1,4 @@
-Title: BluetoothLE
+Title: Client
 ---
 
 # Bluetooth LE

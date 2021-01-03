@@ -1,4 +1,4 @@
-Title: Peripheral Manager
+Title: Hosting
 Description: Run a GATT server from your device
 ---
 # Peripheral Manager (GATT Server)
