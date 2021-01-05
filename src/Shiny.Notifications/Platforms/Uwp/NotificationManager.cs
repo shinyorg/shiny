@@ -22,6 +22,17 @@ namespace Shiny.Notifications
         }
 
 
+        public void Start()
+        {
+            if (this.services.Services.GetService(typeof(INotificationDelegate)) != null)
+            {
+                UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(
+                    builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
+                );
+            }
+        }
+
+
         public IPersistentNotification Create(Notification notification)
         {
             //AdaptiveProgressBarValue.Indeterminate;
@@ -68,7 +79,8 @@ namespace Shiny.Notifications
         //}
 
 
-        public async Task<IEnumerable<Notification>> GetPending() => await this.services.Repository.GetAll<Notification>();
+        public async Task<IEnumerable<Notification>> GetPending()
+            => await this.services.Repository.GetAll<Notification>();
 
 
         public async Task Clear()
@@ -82,17 +94,6 @@ namespace Shiny.Notifications
         {
             ToastNotificationManager.History.Remove(id.ToString());
             await this.services.Repository.Remove<Notification>(id.ToString());
-        }
-
-
-        public void Start()
-        {
-            if (this.services.Services.GetService(typeof(INotificationDelegate)) != null)
-            {
-                UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(
-                    builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
-                );
-            }
         }
 
 
@@ -196,14 +197,12 @@ namespace Shiny.Notifications
             return native;
         }
 
-        public Task CreateChannel(Channel channel)
-            => this.services.Repository.SetChannel(channel);
 
-
-        public Task DeleteChannel(string identifier)
-            => this.services.Repository.DeleteChannel(identifier);
-
-        public Task<IList<Channel>> GetChannels()
-            => this.services.Repository.GetChannels();
+        public async Task SetChannels(params Channel[] channels)
+        {
+            await this.services.Repository.Clear<Channel>();
+            foreach (var channel in channels)
+                await this.services.Repository.Set(channel.Identifier, channel);
+        }
     }
 }

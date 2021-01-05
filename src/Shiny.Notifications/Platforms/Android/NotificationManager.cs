@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -127,9 +128,6 @@ namespace Shiny.Notifications
             if (!notification.Android.Ticker.IsEmpty())
                 builder.SetTicker(notification.Android.Ticker);
 
-            //if (!notification.Android.Category.IsEmpty())
-            //    builder.SetCategory(notification.Category);
-
             if (notification.Android.UseBigTextStyle)
                 builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
             else
@@ -139,10 +137,6 @@ namespace Shiny.Notifications
 
             if (notification.BadgeCount != null)
                 builder.SetNumber(notification.BadgeCount.Value);
-
-            // disabled until System.Drawing reliable works in Xamarin again
-            //if (notification.Android.Color != null)
-            //    builder.SetColor(notification.Android.Color.Value)
 
             if (!notification.Android.ColorResourceName.IsEmpty())
             {
@@ -157,20 +151,11 @@ namespace Shiny.Notifications
                 }
             }
 
-            //if (notification.Android.Priority != null)
-            //{
-            //    builder.SetPriority(notification.Android.Priority.Value);
-            //    builder.SetDefaults(NotificationCompat.DefaultAll);
-            //}
-
             if (notification.Android.ShowWhen != null)
                 builder.SetShowWhen(notification.Android.ShowWhen.Value);
 
             if (notification.Android.When != null)
                 builder.SetWhen(notification.Android.When.Value.ToUnixTimeMilliseconds());
-
-            //if (notification.Android.Vibrate)
-            //    builder.SetVibrate(new long[] { 500, 500 });
 
             return builder;
         }
@@ -180,23 +165,39 @@ namespace Shiny.Notifications
             => this.manager.Notify(id, notification);
 
 
-        public async Task CreateChannel(Channel channel)
+       
+
+
+        public async Task SetChannels(params Channel[] channels)
         {
-            //if (!this.context.IsMinApiLevel(26))
+            var existing = await this.services.Repository.GetChannels();
+            foreach (var exist in existing)
+                this.manager.DeleteNotificationChannel(exist.Identifier);
+
+            await this.services.Repository.Clear<Channel>();
+            foreach (var channel in channels)
+                await this.CreateChannel(channel);
+        }
+
+
+        public Task<IList<Channel>> GetChannels()
+            => this.services.Repository.GetChannels();
+
+
+        protected virtual async Task CreateChannel(Channel channel)
+        {
+            channel.AssertValid();
             var native = new NotificationChannel(
                 channel.Identifier,
-                channel.Description,
+                channel.Description ?? channel.Identifier,
                 channel.Importance.ToNative()
             );
             var attrBuilder = new AudioAttributes.Builder();
 
-
             Android.Net.Uri uri = null;
             if (!channel.CustomSoundPath.IsEmpty())
-            {
-                //uri = this.GetSoundResourceUri(channel.CustomSoundPath);
-            }
-            // TODO: vibrate
+                uri = this.GetSoundResourceUri(channel.CustomSoundPath);
+
             switch (channel.Importance)
             {
                 case ChannelImportance.Critical:
@@ -226,33 +227,23 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task DeleteChannel(string identifier)
-        {
-            this.manager.DeleteNotificationChannel(identifier);
-            await this.services.Repository.DeleteChannel(identifier);
-        }
-
-
-        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
-
-
         // Construct a raw resource path of the form
         // "android.resource://<PKG_NAME>/raw/<RES_NAME>", e.g.
         // "android.resource://com.shiny.sample/raw/notification"
-        //private Android.Net.Uri GetSoundResourceUri(string soundResourceName)
-        //{
-        //    // Strip file extension and leading slash from resource name to allow users
-        //    // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
-        //    soundResourceName = soundResourceName.TrimStart('/').Split('.').First();
-        //    var resourceId = this.services.Android.GetRawResourceIdByName(soundResourceName);
-        //    var resources = this.services.Android.AppContext.Resources;
-        //    return new Android.Net.Uri.Builder()
-        //        .Scheme(ContentResolver.SchemeAndroidResource)
-        //        .Authority(resources.GetResourcePackageName(resourceId))
-        //        .AppendPath(resources.GetResourceTypeName(resourceId))
-        //        .AppendPath(resources.GetResourceEntryName(resourceId))
-        //        .Build();
-        //}
+        protected virtual Android.Net.Uri GetSoundResourceUri(string soundResourceName)
+        {
+            // Strip file extension and leading slash from resource name to allow users
+            // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
+            soundResourceName = soundResourceName.TrimStart('/').Split('.').First();
+            var resourceId = this.services.Android.GetRawResourceIdByName(soundResourceName);
+            var resources = this.services.Android.AppContext.Resources;
+            return new Android.Net.Uri.Builder()
+                .Scheme(ContentResolver.SchemeAndroidResource)
+                .Authority(resources.GetResourcePackageName(resourceId))
+                .AppendPath(resources.GetResourceTypeName(resourceId))
+                .AppendPath(resources.GetResourceEntryName(resourceId))
+                .Build();
+        }
 
 
         protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
@@ -345,81 +336,79 @@ namespace Shiny.Notifications
             if (notification.Channel.IsEmpty())
                 return;
 
-            // TODO: if not api 26, emulate?
             var channel = await this.services.Repository.GetChannel(notification.Channel);
             if (channel == null)
                 return; // TODO: exception?
 
-            //this.context.IsMinApiLevel(26)
-            //        var notificationString = this.serializer.Serialize(notification);
+            foreach (var action in channel.Actions)
+            {
+                switch (action.ActionType)
+                {
+                    case ChannelActionType.OpenApp:
+                        break;
 
-            //        foreach (var action in category.Actions)
-            //        {
-            //            switch (action.ActionType)
-            //            {
-            //                case NotificationActionType.OpenApp:
-            //                    break;
+                    case ChannelActionType.TextReply:
+                        var textReplyAction = this.CreateTextReply(notification, action);
+                        builder.AddAction(textReplyAction);
+                        break;
 
-            //                case NotificationActionType.TextReply:
-            //                    var textReplyAction = this.CreateTextReply(notification, action);
-            //                    builder.AddAction(textReplyAction);
-            //                    break;
+                    case ChannelActionType.None:
+                    case ChannelActionType.Destructive:
+                        var destAction = this.CreateAction(notification, action);
+                        builder.AddAction(destAction);
+                        break;
 
-            //                case NotificationActionType.None:
-            //                case NotificationActionType.Destructive:
-            //                    var destAction = this.CreateAction(notification, action);
-            //                    builder.AddAction(destAction);
-            //                    break;
-
-            //                default:
-            //                    throw new ArgumentException("Invalid action type");
-            //            }
-            //        }
+                    default:
+                        throw new ArgumentException("Invalid action type");
+                }
+            }
         }
-        //static int counter = 100;
-        //protected virtual PendingIntent CreateActionIntent(Notification notification, NotificationAction action)
-        //{
-        //    var intent = this.context.CreateIntent<NotificationBroadcastReceiver>(NotificationBroadcastReceiver.IntentAction);
-        //    var content = this.serializer.Serialize(notification);
-        //    intent
-        //        .PutExtra("Notification", content)
-        //        .PutExtra("Action", action.Identifier);
-
-        //    counter++;
-        //    var pendingIntent = PendingIntent.GetBroadcast(
-        //        this.context.AppContext,
-        //        counter,
-        //        intent,
-        //        PendingIntentFlags.UpdateCurrent
-        //    );
-        //    return pendingIntent;
-        //}
 
 
-        //protected virtual NotificationCompat.Action CreateAction(Notification notification, NotificationAction action)
-        //{
-        //    var pendingIntent = this.CreateActionIntent(notification, action);
-        //    var iconId = this.context.GetResourceIdByName(action.Identifier);
-        //    var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
+        static int counter = 100;
+        protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
+        {
+            var intent = this.services.Android.CreateIntent<NotificationBroadcastReceiver>(NotificationBroadcastReceiver.IntentAction);
+            var content = this.services.Serializer.Serialize(notification);
+            intent
+                .PutExtra("Notification", content)
+                .PutExtra("Action", action.Identifier);
 
-        //    return nativeAction;
-        //}
+            counter++;
+            var pendingIntent = PendingIntent.GetBroadcast(
+                this.services.Android.AppContext,
+                counter,
+                intent,
+                PendingIntentFlags.UpdateCurrent
+            );
+            return pendingIntent;
+        }
 
 
-        //protected virtual NotificationCompat.Action CreateTextReply(Notification notification, NotificationAction action)
-        //{
-        //    var pendingIntent = this.CreateActionIntent(notification, action);
-        //    var input = new AndroidX.Core.App.RemoteInput.Builder("Result")
-        //        .SetLabel(action.Title)
-        //        .Build();
+        protected virtual NotificationCompat.Action CreateAction(Notification notification, ChannelAction action)
+        {
+            var pendingIntent = this.CreateActionIntent(notification, action);
+            var iconId = this.services.Android.GetResourceIdByName(action.Identifier);
+            var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
 
-        //    var iconId = this.context.GetResourceIdByName(action.Identifier);
-        //    var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
-        //        .SetAllowGeneratedReplies(true)
-        //        .AddRemoteInput(input)
-        //        .Build();
+            return nativeAction;
+        }
 
-        //    return nativeAction;
-        //}
+
+        protected virtual NotificationCompat.Action CreateTextReply(Notification notification, ChannelAction action)
+        {
+            var pendingIntent = this.CreateActionIntent(notification, action);
+            var input = new AndroidX.Core.App.RemoteInput.Builder("Result")
+                .SetLabel(action.Title)
+                .Build();
+
+            var iconId = this.services.Android.GetResourceIdByName(action.Identifier);
+            var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
+                .SetAllowGeneratedReplies(true)
+                .AddRemoteInput(input)
+                .Build();
+
+            return nativeAction;
+        }
     }
 }

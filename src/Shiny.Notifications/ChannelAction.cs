@@ -7,11 +7,27 @@ namespace Shiny.Notifications
     {
         public string Identifier { get; set; }
         public string Title { get; set; }
-        public NotificationActionType ActionType { get; set; } = NotificationActionType.None;
+        public ChannelActionType ActionType { get; set; } = ChannelActionType.None;
+
+
+        public static ChannelAction Create(string id, ChannelActionType actionType = ChannelActionType.None) => new ChannelAction
+        {
+            Identifier = id,
+            Title = id,
+            ActionType = actionType
+        };
+
+
+        public static ChannelAction Create(string id, string title, ChannelActionType actionType = ChannelActionType.None) => new ChannelAction
+        {
+            Identifier = id,
+            Title = title,
+            ActionType = actionType
+        };
     }
 
 
-    public enum NotificationActionType
+    public enum ChannelActionType
     {
         TextReply,
         Destructive,

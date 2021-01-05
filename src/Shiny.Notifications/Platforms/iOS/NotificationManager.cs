@@ -31,7 +31,12 @@ namespace Shiny.Notifications
 
         public void Start()
         {
-            this.SetCategories();
+            this.services
+                .Repository
+                .GetChannels()
+                .ContinueWith(x =>
+                    this.SetChannels(x.Result.ToArray())
+                );
 
             this.nativeDelegate
                 .WhenPresented()
@@ -165,6 +170,82 @@ namespace Shiny.Notifications
         }
 
 
+        public Task Cancel(int notificationId) => Dispatcher.InvokeOnMainThreadAsync(() =>
+        {
+            var ids = new[] { notificationId.ToString() };
+
+            UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
+            UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
+        });
+
+
+        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
+
+
+        public async Task SetChannels(params Channel[] channels)
+        {
+            await this.services.Repository.Clear<Channel>();
+            if (channels.Length == 0)
+                return;
+
+            var categories = new List<UNNotificationCategory>();
+            foreach (var channel in channels)
+            {
+                var actions = new List<UNNotificationAction>();
+                foreach (var action in channel.Actions)
+                {
+                    switch (action.ActionType)
+                    {
+                        case ChannelActionType.TextReply:
+                            actions.Add(UNTextInputNotificationAction.FromIdentifier(
+                                action.Identifier,
+                                action.Title,
+                                UNNotificationActionOptions.None,
+                                action.Title,
+                                String.Empty
+                            ));
+                            break;
+
+                        case ChannelActionType.Destructive:
+                            actions.Add(UNNotificationAction.FromIdentifier(
+                                action.Identifier,
+                                action.Title,
+                                UNNotificationActionOptions.Destructive
+                            ));
+                            break;
+
+                        case ChannelActionType.OpenApp:
+                            actions.Add(UNNotificationAction.FromIdentifier(
+                                action.Identifier,
+                                action.Title,
+                                UNNotificationActionOptions.Foreground
+                            ));
+                            break;
+
+                        case ChannelActionType.None:
+                            actions.Add(UNNotificationAction.FromIdentifier(
+                                action.Identifier,
+                                action.Title,
+                                UNNotificationActionOptions.None
+                            ));
+                            break;
+                    }
+                }
+
+                var native = UNNotificationCategory.FromIdentifier(
+                    channel.Identifier,
+                    actions.ToArray(),
+                    new string[] { "" },
+                    UNNotificationCategoryOptions.None
+                );
+                categories.Add(native);
+                await this.services.Repository.Set(channel.Identifier, channel);
+            }
+            var set = new NSSet<UNNotificationCategory>(categories.ToArray());
+            UNUserNotificationCenter.Current.SetNotificationCategories(set);
+        }
+
+
         protected virtual async Task<UNMutableNotificationContent> GetContent(Notification notification)
         {
             var content = new UNMutableNotificationContent
@@ -236,95 +317,6 @@ namespace Shiny.Notifications
                 }, false);
             }
             return trigger;
-        }
-
-
-        public Task Cancel(int notificationId) => Dispatcher.InvokeOnMainThreadAsync(() =>
-        {
-            var ids = new[] { notificationId.ToString() };
-
-            UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
-            UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
-        });
-
-
-        public async Task CreateChannel(Channel channel)
-        {
-            await this.services.Repository.SetChannel(channel);
-            await this.SetCategories();
-        }
-
-
-        public async Task DeleteChannel(string identifier)
-        {
-            await this.services.Repository.DeleteChannel(identifier);
-            await this.SetCategories();
-        }
-
-
-        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
-
-
-        async Task SetCategories()
-        {
-            var channels = await this.services.Repository.GetAll<Channel>();
-            if (channels.Count == 0)
-                return;
-
-            var categories = new List<UNNotificationCategory>();
-            foreach (var channel in channels)
-            {
-                var actions = new List<UNNotificationAction>();
-                foreach (var action in channel.Actions)
-                {
-                    switch (action.ActionType)
-                    {
-                        case NotificationActionType.TextReply:
-                            actions.Add(UNTextInputNotificationAction.FromIdentifier(
-                                action.Identifier,
-                                action.Title,
-                                UNNotificationActionOptions.None,
-                                action.Title,
-                                String.Empty
-                            ));
-                            break;
-
-                        case NotificationActionType.Destructive:
-                            actions.Add(UNNotificationAction.FromIdentifier(
-                                action.Identifier,
-                                action.Title,
-                                UNNotificationActionOptions.Destructive
-                            ));
-                            break;
-
-                        case NotificationActionType.OpenApp:
-                            actions.Add(UNNotificationAction.FromIdentifier(
-                                action.Identifier,
-                                action.Title,
-                                UNNotificationActionOptions.Foreground
-                            ));
-                            break;
-
-                        case NotificationActionType.None:
-                            actions.Add(UNNotificationAction.FromIdentifier(
-                                action.Identifier,
-                                action.Title,
-                                UNNotificationActionOptions.None
-                            ));
-                            break;
-                    }
-                }
-
-                var native = UNNotificationCategory.FromIdentifier(
-                    channel.Identifier,
-                    actions.ToArray(),
-                    new string[] { "" },
-                    UNNotificationCategoryOptions.None
-                );
-                categories.Add(native);
-            }
-            var set = new NSSet<UNNotificationCategory>(categories.ToArray());
-            UNUserNotificationCenter.Current.SetNotificationCategories(set);
         }
     }
 }

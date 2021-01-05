@@ -18,7 +18,8 @@ namespace Shiny
         public static bool UseNotifications(this IServiceCollection services,
                                             Type? delegateType,
                                             bool requestPermissionImmediately = false,
-                                            AndroidOptions? androidConfig = null)
+                                            AndroidOptions? androidConfig = null,
+                                            params Channel[] channels)
         {
 #if NETSTANDARD
             return false;
@@ -26,43 +27,31 @@ namespace Shiny
             services.RegisterModule(new NotificationModule(
                 delegateType,
                 requestPermissionImmediately,
-                androidConfig
+                androidConfig,
+                channels
             ));
             return true;
 #endif
         }
 
 
-        public static bool UseNotifications(this IServiceCollection services,
-                                            Type? delegateType,
-                                            bool requestPermissionImmediately = false)
-            => services.UseNotifications(delegateType, requestPermissionImmediately);
-
-
-        public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
-                                                                   bool requestPermissionImmediately = false)
-                where TNotificationDelegate : class, INotificationDelegate
-            => services.UseNotifications(
-                typeof(TNotificationDelegate),
-                requestPermissionImmediately,
-                null
-            );
-
-
         public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
                                                                    bool requestPermissionImmediately = false,
-                                                                   AndroidOptions? androidConfig = null)
+                                                                   AndroidOptions? androidConfig = null,
+                                                                   params Channel[] channels)
                 where TNotificationDelegate : class, INotificationDelegate
             => services.UseNotifications(
                 typeof(TNotificationDelegate),
                 requestPermissionImmediately,
-                androidConfig
+                androidConfig,
+                channels
             );
 
 
         public static bool UseNotifications(this IServiceCollection services,
                                             bool requestPermissionImmediately = false,
-                                            AndroidOptions? androidConfig = null)
+                                            AndroidOptions? androidConfig = null,
+                                            params Channel[] channels)
         {
 #if NETSTANDARD
             return false;
@@ -70,7 +59,8 @@ namespace Shiny
             services.RegisterModule(new NotificationModule(
                 null,
                 requestPermissionImmediately,
-                androidConfig
+                androidConfig,
+                channels
             ));
             return true;
 #endif

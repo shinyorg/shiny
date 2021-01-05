@@ -109,8 +109,6 @@ namespace Samples.Notifications
                     { nameof(this.Payload), this.Payload }
                 };
             }
-
-            //notification.Android.Vibrate = this.UseAndroidVibrate;
             notification.Android.UseBigTextStyle = this.UseAndroidBigTextStyle;
 
             await this.notificationManager.Send(notification);
@@ -132,9 +130,7 @@ namespace Samples.Notifications
         [Reactive] public TimeSpan SelectedTime { get; set; }
         [Reactive] public int BadgeCount { get; set; }
         [Reactive] public string Payload { get; set; }
-        [Reactive] public bool UseAndroidVibrate { get; set; }
         [Reactive] public bool UseAndroidBigTextStyle { get; set; }
-        [Reactive] public bool UseAndroidHighPriority { get; set; }
         [Reactive] public string Channel { get; set; }
         [Reactive] public string[] Channels { get; private set; }
 
@@ -154,6 +150,7 @@ namespace Samples.Notifications
         {
             this.Identifier = String.Empty;
             this.Payload = String.Empty;
+            this.Channel = null;
         }
     }
 }

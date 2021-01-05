@@ -26,34 +26,36 @@
                         IsVisible="{Binding IsAndroid, Converter={StaticResource Not}}"/>
 
                     <ui:MaterialTextField Text="{Binding Identifier}"
-                                      Placeholder="ID (Leave blank for auto/default)"
-                                      InputType="Numeric" />
+                                          Placeholder="ID (Leave blank for auto/default)"
+                                          InputType="Numeric" />
 
                     <ui:MaterialTextField Text="{Binding NotificationTitle}"
-                                      Placeholder="Title" />
+                                          Placeholder="Title" />
 
                     <ui:MaterialTextField Text="{Binding NotificationMessage}"
-                                      Placeholder="Message" />
+                                          Placeholder="Message" />
+
+                    <Picker Title="Channel"
+                            ItemsSource="{Binding Channels}"
+                            SelectedItem="{Binding Channel}" />
 
                     <ui:MaterialTextField Text="{Binding Payload}"
-                                      Placeholder="Payload" />
+                                          Placeholder="Payload" />
 
                     <ui:MaterialTextField Text="{Binding BadgeCount}"
-                                      Placeholder="Badge Count"
-                                      InputType="Numeric" />
+                                          Placeholder="Badge Count"
+                                          InputType="Numeric" />
 
                     <ui:MaterialDateField Date="{Binding SelectedDate}"
-                                      Placeholder="Date" />
+                                          Placeholder="Date" />
 
                     <ui:MaterialTimePicker Time="{Binding SelectedTime}" />
+
 
                     <ContentView IsVisible="{Binding IsAndroid}">
                         <StackLayout>
                             <ui:MaterialCheckbox Text="Android Big Text"
                                              IsSelected="{Binding UseAndroidBigTextStyle}" />
-
-                            <ui:MaterialCheckbox Text="Android Vibrate"
-                                             IsSelected="{Binding UseAndroidVibrate}" />
                         </StackLayout>
                     </ContentView>
                 </StackLayout>

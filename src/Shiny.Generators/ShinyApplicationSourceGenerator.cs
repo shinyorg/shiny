@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Shiny.Generators
 {
+    // TODO: could use with UWP/Windows
     public abstract class ShinyApplicationSourceGenerator : ISourceGenerator
     {
         const string GENERATED_STARTUP_TYPE_NAME = "AppShinyStartup";
@@ -87,14 +88,15 @@ namespace Shiny.Generators
                         this.RegisterAllDelegate("Shiny.Locations.IGpsDelegate", "services.UseGps", false);
                         this.RegisterAllDelegate("Shiny.Locations.IGeofenceDelegate", "services.UseGeofencing", true);
                         this.RegisterAllDelegate("Shiny.BluetoothLE.IBleDelegate", "services.UseBleClient", false);
-                        this.RegisterAllDelegate("Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
                         this.RegisterAllDelegate("Shiny.Net.Http.IHttpTransferDelegate", "services.UseHttpTransfers", true);
                         this.RegisterAllDelegate("Shiny.Beacons.IBeaconMonitorDelegate", "services.UseBeaconRanging", true);
                         this.RegisterAllDelegate("Shiny.Locations.Sync.IGeofenceSyncDelegate", "services.UseGeofencingSync", true);
                         this.RegisterAllDelegate("Shiny.Locations.Sync.IGpsSyncDelegate", "services.UseGpsSync", true);
                         this.RegisterAllDelegate("Shiny.TripTracker.ITripTrackerDelegate", "services.UseTripTracker", true);
                         this.RegisterAllDelegate("Shiny.DataSync.IDataSyncDelegate", "services.UseDataSync", true);
-                        this.RegisterPush();
+
+                        if (!this.RegisterPush())
+                            this.RegisterAllDelegate("Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
 
                         if (!this.ShinyConfig.ExcludeJobs)
                             this.RegisterJobs();
@@ -135,9 +137,14 @@ namespace Shiny.Generators
             { "Shiny.Push", "services.UsePush" }
         };
 
-        void RegisterPush()
+        bool RegisterPush()
         {
-            var cannotRegister = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
+            var registered = false;
+            var cannotRegister = this.Context
+                .Compilation
+                .ReferencedAssemblyNames
+                .FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
+
             if (cannotRegister != null)
             {
                 this.Context.ReportDiagnostic(Diagnostic.Create(
@@ -159,8 +166,10 @@ namespace Shiny.Generators
                 {
                     var registerStatement = PushRegisters[register.Name];
                     this.RegisterAllDelegate("Shiny.Push.IPushDelegate", registerStatement, true);
+                    registered = true;
                 }
             }
+            return registered;
         }
 
 
@@ -169,7 +178,11 @@ namespace Shiny.Generators
             var symbol = this.Context.Compilation.GetTypeByMetadataName(typeNameExists);
             if (symbol != null)
             {
-                //this.Log.Info("Registering in Shiny Startup - " + registerString);
+                this.Context.Log(
+                    "SHINYINFO",
+                    "Registering in Shiny Startup - " + registerString,
+                    DiagnosticSeverity.Info
+                );
                 this.builder.AppendLineInvariant(registerString);
                 return true;
             }

@@ -1,5 +1,6 @@
 ﻿#if !NETSTANDARD
 using System;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -10,6 +11,7 @@ namespace Shiny.Notifications
     {
         readonly Type? delegateType;
         readonly bool requestPermissionImmediately;
+        readonly Channel[] channels;
 
 
         public NotificationModule(Type? delegateType,
@@ -19,12 +21,12 @@ namespace Shiny.Notifications
         {
             this.delegateType = delegateType;
             this.requestPermissionImmediately = requestPermissionImmediately;
+            this.channels = channels;
 
             if (androidConfig != null)
             {
                 AndroidOptions.DefaultLaunchActivityFlags = androidConfig.LaunchActivityFlags;
                 AndroidOptions.DefaultShowWhen = androidConfig.ShowWhen;
-                //AndroidOptions.DefaultVibrate = androidConfig.Vibrate;
                 AndroidOptions.DefaultSmallIconResourceName = androidConfig.SmallIconResourceName ?? AndroidOptions.DefaultSmallIconResourceName;
                 AndroidOptions.DefaultColorResourceName = androidConfig.ColorResourceName;
             }
@@ -59,6 +61,9 @@ namespace Shiny.Notifications
         {
             base.OnContainerReady(services);
             var manager = services.GetRequiredService<INotificationManager>();
+
+            if (this.channels.Any())
+                await manager.SetChannels(this.channels);
 
             if (requestPermissionImmediately)
                 await manager.RequestAccess();

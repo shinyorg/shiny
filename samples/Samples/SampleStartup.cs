@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 using Shiny.Notifications;
 using Shiny.Logging;
-
+using Samples.Notifications;
 
 namespace Samples
 {
@@ -58,31 +58,33 @@ namespace Samples
             services.UseGps<GpsDelegate>();
 
             services.UseNotifications();
-            //services.UseNotifications<NotificationDelegate>(
-            //    true,
-            //    new NotificationCategory(
-            //        "Test",
-            //        new NotificationAction("Reply", "Reply", NotificationActionType.TextReply),
-            //        new NotificationAction("Yes", "Yes", NotificationActionType.None),
-            //        new NotificationAction("No", "No", NotificationActionType.Destructive)
-            //    ),
-            //    new NotificationCategory(
-            //        "ChatName",
-            //        new NotificationAction("Answer", "Answer", NotificationActionType.TextReply)
-            //    ),
-            //    new NotificationCategory(
-            //        "ChatAnswer",
-            //        new NotificationAction("yes", "Yes", NotificationActionType.None),
-            //        new NotificationAction("no", "No", NotificationActionType.Destructive)
-            //    )
-            //);
+            services.UseNotifications<NotificationDelegate>(
+                true,
+                null,
+                Channel.Create(
+                    "Test",
+                    ChannelAction.Create("Reply", ChannelActionType.TextReply),
+                    ChannelAction.Create("Reply", ChannelActionType.TextReply),
+                    ChannelAction.Create("Yes"),
+                    ChannelAction.Create("No", ChannelActionType.Destructive)
+                ),
+                Channel.Create(
+                    "ChatName",
+                    ChannelAction.Create("Answer", ChannelActionType.TextReply)
+                ),
+                Channel.Create(
+                    "ChatAnswer",
+                    ChannelAction.Create("Yes"),
+                    ChannelAction.Create("No", ChannelActionType.Destructive)
+                )
+            );
 
             //services.UsePushNotifications<PushDelegate>();
             //services.UseFirebaseMessaging<PushDelegate>();
-            services.UsePushAzureNotificationHubs<PushDelegate>(
-                Constants.AnhListenerConnectionString,
-                Constants.AnhHubName
-            );
+            //services.UsePushAzureNotificationHubs<PushDelegate>(
+            //    Constants.AnhListenerConnectionString,
+            //    Constants.AnhHubName
+            //);
         }
     }
 }

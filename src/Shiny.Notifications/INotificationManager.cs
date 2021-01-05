@@ -8,18 +8,11 @@ namespace Shiny.Notifications
     public interface INotificationManager
     {
         /// <summary>
-        /// Create channel
+        /// Clears current channels and creates what is passed in
         /// </summary>
-        /// <param name="channel"></param>
-        Task CreateChannel(Channel channel);
-
-
-        /// <summary>
-        /// Delete channel
-        /// </summary>
-        /// <param name="identifier"></param>
-        Task DeleteChannel(string identifier);
-
+        /// <param name="channels"></param>
+        /// <returns></returns>
+        Task SetChannels(params Channel[] channels);
 
         /// <summary>
         /// Gets list of channels

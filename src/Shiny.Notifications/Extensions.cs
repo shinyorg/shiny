@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
@@ -8,6 +9,54 @@ namespace Shiny.Notifications
 {
     public static class Extensions
     {
+        public static void AssertValid(this Channel channel)
+        {
+            if (channel.Identifier.IsEmpty())
+                throw new ArgumentException("Channel identifier is required", nameof(channel.Identifier));
+
+            if (channel.Actions != null)
+                foreach (var action in channel.Actions)
+                    action.AssertValid();
+        }
+
+
+        public static void AssertValid(this ChannelAction action)
+        {
+            if (action.Identifier.IsEmpty())
+                throw new ArgumentException("ChannelAction Identifier is required", nameof(action.Identifier));
+
+            if (action.Title.IsEmpty())
+                throw new ArgumentException("ChannelAction Title is required", nameof(action.Title));
+        }
+
+
+        public static async Task CreateChannel(this INotificationManager manager, Channel channel)
+        {
+            var channels = await manager.GetChannels();
+            var newChannels = channels.ToList();
+            newChannels.Add(channel);
+            await manager.SetChannels(newChannels.ToArray());
+        }
+
+
+        public static async Task DeleteChannel(this INotificationManager manager, string channelIdentifier)
+        {
+            var channels = await manager.GetChannels();
+            var newChannels = channels
+                .Where(x => x.Identifier != channelIdentifier)
+                .ToArray();
+            await manager.SetChannels(newChannels);
+        }
+
+
+
+        public static async Task UpdateChannel(this INotificationManager manager, Channel channel)
+        {
+            await manager.DeleteChannel(channel.Identifier);
+            await manager.CreateChannel(channel);
+        }
+
+
         public static bool TryCreatePersistentNotification(this INotificationManager manager, Notification notification, out IPersistentNotification? persistentNotification)
         {
             persistentNotification = null;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Shiny.Notifications
@@ -12,5 +13,15 @@ namespace Shiny.Notifications
 
         public ChannelImportance Importance { get; set; } = ChannelImportance.Normal;
         public string? CustomSoundPath { get; set; }
+
+
+        public static Channel Create(string id, params ChannelAction[] actions)
+        {
+            var channel = new Channel { Identifier = id };
+            if (actions.Length > 0)
+                channel.Actions = actions.ToList();
+
+            return channel;
+        }
     }
 }

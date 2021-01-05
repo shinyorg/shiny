@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Reactive;
 using System.Windows.Input;
-
 using Prism.Navigation;
-
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Infrastructure;
@@ -40,7 +37,7 @@ namespace Samples.Notifications
                 x => this.Importance = x.ToString()
             );
 
-            this.PickActionType1 = dialogs.PickEnumValueCommand<NotificationActionType>(
+            this.PickActionType1 = dialogs.PickEnumValueCommand<ChannelActionType>(
                 "Action Type",
                 x => this.Action1ActionType = x.ToString(),
                this.WhenAny(
@@ -48,7 +45,7 @@ namespace Samples.Notifications
                     x => x.GetValue()
                 )
             );
-            this.PickActionType2 = dialogs.PickEnumValueCommand<NotificationActionType>(
+            this.PickActionType2 = dialogs.PickEnumValueCommand<ChannelActionType>(
                 "Action Type",
                 x => this.Action1ActionType = x.ToString(),
                 this.WhenAny(
@@ -72,12 +69,12 @@ namespace Samples.Notifications
         [Reactive] public bool UseAction1 { get; set; }
         [Reactive] public string Action1Identifier { get; set; }
         [Reactive] public string Action1Title { get; set; }
-        [Reactive] public string Action1ActionType { get; private set; } = NotificationActionType.None.ToString();
+        [Reactive] public string Action1ActionType { get; private set; } = ChannelActionType.None.ToString();
 
         [Reactive] public bool UseAction2 { get; set; }
         [Reactive] public string Action2Identifier { get; set; }
         [Reactive] public string Action2Title { get; set; }
-        [Reactive] public string Action2ActionType { get; private set; } = NotificationActionType.None.ToString();
+        [Reactive] public string Action2ActionType { get; private set; } = ChannelActionType.None.ToString();
 
         //if (!this.AndroidChannel.IsEmpty())
         //{
@@ -125,7 +122,7 @@ namespace Samples.Notifications
                 {
                     Identifier = this.Action1Identifier,
                     Title = this.Action1Title,
-                    ActionType = (NotificationActionType)Enum.Parse(typeof(NotificationActionType), this.Action1ActionType)
+                    ActionType = (ChannelActionType)Enum.Parse(typeof(ChannelActionType), this.Action1ActionType)
                 });
             }
             if (this.UseAction2)
@@ -134,7 +131,7 @@ namespace Samples.Notifications
                 {
                     Identifier = this.Action2Identifier,
                     Title = this.Action2Title,
-                    ActionType = (NotificationActionType)Enum.Parse(typeof(NotificationActionType), this.Action2ActionType)
+                    ActionType = (ChannelActionType)Enum.Parse(typeof(ChannelActionType), this.Action2ActionType)
                 });
             }
 
@@ -144,7 +141,7 @@ namespace Samples.Notifications
         //bool ValidateAction(strin)
 
 
-        (string Key, Action Action) GetActionType(NotificationActionType actionType, string arg) =>
+        (string Key, Action Action) GetActionType(ChannelActionType actionType, string arg) =>
         (
             actionType.ToString(),
             () =>

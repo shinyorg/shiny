@@ -92,6 +92,7 @@ namespace Shiny.Push
             return headers;
         }
 
+
         public static IDictionary<string, string> ExtractHeaders(object args)
         {
             IDictionary<string, string> headers = new Dictionary<string, string>();

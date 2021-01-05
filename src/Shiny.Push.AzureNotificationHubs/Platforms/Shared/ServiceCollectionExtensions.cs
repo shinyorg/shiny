@@ -11,14 +11,16 @@ namespace Shiny
         public static bool UsePushAzureNotificationHubs(this IServiceCollection services,
                                                         Type delegateType,
                                                         string listenerConnectionString,
-                                                        string hubName)
+                                                        string hubName,
+                                                        params Channel[] channels)
         {
 #if NETSTANDARD2_0
             return false;
 #else
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Push.AzureNotificationHubs.PushManager),
-                delegateType
+                delegateType,
+                channels
             ));
             services.AddSingleton(new Shiny.Push.AzureNotificationHubs.AzureNotificationConfig(listenerConnectionString, hubName));
             return true;
@@ -28,12 +30,14 @@ namespace Shiny
 
         public static bool UsePushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services,
                                                                        string listenerConnectionString,
-                                                                       string hubName)
+                                                                       string hubName,
+                                                                       params Channel[] channels)
             where TPushDelegate : class, IPushDelegate
             => services.UsePushAzureNotificationHubs(
                 typeof(TPushDelegate),
                 listenerConnectionString,
-                hubName
+                hubName,
+                channels
             );
     }
 }
