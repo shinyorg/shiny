@@ -58,6 +58,12 @@ namespace Shiny.Testing.BluetoothLE
         public byte[] LastWriteValue { get; private set; }
         public IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true)
         {
+            if (value is null)
+                throw new ArgumentException("Write value cannot be null", nameof(value));
+
+            if (value.Length > this.Service.Peripheral.MtuSize)
+                throw new ArgumentException($"Write length of $'{value.Length}' exceeds MTU size '{this.Service.Peripheral.MtuSize}'");
+
             this.LastWriteValue = value;
             var type = withResponse ? CharacteristicResultType.Write : CharacteristicResultType.WriteWithoutResponse;
             return Observable.Return(new CharacteristicGattResult(this, value, type));
