@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reactive.Linq;
 
 
@@ -125,6 +126,22 @@ namespace Shiny.BluetoothLE
             => peripheral
                 .GetKnownCharacteristics(serviceUuid, characteristicUuid)
                 .Select(x => x.Write(data, withResponse))
+                .Switch();
+
+
+        /// <summary>
+        /// Discover the characteristic and write to it
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <param name="serviceUuid"></param>
+        /// <param name="characteristicUuid"></param>
+        /// <param name="withResponse"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static IObservable<BleWriteSegment> WriteCharacteristicBlob(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, Stream stream, bool useTransaction = false)
+            => peripheral
+                .GetKnownCharacteristics(serviceUuid, characteristicUuid)
+                .Select(x => useTransaction ? x.BlobWriteTransaction(stream) : x.BlobWrite(stream))
                 .Switch();
 
 
