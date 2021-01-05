@@ -41,7 +41,7 @@ namespace Shiny.BluetoothLE
                 remaining = len - pos;
                 if (remaining > 0 && remaining < mtu)
                 {
-                    // readjust buffer -- we don't want to send extra garbage 
+                    // readjust buffer -- we don't want to send extra garbage
                     buffer = new byte[remaining];
                 }
 
@@ -64,8 +64,10 @@ namespace Shiny.BluetoothLE
         public static bool CanRead(this IGattCharacteristic ch) => ch.Properties.HasFlag(CharacteristicProperties.Read);
         public static bool CanWriteWithResponse(this IGattCharacteristic ch) => ch.Properties.HasFlag(CharacteristicProperties.Write);
         public static bool CanWriteWithoutResponse(this IGattCharacteristic ch) => ch.Properties.HasFlag(CharacteristicProperties.WriteWithoutResponse);
-        public static bool CanWrite(this IGattCharacteristic ch)
-            => ch.Properties.HasFlag(CharacteristicProperties.WriteWithoutResponse) || ch.Properties.HasFlag(CharacteristicProperties.Write);
+        public static bool CanWrite(this IGattCharacteristic ch) =>
+            ch.Properties.HasFlag(CharacteristicProperties.WriteWithoutResponse) ||
+            ch.Properties.HasFlag(CharacteristicProperties.Write) ||
+            ch.Properties.HasFlag(CharacteristicProperties.AuthenticatedSignedWrites);
 
 
         public static bool CanNotifyOrIndicate(this IGattCharacteristic ch) => ch.CanNotify() || ch.CanIndicate();
