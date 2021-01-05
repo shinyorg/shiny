@@ -198,11 +198,15 @@ namespace Shiny.Notifications
         }
 
 
+
+
         public async Task SetChannels(params Channel[] channels)
         {
-            await this.services.Repository.Clear<Channel>();
+            await this.services.Repository.DeleteAllChannels();
             foreach (var channel in channels)
-                await this.services.Repository.Set(channel.Identifier, channel);
+                await this.services.Repository.SetChannel(channel);
         }
+
+        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
     }
 }

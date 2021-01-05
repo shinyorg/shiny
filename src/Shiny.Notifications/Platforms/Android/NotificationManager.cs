@@ -165,7 +165,7 @@ namespace Shiny.Notifications
             => this.manager.Notify(id, notification);
 
 
-       
+
 
 
         public async Task SetChannels(params Channel[] channels)
@@ -174,7 +174,7 @@ namespace Shiny.Notifications
             foreach (var exist in existing)
                 this.manager.DeleteNotificationChannel(exist.Identifier);
 
-            await this.services.Repository.Clear<Channel>();
+            await this.services.Repository.DeleteAllChannels();
             foreach (var channel in channels)
                 await this.CreateChannel(channel);
         }

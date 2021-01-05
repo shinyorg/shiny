@@ -82,8 +82,11 @@ namespace Shiny.Notifications
         public static Task SetChannel(this IRepository repository, Channel channel)
             => repository.Set(channel.Identifier, channel);
 
-        public static Task DeleteChannel(this IRepository repository, string channelIdentifier)
-            => repository.Remove<Channel>(channelIdentifier);
+        //public static Task DeleteChannel(this IRepository repository, string channelIdentifier)
+        //    => repository.Remove<Channel>(channelIdentifier);
+
+        public static Task DeleteAllChannels(this IRepository repository)
+            => repository.Clear<Channel>();
 
         public static Task<Channel?> GetChannel(this IRepository repository, string channelIdentifier)
             => repository.Get<Channel>(channelIdentifier);

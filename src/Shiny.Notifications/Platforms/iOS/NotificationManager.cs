@@ -239,7 +239,7 @@ namespace Shiny.Notifications
                     UNNotificationCategoryOptions.None
                 );
                 categories.Add(native);
-                await this.services.Repository.Set(channel.Identifier, channel);
+                await this.services.Repository.SetChannel(channel);
             }
             var set = new NSSet<UNNotificationCategory>(categories.ToArray());
             UNUserNotificationCenter.Current.SetNotificationCategories(set);
@@ -269,7 +269,7 @@ namespace Shiny.Notifications
             if (notification.Channel.IsEmpty())
                 return;
 
-            var channel = await this.services.Repository.Get<Channel>(notification.Channel);
+            var channel = await this.services.Repository.GetChannel(notification.Channel);
             if (channel == null)
                 return;
 
