@@ -14,6 +14,7 @@ using Shiny.Notifications;
 using Shiny.Logging;
 using Samples.Notifications;
 
+
 namespace Samples
 {
     public class SampleStartup : ShinyStartup
@@ -57,13 +58,9 @@ namespace Samples
             //services.UseGpsDirectGeofencing<LocationDelegates>();
             services.UseGps<GpsDelegate>();
 
-            services.UseNotifications();
-            services.UseNotifications<NotificationDelegate>(
-                true,
-                null,
+            var channels = new [] {
                 Channel.Create(
                     "Test",
-                    ChannelAction.Create("Reply", ChannelActionType.TextReply),
                     ChannelAction.Create("Reply", ChannelActionType.TextReply),
                     ChannelAction.Create("Yes"),
                     ChannelAction.Create("No", ChannelActionType.Destructive)
@@ -77,14 +74,21 @@ namespace Samples
                     ChannelAction.Create("Yes"),
                     ChannelAction.Create("No", ChannelActionType.Destructive)
                 )
+            };
+
+            services.UseNotifications<NotificationDelegate>(
+                false,
+                null,
+                channels // only pass channels to push or here, not both
             );
 
             //services.UsePushNotifications<PushDelegate>();
             //services.UseFirebaseMessaging<PushDelegate>();
-            //services.UsePushAzureNotificationHubs<PushDelegate>(
-            //    Constants.AnhListenerConnectionString,
-            //    Constants.AnhHubName
-            //);
+            services.UsePushAzureNotificationHubs<PushDelegate>(
+                Constants.AnhListenerConnectionString,
+                Constants.AnhHubName,
+                channels
+            );
         }
     }
 }
