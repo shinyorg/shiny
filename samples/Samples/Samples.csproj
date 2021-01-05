@@ -18,6 +18,7 @@
         <PackageReference Include="sqlite-net-pcl" />
         <PackageReference Include="Xamarin.Forms" />
         <PackageReference Include="XF.Material" />
+        <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
         <ProjectReference Include="..\Samples.SqliteGenerator\Samples.SqliteGenerator.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />

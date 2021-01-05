@@ -18,7 +18,6 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <PackageReference Include="Xamarin.Firebase.iOS.Core" />
         <PackageReference Include="Xamarin.Firebase.iOS.CloudMessaging" />
         <PackageReference Include="Xamarin.Firebase.iOS.InstanceID" />

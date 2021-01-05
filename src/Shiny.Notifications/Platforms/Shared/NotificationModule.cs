@@ -62,7 +62,7 @@ namespace Shiny.Notifications
             base.OnContainerReady(services);
             var manager = services.GetRequiredService<INotificationManager>();
 
-            if (this.channels.Any())
+            if (this.channels?.Any() ?? false)
                 await manager.SetChannels(this.channels);
 
             if (requestPermissionImmediately)

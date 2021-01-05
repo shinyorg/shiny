@@ -76,14 +76,11 @@ namespace Samples
                 )
             };
 
-            services.UseNotifications<NotificationDelegate>(
-                false,
-                null,
-                channels // only pass channels to push or here, not both
-            );
+            // only pass channels to push or here, not both - technically you don't need this with push
+            services.UseNotifications<NotificationDelegate>();
 
-            //services.UsePushNotifications<PushDelegate>();
-            //services.UseFirebaseMessaging<PushDelegate>();
+            //services.UsePush<PushDelegate>(channels);
+            //services.UseFirebaseMessaging<PushDelegate>(channels);
             services.UsePushAzureNotificationHubs<PushDelegate>(
                 Constants.AnhListenerConnectionString,
                 Constants.AnhHubName,
