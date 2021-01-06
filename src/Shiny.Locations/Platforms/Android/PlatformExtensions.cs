@@ -10,9 +10,6 @@ namespace Shiny.Locations
 {
     static class PlatformExtensions
     {
-        public const string ACCESS_BACKGROUND_LOCATION = "android.permission.ACCESS_BACKGROUND_LOCATION";
-
-
         internal static AccessState GetLocationManagerStatus(this IAndroidContext context, bool gpsRequired, bool networkRequired)
         {
             var lm = context.GetSystemService<LocationManager>(Context.LocationService);
@@ -38,7 +35,7 @@ namespace Shiny.Locations
 
             if (context.IsMinApiLevel(29) && background)
             {
-                status = context.GetCurrentAccessState(ACCESS_BACKGROUND_LOCATION);
+                status = context.GetCurrentAccessState(P.AccessBackgroundLocation);
                 if (status != AccessState.Available)
                     return status;
             }
@@ -56,19 +53,26 @@ namespace Shiny.Locations
                 return status;
 
             var locationPerm = fineAccess ? P.AccessFineLocation : P.AccessCoarseLocation;
-            if (context.IsMinApiLevel(29) && background)
-            {
-                return await context
-                    .RequestAccess
-                    (
-                        ACCESS_BACKGROUND_LOCATION,
-                        P.ForegroundService,
-                        locationPerm
-                    )
-                    .ToTask();
-            }
+            if (!context.IsMinApiLevel(29) || !background)
+                return await context.RequestAccess(locationPerm).ToTask();
 
-            return await context.RequestAccess(locationPerm).ToTask();
+
+            var access = await context
+                .RequestPermissions
+                (
+                    P.AccessBackgroundLocation,
+                    P.ForegroundService,
+                    locationPerm
+                )
+                .ToTask();
+
+            if (!access.IsGranted(locationPerm))
+                return AccessState.Denied;
+
+            if (!access.IsGranted(P.AccessBackgroundLocation))
+                return AccessState.Restricted;
+
+            return AccessState.Available;
         }
 
 

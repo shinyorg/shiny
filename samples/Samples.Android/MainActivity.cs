@@ -5,6 +5,7 @@ using Android.Content.PM;
 using Xamarin.Forms.Platform.Android;
 using Xamarin.Forms;
 using Android.OS;
+using Android.Runtime;
 
 [assembly: ShinyApplication(
     ShinyStartupTypeName = "Samples.SampleStartup",
@@ -29,5 +30,13 @@ namespace Samples.Droid
             "Expander_Experimental",
             "RadioButton_Experimental"
         );
+
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+        {
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            // background denied, foreground & fine location = 0
+            this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }

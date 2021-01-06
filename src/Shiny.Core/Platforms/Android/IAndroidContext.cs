@@ -24,7 +24,9 @@ namespace Shiny
         bool IsInManifest(string androidPermission);
         bool IsMinApiLevel(int apiLevel);
         void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResult);
-        IObservable<AccessState> RequestAccess(params string[] androidPermissions);
+
+        IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions);
+        IObservable<AccessState> RequestAccess(string androidPermission);
         void StartService(Type serviceType, bool foreground);
         void StopService(Type serviceType);
         IObservable<ActivityChanged> WhenActivityStatusChanged();

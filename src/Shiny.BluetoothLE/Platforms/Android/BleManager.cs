@@ -59,10 +59,7 @@ namespace Shiny.BluetoothLE
                 return AccessState.NotSetup;
 
             var forBackground = this.context.Services.GetService(typeof(IBleDelegate)) != null;
-            var result = this.context.Android.IsMinApiLevel(29) && forBackground
-                ? await this.context.Android.RequestAccess(Manifest.Permission.AccessBackgroundLocation, Manifest.Permission.AccessFineLocation)
-                : await this.context.Android.RequestAccess(Manifest.Permission.AccessFineLocation);
-
+            var result = await this.context.Android.RequestAccess(Manifest.Permission.AccessFineLocation);
             if (result != AccessState.Available)
                 return result;
 

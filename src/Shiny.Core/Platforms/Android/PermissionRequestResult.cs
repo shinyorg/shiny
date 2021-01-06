@@ -23,5 +23,12 @@ namespace Shiny
 
         public int Length => this.Permissions?.Length ?? 0;
         public (string, NativePerm) this[int index] => (this.Permissions[index], this.GrantResults[index]);
+
+
+        public bool IsGranted(string permission)
+        {
+            var index = this.Permissions.ToList().IndexOf(permission);
+            return this.GrantResults[index] == NativePerm.Granted;
+        }
     }
 }

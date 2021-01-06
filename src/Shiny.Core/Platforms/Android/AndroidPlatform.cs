@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Disposables;
 using System.Threading;
 using Android.App;
 using Android.Content;
@@ -11,7 +12,7 @@ using AndroidX.Lifecycle;
 using Microsoft.Extensions.DependencyInjection;
 using B = global::Android.OS.Build;
 using Shiny.Logging;
-using System.Reactive.Disposables;
+
 
 namespace Shiny
 {
@@ -163,8 +164,8 @@ namespace Shiny
         });
 
 
-        
-        public IObservable<AccessState> RequestAccess(params string[] androidPermissions) => Observable.Create<AccessState>(ob =>
+
+        public IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions) => Observable.Create<PermissionRequestResult>(ob =>
         {
             //if(ActivityCompat.ShouldShowRequestPermissionRationale(this.TopActivity, androidPermission))
             //var currentGrant = this.GetCurrentAccessState(androidPermission);
@@ -179,17 +180,12 @@ namespace Shiny
             //    ob.Respond()
             //    return () => { };
             //}
-
             var comp = new CompositeDisposable();
             var current = Interlocked.Increment(ref this.requestCode);
             comp.Add(this
                 .permissionSubject
                 .Where(x => x.RequestCode == current)
-                .Subscribe(result =>
-                {
-                    var state = result.IsSuccess() ? AccessState.Available : AccessState.Denied;
-                    ob.OnNext(state);
-                })
+                .Subscribe(x => ob.OnNext(x))
             );
 
             comp.Add(this
@@ -205,6 +201,10 @@ namespace Shiny
             );
             return comp;
         });
+
+
+        public IObservable<AccessState> RequestAccess(string androidPermissions)
+            => this.RequestPermissions(new[] { androidPermissions }).Select(x => x.IsSuccess() ? AccessState.Available : AccessState.Denied);
 
 
         public Intent CreateIntent<T>(params string[] actions)
