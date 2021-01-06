@@ -1,7 +1,7 @@
 <Project>
 
     <ItemGroup>
-        <PackageReference Update="Xamarin.Forms" Version="4.8.0.1821" />
+        <PackageReference Update="Xamarin.Forms" Version="5.0.0.1874" />
         <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.1" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />
         <PackageReference Update="Bogus" Version="32.0.2" />
