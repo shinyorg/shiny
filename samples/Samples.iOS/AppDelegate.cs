@@ -1,7 +1,5 @@
 ﻿using System;
 using Foundation;
-using UIKit;
-using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 using Shiny;
 
@@ -17,10 +15,10 @@ namespace Samples.iOS
     [Register("AppDelegate")]
     public partial class AppDelegate : FormsApplicationDelegate
     {
-        partial void OnPreFinishedLaunching(UIApplication app, NSDictionary options) => Forms.SetFlags(
-            "SwipeView_Experimental",
-            "Expander_Experimental",
-            "RadioButton_Experimental"
-        );
+        //partial void OnPreFinishedLaunching(UIApplication app, NSDictionary options) => Forms.SetFlags(
+        //    "SwipeView_Experimental",
+        //    "Expander_Experimental",
+        //    "RadioButton_Experimental"
+        //);
     }
 }

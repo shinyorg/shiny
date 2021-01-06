@@ -13,30 +13,23 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <StackLayout>
-            <Expander>
-                <Expander.Header>
-                    <Label Text="{Binding SelectedDate, StringFormat='Date: {0:d}'}"
-                           FontSize="Large"
-                           FontAttributes="Bold"
-                           HorizontalOptions="FillAndExpand"
-                           HorizontalTextAlignment="Center"
-                           TextColor="White"
-                           BackgroundColor="Black" />
-                </Expander.Header>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <Frame BorderColor="Black">
-                    <StackLayout>
-                        <DatePicker Date="{Binding SelectedDate}"
-                                    MaximumDate="{x:Static sys:DateTime.Now}"
-                                    HorizontalOptions="CenterAndExpand"
-                                    FontSize="Large"/>
-                    </StackLayout>
-                </Frame>
-            </Expander>
+            <Frame BorderColor="Black"
+                   Grid.Row="0">
+                <DatePicker Date="{Binding SelectedDate}"
+                            MaximumDate="{x:Static sys:DateTime.Now}"
+                            HorizontalOptions="CenterAndExpand"
+                            FontSize="Large"/>
+            </Frame>
 
             <RefreshView IsRefreshing="{Binding IsBusy}"
-                         Command="{Binding Load}">
+                         Command="{Binding Load}"
+                         Grid.Row="1">
                 <CollectionView ItemsSource="{Binding Logs}">
 
                     <CollectionView.EmptyView>
@@ -53,7 +46,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </RefreshView>
+        </Grid>
 
-        </StackLayout>
     </ContentPage.Content>
 </ContentPage>

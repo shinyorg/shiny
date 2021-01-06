@@ -56,7 +56,6 @@ namespace Shiny.Locations
             if (!context.IsMinApiLevel(29) || !background)
                 return await context.RequestAccess(locationPerm).ToTask();
 
-
             var access = await context
                 .RequestPermissions
                 (

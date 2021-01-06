@@ -25,17 +25,9 @@ namespace Samples.Droid
     )]
     public partial class MainActivity : FormsAppCompatActivity
     {
-        partial void OnPreCreate(Bundle savedInstanceState) => Forms.SetFlags(
-            "SwipeView_Experimental",
-            "Expander_Experimental",
-            "RadioButton_Experimental"
-        );
-
-
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            // background denied, foreground & fine location = 0
             this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }

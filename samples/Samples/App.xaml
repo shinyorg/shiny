@@ -7,6 +7,14 @@
                         x:Class="Samples.App">
     <prism:PrismApplication.Resources>
         <ResourceDictionary>
+            <Style x:Key="NoDataLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="{DynamicResource Large}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+                <Setter Property="VerticalTextAlignment" Value="Center" />
+                <Setter Property="VerticalOptions" Value="FillAndExpand" />
+            </Style>
+
             <!--https://coolors.co/c2e812-91f5ad-8b9eb7-745296-632a50-->
             <Color x:Key="Primary">#C2E812</Color>
             <Color x:Key="PrimaryDark">#4ba677</Color>
@@ -67,14 +75,6 @@
 
             <Style TargetType="Switch" ApplyToDerivedTypes="True">
                 <Setter Property="OnColor" Value="{StaticResource Primary}" />
-            </Style>
-
-            <Style x:Key="NoDataLabel" TargetType="Label">
-                <Setter Property="FontSize" Value="{DynamicResource Large}" />
-                <Setter Property="HorizontalTextAlignment" Value="Center" />
-                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
-                <Setter Property="VerticalTextAlignment" Value="Center" />
-                <Setter Property="VerticalOptions" Value="FillAndExpand" />
             </Style>
 
             <Style x:Key="HR" TargetType="BoxView">

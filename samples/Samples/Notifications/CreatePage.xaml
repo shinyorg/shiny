@@ -22,8 +22,8 @@
                 <StackLayout>
 
                     <Button Text="Request Permissions"
-                        Command="{Binding PermissionCheck}"
-                        IsVisible="{Binding IsAndroid, Converter={StaticResource Not}}"/>
+                            Command="{Binding PermissionCheck}"
+                            IsVisible="{Binding IsAndroid, Converter={StaticResource Not}}"/>
 
                     <ui:MaterialTextField Text="{Binding Identifier}"
                                           Placeholder="ID (Leave blank for auto/default)"

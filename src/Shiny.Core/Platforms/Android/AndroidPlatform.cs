@@ -167,7 +167,6 @@ namespace Shiny
 
         public IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions) => Observable.Create<PermissionRequestResult>(ob =>
         {
-            //if(ActivityCompat.ShouldShowRequestPermissionRationale(this.TopActivity, androidPermission))
             //var currentGrant = this.GetCurrentAccessState(androidPermission);
             //if (currentGrant == AccessState.Available)
             //{
@@ -184,8 +183,12 @@ namespace Shiny
             var current = Interlocked.Increment(ref this.requestCode);
             comp.Add(this
                 .permissionSubject
-                .Where(x => x.RequestCode == current)
-                .Subscribe(x => ob.OnNext(x))
+                .Where(x =>
+                    x.RequestCode == current
+                )
+                .Subscribe(x =>
+                    ob.OnNext(x)
+                )
             );
 
             comp.Add(this

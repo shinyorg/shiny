@@ -19,6 +19,7 @@
         <PackageReference Include="XF.Material" />
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="Rg.Plugins.Popup" />
+        <PackageReference Include="Xamarin.CommunityToolkit" />
         <ProjectReference Include="..\Samples.SqliteGenerator\Samples.SqliteGenerator.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />

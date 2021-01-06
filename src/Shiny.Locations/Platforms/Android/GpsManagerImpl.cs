@@ -150,6 +150,7 @@ namespace Shiny.Locations
             this.CurrentListener = request;
         }
 
+
         protected static int GetPriority(GpsPriority priority)
         {
             switch (priority)
