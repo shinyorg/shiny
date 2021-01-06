@@ -40,7 +40,7 @@ namespace Samples.Notifications
             this.PickActionType1 = dialogs.PickEnumValueCommand<ChannelActionType>(
                 "Action Type",
                 x => this.Action1ActionType = x.ToString(),
-               this.WhenAny(
+                this.WhenAny(
                     x => x.UseAction1,
                     x => x.GetValue()
                 )
@@ -75,17 +75,6 @@ namespace Samples.Notifications
         [Reactive] public string Action2Identifier { get; set; }
         [Reactive] public string Action2Title { get; set; }
         [Reactive] public string Action2ActionType { get; private set; } = ChannelActionType.None.ToString();
-
-        //if (!this.AndroidChannel.IsEmpty())
-        //{
-        //    notification.Android.ChannelId = this.AndroidChannel;
-        //    notification.Android.Channel = this.AndroidChannel;
-        //}
-        //if (this.UseAndroidHighPriority)
-        //{
-        //    notification.Android.Priority = 9;
-        //    notification.Android.NotificationImportance = AndroidNotificationImportance.Max;
-        //}
 
         //NotificationSound GetSound()
         //{
@@ -137,20 +126,5 @@ namespace Samples.Notifications
 
             return channel;
         }
-
-        //bool ValidateAction(strin)
-
-
-        (string Key, Action Action) GetActionType(ChannelActionType actionType, string arg) =>
-        (
-            actionType.ToString(),
-            () =>
-            {
-                if (arg == "1")
-                    this.Action1ActionType = actionType.ToString();
-                else
-                    this.Action2ActionType = actionType.ToString();
-            }
-        );
     }
 }

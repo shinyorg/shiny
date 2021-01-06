@@ -21,7 +21,7 @@
                         <TextCell Text="Delegate Notifications" Command="{Binding Navigate}" CommandParameter="Nav/DelegateNotifications" />
                     </TableSection>
                     <TableSection Title="Bluetooth">
-                        <TextCell Text="Central" Command="{Binding Navigate}" CommandParameter="Nav/BleCentral" />
+                        <TextCell Text="Client" Command="{Binding Navigate}" CommandParameter="Nav/BleCentral" />
                         <TextCell Text="Perf Tests" Command="{Binding Navigate}" CommandParameter="Nav/BlePerformance" />
                         <TextCell Text="Extensions" Command="{Binding Navigate}" CommandParameter="Nav/BleExtensions" />
                         <TextCell Text="Hosting" Command="{Binding Navigate}" CommandParameter="Nav/BleHosting" />

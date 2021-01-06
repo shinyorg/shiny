@@ -14,11 +14,11 @@
     <ItemGroup>
         <PackageReference Include="Humanizer" />
         <PackageReference Include="Prism.DryIoc.Forms" />
-        <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="sqlite-net-pcl" />
         <PackageReference Include="Xamarin.Forms" />
         <PackageReference Include="XF.Material" />
-        <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
+        <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="Rg.Plugins.Popup" />
         <ProjectReference Include="..\Samples.SqliteGenerator\Samples.SqliteGenerator.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />

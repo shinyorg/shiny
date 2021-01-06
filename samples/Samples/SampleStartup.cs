@@ -77,7 +77,7 @@ namespace Samples
             };
 
             // only pass channels to push or here, not both - technically you don't need this with push
-            //services.UseNotifications<NotificationDelegate>();
+            services.UseNotifications<NotificationDelegate>();
 
             //services.UsePush<PushDelegate>(channels);
             //services.UseFirebaseMessaging<PushDelegate>(channels);

@@ -13,7 +13,7 @@
             <Color x:Key="Accent">#745296</Color>
             <Color x:Key="NavigationBarTextColor">White</Color>
 
-            <Style x:Key="ContentPage" TargetType="ContentPage">
+            <Style TargetType="ContentPage">
                 <Setter Property="ios:Page.UseSafeArea" Value="True"/>
                 <Setter Property="ios:Page.LargeTitleDisplay" Value="Always" />
             </Style>
