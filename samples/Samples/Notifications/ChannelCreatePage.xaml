@@ -1,8 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:notifications="clr-namespace:Samples.Notifications"
+             x:DataType="notifications:ChannelCreateViewModel"
              x:Class="Samples.Notifications.ChannelCreatePage"
              Title="Create Channel">
+
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
@@ -27,8 +30,8 @@
                                    Text="{Binding Action1Identifier}"
                                    IsEnabled="{Binding UseAction1}" />
                         <TextCell Text="Action Type"
-                                  Detail="{Binding Action1Type}"
-                                  Command="{Binding PickAction1Type}" />
+                                  Detail="{Binding Action1ActionType}"
+                                  Command="{Binding PickActionType1}" />
                     </TableSection>
 
                     <TableSection>
@@ -38,17 +41,16 @@
                                    Text="{Binding Action2Identifier}"
                                    IsEnabled="{Binding UseAction2}" />
                         <TextCell Text="Action Type"
-                                  Command="{Binding PickActionType}"
-                                  CommandParameter="2"
+                                  Detail="{Binding Action2ActionType}"
+                                  Command="{Binding PickActionType2}"
                                   IsEnabled="{Binding UseAction2}" />
                     </TableSection>
                 </TableRoot>
             </TableView>
 
-            <StackLayout Grid.Row="1">
-                <Button Text="Create"
-                        Command="{Binding Create}" />
-            </StackLayout>
+            <Button Text="Create"
+                    Command="{Binding Create}"
+                    Grid.Row="1" />
         </Grid>
     </ContentPage.Content>
 </ContentPage>

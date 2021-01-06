@@ -26,14 +26,16 @@ namespace Shiny.Push
 
         public override void Register(IServiceCollection services)
         {
+            services.AddSingleton(typeof(IPushDelegate), this.delegateType);
+            services.TryAddSingleton(typeof(IPushManager), this.pushManagerType);   
 #if __IOS__
             services.TryAddSingleton<iOSNotificationDelegate>();
             services.TryAddSingleton(sp => (IAppDelegatePushNotificationHandler)sp.Resolve<IPushManager>());
             services.UseNotifications(); // this is only here to satisfy other deps
-#endif
+#else
             services.UseNotifications<PushNotificationDelegate>(false, null, this.channels);
-            services.TryAddSingleton(typeof(IPushManager), this.pushManagerType);
-            services.AddSingleton(typeof(IPushDelegate), this.delegateType);
+#endif
+
         }
     }
 }
