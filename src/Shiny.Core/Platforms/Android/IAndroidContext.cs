@@ -15,7 +15,7 @@ namespace Shiny
         void OnNewIntent(Intent intent);
         void OnActivityResult(int requestCode, Result resultCode, Intent data);
 
-        
+
         Intent CreateIntent<T>(params string[] actions);
         AccessState GetCurrentAccessState(string androidPermission);
         T GetIntentValue<T>(string intentAction, Func<Intent, T> transform);
