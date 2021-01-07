@@ -183,12 +183,8 @@ namespace Shiny
             var current = Interlocked.Increment(ref this.requestCode);
             comp.Add(this
                 .permissionSubject
-                .Where(x =>
-                    x.RequestCode == current
-                )
-                .Subscribe(x =>
-                    ob.OnNext(x)
-                )
+                .Where(x => x.RequestCode == current)
+                .Subscribe(x => ob.Respond(x))
             );
 
             comp.Add(this
