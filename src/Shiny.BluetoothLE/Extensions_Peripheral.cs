@@ -232,22 +232,10 @@ namespace Shiny.BluetoothLE
         /// <param name="serviceUuid"></param>
         /// <param name="characteristicUuid"></param>
         /// <returns></returns>
-        public static IObservable<IGattCharacteristic> WhenKnownCharacteristicDiscovered(this IPeripheral peripheral, string serviceUuid, string characteristicUuid) =>
-            peripheral
+        public static IObservable<IGattCharacteristic> WhenKnownCharacteristicDiscovered(this IPeripheral peripheral, string serviceUuid, string characteristicUuid)
+            => peripheral
                 .WhenConnected()
-                .SelectMany(x => x.GetKnownCharacteristic(serviceUuid, characteristicUuid));
-
-
-        /// <summary>
-        /// Get a known service when the peripheral is connected
-        /// </summary>
-        /// <param name="peripheral"></param>
-        /// <param name="serviceUuid"></param>
-        /// <returns></returns>
-        public static IObservable<IGattService> WhenConnectedGetKnownService(this IPeripheral peripheral, string serviceUuid) =>
-            peripheral
-                .WhenConnected()
-                .Select(x => x.GetKnownService(serviceUuid))
+                .Select(x => x.GetKnownCharacteristic(serviceUuid, characteristicUuid))
                 .Switch();
 
 
