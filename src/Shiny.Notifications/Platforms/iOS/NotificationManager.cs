@@ -179,57 +179,24 @@ namespace Shiny.Notifications
         });
 
 
-        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
+        public Task<IList<Channel>> GetChannels()
+            => this.services.Repository.GetChannels();
 
 
         public async Task SetChannels(params Channel[] channels)
         {
             await this.services.Repository.Clear<Channel>();
-            if (channels.Length == 0)
-                return;
+            var list = channels.ToList();
+            list.Add(Channel.Default);
 
             var categories = new List<UNNotificationCategory>();
-            foreach (var channel in channels)
+            foreach (var channel in list)
             {
                 var actions = new List<UNNotificationAction>();
                 foreach (var action in channel.Actions)
                 {
-                    switch (action.ActionType)
-                    {
-                        case ChannelActionType.TextReply:
-                            actions.Add(UNTextInputNotificationAction.FromIdentifier(
-                                action.Identifier,
-                                action.Title,
-                                UNNotificationActionOptions.None,
-                                action.Title,
-                                String.Empty
-                            ));
-                            break;
-
-                        case ChannelActionType.Destructive:
-                            actions.Add(UNNotificationAction.FromIdentifier(
-                                action.Identifier,
-                                action.Title,
-                                UNNotificationActionOptions.Destructive
-                            ));
-                            break;
-
-                        case ChannelActionType.OpenApp:
-                            actions.Add(UNNotificationAction.FromIdentifier(
-                                action.Identifier,
-                                action.Title,
-                                UNNotificationActionOptions.Foreground
-                            ));
-                            break;
-
-                        case ChannelActionType.None:
-                            actions.Add(UNNotificationAction.FromIdentifier(
-                                action.Identifier,
-                                action.Title,
-                                UNNotificationActionOptions.None
-                            ));
-                            break;
-                    }
+                    var nativeAction = this.CreateAction(action);
+                    actions.Add(nativeAction);
                 }
 
                 var native = UNNotificationCategory.FromIdentifier(
@@ -244,6 +211,36 @@ namespace Shiny.Notifications
             var set = new NSSet<UNNotificationCategory>(categories.ToArray());
             UNUserNotificationCenter.Current.SetNotificationCategories(set);
         }
+
+
+        protected virtual UNNotificationAction CreateAction(ChannelAction action) => action.ActionType switch
+        {
+            ChannelActionType.TextReply => UNTextInputNotificationAction.FromIdentifier(
+                action.Identifier,
+                action.Title,
+                UNNotificationActionOptions.None,
+                action.Title,
+                String.Empty
+            ),
+
+            ChannelActionType.Destructive => UNNotificationAction.FromIdentifier(
+                action.Identifier,
+                action.Title,
+                UNNotificationActionOptions.Destructive
+            ),
+
+            ChannelActionType.OpenApp => UNNotificationAction.FromIdentifier(
+                action.Identifier,
+                action.Title,
+                UNNotificationActionOptions.Foreground
+            ),
+
+            ChannelActionType.None => UNNotificationAction.FromIdentifier(
+                action.Identifier,
+                action.Title,
+                UNNotificationActionOptions.None
+            )
+        };
 
 
         protected virtual async Task<UNMutableNotificationContent> GetContent(Notification notification)
@@ -266,14 +263,15 @@ namespace Shiny.Notifications
 
         protected virtual async Task ApplyChannel(Notification notification, UNMutableNotificationContent native)
         {
+            var channel = Channel.Default;
             if (notification.Channel.IsEmpty())
-                return;
+            {
+                channel = await this.services.Repository.GetChannel(notification.Channel);
+                if (channel == null)
+                    throw new ArgumentException($"{notification.Channel} does not exist");
+            }
 
-            var channel = await this.services.Repository.GetChannel(notification.Channel);
-            if (channel == null)
-                return;
-
-            native.CategoryIdentifier = notification.Channel;
+            native.CategoryIdentifier = channel.Identifier;
             if (!channel.CustomSoundPath.IsEmpty())
             {
                 native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath);

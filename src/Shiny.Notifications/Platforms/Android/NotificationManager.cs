@@ -165,9 +165,6 @@ namespace Shiny.Notifications
             => this.manager.Notify(id, notification);
 
 
-
-
-
         public async Task SetChannels(params Channel[] channels)
         {
             var existing = await this.services.Repository.GetChannels();
@@ -184,9 +181,8 @@ namespace Shiny.Notifications
             => this.services.Repository.GetChannels();
 
 
-        protected virtual async Task CreateChannel(Channel channel)
+        protected virtual void CreateNativeChannel(Channel channel)
         {
-            channel.AssertValid();
             var native = new NotificationChannel(
                 channel.Identifier,
                 channel.Description ?? channel.Identifier,
@@ -223,7 +219,15 @@ namespace Shiny.Notifications
                 native.SetSound(uri, attrBuilder.Build());
 
             this.manager.CreateNotificationChannel(native);
-            this.services.Repository.SetChannel(channel);
+        }
+
+
+        protected virtual async Task CreateChannel(Channel channel)
+        {
+            channel.AssertValid();
+            this.CreateNativeChannel(channel);
+
+            await this.services.Repository.SetChannel(channel);
         }
 
 
@@ -333,33 +337,42 @@ namespace Shiny.Notifications
 
         protected virtual async Task TryApplyChannel(Notification notification, NotificationCompat.Builder builder)
         {
+            var channel = Channel.Default;
             if (notification.Channel.IsEmpty())
-                return;
-
-            var channel = await this.services.Repository.GetChannel(notification.Channel);
-            if (channel == null)
-                return; // TODO: exception?
-
-            foreach (var action in channel.Actions)
             {
-                switch (action.ActionType)
+                if (this.manager.GetNotificationChannel(Channel.Default.Identifier) == null)
+                    this.CreateNativeChannel(Channel.Default);
+            }
+            else
+            {
+                channel = await this.services.Repository.GetChannel(notification.Channel);
+                if (channel == null)
+                    throw new ArgumentException($"{notification.Channel} does not exist");
+            }
+
+            if (channel.Actions != null)
+            {
+                foreach (var action in channel.Actions)
                 {
-                    case ChannelActionType.OpenApp:
-                        break;
+                    switch (action.ActionType)
+                    {
+                        case ChannelActionType.OpenApp:
+                            break;
 
-                    case ChannelActionType.TextReply:
-                        var textReplyAction = this.CreateTextReply(notification, action);
-                        builder.AddAction(textReplyAction);
-                        break;
+                        case ChannelActionType.TextReply:
+                            var textReplyAction = this.CreateTextReply(notification, action);
+                            builder.AddAction(textReplyAction);
+                            break;
 
-                    case ChannelActionType.None:
-                    case ChannelActionType.Destructive:
-                        var destAction = this.CreateAction(notification, action);
-                        builder.AddAction(destAction);
-                        break;
+                        case ChannelActionType.None:
+                        case ChannelActionType.Destructive:
+                            var destAction = this.CreateAction(notification, action);
+                            builder.AddAction(destAction);
+                            break;
 
-                    default:
-                        throw new ArgumentException("Invalid action type");
+                        default:
+                            throw new ArgumentException("Invalid action type");
+                    }
                 }
             }
         }

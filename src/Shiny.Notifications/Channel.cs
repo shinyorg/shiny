@@ -7,6 +7,13 @@ namespace Shiny.Notifications
 {
     public class Channel
     {
+        public static Channel Default { get; set; } = new Channel
+        {
+            Identifier = "Notifications",
+            Importance = ChannelImportance.Normal
+        };
+
+
         public string Identifier { get; set; }
         public string? Description { get; set; }
         public List<ChannelAction> Actions { get; set; } = new List<ChannelAction>();
