@@ -18,10 +18,10 @@ namespace Shiny.BluetoothLE
         IObservable<IGattCharacteristic> DiscoverCharacteristics();
 
         /// <summary>
-        /// Search for known characteristics
+        /// Find a known characteristic
         /// </summary>
-        /// <param name="characteristicIds"></param>
+        /// <param name="characteristicId"></param>
         /// <returns></returns>
-        IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds);
+        IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicId);
     }
 }

@@ -20,9 +20,10 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
+        public override IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
             => Observable.Create<IGattCharacteristic>(ob =>
             {
+                var uuid = CBUUID.FromString(characteristicUuid);
                 var characteristics = new Dictionary<string, IGattCharacteristic>();
                 var handler = new EventHandler<CBServiceEventArgs>((sender, args) =>
                 {
@@ -32,21 +33,14 @@ namespace Shiny.BluetoothLE
                     if (!this.Equals(args.Service))
                         return;
 
-                    foreach (var nch in this.Service.Characteristics)
-                    {
-                        var ch = new GattCharacteristic(this, nch);
-                        if (!characteristics.ContainsKey(ch.Uuid))
-                        {
-                            characteristics.Add(ch.Uuid, ch);
-                            ob.OnNext(ch);
-                        }
-                    }
-                    if (characteristics.Count == characteristicIds.Length)
-                        ob.OnCompleted();
+                    var native = this.Service.Characteristics.FirstOrDefault(x => x.UUID.Equals(uuid));
+                    if (native == null)
+                        ob.OnError(new ArgumentException("No characteristic found for " + characteristicUuid));
+
+                    ob.Respond(new GattCharacteristic(this, native));
                 });
-                var uuids = characteristicIds.Select(CBUUID.FromString).ToArray();
                 this.Peripherial.DiscoveredCharacteristic += handler;
-                this.Peripherial.DiscoverCharacteristics(uuids, this.Service);
+                this.Peripherial.DiscoverCharacteristics(new [] { uuid }, this.Service);
 
                 return () => this.Peripherial.DiscoveredCharacteristic -= handler;
             });

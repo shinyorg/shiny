@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
@@ -23,29 +22,18 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
-            => Observable.Create<IGattCharacteristic>(async ob =>
-            {
-                var found = false;
+        public override IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid) => Observable.FromAsync(async () =>
+        {
+            var result = await this.native.GetCharacteristicsForUuidAsync(Guid.Parse(characteristicUuid), BluetoothCacheMode.Cached);
+            if (result.Status != GattCommunicationStatus.Success)
+                throw new ArgumentException("GATT Communication failure - " + result.Status);
 
-                foreach (var uuid in characteristicIds)
-                {
-                    var result = await this.native.GetCharacteristicsForUuidAsync(Guid.Parse(uuid), BluetoothCacheMode.Cached);
-                    if (result.Status == GattCommunicationStatus.Success)
-                    {
-                        found = true;
-                        var ch = new GattCharacteristic(this.context, result.Characteristics.First(), this);
-                        ob.OnNext(ch);
-                    }
-                }
-                // prevent NRE on observable
-                if (!found)
-                    ob.OnNext(null);
+            if (!result.Characteristics.Any())
+                throw new ArgumentException("No characteristic found for " + characteristicUuid);
 
-                ob.OnCompleted();
-
-                return Disposable.Empty;
-            });
+            var ch = new GattCharacteristic(this.context, result.Characteristics.First(), this);
+            return ch;
+        });
 
 
         public override IObservable<IGattCharacteristic> DiscoverCharacteristics() => Observable.Create<IGattCharacteristic>(async ob =>

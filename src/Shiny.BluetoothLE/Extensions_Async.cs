@@ -47,7 +47,7 @@ namespace Shiny.BluetoothLE
 
         public static Task<IGattCharacteristic> GetKnownCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken? cancelToken = null)
             => peripheral
-                .GetKnownCharacteristics(serviceUuid, characteristicUuid)
+                .GetKnownCharacteristic(serviceUuid, characteristicUuid)
                 .Take(1)
                 .ToTask(cancelToken ?? CancellationToken.None);
 

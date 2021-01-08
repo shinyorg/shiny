@@ -214,7 +214,7 @@ namespace Samples.BluetoothLE
 
                 this.Info = "Searching for characteristic";
                 var characteristic = await this.peripheral
-                    .GetKnownCharacteristics(
+                    .GetKnownCharacteristic(
                         this.ServiceUuid,
                         this.CharacteristicUuid
                     )

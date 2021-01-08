@@ -22,7 +22,7 @@ namespace Shiny.Testing.BluetoothLE
 
         public List<IGattCharacteristic> Characteristics { get; set; } = new List<IGattCharacteristic>();
         public IObservable<IGattCharacteristic> DiscoverCharacteristics() => this.Characteristics.ToObservable();
-        public IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
-            => this.Characteristics.Where(x => characteristicIds.Any(y => y == x.Uuid)).ToObservable();
+        public IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
+            => this.Characteristics.Where(x => x.Uuid.Equals(characteristicUuid)).ToObservable();
     }
 }

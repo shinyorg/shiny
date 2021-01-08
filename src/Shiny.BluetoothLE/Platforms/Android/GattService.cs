@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
 using Java.Util;
@@ -39,26 +37,16 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristics(params string[] characteristicIds)
+        public override IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
             => Observable.Create<IGattCharacteristic>(ob =>
             {
-                var cids = characteristicIds.Select(UUID.FromString).ToArray();
-                var found = false;
+                var uuid = UUID.FromString(characteristicUuid);
+                var cs = this.native.GetCharacteristic(uuid);
+                if (cs == null)
+                    throw new ArgumentException("No characteristic found for " + characteristicUuid);
 
-                foreach (var cid in cids)
-                {
-                    var cs = this.native.GetCharacteristic(cid);
-                    if (cs != null)
-                    {
-                        found = true;
-                        var characteristic = new GattCharacteristic(this, this.context, cs);
-                        ob.OnNext(characteristic);
-                    }
-                }
-                if (!found)
-                    throw new ArgumentException("No characteristics found for UUID list");
-
-                ob.OnCompleted();
+                var characteristic = new GattCharacteristic(this, this.context, cs);
+                ob.Respond(characteristic);
 
                 return Disposable.Empty;
             });
