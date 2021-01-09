@@ -2,10 +2,10 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
+using System.Text;
 using System.Windows.Input;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Samples.Infrastructure;
 using Shiny.BluetoothLE;
 
 
@@ -15,7 +15,6 @@ namespace Samples
     {
         IPeripheral peripheral;
         CompositeDisposable disp;
-
 
         public TestViewModel(IBleManager bleManager)
         {
@@ -57,15 +56,46 @@ namespace Samples
                         .Notify()
                         .Select(x => x.Data)
                         .SubOnMainThread(
-                            data => this.Append($"[RECEIVE] {data}"),
+                            data => this.Append($"[RECEIVE] {Encoding.ASCII.GetString(data)}"),
                             ex => this.Append($"RX Error {ex}")
                         )
                     );
 
+                    //this.Append("Initializing");
+                    //await tx.Write(Encoding.ASCII.GetBytes("ATZ")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("AT RV")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("ATI")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("AT PC")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("AT D")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("AT E0")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("AT SP 5")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("AT ST 80")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("AT SH 81 10 F0")).ToTask();
+                    //await tx.Write(Encoding.ASCII.GetBytes("21 0B 01")).ToTask();
+                    //this.Append("Initialized");
+
+                    var bytes = Encoding.ASCII.GetBytes("010D\r");
+
                     this.disp.Add(Observable
-                        .Interval(TimeSpan.FromSeconds(1))
-                        .Select(_ => tx.Write(new byte[] { 0x01, 0x01 }))
-                        .SubOnMainThread(_ => this.Append("WRITE"))
+                        .Interval(TimeSpan.FromSeconds(3))
+                        .Select(_ => tx.Write(bytes))
+                        .Switch()
+                        .SubOnMainThread(
+                            x => this.Append("WRITE"),
+                            ex => this.Append("WRITE ERROR")
+                        )
+                        //.Subscribe(async _ =>
+                        //{
+                        //    try
+                        //    {
+                        //        await tx.Write(bytes).ToTask();
+                        //        this.Append("WRITE");
+                        //    }
+                        //    catch (Exception ex)
+                        //    {
+                        //        this.Append("ERROR: " + ex);
+                        //    }
+                        //})
                     );
                 },
                 this.WhenAny(x => x.IsBusy, x => !x.GetValue())
