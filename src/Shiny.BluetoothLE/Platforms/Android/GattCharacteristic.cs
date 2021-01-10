@@ -17,7 +17,6 @@ namespace Shiny.BluetoothLE
         readonly BluetoothGattCharacteristic native;
         readonly PeripheralContext context;
         IObservable<CharacteristicGattResult>? notifyOb;
-        IObservable<IGattDescriptor>? descriptorOb;
 
 
         public GattCharacteristic(IGattService service,
@@ -162,7 +161,7 @@ namespace Shiny.BluetoothLE
 
 
         public override IObservable<IGattDescriptor> DiscoverDescriptors()
-            => this.descriptorOb ??= Observable.Create<IGattDescriptor>(ob =>
+            => Observable.Create<IGattDescriptor>(ob =>
             {
                 foreach (var nd in this.native.Descriptors)
                 {
@@ -170,9 +169,7 @@ namespace Shiny.BluetoothLE
                     ob.OnNext(wrap);
                 }
                 return Disposable.Empty;
-            })
-            .Replay()
-            .RefCount();
+            });
 
 
         public override bool Equals(object obj)

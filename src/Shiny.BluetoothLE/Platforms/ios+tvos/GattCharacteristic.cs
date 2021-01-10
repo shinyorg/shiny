@@ -88,38 +88,30 @@ namespace Shiny.BluetoothLE
         }
 
 
-        IObservable<IGattDescriptor> descriptorOb;
-        public override IObservable<IGattDescriptor> DiscoverDescriptors()
+        public override IObservable<IGattDescriptor> DiscoverDescriptors() => Observable.Create<IGattDescriptor>(ob =>
         {
-            this.descriptorOb ??= Observable.Create<IGattDescriptor>(ob =>
+            var descriptors = new Dictionary<string, IGattDescriptor>();
+
+            var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
             {
-                var descriptors = new Dictionary<string, IGattDescriptor>();
+                if (this.NativeCharacteristic.Descriptors == null)
+                    return;
 
-                var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
+                foreach (var dnative in this.NativeCharacteristic.Descriptors)
                 {
-                    if (this.NativeCharacteristic.Descriptors == null)
-                        return;
-
-                    foreach (var dnative in this.NativeCharacteristic.Descriptors)
+                    var wrap = new GattDescriptor(this, dnative);
+                    if (!descriptors.ContainsKey(wrap.Uuid))
                     {
-                        var wrap = new GattDescriptor(this, dnative);
-                        if (!descriptors.ContainsKey(wrap.Uuid))
-                        {
-                            descriptors.Add(wrap.Uuid, wrap);
-                            ob.OnNext(wrap);
-                        }
+                        descriptors.Add(wrap.Uuid, wrap);
+                        ob.OnNext(wrap);
                     }
-                });
-                this.Peripheral.DiscoveredDescriptor += handler;
-                this.Peripheral.DiscoverDescriptors(this.NativeCharacteristic);
+                }
+            });
+            this.Peripheral.DiscoveredDescriptor += handler;
+            this.Peripheral.DiscoverDescriptors(this.NativeCharacteristic);
 
-                return () => this.Peripheral.DiscoveredDescriptor -= handler;
-            })
-            .Replay()
-            .RefCount();
-
-            return this.descriptorOb;
-        }
+            return () => this.Peripheral.DiscoveredDescriptor -= handler;
+        });
 
 
         public override bool Equals(object obj)

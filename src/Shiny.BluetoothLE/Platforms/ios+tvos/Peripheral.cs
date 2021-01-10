@@ -115,6 +115,13 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattService> GetKnownService(string serviceUuid)
             => Observable.Create<IGattService>(ob =>
             {
+                var nativeUuid = CBUUID.FromString(serviceUuid);
+                var nativeService = this.Native.Services?.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
+                if (nativeService != null)
+                {
+                    ob.Respond(new GattService(this, nativeService));
+                    return Disposable.Empty;
+                }
                 var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
                 {
                     if (this.Native.Services == null)
@@ -131,9 +138,9 @@ namespace Shiny.BluetoothLE
                         ob.Respond(service);
                 });
                 this.Native.DiscoveredService += handler;
-                this.Native.DiscoverServices(new[] { CBUUID.FromString(serviceUuid) });
+                this.Native.DiscoverServices(new[] { nativeUuid });
 
-                return () => this.Native.DiscoveredService -= handler;
+                return Disposable.Create(() => this.Native.DiscoveredService -= handler);
             });
 
 

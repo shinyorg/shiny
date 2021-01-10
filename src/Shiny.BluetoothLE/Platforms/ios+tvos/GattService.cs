@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CoreBluetooth;
 
@@ -13,7 +14,8 @@ namespace Shiny.BluetoothLE
         public CBPeripheral Peripherial { get; }
 
 
-        public GattService(Peripheral peripheral, CBService native) : base(peripheral, native.UUID.ToString(), native.Primary)
+        public GattService(Peripheral peripheral, CBService native)
+            : base(peripheral, native.UUID.ToString(), native.Primary)
         {
             this.Peripherial = peripheral.Native;
             this.Service = native;
@@ -23,7 +25,15 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
             => Observable.Create<IGattCharacteristic>(ob =>
             {
-                var uuid = CBUUID.FromString(characteristicUuid);
+                // already exists
+                var nativeUuid = CBUUID.FromString(characteristicUuid);
+                var nativeChar = this.Service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
+                if (nativeChar != null)
+                {
+                    ob.Respond(new GattCharacteristic(this, nativeChar));
+                    return Disposable.Empty;
+                }
+
                 var characteristics = new Dictionary<string, IGattCharacteristic>();
                 var handler = new EventHandler<CBServiceEventArgs>((sender, args) =>
                 {
@@ -33,16 +43,16 @@ namespace Shiny.BluetoothLE
                     if (!this.Equals(args.Service))
                         return;
 
-                    var native = this.Service.Characteristics.FirstOrDefault(x => x.UUID?.Equals(uuid) ?? false);
+                    var native = this.Service.Characteristics.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
                     if (native == null)
                         ob.OnError(new ArgumentException("No characteristic found for " + characteristicUuid));
                     else
                         ob.Respond(new GattCharacteristic(this, native));
                 });
                 this.Peripherial.DiscoveredCharacteristic += handler;
-                this.Peripherial.DiscoverCharacteristics(new [] { uuid }, this.Service);
+                this.Peripherial.DiscoverCharacteristics(new [] { nativeUuid }, this.Service);
 
-                return () => this.Peripherial.DiscoveredCharacteristic -= handler;
+                return Disposable.Create(() => this.Peripherial.DiscoveredCharacteristic -= handler);
             });
 
 
