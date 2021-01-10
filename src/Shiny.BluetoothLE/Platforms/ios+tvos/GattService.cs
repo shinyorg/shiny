@@ -33,11 +33,11 @@ namespace Shiny.BluetoothLE
                     if (!this.Equals(args.Service))
                         return;
 
-                    var native = this.Service.Characteristics.FirstOrDefault(x => x.UUID.Equals(uuid));
+                    var native = this.Service.Characteristics.FirstOrDefault(x => x.UUID?.Equals(uuid) ?? false);
                     if (native == null)
                         ob.OnError(new ArgumentException("No characteristic found for " + characteristicUuid));
-
-                    ob.Respond(new GattCharacteristic(this, native));
+                    else
+                        ob.Respond(new GattCharacteristic(this, native));
                 });
                 this.Peripherial.DiscoveredCharacteristic += handler;
                 this.Peripherial.DiscoverCharacteristics(new [] { uuid }, this.Service);

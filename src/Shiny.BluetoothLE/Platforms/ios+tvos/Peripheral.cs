@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
@@ -16,7 +17,8 @@ namespace Shiny.BluetoothLE
         IDisposable autoReconnectSub;
 
 
-        public Peripheral(CentralContext context, CBPeripheral native) : base(native.Name, native.Identifier.ToString())
+        public Peripheral(CentralContext context, CBPeripheral native)
+            : base(native.Name, native.Identifier.ToString())
         {
             this.context = context;
             this.Native = native;
@@ -118,17 +120,15 @@ namespace Shiny.BluetoothLE
                     if (this.Native.Services == null)
                         return;
 
-                    foreach (var native in this.Native.Services)
-                    {
-                        var service = new GattService(this, native);
-                        // do we really need to compare strings here, when DiscoverServices should
-                        //  only return the one service (if found)
-                        if (service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            ob.Respond(service);
-                            break;
-                        }
-                    }
+                    var service = this.Native
+                        .Services
+                        .Select(x => new GattService(this, x))
+                        .FirstOrDefault(x => x.Uuid.Equals(serviceUuid));
+
+                    if (service == null)
+                        ob.OnError(new ArgumentException("No service found for " + serviceUuid));
+                    else
+                        ob.Respond(service);
                 });
                 this.Native.DiscoveredService += handler;
                 this.Native.DiscoverServices(new[] { CBUUID.FromString(serviceUuid) });
