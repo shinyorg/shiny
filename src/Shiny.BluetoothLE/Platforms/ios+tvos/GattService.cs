@@ -25,12 +25,14 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
             => Observable.Create<IGattCharacteristic>(ob =>
             {
-                // already exists
-                var nativeUuid = CBUUID.FromString(characteristicUuid);
-                var nativeChar = this.Service.Characteristics?.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
-                if (nativeChar != null)
+                var characteristic = this.Service
+                    .Characteristics?
+                    .Select(ch => new GattCharacteristic(this, ch))
+                    .FirstOrDefault(ch => ch.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase));
+
+                if (characteristic != null)
                 {
-                    ob.Respond(new GattCharacteristic(this, nativeChar));
+                    ob.Respond(characteristic);
                     return Disposable.Empty;
                 }
 
@@ -43,12 +45,17 @@ namespace Shiny.BluetoothLE
                     if (!this.Equals(args.Service))
                         return;
 
-                    var native = this.Service.Characteristics.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
-                    if (native == null)
+                    var characteristic = this.Service
+                        .Characteristics?
+                        .Select(ch => new GattCharacteristic(this, ch))
+                        .FirstOrDefault(ch => ch.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase));
+
+                    if (characteristic == null)
                         ob.OnError(new ArgumentException("No characteristic found for " + characteristicUuid));
                     else
-                        ob.Respond(new GattCharacteristic(this, native));
+                        ob.Respond(characteristic);
                 });
+                var nativeUuid = CBUUID.FromString(characteristicUuid);
                 this.Peripherial.DiscoveredCharacteristic += handler;
                 this.Peripherial.DiscoverCharacteristics(new [] { nativeUuid }, this.Service);
 

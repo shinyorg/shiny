@@ -115,11 +115,21 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattService> GetKnownService(string serviceUuid)
             => Observable.Create<IGattService>(ob =>
             {
-                var nativeUuid = CBUUID.FromString(serviceUuid);
-                var nativeService = this.Native.Services?.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
-                if (nativeService != null)
+                //var nativeUuid = CBUUID.FromString(serviceUuid);
+                //var nativeService = this.Native.Services?.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
+                //if (nativeService != null)
+                //{
+                //    ob.Respond(new GattService(this, nativeService));
+                //    return Disposable.Empty;
+                //}
+                var service = this.Native
+                    .Services?
+                    .Select(native => new GattService(this, native))
+                    .FirstOrDefault(x => x.Uuid.Equals(serviceUuid, StringComparison.CurrentCultureIgnoreCase));
+
+                if (service != null)
                 {
-                    ob.Respond(new GattService(this, nativeService));
+                    ob.Respond(service);
                     return Disposable.Empty;
                 }
                 var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
@@ -129,14 +139,16 @@ namespace Shiny.BluetoothLE
 
                     var service = this.Native
                         .Services
-                        .Select(x => new GattService(this, x))
-                        .FirstOrDefault(x => x.Uuid.Equals(serviceUuid));
+                        .Select(native => new GattService(this, native))
+                        .FirstOrDefault(x => x.Uuid.Equals(serviceUuid, StringComparison.CurrentCultureIgnoreCase));
 
                     if (service == null)
                         ob.OnError(new ArgumentException("No service found for " + serviceUuid));
                     else
                         ob.Respond(service);
                 });
+
+                var nativeUuid = CBUUID.FromString(serviceUuid);
                 this.Native.DiscoveredService += handler;
                 this.Native.DiscoverServices(new[] { nativeUuid });
 
