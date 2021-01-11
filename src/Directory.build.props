@@ -24,6 +24,7 @@
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('tizen')) ">$(DefineConstants);__TIZEN__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.10</ExtrasUwpMetaPackageVersion>
+        <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     </PropertyGroup>
 

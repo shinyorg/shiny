@@ -50,10 +50,10 @@
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <DefineConstants>PRODUCTION</DefineConstants>
   </PropertyGroup>
-    <PropertyGroup>
-        <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
-        <CompilerGeneratedFilesOutputPath>$(OutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
-    </PropertyGroup>
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(OutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
     <Reference Include="System" />
@@ -168,4 +168,9 @@
     <LinkDescription Include="Linker.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties TriggeredFromHotReload="False" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
