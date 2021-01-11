@@ -157,6 +157,7 @@ namespace Shiny.Notifications
             if (notification.Android.When != null)
                 builder.SetWhen(notification.Android.When.Value.ToUnixTimeMilliseconds());
 
+            builder.SetChannelId(notification.Channel ?? Channel.Default.Identifier);
             return builder;
         }
 
@@ -349,6 +350,7 @@ namespace Shiny.Notifications
                 if (channel == null)
                     throw new ArgumentException($"{notification.Channel} does not exist");
             }
+            builder.SetChannelId(channel.Identifier);
 
             if (channel.Actions != null)
             {
