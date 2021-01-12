@@ -26,12 +26,18 @@ Order: 2
 |AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterPreviewShield]][AppCenterPreNuget] | Log errors to AppCenter
 
 ## App Services
-|Project|NuGet|Preview|Description|
-|-------|-----|-------|-----------|
-|Trip Tracker|COMING SOON|COMING SOON|Trip tracking|
-|Media Sync|COMING SOON|COMING SOON|Media Sync|
-|Call Directory|COMING SOON|COMING SOON|Call Directory|
-|OBD Interface|COMING SOON|COMING SOON|OBD Interfaces|
+|Project|NuGet|Description|
+|-------|-----|-----------|
+|Trip Tracker|COMING SOON|Trip tracking|
+|Media Sync|COMING SOON|Media Sync|
+|Call Directory|COMING SOON|Call Directory|
+|OBD Interface|COMING SOON|OBD Interfaces|
+|Data Sync|COMING SOON|Data synchronization done right|
+|Location Sync|COMING SOON|Aggressively tries to ensure background location is communicateed to the server|
+|Push - OneSignal|COMING SOON|Push for OneSignal|
+|Push - AWS|COMING SOON|Push for AWS|
+|BLE Hosting Hubs|COMING SOON||
+|BLE Refit|COMING SOON||
 
 ## 3rd Party
 |Project|NuGet|Repo|Description|
