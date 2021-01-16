@@ -1,5 +1,6 @@
 Title: Getting Started
 Order: 1
+RedirectFrom: docs/locations/index
 ---
 A cross platform library for Xamarin & Windows that allows for easy geofence detection
 

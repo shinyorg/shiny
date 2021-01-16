@@ -1,4 +1,5 @@
-Title: FAQ
+Title: Frequently Asked Questions
+Order: 3
 ---
 ## FAQ
 

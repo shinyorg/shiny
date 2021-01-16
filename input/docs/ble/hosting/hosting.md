@@ -1,5 +1,6 @@
 Title: Hosting
 Description: Run a GATT server from your device
+RedirectFrom: docs/ble/hosting/index
 ---
 # Peripheral Manager (GATT Server)
 

@@ -1,5 +1,4 @@
 Title: Trip Tracker
-Order: 1
 ---
 
 ```cs

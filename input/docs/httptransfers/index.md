@@ -20,6 +20,12 @@ iOS|7+
 Android|4.3+
 Windows UWP|16299+
 .NET Standard|2.0
+Add the following to your AndroidManifest.xml
+
+```xml
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+```
 
 ## SETUP
 1. Install the NuGet package - [![NuGet](https://img.shields.io/nuget/v/Shiny.Net.Http.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Net.Http/)
