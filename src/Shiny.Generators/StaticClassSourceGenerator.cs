@@ -11,7 +11,8 @@ namespace Shiny.Generators.Tasks
         GeneratorExecutionContext context;
         string? useNamespace;
 
-        public StaticClassSourceGenerator(string? nameSpace = null) => this.useNamespace = nameSpace;
+        public StaticClassSourceGenerator() { }
+        public StaticClassSourceGenerator(string nameSpace) => this.useNamespace = nameSpace;
 
 
         public void Initialize(GeneratorInitializationContext context) { }
