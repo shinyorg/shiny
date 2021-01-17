@@ -56,13 +56,14 @@ namespace Shiny.Jobs.Infrastructure
             if (running)
                 return;
 
-            running = true;
             var jobs = await this.jobManager.GetJobs();
             if (predicate != null)
                 jobs = jobs.Where(predicate);
 
             if (jobs.Any())
             {
+                running = true;
+
                 this.jobManager.RunTask(
                     nameof(JobForegroundService),
                     async ct =>
@@ -73,11 +74,10 @@ namespace Shiny.Jobs.Infrastructure
                                 if (!ct.IsCancellationRequested)
                                     await this.jobManager.Run(job.Identifier, ct);
                         }
+                        running = false;
                     }
                 );
             }
-            // TODO: wait until they are all done - hmmmm
-            running = false;
         }
 
 
