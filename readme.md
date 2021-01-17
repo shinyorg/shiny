@@ -69,6 +69,7 @@ PReview|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/prev
 |Project|NuGet|Repo|Description|
 |-------|-----|----|-----------|
 |Shiny.Prism|[![PrismNugetShield]][PrismNuget] | [GitHub](https://github.com/dansiegel/Prism.Container.Extensions) | Prism integration with Shiny maintained by Dan Siegel|
+|Apizr.Integrations.Shiny| [![ApizrNugetShield]][ApizrNuget] | [GitHub](https://github.com/Respawnsive/Apizr) | Refit based web api client management, but resilient (retry, connectivity, cache, auth, log, priority, etc...)
 
 
 ## Contributors
@@ -84,6 +85,9 @@ PReview|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/prev
 
 [PrismNugetShield]: https://img.shields.io/nuget/v/Shiny.Prism.svg?style=for-the-badge
 [PrismNuget]: https://www.nuget.org/packages/Shiny.Prism/
+
+[ApizrNugetShield]: https://img.shields.io/nuget/v/Shiny.Prism.svg?style=for-the-badge
+[ApizrNuget]: https://www.nuget.org/packages/Shiny.Prism/
 
 [BeaconsNugetShield]: https://img.shields.io/nuget/v/Shiny.Beacons.svg?style=for-the-badge
 [BeaconsNuget]: https://www.nuget.org/packages/Shiny.Beacons/
