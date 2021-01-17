@@ -25,5 +25,10 @@ ShinyJobManager.Run(...);
 By adding this attribute, it will create static access classes for all of the Shiny services in the main namespace of the assembly you use the assembly attribute in.
 |Shiny Service|Static Class Name|
 |-------------|-----------------|
-|Shiny.Beacons.IBeaconrangingManager|ShinyBeaconRanging|
+|Shiny.Beacons.IBeaconRangingManager|ShinyBeaconRanging|
+|Shiny.Beacons.IBeaconMonitoringManager|ShinyBeaconMonitoring|
+|Shiny.BluetoothLE.IBleManager|ShinyBleManager|
+|Shiny.BluetoothLE.Hosting.IBleHostingManagr|ShinyBleHostingManager|
+
 |Shiny.Locations.IGpsManager|ShinyGpsManager|
+
