@@ -25,7 +25,7 @@ namespace Shiny
 
 
         public UwpPlatform(Application app) : this() => this.app = app;
-        private UwpPlatform()
+        UwpPlatform()
         {
             var path = ApplicationData.Current.LocalFolder.Path;
             this.AppData = new DirectoryInfo(path);
@@ -61,7 +61,6 @@ namespace Shiny
             }
             else
             {
-                // TODO: application will be normal if launched from background
                 this.app.LeavingBackground += fgHandler;
                 this.app.EnteredBackground += bgHandler;
             }

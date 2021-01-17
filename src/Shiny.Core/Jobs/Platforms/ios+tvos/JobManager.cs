@@ -25,7 +25,7 @@ namespace Shiny.Jobs
         }
 
 
-        protected override void ScheduleNative(JobInfo jobInfo) { }
+        protected override void RegisterNative(JobInfo jobInfo) { }
         protected override void CancelNative(JobInfo jobInfo) { }
 
 

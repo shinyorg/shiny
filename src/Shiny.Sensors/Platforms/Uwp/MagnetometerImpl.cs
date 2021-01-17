@@ -25,7 +25,6 @@ namespace Shiny.Sensors
                         args.Reading.MagneticFieldX,
                         args.Reading.MagneticFieldY,
                         args.Reading.MagneticFieldZ
-                        // TODO: accuracy on this
                     ))
                 );
                 this.magnetometer.ReadingChanged += handler;

@@ -99,7 +99,7 @@ namespace Shiny.Jobs
             => BGTaskScheduler.Shared.Cancel(jobInfo.Identifier);
 
 
-        protected override void ScheduleNative(JobInfo jobInfo)
+        protected override void RegisterNative(JobInfo jobInfo)
         {
             this.Assert();
 

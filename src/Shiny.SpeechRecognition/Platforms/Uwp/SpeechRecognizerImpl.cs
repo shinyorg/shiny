@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Windows.Foundation;
+using Windows.Media.Capture;
 using Windows.Media.SpeechRecognition;
 using WinSpeechRecognizer = Windows.Media.SpeechRecognition.SpeechRecognizer;
 
@@ -10,9 +11,39 @@ namespace Shiny.SpeechRecognition
 {
     public class SpeechRecognizerImpl : AbstractSpeechRecognizer
     {
-        // TODO: appmanifest
-        public override Task<AccessState> RequestAccess() => Task.FromResult(AccessState.Available);
-            //Permissions.IsInMainfest("speech")
+        const int NoCaptureDevicesHResult = -1072845856;
+
+
+        public override async Task<AccessState> RequestAccess()
+        {
+            var access = AccessState.Available;
+            try
+            {
+                var settings = new MediaCaptureInitializationSettings
+                {
+                    StreamingCaptureMode = StreamingCaptureMode.Audio,
+                    MediaCategory = MediaCategory.Speech
+                };
+                using (var capture = new MediaCapture())
+                    await capture.InitializeAsync(settings);
+            }
+            catch (TypeLoadException)
+            {
+                access = AccessState.NotSupported;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                access = AccessState.Denied;
+            }
+            catch (Exception ex)
+            {
+                // Thrown when an audio capture device is not present.
+                access = ex.HResult == NoCaptureDevicesHResult
+                    ? AccessState.NotSupported
+                    : AccessState.Unknown;
+            }
+            return access;
+        }
 
 
         public override IObservable<string> ListenUntilPause() => Observable.FromAsync(async ct =>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattReliableWriteTransaction;
 
@@ -9,13 +10,7 @@ namespace Shiny.BluetoothLE
 {
     public class GattReliableWriteTransaction : AbstractGattReliableWriteTransaction
     {
-        readonly Native native;
-
-
-        public GattReliableWriteTransaction()
-        {
-            this.native = new Native();
-        }
+        readonly Native native = new Native();
 
 
         public override IObservable<CharacteristicGattResult> Write(IGattCharacteristic characteristic, byte[] value)
@@ -25,9 +20,8 @@ namespace Shiny.BluetoothLE
             if (!(characteristic is GattCharacteristic platform))
                 throw new ArgumentException("Characteristic must be UWP type");
 
-            // TODO: need write observable
-            this.native.WriteValue(platform.Native, null);
-            return null;
+            this.native.WriteValue(platform.Native, value.AsBuffer());
+            return Observable.Return(new CharacteristicGattResult(characteristic, value, CharacteristicResultType.Write));
         }
 
 
@@ -56,7 +50,8 @@ namespace Shiny.BluetoothLE
         public override void Abort()
         {
             this.AssertAction();
-            // TODO: how to abort?
+
+            this.Status = TransactionState.Aborted;
         }
     }
 }

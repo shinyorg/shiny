@@ -49,7 +49,7 @@ namespace Shiny.Jobs
         }
 
 
-        protected override void ScheduleNative(JobInfo jobInfo)
+        protected override void RegisterNative(JobInfo jobInfo)
         {
             this.CancelNative(jobInfo);
 
@@ -66,8 +66,6 @@ namespace Shiny.Jobs
                 builder.SetTrigger(new TimeTrigger(runMins, false));
             }
 
-            //SystemTriggerType.PowerStateChange
-            // TODO: idle, power change, etc
             if (jobInfo.RequiredInternetAccess != InternetAccess.None)
             {
                 var type = jobInfo.RequiredInternetAccess == InternetAccess.Any

@@ -36,7 +36,7 @@ namespace Shiny.Infrastructure.DependencyInjection
                     }
                 );
             }
-            // TODO; this trap IPowerManager as well
+            // this trap IPowerManager as well
             else if (Implements<INotifyPropertyChanged>(service))
             {
                 var resolveType = service.ServiceType ?? service.ImplementationType;

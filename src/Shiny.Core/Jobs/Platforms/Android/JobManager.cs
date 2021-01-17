@@ -65,7 +65,7 @@ namespace Shiny.Jobs
         }
 
 
-        protected override void ScheduleNative(JobInfo jobInfo)
+        protected override void RegisterNative(JobInfo jobInfo)
         {
             this.CancelNative(jobInfo);
 

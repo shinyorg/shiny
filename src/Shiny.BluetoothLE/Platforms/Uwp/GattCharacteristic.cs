@@ -53,7 +53,6 @@ namespace Shiny.BluetoothLE
         }
 
 
-        // TODO: reliable write
         public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse) => Observable.FromAsync(async ct =>
         {
             this.AssertWrite(withResponse);
