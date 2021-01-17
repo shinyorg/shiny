@@ -2,32 +2,34 @@ Title: NFC
 Description: Near Field Communication
 ---
 
-[![NuGet](https://img.shields.io/nuget/v/Shiny.Nfc.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Nfc/)
+## DESCRIPTION
+
+Near Field Communication (NFC) 
+
+
+## PLATFORMS
 
 |Platform|Version|
 |--------|-------|
 |iOS|9|
-|Android|5|
+|Android|8|
 |UWP|16299|
 
-<!-- snippet: NfcStartup.cs -->
-```cs
-using Microsoft.Extensions.DependencyInjection;
-using Shiny;
+## USAGE
 
-public class NfcStartup : ShinyStartup
-{
-    public override void ConfigureServices(IServiceCollection services)
-    {
-        services.UseNfc();
-    }
-}
-```
-<sup>[snippet source](/src/Snippets/NfcStartup.cs#L1-L10)</sup>
-<!-- endsnippet -->
+|Area|Info|
+|----|----|
+|NuGet| [![NfcNugetShield]][NfcNuget] |
+|Shiny Startup|services.UseNfc|
+|Shiny Delegate|None|
+|Main Service|Shiny.Nfc.INfcManager|
+|Static Generated|ShinyNfc|
+|Manual Resolve|ShinyHost.Resolve<Shiny.Nfc.INfcManager>()|
+|Xamarin.Forms|DependencyService.Get<Shiny.Nfc.INfcManager>()|
 
 
-<!-- snippet: NfcUsage.cs -->
+## HOW TO
+
 ```cs
 using Shiny;
 using Shiny.Nfc;
@@ -58,5 +60,6 @@ public class NfcUsage
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/NfcUsage.cs#L1-L28)</sup>
-<!-- endsnippet -->
+
+
+<?! Include "../nuget.md" /?>

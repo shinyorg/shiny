@@ -1,5 +1,5 @@
-Title: Central Manager
-Order: 1
+Title: BLE Manager
+Order: 2
 ---
 # Adapter
 

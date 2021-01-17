@@ -1,60 +1,62 @@
 Title: Getting Started
-RedirectFrom: docs/ble/client/index
+Order: 1
+RedirectFrom: 
+- docs/ble/client/index
+- docs/ble/index
 ---
 
-# Bluetooth LE
+# DESCRIPTION
 
 Bluetooth LE is divided into 2 separate categories - the central manager (client) and the peripheral manager (server). 
 
-## NuGet
-[![NuGet](https://buildstats.info/nuget/Shiny.BluetoothLE)](https://nuget.org/packages/Shiny.BluetoothLE)
 
-[![MyGet Badge](https://buildstats.info/myget/acrfeed/Shiny.BluetoothLE/Shiny.BluetoothLE?includePreReleases=true)](https://www.myget.org/feed/acrfeed/package/nuget/Shiny.BluetoothLE)
+## PLATFORMS
+
+|Platform|Version|
+|--------|-------|
+|iOS|9|
+|Android|8|
+|UWP|16299|
+
+## USAGE
+
+|Area|Info|
+|----|----|
+|NuGet| [![BleNugetShield]][BleNuget] |
+|Shiny Startup|services.UseBleClient|
+|Main Service|Shiny.BluetoothLE.IBleManager|
+|Shiny Delegate|Shiny.BluetoothLE.IBleDelegate|
+|Static Generated|ShinyBle|
+|Manual Resolve|ShinyHost.Resolve<Shiny.BluetoothLE.IBleManager>()|
+|Xamarin.Forms|DependencyService.Get<Shiny.BluetoothLE.IBleManager>>()|
 
 
-## Support Platforms
+## SETUP
 
-|Platform|Version|Docs|
-|--------|-------|----|
-|Android|5+ (API21)|[Setup](platforms/android)|
-|iOS|9+|[Setup](platforms/ios)|
-|UWP|16299 - Limited Beta|[Setup](platforms/uwp)|
-
-
-## Shiny Setup
-
-Startup
- Services.UseBleCentral() or services.UseBleCentral<YourBleCentralDelegate>();
- 
- 
-Attribute
-  [assembly: ShinyBleCentral(typeof(YourDelegate))]
- 
-## Background Delegate
-
-```csharp
-Public class YourDelegate : Shiny.BluetoothLE.IBleCentralDelegate {
-
-  Public override void OnAdapterStatusChanged() 
-  {
-  }
-  
-  Public override void OnConnected(IPeripheral peripheral) {
-  }
-}
+#### Android
+Make sure to add the following to your application node in AndroidManifest.xml
+```xml
+<uses-permission android:name="android.permission.BLUETOOTH"/>
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 ```
 
-## Accessing The Service
 
-```csharp
-Shiny.ShinyHost.Resolve<Shiny.BluetoothLE.ICentralManager>();
-
-// or DI the interface
-
-Shiny.CrossBleAdapter.Current
+#### iOS
+Add the following to your Info.plist
+```xml
+<key>NSBluetoothPeripheralUsageDescription</key>
+<string>YOUR CUSTOM MESSAGE</string>
+<key>NSBluetoothAlwaysUsageDescription</key>
+<string>YOUR CUSTOM MESSAGE</string>
 ```
 
-# FAQ
+#### UWP
+Add to your app manifest file
+```xml
+<Capabilities>
+    <Capability Name="internetClient" />
+    <DeviceCapability Name="bluetooth" />
+</Capabilities>
+```
 
-> Q. On iOS, when scanning for iBeacons - I'm getting missing scan result data
-> A. Yup - that's expected.  Apple controls these scan results and has native implementation that deals with this
+<?! Include "../../../nuget.md" /?>

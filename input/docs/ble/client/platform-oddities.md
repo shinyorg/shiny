@@ -1,5 +1,42 @@
-Title: Android
+Title: Platform Specific Oddities
+Order: 2
 ---
+# iOS
+
+Apple has some very interesting limitations on Bluetooth especially when it comes to background scanning
+
+## Backgrounding
+* Device names are not available at all
+* When scanning in the background, pass a ScanConfig argument with a service UUID you wish to scan for.  Without this, you will get nothing
+
+```csharp
+BleAdapter.Current.Scan(
+    new ScanSettings 
+    {
+        ServiceUUID = new Guid("<your guid here>")
+    }
+)
+.Subscribe(scanResult => 
+{
+})
+```
+
+
+## Background Restoration
+
+_This feature is only provided on iOS.  It allows for a CBCentralManager to be restored upon a device reconnection (and in turn, get the device that reconnected)_
+_There is additional configuration required to use this event_
+
+```csharp
+
+// then in your shared code (somewhere near your initialization)
+BleAdapter.Current.WhenDeviceStateRestored().Subscribe(device => 
+{
+    // will return the device(s) that are reconnecting
+});
+```
+
+
 # Android
 
 Android Bluetooth is painful and that's being nice.  This library attempts to deal with the necessary thread handling all internally.
@@ -7,13 +44,6 @@ Android Bluetooth is painful and that's being nice.  This library attempts to de
 All of the classes and members listed in this page can only be called from your Android project, not your PCL/Core library.  You should call and set
 these values at your main launcher activity or even at an application level.
 
-## Setup
-
-Make sure to add the following to your application node in AndroidManifest.xml
-```xml
-<uses-permission android:name="android.permission.BLUETOOTH"/>
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-```
 
 ## General Rules
 
@@ -66,6 +96,4 @@ CrossBleAdapter.PauseBeforeServiceDiscovery { get; set; } = TimeSpan.FromMillise
         /// </summary>
 CrossBleAdapter.PauseBetweenAutoReconnectAttempts { get; set; } = TimeSpan.FromSeconds(1);
 
-
-CrossBleAdapter.UseNewScanner { get; set; } = B.VERSION.SdkInt >= BuildVersionCodes.Lollipop;
 ```

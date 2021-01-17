@@ -8,7 +8,7 @@ namespace Shiny
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Register the ICentralManager service that allows you to connect to other BLE devices - Delegates used here are intended for background usage
+        /// Register the IBleManager service that allows you to connect to other BLE devices - Delegates used here are intended for background usage
         /// </summary>
         /// <param name="services"></param>
         /// <param name="config"></param>

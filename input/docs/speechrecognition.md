@@ -1,17 +1,21 @@
 Title: Speech Recognition
 Description: Local speech recognition
 ---
-_Easy to use cross platform speech recognition (speech to text) plugin for Xamarin & UWP_
+## USAGE
+
+|Area|Info|
+|----|----|
+|NuGet| [![SpeechRecognitionNugetShield]][SpeechRecognitionNuget] |
+|Shiny Startup|services.UseSpeechRecognition|
+|Main Service|Shiny.SpeechRecognition.ISpeechRecognizer|
+|Shiny Delegate|None|
+|Static Generated|ShinySpeechRecognizer|
+|Manual Resolve|ShinyHost.Resolve<Shiny.SpeechRecognition.ISpeechRecognizer>()|
+|Xamarin.Forms|DependencyService.Get<Shiny.SpeechRecognition.ISpeechRecognizer>()|
 
 
-|Platform|Version|
-|--------|-------|
-iOS|10+
-Android|5.x
-Windows UWP|16299+
-.NET Standard|2.0
+## HOW TO
 
-## SETUP
 
 #### iOS
 Add the following to your 
