@@ -15,7 +15,7 @@ namespace Shiny.Generators
 
         protected override void Process(IEnumerable<INamedTypeSymbol> osAppTypeSymbols)
         {
-            // nothing to do on UWP at this time
+            // nothing to do on UWP at this time - this will gen the startup though
         }
     }
 }
