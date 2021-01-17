@@ -16,8 +16,10 @@ Second, add the following assembly attribute in your head projects:
     ShinyStartupTypename = ""
     XamarinAppName = "YourNamespace.YourXamarinFormsApp"
     ExcludeJobs = false,
+    ExcludeStartupTasks = false,
     ExcludeModules = false,
-    ExcludeThirdParty = false
+    ExcludeThirdParty = false,
+    ExcludeServices = false
 )]
 ```
 
@@ -32,6 +34,7 @@ This will auto-generate several things for you
     c. all delegates will be registered with their corresponding library (ie. services.UseGps<MyGpsDelegate>() )
 4. Xamarin Forms app can be hooked and Init called for you automatically
 5. If you use Xamarin Forms dependency service, Shiny will auto-inject itself and all of the services you register with Shiny into it.  (ie. DependencyService.Get<IJobManager>())
+6. Any classes marked with [Shiny.ShinyServiceAttribute] will be added and available to the container under all interfaces it implements
 
 
 ## Shiny also auto-adds popular 3rd party initialization for 

@@ -18,17 +18,38 @@ After adding this attribute, perform a build.  The Shiny source generator will n
 Shiny.ShinyHost.Resolve<IJobManager>().Run(...);
 
 // AFTER
-ShinyJobManager.Run(...);
+ShinyJobs.Run(...);
 ```
 
 
 By adding this attribute, it will create static access classes for all of the Shiny services in the main namespace of the assembly you use the assembly attribute in.
+
 |Shiny Service|Static Class Name|
 |-------------|-----------------|
+|Shiny.Jobs.IJobManager|ShinyJobs|
+|Shiny.Net.IConnectivity|ShinyConnectivity|
+|Shiny.Settings.ISettings|ShinySettings|
+|Shiny.Power.IPowerManager|ShinyPower|
 |Shiny.Beacons.IBeaconRangingManager|ShinyBeaconRanging|
 |Shiny.Beacons.IBeaconMonitoringManager|ShinyBeaconMonitoring|
-|Shiny.BluetoothLE.IBleManager|ShinyBleManager|
-|Shiny.BluetoothLE.Hosting.IBleHostingManagr|ShinyBleHostingManager|
-
-|Shiny.Locations.IGpsManager|ShinyGpsManager|
-
+|Shiny.BluetoothLE.IBleManager|ShinyBle|
+|Shiny.BluetoothLE.Hosting.IBleHostingManagr|ShinyBleHosting|
+|Shiny.Net.Http.IHttpTransferManager|ShinyHttpTransfers|
+|Shiny.Notifications.INotificationManager|ShinyNotifications|
+|Shiny.Nfc.INfcManager|ShinyNfc|
+|Shiny.Push.IPushManager|ShinyPush|
+|Shiny.Locations.IGeofenceManager|ShinyGeofences|
+|Shiny.Locations.IGpsManager|ShinyGps|
+|Shiny.Locations.IMotionActivityManager|ShinyMotionActivity|
+|Shiny.SpeechRecognition.ISpeechRecognizer|ShinySpeechRecognizer|
+|Shiny.Sensors.IAccelerometer|ShinyAccelerometer|
+|Shiny.Sensors.IAmbientLight|ShinyAmbientLight|
+|Shiny.Sensors.IBarometer|ShinyBarometer|
+|Shiny.Sensors.ICompass|ShinyCompass|
+|Shiny.Sensors.IGyroscope|ShinyGyroscope|
+|Shiny.Sensors.IHeartRateMonitor|ShinyHeartRate|
+|Shiny.Sensors.IHumidity|ShinyHumidity|
+|Shiny.Sensors.IMagnetometer|ShinyMagnetometer|
+|Shiny.Sensors.IPedometer|ShinyPedometer|
+|Shiny.Sensors.IProximity|ShinyProximity|
+|Shiny.Sensors.ITemperature|ShinyTemperature|
