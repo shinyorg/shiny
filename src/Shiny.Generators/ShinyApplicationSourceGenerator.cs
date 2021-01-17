@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis;
 
 namespace Shiny.Generators
 {
-    // TODO: could use with UWP/Windows
     public abstract class ShinyApplicationSourceGenerator : ISourceGenerator
     {
         const string GENERATED_STARTUP_TYPE_NAME = "AppShinyStartup";
@@ -200,10 +199,18 @@ namespace Shiny.Generators
                 .Where(x => x.Implements(symbol))
                 .ToList();
 
-            // TODO: error
             if (!impls.Any())
+            {
+                if (oneDelegateRequiredToInstall)
+                {
+                    this.Context.Log(
+                        "SHINYDELEGATE",
+                        "Required delegate missing for " + registerStatement,
+                        DiagnosticSeverity.Error
+                    );
+                }
                 return false;
-
+            }
             registerStatement += $"<{impls.First().ToDisplayString()}>();";
             this.builder.AppendLineInvariant(registerStatement);
 
