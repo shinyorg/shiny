@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 
@@ -10,28 +11,26 @@ namespace Shiny.Generators.Tasks
         GeneratorExecutionContext context;
         string? useNamespace;
 
-        public StaticClassSourceGenerator() { }
-        public StaticClassSourceGenerator(string nameSpace) => this.useNamespace = nameSpace;
+        public StaticClassSourceGenerator(string? nameSpace = null) => this.useNamespace = nameSpace;
 
 
         public void Initialize(GeneratorInitializationContext context) { }
-
-
         public void Execute(GeneratorExecutionContext context)
         {
             context.TryDebug();
             this.context = context;
+
             if (this.useNamespace == null)
             {
                 var attribute = context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
                 if (attribute == null)
                     return;
 
-                this.useNamespace = attribute.ConstructorArguments[0].Value.ToString();
+                this.useNamespace = attribute.ConstructorArguments[0].Value?.ToString() ?? this.context.Compilation.AssemblyName;
             }
             this.BuildStaticClass("Shiny.Jobs.IJobManager", "ShinyJobs", "Shiny.Jobs");
             this.BuildStaticClass("Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");
-            //this.BuildStaticClass("Shiny.Settings.ISettings", "ShinySettings", "Shiny.Settings"); // don't know how to gen generic constraints yet
+            this.BuildStaticClass("Shiny.Settings.ISettings", "ShinySettings", "Shiny.Settings");
             this.BuildStaticClass("Shiny.Power.IPowerManager", "ShinyPower", "Shiny.Power");
             this.BuildStaticClass("Shiny.IO.IFileSystem", "ShinyFileSystem", "Shiny.IO");
 
@@ -97,14 +96,30 @@ namespace Shiny.Generators.Tasks
                         var returnType = method.ReturnsVoid ? "void" : method.ReturnType.ToDisplayString();
                         var signature = $"public static {returnType} {method.Name}";
                         var args = $"Current.{method.Name}";
+                        var constraint = "";
 
-                        if (method.IsGenericMethod)
+                        if (method.IsGenericMethod && method.TypeParameters.Length == 1)
                         {
                             signature += "<T>";
                             args += "<T>";
+
+                            var p = method.TypeParameters.First();
+                            for (var i = 0; i < p.ConstraintTypes.Length; i++)
+                            {
+                                if (i > 0)
+                                    constraint += ",";
+
+                                constraint += p.ConstraintTypes[i].ToDisplayString();
+                            }
+        
+                            if (p.HasConstructorConstraint)
+                                constraint += ",new()";
+
+                            if (!String.IsNullOrWhiteSpace(constraint))
+                                constraint = " where " + constraint;
                         }
 
-                        builder.AppendLineInvariant($"{signature}({argList}) => {args}({argListNoNames});");
+                        builder.AppendLineInvariant($"{signature}({argList}){constraint} => {args}({argListNoNames});");
                     }
 
                     foreach (var prop in type.GetAllProperties())
