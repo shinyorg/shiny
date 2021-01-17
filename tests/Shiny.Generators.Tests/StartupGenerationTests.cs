@@ -142,7 +142,6 @@ namespace MyTest
         public void DelegateDetection()
         {
             this.Generator.AddReference("Shiny.Locations");
-            this.Generator.AddReference("Shiny.Locations.Abstractions");
             this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
 namespace Test

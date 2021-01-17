@@ -29,7 +29,7 @@ namespace Shiny.Jobs
 
 
         public abstract Task<AccessState> RequestAccess();
-        protected abstract void ScheduleNative(JobInfo jobInfo);
+        protected abstract void RegisterNative(JobInfo jobInfo);
         protected abstract void CancelNative(JobInfo jobInfo);
 
 
@@ -122,7 +122,7 @@ namespace Shiny.Jobs
         public async Task Register(JobInfo jobInfo)
         {
             this.ResolveJob(jobInfo);
-            this.ScheduleNative(jobInfo);
+            this.RegisterNative(jobInfo);
             await this.repository.Set(jobInfo.Identifier, PersistJobInfo.ToPersist(jobInfo));
         }
 

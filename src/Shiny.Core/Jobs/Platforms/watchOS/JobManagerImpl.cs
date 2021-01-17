@@ -22,7 +22,7 @@ namespace Shiny.Jobs
             throw new NotImplementedException();
         }
 
-        protected override void ScheduleNative(JobInfo jobInfo)
+        protected override void RegisterNative(JobInfo jobInfo)
         {
             throw new NotImplementedException();
         }

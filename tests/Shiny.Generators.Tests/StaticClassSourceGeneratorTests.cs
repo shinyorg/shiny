@@ -22,7 +22,8 @@ namespace Shiny.Generators.Tests
             this.AssertTypes(
                 "Tests.ShinyJobs",
                 "Tests.ShinyConnectivity",
-                "Tests.ShinyPower"
+                "Tests.ShinyPower",
+                "Tests.ShinySettings"
             );
         }
 

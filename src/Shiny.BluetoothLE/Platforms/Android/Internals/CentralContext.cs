@@ -70,11 +70,6 @@ namespace Shiny.BluetoothLE.Internals
                     await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
                     break;
 
-                // TODO: background scan?
-                //case BluetoothDevice.ActionAclDisconnected:
-                //    peripheral.Context.Close();
-                //    break;
-
                 case BluetoothDevice.ActionPairingRequest:
                     var pin = peripheral.PairingRequestPin;
                     peripheral.PairingRequestPin = null;

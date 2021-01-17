@@ -134,7 +134,7 @@ namespace Shiny.Beacons
         async Task CheckStates(IList<Beacon> beacons)
         {
             var copy = this.GetCopy();
-            var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(20)); //TODO: configurable
+            var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(20));
 
             foreach (var state in copy)
             {

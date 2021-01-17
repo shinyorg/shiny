@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Windows.ApplicationModel.Background;
 using Windows.Networking.PushNotifications;
 using Windows.UI.Notifications;
@@ -25,7 +23,7 @@ namespace Shiny.Push
 
             var fire = taskInstance.TriggerDetails is RawNotification ||
                        taskInstance.TriggerDetails is ToastNotification ||
-                       taskInstance.TriggerDetails is TileNotification tile;
+                       taskInstance.TriggerDetails is TileNotification;
             if (fire)
                 await this.serviceProvider.RunDelegates<IPushDelegate>(x => x.OnReceived(headers));
 

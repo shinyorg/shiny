@@ -33,7 +33,6 @@ namespace Shiny.Generators.Tasks
             this.BuildStaticClass("Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");
             this.BuildStaticClass("Shiny.Settings.ISettings", "ShinySettings", "Shiny.Settings");
             this.BuildStaticClass("Shiny.Power.IPowerManager", "ShinyPower", "Shiny.Power");
-            this.BuildStaticClass("Shiny.IO.IFileSystem", "ShinyFileSystem", "Shiny.IO");
 
             this.BuildStaticClass("Shiny.Beacons.IBeaconRangingManager", "ShinyBeaconRanging", "Shiny.Beacons");
             this.BuildStaticClass("Shiny.Beacons.IBeaconMonitoringManager", "ShinyBeaconMonitoring", "Shiny.Beacons");
@@ -112,7 +111,7 @@ namespace Shiny.Generators.Tasks
 
                                 constraint += p.ConstraintTypes[i].ToDisplayString();
                             }
-        
+
                             if (p.HasConstructorConstraint)
                                 constraint += ",new()";
 
