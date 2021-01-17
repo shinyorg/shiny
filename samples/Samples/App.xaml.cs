@@ -92,7 +92,7 @@ namespace Samples
                 container.RegisterDelegate(
                     serviceType,
                     _ => func(),
-                    Reuse.Singleton // HACK: I know everything is singleton
+                    Reuse.Singleton // I know everything is singleton
                 )
             );
             return new DryIocContainerExtension(container);

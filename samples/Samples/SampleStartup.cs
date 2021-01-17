@@ -14,6 +14,8 @@ using Shiny.Notifications;
 using Shiny.Logging;
 using Samples.Notifications;
 
+[assembly: GenerateStaticClasses("Samples")]
+
 
 namespace Samples
 {

@@ -99,10 +99,10 @@ namespace Samples.BleHosting
             // TODO: simple push of datetime
             Observable
                 .Interval(TimeSpan.FromSeconds(2))
-                .SubOnMainThread(async _ =>
+                .Select(_ => Observable.FromAsync(_ => this.Send()))
+                .SubOnMainThread(x =>
                 {
                     // TODO: calc speeds
-                    await this.Send();
                 })
                 .DisposeWith(this.DeactivateWith);
         }

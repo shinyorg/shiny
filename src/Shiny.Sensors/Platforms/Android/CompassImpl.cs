@@ -69,7 +69,6 @@ namespace Shiny.Sensors
             SensorManager.GetOrientation(this.rMatrix, this.orientation);
             var degrees = (Math.ToDegrees(this.orientation[0]) + 360) % 360;
 
-            // TODO: not so allocatey
             // TODO: get compass accuracy
             // TODO: calculate true north
             ob.OnNext(new CompassReading(CompassAccuracy.Approximate, degrees, null));

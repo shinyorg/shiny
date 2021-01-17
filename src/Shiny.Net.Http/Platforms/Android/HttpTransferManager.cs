@@ -35,7 +35,6 @@ namespace Shiny.Net.Http
 
         public override IObservable<HttpTransfer> WhenUpdated()
         {
-            // TODO: cancel/error, should remove from db
             var query = new QueryFilter().ToNative();
 
             this.httpObs ??= Observable

@@ -40,7 +40,7 @@ namespace Shiny.BluetoothLE.Internals
 
 
         public ConcurrentQueue<Func<Task>> Actions { get; }
-        public IObservable<BleException> ConnectionFailed => this.connErrorSubject; // TODO: need the device
+        public IObservable<BleException> ConnectionFailed => this.connErrorSubject;
 
 
         public void Connect(ConnectionConfig? config) => this.InvokeOnMainThread(() =>

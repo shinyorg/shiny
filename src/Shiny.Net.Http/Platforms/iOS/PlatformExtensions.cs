@@ -67,7 +67,7 @@ namespace Shiny.Net.Http
                 //        results = results.Where(x => x.GetTransferStatus() == HttpTransferState.Pending);
                 //        break;
 
-                //        // TODO: paused
+                //        // paused?
                 //}
             }
             return results;

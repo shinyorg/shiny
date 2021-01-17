@@ -58,7 +58,6 @@ namespace Shiny
 
         public static bool UseCompass(this IServiceCollection services)
         {
-            // TODO: watch os compass
 #if NETSTANDARD
             return false;
 #elif TIZEN || __WATCHOS__

@@ -131,7 +131,6 @@ namespace Shiny.Generators
                 .Where(x => x.AttributeClass.Name == attribute.Name)
                 .FirstOrDefault();
 
-            // TODO: why is the constructor arg not coming in?
             return attributeData;
         }
 

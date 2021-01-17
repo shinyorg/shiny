@@ -42,7 +42,7 @@ namespace Shiny.BluetoothLE
                     }
                     else
                     {
-                        this.Status = TransactionState.Aborted; // TODO: or errored?
+                        this.Status = TransactionState.Aborted;
                         ob.OnError(new GattReliableWriteTransactionException("Error committing transaction"));
                     }
                 });
