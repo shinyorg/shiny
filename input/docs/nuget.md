@@ -1,5 +1,6 @@
 Title: All Shiny Nugets
 Order: 1
+RedirectFrom: docs/index
 ---
 
 |Project|NuGet|Preview|Description|

@@ -1,12 +1,15 @@
-Title: App Center Logging
+Title: App Center
 ---
 
-# SETUP
+## DESCRIPTION
 
-Install from NuGet: [![NuGet](https://img.shields.io/nuget/v/Shiny.Logging.AppCenter.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Logging.AppCenter/)
+Logging is important for you to successfully develop your applications and monitor them in production.  Shiny has it's own built in logging framework and was designed to plug into various providers.  This is the plugin for AppCenter.
 
+## SETUP
 
-## Setup
+1. Install from NuGet: [![AppCenterNugetShield]][AppCenterNuget]
+
+2. In your Shiny Startup (NOTE: generated startups do not auto-register this for you)
 
 ```cs
 using Microsoft.Extensions.DependencyInjection;
@@ -20,3 +23,5 @@ public class AppCenterStartup : ShinyStartup
     }
 }
 ```
+
+<?! Include "../../nuget.md" /?>
