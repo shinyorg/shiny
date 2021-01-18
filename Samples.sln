@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Core", "src\Shiny.Cor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE.Common", "src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj", "{4273A168-9E9E-4E46-A6D6-96A3B788321F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.BluetoothLE.Hosting", "src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj", "{01ADE171-31D3-49B2-8223-67DCBFE8C601}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE.Hosting", "src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj", "{01ADE171-31D3-49B2-8223-67DCBFE8C601}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Generators", "src\Shiny.Generators\Shiny.Generators.csproj", "{9FC4A830-1B20-4073-A1C4-EE3A52781DFD}"
 EndProject
@@ -63,13 +63,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.FirebaseMessagin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Sensors", "src\Shiny.Sensors\Shiny.Sensors.csproj", "{32BDD88F-B1D3-4BCE-8C21-9CC81FBC0963}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.SpeechRecognition", "src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj", "{4F89D195-482E-4B5F-B97F-1647BE5C7716}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.SpeechRecognition", "src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj", "{4F89D195-482E-4B5F-B97F-1647BE5C7716}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Support.Uwp", "src\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj", "{959717BE-1AF8-4E4C-8B5E-F5B4759B20E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny", "src\Shiny\Shiny.csproj", "{B133232E-1A21-438D-8B40-F771D65BED1C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny", "src\Shiny\Shiny.csproj", "{B133232E-1A21-438D-8B40-F771D65BED1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Testing", "src\Shiny.Testing\Shiny.Testing.csproj", "{D677ED55-A4E0-4B31-896F-8FDB5FDC780D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Testing", "src\Shiny.Testing\Shiny.Testing.csproj", "{D677ED55-A4E0-4B31-896F-8FDB5FDC780D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -289,6 +289,8 @@ Global
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.AppStore|x86.Build.0 = Debug|x86
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.AppStore|x86.Deploy.0 = Debug|x86
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{4718D281-A453-42A7-9381-0FD48DB8D801}.Debug|Any CPU.Build.0 = Debug|x86
+		{4718D281-A453-42A7-9381-0FD48DB8D801}.Debug|Any CPU.Deploy.0 = Debug|x86
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Debug|ARM.ActiveCfg = Debug|ARM
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Debug|ARM.Build.0 = Debug|ARM
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Debug|ARM.Deploy.0 = Debug|ARM
@@ -301,6 +303,8 @@ Global
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Debug|x86.Build.0 = Debug|x86
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Debug|x86.Deploy.0 = Debug|x86
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Release|Any CPU.ActiveCfg = Release|x86
+		{4718D281-A453-42A7-9381-0FD48DB8D801}.Release|Any CPU.Build.0 = Release|x86
+		{4718D281-A453-42A7-9381-0FD48DB8D801}.Release|Any CPU.Deploy.0 = Release|x86
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Release|ARM.ActiveCfg = Release|ARM
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Release|ARM.Build.0 = Release|ARM
 		{4718D281-A453-42A7-9381-0FD48DB8D801}.Release|ARM.Deploy.0 = Release|ARM
