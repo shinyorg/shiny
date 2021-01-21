@@ -11,6 +11,7 @@ namespace Shiny.Generators.Tasks
         GeneratorExecutionContext context;
         string? useNamespace;
 
+
         public StaticClassSourceGenerator() { }
         public StaticClassSourceGenerator(string nameSpace) => this.useNamespace = nameSpace;
 
@@ -20,19 +21,30 @@ namespace Shiny.Generators.Tasks
         {
             context.TryDebug();
             this.context = context;
+            var attribute = context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
+            if (attribute == null)
+                return;
 
+            this.context.Log("SHINYINFO", "Shiny static class generation will run on this assembly", DiagnosticSeverity.Info);
             if (this.useNamespace == null)
             {
-                var attribute = context.GetCurrentAssemblyAttribute("Shiny.GenerateStaticClassesAttribute");
-                if (attribute == null)
-                    return;
-
-                this.useNamespace = attribute.ConstructorArguments[0].Value?.ToString() ?? this.context.Compilation.AssemblyName;
+                this.useNamespace = attribute
+                    .ConstructorArguments[0]
+                    .Value?
+                    .ToString() ?? this.context.Compilation.AssemblyName;
             }
+            this.context.Log(
+                "SHINYINFO",
+                "Shiny static class generation namespace: " + this.useNamespace,
+                DiagnosticSeverity.Info
+            );
+
             this.BuildStaticClass("Shiny.Jobs.IJobManager", "ShinyJobs", "Shiny.Jobs");
             this.BuildStaticClass("Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");
             this.BuildStaticClass("Shiny.Settings.ISettings", "ShinySettings", "Shiny.Settings");
             this.BuildStaticClass("Shiny.Power.IPowerManager", "ShinyPower", "Shiny.Power");
+            this.BuildStaticClass("Shiny.Infrastructure.IMessageBus", "ShinyMessageBus", "Shiny.Infrastructure");
+            this.BuildStaticClass("Shiny.Infrastructure.ISerializer", "ShinySerializer", "Shiny.Infrastructure");
 
             this.BuildStaticClass("Shiny.Beacons.IBeaconRangingManager", "ShinyBeaconRanging", "Shiny.Beacons");
             this.BuildStaticClass("Shiny.Beacons.IBeaconMonitoringManager", "ShinyBeaconMonitoring", "Shiny.Beacons");
