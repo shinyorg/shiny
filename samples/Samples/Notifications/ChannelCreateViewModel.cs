@@ -47,7 +47,7 @@ namespace Samples.Notifications
             );
             this.PickActionType2 = dialogs.PickEnumValueCommand<ChannelActionType>(
                 "Action Type",
-                x => this.Action1ActionType = x.ToString(),
+                x => this.Action2ActionType = x.ToString(),
                 this.WhenAny(
                     x => x.UseAction2,
                     x => x.GetValue()
