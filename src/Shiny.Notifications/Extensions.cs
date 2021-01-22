@@ -20,6 +20,14 @@ namespace Shiny.Notifications
         }
 
 
+        //public static void SetSoundFromEmbeddedResource(this Channel channel, Assembly assembly, string resourceName)
+        //{
+        //    channel.CustomSoundPath = ShinyHost
+        //        .Resolve<IPlatform>()
+        //        .ResourceToFilePath(assembly, resourceName);
+        //}
+
+
         public static void AssertValid(this ChannelAction action)
         {
             if (action.Identifier.IsEmpty())

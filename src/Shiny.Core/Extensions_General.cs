@@ -2,13 +2,32 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 
 namespace Shiny
 {
     public static class GeneralExtensions
     {
+        public static string ResourceToFilePath(this IPlatform platform, Assembly assembly, string resourceName)
+        {
+            var path = Path.Combine(platform.AppData.FullName, resourceName);
+            if (!File.Exists(path))
+            {
+                using (var stream = assembly.GetManifestResourceStream(resourceName))
+                {
+                    using (var fs = File.Create(path))
+                    {
+                        stream.CopyTo(fs);
+                    }
+                }
+            }
+            return path;
+        }
+
+
         /// <summary>
         /// Extension method to String.IsNullOrWhiteSpace
         /// </summary>
