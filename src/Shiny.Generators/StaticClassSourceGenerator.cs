@@ -43,7 +43,7 @@ namespace Shiny.Generators.Tasks
             this.BuildStaticClass("Shiny.Net.IConnectivity", "ShinyConnectivity", "Shiny.Net");
             this.BuildStaticClass("Shiny.Settings.ISettings", "ShinySettings", "Shiny.Settings");
             this.BuildStaticClass("Shiny.Power.IPowerManager", "ShinyPower", "Shiny.Power");
-            this.BuildStaticClass("Shiny.Infrastructure.IMessageBus", "ShinyMessageBus", "Shiny.Infrastructure");
+            this.BuildStaticClass("Shiny.IMessageBus", "ShinyMessageBus", "Shiny.Infrastructure");
             this.BuildStaticClass("Shiny.Infrastructure.ISerializer", "ShinySerializer", "Shiny.Infrastructure");
 
             this.BuildStaticClass("Shiny.Beacons.IBeaconRangingManager", "ShinyBeaconRanging", "Shiny.Beacons");
