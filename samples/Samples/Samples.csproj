@@ -42,6 +42,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <EmbeddedResource Include="Resources\notification.mp3" />
         <EmbeddedResource Include="Resources\fa-brands-400.ttf" />
         <EmbeddedResource Include="Resources\fa-regular-400.ttf" />
         <EmbeddedResource Include="Resources\fa-solid-900.ttf" />

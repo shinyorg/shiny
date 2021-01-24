@@ -23,6 +23,13 @@
                                   Command="{Binding PickImportance}" />
                     </TableSection>
 
+                    <TableSection Title="Custom Sound">
+                        <SwitchCell Text="Use" On="{Binding UseCustomSound}" />
+                        <SwitchCell Text="Embedded (use native if not selected)"
+                                    On="{Binding UseEmbeddedSound}"
+                                    IsEnabled="{Binding UseCustomSound}" />
+                    </TableSection>
+
                     <TableSection Title="Action 1">
                         <SwitchCell Text="Use"
                                     On="{Binding UseAction1}" />

@@ -76,25 +76,9 @@ namespace Samples.Notifications
         [Reactive] public string Action2Title { get; set; }
         [Reactive] public string Action2ActionType { get; private set; } = ChannelActionType.None.ToString();
 
-        //NotificationSound GetSound()
-        //{
-        //    switch (this.SelectedSoundType)
-        //    {
-        //        case "Default"  : return NotificationSound.Default;
-        //        //case "Priority" : return NotificationSound.Default;
-        //        case "Custom"   : return NotificationSound.FromCustom("notification.mp3");
-        //        default         : return NotificationSound.None;
-        //    }
-        //}
+        [Reactive] public bool UseCustomSound { get; set; }
+        [Reactive] public bool UseEmbeddedSound { get; set; }
 
-        //public string[] SoundTypes { get; } = new[]
-        //   {
-        //    "None",
-        //    "Default",
-        //    "Custom"
-        //    //"Priority"
-        //};
-        //[Reactive] public string SelectedSoundType { get; set; } = "None";
 
         Channel ToChannel()
         {
@@ -104,6 +88,14 @@ namespace Samples.Notifications
                 Description = this.Description,
                 Importance = (ChannelImportance)Enum.Parse(typeof(ChannelImportance), this.Importance)
             };
+
+            if (this.UseCustomSound)
+            {
+                if (this.UseEmbeddedSound)
+                    channel.SetSoundFromEmbeddedResource(this.GetType().Assembly, "Samples.Resources.notification.mp3");
+                else
+                    channel.CustomSoundPath = "notification.mp3";
+            }
 
             if (this.UseAction1)
             {

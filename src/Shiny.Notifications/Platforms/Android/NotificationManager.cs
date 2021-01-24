@@ -11,7 +11,7 @@ using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Shiny.Infrastructure;
 using Shiny.Logging;
-
+using System.IO;
 
 namespace Shiny.Notifications
 {
@@ -239,6 +239,9 @@ namespace Shiny.Notifications
         {
             // Strip file extension and leading slash from resource name to allow users
             // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
+            if (File.Exists(soundResourceName))
+                return Android.Net.Uri.Parse("file://" + soundResourceName);
+
             soundResourceName = soundResourceName.TrimStart('/').Split('.').First();
             var resourceId = this.services.Android.GetRawResourceIdByName(soundResourceName);
             var resources = this.services.Android.AppContext.Resources;

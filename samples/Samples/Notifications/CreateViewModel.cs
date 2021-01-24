@@ -45,7 +45,7 @@ namespace Samples.Notifications
             .DisposeWith(this.DestroyWith);
 
             this.SelectedDate = DateTime.Now;
-            this.SelectedTime = DateTime.Now.TimeOfDay.Add(TimeSpan.FromMinutes(10));
+            this.SelectedTime = DateTime.Now.TimeOfDay.Add(TimeSpan.FromMinutes(1));
 
             this.SendNow = ReactiveCommand.CreateFromTask(() => this.BuildAndSend(
                 "Test Now",
