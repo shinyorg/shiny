@@ -1,5 +1,5 @@
 using System;
-using System.Linq;
+using System.IO;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -11,7 +11,7 @@ using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Shiny.Infrastructure;
 using Shiny.Logging;
-using System.IO;
+
 
 namespace Shiny.Notifications
 {
@@ -193,8 +193,9 @@ namespace Shiny.Notifications
 
             Android.Net.Uri uri = null;
             if (!channel.CustomSoundPath.IsEmpty())
+            {
                 uri = this.GetSoundResourceUri(channel.CustomSoundPath);
-
+            }
             switch (channel.Importance)
             {
                 case ChannelImportance.Critical:
