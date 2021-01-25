@@ -33,6 +33,7 @@
                         <TextCell Text="Geofencing" Command="{Binding Navigate}" CommandParameter="Nav/Geofencing" />
                         <TextCell Text="Beacons" Command="{Binding Navigate}" CommandParameter="Nav/Beacons" />
                         <TextCell Text="Motion Activity" Command="{Binding Navigate}" CommandParameter="Nav/MotionActivity" />
+                        <TextCell Text="Test Motion Activity" Command="{Binding Navigate}" CommandParameter="Nav/TestMotionActivity" />
                     </TableSection>
                     <TableSection Title="Notifications">
                         <TextCell Text="Push" Command="{Binding Navigate}" CommandParameter="Nav/Push" />

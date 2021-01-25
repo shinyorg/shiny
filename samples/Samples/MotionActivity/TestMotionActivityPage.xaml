@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.MotionActivity.TestMotionActivityPage">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="Interval" />
+            <Entry Text="{Binding IntervalSeconds}" Keyboard="Numeric" />
+
+            <Button Text="{Binding ActivityType, StringFormat='{0} Activity Type'}"
+                    Command="{Binding SelectActivityType}" />
+
+            <Button Text="{Binding ActivityType, StringFormat='{0} Confidence'}"
+                    Command="{Binding SelectConfidence}" />
+
+            <Button Text=""
+                    Command="{Binding Toggle}" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

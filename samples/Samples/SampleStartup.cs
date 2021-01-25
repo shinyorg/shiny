@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 using Shiny.Notifications;
 using Shiny.Logging;
+using Shiny.Testing;
 using Samples.Notifications;
 
 [assembly: GenerateStaticClasses("Samples")]
@@ -26,7 +27,7 @@ namespace Samples
             Log.UseConsole();
             Log.UseDebug();
 
-            //services.UseTestMotionActivity(Shiny.Locations.MotionActivityType.Automotive);
+            services.UseTestMotionActivity(Shiny.Locations.MotionActivityType.Automotive);
 
             //services.UseAppCenterLogging(Constants.AppCenterTokens, true, false);
             services.UseSqliteLogging(true, true);

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -35,6 +36,9 @@ namespace Shiny.Notifications
                     .TryProcessIntent(x)
                 );
 
+            if (this.manager.GetNotificationChannel(Channel.Default.Identifier) == null)
+                this.CreateNativeChannel(Channel.Default);
+
             // auto process intent?
             //this.context
             //    .WhenActivityStatusChanged()
@@ -45,6 +49,7 @@ namespace Shiny.Notifications
 
         public IPersistentNotification Create(Notification notification)
         {
+            notification.Channel ??= Channel.Default.Identifier;
             notification.Android.OnGoing = true;
             notification.Android.ShowWhen = null;
             notification.ScheduleDate = null;
@@ -193,9 +198,8 @@ namespace Shiny.Notifications
 
             Android.Net.Uri uri = null;
             if (!channel.CustomSoundPath.IsEmpty())
-            {
                 uri = this.GetSoundResourceUri(channel.CustomSoundPath);
-            }
+
             switch (channel.Importance)
             {
                 case ChannelImportance.Critical:

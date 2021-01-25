@@ -8,7 +8,6 @@ namespace Samples.UWP
         public MainPage()
         {
             this.InitializeComponent();
-            //XF.Material.Forms.Material.Init();
             this.LoadApplication(new Samples.App());
         }
     }
