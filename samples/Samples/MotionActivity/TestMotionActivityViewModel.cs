@@ -18,7 +18,7 @@ namespace Samples.MotionActivity
             this.IsGeneratingData = tm?.IsGeneratingTestData ?? false;
             this.ActivityType = tm?.GeneratingActivityType ?? MotionActivityType.Automotive;
             this.Confidence = tm?.GeneratingConfidence ?? MotionActivityConfidence.High;
-            this.IntervalSeconds = Convert.ToInt32(tm?.GeneratingInterval?.TotalSeconds ?? 0d);
+            this.IntervalSeconds = Convert.ToInt32(tm?.GeneratingInterval?.TotalSeconds ?? 10d);
 
             this.SelectActivityType = dialogs.PickEnumValueCommand<MotionActivityType>(
                 "Select Activity Type",
@@ -29,10 +29,15 @@ namespace Samples.MotionActivity
                 x => this.Confidence = x
             );
 
-            this.Toggle = ReactiveCommand.CreateFromTask(
-                async () =>
+            this.Toggle = ReactiveCommand.Create(
+                () =>
                 {
                     if (tm.IsGeneratingTestData)
+                    {
+                        tm.StopGeneratingTestData();
+                        this.IsGeneratingData = false;
+                    }
+                    else
                     {
                         tm.StartGeneratingTestData(
                             this.ActivityType,
@@ -40,11 +45,6 @@ namespace Samples.MotionActivity
                             this.Confidence
                         );
                         this.IsGeneratingData = true;
-                    }
-                    else
-                    {
-                        tm.StopGeneratingTestData();
-                        this.IsGeneratingData = false;
                     }
                 },
                 this.WhenAny(

@@ -45,7 +45,6 @@ namespace Samples
             containerRegistry.RegisterForNavigation<WelcomePage>("Welcome");
             containerRegistry.RegisterForNavigation<BigTextViewPage>("BigText");
             containerRegistry.RegisterForNavigation<DelegateNotificationsPage>("DelegateNotifications");
-            containerRegistry.RegisterForNavigation<MotionActivity.TestMotionActivityPage>("TestMotionActivity");
 
             containerRegistry.RegisterForNavigation<Gps.MainPage>("Gps");
             containerRegistry.RegisterForNavigation<Geofences.MainPage>("Geofencing");
@@ -53,6 +52,7 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Beacons.MainPage>("Beacons");
             containerRegistry.RegisterForNavigation<Beacons.CreatePage>("CreateBeacon");
             containerRegistry.RegisterForNavigation<MotionActivity.MainPage>("MotionActivity");
+            containerRegistry.RegisterForNavigation<MotionActivity.TestMotionActivityPage>("TestMotionActivity");
 
             containerRegistry.RegisterForNavigation<BluetoothLE.AdapterPage>("BleCentral");
             containerRegistry.RegisterForNavigation<BluetoothLE.PeripheralPage>("Peripheral");
@@ -80,7 +80,7 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Notifications.BadgePage>("Badges");
 
             containerRegistry.RegisterForNavigation<PlatformPage>("Platform");
-            containerRegistry.RegisterForNavigation<Logging.LoggingPage>("Logs");
+            containerRegistry.RegisterForNavigation<LoggingPage>("Logs");
             containerRegistry.RegisterForNavigation<AccessPage>("Access");
             containerRegistry.RegisterForNavigation<Settings.MainPage>("Settings");
         }

@@ -1,20 +1,36 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Samples.MotionActivity.TestMotionActivityPage">
+             x:Class="Samples.MotionActivity.TestMotionActivityPage"
+             Title="Fake Motion Activity">
+
     <ContentPage.Content>
         <StackLayout>
+            <Frame BorderColor="Black" BackgroundColor="Beige">
+                <Label Text="This interfaces with the TestMotionActivityManager (if registered) to help simulate motion activity events within the application.  This is very useful for testing purposes since you cannot do this within the emulators or any plugin apps on any of the operating systems"
+                       HorizontalOptions="FillAndExpand"
+                       HorizontalTextAlignment="Center" />
+            </Frame>
+
             <Label Text="Interval" />
             <Entry Text="{Binding IntervalSeconds}" Keyboard="Numeric" />
 
             <Button Text="{Binding ActivityType, StringFormat='{0} Activity Type'}"
                     Command="{Binding SelectActivityType}" />
 
-            <Button Text="{Binding ActivityType, StringFormat='{0} Confidence'}"
+            <Button Text="{Binding Confidence, StringFormat='{0} Confidence'}"
                     Command="{Binding SelectConfidence}" />
 
-            <Button Text=""
-                    Command="{Binding Toggle}" />
+            <Button Text="Start Generating Data" Command="{Binding Toggle}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsGeneratingData}" Value="True">
+                        <Setter Property="Text" Value="Stop Generating Data" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsGeneratingData}" Value="False">
+                        <Setter Property="Text" Value="Start Generating Data" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

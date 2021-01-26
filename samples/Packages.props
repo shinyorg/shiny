@@ -1,8 +1,8 @@
 <Project>
 
     <ItemGroup>
-        <PackageReference Update="Xamarin.Forms" Version="5.0.0.1905" />
-        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.0.1" />
+        <PackageReference Update="Xamarin.Forms" Version="5.0.0.1931" />
+        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.0.2" />
         <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.1" />
         <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.10" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />

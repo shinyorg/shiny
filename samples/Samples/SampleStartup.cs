@@ -27,8 +27,6 @@ namespace Samples
             Log.UseConsole();
             Log.UseDebug();
 
-            services.UseTestMotionActivity(Shiny.Locations.MotionActivityType.Automotive);
-
             //services.UseAppCenterLogging(Constants.AppCenterTokens, true, false);
             services.UseSqliteLogging(true, true);
             //services.UseSqliteSettings();
@@ -52,10 +50,12 @@ namespace Samples
             services.UseBeaconMonitoring<BeaconDelegate>();
             services.UseBleClient<BleClientDelegate>();
             services.UseBleHosting();
-            services.UseMotionActivity();
             services.UseSpeechRecognition();
             services.UseAllSensors();
             services.UseNfc();
+
+            services.UseTestMotionActivity();
+            //services.UseMotionActivity();
 
             services.UseGeofencing<GeofenceDelegate>();
             //services.UseGpsDirectGeofencing<LocationDelegates>();
