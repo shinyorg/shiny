@@ -93,72 +93,83 @@ namespace Shiny.Generators.Tasks
             {
                 using (builder.BlockInvariant("public static partial class " + genFileName))
                 {
-                    builder.AppendLine($"public static bool IsAvailable => Current != null;");
-                    builder.AppendLine();
                     builder.AppendLine($"public static {ifTypeName} Current => ShinyHost.Resolve<{ifTypeName}>();");
                     builder.AppendLine();
 
-                    var methods = type.GetAllPublicMethods();
+                    AppendMethods(type, builder);
+                    AppendProperties(type, builder);
+                }
+            }
+            this.context.AddSource(genFileName, builder.ToString());
+        }
 
-                    foreach (var method in methods)
+
+        static void AppendMethods(INamedTypeSymbol type, IndentedStringBuilder builder)
+        {
+            var methods = type.GetAllPublicMethods();
+            builder.AppendLineInvariant($"//Methods: {methods.Count()}");
+
+            foreach (var method in methods)
+            {
+                builder.AppendLineInvariant($"//method: {method.Name} - {method.Kind}");
+                var argList = BuildArgString(method, true);
+                var argListNoNames = BuildArgString(method, false);
+
+                var returnType = method.ReturnsVoid ? "void" : method.ReturnType.ToDisplayString();
+                var signature = $"public static {returnType} {method.Name}";
+                var args = $"Current.{method.Name}";
+                var constraint = "";
+
+                if (method.IsGenericMethod && method.TypeParameters.Length == 1)
+                {
+                    signature += "<T>";
+                    args += "<T>";
+
+                    var p = method.TypeParameters.First();
+                    for (var i = 0; i < p.ConstraintTypes.Length; i++)
                     {
-                        var argList = BuildArgString(method, true);
-                        var argListNoNames = BuildArgString(method, false);
+                        if (i > 0)
+                            constraint += ",";
 
-                        var returnType = method.ReturnsVoid ? "void" : method.ReturnType.ToDisplayString();
-                        var signature = $"public static {returnType} {method.Name}";
-                        var args = $"Current.{method.Name}";
-                        var constraint = "";
-
-                        if (method.IsGenericMethod && method.TypeParameters.Length == 1)
-                        {
-                            signature += "<T>";
-                            args += "<T>";
-
-                            var p = method.TypeParameters.First();
-                            for (var i = 0; i < p.ConstraintTypes.Length; i++)
-                            {
-                                if (i > 0)
-                                    constraint += ",";
-
-                                constraint += p.ConstraintTypes[i].ToDisplayString();
-                            }
-
-                            if (p.HasConstructorConstraint)
-                                constraint += ",new()";
-
-                            if (!String.IsNullOrWhiteSpace(constraint))
-                                constraint = " where " + constraint;
-                        }
-
-                        builder.AppendLineInvariant($"{signature}({argList}){constraint} => {args}({argListNoNames});");
+                        constraint += p.ConstraintTypes[i].ToDisplayString();
                     }
 
-                    foreach (var prop in type.GetAllProperties())
+                    if (p.HasConstructorConstraint)
+                        constraint += ",new()";
+
+                    if (!String.IsNullOrWhiteSpace(constraint))
+                        constraint = " where " + constraint;
+                }
+
+                builder.AppendLineInvariant($"{signature}({argList}){constraint} => {args}({argListNoNames});");
+            }
+        }
+
+
+        static void AppendProperties(INamedTypeSymbol type, IndentedStringBuilder builder)
+        {
+            foreach (var prop in type.GetAllProperties())
+            {
+                var propertyName = prop.GetName();
+                var hasGet = prop.GetMethod?.IsPublic() ?? false;
+                var hasSet = prop.SetMethod?.IsPublic() ?? false;
+
+                if (hasGet && !hasSet)
+                {
+                    builder.AppendLineInvariant($"public static {prop.Type.ToDisplayString()} {propertyName} => Current.{propertyName};");
+                }
+                else
+                {
+                    using (builder.BlockInvariant($"public static {prop.Type.ToDisplayString()} {propertyName}"))
                     {
-                        var propertyName = prop.GetName();
-                        var hasGet = prop.GetMethod?.IsPublic() ?? false;
-                        var hasSet = prop.SetMethod?.IsPublic() ?? false;
+                        if (hasGet)
+                            builder.AppendLineInvariant($"get => Current.{propertyName};");
 
-                        if (hasGet && !hasSet)
-                        {
-                            builder.AppendLineInvariant($"public static {prop.Type.ToDisplayString()} {propertyName} => Current.{propertyName};");
-                        }
-                        else
-                        {
-                            using (builder.BlockInvariant($"public static {prop.Type.ToDisplayString()} {propertyName}"))
-                            {
-                                if (hasGet)
-                                    builder.AppendLineInvariant($"get => Current.{propertyName};");
-
-                                if (hasSet)
-                                    builder.AppendLineInvariant($"set => Current.{propertyName} = value;");
-                            }
-                        }
+                        if (hasSet)
+                            builder.AppendLineInvariant($"set => Current.{propertyName} = value;");
                     }
                 }
             }
-            this.context.Source(builder.ToString(), genFileName);
         }
 
 

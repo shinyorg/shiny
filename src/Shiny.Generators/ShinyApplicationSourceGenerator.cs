@@ -121,7 +121,7 @@ namespace Shiny.Generators
                     }
                 }
             }
-            this.Context.Source(this.builder.ToString(), GENERATED_STARTUP_TYPE_NAME);
+            this.Context.AddSource(GENERATED_STARTUP_TYPE_NAME, this.builder.ToString());
         }
 
 

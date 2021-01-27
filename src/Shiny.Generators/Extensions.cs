@@ -33,25 +33,25 @@ namespace Shiny.Generators
 
         public static void TryDebug(this GeneratorExecutionContext context)
         {
-            //Debugger.IsAttached && 
+            //Debugger.IsAttached &&
             var debug = context.Compilation.Assembly.GetTypeByMetadataName("Shiny.ShinyGeneratorDebugAttribute") != null;
             if (debug)
                 Debugger.Launch();
         }
 
 
-        public static void Source(this GeneratorExecutionContext context, string sourceText, string? fileName = null)
-        {
-            fileName ??= Guid.NewGuid().ToString();
-            context.AddSource(fileName, sourceText);
-        }
+        //public static void Source(this GeneratorExecutionContext context, string sourceText, string? fileName = null)
+        //{
+        //    fileName ??= Guid.NewGuid().ToString();
+        //    context.AddSource(fileName, sourceText);
+        //}
 
 
-        public static bool IsPartialClass(this ISymbol symbol) => symbol
-            .DeclaringSyntaxReferences
-            .Select(reference => reference.GetSyntax(CancellationToken.None))
-            .OfType<ClassDeclarationSyntax>()
-            .Any(node => node.Modifiers.Any(SyntaxKind.PartialKeyword));
+        //public static bool IsPartialClass(this ISymbol symbol) => symbol
+        //    .DeclaringSyntaxReferences
+        //    .Select(reference => reference.GetSyntax(CancellationToken.None))
+        //    .OfType<ClassDeclarationSyntax>()
+        //    .Any(node => node.Modifiers.Any(SyntaxKind.PartialKeyword));
 
 
         public static AttributeData? GetClassAttributeData(this Compilation compilation, ITypeSymbol symbol, string attributeTypeName)
@@ -135,8 +135,11 @@ namespace Shiny.Generators
         }
 
 
-        public static bool IsEvent(this IMethodSymbol method) => method.Kind == SymbolKind.Event;
-        public static bool IsProperty(this IMethodSymbol method) => method.Kind == SymbolKind.Property;
+        public static bool IsEvent(this IMethodSymbol method)
+            => method.Kind == SymbolKind.Event;
+        public static bool IsProperty(this IMethodSymbol method)
+            => method.MethodKind == MethodKind.PropertyGet || method.MethodKind == MethodKind.PropertySet;
+
         public static bool IsPublic(this ITypeSymbol symbol)
             => symbol.DeclaredAccessibility == Accessibility.Public;
         public static bool IsPublic(this IMethodSymbol symbol)
@@ -292,7 +295,11 @@ namespace Shiny.Generators
         {
             while (symbol != null && symbol.Name != "Object")
             {
-                var properties = symbol.GetMembers().Where(x => x.Kind == SymbolKind.Property);
+                var properties = symbol
+                    .GetMembers()
+                    .OfType<IMethodSymbol>()
+                    .Where(x => x.IsProperty());
+
                 foreach (var property in properties)
                     yield return (IPropertySymbol)property;
 
@@ -333,7 +340,7 @@ namespace Shiny.Generators
                         .OfType<IMethodSymbol>()
                         .Where(x =>
                             x.IsPublic() &&
-                            x.IsAbstract &&
+                            !x.IsAbstract &&
                             !x.IsEvent() &&
                             !x.IsProperty()
                         )

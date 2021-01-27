@@ -66,8 +66,7 @@ namespace Shiny.Generators
                     );
                 }
             }
-            var source = builder.ToString();
-            this.Context.Source(source, appDelegate.Name);
+            this.Context.AddSource(appDelegate.Name, builder.ToString());
         }
 
 
