@@ -7,6 +7,13 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// THIS SHOULD NEVER BE USED IN A PRODUCTION SCENARIO AND IS ONLY FOR QUICK TESTING OF BACKGROUND PROCESSES
+        /// </summary>
+        /// <param name="services"></param>
+        public static void UseNotificationErrorLogging(this IServiceCollection services)
+            => Logging.Log.AddLogger(new NotificationLogger(), true, false); // events will overwhelm even in debug
+
         //public static void UseAppShutdownNotification(this IServiceCollection services, Notification notification)
         //    => services.AddAppState(sp =>
         //    {
