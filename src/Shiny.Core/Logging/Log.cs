@@ -34,8 +34,8 @@ namespace Shiny.Logging
         public static void UseConsole(bool crashesEnabled = true, bool eventsEnabled = true)
             => AddLogger(new ConsoleLogger(), crashesEnabled, eventsEnabled);
 
-        public static void UseFile(bool crashesEnabled = true, bool eventsEnabled = true)
-            => AddLogger(new FileLogger(), crashesEnabled, eventsEnabled);
+        public static void UseFile(bool crashesEnabled = true, bool eventsEnabled = true, string? logFileName = null)
+            => AddLogger(new FileLogger(logFileName), crashesEnabled, eventsEnabled);
 
 
         static readonly Subject<LogError> errorSubj = new Subject<LogError>();

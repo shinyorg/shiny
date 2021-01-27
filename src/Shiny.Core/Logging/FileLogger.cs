@@ -6,8 +6,11 @@ namespace Shiny.Logging
 {
     public class FileLogger : ILogger
     {
-        public string LogFileName { get; set; } = "shiny.log";
+        public string LogFileName { get; set; }
         readonly object syncLock = new object();
+
+
+        public FileLogger(string? logFileName = null) => this.LogFileName = logFileName ?? "shiny.log";
 
 
         public void Write(Exception exception, params (string Key, string Value)[] parameters)
