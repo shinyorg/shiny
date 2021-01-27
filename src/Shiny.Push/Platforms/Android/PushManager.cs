@@ -20,7 +20,6 @@ namespace Shiny.Push
 
         public PushManager(ShinyCoreServices services, INotificationManager notificationManager) : base(services)
         {
-            FirebaseMessaging.Instance.AutoInitEnabled = true;
             this.notificationManager = notificationManager;
         }
 
@@ -42,6 +41,7 @@ namespace Shiny.Push
             if (nresult != AccessState.Available)
                 return new PushAccessState(nresult, null);
 
+            FirebaseMessaging.Instance.AutoInitEnabled = true;
             var result = await FirebaseInstanceId
                 .Instance
                 .GetInstanceId()

@@ -56,7 +56,6 @@ namespace Shiny.Notifications
         }
 
 
-
         public static async Task UpdateChannel(this INotificationManager manager, Channel channel)
         {
             await manager.DeleteChannel(channel.Identifier);
