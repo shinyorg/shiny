@@ -155,11 +155,14 @@ namespace Shiny.BluetoothLE.Internals
         {
             this.devices.Clear();
 
-            this.callbacks = new LollipopScanCallback(sr =>
-            {
-                var scanResult = this.ToScanResult(sr.Device, sr.Rssi, new AdvertisementData(sr));
-                ob.OnNext(scanResult);
-            });
+            this.callbacks = new LollipopScanCallback(
+                sr =>
+                {
+                    var scanResult = this.ToScanResult(sr.Device, sr.Rssi, new AdvertisementData(sr));
+                    ob.OnNext(scanResult);
+                },
+                errorCode => ob.OnError(new BleException("Error during scan: " + errorCode.ToString()))
+            );
 
             var builder = new ScanSettings.Builder();
             var scanMode = this.ToNative(config.ScanType);
