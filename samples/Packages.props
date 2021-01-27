@@ -9,6 +9,7 @@
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="2.2.5" />
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="121.0.1" />
         <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.1" />
+        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.8.0" />
         <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.10" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />
         <PackageReference Update="Bogus" Version="32.0.2" />

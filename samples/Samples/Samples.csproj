@@ -22,7 +22,6 @@
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="Rg.Plugins.Popup" />
         <PackageReference Include="Xamarin.CommunityToolkit" />
-        <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
         <ProjectReference Include="..\Samples.SqliteGenerator\Samples.SqliteGenerator.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
@@ -40,6 +39,13 @@
         <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\..\src\Shiny\Shiny.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj"
+                          OutputItemType="Analyzer"
+                          ReferenceOutputAssembly="false" />
+        <PackageReference Include="Microsoft.Net.Compilers.Toolset">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
