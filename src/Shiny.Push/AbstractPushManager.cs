@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Shiny.Infrastructure;
 using Shiny.Settings;
 
 
@@ -9,8 +10,11 @@ namespace Shiny.Push
 {
     public abstract class AbstractPushManager : IPushManager
     {
-        protected AbstractPushManager(ISettings settings) => this.Settings = settings;
-        protected ISettings Settings { get; }
+        protected AbstractPushManager(ShinyCoreServices services) => this.Services = services;
+
+
+        protected ShinyCoreServices Services { get; }
+        protected ISettings Settings => this.Services.Settings;
         public abstract IObservable<IDictionary<string, string>> WhenReceived();
         public abstract Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default);
         public abstract Task UnRegister();

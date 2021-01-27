@@ -8,8 +8,8 @@ using System.Reactive.Subjects;
 using Foundation;
 using UIKit;
 using UserNotifications;
-using Shiny.Settings;
 using Shiny.Notifications;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.Push
@@ -23,18 +23,13 @@ namespace Shiny.Push
         Subject<NSData>? onToken;
 
 
-        public PushManager(ISettings settings,
-                           IServiceProvider services,
-                           iOSNotificationDelegate nativeDelegate) : base(settings)
+        public PushManager(ShinyCoreServices services,
+                           iOSNotificationDelegate nativeDelegate) : base(services)
         {
-            this.Services = services;
             this.nativeDelegate = nativeDelegate;
-
             this.payloadSubj = new Subject<IDictionary<string, string>>();
         }
 
-
-        protected IServiceProvider Services { get; }
 
         public virtual void Start()
         {
@@ -45,6 +40,7 @@ namespace Shiny.Push
                 {
                     var payload = x.Notification.Request?.Content?.UserInfo?.FromNsDictionary();
                     await this.Services
+                        .Services
                         .RunDelegates<IPushDelegate>(x => x.OnReceived(payload))
                         .ConfigureAwait(false);
 
@@ -66,7 +62,7 @@ namespace Shiny.Push
                         textReply,
                         parameters
                     );
-                    await this.Services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
+                    await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
                     x.CompletionHandler();
                 });
 
@@ -138,7 +134,7 @@ namespace Shiny.Push
         public async void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         {
             var dict = userInfo.FromNsDictionary();
-            await this.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
+            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
             completionHandler(UIBackgroundFetchResult.NewData);
         }
 
@@ -146,7 +142,7 @@ namespace Shiny.Push
         public async void RegisteredForRemoteNotifications(NSData deviceToken)
         {
             this.onToken?.OnNext(deviceToken);
-            await Services.SafeResolveAndExecute<IPushDelegate>(
+            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(
                 x => x.OnTokenChanged(ToTokenString(deviceToken))
             );
         }

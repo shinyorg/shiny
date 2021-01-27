@@ -19,9 +19,8 @@ like flies the last several years.  The latest to go was AppCenter which it turn
 |Amazon|10+|6|||
 
 ## Registration
-Look to each appropriate provider to see setups for each.  
+Look to each appropriate provider to see setups for each.  The most important function otherwise, is RequestAccess shown below which will give you the push notification token that you can send to your backend. 
 
-<!-- snippet: PushStartup.cs -->
 ```cs
 using System;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,12 +42,9 @@ public class PushStartup : ShinyStartup
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/PushStartup.cs#L1-L19)</sup>
-<!-- endsnippet -->
 
 All providers use the native implementations on the platform to some degree, as such, you will always need to call
 
-<!-- snippet: PushPermissions.cs -->
 ```cs
 using System;
 using System.Threading.Tasks;
@@ -72,11 +68,9 @@ public class PushRegistration
 }
 
 ```
-<sup>[snippet source](/src/Snippets/PushPermissions.cs#L1-L21)</sup>
-<!-- endsnippet -->
+
 
 ## Background Delegate
-<!-- snippet: PushDelegate.cs -->
 ```cs
 using System;
 using System.Collections.Generic;
@@ -121,14 +115,10 @@ public class PushDelegate : IPushDelegate
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/PushDelegate.cs#L1-L23)</sup>
-<!-- endsnippet -->
-
 
 ## Foreground Monitoring
 It is quite often that you may want to change data due to a silent notification being received.  This is similar to watching a SignalR broadcast, but with observables because RX is awesome and Shiny dies on the RX hill!
 
-<!-- snippet: PushForeground.cs -->
 ```cs
 using System.Reactive.Linq;
 using Shiny;
@@ -150,8 +140,6 @@ public class PushForeground
 }
 
 ```
-<sup>[snippet source](/src/Snippets/PushForeground.cs#L1-L19)</sup>
-<!-- endsnippet -->
 
 ## Additional Features
 Like other modules in Shiny, there are certain providers that support additional feature sets.  Push really only has 1 extra, tagging.
@@ -186,5 +174,3 @@ public class Extensions
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/PushExtensions.cs#L1-L22)</sup>
-<!-- endsnippet -->

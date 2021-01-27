@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
-using Shiny.Settings;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.Push.AzureNotificationHubs
@@ -15,22 +15,18 @@ namespace Shiny.Push.AzureNotificationHubs
 
 
 #if WINDOWS_UWP
-        public PushManager(AzureNotificationConfig config, ISettings settings) : base(settings)
+        public PushManager(AzureNotificationConfig config, ShinyCoreServices services) : base(services)
 #elif __IOS__
         public PushManager(AzureNotificationConfig config,
-                           ISettings settings,
-                           IServiceProvider services,
-                           Shiny.Notifications.iOSNotificationDelegate ndelegate) : base(settings, services, ndelegate)
+                           ShinyCoreServices services,
+                           Shiny.Notifications.iOSNotificationDelegate ndelegate) : base(services, ndelegate)
 #elif __ANDROID__
         public PushManager(AzureNotificationConfig config,
-                           IAndroidContext context,
-                           Shiny.Notifications.INotificationManager notifications,
-                           ISettings settings,
-                           IMessageBus bus) : base(context, notifications, settings, bus)
+                           ShinyCoreServices services,
+                           Shiny.Notifications.INotificationManager notifications)
+                           : base(services, notifications)
 #else
-        public PushManager(AzureNotificationConfig config,
-                           ISettings settings,
-                           IMessageBus bus) : base(settings, bus)
+        public PushManager(AzureNotificationConfig config, ShinyCoreServices services) : base(services)
 #endif
         {
             this.hub = new NotificationHubClient(
@@ -144,7 +140,6 @@ namespace Shiny.Push.AzureNotificationHubs
 
             this.RegisteredTags = tags;
         }
-
 
 
 #if __ANDROID__

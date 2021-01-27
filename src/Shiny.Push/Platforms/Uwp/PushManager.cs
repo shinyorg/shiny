@@ -8,7 +8,7 @@ using Windows.Foundation;
 using Windows.Networking.PushNotifications;
 using Windows.ApplicationModel.Background;
 using Windows.UI.Notifications;
-using Shiny.Settings;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.Push
@@ -16,7 +16,7 @@ namespace Shiny.Push
     public class PushManager : AbstractPushManager, IShinyStartupTask
     {
         PushNotificationChannel channel;
-        public PushManager(ISettings settings) : base(settings) {}
+        public PushManager(ShinyCoreServices services) : base(services) {}
 
 
         public void Start()

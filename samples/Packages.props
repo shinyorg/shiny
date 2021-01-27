@@ -1,8 +1,18 @@
 <Project>
 
     <ItemGroup>
+<<<<<<< Updated upstream
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.1931" />
         <PackageReference Update="Xamarin.CommunityToolkit" Version="1.0.2" />
+=======
+        <PackageReference Update="Xamarin.Forms" Version="5.0.0.1905" />
+        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.0.1" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.2.0" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Basement" Version="117.5.0" />
+        <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="2.3.3" />
+        <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="2.2.5" />
+        <PackageReference Update="Xamarin.Firebase.Messaging" Version="121.0.1" />
+>>>>>>> Stashed changes
         <PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.1" />
         <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.10" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />

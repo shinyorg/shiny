@@ -3,15 +3,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.InstanceID;
+using Shiny.Infrastructure;
 using Shiny.Notifications;
-using Shiny.Settings;
 
 
 namespace Shiny.Push.FirebaseMessaging
 {
     public class PushManager : Shiny.Push.PushManager, IPushTagSupport
     {
-        public PushManager(ISettings settings, IServiceProvider services, iOSNotificationDelegate ndelegate) : base(settings, services, ndelegate)
+        public PushManager(ShinyCoreServices services, iOSNotificationDelegate ndelegate) : base(services, ndelegate)
         {
         }
 
@@ -28,13 +28,13 @@ namespace Shiny.Push.FirebaseMessaging
                 async msg =>
                 {
                     var dict = msg.AppData.FromNsDictionary();
-                    await this.Services.RunDelegates<IPushDelegate>(x => x.OnReceived(dict));
+                    await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnReceived(dict));
                 },
                 async token =>
                 {
                     this.CurrentRegistrationToken = token;
                     this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                    await this.Services.RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token));
+                    await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token));
                 }
             );
         }

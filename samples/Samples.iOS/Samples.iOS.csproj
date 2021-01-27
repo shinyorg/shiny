@@ -199,6 +199,10 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
+      <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
+      <Name>Shiny.Push.AzureNotificationHubs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Samples\Samples.csproj">
       <Name>Samples</Name>
       <Project>{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}</Project>

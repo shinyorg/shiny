@@ -5,29 +5,23 @@ using System.Reactive.Linq;
 using Android.Gms.Extensions;
 using Firebase.Iid;
 using Firebase.Messaging;
+using Shiny.Notifications;
+using Shiny.Infrastructure;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
-using Shiny.Settings;
-using Shiny.Notifications;
 
 
 namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager, IPushTagSupport, IAndroidTokenUpdate
     {
-        readonly IAndroidContext context;
-        readonly INotificationManager notifications;
-        readonly IMessageBus bus;
+        readonly INotificationManager notificationManager;
 
 
-        public PushManager(IAndroidContext context,
-                           INotificationManager notifications,
-                           ISettings settings,
-                           IMessageBus bus) : base(settings)
+        public PushManager(ShinyCoreServices services, INotificationManager notificationManager) : base(services)
         {
-            this.context = context;
-            this.notifications = notifications;
-            this.bus = bus;
+            FirebaseMessaging.Instance.AutoInitEnabled = true;
+            this.notificationManager = notificationManager;
         }
 
 
@@ -44,7 +38,7 @@ namespace Shiny.Push
             ////    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
             ////        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
             //}
-            var nresult = await this.notifications.RequestAccess();
+            var nresult = await this.notificationManager.RequestAccess();
             if (nresult != AccessState.Available)
                 return new PushAccessState(nresult, null);
 
@@ -55,7 +49,6 @@ namespace Shiny.Push
 
             this.CurrentRegistrationToken = result.Token;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-            FirebaseMessaging.Instance.AutoInitEnabled = true;
 
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
         }
@@ -72,7 +65,7 @@ namespace Shiny.Push
 
 
         public override IObservable<IDictionary<string, string>> WhenReceived()
-            => this.bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
+            => this.Services.Bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
 
 
         public virtual async Task SetTags(params string[] tags)
