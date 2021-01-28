@@ -32,6 +32,7 @@
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="117.1.0" />
 
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="121.0.1" />
+        <PackageReference Update="Xamarin.Google.Dagger" Version="2.27.0" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="2.3.3" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="2.2.5" />
 
@@ -42,10 +43,31 @@
         <PackageReference Update="Tizen.NET" Version="5.0.0.14562" ExcludeAssets="Runtime" />
         <PackageReference Update="Tizen.NET.Sdk" Version="1.0.1" />
 
-        <PackageReference Update="MarkdownSnippets.MsBuild" Version="21.7.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        <PackageReference Update="MarkdownSnippets.MsBuild" Version="21.7.1" />
+
+        <!--Samples-->
+        <PackageReference Update="Xamarin.Forms" Version="5.0.0.1931" />
+        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.0.2" />
+        <PackageReference Update="Xamarin.Essentials" Version="1.6.1" />
+        <PackageReference Update="Acr.UserDialogs" Version="7.1.0.468" />
+        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.8.0" />
+        <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.10" />
+        <PackageReference Update="Bogus" Version="32.0.2" />
+        <PackageReference Update="Humanizer" Version="2.8.25" />
+        <PackageReference Update="Prism.DryIoc.Forms" Version="8.0.0.1909" />
+        <PackageReference Update="ReactiveUI.Fody" Version="13.0.38" />
+        <PackageReference Update="XF.Material" Version="1.7.7" />
+        <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
+
+        <!--tests-->
+        <PackageReference Update="coverlet.collector" Version="3.0.2" />
+        <PackageReference Update="FluentAssertions" Version="5.10.3" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+        <PackageReference Update="Microsoft.CodeAnalysis" Version="3.8.0" />
+        <PackageReference Update="Moq" Version="4.16.0" />
+        <PackageReference Update="xunit" Version="2.4.1" />
+        <PackageReference Update="xunit.runner.devices" Version="2.5.25" />
+        <PackageReference Update="xunit.runner.visualstudio" Version="2.4.3" />
     </ItemGroup>
 
 </Project>

@@ -4,10 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{3D16168F-A0F7-4B3F-BBF2-2AB1338B8840}"
-	ProjectSection(SolutionItems) = preProject
-		samples\Directory.Build.targets = samples\Directory.Build.targets
-		samples\Packages.props = samples\Packages.props
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "samples\Samples\Samples.csproj", "{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}"
 EndProject
@@ -25,9 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{ED578FCA-6
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build.yml = .github\workflows\build.yml
 		src\Directory.build.props = src\Directory.build.props
-		src\Directory.Build.targets = src\Directory.Build.targets
 		src\global.json = src\global.json
-		src\Packages.props = src\Packages.props
 		readme.md = readme.md
 	EndProjectSection
 EndProject
@@ -70,6 +64,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny", "src\Shiny\Shiny.csproj", "{B133232E-1A21-438D-8B40-F771D65BED1C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Testing", "src\Shiny.Testing\Shiny.Testing.csproj", "{D677ED55-A4E0-4B31-896F-8FDB5FDC780D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0631E087-CB49-44D2-B47E-C2A332F3A80F}"
+	ProjectSection(SolutionItems) = preProject
+		Packages.props = Packages.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

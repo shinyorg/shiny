@@ -1,188 +1,188 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{E780B778-C40F-4993-A62F-277486480A67}</ProjectGuid>
-        <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-        <TemplateGuid>{c9e5eea5-ca05-42a1-839b-61506e0a37df}</TemplateGuid>
-        <OutputType>Library</OutputType>
-        <RootNamespace>Samples.Droid</RootNamespace>
-        <AssemblyName>Samples.Android</AssemblyName>
-        <AndroidApplication>True</AndroidApplication>
-        <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
-        <AndroidResgenClass>Resource</AndroidResgenClass>
-        <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-        <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
-        <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-        <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
-        <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
-        <NuGetPackageImportStamp>
-        </NuGetPackageImportStamp>
-        <AndroidKeyStore>false</AndroidKeyStore>
-        <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
-        <AndroidLinkMode>None</AndroidLinkMode>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>portable</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug</OutputPath>
-        <DefineConstants>DEBUG;PRODUCTION</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <BundleAssemblies>true</BundleAssemblies>
-        <AndroidUseAapt2>true</AndroidUseAapt2>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugSymbols>false</DebugSymbols>
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release</OutputPath>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <AndroidManagedSymbols>true</AndroidManagedSymbols>
-        <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
-        <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
-        <BundleAssemblies>false</BundleAssemblies>
-        <AndroidUseAapt2>true</AndroidUseAapt2>
-        <AndroidPackageFormat>apk</AndroidPackageFormat>
-        <AndroidLinkMode>SdkOnly</AndroidLinkMode>
-        <DefineConstants>PRODUCTION</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup>
-        <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
-        <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="Mono.Android" />
-        <Reference Include="System" />
-        <Reference Include="System.Core" />
-        <Reference Include="System.Xml.Linq" />
-        <Reference Include="System.Xml" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj">
-            <Project>{9fc4a830-1b20-4073-a1c4-ee3a52781dfd}</Project>
-            <Name>Shiny.Generators</Name>
-            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-            <OutputItemType>Analyzer</OutputItemType>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
-            <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
-            <Name>Shiny.Push.AzureNotificationHubs</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
-            <Project>{B133232E-1A21-438D-8B40-F771D65BED1C}</Project>
-            <Name>Shiny</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj">
-            <Project>{0C7C4C2A-9694-4BBD-A129-A41E319A7E10}</Project>
-            <Name>Shiny.Core</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">
-            <Project>{9D6C7510-028F-44C6-BD89-1A1B90CC7FB5}</Project>
-            <Name>Shiny.Beacons</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj">
-            <Project>{01ADE171-31D3-49B2-8223-67DCBFE8C601}</Project>
-            <Name>Shiny.BluetoothLE.Hosting</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
-            <Project>{4CD22375-09B4-474B-B93D-169652F1D386}</Project>
-            <Name>Shiny.BluetoothLE</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj">
-            <Project>{BCCC351F-2277-4256-AD42-2E6C7689F803}</Project>
-            <Name>Shiny.Locations</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj">
-            <Project>{63C3924A-9A4F-44CD-9150-5FF5000E388F}</Project>
-            <Name>Shiny.Net.Http</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj">
-            <Project>{016002B1-24CC-4216-93BA-6A678A3875B6}</Project>
-            <Name>Shiny.Nfc</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
-            <Project>{DC1C1265-32EC-4F2D-9484-34241298248F}</Project>
-            <Name>Shiny.Notifications</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj">
-            <Project>{4F6F8E48-7C6D-40AE-B33A-F1B0DFB60903}</Project>
-            <Name>Shiny.Push</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj">
-            <Project>{32BDD88F-B1D3-4BCE-8C21-9CC81FBC0963}</Project>
-            <Name>Shiny.Sensors</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
-            <Project>{4F89D195-482E-4B5F-B97F-1647BE5C7716}</Project>
-            <Name>Shiny.SpeechRecognition</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
-            <Project>{4273A168-9E9E-4E46-A6D6-96A3B788321F}</Project>
-            <Name>Shiny.BluetoothLE.Common</Name>
-        </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Xamarin.GooglePlayServices.Basement" />
-        <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
-        <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct" />
-        <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime" />
-        <PackageReference Include="Xamarin.Firebase.Messaging" />
-        <PackageReference Include="Xamarin.Essentials" />
-        <PackageReference Include="Xamarin.Forms" />
-        <ProjectReference Include="..\Samples\Samples.csproj">
-            <Name>Samples</Name>
-            <Project>{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}</Project>
-        </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Include="MainActivity.cs" />
-        <Compile Include="Resources\Resource.Designer.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
-    </ItemGroup>
-    <ItemGroup>
-        <GoogleServicesJson Include="google-services.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </GoogleServicesJson>
-        <None Include="Properties\AndroidManifest.xml" />
-    </ItemGroup>
-    <ItemGroup>
-        <AndroidResource Include="Resources\layout\Tabbar.axml" />
-        <AndroidResource Include="Resources\layout\Toolbar.axml" />
-        <AndroidResource Include="Resources\values\styles.xml" />
-        <AndroidResource Include="Resources\values\colors.xml" />
-        <AndroidResource Include="Resources\mipmap-anydpi-v26\icon.xml" />
-        <AndroidResource Include="Resources\mipmap-anydpi-v26\icon_round.xml" />
-        <AndroidResource Include="Resources\mipmap-hdpi\Icon.png" />
-        <AndroidResource Include="Resources\mipmap-mdpi\Icon.png" />
-        <AndroidResource Include="Resources\mipmap-xhdpi\Icon.png" />
-        <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png" />
-        <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png" />
-        <AndroidResource Include="Resources\mipmap-hdpi\launcher_foreground.png" />
-        <AndroidResource Include="Resources\mipmap-mdpi\launcher_foreground.png" />
-        <AndroidResource Include="Resources\mipmap-xhdpi\launcher_foreground.png" />
-        <AndroidResource Include="Resources\mipmap-xxhdpi\launcher_foreground.png" />
-        <AndroidResource Include="Resources\mipmap-xxxhdpi\launcher_foreground.png" />
-        <AndroidResource Include="Resources\drawable\notification.png" />
-        <AndroidResource Include="Resources\drawable\logo.png" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Assets\" />
-        <Folder Include="Resources\drawable-hdpi\" />
-        <Folder Include="Resources\drawable-xhdpi\" />
-        <Folder Include="Resources\drawable-xxhdpi\" />
-        <Folder Include="Resources\drawable-xxxhdpi\" />
-    </ItemGroup>
-    <ItemGroup>
-        <LinkDescription Include="Linker.xml" />
-    </ItemGroup>
-    <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
-    <ProjectExtensions>
-        <VisualStudio>
-            <UserProperties TriggeredFromHotReload="False" />
-        </VisualStudio>
-    </ProjectExtensions>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E780B778-C40F-4993-A62F-277486480A67}</ProjectGuid>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TemplateGuid>{c9e5eea5-ca05-42a1-839b-61506e0a37df}</TemplateGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Samples.Droid</RootNamespace>
+    <AssemblyName>Samples.Android</AssemblyName>
+    <AndroidApplication>True</AndroidApplication>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
+    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <AndroidKeyStore>false</AndroidKeyStore>
+    <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+    <AndroidLinkMode>None</AndroidLinkMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;PRODUCTION</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <BundleAssemblies>true</BundleAssemblies>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AndroidManagedSymbols>true</AndroidManagedSymbols>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <BundleAssemblies>false</BundleAssemblies>
+    <AndroidUseAapt2>true</AndroidUseAapt2>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <DefineConstants>PRODUCTION</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Android" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj">
+      <Project>{9fc4a830-1b20-4073-a1c4-ee3a52781dfd}</Project>
+      <Name>Shiny.Generators</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
+      <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
+      <Name>Shiny.Push.AzureNotificationHubs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
+      <Project>{B133232E-1A21-438D-8B40-F771D65BED1C}</Project>
+      <Name>Shiny</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj">
+      <Project>{0C7C4C2A-9694-4BBD-A129-A41E319A7E10}</Project>
+      <Name>Shiny.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">
+      <Project>{9D6C7510-028F-44C6-BD89-1A1B90CC7FB5}</Project>
+      <Name>Shiny.Beacons</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj">
+      <Project>{01ADE171-31D3-49B2-8223-67DCBFE8C601}</Project>
+      <Name>Shiny.BluetoothLE.Hosting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
+      <Project>{4CD22375-09B4-474B-B93D-169652F1D386}</Project>
+      <Name>Shiny.BluetoothLE</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj">
+      <Project>{BCCC351F-2277-4256-AD42-2E6C7689F803}</Project>
+      <Name>Shiny.Locations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj">
+      <Project>{63C3924A-9A4F-44CD-9150-5FF5000E388F}</Project>
+      <Name>Shiny.Net.Http</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj">
+      <Project>{016002B1-24CC-4216-93BA-6A678A3875B6}</Project>
+      <Name>Shiny.Nfc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
+      <Project>{DC1C1265-32EC-4F2D-9484-34241298248F}</Project>
+      <Name>Shiny.Notifications</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj">
+      <Project>{4F6F8E48-7C6D-40AE-B33A-F1B0DFB60903}</Project>
+      <Name>Shiny.Push</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj">
+      <Project>{32BDD88F-B1D3-4BCE-8C21-9CC81FBC0963}</Project>
+      <Name>Shiny.Sensors</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
+      <Project>{4F89D195-482E-4B5F-B97F-1647BE5C7716}</Project>
+      <Name>Shiny.SpeechRecognition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
+      <Project>{4273A168-9E9E-4E46-A6D6-96A3B788321F}</Project>
+      <Name>Shiny.BluetoothLE.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Xamarin.GooglePlayServices.Basement" />
+    <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
+    <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct" />
+    <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime" />
+    <PackageReference Include="Xamarin.Firebase.Messaging" />
+    <PackageReference Include="Xamarin.Essentials" />
+    <PackageReference Include="Xamarin.Forms" />
+    <ProjectReference Include="..\Samples\Samples.csproj">
+      <Name>Samples</Name>
+      <Project>{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MainActivity.cs" />
+    <Compile Include="Resources\Resource.Designer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <GoogleServicesJson Include="google-services.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </GoogleServicesJson>
+    <None Include="Properties\AndroidManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\Tabbar.axml" />
+    <AndroidResource Include="Resources\layout\Toolbar.axml" />
+    <AndroidResource Include="Resources\values\styles.xml" />
+    <AndroidResource Include="Resources\values\colors.xml" />
+    <AndroidResource Include="Resources\mipmap-anydpi-v26\icon.xml" />
+    <AndroidResource Include="Resources\mipmap-anydpi-v26\icon_round.xml" />
+    <AndroidResource Include="Resources\mipmap-hdpi\Icon.png" />
+    <AndroidResource Include="Resources\mipmap-mdpi\Icon.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\Icon.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png" />
+    <AndroidResource Include="Resources\mipmap-hdpi\launcher_foreground.png" />
+    <AndroidResource Include="Resources\mipmap-mdpi\launcher_foreground.png" />
+    <AndroidResource Include="Resources\mipmap-xhdpi\launcher_foreground.png" />
+    <AndroidResource Include="Resources\mipmap-xxhdpi\launcher_foreground.png" />
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\launcher_foreground.png" />
+    <AndroidResource Include="Resources\drawable\notification.png" />
+    <AndroidResource Include="Resources\drawable\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\" />
+    <Folder Include="Resources\drawable-hdpi\" />
+    <Folder Include="Resources\drawable-xhdpi\" />
+    <Folder Include="Resources\drawable-xxhdpi\" />
+    <Folder Include="Resources\drawable-xxxhdpi\" />
+  </ItemGroup>
+  <ItemGroup>
+    <LinkDescription Include="Linker.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionSamplesAndroidHideInfoBar="True" TriggeredFromHotReload="False" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

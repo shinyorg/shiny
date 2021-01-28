@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Shiny.BluetoothLE;
 using Shiny.Devices.Tests.BluetoothLE;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -112,12 +111,12 @@ namespace Shiny.BluetoothLE.Tests
             await this.Setup(true);
 
             var s1 = await this.peripheral
-                .GetKnownCharacteristics(Constants.ScratchServiceUuid, Constants.ScratchCharacteristicUuid1)
+                .GetKnownCharacteristic(Constants.ScratchServiceUuid, Constants.ScratchCharacteristicUuid1)
                 .Timeout(Constants.OperationTimeout)
                 .ToTask();
 
             var s2 = await this.peripheral
-                .GetKnownCharacteristics(Constants.ScratchServiceUuid, Constants.ScratchCharacteristicUuid2)
+                .GetKnownCharacteristic(Constants.ScratchServiceUuid, Constants.ScratchCharacteristicUuid2)
                 .Timeout(Constants.OperationTimeout)
                 .ToTask();
 
@@ -127,17 +126,16 @@ namespace Shiny.BluetoothLE.Tests
 
 
         [Fact]
-        public async Task KnownCharacteristics_WhenKnownCharacteristics()
+        public async Task KnownCharacteristics_WhenKnownCharacteristic()
         {
             await this.Setup(true);
 
             var tcs = new TaskCompletionSource<object>();
             var results = new List<IGattCharacteristic>();
             this.peripheral
-                .WhenKnownCharacteristicsDiscovered(
+                .WhenKnownCharacteristicDiscovered(
                     Constants.ScratchServiceUuid,
-                    Constants.ScratchCharacteristicUuid1,
-                    Constants.ScratchCharacteristicUuid2
+                    Constants.ScratchCharacteristicUuid1
                 )
                 .Subscribe(
                     results.Add,
@@ -151,9 +149,8 @@ namespace Shiny.BluetoothLE.Tests
                 Task.Delay(5000)
             );
 
-            Assert.Equal(2, results.Count);
+            Assert.Equal(1, results.Count);
             Assert.True(results.Any(x => x.Uuid.Equals(Constants.ScratchCharacteristicUuid1)));
-            Assert.True(results.Any(x => x.Uuid.Equals(Constants.ScratchCharacteristicUuid2)));
         }
 
 

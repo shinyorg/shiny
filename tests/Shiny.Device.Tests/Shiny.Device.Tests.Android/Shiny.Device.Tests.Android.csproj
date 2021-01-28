@@ -52,10 +52,8 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1687" />
-    <PackageReference Include="xunit.runner.devices">
-      <Version>2.5.25</Version>
-    </PackageReference>
+    <PackageReference Include="Xamarin.Forms" />
+    <PackageReference Include="xunit.runner.devices" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
@@ -144,6 +142,10 @@
     <ProjectReference Include="..\..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
       <Project>{34905983-1f79-4b74-9bb0-d1dc7d24b8bf}</Project>
       <Name>Shiny.SpeechRecognition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shiny.Device.Tests\Shiny.Device.Tests.csproj">
+      <Project>{8e87d625-07ea-4ce2-a549-e3a815ab52d6}</Project>
+      <Name>Shiny.Device.Tests</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

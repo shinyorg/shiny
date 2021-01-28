@@ -1,5 +1,4 @@
 ﻿using System;
-using Shiny.BluetoothLE;
 using Shiny.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
