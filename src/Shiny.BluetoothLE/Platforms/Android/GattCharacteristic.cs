@@ -121,42 +121,24 @@ namespace Shiny.BluetoothLE
 
 
 
-        public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent = false, bool enableIndicationsIfAvailable = false)
+        public override IObservable<CharacteristicGattResult> Notify(bool autoNotify = true, bool enableIndicationsIfAvailable = false)
         {
             this.AssertNotify();
+            return this.context
+                .Callbacks
+                .CharacteristicChanged
+                .Where(this.NativeEquals)
+                .Select(args =>
+                {
+                    if (!args.IsSuccessful)
+                        throw new BleException($"Notification error - {args.Status}");
 
-            return this.notifyOb ??= Observable.Create<CharacteristicGattResult>(ob =>
-            {
-                this.context
-                    .Callbacks
-                    .CharacteristicChanged
-                    .Where(this.NativeEquals)
-                    .Subscribe(args =>
-                    {
-                        if (args.IsSuccessful)
-                            ob.OnNext(new CharacteristicGattResult(this, args.Characteristic.GetValue(), CharacteristicResultType.Notification));
-                        else
-                            ob.OnError(new BleException($"Notification error - {args.Status}"));
-                    });
-
-                this.EnableNotifications(enableIndicationsIfAvailable).Subscribe(
-                    _ =>
-                    {
-                        if (sendHookEvent)
-                            ob.OnNext(new CharacteristicGattResult(this, null, CharacteristicResultType.NotificationSubscribed));
-                    },
-                    ob.OnError
-                );
-
-                return () => this
-                    .DisableNotifications()
-                    .Subscribe(
-                        _ => { },
-                        ex => { }
+                    return new CharacteristicGattResult(
+                        this,
+                        args.Characteristic.GetValue(),
+                        CharacteristicResultType.Notification
                     );
-            })
-            .Publish()
-            .RefCount();
+                });
         }
 
 

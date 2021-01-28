@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Reactive;
 
 namespace Shiny.BluetoothLE
 {
@@ -11,12 +11,20 @@ namespace Shiny.BluetoothLE
         CharacteristicProperties Properties { get; }
 
         /// <summary>
-        /// Subscribe to notifications (or indications if available) - once all subscriptions are cleared, the characteristic is unsubscribed
+        ///
         /// </summary>
-        /// <param name="sendHookEvent">This will send an event when the notification gets hooked for the first time if true, otherwise it is skipped</param>
-        /// <param name="useIndicationIfAvailable">If true and indication is available, it will be used</param>
+        /// <param name="enable"></param>
+        /// <param name="useIndicationIfAvailable"></param>
         /// <returns></returns>
-        IObservable<CharacteristicGattResult> Notify(bool sendHookEvent = false, bool useIndicationIfAvailable = false);
+        IObservable<Unit> EnableNotifications(bool enable, bool useIndicationIfAvailable = false);
+
+        ///// <summary>
+        ///// Subscribe to notifications (or indications if available) - once all subscriptions are cleared, the characteristic is unsubscribed
+        ///// </summary>
+        ///// <param name="sendHookEvent">This will send an event when the notification gets hooked for the first time if true, otherwise it is skipped</param>
+        ///// <param name="useIndicationIfAvailable">If true and indication is available, it will be used</param>
+        ///// <returns></returns>
+        IObservable<CharacteristicGattResult> WhenNotification();
 
         /// <summary>
         /// Discovers descriptors for this characteristic

@@ -10,6 +10,20 @@ namespace Shiny.BluetoothLE
     public static class CharacteristicExtensions
     {
         /// <summary>
+        /// Enables (and disables) notifications and hooks to listener
+        /// </summary>
+        /// <param name="characteristic"></param>
+        /// <param name="useIndicationsIfAvailable"></param>
+        /// <returns></returns>
+        public static IObservable<CharacteristicGattResult> Notify(this IGattCharacteristic characteristic, bool useIndicationsIfAvailable = false)
+            => characteristic
+                .EnableNotifications(true, useIndicationsIfAvailable)
+                .Select(_ => characteristic.WhenNotification())
+                .Switch()
+                .Finally(() => characteristic.EnableNotifications(false).Subscribe());
+
+
+        /// <summary>
         /// Used for writing blobs
         /// </summary>
         /// <param name="ch">The characteristic to write on</param>

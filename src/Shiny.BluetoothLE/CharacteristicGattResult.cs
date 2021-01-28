@@ -8,7 +8,6 @@ namespace Shiny.BluetoothLE
         Read,
         Write,
         WriteWithoutResponse,
-        NotificationSubscribed,
         Notification
     }
 
