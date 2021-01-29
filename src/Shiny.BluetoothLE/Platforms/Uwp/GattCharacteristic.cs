@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
+using Windows.Foundation;
 using Shiny.BluetoothLE.Internals;
+using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
 
 
 namespace Shiny.BluetoothLE
@@ -14,7 +17,6 @@ namespace Shiny.BluetoothLE
     public class GattCharacteristic : AbstractGattCharacteristic
     {
         readonly DeviceContext context;
-        IObserver<CharacteristicGattResult> currentOb;
 
 
         public GattCharacteristic(DeviceContext context,
@@ -98,62 +100,64 @@ namespace Shiny.BluetoothLE
         });
 
 
-        IObservable<CharacteristicGattResult> notifyOb;
-        public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable)
+        public override IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable) => Observable.FromAsync(async ct =>
         {
-            this.notifyOb ??= Observable.Create<CharacteristicGattResult>(
-                async ob =>
+            if (!enable)
+            {
+                await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+                this.IsNotifying = false;
+                this.context.SetNotifyCharacteristic(this);
+            }
+            else
+            {
+                var type = useIndicationsIfAvailable && this.CanIndicate()
+                    ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
+                    : GattClientCharacteristicConfigurationDescriptorValue.Notify;
+
+                var status = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(type);
+                if (status != GattCommunicationStatus.Success)
+                    throw new BleException($"Failed to write client characteristic configuration descriptor - {status}");
+
+                this.IsNotifying = true;
+                this.context.SetNotifyCharacteristic(this);
+            }
+        });
+
+
+        readonly List<TypedEventHandler<Native, GattValueChangedEventArgs>> handlers = new List<TypedEventHandler<Native, GattValueChangedEventArgs>>();
+        public override IObservable<CharacteristicGattResult> WhenNotificationReceived() => Observable.Create<CharacteristicGattResult>(async ob =>
+        {
+            var handler = new TypedEventHandler<Native, GattValueChangedEventArgs>((sender, args) =>
+            {
+                if (sender.Equals(this.Native))
                 {
-                    var type = enableIndicationsIfAvailable && this.CanIndicate()
-                        ? GattClientCharacteristicConfigurationDescriptorValue.Indicate
-                        : GattClientCharacteristicConfigurationDescriptorValue.Notify;
+                    var bytes = args.CharacteristicValue.ToArray();
+                    var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
+                    ob.OnNext(result);
+                }
+            });
 
-                    var status = await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(type);
-                    if (status != GattCommunicationStatus.Success)
-                        throw new BleException($"Failed to write client characteristic configuration descriptor - {status}");
+            this.Native.ValueChanged += handler;
+            this.handlers.Add(handler);
 
-                    this.Native.ValueChanged += this.OnValueChanged;
-                    this.context.SetNotifyCharacteristic(this);
-                    this.IsNotifying = true;
-                    this.currentOb = ob;
+            this.context.SetNotifyCharacteristic(this);
+            this.IsNotifying = true;
 
-                    if (sendHookEvent)
-                    {
-                        ob.OnNext(new CharacteristicGattResult(
-                            this,
-                            null,
-                            CharacteristicResultType.NotificationSubscribed
-                        ));
-                    }
-
-                    return async () =>
-                    {
-                        await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
-                        this.Native.ValueChanged -= this.OnValueChanged;
-                    };
-                })
-                .Publish()
-                .RefCount();
-
-            return this.notifyOb;
-        }
+            return () =>
+            {
+                this.Native.ValueChanged -= handler;
+                this.handlers.Remove(handler);
+            };
+        });
 
 
         internal async Task Disconnect()
         {
             await this.Native.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
-            this.Native.ValueChanged -= this.OnValueChanged;
-        }
+            foreach (var handler in this.handlers)
+                this.Native.ValueChanged -= handler;
 
-
-        void OnValueChanged(Native sender, GattValueChangedEventArgs args)
-        {
-            if (sender.Equals(this.Native))
-            {
-                var bytes = args.CharacteristicValue.ToArray();
-                var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
-                this.currentOb.OnNext(result);
-            }
+            this.handlers.Clear();
         }
     }
 }

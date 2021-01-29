@@ -18,7 +18,7 @@ namespace Shiny.BluetoothLE
         public static IObservable<CharacteristicGattResult> Notify(this IGattCharacteristic characteristic, bool useIndicationsIfAvailable = false)
             => characteristic
                 .EnableNotifications(true, useIndicationsIfAvailable)
-                .Select(_ => characteristic.WhenNotification())
+                .Select(_ => characteristic.WhenNotificationReceived())
                 .Switch()
                 .Finally(() => characteristic.EnableNotifications(false).Subscribe());
 

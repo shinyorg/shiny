@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Linq;
 using CoreBluetooth;
 using Foundation;
@@ -53,39 +54,32 @@ namespace Shiny.BluetoothLE
         });
 
 
-        IObservable<CharacteristicGattResult> notifyOb;
-        public override IObservable<CharacteristicGattResult> Notify(bool sendHookEvent, bool enableIndicationsIfAvailable)
+        public override IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable)
         {
             this.AssertNotify();
-
-            this.notifyOb ??= Observable.Create<CharacteristicGattResult>(ob =>
-            {
-                var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
-                {
-                    if (!this.Equals(args.Characteristic))
-                        return;
-
-                    if (args.Error == null)
-                        ob.OnNext(new CharacteristicGattResult(this, args.Characteristic.Value?.ToArray(), CharacteristicResultType.Notification));
-                    else
-                        ob.OnError(new BleException(args.Error.Description));
-                });
-                this.Peripheral.UpdatedCharacterteristicValue += handler;
-                this.Peripheral.SetNotifyValue(true, this.NativeCharacteristic);
-                this.IsNotifying = true;
-
-                return () =>
-                {
-                    this.Peripheral.SetNotifyValue(false, this.NativeCharacteristic);
-                    this.Peripheral.UpdatedCharacterteristicValue -= handler;
-                    this.IsNotifying = false;
-                };
-            })
-            .Publish()
-            .RefCount();
-
-            return this.notifyOb;
+            this.Peripheral.SetNotifyValue(enable, this.NativeCharacteristic);
+            this.IsNotifying = enable;
+            return Observable.Return(Unit.Default);
         }
+
+
+        public override IObservable<CharacteristicGattResult> WhenNotificationReceived() => Observable.Create<CharacteristicGattResult>(ob =>
+        {
+            var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
+            {
+                if (!this.Equals(args.Characteristic))
+                    return;
+
+                if (args.Error == null)
+                    ob.OnNext(new CharacteristicGattResult(this, args.Characteristic.Value?.ToArray(), CharacteristicResultType.Notification));
+                else
+                    ob.OnError(new BleException(args.Error.Description));
+            });
+            this.Peripheral.UpdatedCharacterteristicValue += handler;
+
+            return () => this.Peripheral.UpdatedCharacterteristicValue -= handler;
+        });
+
 
 
         public override IObservable<IGattDescriptor> DiscoverDescriptors() => Observable.Create<IGattDescriptor>(ob =>

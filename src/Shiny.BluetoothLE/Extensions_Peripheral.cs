@@ -61,8 +61,10 @@ namespace Shiny.BluetoothLE
         public static IObservable<CharacteristicGattResult> Notify(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, bool sendHook = false, bool useIndicationIfAvailable = false)
             => peripheral
                 .WhenKnownCharacteristicDiscovered(serviceUuid, characteristicUuid)
-                .Select(x => x.Notify(sendHook, useIndicationIfAvailable))
-                .Merge();
+                .Select(x => x.EnableNotifications(true, useIndicationIfAvailable).Select(_ => x))
+                .Switch()
+                .Select(x => x.WhenNotificationReceived())
+                .Switch();
 
 
         /// <summary>

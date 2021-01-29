@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Shiny.BluetoothLE;
@@ -25,29 +26,16 @@ namespace Shiny.Testing.BluetoothLE
         public IObservable<IGattDescriptor> DiscoverDescriptors() => this.Descriptors.ToObservable();
 
 
-        public Subject<byte[]> NotificationSubject { get; } = new Subject<byte[]>();
-        public IObservable<CharacteristicGattResult> Notify(bool sendHookEvent = false, bool useIndicationIfAvailable = false)
-            => Observable.Create<CharacteristicGattResult>(ob =>
-            {
-                this.IsNotifying = true;
-                if (sendHookEvent)
-                {
-                    ob.OnNext(new CharacteristicGattResult(
-                        this,
-                        null,
-                        CharacteristicResultType.NotificationSubscribed
-                     ));
-                }
-                var sub = this.NotificationSubject.Subscribe(
-                    x => ob.OnNext(new CharacteristicGattResult(this, x, CharacteristicResultType.Notification))
-                );
+        public IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable)
+        {
+            this.IsNotifying = enable;
+            return Observable.Return(Unit.Default);
+        }
 
-                return () =>
-                {
-                    this.IsNotifying = false;
-                    sub.Dispose();
-                };
-            });
+
+        public Subject<byte[]> NotificationSubject { get; } = new Subject<byte[]>();
+        public IObservable<CharacteristicGattResult> WhenNotificationReceived()
+            => this.NotificationSubject.Select(data => new CharacteristicGattResult(this, data, CharacteristicResultType.Notification));
 
 
         public byte[] ReadValue { get; set; }
