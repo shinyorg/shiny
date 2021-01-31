@@ -50,10 +50,10 @@
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <DefineConstants>PRODUCTION</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup>
+  <!--<PropertyGroup>
     <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
-  </PropertyGroup>
+  </PropertyGroup>-->
   <ItemGroup>
     <Reference Include="Mono.Android" />
     <Reference Include="System" />

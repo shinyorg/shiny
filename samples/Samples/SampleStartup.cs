@@ -1,4 +1,9 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny;
+using Shiny.Notifications;
+using Shiny.Logging;
+using Shiny.Testing;
 using Samples.Settings;
 using Samples.Infrastructure;
 using Samples.Jobs;
@@ -8,11 +13,6 @@ using Samples.BluetoothLE;
 using Samples.Geofences;
 using Samples.Gps;
 using Samples.Push;
-using Microsoft.Extensions.DependencyInjection;
-using Shiny;
-using Shiny.Notifications;
-using Shiny.Logging;
-using Shiny.Testing;
 using Samples.Notifications;
 
 [assembly: GenerateStaticClasses("Samples")]

@@ -94,12 +94,12 @@ namespace Shiny.Generators
             }
             else
             {
-                builder.AppendFormatInvariant("partial void OnPreCreate(Bundle savedInstanceState);");
-                builder.AppendFormatInvariant("partial void OnPostCreate(Bundle savedInstanceState);");
+                builder.AppendFormatInvariant("partial void OnBeforeCreate(Bundle savedInstanceState);");
+                builder.AppendFormatInvariant("partial void OnAfterCreate(Bundle savedInstanceState);");
                 using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                 {
                     builder.AppendLineInvariant("this.ShinyOnCreate();");
-                    builder.AppendLineInvariant("this.OnPreCreate(savedInstanceState);");
+                    builder.AppendLineInvariant("this.OnBeforeCreate(savedInstanceState);");
 
                     if (String.IsNullOrWhiteSpace(this.values.XamarinFormsAppTypeName))
                     {
@@ -119,7 +119,7 @@ namespace Shiny.Generators
                         }
                     }
                     this.TryAppendOnCreateThirdParty(activity, builder);
-                    builder.AppendLineInvariant("this.OnPostCreate(savedInstanceState);");
+                    builder.AppendLineInvariant("this.OnAfterCreate(savedInstanceState);");
                 }
             }
         }

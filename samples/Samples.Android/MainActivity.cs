@@ -25,10 +25,5 @@ namespace Samples.Droid
     )]
     public partial class MainActivity : FormsAppCompatActivity
     {
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
-        {
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            this.ShinyOnRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 }
