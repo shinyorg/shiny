@@ -20,5 +20,11 @@ namespace Samples.iOS
         //    "Expander_Experimental",
         //    "RadioButton_Experimental"
         //);
+
+        //public override bool ContinueUserActivity(UIKit.UIApplication application, NSUserActivity userActivity, UIKit.UIApplicationRestorationHandler completionHandler)
+        //{
+        //    //completionHandler()
+        //    return true;
+        //}
     }
 }

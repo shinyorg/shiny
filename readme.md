@@ -1,32 +1,23 @@
 ﻿# Shiny for Xamarin & Windows 
 <img src="art/logo.png" width="100" /> 
 
-Shiny is a set of libraries designed to help make device services & backgrounding easy on Xamarin & UWP platforms (with more to come).
+Shiny is a set of libraries designed to help make device services & backgrounding easy on Xamarin & UWP platforms (with more to come). 
 
-These samples make use of:
-* Reactive Programming
-* Dependency Injection
-
-If you don't like any of these or you find them "complex" - Shiny is probably not for you.
-
-If you are looking to just use one part of Shiny, such as notifications, this probably isn't for you.  Shiny brings:
+## Features
 * Handles all of the cruft like Permissions, main thread traversal, persistent storage and app restarts
 * Your infrastructure to the background
 * Gives a clean & testable API surface for your code
-
-If you think Shiny is too heavy, try wiring all of these things up yourself with all of the above goals in mind. 
+* BLE Client & Hosting
+* Beacons Ranging & Monitoring
+* Locations - GPS, Geofencing, & Activity Monitoring (driving, walking, etc)
+* Local Notifications
+* Push Notification - Native, Azure Notifications Hubs, Firebase, and more
+* Local Notifications - best of breed local notifications supporting almost all features across all of the supported platforms
+* Near Field Communications (NFC) - easy to use NFC tag reader
 
 * [Documentation](https://shinylib.net)
 * [Change Log](https://shinylib.net/blog)
 * [Samples](https://github.com/shinyorg/shiny/samples) - Shows almost every single function point within Shiny
-* Blog Posts
-  * [Introducing Shiny](https://allancritchie.net/posts/introducingshiny)
-  * [Background Jobs - Shiny Style](https://allancritchie.net/posts/shinyjobs)
-  * [Settings in a New Light - Shiny Style](https://allancritchie.net/posts/shinysettings)
-  * [Geofencing with a Pinch of Notifications - Shiny Style](https://allancritchie.net/posts/shiny-geofencing)
-  * [Startup Tasks, Modules, and Stateful Delegates - Shiny Style](https://allancritchie.net/posts/shiny-di)
-  * [Beacons - Shiny Style](https://allancritchie.net/posts/shiny-beacons)
- 
 
 
 ## Builds
@@ -35,7 +26,7 @@ Branch|Status
 ------|------
 Master|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/master?style=for-the-badge)|
 Dev|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/dev?style=for-the-badge)|
-PReview|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/preview?style=for-the-badge)|
+Preview|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/preview?style=for-the-badge)|
 
 
 ## NuGet Packages

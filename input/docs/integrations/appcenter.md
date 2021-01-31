@@ -1,4 +1,5 @@
 Title: App Center
+Description: Integrate error logging into your background delegates - no need for any other code!
 ---
 
 ## DESCRIPTION

@@ -23,7 +23,7 @@ Notifications are a great way of letting your users know your app just figured s
 |NuGet| [![NotificationsNugetShield]][NotificationsNuget] |
 |Shiny Startup|services.UseNotifications|
 |Main Service|Shiny.Notifications.INotificationManager|
-|Shiny Delegate|Shiny.Notifications.INotificationDelegate|
+|Background Delegate (optional)|Shiny.Notifications.INotificationDelegate|
 |Static Generated|ShinyNotifications|
 |Manual Resolve|ShinyHost.Resolve<Shiny.Notifications.INotificationManager>()|
 |Xamarin.Forms|DependencyService.Get<Shiny.Notifications.INotificationManager>>()|

@@ -31,11 +31,11 @@ Windows UWP|16299+
 |Area|Info|
 |----|----|
 |NuGet| [![HttpNugetShield]][HttpNuget] |
-|Shiny Startup|services.UseHttpTransfers|
+|Shiny Startup|services.UseHttpTransfers<YourHttpDelegate>()|
 |Main Service|Shiny.Net.Http.IHttpTransferManager|
-|Shiny Delegate|Shiny.Net.Http.IHttpTransferDelegate (required)|
+|Background Delegate (required)|Shiny.Net.Http.IHttpTransferDelegate (required)|
 |Static Generated|ShinyHttpTransfers|
-|Manual Resolve|ShinyHost.Resolve<SShiny.Net.Http.IHttpTransferManager>()|
+|Manual Resolve|ShinyHost.Resolve<Shiny.Net.Http.IHttpTransferManager>()|
 |Xamarin.Forms|DependencyService.Get<Shiny.Net.Http.IHttpTransferManager>()|
 
 <?! Include "../../nuget.md" /?>

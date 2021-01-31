@@ -2,6 +2,16 @@ Title: Geofences
 Order: 2
 ---
 
+|Area|Info|
+|----|----|
+|NuGet| [![LocationsNugetShield]][LocationsNuget] |
+|Shiny Startup|services.UseGeofencing<YourDelegate>()|
+|Main Service|Shiny.Locations.IGeofenceManager|
+|Background Delegate|Shiny.Beacons.IGeofenceDelegate (required)|
+|Static Generated|ShinyGeofences|
+|Manual Resolve|ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>()|
+|Xamarin.Forms|DependencyService.Get<Shiny.Locations.IGeofenceManager>()|
+
 
 ```cs
 using Microsoft.Extensions.DependencyInjection;

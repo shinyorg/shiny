@@ -1,4 +1,5 @@
 Title: SQLite
+Description: Providers logging, storage, and settings to Shiny using SQLite
 ---
 
 Install from NuGet: [![SqliteNugetShield]][SqliteNuget]
