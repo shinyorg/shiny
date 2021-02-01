@@ -36,7 +36,7 @@
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="2.3.3" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="2.2.5" />
 
-        <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
+        <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.11" />
         <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="[6.1.1, 7)" />
         <PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
 
