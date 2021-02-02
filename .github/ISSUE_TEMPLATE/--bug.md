@@ -7,7 +7,11 @@ assignees: ''
 
 ---
 
-# IF YOU DON'T ANSWER THIS TEMPLATE - THE BOT WILL AUTOMATICALLY CLOSE YOUR ISSUE!  PLEASE DON'T ASK FOR WORKAROUNDS OR TIMELINES - THIS IS FREE SOURCE CODE
+# PLEASE READ
+## IF YOU DON'T ANSWER THIS TEMPLATE - THE BOT WILL AUTOMATICALLY CLOSE YOUR ISSUE!  PLEASE DON'T ASK FOR WORKAROUNDS OR TIMELINES - THIS IS FREE SOURCE CODE
+## NO ISSUES ARE BEING TAKEN FOR DOCS, ONLY PR'S
+## NON-stable components (preview, beta, etc) are not fully baked - issues MUST include full reproducible sample and stacktrace or they will be closed without explanation!!!
+
 
 ## Please check all of the platforms you are having the issue on (if platform is not listed, it is not supported)
 
@@ -19,26 +23,20 @@ assignees: ''
 
 ## Feature Library
 
-### NON-stable components (preview, beta, etc) are not fully done - issues MUST include full reproducible sample and stacktrace or they will be closed without explanation!!!
 
  - [ ] Core
  - [ ] Locations
  - [ ] HTTP Transfers
  - [ ] Notifications
  - [ ] NFC
- - [ ] Push
+ - [ ] Push - Native
  - [ ] Push - Azure Notification Hub
  - [ ] Push - Firebase
  - [ ] Sensors
  - [ ] AppCenter Logging Integration
- - [ ] Location Sync
- - [ ] Photo Sync (alpha)
- - [ ] Data Sync
- - [ ] Trip Tracker
  - [ ] BluetoothLE Client
- - [ ] BluetoothLE Hosting (beta)
+ - [ ] BluetoothLE Hosting
  - [ ] Beacons
- - [ ] Beacon Advertiser (beta)
  - [ ] SQLite Integration
 
 
