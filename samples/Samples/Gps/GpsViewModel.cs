@@ -2,9 +2,6 @@
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-
-using DynamicData;
-
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Infrastructure;
@@ -73,10 +70,15 @@ namespace Samples.Gps
                     }
                     else
                     {
-                        var result = await dialogs.RequestAccess(() => this.manager.RequestAccess(new GpsRequest
+                        var result = await dialogs.RequestAccess(async () =>
                         {
-                            UseBackground = this.UseBackground
-                        }));
+                            var access = await this.manager.RequestAccess(new GpsRequest
+                            {
+                                UseBackground = this.UseBackground
+                            });
+                            this.Access = access.ToString();
+                            return access;
+                        });
                         if (!result)
                         {
                             await dialogs.Alert("Insufficient permissions");

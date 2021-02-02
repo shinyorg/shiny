@@ -28,19 +28,19 @@ namespace Shiny.Locations
         }
 
 
-        /// <summary>
-        /// Requests access for GPS and starts listening for changes.
-        /// </summary>
-        /// <param name="gps">The gps manager.</param>
-        /// <param name="request">The gps request.</param>
-        /// <returns></returns>
-        public static async Task<AccessState> RequestAccessAndStart(this IGpsManager gps, GpsRequest request)
-        {
-            var access = await gps.RequestAccess(request);
-            if (access == AccessState.Available)
-                await gps.StartListener(request);
+        ///// <summary>
+        ///// Requests access for GPS and starts listening for changes.
+        ///// </summary>
+        ///// <param name="gps">The gps manager.</param>
+        ///// <param name="request">The gps request.</param>
+        ///// <returns></returns>
+        //public static async Task<AccessState> RequestAccessAndStart(this IGpsManager gps, GpsRequest request)
+        //{
+        //    var access = await gps.RequestAccess(request);
+        //    if (access == AccessState.Available)
+        //        await gps.StartListener(request);
 
-            return access;
-        }
+        //    return access;
+        //}
     }
 }

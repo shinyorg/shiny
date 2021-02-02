@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿using System;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -15,6 +16,7 @@ namespace Shiny.Locations
     public class ShinyGpsService : Service
     {
         public static bool IsStarted { get; private set; }
+        IDisposable? cleanUp;
 
 
         public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
@@ -42,6 +44,19 @@ namespace Shiny.Locations
             }
             IsStarted = true;
 
+            var gps = ShinyHost.Resolve<IGpsManager>();
+            // TODO: start the listener here too?
+            this.cleanUp = gps
+                .WhenReading()
+                .SubscribeAsync(reading =>
+                    ShinyHost
+                        .Container
+                        .RunDelegates<IGpsDelegate>(
+                            x => x.OnReading(reading)
+                        )
+                );
+                
+
             return StartCommandResult.Sticky;
         }
 
@@ -50,6 +65,7 @@ namespace Shiny.Locations
         {
             IsStarted = false;
 
+            this.cleanUp?.Dispose();
             var context = ShinyHost.Resolve<IAndroidContext>();
             if (context.IsMinApiLevel(26))
                 this.StopForeground(true);
