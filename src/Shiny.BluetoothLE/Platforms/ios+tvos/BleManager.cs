@@ -39,7 +39,8 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override AccessState Status => this.context.Manager.State.FromNative();
+        public override AccessState Status
+            => this.context.Manager.State.FromNative();
 
 
         public override IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid)
