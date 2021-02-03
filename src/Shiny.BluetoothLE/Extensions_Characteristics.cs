@@ -10,6 +10,23 @@ namespace Shiny.BluetoothLE
     public static class CharacteristicExtensions
     {
         /// <summary>
+        ///
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <param name="serviceUuid"></param>
+        /// <param name="characteristicUuid"></param>
+        /// <param name="useIndicationsIfAvailable"></param>
+        /// <returns></returns>
+        public static IObservable<CharacteristicGattResult> WhenConnectedNotify(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = false)
+            => peripheral
+                .WhenConnected()
+                .Select(x => x.GetKnownCharacteristic(serviceUuid, characteristicUuid))
+                .Switch()
+                .Select(x => x.Notify(useIndicationsIfAvailable))
+                .Switch();
+
+
+        /// <summary>
         /// Enables (and disables) notifications and hooks to listener
         /// </summary>
         /// <param name="characteristic"></param>
