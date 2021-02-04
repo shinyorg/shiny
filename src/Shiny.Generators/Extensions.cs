@@ -128,7 +128,10 @@ namespace Shiny.Generators
 
             var assemblyAttributes = context.Compilation.Assembly.GetAttributes();
             var attributeData = assemblyAttributes
-                .Where(x => x.AttributeClass.Name == attribute.Name)
+                .Where(x =>
+                {
+                    return x.AttributeClass.Name == attribute.Name;
+                })
                 .FirstOrDefault();
 
             return attributeData;
@@ -204,18 +207,18 @@ namespace Shiny.Generators
         }
 
 
-        //public static bool Is(this INamedTypeSymbol symbol, string typeName)
-        //{
-        //    while (symbol != null && symbol.Name != "Object")
-        //    {
-        //        if (symbol.ToDisplayString() == typeName)
-        //            return true;
+        public static bool Is(this INamedTypeSymbol symbol, INamedTypeSymbol otherSymbol)
+        {
+            while (symbol != null && symbol.Name != "Object")
+            {
+                if (symbol.ToDisplayString() == otherSymbol.ToDisplayString())
+                    return true;
 
-        //        symbol = symbol?.BaseType;
-        //    }
+                symbol = symbol?.BaseType;
+            }
 
-        //    return false;
-        //}
+            return false;
+        }
 
 
         ///// <summary>
@@ -297,8 +300,9 @@ namespace Shiny.Generators
             {
                 var properties = symbol
                     .GetMembers()
-                    .OfType<IMethodSymbol>()
-                    .Where(x => x.IsProperty());
+                    .OfType<IPropertySymbol>();
+                    //.OfType<IMethodSymbol>()
+                    //.Where(x => x.IsProperty());
 
                 foreach (var property in properties)
                     yield return (IPropertySymbol)property;
