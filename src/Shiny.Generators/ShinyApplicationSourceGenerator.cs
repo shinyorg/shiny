@@ -58,12 +58,15 @@ namespace Shiny.Generators
         IndentedStringBuilder builder;
         void GenerateStartup(string nameSpace)
         {
+            // TODO: get all AutoStartup & AutoStartupWithDelegate attributes
+
             this.allSymbols = this.Context
                 .GetAllAssemblies()
                 .Where(x => !x.Name.StartsWith("Shiny") && !x.Name.StartsWith("Xamarin."))
                 .SelectMany(x => x.GetAllTypeSymbols())
                 .Where(x => !x.IsAbstract && x.IsPublic())
                 .ToList();
+
 
             this.builder = new IndentedStringBuilder();
             this.builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
@@ -78,24 +81,8 @@ namespace Shiny.Generators
                     {
                         this.builder.AppendLine("this.AdditionalConfigureServices(services);");
 
-                        this.RegisterIf("Shiny.BluetoothLE.Hosting.IBleHostingManager", "services.UseBleHosting();");
-                        this.RegisterIf("Shiny.Nfc.INfcManager", "services.UseNfc();");
-                        this.RegisterIf("Shiny.Sensors.IAccelerometer", "services.UseAllSensors();");
-                        this.RegisterIf("Shiny.SpeechRecognition.ISpeechRecognizer", "services.UseSpeechRecognition();");
-                        this.RegisterIf("Shiny.Locations.IGpsManager", "services.UseMotionActivity();");
-
-                        this.RegisterAllDelegate("Shiny.Locations.IGpsDelegate", "services.UseGps", false);
-                        this.RegisterAllDelegate("Shiny.Locations.IGeofenceDelegate", "services.UseGeofencing", true);
-                        this.RegisterAllDelegate("Shiny.BluetoothLE.IBleDelegate", "services.UseBleClient", false);
-                        this.RegisterAllDelegate("Shiny.Net.Http.IHttpTransferDelegate", "services.UseHttpTransfers", true);
-                        this.RegisterAllDelegate("Shiny.Beacons.IBeaconMonitorDelegate", "services.UseBeaconRanging", true);
-                        this.RegisterAllDelegate("Shiny.Locations.Sync.IGeofenceSyncDelegate", "services.UseGeofencingSync", true);
-                        this.RegisterAllDelegate("Shiny.Locations.Sync.IGpsSyncDelegate", "services.UseGpsSync", true);
-                        this.RegisterAllDelegate("Shiny.TripTracker.ITripTrackerDelegate", "services.UseTripTracker", true);
-                        this.RegisterAllDelegate("Shiny.DataSync.IDataSyncDelegate", "services.UseDataSync", true);
-
-                        if (!this.RegisterPush())
-                            this.RegisterAllDelegate("Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
+                        //if (!this.RegisterPush())
+                        //    this.RegisterAllDelegate("Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
 
                         if (!this.ShinyConfig.ExcludeJobs)
                             this.RegisterJobs();
@@ -125,106 +112,106 @@ namespace Shiny.Generators
         }
 
 
-        static readonly string[] PushCannotGenerateRegister = new []
-        {
-            "Shiny.Push.AzureNotificationHubs",
-            "Shiny.Push.Aws"
-        };
-        static readonly Dictionary<string, string> PushRegisters = new Dictionary<string, string>
-        {
-            { "Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging" },
-            { "Shiny.Push", "services.UsePush" }
-        };
+        //static readonly string[] PushCannotGenerateRegister = new []
+        //{
+        //    "Shiny.Push.AzureNotificationHubs",
+        //    "Shiny.Push.Aws"
+        //};
+        //static readonly Dictionary<string, string> PushRegisters = new Dictionary<string, string>
+        //{
+        //    { "Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging" },
+        //    { "Shiny.Push", "services.UsePush" }
+        //};
 
-        bool RegisterPush()
-        {
-            var registered = false;
-            var cannotRegister = this.Context
-                .Compilation
-                .ReferencedAssemblyNames
-                .FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
+        //bool RegisterPush()
+        //{
+        //    var registered = false;
+        //    var cannotRegister = this.Context
+        //        .Compilation
+        //        .ReferencedAssemblyNames
+        //        .FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
 
-            if (cannotRegister != null)
-            {
-                this.Context.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "ShinyPush",
-                        $"{cannotRegister.Name} cannot be registered with auto-generation due to required configuration",
-                        null,
-                        "Push",
-                        DiagnosticSeverity.Warning,
-                        true
-                    ),
-                    Location.None
-                ));
-            }
-            else
-            {
-                var register = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushRegisters.ContainsKey(x.Name));
-                if (register != null)
-                {
-                    var registerStatement = PushRegisters[register.Name];
-                    this.RegisterAllDelegate("Shiny.Push.IPushDelegate", registerStatement, true);
-                    registered = true;
-                }
-            }
-            return registered;
-        }
-
-
-        bool RegisterIf(string typeNameExists, string registerString)
-        {
-            var symbol = this.Context.Compilation.GetTypeByMetadataName(typeNameExists);
-            if (symbol != null)
-            {
-                this.Context.Log(
-                    "SHINYINFO",
-                    "Registering in Shiny Startup - " + registerString,
-                    DiagnosticSeverity.Info
-                );
-                this.builder.AppendLineInvariant(registerString);
-                return true;
-            }
-            return false;
-        }
+        //    if (cannotRegister != null)
+        //    {
+        //        this.Context.ReportDiagnostic(Diagnostic.Create(
+        //            new DiagnosticDescriptor(
+        //                "ShinyPush",
+        //                $"{cannotRegister.Name} cannot be registered with auto-generation due to required configuration",
+        //                null,
+        //                "Push",
+        //                DiagnosticSeverity.Warning,
+        //                true
+        //            ),
+        //            Location.None
+        //        ));
+        //    }
+        //    else
+        //    {
+        //        var register = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushRegisters.ContainsKey(x.Name));
+        //        if (register != null)
+        //        {
+        //            var registerStatement = PushRegisters[register.Name];
+        //            this.RegisterAllDelegate("Shiny.Push.IPushDelegate", registerStatement, true);
+        //            registered = true;
+        //        }
+        //    }
+        //    return registered;
+        //}
 
 
-        bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
-        {
-            var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
-            if (symbol == null)
-                return false;
+        //bool RegisterIf(string typeNameExists, string registerString)
+        //{
+        //    var symbol = this.Context.Compilation.GetTypeByMetadataName(typeNameExists);
+        //    if (symbol != null)
+        //    {
+        //        this.Context.Log(
+        //            "SHINYINFO",
+        //            "Registering in Shiny Startup - " + registerString,
+        //            DiagnosticSeverity.Info
+        //        );
+        //        this.builder.AppendLineInvariant(registerString);
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
-            var impls = this.allSymbols
-                .Where(x => x.Implements(symbol))
-                .ToList();
 
-            if (!impls.Any())
-            {
-                if (oneDelegateRequiredToInstall)
-                {
-                    this.Context.Log(
-                        "SHINYDELEGATE",
-                        "Required delegate missing for " + registerStatement,
-                        DiagnosticSeverity.Error
-                    );
-                }
-                return false;
-            }
-            registerStatement += $"<{impls.First().ToDisplayString()}>();";
-            this.builder.AppendLineInvariant(registerStatement);
+        //bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
+        //{
+        //    var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
+        //    if (symbol == null)
+        //        return false;
 
-            if (impls.Count > 1)
-            {
-                var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
-                for (var i = startIndex; i < impls.Count; i++)
-                {
-                    var impl = impls[i];
-                    this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
-                }
-            }
-            return true;
-        }
+        //    var impls = this.allSymbols
+        //        .Where(x => x.Implements(symbol))
+        //        .ToList();
+
+        //    if (!impls.Any())
+        //    {
+        //        if (oneDelegateRequiredToInstall)
+        //        {
+        //            this.Context.Log(
+        //                "SHINYDELEGATE",
+        //                "Required delegate missing for " + registerStatement,
+        //                DiagnosticSeverity.Error
+        //            );
+        //        }
+        //        return false;
+        //    }
+        //    registerStatement += $"<{impls.First().ToDisplayString()}>();";
+        //    this.builder.AppendLineInvariant(registerStatement);
+
+        //    if (impls.Count > 1)
+        //    {
+        //        var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
+        //        for (var i = startIndex; i < impls.Count; i++)
+        //        {
+        //            var impl = impls[i];
+        //            this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
+        //        }
+        //    }
+        //    return true;
+        //}
 
 
         void RegisterServices()

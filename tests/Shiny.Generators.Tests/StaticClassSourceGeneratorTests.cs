@@ -39,7 +39,7 @@ namespace Shiny.Generators.Tests
         }
 
 
-        protected override StaticClassSourceGenerator Create() => new StaticClassSourceGenerator("Tests");
+        protected override StaticClassSourceGenerator Create() => new StaticClassSourceGenerator();
 
         void AssertTypes(params string[] types)
         {

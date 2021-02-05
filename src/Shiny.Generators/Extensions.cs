@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 
 namespace Shiny.Generators
@@ -29,6 +26,8 @@ namespace Shiny.Generators
                 )
             );
         }
+
+
 
 
         public static void TryDebug(this GeneratorExecutionContext context)
@@ -77,8 +76,14 @@ namespace Shiny.Generators
         {
             yield return context.Compilation.Assembly;
             foreach (var reference in context.Compilation.References)
+            {
                 if (reference.Properties.Kind == MetadataImageKind.Assembly)
-                    yield return (IAssemblySymbol)context.Compilation.GetAssemblyOrModuleSymbol(reference);
+                {
+                    var assembly = (IAssemblySymbol)context.Compilation.GetAssemblyOrModuleSymbol(reference);
+                    if (assembly != null)
+                        yield return assembly;
+                }
+            }
         }
 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,6 +13,13 @@ namespace Shiny.Generators.Tests
 {
     public class AssemblyGenerator
     {
+        static readonly MetadataReference CorlibReference =  MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+        static readonly MetadataReference SystemRuntimeReference = MetadataReference.CreateFromFile(typeof(GCSettings).Assembly.Location);
+        static readonly MetadataReference NetStdReference = MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
+        static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
+        static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
+        static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+
         readonly List<MetadataReference> references = new List<MetadataReference>();
         readonly List<SyntaxTree> sources = new List<SyntaxTree>();
 
@@ -56,8 +64,16 @@ namespace Shiny.Generators.Tests
 
         public Compilation DoGenerate(string dllName, ISourceGenerator sourceGenerator)
         {
-            //var meta = MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
-            //this.references.Add(meta);
+            this.references.AddRange(new []
+            {
+                CorlibReference,
+                SystemRuntimeReference,
+                NetStdReference,
+                SystemCoreReference,
+                CSharpSymbolsReference,
+                CodeAnalysisReference
+            });
+
             var driver = CSharpGeneratorDriver.Create(sourceGenerator);
             var inputCompilation = this.Create(dllName);
 

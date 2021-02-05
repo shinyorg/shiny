@@ -197,7 +197,7 @@ namespace Shiny.Generators
                 );
             }
             else
-            { 
+            {
                 using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
                 {
                     builder.AppendLine("base.OnNewIntent(intent);");

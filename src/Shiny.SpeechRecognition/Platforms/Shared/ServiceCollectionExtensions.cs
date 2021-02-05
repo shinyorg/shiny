@@ -8,19 +8,19 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseSpeechRecognition(this IServiceCollection builder)
+        public static bool UseSpeechRecognition(this IServiceCollection services)
         {
 #if NETSTANDARD
             return false;
 #elif __IOS__
             if (UIKit.UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
             {
-                builder.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
+                services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
                 return true;
             }
             return false;
 #else
-            builder.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
+            services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
             return true;
 #endif
         }
