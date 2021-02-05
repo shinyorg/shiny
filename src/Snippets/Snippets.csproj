@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MarkdownSnippets.MsBuild" />
+        <!--<PackageReference Include="MarkdownSnippets.MsBuild" />-->
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />

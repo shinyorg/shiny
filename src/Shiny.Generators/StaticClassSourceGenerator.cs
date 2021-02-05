@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 
 
-namespace Shiny.Generators.Tasks
+namespace Shiny.Generators
 {
     [Generator]
     public class StaticClassSourceGenerator : ISourceGenerator
@@ -23,10 +23,9 @@ namespace Shiny.Generators.Tasks
                 return;
 
             this.context.Log("SHINYINFO", "Shiny static class generation will run on this assembly", DiagnosticSeverity.Info);
-            this.useNamespace = attribute
-                .ConstructorArguments[0]
-                .Value
-                .ToString();
+            this.useNamespace = attribute.ConstructorArguments.FirstOrDefault().Value?.ToString();
+            if (String.IsNullOrWhiteSpace(this.useNamespace))
+                throw new ArgumentException("Namespace not supplied for static generation");
 
             this.context.Log(
                 "SHINYINFO",
@@ -91,11 +90,9 @@ namespace Shiny.Generators.Tasks
         static void AppendMethods(INamedTypeSymbol type, IndentedStringBuilder builder)
         {
             var methods = type.GetAllPublicMethods();
-            //builder.AppendLineInvariant($"//Methods: {methods.Count()}");
 
             foreach (var method in methods)
             {
-                //builder.AppendLineInvariant($"//method: {method.Name} - {method.Kind}");
                 var argList = BuildArgString(method, true);
                 var argListNoNames = BuildArgString(method, false);
 
@@ -122,7 +119,7 @@ namespace Shiny.Generators.Tasks
                         constraint += ",new()";
 
                     if (!String.IsNullOrWhiteSpace(constraint))
-                        constraint = " where " + constraint;
+                        constraint = " where T: " + constraint;
                 }
 
                 builder.AppendLineInvariant($"{signature}({argList}){constraint} => {args}({argListNoNames});");

@@ -1,13 +1,11 @@
 ﻿using System;
 using FluentAssertions;
-using Shiny.Generators.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
 
 namespace Shiny.Generators.Tests
 {
-    // assembly attributes aren't being picked up in the test harness
     public class StaticClassSourceGeneratorTests : AbstractSourceGeneratorTests<StaticClassSourceGenerator>
     {
         public StaticClassSourceGeneratorTests(ITestOutputHelper output) : base(output, "Shiny", "Shiny.Core") { }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Runtime;
@@ -14,8 +15,8 @@ namespace Shiny.Generators.Tests
     public class AssemblyGenerator
     {
         static readonly MetadataReference CorlibReference =  MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-        static readonly MetadataReference SystemRuntimeReference = MetadataReference.CreateFromFile(typeof(GCSettings).Assembly.Location);
-        static readonly MetadataReference NetStdReference = MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
+        //static readonly MetadataReference SystemRuntimeReference = MetadataReference.CreateFromFile(typeof(GCSettings).Assembly.Location);
+        //static readonly MetadataReference NetStdReference = MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location);
         static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
         static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
@@ -64,15 +65,25 @@ namespace Shiny.Generators.Tests
 
         public Compilation DoGenerate(string dllName, ISourceGenerator sourceGenerator)
         {
+            var dd = typeof(Enumerable).Assembly.Location;
+            var coreDir = Directory.GetParent(dd);
+            var netstandard = MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "netstandard.dll");
+            var runtime = MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.Runtime.dll");
+            var objModel = MetadataReference.CreateFromFile(coreDir.FullName + Path.DirectorySeparatorChar + "System.ObjectModel.dll");
+
             this.references.AddRange(new []
             {
+                netstandard,
+                runtime,
+                objModel,
                 CorlibReference,
-                SystemRuntimeReference,
-                NetStdReference,
+                //SystemRuntimeReference,
+                //NetStdReference,
                 SystemCoreReference,
                 CSharpSymbolsReference,
                 CodeAnalysisReference
             });
+            this.AddReference("netstandard");
 
             var driver = CSharpGeneratorDriver.Create(sourceGenerator);
             var inputCompilation = this.Create(dllName);
@@ -82,12 +93,24 @@ namespace Shiny.Generators.Tests
                 out var outputCompilation,
                 out var diags
             );
-            foreach (var diag in diags)
-            {
-                if (diag.Severity == DiagnosticSeverity.Error)
-                    throw new ArgumentException(diag.GetMessage());
-            }
+            this.ThrowAnyErrors(diags);
+            this.ThrowAnyErrors(inputCompilation.GetDiagnostics());
+            this.ThrowAnyErrors(outputCompilation.GetDiagnostics());
             return outputCompilation;
+        }
+
+
+        void ThrowAnyErrors(ImmutableArray<Diagnostic> diags)
+        {
+            foreach (var diag in diags)
+                if (diag.Severity == DiagnosticSeverity.Error)
+                {
+                    var msg = diag.GetMessage();
+                    if (diag.Location != null)
+                        msg += " - " + diag.Location.ToString();
+
+                    throw new ArgumentException(msg);
+                }
         }
     }
 }

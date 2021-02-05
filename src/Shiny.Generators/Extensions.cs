@@ -132,22 +132,26 @@ namespace Shiny.Generators
                 return null;
 
             var assemblyAttributes = context.Compilation.Assembly.GetAttributes();
-            var attributeData = assemblyAttributes
-                .Where(x =>
-                {
-                    return x.AttributeClass.Name == attribute.Name;
-                })
-                .FirstOrDefault();
+            var attributeData = assemblyAttributes.FirstOrDefault(
+                x => x.AttributeClass.ToDisplayString() == attribute.ToDisplayString()
+            );
 
             return attributeData;
         }
 
 
-        public static bool IsEvent(this IMethodSymbol method)
-            => method.Kind == SymbolKind.Event;
-        public static bool IsProperty(this IMethodSymbol method)
-            => method.MethodKind == MethodKind.PropertyGet || method.MethodKind == MethodKind.PropertySet;
-
+        public static bool IsEvent(this IMethodSymbol method) => method.MethodKind switch
+        {
+            MethodKind.EventAdd => true,
+            MethodKind.EventRemove => true,
+            _ => false
+        };
+        public static bool IsProperty(this IMethodSymbol method) => method.MethodKind switch
+        {
+            MethodKind.PropertyGet => true,
+            MethodKind.PropertySet => true,
+            _ => false
+        };
         public static bool IsPublic(this ITypeSymbol symbol)
             => symbol.DeclaredAccessibility == Accessibility.Public;
         public static bool IsPublic(this IMethodSymbol symbol)
@@ -226,91 +230,17 @@ namespace Shiny.Generators
         }
 
 
-        ///// <summary>
-        ///// Returns the element type of the IEnumerable, if any.
-        ///// </summary>
-        ///// <param name="resolvedType"></param>
-        ///// <returns></returns>
-        //public static ITypeSymbol EnumerableOf(this ITypeSymbol resolvedType)
-        //{
-        //    var intf = resolvedType
-        //        .GetAllInterfaces(includeCurrent: true)
-        //        .FirstOrDefault(i => i.ToDisplayString().StartsWith("System.Collections.Generic.IEnumerable", StringComparison.OrdinalIgnoreCase));
-
-        //    return intf?.TypeArguments.First();
-        //}
-
-        //public static IEnumerable<INamedTypeSymbol> GetAllInterfaces(this ITypeSymbol symbol, bool includeCurrent = true)
-        //{
-        //    if (symbol != null)
-        //    {
-        //        if (includeCurrent && symbol.TypeKind == TypeKind.Interface)
-        //        {
-        //            yield return (INamedTypeSymbol)symbol;
-        //        }
-
-        //        do
-        //        {
-        //            foreach (var intf in symbol.Interfaces)
-        //            {
-        //                yield return intf;
-
-        //                foreach (var innerInterface in intf.GetAllInterfaces())
-        //                {
-        //                    yield return innerInterface;
-        //                }
-        //            }
-
-        //            symbol = symbol.BaseType;
-
-        //            if (symbol == null)
-        //            {
-        //                break;
-        //            }
-
-        //        } while (symbol.Name != "Object");
-        //    }
-        //}
-
-        //public static bool IsNullable(this ITypeSymbol type)
-        //{
-        //    return ((type as INamedTypeSymbol)?.IsGenericType ?? false)
-        //        && type.OriginalDefinition.ToDisplayString().Equals("System.Nullable<T>", StringComparison.OrdinalIgnoreCase);
-        //}
-
-        //public static bool IsNullable(this ITypeSymbol type, out ITypeSymbol nullableType)
-        //{
-        //    if (type.IsNullable())
-        //    {
-        //        nullableType = ((INamedTypeSymbol)type).TypeArguments.First();
-        //        return true;
-        //    }
-        //    else
-        //    {
-        //        nullableType = null;
-        //        return false;
-        //    }
-        //}
-
-        //public static ITypeSymbol NullableOf(this ITypeSymbol type)
-        //{
-        //    return type.IsNullable()
-        //        ? ((INamedTypeSymbol)type).TypeArguments.First()
-        //        : null;
-        //}
-
         public static IEnumerable<IPropertySymbol> GetAllProperties(this INamedTypeSymbol symbol)
         {
             while (symbol != null && symbol.Name != "Object")
             {
                 var properties = symbol
                     .GetMembers()
-                    .OfType<IPropertySymbol>();
-                    //.OfType<IMethodSymbol>()
-                    //.Where(x => x.IsProperty());
+                    .OfType<IPropertySymbol>()
+                    .Where(x => x.DeclaredAccessibility == Accessibility.Public);
 
                 foreach (var property in properties)
-                    yield return (IPropertySymbol)property;
+                    yield return property;
 
                 symbol = symbol?.BaseType;
             }
@@ -321,17 +251,19 @@ namespace Shiny.Generators
         {
             if (type.IsInterface())
             {
-                var methods = type
-                    .AllInterfaces
-                    .SelectMany(x => x
-                        .GetMembers()
-                        .OfType<IMethodSymbol>()
-                        .Where(y =>
-                            x.IsPublic() &&
-                            !y.IsProperty() &&
-                            !y.IsEvent()
-                        )
-                    );
+                var interfaces = new List<ITypeSymbol>();
+                interfaces.Add(type);
+                interfaces.AddRange(type.AllInterfaces);
+
+                var methods = interfaces.SelectMany(x => x
+                    .GetMembers()
+                    .OfType<IMethodSymbol>()
+                    .Where(y =>
+                        y.IsPublic() &&
+                        !y.IsProperty() &&
+                        !y.IsEvent()
+                    )
+                );
 
                 foreach (var method in methods)
                     yield return method;
