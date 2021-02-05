@@ -11,11 +11,5 @@ namespace Shiny.Generators.Tests
         // TODO: Shiny Hooks
         // TODO: Xam Forms Init/LoadApplication
         public AndroidActivitySourceGeneratorTests(ITestOutputHelper output) : base(output, "Mono.Android", "Shiny", "Shiny.Core") { }
-
-
-        [Fact]
-        public void Test()
-        {
-        }
     }
 }

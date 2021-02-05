@@ -10,6 +10,7 @@ namespace Shiny.Generators
     {
         const string GENERATED_STARTUP_TYPE_NAME = "AppShinyStartup";
         readonly string osApplicationTypeName;
+        List<IAssemblySymbol> shinyAssemblies = null;
         List<INamedTypeSymbol> allSymbols;
 
         protected ShinyApplicationSourceGenerator(string osApplicationTypeName) => this.osApplicationTypeName = osApplicationTypeName;
@@ -58,7 +59,13 @@ namespace Shiny.Generators
         IndentedStringBuilder builder;
         void GenerateStartup(string nameSpace)
         {
-            // TODO: get all AutoStartup & AutoStartupWithDelegate attributes
+            this.shinyAssemblies = this.Context
+                .GetAllAssemblies()
+                .Where(x => x
+                    .ToDisplayString()
+                    .StartsWith("Shiny.")
+                )
+                .ToList();
 
             this.allSymbols = this.Context
                 .GetAllAssemblies()
@@ -66,7 +73,6 @@ namespace Shiny.Generators
                 .SelectMany(x => x.GetAllTypeSymbols())
                 .Where(x => !x.IsAbstract && x.IsPublic())
                 .ToList();
-
 
             this.builder = new IndentedStringBuilder();
             this.builder.AppendNamespaces("Microsoft.Extensions.DependencyInjection");
@@ -81,6 +87,8 @@ namespace Shiny.Generators
                     {
                         this.builder.AppendLine("this.AdditionalConfigureServices(services);");
 
+                        this.RegisterNoDelegates();
+                        this.RegisterWithDelegate();
                         //if (!this.RegisterPush())
                         //    this.RegisterAllDelegate("Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
 
@@ -112,106 +120,71 @@ namespace Shiny.Generators
         }
 
 
-        //static readonly string[] PushCannotGenerateRegister = new []
-        //{
-        //    "Shiny.Push.AzureNotificationHubs",
-        //    "Shiny.Push.Aws"
-        //};
-        //static readonly Dictionary<string, string> PushRegisters = new Dictionary<string, string>
-        //{
-        //    { "Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging" },
-        //    { "Shiny.Push", "services.UsePush" }
-        //};
-
-        //bool RegisterPush()
-        //{
-        //    var registered = false;
-        //    var cannotRegister = this.Context
-        //        .Compilation
-        //        .ReferencedAssemblyNames
-        //        .FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
-
-        //    if (cannotRegister != null)
-        //    {
-        //        this.Context.ReportDiagnostic(Diagnostic.Create(
-        //            new DiagnosticDescriptor(
-        //                "ShinyPush",
-        //                $"{cannotRegister.Name} cannot be registered with auto-generation due to required configuration",
-        //                null,
-        //                "Push",
-        //                DiagnosticSeverity.Warning,
-        //                true
-        //            ),
-        //            Location.None
-        //        ));
-        //    }
-        //    else
-        //    {
-        //        var register = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushRegisters.ContainsKey(x.Name));
-        //        if (register != null)
-        //        {
-        //            var registerStatement = PushRegisters[register.Name];
-        //            this.RegisterAllDelegate("Shiny.Push.IPushDelegate", registerStatement, true);
-        //            registered = true;
-        //        }
-        //    }
-        //    return registered;
-        //}
+        void RegisterNoDelegates() => this.FindAttributedAssemblies("Shiny.Attributes.AutoStartupAttribute", attributeData =>
+        {
+            var startupRegistrationServiceExtensionMethodName = attributeData.ConstructorArguments.FirstOrDefault().Value.ToString();
+            var registerString = $"services.{startupRegistrationServiceExtensionMethodName}();";
+            this.Context.Log(
+                "SHINYINFO",
+                "Registering in Shiny Startup - " + registerString,
+                DiagnosticSeverity.Info
+            );
+            this.builder.AppendLineInvariant(registerString);
+        });
 
 
-        //bool RegisterIf(string typeNameExists, string registerString)
-        //{
-        //    var symbol = this.Context.Compilation.GetTypeByMetadataName(typeNameExists);
-        //    if (symbol != null)
-        //    {
-        //        this.Context.Log(
-        //            "SHINYINFO",
-        //            "Registering in Shiny Startup - " + registerString,
-        //            DiagnosticSeverity.Info
-        //        );
-        //        this.builder.AppendLineInvariant(registerString);
-        //        return true;
-        //    }
-        //    return false;
-        //}
+        void RegisterWithDelegate() => this.FindAttributedAssemblies("Shiny.Attributes.AutoStartupWithDelegateAttribute", attributeData =>
+        {
+            var delegateTypeName = (string)attributeData.ConstructorArguments[0].Value;
+            var startupRegistrationServiceExtensionMethodName = (string)attributeData.ConstructorArguments[1].Value;
+            var oneDelegateRequiredToInstall = (bool)attributeData.ConstructorArguments[2].Value;
+
+            var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
+            var impls = this.allSymbols
+                .Where(x => x.Implements(symbol))
+                .ToList();
+
+            if (!impls.Any() && oneDelegateRequiredToInstall)
+            {
+                this.Context.Log(
+                    "SHINYDELEGATE",
+                    "Required delegate missing for services." + startupRegistrationServiceExtensionMethodName,
+                    DiagnosticSeverity.Error
+                );
+                return;
+            }
+            var registerStatement = $"services.{startupRegistrationServiceExtensionMethodName}<{impls.First().ToDisplayString()}>();";
+            this.builder.AppendLineInvariant(registerStatement);
+
+            if (impls.Count > 1)
+            {
+                var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
+                for (var i = startIndex; i < impls.Count; i++)
+                {
+                    var impl = impls[i];
+                    this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
+                }
+            }
+        });
 
 
-        //bool RegisterAllDelegate(string delegateTypeName, string registerStatement, bool oneDelegateRequiredToInstall)
-        //{
-        //    var symbol = this.Context.Compilation.GetTypeByMetadataName(delegateTypeName);
-        //    if (symbol == null)
-        //        return false;
+        void FindAttributedAssemblies(string attributeName, Action<AttributeData> process)
+        {
+            foreach (var ass in shinyAssemblies)
+            {
+                var shinyAttributes = ass
+                    .GetAttributes()
+                    .Where(x =>
+                    {
+                        var other = x.AttributeClass.ToDisplayString();
+                        return attributeName.Equals(other);
+                    })
+                    .ToList();
 
-        //    var impls = this.allSymbols
-        //        .Where(x => x.Implements(symbol))
-        //        .ToList();
-
-        //    if (!impls.Any())
-        //    {
-        //        if (oneDelegateRequiredToInstall)
-        //        {
-        //            this.Context.Log(
-        //                "SHINYDELEGATE",
-        //                "Required delegate missing for " + registerStatement,
-        //                DiagnosticSeverity.Error
-        //            );
-        //        }
-        //        return false;
-        //    }
-        //    registerStatement += $"<{impls.First().ToDisplayString()}>();";
-        //    this.builder.AppendLineInvariant(registerStatement);
-
-        //    if (impls.Count > 1)
-        //    {
-        //        var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
-        //        for (var i = startIndex; i < impls.Count; i++)
-        //        {
-        //            var impl = impls[i];
-        //            this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
-        //        }
-        //    }
-        //    return true;
-        //}
+                foreach (var attribute in shinyAttributes)
+                    process(attribute);
+            }
+        }
 
 
         void RegisterServices()
@@ -272,3 +245,48 @@ namespace Shiny.Generators
         }
     }
 }
+//static readonly string[] PushCannotGenerateRegister = new []
+//{
+//    "Shiny.Push.AzureNotificationHubs",
+//    "Shiny.Push.Aws"
+//};
+//static readonly Dictionary<string, string> PushRegisters = new Dictionary<string, string>
+//{
+//    { "Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging" },
+//    { "Shiny.Push", "services.UsePush" }
+//};
+
+//bool RegisterPush()
+//{
+//    var registered = false;
+//    var cannotRegister = this.Context
+//        .Compilation
+//        .ReferencedAssemblyNames
+//        .FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
+
+//    if (cannotRegister != null)
+//    {
+//        this.Context.ReportDiagnostic(Diagnostic.Create(
+//            new DiagnosticDescriptor(
+//                "ShinyPush",
+//                $"{cannotRegister.Name} cannot be registered with auto-generation due to required configuration",
+//                null,
+//                "Push",
+//                DiagnosticSeverity.Warning,
+//                true
+//            ),
+//            Location.None
+//        ));
+//    }
+//    else
+//    {
+//        var register = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushRegisters.ContainsKey(x.Name));
+//        if (register != null)
+//        {
+//            var registerStatement = PushRegisters[register.Name];
+//            this.RegisterAllDelegate("Shiny.Push.IPushDelegate", registerStatement, true);
+//            registered = true;
+//        }
+//    }
+//    return registered;
+//}

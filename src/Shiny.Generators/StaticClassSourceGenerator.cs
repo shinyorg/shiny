@@ -59,7 +59,7 @@ namespace Shiny.Generators
                     this.BuildStaticClass(typeName, genFileName);
                 }
             }
-            //this.BuildStaticClass("Shiny.Push.IPushManager", "ShinyPush");
+            // TODO: this.BuildStaticClass("Shiny.Push.IPushManager", "ShinyPush");
         }
 
 
@@ -70,8 +70,6 @@ namespace Shiny.Generators
                 return;
 
             var builder = new IndentedStringBuilder();
-            //builder.AppendNamespaces(namespaces);
-
             using (builder.BlockInvariant("namespace " + this.useNamespace))
             {
                 using (builder.BlockInvariant("public static partial class " + genFileName))

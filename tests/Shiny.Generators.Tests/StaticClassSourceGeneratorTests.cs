@@ -15,7 +15,7 @@ namespace Shiny.Generators.Tests
         public void CoreClasses()
         {
             this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
-            this.RunGenerator();
+            this.RunGenerator(true);
 
             this.AssertTypes(
                 "Tests.ShinyJobs",
@@ -31,7 +31,7 @@ namespace Shiny.Generators.Tests
         {
             this.Generator.AddReferences("Shiny.BluetoothLE");
             this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
-            this.RunGenerator();
+            this.RunGenerator(true);
 
             this.AssertTypes("Tests.ShinyBle");
         }
