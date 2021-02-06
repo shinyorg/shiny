@@ -25,6 +25,7 @@ namespace Shiny.Notifications
 
         protected override async Task OnReceiveAsync(Context? context, Intent? intent)
         {
+            // TODO: alarm, get notificationId from intent, get notification from repo, fire notification without scheduledate
             var manager = ShinyHost.Resolve<INotificationManager>();
             var serializer = ShinyHost.Resolve<ISerializer>();
 

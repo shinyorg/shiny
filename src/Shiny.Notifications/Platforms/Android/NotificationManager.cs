@@ -8,6 +8,7 @@ using Android.App;
 using Android.Content;
 using Android.Media;
 using Android.Graphics;
+using Android.Icu.Util;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Shiny.Infrastructure;
@@ -112,6 +113,20 @@ namespace Shiny.Notifications
 
 
         public int Badge { get; set; }
+
+
+        public void SetAlarm(int notificationId, DateTimeOffset date)
+        {
+            var alarm = this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService);
+            var intent = new Intent(this.services.Android.AppContext, typeof(NotificationBroadcastReceiver));
+            intent.Extras.PutInt("NotificationId", notificationId);
+            //date.ToLocalTime().ToUnixTimeMilliseconds();
+            var calendar = Calendar.GetInstance((Android.Icu.Util.TimeZone)null);
+            calendar.Set(date.Year, date.Month, date.Day, date.Hour, date.Minute);
+
+            var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, 0);
+            alarm.SetExact(AlarmType.Rtc, calendar.TimeInMillis, pendingIntent);
+        }
 
 
         public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification)
