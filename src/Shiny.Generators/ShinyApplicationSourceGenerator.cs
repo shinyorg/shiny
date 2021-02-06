@@ -193,6 +193,7 @@ namespace Shiny.Generators
             {
                 var attrs = symbol.GetAttributes();
                 var hasService = attrs.Any(x => x.AttributeClass.Name.Equals("Shiny.ShinyServiceAttribute"));
+                
                 if (hasService)
                 {
                     if (!symbol.AllInterfaces.Any())

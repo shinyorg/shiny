@@ -17,13 +17,11 @@ namespace Samples.BluetoothLE
     public class PeripheralViewModel : ViewModel
     {
         readonly IDialogs dialogs;
-        readonly IBleManager centralManager;
         IPeripheral peripheral;
 
 
-        public PeripheralViewModel(IBleManager centralManager, IDialogs dialogs)
+        public PeripheralViewModel(IDialogs dialogs)
         {
-            this.centralManager = centralManager;
             this.dialogs = dialogs;
 
             this.SelectCharacteristic = ReactiveCommand.Create<GattCharacteristicViewModel>(x => x.Select());
