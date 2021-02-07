@@ -85,14 +85,10 @@ namespace Shiny.Notifications
             => await this.services.Repository.GetAll<Notification>();
 
 
-        public async Task<AccessState> RequestAccess()
+        public Task<AccessState> RequestAccess()
         {
-            var state = AccessState.Disabled;
-
-            if (this.manager.AreNotificationsEnabled())
-                state = await this.services.Jobs.RequestAccess();
-
-            return state;
+            var state = this.manager.AreNotificationsEnabled() ? AccessState.Available : AccessState.Disabled;
+            return Task.FromResult(state);
         }
 
 
@@ -104,6 +100,7 @@ namespace Shiny.Notifications
             if (notification.ScheduleDate != null)
             {
                 await this.services.Repository.Set(notification.Id.ToString(), notification);
+                this.SetAlarm(notification);
                 return;
             }
             await this.TryApplyChannel(notification, builder);
@@ -115,12 +112,14 @@ namespace Shiny.Notifications
         public int Badge { get; set; }
 
 
-        public void SetAlarm(int notificationId, DateTimeOffset date)
+        void SetAlarm(Notification notification)
         {
+            var date = notification.ScheduleDate.Value.LocalDateTime;
+
+            var intent = this.services.Android.CreateIntent<AlarmBroadcastReceiver>();
+            intent.Extras.PutInt("NotificationId", notification.Id);
+
             var alarm = this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService);
-            var intent = new Intent(this.services.Android.AppContext, typeof(NotificationBroadcastReceiver));
-            intent.Extras.PutInt("NotificationId", notificationId);
-            //date.ToLocalTime().ToUnixTimeMilliseconds();
             var calendar = Calendar.GetInstance((Android.Icu.Util.TimeZone)null);
             calendar.Set(date.Year, date.Month, date.Day, date.Hour, date.Minute);
 
@@ -288,7 +287,10 @@ namespace Shiny.Notifications
             }
             else
             {
-                launchIntent = new Intent(this.services.Android.AppContext, notification.Android.LaunchActivityType);
+                launchIntent = new Intent(
+                    this.services.Android.AppContext,
+                    notification.Android.LaunchActivityType
+                );
             }
 
             var notificationString = this.services.Serializer.Serialize(notification);
@@ -406,7 +408,7 @@ namespace Shiny.Notifications
         static int counter = 100;
         protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
         {
-            var intent = this.services.Android.CreateIntent<NotificationBroadcastReceiver>(NotificationBroadcastReceiver.IntentAction);
+            var intent = this.services.Android.CreateIntent<EntryBroadcastReceiver>(EntryBroadcastReceiver.IntentAction);
             var content = this.services.Serializer.Serialize(notification);
             intent
                 .PutExtra("Notification", content)

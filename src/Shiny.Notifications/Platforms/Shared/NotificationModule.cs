@@ -41,11 +41,6 @@ namespace Shiny.Notifications
             services.TryAddSingleton<INotificationManager, NotificationManager>();
 #if __ANDROID__
             services.TryAddSingleton<AndroidNotificationProcessor>();
-            services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob))
-            {
-                Repeat = true,
-                IsSystemJob = true
-            });
 #elif __IOS__
             services.TryAddSingleton<iOSNotificationDelegate>();
 #elif WINDOWS_UWP
