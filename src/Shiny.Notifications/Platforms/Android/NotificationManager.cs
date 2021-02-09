@@ -112,22 +112,6 @@ namespace Shiny.Notifications
         public int Badge { get; set; }
 
 
-        void SetAlarm(Notification notification)
-        {
-            var date = notification.ScheduleDate.Value.LocalDateTime;
-
-            var intent = this.services.Android.CreateIntent<AlarmBroadcastReceiver>();
-            intent.Extras.PutInt("NotificationId", notification.Id);
-
-            var alarm = this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService);
-            var calendar = Calendar.GetInstance((Android.Icu.Util.TimeZone)null);
-            calendar.Set(date.Year, date.Month, date.Day, date.Hour, date.Minute);
-
-            var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, 0);
-            alarm.SetExact(AlarmType.Rtc, calendar.TimeInMillis, pendingIntent);
-        }
-
-
         public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification)
         {
             if (notification.Id == 0)
@@ -408,7 +392,7 @@ namespace Shiny.Notifications
         static int counter = 100;
         protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
         {
-            var intent = this.services.Android.CreateIntent<EntryBroadcastReceiver>(EntryBroadcastReceiver.IntentAction);
+            var intent = this.services.Android.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.EntryIntentAction);
             var content = this.services.Serializer.Serialize(notification);
             intent
                 .PutExtra("Notification", content)
@@ -420,7 +404,7 @@ namespace Shiny.Notifications
                 counter,
                 intent,
                 PendingIntentFlags.UpdateCurrent
-            );
+            )!;
             return pendingIntent;
         }
 
@@ -449,6 +433,25 @@ namespace Shiny.Notifications
                 .Build();
 
             return nativeAction;
+        }
+
+
+        protected virtual void SetAlarm(Notification notification)
+        {
+            var date = notification.ScheduleDate.Value.LocalDateTime;
+            var intent = this.services.Android.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
+            intent.PutExtra("NotificationId", notification.Id);
+
+            var calendar = Calendar.GetInstance((Android.Icu.Util.TimeZone)null)!;
+            calendar.Set(date.Year, date.Month, date.Day, date.Hour, date.Minute);
+
+            var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, 0);
+            AlarmManagerCompat.SetExactAndAllowWhileIdle(
+                this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService),
+                (int)AlarmType.Rtc,
+                calendar.TimeInMillis,
+                pendingIntent
+            );
         }
     }
 }
