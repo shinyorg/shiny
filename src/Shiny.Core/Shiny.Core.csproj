@@ -1,7 +1,8 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <Description>The Shiny containing all of the major functionality like hosting, logging, connectivity, environment, IO, power, settings, application state monitoring, and jobs as well as many other utilities</Description>
+        <RootNamespace>Shiny</RootNamespace>
+        <Description>The Shiny Core containing all of the major functionality like hosting, logging, connectivity, environment, IO, power, settings, and jobs as well as many other utilities</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;xamarin.watchos10;xamarin.tvos10;tizen50;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
         <TargetsForTfmSpecificBuildOutput Condition=" $(TargetFramework.StartsWith('uap')) ">$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
@@ -11,10 +12,9 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <None Include="**\Platforms\**\*.cs" />
         <Compile Remove="**\Platforms\**\*.cs" />
-
+        <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-        <PackageReference Include="Newtonsoft.Json" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
@@ -25,13 +25,13 @@
     <ItemGroup Condition=" $(TargetFramework.Contains('android')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Common" />
+        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
-        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Common" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" />
+        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">

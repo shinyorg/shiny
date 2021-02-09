@@ -440,12 +440,12 @@ namespace Shiny.Notifications
         {
             var date = notification.ScheduleDate.Value.LocalDateTime;
             var intent = this.services.Android.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
-             intent.PutExtra("NotificationId", notification.Id);
+            intent.PutExtra("NotificationId", notification.Id);
 
             var calendar = Calendar.GetInstance((Android.Icu.Util.TimeZone)null)!;
             calendar.Set(date.Year, date.Month, date.Day, date.Hour, date.Minute);
 
-            var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, 0);
+            var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, PendingIntentFlags.OneShot);
             AlarmManagerCompat.SetExactAndAllowWhileIdle(
                 this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService),
                 (int)AlarmType.Rtc,

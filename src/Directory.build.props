@@ -12,7 +12,7 @@
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReleaseNotes>https://github.com/shinyorg/shiny/blob/master/ChangeLog.md</PackageReleaseNotes>
-        <PackageTags>xamarin uwp ios android tizen tvos watchos ble geofences gps location background jobs settings environment speech sensors acr</PackageTags>
+        <PackageTags>xamarin uwp ios android tizen tvos watchos ble bluetooth bluetoothle push notifications sensors geofences gps location backgroundjobs settings environment speech sensors</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <DebugType Condition=" $(Configuration) == 'Release' ">embedded</DebugType>

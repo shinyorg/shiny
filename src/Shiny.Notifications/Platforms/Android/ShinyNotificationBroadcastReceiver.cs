@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
-using RemoteInput = AndroidX.Core.App.RemoteInput;
 
 
 namespace Shiny.Notifications
