@@ -61,10 +61,11 @@ namespace Samples.Logging
                 x.Description,
                 () =>
                 {
-                    if (x.Parameters.IsEmpty())
-                        return null;
+                    return null;
+                    //if (x.Parameters.IsEmpty())
+                    //    return null;
 
-                    return this.serializer.Deserialize<Dictionary<string, string>>(x.Parameters);
+                    //return this.serializer.Deserialize<Dictionary<string, string>>(x.Parameters);
                 }
             ));
         }
@@ -82,7 +83,7 @@ namespace Samples.Logging
                     var s = $"{title}{Environment.NewLine}{exception}{Environment.NewLine}";
                     var parameters = getParameters();
 
-                    if (!parameters.Any())
+                    if (parameters != null && parameters.Any())
                         foreach (var p in parameters)
                             s += $"{Environment.NewLine}{p.Key}: {p.Value}";
 

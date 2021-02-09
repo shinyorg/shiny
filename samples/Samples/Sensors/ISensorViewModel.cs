@@ -6,10 +6,10 @@ namespace Samples.Sensors
 {
     public interface ISensorViewModel
     {
-        string Title { get; }
+        string? Title { get; }
         ICommand Toggle { get; }
-        string ValueName { get; }
-        string Value { get; }
-        string ToggleText { get; }
+        string? ValueName { get; }
+        string? Value { get; }
+        string? ToggleText { get; }
     }
 }

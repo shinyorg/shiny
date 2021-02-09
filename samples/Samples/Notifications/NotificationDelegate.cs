@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Prism.Navigation;
+using Samples.Logging;
 using Samples.Models;
 using Shiny;
 using Shiny.Notifications;
@@ -12,6 +14,7 @@ namespace Samples.Notifications
         readonly SampleSqliteConnection conn;
         readonly IMessageBus messageBus;
         readonly INotificationManager notifications;
+        string? errorMessage;
 
 
         public NotificationDelegate(SampleSqliteConnection conn,
@@ -24,8 +27,23 @@ namespace Samples.Notifications
         }
 
 
+        public async Task<bool> TryNavigateFromNotification(INavigationService navigator)
+        {
+            if (this.errorMessage == null)
+                return false;
+
+            await navigator.ShowBigText(this.errorMessage, "ERROR");
+            this.errorMessage = null;
+            return true;
+        }
+
+
         public async Task OnEntry(NotificationResponse response)
         {
+            string? exception = null;
+            if (response.Notification.Payload?.TryGetValue("ERROR", out exception) ?? false)
+                this.errorMessage = exception;
+
             await this.Store(new NotificationEvent
             {
                 NotificationId = response.Notification.Id,
@@ -50,34 +68,34 @@ namespace Samples.Notifications
 
         async Task DoChat(NotificationResponse response)
         {
-            //var cat = response.Notification.Category;
-            //if (!cat?.StartsWith("Chat") ?? false)
-            //    return;
+            var cat = response.Notification.Channel;
+            if (cat?.StartsWith("Chat") ?? false)
+            {
+                cat = cat.Replace("Chat", String.Empty).ToLower();
+                switch (cat)
+                {
+                    case "name":
+                        var name = "Shy Person";
+                        if (!response.Text.IsEmpty())
+                            name = response.Text.Trim();
 
-            //cat = cat.Replace("Chat", String.Empty).ToLower();
-            //switch (cat)
-            //{
-            //    case "name":
-            //        var name = "Shy Person";
-            //        if (!response.Text.IsEmpty())
-            //            name = response.Text.Trim();
+                        await notifications.Send("Shiny Chat", $"Hi {name}, do you like me?", "ChatAnswer");
+                        break;
 
-            //        await notifications.Send("Shiny Chat", $"Hi {name}, do you like me?", "ChatAnswer");
-            //        break;
+                    case "answer":
+                        switch (response.ActionIdentifier.ToLower())
+                        {
+                            case "yes":
+                                await this.notifications.Send("Shiny Chat", "YAY!!");
+                                break;
 
-            //    case "answer":
-            //        switch (response.ActionIdentifier.ToLower())
-            //        {
-            //            case "yes":
-            //                await this.notifications.Send("Shiny Chat", "YAY!!");
-            //                break;
-
-            //            case "no":
-            //                await this.notifications.Send("Shiny Chat", "Go away then!");
-            //                break;
-            //        }
-            //        break;
-            //}
+                            case "no":
+                                await this.notifications.Send("Shiny Chat", "Go away then!");
+                                break;
+                        }
+                        break;
+                }
+            }
         }
 
 
