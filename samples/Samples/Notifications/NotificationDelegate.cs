@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Prism.Navigation;
-using Samples.Logging;
 using Samples.Models;
 using Shiny;
 using Shiny.Notifications;

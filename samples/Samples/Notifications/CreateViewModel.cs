@@ -140,6 +140,12 @@ namespace Samples.Notifications
         public async override void OnAppearing()
         {
             base.OnAppearing();
+            Observable
+                .Interval(TimeSpan.FromSeconds(10))
+                .Where(_ => this.ScheduledTime < DateTimeOffset.Now)
+                .SubOnMainThread(_ => this.SelectedTime.Add(TimeSpan.FromSeconds(1)))
+                .DisposeWith(this.DeactivateWith);
+
             this.Channels = (await this.notificationManager.GetChannels())
                 .Select(x => x.Identifier)
                 .ToArray();

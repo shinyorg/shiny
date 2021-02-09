@@ -13,10 +13,10 @@ namespace Shiny.Notifications
         Enabled = true,
         Exported = false
     )]
-    [IntentFilter(new[] {
-        EntryIntentAction,
-        AlarmIntentAction
-    })]
+    //[IntentFilter(new[] {
+    //    EntryIntentAction,
+    //    AlarmIntentAction
+    //})]
     public class ShinyNotificationBroadcastReceiver : ShinyBroadcastReceiver
     {
         public const string ReceiverName = "com.shiny.notifications." + nameof(ShinyNotificationBroadcastReceiver);

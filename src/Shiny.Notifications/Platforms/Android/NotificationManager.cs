@@ -448,7 +448,7 @@ namespace Shiny.Notifications
             var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, PendingIntentFlags.OneShot);
             AlarmManagerCompat.SetExactAndAllowWhileIdle(
                 this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService),
-                (int)AlarmType.Rtc,
+                (int)AlarmType.RtcWakeup,
                 calendar.TimeInMillis,
                 pendingIntent
             );
