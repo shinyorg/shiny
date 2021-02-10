@@ -43,13 +43,6 @@ namespace Shiny.Notifications
             services.TryAddSingleton<AndroidNotificationProcessor>();
 #elif __IOS__
             services.TryAddSingleton<iOSNotificationDelegate>();
-#elif WINDOWS_UWP
-
-            UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(x => x.SetTrigger(
-                new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(
-                    Windows.UI.Notifications.NotificationKinds.Toast
-                )
-            ));
 #endif
 
 #if __ANDROID__ || WINDOWS_UWP

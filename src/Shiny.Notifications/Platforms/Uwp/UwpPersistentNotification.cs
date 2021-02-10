@@ -9,7 +9,10 @@ namespace Shiny.Notifications
     {
         readonly ToastNotifier toastNotifications;
         readonly Notification notification;
+        int total = 0;
+        int progress = 0;
         int sequence = 1;
+        bool indeterministic;
 
 
         public UwpPersistentNotification(Notification notification)
@@ -21,6 +24,9 @@ namespace Shiny.Notifications
 
         public void ClearProgress()
         {
+            this.total = 0;
+            this.progress = 0;
+            this.Update();
         }
 
 
@@ -30,11 +36,17 @@ namespace Shiny.Notifications
 
         public void SetIndeterministicProgress(bool show)
         {
+            this.indeterministic = true;
+
         }
 
 
         public void SetProgress(int progress, int total)
         {
+            this.indeterministic = false;
+            this.progress = progress;
+            this.total = total;
+            this.Update();
         }
 
 
@@ -45,15 +57,13 @@ namespace Shiny.Notifications
             {
                 SequenceNumber = (uint)this.sequence
             };
+            data.Values["progressStatus"] = this.notification.Title;
 
-            // Assign new values
-            // Note that you only need to assign values that changed. In this example
-            // we don't assign progressStatus since we don't need to change it
-            //data.Values["progressValue"] = progress / total;
-            //data.Values["progressValueString"] = "18/26 songs";
-            //data.Values["progressStatus"] = "Downloading...";
-
-            // Update the existing notification's data by using tag/group
+            if (!this.indeterministic)
+            {
+                data.Values["progressValue"] = (this.progress / this.total).ToString();
+                data.Values["progressValueString"] = $"{this.progress}/{this.total}";
+            }
             this.toastNotifications.Update(
                 data,
                 this.notification.Id.ToString(),
