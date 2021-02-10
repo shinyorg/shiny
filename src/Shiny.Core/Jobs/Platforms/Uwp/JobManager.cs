@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
 using Shiny.Infrastructure;
+using Shiny.Logging;
 
 
 namespace Shiny.Jobs
@@ -78,7 +79,16 @@ namespace Shiny.Jobs
 
                 builder.AddCondition(new SystemCondition(type));
             }
-            builder.Register();
+
+            try
+            {
+                builder.Register();
+            }
+            catch (Exception x)
+            {
+                Log.Write("ScheduleNative", $"Failed to register job '{builder.Name}'");
+                Log.Write(x);
+            }
         }
 
 
