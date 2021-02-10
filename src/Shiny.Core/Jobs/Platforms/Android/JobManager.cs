@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Settings;
 using Android.Content;
 using AndroidX.Work;
 using Shiny.Logging;

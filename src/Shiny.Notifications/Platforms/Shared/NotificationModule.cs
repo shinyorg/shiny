@@ -44,10 +44,17 @@ namespace Shiny.Notifications
 #elif __IOS__
             services.TryAddSingleton<iOSNotificationDelegate>();
 #elif WINDOWS_UWP
-            UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(builder =>
-            {
-                builder.SetTrigger(new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(Windows.UI.Notifications.NotificationKinds.Toast));
-            });
+
+            UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(x => x.SetTrigger(
+                new Windows.ApplicationModel.Background.UserNotificationChangedTrigger(
+                    Windows.UI.Notifications.NotificationKinds.Toast
+                )
+            ));
+#endif
+
+#if __ANDROID__ || WINDOWS_UWP
+            services.RegisterJob(typeof(NotificationJob));
+            services.UseJobForegroundService();
 #endif
         }
 

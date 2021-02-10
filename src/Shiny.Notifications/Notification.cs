@@ -38,7 +38,7 @@ namespace Shiny.Notifications
         /// <summary>
         /// Additional data you can add to your notification
         /// </summary>
-        public IDictionary<string, string>? Payload { get; set; }
+        public IDictionary<string, string>? Payload { get; set; } = new Dictionary<string, string>(0);
 
         /// <summary>
         /// The value to display on the homescreen badge - set to 0z to remove it

@@ -60,7 +60,7 @@ namespace Samples.Notifications
                         this.NotificationMessage,
                         this.ScheduledTime
                     );
-                    await dialogs.Alert("Notification Sent Successfully");
+                    await dialogs.Snackbar("Notification Sent Successfully");
                 },
                 this.WhenAny(
                     x => x.NotificationTitle,
@@ -89,7 +89,7 @@ namespace Samples.Notifications
         }
 
 
-        async Task BuildAndSend(string title, string message, DateTime? scheduleDate)
+        async Task BuildAndSend(string title, string message, DateTime? scheduleDate = null)
         {
             var notification = new Notification
             {
@@ -131,7 +131,7 @@ namespace Samples.Notifications
         [Reactive] public int BadgeCount { get; set; }
         [Reactive] public string Payload { get; set; }
         [Reactive] public bool UseAndroidBigTextStyle { get; set; }
-        [Reactive] public string Channel { get; set; }
+        [Reactive] public string? Channel { get; set; }
         [Reactive] public string[] Channels { get; private set; }
 
         public bool IsAndroid => Device.RuntimePlatform == Device.Android;
@@ -140,6 +140,12 @@ namespace Samples.Notifications
         public async override void OnAppearing()
         {
             base.OnAppearing();
+            Observable
+                .Interval(TimeSpan.FromSeconds(10))
+                .Where(_ => this.ScheduledTime < DateTimeOffset.Now)
+                .SubOnMainThread(_ => this.SelectedTime.Add(TimeSpan.FromSeconds(1)))
+                .DisposeWith(this.DeactivateWith);
+
             this.Channels = (await this.notificationManager.GetChannels())
                 .Select(x => x.Identifier)
                 .ToArray();

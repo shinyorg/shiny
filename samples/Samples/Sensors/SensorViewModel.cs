@@ -11,10 +11,10 @@ namespace Samples.Sensors
 {
     public class SensorViewModel<TReading> : ReactiveObject, ISensorViewModel
     {
-        IDisposable sensorSub;
+        IDisposable? sensorSub;
 
 
-        public SensorViewModel(ISensor<TReading> sensor, string valueName, string title = null)
+        public SensorViewModel(ISensor<TReading> sensor, string valueName, string? title = null)
         {
             this.Title = title ?? sensor.GetType().Name.Replace("Impl", String.Empty);
             this.ValueName = valueName;
@@ -32,7 +32,7 @@ namespace Samples.Sensors
                         .WhenReadingTaken()
                         .Sample(TimeSpan.FromMilliseconds(500))
                         .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(x => this.Value = x.ToString());
+                        .Subscribe(x => this.Value = x!.ToString());
                 }
                 else
                 {
@@ -44,10 +44,10 @@ namespace Samples.Sensors
         }
 
 
-        public string Title { get; }
+        public string? Title { get; }
         public ICommand Toggle { get; }
-        public string ValueName { get; }
-        [Reactive] public string Value { get; private set; }
-        [Reactive] public string ToggleText { get; private set; }
+        public string? ValueName { get; }
+        [Reactive] public string? Value { get; private set; }
+        [Reactive] public string? ToggleText { get; private set; }
     }
 }

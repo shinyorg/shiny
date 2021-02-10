@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
@@ -24,7 +23,7 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task TryProcessIntent(Intent intent)
+        public async Task TryProcessIntent(Intent? intent)
         {
             if (intent == null || !this.delegates.Any())
                 return;
@@ -39,7 +38,7 @@ namespace Shiny.Notifications
 
                     var action = intent.GetStringExtra("Action");
                     var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
-                    var response = new NotificationResponse(notification, null, null);
+                    var response = new NotificationResponse(notification, action, text);
                     await ndelegate.OnEntry(response);
                 });
             }
