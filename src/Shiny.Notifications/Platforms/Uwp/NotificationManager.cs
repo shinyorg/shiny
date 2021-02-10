@@ -36,10 +36,17 @@ namespace Shiny.Notifications
         public IPersistentNotification Create(Notification notification)
         {
             //AdaptiveProgressBarValue.Indeterminate;
-            var native = this.CreateNativeNotification(notification, true);
+            var content = this.CreateContent(notification);
+            content.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
+            {
+                //    Title = "Weekly playlist",
+                //    Value = new BindableProgressBarValue("progressValue"),
+                //    ValueStringOverride = new BindableString("progressValueString"),
+                //    Status = new BindableString("progressStatus")
+            });
             notification.ScheduleDate = null;
             var pnotification = new UwpPersistentNotification(notification);
-            ToastNotificationManager.CreateToastNotifier().Show(native);
+            //ToastNotificationManager.CreateToastNotifier().Show(native);
 
             return pnotification;
         }
@@ -51,8 +58,12 @@ namespace Shiny.Notifications
 
         public async Task Send(Notification notification)
         {
-            var native = this.CreateNativeNotification(notification, false);
-            if (notification.ScheduleDate != null)
+            // create the notification to validate it
+            if (notification.Id == 0)
+                notification.Id = this.services.Settings.IncrementValue("NotificationId");
+
+            var native = this.CreateNativeNotification(notification);
+            if (notification.ScheduleDate != null && notification.ScheduleDate > DateTimeOffset.UtcNow)
             {
                 await this.services.Repository.Set(notification.Id.ToString(), notification);
                 return;
@@ -62,21 +73,12 @@ namespace Shiny.Notifications
             if (notification.BadgeCount != null)
                 this.Badge = notification.BadgeCount.Value;
 
-            await this.services.Services.SafeResolveAndExecute<INotificationDelegate>(x => x.OnReceived(notification));
+            await this.services
+                .Services
+                .SafeResolveAndExecute<INotificationDelegate>(
+                    x => x.OnReceived(notification)
+                );
         }
-
-
-        //string BuildSoundPath(string sound)
-        //{
-        //    var ext = Path.GetExtension(sound);
-        //    if (String.IsNullOrWhiteSpace(ext))
-        //        sound += ".mp4";
-
-        //    if (sound.StartsWith("ms-appx://"))
-        //        sound = "ms-appx://" + sound;
-
-        //    return sound;
-        //}
 
 
         public async Task<IEnumerable<Notification>> GetPending()
@@ -110,43 +112,32 @@ namespace Shiny.Notifications
         }
 
 
-        public ToastNotification CreateNativeNotification(Notification notification, bool includeProgressBar)
+        protected virtual ToastNotification CreateNativeNotification(Notification notification)
         {
-            if (notification.Id == 0)
-                notification.Id = this.services.Settings.IncrementValue("NotificationId");
-
-            var toastContent = new ToastContent
+            var toastContent = this.CreateContent(notification);
+            var native = new ToastNotification(toastContent.GetXml())
             {
-                //Duration = notification.Windows.UseLongDuration ? ToastDuration.Long : ToastDuration.Short,
-                //Launch = notification.Payload,
-                ActivationType = ToastActivationType.Background,
-                //ActivationType = ToastActivationType.Foreground,
-                Visual = new ToastVisual
-                {
-                    BindingGeneric = new ToastBindingGeneric
-                    {
-                        Children =
-                        {
-                            new AdaptiveText
-                            {
-                                Text = notification.Title
-                            },
-                            new AdaptiveText
-                            {
-                                Text = notification.Message
-                            }
-
-                            //new AdaptiveProgressBar()
-                            //{
-                            //    Title = "Weekly playlist",
-                            //    Value = new BindableProgressBarValue("progressValue"),
-                            //    ValueStringOverride = new BindableString("progressValueString"),
-                            //    Status = new BindableString("progressStatus")
-                            //}
-                        }
-                    }
-                }
+                Tag = notification.Id.ToString(),
+                Group = notification.Channel
             };
+            return native;
+        }
+
+
+
+        public async Task SetChannels(params Channel[] channels)
+        {
+            await this.services.Repository.DeleteAllChannels();
+            foreach (var channel in channels)
+                await this.services.Repository.SetChannel(channel);
+        }
+
+
+        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
+
+
+        protected async Task TrySetChannel(Notification notification, ToastContent content)
+        {
             //if (!notification.Category.IsEmpty())
             //{
             //    var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
@@ -185,28 +176,52 @@ namespace Shiny.Notifications
             //    }
             //    toastContent.Actions = nativeActions;
             //}
+        }
 
+
+        protected virtual ToastContent CreateContent(Notification notification)
+        {
+            var content = new ToastContent
+            {
+                Duration = ToastDuration.Short,
+                //Launch = notification.Payload,
+                //ActivationType = ToastActivationType.Background,
+                ActivationType = ToastActivationType.Foreground,
+                Visual = new ToastVisual
+                {
+                    BindingGeneric = new ToastBindingGeneric
+                    {
+                        Children =
+                            {
+                                new AdaptiveText
+                                {
+                                    Text = notification.Title
+                                },
+                                new AdaptiveText
+                                {
+                                    Text = notification.Message
+                                }
+                            }
+                    }
+                }
+            };
             //if (!Notification.CustomSoundFilePath.IsEmpty())
             //    toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
-
-            var native = new ToastNotification(toastContent.GetXml())
-            {
-                Tag = notification.Id.ToString(),
-                Group = notification.Channel
-            };
-            return native;
+            return content;
         }
 
 
 
+        //string BuildSoundPath(string sound)
+        //{
+        //    var ext = Path.GetExtension(sound);
+        //    if (String.IsNullOrWhiteSpace(ext))
+        //        sound += ".mp4";
 
-        public async Task SetChannels(params Channel[] channels)
-        {
-            await this.services.Repository.DeleteAllChannels();
-            foreach (var channel in channels)
-                await this.services.Repository.SetChannel(channel);
-        }
+        //    if (sound.StartsWith("ms-appx://"))
+        //        sound = "ms-appx://" + sound;
 
-        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
+        //    return sound;
+        //}
     }
 }
