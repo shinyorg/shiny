@@ -8,7 +8,7 @@ using Android.App;
 using Android.Content;
 using Android.Media;
 using Android.Graphics;
-using Android.Icu.Util;
+//using Android.Icu.Util;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Shiny.Infrastructure;
@@ -85,10 +85,13 @@ namespace Shiny.Notifications
             => await this.services.Repository.GetAll<Notification>();
 
 
-        public Task<AccessState> RequestAccess()
+        public async Task<AccessState> RequestAccess()
         {
-            var state = this.manager.AreNotificationsEnabled() ? AccessState.Available : AccessState.Disabled;
-            return Task.FromResult(state);
+            if (!this.manager.AreNotificationsEnabled())
+                return AccessState.Disabled;
+
+            var result = await this.services.Jobs.RequestAccess();
+            return result;
         }
 
 
@@ -100,7 +103,7 @@ namespace Shiny.Notifications
             if (notification.ScheduleDate != null)
             {
                 await this.services.Repository.Set(notification.Id.ToString(), notification);
-                this.SetAlarm(notification);
+                //this.SetAlarm(notification);
                 return;
             }
             await this.TryApplyChannel(notification, builder);
@@ -243,17 +246,17 @@ namespace Shiny.Notifications
             // Strip file extension and leading slash from resource name to allow users
             // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
             if (File.Exists(soundResourceName))
-                return Android.Net.Uri.Parse("file://" + soundResourceName);
+                return Android.Net.Uri.Parse("file://" + soundResourceName)!;
 
             soundResourceName = soundResourceName.TrimStart('/').Split('.').First();
             var resourceId = this.services.Android.GetRawResourceIdByName(soundResourceName);
             var resources = this.services.Android.AppContext.Resources;
             return new Android.Net.Uri.Builder()
-                .Scheme(ContentResolver.SchemeAndroidResource)
-                .Authority(resources.GetResourcePackageName(resourceId))
-                .AppendPath(resources.GetResourceTypeName(resourceId))
-                .AppendPath(resources.GetResourceEntryName(resourceId))
-                .Build();
+                .Scheme(ContentResolver.SchemeAndroidResource)!
+                .Authority(resources.GetResourcePackageName(resourceId))!
+                .AppendPath(resources.GetResourceTypeName(resourceId))!
+                .AppendPath(resources.GetResourceEntryName(resourceId))!
+                .Build()!;
         }
 
 
@@ -300,7 +303,7 @@ namespace Shiny.Notifications
                     notification.Id,
                     launchIntent,
                     PendingIntentFlags.OneShot
-                );
+                )!;
             }
             return pendingIntent;
         }
@@ -436,22 +439,22 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual void SetAlarm(Notification notification)
-        {
-            var date = notification.ScheduleDate.Value.LocalDateTime;
-            var intent = this.services.Android.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
-            intent.PutExtra("NotificationId", notification.Id);
+        //protected virtual void SetAlarm(Notification notification)
+        //{
+        //    var date = notification.ScheduleDate.Value.LocalDateTime;
+        //    var intent = this.services.Android.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
+        //    intent.PutExtra("NotificationId", notification.Id);
 
-            var calendar = Calendar.GetInstance((Android.Icu.Util.TimeZone)null)!;
-            calendar.Set(date.Year, date.Month, date.Day, date.Hour, date.Minute);
+        //    var calendar = Calendar.GetInstance((Android.Icu.Util.TimeZone)null)!;
+        //    calendar.Set(date.Year, date.Month, date.Day, date.Hour, date.Minute);
 
-            var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, PendingIntentFlags.OneShot);
-            AlarmManagerCompat.SetExactAndAllowWhileIdle(
-                this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService),
-                (int)AlarmType.RtcWakeup,
-                calendar.TimeInMillis,
-                pendingIntent
-            );
-        }
+        //    var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, PendingIntentFlags.OneShot);
+        //    AlarmManagerCompat.SetExactAndAllowWhileIdle(
+        //        this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService),
+        //        (int)AlarmType.RtcWakeup,
+        //        calendar.TimeInMillis,
+        //        pendingIntent
+        //    );
+        //}
     }
 }

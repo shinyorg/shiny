@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 using Shiny.Logging;
-
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Shiny
 {
@@ -37,10 +37,11 @@ namespace Shiny
         /// This will run any jobs marked with RunOnForeground
         /// </summary>
         /// <param name="services"></param>
-        public static void UseJobForegroundService(this IServiceCollection services, TimeSpan interval)
+        /// <param name="interval"></param>
+        public static void UseJobForegroundService(this IServiceCollection services, TimeSpan? interval = null)
         {
-            JobForegroundService.Interval = interval;
-            services.AddSingleton<JobForegroundService>();
+            JobForegroundService.Interval = interval ?? TimeSpan.FromSeconds(30);
+            services.TryAddSingleton<JobForegroundService>();
         }
 
 
