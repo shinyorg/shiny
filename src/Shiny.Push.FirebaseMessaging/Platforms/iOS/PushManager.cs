@@ -78,6 +78,7 @@ namespace Shiny.Push.FirebaseMessaging
                     await Messaging.SharedInstance.SubscribeAsync(tag);
                 }
             }
+            this.RegisteredTags = tags;
         }
     }
 }

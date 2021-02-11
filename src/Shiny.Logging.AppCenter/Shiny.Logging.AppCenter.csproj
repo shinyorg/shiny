@@ -10,6 +10,7 @@
         <None Include="readme.txt" pack="true" PackagePath="." />
         <PackageReference Include="Microsoft.AppCenter.Crashes" />
         <PackageReference Include="Microsoft.AppCenter.Analytics" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
