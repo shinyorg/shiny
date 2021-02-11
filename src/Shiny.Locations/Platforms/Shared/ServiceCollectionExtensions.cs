@@ -1,9 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-
 using Shiny.Locations;
-using Shiny.Logging;
 
 
 namespace Shiny
@@ -19,22 +16,7 @@ namespace Shiny
         public static bool UseMotionActivity(this IServiceCollection services, bool requestPermissionOnStart = false)
         {
 #if __ANDROID__ || __IOS__
-#if __ANDROID__
-            services.AddSingleton<AndroidSqliteDatabase>();
-#endif
-            services.TryAddSingleton<IMotionActivityManager, MotionActivityManagerImpl>();
-            if (requestPermissionOnStart)
-            {
-                services.RegisterPostBuildAction(async sp =>
-                {
-                    var access = await sp
-                        .GetRequiredService<IMotionActivityManager>()
-                        .RequestAccess();
-
-                    if (access != AccessState.Available)
-                        Log.Write(LocationLogCategory.MotionActivity, "Invalid access - " + access);
-                });
-            }
+            services.RegisterModule(new MotionActivityModule(requestPermissionOnStart));
             return true;
 #else
             return false;
@@ -102,22 +84,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
-            services.TryAddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
-            services.UseGps<GpsGeofenceDelegate>();
-            if (requestPermissionOnStart)
-            {
-                services.RegisterPostBuildAction(async sp =>
-                {
-                    var access = await sp
-                        .GetRequiredService<IGeofenceManager>()
-                        .RequestAccess();
-
-                    if (access != AccessState.Available)
-                        Log.Write(LocationLogCategory.Geofence, "Invalid access - " + access);
-                });
-            }
-
+            services.RegisterModule(new GeofenceGpsDirectModule(delegateType, requestPermissionOnStart));
             return true;
 #endif
         }

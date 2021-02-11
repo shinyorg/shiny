@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Gms.Location;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using Shiny.Locations.Infrastructure;
-using Shiny.Logging;
 
 
 namespace Shiny.Locations
@@ -14,11 +14,15 @@ namespace Shiny.Locations
     {
         readonly IEnumerable<IGeofenceDelegate> delegates;
         readonly RepositoryWrapper<GeofenceRegion, GeofenceRegionStore> repository;
+        readonly ILogger logger;
 
 
-        public GeofenceProcessor(IRepository repository, IEnumerable<IGeofenceDelegate> delegates)
+        public GeofenceProcessor(IRepository repository,
+                                 ILogger<IGeofenceDelegate> logger,
+                                 IEnumerable<IGeofenceDelegate> delegates)
         {
             this.repository = repository.Wrap();
+            this.logger = logger;
             this.delegates = delegates;
         }
 
@@ -31,11 +35,8 @@ namespace Shiny.Locations
 
             if (e.HasError)
             {
-                Log.Write(
-                    LocationLogCategory.Geofence,
-                    "Event Error",
-                    ("ErrorCode", GeofenceStatusCodes.GetStatusCodeString(e.ErrorCode))
-                );
+                var err = GeofenceStatusCodes.GetStatusCodeString(e.ErrorCode);
+                this.logger.LogWarning("Geofence OS error - " + err);
             }
             else if (e.TriggeringGeofences != null)
             {
@@ -46,21 +47,13 @@ namespace Shiny.Locations
 
                     if (region == null)
                     {
-                        Log.Write(
-                            LocationLogCategory.Geofence,
-                            "Not Found",
-                            ("RequestId", triggeringGeofence.RequestId)
-                        );
+                        this.logger.LogWarning("Geofence reported by OS not found in Shiny Repository - RequestID: " + triggeringGeofence.RequestId);
                     }
                     else
                     {
                         await this.delegates.RunDelegates(
                             x => x.OnStatusChanged(state, region),
-                            ex => Log.Write(
-                                ex,
-                                ("RequestId", triggeringGeofence.RequestId),
-                                ("Transition", state.ToString())
-                            )
+                            ex => this.logger.LogError($"Error in geofence delegate - Region: {region.Identifier} State: {state}")
                         );
                     }
                 }

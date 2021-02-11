@@ -45,6 +45,7 @@ namespace Samples
             containerRegistry.RegisterForNavigation<MainPage>("Main");
             containerRegistry.RegisterForNavigation<WelcomePage>("Welcome");
             containerRegistry.RegisterForNavigation<BigTextViewPage>("BigText");
+            containerRegistry.RegisterForNavigation<LogPage>("Logs");
             containerRegistry.RegisterForNavigation<DelegateNotificationsPage>("DelegateNotifications");
 
             containerRegistry.RegisterForNavigation<Gps.MainPage>("Gps");
@@ -80,7 +81,6 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Notifications.BadgePage>("Badges");
 
             containerRegistry.RegisterForNavigation<PlatformPage>("Platform");
-            containerRegistry.RegisterForNavigation<LoggingPage>("Logs");
             containerRegistry.RegisterForNavigation<AccessPage>("Access");
             containerRegistry.RegisterForNavigation<Settings.MainPage>("Settings");
         }
@@ -90,12 +90,16 @@ namespace Samples
         {
             var container = new Container(this.CreateContainerRules());
             ShinyHost.Populate((serviceType, func, lifetime) =>
-                container.RegisterDelegate(
-                    serviceType,
-                    _ => func(),
-                    Reuse.Singleton // I know everything is singleton
-                )
-            );
+            {
+                if (!serviceType.IsGenericTypeDefinition)
+                {
+                    container.RegisterDelegate(
+                        serviceType,
+                        _ => func(),
+                        Reuse.Singleton // I know everything is singleton
+                    );
+                }
+            });
             return new DryIocContainerExtension(container);
         }
     }

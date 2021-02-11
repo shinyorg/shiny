@@ -2,7 +2,6 @@
 using System.Linq;
 using Android.App;
 using Firebase.Messaging;
-using Shiny.Logging;
 using Shiny.Notifications;
 using Notification = Shiny.Notifications.Notification;
 
@@ -18,8 +17,9 @@ namespace Shiny.Push
         readonly Lazy<IMessageBus> msgBus = ShinyHost.LazyResolve<IMessageBus>();
 
 
-        public override async void OnMessageReceived(RemoteMessage message) => await Log.SafeExecute(async () =>
+        public override async void OnMessageReceived(RemoteMessage message)
         {
+
             await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data));
             this.msgBus.Value.Publish(
                 nameof(ShinyFirebaseService),
@@ -53,13 +53,13 @@ namespace Shiny.Push
                 // TODO: I have to intercept the response for the IPushDelegate.OnEntry
                 await this.notifications.Value.Send(notification);
             }
-        });
+        }
 
 
-        public override async void OnNewToken(string token) => await Log.SafeExecute(async () =>
+        public override async void OnNewToken(string token)
         {
             await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token));
             await ((IAndroidTokenUpdate)ShinyHost.Resolve<IPushManager>()).UpdateNativePushToken(token);
-        });
+        }
     }
 }

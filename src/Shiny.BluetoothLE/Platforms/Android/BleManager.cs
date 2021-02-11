@@ -83,7 +83,7 @@ namespace Shiny.BluetoothLE
                 .Do(access =>
                 {
                     if (access != AccessState.Available)
-                        throw new PermissionException(BleLogCategory.BluetoothLE, access);
+                        throw new PermissionException("BluetoothLE", access);
 
                     this.IsScanning = true;
                 })

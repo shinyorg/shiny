@@ -4,9 +4,11 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Gms.Location;
-using Shiny.Logging;
+using Microsoft.Extensions.Logging;
+using Shiny.Infrastructure;
 
 using static Android.Manifest;
+
 
 namespace Shiny.Locations
 {
@@ -19,20 +21,20 @@ namespace Shiny.Locations
         public static int MediumConfidenceValue { get; set; } = 40;
 
         readonly ActivityRecognitionClient client;
-        readonly IAndroidContext context;
         readonly AndroidSqliteDatabase database;
-        readonly IMessageBus messageBus;
+        readonly ShinyCoreServices core;
+        readonly ILogger logger;
         PendingIntent? pendingIntent;
 
 
-        public MotionActivityManagerImpl(IAndroidContext context,
+        public MotionActivityManagerImpl(ShinyCoreServices core,
                                          AndroidSqliteDatabase database,
-                                         IMessageBus messageBus)
+                                         ILogger<IMotionActivityManager> logger)
         {
-            this.context = context;
+            this.core = core;
             this.database = database;
-            this.messageBus = messageBus;
-            this.client = ActivityRecognition.GetClient(context.AppContext);
+            this.logger = logger;
+            this.client = ActivityRecognition.GetClient(core.Android.AppContext);
         }
 
 
@@ -44,16 +46,21 @@ namespace Shiny.Locations
         }
 
 
-        public void Start()
+        public async void Start()
         {
             if (this.IsStarted)
             {
-                Log.SafeExecute(() =>
-                    this.client.RequestActivityUpdatesAsync(
+                try
+                {
+                    await this.client.RequestActivityUpdatesAsync(
                         Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
                         this.GetPendingIntent()
-                    )
-                );
+                    );
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "Error restarting motion activity logging");
+                }
             }
         }
 
@@ -62,9 +69,10 @@ namespace Shiny.Locations
         {
             var result = AccessState.Available;
 
-            if (this.context.IsMinApiLevel(29))
+            if (this.core.Android.IsMinApiLevel(29))
             {
-                result = await this.context
+                result = await this.core
+                    .Android
                     .RequestAccess(Permission.ActivityRecognition)
                     .ToTask();
 
@@ -118,7 +126,7 @@ ORDER BY
         }
 
         public IObservable<MotionActivityEvent> WhenActivityChanged()
-            => this.messageBus.Listener<MotionActivityEvent>();
+            => this.core.Bus.Listener<MotionActivityEvent>();
 
 
         protected virtual PendingIntent GetPendingIntent()
@@ -126,9 +134,9 @@ ORDER BY
             if (this.pendingIntent != null)
                 return this.pendingIntent;
 
-            var intent = this.context.CreateIntent<MotionActivityBroadcastReceiver>(IntentAction);
+            var intent = this.core.Android.CreateIntent<MotionActivityBroadcastReceiver>(IntentAction);
             this.pendingIntent = PendingIntent.GetBroadcast(
-                this.context.AppContext,
+                this.core.Android.AppContext,
                 0,
                 intent,
                 PendingIntentFlags.UpdateCurrent

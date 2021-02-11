@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reactive.Subjects;
 using Foundation;
-using Shiny.Logging;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Net.Http
@@ -13,11 +13,13 @@ namespace Shiny.Net.Http
         readonly Lazy<IHttpTransferDelegate> tdelegate = new Lazy<IHttpTransferDelegate>(() => ShinyHost.Resolve<IHttpTransferDelegate>());
         readonly Subject<HttpTransfer> onEvent;
         readonly HttpTransferManager manager;
+        readonly ILogger logger;
 
 
-        public ShinyUrlSessionDelegate(HttpTransferManager manager)
+        public ShinyUrlSessionDelegate(HttpTransferManager manager, ILogger logger)
         {
             this.manager = manager;
+            this.logger = logger;
             this.onEvent = new Subject<HttpTransfer>();
         }
 
@@ -29,7 +31,7 @@ namespace Shiny.Net.Http
         {
             this.manager.CompleteSession();
             if (error != null)
-                Log.Write(new Exception(error.LocalizedDescription));
+                this.logger.LogError(new Exception(error.LocalizedDescription), "DidBecomeInvalid reported an error");
         }
 
 
@@ -58,7 +60,7 @@ namespace Shiny.Net.Http
 
             if (task.State != NSUrlSessionTaskState.Canceling && error != null && transfer.Exception != null)
             {
-                Log.Write(transfer.Exception, ("HttpTransfer", transfer.Identifier));
+                this.logger.LogError(transfer.Exception, "Error with HTTP transfer: " + transfer.Identifier);
                 await this.tdelegate.Value.OnError(transfer, transfer.Exception);
             }
             this.onEvent.OnNext(transfer);

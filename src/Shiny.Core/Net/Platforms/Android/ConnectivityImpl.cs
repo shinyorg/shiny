@@ -5,18 +5,25 @@ using Android.App;
 using Android.Content;
 using Android.Net;
 using Android.Telephony;
+using Microsoft.Extensions.Logging;
 
 [assembly: UsesPermission(Android.Manifest.Permission.AccessNetworkState)]
+
 
 namespace Shiny.Net
 {
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
         readonly IAndroidContext context;
+        readonly ILogger logger;
         IDisposable? netmon;
 
 
-        public ConnectivityImpl(IAndroidContext context) => this.context = context;
+        public ConnectivityImpl(IAndroidContext context, ILogger<IConnectivity> logger)
+        {
+            this.context = context;
+            this.logger = logger;
+        }
 
 
         public string? CellularCarrier => this.Telephone.NetworkOperatorName;
@@ -88,7 +95,7 @@ namespace Shiny.Net
             }
             catch (Exception ex)
             {
-                Logging.Log.Write("Connectivity", ex.ToString());
+                this.logger.LogWarning("Connectivity implementation error - " + ex);
             }
         }
 

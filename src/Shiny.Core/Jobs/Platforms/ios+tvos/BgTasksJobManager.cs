@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using BackgroundTasks;
 using UIKit;
 using Shiny.Infrastructure;
-using Shiny.Logging;
 using ObjCRuntime;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Jobs
@@ -16,7 +16,7 @@ namespace Shiny.Jobs
         bool registeredSuccessfully = false;
 
 
-        public BgTasksJobManager(IServiceProvider container, IRepository repository) : base(container, repository)
+        public BgTasksJobManager(IServiceProvider container, IRepository repository, ILogger<IJobManager> logger) : base(container, repository, logger)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace Shiny.Jobs
             }
             catch (Exception ex)
             {
-                Log.Write(new Exception(EX_MSG, ex));
+                this.Log.LogCritical(new Exception(EX_MSG, ex), "Background tasks are not setup properly");
             }
         }
 
@@ -124,7 +124,7 @@ namespace Shiny.Jobs
                 async task =>
                 {
                     using (var cancelSrc = new CancellationTokenSource())
-                    { 
+                    {
                         task.ExpirationHandler = cancelSrc.Cancel;
 
                         var result = await this.Run(task.Identifier, cancelSrc.Token);

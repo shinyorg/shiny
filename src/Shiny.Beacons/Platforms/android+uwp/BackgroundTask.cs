@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 using Shiny.BluetoothLE;
-using Shiny.Logging;
-
+using Shiny.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Beacons
 {
@@ -13,31 +13,32 @@ namespace Shiny.Beacons
     {
         readonly IBleManager bleManager;
         readonly IBeaconMonitoringManager beaconManager;
-        readonly IMessageBus messageBus;
-        readonly IServiceProvider serviceProvider;
+        readonly ILogger logger;
+        readonly ShinyCoreServices core;
         readonly IDictionary<string, BeaconRegionStatus> states;
         IDisposable? scanSub;
 
 
-        public BackgroundTask(IServiceProvider serviceProvider,
+        public BackgroundTask(ShinyCoreServices core,
                               IBleManager centralManager,
                               IBeaconMonitoringManager beaconManager,
-                              IMessageBus messageBus)
+                              ILogger<IBeaconMonitorDelegate> logger)
         {
             this.bleManager = centralManager;
             this.beaconManager = beaconManager;
-            this.messageBus = messageBus;
-            this.serviceProvider = serviceProvider;
+            this.logger = logger;
+            this.core = core;
             this.states = new Dictionary<string, BeaconRegionStatus>();
         }
 
 
         public void Run()
         {
-            Log.Write(BeaconLogCategory.Task, "Starting");
+            this.logger.LogInformation("Starting Beacon Monitoring");
 
             // I record state of the beacon region so I can fire stuff without going into initial state from unknown
-            this.messageBus
+            this.core
+                .Bus
                 .Listener<BeaconRegisterEvent>()
                 .Subscribe(ev =>
                 {
@@ -77,7 +78,7 @@ namespace Shiny.Beacons
                 });
 
             this.StartScan();
-            Log.Write(BeaconLogCategory.Task, "Started");
+            this.logger.LogInformation("Beacon Monitoring Started Successfully");
         }
 
 
@@ -86,7 +87,7 @@ namespace Shiny.Beacons
             if (this.scanSub != null)
                 return;
 
-            Log.Write(BeaconLogCategory.Task, "Scan Starting");
+            this.logger.LogInformation("Beacon Monitoring Scan Starting");
             var regions = await this.beaconManager.GetMonitoredRegions();
             if (!regions.Any())
                 return;
@@ -94,15 +95,19 @@ namespace Shiny.Beacons
             foreach (var region in regions)
                 this.states.Add(region.Identifier, new BeaconRegionStatus(region));
 
-            Log.SafeExecute(() =>
+            try
             {
                 this.scanSub = this.bleManager
                     .ScanForBeacons(true)
                     .Buffer(TimeSpan.FromSeconds(5))
                     .SubscribeAsyncConcurrent(this.CheckStates);
 
-                Log.Write(BeaconLogCategory.Task, "Scan Started");
-            });
+                this.logger.LogInformation("Beacon Monitoring Scan Started Successfully");
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogInformation("Beacon Monitoring Scan Starting");
+            }
         }
 
 
@@ -120,14 +125,13 @@ namespace Shiny.Beacons
             if (this.scanSub == null)
                 return;
 
-            Log.Write(BeaconLogCategory.Task, "Scan Stopping");
             this.scanSub?.Dispose();
             this.states.Clear();
             this.scanSub = null;
             lock (this.states)
                 this.states.Clear();
 
-            Log.Write(BeaconLogCategory.Task, "Scan Stopped");
+            this.logger.LogInformation("Beacon Monitoring Scan Stopped");
         }
 
 
@@ -152,7 +156,7 @@ namespace Shiny.Beacons
                             state.IsInRange = true;
                             if (state.Region.NotifyOnEntry)
                             {
-                                await this.serviceProvider.RunDelegates<IBeaconMonitorDelegate>(
+                                await this.core.Services.RunDelegates<IBeaconMonitorDelegate>(
                                     x => x.OnStatusChanged(BeaconRegionState.Entered, state.Region)
                                 );
                             }
@@ -167,7 +171,7 @@ namespace Shiny.Beacons
                     state.IsInRange = false;
                     if (state.Region.NotifyOnExit)
                     {
-                        await this.serviceProvider.RunDelegates<IBeaconMonitorDelegate>(
+                        await this.core.Services.RunDelegates<IBeaconMonitorDelegate>(
                             x => x.OnStatusChanged(BeaconRegionState.Exited, state.Region)
                         );
                     }

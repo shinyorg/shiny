@@ -2,7 +2,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shiny.Logging;
+using Microsoft.Extensions.Logging;
 #if __ANDROID__
 using Android.App;
 using Android.Gms.Common;
@@ -59,16 +59,17 @@ namespace Shiny.Locations
             if (!this.requestPermissionOnStart)
                 return;
 
+            var logger = ShinyHost.LoggerFactory.CreateLogger<ILogger<IGeofenceManager>>();
             try
             {
                 var mgr = services.GetService<IGeofenceManager>();
                 var access = await mgr.RequestAccess();
                 if (access != AccessState.Available)
-                    Log.Write("Geofence", "Permission Denied on startup");
+                    logger.LogWarning("Location permissions denied on startup");
             }
             catch (Exception ex)
             {
-                Log.Write(ex);
+                logger.LogError(ex, "Error on startup geofence permission check");
             }
         }
     }

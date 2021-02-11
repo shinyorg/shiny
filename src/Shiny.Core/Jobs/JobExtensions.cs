@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
-using Shiny.Logging;
+using Shiny.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+
 
 namespace Shiny
 {
@@ -59,7 +60,12 @@ namespace Shiny
                 if (access == AccessState.Available)
                     await jobs.Register(jobInfo);
                 else
-                    Log.Write("Jobs", "Job permission failed - " + access);
+                {
+                    ShinyHost
+                        .LoggerFactory
+                        .CreateLogger<ILogger<IJobManager>>()
+                        .LogError("Job permission failed - " + access);
+                }
             });
         }
 

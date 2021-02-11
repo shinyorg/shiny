@@ -5,13 +5,17 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Windows.Networking.BackgroundTransfer;
 using Windows.Storage;
-using Shiny.Logging;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Net.Http
 {
     public class HttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
     {
+        readonly ILogger logger;
+        public HttpTransferManager(ILogger<IHttpTransferManager> logger) => this.logger = logger;
+
+
         protected override async Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
         {
             var items = await BackgroundDownloader
@@ -148,7 +152,7 @@ namespace Shiny.Net.Http
             }
             catch (Exception ex)
             {
-                Log.Write(ex);
+                this.logger.LogError(ex, "Error restarting HTTP transfers");
             }
         }
     }

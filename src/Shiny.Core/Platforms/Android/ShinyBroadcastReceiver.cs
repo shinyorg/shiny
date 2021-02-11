@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.Content;
-using Shiny.Logging;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny
@@ -26,8 +26,12 @@ namespace Shiny
             this.OnReceiveAsync(context, intent).ContinueWith(x =>
             {
                 if (x.IsFaulted)
-                    Log.Write(x.Exception);
-
+                {
+                    ShinyHost
+                        .LoggerFactory
+                        .CreateLogger<ILogger<ShinyBroadcastReceiver>>()
+                        .LogError(x.Exception, "Error in broadcast receiver");
+                }
                 pendingResult.Finish();
             });
         }

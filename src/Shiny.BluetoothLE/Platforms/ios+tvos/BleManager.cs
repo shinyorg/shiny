@@ -11,7 +11,10 @@ namespace Shiny.BluetoothLE
 {
     public class BleManager : AbstractBleManager
     {
+        const string ErrorCategory = "BluetoothLE";
         readonly CentralContext context;
+
+
         public BleManager(CentralContext context) => this.context = context;
 
 
@@ -90,7 +93,7 @@ namespace Shiny.BluetoothLE
                 .Do(access =>
                 {
                     if (access != AccessState.Available)
-                        throw new PermissionException(BleLogCategory.BluetoothLE, access);
+                        throw new PermissionException(ErrorCategory, access);
 
                     this.IsScanning = true;
                 })

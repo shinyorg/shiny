@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Shiny
 {
-    public class AppCenterLogger : ILogger
+    public class AppCenterLogger
     {
     }
 }

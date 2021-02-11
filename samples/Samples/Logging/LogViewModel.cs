@@ -7,22 +7,20 @@ using System.Threading.Tasks;
 using Prism.Navigation;
 using ReactiveUI;
 using Samples.Infrastructure;
-using Shiny;
 using Shiny.Infrastructure;
 using Shiny.Integrations.Sqlite;
-using Shiny.Logging;
 
 
 namespace Samples.Logging
 {
-    public class ErrorLogViewModel : AbstractLogViewModel<CommandItem>
+    public class LogViewModel : AbstractLogViewModel<CommandItem>
     {
         readonly ShinySqliteConnection conn;
         readonly ISerializer serializer;
         readonly INavigationService navigator;
 
 
-        public ErrorLogViewModel(ShinySqliteConnection conn,
+        public LogViewModel(ShinySqliteConnection conn,
                                  ISerializer serializer,
                                  IDialogs dialogs,
                                  INavigationService navigator) : base(dialogs)
@@ -32,20 +30,6 @@ namespace Samples.Logging
             this.navigator = navigator;
         }
 
-
-        public override void OnAppearing()
-        {
-            base.OnAppearing();
-            Log
-                .WhenExceptionLogged()
-                .Select(x => this.ToItem(
-                    DateTime.UtcNow,
-                    x.Exception.ToString(),
-                    () => x.Parameters
-                ))
-                .SubOnMainThread(this.InsertItem)
-                .DisposeWith(this.DeactivateWith);
-        }
 
         protected override Task ClearLogs() => this.conn.Logs.DeleteAsync(x => x.IsError);
         protected override async Task<IEnumerable<CommandItem>> LoadLogs()

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Foundation;
-using Shiny.Logging;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny
@@ -17,7 +17,7 @@ namespace Shiny
             task().ContinueWith(x =>
             {
                 if (x.IsFaulted)
-                    Log.Write(x.Exception);
+                    ShinyHost.LoggerFactory.CreateLogger("Dispatcher").LogError(x.Exception, "Error in dispatched background task");
 
                 UIKit.UIApplication.SharedApplication.EndBackgroundTask(taskId);
             });
@@ -25,7 +25,7 @@ namespace Shiny
             task().ContinueWith(x =>
             {
                 if (x.IsFaulted)
-                    Log.Write(x.Exception);
+                    ShinyHost.LoggerFactory.CreateLogger("Dispatcher").LogError(x.Exception, "Error in dispatched background task");
             });
 #endif
         }

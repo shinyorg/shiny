@@ -5,10 +5,10 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
-using Shiny.Logging;
+using Android.OS;
 using Android.Bluetooth;
 using Exception = System.Exception;
-using Android.OS;
+
 
 namespace Shiny.BluetoothLE.Internals
 {
@@ -58,7 +58,6 @@ namespace Shiny.BluetoothLE.Internals
             }
             catch (Exception ex)
             {
-                Log.Write(BleLogCategory.Peripheral, "Connection to peripheral failed - " + ex);
                 this.connErrorSubject.OnNext(new BleException("Failed to connect to peripheral", ex));
             }
         });
@@ -139,7 +138,7 @@ namespace Shiny.BluetoothLE.Internals
             }
             catch (Exception ex)
             {
-                Log.Write(BleLogCategory.Peripheral, "Unclean disconnect - " + ex);
+                //Log.Write(BleLogCategory.Peripheral, "Unclean disconnect - " + ex);
             }
         }
 

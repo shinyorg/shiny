@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Android.Content;
 using AndroidX.Work;
-using Shiny.Logging;
 using P = Android.Manifest.Permission;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Jobs
@@ -17,7 +17,8 @@ namespace Shiny.Jobs
 
         public JobManager(IAndroidContext context,
                           IServiceProvider container,
-                          IRepository repository) : base(container, repository)
+                          IRepository repository,
+                          ILogger<IJobManager> logger) : base(container, repository, logger)
         {
             this.context = context;
         }
@@ -47,7 +48,7 @@ namespace Shiny.Jobs
                             }
                             catch (Exception ex)
                             {
-                                Log.Write(ex);
+                                this.Log.LogError(ex, "Error running task - " + taskName);
                             }
                             finally
                             {
@@ -58,7 +59,7 @@ namespace Shiny.Jobs
                 }
                 catch (Exception ex)
                 {
-                    Log.Write(ex);
+                    this.Log.LogError(ex, "Error setting up task - " + taskName);
                 }
             }
         }

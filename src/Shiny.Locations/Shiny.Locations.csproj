@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>Shiny Locations - bringing geofencing and GPS to a background service near you!</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0;tizen50</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
@@ -61,6 +61,11 @@
         <Compile Include="Platforms\Android\**\*.cs" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Platforms\Shared\GeofenceGpsDirectModule.cs" />
+      <None Remove="Platforms\Shared\MotionActivityModule.cs" />
     </ItemGroup>
 
 </Project>

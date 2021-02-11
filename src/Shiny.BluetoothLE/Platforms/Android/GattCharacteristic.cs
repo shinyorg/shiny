@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using Shiny.BluetoothLE.Internals;
-using Shiny.Logging;
 using Android.Bluetooth;
 using Java.Util;
 using Observable = System.Reactive.Linq.Observable;
-using System.Reactive;
+
 
 namespace Shiny.BluetoothLE
 {
@@ -16,7 +16,6 @@ namespace Shiny.BluetoothLE
         static readonly UUID NotifyDescriptorId = UUID.FromString("00002902-0000-1000-8000-00805f9b34fb");
         readonly BluetoothGattCharacteristic native;
         readonly PeripheralContext context;
-        IObservable<CharacteristicGattResult>? notifyOb;
 
 
         public GattCharacteristic(IGattService service,
@@ -41,8 +40,6 @@ namespace Shiny.BluetoothLE
                 .Where(this.NativeEquals)
                 .Subscribe(args =>
                 {
-                    Log.Write("BLE-Characteristic", "write event - " + args.Characteristic.Uuid);
-
                     if (!args.IsSuccessful)
                     {
                         ob.OnError(new BleException($"Failed to write characteristic - {args.Status}"));
@@ -56,7 +53,6 @@ namespace Shiny.BluetoothLE
                     }
                 });
 
-            Log.Write("BLE-Characteristic", "Hooking for write response - " + this.Uuid);
             this.context.InvokeOnMainThread(() =>
             {
                 try
@@ -232,7 +228,7 @@ namespace Shiny.BluetoothLE
             if ((useIndicationsIfAvailable || !this.CanNotify()) && this.CanIndicate())
                 return BluetoothGattDescriptor.EnableIndicationValue.ToArray();
 
-             return BluetoothGattDescriptor.EnableNotificationValue.ToArray();
+            return BluetoothGattDescriptor.EnableNotificationValue.ToArray();
         }
 
         #endregion

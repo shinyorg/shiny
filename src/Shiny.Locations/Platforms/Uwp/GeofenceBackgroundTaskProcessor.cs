@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using Windows.ApplicationModel.Background;
 using Windows.Devices.Geolocation;
 using Windows.Devices.Geolocation.Geofencing;
+using Shiny;
 using Shiny.Infrastructure;
-using Shiny.Logging;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Locations
 {
     public class GeofenceBackgroundTaskProcessor : IBackgroundTaskProcessor
     {
-        readonly IGeofenceDelegate gdelegate;
+        readonly IEnumerable<IGeofenceDelegate> delegates;
         readonly IRepository repository;
+        readonly ILogger logger;
 
 
-        public GeofenceBackgroundTaskProcessor(IGeofenceDelegate gdelegate, IRepository repository)
+        public GeofenceBackgroundTaskProcessor(IRepository repository,
+                                               ILogger<IGeofenceDelegate> logger,
+                                               IEnumerable<IGeofenceDelegate> delegates)
         {
-            this.gdelegate = gdelegate;
             this.repository = repository;
+            this.logger = logger;
+            this.delegates = delegates;
         }
 
 
@@ -38,7 +44,11 @@ namespace Shiny.Locations
                 if (region != null)
                 {
                     var newStatus = report.NewState.FromNative();
-                    await Log.SafeExecute(() => this.gdelegate.OnStatusChanged(newStatus, region));
+
+                    await this.delegates.RunDelegates(
+                        x => x.OnStatusChanged(newStatus, region),
+                        ex => this.logger.LogError(ex, "Error in geofence delegate")
+                    );
 
                     if (region.SingleUse)
                         await this.repository.Remove<GeofenceRegion>(region.Identifier);

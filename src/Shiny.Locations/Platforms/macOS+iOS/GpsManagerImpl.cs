@@ -4,8 +4,8 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CoreLocation;
-using Shiny.Logging;
 
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Locations
 {
@@ -13,10 +13,12 @@ namespace Shiny.Locations
     {
         readonly CLLocationManager locationManager;
         readonly GpsManagerDelegate gdelegate;
+        readonly ILogger logger;
 
 
-        public GpsManagerImpl()
+        public GpsManagerImpl(ILogger<IGpsManager> logger)
         {
+            this.logger = logger;
             this.gdelegate = new GpsManagerDelegate();
             this.locationManager = new CLLocationManager { Delegate = this.gdelegate };
             //this.locationManager.RequestTemporaryFullAccuracyAuthorizationAsync
@@ -40,7 +42,7 @@ namespace Shiny.Locations
                 }
                 catch (Exception ex)
                 {
-                    Log.Write(ex);
+                    this.logger.LogError(ex, "Error trying to restart GPS");
                 }
             }
         }

@@ -5,8 +5,8 @@ using System.Linq;
 using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
-using Shiny.Logging;
 
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE.Internals
 {
@@ -14,23 +14,27 @@ namespace Shiny.BluetoothLE.Internals
     {
         readonly ConcurrentDictionary<string, IPeripheral> peripherals = new ConcurrentDictionary<string, IPeripheral>();
         readonly Lazy<CBCentralManager> managerLazy;
+        readonly ILogger logger;
 
 
-        public CentralContext(IServiceProvider services, BleConfiguration config)
+        public CentralContext(IServiceProvider services,
+                              BleConfiguration config,
+                              ILogger<IBleManager> logger)
         {
             this.Services = services;
+            this.logger = logger;
 
             this.managerLazy = new Lazy<CBCentralManager>(() =>
             {
                 if (!PlatformExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
-                    Log.Write("BluetoothLE", "NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
+                    this.logger.LogCritical("NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
 
                 var background = services.GetService(typeof(IBleDelegate)) != null;
                 if (!background)
                     return new CBCentralManager(this, null);
 
                 if (!PlatformExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
-                    Log.Write("BluetoothLE", "NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
+                    this.logger.LogCritical("NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
 
                 var opts = new CBCentralInitOptions
                 {

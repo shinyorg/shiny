@@ -10,7 +10,6 @@ using Android.Bluetooth.LE;
 using Android.Content;
 using Android.OS;
 using Java.Util;
-using Shiny.Logging;
 using Shiny.Infrastructure;
 using ScanMode = Android.Bluetooth.LE.ScanMode;
 using Observable = System.Reactive.Linq.Observable;
@@ -76,19 +75,15 @@ namespace Shiny.BluetoothLE.Internals
 
                     if (!pin.IsEmpty())
                     {
-                        Log.Write("BlePairing", "Will attempt to auto-pair with PIN " + pin);
                         var bytes = Encoding.UTF8.GetBytes(pin);
 
                         if (!device.SetPin(bytes))
-                        {
-                            Log.Write("BlePairing", "Auto-Pairing PIN failed");
                             action = BlePairingFailed;
-                        }
-                        else
-                        {
-                            Log.Write("BlePairing", "Auto-Pairing PIN was sent successfully apparently");
-                            //device.SetPairingConfirmation(true);
-                        }
+                        //else
+                        //{
+                        //    Log.Write("BlePairing", "Auto-Pairing PIN was sent successfully apparently");
+                        //    //device.SetPairingConfirmation(true);
+                        //}
                     }
                     break;
             }

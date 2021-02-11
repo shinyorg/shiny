@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.Logging;
+
 using Shiny.Infrastructure;
-using Shiny.Logging;
 using UIKit;
 
 
@@ -17,7 +19,7 @@ namespace Shiny.Jobs
         public static double? BackgroundFetchInterval { get; set; }
 
 
-        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
+        public JobManager(IServiceProvider container, IRepository repository, ILogger<IJobManager> logger) : base(container, repository, logger)
         {
             if (PlatformExtensions.HasBackgroundMode("fetch"))
                 UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum);
@@ -124,7 +126,7 @@ namespace Shiny.Jobs
             catch (Exception ex)
             {
                 result = UIBackgroundFetchResult.Failed;
-                Log.Write(ex);
+                ShinyHost.LoggerFactory.CreateLogger<ILogger<IJobManager>>().LogError(ex, "Failed to run background fetch");
             }
             finally
             {

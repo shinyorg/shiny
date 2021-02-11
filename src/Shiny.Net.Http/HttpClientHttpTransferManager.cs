@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
-using Shiny.Logging;
 using Shiny.Net.Http.Infrastructure;
 
 
@@ -12,7 +12,14 @@ namespace Shiny.Net.Http
 {
     public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
     {
-        public HttpClientHttpTransferManager(ShinyCoreServices services) => this.Services = services;
+        readonly ILogger logger;
+
+
+        public HttpClientHttpTransferManager(ShinyCoreServices services, ILogger logger)
+        {
+            this.Services = services;
+            this.logger = logger;
+        }
 
 
         protected ShinyCoreServices Services { get; }
@@ -117,7 +124,7 @@ namespace Shiny.Net.Http
             }
             catch (Exception ex)
             {
-                Log.Write(ex);
+                this.logger.LogError(ex, "Error restarting HTTP transfer manager");
             }
         }
     }

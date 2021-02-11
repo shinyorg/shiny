@@ -5,8 +5,8 @@ using Android.Content;
 using AndroidX.Concurrent.Futures;
 using AndroidX.Work;
 using Google.Common.Util.Concurrent;
-using Shiny.Logging;
 
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Jobs
 {
@@ -14,6 +14,7 @@ namespace Shiny.Jobs
     {
         public const string ShinyJobIdentifier = nameof(ShinyJobIdentifier);
         readonly CancellationTokenSource cancelSource = new CancellationTokenSource();
+
 
         public ShinyJobWorker(Context context, WorkerParameters workerParams) : base(context, workerParams)
         {
@@ -41,7 +42,11 @@ namespace Shiny.Jobs
                                 break;
 
                             case TaskStatus.Faulted:
-                                Log.Write(x.Exception);
+                                ShinyHost
+                                    .LoggerFactory
+                                    .CreateLogger<ILogger<IJobManager>>()
+                                    .LogError(x.Exception, "Error in job");
+
                                 completer.SetException(new Java.Lang.Throwable(x.Exception.ToString()));
                                 break;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using Timer = System.Timers.Timer;
 
@@ -12,7 +13,7 @@ namespace Shiny.Jobs
         readonly Timer timer;
 
 
-        public JobManager(IServiceProvider container, IRepository repository) : base(container, repository)
+        public JobManager(IServiceProvider container, IRepository repository, ILogger<IJobManager> logger) : base(container, repository, logger)
         {
             this.timer = new Timer(TimeSpan.FromSeconds(30).TotalMilliseconds);
             this.timer.Elapsed += async (sender, args) =>

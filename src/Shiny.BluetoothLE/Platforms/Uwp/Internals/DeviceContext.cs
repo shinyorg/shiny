@@ -4,8 +4,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
-using Shiny.Logging;
-using NC = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
 
 
 namespace Shiny.BluetoothLE.Internals
@@ -34,7 +32,7 @@ namespace Shiny.BluetoothLE.Internals
 
 
         public IPeripheral Peripheral { get; }
-        public BluetoothLEDevice NativeDevice { get; private set; }
+        public BluetoothLEDevice? NativeDevice { get; private set; }
         public IObservable<ConnectionState> WhenStatusChanged() => this.connSubject.StartWith(this.Status);
 
 

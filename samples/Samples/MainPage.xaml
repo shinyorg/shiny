@@ -19,7 +19,7 @@
 
                         <TextCell Text="Welcome" Command="{Binding Navigate}" CommandParameter="Nav/Welcome" />
                         <TextCell Text="Access" Command="{Binding Navigate}" CommandParameter="Nav/Access" />
-                        <TextCell Text="Logging" Command="{Binding Navigate}" CommandParameter="Nav/Logs" />
+                        <TextCell Text="Logs" Command="{Binding Navigate}" CommandParameter="Nav/Logs" />
                         <TextCell Text="Delegate Notifications" Command="{Binding Navigate}" CommandParameter="Nav/DelegateNotifications" />
                     </TableSection>
                     <TableSection Title="Bluetooth">

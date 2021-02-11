@@ -95,60 +95,39 @@ namespace Shiny.BluetoothLE
             if (this.IsScanning)
                 throw new ArgumentException("There is already an active scan");
 
-            return Observable.Create<ScanResult>(async ob =>
-            {
-                this.IsScanning = true;
-                this.context.Clear();
-
-                IDisposable? sub = null;
-                IDisposable? stopSub = null;
-
-                var result = await this.RequestAccess();
-                if (result != AccessState.Available)
+            return this.RequestAccess()
+                .Do(result =>
                 {
-                    ob.OnError(new PermissionException(BleLogCategory.BluetoothLE, result));
-                }
-                else
-                {
-                    sub = this
-                        .GetRadio()
-                        .Select(_ => this.CreateScanner(config))
-                        .Switch()
-                        .Subscribe(
-                            async args => // CAREFUL
-                            {
-                                var device = this.context.GetPeripheral(args.BluetoothAddress);
-                                if (device == null)
-                                {
-                                    var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress);
-                                    if (btDevice != null)
-                                        device = this.context.AddOrGetPeripheral(btDevice);
-                                }
-                                if (device != null)
-                                {
-                                    var adData = new AdvertisementData(args);
-                                    var scanResult = new ScanResult(device, args.RawSignalStrengthInDBm, adData);
-                                    ob.OnNext(scanResult);
-                                }
-                            },
-                            ob.OnError
-                        );
+                    if (result != AccessState.Available)
+                        throw new PermissionException("BluetoothLE", result);
 
-                    stopSub = this.scanSubject.Subscribe(_ =>
+                    this.IsScanning = true;
+                    this.context.Clear();
+                })
+                .Select(_ => this.GetRadio())
+                .Switch()
+                .Select(_ => this.CreateScanner(config))
+                .Switch()
+                .Select(args => Observable.FromAsync(async ct =>
+                {
+                    var device = this.context.GetPeripheral(args.BluetoothAddress);
+                    if (device == null)
                     {
-                        this.IsScanning = false;
-                        sub?.Dispose();
-                        ob.OnCompleted();
-                    });
-                }
-
-                return () =>
-                {
-                    this.IsScanning = false;
-                    sub?.Dispose();
-                    stopSub?.Dispose();
-                };
-            });
+                        var btDevice = await BluetoothLEDevice.FromBluetoothAddressAsync(args.BluetoothAddress);
+                        if (btDevice != null)
+                            device = this.context.AddOrGetPeripheral(btDevice);
+                    }
+                    ScanResult? scanResult = null;
+                    if (device != null)
+                    {
+                        var adData = new AdvertisementData(args);
+                        scanResult = new ScanResult(device, args.RawSignalStrengthInDBm, adData);
+                    }
+                    return scanResult;
+                }))
+                .Where(x => x != null)
+                .Finally(() => this.IsScanning = false)
+                .Switch()!;
         }
 
 

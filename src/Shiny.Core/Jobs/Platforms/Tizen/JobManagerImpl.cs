@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 
 
@@ -7,7 +8,7 @@ namespace Shiny.Jobs
 {
     public class JobManagerImpl : AbstractJobManager
     {
-        public JobManagerImpl(IServiceProvider container, IRepository repository) : base(container, repository)
+        public JobManagerImpl(IServiceProvider container, IRepository repository, ILogger<IJobManager> logger) : base(container, repository, logger)
         {
         }
 

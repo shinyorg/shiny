@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using Android.App;
 using Android.Gms.Location;
 using Shiny.Infrastructure;
-using Shiny.Logging;
 using Shiny.Locations.Infrastructure;
 
 
@@ -29,12 +28,12 @@ namespace Shiny.Locations
         }
 
 
-        public async void Start() => Log.SafeExecute(async () =>
+        public async void Start()
         {
             var regions = await this.Repository.GetAll();
             foreach (var region in regions)
                 await this.Create(region);
-        });
+        }
 
 
         public override IObservable<AccessState> WhenAccessStatusChanged()

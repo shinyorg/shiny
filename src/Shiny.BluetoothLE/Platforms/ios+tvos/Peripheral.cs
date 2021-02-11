@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using System.Reactive.Disposables;
 using CoreBluetooth;
 using Foundation;
-using Shiny.Logging;
 using Shiny.BluetoothLE.Internals;
 
 
@@ -158,7 +157,6 @@ namespace Shiny.BluetoothLE
 
         public override IObservable<IGattService> DiscoverServices() => Observable.Create<IGattService>(ob =>
         {
-            Log.Write("BluetoothLe-Device", "service discovery hooked for peripheral " + this.Uuid);
             var services = new Dictionary<string, IGattService>();
 
             var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>

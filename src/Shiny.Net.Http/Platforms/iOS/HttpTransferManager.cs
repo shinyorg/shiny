@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Net.Http
@@ -16,9 +17,9 @@ namespace Shiny.Net.Http
         readonly NSUrlSessionConfiguration sessionConfig;
 
 
-        public HttpTransferManager(int maxConnectionsPerHost = 1)
+        public HttpTransferManager(ILogger<IHttpTransferManager> logger, int maxConnectionsPerHost = 1)
         {
-            this.sessionDelegate = new ShinyUrlSessionDelegate(this);
+            this.sessionDelegate = new ShinyUrlSessionDelegate(this, logger);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
             this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;

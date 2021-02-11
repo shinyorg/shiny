@@ -1,10 +1,9 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
-using Shiny.Logging;
 using Windows.ApplicationModel.Background;
 using Windows.UI.Notifications;
-using Windows.UI.Notifications.Management;
 
 
 namespace Shiny.Notifications
@@ -13,12 +12,14 @@ namespace Shiny.Notifications
     {
         readonly ISerializer serializer;
         readonly IServiceProvider serviceProvider;
+        readonly ILogger logger;
 
 
-        public NotificationBackgroundTaskProcessor(ISerializer serializer, IServiceProvider serviceProvider)
+        public NotificationBackgroundTaskProcessor(ISerializer serializer, IServiceProvider serviceProvider, ILogger<INotificationDelegate> logger)
         {
             this.serializer = serializer;
             this.serviceProvider = serviceProvider;
+            this.logger = logger;
         }
 
 
@@ -68,7 +69,7 @@ namespace Shiny.Notifications
             }
             catch (Exception ex)
             {
-                Log.Write(ex);
+                this.logger.LogError(ex, "");
             }
             finally
             {

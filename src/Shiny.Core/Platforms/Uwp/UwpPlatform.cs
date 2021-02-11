@@ -80,7 +80,7 @@ namespace Shiny
 
         public void Initialize(IShinyStartup startup, IServiceCollection services)
         {
-            startup.ConfigureServices(services);
+            startup.ConfigureServices(services, this);
             Dehydrate(STARTUP_KEY, startup);
         }
 

@@ -17,19 +17,19 @@ namespace Shiny.Jobs
         readonly IServiceProvider container;
         readonly Subject<JobRunResult> jobFinished;
         readonly Subject<JobInfo> jobStarted;
-        readonly ILogger logger;
 
 
-        protected AbstractJobManager(IServiceProvider container, IRepository repository, ILogger logger)
+        protected AbstractJobManager(IServiceProvider container, IRepository repository, ILogger<IJobManager> logger)
         {
             this.container = container;
             this.repository = repository;
-            this.logger = logger;
+            this.Log = logger;
             this.jobStarted = new Subject<JobInfo>();
             this.jobFinished = new Subject<JobRunResult>();
         }
 
 
+        protected ILogger<IJobManager> Log { get; }
         public abstract Task<AccessState> RequestAccess();
         protected abstract void RegisterNative(JobInfo jobInfo);
         protected abstract void CancelNative(JobInfo jobInfo);
@@ -65,7 +65,7 @@ namespace Shiny.Jobs
             }
             catch (Exception ex)
             {
-                Log.Write(ex);
+                this.Log.LogError(ex, "Error running job " + jobName);
                 result = new JobRunResult(actual, ex);
             }
 
@@ -168,7 +168,7 @@ namespace Shiny.Jobs
                 }
                 catch (Exception ex)
                 {
-                    Log.Write(ex);
+                    this.Log.LogError(ex, "Error running job batch");
                 }
                 finally
                 {
@@ -229,18 +229,18 @@ namespace Shiny.Jobs
                                       Exception? exception = null)
         {
             if (exception == null)
-                Log.Write("Jobs", state == JobState.Finish ? "Job Success" : $"Job {state}", ("JobName", job.Identifier));
+                this.Log.LogInformation(state == JobState.Finish ? "Job Success" : $"Job {state}", ("JobName", job.Identifier));
             else
-                Log.Write(exception, ("JobName", job.Identifier));
+                this.Log.LogError(exception, "Error running job " + job.Identifier);
         }
 
 
         protected virtual void LogTask(JobState state, string taskName, Exception? exception = null)
         {
             if (exception == null)
-                Log.Write("Jobs", state == JobState.Finish ? "Task Success" : $"Task {state}", ("TaskName", taskName));
+                this.Log.LogInformation(state == JobState.Finish ? "Task Success" : $"Task {state}", ("TaskName", taskName));
             else
-                Log.Write(exception, ("TaskName", taskName));
+                this.Log.LogError(exception, "Task failed - " + taskName);
         }
     }
 }

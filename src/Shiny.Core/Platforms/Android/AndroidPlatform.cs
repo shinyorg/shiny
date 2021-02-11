@@ -11,7 +11,6 @@ using AndroidX.Core.App;
 using AndroidX.Lifecycle;
 using Microsoft.Extensions.DependencyInjection;
 using B = global::Android.OS.Build;
-using Shiny.Logging;
 
 
 namespace Shiny
@@ -231,7 +230,7 @@ namespace Shiny
                     if (permission.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase))
                         return true;
 
-            Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
+            //Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
             return false;
         }
     }

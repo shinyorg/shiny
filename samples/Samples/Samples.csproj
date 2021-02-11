@@ -40,9 +40,7 @@
         <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj" />
         <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\..\src\Shiny\Shiny.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj"
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="Microsoft.Net.Compilers.Toolset">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -54,5 +52,11 @@
         <EmbeddedResource Include="Resources\fa-brands-400.ttf" />
         <EmbeddedResource Include="Resources\fa-regular-400.ttf" />
         <EmbeddedResource Include="Resources\fa-solid-900.ttf" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Logging\LogPage.xaml.cs">
+        <DependentUpon>LogPage.xaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>

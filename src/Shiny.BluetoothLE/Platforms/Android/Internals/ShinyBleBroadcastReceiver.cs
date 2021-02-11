@@ -3,6 +3,7 @@ using Android.App;
 using Android.Bluetooth;
 using Android.Content;
 
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE.Internals
 {
@@ -18,6 +19,7 @@ namespace Shiny.BluetoothLE.Internals
     })]
     public class ShinyBleBroadcastReceiver : BroadcastReceiver
     {
+        // TODO: may need to be async if broadcast receiver has a quick stop
         public override void OnReceive(Context context, Intent intent)
         {
             try
@@ -26,7 +28,10 @@ namespace Shiny.BluetoothLE.Internals
             }
             catch (Exception ex)
             {
-                Logging.Log.Write(ex);
+                ShinyHost
+                    .LoggerFactory
+                    .CreateLogger<ILogger<ShinyBleBroadcastReceiver>>()
+                    .LogError(ex, "Error executing in broadcast receiver");
             }
         }
     }

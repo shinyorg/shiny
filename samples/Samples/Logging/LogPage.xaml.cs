@@ -4,9 +4,9 @@ using Xamarin.Forms;
 
 namespace Samples.Logging
 {
-    public partial class EventsPage : ContentPage
+    public partial class LogPage : ContentPage
     {
-        public EventsPage()
+        public LogPage()
         {
             this.InitializeComponent();
         }
