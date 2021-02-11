@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using Shiny.Jobs.Infrastructure;
-using Shiny.Logging;
 
 
 namespace Shiny.Jobs
@@ -17,12 +17,14 @@ namespace Shiny.Jobs
         readonly IServiceProvider container;
         readonly Subject<JobRunResult> jobFinished;
         readonly Subject<JobInfo> jobStarted;
+        readonly ILogger logger;
 
 
-        protected AbstractJobManager(IServiceProvider container, IRepository repository)
+        protected AbstractJobManager(IServiceProvider container, IRepository repository, ILogger logger)
         {
             this.container = container;
             this.repository = repository;
+            this.logger = logger;
             this.jobStarted = new Subject<JobInfo>();
             this.jobFinished = new Subject<JobRunResult>();
         }

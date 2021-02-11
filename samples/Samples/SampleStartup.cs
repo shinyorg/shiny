@@ -24,7 +24,10 @@ namespace Samples
     {
         public override void ConfigureLogging(ILoggingBuilder builder, IPlatform platform)
         {
-            builder.AddConsole();
+            builder.AddConsole(opts =>
+            {
+                opts.LogToStandardErrorThreshold = LogLevel.Debug;
+            });
         }
 
 
