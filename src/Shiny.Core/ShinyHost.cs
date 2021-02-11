@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using Shiny.Infrastructure.DependencyInjection;
 
@@ -74,6 +75,9 @@ namespace Shiny
         }
 
 
+        public static ILoggerFactory LoggerFactory { get; } = new LoggerFactory();
+
+
         /// <summary>
         /// Setting this before calling build will force the internal service builder to validate scopes of DI registrations (THIS IS SLOW - USE IT FOR DEBUGGING)
         /// </summary>
@@ -84,15 +88,17 @@ namespace Shiny
         {
             var services = new ShinyServiceCollection();
             services.AddSingleton(platform);
+            services.AddLogging(builder => startup?.ConfigureLogging(builder, platform));
 
             if (startup != null)
             {
                 if (platform is IStartupInitializer startupInitializer)
                     startupInitializer.Initialize(startup, services);
                 else
-                    startup.ConfigureServices(services);
+                    startup.ConfigureServices(services, platform);
             }
             platform.Register(services);
+
             Services = services;
             services.BuildShinyServiceProvider(
                 ValidateScopes,

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Logging;
-
+using Microsoft.Extensions.Logging;
 
 namespace Shiny
 {
@@ -110,7 +109,9 @@ namespace Shiny
             }
             catch (Exception ex)
             {
-                Log.Write(ex);
+                services
+                    .Resolve<ILogger<T>>()
+                    .LogError(ex, "Error executing delegate");
             }
         }
 
@@ -121,6 +122,7 @@ namespace Shiny
             if (services == null)
                 return;
 
+            var logger = serviceProvider.Resolve<ILogger<T>>();
             foreach (var service in services)
             {
                 try
@@ -130,7 +132,7 @@ namespace Shiny
                 catch (Exception ex)
                 {
                     if (onError == null)
-                        Log.Write(ex);
+                        logger.LogError(ex, "Error executing delegate");
                     else
                         onError(ex);
                 }
@@ -147,6 +149,7 @@ namespace Shiny
             if (services == null)
                 return;
 
+            var logger = ShinyHost.LoggerFactory.CreateLogger<T>();
             var tasks = services
                 .Select(async x =>
                 {
@@ -157,7 +160,7 @@ namespace Shiny
                     catch (Exception ex)
                     {
                         if (onError == null)
-                            Log.Write(ex);
+                            logger.LogError(ex, "Error executing delegate");
                         else
                             onError(ex);
                     }

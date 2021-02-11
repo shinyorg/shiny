@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 using Shiny.Notifications;
-using Shiny.Logging;
 using Shiny.Testing;
 using Samples.Settings;
 using Samples.Infrastructure;
@@ -14,6 +13,7 @@ using Samples.Geofences;
 using Samples.Gps;
 using Samples.Push;
 using Samples.Notifications;
+using Microsoft.Extensions.Logging;
 
 [assembly: GenerateStaticClasses("Samples")]
 
@@ -22,17 +22,23 @@ namespace Samples
 {
     public class SampleStartup : ShinyStartup
     {
-        public override void ConfigureServices(IServiceCollection services)
+        public override void ConfigureLogging(ILoggingBuilder builder, IPlatform platform)
         {
-            // THESE LOGGERS ARE ONLY GOOD FOR FOREGROUND LEVEL DEBUG TESTING
-            Log.UseConsole();
-            Log.UseDebug();
+            builder.AddConsole();
+        }
 
-            // YOU REALLY NEED TO USE ONE OF THE FOLLOWING LOGGERS TO TEST BACKGROUND PROCESSES FOR CRASHES AND IN PRODUCTION
-            Log.UseFile();
-            //services.UseAppCenterLogging(Constants.AppCenterTokens, true, false);
-            services.UseSqliteLogging(true, true);
-            services.UseNotificationErrorLogging(); // NEVER USE IN PRODUCTION - limited testing for background processes in dev
+
+        public override void ConfigureServices(IServiceCollection services, IPlatform platform)
+        {
+            //// THESE LOGGERS ARE ONLY GOOD FOR FOREGROUND LEVEL DEBUG TESTING
+            //Log.UseConsole();
+            //Log.UseDebug();
+
+            //// YOU REALLY NEED TO USE ONE OF THE FOLLOWING LOGGERS TO TEST BACKGROUND PROCESSES FOR CRASHES AND IN PRODUCTION
+            //Log.UseFile();
+            ////services.UseAppCenterLogging(Constants.AppCenterTokens, true, false);
+            //services.UseSqliteLogging(true, true);
+            //services.UseNotificationErrorLogging(); // NEVER USE IN PRODUCTION - limited testing for background processes in dev
 
             //services.UseSqliteSettings();
             //services.UseSqliteStorage();

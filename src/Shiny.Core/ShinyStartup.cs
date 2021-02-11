@@ -1,12 +1,14 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny
 {
     public interface IShinyStartup
     {
-        void ConfigureServices(IServiceCollection services);
+        void ConfigureLogging(ILoggingBuilder builder, IPlatform platform);
+        void ConfigureServices(IServiceCollection services, IPlatform platform);
         IServiceProvider CreateServiceProvider(IServiceCollection services);
     }
 
@@ -14,10 +16,16 @@ namespace Shiny
     public abstract class ShinyStartup : IShinyStartup
     {
         /// <summary>
+        ///
+        /// </summary>
+        /// <param name="factory"></param>
+        public virtual void ConfigureLogging(ILoggingBuilder builder, IPlatform platform) { }
+
+        /// <summary>
         /// Configure the service collection
         /// </summary>
         /// <param name="services"></param>
-        public abstract void ConfigureServices(IServiceCollection services);
+        public abstract void ConfigureServices(IServiceCollection services, IPlatform platform);
 
 
         /// <summary>

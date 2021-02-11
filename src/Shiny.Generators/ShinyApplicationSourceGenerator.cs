@@ -79,18 +79,16 @@ namespace Shiny.Generators
 
             using (this.builder.BlockInvariant("namespace " + nameSpace))
             {
-                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.IShinyStartup"))
+                using (this.builder.BlockInvariant($"public partial class {GENERATED_STARTUP_TYPE_NAME} : Shiny.ShinyStartup"))
                 {
-                    this.builder.AppendLine("partial void AdditionalConfigureServices(IServiceCollection services);");
+                    this.builder.AppendLine("partial void AdditionalConfigureServices(IServiceCollection services, IPlatform platform);");
 
-                    using (this.builder.BlockInvariant("public void ConfigureServices(IServiceCollection services)"))
+                    using (this.builder.BlockInvariant("public override void ConfigureServices(IServiceCollection services, IPlatform platform)"))
                     {
-                        this.builder.AppendLine("this.AdditionalConfigureServices(services);");
+                        this.builder.AppendLine("this.AdditionalConfigureServices(services, platform);");
 
                         this.RegisterNoDelegates();
                         this.RegisterWithDelegate();
-                        //if (!this.RegisterPush())
-                        //    this.RegisterAllDelegate("Shiny.Notifications.INotificationDelegate", "services.UseNotifications", false);
 
                         if (!this.ShinyConfig.ExcludeJobs)
                             this.RegisterJobs();
@@ -105,15 +103,15 @@ namespace Shiny.Generators
                             this.RegisterServices();
                     }
 
-                    using (this.builder.BlockInvariant("public void ConfigureApp(IServiceProvider provider)"))
-                    {
-                        var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Internals.DependencyResolver");
-                        if (xamFormsType != null)
-                        {
-                            this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
-                            this.builder.AppendLine();
-                        }
-                    }
+                    //using (this.builder.BlockInvariant("public void ConfigureApp(IServiceProvider provider)"))
+                    //{
+                    //    var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Internals.DependencyResolver");
+                    //    if (xamFormsType != null)
+                    //    {
+                    //        this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
+                    //        this.builder.AppendLine();
+                    //    }
+                    //}
                 }
             }
             this.Context.AddSource(GENERATED_STARTUP_TYPE_NAME, this.builder.ToString());
@@ -193,7 +191,7 @@ namespace Shiny.Generators
             {
                 var attrs = symbol.GetAttributes();
                 var hasService = attrs.Any(x => x.AttributeClass.Name.Equals("Shiny.ShinyServiceAttribute"));
-                
+
                 if (hasService)
                 {
                     if (!symbol.AllInterfaces.Any())
@@ -246,48 +244,3 @@ namespace Shiny.Generators
         }
     }
 }
-//static readonly string[] PushCannotGenerateRegister = new []
-//{
-//    "Shiny.Push.AzureNotificationHubs",
-//    "Shiny.Push.Aws"
-//};
-//static readonly Dictionary<string, string> PushRegisters = new Dictionary<string, string>
-//{
-//    { "Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging" },
-//    { "Shiny.Push", "services.UsePush" }
-//};
-
-//bool RegisterPush()
-//{
-//    var registered = false;
-//    var cannotRegister = this.Context
-//        .Compilation
-//        .ReferencedAssemblyNames
-//        .FirstOrDefault(x => PushCannotGenerateRegister.Any(y => y.Equals(x.Name)));
-
-//    if (cannotRegister != null)
-//    {
-//        this.Context.ReportDiagnostic(Diagnostic.Create(
-//            new DiagnosticDescriptor(
-//                "ShinyPush",
-//                $"{cannotRegister.Name} cannot be registered with auto-generation due to required configuration",
-//                null,
-//                "Push",
-//                DiagnosticSeverity.Warning,
-//                true
-//            ),
-//            Location.None
-//        ));
-//    }
-//    else
-//    {
-//        var register = this.Context.Compilation.ReferencedAssemblyNames.FirstOrDefault(x => PushRegisters.ContainsKey(x.Name));
-//        if (register != null)
-//        {
-//            var registerStatement = PushRegisters[register.Name];
-//            this.RegisterAllDelegate("Shiny.Push.IPushDelegate", registerStatement, true);
-//            registered = true;
-//        }
-//    }
-//    return registered;
-//}
