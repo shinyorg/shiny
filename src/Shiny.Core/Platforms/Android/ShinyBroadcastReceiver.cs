@@ -17,6 +17,8 @@ namespace Shiny
 
         protected T Resolve<T>() => ShinyHost.Resolve<T>();
         protected Lazy<T> ResolveLazy<T>() => ShinyHost.LazyResolve<T>();
+        protected virtual void LogError<T>(Exception exception, string message)
+            => ShinyHost.LoggerFactory.CreateLogger<T>().LogError(exception, message);
 
 
         protected abstract Task OnReceiveAsync(Context? context, Intent? intent);

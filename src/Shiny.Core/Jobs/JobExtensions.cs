@@ -41,8 +41,8 @@ namespace Shiny
         /// <param name="interval"></param>
         public static void UseJobForegroundService(this IServiceCollection services, TimeSpan? interval = null)
         {
-            JobForegroundService.Interval = interval ?? TimeSpan.FromSeconds(30);
-            services.TryAddSingleton<JobForegroundService>();
+            JobLifecycleTask.Interval = interval ?? TimeSpan.FromSeconds(30);
+            services.TryAddSingleton<JobLifecycleTask>();
         }
 
 
@@ -55,7 +55,7 @@ namespace Shiny
         {
             services.RegisterPostBuildAction(async sp =>
             {
-                var jobs = sp.GetService<IJobManager>();
+                var jobs = sp.GetRequiredService<IJobManager>();
                 var access = await jobs.RequestAccess();
                 if (access == AccessState.Available)
                     await jobs.Register(jobInfo);

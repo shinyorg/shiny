@@ -3,9 +3,9 @@
 
 namespace Shiny
 {
-    public class ShinyForegroundService : IShinyStartupTask
+    public class ShinyLifecycleTask : ShinyStartupTask
     {
-        public ShinyForegroundService()
+        public ShinyLifecycleTask()
         {
             ShinyHost
                 .Resolve<IPlatform>()
@@ -26,7 +26,7 @@ namespace Shiny
         }
 
 
-        public virtual void Start() {}
+        public override void Start() {}
         public virtual void OnBackground() { }
         public virtual void OnForeground() { }
     }
