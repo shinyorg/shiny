@@ -30,6 +30,13 @@ namespace Samples
             {
                 opts.LogToStandardErrorThreshold = LogLevel.Debug;
             });
+            builder.AddAppCenter(opts =>
+            {
+                opts.AppCenterAndroidSecret = Constants.AndroidAppCenterToken;
+                opts.AppCenteriOSSecret = Constants.iOSAppCenterToken;
+                opts.AppCenterUWPSecret = Constants.UwpAppCenterToken;
+                opts.AppCenterLogLevel = Microsoft.AppCenter.LogLevel.Warn;
+            });
         }
 
 
