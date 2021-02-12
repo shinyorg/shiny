@@ -15,6 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="Humanizer" />
+        <PackageReference Include="DryIoc.Microsoft.DependencyInjection" />
         <PackageReference Include="Prism.DryIoc.Forms" />
         <PackageReference Include="sqlite-net-pcl" />
         <PackageReference Include="Xamarin.Forms" />

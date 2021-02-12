@@ -42,29 +42,6 @@ namespace Shiny
         public static IServiceCollection? Services { get; private set; }
 
 
-        /// <summary>
-        /// Feeds another service container
-        /// </summary>
-        /// <param name="feed"></param>
-        public static void Populate(Action<Type, Func<object>, ServiceLifetime> feed)
-        {
-            if (Services == null)
-                throw new ArgumentException("Services have not yet been initialized");
-
-            foreach (var service in Services)
-            {
-                if (!service.ServiceType.IsGenericTypeDefinition)
-                {
-                    feed(
-                        service.ServiceType,
-                        () => Container.GetService(service.ServiceType),
-                        service.Lifetime
-                    );
-                }
-            }
-        }
-
-
         static IServiceProvider? container;
         public static IServiceProvider Container
         {

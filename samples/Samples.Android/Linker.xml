@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <linker>
-    <assembly fullname="Shiny.Core">
+    <assembly fullname="DryIoc">
+        <namespace fullname="*" />
+    </assembly>
+    <!--<assembly fullname="Shiny.Core">
         <namespace fullname="*" />
     </assembly>
     <assembly fullname="Shiny.Beacons">
@@ -35,5 +38,5 @@
     </assembly>
     <assembly fullname="Shiny.SpeechRecognition">
         <namespace fullname="*" />
-    </assembly>
+    </assembly>-->
 </linker>

@@ -1,12 +1,10 @@
 ﻿using System;
-using Shiny;
 using Prism.Ioc;
 using Prism.Mvvm;
 using Prism.DryIoc;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Samples.Infrastructure;
-using DryIoc;
 using Samples.Logging;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
@@ -87,20 +85,6 @@ namespace Samples
 
 
         protected override IContainerExtension CreateContainerExtension()
-        {
-            var container = new Container(this.CreateContainerRules());
-            ShinyHost.Populate((serviceType, func, lifetime) =>
-            {
-                if (!serviceType.IsGenericTypeDefinition)
-                {
-                    container.RegisterDelegate(
-                        serviceType,
-                        _ => func(),
-                        Reuse.Singleton // I know everything is singleton
-                    );
-                }
-            });
-            return new DryIocContainerExtension(container);
-        }
+            => new DryIocContainerExtension(SampleStartup.Container);
     }
 }
