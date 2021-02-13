@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -23,6 +24,20 @@ namespace Shiny.BluetoothLE
                 if (ch == null && throwIfNotFound)
                     throw new ArgumentException($"No characteristic found - {serviceUuid}/{characteristicUuid}");
             });
+
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <param name="serviceUuid"></param>
+        /// <returns></returns>
+        public static IObservable<IList<IGattCharacteristic>> GetCharacteristicsByService(this IPeripheral peripheral, string serviceUuid) =>
+            peripheral
+                .GetKnownService(serviceUuid, true)
+                .Select(x => x.GetCharacteristics())
+                .Switch();
+
 
         /// <summary>
         ///
