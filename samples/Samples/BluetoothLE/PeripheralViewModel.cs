@@ -148,9 +148,10 @@ namespace Samples.BluetoothLE
                     x =>
                     {
                         var group = new Group<GattCharacteristicViewModel>(x.Key, x.Key);
-                        //var list = x.;
+                        var list = x.ToList().Wait();
+                        group.AddRange(list);
 
-                        //group.AddRange(x.ToList())
+                        this.GattCharacteristics.Add(group);
                     },
                     ex => this.dialogs.Snackbar(ex.ToString())
                 );
