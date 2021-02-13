@@ -17,6 +17,15 @@ namespace Shiny.Integrations.Sqlite
         }
 
 
+        public void Purge()
+        {
+            var conn = this.GetConnection();
+            conn.DeleteAll<LogStore>();
+            conn.DeleteAll<RepoStore>();
+            conn.DeleteAll<SettingStore>();
+        }
+
+
         public AsyncTableQuery<LogStore> Logs => this.Table<LogStore>();
         public AsyncTableQuery<RepoStore> RepoItems => this.Table<RepoStore>();
         public AsyncTableQuery<SettingStore> Settings => this.Table<SettingStore>();

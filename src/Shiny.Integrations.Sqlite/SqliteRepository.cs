@@ -37,10 +37,7 @@ namespace Shiny.Integrations.Sqlite
 
         public async Task<T?> Get<T>(string key) where T : class
         {
-            var item = await this.conn.RepoItems.FirstOrDefaultAsync(x =>
-                x.Key == key &&
-                x.TypeName == typeof(T).AssemblyQualifiedName
-            );
+            var item = await GetRepoItem<T>(key);
             if (item == null)
                 return null;
 
@@ -74,7 +71,7 @@ namespace Shiny.Integrations.Sqlite
 
         public async Task<bool> Remove<T>(string key) where T : class
         {
-            var item = await this.Get<T>(key);
+            var item = await this.GetRepoItem<T>(key);
             if (item == null)
                 return false;
 
@@ -108,5 +105,12 @@ namespace Shiny.Integrations.Sqlite
                 return false;
             }
         }
+
+
+        Task<RepoStore> GetRepoItem<T>(string key)
+            => this.conn.RepoItems.FirstOrDefaultAsync(x =>
+                x.Key == key &&
+                x.TypeName == typeof(T).AssemblyQualifiedName
+            );
     }
 }

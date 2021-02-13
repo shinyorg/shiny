@@ -8,9 +8,13 @@ namespace Shiny.Testing
 {
     public class TestPlatform : IPlatform
     {
-        public virtual void Register(IServiceCollection services)
+        public TestPlatform()
         {
             this.AppData = this.Cache = this.Public = new DirectoryInfo(".");
+        }
+
+        public virtual void Register(IServiceCollection services)
+        {
         }
 
 
