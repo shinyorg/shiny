@@ -1,14 +1,13 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 
+
 public class SqliteStartup : ShinyStartup
 {
-    public override void ConfigureServices(IServiceCollection services)
+    public override void ConfigureServices(IServiceCollection services, IPlatform platform)
     {
-        services.UseSqliteLogging(true, false);
-
+        //services.UseSqliteLogging(true, false);
         services.UseSqliteSettings();
-
         services.UseSqliteStorage();
     }
 }

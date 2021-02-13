@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shiny;
 
+
 public class HttpTransferStartup : ShinyStartup
 {
-    public override void ConfigureServices(IServiceCollection services)
+    public override void ConfigureServices(IServiceCollection services, IPlatform platform)
     {
-        throw new System.NotImplementedException();
+        services.UseHttpTransfers<HttpTransferDelegate>();
     }
 }

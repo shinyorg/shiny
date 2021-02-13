@@ -5,7 +5,7 @@ using Shiny;
 
 public class PushStartup : ShinyStartup
 {
-    public override void ConfigureServices(IServiceCollection services)
+    public override void ConfigureServices(IServiceCollection services, IPlatform platform)
     {
         // you can only register one :)
         // NOTE: these also all take a notification category if you wish to have actions available

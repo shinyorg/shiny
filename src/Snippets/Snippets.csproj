@@ -14,7 +14,6 @@
         <ProjectReference Include="..\Shiny.Integrations.Sqlite\Shiny.Integrations.Sqlite.csproj" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
         <ProjectReference Include="..\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\Shiny.Nfc\Shiny.Nfc.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
