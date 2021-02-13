@@ -45,8 +45,8 @@ jobs:
     - name: Build
       run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
 
-    - name: Test Core
-      run: dotnet test Build.sln
+ #   - name: Test Core
+  #    run: dotnet test Build.sln
 
     - name: Post NuGet Artifacts
       uses: actions/upload-artifact@v2
