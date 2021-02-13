@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
 using CoreBluetooth;
 using Foundation;
@@ -25,44 +24,43 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<GattDescriptorResult> Read() => Observable.Create<GattDescriptorResult>((Func<IObserver<GattDescriptorResult>, Action>)(ob =>
+        public override IObservable<GattDescriptorResult> Read() => Observable.Create<GattDescriptorResult>(ob =>
         {
             var handler = new EventHandler<CBDescriptorEventArgs>((sender, args) =>
             {
                 if (!this.Equals(args.Descriptor))
                     return;
 
-                
                 if (args.Error != null)
+                {
                     ob.OnError(new BleException(args.Error.Description));
+                }
                 else
-                { 
+                {
                     var value = args.Descriptor.ToByteArray();
-                    ob.Respond<GattDescriptorResult>((GattDescriptorResult)new BluetoothLE.DescriptorGattResult(this, value));
+                    ob.Respond<GattDescriptorResult>(new GattDescriptorResult(this, value));
                 }
             });
             this.Peripheral.UpdatedValue += handler;
             this.Peripheral.ReadValue(this.native);
 
             return () => this.Peripheral.UpdatedValue -= handler;
-        }));
+        });
 
 
-        public override IObservable<GattDescriptorResult> Write(byte[] data) => Observable.Create<GattDescriptorResult>((Func<IObserver<GattDescriptorResult>, Action>)(ob =>
+        public override IObservable<GattDescriptorResult> Write(byte[] data) => Observable.Create<GattDescriptorResult>(ob =>
         {
             var handler = new EventHandler<CBDescriptorEventArgs>((sender, args) =>
             {
                 if (!this.Equals(args.Descriptor))
                     return;
 
-                
                 if (args.Error != null)
                     ob.OnError(new BleException(args.Error.Description));
-                
                 else
                 {
                     var bytes = args.Descriptor.ToByteArray();
-                    ob.Respond<GattDescriptorResult>((GattDescriptorResult)new BluetoothLE.DescriptorGattResult(this, bytes));
+                    ob.Respond(new GattDescriptorResult(this, bytes));
                 }
             });
 
@@ -71,7 +69,7 @@ namespace Shiny.BluetoothLE
             this.Peripheral.WriteValue(nsdata, this.native);
 
             return () => this.Peripheral.WroteDescriptorValue -= handler;
-        }));
+        });
 
 
         bool Equals(CBDescriptor descriptor)

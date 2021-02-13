@@ -35,7 +35,7 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<GattCharacteristicResult> Read() => Observable.Create<GattCharacteristicResult>((Func<IObserver<GattCharacteristicResult>, Action>)(ob =>
+        public override IObservable<GattCharacteristicResult> Read() => Observable.Create<GattCharacteristicResult>(ob =>
         {
             this.AssertRead();
             var handler = new EventHandler<CBCharacteristicEventArgs>((sender, args) =>
@@ -52,13 +52,13 @@ namespace Shiny.BluetoothLE
                     var value = this.NativeCharacteristic.Value?.ToArray();
                     var result = new GattCharacteristicResult(this, value, GattCharacteristicResultType.Read);
                     ob.Respond(result);
-                }   
+                }
             });
             this.Peripheral.UpdatedCharacterteristicValue += handler;
             this.Peripheral.ReadValue(this.NativeCharacteristic);
 
             return () => this.Peripheral.UpdatedCharacterteristicValue -= handler;
-        }));
+        });
 
 
         public override IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable)
