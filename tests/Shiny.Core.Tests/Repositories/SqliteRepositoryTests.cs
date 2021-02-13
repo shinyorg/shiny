@@ -1,17 +1,21 @@
 ﻿using System;
+using System.IO;
 using Shiny.Infrastructure;
 using Shiny.Integrations.Sqlite;
 
 
 namespace Shiny.Tests.Repositories
 {
-    public class SqliteRepositoryTests : BaseRepositoryTests
+    public class SqliteRepositoryTests : BaseRepositoryTests, IDisposable
     {
         readonly ShinySqliteConnection conn;
         public SqliteRepositoryTests() => this.conn = Helper.GetConnection();
 
 
         protected override IRepository Create()
-            => new SqliteRepository(conn, new ShinySerializer());
+            => new SqliteRepository(this.conn, new ShinySerializer());
+
+
+        public void Dispose() => this.conn?.Purge();
     }
 }

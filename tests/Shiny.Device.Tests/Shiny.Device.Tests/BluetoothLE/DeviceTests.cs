@@ -68,24 +68,24 @@ namespace Shiny.BluetoothLE.Tests
         }
 
 
-        [Fact]
-        public async Task Service_Rediscover()
-        {
-            await this.Setup(true);
-            var services1 = await this.peripheral
-                .GetCharacteristicsForService(Constants.ScratchServiceUuid)
-                .Timeout(Constants.OperationTimeout)
-                .ToList()
-                .ToTask();
+        //[Fact]
+        //public async Task Service_Rediscover()
+        //{
+        //    await this.Setup(true);
+        //    var services1 = await this.peripheral
+        //        .GetCharacteristicsForService(Constants.ScratchServiceUuid)
+        //        .Timeout(Constants.OperationTimeout)
+        //        .ToList()
+        //        .ToTask();
 
-            var services2 = await this.peripheral
-                .GetCharacteristicsForService(Constants.ScratchServiceUuid)
-                .Timeout(Constants.OperationTimeout)
-                .ToList()
-                .ToTask();
+        //    var services2 = await this.peripheral
+        //        .GetCharacteristicsForService(Constants.ScratchServiceUuid)
+        //        .Timeout(Constants.OperationTimeout)
+        //        .ToList()
+        //        .ToTask();
 
-            Assert.Equal(services1.Count, services2.Count);
-        }
+        //    Assert.Equal(services1.Count, services2.Count);
+        //}
 
 
         //[Fact]
@@ -125,33 +125,33 @@ namespace Shiny.BluetoothLE.Tests
         }
 
 
-        [Fact]
-        public async Task KnownCharacteristics_WhenKnownCharacteristic()
-        {
-            await this.Setup(true);
+        //[Fact]
+        //public async Task KnownCharacteristics_WhenKnownCharacteristic()
+        //{
+        //    await this.Setup(true);
 
-            var tcs = new TaskCompletionSource<object>();
-            var results = new List<IGattCharacteristic>();
-            this.peripheral
-                .WhenKnownCharacteristicDiscovered(
-                    Constants.ScratchServiceUuid,
-                    Constants.ScratchCharacteristicUuid1
-                )
-                .Subscribe(
-                    results.Add,
-                    ex => tcs.SetException(ex),
-                    () => tcs.SetResult(null)
-                );
+        //    var tcs = new TaskCompletionSource<object>();
+        //    var results = new List<IGattCharacteristic>();
+        //    this.peripheral
+        //        .WhenKnownCharacteristicDiscovered(
+        //            Constants.ScratchServiceUuid,
+        //            Constants.ScratchCharacteristicUuid1
+        //        )
+        //        .Subscribe(
+        //            results.Add,
+        //            ex => tcs.SetException(ex),
+        //            () => tcs.SetResult(null)
+        //        );
 
-            await this.peripheral.ConnectWait();
-            await Task.WhenAny(
-                tcs.Task,
-                Task.Delay(5000)
-            );
+        //    await this.peripheral.ConnectWait();
+        //    await Task.WhenAny(
+        //        tcs.Task,
+        //        Task.Delay(5000)
+        //    );
 
-            Assert.Equal(1, results.Count);
-            Assert.True(results.Any(x => x.Uuid.Equals(Constants.ScratchCharacteristicUuid1)));
-        }
+        //    Assert.Equal(1, results.Count);
+        //    Assert.True(results.Any(x => x.Uuid.Equals(Constants.ScratchCharacteristicUuid1)));
+        //}
 
 
         [Fact]
@@ -264,7 +264,7 @@ namespace Shiny.BluetoothLE.Tests
             await this.Setup(false);
 
             var count = 0;
-            this.peripheral.DiscoverServices().Subscribe(_ => count++);
+            this.peripheral.GetServices().Subscribe(_ => count++);
 
             await this.peripheral.ConnectWait().ToTask();
             await UserDialogs.Instance.AlertAsync("Now turn peripheral off & press OK");

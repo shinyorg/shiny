@@ -3,13 +3,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Shiny.Infrastructure;
+using SQLite;
 using Xunit;
 
 
 namespace Shiny.Tests.Repositories
 {
+    [Table("TestModel")]
     public class TestModel
     {
+        [PrimaryKey]
         public string Value1 { get; set; }
         public int Value2 { get; set; }
     }

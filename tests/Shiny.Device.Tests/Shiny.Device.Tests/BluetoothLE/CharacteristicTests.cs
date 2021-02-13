@@ -16,7 +16,7 @@ namespace Shiny.Devices.Tests.BluetoothLE
     {
         readonly ITestOutputHelper output;
         readonly IBleManager manager;
-        IGattCharacteristic[] characteristics;
+        IList<IGattCharacteristic> characteristics;
         IPeripheral peripheral;
 
 
@@ -40,10 +40,9 @@ namespace Shiny.Devices.Tests.BluetoothLE
                 .ToTask();
 
             this.characteristics = await this.peripheral
-                .GetCharacteristicsForService(Constants.ScratchServiceUuid)
+                .GetCharacteristicsByService(Constants.ScratchServiceUuid)
                 .Take(5)
                 .Timeout(Constants.OperationTimeout)
-                .ToArray()
                 .ToTask();
         }
 
@@ -122,7 +121,7 @@ namespace Shiny.Devices.Tests.BluetoothLE
         {
             await this.Setup();
             var bytes = new byte[] { 0x01 };
-            var list = new List<Task<CharacteristicGattResult>>();
+            var list = new List<Task<GattCharacteristicResult>>();
 
             foreach (var ch in this.characteristics)
                 list.Add(ch.Write(bytes).Timeout(Constants.OperationTimeout).ToTask());
@@ -135,7 +134,7 @@ namespace Shiny.Devices.Tests.BluetoothLE
         public async Task Concurrent_Reads()
         {
             await this.Setup();
-            var list = new List<Task<CharacteristicGattResult>>();
+            var list = new List<Task<GattCharacteristicResult>>();
             foreach (var ch in this.characteristics)
                 list.Add(ch.Read().Timeout(Constants.OperationTimeout).ToTask());
 

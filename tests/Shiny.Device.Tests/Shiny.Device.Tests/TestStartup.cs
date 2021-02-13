@@ -1,17 +1,19 @@
 ﻿using System;
-using Shiny.Logging;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Device.Tests
 {
     public class TestStartup : ShinyStartup
     {
-        public override void ConfigureServices(IServiceCollection services)
+        public override void ConfigureLogging(ILoggingBuilder builder, IPlatform platform)
         {
-            Log.UseDebug();
-            Log.UseConsole();
+            //https://github.com/yorchideas/Xunit.Extensions.Logging
+        }
 
+
+        public override void ConfigureServices(IServiceCollection services, IPlatform platform)
+        {
             services.UseBleClient();
             //services.UseBleHosting();
         }
