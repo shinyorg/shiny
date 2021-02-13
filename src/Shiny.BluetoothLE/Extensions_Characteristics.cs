@@ -9,6 +9,21 @@ namespace Shiny.BluetoothLE
 {
     public static class CharacteristicExtensions
     {
+        internal static IObservable<IGattService?> Assert(this IObservable<IGattService?> ob, string serviceUuid, bool throwIfNotFound)
+            => ob.Do(service =>
+            {
+                if (service == null && throwIfNotFound)
+                    throw new ArgumentException($"No service found - {serviceUuid}");
+            });
+
+
+        internal static IObservable<IGattCharacteristic?> Assert(this IObservable<IGattCharacteristic?> ob, string serviceUuid, string characteristicUuid, bool throwIfNotFound)
+            => ob.Do(ch =>
+            {
+                if (ch == null && throwIfNotFound)
+                    throw new ArgumentException($"No characteristic found - {serviceUuid}/{characteristicUuid}");
+            });
+
         /// <summary>
         ///
         /// </summary>
@@ -17,7 +32,7 @@ namespace Shiny.BluetoothLE
         /// <param name="characteristicUuid"></param>
         /// <param name="useIndicationsIfAvailable"></param>
         /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> WhenConnectedNotify(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = false)
+        public static IObservable<GattCharacteristicResult> WhenConnectedNotify(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, bool useIndicationsIfAvailable = false)
             => peripheral
                 .WhenConnected()
                 .Select(x => x.GetKnownCharacteristic(serviceUuid, characteristicUuid))
@@ -32,7 +47,7 @@ namespace Shiny.BluetoothLE
         /// <param name="characteristic"></param>
         /// <param name="useIndicationsIfAvailable"></param>
         /// <returns></returns>
-        public static IObservable<CharacteristicGattResult> Notify(this IGattCharacteristic characteristic, bool useIndicationsIfAvailable = false)
+        public static IObservable<GattCharacteristicResult> Notify(this IGattCharacteristic characteristic, bool useIndicationsIfAvailable = false)
             => characteristic
                 .EnableNotifications(true, useIndicationsIfAvailable)
                 .Select(_ => characteristic.WhenNotificationReceived())
@@ -85,7 +100,7 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public static IObservable<CharacteristicGattResult> ReadInterval(this IGattCharacteristic character, TimeSpan timeSpan)
+        public static IObservable<GattCharacteristicResult> ReadInterval(this IGattCharacteristic character, TimeSpan timeSpan)
             => Observable
                 .Interval(timeSpan)
                 .Select(_ => character.Read())

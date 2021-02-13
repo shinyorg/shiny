@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 
 namespace Shiny.BluetoothLE
@@ -48,14 +49,15 @@ namespace Shiny.BluetoothLE
         /// BLE service discovery - This method does not complete.  It will clear all discovered services on subsequent connections
         /// and does not require a connection to hook to it.
         /// </summary>
-        IObservable<IGattService> DiscoverServices();
+        IObservable<IList<IGattService>> GetServices();
 
         /// <summary>
         /// Searches for a known service
         /// </summary>
         /// <param name="serviceUuid"></param>
+        /// <param name="throwIfNotFound"></param>
         /// <returns></returns>
-        IObservable<IGattService> GetKnownService(string serviceUuid);
+        IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false);
 
         /// <summary>
         /// Monitor peripheral name changes

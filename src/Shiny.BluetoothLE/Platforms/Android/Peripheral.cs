@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
-
+using System.Collections.Generic;
 
 namespace Shiny.BluetoothLE
 {
@@ -50,11 +50,14 @@ namespace Shiny.BluetoothLE
 
 
         // android does not have a find "1" service - it must discover all services.... seems shit
-        public override IObservable<IGattService> GetKnownService(string serviceUuid) => this
-            .DiscoverServices()
-            .Where(x => x.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase))
+        public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false) => this
+            .GetServices()
+            .Select(x => x
+                .FirstOrDefault(y => y.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase))
+            )
             .Take(1)
-            .Select(x => x);
+            .Select(x => x)
+            .Assert(serviceUuid, throwIfNotFound);
 
 
         public override IObservable<string> WhenNameUpdated() => this.Context
@@ -72,7 +75,7 @@ namespace Shiny.BluetoothLE
                 .Merge(this.connSubject);
 
 
-        public override IObservable<IGattService> DiscoverServices() => Observable.Create<IGattService>(ob =>
+        public override IObservable<IList<IGattService>> GetServices() => Observable.Create<IList<IGattService>>(ob =>
         {
             this.AssertConnection();
 
@@ -81,12 +84,14 @@ namespace Shiny.BluetoothLE
                 if (cb.Gatt?.Services == null)
                     return;
 
-                foreach (var ns in cb.Gatt.Services)
-                {
-                    var service = new GattService(this, this.Context, ns);
-                    ob.OnNext(service);
-                }
-                ob.OnCompleted();
+                var list = cb
+                    .Gatt
+                    .Services
+                    .Select(native => new GattService(this, this.Context, native))
+                    .Cast<IGattService>()
+                    .ToList();
+
+                ob.Respond(list);
             });
 
             //this.context.RefreshServices();

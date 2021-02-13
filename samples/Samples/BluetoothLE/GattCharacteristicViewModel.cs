@@ -139,7 +139,7 @@ namespace Samples.BluetoothLE
                 );
                 this.watcher = this.Characteristic
                     .Notify()
-                    .Where(x => x.Type == CharacteristicResultType.Notification)
+                    .Where(x => x.Type == GattCharacteristicResultType.Notification)
                     .SubOnMainThread(
                         x => this.SetReadValue(x, utf8),
                         ex => this.dialogs.Alert(ex.ToString())
@@ -166,7 +166,7 @@ namespace Samples.BluetoothLE
         }
 
 
-        void SetReadValue(CharacteristicGattResult result, bool fromUtf8) => Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
+        void SetReadValue(GattCharacteristicResult result, bool fromUtf8) => Xamarin.Forms.Device.BeginInvokeOnMainThread(() =>
         {
             this.IsValueAvailable = true;
             this.LastValue = DateTime.Now;

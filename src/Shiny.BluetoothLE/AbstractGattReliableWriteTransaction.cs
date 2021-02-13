@@ -20,7 +20,7 @@ namespace Shiny.BluetoothLE
 
 
         public TransactionState Status { get; protected set; } = TransactionState.Active;
-        public abstract IObservable<CharacteristicGattResult> Write(IGattCharacteristic characteristic, byte[] value);
+        public abstract IObservable<GattCharacteristicResult> Write(IGattCharacteristic characteristic, byte[] value);
         public abstract IObservable<Unit> Commit();
         public abstract void Abort();
 

@@ -4,7 +4,9 @@ using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
 using Java.Util;
 using Observable = System.Reactive.Linq.Observable;
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE
 {
@@ -25,31 +27,30 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IGattCharacteristic> DiscoverCharacteristics() => Observable.Create<IGattCharacteristic>(ob =>
-        {
-            foreach (var characteristic in this.native.Characteristics)
-            {
-                var wrap = new GattCharacteristic(this, this.context, characteristic);
-                ob.OnNext(wrap);
-            }
-            ob.OnCompleted();
-            return Disposable.Empty;
-        });
+        public override IObservable<IList<IGattCharacteristic>> GetCharacteristics() =>
+            this.native
+                .Characteristics
+                .Select(native => new GattCharacteristic(this, this.context, native))
+                .Cast<IGattCharacteristic>()
+                .ToList()
+                .Cast<IList<IGattCharacteristic>>()
+                .ToObservable();
 
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
-            => Observable.Create<IGattCharacteristic>(ob =>
+        public override IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false)
+            => Observable.Create<IGattCharacteristic?>(ob =>
             {
                 var uuid = UUID.FromString(characteristicUuid);
                 var cs = this.native.GetCharacteristic(uuid);
                 if (cs == null)
-                    throw new ArgumentException("No characteristic found for " + characteristicUuid);
+                    return null;
 
                 var characteristic = new GattCharacteristic(this, this.context, cs);
                 ob.Respond(characteristic);
 
                 return Disposable.Empty;
-            });
+            })
+            .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
 
 
         public override bool Equals(object obj)

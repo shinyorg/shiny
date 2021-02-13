@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 
@@ -19,8 +20,11 @@ namespace Shiny.BluetoothLE
         public string Uuid { get; }
         public bool IsPrimary { get; }
 
-        public abstract IObservable<IGattCharacteristic> DiscoverCharacteristics();
-        public virtual IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
-            => this.DiscoverCharacteristics().Where(x => x.Uuid.Equals(characteristicUuid)).Take(1);
+        public abstract IObservable<IList<IGattCharacteristic>> GetCharacteristics();
+        public virtual IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false) =>
+            this
+                .GetCharacteristics()
+                .Select(x => x.FirstOrDefault(y => y.Uuid.Equals(characteristicUuid)))
+                .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
     }
 }

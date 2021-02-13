@@ -111,8 +111,8 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override IObservable<IGattService> GetKnownService(string serviceUuid)
-            => Observable.Create<IGattService>(ob =>
+        public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false)
+            => Observable.Create<IGattService?>(ob =>
             {
                 //var nativeUuid = CBUUID.FromString(serviceUuid);
                 //var nativeService = this.Native.Services?.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
@@ -141,10 +141,7 @@ namespace Shiny.BluetoothLE
                         .Select(native => new GattService(this, native))
                         .FirstOrDefault(x => x.Uuid.Equals(serviceUuid, StringComparison.CurrentCultureIgnoreCase));
 
-                    if (service == null)
-                        ob.OnError(new ArgumentException("No service found for " + serviceUuid));
-                    else
-                        ob.Respond(service);
+                    ob.Respond(service);
                 });
 
                 var nativeUuid = CBUUID.FromString(serviceUuid);
@@ -152,10 +149,11 @@ namespace Shiny.BluetoothLE
                 this.Native.DiscoverServices(new[] { nativeUuid });
 
                 return Disposable.Create(() => this.Native.DiscoveredService -= handler);
-            });
+            })
+            .Assert(this.Uuid, throwIfNotFound);
 
 
-        public override IObservable<IGattService> DiscoverServices() => Observable.Create<IGattService>(ob =>
+        public override IObservable<IList<IGattService>> GetServices() => Observable.Create<IList<IGattService>>(ob =>
         {
             var services = new Dictionary<string, IGattService>();
 
@@ -166,20 +164,16 @@ namespace Shiny.BluetoothLE
                     ob.OnError(new BleException(args.Error.LocalizedDescription));
                     return;
                 }
-
-                if (this.Native.Services == null)
-                    return;
-
-                foreach (var native in this.Native.Services)
+                else if (this.Native.Services != null)
                 {
-                    var service = new GattService(this, native);
-                    if (!services.ContainsKey(service.Uuid))
-                    {
-                        services.Add(service.Uuid, service);
-                        ob.OnNext(service);
-                    }
+                    var list = this.Native
+                        .Services
+                        .Select(native => new GattService(this, native))
+                        .Cast<IGattService>()
+                        .ToList();
+
+                    ob.Respond(list);
                 }
-                ob.OnCompleted();
             });
             this.Native.DiscoveredService += handler;
             this.Native.DiscoverServices();

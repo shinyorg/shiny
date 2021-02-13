@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 
 
@@ -23,9 +24,15 @@ namespace Shiny.BluetoothLE
         public abstract void Connect(ConnectionConfig? config);
         public abstract void CancelConnection();
         public abstract IObservable<ConnectionState> WhenStatusChanged();
-        public abstract IObservable<IGattService> DiscoverServices();
-        public virtual IObservable<int> ReadRssi() => Observable.Empty<int>();
-        public virtual IObservable<string> WhenNameUpdated() => throw new NotImplementedException("WhenNameUpdated is not supported on this platform");
-        public virtual IObservable<IGattService> GetKnownService(string serviceUuid) => throw new NotImplementedException("GetKnownService is not supported on this platform");
+        public abstract IObservable<IList<IGattService>> GetServices();
+
+        public virtual IObservable<int> ReadRssi()
+            => Observable.Empty<int>();
+
+        public virtual IObservable<string> WhenNameUpdated()
+            => throw new NotImplementedException("WhenNameUpdated is not supported on this platform");
+
+        public virtual IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false)
+            => throw new NotImplementedException("GetKnownService is not supported on this platform");
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -47,7 +48,7 @@ namespace Shiny.BluetoothLE
         public string Uuid { get; }
         public CharacteristicProperties Properties { get; }
         public bool IsNotifying => this.notify && this.notifyReady;
-        public IObservable<IGattDescriptor> DiscoverDescriptors() => this.Get().Select(x => x.DiscoverDescriptors()).Switch();
+        public IObservable<IList<IGattDescriptor>> GetDescriptors() => this.Get().Select(x => x.GetDescriptors()).Switch();
         public IObservable<Unit> EnableNotifications(bool enable, bool useIndicationIfAvailable = false) => this
             .Get()
             .Select(x => x.EnableNotifications(enable, useIndicationIfAvailable))
@@ -59,9 +60,9 @@ namespace Shiny.BluetoothLE
             })
             .Switch();
 
-        public IObservable<CharacteristicGattResult> Read() => this.Get().Select(x => x.Read()).Switch();
-        public IObservable<CharacteristicGattResult> WhenNotificationReceived() => this.Get().Select(x => x.WhenNotificationReceived()).Switch();
-        public IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true) => this.Get().Select(x => x.Write(value, withResponse)).Switch();
+        public IObservable<GattCharacteristicResult> Read() => this.Get().Select(x => x.Read()).Switch();
+        public IObservable<GattCharacteristicResult> WhenNotificationReceived() => this.Get().Select(x => x.WhenNotificationReceived()).Switch();
+        public IObservable<GattCharacteristicResult> Write(byte[] value, bool withResponse = true) => this.Get().Select(x => x.Write(value, withResponse)).Switch();
 
 
         IObservable<IGattCharacteristic> Get() => Observable

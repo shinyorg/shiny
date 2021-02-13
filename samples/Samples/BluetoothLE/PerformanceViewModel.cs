@@ -84,7 +84,7 @@ namespace Samples.BluetoothLE
 
                     this.notifySub = characteristic
                         .Notify(true)
-                        .Where(x => x.Type == CharacteristicResultType.Notification)
+                        .Where(x => x.Type == GattCharacteristicResultType.Notification)
                         .Subscribe(x =>
                         {
                             Interlocked.Add(ref this.bytes, x.Data?.Length ?? 0);

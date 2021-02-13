@@ -52,11 +52,15 @@ namespace Shiny.Testing.BluetoothLE
 
         public List<IGattService> Services { get; set; } = new List<IGattService>();
 
-        public IObservable<IGattService> DiscoverServices()
-            => this.Services.ToObservable();
+        public IObservable<IList<IGattService>> GetServices()
+            => this.Services.Cast<IList<IGattService>>().ToObservable();
 
-        public IObservable<IGattService> GetKnownService(string serviceUuid)
-            => Observable.Return(this.Services.FirstOrDefault(x => x.Uuid == serviceUuid));
+        public IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false)
+            => Observable.Return(this.Services.FirstOrDefault(x => x.Uuid == serviceUuid)).Do(ch =>
+            {
+                if (ch == null && throwIfNotFound)
+                    throw new ArgumentException($"Service not found - {serviceUuid}");
+            });
 
 
         public Subject<int> RssiSubject { get; } = new Subject<int>();

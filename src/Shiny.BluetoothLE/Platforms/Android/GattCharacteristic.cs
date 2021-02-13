@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Disposables;
+using System.Collections.Generic;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
 using Java.Util;
@@ -30,15 +30,15 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true) => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
+        public override IObservable<GattCharacteristicResult> Write(byte[] value, bool withResponse = true) => this.context.Invoke(Observable.Create<GattCharacteristicResult>((Func<IObserver<GattCharacteristicResult>, IDisposable>)(ob =>
         {
             this.AssertWrite(withResponse);
 
             var sub = this.context
                 .Callbacks
                 .CharacteristicWrite
-                .Where(this.NativeEquals)
-                .Subscribe(args =>
+                .Where<GattCharacteristicEventArgs>(this.NativeEquals)
+                .Subscribe<GattCharacteristicEventArgs>((Action<GattCharacteristicEventArgs>)(args =>
                 {
                     if (!args.IsSuccessful)
                     {
@@ -47,11 +47,12 @@ namespace Shiny.BluetoothLE
                     else
                     {
                         var writeType = withResponse
-                            ? CharacteristicResultType.Write
-                            : CharacteristicResultType.WriteWithoutResponse;
-                        ob.Respond(new CharacteristicGattResult(this, value, writeType));
+                            ? GattCharacteristicResultType.Write
+                            : GattCharacteristicResultType.WriteWithoutResponse;
+
+                        ob.Respond(new GattCharacteristicResult(this, value, writeType));
                     }
-                });
+                }));
 
             this.context.InvokeOnMainThread(() =>
             {
@@ -80,10 +81,10 @@ namespace Shiny.BluetoothLE
             });
 
             return sub;
-        }));
+        })));
 
 
-        public override IObservable<CharacteristicGattResult> Read() => this.context.Invoke(Observable.Create<CharacteristicGattResult>(ob =>
+        public override IObservable<GattCharacteristicResult> Read() => this.context.Invoke(Observable.Create<GattCharacteristicResult>((Func<IObserver<GattCharacteristicResult>, IDisposable>)(ob =>
         {
             this.AssertRead();
 
@@ -93,10 +94,16 @@ namespace Shiny.BluetoothLE
                 .Where(this.NativeEquals)
                 .Subscribe(args =>
                 {
-                    if (args.IsSuccessful)
-                        ob.Respond(new CharacteristicGattResult(this, args.Characteristic.GetValue(), CharacteristicResultType.Read));
-                    else
+                    if (!args.IsSuccessful)
+                    {
                         ob.OnError(new BleException($"Failed to read characteristic - {args.Status}"));
+                    }
+                    else
+                    {
+                        var value = args.Characteristic.GetValue();
+                        var result = new GattCharacteristicResult(this, value, GattCharacteristicResultType.Read);
+                        ob.Respond(result);
+                    }
                 });
 
             this.context.InvokeOnMainThread(() =>
@@ -113,7 +120,7 @@ namespace Shiny.BluetoothLE
             });
 
             return sub;
-        }));
+        })));
 
 
         public override IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable) => this.context.Invoke(Observable.Create<Unit>(ob =>
@@ -145,37 +152,35 @@ namespace Shiny.BluetoothLE
         }));
 
 
-        public override IObservable<CharacteristicGattResult> WhenNotificationReceived()
+        public override IObservable<GattCharacteristicResult> WhenNotificationReceived()
         {
             this.AssertNotify();
             return this.context
                 .Callbacks
                 .CharacteristicChanged
                 .Where(this.NativeEquals)
-                .Select(args =>
+                .Select((Func<GattCharacteristicEventArgs, GattCharacteristicResult>)(args =>
                 {
                     if (!args.IsSuccessful)
                         throw new BleException($"Notification error - {args.Status}");
 
-                    return new CharacteristicGattResult(
+                    return new GattCharacteristicResult(
                         this,
                         args.Characteristic.GetValue(),
-                        CharacteristicResultType.Notification
+                        GattCharacteristicResultType.Notification
                     );
-                });
+                }));
         }
 
 
-        public override IObservable<IGattDescriptor> DiscoverDescriptors()
-            => Observable.Create<IGattDescriptor>(ob =>
-            {
-                foreach (var nd in this.native.Descriptors)
-                {
-                    var wrap = new GattDescriptor(this, this.context, nd);
-                    ob.OnNext(wrap);
-                }
-                return Disposable.Empty;
-            });
+        public override IObservable<IList<IGattDescriptor>> GetDescriptors() =>
+            this.native
+                .Descriptors
+                .Select(x => new GattDescriptor(this, this.context, x))
+                .Cast<IGattDescriptor>()
+                .ToList()
+                .Cast<IList<IGattDescriptor>>()
+                .ToObservable();
 
 
         public override bool Equals(object obj)

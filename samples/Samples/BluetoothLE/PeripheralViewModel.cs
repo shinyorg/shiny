@@ -141,25 +141,19 @@ namespace Samples.BluetoothLE
                 .DisposeWith(this.DeactivateWith);
 
             this.peripheral
-                .WhenAnyCharacteristicDiscovered()
+                .GetAllCharacteristics()
+                .SelectMany(x => x.Select(y => new GattCharacteristicViewModel(y, this.dialogs)))
+                .GroupBy(x => x.Uuid)
                 .SubOnMainThread(
-                    chs =>
+                    x =>
                     {
-                        var service = this.GattCharacteristics.FirstOrDefault(x => x.ShortName.Equals(chs.Service.Uuid.ToString()));
-                        if (service == null)
-                        {
-                            service = new Group<GattCharacteristicViewModel>(
-                                chs.Service.Uuid.ToString(),
-                                chs.Service.Uuid.ToString()
-                            );
-                            this.GattCharacteristics.Add(service);
-                        }
+                        var group = new Group<GattCharacteristicViewModel>(x.Key, x.Key);
+                        //var list = x.;
 
-                        service.Add(new GattCharacteristicViewModel(chs, this.dialogs));
+                        //group.AddRange(x.ToList())
                     },
                     ex => this.dialogs.Snackbar(ex.ToString())
-                )
-                .DisposeWith(this.DeactivateWith);
+                );
         }
 
 

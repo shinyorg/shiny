@@ -24,11 +24,9 @@ namespace Shiny.BluetoothLE
 
         public static IObservable<DeviceInfo> ReadDeviceInformation(this IPeripheral peripheral)
             => peripheral
-                .GetKnownService(DeviceInformationServiceUuid)
-                .Select(x => x.DiscoverCharacteristics())
-                .Switch()
-                .SelectMany(x => x.Read())
-                .Buffer(3)
+                .GetKnownService(DeviceInformationServiceUuid, true)
+                .SelectMany(x => x.GetCharacteristics())
+                .SelectMany(x => x.Select(y => y.Read()))
                 .Select(data =>
                 {
                     var dev = new DeviceInfo();
@@ -66,10 +64,12 @@ namespace Shiny.BluetoothLE
 
 
         public static IObservable<int> ReadBatteryInformation(this IPeripheral peripheral) => peripheral
-            .GetKnownService(BatteryServiceUuid)
-            .Select(x => x.DiscoverCharacteristics())
+            .GetKnownService(BatteryServiceUuid, true)
+            .Select(x => x.GetCharacteristics())
             .Take(1)
             .Switch()
+            .Select(x => x.FirstOrDefault())
+            .Where(x => x != null)
             .Select(x => x.Read())
             .Switch()
             .Select(x => (int)x.Data[0]);

@@ -18,7 +18,7 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<CharacteristicGattResult> Write(IGattCharacteristic characteristic, byte[] value)
+        public override IObservable<GattCharacteristicResult> Write(IGattCharacteristic characteristic, byte[] value)
         {
             // just write to the standard characteristic write
             this.AssertAction();

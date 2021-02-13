@@ -22,8 +22,8 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
-            => Observable.Create<IGattCharacteristic>(ob =>
+        public override IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false)
+            => Observable.Create<IGattCharacteristic?>(ob =>
             {
                 var characteristic = this.Service
                     .Characteristics?
@@ -50,21 +50,19 @@ namespace Shiny.BluetoothLE
                         .Select(ch => new GattCharacteristic(this, ch))
                         .FirstOrDefault(ch => ch.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase));
 
-                    if (characteristic == null)
-                        ob.OnError(new ArgumentException("No characteristic found for " + characteristicUuid));
-                    else
-                        ob.Respond(characteristic);
+                     ob.Respond(characteristic);
                 });
                 var nativeUuid = CBUUID.FromString(characteristicUuid);
                 this.Peripherial.DiscoveredCharacteristic += handler;
                 this.Peripherial.DiscoverCharacteristics(new [] { nativeUuid }, this.Service);
 
                 return Disposable.Create(() => this.Peripherial.DiscoveredCharacteristic -= handler);
-            });
+            })
+            .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
 
 
-        public override IObservable<IGattCharacteristic> DiscoverCharacteristics()
-            => Observable.Create<IGattCharacteristic>(ob =>
+        public override IObservable<IList<IGattCharacteristic>> GetCharacteristics()
+            => Observable.Create<IList<IGattCharacteristic>>(ob =>
             {
                 var characteristics = new Dictionary<string, IGattCharacteristic>();
                 var handler = new EventHandler<CBServiceEventArgs>((sender, args) =>
@@ -75,16 +73,14 @@ namespace Shiny.BluetoothLE
                     if (!this.Equals(args.Service))
                         return;
 
-                    foreach (var nch in this.Service.Characteristics)
-                    {
-                        var ch = new GattCharacteristic(this, nch);
-                        if (!characteristics.ContainsKey(ch.Uuid))
-                        {
-                            characteristics.Add(ch.Uuid, ch);
-                            ob.OnNext(ch);
-                        }
-                    }
-                    ob.OnCompleted();
+                    var list = this.Service
+                        .Characteristics
+                        .Select(ch => new GattCharacteristic(this, ch))
+                        .Distinct()
+                        .Cast<IGattCharacteristic>()
+                        .ToList();
+
+                    ob.Respond(list);
                 });
                 this.Peripherial.DiscoveredCharacteristic += handler;
                 this.Peripherial.DiscoverCharacteristics(this.Service);

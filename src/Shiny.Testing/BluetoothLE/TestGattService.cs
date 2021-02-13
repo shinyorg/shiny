@@ -21,8 +21,22 @@ namespace Shiny.Testing.BluetoothLE
 
 
         public List<IGattCharacteristic> Characteristics { get; set; } = new List<IGattCharacteristic>();
-        public IObservable<IGattCharacteristic> DiscoverCharacteristics() => this.Characteristics.ToObservable();
-        public IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid)
-            => this.Characteristics.Where(x => x.Uuid.Equals(characteristicUuid)).ToObservable();
+        public IObservable<IList<IGattCharacteristic>> GetCharacteristics() =>
+            this.Characteristics
+                .Cast<IList<IGattCharacteristic>>()
+                .ToObservable();
+
+        public IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false) =>
+            Observable.Return(
+                this.Characteristics
+                    .FirstOrDefault(
+                        x => x.Uuid.Equals(characteristicUuid)
+                    )
+            )
+            .Do(ch =>
+            {
+                if (throwIfNotFound && ch == null)
+                    throw new ArgumentException($"Characteristic not found - {this.Uuid}/{characteristicUuid}");
+            });
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive;
+
 
 namespace Shiny.BluetoothLE
 {
@@ -18,10 +20,10 @@ namespace Shiny.BluetoothLE
         public string Uuid { get; }
         public CharacteristicProperties Properties { get; }
 
-        public abstract IObservable<IGattDescriptor> DiscoverDescriptors();
+        public abstract IObservable<IList<IGattDescriptor>> GetDescriptors();
         public abstract IObservable<Unit> EnableNotifications(bool enable, bool useIndicationIfAvailable = false);
-        public abstract IObservable<CharacteristicGattResult> WhenNotificationReceived();
-        public abstract IObservable<CharacteristicGattResult> Read();
-        public abstract IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse = true);
+        public abstract IObservable<GattCharacteristicResult> WhenNotificationReceived();
+        public abstract IObservable<GattCharacteristicResult> Read();
+        public abstract IObservable<GattCharacteristicResult> Write(byte[] value, bool withResponse = true);
     }
 }

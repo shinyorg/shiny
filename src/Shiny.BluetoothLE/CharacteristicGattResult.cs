@@ -3,7 +3,7 @@
 
 namespace Shiny.BluetoothLE
 {
-    public enum CharacteristicResultType
+    public enum GattCharacteristicResultType
     {
         Read,
         Write,
@@ -12,9 +12,9 @@ namespace Shiny.BluetoothLE
     }
 
 
-    public class CharacteristicGattResult
+    public class GattCharacteristicResult
     {
-        public CharacteristicGattResult(IGattCharacteristic characteristic, byte[]? data, CharacteristicResultType type)
+        public GattCharacteristicResult(IGattCharacteristic characteristic, byte[]? data, GattCharacteristicResultType type)
         {
             this.Characteristic = characteristic;
             this.Type = type;
@@ -23,7 +23,7 @@ namespace Shiny.BluetoothLE
 
 
         public IGattCharacteristic Characteristic { get; }
-        public CharacteristicResultType Type { get; }
+        public GattCharacteristicResultType Type { get; }
         public byte[]? Data { get; }
     }
 }
