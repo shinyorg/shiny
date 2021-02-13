@@ -2,8 +2,11 @@
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
+using Windows.Foundation;
 using Characteristic = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCharacteristic;
 
 
@@ -11,6 +14,20 @@ namespace Shiny.BluetoothLE
 {
     public static class UwpExtensions
     {
+        public static async Task Execute(this IAsyncOperation<GattCommunicationStatus> operation, CancellationToken ct)
+        {
+            var result = await operation.AsTask(ct).ConfigureAwait(false);
+            result.Assert();
+        }
+
+
+        public static void Assert(this GattCommunicationStatus status)
+        {
+            if (status != GattCommunicationStatus.Success)
+                throw new ArgumentException("Invalid Communcation Status - " + status);
+        }
+
+
         public static bool HasNotify(this Characteristic ch) =>
             ch.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Indicate) ||
             ch.CharacteristicProperties.HasFlag(GattCharacteristicProperties.Notify);

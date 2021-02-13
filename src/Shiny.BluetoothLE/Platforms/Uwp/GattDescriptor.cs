@@ -2,9 +2,7 @@
 using System.Reactive.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Bluetooth;
-using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattDescriptor;
-using Shiny.BluetoothLE.Internals;
 
 
 namespace Shiny.BluetoothLE
@@ -15,29 +13,26 @@ namespace Shiny.BluetoothLE
 
 
         public GattDescriptor(Native native, IGattCharacteristic characteristic) : base(characteristic, native.Uuid.ToString())
+            => this.native = native;
+
+
+        public override IObservable<GattDescriptorResult> Write(byte[] data) => Observable.FromAsync(async ct =>
         {
-            this.native = native;
-        }
-
-
-        public override IObservable<DescriptorGattResult> Write(byte[] data) => Observable.FromAsync(async _ =>
-        {
-            var status = await this.native.WriteValueAsync(data.AsBuffer());
-            if (status != GattCommunicationStatus.Success)
-                throw new BleException($"Failed to write descriptor - {status}");
-
-            return new DescriptorGattResult(this, data);
+            await this.native.WriteValueAsync(data.AsBuffer()).Execute(ct);
+            return new GattDescriptorResult(this, data);
         });
 
 
-        public override IObservable<DescriptorGattResult> Read() => Observable.FromAsync(async _ =>
+        public override IObservable<GattDescriptorResult> Read() => Observable.FromAsync(async ct =>
         {
-            var result = await this.native.ReadValueAsync(BluetoothCacheMode.Uncached);
-            if (result.Status != GattCommunicationStatus.Success)
-                throw new BleException($"Failed to read descriptor - {result.Status}");
+            var result = await this.native
+                .ReadValueAsync(BluetoothCacheMode.Uncached)
+                .AsTask(ct)
+                .ConfigureAwait(false);
+            result.Status.Assert();
 
             var value = result.Value?.ToArray();
-            return new DescriptorGattResult(this, value);
+            return new GattDescriptorResult(this, value);
         });
     }
 }

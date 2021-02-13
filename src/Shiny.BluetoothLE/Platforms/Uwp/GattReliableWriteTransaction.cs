@@ -13,7 +13,7 @@ namespace Shiny.BluetoothLE
         readonly Native native = new Native();
 
 
-        public override IObservable<CharacteristicGattResult> Write(IGattCharacteristic characteristic, byte[] value)
+        public override IObservable<GattCharacteristicResult> Write(IGattCharacteristic characteristic, byte[] value)
         {
             this.AssertAction();
 
@@ -21,7 +21,7 @@ namespace Shiny.BluetoothLE
                 throw new ArgumentException("Characteristic must be UWP type");
 
             this.native.WriteValue(platform.Native, value.AsBuffer());
-            return Observable.Return(new CharacteristicGattResult(characteristic, value, CharacteristicResultType.Write));
+            return Observable.Return(new GattCharacteristicResult(characteristic, value, GattCharacteristicResultType.Write));
         }
 
 

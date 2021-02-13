@@ -7,7 +7,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Shiny.BluetoothLE.Internals;
-
+using System.Collections.Generic;
 
 namespace Shiny.BluetoothLE
 {
@@ -31,28 +31,33 @@ namespace Shiny.BluetoothLE
         public override ConnectionState Status => this.context.Status;
         public override IObservable<ConnectionState> WhenStatusChanged() => this.context.WhenStatusChanged();
         public override IObservable<int> ReadRssi() => Observable.Empty<int>();
-        public override IObservable<IGattService> GetKnownService(string serviceUuid) => Observable.FromAsync(async ct =>
-        {
-            var result = await this.context.NativeDevice.GetGattServicesForUuidAsync(Guid.Parse(serviceUuid), BluetoothCacheMode.Cached);
-            if (result.Status != GattCommunicationStatus.Success)
-                throw new ArgumentException("Could not find GATT service - " + result.Status);
-
-            var wrap = new GattService(this.context, result.Services.First());
-            return wrap;
-        });
-
-
-        public override IObservable<IGattService> DiscoverServices() => Observable.Create<IGattService>(async ob =>
-        {
-            var result = await this.context.NativeDevice.GetGattServicesAsync(BluetoothCacheMode.Uncached);
-            foreach (var nservice in result.Services)
+        public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false) => Observable
+            .FromAsync(async ct =>
             {
-                var service = new GattService(this.context, nservice);
-                ob.OnNext(service);
-            }
-            ob.OnCompleted();
+                var result = await this.context.NativeDevice.GetGattServicesForUuidAsync(Guid.Parse(serviceUuid), BluetoothCacheMode.Cached);
+                if (result.Status != GattCommunicationStatus.Success)
+                    throw new ArgumentException("Could not find GATT service - " + result.Status);
 
-            return Disposable.Empty;
+                var wrap = new GattService(this.context, result.Services.First());
+                return wrap;
+            })
+            .Assert(serviceUuid, throwIfNotFound);
+
+
+        public override IObservable<IList<IGattService>> GetServices() => Observable.FromAsync(async ct =>
+        {
+            var result = await this.context
+                .NativeDevice
+                .GetGattServicesAsync(BluetoothCacheMode.Uncached)
+                .AsTask(ct)
+                .ConfigureAwait(false);
+
+            result.Status.Assert();
+            return result
+                .Services
+                .Select(x => new GattService(this.context, x))
+                .Cast<IGattService>()
+                .ToList();
         });
 
 

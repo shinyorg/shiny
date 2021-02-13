@@ -21,11 +21,11 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<DescriptorGattResult> Write(byte[] data) =>
+        public override IObservable<GattDescriptorResult> Write(byte[] data) =>
             this.context.Invoke(this.WriteInternal(data));
 
 
-        protected internal IObservable<DescriptorGattResult> WriteInternal(byte[] data) => Observable.Create<DescriptorGattResult>(ob =>
+        protected internal IObservable<GattDescriptorResult> WriteInternal(byte[] data) => Observable.Create<GattDescriptorResult>(ob =>
         {
             var sub = this.context
                 .Callbacks
@@ -34,7 +34,7 @@ namespace Shiny.BluetoothLE
                 .Subscribe(args =>
                 {
                     if (args.IsSuccessful)
-                        ob.Respond(new DescriptorGattResult(this, data));
+                        ob.Respond(new GattDescriptorResult(this, data));
                     else
                         ob.OnError(new BleException($"Failed to write descriptor value - {args.Status}"));
                 });
@@ -59,7 +59,7 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override IObservable<DescriptorGattResult> Read() => this.context.Invoke(Observable.Create<DescriptorGattResult>(ob =>
+        public override IObservable<GattDescriptorResult> Read() => this.context.Invoke(Observable.Create<GattDescriptorResult>(ob =>
         {
             var sub = this.context
                 .Callbacks
@@ -68,7 +68,7 @@ namespace Shiny.BluetoothLE
                 .Subscribe(args =>
                 {
                     if (args.IsSuccessful)
-                        ob.Respond(new DescriptorGattResult(this, args.Descriptor.GetValue()));
+                        ob.Respond(new GattDescriptorResult(this, args.Descriptor.GetValue()));
                     else
                         ob.OnError(new BleException($"Failed to read descriptor value - {args.Status}"));
                 });

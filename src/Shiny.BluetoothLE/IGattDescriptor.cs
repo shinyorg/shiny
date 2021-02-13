@@ -7,7 +7,7 @@ namespace Shiny.BluetoothLE
     {
         IGattCharacteristic Characteristic { get; }
         string Uuid { get; }
-        IObservable<DescriptorGattResult> Write(byte[] data);
-        IObservable<DescriptorGattResult> Read();
+        IObservable<GattDescriptorResult> Write(byte[] data);
+        IObservable<GattDescriptorResult> Read();
     }
 }

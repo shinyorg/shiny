@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -34,28 +34,24 @@ namespace Shiny.BluetoothLE
         public Native Native { get; }
 
 
-        IObservable<IGattDescriptor> descriptorOb;
-        public override IObservable<IGattDescriptor> DiscoverDescriptors()
+        public override IObservable<IList<IGattDescriptor>> GetDescriptors() => Observable.FromAsync<IList<IGattDescriptor>>(async ct =>
         {
-            this.descriptorOb ??= Observable.Create<IGattDescriptor>(async ob =>
-            {
-                var result = await this.Native.GetDescriptorsAsync(BluetoothCacheMode.Uncached);
-                if (result.Status != GattCommunicationStatus.Success)
-                    throw new BleException("Unable to request descriptors");
+            var result = await this.Native
+                .GetDescriptorsAsync(BluetoothCacheMode.Uncached)
+                .AsTask(ct)
+                .ConfigureAwait(false);
 
-                foreach (var dnative in result.Descriptors)
-                {
-                    var descriptor = new GattDescriptor(dnative, this);
-                    ob.OnNext(descriptor);
-                }
-                return Disposable.Empty;
-            })
-            .Replay();
-            return this.descriptorOb;
-        }
+            result.Status.Assert();
+
+            return result
+                .Descriptors
+                .Select(native => new GattDescriptor(native, this))
+                .Cast<IGattDescriptor>()
+                .ToList();
+        });
 
 
-        public override IObservable<CharacteristicGattResult> Write(byte[] value, bool withResponse) => Observable.FromAsync(async ct =>
+        public override IObservable<GattCharacteristicResult> Write(byte[] value, bool withResponse) => Observable.FromAsync(async ct =>
         {
             this.AssertWrite(withResponse);
 
@@ -63,25 +59,22 @@ namespace Shiny.BluetoothLE
                 ? GattWriteOption.WriteWithResponse
                 : GattWriteOption.WriteWithoutResponse;
 
-            var status = await this.Native
+            await this.Native
                 .WriteValueAsync(value.AsBuffer(), writeType)
-                .AsTask(ct)
+                .Execute(ct)
                 .ConfigureAwait(false);
 
-            if (status != GattCommunicationStatus.Success)
-                throw new BleException($"Failed to write characteristic - {status}");
-
-            return new CharacteristicGattResult(
+            return new GattCharacteristicResult(
                 this,
                 value,
                 withResponse
-                    ? CharacteristicResultType.Write
-                    : CharacteristicResultType.WriteWithoutResponse
+                    ? GattCharacteristicResultType.Write
+                    : GattCharacteristicResultType.WriteWithoutResponse
             );
         });
 
 
-        public override IObservable<CharacteristicGattResult> Read() => Observable.FromAsync(async ct =>
+        public override IObservable<GattCharacteristicResult> Read() => Observable.FromAsync(async ct =>
         {
             this.AssertRead();
             var result = await this.Native
@@ -92,10 +85,10 @@ namespace Shiny.BluetoothLE
             if (result.Status != GattCommunicationStatus.Success)
                 throw new BleException($"Failed to read characteristic - {result.Status}");
 
-            return new CharacteristicGattResult(
+            return new GattCharacteristicResult(
                 this,
                 result.Value?.ToArray(),
-                CharacteristicResultType.Read
+                GattCharacteristicResultType.Read
             );
         });
 
@@ -125,14 +118,14 @@ namespace Shiny.BluetoothLE
 
 
         readonly List<TypedEventHandler<Native, GattValueChangedEventArgs>> handlers = new List<TypedEventHandler<Native, GattValueChangedEventArgs>>();
-        public override IObservable<CharacteristicGattResult> WhenNotificationReceived() => Observable.Create<CharacteristicGattResult>(async ob =>
+        public override IObservable<GattCharacteristicResult> WhenNotificationReceived() => Observable.Create<GattCharacteristicResult>(async ob =>
         {
             var handler = new TypedEventHandler<Native, GattValueChangedEventArgs>((sender, args) =>
             {
                 if (sender.Equals(this.Native))
                 {
                     var bytes = args.CharacteristicValue.ToArray();
-                    var result = new CharacteristicGattResult(this, bytes, CharacteristicResultType.Notification);
+                    var result = new GattCharacteristicResult(this, bytes, GattCharacteristicResultType.Notification);
                     ob.OnNext(result);
                 }
             });

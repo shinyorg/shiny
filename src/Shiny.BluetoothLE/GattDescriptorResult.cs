@@ -3,9 +3,9 @@
 
 namespace Shiny.BluetoothLE
 {
-    public class DescriptorGattResult
+    public class GattDescriptorResult
     {
-        public DescriptorGattResult(IGattDescriptor descriptor, byte[]? data)
+        public GattDescriptorResult(IGattDescriptor descriptor, byte[]? data)
         {
             this.Descriptor = descriptor;
             this.Data = data;

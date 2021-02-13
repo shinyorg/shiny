@@ -5,7 +5,7 @@ using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattDeviceService;
 using Shiny.BluetoothLE.Internals;
-
+using System.Collections.Generic;
 
 namespace Shiny.BluetoothLE
 {
@@ -22,30 +22,35 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public override IObservable<IGattCharacteristic> GetKnownCharacteristic(string characteristicUuid) => Observable.FromAsync(async () =>
-        {
-            var result = await this.native.GetCharacteristicsForUuidAsync(Guid.Parse(characteristicUuid), BluetoothCacheMode.Cached);
-            if (result.Status != GattCommunicationStatus.Success)
-                throw new ArgumentException("GATT Communication failure - " + result.Status);
-
-            if (!result.Characteristics.Any())
-                throw new ArgumentException("No characteristic found for " + characteristicUuid);
-
-            var ch = new GattCharacteristic(this.context, result.Characteristics.First(), this);
-            return ch;
-        });
-
-
-        public override IObservable<IGattCharacteristic> DiscoverCharacteristics() => Observable.Create<IGattCharacteristic>(async ob =>
-        {
-            var result = await this.native.GetCharacteristicsAsync(BluetoothCacheMode.Uncached);
-            foreach (var characteristic in result.Characteristics)
+        public override IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false) =>
+            Observable.FromAsync(async () =>
             {
-                var wrap = new GattCharacteristic(this.context, characteristic, this);
-                ob.OnNext(wrap);
-            }
+                var result = await this.native.GetCharacteristicsForUuidAsync(
+                    Guid.Parse(characteristicUuid),
+                    BluetoothCacheMode.Cached
+                );
+                if (result.Status != GattCommunicationStatus.Success)
+                    throw new ArgumentException("GATT Communication failure - " + result.Status);
 
-            ob.OnCompleted();
+                var ch = new GattCharacteristic(this.context, result.Characteristics.First(), this);
+                return ch;
+            })
+            .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
+
+
+        public override IObservable<IList<IGattCharacteristic>> GetCharacteristics() => Observable.FromAsync(async ct =>
+        {
+            var result = await this.native
+                .GetCharacteristicsAsync(BluetoothCacheMode.Uncached)
+                .AsTask(ct)
+                .ConfigureAwait(false);
+
+            result.Status.Assert();
+            return result
+                .Characteristics
+                .Select(x => new GattCharacteristic(this.context, x, this))
+                .Cast<IGattCharacteristic>()
+                .ToList();
         });
     }
 }

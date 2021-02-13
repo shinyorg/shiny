@@ -56,7 +56,6 @@ namespace Shiny.BluetoothLE
                 .FirstOrDefault(y => y.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase))
             )
             .Take(1)
-            .Select(x => x)
             .Assert(serviceUuid, throwIfNotFound);
 
 
