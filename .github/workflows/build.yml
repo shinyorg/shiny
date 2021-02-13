@@ -8,12 +8,12 @@ on:
         required: true
         default: 'warning'
   push:
-    branches: [ master, dev, preview ]
+    branches: [ master, 'main', dev, preview ]
     paths:
     - "src/**"
     - ".github/workflows/**"
   pull_request:
-    branches: [ master, dev ]
+    branches: [ master, 'main', dev ]
     paths:
     - "src/**"
 
@@ -45,11 +45,14 @@ jobs:
     - name: Build
       run: msbuild Build.sln /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
 
+    - name: Test Core
+      run: dotnet test Build.sln
+
     - name: Post NuGet Artifacts
       uses: actions/upload-artifact@v2
       with:
         name: nuget-artifacts
         path: '**/*.nupkg'
     - name: Publish to NuGet
-      if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' }}
+      if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
       run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGETAPIKEY}} --skip-duplicate

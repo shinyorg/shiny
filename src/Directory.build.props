@@ -20,7 +20,7 @@
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <VersionPrefix>$(ShinyVersion)</VersionPrefix>
         <VersionPrefix Condition=" $(BUILD_BUILDNUMBER) != '' ">$(VersionPrefix).$(BUILD_BUILDNUMBER)</VersionPrefix>
-        <VersionSuffix Condition=" $(BUILD_SOURCEBRANCHNAME) != 'refs/heads/master' ">preview</VersionSuffix>
+        <VersionSuffix Condition=" $(BUILD_SOURCEBRANCHNAME) != 'refs/heads/master' AND $(BUILD_SOURCEBRANCHNAME) != 'refs/heads/main' ">preview</VersionSuffix>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('tizen')) ">$(DefineConstants);__TIZEN__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.11</ExtrasUwpMetaPackageVersion>
