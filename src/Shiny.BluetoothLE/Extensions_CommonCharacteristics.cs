@@ -27,6 +27,8 @@ namespace Shiny.BluetoothLE
                 .GetKnownService(DeviceInformationServiceUuid, true)
                 .SelectMany(x => x.GetCharacteristics())
                 .SelectMany(x => x.Select(y => y.Read()))
+                .Concat()
+                .ToList()
                 .Select(data =>
                 {
                     var dev = new DeviceInfo();
