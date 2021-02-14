@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -30,6 +31,15 @@ namespace Shiny
 
     public static class RxExtensions
     {
+        public static IObservable<T> ObserveOnIf<T>(this IObservable<T> ob, IScheduler? scheduler)
+        {
+            if (scheduler != null)
+                ob.ObserveOn(scheduler);
+
+            return ob;
+        }
+
+
         static PropertyInfo GetPropertyInfo<TSender, TRet>(this TSender sender, Expression<Func<TSender, TRet>> expression)
         {
             if (sender == null)
