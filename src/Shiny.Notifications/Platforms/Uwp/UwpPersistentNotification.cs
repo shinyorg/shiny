@@ -7,7 +7,7 @@ namespace Shiny.Notifications
 {
     public class UwpPersistentNotification : IPersistentNotification
     {
-        readonly ToastNotifier toastNotifications;
+        readonly ToastNotifier toastNotifier;
         readonly Notification notification;
         int total = 0;
         int progress = 0;
@@ -15,10 +15,10 @@ namespace Shiny.Notifications
         bool indeterministic;
 
 
-        public UwpPersistentNotification(Notification notification)
+        public UwpPersistentNotification(Notification notification, ToastNotifier toastNotifier)
         {
             this.notification = notification;
-            this.toastNotifications = ToastNotificationManager.CreateToastNotifier();
+            this.toastNotifier = toastNotifier;
         }
 
 
@@ -37,7 +37,7 @@ namespace Shiny.Notifications
         public void SetIndeterministicProgress(bool show)
         {
             this.indeterministic = true;
-
+            this.Update();
         }
 
 
@@ -57,14 +57,14 @@ namespace Shiny.Notifications
             {
                 SequenceNumber = (uint)this.sequence
             };
-            data.Values["progressStatus"] = this.notification.Title;
+            //data.Values["progressStatus"] = this.notification.Title;
 
             if (!this.indeterministic)
             {
                 data.Values["progressValue"] = (this.progress / this.total).ToString();
                 data.Values["progressValueString"] = $"{this.progress}/{this.total}";
             }
-            this.toastNotifications.Update(
+            this.toastNotifier.Update(
                 data,
                 this.notification.Id.ToString(),
                 notification.Channel

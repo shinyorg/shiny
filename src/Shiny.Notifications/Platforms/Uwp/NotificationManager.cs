@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Windows.UI.Notifications;
@@ -39,14 +40,22 @@ namespace Shiny.Notifications
             var content = this.CreateContent(notification);
             content.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
             {
-                //    Title = "Weekly playlist",
-                //    Value = new BindableProgressBarValue("progressValue"),
-                //    ValueStringOverride = new BindableString("progressValueString"),
-                //    Status = new BindableString("progressStatus")
+                Title = notification.Title,
+                Value = new BindableProgressBarValue("progressValue"),
+                ValueStringOverride = new BindableString("progressValueString"),
+                Status = new BindableString("progressStatus")
             });
             notification.ScheduleDate = null;
-            var pnotification = new UwpPersistentNotification(notification);
-            //ToastNotificationManager.CreateToastNotifier().Show(native);
+
+            var notifier = ToastNotificationManager.CreateToastNotifier();
+            var toastContent = this.CreateContent(notification);
+            var native = new ToastNotification(toastContent.GetXml())
+            {
+                Tag = notification.Id.ToString(),
+                Group = notification.Channel
+            };
+            var pnotification = new UwpPersistentNotification(notification, notifier);
+            notifier.Show(native);
 
             return pnotification;
         }
@@ -69,6 +78,7 @@ namespace Shiny.Notifications
                 return;
             }
 
+            //await this.TrySetChannel(notification, content);
             ToastNotificationManager.CreateToastNotifier().Show(native);
             if (notification.BadgeCount != null)
                 this.Badge = notification.BadgeCount.Value;
@@ -138,44 +148,47 @@ namespace Shiny.Notifications
 
         protected async Task TrySetChannel(Notification notification, ToastContent content)
         {
-            //if (!notification.Category.IsEmpty())
-            //{
-            //    var category = this.registeredCategories.FirstOrDefault(x => x.Identifier.Equals(notification.Category));
+            if (!notification.Channel.IsEmpty())
+            {
+                var channel = await this.services.Repository.GetChannel(notification.Channel);
 
-            //    var nativeActions = new ToastActionsCustom();
+                if (channel.Actions.Any())
+                {
+                    var nativeActions = new ToastActionsCustom();
 
-            //    foreach (var action in category.Actions)
-            //    {
-            //        switch (action.ActionType)
-            //        {
-            //            case NotificationActionType.OpenApp:
-            //                nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
-            //                {
-            //                    //ActivationType = ToastActivationType.Foreground
-            //                    ActivationType = ToastActivationType.Background
-            //                });
-            //                break;
+                    foreach (var action in channel.Actions)
+                    {
+                        switch (action.ActionType)
+                        {
+                            case ChannelActionType.OpenApp:
+                                nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
+                                {
+                                    ActivationType = ToastActivationType.Foreground
+                                    //ActivationType = ToastActivationType.Background
+                                });
+                                break;
 
-            //            case NotificationActionType.None:
-            //            case NotificationActionType.Destructive:
-            //                nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
-            //                {
-            //                    ActivationType = ToastActivationType.Background
-            //                });
-            //                break;
+                            case ChannelActionType.None:
+                            case ChannelActionType.Destructive:
+                                nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
+                                {
+                                    ActivationType = ToastActivationType.Background
+                                });
+                                break;
 
-            //            case NotificationActionType.TextReply:
-            //                nativeActions.Inputs.Add(new ToastTextBox(action.Identifier)
-            //                {
-            //                    Title = notification.Title
-            //                    //DefaultInput = "",
-            //                    //PlaceholderContent = ""
-            //                });
-            //                break;
-            //        }
-            //    }
-            //    toastContent.Actions = nativeActions;
-            //}
+                            case ChannelActionType.TextReply:
+                                nativeActions.Inputs.Add(new ToastTextBox(action.Identifier)
+                                {
+                                    Title = notification.Title
+                                    //DefaultInput = "",
+                                    //PlaceholderContent = ""
+                                });
+                                break;
+                        }
+                    }
+                    content.Actions = nativeActions;
+                }
+            }
         }
 
 
