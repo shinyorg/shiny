@@ -1,12 +1,25 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Shiny.Notifications;
+using Shiny.Notifications.Logging;
 
 
 namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Add error logging using notifications - this should NEVER BE USED IN PRODUCTION
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddNotificationErrors(this ILoggingBuilder builder)
+        {
+            builder.Services.AddSingleton<ILoggerProvider, NotificationLoggerProvider>();
+            builder.Services.UseNotifications(true);
+        }
+
+
         public static bool UseNotifications(this IServiceCollection services,
                                             Type? delegateType,
                                             bool requestPermissionImmediately = false,

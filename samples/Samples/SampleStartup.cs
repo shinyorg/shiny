@@ -27,9 +27,9 @@ namespace Samples
         public override void ConfigureLogging(ILoggingBuilder builder, IPlatform platform)
         {
             builder.AddConsole(opts =>
-            {
-                opts.LogToStandardErrorThreshold = LogLevel.Debug;
-            });
+                opts.LogToStandardErrorThreshold = LogLevel.Debug
+            );
+            builder.AddNotificationErrors();
             builder.AddAppCenter(opts =>
             {
                 opts.AppCenterAndroidSecret = Constants.AndroidAppCenterToken;
