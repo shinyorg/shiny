@@ -48,7 +48,7 @@
         <PackageReference Update="Tizen.NET" Version="8.0.0.15631" ExcludeAssets="Runtime" />
         <PackageReference Update="Tizen.NET.Sdk" Version="1.1.6" />
 
-        <PackageReference Update="MarkdownSnippets.MsBuild" Version="22.0.3" />
+        <PackageReference Update="MarkdownSnippets.MsBuild" Version="23.0.2" />
 
         <!--Samples-->
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.1931" />
