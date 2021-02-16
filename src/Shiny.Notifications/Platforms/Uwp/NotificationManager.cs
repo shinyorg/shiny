@@ -10,7 +10,9 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Notifications
 {
-    public class NotificationManager : INotificationManager, IPersistentNotificationManagerExtension
+    public class NotificationManager : INotificationManager,
+                                       IPersistentNotificationManagerExtension,
+                                       IShinyStartupTask
     {
         readonly ShinyCoreServices services;
         readonly BadgeUpdater badgeUpdater;
@@ -37,25 +39,21 @@ namespace Shiny.Notifications
         public IPersistentNotification Create(Notification notification)
         {
             //AdaptiveProgressBarValue.Indeterminate;
-            var content = this.CreateContent(notification);
-            content.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
-            {
-                Title = notification.Title,
-                Value = new BindableProgressBarValue("progressValue"),
-                ValueStringOverride = new BindableString("progressValueString"),
-                Status = new BindableString("progressStatus")
-            });
+            //var content = this.CreateContent(notification);
+            //content.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
+            //{
+            //    Title = notification.Title,
+            //    Value = new BindableProgressBarValue("progressValue"),
+            //    ValueStringOverride = new BindableString("progressValueString"),
+            //    Status = new BindableString("progressStatus")
+            //});
             notification.ScheduleDate = null;
 
             var notifier = ToastNotificationManager.CreateToastNotifier();
-            var toastContent = this.CreateContent(notification);
-            var native = new ToastNotification(toastContent.GetXml())
-            {
-                Tag = notification.Id.ToString(),
-                Group = notification.Channel
-            };
+            //var toastContent = this.CreateContent(notification);
+
             var pnotification = new UwpPersistentNotification(notification, notifier);
-            notifier.Show(native);
+            //notifier.Show(native);
 
             return pnotification;
         }
@@ -71,14 +69,15 @@ namespace Shiny.Notifications
             if (notification.Id == 0)
                 notification.Id = this.services.Settings.IncrementValue("NotificationId");
 
-            var native = this.CreateNativeNotification(notification);
+            var content = await this.CreateContent(notification);
+            var native = this.CreateNativeNotification(content, notification);
+
             if (notification.ScheduleDate != null && notification.ScheduleDate > DateTimeOffset.UtcNow)
             {
                 await this.services.Repository.Set(notification.Id.ToString(), notification);
                 return;
             }
 
-            //await this.TrySetChannel(notification, content);
             ToastNotificationManager.CreateToastNotifier().Show(native);
             if (notification.BadgeCount != null)
                 this.Badge = notification.BadgeCount.Value;
@@ -122,16 +121,12 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual ToastNotification CreateNativeNotification(Notification notification)
-        {
-            var toastContent = this.CreateContent(notification);
-            var native = new ToastNotification(toastContent.GetXml())
+        protected virtual ToastNotification CreateNativeNotification(ToastContent toastContent, Notification notification)
+            => new ToastNotification(toastContent.GetXml())
             {
                 Tag = notification.Id.ToString(),
-                Group = notification.Channel
+                Group = notification.Channel ?? Channel.Default.Identifier
             };
-            return native;
-        }
 
 
 
@@ -150,6 +145,9 @@ namespace Shiny.Notifications
         {
             if (!notification.Channel.IsEmpty())
             {
+                //if (!Notification.CustomSoundFilePath.IsEmpty())
+                //    toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
+
                 var channel = await this.services.Repository.GetChannel(notification.Channel);
 
                 if (channel.Actions.Any())
@@ -192,7 +190,7 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual ToastContent CreateContent(Notification notification)
+        protected virtual async Task<ToastContent> CreateContent(Notification notification)
         {
             var content = new ToastContent
             {
@@ -218,11 +216,10 @@ namespace Shiny.Notifications
                     }
                 }
             };
-            //if (!Notification.CustomSoundFilePath.IsEmpty())
-            //    toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
+
+            await this.TrySetChannel(notification, content);
             return content;
         }
-
 
 
         //string BuildSoundPath(string sound)
