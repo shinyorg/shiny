@@ -30,7 +30,8 @@ namespace Shiny.Notifications
             if (this.services.Services.GetService(typeof(INotificationDelegate)) != null)
             {
                 UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(
-                    builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
+                    builder => builder.SetTrigger(new ToastNotificationActionTrigger())
+                    //builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
                 );
             }
         }

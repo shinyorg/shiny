@@ -20,7 +20,6 @@ namespace Shiny
         public static string BackgroundTaskName => typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
 
         const string STARTUP_KEY = "ShinyStartupTypeName";
-        static bool hydrated = false;
         readonly Application? app;
 
 
@@ -80,17 +79,29 @@ namespace Shiny
 
         public void Initialize(IShinyStartup startup, IServiceCollection services)
         {
+            if (hydrated)
+                return;
+
             startup.ConfigureServices(services, this);
             Dehydrate(STARTUP_KEY, startup);
         }
 
 
+        static bool hydrated;
         public static void BackgroundRun(IBackgroundTaskInstance taskInstance)
         {
-            if (!hydrated)
+            if (!ShinyHost.IsInitialized)
             {
-                var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
-                ShinyHost.Init(new UwpPlatform(), startup);
+                try
+                {
+                    var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
+                    hydrated = true;
+                    ShinyHost.Init(new UwpPlatform(), startup);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             }
             if (taskInstance.Task.Name.StartsWith("JOB-"))
             {

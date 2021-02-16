@@ -8,7 +8,7 @@ namespace Shiny
 {
     public static partial class ServiceCollectionExtensions
     {
-        public static void RegisterVersionDetection<T>(this IServiceCollection services) where T : IVersionChangeDelegate, class
+        public static void RegisterVersionDetection<T>(this IServiceCollection services) where T : class, IVersionChangeDelegate
         {
             services.AddSingleton<IVersionChangeDelegate, T>();
             services.TryAddSingleton<VersionDetectionTask>();

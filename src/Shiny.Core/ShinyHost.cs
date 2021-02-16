@@ -12,6 +12,12 @@ namespace Shiny
     public static class ShinyHost
     {
         /// <summary>
+        ///
+        /// </summary>
+        public static bool IsInitialized => container != null;
+
+
+        /// <summary>
         /// Resolve a specified service from the container
         /// </summary>
         /// <typeparam name="T"></typeparam>
