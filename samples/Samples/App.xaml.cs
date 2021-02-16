@@ -45,6 +45,7 @@ namespace Samples
             containerRegistry.RegisterForNavigation<BigTextViewPage>("BigText");
             containerRegistry.RegisterForNavigation<LogPage>("Logs");
             containerRegistry.RegisterForNavigation<DelegateNotificationsPage>("DelegateNotifications");
+            containerRegistry.RegisterForNavigation<Versioning.MainPage>("Versioning");
 
             containerRegistry.RegisterForNavigation<Gps.MainPage>("Gps");
             containerRegistry.RegisterForNavigation<Geofences.MainPage>("Geofencing");

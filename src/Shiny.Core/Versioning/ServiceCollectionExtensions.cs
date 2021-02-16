@@ -8,10 +8,16 @@ namespace Shiny
 {
     public static partial class ServiceCollectionExtensions
     {
-        public static void RegisterVersionDetection<T>(this IServiceCollection services) where T : class, IVersionChangeDelegate
+        public static void UseVersionManagement(this IServiceCollection services, Type? delegateType = null)
         {
-            services.AddSingleton<IVersionChangeDelegate, T>();
-            services.TryAddSingleton<VersionDetectionTask>();
+            if (delegateType != null)
+                services.AddSingleton(typeof(IVersionChangeDelegate), delegateType);
+
+            services.TryAddSingleton<IVersionManager, VersionManager>();
         }
+
+
+        public static void UseVersionManagement<T>(this IServiceCollection services) where T : class, IVersionChangeDelegate
+            => services.UseVersionManagement(typeof(T));
     }
 }
