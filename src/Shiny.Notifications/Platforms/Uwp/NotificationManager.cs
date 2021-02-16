@@ -29,6 +29,7 @@ namespace Shiny.Notifications
         {
             if (this.services.Services.GetService(typeof(INotificationDelegate)) != null)
             {
+
                 UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(
                     builder => builder.SetTrigger(new ToastNotificationActionTrigger())
                     //builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
@@ -144,49 +145,49 @@ namespace Shiny.Notifications
 
         protected async Task TrySetChannel(Notification notification, ToastContent content)
         {
+            Channel? channel = null;
             if (!notification.Channel.IsEmpty())
+                channel = await this.services.Repository.GetChannel(notification.Channel);
+
+            channel ??= Channel.Default;
+
+            //if (!Notification.CustomSoundFilePath.IsEmpty())
+            //    toastContent.Audio = new ToastAudio { Src = new Uri(channel.CustomSoundPath) };
+
+            if (channel.Actions.Any())
             {
-                //if (!Notification.CustomSoundFilePath.IsEmpty())
-                //    toastContent.Audio = new ToastAudio { Src = new Uri(Notification.CustomSoundFilePath) };
+                var nativeActions = new ToastActionsCustom();
 
-                var channel = await this.services.Repository.GetChannel(notification.Channel);
-
-                if (channel.Actions.Any())
+                foreach (var action in channel.Actions)
                 {
-                    var nativeActions = new ToastActionsCustom();
-
-                    foreach (var action in channel.Actions)
+                    switch (action.ActionType)
                     {
-                        switch (action.ActionType)
-                        {
-                            case ChannelActionType.OpenApp:
-                                nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
-                                {
-                                    ActivationType = ToastActivationType.Foreground
-                                    //ActivationType = ToastActivationType.Background
-                                });
-                                break;
+                        case ChannelActionType.OpenApp:
+                            nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
+                            {
+                                ActivationType = ToastActivationType.Foreground
+                            });
+                            break;
 
-                            case ChannelActionType.None:
-                            case ChannelActionType.Destructive:
-                                nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
-                                {
-                                    ActivationType = ToastActivationType.Background
-                                });
-                                break;
+                        case ChannelActionType.None:
+                        case ChannelActionType.Destructive:
+                            nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
+                            {
+                                ActivationType = ToastActivationType.Background
+                            });
+                            break;
 
-                            case ChannelActionType.TextReply:
-                                nativeActions.Inputs.Add(new ToastTextBox(action.Identifier)
-                                {
-                                    Title = notification.Title
-                                    //DefaultInput = "",
-                                    //PlaceholderContent = ""
-                                });
-                                break;
-                        }
+                        case ChannelActionType.TextReply:
+                            nativeActions.Inputs.Add(new ToastTextBox(action.Identifier)
+                            {
+                                Title = notification.Title
+                                //DefaultInput = "",
+                                //PlaceholderContent = ""
+                            });
+                            break;
                     }
-                    content.Actions = nativeActions;
                 }
+                content.Actions = nativeActions;
             }
         }
 
@@ -196,24 +197,22 @@ namespace Shiny.Notifications
             var content = new ToastContent
             {
                 Duration = ToastDuration.Short,
-                //Launch = notification.Payload,
-                //ActivationType = ToastActivationType.Background,
                 ActivationType = ToastActivationType.Foreground,
                 Visual = new ToastVisual
                 {
                     BindingGeneric = new ToastBindingGeneric
                     {
                         Children =
+                        {
+                            new AdaptiveText
                             {
-                                new AdaptiveText
-                                {
-                                    Text = notification.Title
-                                },
-                                new AdaptiveText
-                                {
-                                    Text = notification.Message
-                                }
+                                Text = notification.Title
+                            },
+                            new AdaptiveText
+                            {
+                                Text = notification.Message
                             }
+                        }
                     }
                 }
             };

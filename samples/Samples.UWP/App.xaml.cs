@@ -18,10 +18,23 @@ namespace Samples.UWP
             //app.EnteredBackground
             //app.LeavingBackground
             //app.Suspending
-
             this.InitializeComponent();
             //UwpShinyHost.ClearBackgroundTasks();
+            this.Suspending += this.OnSuspending;
             this.ShinyInit(new SampleStartup());
+        }
+
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            // fired for foreground notifications
+            if (args is ToastNotificationActivatedEventArgs not)
+            {
+                var args1 = not.Argument;
+                // TODO: Handle activation according to argument
+            }
+
+            Window.Current.Activate();
         }
 
 
@@ -34,11 +47,6 @@ namespace Samples.UWP
                 rootFrame = new Frame();
                 rootFrame.NavigationFailed += this.OnNavigationFailed;
                 Rg.Plugins.Popup.Popup.Init();
-                Forms.SetFlags(
-                    "SwipeView_Experimental",
-                    "Expander_Experimental",
-                    "RadioButton_Experimental"
-                );
                 Forms.Init(e);
 
                 Window.Current.Content = rootFrame;
