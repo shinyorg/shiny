@@ -41,14 +41,14 @@
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="2.3.3" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="2.2.5" />
 
-        <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.11" />
+        <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.12" />
         <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="[6.1.1, 7)" />
         <PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
 
         <PackageReference Update="Tizen.NET" Version="8.0.0.15631" ExcludeAssets="Runtime" />
         <PackageReference Update="Tizen.NET.Sdk" Version="1.1.6" />
 
-        <PackageReference Update="MarkdownSnippets.MsBuild" Version="22.0.3" />
+        <PackageReference Update="MarkdownSnippets.MsBuild" Version="23.0.2" />
 
         <!--Samples-->
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.1931" />

@@ -29,7 +29,7 @@ namespace Samples
             builder.AddConsole(opts =>
                 opts.LogToStandardErrorThreshold = LogLevel.Debug
             );
-            builder.AddNotificationErrors();
+            //builder.AddNotificationErrors();
             builder.AddAppCenter(opts =>
             {
                 opts.AppCenterAndroidSecret = Constants.AndroidAppCenterToken;
