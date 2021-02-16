@@ -23,9 +23,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Uno.SourceGenerationTasks" Version="3.0.0-dev.18" />
-  </ItemGroup>
-
 </Project>
