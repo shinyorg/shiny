@@ -13,5 +13,7 @@ namespace Samples.Models
         public string Area { get; set; }
         public string Old { get; set; }
         public string New { get; set; }
+
+        public DateTime Date { get; set; }
     }
 }

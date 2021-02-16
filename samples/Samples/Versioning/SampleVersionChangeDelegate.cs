@@ -17,7 +17,8 @@ namespace Samples.Versioning
         {
             Area = "App",
             Old = oldVersion,
-            New = newVersion
+            New = newVersion,
+            Date = DateTime.UtcNow
         });
 
 
@@ -25,7 +26,8 @@ namespace Samples.Versioning
         {
             Area = "OS",
             Old = oldVersion,
-            New = newVersion
+            New = newVersion,
+            Date = DateTime.UtcNow
         });
     }
 }

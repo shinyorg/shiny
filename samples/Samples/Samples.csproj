@@ -54,10 +54,4 @@
         <EmbeddedResource Include="Resources\fa-regular-400.ttf" />
         <EmbeddedResource Include="Resources\fa-solid-900.ttf" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Logging\LogPage.xaml.cs">
-        <DependentUpon>LogPage.xaml</DependentUpon>
-      </Compile>
-    </ItemGroup>
 </Project>
