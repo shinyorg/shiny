@@ -52,14 +52,40 @@ namespace Shiny.BluetoothLE
         public bool IsScanning => this.scanSub != null;
 
 
-        public void Start(ScanConfig? config = null, IScheduler? scheduler = null)
+        ScanConfig? scanConfig;
+        public ScanConfig? ScanConfig
+        {
+            get => this.scanConfig;
+            set => this.Flip(() => this.scanConfig = value);
+        }
+
+
+        IScheduler? scheduler;
+        public IScheduler? Scheduler
+        {
+            get => this.scheduler;
+            set => this.Flip(() => this.scheduler = value);
+        }
+
+
+        public void Toggle()
+        {
+            if (this.IsScanning)
+                this.Stop();
+            else
+                this.Start();
+        }
+
+
+        public void Start()
         {
             if (this.IsScanning)
                 return;
 
+            this.Peripherals.Clear();
             this.scanSub = this.bleManager
-                .Scan(config)
-                .ObserveOnIf(scheduler)
+                .Scan(this.ScanConfig)
+                .ObserveOnIf(this.Scheduler)
                 .Synchronize()
                 .Subscribe(scanResult =>
                 {
@@ -79,6 +105,16 @@ namespace Shiny.BluetoothLE
         {
             this.scanSub?.Dispose();
             this.scanSub = null;
+        }
+
+
+        void Flip(Action action)
+        {
+            var wasScanning = this.IsScanning;
+            this.Stop();
+            action();
+            if (wasScanning)
+                this.Start();
         }
     }
 

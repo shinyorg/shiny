@@ -24,7 +24,8 @@
                         <TextCell Text="Delegate Notifications" Command="{Binding Navigate}" CommandParameter="Nav/DelegateNotifications" />
                     </TableSection>
                     <TableSection Title="Bluetooth">
-                        <TextCell Text="Client" Command="{Binding Navigate}" CommandParameter="Nav/BleCentral" />
+                        <TextCell Text="Peripheral Scan" Command="{Binding Navigate}" CommandParameter="Nav/BleCentral" />
+                        <TextCell Text="Peripheral Scan (Managed)" Command="{Binding Navigate}" CommandParameter="Nav/BleManagedScan" />
                         <TextCell Text="Perf Tests" Command="{Binding Navigate}" CommandParameter="Nav/BlePerformance" />
                         <TextCell Text="Hosting" Command="{Binding Navigate}" CommandParameter="Nav/BleHosting" />
                     </TableSection>
@@ -32,6 +33,7 @@
                         <TextCell Text="GPS" Command="{Binding Navigate}" CommandParameter="Nav/Gps"  />
                         <TextCell Text="Geofencing" Command="{Binding Navigate}" CommandParameter="Nav/Geofencing" />
                         <TextCell Text="Beacons" Command="{Binding Navigate}" CommandParameter="Nav/Beacons" />
+                        <TextCell Text="Beacons (Managed)" Command="{Binding Navigate}" CommandParameter="Nav/BeaconsManaged" />
                         <TextCell Text="Motion Activity" Command="{Binding Navigate}" CommandParameter="Nav/MotionActivity" />
                         <TextCell Text="Test Motion Activity" Command="{Binding Navigate}" CommandParameter="Nav/TestMotionActivity" />
                     </TableSection>
