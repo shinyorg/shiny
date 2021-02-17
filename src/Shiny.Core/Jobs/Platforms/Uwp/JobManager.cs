@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Windows.ApplicationModel.Background;
 using Shiny.Infrastructure;
-using Microsoft.Extensions.Logging;
+
 
 namespace Shiny.Jobs
 {
@@ -54,7 +54,7 @@ namespace Shiny.Jobs
             this.CancelNative(jobInfo);
 
             var builder = new BackgroundTaskBuilder();
-            builder.Name = GetJobTaskName(jobInfo);
+            builder.Name = ToJobTaskName(jobInfo);
             builder.TaskEntryPoint = UwpPlatform.BackgroundTaskName;
 
             if (jobInfo.PeriodicTime != null)
@@ -74,25 +74,17 @@ namespace Shiny.Jobs
 
                 builder.AddCondition(new SystemCondition(type));
             }
+
+            // TODO: this periodically crashes
             builder.Register();
         }
 
 
-        protected override void CancelNative(JobInfo jobInfo) => GetTask("JOB-" + jobInfo.Identifier)?.Unregister(true);
+        protected override void CancelNative(JobInfo jobInfo)
+            => UwpPlatform.RemoveBackgroundTask(ToJobTaskName(jobInfo));
 
-        static string GetJobTaskName(JobInfo job) => "JOB-" + job.Identifier;
 
-        static IBackgroundTaskRegistration GetTask(string taskName)
-        {
-            var tasks = BackgroundTaskRegistration
-                .AllTasks
-                .ToList();
-
-            return tasks
-                .Where(x => x.Value.Name.Equals(taskName))
-                .Select(x => x.Value)
-                .FirstOrDefault();
-        }
+        static string ToJobTaskName(JobInfo jobInfo) => $"JOB-{jobInfo.Identifier}";
     }
 }
 

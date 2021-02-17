@@ -92,16 +92,9 @@ namespace Shiny
         {
             if (!ShinyHost.IsInitialized)
             {
-                try
-                {
-                    var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
-                    hydrated = true;
-                    ShinyHost.Init(new UwpPlatform(), startup);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                }
+                var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
+                hydrated = true;
+                ShinyHost.Init(new UwpPlatform(), startup);
             }
             if (taskInstance.Task.Name.StartsWith("JOB-"))
             {
@@ -139,13 +132,6 @@ namespace Shiny
             => GetTask(typeof(TService).AssemblyQualifiedName)?.Unregister(true);
 
 
-        public static void ClearBackgroundTasks() => BackgroundTaskRegistration
-            .AllTasks
-            .Select(x => x.Value)
-            .ToList()
-            .ForEach(x => x.Unregister(false));
-
-
         static void Dehydrate(string key, object? obj)
         {
             if (obj != null)
@@ -170,10 +156,31 @@ namespace Shiny
         }
 
 
-        static IBackgroundTaskRegistration GetTask(string taskName) => BackgroundTaskRegistration
+        public static IBackgroundTaskRegistration GetTask(string taskName) => BackgroundTaskRegistration
             .AllTasks
             .Where(x => x.Value.Name.Equals(taskName))
             .Select(x => x.Value)
             .FirstOrDefault();
+
+
+        public static void RemoveBackgroundTask(string taskName)
+        {
+            // the task name for notifications is the processor, not the job name
+            var taskNames = BackgroundTaskRegistration
+                .AllTasks
+                .Select(x => x.Value.Name)
+                .ToList();
+
+            var task = GetTask(taskName);
+            if (task != null)
+                task.Unregister(true);
+        }
+
+
+        public static void ClearBackgroundTasks() => BackgroundTaskRegistration
+            .AllTasks
+            .Select(x => x.Value)
+            .ToList()
+            .ForEach(x => x.Unregister(false));
     }
 }
