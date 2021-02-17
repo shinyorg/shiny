@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Windows.UI.Notifications;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Windows.UI.Notifications;
 using Windows.ApplicationModel.Background;
 using Shiny.Infrastructure;
 
@@ -29,10 +29,8 @@ namespace Shiny.Notifications
         {
             if (this.services.Services.GetService(typeof(INotificationDelegate)) != null)
             {
-
                 UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(
                     builder => builder.SetTrigger(new ToastNotificationActionTrigger())
-                    //builder => builder.SetTrigger(new UserNotificationChangedTrigger(NotificationKinds.Toast))
                 );
             }
         }
