@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.OS;
@@ -47,7 +46,7 @@ namespace Shiny.BluetoothLE.Internals
         {
             try
             {
-                this.CleanUpQueue();
+                //this.CleanUpQueue();
                 this.CreateGatt(config?.AutoConnect ?? true);
                 if (this.Gatt == null)
                     throw new BleException("GATT connection could not be established");
@@ -63,35 +62,38 @@ namespace Shiny.BluetoothLE.Internals
         });
 
 
+        readonly object syncLock = new object();
+
         public IObservable<T> Invoke<T>(IObservable<T> observable)
         {
             if (!this.CentralContext.Configuration.AndroidUseInternalSyncQueue)
                 return observable;
 
-            return Observable.Create<T>(ob =>
-            {
-                var cancel = false;
-                this.Actions.Enqueue(async () =>
-                {
-                    if (cancel)
-                        return;
+            return observable.Synchronize(this.syncLock);
+            //return Observable.Create<T>(ob =>
+            //{
+            //    var cancel = false;
+            //    this.Actions.Enqueue(async () =>
+            //    {
+            //        if (cancel)
+            //            return;
 
-                    try
-                    {
-                        var result = await observable
-                            .ToTask(this.cancelSrc.Token)
-                            .ConfigureAwait(false);
-                        ob.Respond(result);
-                    }
-                    catch (Exception ex)
-                    {
-                        ob.OnError(ex);
-                    }
-                });
-                this.ProcessQueue(); // fire and forget
+            //        try
+            //        {
+            //            var result = await observable
+            //                .ToTask(this.cancelSrc.Token)
+            //                .ConfigureAwait(false);
+            //            ob.Respond(result);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            ob.OnError(ex);
+            //        }
+            //    });
+            //    this.ProcessQueue(); // fire and forget
 
-                return () => cancel = true;
-            });
+            //    return () => cancel = true;
+            //});
         }
 
 
@@ -132,7 +134,7 @@ namespace Shiny.BluetoothLE.Internals
         {
             try
             {
-                this.CleanUpQueue();
+                //this.CleanUpQueue();
                 this.Gatt?.Close();
                 this.Gatt = null;
             }
@@ -143,45 +145,43 @@ namespace Shiny.BluetoothLE.Internals
         }
 
 
-        bool running;
-        async void ProcessQueue()
-        {
-            if (this.running)
-                return;
+        //bool running;
+        //async void ProcessQueue()
+        //{
+        //    if (this.running)
+        //        return;
 
-            try
-            {
-                this.running = true;
-                Func<Task>? outTask = null;
-                while (this.Actions.TryDequeue(out outTask) && this.running)
-                {
-                    await outTask();
-                }
-            }
-            catch (TaskCanceledException)
-            {
-            }
-            this.running = false;
-        }
-
-
-        void CleanUpQueue()
-        {
-            this.running = false;
-            this.cancelSrc?.Cancel();
-            this.cancelSrc = new CancellationTokenSource();
-            this.Actions.Clear();
-        }
+        //    try
+        //    {
+        //        this.running = true;
+        //        Func<Task>? outTask = null;
+        //        while (this.Actions.TryDequeue(out outTask) && this.running)
+        //        {
+        //            await outTask();
+        //        }
+        //    }
+        //    catch (TaskCanceledException)
+        //    {
+        //    }
+        //    this.running = false;
+        //}
 
 
-        void CreateGatt(bool autoConnect)
-        {
-            var c = this.CentralContext.Android;
-            this.Gatt = c.IsMinApiLevel(23)
-                //? this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks, BluetoothTransports.Le)
-                ? this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks, BluetoothTransports.Auto)
-                : this.NativeDevice.ConnectGatt(c.AppContext, autoConnect, this.Callbacks);
-        }
+        //void CleanUpQueue()
+        //{
+        //    this.running = false;
+        //    this.cancelSrc?.Cancel();
+        //    this.cancelSrc = new CancellationTokenSource();
+        //    this.Actions.Clear();
+        //}
+
+
+        void CreateGatt(bool autoConnect) => this.Gatt = this.NativeDevice.ConnectGatt(
+            this.CentralContext.Android.AppContext,
+            autoConnect,
+            this.Callbacks,
+            BluetoothTransports.Le
+        );
 
         //void CreateGatt(bool autoConnect)
             //try
