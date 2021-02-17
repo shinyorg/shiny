@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using Prism.Navigation;
@@ -30,7 +29,11 @@ namespace Samples.BluetoothLE
             this.WhenAnyValue(x => x.SelectedPeripheral)
                 .Skip(1)
                 .Where(x => x != null)
-                .Subscribe(async x => await navigator.Navigate("Peripheral", ("Peripheral", x.Peripheral)));
+                .Subscribe(async x =>
+                {
+                    this.StopScan();
+                    await navigator.Navigate("Peripheral", ("Peripheral", x.Peripheral));
+                });
 
             this.ToggleAdapterState = ReactiveCommand.CreateFromTask(
                 async () =>
@@ -109,13 +112,6 @@ namespace Samples.BluetoothLE
         public ObservableCollection<PeripheralItemViewModel> Peripherals { get; } = new ObservableCollection<PeripheralItemViewModel>();
         [Reactive] public PeripheralItemViewModel SelectedPeripheral { get; set; }
         [Reactive] public bool IsScanning { get; private set; }
-
-
-        //public override void OnDisappearing()
-        //{
-        //    base.OnDisappearing();
-        //    this.StopScan();
-        //}
 
 
         void StopScan()

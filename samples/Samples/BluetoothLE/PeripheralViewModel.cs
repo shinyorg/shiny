@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using Prism.Navigation;
@@ -101,60 +100,56 @@ namespace Samples.BluetoothLE
             this.IsMtuVisible = this.peripheral.IsMtuRequestsAvailable();
             this.IsPairingVisible = this.peripheral.IsPairingRequestsAvailable();
 
-            this.PairingText = this.peripheral.TryGetPairingStatus() == PairingState.Paired ? "Peripheral Paired" : "Pair Peripheral";
+            this.PairingText = this.peripheral.TryGetPairingStatus() == PairingState.Paired
+                ? "Peripheral Paired"
+                : "Pair Peripheral";
 
-
-            this.peripheral
-                .ReadRssiContinuously(TimeSpan.FromSeconds(3))
-                .SubOnMainThread(x => this.Rssi = x)
-                .DisposeWith(this.DeactivateWith);
+            //this.peripheral
+            //    .WhenConnected()
+            //    .Select(x => x.ReadRssiContinuously(TimeSpan.FromSeconds(3)))
+            //    .Switch()
+            //    .SubOnMainThread(x => this.Rssi = x)
+            //    .DisposedBy(this.DeactivateWith);
 
             this.peripheral
                 .WhenStatusChanged()
-                .SubOnMainThread(status =>
+                .Do(x =>
                 {
-                    switch (status)
-                    {
-                        case ConnectionState.Connecting:
-                            this.ConnectText = "Cancel Connection";
-                            break;
-
-                        case ConnectionState.Connected:
-                            this.ConnectText = "Disconnect";
-                            break;
-
-                        case ConnectionState.Disconnected:
-                            this.ConnectText = "Connect";
-                            try
-                            {
-                                this.GattCharacteristics.Clear();
-                            }
-                            catch (Exception ex)
-                            {
-                                // eat this for now
-                                Console.WriteLine(ex);
-                            }
-
-                            break;
-                    }
+                    if (x == ConnectionState.Connected)
+                        this.GattCharacteristics.Clear();
                 })
-                .DisposeWith(this.DeactivateWith);
+                .Select(x => x switch
+                {
+                    ConnectionState.Connecting => "Cancel Connection",
+                    ConnectionState.Connected => "Disconnect",
+                    ConnectionState.Disconnected => "Connect",
+                    ConnectionState.Disconnecting => "Disconnecting..."
+                })
+                .SubOnMainThread(x => this.ConnectText = x)
+                .DisposedBy(this.DeactivateWith);
 
             this.peripheral
-                .GetAllCharacteristics()
-                .SelectMany(x => x.Select(y => new GattCharacteristicViewModel(y, this.dialogs)))
-                .GroupBy(x => x.Uuid)
+                .WhenConnected()
+                .SelectMany(x => x.GetAllCharacteristics())
+                .Select(x => x.Select(y => new GattCharacteristicViewModel(y, this.dialogs)))
                 .SubOnMainThread(
-                    x =>
+                    list =>
                     {
-                        var group = new Group<GattCharacteristicViewModel>(x.Key, x.Key);
-                        var list = x.ToList().Wait();
-                        group.AddRange(list);
+                        var chars = list
+                            .GroupBy(x => x.ServiceUuid)
+                            .Select(x =>
+                            {
+                                var group = new Group<GattCharacteristicViewModel>(x.Key, x.Key);
+                                group.AddRange(x.ToList());
+                                return group;
+                            })
+                            .ToList();
 
-                        this.GattCharacteristics.Add(group);
+                        this.GattCharacteristics.AddRange(chars);
                     },
                     ex => this.dialogs.Snackbar(ex.ToString())
-                );
+                )
+                .DisposedBy(this.DeactivateWith);
         }
 
 
@@ -166,7 +161,7 @@ namespace Samples.BluetoothLE
         [Reactive] public string Name { get; private set; }
         [Reactive] public string Uuid { get; private set; }
         [Reactive] public string PairingText { get; private set; }
-        public ObservableCollection<Group<GattCharacteristicViewModel>> GattCharacteristics { get; } = new ObservableCollection<Group<GattCharacteristicViewModel>>();
+        public ObservableList<Group<GattCharacteristicViewModel>> GattCharacteristics { get; } = new ObservableList<Group<GattCharacteristicViewModel>>();
 
         [Reactive] public string ConnectText { get; private set; } = "Connect";
         [Reactive] public int Rssi { get; private set; }
