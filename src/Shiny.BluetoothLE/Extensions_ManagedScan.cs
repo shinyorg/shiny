@@ -9,10 +9,27 @@ namespace Shiny.BluetoothLE
 {
     public class ManagedScanPeripheral : NotifyPropertyChanged
     {
-        public ManagedScanPeripheral(IPeripheral peripheral) => this.Peripheral = peripheral;
+        public ManagedScanPeripheral(IPeripheral peripheral, string[]? serviceUuids)
+        {
+            this.Peripheral = peripheral;
+            this.ServiceUuids = serviceUuids;
+        }
+
 
         public IPeripheral Peripheral { get; }
+        public string[]? ServiceUuids { get; }
 
+        // TODO: observable
+        public bool IsConnected => this.Peripheral.IsConnected();
+        public string Uuid => this.Peripheral.Uuid;
+
+        bool? connectable;
+        public bool? Connectable
+        {
+            get => this.connectable;
+            internal set => this.Set(ref this.connectable, value);
+        }
+        
 
         string name;
         public string Name
@@ -29,8 +46,21 @@ namespace Shiny.BluetoothLE
             internal set => this.Set(ref this.rssi, value);
         }
 
-        // TODO: add timestamp?
-        // TODO: add service UUIDS?  could just add all of advertisement and keep name/rssi as observable since those can change during scan
+
+        ManufacturerData? manufacturerData;
+        public ManufacturerData? ManufacturerData
+        {
+            get => this.manufacturerData;
+            internal set => this.Set(ref this.manufacturerData, value);
+        }
+
+
+        DateTimeOffset lastSeen;
+        public DateTimeOffset LastSeen
+        {
+            get => this.lastSeen;
+            internal set => this.Set(ref this.lastSeen, value);
+        }
     }
 
 
@@ -92,9 +122,11 @@ namespace Shiny.BluetoothLE
                     var result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
                     if (result == null)
                     {
-                        result = new ManagedScanPeripheral(scanResult.Peripheral);
+                        result = new ManagedScanPeripheral(scanResult.Peripheral, scanResult.AdvertisementData?.ServiceUuids);
                         this.Peripherals.Add(result);
                     }
+                    result.Connectable = scanResult.AdvertisementData?.IsConnectable;
+                    result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
                     result.Name = scanResult.Peripheral.Name;
                     result.Rssi = scanResult.Rssi;
                 });

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
 using System.Windows.Input;
 using Prism.Navigation;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Shiny.BluetoothLE;
 
 
@@ -11,6 +13,7 @@ namespace Samples.BluetoothLE
     public class ManagedScanViewModel : ViewModel
     {
         readonly ManagedScan scanner;
+
 
         public ManagedScanViewModel(IBleManager bleManager, INavigationService navigator)
         {
@@ -22,15 +25,20 @@ namespace Samples.BluetoothLE
                 scanner.Toggle();
                 this.IsBusy = scanner.IsScanning;
             });
-            //this.NavToPeripheral = navigator.NavigateCommand<ManagedScanPeripheral>(
-            //    "",
-            //    p => p.Peripheral
-            //);
+
+            this.WhenAnyValue(x => x.SelectedPeripheral)
+                .Skip(1)
+                .Where(x => x != null)
+                .Subscribe(async x =>
+                {
+                    scanner.Stop();
+                    await navigator.Navigate("Peripheral", ("Peripheral", x.Peripheral));
+                });
         }
 
 
         public ICommand Toggle { get;  }
-        public ICommand NavToPeripheral { get; }
+        [Reactive] public ManagedScanPeripheral SelectedPeripheral { get; set; }
         public ObservableCollection<ManagedScanPeripheral> Peripherals
             => this.scanner.Peripherals;
     }
