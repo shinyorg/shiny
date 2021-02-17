@@ -81,51 +81,48 @@ namespace Shiny.BluetoothLE
                 .Merge(this.connSubject);
 
 
-        public override IObservable<IList<IGattService>> GetServices() => this.Context.Invoke(Observable.Create<IList<IGattService>>(ob =>
-        {
-            this.AssertConnection();
-
-            var sub = this.Context.Callbacks.ServicesDiscovered.Subscribe(cb =>
+        public override IObservable<IList<IGattService>> GetServices()
+            => this.Context.Invoke(Observable.Create<IList<IGattService>>(ob =>
             {
-                if (cb.Gatt?.Services == null)
-                    return;
+                this.AssertConnection();
+                var sub = this.Context
+                    .Callbacks
+                    .ServicesDiscovered
+                    .Select(x => x.Gatt?.Services)
+                    .Where(x => x != null)
+                    .SelectMany(x => x
+                        .Select(native => new GattService(this, this.Context, native))
+                        .Cast<IGattService>()
+                    )
+                    .ToList()
+                    .Subscribe(
+                        ob.Respond,
+                        ob.OnError
+                    );
 
-                var list = cb
-                    .Gatt
-                    .Services
-                    .Select(native => new GattService(this, this.Context, native))
-                    .Cast<IGattService>()
-                    .ToList();
-
-                ob.Respond(list);
-            });
-
-            //this.context.RefreshServices();
-            this.Context.Gatt.DiscoverServices();
-
-            return sub;
-        }));
+                this.Context.Gatt.DiscoverServices();
+                return sub;
+            }));
 
 
-        public override IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
+        public override IObservable<int> ReadRssi()
         {
             this.AssertConnection();
 
-            var sub = this.Context
-                .Callbacks
-                .ReadRemoteRssi
-                .Take(1)
-                .Subscribe(cb =>
-                {
-                    if (cb.IsSuccessful)
-                        ob.Respond(cb.Rssi);
-                    else
-                        ob.OnError(new BleException("Failed to get RSSI - " + cb.Status));
-                });
+            return this.Context.Invoke(
+                this.Context
+                    .Callbacks
+                    .ReadRemoteRssi
+                    .Take(1)
+                    .Select(x =>
+                    {
+                        if (x.IsSuccessful)
+                            throw new BleException("Failed to get RSSI - " + x.Status);
 
-            this.Context.Gatt.ReadRemoteRssi();
-            return sub;
-        });
+                        return x.Rssi;
+                    })
+            );
+        }
 
 
         internal string? PairingRequestPin { get; set; }
@@ -185,23 +182,15 @@ namespace Shiny.BluetoothLE
         }));
 
 
-        public IObservable<int> WhenMtuChanged() => Observable
-            .Create<int>(ob => this.Context
-                .Callbacks
-                .MtuChanged
-                .Subscribe(cb =>
-                {
-                    if (!cb.IsSuccessful)
-                    {
-                        ob.OnError(new BleException("Failed to request MTU - " + cb.Status));
-                    }
-                    else
-                    {
-                        this.currentMtu = cb.Mtu;
-                        ob.Respond(cb.Mtu);
-                    }
-                })
-            )
+        public IObservable<int> WhenMtuChanged() => this.Context
+            .Callbacks
+            .MtuChanged
+            .Where(x => x.IsSuccessful)
+            .Select(x =>
+            {
+                this.currentMtu = x.Mtu;
+                return x.Mtu;
+            })
             .StartWith(this.currentMtu);
 
 
