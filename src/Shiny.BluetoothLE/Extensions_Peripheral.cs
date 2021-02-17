@@ -225,7 +225,7 @@ namespace Shiny.BluetoothLE
             peripheral
                 .GetServices()
                 .SelectMany(x => x.Select(y => y.GetCharacteristics()))
-                .Switch();
+                .Merge();
 
 
         /// <summary>

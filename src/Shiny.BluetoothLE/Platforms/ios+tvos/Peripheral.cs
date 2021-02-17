@@ -16,8 +16,13 @@ namespace Shiny.BluetoothLE
         IDisposable autoReconnectSub;
 
 
-        public Peripheral(CentralContext context, CBPeripheral native)
-            : base(native.Name, native.Identifier.ToString())
+        public Peripheral(
+            CentralContext context,
+            CBPeripheral native
+        ) : base(
+            native.Name,
+            native.Identifier.ToString()
+        )
         {
             this.context = context;
             this.Native = native;

@@ -67,14 +67,13 @@ namespace Shiny.BluetoothLE
             if (serviceUuid == null)
                 return Observable.Return(this.context.GetConnectedDevices().ToList());
 
-            var list = new List<IPeripheral>();
-            var peripherals = this.context.Manager.RetrieveConnectedPeripherals(CBUUID.FromString(serviceUuid));
-            foreach (var peripheral in peripherals)
-            {
-                var dev = this.context.GetPeripheral(peripheral);
-                list.Add(dev);
-            }
-            return Observable.Return(list);
+            return Observable.Return(this
+                .context
+                .Manager
+                .RetrieveConnectedPeripherals(CBUUID.FromString(serviceUuid))
+                .Select(x => this.context.GetPeripheral(x))
+                .ToList()
+            );
         }
 
 
@@ -94,8 +93,6 @@ namespace Shiny.BluetoothLE
                 {
                     if (access != AccessState.Available)
                         throw new PermissionException(ErrorCategory, access);
-
-                    this.IsScanning = true;
                 })
                 .SelectMany(_ =>
                 {
@@ -112,10 +109,8 @@ namespace Shiny.BluetoothLE
                     return this.context.ScanResultReceived;
                 })
                 .Finally(() =>
-                {
-                    this.context.Manager.StopScan();
-                    this.IsScanning = false;
-                });
+                    this.context.Manager.StopScan()
+                );
         }
 
 

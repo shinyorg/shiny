@@ -1,11 +1,12 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
-using System.Collections.Generic;
+
 
 namespace Shiny.BluetoothLE
 {
@@ -19,8 +20,13 @@ namespace Shiny.BluetoothLE
         internal PeripheralContext Context { get; }
 
 
-        public Peripheral(CentralContext centralContext, BluetoothDevice native)
-            : base(native.Name, ToDeviceId(native.Address).ToString())
+        public Peripheral(
+            CentralContext centralContext,
+            BluetoothDevice native
+        ) : base(
+            native.Name,
+            ToDeviceId(native.Address).ToString()
+        )
         {
             this.connSubject = new Subject<ConnectionState>();
             this.Context = new PeripheralContext(centralContext, native);
@@ -52,9 +58,10 @@ namespace Shiny.BluetoothLE
         // android does not have a find "1" service - it must discover all services.... seems shit
         public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false) => this
             .GetServices()
-            .Select(x => x
-                .FirstOrDefault(y => y.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase))
-            )
+            .Select(x => x.FirstOrDefault(y => y
+                .Uuid
+                .Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase)
+            ))
             .Take(1)
             .Assert(serviceUuid, throwIfNotFound);
 
@@ -74,7 +81,7 @@ namespace Shiny.BluetoothLE
                 .Merge(this.connSubject);
 
 
-        public override IObservable<IList<IGattService>> GetServices() => Observable.Create<IList<IGattService>>(ob =>
+        public override IObservable<IList<IGattService>> GetServices() => this.Context.Invoke(Observable.Create<IList<IGattService>>(ob =>
         {
             this.AssertConnection();
 
@@ -97,7 +104,7 @@ namespace Shiny.BluetoothLE
             this.Context.Gatt.DiscoverServices();
 
             return sub;
-        });
+        }));
 
 
         public override IObservable<int> ReadRssi() => Observable.Create<int>(ob =>
@@ -161,21 +168,11 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public PairingState PairingStatus
+        public PairingState PairingStatus => this.Context.NativeDevice.BondState switch
         {
-            get
-            {
-                switch (this.Context.NativeDevice.BondState)
-                {
-                    case Bond.Bonded:
-                        return PairingState.Paired;
-
-                    default:
-                    case Bond.None:
-                        return PairingState.NotPaired;
-                }
-            }
-        }
+            Bond.Bonded => PairingState.Paired,
+            _ => PairingState.NotPaired
+        };
 
 
         int currentMtu = 20;
@@ -195,7 +192,9 @@ namespace Shiny.BluetoothLE
                 .Subscribe(cb =>
                 {
                     if (!cb.IsSuccessful)
+                    {
                         ob.OnError(new BleException("Failed to request MTU - " + cb.Status));
+                    }
                     else
                     {
                         this.currentMtu = cb.Mtu;
