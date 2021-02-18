@@ -21,18 +21,26 @@ namespace Samples.BluetoothLE
         }
 
 
-        public override Task OnConnected(IPeripheral peripheral) => Task.WhenAll(
-            this.services.Connection.InsertAsync(new BleEvent
+        //public override Task OnConnected(IPeripheral peripheral) =>
+        //    this.services.Connection.InsertAsync(new BleEvent
+        //    {
+        //        Timestamp = DateTime.Now
+        //    });
+
+        public override async Task OnConnected(IPeripheral peripheral)
+        {
+            await this.services.Connection.InsertAsync(new BleEvent
             {
+                Description = $"Peripheral '{peripheral.Name}' Connected",
                 Timestamp = DateTime.Now
-            }),
-            this.services.Notifications.Send(
+            });
+            await this.services.Notifications.Send(
                 this.GetType(),
                 true,
                 "BluetoothLE Device Connected",
                 $"{peripheral.Name} has connected"
-            )
-        );
+            );
+        }
 
 
         //public override Task OnScanResult(ScanResult result)
