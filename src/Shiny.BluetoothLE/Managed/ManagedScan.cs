@@ -7,10 +7,11 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE.Managed
 {
-    public class ManagedScan
+    public class ManagedScan : IDisposable
     {
         readonly IBleManager bleManager;
         IDisposable? scanSub;
+        IDisposable? clearSub;
 
 
         public ManagedScan(IBleManager bleManager, IScheduler? scheduler = null)
@@ -40,6 +41,33 @@ namespace Shiny.BluetoothLE.Managed
         }
 
 
+        public TimeSpan? ClearTime { get; private set; }
+
+        public void StartClearAfterTime(TimeSpan timeSpan)
+        {
+            this.ClearTime = timeSpan;
+            this.clearSub = Observable
+                .Interval(TimeSpan.FromSeconds(10))
+                .ObserveOnIf(this.Scheduler)
+                .Synchronize(this.Peripherals)
+                .Subscribe(_ =>
+                {
+                    var maxAge = DateTimeOffset.UtcNow.Subtract(timeSpan);
+                    var tmp = this.Peripherals.Where(x => x.LastSeen < maxAge).ToList();
+
+                    foreach (var p in tmp)
+                        this.Peripherals.Remove(p);
+                });
+        }
+
+
+        public void StopClearAfterTime()
+        {
+            this.ClearTime = null;
+            this.clearSub?.Dispose();
+        }
+
+
         public bool Toggle()
         {
             if (this.IsScanning)
@@ -59,21 +87,25 @@ namespace Shiny.BluetoothLE.Managed
             this.Peripherals.Clear();
             this.scanSub = this.bleManager
                 .Scan(this.ScanConfig)
+                .Buffer(TimeSpan.FromSeconds(3))
                 .ObserveOnIf(this.Scheduler)
-                .Synchronize()
-                .Subscribe(scanResult =>
+                .Synchronize(this.Peripherals)
+                .Subscribe(scanResults =>
                 {
-                    var result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
-                    if (result == null)
+                    foreach (var scanResult in scanResults)
                     {
-                        result = new ManagedScanResult(scanResult.Peripheral, scanResult.AdvertisementData?.ServiceUuids);
-                        this.Peripherals.Add(result);
+                        var result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
+                        if (result == null)
+                        {
+                            result = new ManagedScanResult(scanResult.Peripheral, scanResult.AdvertisementData?.ServiceUuids);
+                            this.Peripherals.Add(result);
+                        }
+                        result.Connectable = scanResult.AdvertisementData?.IsConnectable;
+                        result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
+                        result.Name = scanResult.Peripheral.Name;
+                        result.Rssi = scanResult.Rssi;
+                        result.LastSeen = DateTimeOffset.UtcNow;
                     }
-                    result.Connectable = scanResult.AdvertisementData?.IsConnectable;
-                    result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
-                    result.Name = scanResult.Peripheral.Name;
-                    result.Rssi = scanResult.Rssi;
-                    result.LastSeen = DateTimeOffset.UtcNow;
                 });
         }
 
@@ -92,6 +124,14 @@ namespace Shiny.BluetoothLE.Managed
             action();
             if (wasScanning)
                 this.Start();
+        }
+
+
+        public void Dispose()
+        {
+            this.Stop();
+            this.StopClearAfterTime();
+            this.Peripherals.Clear();
         }
     }
 }
