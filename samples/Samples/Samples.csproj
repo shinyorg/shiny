@@ -55,9 +55,4 @@
         <EmbeddedResource Include="Resources\fa-solid-900.ttf" />
     </ItemGroup>
 
-    <ItemGroup>
-      <EmbeddedResource Update="BluetoothLE\ManagedPeripheralPage.xaml">
-        <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-      </EmbeddedResource>
-    </ItemGroup>
 </Project>
