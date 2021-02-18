@@ -31,6 +31,7 @@ namespace Samples.BluetoothLE
                 .Where(x => x != null)
                 .Subscribe(async x =>
                 {
+                    this.SelectedPeripheral = null;
                     this.StopScan();
                     await navigator.Navigate("Peripheral", ("Peripheral", x.Peripheral));
                 });
@@ -110,7 +111,7 @@ namespace Samples.BluetoothLE
         public ICommand ToggleAdapterState { get; }
         public bool CanControlAdapterState { get; }
         public ObservableCollection<PeripheralItemViewModel> Peripherals { get; } = new ObservableCollection<PeripheralItemViewModel>();
-        [Reactive] public PeripheralItemViewModel SelectedPeripheral { get; set; }
+        [Reactive] public PeripheralItemViewModel? SelectedPeripheral { get; set; }
         [Reactive] public bool IsScanning { get; private set; }
 
 
