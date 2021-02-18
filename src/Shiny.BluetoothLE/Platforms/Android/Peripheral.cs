@@ -90,11 +90,11 @@ namespace Shiny.BluetoothLE
                     .ServicesDiscovered
                     .Select(x => x.Gatt?.Services)
                     .Where(x => x != null)
-                    .SelectMany(x => x
+                    .Select(x => x
                         .Select(native => new GattService(this, this.Context, native))
                         .Cast<IGattService>()
+                        .ToList()
                     )
-                    .ToList()
                     .Subscribe(
                         ob.Respond,
                         ob.OnError
