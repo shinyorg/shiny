@@ -33,7 +33,7 @@
                         <TextCell Text="GPS" Command="{Binding Navigate}" CommandParameter="Nav/Gps"  />
                         <TextCell Text="Geofencing" Command="{Binding Navigate}" CommandParameter="Nav/Geofencing" />
                         <TextCell Text="Beacons" Command="{Binding Navigate}" CommandParameter="Nav/Beacons" />
-                        <TextCell Text="Beacons (Managed)" Command="{Binding Navigate}" CommandParameter="Nav/BeaconsManaged" />
+                        <TextCell Text="Beacon Scan (Managed)" Command="{Binding Navigate}" CommandParameter="Nav/BeaconsManaged" />
                         <TextCell Text="Motion Activity" Command="{Binding Navigate}" CommandParameter="Nav/MotionActivity" />
                         <TextCell Text="Test Motion Activity" Command="{Binding Navigate}" CommandParameter="Nav/TestMotionActivity" />
                     </TableSection>

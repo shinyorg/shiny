@@ -59,6 +59,9 @@ namespace Shiny.Beacons.Managed
             this.ScanningRegion = scanRegion;
             this.Beacons.Clear();
 
+            // restart clear if applicable
+            this.ClearTime = this.ClearTime;
+
             this.scanSub = this.beaconManager
                 .WhenBeaconRanged(scanRegion)
                 .Buffer(TimeSpan.FromSeconds(2))
@@ -83,6 +86,7 @@ namespace Shiny.Beacons.Managed
 
         public void Stop()
         {
+            this.clearSub?.Dispose();
             this.scanSub?.Dispose();
             this.scheduler = null;
             this.ScanningRegion = null;
@@ -91,7 +95,6 @@ namespace Shiny.Beacons.Managed
 
         public void Dispose()
         {
-            this.clearSub?.Dispose();
             this.Stop();
             this.Beacons.Clear();
         }

@@ -18,8 +18,7 @@ namespace Samples.BluetoothLE
 
         public ManagedScanViewModel(IBleManager bleManager, INavigationService navigator)
         {
-            this.scanner = bleManager.CreateManagedScanner(RxApp.MainThreadScheduler);
-            //this.scanner.StartClearAfterTime(TimeSpan.FromSeconds(10));
+            this.scanner = bleManager.CreateManagedScanner(RxApp.MainThreadScheduler, TimeSpan.FromSeconds(10));
 
             this.Toggle = ReactiveCommand.Create(() =>
                 this.IsBusy = scanner.Toggle()

@@ -52,6 +52,7 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Geofences.CreatePage>("CreateGeofence");
             containerRegistry.RegisterForNavigation<Beacons.MainPage>("Beacons");
             containerRegistry.RegisterForNavigation<Beacons.CreatePage>("CreateBeacon");
+            containerRegistry.RegisterForNavigation<Beacons.ManagedBeaconPage>("BeaconsManaged");
             containerRegistry.RegisterForNavigation<MotionActivity.MainPage>("MotionActivity");
             containerRegistry.RegisterForNavigation<MotionActivity.TestMotionActivityPage>("TestMotionActivity");
 

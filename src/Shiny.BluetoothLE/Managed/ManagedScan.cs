@@ -86,7 +86,10 @@ namespace Shiny.BluetoothLE.Managed
             if (this.IsScanning)
                 return;
 
+            // restart clear timer if set
+            this.ClearTime = this.ClearTime;
             this.Peripherals.Clear();
+
             this.scanSub = this.bleManager
                 .Scan(this.ScanConfig)
                 .Buffer(TimeSpan.FromSeconds(3))
@@ -114,6 +117,7 @@ namespace Shiny.BluetoothLE.Managed
 
         public void Stop()
         {
+            this.clearSub?.Dispose();
             this.scanSub?.Dispose();
             this.scanSub = null;
         }
@@ -132,7 +136,6 @@ namespace Shiny.BluetoothLE.Managed
         public void Dispose()
         {
             this.Stop();
-            this.clearSub?.Dispose();
             this.Peripherals.Clear();
         }
     }
