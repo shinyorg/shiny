@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
@@ -93,7 +92,7 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable) => Observable.FromAsync(async ct =>
+        public override IObservable<IGattCharacteristic> EnableNotifications(bool enable, bool useIndicationsIfAvailable) => Observable.FromAsync(async ct =>
         {
             if (!enable)
             {
@@ -114,6 +113,7 @@ namespace Shiny.BluetoothLE
                 this.IsNotifying = true;
                 this.context.SetNotifyCharacteristic(this);
             }
+            return this;
         });
 
 

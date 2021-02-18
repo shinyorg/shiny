@@ -21,7 +21,7 @@ namespace Shiny.BluetoothLE
         public CharacteristicProperties Properties { get; }
 
         public abstract IObservable<IList<IGattDescriptor>> GetDescriptors();
-        public abstract IObservable<Unit> EnableNotifications(bool enable, bool useIndicationIfAvailable = false);
+        public abstract IObservable<IGattCharacteristic> EnableNotifications(bool enable, bool useIndicationIfAvailable = false);
         public abstract IObservable<GattCharacteristicResult> WhenNotificationReceived();
         public abstract IObservable<GattCharacteristicResult> Read();
         public abstract IObservable<GattCharacteristicResult> Write(byte[] value, bool withResponse = true);

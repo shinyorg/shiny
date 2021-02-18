@@ -33,7 +33,7 @@ namespace Samples
                         .ToTask();
 
                     this.Append("Device Found");
-                    await this.peripheral.ConnectWait();
+                    await this.peripheral.WithConnectIf();
                     this.Append("Device Connected");
                     var rx = await this.peripheral.GetKnownCharacteristic("FFF0", "FFF1").ToTask();
                     if (rx == null)

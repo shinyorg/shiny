@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:ble="clr-namespace:Shiny.BluetoothLE;assembly=Shiny.BluetoothLE"
+             xmlns:ble="clr-namespace:Shiny.BluetoothLE.Managed;assembly=Shiny.BluetoothLE"
              x:Class="Samples.BluetoothLE.ManagedScanPage"
              Title="BLE Managed Scan">
 

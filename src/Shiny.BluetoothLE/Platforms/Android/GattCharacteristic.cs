@@ -123,7 +123,7 @@ namespace Shiny.BluetoothLE
         })));
 
 
-        public override IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable) => this.context.Invoke(Observable.Create<Unit>(ob =>
+        public override IObservable<IGattCharacteristic> EnableNotifications(bool enable, bool useIndicationsIfAvailable) => this.context.Invoke(Observable.Create<IGattCharacteristic>(ob =>
         {
             if (!this.context.Gatt.SetCharacteristicNotification(this.native, enable))
                 throw new BleException("Failed to set characteristic notification value");
@@ -144,7 +144,7 @@ namespace Shiny.BluetoothLE
                     _ =>
                     {
                         this.IsNotifying = enable;
-                        ob.Respond(Unit.Default);
+                        ob.Respond(this);
                     },
                     ob.OnError
                 );
@@ -159,7 +159,7 @@ namespace Shiny.BluetoothLE
                 .Callbacks
                 .CharacteristicChanged
                 .Where(this.NativeEquals)
-                .Select((Func<GattCharacteristicEventArgs, GattCharacteristicResult>)(args =>
+                .Select(args =>
                 {
                     if (!args.IsSuccessful)
                         throw new BleException($"Notification error - {args.Status}");
@@ -169,7 +169,7 @@ namespace Shiny.BluetoothLE
                         args.Characteristic.GetValue(),
                         GattCharacteristicResultType.Notification
                     );
-                }));
+                });
         }
 
 

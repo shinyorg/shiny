@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
@@ -10,9 +11,9 @@ namespace Shiny.BluetoothLE
 {
     public static class AsyncExtensions
     {
-        public static Task ConnectWaitAsync(this IPeripheral peripheral, CancellationToken? cancelToken = null)
+        public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken? cancelToken = null)
             => peripheral
-                .ConnectWait()
+                .WithConnectIf(config)
                 .Timeout(TimeSpan.FromSeconds(30))
                 .ToTask(cancelToken ?? CancellationToken.None);
 
@@ -40,6 +41,10 @@ namespace Shiny.BluetoothLE
                 .GetKnownCharacteristic(serviceUuid, characteristicUuid)
                 .Take(1)
                 .ToTask(cancelToken ?? CancellationToken.None);
+
+
+        public static Task WriteBlobAsync(this IGattCharacteristic characteristic, Stream stream, CancellationToken? cancelToken = null)
+            => characteristic.WriteBlob(stream).ToTask(cancelToken ?? CancellationToken.None);
 
 
         public static Task<GattCharacteristicResult> WriteAsync(this IGattCharacteristic characteristic, byte[] data, bool withResponse, CancellationToken? cancelToken = null)

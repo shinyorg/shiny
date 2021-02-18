@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -71,11 +72,28 @@ namespace Shiny.BluetoothLE
 
 
         /// <summary>
+        ///
+        /// </summary>
+        /// <param name="characteristic"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public static IObservable<Unit> WriteBlob(this IGattCharacteristic characteristic, Stream stream) => Observable.Create<Unit>(ob =>
+            characteristic
+                .WriteBlobWithProgress(stream)
+                .Subscribe(
+                    _ => { },
+                    ex => ob.OnError(ex),
+                    () => ob.Respond(Unit.Default)
+                )
+        );
+
+
+        /// <summary>
         /// Used for writing blobs
         /// </summary>
         /// <param name="ch">The characteristic to write on</param>
         /// <param name="stream">The stream to send</param>
-        public static IObservable<BleWriteSegment> BlobWrite(this IGattCharacteristic ch, Stream stream) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
+        public static IObservable<BleWriteSegment> WriteBlobWithProgress(this IGattCharacteristic ch, Stream stream) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
         {
             var mtu = ch.Service.Peripheral.MtuSize;
             var buffer = new byte[mtu];

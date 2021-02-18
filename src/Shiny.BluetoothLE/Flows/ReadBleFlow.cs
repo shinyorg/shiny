@@ -31,7 +31,7 @@ namespace Shiny.BluetoothLE.Flows
 
         public IObservable<byte[]> Write(byte[] data) => Observable.FromAsync(async ct =>
         {
-            await this.tx.BlobWrite(new MemoryStream(data)).ToTask(ct);
+            await this.tx.WriteBlob(new MemoryStream(data)).ToTask(ct);
             var ms = new MemoryStream();
             var eof = false;
 

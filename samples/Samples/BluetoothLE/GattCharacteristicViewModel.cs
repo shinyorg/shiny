@@ -73,7 +73,7 @@ namespace Samples.BluetoothLE
             sw.Start();
 
             var sub = this.Characteristic
-                .BlobWrite(new MemoryStream(bytes))
+                .WriteBlob(new MemoryStream(bytes))
                 .Subscribe(
                     //s => dlg.Title = $"Sending Blob - Sent {s.Position} of {s.TotalLength} bytes",
                     ex =>

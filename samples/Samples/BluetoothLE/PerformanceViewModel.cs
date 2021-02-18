@@ -199,7 +199,7 @@ namespace Samples.BluetoothLE
                 this.Info = "Peripheral Found - Connecting";
 
                 await this.peripheral
-                    .ConnectWait()
+                    .WithConnectIf()
                     .Timeout(TimeSpan.FromSeconds(5))
                     .ToTask(cancelToken);
 

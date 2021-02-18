@@ -46,7 +46,7 @@ namespace Shiny.BluetoothLE.Flows
 
             try
             {
-                await this.tx.BlobWrite(new MemoryStream(data));
+                await this.tx.WriteBlob(new MemoryStream(data));
             }
             catch (Exception ex)
             {

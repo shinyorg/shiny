@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive;
 
 
 namespace Shiny.BluetoothLE
@@ -18,7 +17,7 @@ namespace Shiny.BluetoothLE
         /// <param name="enable"></param>
         /// <param name="useIndicationIfAvailable">If true and indication is available, it will be used</param>
         /// <returns></returns>
-        IObservable<Unit> EnableNotifications(bool enable, bool useIndicationIfAvailable = false);
+        IObservable<IGattCharacteristic> EnableNotifications(bool enable, bool useIndicationIfAvailable = false);
 
         ///// <summary>
         ///// Subscribe to notifications (or indications if available) - once all subscriptions are cleared, the characteristic is unsubscribed

@@ -61,12 +61,12 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable)
+        public override IObservable<IGattCharacteristic> EnableNotifications(bool enable, bool useIndicationsIfAvailable)
         {
             this.AssertNotify();
             this.Peripheral.SetNotifyValue(enable, this.NativeCharacteristic);
             this.IsNotifying = enable;
-            return Observable.Return(Unit.Default);
+            return Observable.Return(this);
         }
 
 

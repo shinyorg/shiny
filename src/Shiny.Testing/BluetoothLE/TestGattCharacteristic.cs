@@ -30,10 +30,10 @@ namespace Shiny.Testing.BluetoothLE
                 .ToObservable();
 
 
-        public IObservable<Unit> EnableNotifications(bool enable, bool useIndicationsIfAvailable)
+        public IObservable<IGattCharacteristic> EnableNotifications(bool enable, bool useIndicationsIfAvailable)
         {
             this.IsNotifying = enable;
-            return Observable.Return(Unit.Default);
+            return Observable.Return(this);
         }
 
 

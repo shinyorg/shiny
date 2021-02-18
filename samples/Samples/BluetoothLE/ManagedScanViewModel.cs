@@ -6,6 +6,7 @@ using Prism.Navigation;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Shiny.BluetoothLE;
+using Shiny.BluetoothLE.Managed;
 
 
 namespace Samples.BluetoothLE
@@ -21,25 +22,24 @@ namespace Samples.BluetoothLE
             this.scanner.Scheduler = RxApp.MainThreadScheduler;
 
             this.Toggle = ReactiveCommand.Create(() =>
-            {
-                scanner.Toggle();
-                this.IsBusy = scanner.IsScanning;
-            });
+                this.IsBusy = scanner.Toggle()
+            );
 
             this.WhenAnyValue(x => x.SelectedPeripheral)
                 .Skip(1)
                 .Where(x => x != null)
                 .Subscribe(async x =>
                 {
+                    this.SelectedPeripheral = null;
                     scanner.Stop();
-                    await navigator.Navigate("Peripheral", ("Peripheral", x.Peripheral));
+                    await navigator.Navigate("ManagedPeripheral", ("Peripheral", x.Peripheral));
                 });
         }
 
 
         public ICommand Toggle { get;  }
-        [Reactive] public ManagedScanPeripheral SelectedPeripheral { get; set; }
-        public ObservableCollection<ManagedScanPeripheral> Peripherals
+        [Reactive] public ManagedScanResult SelectedPeripheral { get; set; }
+        public ObservableCollection<ManagedScanResult> Peripherals
             => this.scanner.Peripherals;
     }
 }
