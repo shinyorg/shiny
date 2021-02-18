@@ -14,7 +14,7 @@ namespace Shiny.BluetoothLE.Managed
         IDisposable? clearSub;
 
 
-        public ManagedScan(IBleManager bleManager, IScheduler? scheduler = null, TimeSpan? clearTime)
+        public ManagedScan(IBleManager bleManager, IScheduler? scheduler = null, TimeSpan? clearTime = null)
         {
             this.bleManager = bleManager;
             this.scheduler = scheduler;
