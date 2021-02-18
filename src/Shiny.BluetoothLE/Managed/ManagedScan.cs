@@ -14,10 +14,11 @@ namespace Shiny.BluetoothLE.Managed
         IDisposable? clearSub;
 
 
-        public ManagedScan(IBleManager bleManager, IScheduler? scheduler = null)
+        public ManagedScan(IBleManager bleManager, IScheduler? scheduler = null, TimeSpan? clearTime)
         {
             this.bleManager = bleManager;
             this.scheduler = scheduler;
+            this.ClearTime = clearTime;
         }
 
 
@@ -41,30 +42,31 @@ namespace Shiny.BluetoothLE.Managed
         }
 
 
-        public TimeSpan? ClearTime { get; private set; }
-
-        public void StartClearAfterTime(TimeSpan timeSpan)
+        TimeSpan? clearTime;
+        public TimeSpan? ClearTime
         {
-            this.ClearTime = timeSpan;
-            this.clearSub = Observable
-                .Interval(TimeSpan.FromSeconds(10))
-                .ObserveOnIf(this.Scheduler)
-                .Synchronize(this.Peripherals)
-                .Subscribe(_ =>
+            get => this.clearTime;
+            set
+            {
+                this.clearTime = value;
+                this.clearSub?.Dispose();
+
+                if (value != null)
                 {
-                    var maxAge = DateTimeOffset.UtcNow.Subtract(timeSpan);
-                    var tmp = this.Peripherals.Where(x => x.LastSeen < maxAge).ToList();
+                    this.clearSub = Observable
+                        .Interval(TimeSpan.FromSeconds(10))
+                        .ObserveOnIf(this.Scheduler)
+                        .Synchronize(this.Peripherals)
+                        .Subscribe(_ =>
+                        {
+                            var maxAge = DateTimeOffset.UtcNow.Subtract(value.Value);
+                            var tmp = this.Peripherals.Where(x => x.LastSeen < maxAge).ToList();
 
-                    foreach (var p in tmp)
-                        this.Peripherals.Remove(p);
-                });
-        }
-
-
-        public void StopClearAfterTime()
-        {
-            this.ClearTime = null;
-            this.clearSub?.Dispose();
+                            foreach (var p in tmp)
+                                this.Peripherals.Remove(p);
+                        });
+                }
+            }
         }
 
 
@@ -130,7 +132,7 @@ namespace Shiny.BluetoothLE.Managed
         public void Dispose()
         {
             this.Stop();
-            this.StopClearAfterTime();
+            this.clearSub?.Dispose();
             this.Peripherals.Clear();
         }
     }

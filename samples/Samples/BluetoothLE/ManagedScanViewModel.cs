@@ -18,8 +18,8 @@ namespace Samples.BluetoothLE
 
         public ManagedScanViewModel(IBleManager bleManager, INavigationService navigator)
         {
-            this.scanner = bleManager.CreateManagedScanner();
-            this.scanner.Scheduler = RxApp.MainThreadScheduler;
+            this.scanner = bleManager.CreateManagedScanner(RxApp.MainThreadScheduler);
+            //this.scanner.StartClearAfterTime(TimeSpan.FromSeconds(10));
 
             this.Toggle = ReactiveCommand.Create(() =>
                 this.IsBusy = scanner.Toggle()
@@ -37,8 +37,14 @@ namespace Samples.BluetoothLE
         }
 
 
+
+        public override void OnDisappearing()
+        {
+            this.scanner.Stop();
+        }
+
         public ICommand Toggle { get;  }
-        [Reactive] public ManagedScanResult SelectedPeripheral { get; set; }
+        [Reactive] public ManagedScanResult? SelectedPeripheral { get; set; }
         public ObservableCollection<ManagedScanResult> Peripherals
             => this.scanner.Peripherals;
     }
