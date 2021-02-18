@@ -24,7 +24,7 @@
                             SelectionMode="Single"
                             VerticalOptions="FillAndExpand">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="ble:ManagedScanPeripheral">
+                    <DataTemplate x:DataType="ble:ManagedScanResult">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="30" />

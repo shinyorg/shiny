@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using Shiny.Beacons.Managed;
 
 
 namespace Shiny.Beacons
 {
     public static class Extensions
     {
+        public static ManagedScan CreateManagedScan(this IBeaconRangingManager manager)
+            => new ManagedScan(manager);
+
+
         public static bool TrySetBeaconNotificationConfiguration(this IBeaconMonitoringManager manager, string? title = null, string? description = null, string? tickerText = null)
         {
             var config = manager as IBeaconMonitoringNotificationConfiguration;
