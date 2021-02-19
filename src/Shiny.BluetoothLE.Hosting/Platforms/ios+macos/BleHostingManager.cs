@@ -7,6 +7,7 @@ using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
 using Foundation;
 
+
 namespace Shiny.BluetoothLE.Hosting
 {
     public class BleHostingManager : IBleHostingManager
@@ -15,31 +16,15 @@ namespace Shiny.BluetoothLE.Hosting
         readonly IDictionary<string, GattService> services = new Dictionary<string, GattService>();
 
 
-        public AccessState Status
+        public AccessState Status => this.manager.State switch
         {
-            get
-            {
-                switch (this.manager.State)
-                {
-                    case CBPeripheralManagerState.PoweredOff:
-                        return AccessState.Disabled;
-
-                    case CBPeripheralManagerState.Unauthorized:
-                        return AccessState.Denied;
-
-                    case CBPeripheralManagerState.Unsupported:
-                        return AccessState.NotSupported;
-
-                    case CBPeripheralManagerState.PoweredOn:
-                        return AccessState.Available;
-
-                    case CBPeripheralManagerState.Resetting:
-                    case CBPeripheralManagerState.Unknown:
-                    default:
-                        return AccessState.Unknown;
-                }
-            }
-        }
+            CBPeripheralManagerState.PoweredOff => AccessState.Disabled,
+            CBPeripheralManagerState.Unauthorized => AccessState.Denied,
+            CBPeripheralManagerState.Unsupported => AccessState.NotSupported,
+            CBPeripheralManagerState.PoweredOn => AccessState.Available,
+            //  CBPeripheralManagerState.Resetting, Unknown
+            _ => AccessState.Unknown
+        };
 
 
         public IObservable<AccessState> WhenStatusChanged() => Observable.Create<AccessState>(ob =>
@@ -76,7 +61,6 @@ namespace Shiny.BluetoothLE.Hosting
 
                 this.manager.StartAdvertising(new StartAdvertisingOptions
                 {
-                    LocalName = adData?.LocalName,
                     ServicesUUID = this.services
                         .Select(x => CBUUID.FromString(x.Value.Uuid))
                         .ToArray()

@@ -5,13 +5,17 @@
              x:Class="Samples.BleHosting.GattServerPage"
              x:DataType="ble:GattServerViewModel"
              Title="GATT Server">
+
     <ContentPage.Content>
         <TableView>
             <TableRoot>
                 <TableSection Title="Info">
-                    <TextCell Text="A495FF20-C5B1-4B44-B512-1370F02D74DE" TextColor="Red" />
-                    <EntryCell Label="Local Name" Text="{Binding LocalName}" />
-                    <TextCell Text="{Binding ServerText}" Command="{Binding ToggleServer}" />
+                    <TextCell Text="Service UUID"
+                              Detail="A495FF20-C5B1-4B44-B512-1370F02D74DE"
+                              DetailColor="Red" />
+
+                    <TextCell Text="{Binding ServerText}"
+                              Command="{Binding ToggleServer}" />
                 </TableSection>
 
                 <TableSection Title="Read/Write">

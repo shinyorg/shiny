@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Text;
 using System.Windows.Input;
@@ -47,10 +46,7 @@ namespace Samples.BleHosting
 
                     await this.hostingManager.StartAdvertising(new AdvertisementData
                     {
-                        LocalName = LocalName,
-                        ServiceUuids = new List<string> {
-                            ServiceUuid
-                        }
+                        ServiceUuids = { ServiceUuid }
                     });
 
                     this.ServerText = "Stop Server";

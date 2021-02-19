@@ -79,7 +79,7 @@ namespace Shiny.BluetoothLE.Hosting
                 .SetConnectable(true);
 
             var data = new AdvertiseData.Builder()
-                //.SetIncludeDeviceName(true) // TODO: configurable
+                //.SetIncludeDeviceName(true)
                 .SetIncludeTxPowerLevel(true);
 
             if (adData != null)
