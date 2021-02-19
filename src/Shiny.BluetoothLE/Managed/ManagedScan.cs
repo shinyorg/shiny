@@ -3,25 +3,34 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 
 
 namespace Shiny.BluetoothLE.Managed
 {
     public class ManagedScan : IDisposable
     {
+        readonly Subject<(IPeripheral Peripheral, ManagedScanResult ScanResult)> newSubj;
         readonly IBleManager bleManager;
         IDisposable? scanSub;
         IDisposable? clearSub;
 
 
-        public ManagedScan(IBleManager bleManager, IScheduler? scheduler = null, TimeSpan? clearTime = null)
+        public ManagedScan(IBleManager bleManager,
+                           ScanConfig? scanConfig = null,
+                           IScheduler? scheduler = null,
+                           TimeSpan? clearTime = null)
         {
+            this.newSubj = new Subject<(IPeripheral Peripheral, ManagedScanResult ScanResult)>();
             this.bleManager = bleManager;
+
+            this.scanConfig = scanConfig;
             this.scheduler = scheduler;
-            this.ClearTime = clearTime;
+            this.clearTime = clearTime;
         }
 
 
+        public IObservable<(IPeripheral Peripheral, ManagedScanResult ScanResult)> WhenNewPeripheralFound() => this.newSubj;
         public ObservableCollection<ManagedScanResult> Peripherals { get; } = new ObservableCollection<ManagedScanResult>();
         public bool IsScanning => this.scanSub != null;
 
@@ -104,6 +113,9 @@ namespace Shiny.BluetoothLE.Managed
                         {
                             result = new ManagedScanResult(scanResult.Peripheral, scanResult.AdvertisementData?.ServiceUuids);
                             this.Peripherals.Add(result);
+
+                            // new device found
+                            this.newSubj.OnNext((result.Peripheral, result));
                         }
                         result.Connectable = scanResult.AdvertisementData?.IsConnectable;
                         result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
