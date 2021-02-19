@@ -16,10 +16,11 @@ namespace Shiny.BluetoothLE.Managed
     public class ManagedPeripheral : NotifyPropertyChanged, IDisposable
     {
         readonly List<GattCharacteristicInfo> characteristics;
-        readonly Subject<(string ServiceUuid, string CharacteristicUuid)> notifySub;
+        readonly Subject<GattCharacteristicResult> notifySub;
         readonly Subject<(string ServiceUuid, string CharacteristicUuid)> notifyReadySub;
         CompositeDisposable npcDispose;
         CompositeDisposable coreDispose;
+        CompositeDisposable? notifyDispose;
         IDisposable? rssiSub;
 
 
@@ -27,13 +28,14 @@ namespace Shiny.BluetoothLE.Managed
         {
             this.coreDispose = new CompositeDisposable();
             this.characteristics = new List<GattCharacteristicInfo>();
-            this.notifySub = new Subject<(string ServiceUuid, string CharacteristicUuid)>();
+            this.notifySub = new Subject<GattCharacteristicResult>();
             this.notifyReadySub = new Subject<(string ServiceUuid, string CharacteristicUuid)>();
             this.Peripheral = peripheral;
 
             this.CreateNpc(scheduler);
             this.Peripheral
                 .WhenConnected()
+                .Do(_ => this.notifyDispose = new CompositeDisposable())
                 .Select(_ => this.RestoreNotifications())
                 .Subscribe()
                 .DisposedBy(this.coreDispose);
@@ -42,6 +44,7 @@ namespace Shiny.BluetoothLE.Managed
                 .WhenDisconnected()
                 .Do(_ =>
                 {
+                    this.notifyDispose?.Dispose();
                     lock (this.characteristics)
                     {
                         foreach (var ch in this.characteristics)
@@ -59,7 +62,10 @@ namespace Shiny.BluetoothLE.Managed
         public IPeripheral Peripheral { get; }
 
 
-        public IObservable<Unit> ConnectWait(ConnectionConfig? config = null) => this.Peripheral.WithConnectIf(config).Select(_ => Unit.Default);
+        public IObservable<Unit> ConnectWait(ConnectionConfig? config = null) => this.Peripheral
+            .WithConnectIf(config)
+            .Select(_ => Unit.Default);
+
         public void CancelConnection() => this.Peripheral.CancelConnection();
 
 
@@ -101,15 +107,19 @@ namespace Shiny.BluetoothLE.Managed
 
         public bool IsMonitoringRssi => this.rssiSub != null;
 
+        public IObservable<byte[]> WhenNotificationReceived(string serviceUuid, string characteristicUuid) =>
+            this.notifySub
+                .Where(x =>
+                    x.Characteristic.Service.Uuid.Equals(serviceUuid) &&
+                    x.Characteristic.Uuid.Equals(characteristicUuid)
+                )
+                .Select(x => x.Data!);
 
-        public IObservable<GattCharacteristicResult> WhenNotificationReceived(string serviceUuid, string characteristicUuid)
-        {
-            // TODO: if not hooked or in list to hook, hook it, add to config
-            return null;
-        }
+        public IObservable<GattCharacteristicResult> WhenAnyNotificationReceived()
+            => this.notifySub;
 
-
-        public IObservable<(string ServiceUuid, string CharacteristicUuid)> WhenNotificationReady() => this.notifyReadySub;
+        public IObservable<(string ServiceUuid, string CharacteristicUuid)> WhenNotificationReady()
+            => this.notifyReadySub;
 
 
         public IReadOnlyList<GattCharacteristicInfo> Characteristics => this.characteristics.AsReadOnly();
@@ -140,6 +150,19 @@ namespace Shiny.BluetoothLE.Managed
                 this.GetInfo(serviceUuid, characteristicUuid).Value = x.Data;
                 return x.Data;
             });
+
+
+        public IObservable<Unit> EnableNotifications(bool enable, string serviceUuid, string characteristicUuid, bool useIndicationIfAvailable = false) =>
+            this.GetChar(serviceUuid, characteristicUuid)
+                .Select(x => x.EnableNotifications(enable, useIndicationIfAvailable))
+                .Switch()
+                .Do(_ =>
+                {
+                    var info = this.GetInfo(serviceUuid, characteristicUuid);
+                    info.IsNotificationsEnabled = enable;
+                    info.UseIndicationIfAvailable = useIndicationIfAvailable;
+                })
+                .Select(_ => Unit.Default);
 
 
         public bool ToggleRssi()
@@ -187,14 +210,18 @@ namespace Shiny.BluetoothLE.Managed
         IObservable<Unit> RestoreNotifications() => this.characteristics
             .ToObservable()
             .Where(x => x.IsNotificationsEnabled)
-            .Select(x => this.GetChar(x.ServiceUuid, x.CharacteristicUuid))
+            .Select(x => this
+                .GetChar(x.ServiceUuid, x.CharacteristicUuid)
+                .Do(ch => ch
+                    .WhenNotificationReceived()
+                    .Subscribe(x => this.notifySub.OnNext(x))
+                    .DisposedBy(this.notifyDispose!)
+                )
+                .Select(y => y.EnableNotifications(true, x.IsNotificationsEnabled))
+                .Switch()
+            )
             .Switch()
-            .Select(x => x.EnableNotifications(true, true))
-            .Merge()
-            .Do(x =>
-            {
-                // TODO: flag notifications as enabled
-            })
+            .Do(x => this.notifyReadySub.OnNext((x.Service.Uuid, x.Uuid)))
             .Select(_ => Unit.Default);
 
 
