@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using CoreBluetooth;
-
+using Foundation;
 
 namespace Shiny.BluetoothLE.Hosting
 {
@@ -56,14 +56,37 @@ namespace Shiny.BluetoothLE.Hosting
             if (this.manager.Advertising)
                 throw new ArgumentException("Advertising is already active");
 
-            await this.manager.WhenReady().ToTask();
-            this.manager.StartAdvertising(new StartAdvertisingOptions
+            await this.manager
+                .WhenReady()
+                .Timeout(TimeSpan.FromSeconds(10))
+                .ToTask();
+
+            var tcs = new TaskCompletionSource<object>();
+            var handler = new EventHandler<NSErrorEventArgs>((sender, args) =>
             {
-                LocalName = adData?.LocalName,
-                ServicesUUID = this.services
-                    .Select(x => CBUUID.FromString(x.Value.Uuid))
-                    .ToArray()
+                if (args.Error == null)
+                    tcs.SetResult(null);
+                else
+                    tcs.SetException(new ArgumentException(args.Error.LocalizedDescription));
             });
+
+            try
+            {
+                this.manager.AdvertisingStarted += handler;
+
+                this.manager.StartAdvertising(new StartAdvertisingOptions
+                {
+                    LocalName = adData?.LocalName,
+                    ServicesUUID = this.services
+                        .Select(x => CBUUID.FromString(x.Value.Uuid))
+                        .ToArray()
+                });
+                await tcs.Task.ConfigureAwait(false);
+            }
+            finally
+            {
+                this.manager.AdvertisingStarted -= handler;
+            }
         }
 
 

@@ -9,33 +9,31 @@
         <TableView>
             <TableRoot>
                 <TableSection Title="Info">
-                    <TextCell Text="Local Name" Detail="ShinyTest" />
+                    <TextCell Text="A495FF20-C5B1-4B44-B512-1370F02D74DE" TextColor="Red" />
+                    <EntryCell Label="Local Name" Text="{Binding LocalName}" />
+                    <TextCell Text="{Binding ServerText}" Command="{Binding ToggleServer}" />
                 </TableSection>
 
-                <TableSection Title="Read/Write (A495FF21-C5B1-4B44-B512-1370F02D74DE)">
+                <TableSection Title="Read/Write">
+                    <TextCell Text="A495FF21-C5B1-4B44-B512-1370F02D74DE" TextColor="Red" />
                     <TextCell Text="Last Write Time" Detail="{Binding LastWriteTime}" />
                     <TextCell Text="Last Write Value" Detail="{Binding LastWriteValue}" />
                     <TextCell Text="Last Read Time" Detail="{Binding LastReadTime}" />
                     <TextCell Text="Last Read Value" Detail="{Binding LastReadValue}" />
                 </TableSection>
 
-                <TableSection Title="Subscription (A495FF22-C5B1-4B44-B512-1370F02D74DE)">
-                    <TextCell Text="Subscribers" Detail="{Binding SubscribersSimple}" />
-                    <TextCell Text="Last Value" Detail="{Binding SubscriberLastValue}" />
+                <TableSection Title="Subscription">
+                    <TextCell Text="A495FF22-C5B1-4B44-B512-1370F02D74DE" TextColor="Red" />
+                    <TextCell Text="Subscribers" Detail="{Binding Subscribers}" />
+                    <TextCell Text="Last Value" Detail="{Binding SubscribersLastValue}" />
                 </TableSection>
 
-                <TableSection Title="Read/Write Perf (A495FF23-C5B1-4B44-B512-1370F02D74DE)">
+                <TableSection Title="Read/Write Perf">
+                    <TextCell Text="A495FF23-C5B1-4B44-B512-1370F02D74DE" TextColor="Red" />
                     <TextCell Text="Writes" Detail="{Binding SpeedWrites}" />
                     <TextCell Text="Reads" Detail="{Binding SpeedReads}" />
                     <TextCell Text="Speed" Detail="{Binding TransferSpeed}" />
                 </TableSection>
-
-                <TableSection Title="Subscription Perf (A495FF24-C5B1-4B44-B512-1370F02D74DE)">
-                    <TextCell Text="Subscribers" Detail="{Binding SubscribersPerf}" />
-                    <TextCell Text="Pushes" Detail="{Binding SubscriberPushes}" />
-                    <TextCell Text="Speed" Detail="{Binding SubscriberSpeed}" />
-                </TableSection>
-
             </TableRoot>
         </TableView>
     </ContentPage.Content>

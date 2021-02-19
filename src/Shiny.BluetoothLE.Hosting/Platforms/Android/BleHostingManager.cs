@@ -63,20 +63,24 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public Task StartAdvertising(AdvertisementData? adData = null)
+        public async Task StartAdvertising(AdvertisementData? adData = null)
         {
             if (!this.context.Context.IsMinApiLevel(23))
                 throw new ApplicationException("BLE Advertiser needs API Level 23+");
 
-            this.adCallbacks = new AdvertisementCallbacks();
+            var tcs = new TaskCompletionSource<object>();
+            this.adCallbacks = new AdvertisementCallbacks(
+                () => tcs.SetResult(null),
+                ex => tcs.SetException(ex)
+            );
 
             var settings = new AdvertiseSettings.Builder()
                 .SetAdvertiseMode(AdvertiseMode.Balanced)
-                .SetConnectable(true); // TODO: configurable
+                .SetConnectable(true);
 
             var data = new AdvertiseData.Builder()
-                .SetIncludeDeviceName(true) // TODO: configurable
-                .SetIncludeTxPowerLevel(true); // TODO: configurable
+                //.SetIncludeDeviceName(true) // TODO: configurable
+                .SetIncludeTxPowerLevel(true);
 
             if (adData != null)
             {
@@ -98,7 +102,7 @@ namespace Shiny.BluetoothLE.Hosting
                     this.adCallbacks
                 );
 
-            return Task.CompletedTask;
+            await tcs.Task;
         }
 
 

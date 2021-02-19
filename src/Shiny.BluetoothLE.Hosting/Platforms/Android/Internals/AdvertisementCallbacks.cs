@@ -6,21 +6,28 @@ namespace Shiny.BluetoothLE.Hosting.Internals
 {
     public class AdvertisementCallbacks : AdvertiseCallback
     {
-        public Action Started { get; set; }
-        public Action<Exception> Failed { get; set; }
+        readonly Action onStart;
+        readonly Action<Exception> onError;
+
+
+        public AdvertisementCallbacks(Action onStart, Action<Exception> onError)
+        {
+            this.onStart = onStart;
+            this.onError = onError;
+        }
 
 
         public override void OnStartSuccess(AdvertiseSettings settingsInEffect)
         {
             base.OnStartSuccess(settingsInEffect);
-            this.Started?.Invoke();
+            this.onStart.Invoke();
         }
 
 
         public override void OnStartFailure(AdvertiseFailure errorCode)
         {
             base.OnStartFailure(errorCode);
-            this.Failed?.Invoke(new ArgumentException($"Failed to start BLE advertising - {errorCode}"));
+            this.onError.Invoke(new ArgumentException($"Failed to start BLE advertising - {errorCode}"));
         }
     }
 }

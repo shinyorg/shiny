@@ -1,127 +1,156 @@
 ﻿using System;
-using System.Reactive.Disposables;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Input;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Shiny.BluetoothLE.Hosting;
+using Xamarin.Forms;
 
 
 namespace Samples.BleHosting
 {
     public class GattServerViewModel : ViewModel
     {
-        const string LocalName = "ShinyTest";
         static readonly string ServiceUuid = "A495FF20-C5B1-4B44-B512-1370F02D74DE";
         static readonly string Characteristic1Uuid = "A495FF21-C5B1-4B44-B512-1370F02D74DE";
         static readonly string Characteristic2Uuid = "A495FF22-C5B1-4B44-B512-1370F02D74DE";
         static readonly string Characteristic3Uuid = "A495FF23-C5B1-4B44-B512-1370F02D74DE";
-        static readonly string Characteristic4Uuid = "A495FF24-C5B1-4B44-B512-1370F02D74DE";
 
-        readonly IBleHostingManager peripheralManager;
+        readonly IBleHostingManager hostingManager;
+        IDisposable? notifierSub;
+        IGattCharacteristic push;
+
+
         public GattServerViewModel(IBleHostingManager hostingManager)
-            => this.peripheralManager = hostingManager;
+        {
+            this.hostingManager = hostingManager;
+            this.ServerText = this.hostingManager.IsAdvertising ? "Stop Server" : "Start Server";
 
+            this.ToggleServer = ReactiveCommand.CreateFromTask(async () =>
+            {
+                if (this.hostingManager.IsAdvertising)
+                {
+                    this.hostingManager.ClearServices();
+                    this.hostingManager.StopAdvertising();
+                    this.notifierSub?.Dispose();
+                    this.ServerText = "Start Server";
+                }
+                else
+                {
+                    var service = await this.hostingManager.AddService(
+                        ServiceUuid,
+                        true,
+                        this.BuildService
+                    );
+
+                    await this.hostingManager.StartAdvertising(new AdvertisementData
+                    {
+                        LocalName = LocalName,
+                        ServiceUuids = new List<string> {
+                            ServiceUuid
+                        }
+                    });
+
+                    this.ServerText = "Stop Server";
+                }
+            });
+        }
+
+
+        public ICommand ToggleServer { get; }
+        [Reactive] public string ServerText { get; private set; }
+        [Reactive] public string LocalName { get; set; } = "ShinyTest";
 
         [Reactive] public string LastWriteValue { get; private set; }
         [Reactive] public string LastWriteTime { get; private set; }
         [Reactive] public string LastReadValue { get; private set; }
         [Reactive] public string LastReadTime { get; private set; }
 
-        [Reactive] public int SubscribersSimple { get; private set; }
-        [Reactive] public string SubscriberLastValue { get; private set; }
+        [Reactive] public int Subscribers { get; private set; }
+        [Reactive] public string SubscribersLastValue { get; private set; }
 
         [Reactive] public int SpeedWrites { get; private set; }
         [Reactive] public int SpeedReads { get; private set; }
         [Reactive] public string TransferSpeed { get; private set; }
 
-        [Reactive] public int SubscribersPerf { get; private set; }
-        [Reactive] public int SubscriberPushes { get; private set; }
-        [Reactive] public string SubscriberSpeed { get; private set; }
 
-        IGattCharacteristic simplePush;
-        IGattCharacteristic perfPush;
-
-
-        public override async void OnAppearing()
+        void BuildService(IGattServiceBuilder serviceBuilder)
         {
-            base.OnAppearing();
-
-            var service = await peripheralManager.AddService(ServiceUuid, true, sb =>
-            {
-                sb.AddCharacteristic(Characteristic1Uuid, cb => cb
-                    .SetWrite(request =>
+            serviceBuilder.AddCharacteristic(
+                Characteristic1Uuid,
+                cb =>
+                {
+                    cb.SetWrite(request =>
                     {
                         this.LastWriteValue = Encoding.UTF8.GetString(request.Data, 0, request.Data.Length);
                         this.LastWriteTime = DateTime.Now.ToString();
                         return GattState.Success;
-                    })
-                    .SetRead(request =>
+                    });
+
+                    cb.SetRead(request =>
                     {
                         var ticks = DateTime.Now.Ticks;
-                        this.LastReadValue = ticks.ToString();
-                        this.LastReadTime = DateTime.Now.ToString();
+                        Device.BeginInvokeOnMainThread(() =>
+                        {
+                            this.LastReadValue = ticks.ToString();
+                            this.LastReadTime = DateTime.Now.ToString();
+                        });
                         var data = BitConverter.GetBytes(ticks);
                         return ReadResult.Success(data);
-                    })
-                );
+                    });
+                }
+            );
 
-                this.simplePush = sb.AddCharacteristic(Characteristic2Uuid, cb => cb.SetNotification(cs =>
-                    // main thread
-                    this.SubscribersSimple = cs.Characteristic.SubscribedCentrals.Count
-                ));
+            this.push = serviceBuilder.AddCharacteristic(
+                Characteristic2Uuid,
+                cb => cb.SetNotification(cs =>
+                {
+                    var c = cs.Characteristic.SubscribedCentrals.Count;
+                    Device.BeginInvokeOnMainThread(() => this.Subscribers = c);
 
-                sb.AddCharacteristic(Characteristic3Uuid, cb => cb
-                    .SetWrite(request =>
+                    if (c == 0)
                     {
-                        // main thread
-                        this.SpeedWrites++;
+                        this.notifierSub?.Dispose();
+                    }
+                    else
+                    {
+                        this.notifierSub = Observable
+                            .Interval(TimeSpan.FromSeconds(2))
+                            .Select(_ => Observable.FromAsync(async () =>
+                            {
+                                var ticks = DateTime.Now.Ticks;
+                                var data = BitConverter.GetBytes(ticks);
+                                await this.push.Notify(data);
+
+                                return ticks;
+                            }))
+                            .SubOnMainThread(x =>
+                                this.SubscribersLastValue = x.ToString()
+                            );
+                    }
+                })
+            );
+
+            serviceBuilder.AddCharacteristic(
+                Characteristic3Uuid,
+                cb =>
+                {
+                    cb.SetWrite(request =>
+                    {
+                        Device.BeginInvokeOnMainThread(() => ++this.SpeedWrites);
                         return GattState.Success;
-                    })
-                    .SetRead(request =>
-                    {
-                        //Interlocked.Increment(ref this.SpeedWrites);
+                    });
+
+                    cb.SetRead(request =>
+                    {   
+                        Device.BeginInvokeOnMainThread(() => ++this.SpeedReads);
                         var data = BitConverter.GetBytes(DateTime.Now.Ticks);
                         return ReadResult.Success(data);
-                    })
-                );
-
-                this.perfPush = sb.AddCharacteristic(Characteristic4Uuid, cb => cb.SetNotification(cs =>
-                    this.SubscribersPerf = cs.Characteristic.SubscribedCentrals.Count
-                ));
-            });
-
-            await this.peripheralManager.StartAdvertising(new AdvertisementData
-            {
-                LocalName = LocalName
-            });
-
-            // TODO: simple push of datetime
-            Observable
-                .Interval(TimeSpan.FromSeconds(2))
-                .Select(_ => Observable.FromAsync(_ => this.Send()))
-                .SubOnMainThread(x =>
-                {
-                    // TODO: calc speeds
-                })
-                .DisposeWith(this.DeactivateWith);
-        }
-
-
-        public override void OnDisappearing()
-        {
-            base.OnDisappearing();
-            this.peripheralManager.ClearServices();
-            this.peripheralManager.StopAdvertising();
-        }
-
-
-        async Task Send()
-        {
-            var ticks = DateTime.Now.Ticks;
-            var data = BitConverter.GetBytes(ticks);
-            this.SubscriberLastValue = ticks.ToString();
-            await this.simplePush.Notify(data);
+                    });
+                }
+            );
         }
     }
 }
