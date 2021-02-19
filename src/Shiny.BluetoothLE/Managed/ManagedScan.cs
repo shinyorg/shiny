@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -28,6 +29,12 @@ namespace Shiny.BluetoothLE.Managed
             this.scheduler = scheduler;
             this.clearTime = clearTime;
         }
+
+
+        public IEnumerable<IPeripheral> GetConnectedPeripherals() => this.Peripherals
+            .ToList()
+            .Where(x => x.Peripheral.IsConnected())
+            .Select(x => x.Peripheral);
 
 
         public IObservable<(IPeripheral Peripheral, ManagedScanResult ScanResult)> WhenNewPeripheralFound() => this.newSubj;
