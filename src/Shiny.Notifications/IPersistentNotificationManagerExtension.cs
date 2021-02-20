@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Notifications
 {
@@ -7,6 +7,6 @@ namespace Shiny.Notifications
     //https://www.tutlane.com/tutorial/android/android-progress-notification-with-examples#:~:text=%20Android%20Progress%20Notification%20with%20Examples%20%201,using%20android%20virtual%20device%20%28AVD%29%20we...%20More%20
     public interface IPersistentNotificationManagerExtension
     {
-        IPersistentNotification Create(Notification notification);
+        Task<IPersistentNotification> Create(Notification notification);
     }
 }
