@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reactive.Linq;
+
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -45,17 +47,31 @@ namespace Shiny.Locations
             IsStarted = true;
 
             var gps = ShinyHost.Resolve<IGpsManager>();
-            // TODO: start the listener here too?
-            this.cleanUp = gps
-                .WhenReading()
-                .SubscribeAsync(reading =>
-                    ShinyHost
-                        .Container
-                        .RunDelegates<IGpsDelegate>(
-                            x => x.OnReading(reading)
-                        )
-                );
-                
+
+            var request = new GpsRequest(); // TODO: grab from intent
+            var ob = gps.WhenReading();
+
+            if (request.ThrottledInterval != null)
+                ob.Sample(request.ThrottledInterval.Value);
+
+            if (request.MinimumDistance != null)
+            {
+                ob
+                    .WithPrevious()
+                    .Where(x => x.Item1
+                        .Position
+                        .GetDistanceTo(x.Item2.Position).TotalMeters >= request.MinimumDistance.TotalMeters
+                    )
+                    .Select(x => x.Item2);
+            }
+
+            this.cleanUp = ob.SubscribeAsync(reading =>
+                ShinyHost
+                    .Container
+                    .RunDelegates<IGpsDelegate>(
+                        x => x.OnReading(reading)
+                    )
+            );
 
             return StartCommandResult.Sticky;
         }

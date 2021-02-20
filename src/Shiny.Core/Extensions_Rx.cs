@@ -31,6 +31,10 @@ namespace Shiny
 
     public static class RxExtensions
     {
+        public static IObservable<Tuple<T, T>> WithPrevious<T>(this IObservable<T> ob)
+            => ob.Scan(Tuple.Create(default(T), default(T)), (acc, current) => Tuple.Create(acc.Item2, current));
+
+
         public static IObservable<T> ObserveOnIf<T>(this IObservable<T> ob, IScheduler? scheduler)
         {
             if (scheduler != null)
