@@ -9,9 +9,18 @@ using System.Reactive.Subjects;
 
 namespace Shiny.BluetoothLE.Managed
 {
+    public enum ManagedScanListAction
+    {
+        Add,
+        Update,
+        Remove,
+        Clear
+    }
+
+
     public class ManagedScan : IDisposable
     {
-        readonly Subject<(IPeripheral Peripheral, ManagedScanResult ScanResult)> newSubj;
+        readonly Subject<(ManagedScanListAction Action, ManagedScanResult ScanResult)> actionSubj;
         readonly IBleManager bleManager;
         IDisposable? scanSub;
         IDisposable? clearSub;
@@ -22,7 +31,7 @@ namespace Shiny.BluetoothLE.Managed
                            IScheduler? scheduler = null,
                            TimeSpan? clearTime = null)
         {
-            this.newSubj = new Subject<(IPeripheral Peripheral, ManagedScanResult ScanResult)>();
+            this.actionSubj = new Subject<(ManagedScanListAction Action, ManagedScanResult ScanResult)>();
             this.bleManager = bleManager;
 
             this.scanConfig = scanConfig;
@@ -37,7 +46,7 @@ namespace Shiny.BluetoothLE.Managed
             .Select(x => x.Peripheral);
 
 
-        public IObservable<(IPeripheral Peripheral, ManagedScanResult ScanResult)> WhenNewPeripheralFound() => this.newSubj;
+        public IObservable<(ManagedScanListAction Action, ManagedScanResult ScanResult)> WhenScan() => this.actionSubj;
         public ObservableCollection<ManagedScanResult> Peripherals { get; } = new ObservableCollection<ManagedScanResult>();
         public bool IsScanning => this.scanSub != null;
 
@@ -79,7 +88,10 @@ namespace Shiny.BluetoothLE.Managed
                             var tmp = this.Peripherals.Where(x => x.LastSeen < maxAge).ToList();
 
                             foreach (var p in tmp)
+                            {
                                 this.Peripherals.Remove(p);
+                                this.actionSubj.OnNext((ManagedScanListAction.Remove, p));
+                            }
                         });
                 }
             }
@@ -115,20 +127,20 @@ namespace Shiny.BluetoothLE.Managed
                 {
                     foreach (var scanResult in scanResults)
                     {
+                        var action = ManagedScanListAction.Update;
                         var result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
                         if (result == null)
                         {
+                            action = ManagedScanListAction.Add;
                             result = new ManagedScanResult(scanResult.Peripheral, scanResult.AdvertisementData?.ServiceUuids);
                             this.Peripherals.Add(result);
-
-                            // new device found
-                            this.newSubj.OnNext((result.Peripheral, result));
                         }
                         result.Connectable = scanResult.AdvertisementData?.IsConnectable;
                         result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
                         result.Name = scanResult.Peripheral.Name;
                         result.Rssi = scanResult.Rssi;
                         result.LastSeen = DateTimeOffset.UtcNow;
+                        this.actionSubj.OnNext((action, result));
                     }
                 });
         }
