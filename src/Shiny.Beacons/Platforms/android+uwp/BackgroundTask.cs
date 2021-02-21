@@ -7,6 +7,7 @@ using Shiny.BluetoothLE;
 using Shiny.Infrastructure;
 using Microsoft.Extensions.Logging;
 
+
 namespace Shiny.Beacons
 {
     public class BackgroundTask

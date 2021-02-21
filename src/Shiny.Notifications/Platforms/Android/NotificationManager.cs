@@ -16,7 +16,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Notifications
 {
-    public class NotificationManager : INotificationManager, IPersistentNotificationManagerExtension
+    public class NotificationManager : INotificationManager
     {
         readonly ShinyCoreServices core;
         readonly NotificationManagerCompat manager;
@@ -47,19 +47,19 @@ namespace Shiny.Notifications
         }
 
 
-        public IPersistentNotification Create(Notification notification)
-        {
-            notification.Channel ??= Channel.Default.Identifier;
-            notification.Android.OnGoing = true;
-            notification.Android.ShowWhen = null;
-            notification.ScheduleDate = null;
+        //public IPersistentNotification Create(Notification notification)
+        //{
+        //    notification.Channel ??= Channel.Default.Identifier;
+        //    notification.Android.OnGoing = true;
+        //    notification.Android.ShowWhen = null;
+        //    notification.ScheduleDate = null;
 
-            var builder = this.CreateNativeBuilder(notification);
-            var pnotification = new AndroidPersistentNotification(notification.Id, this.manager, builder);
+        //    var builder = this.CreateNativeBuilder(notification);
+        //    var pnotification = new AndroidPersistentNotification(notification.Id, this.manager, builder);
 
-            this.manager.Notify(notification.Id, builder.Build());
-            return pnotification;
-        }
+        //    this.manager.Notify(notification.Id, builder.Build());
+        //    return pnotification;
+        //}
 
 
         public Android.App.Notification CreateNativeNotification(Notification notification) =>

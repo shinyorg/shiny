@@ -8,11 +8,11 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Beacons
 {
-#if __ANDROID__
-    public class BeaconMonitoringManager : NotifyPropertyChanged, IBeaconMonitoringManager, IBeaconMonitoringNotificationConfiguration, IShinyStartupTask
-#else
-    public class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyStartupTask
-#endif
+
+    public class BeaconMonitoringManager : NotifyPropertyChanged,
+                                           IBeaconMonitoringManager,
+                                           IShinyForegroundManager,
+                                           IShinyStartupTask
     {
         readonly IRepository repository;
         readonly IBleManager bleManager;
@@ -47,11 +47,27 @@ namespace Shiny.Beacons
         }
 
 
-        string? description;
-        public string? Description
+        string? message;
+        public string? Message
         {
-            get => this.description;
-            set => this.Set(ref this.description, value);
+            get => this.message;
+            set => this.Set(ref this.message, value);
+        }
+
+
+        int? progress;
+        public int? Progress
+        {
+            get => this.progress;
+            set => this.Set(ref this.progress, value);
+        }
+
+
+        bool? indeterministic;
+        public bool? IsIndeterministic
+        {
+            get => this.indeterministic;
+            set => this.Set(ref this.indeterministic, value);
         }
 
 

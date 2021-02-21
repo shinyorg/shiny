@@ -56,16 +56,10 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Platforms\Shared\GeofenceGpsDirectModule.cs" />
-      <None Remove="Platforms\Shared\MotionActivityModule.cs" />
     </ItemGroup>
 
 </Project>

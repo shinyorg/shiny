@@ -12,20 +12,6 @@ namespace Shiny.Beacons
             => new ManagedScan(manager);
 
 
-        public static bool TrySetBeaconNotificationConfiguration(this IBeaconMonitoringManager manager, string? title = null, string? description = null, string? tickerText = null)
-        {
-            var config = manager as IBeaconMonitoringNotificationConfiguration;
-            if (config == null)
-                return false;
-
-            config.Title = title;
-            config.Description = description;
-            config.Ticker = tickerText;
-
-            return true;
-        }
-
-
         public static bool IsBeaconInRegion(this BeaconRegion region, Beacon beacon)
         {
             if (!region.Uuid.Equals(beacon.Uuid))
