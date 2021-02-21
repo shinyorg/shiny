@@ -20,7 +20,7 @@ namespace Shiny.BluetoothLE.Managed
 
     public class ManagedScan : IDisposable
     {
-        readonly Subject<(ManagedScanListAction Action, ManagedScanResult ScanResult)> actionSubj;
+        readonly Subject<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> actionSubj;
         readonly IBleManager bleManager;
         IDisposable? scanSub;
         IDisposable? clearSub;
@@ -31,7 +31,7 @@ namespace Shiny.BluetoothLE.Managed
                            IScheduler? scheduler = null,
                            TimeSpan? clearTime = null)
         {
-            this.actionSubj = new Subject<(ManagedScanListAction Action, ManagedScanResult ScanResult)>();
+            this.actionSubj = new Subject<(ManagedScanListAction Action, ManagedScanResult? ScanResult)>();
             this.bleManager = bleManager;
 
             this.scanConfig = scanConfig;
@@ -46,7 +46,7 @@ namespace Shiny.BluetoothLE.Managed
             .Select(x => x.Peripheral);
 
 
-        public IObservable<(ManagedScanListAction Action, ManagedScanResult ScanResult)> WhenScan() => this.actionSubj;
+        public IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan() => this.actionSubj;
         public ObservableCollection<ManagedScanResult> Peripherals { get; } = new ObservableCollection<ManagedScanResult>();
         public bool IsScanning => this.scanSub != null;
 
@@ -117,6 +117,7 @@ namespace Shiny.BluetoothLE.Managed
             // restart clear timer if set
             this.ClearTime = this.ClearTime;
             this.Peripherals.Clear();
+            this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
 
             this.scanSub = this.bleManager
                 .Scan(this.ScanConfig)
