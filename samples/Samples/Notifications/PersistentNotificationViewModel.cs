@@ -38,8 +38,8 @@ namespace Samples.Notifications
                     ToValue(x)
                 ));
 
-            this.Toggle = ReactiveCommand.Create(
-                () =>
+            this.Toggle = ReactiveCommand.CreateFromTask(
+                async () =>
                 {
                     if (this.notification != null)
                     {
@@ -48,7 +48,7 @@ namespace Samples.Notifications
                     }
                     else
                     {
-                        this.notification = ext.Create(new Notification
+                        this.notification = await ext.Create(new Notification
                         {
                             Title = "Test",
                             Message = "Test"

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Beacons;
@@ -7,14 +8,64 @@ using Shiny.Beacons;
 
 namespace Shiny.Testing.Beacons
 {
-    public class TestBeaconMonitoringManager : IBeaconMonitoringManager
+    public class TestBeaconMonitoringManager : NotifyPropertyChanged, IBeaconMonitoringManager
     {
         readonly IList<BeaconRegion> regions = new List<BeaconRegion>();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
             => Task.FromResult<IEnumerable<BeaconRegion>>(this.regions);
 
 
         public AccessState CurrentAccessState { get; set; } = AccessState.Available;
+        string? title;
+        public string? Title
+        {
+            get => this.title;
+            set => this.Set(ref this.title, value);
+        }
+
+
+        string? message;
+        public string? Message
+        {
+            get => this.message;
+            set => this.Set(ref this.message, value);
+        }
+
+
+        int? progress;
+        public int? Progress
+        {
+            get => this.progress;
+            set => this.Set(ref this.progress, value);
+        }
+
+
+        bool? indeterministic;
+        public bool? IsIndeterministic
+        {
+            get => this.indeterministic;
+            set => this.Set(ref this.indeterministic, value);
+        }
+
+
+        string? ticker;
+        public string? Ticker
+        {
+            get => this.ticker;
+            set => this.Set(ref this.ticker, value);
+        }
+
+
+        string? channel;
+        public string? Channel
+        {
+            get => this.channel;
+            set => this.Set(ref this.channel, value);
+        }
+
         public Task<AccessState> RequestAccess() => Task.FromResult(this.CurrentAccessState);
 
 
