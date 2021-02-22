@@ -41,6 +41,7 @@ namespace Shiny.Notifications
             services.TryAddSingleton<INotificationManager, NotificationManager>();
 #if __ANDROID__
             services.TryAddSingleton<AndroidNotificationProcessor>();
+            services.TryAddSingleton<AndroidNotificationManager>();
 #elif __IOS__
             services.TryAddSingleton<iOSNotificationDelegate>();
 #endif

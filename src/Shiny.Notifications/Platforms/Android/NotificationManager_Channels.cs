@@ -14,7 +14,7 @@ namespace Shiny.Notifications
         {
             var existing = await this.core.Repository.GetChannels();
             foreach (var exist in existing)
-                this.manager.DeleteNotificationChannel(exist.Identifier);
+                this.manager.NativeManager.DeleteNotificationChannel(exist.Identifier);
 
             await this.core.Repository.DeleteAllChannels();
             foreach (var channel in channels)
@@ -136,7 +136,6 @@ namespace Shiny.Notifications
 
             Android.Net.Uri uri = null;
             if (!channel.CustomSoundPath.IsEmpty())
-                uri = this.GetSoundResourceUri(channel.CustomSoundPath);
 
             switch (channel.Importance)
             {
@@ -162,7 +161,7 @@ namespace Shiny.Notifications
             if (uri != null)
                 native.SetSound(uri, attrBuilder.Build());
 
-            this.manager.CreateNotificationChannel(native);
+            this.manager.NativeManager.CreateNotificationChannel(native);
         }
 
 

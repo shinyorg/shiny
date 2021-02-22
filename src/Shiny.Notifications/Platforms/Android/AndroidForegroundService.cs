@@ -6,16 +6,17 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using AndroidX.Core.App;
+using Shiny.Notifications;
+using ShinyNotification = Shiny.Notifications.Notification;
 
 
 namespace Shiny
 {
-    public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Service
+    public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Service where TService : IShinyForegroundManager
     {
         static int idCount = 0;
         int? notificationId;
 
-        NotificationCompat.Builder? notificationBuilder;
         readonly Lazy<IMessageBus> messageBus = ShinyHost.LazyResolve<IMessageBus>();
 
         protected void Publish<T>(T args) => this.messageBus.Value.Publish(args);
@@ -37,6 +38,7 @@ namespace Shiny
         protected TService? Service { get; private set; }
         protected IList<TDelegate>? Delegates { get; private set; }
         protected IAndroidContext? Context { get; private set; }
+        protected AndroidNotificationManager? AndroidNotifications { get; private set; }
 
 
         public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
@@ -44,20 +46,16 @@ namespace Shiny
             this.Service = this.Resolve<TService>();
             this.Delegates = this.ResolveAll<TDelegate>().ToList();
             this.Context = this.Resolve<IAndroidContext>();
+            this.AndroidNotifications = this.Resolve<AndroidNotificationManager>();
 
             if (this.Context.IsMinApiLevel(26))
             {
-                if (this.Service is IShinyForegroundManager npc)
-                {
-                    npc
-                        .WhenAnyProperty()
-                        .Subscribe(_ => this.SetNotification())
-                        .DisposedBy(this.DestroyWith);
+                this.Service
+                    .WhenAnyProperty()
+                    .Subscribe(_ => this.SetNotification())
+                    .DisposedBy(this.DestroyWith);
 
-                    this.SetNotification();
-                }
-                else
-                    throw new ArgumentException($"{typeof(TService).FullName} does not implement IShinyForegroundManager");
+                this.SetNotification();
             }
             this.OnStart(intent);
             return StartCommandResult.Sticky;
@@ -68,9 +66,10 @@ namespace Shiny
         {
             this.DestroyWith.Dispose();
 
-            if (this.Context.IsMinApiLevel(26))
+            if (this.Context!.IsMinApiLevel(26))
                 this.StopForeground(true);
 
+            this.notificationId = null;
             this.OnStop();
             base.OnDestroy();
         }
@@ -81,33 +80,31 @@ namespace Shiny
 
         void SetNotification()
         {
-            // TODO: want notification data, launch intent, icons, channels/actions - sounds not needed
-                // if notifications are brought into core, the notification is still created async
-            //var pendingIntent = this.GetLaunchPendingIntent(notification);
-            this.notificationBuilder ??= new NotificationCompat.Builder(this.Context.AppContext);
-            this.notificationBuilder
-                .SetContentTitle("")
-                .SetContentText("")
-                //        builder.SetStyle(new NotificationCompat.BigTextStyle().BigText(notification.Message));
-                .SetTicker("")
-                .SetContentInfo("")
-                .SetOngoing(true)
-                //.SetAutoCancel(false)
-                .SetCategory(Notification.CategoryService);
-            // TODO: channel needs to already exist
-            //    builder.SetChannelId(notification.Channel ?? Channel.Default.Identifier);
-            //    .SetSmallIcon(this.GetSmallIconResource(notification))
+            var notification = new ShinyNotification
+            {
+                Title = this.Service!.Title ?? "GPS is tracking",
+                Message = this.Service.Message ?? "GPS is tracking",
+                Channel = this.Service.Channel,
+                Android = new AndroidOptions
+                {
+                    OnGoing = true,
+                    Ticker = this.Service.Message ?? "GPS Tracking is enabled",
+                    Category = Android.App.Notification.CategoryService
+                }
+            };
 
+            // I need to get the channel but the notification cannot launch async, could get native, but actions will be missing
+            // could pass initial notification and channel info through the intent?
+            var builder = this.AndroidNotifications!.CreateNativeBuilder(notification, Channel.Default);
 
             if (this.notificationId == null)
             {
                 this.notificationId = ++idCount;
-                this.StartForeground(this.notificationId.Value, this.notificationBuilder.Build());
+                this.StartForeground(this.notificationId.Value, builder.Build());
             }
             else
             {
-                var manager = NotificationManagerCompat.From(this.Context.AppContext);
-                manager.Notify(this.notificationId.Value, this.notificationBuilder.Build());
+                this.AndroidNotifications.NativeManager.Notify(this.notificationId.Value, builder.Build());
             }
         }
     }

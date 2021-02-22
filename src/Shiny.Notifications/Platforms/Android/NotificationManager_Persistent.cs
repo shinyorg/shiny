@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+
 namespace Shiny.Notifications
 {
     public partial class NotificationManager : IPersistentNotificationManagerExtension
@@ -13,10 +14,10 @@ namespace Shiny.Notifications
             notification.Android.ShowWhen = null;
             notification.ScheduleDate = null;
 
-            var builder = this.CreateNativeBuilder(notification, channel);
-            var pnotification = new AndroidPersistentNotification(notification.Id, this.manager, builder);
+            var builder = this.manager.CreateNativeBuilder(notification, channel);
+            var pnotification = new AndroidPersistentNotification(notification.Id, this.manager.NativeManager, builder);
 
-            this.manager.Notify(notification.Id, builder.Build());
+            this.manager.NativeManager.Notify(notification.Id, builder.Build());
             return pnotification;
         }
     }

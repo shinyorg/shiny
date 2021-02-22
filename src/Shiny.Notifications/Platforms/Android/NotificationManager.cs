@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using AndroidX.Core.App;
 using Shiny.Infrastructure;
 
 
@@ -11,13 +10,15 @@ namespace Shiny.Notifications
     public partial class NotificationManager : INotificationManager
     {
         readonly ShinyCoreServices core;
-        readonly NotificationManagerCompat manager;
+        readonly AndroidNotificationManager manager;
 
 
-        public NotificationManager(ShinyCoreServices core)
+
+        public NotificationManager(ShinyCoreServices core, AndroidNotificationManager manager)
         {
             this.core = core;
-            this.manager = NotificationManagerCompat.From(this.core.Android.AppContext);
+            this.manager = manager;
+
             this.core
                 .Android
                 .WhenIntentReceived()
@@ -38,14 +39,14 @@ namespace Shiny.Notifications
 
         public async Task Cancel(int id)
         {
-            this.manager.Cancel(id);
+            this.manager.NativeManager.Cancel(id);
             await this.core.Repository.Remove<Notification>(id.ToString());
         }
 
 
         public async Task Clear()
         {
-            this.manager.CancelAll();
+            this.manager.NativeManager.CancelAll();
             await this.core.Repository.Clear<Notification>();
         }
 
@@ -56,7 +57,7 @@ namespace Shiny.Notifications
 
         public async Task<AccessState> RequestAccess()
         {
-            if (!this.manager.AreNotificationsEnabled())
+            if (!this.manager.NativeManager.AreNotificationsEnabled())
                 return AccessState.Disabled;
 
             var result = await this.core.Jobs.RequestAccess();
@@ -66,9 +67,12 @@ namespace Shiny.Notifications
 
         public async Task Send(Notification notification)
         {
+            if (notification.Id == 0)
+                notification.Id = this.core.Settings.IncrementValue("NotificationId");
+
             // this is here to cause validation of the settings before firing or scheduling
             var channel = await this.GetChannel(notification);
-            var builder = this.CreateNativeBuilder(notification, channel);
+            var builder = this.manager.CreateNativeBuilder(notification, channel);
             
             if (notification.ScheduleDate != null)
             {
@@ -76,7 +80,7 @@ namespace Shiny.Notifications
                 //this.SetAlarm(notification);
                 return;
             }
-            this.SendNative(notification.Id, builder.Build());
+            this.manager.SendNative(notification.Id, builder.Build());
             await this.core
                 .Services
                 .SafeResolveAndExecute<INotificationDelegate>(

@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-
-using Android.App;
 using Android.Content;
-using Shiny.Infrastructure;
 
 
 namespace Shiny.Notifications

@@ -6,21 +6,30 @@ using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.Notifications
 {
-    public partial class NotificationManager
+    public class AndroidNotificationManager
     {
-        public Android.App.Notification CreateNativeNotification(Notification notification, Channel channel) =>
-            this.CreateNativeBuilder(notification, channel).Build();
+        readonly ShinyCoreServices core;
+        public NotificationManagerCompat NativeManager { get; }
+
+
+        public AndroidNotificationManager(ShinyCoreServices core)
+        {
+            this.core = core;
+            this.NativeManager = NotificationManagerCompat.From(this.core.Android.AppContext);
+        }
+
+
+        public Android.App.Notification CreateNativeNotification(Notification notification, Channel channel)
+            => this.CreateNativeBuilder(notification, channel).Build();
 
 
         public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification, Channel channel)
         {
-            if (notification.Id == 0)
-                notification.Id = this.core.Settings.IncrementValue("NotificationId");
-
             var pendingIntent = this.GetLaunchPendingIntent(notification);
             var builder = new NotificationCompat.Builder(this.core.Android.AppContext)
                 .SetContentTitle(notification.Title)
@@ -63,13 +72,13 @@ namespace Shiny.Notifications
 
 
         public virtual void SendNative(int id, Android.App.Notification notification)
-            => this.manager.Notify(id, notification);
+            => this.NativeManager.Notify(id, notification);
 
 
         // Construct a raw resource path of the form
         // "android.resource://<PKG_NAME>/raw/<RES_NAME>", e.g.
         // "android.resource://com.shiny.sample/raw/notification"
-        protected virtual Android.Net.Uri GetSoundResourceUri(string soundResourceName)
+        public virtual Android.Net.Uri GetSoundResourceUri(string soundResourceName)
         {
             // Strip file extension and leading slash from resource name to allow users
             // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
