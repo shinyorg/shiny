@@ -136,6 +136,7 @@ namespace Shiny.Notifications
 
             Android.Net.Uri uri = null;
             if (!channel.CustomSoundPath.IsEmpty())
+                uri = this.manager.GetSoundResourceUri(channel.CustomSoundPath);
 
             switch (channel.Importance)
             {
