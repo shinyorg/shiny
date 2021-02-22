@@ -22,9 +22,9 @@
         <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="4.7.1" />
         <PackageReference Update="Xamarin.Firebase.iOS.InstanceID" Version="4.8.0" />
 
-        <PackageReference Update="Xamarin.AndroidX.Core" Version="1.3.2.2" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.3.0" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.3.0" />
+        <PackageReference Update="Xamarin.AndroidX.Core" Version="1.3.2.1" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.2.0.4" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.2.0.4" />
         <PackageReference Update="Xamarin.AndroidX.Arch.Core.Runtime" Version="2.1.0.7" />
         <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.2.0.6" />
         <PackageReference Update="Xamarin.AndroidX.Concurrent.Futures" Version="1.1.0.1" />
@@ -32,8 +32,8 @@
         <PackageReference Update="Xamarin.AndroidX.Room.Runtime" Version="2.2.6" />
         <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.5.0" />
 
-        <PackageReference Update="Xamarin.GooglePlayServices.Basement" Version="117.6.0" />
-        <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.2.1" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Basement" Version="117.5.0" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.2.0" />
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="117.1.0" />
 
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="121.0.1" />
@@ -57,7 +57,7 @@
         <PackageReference Update="Acr.UserDialogs" Version="7.1.0.475" />
         <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.8.0" />
         <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.10" />
-        <PackageReference Update="Bogus" Version="33.0.2" />
+        <PackageReference Update="Bogus" Version="33.0.1" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.0.0.1909" />
         <PackageReference Update="ReactiveUI.Fody" Version="13.1.1" />
@@ -65,7 +65,7 @@
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
 
         <!--tests-->
-        <PackageReference Update="coverlet.collector" Version="3.0.3" />
+        <PackageReference Update="coverlet.collector" Version="3.0.2" />
         <PackageReference Update="FluentAssertions" Version="5.10.3" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.8.3" />
         <PackageReference Update="Microsoft.CodeAnalysis" Version="3.8.0" />
