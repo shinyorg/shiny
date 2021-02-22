@@ -33,7 +33,7 @@
         <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.5.0" />
 
         <PackageReference Update="Xamarin.GooglePlayServices.Basement" Version="117.5.0" />
-        <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.2.0" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.2.1" />
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="117.1.0" />
 
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="121.0.1" />
