@@ -22,7 +22,7 @@
         <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="4.7.1" />
         <PackageReference Update="Xamarin.Firebase.iOS.InstanceID" Version="4.8.0" />
 
-        <PackageReference Update="Xamarin.AndroidX.Core" Version="1.3.2.1" />
+        <PackageReference Update="Xamarin.AndroidX.Core" Version="1.3.2.2" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.2.0.4" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.2.0.4" />
         <PackageReference Update="Xamarin.AndroidX.Arch.Core.Runtime" Version="2.1.0.7" />
