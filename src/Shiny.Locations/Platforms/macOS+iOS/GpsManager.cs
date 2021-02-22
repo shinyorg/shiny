@@ -4,19 +4,19 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CoreLocation;
-
 using Microsoft.Extensions.Logging;
+
 
 namespace Shiny.Locations
 {
-    public class GpsManagerImpl : NotifyPropertyChanged, IGpsManager, IShinyStartupTask
+    public partial class GpsManager : IGpsManager, IShinyStartupTask
     {
         readonly CLLocationManager locationManager;
         readonly GpsManagerDelegate gdelegate;
         readonly ILogger logger;
 
 
-        public GpsManagerImpl(ILogger<IGpsManager> logger)
+        public GpsManager(ILogger<IGpsManager> logger)
         {
             this.logger = logger;
             this.gdelegate = new GpsManagerDelegate();

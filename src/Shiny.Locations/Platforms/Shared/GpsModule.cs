@@ -29,7 +29,7 @@ namespace Shiny.Locations
                 services.AddSingleton(typeof(IGpsDelegate), this.delegateType);
 
 #if !MONOANDROID
-            services.TryAddSingleton<IGpsManager, GpsManagerImpl>();
+            services.TryAddSingleton<IGpsManager, GpsManager>();
 #else
             var resultCode = GoogleApiAvailability
                 .Instance

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.Locations
 {
-    public interface IGpsManager
+    public interface IGpsManager : IShinyForegroundManager
     {
         /// <summary>
         /// If the device is currently listening to GPS broadcasts

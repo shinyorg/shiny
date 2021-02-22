@@ -64,4 +64,9 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Platforms\Shared\GpsManager.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

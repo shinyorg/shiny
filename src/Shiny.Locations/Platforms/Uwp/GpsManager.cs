@@ -8,7 +8,7 @@ using Windows.Foundation;
 
 namespace Shiny.Locations
 {
-    public class GpsManagerImpl : NotifyPropertyChanged, IGpsManager
+    public partial class GpsManager: IGpsManager
     {
         readonly Geolocator geolocator;
         readonly Subject<IGpsReading> gpsSubject;

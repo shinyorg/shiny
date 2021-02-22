@@ -11,7 +11,6 @@ namespace Shiny.Locations
 {
     static class PlatformExtensions
     {
-
         public static LocationRequest ToNative(this GpsRequest request)
         {
             var nativeRequest = LocationRequest
