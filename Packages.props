@@ -65,7 +65,7 @@
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
 
         <!--tests-->
-        <PackageReference Update="coverlet.collector" Version="3.0.2" />
+        <PackageReference Update="coverlet.collector" Version="3.0.3" />
         <PackageReference Update="FluentAssertions" Version="5.10.3" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.8.3" />
         <PackageReference Update="Microsoft.CodeAnalysis" Version="3.8.0" />
