@@ -10,6 +10,7 @@ namespace Shiny
     {
         string? Title { get; }
         string? Message { get; }
+        string? Channel { get; }
         int? Progress { get; }
         bool? IsIndeterministic { get; }
         //string? Ticker { get; }

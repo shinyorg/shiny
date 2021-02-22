@@ -10,38 +10,23 @@ namespace Shiny.Beacons
         Exported = true,
         ForegroundServiceType = ForegroundService.TypeLocation
     )]
-    public class ShinyBeaconMonitoringService : ShinyAndroidForegroundService<BackgroundTask, IBeaconMonitorDelegate>
+    public class ShinyBeaconMonitoringService : ShinyAndroidForegroundService<IBeaconMonitoringManager, IBeaconMonitorDelegate>
     {
+        public static bool IsStarted { get; private set; }
+        BackgroundTask? backgroundTask;
 
-        //public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
-        //{
-        //    var context = ShinyHost.Resolve<IAndroidContext>();
-        //    if (context.IsMinApiLevel(26))
-        //    {
-        //        var notificationManager = (S.NotificationManager)ShinyHost.Resolve<S.INotificationManager>();
-        //        var config = ShinyHost.Resolve<IBeaconMonitoringManager>() as IBeaconMonitoringNotificationConfiguration;
+        protected override void OnStart(Intent? intent)
+        {
+            this.backgroundTask = this.Resolve<BackgroundTask>();
+            this.backgroundTask.Run();
+            IsStarted = true;
+        }
 
-        //        var native = notificationManager.CreateNativeNotification(new S.Notification
-        //        {
-        //            Title = config?.Title ?? "Shiny Beacon Monitoring",
-        //            Message = config?.Description ?? "Shiny Beacon monitoring is running",
-        //            Android = new S.AndroidOptions
-        //            {
-        //                ContentInfo = config?.Description ?? "Shiny Beacons",
-        //                OnGoing = true,
-        //                //LightColor = Android.Graphics.Color.Blue,
-        //                Ticker = config?.Ticker ?? config?.Description ?? "Shiny Beacon monitoring is running",
-        //                Category = Notification.CategoryService
-        //            }
-        //        });
-        //        this.StartForeground(1, native);
-        //    }
-        //    IsStarted = true;
 
-        //    ShinyHost.Container.Resolve<BackgroundTask>().StartScan();
-        //    return StartCommandResult.Sticky;
-        //}
-        protected override void OnStart(Intent? intent) => this.Service.Run();
-        public override void OnDestroy() => this.Service.StopScan();
+        public override void OnDestroy()
+        {
+            this.backgroundTask?.StopScan();
+            IsStarted = false;
+        }
     }
 }

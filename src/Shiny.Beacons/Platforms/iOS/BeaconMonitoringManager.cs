@@ -9,7 +9,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Beacons
 {
-    public class BeaconMonitoringManager : IBeaconMonitoringManager
+    public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     {
         readonly IRepository repository;
         readonly CLLocationManager manager;

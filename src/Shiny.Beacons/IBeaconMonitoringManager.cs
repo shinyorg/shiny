@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.Beacons
 {
-    public interface IBeaconMonitoringManager
+    public interface IBeaconMonitoringManager : IShinyForegroundManager
     {
         /// <summary>
         /// Request necessary permissions to beacon scanning

@@ -7,7 +7,6 @@ namespace Shiny.Locations
 {
     public abstract class AbstractGpsManager : NotifyPropertyChanged,
                                                IGpsManager,
-                                               IGpsBackgroundNotificationConfiguration,
                                                IShinyStartupTask
     {
 
@@ -31,28 +30,28 @@ namespace Shiny.Locations
         protected IAndroidContext Context { get; }
 
 
-        string? title;
-        public string? Title
-        {
-            get => this.title;
-            set => this.Set(ref this.title, value);
-        }
+        //string? title;
+        //public string? Title
+        //{
+        //    get => this.title;
+        //    set => this.Set(ref this.title, value);
+        //}
 
 
-        string? description;
-        public string? Description
-        {
-            get => this.description;
-            set => this.Set(ref this.description, value);
-        }
+        //string? description;
+        //public string? Description
+        //{
+        //    get => this.description;
+        //    set => this.Set(ref this.description, value);
+        //}
 
 
-        string? ticker;
-        public string? Ticker
-        {
-            get => this.ticker;
-            set => this.Set(ref this.ticker, value);
-        }
+        //string? ticker;
+        //public string? Ticker
+        //{
+        //    get => this.ticker;
+        //    set => this.Set(ref this.ticker, value);
+        //}
 
 
         GpsRequest? request;

@@ -18,7 +18,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-#if __ANDROID__ || WINDOWS_UWP
+#if MONOANDROID || WINDOWS_UWP
             services.UseBleClient();
 #endif
             services.TryAddSingleton<IBeaconRangingManager, BeaconRangingManager>();
@@ -44,6 +44,7 @@ namespace Shiny
 #if __ANDROID__ || WINDOWS_UWP
             services.TryAddSingleton<BackgroundTask>();
             services.UseBleClient();
+            services.UseNotifications();
 #endif
             services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
             services.TryAddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();

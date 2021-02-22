@@ -19,6 +19,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*Uwp*\**\*.cs" />
@@ -26,6 +27,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*Android*\**\*.cs" />
@@ -55,5 +57,10 @@
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\tizen\**\*.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Platforms\Shared\BeaconMonitoringManager.cs">
+        <SubType></SubType>
+      </Compile>
     </ItemGroup>
 </Project>
