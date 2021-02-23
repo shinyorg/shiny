@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.UI.Notifications;
 
 
@@ -8,17 +9,44 @@ namespace Shiny.Notifications
     public class UwpPersistentNotification : IPersistentNotification
     {
         readonly ToastNotifier toastNotifier;
-        readonly Notification notification;
+        int notificationId;
         int total = 0;
         int progress = 0;
         int sequence = 1;
+        string channel;
         bool indeterministic;
 
 
-        public UwpPersistentNotification(Notification notification, ToastNotifier toastNotifier)
+        public UwpPersistentNotification(ToastNotifier toastNotifier, int notificationId, string channel)
         {
-            this.notification = notification;
             this.toastNotifier = toastNotifier;
+            this.notificationId = notificationId;
+            this.channel = channel;
+            this.Update();
+        }
+
+
+        string title;
+        public string Title
+        {
+            get => this.title;
+            set
+            {
+                this.title = value;
+                this.Update();
+            }
+        }
+
+
+        string message;
+        public string Message
+        {
+            get => this.message;
+            set
+            {
+                this.message = value;
+                this.Update();
+            }
         }
 
 
@@ -30,7 +58,7 @@ namespace Shiny.Notifications
         }
 
 
-        public void Dismiss() => ToastNotificationManager.History.Remove(this.notification.Id.ToString());
+        public void Dismiss() => ToastNotificationManager.History.Remove(this.notificationId.ToString());
         public void Dispose() => this.Dismiss();
 
 
@@ -57,17 +85,21 @@ namespace Shiny.Notifications
             {
                 SequenceNumber = (uint)this.sequence
             };
-            //data.Values["progressStatus"] = this.notification.Title;
+            data.Values["title"] = this.Title;
 
-            if (!this.indeterministic)
+            if (this.indeterministic)
+            {
+                data.Values["progressValue"] = AdaptiveProgressBarValue.Indeterminate.ToString();
+            }
+            else
             {
                 data.Values["progressValue"] = (this.progress / this.total).ToString();
                 data.Values["progressValueString"] = $"{this.progress}/{this.total}";
             }
             this.toastNotifier.Update(
                 data,
-                this.notification.Id.ToString(),
-                notification.Channel
+                this.notificationId.ToString(),
+                this.channel
             );
         }
     }

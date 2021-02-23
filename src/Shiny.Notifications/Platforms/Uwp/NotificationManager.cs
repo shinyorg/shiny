@@ -36,24 +36,29 @@ namespace Shiny.Notifications
         }
 
 
-        public IPersistentNotification Create(Notification notification)
+        public async Task<IPersistentNotification> Create(Notification notification)
         {
-            //AdaptiveProgressBarValue.Indeterminate;
-            //var content = this.CreateContent(notification);
-            //content.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
-            //{
-            //    Title = notification.Title,
-            //    Value = new BindableProgressBarValue("progressValue"),
-            //    ValueStringOverride = new BindableString("progressValueString"),
-            //    Status = new BindableString("progressStatus")
-            //});
+            var content = await this.CreateContent(notification);
+            content.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
+            {
+                Title = new BindableString("title"),
+                Value = new BindableProgressBarValue("progressValue"),
+                ValueStringOverride = new BindableString("progressValueString"),
+                Status = new BindableString("progressStatus")
+            });
             notification.ScheduleDate = null;
 
             var notifier = ToastNotificationManager.CreateToastNotifier();
-            //var toastContent = this.CreateContent(notification);
-
-            var pnotification = new UwpPersistentNotification(notification, notifier);
-            //notifier.Show(native);
+            var pnotification = new UwpPersistentNotification(
+                notifier,
+                notification.Id,
+                notification.Channel ?? Channel.Default.Identifier
+            );
+            var native = this.CreateNativeNotification(content, notification);
+            notifier.Show(native);
+            pnotification.Title = notification.Title;
+            pnotification.Message = notification.Message;
+            pnotification.ClearProgress();
 
             return pnotification;
         }

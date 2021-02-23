@@ -11,7 +11,7 @@ namespace Shiny.Notifications
         readonly int notificationId;
 
 
-        public AndroidPersistentNotification(int notificationId, NotificationManagerCompat manager, NotificationCompat.Builder builder)
+        public AndroidPersistentNotification(NotificationManagerCompat manager, NotificationCompat.Builder builder)
         {
             this.notificationId = notificationId;
             this.manager = manager;
@@ -25,6 +25,31 @@ namespace Shiny.Notifications
             this.Update();
         }
 
+
+        string title;
+        public string Title
+        {
+            get => this.title;
+            set
+            {
+                this.title = value;
+                this.builder.SetContentTitle(value);
+                this.Update();
+            }
+        }
+
+
+        string message;
+        public string Message
+        {
+            get => this.message;
+            set
+            {
+                this.message = value;
+                this.builder.SetContentText(value);
+                this.Update();
+            }
+        }
 
         public void Dismiss() => this.manager.Cancel(this.notificationId);
         public void Dispose() => this.Dismiss();
