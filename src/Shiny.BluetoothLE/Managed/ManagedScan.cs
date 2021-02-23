@@ -10,16 +10,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE.Managed
 {
-    public enum ManagedScanListAction
-    {
-        Add,
-        Update,
-        Remove,
-        Clear
-    }
-
-
-    public class ManagedScan : IDisposable
+    public class ManagedScan : IDisposable, IManagedScan
     {
         readonly Subject<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> actionSubj;
         readonly IBleManager bleManager;

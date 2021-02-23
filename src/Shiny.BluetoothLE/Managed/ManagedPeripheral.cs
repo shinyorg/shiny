@@ -13,7 +13,7 @@ namespace Shiny.BluetoothLE.Managed
 {
 
     // TODO: general purpose error subject for restore fails?
-    public class ManagedPeripheral : NotifyPropertyChanged, IDisposable
+    public class ManagedPeripheral : NotifyPropertyChanged, IDisposable, IManagedPeripheral
     {
         readonly List<GattCharacteristicInfo> characteristics;
         readonly Subject<GattCharacteristicResult> notifySub;
