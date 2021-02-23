@@ -29,7 +29,6 @@
         <PackageReference Include="Xamarin.AndroidX.Room.Common" />
         <PackageReference Include="Xamarin.AndroidX.Room.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
-        <PackageReference Include="Xamarin.AndroidX.AppCompat" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" />

@@ -14,7 +14,7 @@ namespace Shiny.Locations
         readonly Subject<IGpsReading> gpsSubject;
 
 
-        public GpsManagerImpl()
+        public GpsManager()
         {
             this.geolocator = new Geolocator();
             this.gpsSubject = new Subject<IGpsReading>();

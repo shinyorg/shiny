@@ -45,6 +45,12 @@
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" $(TargetFramework.Contains('android')) ">
+        <MonoAndroidResourcePrefix></MonoAndroidResourcePrefix>
+        <AndroidResgenFile></AndroidResgenFile>
+        <AndroidResgenClass></AndroidResgenClass>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
