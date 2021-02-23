@@ -8,6 +8,7 @@ namespace Shiny.Notifications
     {
         public async Task<IPersistentNotification> Create(Notification notification, bool show)
         {
+            // TODO: need a channel that doesn't play sound when updates occur
             var channel = await this.GetChannel(notification);
 
             notification.Android.OnGoing = true;

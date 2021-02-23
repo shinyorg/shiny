@@ -66,7 +66,7 @@ namespace Shiny.Notifications
             if (notification.Android.When != null)
                 builder.SetWhen(notification.Android.When.Value.ToUnixTimeMilliseconds());
 
-            builder.SetChannelId(notification.Channel ?? Channel.Default.Identifier);
+            builder.SetChannelId(channel.Identifier);
             return builder;
         }
 

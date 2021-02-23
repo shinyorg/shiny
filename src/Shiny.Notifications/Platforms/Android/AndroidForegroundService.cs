@@ -5,7 +5,6 @@ using System.Reactive.Disposables;
 using Android.App;
 using Android.Content;
 using Android.OS;
-using AndroidX.Core.App;
 using Shiny.Notifications;
 using ShinyNotification = Shiny.Notifications.Notification;
 
@@ -14,7 +13,7 @@ namespace Shiny
 {
     public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Service where TService : IShinyForegroundManager
     {
-        static int idCount = 0;
+        static int idCount = 7999;
         int? notificationId;
 
         readonly Lazy<IMessageBus> messageBus = ShinyHost.LazyResolve<IMessageBus>();

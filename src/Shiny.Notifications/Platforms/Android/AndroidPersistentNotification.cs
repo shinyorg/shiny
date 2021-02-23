@@ -8,7 +8,7 @@ namespace Shiny.Notifications
     {
         readonly AndroidNotificationManager manager;
         readonly NotificationCompat.Builder builder;
-        static int currentId = 0;
+        static int currentId = 8999;
         int notificationId;
 
 
@@ -24,16 +24,16 @@ namespace Shiny.Notifications
             if (this.IsShowing)
                 throw new ArgumentException("Already showing");
 
-            this.IsShowing = true;
             this.notificationId = ++currentId;
-            this.Update();
+            this.manager.NativeManager.Notify(this.notificationId, this.builder.Build());
+            this.IsShowing = true;
         }
 
 
         public void Dismiss()
         {
-            this.IsShowing = false;
             this.manager.NativeManager.Cancel(this.notificationId);
+            this.IsShowing = false;
         }
 
 
@@ -46,6 +46,9 @@ namespace Shiny.Notifications
             get => this.title;
             set
             {
+                if (this.title == value)
+                    return;
+
                 this.title = value;
                 this.builder.SetContentTitle(value);
                 this.Update();
@@ -59,53 +62,72 @@ namespace Shiny.Notifications
             get => this.message;
             set
             {
+                if (this.message == value)
+                    return;
+
                 this.message = value;
-                this.builder.SetContentInfo(value);
+                this.builder.SetContentText(value);
                 this.Update();
             }
         }
 
 
-        bool? ind;
-        public bool? IsIndeterministic
+        bool ind;
+        public bool IsIndeterministic
         {
             get => this.ind;
             set
             {
+                if (this.ind == value)
+                    return;
+
                 this.ind = value;
-                //this.builder.SetProgress(this.Total, this.Progress, this.IsIndeterministic);
-                this.Update();
+                this.SetProgress();
             }
         }
 
 
-        int total;
-        public int Total
+        double total;
+        public double Total
         {
             get => this.total;
             set
             {
+                if (this.total == value)
+                    return;
+
                 this.total = value;
-                //this.builder.SetProgress(this.Total, this.Progress, this.IsIndeterministic);
-                this.Update();
+                this.SetProgress();
             }
         }
 
 
-        int progress;
-        public int Progress
+        double progress;
+        public double Progress
         {
             get => this.progress;
             set
             {
+                if (this.progress == value)
+                    return;
+
                 this.progress = value;
-                //this.builder.SetProgress(this.Total, this.Progress, this.IsIndeterministic);
-                this.Update();
+                this.SetProgress();
             }
         }
 
 
         public bool IsShowing { get; private set; }
+
+
+        void SetProgress()
+        {
+            var progress = Convert.ToInt32(this.Progress * 100);
+            var total = Convert.ToInt32(this.Total * 100);
+
+            this.builder.SetProgress(total, progress, this.IsIndeterministic);
+            this.Update();
+        }
 
 
         void Update()

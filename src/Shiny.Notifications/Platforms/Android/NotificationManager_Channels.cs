@@ -28,23 +28,21 @@ namespace Shiny.Notifications
 
         protected async Task<Channel> GetChannel(Notification notification)
         {
-            //if (this.manager.GetNotificationChannel(Channel.Default.Identifier) == null)
-            //    this.CreateNativeChannel(Channel.Default);
-            //var channel = Channel.Default;
-            //if (notification.Channel.IsEmpty())
-            //{
-            //    if (this.manager.GetNotificationChannel(Channel.Default.Identifier) == null)
-            //        this.CreateNativeChannel(Channel.Default);
-            //}
-            //else
-            //{
-            //    channel = await this.core.Repository.GetChannel(notification.Channel);
-            //    if (channel == null)
-            //        throw new ArgumentException($"{notification.Channel} does not exist");
-            //}
-            var channel = await this.core.Repository.Get<Channel>(notification.Channel ?? Channel.Default.Identifier);
+            var channel = Channel.Default;
+            if (notification.Channel.IsEmpty())
+            {
+                if (this.manager.NativeManager.GetNotificationChannel(Channel.Default.Identifier) == null)
+                    this.CreateNativeChannel(Channel.Default);
+            }
+            else
+            {
+                channel = await this.core.Repository.GetChannel(notification.Channel);
+                if (channel == null)
+                    throw new ArgumentException($"{notification.Channel} does not exist");
+            }
             return channel;
         }
+
 
         protected virtual void ApplyChannel(Notification notification, Channel channel, NotificationCompat.Builder builder)
         {

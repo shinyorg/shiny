@@ -12,6 +12,7 @@ namespace Shiny.Notifications
         static int current;
         int notificationId;
         int sequence;
+        string channel;
 
 
         public UwpPersistentNotification(Notification initialNotification)
@@ -20,6 +21,7 @@ namespace Shiny.Notifications
 
             this.title = initialNotification.Title;
             this.message = initialNotification.Message;
+            this.channel = initialNotification.Channel ?? Channel.Default.Identifier;
         }
 
 
@@ -32,6 +34,9 @@ namespace Shiny.Notifications
             get => this.title;
             set
             {
+                if (this.title == value)
+                    return;
+
                 this.title = value;
                 this.Update();
             }
@@ -44,15 +49,17 @@ namespace Shiny.Notifications
             get => this.message;
             set
             {
+                if (this.message == value)
+                    return;
+
                 this.message = value;
                 this.Update();
             }
         }
 
 
-        // when this changes, if showing, the whole toast changes
-        bool? ind;
-        public bool? IsIndeterministic
+        bool ind;
+        public bool IsIndeterministic
         {
             get => this.ind;
             set
@@ -70,24 +77,30 @@ namespace Shiny.Notifications
         }
 
 
-        int total;
-        public int Total
+        double total;
+        public double Total
         {
             get => this.total;
             set
             {
+                if (this.total == value)
+                    return;
+
                 this.total = value;
                 this.Update();
             }
         }
 
 
-        int progress;
-        public int Progress
+        double progress;
+        public double Progress
         {
             get => this.progress;
             set
             {
+                if (this.progress == value)
+                    return;
+
                 this.progress = value;
                 this.Update();
             }
@@ -114,21 +127,18 @@ namespace Shiny.Notifications
             {
                 SequenceNumber = (uint)this.sequence
             };
-            data.Values["title"] = this.Title;
+            data.Values["Title"] = this.Title;
+            data.Values["Message"] = this.Message;
 
-            //if (this.indeterministic)
-            //{
-            //    data.Values["progressValue"] = AdaptiveProgressBarValue.Indeterminate.ToString();
-            //}
-            //else
-            //{
-            //    data.Values["progressValue"] = (this.progress / this.total).ToString();
-            //    data.Values["progressValueString"] = $"{this.progress}/{this.total}";
-            //}
+            if (!this.IsIndeterministic && this.Total > 0)
+            {
+                data.Values["progressValue"] = (this.progress / this.total).ToString();
+                data.Values["progressValueString"] = $"{this.progress}/{this.total}";
+            }
             this.toastNotifier.Update(
                 data,
                 this.notificationId.ToString(),
-                "this.channel"
+                this.channel
             );
         }
 
@@ -158,25 +168,30 @@ namespace Shiny.Notifications
                 }
             };
 
-            if (this.IsIndeterministic != null)
+            if (this.IsIndeterministic || this.Total > 0)
             {
-                //toastContent.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
-                //{
-                //    Title = new BindableString("title"),
-                //    Value = new BindableProgressBarValue("progressValue"),
-                //    ValueStringOverride = new BindableString("progressValueString"),
-                //    Status = new BindableString("progressStatus")
-                //});
+                //Title = new BindableString("title"),
+                var progressBar = new AdaptiveProgressBar();
+
+                if (this.IsIndeterministic)
+                {
+                    progressBar.Value = AdaptiveProgressBarValue.Indeterminate;
+                }
+                else
+                {
+                    progressBar.Value = new BindableProgressBarValue("progressValue");
+                    progressBar.ValueStringOverride = new BindableString("progressValueString");
+                    progressBar.Status = new BindableString("progressStatus");
+                }
+                toastContent.Visual.BindingGeneric.Children.Add(progressBar);
             }
 
             this.toastNotifier.Show(new ToastNotification(toastContent.GetXml())
             {
-                Tag = this.notificationId.ToString()
-                //Group = notification.Channel ?? Channel.Default.Identifier
+                Tag = this.notificationId.ToString(),
+                Group = this.channel
             });
+            this.Update();
         }
     }
 }
-
-//protected virtual ToastNotification CreateNativeNotification(ToastContent toastContent, Notification notification)
-//    =>

@@ -20,7 +20,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Label Text="Title"
@@ -30,19 +29,19 @@
                        Grid.Column="1"
                        Grid.Row="0" />
 
-                <Label Text="Description"
+                <Label Text="Message"
                        Grid.Column="0"
                        Grid.Row="1" />
-                <Entry Text="{Binding Description}"
+                <Entry Text="{Binding NotificationMessage}"
                        Grid.Column="1"
                        Grid.Row="1" />
 
                 <Label Text="Progress"
                        Grid.Column="0"
                        Grid.Row="2" />
+                <!--Maximum="{Binding Total, Mode=OneWay}"-->
                 <Slider Value="{Binding Progress}"
                         Minimum="0.0"
-                        Maximum="1.0"
                         Grid.Column="1"
                         Grid.Row="2" />
 
@@ -68,7 +67,7 @@
                         Grid.ColumnSpan="2"
                         Grid.Row="5" />
             </Grid>
-            
+
             <StackLayout IsVisible="{Binding IsSupported, Converter={StaticResource Not}}">
                 <Label Text="Not Supported on this Platform"
                        Style="{StaticResource NoDataLabel}" />
