@@ -8,9 +8,9 @@ namespace Shiny.Notifications
         string Title { get; set; }
         string Message { get; set; }
 
-        bool IsIndeterministic { get; }
-        int? Total { get; set; }
-        int? Progress { get; set; }
+        bool? IsIndeterministic { get; set; }
+        int Total { get; set; }
+        int Progress { get; set; }
 
         void Show();
         void Dismiss();

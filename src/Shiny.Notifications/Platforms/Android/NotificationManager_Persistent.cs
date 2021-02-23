@@ -6,19 +6,20 @@ namespace Shiny.Notifications
 {
     public partial class NotificationManager : IPersistentNotificationManagerExtension
     {
-        public async Task<IPersistentNotification> Create(Notification notification)
+        public async Task<IPersistentNotification> Create(Notification notification, bool show)
         {
-            var channel = await this.core.Repository.GetChannel(notification.Channel ?? Channel.Default.Identifier);
+            var channel = await this.GetChannel(notification);
 
             notification.Android.OnGoing = true;
             notification.Android.ShowWhen = null;
             notification.ScheduleDate = null;
 
             var builder = this.manager.CreateNativeBuilder(notification, channel);
-            var pnotification = new AndroidPersistentNotification(notification.Id, this.manager.NativeManager, builder);
+            var p = new AndroidPersistentNotification(this.manager, builder);
+            if (show)
+                p.Show();
 
-            this.manager.NativeManager.Notify(notification.Id, builder.Build());
-            return pnotification;
+            return p;
         }
     }
 }

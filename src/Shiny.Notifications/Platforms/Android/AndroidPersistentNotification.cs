@@ -6,24 +6,28 @@ namespace Shiny.Notifications
 {
     public class AndroidPersistentNotification : IPersistentNotification
     {
-        readonly NotificationManagerCompat manager;
+        readonly AndroidNotificationManager manager;
         readonly NotificationCompat.Builder builder;
-        readonly int notificationId;
+        static int currentId = 0;
+        int notificationId;
 
 
-        public AndroidPersistentNotification(NotificationManagerCompat manager, NotificationCompat.Builder builder)
+        public AndroidPersistentNotification(AndroidNotificationManager manager, NotificationCompat.Builder builder)
         {
-            this.notificationId = notificationId;
             this.manager = manager;
             this.builder = builder;
         }
 
 
-        public void SetProgress(int progress, int total)
+        public void Show()
         {
-            this.builder.SetProgress(total, progress, false);
+            this.notificationId = ++currentId;
             this.Update();
         }
+
+
+        public void Dismiss() => this.manager.NativeManager.Cancel(this.notificationId);
+        public void Dispose() => this.Dismiss();
 
 
         string title;
@@ -46,21 +50,51 @@ namespace Shiny.Notifications
             set
             {
                 this.message = value;
-                this.builder.SetContentText(value);
+                this.builder.SetContentInfo(value);
                 this.Update();
             }
         }
 
-        public void Dismiss() => this.manager.Cancel(this.notificationId);
-        public void Dispose() => this.Dismiss();
-        public void SetIndeterministicProgress(bool show)
+
+        bool? ind;
+        public bool? IsIndeterministic
         {
-            this.builder.SetProgress(0, 0, show);
-            this.Update();
+            get => this.ind;
+            set
+            {
+                this.ind = value;
+                //this.builder.SetProgress(this.Total, this.Progress, this.IsIndeterministic);
+                this.Update();
+            }
         }
 
 
-        public void ClearProgress() => this.SetIndeterministicProgress(false);
-        void Update() => this.manager.Notify(this.notificationId, this.builder.Build());
+        int total;
+        public int Total
+        {
+            get => this.total;
+            set
+            {
+                this.total = value;
+                //this.builder.SetProgress(this.Total, this.Progress, this.IsIndeterministic);
+                this.Update();
+            }
+        }
+
+
+        int progress;
+        public int Progress
+        {
+            get => this.progress;
+            set
+            {
+                this.progress = value;
+                //this.builder.SetProgress(this.Total, this.Progress, this.IsIndeterministic);
+                this.Update();
+            }
+        }
+
+
+        void Update() => this.manager.NativeManager.Notify(this.notificationId, this.builder.Build());
     }
 }
