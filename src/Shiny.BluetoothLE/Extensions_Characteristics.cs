@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -77,13 +76,13 @@ namespace Shiny.BluetoothLE
         /// <param name="characteristic"></param>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public static IObservable<Unit> WriteBlob(this IGattCharacteristic characteristic, Stream stream) => Observable.Create<Unit>(ob =>
+        public static IObservable<IGattCharacteristic> WriteBlob(this IGattCharacteristic characteristic, Stream stream) => Observable.Create<IGattCharacteristic>(ob =>
             characteristic
                 .WriteBlobWithProgress(stream)
                 .Subscribe(
                     _ => { },
                     ex => ob.OnError(ex),
-                    () => ob.Respond(Unit.Default)
+                    () => ob.Respond(characteristic)
                 )
         );
 

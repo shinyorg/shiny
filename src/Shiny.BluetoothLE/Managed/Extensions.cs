@@ -7,6 +7,13 @@ namespace Shiny.BluetoothLE
 {
     public static class ManagedExtensions
     {
+        //public static ManagedScanWrapper<T> CreateManagedScan<T>(this IBleManager bleManager, ScanConfig scanConfig, IScheduler ? scheduler = null, TimeSpan? clearTime = null)
+        //{
+        //    var managed = bleManager.CreateManagedScanner(scheduler, clearTime, scanConfig);
+        //    return new ManagedScanWrapper<T>
+        //}
+
+
         public static ManagedScan CreateManagedScanner(this IBleManager bleManager, IScheduler? scheduler = null, TimeSpan? clearTime = null, ScanConfig? scanConfig = null)
             => new ManagedScan(bleManager, scanConfig, scheduler, clearTime);
 

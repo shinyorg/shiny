@@ -62,9 +62,9 @@ namespace Shiny.BluetoothLE.Managed
         public IPeripheral Peripheral { get; }
 
 
-        public IObservable<Unit> ConnectWait(ConnectionConfig? config = null) => this.Peripheral
+        public IObservable<ManagedPeripheral> ConnectWait(ConnectionConfig? config = null) => this.Peripheral
             .WithConnectIf(config)
-            .Select(_ => Unit.Default);
+            .Select(_ => this);
 
         public void CancelConnection() => this.Peripheral.CancelConnection();
 
@@ -125,19 +125,19 @@ namespace Shiny.BluetoothLE.Managed
         public IReadOnlyList<GattCharacteristicInfo> Characteristics => this.characteristics.AsReadOnly();
 
 
-        public IObservable<Unit> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream) => this
+        public IObservable<ManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream) => this
             .GetChar(serviceUuid, characteristicUuid)
             .Select(x => x.WriteBlob(stream))
-            .Switch();
+            .Select(_ => this);
 
 
-        public IObservable<Unit> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
+        public IObservable<ManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
             .GetChar(serviceUuid, characteristicUuid)
             .Select(x => x.Write(data, withResponse))
             .Select(x =>
             {
                 this.GetInfo(serviceUuid, characteristicUuid).Value = data;
-                return Unit.Default;
+                return this;
             });
 
 
@@ -176,11 +176,11 @@ namespace Shiny.BluetoothLE.Managed
         }
 
 
-        public void StartRssi(IScheduler? scheduler = null)
+        public void StartRssi()
         {
             this.rssiSub = this.Peripheral
                 .ReadRssiContinuously()
-                .ObserveOnIf(scheduler)
+                .ObserveOnIf(this.Scheduler)
                 .Subscribe(x => this.Rssi = x);
         }
 
@@ -261,10 +261,10 @@ namespace Shiny.BluetoothLE.Managed
 
         public void Dispose()
         {
+            this.Peripheral.CancelConnection();
             this.npcDispose.Dispose();
             this.coreDispose.Dispose();
             this.StopRssi();
-            this.Peripheral.CancelConnection();
         }
     }
 }

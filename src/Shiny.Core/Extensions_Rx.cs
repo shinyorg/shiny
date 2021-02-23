@@ -31,10 +31,24 @@ namespace Shiny
 
     public static class RxExtensions
     {
+        /// <summary>
+        /// Passes the last and current values from the stream
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ob"></param>
+        /// <returns></returns>
         public static IObservable<Tuple<T, T>> WithPrevious<T>(this IObservable<T> ob)
             => ob.Scan(Tuple.Create(default(T), default(T)), (acc, current) => Tuple.Create(acc.Item2, current));
 
 
+
+        /// <summary>
+        /// This is to make chaining easier when a scheduler is null
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="ob"></param>
+        /// <param name="scheduler"></param>
+        /// <returns></returns>
         public static IObservable<T> ObserveOnIf<T>(this IObservable<T> ob, IScheduler? scheduler)
         {
             if (scheduler != null)
@@ -58,16 +72,25 @@ namespace Shiny
         }
 
 
-        public static Task WithTimeout(this Task task, TimeSpan ts) => Observable
-            .FromAsync(() => task)
-            .Timeout(ts)
-            .ToTask(CancellationToken.None);
-
-
-        public static Task<T> WithTimeout<T>(this Task<T> task, TimeSpan ts) => Observable
-            .FromAsync(() => task)
-            .Timeout(ts)
-            .ToTask(CancellationToken.None);
+        /// <summary>
+        /// Runs an action only once when the first result is received
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obs"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public static IObservable<T> DoOnce<T>(this IObservable<T> obs, Action<T> action)
+        {
+            var count = 1;
+            return obs.Do(x =>
+            {
+                if (count == 0)
+                {
+                    Interlocked.Increment(ref count);
+                    action(x);
+                }
+            });
+        }
 
         /// <summary>
         /// A function from ReactiveUI - useful for non-ui stuff too ;)
@@ -94,15 +117,6 @@ namespace Shiny
             ob.OnNext(value);
             ob.OnCompleted();
         }
-
-
-        public static IObservable<NotifyCollectionChangedEventArgs> WhenCollectionChanged(this INotifyCollectionChanged collection) => Observable.Create<NotifyCollectionChangedEventArgs>(ob =>
-        {
-            var handler = new NotifyCollectionChangedEventHandler((sender, args) => ob.OnNext(args));
-            collection.CollectionChanged += handler;
-            return () => collection.CollectionChanged -= handler;
-        });
-
 
 
         /// <summary>

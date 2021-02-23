@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 
 
 namespace Shiny.BluetoothLE.Managed
@@ -98,52 +99,62 @@ namespace Shiny.BluetoothLE.Managed
         }
 
 
-        public bool Toggle()
+        public async Task<bool> Toggle()
         {
             if (this.IsScanning)
                 this.Stop();
             else
-                this.Start();
+                await this.Start();
 
             return this.IsScanning;
         }
 
 
-        public void Start()
+        public async Task Start()
         {
             if (this.IsScanning)
                 return;
 
             // restart clear timer if set
             this.ClearTime = this.ClearTime;
-            this.Peripherals.Clear();
-            this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
+            if (this.Peripherals.Count > 0)
+            {
+                this.Peripherals.Clear();
+                this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
+            }
 
+            var tcs = new TaskCompletionSource<object>();
             this.scanSub = this.bleManager
                 .Scan(this.ScanConfig)
+                .DoOnce(x => tcs.TrySetResult(null))
                 .Buffer(TimeSpan.FromSeconds(3))
                 .ObserveOnIf(this.Scheduler)
                 .Synchronize(this.Peripherals)
-                .Subscribe(scanResults =>
-                {
-                    foreach (var scanResult in scanResults)
+                .Subscribe(
+                    scanResults =>
                     {
-                        var action = ManagedScanListAction.Update;
-                        var result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
-                        if (result == null)
+                        foreach (var scanResult in scanResults)
                         {
-                            action = ManagedScanListAction.Add;
-                            result = new ManagedScanResult(scanResult.Peripheral, scanResult.AdvertisementData?.ServiceUuids);
-                            this.Peripherals.Add(result);
+                            var action = ManagedScanListAction.Update;
+                            var result = this.Peripherals.FirstOrDefault(x => x.Peripheral.Equals(scanResult.Peripheral));
+                            if (result == null)
+                            {
+                                action = ManagedScanListAction.Add;
+                                result = new ManagedScanResult(scanResult.Peripheral, scanResult.AdvertisementData?.ServiceUuids);
+                                this.Peripherals.Add(result);
+                            }
+                            result.Connectable = scanResult.AdvertisementData?.IsConnectable;
+                            result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
+                            result.Name = scanResult.Peripheral.Name;
+                            result.Rssi = scanResult.Rssi;
+                            result.LastSeen = DateTimeOffset.UtcNow;
+                            this.actionSubj.OnNext((action, result));
                         }
-                        result.Connectable = scanResult.AdvertisementData?.IsConnectable;
-                        result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
-                        result.Name = scanResult.Peripheral.Name;
-                        result.Rssi = scanResult.Rssi;
-                        result.LastSeen = DateTimeOffset.UtcNow;
-                        this.actionSubj.OnNext((action, result));
-                    }
-                });
+                    },
+                    ex => tcs.TrySetException(ex)
+                );
+
+            await tcs.Task.ConfigureAwait(false);
         }
 
 
