@@ -17,7 +17,13 @@ namespace Shiny.Notifications
         public UwpPersistentNotification(Notification initialNotification)
         {
             this.toastNotifier = ToastNotificationManager.CreateToastNotifier();
+
+            this.title = initialNotification.Title;
+            this.message = initialNotification.Message;
         }
+
+
+        public bool IsShowing { get; private set; }
 
 
         string title;
@@ -44,8 +50,24 @@ namespace Shiny.Notifications
         }
 
 
+        // when this changes, if showing, the whole toast changes
         bool? ind;
-        public bool? IsIndeterministic { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool? IsIndeterministic
+        {
+            get => this.ind;
+            set
+            {
+                if (this.ind == value)
+                    return;
+
+                this.ind = value;
+                if (this.IsShowing)
+                {
+                    this.Dismiss();
+                    this.Show();
+                }
+            }
+        }
 
 
         int total;
@@ -74,8 +96,12 @@ namespace Shiny.Notifications
 
         public void Show()
         {
-            this.notificationId = ++current;
+            if (this.IsShowing)
+                throw new ArgumentException("Toast is already showing");
 
+            this.notificationId = ++current;
+            this.CreateToast();
+            this.IsShowing = true;
         }
         public void Dismiss() => ToastNotificationManager.History.Remove(this.notificationId.ToString());
         public void Dispose() => this.Dismiss();
@@ -105,45 +131,52 @@ namespace Shiny.Notifications
                 "this.channel"
             );
         }
+
+
+        void CreateToast()
+        {
+            var toastContent = new ToastContent
+            {
+                Duration = ToastDuration.Short,
+                ActivationType = ToastActivationType.Foreground,
+                Visual = new ToastVisual
+                {
+                    BindingGeneric = new ToastBindingGeneric
+                    {
+                        Children =
+                        {
+                            new AdaptiveText
+                            {
+                                Text = new BindableString("Title")
+                            },
+                            new AdaptiveText
+                            {
+                                Text = new BindableString("Message")
+                            }
+                        }
+                    }
+                }
+            };
+
+            if (this.IsIndeterministic != null)
+            {
+                //toastContent.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
+                //{
+                //    Title = new BindableString("title"),
+                //    Value = new BindableProgressBarValue("progressValue"),
+                //    ValueStringOverride = new BindableString("progressValueString"),
+                //    Status = new BindableString("progressStatus")
+                //});
+            }
+
+            this.toastNotifier.Show(new ToastNotification(toastContent.GetXml())
+            {
+                Tag = this.notificationId.ToString()
+                //Group = notification.Channel ?? Channel.Default.Identifier
+            });
+        }
     }
 }
 
 //protected virtual ToastNotification CreateNativeNotification(ToastContent toastContent, Notification notification)
-//    => new ToastNotification(toastContent.GetXml())
-//    {
-//        Tag = notification.Id.ToString(),
-//        Group = notification.Channel ?? Channel.Default.Identifier
-//    };
-
-
-
-//content.Visual.BindingGeneric.Children.Add(new AdaptiveProgressBar
-//{
-//    Title = new BindableString("title"),
-//    Value = new BindableProgressBarValue("progressValue"),
-//    ValueStringOverride = new BindableString("progressValueString"),
-//    Status = new BindableString("progressStatus")
-//});
-
-//var content = new ToastContent
-//{
-//    Duration = ToastDuration.Short,
-//    ActivationType = ToastActivationType.Foreground,
-//    Visual = new ToastVisual
-//    {
-//        BindingGeneric = new ToastBindingGeneric
-//        {
-//            Children =
-//                        {
-//                            new AdaptiveText
-//                            {
-//                                Text = notification.Title
-//                            },
-//                            new AdaptiveText
-//                            {
-//                                Text = notification.Message
-//                            }
-//                        }
-//        }
-//    }
-//};
+//    =>

@@ -73,7 +73,7 @@ namespace Shiny.Notifications
             // this is here to cause validation of the settings before firing or scheduling
             var channel = await this.GetChannel(notification);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
-            
+
             if (notification.ScheduleDate != null)
             {
                 await this.core.Repository.Set(notification.Id.ToString(), notification);

@@ -21,12 +21,22 @@ namespace Shiny.Notifications
 
         public void Show()
         {
+            if (this.IsShowing)
+                throw new ArgumentException("Already showing");
+
+            this.IsShowing = true;
             this.notificationId = ++currentId;
             this.Update();
         }
 
 
-        public void Dismiss() => this.manager.NativeManager.Cancel(this.notificationId);
+        public void Dismiss()
+        {
+            this.IsShowing = false;
+            this.manager.NativeManager.Cancel(this.notificationId);
+        }
+
+
         public void Dispose() => this.Dismiss();
 
 
@@ -95,6 +105,13 @@ namespace Shiny.Notifications
         }
 
 
-        void Update() => this.manager.NativeManager.Notify(this.notificationId, this.builder.Build());
+        public bool IsShowing { get; private set; }
+
+
+        void Update()
+        {
+            if (this.IsShowing)
+                this.manager.NativeManager.Notify(this.notificationId, this.builder.Build());
+        }
     }
 }
