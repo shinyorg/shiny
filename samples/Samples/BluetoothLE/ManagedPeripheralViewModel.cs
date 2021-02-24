@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Prism.Navigation;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Shiny;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Managed;
 
@@ -22,15 +23,13 @@ namespace Samples.BluetoothLE
         {
             this.Peripheral = parameters
                 .GetValue<IPeripheral>("Peripheral")
-                .CreateManaged(RxApp.MainThreadScheduler);
+                .CreateManaged(RxApp.MainThreadScheduler)
+                .DisposedBy(this.DeactivateWith);
         }
 
 
-        public override void OnDisappearing() => this.Peripheral.Dispose();
-
-
         public ICommand ToggleRssi { get; }
-        public ManagedPeripheral Peripheral { get; private set; }
+        public IManagedPeripheral Peripheral { get; private set; }
         [Reactive] public bool IsRssi { get; private set; }
     }
 }

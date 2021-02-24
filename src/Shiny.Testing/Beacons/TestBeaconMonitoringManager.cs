@@ -35,36 +35,29 @@ namespace Shiny.Testing.Beacons
         }
 
 
-        int? progress;
-        public int? Progress
-        {
-            get => this.progress;
-            set => this.Set(ref this.progress, value);
-        }
-
-
-        bool? indeterministic;
-        public bool? IsIndeterministic
+        bool indeterministic;
+        public bool IsIndeterministic
         {
             get => this.indeterministic;
             set => this.Set(ref this.indeterministic, value);
         }
 
 
-        string? ticker;
-        public string? Ticker
+        int progress;
+        public int Progress
         {
-            get => this.ticker;
-            set => this.Set(ref this.ticker, value);
+            get => this.progress;
+            set => this.Set(ref this.progress, value);
         }
 
 
-        string? channel;
-        public string? Channel
+        int total;
+        public int Total
         {
-            get => this.channel;
-            set => this.Set(ref this.channel, value);
+            get => this.total;
+            set => this.Set(ref this.total, value);
         }
+
 
         public Task<AccessState> RequestAccess() => Task.FromResult(this.CurrentAccessState);
 

@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Prism.Navigation;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Shiny;
 using Shiny.BluetoothLE;
 using Shiny.BluetoothLE.Managed;
 
@@ -13,15 +14,17 @@ namespace Samples.BluetoothLE
 {
     public class ManagedScanViewModel : ViewModel
     {
-        readonly ManagedScan scanner;
+        readonly IManagedScan scanner;
 
 
         public ManagedScanViewModel(IBleManager bleManager, INavigationService navigator)
         {
-            this.scanner = bleManager.CreateManagedScanner(RxApp.MainThreadScheduler, TimeSpan.FromSeconds(10));
+            this.scanner = bleManager
+                .CreateManagedScanner(RxApp.MainThreadScheduler, TimeSpan.FromSeconds(10))
+                .DisposedBy(this.DeactivateWith);
 
-            this.Toggle = ReactiveCommand.Create(() =>
-                this.IsBusy = scanner.Toggle()
+            this.Toggle = ReactiveCommand.CreateFromTask(async () =>
+                this.IsBusy = await this.scanner.Toggle()
             );
 
             this.WhenAnyValue(x => x.SelectedPeripheral)
@@ -30,17 +33,11 @@ namespace Samples.BluetoothLE
                 .Subscribe(async x =>
                 {
                     this.SelectedPeripheral = null;
-                    scanner.Stop();
+                    this.scanner.Stop();
                     await navigator.Navigate("ManagedPeripheral", ("Peripheral", x.Peripheral));
                 });
         }
 
-
-
-        public override void OnDisappearing()
-        {
-            this.scanner.Stop();
-        }
 
         public ICommand Toggle { get;  }
         [Reactive] public ManagedScanResult? SelectedPeripheral { get; set; }

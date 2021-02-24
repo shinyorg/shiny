@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Reactive;
+using System.Reactive.Linq;
+using Shiny;
 
 
 namespace Samples
@@ -10,6 +13,16 @@ namespace Samples
     {
         public ObservableList() { }
         public ObservableList(IEnumerable<T> items) : base(items) { }
+
+
+        public IObservable<Unit> WhenCollectionChanged() => Observable.Create<Unit>(ob =>
+        {
+            var handler = new NotifyCollectionChangedEventHandler((sender, args) =>
+                ob.Respond(Unit.Default)
+            );
+            this.CollectionChanged += handler;
+            return () => this.CollectionChanged -= handler;
+        });
 
 
         /// <summary>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE.Managed
 {
-    public interface IManagedScan
+    public interface IManagedScan : IDisposable
     {
         TimeSpan? ClearTime { get; set; }
         bool IsScanning { get; }
@@ -15,7 +15,6 @@ namespace Shiny.BluetoothLE.Managed
         ScanConfig? ScanConfig { get; set; }
         IScheduler? Scheduler { get; set; }
 
-        void Dispose();
         IEnumerable<IPeripheral> GetConnectedPeripherals();
         Task Start();
         void Stop();

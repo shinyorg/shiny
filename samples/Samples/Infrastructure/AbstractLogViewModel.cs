@@ -21,6 +21,7 @@ namespace Samples.Infrastructure
             this.Dialogs = dialogs;
 
             this.Logs = new ObservableList<TItem>();
+
             this.Logs
                 .WhenCollectionChanged()
                 .Synchronize(this.syncLock)

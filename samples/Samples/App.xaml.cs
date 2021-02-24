@@ -45,7 +45,6 @@ namespace Samples
             containerRegistry.RegisterForNavigation<BigTextViewPage>("BigText");
             containerRegistry.RegisterForNavigation<LogPage>("Logs");
             containerRegistry.RegisterForNavigation<DelegateNotificationsPage>("DelegateNotifications");
-            containerRegistry.RegisterForNavigation<Versioning.MainPage>("Versioning");
 
             containerRegistry.RegisterForNavigation<Gps.MainPage>("Gps");
             containerRegistry.RegisterForNavigation<Geofences.MainPage>("Geofencing");
@@ -78,7 +77,6 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Notifications.MainPage>("Notifications");
             containerRegistry.RegisterForNavigation<Notifications.ChannelListPage>("NotificationChannels");
             containerRegistry.RegisterForNavigation<Notifications.ChannelCreatePage>("NotificationChannelCreate");
-            containerRegistry.RegisterForNavigation<Notifications.PersistentNotificationPage>("PersistentNotification");
             containerRegistry.RegisterForNavigation<Notifications.BadgePage>("Badges");
 
             containerRegistry.RegisterForNavigation<PlatformPage>("Platform");

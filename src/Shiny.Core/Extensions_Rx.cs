@@ -147,48 +147,49 @@ namespace Shiny
             });
 
 
-        /// <summary>
-        /// Will watch for changes in any observable item in the ObservableCollection
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="collection"></param>
-        /// <returns></returns>
-        public static IObservable<ItemChanged<T, string>> WhenItemChanged<T>(this ObservableCollection<T> collection)
-            where T : INotifyPropertyChanged
-            => Observable.Create<ItemChanged<T, string>>(ob =>
-            {
-                var disp = new CompositeDisposable();
-                foreach (var item in collection)
-                    disp.Add(item.WhenAnyProperty().Subscribe(ob.OnNext));
+        ///// <summary>
+        ///// Will watch for changes in any observable item in the ObservableCollection
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="collection"></param>
+        ///// <returns></returns>
+        //public static IObservable<ItemChanged<T, string>> WhenItemChanged<T>(this ObservableCollection<T> collection)
+        //    where T : INotifyPropertyChanged
+        //    => Observable.Create<ItemChanged<T, string>>(ob =>
+        //    {
+        //        // TODO: watch for collection changes too
+        //        var disp = new CompositeDisposable();
+        //        foreach (var item in collection)
+        //            disp.Add(item.WhenAnyProperty().Subscribe(ob.OnNext));
 
-                return disp;
-            });
+        //        return disp;
+        //    });
 
 
-        /// <summary>
-        /// Will watch for a specific property change with any item in the ObservableCollection
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TRet"></typeparam>
-        /// <param name="collection"></param>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public static IObservable<ItemChanged<T, TRet>> WhenItemValueChanged<T, TRet>(
-            this ObservableCollection<T> collection,
-            Expression<Func<T, TRet>> expression) where T : INotifyPropertyChanged =>
-            Observable.Create<ItemChanged<T, TRet>>(ob =>
-            {
-                var disp = new CompositeDisposable();
-                foreach (var item in collection)
-                {
-                    disp.Add(item
-                        .WhenAnyProperty(expression)
-                        .Subscribe(x => ob.OnNext(new ItemChanged<T, TRet>(item, x)))
-                    );
-                }
+        ///// <summary>
+        ///// Will watch for a specific property change with any item in the ObservableCollection
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <typeparam name="TRet"></typeparam>
+        ///// <param name="collection"></param>
+        ///// <param name="expression"></param>
+        ///// <returns></returns>
+        //public static IObservable<ItemChanged<T, TRet>> WhenItemValueChanged<T, TRet>(
+        //    this ObservableCollection<T> collection,
+        //    Expression<Func<T, TRet>> expression) where T : INotifyPropertyChanged =>
+        //    Observable.Create<ItemChanged<T, TRet>>(ob =>
+        //    {
+        //        var disp = new CompositeDisposable();
+        //        foreach (var item in collection)
+        //        {
+        //            disp.Add(item
+        //                .WhenAnyProperty(expression)
+        //                .Subscribe(x => ob.OnNext(new ItemChanged<T, TRet>(item, x)))
+        //            );
+        //        }
 
-                return disp;
-            });
+        //        return disp;
+        //    });
 
 
         public static IObservable<TRet> WhenAnyProperty<TSender, TRet>(this TSender This, Expression<Func<TSender, TRet>> expression) where TSender : INotifyPropertyChanged
