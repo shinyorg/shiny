@@ -35,7 +35,7 @@ namespace Shiny.Devices.Tests.BluetoothLE
                 .ToTask();
 
             await this.peripheral
-                .ConnectWait()
+                .WithConnectIf()
                 .Timeout(Constants.ConnectTimeout) // android can take some time :P
                 .ToTask();
 
@@ -47,10 +47,7 @@ namespace Shiny.Devices.Tests.BluetoothLE
         }
 
 
-        public void Dispose()
-        {
-            this.peripheral?.CancelConnection();
-        }
+        public void Dispose() => this.peripheral?.CancelConnection();
 
 
         [Fact]
@@ -159,7 +156,10 @@ namespace Shiny.Devices.Tests.BluetoothLE
                         this.peripheral.CancelConnection();
 
                         await Task.Delay(1000);
-                        await this.peripheral.ConnectWait().Timeout(Constants.ConnectTimeout);
+                        await this.peripheral
+                            .WithConnectIf()
+                            .Timeout(Constants.ConnectTimeout);
+
                         await this.peripheral
                             .WriteCharacteristic(
                                 Constants.ScratchServiceUuid,

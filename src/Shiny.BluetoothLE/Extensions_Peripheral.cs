@@ -10,6 +10,36 @@ namespace Shiny.BluetoothLE
     public static class PeripheralExtensions
     {
         /// <summary>
+        ///
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <param name="serviceUuid"></param>
+        /// <param name="characteristicUuid"></param>
+        /// <param name="data"></param>
+        /// <param name="withResponse"></param>
+        /// <returns></returns>
+        public static IObservable<GattCharacteristicResult> WriteCharacteristic(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true)
+            => peripheral
+                .GetKnownCharacteristic(serviceUuid, characteristicUuid, true)
+                .Select(x => x.Write(data, withResponse))
+                .Switch();
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="peripheral"></param>
+        /// <param name="serviceUuid"></param>
+        /// <param name="characteristicUuid"></param>
+        /// <returns></returns>
+        public static IObservable<byte[]?> ReadCharacteristic(this IPeripheral peripheral, string serviceUuid, string characteristicUuid)
+            => peripheral
+                .GetKnownCharacteristic(serviceUuid, characteristicUuid, true)
+                .Select(x => x.Read())
+                .Switch()
+                .Select(x => x.Data);
+
+
+        /// <summary>
         /// Connect and manage connection as well as hook into your required characterisitcs with all proper cleanups necessary
         /// </summary>
         /// <param name="peripheral"></param>

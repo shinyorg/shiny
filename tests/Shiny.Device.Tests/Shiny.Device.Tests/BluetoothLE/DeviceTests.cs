@@ -43,7 +43,7 @@ namespace Shiny.BluetoothLE.Tests
 
 
         Task Connect() => this.peripheral
-            .ConnectWait()
+            .WithConnectIf()
             .Timeout(Constants.ConnectTimeout)
             .ToTask();
 
@@ -243,7 +243,7 @@ namespace Shiny.BluetoothLE.Tests
                     }
                 });
 
-            await this.peripheral.ConnectWait();
+            await this.peripheral.WithConnectIf();
             await UserDialogs.Instance.AlertAsync("No turn peripheral off - wait a 3 seconds then turn it back on - press OK if light goes green or you believe connection has failed");
             Assert.Equal(2, connected);
             Assert.Equal(2, disconnected);
@@ -266,7 +266,7 @@ namespace Shiny.BluetoothLE.Tests
             var count = 0;
             this.peripheral.GetServices().Subscribe(_ => count++);
 
-            await this.peripheral.ConnectWait().ToTask();
+            await this.peripheral.WithConnectIf().ToTask();
             await UserDialogs.Instance.AlertAsync("Now turn peripheral off & press OK");
             var origCount = count;
             count = 0;
