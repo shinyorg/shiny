@@ -5,6 +5,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Jobs
 {
+    // https://docs.microsoft.com/en-us/xamarin/ios/watchos/platform/background-tasks
     public class JobManagerImpl : AbstractJobManager
     {
         public JobManagerImpl(IServiceProvider container, IRepository repository) : base(container, repository)

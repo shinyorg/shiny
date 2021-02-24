@@ -34,6 +34,44 @@ namespace Shiny.Notifications
         }
 
 
+        //https://docs.microsoft.com/en-us/windows/uwp/design/shell/tiles-and-notifications/notification-listener
+
+
+        //IReadOnlyList<UserNotification> notifs = await listener.GetNotificationsAsync(NotificationKinds.Toast);
+
+
+        //        // Get the listener
+        //        UserNotificationListener listener = UserNotificationListener.Current;
+
+        //        // And request access to the user's notifications (must be called from UI thread)
+        //        UserNotificationListenerAccessStatus accessStatus = await listener.RequestAccessAsync();
+
+        //switch (accessStatus)
+        //{
+        //    // This means the user has granted access.
+        //    case UserNotificationListenerAccessStatus.Allowed:
+
+        //        // Yay! Proceed as normal
+        //        break;
+
+        //    // This means the user has denied access.
+        //    // Any further calls to RequestAccessAsync will instantly
+        //    // return Denied. The user must go to the Windows settings
+        //    // and manually allow access.
+        //    case UserNotificationListenerAccessStatus.Denied:
+
+        //        // Show UI explaining that listener features will not
+        //        // work until user allows access.
+        //        break;
+
+        //    // This means the user closed the prompt without
+        //    // selecting either allow or deny. Further calls to
+        //    // RequestAccessAsync will show the dialog again.
+        //    case UserNotificationListenerAccessStatus.Unspecified:
+
+        //        // Show UI that allows the user to bring up the prompt again
+        //        break;
+        //}
         public Task<AccessState> RequestAccess()
             => this.services.Jobs.RequestAccess();
 
