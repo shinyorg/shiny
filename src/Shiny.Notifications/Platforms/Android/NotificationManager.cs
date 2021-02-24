@@ -13,7 +13,6 @@ namespace Shiny.Notifications
         readonly AndroidNotificationManager manager;
 
 
-
         public NotificationManager(ShinyCoreServices core, AndroidNotificationManager manager)
         {
             this.core = core;

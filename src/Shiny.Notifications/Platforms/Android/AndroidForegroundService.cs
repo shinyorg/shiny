@@ -5,8 +5,8 @@ using System.Reactive.Disposables;
 using Android.App;
 using Android.Content;
 using Android.OS;
+using AndroidX.Core.App;
 using Shiny.Notifications;
-using ShinyNotification = Shiny.Notifications.Notification;
 
 
 namespace Shiny
@@ -77,33 +77,36 @@ namespace Shiny
         public override IBinder? OnBind(Intent? intent) => null;
 
 
+
+        NotificationCompat.Builder builder;
         void SetNotification()
         {
-            var notification = new ShinyNotification
-            {
-                Title = this.Service!.Title ?? "GPS is tracking",
-                Message = this.Service.Message ?? "GPS is tracking",
-                Channel = this.Service.Channel,
-                Android = new AndroidOptions
-                {
-                    OnGoing = true,
-                    Ticker = this.Service.Message ?? "GPS Tracking is enabled",
-                    Category = Android.App.Notification.CategoryService
-                }
-            };
+            this.builder ??= new NotificationCompat.Builder(this.Context.AppContext)
+                .SetChannelId(Channel.Default.Identifier)
+                .SetSmallIcon(this.AndroidNotifications.GetSmallIconResource(null))
+                .SetOngoing(true);
+//                .SetContentIntent(this.AndroidNotifications.GetLaunchPendingIntent(null));
 
-            // I need to get the channel but the notification cannot launch async, could get native, but actions will be missing
-            // could pass initial notification and channel info through the intent?
-            var builder = this.AndroidNotifications!.CreateNativeBuilder(notification, Channel.Default);
+            this.builder.SetProgress(
+                this.Service.Total,
+                this.Service.Progress,
+                this.Service.IsIndeterministic
+            );
+
+            if (this.Service.Title.IsEmpty())
+                this.builder.SetContentTitle(this.Service.Title);
+
+            if (!this.Service.Message.IsEmpty())
+                this.builder.SetContentText(this.Service.Message);
 
             if (this.notificationId == null)
             {
                 this.notificationId = ++idCount;
-                this.StartForeground(this.notificationId.Value, builder.Build());
+                this.StartForeground(this.notificationId.Value, this.builder.Build());
             }
             else
             {
-                this.AndroidNotifications.NativeManager.Notify(this.notificationId.Value, builder.Build());
+                this.AndroidNotifications.NativeManager.Notify(this.notificationId.Value, this.builder.Build());
             }
         }
     }

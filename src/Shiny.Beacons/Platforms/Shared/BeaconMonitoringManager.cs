@@ -21,35 +21,27 @@ namespace Shiny.Beacons
         }
 
 
-        int? progress;
-        public int? Progress
+        int progress;
+        public int Progress
         {
             get => this.progress;
             set => this.Set(ref this.progress, value);
         }
 
 
-        bool? indeterministic;
-        public bool? IsIndeterministic
+        int total;
+        public int Total
+        {
+            get => this.total;
+            set => this.Set(ref this.total, value);
+        }
+
+
+        bool indeterministic;
+        public bool IsIndeterministic
         {
             get => this.indeterministic;
             set => this.Set(ref this.indeterministic, value);
-        }
-
-
-        string? ticker;
-        public string? Ticker
-        {
-            get => this.ticker;
-            set => this.Set(ref this.ticker, value);
-        }
-
-
-        string? channel;
-        public string? Channel
-        {
-            get => this.channel;
-            set => this.Set(ref this.channel, value);
         }
     }
 }

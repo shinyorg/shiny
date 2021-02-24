@@ -33,7 +33,7 @@ namespace Shiny.Notifications
             var pendingIntent = this.GetLaunchPendingIntent(notification);
             var builder = new NotificationCompat.Builder(this.core.Android.AppContext)
                 .SetContentTitle(notification.Title)
-                .SetSmallIcon(this.GetSmallIconResource(notification))
+                .SetSmallIcon(this.GetSmallIconResource(notification.Android.SmallIconResourceName))
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing)
                 .SetContentIntent(pendingIntent);
@@ -97,10 +97,11 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
+        public virtual PendingIntent GetLaunchPendingIntent(Notification notification, string? actionId = null)
         {
             Intent launchIntent;
-            if (notification.Android?.LaunchActivityType == null)
+
+            if (notification.Android.LaunchActivityType == null)
             {
                 launchIntent = this.core
                     .Android
@@ -156,9 +157,9 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual int GetSmallIconResource(Notification notification)
+        public virtual int GetSmallIconResource(string resourceName)
         {
-            if (notification.Android.SmallIconResourceName.IsEmpty())
+            if (resourceName.IsEmpty())
             {
                 var id = this.core.Android.GetResourceIdByName("notification");
                 if (id > 0)
@@ -166,9 +167,9 @@ namespace Shiny.Notifications
 
                 return this.core.Android.AppContext.ApplicationInfo.Icon;
             }
-            var smallIconResourceId = this.core.Android.GetResourceIdByName(notification.Android.SmallIconResourceName);
+            var smallIconResourceId = this.core.Android.GetResourceIdByName(resourceName);
             if (smallIconResourceId <= 0)
-                throw new ArgumentException($"Icon ResourceId for {notification.Android.SmallIconResourceName} not found");
+                throw new ArgumentException($"Icon ResourceId for {resourceName} not found");
 
             return smallIconResourceId;
         }
