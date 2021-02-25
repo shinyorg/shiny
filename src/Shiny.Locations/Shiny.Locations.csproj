@@ -4,7 +4,7 @@
         <Description>Shiny Locations - bringing geofencing and GPS to a background service near you!</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
-        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeReferencedProjectInPackage</TargetsForTfmSpecificContentInPackage>
+        <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeReferencedProjectInPackage</TargetsForTfmSpecificContentInPackage>-->
     </PropertyGroup>
 
     <ItemGroup>
@@ -73,9 +73,9 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
     </ItemGroup>
 
-    <Target Name="IncludeReferencedProjectInPackage">
+    <!--<Target Name="IncludeReferencedProjectInPackage">
         <ItemGroup>
             <TfmSpecificPackageFile Include="$(OutputPath)\Shiny.Locations.Common.dll" PackagePath="lib/$(TargetFramework)" />
         </ItemGroup>
-    </Target>
+    </Target>-->
 </Project>

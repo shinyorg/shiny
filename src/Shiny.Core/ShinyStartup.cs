@@ -18,7 +18,8 @@ namespace Shiny
         /// <summary>
         ///
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="builder"></param>
+        /// <param name="platform"></param>
         public virtual void ConfigureLogging(ILoggingBuilder builder, IPlatform platform) { }
 
         /// <summary>

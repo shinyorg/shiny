@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <!--<PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.8.0" />-->
+        <PackageReference Include="Microsoft.Net.Compilers.Toolset" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>

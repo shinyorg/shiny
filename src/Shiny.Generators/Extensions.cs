@@ -28,8 +28,6 @@ namespace Shiny.Generators
         }
 
 
-
-
         public static void TryDebug(this GeneratorExecutionContext context)
         {
             //Debugger.IsAttached &&
@@ -37,13 +35,6 @@ namespace Shiny.Generators
             if (debug)
                 Debugger.Launch();
         }
-
-
-        //public static void Source(this GeneratorExecutionContext context, string sourceText, string? fileName = null)
-        //{
-        //    fileName ??= Guid.NewGuid().ToString();
-        //    context.AddSource(fileName, sourceText);
-        //}
 
 
         //public static bool IsPartialClass(this ISymbol symbol) => symbol
@@ -68,8 +59,12 @@ namespace Shiny.Generators
             .FirstOrDefault(x => x.AttributeClass.Name == attributeSymbol.Name);
 
 
+        //public static bool HasXamarinForms(this GeneratorExecutionContext context)
+        //    => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals("Xamarin.Forms", StringComparison.CurrentCultureIgnoreCase));
+
+
         public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
-            => context.Compilation.GetTypeByMetadataName("Xamarin.Essentials.AppInfo") != null;
+            => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals("Xamarin.Essentials", StringComparison.CurrentCultureIgnoreCase));
 
 
         public static IEnumerable<IAssemblySymbol> GetAllAssemblies(this GeneratorExecutionContext context)

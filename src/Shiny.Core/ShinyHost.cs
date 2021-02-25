@@ -75,9 +75,7 @@ namespace Shiny
         {
             var services = new ShinyServiceCollection();
             services.AddSingleton(platform);
-            //services.AddOptions();
             services.AddLogging(builder => startup?.ConfigureLogging(builder, platform));
-            //services.AddSingleton(typeof(ILogger<>), typeof(DummyLogger<>));
 
             if (startup != null)
             {
@@ -89,24 +87,12 @@ namespace Shiny
             platform.Register(services);
 
             Services = services;
-            //var sw = new System.Diagnostics.Stopwatch();
-            //sw.Start();
 
             services.BuildShinyServiceProvider(
                 ValidateScopes,
                 s => startup?.CreateServiceProvider(s),
                 s => container = s
             );
-            //sw.Stop();
-            //Console.WriteLine($"Startup: {sw.ElapsedMilliseconds} ms");
         }
     }
-
-    //public class DummyLogger<T> : ILogger, IDisposable
-    //{
-    //    public IDisposable BeginScope<TState>(TState state) => this;
-    //    public void Dispose() { }
-    //    public bool IsEnabled(LogLevel logLevel) => true;
-    //    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) { }
-    //}
 }

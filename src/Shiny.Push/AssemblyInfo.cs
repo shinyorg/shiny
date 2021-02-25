@@ -1,5 +1,5 @@
 ﻿using Shiny.Attributes;
-// TODO: notifications can't be registered with this - what about other push libs?
 
+[assembly: AutoStartupWithDelegate("Shiny.Push.IPushDelegate", "UsePush", true)]
 [assembly: StaticGeneration("Shiny.Push.IPushManager", "ShinyPush")]
 

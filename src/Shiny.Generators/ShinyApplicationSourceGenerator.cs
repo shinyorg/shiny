@@ -87,6 +87,7 @@ namespace Shiny.Generators
                     {
                         this.builder.AppendLine("this.AdditionalConfigureServices(services, platform);");
 
+                        this.CheckForNoAutoStartup();
                         this.RegisterNoDelegates();
                         this.RegisterWithDelegate();
 
@@ -102,20 +103,23 @@ namespace Shiny.Generators
                         if (!this.ShinyConfig.ExcludeServices)
                             this.RegisterServices();
                     }
-
-                    //using (this.builder.BlockInvariant("public void ConfigureApp(IServiceProvider provider)"))
-                    //{
-                    //    var xamFormsType = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Internals.DependencyResolver");
-                    //    if (xamFormsType != null)
-                    //    {
-                    //        this.builder.AppendFormatInvariant("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
-                    //        this.builder.AppendLine();
-                    //    }
-                    //}
                 }
             }
             this.Context.AddSource(GENERATED_STARTUP_TYPE_NAME, this.builder.ToString());
         }
+
+
+        void CheckForNoAutoStartup() => this.FindAttributedAssemblies("Shiny.Attributes.NoAutoStartupAttribute", attributeData =>
+        {
+            var assembly = attributeData.AttributeClass.ContainingAssembly.ToDisplayString();
+            var instructions = (string)attributeData.ConstructorArguments[0].Value;
+
+            this.Context.Log(
+                "SHINYWARN",
+                $"Shiny Library '{assembly}' cannot be auto-registered.  " + instructions,
+                DiagnosticSeverity.Warning
+            );
+        });
 
 
         void RegisterNoDelegates() => this.FindAttributedAssemblies("Shiny.Attributes.AutoStartupAttribute", attributeData =>
