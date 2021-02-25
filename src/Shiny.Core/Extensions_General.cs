@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Shiny
 {
-    public static class GeneralExtensions
+    public static partial class Extensions
     {
         public static string ResourceToFilePath(this IPlatform platform, Assembly assembly, string resourceName)
         {

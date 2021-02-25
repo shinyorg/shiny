@@ -12,17 +12,17 @@ namespace Samples.Sensors
         public bool HasSensors => this.Sensors.Any();
 
 
-        public MainViewModel(IAccelerometer accelerometer = null,
-                             IGyroscope gyroscope = null,
-                             IMagnetometer magnetometer = null,
-                             ICompass compass = null,
-                             IAmbientLight ambientLight = null,
-                             IBarometer barometer = null,
-                             IPedometer pedometer = null,
-                             IProximity proximity = null,
-                             IHeartRateMonitor heartRate = null,
-                             IHumidity humidity = null,
-                             ITemperature temperature = null)
+        public MainViewModel(IAccelerometer? accelerometer = null,
+                             IGyroscope? gyroscope = null,
+                             IMagnetometer? magnetometer = null,
+                             ICompass? compass = null,
+                             IAmbientLight? ambientLight = null,
+                             IBarometer? barometer = null,
+                             IPedometer? pedometer = null,
+                             IProximity? proximity = null,
+                             IHeartRateMonitor? heartRate = null,
+                             IHumidity? humidity = null,
+                             ITemperature? temperature = null)
         {
 
             this.Sensors = new List<ISensorViewModel>();
@@ -41,7 +41,7 @@ namespace Samples.Sensors
         }
 
 
-        void AddIf<T>(ISensor<T> sensor, string measurement)
+        void AddIf<T>(ISensor<T>? sensor, string measurement)
         {
             if (sensor != null)
                 this.Sensors.Add(new SensorViewModel<T>(sensor, measurement));

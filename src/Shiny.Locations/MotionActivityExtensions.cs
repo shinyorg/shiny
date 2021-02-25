@@ -146,8 +146,8 @@ namespace Shiny.Locations
         /// <returns></returns>
         public static Task<IList<MotionActivityEvent>> QueryByDate(this IMotionActivityManager activity, DateTimeOffset date)
         {
-            var range = date.GetRangeForDate();
-            return activity.Query(range.Start, range.End);
+            var endOfDay = date.Date.AddDays(1).AddTicks(-1);
+            return activity.Query(date.Date, endOfDay);
         }
     }
 }

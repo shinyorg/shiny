@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Shiny.Infrastructure;
 
 
 namespace Shiny
@@ -29,7 +26,7 @@ namespace Shiny
     }
 
 
-    public static class RxExtensions
+    public static partial class Extensions
     {
         /// <summary>
         /// Passes the last and current values from the stream
@@ -55,20 +52,6 @@ namespace Shiny
                 ob.ObserveOn(scheduler);
 
             return ob;
-        }
-
-
-        static PropertyInfo GetPropertyInfo<TSender, TRet>(this TSender sender, Expression<Func<TSender, TRet>> expression)
-        {
-            if (sender == null)
-                throw new ArgumentException("Sender is null");
-
-            var member = (expression as LambdaExpression)?.Body as MemberExpression;
-            if (member == null)
-                throw new ArgumentException("Invalid lamba expression - body is not a member expression");
-
-            var property = sender.GetType().GetRuntimeProperty(member.Member.Name);
-            return property;
         }
 
 
@@ -147,51 +130,6 @@ namespace Shiny
             });
 
 
-        ///// <summary>
-        ///// Will watch for changes in any observable item in the ObservableCollection
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="collection"></param>
-        ///// <returns></returns>
-        //public static IObservable<ItemChanged<T, string>> WhenItemChanged<T>(this ObservableCollection<T> collection)
-        //    where T : INotifyPropertyChanged
-        //    => Observable.Create<ItemChanged<T, string>>(ob =>
-        //    {
-        //        // TODO: watch for collection changes too
-        //        var disp = new CompositeDisposable();
-        //        foreach (var item in collection)
-        //            disp.Add(item.WhenAnyProperty().Subscribe(ob.OnNext));
-
-        //        return disp;
-        //    });
-
-
-        ///// <summary>
-        ///// Will watch for a specific property change with any item in the ObservableCollection
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <typeparam name="TRet"></typeparam>
-        ///// <param name="collection"></param>
-        ///// <param name="expression"></param>
-        ///// <returns></returns>
-        //public static IObservable<ItemChanged<T, TRet>> WhenItemValueChanged<T, TRet>(
-        //    this ObservableCollection<T> collection,
-        //    Expression<Func<T, TRet>> expression) where T : INotifyPropertyChanged =>
-        //    Observable.Create<ItemChanged<T, TRet>>(ob =>
-        //    {
-        //        var disp = new CompositeDisposable();
-        //        foreach (var item in collection)
-        //        {
-        //            disp.Add(item
-        //                .WhenAnyProperty(expression)
-        //                .Subscribe(x => ob.OnNext(new ItemChanged<T, TRet>(item, x)))
-        //            );
-        //        }
-
-        //        return disp;
-        //    });
-
-
         public static IObservable<TRet> WhenAnyProperty<TSender, TRet>(this TSender This, Expression<Func<TSender, TRet>> expression) where TSender : INotifyPropertyChanged
         {
             var p = This.GetPropertyInfo(expression);
@@ -251,25 +189,5 @@ namespace Shiny
                 .Select(x => Observable.FromAsync(() => onNextAsync(x)))
                 .Merge(maxConcurrent)
                 .Subscribe();
-
-        //public static IDisposable ApplyMaxLengthConstraint<T>(this T npc, Expression<Func<T, string>> expression, int maxLength) where T : INotifyPropertyChanged
-        //{
-        //    var property = npc.GetPropertyInfo(expression);
-
-        //    if (property.PropertyType != typeof(string))
-        //        throw new ArgumentException($"You can only use maxlength constraints on string based properties - {npc.GetType()}.{property.Name}");
-
-        //    if (!property.CanWrite)
-        //        throw new ArgumentException($"You can only apply maxlength constraints to public setter properties - {npc.GetType()}.{property.Name}");
-
-        //    return npc
-        //        .WhenAnyProperty(expression)
-        //        .Where(x => x != null && x.Length > maxLength)
-        //        .Subscribe(x =>
-        //        {
-        //            var value = x.Substring(0, maxLength);
-        //            property.SetValue(npc, value);
-        //        });
-        //}
     }
 }

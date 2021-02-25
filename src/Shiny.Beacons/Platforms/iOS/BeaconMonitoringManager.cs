@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using CoreLocation;
 using Shiny.Infrastructure;
+using Shiny.Locations;
 
 
 namespace Shiny.Beacons

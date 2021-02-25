@@ -1,0 +1,23 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+
+    <PropertyGroup>
+        <Description>Shiny Locations Common - bringing geofencing and GPS to a background service near you!</Description>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;</TargetFrameworks>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>Shiny.Locations</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="Platforms\**\*.cs" />
+        <None Include="Platforms\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\ios\**\*.cs" />
+    </ItemGroup>
+</Project>

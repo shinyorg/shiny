@@ -14,11 +14,13 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
@@ -27,6 +29,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
@@ -35,12 +38,14 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <Reference Include="netstandard" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*macOS*\**\*.cs" />
@@ -48,6 +53,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.tvos')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\*tvOS*\**\*.cs" />
     </ItemGroup>
@@ -55,12 +61,8 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\tizen\**\*.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Update="Platforms\Shared\BeaconMonitoringManager.cs">
-        <SubType></SubType>
-      </Compile>
     </ItemGroup>
 </Project>

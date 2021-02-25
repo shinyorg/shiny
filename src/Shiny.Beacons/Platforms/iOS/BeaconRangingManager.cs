@@ -6,20 +6,19 @@ using CoreLocation;
 using UIKit;
 using Shiny.Beacons;
 using Shiny.Infrastructure;
+using Shiny.Locations;
 
 
 namespace Shiny.Beacons
 {
     public class BeaconRangingManager : IBeaconRangingManager
     {
-        readonly IRepository repository;
         readonly CLLocationManager manager;
         readonly BeaconLocationManagerDelegate gdelegate;
 
 
-        public BeaconRangingManager(IServiceProvider services, IRepository repository)
+        public BeaconRangingManager(IServiceProvider services)
         {
-            this.repository = repository;
             this.gdelegate = new BeaconLocationManagerDelegate(services);
             this.manager = new CLLocationManager
             {

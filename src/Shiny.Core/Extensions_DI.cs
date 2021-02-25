@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+
 namespace Shiny
 {
-    public static class Extensions_DI
+    public static partial class Extensions
     {
         readonly static IDictionary<int, List<Action<IServiceProvider>>> postBuild = new Dictionary<int, List<Action<IServiceProvider>>>();
 
