@@ -8,7 +8,9 @@ namespace Shiny.BluetoothLE
     public static class StandardUuids
     {
         public const string DeviceInformationServiceUuid = "180A";
-        public const string BatteryServiceUuid = "180F";
+        public static (string ServiceUuid, string CharacteristicUuid) HeartRateMeasurementSensor => ("180D", "2A37");
+
+        public static (string ServiceUuid, string CharacteristicUuid) BatteryService => ("180F", "2A19");
     }
 
 
@@ -69,13 +71,15 @@ namespace Shiny.BluetoothLE
                 });
 
 
-        public static IObservable<int> ReadBatteryInformation(this IPeripheral peripheral) => peripheral
-            .GetKnownService(StandardUuids.BatteryServiceUuid, true)
-            .Select(x => x.GetCharacteristics())
-            .Take(1)
-            .Switch()
-            .Select(x => x.FirstOrDefault())
-            .Where(x => x != null)
+        public static IObservable<int> ReadBatteryInformation(this IPeripheral peripheral)
+            => StandardIntObserable(peripheral, StandardUuids.BatteryService);
+
+        public static IObservable<int> HeartRateSensor(this IPeripheral peripheral)
+            => StandardIntObserable(peripheral, StandardUuids.HeartRateMeasurementSensor);
+
+
+        static IObservable<int> StandardIntObserable(IPeripheral peripheral, (string ServiceUuid, string CharacteristicUuid) uuid) => peripheral
+            .GetKnownCharacteristic(uuid.ServiceUuid, uuid.CharacteristicUuid, true)
             .Select(x => x.Read())
             .Switch()
             .Select(x => (int)x.Data[0]);

@@ -167,13 +167,15 @@ namespace Shiny.BluetoothLE
         );
 
 
-        public IObservable<Unit> SetAdapterState(bool enable)
-        {
-            var state = enable ? RadioState.On : RadioState.Off;
-            return this.GetRadio()
-                .Select(x => Observable.FromAsync(async () => await this.radio.SetStateAsync(state)))
-                .Select(_ => Unit.Default);
-        }
+        public IObservable<bool> SetAdapterState(bool enable) => this
+            .GetRadio()
+            .Select(x => Observable.FromAsync(async () =>
+            {
+                var state = enable? RadioState.On: RadioState.Off;
+                return await this.radio.SetStateAsync(state);
+            }))
+            .Switch()
+            .Select(x => x == RadioAccessStatus.Allowed);
 
 
         IObservable<BluetoothLEAdvertisementReceivedEventArgs> CreateScanner(ScanConfig? config)

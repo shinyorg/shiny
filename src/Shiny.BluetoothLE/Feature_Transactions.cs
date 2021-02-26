@@ -29,7 +29,7 @@ namespace Shiny.BluetoothLE
         public static bool IsReliableTransactionsAvailable(this IPeripheral peripheral) => peripheral is ICanDoTransactions;
 
 
-        public static IObservable<BleWriteSegment> BlobWriteTransaction(this IGattCharacteristic ch, Stream stream) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
+        public static IObservable<BleWriteSegment> WriteBlobTransaction(this IGattCharacteristic ch, Stream stream) => Observable.Create<BleWriteSegment>(async (ob, ct) =>
         {
             var trans = ch.Service.Peripheral.TryBeginTransaction();
             using (trans)
@@ -59,7 +59,7 @@ namespace Shiny.BluetoothLE
                     remaining = len - pos;
                     if (remaining > 0 && remaining < mtu)
                     {
-                        // readjust buffer -- we don't want to send extra garbage 
+                        // readjust buffer -- we don't want to send extra garbage
                         buffer = new byte[remaining];
                     }
 

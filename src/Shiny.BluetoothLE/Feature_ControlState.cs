@@ -11,7 +11,7 @@ namespace Shiny.BluetoothLE
         /// Works only on Android
         /// </summary>
         /// <returns></returns>
-        IObservable<Unit> SetAdapterState(bool enable);
+        IObservable<bool> SetAdapterState(bool enable);
     }
 
 
@@ -20,10 +20,10 @@ namespace Shiny.BluetoothLE
         public static bool CanControlAdapterState(this IBleManager centralManager) => centralManager is ICanControlAdapterState;
 
 
-        public static IObservable<bool> TrySetAdapterState(this IBleManager centralManager, bool enable)
+        public static IObservable<bool> TrySetAdapterState(this IBleManager bleManager, bool enable)
         {
             var result = false;
-            if (centralManager is ICanControlAdapterState state)
+            if (bleManager is ICanControlAdapterState state)
             {
                 state.SetAdapterState(enable);
                 result = true;
