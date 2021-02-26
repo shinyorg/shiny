@@ -40,7 +40,7 @@ namespace Shiny.Notifications
 
             this.nativeDelegate
                 .WhenPresented()
-                .Where(x => !(x.Notification?.Request?.Trigger is UNPushNotificationTrigger))
+                .Where(x => x.Notification?.Request?.Trigger?.GetType().Name != "UNPushNotificationTrigger")
                 .SubscribeAsync(async x =>
                 {
                     var shiny = x.Notification.Request.FromNative();
