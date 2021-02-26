@@ -5,6 +5,14 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE
 {
+    public static class StandardUuids
+    {
+        public const string DeviceInformationServiceUuid = "180A";
+        public const string BatteryServiceUuid = "180F";
+    }
+
+
+
     public class DeviceInfo
     {
         public string? ManufacturerName { get; set; }
@@ -18,13 +26,9 @@ namespace Shiny.BluetoothLE
 
     public static partial class Extensions
     {
-        public const string DeviceInformationServiceUuid = "180A";
-        public const string BatteryServiceUuid = "180F";
-
-
         public static IObservable<DeviceInfo> ReadDeviceInformation(this IPeripheral peripheral)
             => peripheral
-                .GetKnownService(DeviceInformationServiceUuid, true)
+                .GetKnownService(StandardUuids.DeviceInformationServiceUuid, true)
                 .SelectMany(x => x.GetCharacteristics())
                 .SelectMany(x => x.Select(y => y.Read()))
                 .Concat()
@@ -66,7 +70,7 @@ namespace Shiny.BluetoothLE
 
 
         public static IObservable<int> ReadBatteryInformation(this IPeripheral peripheral) => peripheral
-            .GetKnownService(BatteryServiceUuid, true)
+            .GetKnownService(StandardUuids.BatteryServiceUuid, true)
             .Select(x => x.GetCharacteristics())
             .Take(1)
             .Switch()
