@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shiny.BluetoothLE
 {
-    public static class AsyncExtensions
+    public static partial class Extensions
     {
         public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken? cancelToken = null)
             => peripheral
@@ -53,5 +53,12 @@ namespace Shiny.BluetoothLE
 
         public static Task<GattCharacteristicResult> ReadAsync(this IGattCharacteristic characteristic, CancellationToken? cancelToken = null)
             => characteristic.Read().ToTask(cancelToken ?? CancellationToken.None);
+
+
+        public static Task<GattCharacteristicResult> WriteCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true, CancellationToken? cancelToken = null)
+            => peripheral.WriteCharacteristic(serviceUuid, characteristicUuid, data, withResponse).ToTask(cancelToken ?? CancellationToken.None);
+
+        public static Task<byte[]?> ReadCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken? cancelToken = null)
+            => peripheral.ReadCharacteristic(serviceUuid, characteristicUuid).ToTask(cancelToken ?? CancellationToken.None);
     }
 }

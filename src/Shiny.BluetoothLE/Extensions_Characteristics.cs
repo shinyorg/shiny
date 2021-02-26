@@ -8,7 +8,7 @@ using System.Reactive.Threading.Tasks;
 
 namespace Shiny.BluetoothLE
 {
-    public static class CharacteristicExtensions
+    public static partial class Extensions
     {
         internal static IObservable<IGattService?> Assert(this IObservable<IGattService?> ob, string serviceUuid, bool throwIfNotFound)
             => ob.Do(service =>

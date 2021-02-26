@@ -16,7 +16,7 @@ namespace Shiny.BluetoothLE
     }
 
 
-    public static class CommonCharacteristicsExtensions
+    public static partial class Extensions
     {
         public const string DeviceInformationServiceUuid = "180A";
         public const string BatteryServiceUuid = "180F";

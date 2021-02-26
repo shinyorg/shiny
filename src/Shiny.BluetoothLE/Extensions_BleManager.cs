@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE
 {
-    public static class BleManagerExtensions
+    public static partial class Extensions
     {
         /// <summary>
         /// This will scan until the peripheral a specific peripheral is found, then cancel the scan
