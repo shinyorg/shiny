@@ -29,6 +29,7 @@ namespace Samples
             builder.AddConsole(opts =>
                 opts.LogToStandardErrorThreshold = LogLevel.Debug
             );
+            builder.UseSqliteLogging();
             //builder.AddNotificationErrors();
             builder.AddAppCenter(opts =>
             {

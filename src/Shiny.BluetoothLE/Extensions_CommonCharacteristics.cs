@@ -5,27 +5,6 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE
 {
-    public static class StandardUuids
-    {
-        public const string DeviceInformationServiceUuid = "180A";
-        public static (string ServiceUuid, string CharacteristicUuid) HeartRateMeasurementSensor => ("180D", "2A37");
-
-        public static (string ServiceUuid, string CharacteristicUuid) BatteryService => ("180F", "2A19");
-    }
-
-
-
-    public class DeviceInfo
-    {
-        public string? ManufacturerName { get; set; }
-        public string? ModelNumber { get; set; }
-        public string? SerialNumber { get; set; }
-        public string? FirmwareRevision { get; set; }
-        public string? HardwareRevision { get; set; }
-        public string? SoftwareRevision { get; set; }
-    }
-
-
     public static partial class Extensions
     {
         public static IObservable<DeviceInfo> ReadDeviceInformation(this IPeripheral peripheral)
