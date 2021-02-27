@@ -42,6 +42,6 @@ namespace Shiny.BluetoothLE
         /// <summary>
         /// CBCentralInitOptions restoration key for background restoration
         /// </summary>
-        public string iOSRestoreIdentifier { get; set; } = "shinyble";
+        public string iOSRestoreIdentifier { get; set; }
     }
 }

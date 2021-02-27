@@ -4,7 +4,7 @@
         <Description>Shiny Reactive BluetoothLE Plugin for client/central operations</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
-        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeReferencedProjectInPackage</TargetsForTfmSpecificContentInPackage>
+        <!--<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeReferencedProjectInPackage</TargetsForTfmSpecificContentInPackage>-->
     </PropertyGroup>
 
     <ItemGroup>
@@ -55,9 +55,11 @@
         <Compile Include="**\Platforms\tizen\**\*.cs" />
     </ItemGroup>
 
+    <!--
     <Target Name="IncludeReferencedProjectInPackage">
         <ItemGroup>
             <TfmSpecificPackageFile Include="$(OutputPath)\Shiny.BluetoothLE.Common.dll" PackagePath="lib/$(TargetFramework)" />
         </ItemGroup>
     </Target>
+    -->
 </Project>

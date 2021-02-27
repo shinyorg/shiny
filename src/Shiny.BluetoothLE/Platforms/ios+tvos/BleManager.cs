@@ -12,10 +12,10 @@ namespace Shiny.BluetoothLE
     public class BleManager : AbstractBleManager
     {
         const string ErrorCategory = "BluetoothLE";
-        readonly CentralContext context;
+        readonly ManagerContext context;
 
 
-        public BleManager(CentralContext context) => this.context = context;
+        public BleManager(ManagerContext context) => this.context = context;
 
 
         public override bool IsScanning => this.context.Manager.IsScanning;

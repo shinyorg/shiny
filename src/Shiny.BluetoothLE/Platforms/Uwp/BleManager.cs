@@ -17,13 +17,13 @@ namespace Shiny.BluetoothLE
                               ICanControlAdapterState,
                               ICanSeePairedPeripherals
     {
-        readonly CentralContext context;
+        readonly ManagerContext context;
         readonly Subject<bool> scanSubject;
         BluetoothAdapter native;
         Radio radio;
 
 
-        public BleManager(CentralContext context)
+        public BleManager(ManagerContext context)
         {
             this.scanSubject = new Subject<bool>();
             this.context = context;

@@ -14,10 +14,10 @@ namespace Shiny.BluetoothLE
                               ICanSeePairedPeripherals
     {
         public const string BroadcastReceiverName = "com.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
-        readonly CentralContext context;
+        readonly ManagerContext context;
 
 
-        public BleManager(CentralContext context) => this.context = context;
+        public BleManager(ManagerContext context) => this.context = context;
 
 
         bool isScanning;
