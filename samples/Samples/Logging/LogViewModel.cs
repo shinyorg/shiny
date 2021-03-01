@@ -21,9 +21,9 @@ namespace Samples.Logging
 
 
         public LogViewModel(ShinySqliteConnection conn,
-                                 ISerializer serializer,
-                                 IDialogs dialogs,
-                                 INavigationService navigator) : base(dialogs)
+                            ISerializer serializer,
+                            IDialogs dialogs,
+                            INavigationService navigator) : base(dialogs)
         {
             this.conn = conn;
             this.serializer = serializer;
@@ -71,7 +71,7 @@ namespace Samples.Logging
                         foreach (var p in parameters)
                             s += $"{Environment.NewLine}{p.Key}: {p.Value}";
 
-                    await navigator.ShowBigText(s, title);
+                    await this.navigator.ShowBigText(s, title);
                 })
             };
         }
