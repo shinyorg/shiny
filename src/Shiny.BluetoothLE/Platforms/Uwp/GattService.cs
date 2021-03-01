@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Collections.Generic;
+using Shiny.BluetoothLE.Internals;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Native = Windows.Devices.Bluetooth.GenericAttributeProfile.GattDeviceService;
-using Shiny.BluetoothLE.Internals;
-using System.Collections.Generic;
+
 
 namespace Shiny.BluetoothLE
 {
     public class GattService : AbstractGattService
     {
-        readonly DeviceContext context;
+        readonly PeripheralContext context;
         readonly Native native;
 
 
-        public GattService(DeviceContext context, Native native) : base(context.Peripheral, native.Uuid.ToString(), false)
+        public GattService(PeripheralContext context, Native native) : base(context.Peripheral, native.Uuid.ToString(), false)
         {
             this.context = context;
             this.native = native;

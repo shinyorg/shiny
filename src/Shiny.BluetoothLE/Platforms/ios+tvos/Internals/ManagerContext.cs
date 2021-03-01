@@ -5,19 +5,19 @@ using System.Linq;
 using System.Reactive.Subjects;
 using CoreBluetooth;
 using Foundation;
-
 using Microsoft.Extensions.Logging;
+
 
 namespace Shiny.BluetoothLE.Internals
 {
-    public class CentralContext : CBCentralManagerDelegate
+    public class ManagerContext : CBCentralManagerDelegate
     {
         readonly ConcurrentDictionary<string, IPeripheral> peripherals = new ConcurrentDictionary<string, IPeripheral>();
         readonly Lazy<CBCentralManager> managerLazy;
         readonly ILogger logger;
 
 
-        public CentralContext(IServiceProvider services,
+        public ManagerContext(IServiceProvider services,
                               BleConfiguration config,
                               ILogger<IBleManager> logger)
         {
@@ -38,11 +38,9 @@ namespace Shiny.BluetoothLE.Internals
 
                 var opts = new CBCentralInitOptions
                 {
-                    ShowPowerAlert = config.iOSShowPowerAlert
+                    ShowPowerAlert = config.iOSShowPowerAlert,
+                    RestoreIdentifier = config.iOSRestoreIdentifier ?? "shinyble"
                 };
-
-                if (!config.iOSRestoreIdentifier.IsEmpty())
-                    opts.RestoreIdentifier = config.iOSRestoreIdentifier;
 
                 return new CBCentralManager(this, null, opts);
             });

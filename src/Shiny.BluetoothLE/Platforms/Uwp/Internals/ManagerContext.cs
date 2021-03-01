@@ -6,7 +6,7 @@ using Windows.Devices.Bluetooth;
 
 namespace Shiny.BluetoothLE.Internals
 {
-    public class CentralContext
+    public class ManagerContext
     {
         readonly ConcurrentDictionary<ulong, IPeripheral> peripherals = new ConcurrentDictionary<ulong, IPeripheral>();
 

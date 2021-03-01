@@ -24,7 +24,7 @@ namespace Shiny.BluetoothLE.Internals
         {
             try
             {
-                ShinyHost.Resolve<CentralContext>().DeviceEvent(intent);
+                ShinyHost.Resolve<ManagerContext>().DeviceEvent(intent);
             }
             catch (Exception ex)
             {

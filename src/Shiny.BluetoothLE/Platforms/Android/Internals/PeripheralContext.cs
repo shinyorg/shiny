@@ -17,7 +17,7 @@ namespace Shiny.BluetoothLE.Internals
         CancellationTokenSource? cancelSrc;
 
 
-        public PeripheralContext(CentralContext context, BluetoothDevice device)
+        public PeripheralContext(ManagerContext context, BluetoothDevice device)
         {
             this.CentralContext = context;
             this.NativeDevice = device;
@@ -27,7 +27,7 @@ namespace Shiny.BluetoothLE.Internals
 
 
         public GattCallbacks Callbacks { get; } = new GattCallbacks();
-        public CentralContext CentralContext { get; }
+        public ManagerContext CentralContext { get; }
         public BluetoothGatt? Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
 

@@ -15,7 +15,7 @@ namespace Shiny.BluetoothLE
 
         public static IObservable<Unit> WhenReady(this CBCentralManager manager) => Observable.Create<Unit>(ob =>
         {
-            var context = manager.Delegate as CentralContext;
+            var context = manager.Delegate as ManagerContext;
             if (context == null)
                 throw new ArgumentException("CBCentralManager.Delegate is not CentralContext");
 

@@ -15,15 +15,18 @@ namespace Shiny.BluetoothLE
 {
     public class GattCharacteristic : AbstractGattCharacteristic
     {
-        readonly DeviceContext context;
+        readonly PeripheralContext context;
 
 
-        public GattCharacteristic(DeviceContext context,
-                                  Native native,
-                                  IGattService service)
-                            : base(service,
-                                   native.Uuid.ToString(),
-                                   (CharacteristicProperties)native.CharacteristicProperties)
+        public GattCharacteristic(
+            PeripheralContext context,
+            Native native,
+            IGattService service
+        ) : base(
+            service,
+            native.Uuid.ToString(),
+            (CharacteristicProperties)native.CharacteristicProperties
+        )
         {
             this.context = context;
             this.Native = native;

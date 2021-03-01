@@ -15,12 +15,12 @@ namespace Shiny.BluetoothLE
                               ICanDoTransactions,
                               ICanPairPeripherals
     {
-        readonly DeviceContext context;
+        readonly PeripheralContext context;
 
 
-        public Peripheral(CentralContext adapterContext, BluetoothLEDevice native)
+        public Peripheral(ManagerContext managerContext, BluetoothLEDevice native)
         {
-            this.context = new DeviceContext(adapterContext, this, native);
+            this.context = new PeripheralContext(managerContext, this, native);
             this.Name = native.Name;
             this.Uuid = native.GetDeviceId().ToString();
         }

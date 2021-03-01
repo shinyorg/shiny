@@ -17,7 +17,7 @@ using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE.Internals
 {
-    public class CentralContext
+    public class ManagerContext
     {
         public const string BlePairingFailed = nameof(BlePairingFailed);
         readonly ConcurrentDictionary<string, Peripheral> devices;
@@ -26,7 +26,7 @@ namespace Shiny.BluetoothLE.Internals
         LollipopScanCallback? callbacks;
 
 
-        public CentralContext(ShinyCoreServices services, BleConfiguration config)
+        public ManagerContext(ShinyCoreServices services, BleConfiguration config)
         {
             this.Configuration = config;
             this.services = services;

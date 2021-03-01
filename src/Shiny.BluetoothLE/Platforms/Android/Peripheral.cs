@@ -21,7 +21,7 @@ namespace Shiny.BluetoothLE
 
 
         public Peripheral(
-            CentralContext centralContext,
+            ManagerContext centralContext,
             BluetoothDevice native
         ) : base(
             native.Name,
@@ -144,7 +144,7 @@ namespace Shiny.BluetoothLE
                 PairingRequestPin = pin;
                 disp.Add(this.Context
                     .CentralContext
-                    .ListenForMe(CentralContext.BlePairingFailed, this)
+                    .ListenForMe(ManagerContext.BlePairingFailed, this)
                     .Subscribe(_ => ob.Respond(false))
                 );
                 disp.Add(this.Context

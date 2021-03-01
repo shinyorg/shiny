@@ -8,22 +8,22 @@ using Windows.Devices.Bluetooth;
 
 namespace Shiny.BluetoothLE.Internals
 {
-    public class DeviceContext
+    public class PeripheralContext
     {
         readonly object syncLock;
-        readonly CentralContext adapterContext;
+        readonly ManagerContext managerContext;
         readonly IList<GattCharacteristic> subscribers;
         readonly Subject<ConnectionState> connSubject;
         readonly ulong bluetoothAddress;
 
 
-        public DeviceContext(CentralContext adapterContext,
-                             IPeripheral peripheral,
-                             BluetoothLEDevice native)
+        public PeripheralContext(ManagerContext managerContext,
+                                 IPeripheral peripheral,
+                                 BluetoothLEDevice native)
         {
             this.syncLock = new object();
             this.connSubject = new Subject<ConnectionState>();
-            this.adapterContext = adapterContext;
+            this.managerContext = managerContext;
             this.subscribers = new List<GattCharacteristic>();
             this.Peripheral = peripheral;
             this.NativeDevice = native;
@@ -67,7 +67,7 @@ namespace Shiny.BluetoothLE.Internals
             }
             this.subscribers.Clear();
 
-            this.adapterContext.RemovePeripheral(this.NativeDevice.BluetoothAddress);
+            this.managerContext.RemovePeripheral(this.NativeDevice.BluetoothAddress);
             this.NativeDevice.ConnectionStatusChanged -= this.OnNativeConnectionStatusChanged;
             this.NativeDevice?.Dispose();
             this.NativeDevice = null;
