@@ -69,7 +69,7 @@
         <PackageReference Update="FluentAssertions" Version="5.10.3" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.8.3" />
         <PackageReference Update="Microsoft.CodeAnalysis" Version="3.8.0" />
-        <PackageReference Update="Moq" Version="4.16.0" />
+        <PackageReference Update="Moq" Version="4.16.1" />
         <PackageReference Update="xunit" Version="2.4.1" />
         <PackageReference Update="xunit.runner.devices" Version="2.5.25" />
         <PackageReference Update="xunit.runner.visualstudio" Version="2.4.3" />
