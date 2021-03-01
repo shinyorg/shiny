@@ -149,7 +149,13 @@ namespace Shiny.BluetoothLE
         public static IObservable<IGattCharacteristic?> GetKnownCharacteristic(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, bool throwIfNotFound = false) =>
             peripheral
                 .GetKnownService(serviceUuid, throwIfNotFound)
-                .Select(x => x.GetKnownCharacteristic(characteristicUuid, throwIfNotFound))
+                .Select(x =>
+                {
+                    if (x == null)
+                        return Observable.Empty<IGattCharacteristic>();
+
+                    return x.GetKnownCharacteristic(characteristicUuid, throwIfNotFound);
+                })
                 .Switch();
 
 
