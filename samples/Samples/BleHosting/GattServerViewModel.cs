@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Text;
 using System.Windows.Input;
@@ -29,9 +30,10 @@ namespace Samples.BleHosting
 
             this.ToggleServer = ReactiveCommand.CreateFromTask(async () =>
             {
+                this.hostingManager.ClearServices();
+
                 if (this.hostingManager.IsAdvertising)
                 {
-                    this.hostingManager.ClearServices();
                     this.hostingManager.StopAdvertising();
                     this.notifierSub?.Dispose();
                     this.ServerText = "Start Server";
@@ -46,7 +48,7 @@ namespace Samples.BleHosting
 
                     await this.hostingManager.StartAdvertising(new AdvertisementData
                     {
-                        ServiceUuids = { ServiceUuid }
+                        ServiceUuids = new List<string> { ServiceUuid }
                     });
 
                     this.ServerText = "Stop Server";
@@ -140,7 +142,7 @@ namespace Samples.BleHosting
                     });
 
                     cb.SetRead(request =>
-                    {   
+                    {
                         Device.BeginInvokeOnMainThread(() => ++this.SpeedReads);
                         var data = BitConverter.GetBytes(DateTime.Now.Ticks);
                         return ReadResult.Success(data);
