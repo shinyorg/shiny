@@ -78,25 +78,28 @@ namespace Shiny
 
 
 
+        public static string NotificationChannelId { get; set; } = "Background";
+
+
         NotificationCompat.Builder? builder;
-        void SetNotification()
+        protected virtual void SetNotification()
         {
+            this.EnsureChannel();
+
             this.builder ??= new NotificationCompat.Builder(this.Context.AppContext)
-                .SetChannelId(Channel.Default.Identifier)
+                .SetChannelId(NotificationChannelId)
                 .SetSmallIcon(this.AndroidNotifications.GetSmallIconResource(null))
                 .SetOngoing(true);
 
-            this.builder.SetProgress(
-                this.Service.Total,
-                this.Service.Progress,
-                this.Service.IsIndeterministic
-            );
-
-            if (!this.Service.Title.IsEmpty())
-                this.builder.SetContentTitle(this.Service.Title);
-
-            if (!this.Service.Message.IsEmpty())
-                this.builder.SetContentText(this.Service.Message);
+            this.builder
+                .SetProgress(
+                    this.Service.Total,
+                    this.Service.Progress,
+                    this.Service.IsIndeterministic
+                )
+                .SetContentTitle(this.Service.Title ?? "Shiny Service")
+                .SetTicker("..")
+                .SetContentText(this.Service.Message ?? "Shiny service is continuing to process data in the background");
 
             if (this.notificationId == null)
             {
@@ -107,6 +110,20 @@ namespace Shiny
             {
                 this.AndroidNotifications.NativeManager.Notify(this.notificationId.Value, this.builder.Build());
             }
+        }
+
+
+        public virtual void EnsureChannel()
+        {
+            var nm = this.AndroidNotifications.NativeManager;
+            if (nm.GetNotificationChannel(NotificationChannelId) != null)
+                return;
+
+            nm.CreateNotificationChannel(new NotificationChannel(
+                NotificationChannelId,
+                "Background",
+                NotificationImportance.Default
+            ));
         }
     }
 }
