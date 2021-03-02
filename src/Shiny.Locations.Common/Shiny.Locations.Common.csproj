@@ -4,8 +4,6 @@
         <Description>Shiny Locations - Common components for Beacons and Locations</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
-        <!--<IsPackable>false</IsPackable>-->
-        <RootNamespace>Shiny.Locations</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

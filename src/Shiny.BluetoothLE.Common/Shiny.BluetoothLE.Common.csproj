@@ -4,7 +4,6 @@
         <Description>Shiny BluetoothLE - Common components for Hosting and Client</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
-        <RootNamespace>Shiny.BluetoothLE</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

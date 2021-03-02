@@ -45,11 +45,11 @@
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" $(TargetFramework.Contains('android')) ">
+    <!--<PropertyGroup Condition=" $(TargetFramework.Contains('android')) ">
         <MonoAndroidResourcePrefix></MonoAndroidResourcePrefix>
         <AndroidResgenFile></AndroidResgenFile>
         <AndroidResgenClass></AndroidResgenClass>
-    </PropertyGroup>
+    </PropertyGroup>-->
 
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
