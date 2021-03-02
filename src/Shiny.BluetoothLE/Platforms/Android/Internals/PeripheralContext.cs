@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading;
 using System.Threading.Tasks;
 using Android.OS;
 using Android.Bluetooth;
@@ -14,12 +13,12 @@ namespace Shiny.BluetoothLE.Internals
     public class PeripheralContext
     {
         readonly Subject<BleException> connErrorSubject;
-        CancellationTokenSource? cancelSrc;
+        //CancellationTokenSource? cancelSrc;
 
 
         public PeripheralContext(ManagerContext context, BluetoothDevice device)
         {
-            this.CentralContext = context;
+            this.ManagerContext = context;
             this.NativeDevice = device;
             this.Actions = new ConcurrentQueue<Func<Task>>();
             this.connErrorSubject = new Subject<BleException>();
@@ -27,12 +26,12 @@ namespace Shiny.BluetoothLE.Internals
 
 
         public GattCallbacks Callbacks { get; } = new GattCallbacks();
-        public ManagerContext CentralContext { get; }
+        public ManagerContext ManagerContext { get; }
         public BluetoothGatt? Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
 
         public ConnectionState Status => this
-            .CentralContext
+            .ManagerContext
             .Manager
             .GetConnectionState(this.NativeDevice, ProfileType.Gatt)
             .ToStatus();
@@ -66,7 +65,7 @@ namespace Shiny.BluetoothLE.Internals
 
         public IObservable<T> Invoke<T>(IObservable<T> observable)
         {
-            if (!this.CentralContext.Configuration.AndroidUseInternalSyncQueue)
+            if (!this.ManagerContext.Configuration.AndroidUseInternalSyncQueue)
                 return observable;
 
             return observable.Synchronize(this.syncLock);
@@ -123,7 +122,7 @@ namespace Shiny.BluetoothLE.Internals
         readonly Handler handler = new Handler(Looper.MainLooper);
         public void InvokeOnMainThread(Action action)
         {
-            if (this.CentralContext.Configuration.AndroidShouldInvokeOnMainThread)
+            if (this.ManagerContext.Configuration.AndroidShouldInvokeOnMainThread)
                 handler.Post(action);
             else
                 action();
@@ -177,7 +176,7 @@ namespace Shiny.BluetoothLE.Internals
 
 
         void CreateGatt(bool autoConnect) => this.Gatt = this.NativeDevice.ConnectGatt(
-            this.CentralContext.Android.AppContext,
+            this.ManagerContext.Android.AppContext,
             autoConnect,
             this.Callbacks,
             BluetoothTransports.Le

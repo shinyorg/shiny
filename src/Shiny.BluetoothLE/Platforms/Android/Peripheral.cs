@@ -67,7 +67,7 @@ namespace Shiny.BluetoothLE
 
 
         public override IObservable<string> WhenNameUpdated() => this.Context
-            .CentralContext
+            .ManagerContext
             .ListenForMe(BluetoothDevice.ActionNameChanged, this)
             .Select(x => x.Name);
 
@@ -143,12 +143,12 @@ namespace Shiny.BluetoothLE
             {
                 PairingRequestPin = pin;
                 disp.Add(this.Context
-                    .CentralContext
+                    .ManagerContext
                     .ListenForMe(ManagerContext.BlePairingFailed, this)
                     .Subscribe(_ => ob.Respond(false))
                 );
                 disp.Add(this.Context
-                    .CentralContext
+                    .ManagerContext
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
                     .Where(x => this.Context.NativeDevice.BondState != Bond.Bonding)
                     .Subscribe(x =>

@@ -18,12 +18,16 @@ namespace Shiny.BluetoothLE
         readonly PeripheralContext context;
 
 
-        public GattCharacteristic(IGattService service,
-                                  PeripheralContext context,
-                                  BluetoothGattCharacteristic native)
-                            : base(service,
-                                   native.Uuid.ToString(),
-                                   (CharacteristicProperties)(int)native.Properties)
+        public GattCharacteristic(
+            IGattService service,
+            PeripheralContext context,
+            BluetoothGattCharacteristic native
+        )
+        : base(
+              service,
+              native.Uuid.ToString(),
+              (CharacteristicProperties)(int)native.Properties
+        )
         {
             this.context = context;
             this.native = native;
@@ -37,8 +41,8 @@ namespace Shiny.BluetoothLE
             var sub = this.context
                 .Callbacks
                 .CharacteristicWrite
-                .Where<GattCharacteristicEventArgs>(this.NativeEquals)
-                .Subscribe<GattCharacteristicEventArgs>((Action<GattCharacteristicEventArgs>)(args =>
+                .Where(this.NativeEquals)
+                .Subscribe(args =>
                 {
                     if (!args.IsSuccessful)
                     {
@@ -52,7 +56,7 @@ namespace Shiny.BluetoothLE
 
                         ob.Respond(new GattCharacteristicResult(this, value, writeType));
                     }
-                }));
+                });
 
             this.context.InvokeOnMainThread(() =>
             {

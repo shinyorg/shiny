@@ -2,8 +2,8 @@
 using Android.App;
 using Android.Bluetooth;
 using Android.Content;
-
 using Microsoft.Extensions.Logging;
+
 
 namespace Shiny.BluetoothLE.Internals
 {

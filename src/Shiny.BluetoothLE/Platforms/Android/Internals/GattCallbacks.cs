@@ -7,6 +7,9 @@ namespace Shiny.BluetoothLE.Internals
 {
     public class GattCallbacks : BluetoothGattCallback
     {
+        //public override void OnPhyRead(BluetoothGatt? gatt, [GeneratedEnum] ScanSettingsPhy txPhy, [GeneratedEnum] ScanSettingsPhy rxPhy, [GeneratedEnum] GattStatus status) => base.OnPhyRead(gatt, txPhy, rxPhy, status);
+        //public override void OnPhyUpdate(BluetoothGatt? gatt, [GeneratedEnum] ScanSettingsPhy txPhy, [GeneratedEnum] ScanSettingsPhy rxPhy, [GeneratedEnum] GattStatus status) => base.OnPhyUpdate(gatt, txPhy, rxPhy, status);
+
         public Subject<GattCharacteristicEventArgs> CharacteristicRead { get; } = new Subject<GattCharacteristicEventArgs>();
         public override void OnCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, GattStatus status)
             => this.CharacteristicRead.OnNext(new GattCharacteristicEventArgs(gatt, characteristic, status));

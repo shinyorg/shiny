@@ -119,18 +119,8 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false)
             => Observable.Create<IGattService?>(ob =>
             {
-                //var nativeUuid = CBUUID.FromString(serviceUuid);
-                //var nativeService = this.Native.Services?.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
-                //if (nativeService != null)
-                //{
-                //    ob.Respond(new GattService(this, nativeService));
-                //    return Disposable.Empty;
-                //}
-                var service = this.Native
-                    .Services?
-                    .Select(native => new GattService(this, native))
-                    .FirstOrDefault(x => x.Uuid.Equals(serviceUuid, StringComparison.CurrentCultureIgnoreCase));
-
+                var nativeUuid = CBUUID.FromString(serviceUuid);
+                var service = this.TryGetService(nativeUuid);
                 if (service != null)
                 {
                     ob.Respond(service);
@@ -141,21 +131,28 @@ namespace Shiny.BluetoothLE
                     if (this.Native.Services == null)
                         return;
 
-                    var service = this.Native
-                        .Services
-                        .Select(native => new GattService(this, native))
-                        .FirstOrDefault(x => x.Uuid.Equals(serviceUuid, StringComparison.CurrentCultureIgnoreCase));
-
+                    var service = this.TryGetService(nativeUuid);
                     ob.Respond(service);
                 });
 
-                var nativeUuid = CBUUID.FromString(serviceUuid);
                 this.Native.DiscoveredService += handler;
-                this.Native.DiscoverServices(new[] { nativeUuid });
+                this.Native.DiscoverServices(new [] { nativeUuid });
 
                 return Disposable.Create(() => this.Native.DiscoveredService -= handler);
             })
-            .Assert(this.Uuid, throwIfNotFound);
+            .Assert(serviceUuid, throwIfNotFound);
+
+
+        IGattService? TryGetService(CBUUID nativeUuid)
+        {
+            var services = this.Native.Services?.ToList() ?? new List<CBService>(0);
+            var service = services.FirstOrDefault(x => x.UUID.Equals(nativeUuid));
+
+            if (service == null)
+                return null;
+
+            return new GattService(this, service);
+        }
 
 
         public override IObservable<IList<IGattService>> GetServices() => Observable.Create<IList<IGattService>>(ob =>
