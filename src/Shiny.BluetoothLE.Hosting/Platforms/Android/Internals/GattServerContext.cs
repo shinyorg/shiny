@@ -25,8 +25,8 @@ namespace Shiny.BluetoothLE.Hosting.Internals
         {
             get
             {
-                this.server ??= this.Manager.OpenGattServer(this.Context.AppContext, this);
-                return this.server;
+                this.server ??= this.Manager.OpenGattServer(this.Context.AppContext, this)!;
+                return this.server!;
             }
         }
 
@@ -34,7 +34,7 @@ namespace Shiny.BluetoothLE.Hosting.Internals
         public void CloseServer()
         {
             this.server.Close();
-            this.server = null;
+            this.server = null!;
         }
 
 

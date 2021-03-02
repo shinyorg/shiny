@@ -78,14 +78,13 @@ namespace Shiny
 
 
 
-        NotificationCompat.Builder builder;
+        NotificationCompat.Builder? builder;
         void SetNotification()
         {
             this.builder ??= new NotificationCompat.Builder(this.Context.AppContext)
                 .SetChannelId(Channel.Default.Identifier)
                 .SetSmallIcon(this.AndroidNotifications.GetSmallIconResource(null))
                 .SetOngoing(true);
-//                .SetContentIntent(this.AndroidNotifications.GetLaunchPendingIntent(null));
 
             this.builder.SetProgress(
                 this.Service.Total,
@@ -93,7 +92,7 @@ namespace Shiny
                 this.Service.IsIndeterministic
             );
 
-            if (this.Service.Title.IsEmpty())
+            if (!this.Service.Title.IsEmpty())
                 this.builder.SetContentTitle(this.Service.Title);
 
             if (!this.Service.Message.IsEmpty())
