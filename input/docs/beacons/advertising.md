@@ -1,4 +1,0 @@
-Title: Advertising
----
-
-# COMING SOON
