@@ -65,11 +65,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
+      <Project>{4273a168-9e9e-4e46-a6d6-96a3b788321f}</Project>
+      <Name>Shiny.BluetoothLE.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj">
       <Project>{9fc4a830-1b20-4073-a1c4-ee3a52781dfd}</Project>
       <Name>Shiny.Generators</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
+      <Project>{11ec9d9d-3502-4a4a-94aa-5bdb1b20bb8e}</Project>
+      <Name>Shiny.Locations.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
       <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
@@ -122,10 +130,6 @@
     <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
       <Project>{4F89D195-482E-4B5F-B97F-1647BE5C7716}</Project>
       <Name>Shiny.SpeechRecognition</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
-      <Project>{4273A168-9E9E-4E46-A6D6-96A3B788321F}</Project>
-      <Name>Shiny.BluetoothLE.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -185,7 +189,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadWrongLinkerErrorInfoBarSamplesAndroidHideInfoBar="True" TriggeredFromHotReload="False" XamarinHotReloadDebuggerTimeoutExceptionSamplesAndroidHideInfoBar="True" />
+      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionSamplesAndroidHideInfoBar="True" TriggeredFromHotReload="False" XamarinHotReloadWrongLinkerErrorInfoBarSamplesAndroidHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
