@@ -11,7 +11,7 @@ namespace Shiny.BluetoothLE.Hosting
         IObservable<AccessState> WhenStatusChanged();
 
         bool IsAdvertising { get; }
-        Task StartAdvertising(AdvertisementData? adData = null);
+        Task StartAdvertising(AdvertisementOptions? options = null);
         void StopAdvertising();
 
         Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder);

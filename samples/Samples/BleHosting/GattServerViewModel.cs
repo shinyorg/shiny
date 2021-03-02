@@ -46,9 +46,12 @@ namespace Samples.BleHosting
                         this.BuildService
                     );
 
-                    await this.hostingManager.StartAdvertising(new AdvertisementData
+                    await this.hostingManager.StartAdvertising(new AdvertisementOptions
                     {
-                        ServiceUuids = new List<string> { ServiceUuid }
+                        LocalName = this.LocalName,
+                        AndroidIncludeDeviceName = this.AndroidIncludeDeviceName,
+                        AndroidIncludeTxPower = this.AndroidIncludeTx,
+                        UseGattServiceUuids = true
                     });
 
                     this.ServerText = "Stop Server";
@@ -60,6 +63,8 @@ namespace Samples.BleHosting
         public ICommand ToggleServer { get; }
         [Reactive] public string ServerText { get; private set; }
         [Reactive] public string LocalName { get; set; } = "ShinyTest";
+        [Reactive] public bool AndroidIncludeDeviceName { get; set; } = true;
+        [Reactive] public bool AndroidIncludeTx { get; set; } = true;
 
         [Reactive] public string LastWriteValue { get; private set; }
         [Reactive] public string LastWriteTime { get; private set; }

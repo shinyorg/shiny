@@ -85,25 +85,31 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public Task StartAdvertising(AdvertisementData? adData = null)
+        public Task StartAdvertising(AdvertisementOptions? options = null)
         {
+            options ??= new AdvertisementOptions();
+            if (!options.LocalName.IsEmpty())
+                this.publisher.Advertisement.LocalName = options.LocalName;
+
             this.publisher.Advertisement.Flags = BluetoothLEAdvertisementFlags.ClassicNotSupported;
             this.publisher.Advertisement.ManufacturerData.Clear();
             this.publisher.Advertisement.ServiceUuids.Clear();
 
-            if (adData?.ManufacturerData != null)
+            if (options.ManufacturerData != null)
             {
                 using (var writer = new DataWriter())
                 {
-                    writer.WriteBytes(adData.ManufacturerData.Data);
-                    var md = new BluetoothLEManufacturerData(adData.ManufacturerData.CompanyId, writer.DetachBuffer());
+                    writer.WriteBytes(options.ManufacturerData.Data);
+                    var md = new BluetoothLEManufacturerData(options.ManufacturerData.CompanyId, writer.DetachBuffer());
                     this.publisher.Advertisement.ManufacturerData.Add(md);
                 }
             }
+            var serviceUuids = options.UseGattServiceUuids
+                ? this.services.Keys.ToList()
+                : options.ServiceUuids;
 
-            if (adData?.ServiceUuids != null)
-                foreach (var serviceUuid in adData.ServiceUuids)
-                    this.publisher.Advertisement.ServiceUuids.Add(Guid.Parse(serviceUuid));
+            foreach (var serviceUuid in serviceUuids)
+                this.publisher.Advertisement.ServiceUuids.Add(Guid.Parse(serviceUuid));
 
             this.publisher.Start();
             return Task.CompletedTask;

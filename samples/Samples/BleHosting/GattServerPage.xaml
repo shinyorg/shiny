@@ -14,6 +14,15 @@
                               Detail="A495FF20-C5B1-4B44-B512-1370F02D74DE"
                               DetailColor="Red" />
 
+                    <EntryCell Label="Local Name (iOS/UWP)"
+                               Text="{Binding LocalName}" />
+
+                    <SwitchCell Text="Android Include TX"
+                                On="{Binding AndroidIncludeTx}" />
+
+                    <SwitchCell Text="Android Include Device Name"
+                                On="{Binding AndroidIncludeDeviceName}" />
+
                     <TextCell Text="{Binding ServerText}"
                               Command="{Binding ToggleServer}" />
                 </TableSection>

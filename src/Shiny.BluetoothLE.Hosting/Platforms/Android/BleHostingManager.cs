@@ -63,11 +63,12 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
-        public async Task StartAdvertising(AdvertisementData? adData = null)
+        public async Task StartAdvertising(AdvertisementOptions? options = null)
         {
             if (!this.context.Context.IsMinApiLevel(23))
                 throw new ApplicationException("BLE Advertiser needs API Level 23+");
 
+            options ??= new AdvertisementOptions();
             var tcs = new TaskCompletionSource<object>();
             this.adCallbacks = new AdvertisementCallbacks(
                 () => tcs.SetResult(null),
@@ -79,18 +80,18 @@ namespace Shiny.BluetoothLE.Hosting
                 .SetConnectable(true);
 
             var data = new AdvertiseData.Builder()
-                //.SetIncludeDeviceName(true)
-                .SetIncludeTxPowerLevel(true);
+                .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
+                .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
 
-            if (adData != null)
-            {
-                if (adData.ManufacturerData != null)
-                    data.AddManufacturerData(adData.ManufacturerData.CompanyId, adData.ManufacturerData.Data);
+            if (options.ManufacturerData != null)
+                data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
 
-                if (adData.ServiceUuids != null)
-                    foreach (var serviceUuid in adData.ServiceUuids)
-                        data.AddServiceUuid(new Android.OS.ParcelUuid(UUID.FromString(serviceUuid)));
-            }
+            var serviceUuids = options.UseGattServiceUuids
+                ? this.services.Keys.ToList()
+                : options.ServiceUuids;
+
+            foreach (var uuid in serviceUuids)
+                data.AddServiceUuid(new Android.OS.ParcelUuid(UUID.FromString(uuid)));
 
             this.context
                 .Manager

@@ -36,11 +36,12 @@ namespace Shiny.BluetoothLE.Hosting
 
 
         public bool IsAdvertising => this.manager.Advertising;
-        public async Task StartAdvertising(AdvertisementData? adData = null)
+        public async Task StartAdvertising(AdvertisementOptions? options = null)
         {
             if (this.manager.Advertising)
                 throw new ArgumentException("Advertising is already active");
 
+            options ??= new AdvertisementOptions();
             await this.manager
                 .WhenReady()
                 .Timeout(TimeSpan.FromSeconds(10))
@@ -59,12 +60,19 @@ namespace Shiny.BluetoothLE.Hosting
             {
                 this.manager.AdvertisingStarted += handler;
 
-                this.manager.StartAdvertising(new StartAdvertisingOptions
+                var opts = new StartAdvertisingOptions();
+                var serviceUuids = options.UseGattServiceUuids
+                    ? this.services.Keys.ToList()
+                    : options.ServiceUuids;
+
+                if (serviceUuids.Count > 0)
                 {
-                    ServicesUUID = this.services
-                        .Select(x => CBUUID.FromString(x.Value.Uuid))
-                        .ToArray()
-                });
+                    opts.ServicesUUID = serviceUuids
+                        .Select(CBUUID.FromString)
+                        .ToArray();
+                }
+
+                this.manager.StartAdvertising(opts);
                 await tcs.Task.ConfigureAwait(false);
             }
             finally
