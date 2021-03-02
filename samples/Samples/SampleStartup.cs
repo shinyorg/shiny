@@ -30,7 +30,6 @@ namespace Samples
                 opts.LogToStandardErrorThreshold = LogLevel.Debug
             );
             builder.UseSqliteLogging();
-            //builder.AddNotificationErrors();
             builder.AddAppCenter(opts =>
             {
                 opts.AppCenterAndroidSecret = Constants.AndroidAppCenterToken;
