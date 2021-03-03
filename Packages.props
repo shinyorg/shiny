@@ -2,7 +2,8 @@
     <ItemGroup>
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
-        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.8.0" />
+        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" />
+        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.9.0" />
 
         <PackageReference Update="sqlite-net-pcl" Version="1.7.335" />
         <PackageReference Update="Newtonsoft.Json" Version="12.0.3" />
@@ -48,14 +49,11 @@
         <PackageReference Update="Tizen.NET" Version="8.0.0.15631" ExcludeAssets="Runtime" />
         <PackageReference Update="Tizen.NET.Sdk" Version="1.1.6" />
 
-        <PackageReference Update="MarkdownSnippets.MsBuild" Version="23.0.2" />
-
         <!--Samples-->
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.2012" />
         <PackageReference Update="Xamarin.CommunityToolkit" Version="1.0.3" />
         <PackageReference Update="Xamarin.Essentials" Version="1.6.1" />
         <PackageReference Update="Acr.UserDialogs" Version="7.1.0.475" />
-        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.8.0" />
         <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.10" />
         <PackageReference Update="Bogus" Version="33.0.2" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
