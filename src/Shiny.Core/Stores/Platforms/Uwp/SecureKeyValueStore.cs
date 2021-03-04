@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
-
-using Shiny.Infrastructure;
-
 using Windows.Security.Cryptography.DataProtection;
 using Windows.Storage;
+using Shiny.Infrastructure;
+
 
 namespace Shiny.Stores
 {

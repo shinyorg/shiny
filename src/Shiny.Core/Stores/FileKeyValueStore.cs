@@ -45,9 +45,7 @@ namespace Shiny.Stores
 
         public bool Remove(string key) => this.Do(values => values.Remove(key), true);
         public void Clear() => this.Do(x => x.Clear(), true);
-        public void Set<T>(string key, T value) => this.Do(x => x[key] = value, true);
         public void Set(string key, object value) => this.Do(x => x[key] = value, true);
-
 
 
         readonly object syncLock = new object();

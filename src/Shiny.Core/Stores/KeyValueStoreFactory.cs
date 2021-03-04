@@ -11,6 +11,7 @@ namespace Shiny.Stores
         bool HasStore(string aliasName);
         IKeyValueStore GetStore(string aliasName);
         IKeyValueStore DefaultStore { get; }
+        void SetDefaultStore(string aliasName);
     }
 
 
@@ -31,10 +32,11 @@ namespace Shiny.Stores
             }
         }
 
+        public void SetDefaultStore(string aliasName)
+            => this.defaultStore = this.GetStore(aliasName);
 
         public string[] AvailableStores
             => this.keyStores.Select(x => x.Alias).ToArray();
-
 
         public bool HasStore(string aliasName)
             => this.keyStores.Any(x => x.Alias.Equals(aliasName, StringComparison.InvariantCultureIgnoreCase));

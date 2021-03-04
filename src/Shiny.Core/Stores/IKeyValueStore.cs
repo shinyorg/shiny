@@ -14,7 +14,6 @@ namespace Shiny.Stores
         T? Get<T>(string key);
         object? Get(Type type, string key);
 
-        //void Set<T>(string key, T value);
         void Set(string key, object value);
     }
 }

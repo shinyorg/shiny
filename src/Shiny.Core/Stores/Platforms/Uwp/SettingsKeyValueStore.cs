@@ -29,11 +29,7 @@ namespace Shiny.Stores
             return obj;
         }
         public bool Remove(string key) => this.Container.Values.Remove(key);
-        public void Set<T>(string key, T value) => this.DoSet(key, value);
-        public void Set(string key, object value) => this.DoSet(key, value);
-
-
-        protected virtual void DoSet(string key, object value)
+        public void Set(string key, object value)
         {
             var s = this.serializer.Serialize(value);
             this.Container.Values.Add(key, s);

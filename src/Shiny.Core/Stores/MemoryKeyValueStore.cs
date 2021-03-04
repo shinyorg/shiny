@@ -13,7 +13,6 @@ namespace Shiny.Stores
         public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
         public object Get(Type type, string key) => this.Do(x => x.ContainsKey(key) ? x[key] : null);
         public bool Remove(string key) => (bool)this.Do(x => x.Remove(key));
-        public void Set<T>(string key, T value) => this.Do(x => x[key] = value);
         public void Set(string key, object value) => this.Do(x => x[key] = value);
 
 
