@@ -124,7 +124,7 @@ namespace Shiny.Notifications
         const string BADGE_KEY = "ShinyNotificationBadge";
         public int Badge
         {
-            get => this.services.Settings.Get(BADGE_KEY, 0);
+            get => this.services.Settings.Get<int>(BADGE_KEY);
             set
             {
                 var badge = new BadgeNumericContent((uint)value);

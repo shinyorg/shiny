@@ -10,19 +10,21 @@ namespace Shiny.Stores
     {
         readonly ISerializer serializer;
         public SecAccessible DefaultAccessible { get; set; } = SecAccessible.Always;
-        public string Alias { get; set; }
 
 
         public SecureKeyValueStore(IPlatform platform, ISerializer serializer)
         {
-            this.Alias = $"{platform.AppIdentifier}.shiny";
+            this.Service = $"{platform.AppIdentifier}.shiny";
             this.serializer = serializer;
         }
 
 
+        public string Alias => "secure";
+        public string Service { get; set; }
+
         public void Clear()
         {
-            using (var query = new SecRecord(SecKind.GenericPassword) { Service = this.Alias })
+            using (var query = new SecRecord(SecKind.GenericPassword) { Service = this.Service })
                 SecKeyChain.Remove(query);
         }
 
@@ -87,7 +89,7 @@ namespace Shiny.Stores
             var record = new SecRecord(SecKind.GenericPassword)
             {
                 Account = key,
-                Service = this.Alias,
+                Service = this.Service,
                 Label = key,
                 Accessible = DefaultAccessible,
                 ValueData = NSData.FromString(content, NSStringEncoding.UTF8),
@@ -102,7 +104,7 @@ namespace Shiny.Stores
         protected virtual SecRecord GetRecord(string key) => new SecRecord(SecKind.GenericPassword)
         {
             Account = key,
-            Service = this.Alias
+            Service = this.Service
         };
     }
 }

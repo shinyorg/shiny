@@ -82,7 +82,7 @@ namespace Shiny.Notifications
 
         public int Badge
         {
-            get => this.services.Settings.Get("Badge", 0);
+            get => this.services.Settings.Get<int>("Badge");
             set
             {
                 this.services.Settings.Set("Badge", value);

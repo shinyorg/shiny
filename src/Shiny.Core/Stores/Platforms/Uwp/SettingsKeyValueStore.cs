@@ -15,6 +15,7 @@ namespace Shiny.Stores
             => this.serializer = serializer;
 
 
+        public string Alias => "settings";
         public void Clear() => this.Container.Values.Clear();
         public bool Contains(string key) => this.Container.Values.ContainsKey(key);
         public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);

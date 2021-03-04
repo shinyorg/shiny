@@ -5,6 +5,8 @@ namespace Shiny.Stores
 {
     public class SettingsKeyValueStore : IKeyValueStore
     {
+        public string Alias => "settings";
+
         public void Clear() => throw new NotImplementedException();
         public bool Contains(string key) => throw new NotImplementedException();
         public T? Get<T>(string key) => throw new NotImplementedException();

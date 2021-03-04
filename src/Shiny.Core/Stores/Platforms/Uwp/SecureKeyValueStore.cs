@@ -35,6 +35,7 @@ namespace Shiny.Stores
         }
 
 
+        public string Alias => "secure";
         public void Clear() => this.settingsStore.Clear();
         public bool Contains(string key) => this.settingsStore.Contains(key);
         public T? Get<T>(string key) => throw new NotImplementedException();

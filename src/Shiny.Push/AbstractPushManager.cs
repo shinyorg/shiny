@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
-using Shiny.Settings;
+using Shiny.Stores;
 
 
 namespace Shiny.Push
@@ -14,7 +14,7 @@ namespace Shiny.Push
 
 
         protected ShinyCoreServices Services { get; }
-        protected ISettings Settings => this.Services.Settings;
+        protected IKeyValueStore Settings => this.Services.Settings;
         public abstract IObservable<IDictionary<string, string>> WhenReceived();
         public abstract Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default);
         public abstract Task UnRegister();
@@ -30,7 +30,7 @@ namespace Shiny.Push
 
         public string? CurrentRegistrationToken
         {
-            get => this.Settings.Get<string?>(nameof(this.CurrentRegistrationToken));
+            get => this.Settings.Get<string>(nameof(this.CurrentRegistrationToken));
             protected set => this.Settings.Set(nameof(this.CurrentRegistrationToken), value);
         }
 
@@ -44,7 +44,7 @@ namespace Shiny.Push
 
         public DateTime? CurrentRegistrationExpiryDate
         {
-            get => this.Settings.Get<DateTime?>(nameof(this.CurrentRegistrationExpiryDate));
+            get => this.Settings.Get<DateTime>(nameof(this.CurrentRegistrationExpiryDate));
             protected set => this.Settings.Set(nameof(this.CurrentRegistrationExpiryDate), value);
         }
 
@@ -52,7 +52,7 @@ namespace Shiny.Push
         public string[]? RegisteredTags
         {
             get => this.Settings.Get<string[]?>(nameof(this.RegisteredTags));
-            protected set => this.Settings.Get(nameof(this.RegisteredTags), value);
+            protected set => this.Settings.Set(nameof(this.RegisteredTags), value);
         }
     }
 }

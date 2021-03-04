@@ -6,6 +6,8 @@ namespace Shiny.Stores
 {
     public class MemoryKeyValueStore : IKeyValueStore
     {
+        public string Alias => "memory";
+
         public void Clear() => this.Do(x => x.Clear());
         public bool Contains(string key) => this.Do(x => x.ContainsKey(key));
         public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
@@ -26,7 +28,7 @@ namespace Shiny.Stores
         {
             lock (this.syncLock)
             {
-                return (T)worker(this.values);
+                return worker(this.values);
             }
         }
     }

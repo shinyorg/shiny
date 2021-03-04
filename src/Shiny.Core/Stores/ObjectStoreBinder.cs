@@ -9,6 +9,7 @@ namespace Shiny.Stores
 {
     public interface IObjectStoreBinder
     {
+        void Bind(INotifyPropertyChanged npc, string? keyValueStoreAlias = null);
         void Bind(INotifyPropertyChanged npc, IKeyValueStore store);
         void UnBind(INotifyPropertyChanged npc);
     }
@@ -16,7 +17,27 @@ namespace Shiny.Stores
 
     public class ObjectStoreBinder : IObjectStoreBinder
     {
-        //readonly IDictionary<object, I>
+        readonly IDictionary<object, IKeyValueStore> bindings;
+        readonly IKeyValueStoreFactory factory;
+
+
+        public ObjectStoreBinder(IKeyValueStoreFactory factory)
+        {
+            this.factory = factory;
+            this.bindings = new Dictionary<object, IKeyValueStore>();
+        }
+
+
+
+        public void Bind(INotifyPropertyChanged npc, string? keyValueStoreAlias = null)
+            => this.Bind(
+                npc,
+                keyValueStoreAlias == null
+                    ? this.factory.DefaultStore
+                    : this.factory.GetStore(keyValueStoreAlias)
+            );
+
+
         public void Bind(INotifyPropertyChanged npc, IKeyValueStore store)
         {
             var type = npc.GetType();
@@ -32,15 +53,16 @@ namespace Shiny.Stores
                 }
             }
             npc.PropertyChanged += this.OnPropertyChanged;
+            this.bindings.Add(npc, store);
         }
-
-
-        protected virtual string GetBindingKey(Type type, PropertyInfo prop)
-            => $"{type.FullName}.{prop.Name}";
 
 
         public virtual void UnBind(INotifyPropertyChanged obj)
             => obj.PropertyChanged -= this.OnPropertyChanged;
+
+
+        protected virtual string GetBindingKey(Type type, PropertyInfo prop)
+            => $"{type.FullName}.{prop.Name}";
 
 
         protected virtual IEnumerable<PropertyInfo> GetTypeProperties(Type type) => type
@@ -63,8 +85,10 @@ namespace Shiny.Stores
                 var key = this.GetBindingKey(sender.GetType(), prop);
                 var value = prop.GetValue(sender);
 
-                // TIE STORE TO SENDER
-                //this.SetValue(key, value);
+                if (!this.bindings.ContainsKey(sender))
+                    throw new ArgumentException("No key/value store found for current binding object - " + sender.GetType().FullName);
+
+                this.bindings[sender].Set(key, value);
             }
         }
     }

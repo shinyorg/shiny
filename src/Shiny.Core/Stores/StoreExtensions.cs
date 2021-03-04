@@ -1,9 +1,10 @@
 ﻿using System;
 
+using Shiny.Stores;
 
-namespace Shiny.Stores
+namespace Shiny
 {
-    public static class Extensions
+    public static class StoreExtensions
     {
         static readonly object syncLock = new object();
 

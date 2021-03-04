@@ -2,10 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-
 using Shiny.Infrastructure;
 using Shiny.Integrations.Sqlite;
-using Shiny.Settings;
+using Shiny.Stores;
 
 
 namespace Shiny
@@ -37,10 +36,10 @@ namespace Shiny
         }
 
 
-        public static void UseSqliteSettings(this IServiceCollection services)
+        public static void UseSqliteStore(this IServiceCollection services)
         {
             services.TryAddSingleton<ShinySqliteConnection>();
-            services.AddSingleton<ISettings, SqliteSettings>();
+            services.AddSingleton<IKeyValueStore, SqliteKeyValueStore>();
         }
     }
 }

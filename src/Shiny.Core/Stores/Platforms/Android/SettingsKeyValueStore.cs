@@ -18,6 +18,7 @@ namespace Shiny.Stores
         }
 
 
+        public string Alias => "settings";
         public void Clear() => this.UoW(x => x.Clear());
         public bool Contains(string key) => this.GetValue(x => x.Contains(key));
         public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
@@ -31,7 +32,6 @@ namespace Shiny.Stores
         public void Set<T>(string key, T value) => throw new NotImplementedException();
         public void Set(string key, object value)
         {
-            this.
         }
 
 
