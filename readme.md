@@ -15,7 +15,8 @@ Shiny is a set of libraries designed to help make device services & backgroundin
 * Local Notifications - best of breed local notifications supporting almost all features across all of the supported platforms
 * Near Field Communications (NFC) - easy to use NFC tag reader
 
-* [Documentation](https://shinylib.net)
+## Links
+* [Documentation](https://shinyorg.github.io)
 * [Change Log](https://shinylib.net/blog)
 * [Samples](https://github.com/shinyorg/shiny/samples) - Shows almost every single function point within Shiny
 

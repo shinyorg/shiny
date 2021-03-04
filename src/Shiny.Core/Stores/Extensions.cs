@@ -1,27 +1,27 @@
 ﻿using System;
-using Shiny.Settings;
 
-namespace Shiny
+
+namespace Shiny.Stores
 {
-    public static class SettingsExtensions
+    public static class Extensions
     {
         static readonly object syncLock = new object();
 
         /// <summary>
         /// Thread safetied setting value incrementor
         /// </summary>
-        /// <param name="settings"></param>
+        /// <param name="store"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static int IncrementValue(this ISettings settings, string name = "NextId")
+        public static int IncrementValue(this IKeyValueStore store, string key = "NextId")
         {
             var id = 0;
 
             lock (syncLock)
             {
-                id = settings.Get(name, 0);
+                id = store.Get<int>(key);
                 id++;
-                settings.Set(name, id);
+                store.Set(key, id);
             }
             return id;
         }
@@ -31,15 +31,15 @@ namespace Shiny
         /// Gets a required value from settings
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="settings"></param>
+        /// <param name="store"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static T GetRequired<T>(this ISettings settings, string key)
+        public static T GetRequired<T>(this IKeyValueStore store, string key)
         {
-            if (!settings.Contains(key))
-                throw new ArgumentException($"Settings key '{key}' is not set");
+            if (!store.Contains(key))
+                throw new ArgumentException($"Store key '{key}' is not set");
 
-            return settings.Get<T>(key);
+            return store.Get<T>(key)!;
         }
 
 
@@ -50,12 +50,12 @@ namespace Shiny
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public static bool SetDefault<T>(this ISettings settings, string key, T value)
+        public static bool SetDefault<T>(this IKeyValueStore store, string key, T value)
         {
-            if (settings.Contains(key))
+            if (store.Contains(key))
                 return false;
 
-            settings.Set(key, value);
+            store.Set(key, value);
             return true;
         }
     }
