@@ -5,6 +5,7 @@ using UIKit;
 using Xunit.Runner;
 using Xunit.Sdk;
 
+[assembly: Shiny.ShinyApplication(ShinyStartupTypeName = "Shiny.Device.Tests.TestStartup")]
 
 namespace Shiny.Device.Tests.iOS
 {
@@ -13,7 +14,6 @@ namespace Shiny.Device.Tests.iOS
     {
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            //Acr.Logging.Log.ToDebug();
             this.ShinyFinishedLaunching(new TestStartup());
             this.AddExecutionAssembly(typeof(ExtensibilityPointFactory).Assembly);
             this.AddTestAssembly(typeof(TestStartup).Assembly);

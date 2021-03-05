@@ -145,6 +145,10 @@
       <Project>{d7f94901-2960-4ba0-acb2-280761e70af0}</Project>
       <Name>Shiny.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Shiny.Generators\Shiny.Generators.csproj">
+      <Project>{74207658-2ba6-403b-b608-1b8b4d9fa130}</Project>
+      <Name>Shiny.Generators</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Shiny.Locations\Shiny.Locations.csproj">
       <Project>{5a0dd7a1-e497-4051-84b0-2e16b015e012}</Project>
       <Name>Shiny.Locations</Name>
@@ -168,6 +172,10 @@
     <ProjectReference Include="..\..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
       <Project>{34905983-1f79-4b74-9bb0-d1dc7d24b8bf}</Project>
       <Name>Shiny.SpeechRecognition</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Shiny\Shiny.csproj">
+      <Project>{5b569bcc-b60c-4224-babc-77dd1f193f4b}</Project>
+      <Name>Shiny</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shiny.Device.Tests\Shiny.Device.Tests.csproj">
       <Project>{8E87D625-07EA-4CE2-A549-E3A815AB52D6}</Project>
