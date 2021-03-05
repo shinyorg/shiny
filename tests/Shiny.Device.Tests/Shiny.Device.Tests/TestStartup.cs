@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+
 namespace Shiny.Device.Tests
 {
     public class TestStartup : ShinyStartup
@@ -15,6 +16,7 @@ namespace Shiny.Device.Tests
         public override void ConfigureServices(IServiceCollection services, IPlatform platform)
         {
             services.UseBleClient();
+            services.UseSqliteStore();
             //services.UseBleHosting();
         }
     }

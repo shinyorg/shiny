@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 
-namespace Shiny.Device.Tests.Settings
+namespace Shiny.Device.Tests.Stores
 {
     public class TestBind : INotifyPropertyChanged
     {
