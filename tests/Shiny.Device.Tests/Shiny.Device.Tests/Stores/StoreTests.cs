@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
-using Microsoft.Extensions.DependencyInjection;
-
-using Shiny.Integrations.Sqlite;
 using Shiny.Stores;
 using Xunit;
 
@@ -28,7 +24,7 @@ namespace Shiny.Device.Tests.Stores
 
         public void Dispose()
         {
-            this.currentStore.Clear();
+            this.currentStore?.Clear();
         }
 
 
@@ -37,47 +33,39 @@ namespace Shiny.Device.Tests.Stores
         [MemberData(nameof(Data))]
         public virtual void NullableEnums(string storeAliasName)
         {
-            var value = this.currentStore.Get<MyTestEnum>(nameof(NullableEnums));
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(storeAliasName);
+            var value = this.currentStore.Get<MyTestEnum?>(nameof(NullableEnums));
             Assert.Null(value);
 
             value = this.currentStore.Get<MyTestEnum?>(nameof(NullableEnums));
             Assert.Equal(MyTestEnum.Bye, value);
 
-            this.currentStore.Set<MyTestEnum?>(nameof(NullableEnums), MyTestEnum.Hi);
+            this.currentStore.Set(nameof(NullableEnums), MyTestEnum.Hi);
             value = this.currentStore.Get<MyTestEnum?>(nameof(NullableEnums));
             Assert.Equal(MyTestEnum.Hi, value);
 
-            this.currentStore.Set<MyTestEnum?>(nameof(NullableEnums), null);
+            this.currentStore.Set(nameof(NullableEnums), null);
             value = this.currentStore.Get<MyTestEnum?>(nameof(NullableEnums));
             Assert.Null(value);
         }
 
 
-        [Fact]
-        public void SetNullRemoves()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void SetNullRemoves(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             this.currentStore.Set("SetNullRemoves", "Blah");
-            this.currentStore.Set<string>("SetNullRemoves", null);
+            this.currentStore.Set("SetNullRemoves", null);
             Assert.False(this.currentStore.Contains("SetNullRemoves"));
         }
 
 
-        [Fact]
-        public async Task OnSettingChanged()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void SetDefault_DoesNotRemove_SimpleType(string alias)
         {
-            var task = this.currentStore.Changed.ToTask();
-            this.currentStore.Set("OnSettingChanged", "boo");
-            var eventArgs = await task;
-
-            Assert.Equal(SettingChangeAction.Add, eventArgs.Action);
-            Assert.Equal("OnSettingChanged", eventArgs.Key);
-            Assert.Equal("boo", eventArgs.Value);
-        }
-
-
-        [Fact]
-        public void SetDefault_DoesNotRemove_SimpleType()
-        {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             this.currentStore.Set("Bool", false);
             Assert.True(this.currentStore.Contains("Bool"), "Bool is missing");
 
@@ -86,20 +74,24 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void SetDefault_DoesRemove_ComplexType()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void SetDefault_DoesRemove_ComplexType(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             this.currentStore.Set("Object", new object());
             Assert.True(this.currentStore.Contains("Object"), "Object is missing");
 
-            this.currentStore.Set<object>("Object", null);
+            this.currentStore.Set("Object", null);
             Assert.False(this.currentStore.Contains("Object"), "Object should be missing");
         }
 
 
-        [Fact]
-        public void Object()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void Tuples(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             var inv = new Tuple<int, string>(1, "2");
             this.currentStore.Set("Object", inv);
 
@@ -109,18 +101,22 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void IntTest()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void IntTest(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             this.currentStore.Set("Test", 99);
             var value = this.currentStore.Get<int>("Test");
             Assert.True(value.Equals(99));
         }
 
 
-        [Fact]
-        public void IntNullTest()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void IntNullTest(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             var nvalue = this.currentStore.Get<int?>("Blah");
             Assert.True(nvalue == null, "Int? should be null");
 
@@ -132,9 +128,11 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void DateTimeNullTest()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void DateTimeNullTest(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             var dt = new DateTime(1999, 12, 31, 23, 59, 0);
             var nvalue = this.currentStore.Get<DateTime?>("DateTimeNullTest");
             Assert.True(nvalue == null, "Should be null");
@@ -145,9 +143,11 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void DateTimeOffsetTest()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void DateTimeOffsetTest(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             var dt = DateTimeOffset.Now.TrimDate();
             this.currentStore.Set("now", dt);
             var result = this.currentStore.Get<DateTimeOffset>("now");
@@ -155,9 +155,11 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void SetOverride()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void SetOverride(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             this.currentStore.Set("Test", "1");
             this.currentStore.Set("Test", "2");
             var r = this.currentStore.Get<string>("Test");
@@ -165,9 +167,11 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void ContainsTest()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void ContainsTest(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             Assert.False(this.currentStore.Contains(Guid.NewGuid().ToString()), "Contains should have returned false");
 
             this.currentStore.Set("Test", "1");
@@ -175,17 +179,21 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void RemoveTest()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void RemoveTest(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             this.currentStore.Set("Test", "1");
             Assert.True(this.currentStore.Remove("Test"), "Remove should have returned success");
         }
 
 
-        [Fact]
-        public void LongTest()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void LongTest(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             long value = 1;
             this.currentStore.Set("LongTest", value);
             var value2 = this.currentStore.Get<long>("LongTest");
@@ -193,9 +201,11 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void GuidTest()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void GuidTest(string alias)
         {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             Assert.Equal(this.currentStore.Get<Guid>("GuidTest"), Guid.Empty);
 
             var guid = new Guid();
@@ -204,38 +214,40 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void NullBools()
+        //[Fact]
+        //public void NullBools()
+        //{
+        //    this.currentStore.Set<bool?>("SetNullBool", null);
+        //    var value = this.currentStore.Get<bool?>("SetNullBool");
+        //    Assert.Null(value);
+
+        //    this.currentStore.Set<bool?>("SetNullBool", true);
+        //    value = this.currentStore.Get<bool?>("SetNullBool");
+        //    Assert.Equal(true, value);
+
+        //    this.currentStore.Set<bool?>("SetNullBool", false);
+        //    value = this.currentStore.Get<bool?>("SetNullBool");
+        //    Assert.Equal(false, value);
+
+        //    this.currentStore.Set<bool?>("SetNullBool", null);
+        //    value = this.currentStore.Get<bool?>("SetNullBool");
+        //    Assert.Null(value);
+        //}
+
+
+        //[Fact]
+        //public void GetDefaultParameter()
+        //{
+        //    var tmp = Guid.NewGuid().ToString();
+        //    Assert.Equal(this.currentStore.Get("GetDefaultParameter", tmp), tmp);
+        //}
+
+
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void TryDefaults(string alias)
         {
-            this.currentStore.Set<bool?>("SetNullBool", null);
-            var value = this.currentStore.Get<bool?>("SetNullBool");
-            Assert.Null(value);
-
-            this.currentStore.Set<bool?>("SetNullBool", true);
-            value = this.currentStore.Get<bool?>("SetNullBool");
-            Assert.Equal(true, value);
-
-            this.currentStore.Set<bool?>("SetNullBool", false);
-            value = this.currentStore.Get<bool?>("SetNullBool");
-            Assert.Equal(false, value);
-
-            this.currentStore.Set<bool?>("SetNullBool", null);
-            value = this.currentStore.Get<bool?>("SetNullBool");
-            Assert.Null(value);
-        }
-
-
-        [Fact]
-        public void GetDefaultParameter()
-        {
-            var tmp = Guid.NewGuid().ToString();
-            Assert.Equal(this.currentStore.Get("GetDefaultParameter", tmp), tmp);
-        }
-
-
-        [Fact]
-        public void TryDefaults()
-        {
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
             Assert.True(this.currentStore.SetDefault("TryDefaults", "Initial Value"), "Default value could not be set");
             Assert.False(this.currentStore.SetDefault("TryDefaults", "Second Value"), "Default value was set and should not have been");
             Assert.Equal("Initial Value", this.currentStore.Get<string>("TryDefaults"));
@@ -257,13 +269,12 @@ namespace Shiny.Device.Tests.Stores
         //#endif
 
 
-        [Fact]
+        [Theory]
         [MemberData(nameof(Data))]
         public void Binding_Basic(string alias)
         {
-            var obj = new TestBind();
-            ShinyHost.Resolve<IObjectStoreBinder>().Bind(obj, alias);
-            obj.StringProperty = "Hi";
+            var values = GetBinder<TestBind>(alias);
+            values.BoundObject.StringProperty = "Hi";
 
             Assert.True(this.currentStore.Contains("TestBind.StringProperty"));
             Assert.False(this.currentStore.Contains("TestBind.IgnoredProperty"));
@@ -271,14 +282,28 @@ namespace Shiny.Device.Tests.Stores
         }
 
 
-        [Fact]
-        public void Binding_Persist()
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void Binding_Persist(string alias)
         {
-            var obj = this.currentStore.Bind<TestBind>();
-            obj.StringProperty = "Binding_Persist";
+            var values = GetBinder<TestBind>(alias);
+            values.BoundObject.StringProperty = "Binding_Persist";
 
-            var obj2 = this.currentStore.Bind<TestBind>();
-            Assert.Equal(obj2.StringProperty, obj.StringProperty);
+            var obj2 = new TestBind();
+            values.Binder.Bind(obj2, alias);
+            Assert.Equal(obj2.StringProperty, values.BoundObject.StringProperty);
+        }
+
+
+        (IObjectStoreBinder Binder, T BoundObject) GetBinder<T>(string alias) where T : class, INotifyPropertyChanged, new()
+        {
+            var binder = ShinyHost.Resolve<IObjectStoreBinder>();
+            var obj = new T();
+            binder.Bind(obj, alias);
+
+            this.currentStore = ShinyHost.Resolve<IKeyValueStoreFactory>().GetStore(alias);
+
+            return (binder, obj);
         }
     }
 
