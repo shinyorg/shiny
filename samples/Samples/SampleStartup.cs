@@ -42,17 +42,7 @@ namespace Samples
 
         public override void ConfigureServices(IServiceCollection services, IPlatform platform)
         {
-            //// THESE LOGGERS ARE ONLY GOOD FOR FOREGROUND LEVEL DEBUG TESTING
-            //Log.UseConsole();
-            //Log.UseDebug();
-
-            //// YOU REALLY NEED TO USE ONE OF THE FOLLOWING LOGGERS TO TEST BACKGROUND PROCESSES FOR CRASHES AND IN PRODUCTION
-            //Log.UseFile();
-            ////services.UseAppCenterLogging(Constants.AppCenterTokens, true, false);
-            //services.UseSqliteLogging(true, true);
-            //services.UseNotificationErrorLogging(); // NEVER USE IN PRODUCTION - limited testing for background processes in dev
-
-            //services.UseSqliteSettings();
+            services.UseSqliteStore();
             //services.UseSqliteStorage();
             services.AddSingleton<AppNotifications>();
             services.AddSingleton<IDialogs, Dialogs>();

@@ -5,8 +5,6 @@
              Title="Basic">
     <ContentPage.Content>
         <StackLayout>
-            <Button Text="Open App Settings" Command="{Binding OpenAppSettings}" />
-
             <Label Text="The text below will be remembered across sessions" />
 
             <Label Text="Check" />

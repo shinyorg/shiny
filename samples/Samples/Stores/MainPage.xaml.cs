@@ -2,7 +2,7 @@
 using Xamarin.Forms;
 
 
-namespace Samples.Settings
+namespace Samples.Stores
 {
     public partial class MainPage : TabbedPage
     {

@@ -53,7 +53,7 @@
                     <TableSection Title="Core">
                         <TextCell Text="Platform" Command="{Binding Navigate}" CommandParameter="Nav/Platform" />
                         <TextCell Text="Jobs" Command="{Binding Navigate}" CommandParameter="Nav/Jobs" />
-                        <TextCell Text="Settings" Command="{Binding Navigate}" CommandParameter="Nav/Settings" />
+                        <TextCell Text="Settings/Secure Storage" Command="{Binding Navigate}" CommandParameter="Nav/Stores" />
                     </TableSection>
                 </TableRoot>
             </TableView>

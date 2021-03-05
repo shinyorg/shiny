@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Reactive.Linq;
-using Shiny.Settings;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Prism.Navigation;
+using Shiny.Stores;
 
 
 namespace Samples.Settings
 {
     public class BindViewModel : ViewModel
     {
-        readonly ISettings settings;
+        readonly IObjectStoreBinder binder;
 
 
-        public BindViewModel(ISettings settings)
+        public BindViewModel(IObjectStoreBinder binder)
         {
-            this.settings = settings;
+            this.binder = binder;
             this.WhenAnyValue(
                 x => x.YourText,
                 x => x.IsChecked
@@ -33,14 +32,14 @@ namespace Samples.Settings
         public override void OnAppearing()
         {
             base.OnAppearing();
-            this.settings.Bind(this);
+            this.binder.Bind(this, "settings");
         }
 
 
         public override void OnDisappearing()
         {
             base.OnDisappearing();
-            this.settings.UnBind(this);
+            this.binder.UnBind(this);
         }
     }
 }

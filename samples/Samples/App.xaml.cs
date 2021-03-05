@@ -81,7 +81,7 @@ namespace Samples
 
             containerRegistry.RegisterForNavigation<PlatformPage>("Platform");
             containerRegistry.RegisterForNavigation<AccessPage>("Access");
-            containerRegistry.RegisterForNavigation<Settings.MainPage>("Settings");
+            containerRegistry.RegisterForNavigation<Stores.MainPage>("Stores");
         }
 
 

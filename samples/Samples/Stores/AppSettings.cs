@@ -4,8 +4,16 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 
-namespace Samples.Settings
+namespace Samples.Stores
 {
+    public interface IAppSettings
+    {
+        bool IsChecked { get; set; }
+        string YourText { get; set; }
+        DateTime? LastUpdated { get; set; }
+    }
+
+
     public class AppSettings : ReactiveObject, IAppSettings
     {
         const string DEFAULT_TRANSFER = "http://ipv4.download.thinkbroadband.com/1GB.zip";
