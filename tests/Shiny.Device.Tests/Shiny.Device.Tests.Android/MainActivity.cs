@@ -5,6 +5,8 @@ using Android.Content.PM;
 using Android.OS;
 using Xunit.Runners.UI;
 
+[assembly: Shiny.ShinyApplication(ShinyStartupTypeName = "Shiny.Device.Tests.TestStartup")]
+
 
 namespace Shiny.Device.Tests.Droid
 {
@@ -19,7 +21,7 @@ namespace Shiny.Device.Tests.Droid
     {
         protected override void OnCreate(Bundle bundle)
         {
-            //Acr.Logging.Log.ToDebug();
+            this.ShinyOnCreate();
 
             //UserDialogs.Init(() => this);
             //this.AddTestAssembly(typeof(BluetoothLE.Tests.DeviceTests).Assembly);
