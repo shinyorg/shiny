@@ -24,7 +24,7 @@ namespace Shiny.Device.Tests.Droid
             this.ShinyOnCreate();
 
             //UserDialogs.Init(() => this);
-            //this.AddTestAssembly(typeof(BluetoothLE.Tests.DeviceTests).Assembly);
+            this.AddTestAssembly(typeof(TestStartup).Assembly);
             this.AddTestAssembly(Assembly.GetExecutingAssembly());
 
             //CrossBleAdapter.UseNewScanner = false;
