@@ -56,14 +56,21 @@ namespace Shiny.Stores
             worker(values);
             return null;
         }, false);
-        protected virtual T Do<T>(Func<Dictionary<string, object>, T> worker, bool requestFlush)
+        protected virtual T Do<T>(Func<Dictionary<string, object>, T?> worker, bool requestFlush)
         {
-            lock (syncLock)
+            lock (this.syncLock)
             {
                 if (this.keyValues == null)
                 {
-                    var contents = File.ReadAllText(this.filePath);
-                    this.keyValues = this.serializer.Deserialize<Dictionary<string, object>>(contents);
+                    if (!File.Exists(this.filePath))
+                    {
+                        this.keyValues = new Dictionary<string, object>();
+                    }
+                    else
+                    {
+                        var contents = File.ReadAllText(this.filePath);
+                        this.keyValues = this.serializer.Deserialize<Dictionary<string, object>>(contents) ?? new Dictionary<string, object>();
+                    }
                 }
                 var result = worker(this.keyValues);
                 if (requestFlush)
