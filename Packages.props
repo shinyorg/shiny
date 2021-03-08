@@ -58,7 +58,7 @@
         <PackageReference Update="Bogus" Version="33.0.2" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.0.0.1909" />
-        <PackageReference Update="ReactiveUI.Fody" Version="13.1.1" />
+        <PackageReference Update="ReactiveUI.Fody" Version="13.2.2" />
         <PackageReference Update="XF.Material" Version="1.7.7" />
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
 
