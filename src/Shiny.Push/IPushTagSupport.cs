@@ -7,7 +7,10 @@ namespace Shiny.Push
 {
     public interface IPushTagSupport
     {
-        Task SetTags(params string[] tags);
+        Task AddTag(string tag);
+        Task RemoveTag(string tag);
+        Task ClearTags();
+
         string[]? RegisteredTags { get; }
     }
 }
