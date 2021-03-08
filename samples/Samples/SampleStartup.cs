@@ -29,14 +29,9 @@ namespace Samples
             builder.AddConsole(opts =>
                 opts.LogToStandardErrorThreshold = LogLevel.Debug
             );
-            builder.UseSqliteLogging();
-            builder.AddAppCenter(opts =>
-            {
-                opts.AppCenterAndroidSecret = Constants.AndroidAppCenterToken;
-                opts.AppCenteriOSSecret = Constants.iOSAppCenterToken;
-                opts.AppCenterUWPSecret = Constants.UwpAppCenterToken;
-                opts.AppCenterLogLevel = Microsoft.AppCenter.LogLevel.Warn;
-            });
+            builder.AddSqliteLogging(LogLevel.Warning);
+            builder.AddFirebase(LogLevel.Warning);
+            builder.AddAppCenter(Constants.AndroidAppCenterToken, LogLevel.Warning);
         }
 
 
