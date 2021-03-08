@@ -11,6 +11,7 @@ namespace Samples.Stores
         bool IsChecked { get; set; }
         string YourText { get; set; }
         DateTime? LastUpdated { get; set; }
+        string LastTransferUrl { get; set; }
     }
 
 

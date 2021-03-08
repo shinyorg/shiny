@@ -9,8 +9,8 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Shiny;
 using Shiny.Net.Http;
-using Samples.Settings;
 using Samples.Infrastructure;
+using Samples.Stores;
 
 
 namespace Samples.HttpTransfers
@@ -24,7 +24,7 @@ namespace Samples.HttpTransfers
                                IHttpTransferManager httpTransfers,
                                IDialogs dialogs,
                                IPlatform platform,
-                               AppSettings appSettings)
+                               IAppSettings appSettings)
         {
             this.platform = platform;
             this.Url = appSettings.LastTransferUrl;

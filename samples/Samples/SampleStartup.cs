@@ -16,6 +16,7 @@ using Samples.Geofences;
 using Samples.Gps;
 using Samples.Push;
 using Samples.Notifications;
+using Samples.Stores;
 
 [assembly: GenerateStaticClasses("Samples")]
 

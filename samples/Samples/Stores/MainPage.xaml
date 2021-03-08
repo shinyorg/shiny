@@ -3,7 +3,7 @@
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
             xmlns:stores="clr-namespace:Samples.Stores"
             x:Class="Samples.Stores.MainPage"
-            Title="Settings">
+            Title="Stores">
     <TabbedPage.Children>
         <stores:BindPage />
         <stores:BasicPage />

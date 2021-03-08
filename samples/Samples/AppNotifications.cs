@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Notifications;
-using Shiny.Settings;
+using Shiny.Stores;
 
 
 namespace Samples
@@ -26,14 +26,14 @@ namespace Samples
 
     public class AppNotifications
     {
-        readonly ISettings settings;
+        readonly IKeyValueStore settings;
         readonly INotificationManager notifications;
         readonly Dictionary<Type, NotificationRegistration> registrations;
 
 
-        public AppNotifications(ISettings settings, INotificationManager notifications)
+        public AppNotifications(IKeyValueStoreFactory storeFactory, INotificationManager notifications)
         {
-            this.settings = settings;
+            this.settings = storeFactory.GetStore("settings");
             this.notifications = notifications;
             this.registrations = new Dictionary<Type, NotificationRegistration>();
         }
@@ -56,7 +56,7 @@ namespace Samples
         }
 
 
-        public bool IsEnabled(Type type, bool entry) => this.settings.Get(ToKey(type, entry), true);
+        public bool IsEnabled(Type type, bool entry) => this.settings.Get<bool>(ToKey(type, entry));
 
 
         public async Task Send(Type type, bool entry, string title, string message)
