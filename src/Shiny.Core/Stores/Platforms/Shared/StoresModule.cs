@@ -15,8 +15,6 @@ namespace Shiny.Stores
             services.AddSingleton<IKeyValueStore, FileKeyValueStore>();
 #if !NETSTANDARD
             services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-#endif
-#if !MONOANDROID && !NETSTANDARD
             services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
 #endif
         }
