@@ -27,7 +27,6 @@
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
         <ProjectReference Include="..\Samples.SqliteGenerator\Samples.SqliteGenerator.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />

@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Shiny;
-using Shiny.Notifications;
-using Samples.Settings;
 
 
 namespace Samples.Infrastructure

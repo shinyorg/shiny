@@ -59,7 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
-    <Compile Include="MainApplication.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -120,10 +119,16 @@
     <ProjectReference Include="..\..\..\src\Shiny.Generators\Shiny.Generators.csproj">
       <Project>{74207658-2ba6-403b-b608-1b8b4d9fa130}</Project>
       <Name>Shiny.Generators</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Shiny.Integrations.Sqlite\Shiny.Integrations.Sqlite.csproj">
       <Project>{271e5317-66e3-4e0f-a08b-7ce89b395237}</Project>
       <Name>Shiny.Integrations.Sqlite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
+      <Project>{4ee9f1ff-ee8c-4d1f-8687-7dfe368c13a4}</Project>
+      <Name>Shiny.Locations.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Shiny.Locations\Shiny.Locations.csproj">
       <Project>{5a0dd7a1-e497-4051-84b0-2e16b015e012}</Project>

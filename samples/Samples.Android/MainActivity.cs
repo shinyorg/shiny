@@ -1,29 +1,19 @@
-﻿using System;
-using Shiny;
-using Android.App;
-using Android.Content.PM;
-using Xamarin.Forms.Platform.Android;
-using Xamarin.Forms;
-using Android.OS;
-using Android.Runtime;
-
-[assembly: ShinyApplication(
+﻿[assembly: Shiny.ShinyApplication(
     ShinyStartupTypeName = "Samples.SampleStartup",
     XamarinFormsAppTypeName = "Samples.App"
 )]
-[assembly: ShinyGeneratorDebug]
 
 
 namespace Samples.Droid
 {
-    [Activity(
+    [global::Android.App.Activity(
         Label = "Shiny",
         Icon = "@mipmap/icon",
         Theme = "@style/MainTheme",
         MainLauncher = true,
-        ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation
+        ConfigurationChanges = global::Android.Content.PM.ConfigChanges.ScreenSize | global::Android.Content.PM.ConfigChanges.Orientation
     )]
-    public partial class MainActivity : FormsAppCompatActivity
+    public partial class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
     }
 }
