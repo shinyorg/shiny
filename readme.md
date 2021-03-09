@@ -56,13 +56,14 @@ Preview|![Build](https://img.shields.io/github/checks-status/shinyorg/shiny/prev
 |Firebase Push| [![FirebasePushNugetShield]][FirebasePushNuget] | [![FirebasePushPreviewShield]][FirebasePushPreNuget] | Push Integration for Google Firebase - Support for iOS & Android
 |SQLite| [![SqliteNugetShield]][SqliteNuget] | [![SqlitePreviewShield]][SqlitePreNuget] | Provides caching, logging, storage, & settings implementations
 |AppCenter Logging| [![AppCenterNugetShield]][AppCenterNuget] | [![AppCenterPreviewShield]][AppCenterPreNuget] | Log errors to AppCenter
+|Firebase Analytics/Crashlytics|TODO|TODO|TODO|
 
 ## 3rd Party
 |Project|NuGet|Repo|Description|
 |-------|-----|----|-----------|
 |Shiny.Prism|[![PrismNugetShield]][PrismNuget] | [GitHub](https://github.com/dansiegel/Prism.Container.Extensions) | Prism integration with Shiny maintained by Dan Siegel|
 |Apizr.Integrations.Shiny| [![ApizrNugetShield]][ApizrNuget] | [GitHub](https://github.com/Respawnsive/Apizr) | Refit based web api client management, but resilient (retry, connectivity, cache, auth, log, priority, etc...)
-
+|Sentry Logging Extensions|TODO|TODO|TODO|
 
 ## Contributors
 * [Allan Ritchie](https://github.com/aritchie) - Project Lead
