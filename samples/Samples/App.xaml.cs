@@ -37,13 +37,14 @@ namespace Samples
 #if DEBUG
             Xamarin.Forms.Internals.Log.Listeners.Add(new TraceLogListener());
 #endif
-            containerRegistry.RegisterForNavigation<TestPage>("Test");
+            //containerRegistry.RegisterForNavigation<TestPage>("Test");
 
             containerRegistry.RegisterForNavigation<NavigationPage>("Nav");
             containerRegistry.RegisterForNavigation<MainPage>("Main");
             containerRegistry.RegisterForNavigation<WelcomePage>("Welcome");
             containerRegistry.RegisterForNavigation<BigTextViewPage>("BigText");
             containerRegistry.RegisterForNavigation<LogPage>("Logs");
+            containerRegistry.RegisterForNavigation<TestLogPage>("TestLogProviders");
             containerRegistry.RegisterForNavigation<DelegateNotificationsPage>("DelegateNotifications");
 
             containerRegistry.RegisterForNavigation<Gps.MainPage>("Gps");

@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Shiny;
 using Shiny.Notifications;
 using Shiny.Testing;
-using Samples.Settings;
 using Samples.Infrastructure;
 using Samples.Jobs;
 using Samples.HttpTransfers;
@@ -30,9 +29,9 @@ namespace Samples
             builder.AddConsole(opts =>
                 opts.LogToStandardErrorThreshold = LogLevel.Debug
             );
-            builder.AddSqliteLogging(LogLevel.Warning);
-            builder.AddFirebase(LogLevel.Warning);
-            builder.AddAppCenter(Constants.AndroidAppCenterToken, LogLevel.Warning);
+            //builder.AddSqliteLogging(LogLevel.Warning);
+            //builder.AddFirebase(LogLevel.Warning);
+            //builder.AddAppCenter(Constants.AndroidAppCenterToken, LogLevel.Warning);
         }
 
 

@@ -5,7 +5,7 @@ using ReactiveUI.Fody.Helpers;
 using Shiny.Stores;
 
 
-namespace Samples.Settings
+namespace Samples.Stores
 {
     public class BindViewModel : ViewModel
     {

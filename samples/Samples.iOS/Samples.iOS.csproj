@@ -206,6 +206,10 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
+      <Project>{11ec9d9d-3502-4a4a-94aa-5bdb1b20bb8e}</Project>
+      <Name>Shiny.Locations.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj">
       <Project>{80421dcd-e1be-404f-b3a3-8bcee3b79dd2}</Project>
       <Name>Shiny.Logging.Firebase</Name>
@@ -280,7 +284,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties TriggeredFromHotReload="False" XamarinHotReloadMonoInterpreterErrorInfoBarSamplesiOSHideInfoBar="True" />
+      <UserProperties XamarinHotReloadMonoInterpreterErrorInfoBarSamplesiOSHideInfoBar="True" TriggeredFromHotReload="False" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
