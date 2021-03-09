@@ -270,6 +270,10 @@
       <Project>{4273A168-9E9E-4E46-A6D6-96A3B788321F}</Project>
       <Name>Shiny.BluetoothLE.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj">
+      <Project>{CE8697F2-0F6E-4E05-BD46-5A20B9F4C4DC}</Project>
+      <Name>Shiny.Logging.AppCenter</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\60.png" />

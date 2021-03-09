@@ -16,17 +16,15 @@ namespace Shiny
                                         string appCenterSecret,
                                         LogLevel logLevel = LogLevel.Warning)
         {
-            if (String.IsNullOrWhiteSpace(appCenterSecret) || logLevel == LogLevel.Warning)
-                return;
-
             builder.AddProvider(new AppCenterLoggerProvider(logLevel));
-            var list = new List<Type>(2);
-            list.Add(typeof(Crashes));
-
-            if (logLevel <= LogLevel.Information)
-                list.Add(typeof(Analytics));
-
-            AppCenter.Start(appCenterSecret, list.ToArray());
+            if (!String.IsNullOrWhiteSpace(appCenterSecret))
+            {
+                AppCenter.Start(
+                    appCenterSecret,
+                    typeof(Crashes),
+                    typeof(Analytics)
+                );
+            }
         }
     }
 }

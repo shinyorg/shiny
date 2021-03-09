@@ -29,9 +29,9 @@ namespace Samples
             builder.AddConsole(opts =>
                 opts.LogToStandardErrorThreshold = LogLevel.Debug
             );
-            //builder.AddSqliteLogging(LogLevel.Warning);
+            builder.AddSqliteLogging(LogLevel.Warning);
             //builder.AddFirebase(LogLevel.Warning);
-            //builder.AddAppCenter(Constants.AndroidAppCenterToken, LogLevel.Warning);
+            builder.AddAppCenter(Constants.AppCenterToken, LogLevel.Warning);
         }
 
 
