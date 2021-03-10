@@ -1,0 +1,47 @@
+<Project Sdk="MSBuild.Sdk.Extras">
+
+    <PropertyGroup>
+        <Description>Shiny Tests</Description>
+        <TargetFrameworks>netstandard2.0;netcoreapp3.1;xamarin.ios10;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <Compile Remove="Platforms\**\*.cs" />
+        <None Include="Platforms\**\*.cs" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="xunit" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
+        <ProjectReference Include="...\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\netcore\**\*.cs" />
+        <PackageReference Include="xunit.runner.visualstudio">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\iOS\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Uwp\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\Android\**\*.cs" />
+    </ItemGroup>
+
+</Project>
