@@ -30,12 +30,12 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
-        public static bool UseGeofencing(this IServiceCollection services, Type geofenceDelegateType, bool requestPermissionOnStart = false)
+        public static bool UseGeofencing(this IServiceCollection services, Type geofenceDelegateType)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new GeofenceModule(geofenceDelegateType, requestPermissionOnStart));
+            services.RegisterModule(new GeofenceModule(geofenceDelegateType));
             return true;
 #endif
         }
@@ -48,12 +48,12 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
-        public static bool UseGeofencing<T>(this IServiceCollection services, bool requestPermissionOnStart = false) where T : class, IGeofenceDelegate
+        public static bool UseGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new GeofenceModule(typeof(T), requestPermissionOnStart));
+            services.RegisterModule(new GeofenceModule(typeof(T)));
             return true;
 #endif
         }
@@ -67,8 +67,8 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
-        public static bool UseGpsDirectGeofencing<T>(this IServiceCollection services, bool requestPermissionOnStart = false) where T : class, IGeofenceDelegate
-            => services.UseGpsDirectGeofencing(typeof(T), requestPermissionOnStart);
+        public static bool UseGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
+            => services.UseGpsDirectGeofencing(typeof(T));
 
 
         /// <summary>
@@ -79,12 +79,12 @@ namespace Shiny
         /// <param name="delegateType"></param>
         /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
-        public static bool UseGpsDirectGeofencing(this IServiceCollection services, Type delegateType, bool requestPermissionOnStart = false)
+        public static bool UseGpsDirectGeofencing(this IServiceCollection services, Type delegateType)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new GeofenceGpsDirectModule(delegateType, requestPermissionOnStart));
+            services.RegisterModule(new GeofenceGpsDirectModule(delegateType));
             return true;
 #endif
         }
@@ -100,7 +100,7 @@ namespace Shiny
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new GpsModule(null, null));
+            services.RegisterModule(new GpsModule(null));
             return true;
 #endif
         }
@@ -111,15 +111,14 @@ namespace Shiny
         /// </summary>
         /// <param name="delegateType">The IGpsDelegate to call</param>
         /// <param name="services">The servicecollection to configure</param>
-        /// <param name="requestIfPermissionGranted">This will be used when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
         /// <returns></returns>
 
-        public static bool UseGps(this IServiceCollection services, Type? delegateType, GpsRequest? requestIfPermissionGranted = null)
+        public static bool UseGps(this IServiceCollection services, Type? delegateType)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new GpsModule(delegateType, requestIfPermissionGranted));
+            services.RegisterModule(new GpsModule(delegateType));
             return true;
 #endif
         }
@@ -132,7 +131,7 @@ namespace Shiny
         /// <param name="services">The servicecollection to configure</param>
         /// <param name="requestIfPermissionGranted">This will be used when permission is given to use GPS functionality (background permission is assumed when calling this - setting your GPS request to not use background is ignored)</param>
         /// <returns></returns>
-        public static bool UseGps<T>(this IServiceCollection services, GpsRequest? requestIfPermissionGranted = null) where T : class, IGpsDelegate
-            => services.UseGps(typeof(T), requestIfPermissionGranted);
+        public static bool UseGps<T>(this IServiceCollection services) where T : class, IGpsDelegate
+            => services.UseGps(typeof(T));
     }
 }
