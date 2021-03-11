@@ -6,10 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{482108EE-8D47-4693-80B4-B609B536491B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		src\Directory.build.props = src\Directory.build.props
-		Directory.Build.targets = Directory.Build.targets
 		LICENSE.md = LICENSE.md
-		src\nuget.png = src\nuget.png
 		Packages.props = Packages.props
 		readme.md = readme.md
 	EndProjectSection
@@ -30,12 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Net.Http", "src\Shiny
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1DC43C21-5765-4B46-95F9-CDECB851DF94}"
 	ProjectSection(SolutionItems) = preProject
-		build.sh = build.sh
-		builddocs.ps1 = builddocs.ps1
 		.github\CODE_OF_CONDUCT.md = .github\CODE_OF_CONDUCT.md
 		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
 		.github\FUNDING.yml = .github\FUNDING.yml
-		global.json = global.json
 		.github\issue-close-app.yml = .github\issue-close-app.yml
 		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
 		.github\noresponse.yml = .github\noresponse.yml
@@ -81,14 +75,26 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Locations.Common", "src\Shiny.Locations.Common\Shiny.Locations.Common.csproj", "{4EE9F1FF-EE8C-4D1F-8687-7DFE368C13A4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C114E37-36C8-4971-91C6-E2557DDCB4E8}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.build.props = tests\Directory.build.props
+		tests\global.json = tests\global.json
+		tests\xunit.runner.json = tests\xunit.runner.json
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{5433A26B-8DCF-4162-9DAB-1804D5E20F4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{5433A26B-8DCF-4162-9DAB-1804D5E20F4D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Tests.Android", "tests\Shiny.Tests.Android\Shiny.Tests.Android.csproj", "{CFB76876-C9B0-4567-A078-1E89DF744073}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Tests.iOS", "tests\Shiny.Tests.iOS\Shiny.Tests.iOS.csproj", "{8206C665-DCDE-48EF-894B-54068197F5C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Tests.Uwp", "tests\Shiny.Tests.Uwp\Shiny.Tests.Uwp.csproj", "{44D55ACD-4DF7-41C7-9AD9-59EB4AD427D0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6374E4D9-1BD8-4880-B603-AFDEA8345D7E}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.build.props = src\Directory.build.props
+		src\global.json = src\global.json
+		src\nuget.png = src\nuget.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1561,9 +1567,28 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{007465D6-5714-4E7E-929D-6F01D04E43B6} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{5A0DD7A1-E497-4051-84B0-2E16B015E012} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{BE287E27-B7BC-44F5-8E0D-2F1A6E016D47} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{E76DB2CB-7A95-40B0-9A50-230320554B6B} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{34905983-1F79-4B74-9BB0-D1DC7D24B8BF} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{B2E9F094-425F-4899-A979-338C940A917B} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{22AD683C-25C2-45C9-8FD0-74E9A43628FB} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{204B1F42-0D9C-4349-87C5-34148E3D170A} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
+		{271E5317-66E3-4E0F-A08B-7CE89B395237} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{48AE87AB-C0FE-4426-860C-2C5808E10238} = {1DC43C21-5765-4B46-95F9-CDECB851DF94}
+		{B7855E77-9363-4F36-9A0D-FC9277A88F8D} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{16D0CFB9-FCC9-4DA0-AADC-EB25389DD341} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{97545AAF-579F-4334-AFD8-9D3E17832F5E} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{D7F94901-2960-4BA0-ACB2-280761E70AF0} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{DA7EE0F6-E80E-4470-BEC3-D5FEE5A6073D} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{886F6FF7-2E92-488A-9011-B5C333B6BD54} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{8321BD6B-4C38-4707-8E36-4D7140557497} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{16432E04-5481-4852-A535-18F3F81624E3} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{74207658-2BA6-403B-B608-1B8B4D9FA130} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{830A51D5-64DB-459F-8557-E36AC06BC2A1} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
+		{5B569BCC-B60C-4224-BABC-77DD1F193F4B} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
+		{4EE9F1FF-EE8C-4D1F-8687-7DFE368C13A4} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{5433A26B-8DCF-4162-9DAB-1804D5E20F4D} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
 		{CFB76876-C9B0-4567-A078-1E89DF744073} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
 		{8206C665-DCDE-48EF-894B-54068197F5C5} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}

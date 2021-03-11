@@ -1,17 +1,15 @@
-<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
         <Description>Shiny Tests</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.17763;$(TargetFrameworks)</TargetFrameworks>
-        <LangVersion>8.0</LangVersion>
-        <ExtrasUwpMetaPackageVersion>6.2.12</ExtrasUwpMetaPackageVersion>
-        <Nullable>enable</Nullable>
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
+        <None Remove="C:\dev\shinylibs\shiny\tests\nuget.png" />
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="Moq" />
@@ -23,10 +21,10 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
-        <ProjectReference Include=".$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
-   <!-- <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
+    <!-- <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
         <ProjectReference Include=".$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\netcore\**\*.cs" />
         <Compile Include="Platforms\shared\**\*.cs" />
