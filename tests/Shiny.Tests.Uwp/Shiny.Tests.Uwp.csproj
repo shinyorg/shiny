@@ -150,15 +150,9 @@
         </Page>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-            <Version>6.2.11</Version>
-        </PackageReference>
-        <PackageReference Include="Xamarin.Forms">
-            <Version>5.0.0.2012</Version>
-        </PackageReference>
-        <PackageReference Include="xunit.runner.devices">
-            <Version>2.5.25</Version>
-        </PackageReference>
+        <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" />
+        <PackageReference Include="Xamarin.Forms" />
+        <PackageReference Include="xunit.runner.devices" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">

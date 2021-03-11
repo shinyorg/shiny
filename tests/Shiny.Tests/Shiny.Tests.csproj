@@ -2,8 +2,11 @@
 
     <PropertyGroup>
         <Description>Shiny Tests</Description>
-        <TargetFrameworks>netstandard2.0;netcoreapp3.1;xamarin.ios10;monoandroid10.0</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">uap10.0.17763;$(TargetFrameworks)</TargetFrameworks>
+        <LangVersion>8.0</LangVersion>
+        <ExtrasUwpMetaPackageVersion>6.2.12</ExtrasUwpMetaPackageVersion>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,11 +16,20 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="Moq" />
         <PackageReference Include="xunit" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Beacons\Shiny.Beacons.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Locations\Shiny.Locations.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Integrations.Sqlite\Shiny.Integrations.Sqlite.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Testing\Shiny.Testing.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
-        <ProjectReference Include="...\..\src\Shiny.Core\Shiny.Core.csproj" />
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <ProjectReference Include=".$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+   <!-- <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
+        <ProjectReference Include=".$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\netcore\**\*.cs" />
+        <Compile Include="Platforms\shared\**\*.cs" />
         <PackageReference Include="xunit.runner.visualstudio">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,21 +38,27 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-    </ItemGroup>
+    </ItemGroup>-->
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
-        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
-        <Compile Include="Platforms\iOS\**\*.cs" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <Compile Include="Platforms\*ios*\**\*.cs" />
+        <Compile Include="Platforms\shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
-        <Compile Include="Platforms\Uwp\**\*.cs" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <Compile Include="Platforms\*uwp*\**\*.cs" />
+        <Compile Include="Platforms\shared\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
-        <Compile Include="Platforms\Android\**\*.cs" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <Compile Include="Platforms\*android*\**\*.cs" />
+        <Compile Include="Platforms\shared\**\*.cs" />
     </ItemGroup>
 
 </Project>

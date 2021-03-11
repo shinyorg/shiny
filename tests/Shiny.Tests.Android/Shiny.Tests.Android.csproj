@@ -18,7 +18,6 @@
         <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
         <AndroidResgenClass>Resource</AndroidResgenClass>
         <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-        <AndroidUseLatestPlatformSdk>false</AndroidUseLatestPlatformSdk>
         <TargetFrameworkVersion>v11.0</TargetFrameworkVersion>
         <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
         <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
@@ -100,15 +99,9 @@
         <Folder Include="Resources\drawable\" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.2.0.5" />
-        <PackageReference Include="Xamarin.Forms">
-            <Version>5.0.0.2012</Version>
-        </PackageReference>
-        <PackageReference Include="Xamarin.Google.Android.Material" Version="1.0.0.1" />
-        <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
-        <PackageReference Include="xunit.runner.devices">
-            <Version>2.5.25</Version>
-        </PackageReference>
+        <PackageReference Include="Xamarin.Forms" />
+        <PackageReference Include="Xamarin.Essentials" />
+        <PackageReference Include="xunit.runner.devices" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">
