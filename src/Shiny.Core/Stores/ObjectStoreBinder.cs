@@ -9,8 +9,26 @@ namespace Shiny.Stores
 {
     public interface IObjectStoreBinder
     {
+        /// <summary>
+        /// Attempts to bind an object to a named store, if the alias is not passed, the binder will look at the attribute
+        /// </summary>
+        /// <param name="npc"></param>
+        /// <param name="keyValueStoreAlias"></param>
         void Bind(INotifyPropertyChanged npc, string? keyValueStoreAlias = null);
+
+
+        /// <summary>
+        /// Binds an object to a given store
+        /// </summary>
+        /// <param name="npc"></param>
+        /// <param name="store"></param>
         void Bind(INotifyPropertyChanged npc, IKeyValueStore store);
+
+
+        /// <summary>
+        /// Unbinds an object from whatever store it was bound to
+        /// </summary>
+        /// <param name="npc"></param>
         void UnBind(INotifyPropertyChanged npc);
     }
 
@@ -28,14 +46,23 @@ namespace Shiny.Stores
         }
 
 
-
         public void Bind(INotifyPropertyChanged npc, string? keyValueStoreAlias = null)
-            => this.Bind(
-                npc,
-                keyValueStoreAlias == null
-                    ? this.factory.DefaultStore
-                    : this.factory.GetStore(keyValueStoreAlias)
-            );
+        {
+            var store = this.factory.DefaultStore;
+
+            if (keyValueStoreAlias != null)
+            {
+                store = this.factory.GetStore(keyValueStoreAlias);
+            }
+            else
+            {
+                keyValueStoreAlias = npc.GetType().GetCustomAttribute<ObjectStoreBinderAttribute>()?.StoreAlias;
+                if (keyValueStoreAlias != null)
+                    store = this.factory.GetStore(keyValueStoreAlias); // error if attribute is bad
+            }
+
+            this.Bind(npc, store);
+        }
 
 
         public void Bind(INotifyPropertyChanged npc, IKeyValueStore store)
