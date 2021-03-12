@@ -11,12 +11,6 @@
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-        <!--<Compile Include="$(MSBuildThisFileDirectory)CSharp9Hack.cs" />-->
-    </ItemGroup>
-
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
         <PackageReference Include="Microsoft.Windows.SDK.Contracts" />
     </ItemGroup>

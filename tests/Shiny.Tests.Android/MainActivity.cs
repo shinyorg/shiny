@@ -5,7 +5,7 @@ using Android.Content.PM;
 using Android.OS;
 using Xunit.Runners.UI;
 
-[assembly: Shiny.ShinyApplication(ShinyStartupTypeName = "Shiny.Device.Tests.TestStartup")]
+[assembly: Shiny.ShinyApplication(ShinyStartupTypeName = "Shiny.Tests.TestStartup")]
 
 
 namespace Shiny.Tests.Droid
@@ -22,9 +22,6 @@ namespace Shiny.Tests.Droid
         protected override void OnCreate(Bundle bundle)
         {
             this.ShinyOnCreate();
-
-            //UserDialogs.Init(() => this);
-            this.AddTestAssembly(typeof(TestStartup).Assembly);
             this.AddTestAssembly(Assembly.GetExecutingAssembly());
 
             //CrossBleAdapter.UseNewScanner = false;

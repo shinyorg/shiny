@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Device.Tests.UWP
+namespace Shiny.Tests.UWP
 {
     public sealed partial class MainPage
     {

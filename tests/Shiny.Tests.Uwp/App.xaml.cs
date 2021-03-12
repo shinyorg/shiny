@@ -3,7 +3,7 @@ using System.Reflection;
 using Xunit.Runners.UI;
 
 
-namespace Shiny.Device.Tests.Uwp
+namespace Shiny.Tests.Uwp
 {
     sealed partial class App : RunnerApplication
     {
