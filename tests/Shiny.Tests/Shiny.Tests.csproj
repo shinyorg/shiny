@@ -9,11 +9,12 @@
     <ItemGroup>
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
-        <None Remove="C:\dev\shinylibs\shiny\tests\nuget.png" />
+        <Reference Include="System.Xml.Linq" />
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="Moq" />
         <PackageReference Include="xunit" />
+        <PackageReference Include="Acr.UserDialogs" />
         <ProjectReference Include="$(SolutionDir)\src\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="$(SolutionDir)\src\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="$(SolutionDir)\src\Shiny.Integrations.Sqlite\Shiny.Integrations.Sqlite.csproj" />
@@ -22,6 +23,7 @@
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
         <ProjectReference Include="$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Testing\Shiny.Testing.csproj" />
     </ItemGroup>
 
     <!-- <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) ">
@@ -41,6 +43,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
         <ProjectReference Include="$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="$(SolutionDir)\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Testing\Shiny.Testing.csproj" />
         <Compile Include="Platforms\*ios*\**\*.cs" />
         <Compile Include="Platforms\shared\**\*.cs" />
     </ItemGroup>
@@ -48,6 +51,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="$(SolutionDir)\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Testing\Shiny.Testing.csproj" />
         <Compile Include="Platforms\*uwp*\**\*.cs" />
         <Compile Include="Platforms\shared\**\*.cs" />
     </ItemGroup>
@@ -55,6 +59,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <ProjectReference Include="$(SolutionDir)\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="$(SolutionDir)\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="$(SolutionDir)\src\Shiny.Testing\Shiny.Testing.csproj" />
         <Compile Include="Platforms\*android*\**\*.cs" />
         <Compile Include="Platforms\shared\**\*.cs" />
     </ItemGroup>

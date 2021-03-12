@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
-using Shiny.Testing.Locations;
 using Xunit;
+using Shiny.Testing.Locations;
 
 
 namespace Shiny.Locations.Tests

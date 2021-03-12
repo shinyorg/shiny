@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-
 using Shiny.Stores;
 using Xunit;
 
@@ -10,16 +9,18 @@ namespace Shiny.Device.Tests.Stores
 {
     public class StoreTests : IDisposable
     {
-        IKeyValueStore currentStore;
+        IKeyValueStore? currentStore;
 
 
         public static IEnumerable<object[]> Data => new List<object[]>
         {
-                new object[] { "settings" },
-                new object[] { "secure" },
-                new object[] { "file" },
-                new object[] { "memory" },
-                new object[] { "sqlite" }
+#if !WINDOWS_UWP
+            new object[] { "secure" },
+#endif
+            new object[] { "settings" },
+            new object[] { "file" },
+            new object[] { "memory" },
+            new object[] { "sqlite" }
         };
 
         public void Dispose()
