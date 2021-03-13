@@ -1,6 +1,6 @@
 ﻿using System;
-
 using Shiny.Stores;
+
 
 namespace Shiny
 {
@@ -12,7 +12,6 @@ namespace Shiny
         /// Thread safetied setting value incrementor
         /// </summary>
         /// <param name="store"></param>
-        /// <param name="name"></param>
         /// <returns></returns>
         public static int IncrementValue(this IKeyValueStore store, string key = "NextId")
         {

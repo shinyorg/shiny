@@ -1,5 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
+using FluentAssertions;
 using Shiny.Stores;
 using Xunit;
 
@@ -8,18 +8,64 @@ namespace Shiny.Tests.Stores
 {
     public partial class StoreTests
     {
-        [Category("Types")]
+        [Trait("Category", "Types")]
         [Theory]
         [MemberData(nameof(Data))]
-        public void Type_DateTimeOffset(IKeyValueStore store)
+        public void DateTimeOffsetTest(IKeyValueStore store)
         {
             this.currentStore = store;
             var dt = DateTimeOffset.Now;
             this.currentStore.Set("now", dt);
             var result = this.currentStore.Get<DateTimeOffset>("now");
-            Assert.Equal(dt, result);
+            dt.Should().Be(result);
         }
 
+
+        [Trait("Category", "Types")]
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void EnumTest(IKeyValueStore store)
+        {
+            this.currentStore = store;
+            this.currentStore.Set(nameof(EnumTest), MyTestEnum.Hi);
+            var value = this.currentStore.Get<MyTestEnum>(nameof(EnumTest));
+            value.Should().Be(MyTestEnum.Hi);
+        }
+
+
+        [Trait("Category", "Types")]
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void LongTest(IKeyValueStore store)
+        {
+            this.currentStore = store;
+            long value = 99;
+            this.currentStore.Set("LongTest", value);
+            var value2 = this.currentStore.Get<long>("LongTest");
+            Assert.Equal(value, value2);
+        }
+
+
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void EmptyGuidTest(IKeyValueStore store)
+        {
+            this.currentStore = store;
+            var empty = this.currentStore.Get<Guid>(nameof(EmptyGuidTest));
+            empty.Should().Be(Guid.Empty);
+        }
+
+
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void GuidTest(IKeyValueStore store)
+        {
+            this.currentStore = store;
+
+            var guid = new Guid();
+            this.currentStore.Set(nameof(GuidTest), guid);
+            this.currentStore.Get<Guid>(nameof(GuidTest)).Should().Be(guid);
+        }
 
         //[Theory]
         //[MemberData(nameof(Data))]
@@ -42,8 +88,6 @@ namespace Shiny.Tests.Stores
         //}
 
 
-
-
         //[Theory]
         //[MemberData(nameof(Data))]
         //public void DateTimeNullTest(IKeyValueStore store)
@@ -56,33 +100,6 @@ namespace Shiny.Tests.Stores
         //    this.currentStore.Set("DateTimeNullTest", dt);
         //    nvalue = this.currentStore.Get<DateTime?>("DateTimeNullTest");
         //    Assert.Equal(nvalue, dt);
-        //}
-
-
-
-
-        //[Theory]
-        //[MemberData(nameof(Data))]
-        //public void LongTest(IKeyValueStore store)
-        //{
-        //    this.currentStore = store;
-        //    long value = 1;
-        //    this.currentStore.Set("LongTest", value);
-        //    var value2 = this.currentStore.Get<long>("LongTest");
-        //    Assert.Equal(value, value2);
-        //}
-
-
-        //[Theory]
-        //[MemberData(nameof(Data))]
-        //public void GuidTest(IKeyValueStore store)
-        //{
-        //    this.currentStore = store;
-        //    Assert.Equal(this.currentStore.Get<Guid>("GuidTest"), Guid.Empty);
-
-        //    var guid = new Guid();
-        //    this.currentStore.Set("GuidTest", guid);
-        //    Assert.Equal(this.currentStore.Get<Guid>("GuidTest"), guid);
         //}
 
 

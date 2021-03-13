@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Shiny.Infrastructure;
 using Shiny.Models;
 using Shiny.Stores;
@@ -7,7 +6,6 @@ using Shiny.Stores;
 
 namespace Shiny.Integrations.Sqlite
 {
-    // TODO: what if I want this to be the default store?
     public class SqliteKeyValueStore : IKeyValueStore
     {
         readonly ShinySqliteConnection conn;
@@ -29,7 +27,6 @@ namespace Shiny.Integrations.Sqlite
 
         public object? Get(Type type, string key)
             => this.conn.GetConnection().Find<SettingStore>(key)?.GetValue();
-        // TODO: deserialize
 
         public void Clear()
             => this.conn.GetConnection().DeleteAll<SettingStore>();
@@ -37,13 +34,11 @@ namespace Shiny.Integrations.Sqlite
         public bool Remove(string key)
             => this.conn.GetConnection().Delete<SettingStore>(key) > 0;
 
-
         public void Set<T>(string key, T value) => this.DoSet(key, value);
         public void Set(string key, object value) => this.DoSet(key, value);
 
         protected virtual void DoSet(string key, object value)
         {
-            // TODO: serialize tests
             var store = new SettingStore { Key = key };
             store.SetValue(value);
             this.conn.GetConnection().InsertOrReplace(store);
