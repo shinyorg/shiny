@@ -150,11 +150,13 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="xunit" />
-    <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" />
-    <PackageReference Include="Xamarin.Forms" />
-    <PackageReference Include="xunit.runner.devices" />
+        <PackageReference Include="xunit.runner.devices" />
+        <PackageReference Include="Moq" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" />
+        <PackageReference Include="Xamarin.Forms" />
+        <PackageReference Include="Acr.UserDialogs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">

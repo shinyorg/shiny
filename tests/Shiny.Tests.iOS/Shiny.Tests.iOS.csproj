@@ -77,11 +77,13 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="xunit.runner.devices" />
     <PackageReference Include="xunit" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Moq" />
     <PackageReference Include="Xamarin.Essentials" />
     <PackageReference Include="Xamarin.Forms" />
-    <PackageReference Include="xunit.runner.devices" />
+    <PackageReference Include="Acr.UserDialogs" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">

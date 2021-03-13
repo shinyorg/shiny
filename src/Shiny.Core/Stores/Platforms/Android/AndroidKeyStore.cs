@@ -52,7 +52,7 @@ namespace Shiny.Stores
             // we want to use symmetric if we are >= 23 or we didn't set it previously.
 
             //useSymmetric = Preferences.Get(useSymmetricPreferenceKey, Platform.HasApiLevel(BuildVersionCodes.M), SecureStorage.Alias);
-            useSymmetric = this.clearStore.Get<bool>(useSymmetricPreferenceKey); // TODO: add base key
+            this.useSymmetric = this.clearStore.Get<bool>(useSymmetricPreferenceKey); // TODO: add base key
 
             // If >= API 23 we can use the KeyStore's symmetric key
             if (useSymmetric && !alwaysUseAsymmetricKey)
@@ -67,7 +67,7 @@ namespace Shiny.Stores
             // contained in one block.
 
             // Get the asymmetric key pair
-            var keyPair = GetAsymmetricKeyPair();
+            var keyPair = this.GetAsymmetricKeyPair();
 
             //var existingKeyStr = Preferences.Get(prefsMasterKey, null, alias);
             var existingKeyStr = this.clearStore.Get<string>(prefsMasterKey);
@@ -101,9 +101,8 @@ namespace Shiny.Stores
             var keyGenerator = KeyGenerator.GetInstance(aesAlgorithm);
             var defSymmetricKey = keyGenerator.GenerateKey();
 
-            var newWrappedKey = WrapKey(defSymmetricKey, keyPair.Public);
-
-            //Preferences.Set(prefsMasterKey, Convert.ToBase64String(newWrappedKey), alias);
+            var newWrappedKey = this.WrapKey(defSymmetricKey, keyPair.Public);
+            this.clearStore.Set(prefsMasterKey, Convert.ToBase64String(newWrappedKey));
 
             return defSymmetricKey;
         }
@@ -132,10 +131,11 @@ namespace Shiny.Stores
             return keyGenerator.GenerateKey();
         }
 
+
         KeyPair GetAsymmetricKeyPair()
         {
             // set that we generated keys on pre-m device.
-            this.clearStore.Set(useSymmetricPreferenceKey, "TODO:alias");
+            this.clearStore.Set(this.useSymmetricPreferenceKey, "TODO:alias");
 
             var asymmetricAlias = $"{alias}.asymmetric";
 

@@ -29,5 +29,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Stores\MyTestEnum.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Stores\StoreTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Stores\TestBind.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stores\ObjectBinderTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stores\StoreTests.Types.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stores\StoreTests.Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Stores\StoreTests.Base.cs" />
   </ItemGroup>
 </Project>
