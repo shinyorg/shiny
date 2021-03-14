@@ -5,6 +5,7 @@ using Shiny.Integrations.Sqlite;
 using Shiny.Stores;
 using Shiny.Testing;
 
+
 namespace Shiny.Tests.Core.Stores
 {
     public partial class StoreTests : IDisposable
@@ -19,9 +20,10 @@ namespace Shiny.Tests.Core.Stores
                 var serializer = new ShinySerializer();
                 IPlatform platform;
 #if __ANDROID__
-                platform = new AndroidPlatform(Android.App.Application.Context);
-                yield return new object[] { new SecureKeyValueStore(platform) };
-                yield return new object[] { new SettingsKeyValueStore(platform) };
+                platform = ShinyHost.Resolve<IPlatform>();
+
+                yield return new object[] { new SecureKeyValueStore((AndroidPlatform)platform, (IAndroidContext)platform, serializer) };
+                yield return new object[] { new SettingsKeyValueStore((IAndroidContext)platform, serializer) };
 #elif __IOS__
                 platform = new ApplePlatform();
                 yield return new object[] { new SecureKeyValueStore(platform, serializer) };
