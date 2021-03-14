@@ -4,7 +4,7 @@ using Shiny.Stores;
 using Xunit;
 
 
-namespace Shiny.Tests.Stores
+namespace Shiny.Tests.Core.Stores
 {
     public partial class StoreTests
     {

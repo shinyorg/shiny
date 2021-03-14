@@ -116,9 +116,3 @@ namespace Shiny.Stores
         }
     }
 }
-
-
-//protected override void NativeSet(Type type, string key, object value) => this.Do(prefs =>
-//{
-
-//});

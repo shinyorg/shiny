@@ -5,7 +5,7 @@ using Shiny.Integrations.Sqlite;
 using Shiny.Stores;
 using Shiny.Testing;
 
-namespace Shiny.Tests.Stores
+namespace Shiny.Tests.Core.Stores
 {
     public partial class StoreTests : IDisposable
     {

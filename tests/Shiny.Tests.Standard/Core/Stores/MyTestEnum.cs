@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Tests.Stores
+namespace Shiny.Tests.Core.Stores
 {
     public enum MyTestEnum
     {

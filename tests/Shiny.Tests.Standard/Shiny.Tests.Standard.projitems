@@ -21,17 +21,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)Core\Repositories\SqliteRepositoryTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Serialization\BaseSerializationTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Core\Serialization\JsonSerializationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\AttributeTestBind.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Locations\DistanceTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Locations\GeofenceRegionTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Locations\GpsGeofenceDelegateTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Locations\MotionActivityTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Locations\PositionTests.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Stores\MyTestEnum.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Stores\StoreTests.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Stores\TestBind.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Stores\ObjectBinderTests.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Stores\StoreTests.Types.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Stores\StoreTests.Extensions.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Stores\StoreTests.Base.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\MyTestEnum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\TestBind.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.ObjectBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Types.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Base.cs" />
   </ItemGroup>
 </Project>

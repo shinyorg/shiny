@@ -48,7 +48,7 @@ namespace Shiny.Stores
 
         public void Bind(INotifyPropertyChanged npc, string? keyValueStoreAlias = null)
         {
-            var store = this.factory.DefaultStore;
+            IKeyValueStore? store = null;
 
             if (keyValueStoreAlias != null)
             {
@@ -61,7 +61,7 @@ namespace Shiny.Stores
                     store = this.factory.GetStore(keyValueStoreAlias); // error if attribute is bad
             }
 
-            this.Bind(npc, store);
+            this.Bind(npc, store ?? this.factory.DefaultStore);
         }
 
 
@@ -115,8 +115,32 @@ namespace Shiny.Stores
                 if (!this.bindings.ContainsKey(sender))
                     throw new ArgumentException("No key/value store found for current binding object - " + sender.GetType().FullName);
 
-                this.bindings[sender].Set(key, value);
+                var store = this.bindings[sender];
+                if (IsNullOrDefault(value))
+                {
+                    store.Remove(key);
+                }
+                else
+                {
+                    store.Set(key, value);
+                }
             }
+        }
+
+
+        static bool IsNullOrDefault(object obj)
+        {
+            var type = obj.GetType();
+            if (Nullable.GetUnderlyingType(type) != null)
+                return false;
+
+            if (type.IsValueType)
+            {
+                var def = Activator.CreateInstance(type);
+                return obj.Equals(def);
+            }
+
+            return false;
         }
     }
 }

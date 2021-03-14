@@ -14,7 +14,7 @@ namespace Shiny.Stores
 
         public SecureKeyValueStore(IPlatform platform, ISerializer serializer)
         {
-            this.Service = $"{platform.AppIdentifier}.shiny";
+            this.Service = $"{platform.AppIdentifier}.secure";
             this.serializer = serializer;
         }
 
@@ -76,11 +76,7 @@ namespace Shiny.Stores
         }
 
 
-        public void Set<T>(string key, T value) => this.DoSet(key, value);
-        public void Set(string key, object value) => this.DoSet(key, value);
-
-
-        protected virtual void DoSet(string key, object value)
+        public void Set(string key, object value)
         {
             this.Remove(key);
 

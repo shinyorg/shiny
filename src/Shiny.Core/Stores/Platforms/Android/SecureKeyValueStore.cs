@@ -13,10 +13,13 @@ namespace Shiny.Stores
         readonly ISerializer serializer;
 
 
-        public SecureKeyValueStore(IAndroidContext context, ISerializer serializer)
+        public SecureKeyValueStore(IPlatform platform,
+                                   IAndroidContext context,
+                                   ISerializer serializer)
         {
+
             this.settingsStore = new SettingsKeyValueStore(context, serializer);
-            this.keyStore = new AndroidKeyStore(context, this.settingsStore, "TODO: alias", false);
+            this.keyStore = new AndroidKeyStore(context, this.settingsStore, $"{platform.AppIdentifier}.secure", false);
             this.serializer = serializer;
         }
 

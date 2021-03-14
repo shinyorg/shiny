@@ -4,7 +4,7 @@ using Shiny.Stores;
 using Xunit;
 
 
-namespace Shiny.Tests.Stores
+namespace Shiny.Tests.Core.Stores
 {
     public partial class StoreTests
     {
@@ -42,9 +42,9 @@ namespace Shiny.Tests.Stores
         public void SetDefault(IKeyValueStore store)
         {
             this.currentStore = store;
-            Assert.True(this.currentStore.SetDefault(nameof(SetDefault), "Initial Value"), "Default value could not be set");
-            Assert.False(this.currentStore.SetDefault(nameof(SetDefault), "Second Value"), "Default value was set and should not have been");
-            Assert.Equal("Initial Value", this.currentStore.Get<string>(nameof(SetDefault)));
+            this.currentStore.SetDefault(nameof(SetDefault), "Initial Value").Should().BeTrue("Default value could not be set");
+            this.currentStore.SetDefault(nameof(SetDefault), "Second Value").Should().BeFalse("Default value was set and should not have been");
+            this.currentStore.Get<string>(nameof(SetDefault)).Should().Be("Initial Value");
         }
     }
 }

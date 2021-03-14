@@ -19,37 +19,110 @@ namespace Shiny.Stores
 
 
         public string Alias => "settings";
-        public void Clear() => this.UoW(x => x.Clear());
-        public bool Contains(string key) => this.GetValue(x => x.Contains(key));
+        public void Clear() => this.Do((_, edit) => edit.Clear());
+        public bool Contains(string key)
+        {
+            lock (this.syncLock)
+                return this.GetPrefs().Contains(key);
+        }
+
+
         public object? Get(Type type, string key)
         {
-            return null;
+            lock (this.syncLock)
+            {
+                using (var prefs = this.GetPrefs())
+                {
+                    if (!prefs.Contains(key))
+                        return null;
+
+                    var typeCode = Type.GetTypeCode(type);
+                    switch (typeCode)
+                    {
+                        case TypeCode.Boolean:
+                            return prefs.GetBoolean(key, false);
+
+                        case TypeCode.Int32:
+                            return prefs.GetInt(key, 0);
+
+                        case TypeCode.Int64:
+                            return prefs.GetLong(key, 0);
+
+                        case TypeCode.Single:
+                            return prefs.GetFloat(key, 0);
+
+                        case TypeCode.String:
+                            return prefs.GetString(key, String.Empty);
+
+                        default:
+                            var @string = prefs.GetString(key, String.Empty);
+                            return this.serializer.Deserialize(type, @string);
+                    }
+                }
+            }
         }
 
 
-        public bool Remove(string key) => throw new NotImplementedException();
-        public void Set(string key, object value)
+        public bool Remove(string key)
         {
+            var removed = false;
+            this.Do((prefs, edit) =>
+            {
+                if (prefs.Contains(key))
+                {
+                    edit.Remove(key);
+                    removed = true;
+                }
+            });
+            return removed;
         }
+
+
+        public void Set(string key, object value) => this.Do((prefs, edit) =>
+        {
+            var typeCode = Type.GetTypeCode(value.GetType());
+            switch (typeCode)
+            {
+                case TypeCode.Boolean:
+                    edit.PutBoolean(key, (bool)value);
+                    break;
+
+                case TypeCode.Int32:
+                    edit.PutInt(key, (int)value);
+                    break;
+
+                case TypeCode.Int64:
+                    edit.PutLong(key, (long)value);
+                    break;
+
+                case TypeCode.Single:
+                    edit.PutFloat(key, (float)value);
+                    break;
+
+                case TypeCode.String:
+                    edit.PutString(key, (string)value);
+                    break;
+
+                default:
+                    var @string = this.serializer.Serialize(value);
+                    edit.PutString(key, @string);
+                    break;
+            }
+        });
 
 
         readonly object syncLock = new object();
-        T GetValue<T>(Func<ISharedPreferences, T> doWork)
+        void Do(Action<ISharedPreferences, ISharedPreferencesEditor> doWork)
         {
             lock (this.syncLock)
             {
-                var prefs = this.GetPrefs();
-                return doWork(prefs);
-            }
-        }
-        void UoW(Action<ISharedPreferencesEditor> doWork)
-        {
-            lock (this.syncLock)
-            {
-                using (var editor = this.GetPrefs().Edit()!)
+                using (var prefs = this.GetPrefs())
                 {
-                    doWork(editor);
-                    editor.Commit();
+                    using (var editor = prefs.Edit()!)
+                    {
+                        doWork(prefs, editor);
+                        editor.Commit();
+                    }
                 }
             }
         }
