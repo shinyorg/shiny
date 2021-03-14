@@ -135,15 +135,14 @@ namespace Shiny.Stores
 
         static bool IsNullOrDefault(object obj)
         {
-            var result = true;
+            if (obj == null)
+                return true;
 
-            if (obj != null)
-            {
-                var type = obj.GetType();
-                if (type.IsValueType)
-                    result = Activator.CreateInstance(type).Equals(obj);
-            }
-            return result;
+            var type = obj.GetType();
+            if (type.IsValueType)
+                return Activator.CreateInstance(type).Equals(obj);
+
+            return false;
         }
     }
 }
