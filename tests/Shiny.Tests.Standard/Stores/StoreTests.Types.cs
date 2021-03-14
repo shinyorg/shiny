@@ -48,18 +48,7 @@ namespace Shiny.Tests.Stores
         }
 
 
-        [Theory]
-        [MemberData(nameof(Data))]
-        public void EmptyGuidTest(IKeyValueStore store)
-        {
-            this.currentStore = store;
-            this.currentStore
-                .Get(typeof(Guid), nameof(EmptyGuidTest))
-                .Should()
-                .Be(Guid.Empty);
-        }
-
-
+        [Trait("Category", "Types")]
         [Theory]
         [MemberData(nameof(Data))]
         public void GuidTest(IKeyValueStore store)
