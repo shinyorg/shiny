@@ -21,7 +21,6 @@ namespace Shiny.Stores
         public string Alias => "settings";
         public void Clear() => this.UoW(x => x.Clear());
         public bool Contains(string key) => this.GetValue(x => x.Contains(key));
-        public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
         public object? Get(Type type, string key)
         {
             return null;
@@ -29,7 +28,6 @@ namespace Shiny.Stores
 
 
         public bool Remove(string key) => throw new NotImplementedException();
-        public void Set<T>(string key, T value) => throw new NotImplementedException();
         public void Set(string key, object value)
         {
         }

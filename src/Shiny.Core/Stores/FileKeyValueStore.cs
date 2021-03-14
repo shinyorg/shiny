@@ -37,7 +37,6 @@ namespace Shiny.Stores
 
 
         public bool Contains(string key) => this.Do(x => x.ContainsKey(key), false);
-        public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
         public object? Get(Type type, string key) => this.Do(values =>
             values.ContainsKey(key) ? values[key] : null
         , false);

@@ -8,12 +8,12 @@ on:
         required: true
         default: 'warning'
   push:
-    branches: [ master, 'main', dev, preview ]
+    branches: [ master, main, dev, preview ]
     paths:
     - "src/**"
     - ".github/workflows/**"
   pull_request:
-    branches: [ master, 'main', dev ]
+    branches: [ master, main, dev ]
     paths:
     - "src/**"
 

@@ -18,7 +18,6 @@ namespace Shiny.Stores
         public string Alias => "settings";
         public void Clear() => this.Container.Values.Clear();
         public bool Contains(string key) => this.Container.Values.ContainsKey(key);
-        public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
         public object? Get(Type type, string key)
         {
             if (!this.Contains(key))

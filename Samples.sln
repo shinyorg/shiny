@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{3D16168F-A0F7-4B3F-BBF2-2AB1338B8840}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\samples.yml = .github\workflows\samples.yml
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "samples\Samples\Samples.csproj", "{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}"
 EndProject
@@ -70,9 +73,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Locations.Common", "src\Shiny.Locations.Common\Shiny.Locations.Common.csproj", "{11EC9D9D-3502-4A4A-94AA-5BDB1B20BB8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Logging.AppCenter", "src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj", "{CE8697F2-0F6E-4E05-BD46-5A20B9F4C4DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.AppCenter", "src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj", "{CE8697F2-0F6E-4E05-BD46-5A20B9F4C4DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Logging.Firebase", "src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj", "{80421DCD-E1BE-404F-B3A3-8BCEE3B79DD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.Firebase", "src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj", "{80421DCD-E1BE-404F-B3A3-8BCEE3B79DD2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

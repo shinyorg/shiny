@@ -1,128 +1,126 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Text;
-using Windows.Security.Cryptography.DataProtection;
-using Windows.Storage;
-using Shiny.Infrastructure;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Reactive.Linq;
+//using System.Reactive.Subjects;
+//using System.Text;
+//using Windows.Security.Cryptography.DataProtection;
+//using Windows.Storage;
+//using Shiny.Infrastructure;
 
 
-namespace Shiny.Stores
-{
-    public class SecureKeyValueStore : IKeyValueStore
-    {
-        readonly Subject<KeyValuePair<string, object>> flushReq;
-        readonly SettingsKeyValueStore settingsStore;
+//namespace Shiny.Stores
+//{
+//    public class SecureKeyValueStore : IKeyValueStore
+//    {
+//        readonly Subject<KeyValuePair<string, object>> flushReq;
+//        readonly SettingsKeyValueStore settingsStore;
 
 
-        public SecureKeyValueStore(ISerializer serializer)
-        {
-            this.settingsStore = new SettingsKeyValueStore(serializer) { ContainerName = "ShinySecure" };
-            this.flushReq = new Subject<KeyValuePair<string, object>>();
+//        public SecureKeyValueStore(ISerializer serializer)
+//        {
+//            this.settingsStore = new SettingsKeyValueStore(serializer) { ContainerName = "ShinySecure" };
+//            this.flushReq = new Subject<KeyValuePair<string, object>>();
 
-            this.flushReq
-                .Throttle(TimeSpan.FromSeconds(500))
-                .Subscribe(_ =>
-                {
-                    var provider = new DataProtectionProvider("LOCAL=user");
+//            this.flushReq
+//                .Throttle(TimeSpan.FromSeconds(500))
+//                .Subscribe(_ =>
+//                {
+//                    var provider = new DataProtectionProvider("LOCAL=user");
 
-                    // iterate through ALL values?
-                    //var bytes = Encoding.UTF8.GetBytes(data);
-                    //provider.ProtectAsync()
-                });
-        }
-
-
-        public string Alias => "secure";
-        public void Clear() => this.settingsStore.Clear();
-        public bool Contains(string key) => this.settingsStore.Contains(key);
-        public T? Get<T>(string key) => throw new NotImplementedException();
-        public object? Get(Type type, string key)
-        {
-            // ITERATE THROUGH ALL VALUES AND UNENCRYPT to mem dictionary?
-            //var data = this.settingsStore.Get<byte[]>(key);
-            //if (data == null)
-            //    return null;
-
-            //var provider = new DataProtectionProvider();
-            //var buffer = await provider.UnprotectAsync(data);
-            //var value = Encoding.UTF8.GetString(buffer.ToArray());
-            return null;
-        }
-        public bool Remove(string key) => this.settingsStore.Remove(key);
-        public void Set<T>(string key, T value) => this.DoSet(key, value);
-        public void Set(string key, object value) => this.DoSet(key, value);
+//                    // iterate through ALL values?
+//                    //var bytes = Encoding.UTF8.GetBytes(data);
+//                    //provider.ProtectAsync()
+//                });
+//        }
 
 
-        void DoSet(string key, object value)
-        {
+//        public string Alias => "secure";
+//        public void Clear() => this.settingsStore.Clear();
+//        public bool Contains(string key) => this.settingsStore.Contains(key);
+//        public object? Get(Type type, string key)
+//        {
+//            // ITERATE THROUGH ALL VALUES AND UNENCRYPT to mem dictionary?
+//            //var data = this.settingsStore.Get<byte[]>(key);
+//            //if (data == null)
+//            //    return null;
+
+//            //var provider = new DataProtectionProvider();
+//            //var buffer = await provider.UnprotectAsync(data);
+//            //var value = Encoding.UTF8.GetString(buffer.ToArray());
+//            return null;
+//        }
+//        public bool Remove(string key) => this.settingsStore.Remove(key);
+//        public void Set(string key, object value) => this.DoSet(key, value);
 
 
-            //Encoding.UTF8.GetString(buffer.ToArray());
+//        void DoSet(string key, object value)
+//        {
 
-        }
 
-        //static async Task<string> PlatformGetAsync(string key)
-        //{
-        //    var settings = GetSettings(Alias);
+//            //Encoding.UTF8.GetString(buffer.ToArray());
 
-        //    var encBytes = settings.Values[key] as byte[];
+//        }
 
-        //    if (encBytes == null)
-        //        return null;
+//        //static async Task<string> PlatformGetAsync(string key)
+//        //{
+//        //    var settings = GetSettings(Alias);
 
-        //    var provider = new DataProtectionProvider();
+//        //    var encBytes = settings.Values[key] as byte[];
 
-        //    var buffer = await provider.UnprotectAsync(encBytes.AsBuffer());
+//        //    if (encBytes == null)
+//        //        return null;
 
-        //    return Encoding.UTF8.GetString(buffer.ToArray());
-        //}
+//        //    var provider = new DataProtectionProvider();
 
-        //static async Task PlatformSetAsync(string key, string data)
-        //{
-        //    var settings = GetSettings(Alias);
+//        //    var buffer = await provider.UnprotectAsync(encBytes.AsBuffer());
 
-        //    var bytes = Encoding.UTF8.GetBytes(data);
+//        //    return Encoding.UTF8.GetString(buffer.ToArray());
+//        //}
 
-        //    // LOCAL=user and LOCAL=machine do not require enterprise auth capability
-        //    var provider = new DataProtectionProvider("LOCAL=user");
+//        //static async Task PlatformSetAsync(string key, string data)
+//        //{
+//        //    var settings = GetSettings(Alias);
 
-        //    var buffer = await provider.ProtectAsync(bytes.AsBuffer());
+//        //    var bytes = Encoding.UTF8.GetBytes(data);
 
-        //    var encBytes = buffer.ToArray();
+//        //    // LOCAL=user and LOCAL=machine do not require enterprise auth capability
+//        //    var provider = new DataProtectionProvider("LOCAL=user");
 
-        //    settings.Values[key] = encBytes;
-        //}
+//        //    var buffer = await provider.ProtectAsync(bytes.AsBuffer());
 
-        //static bool PlatformRemove(string key)
-        //{
-        //    var settings = GetSettings(Alias);
+//        //    var encBytes = buffer.ToArray();
 
-        //    if (settings.Values.ContainsKey(key))
-        //    {
-        //        settings.Values.Remove(key);
-        //        return true;
-        //    }
+//        //    settings.Values[key] = encBytes;
+//        //}
 
-        //    return false;
-        //}
+//        //static bool PlatformRemove(string key)
+//        //{
+//        //    var settings = GetSettings(Alias);
 
-        //static void PlatformRemoveAll()
-        //{
-        //    var settings = GetSettings(Alias);
+//        //    if (settings.Values.ContainsKey(key))
+//        //    {
+//        //        settings.Values.Remove(key);
+//        //        return true;
+//        //    }
 
-        //    settings.Values.Clear();
-        //}
-        static ApplicationDataContainer GetSettings(string name)
-        {
-            var ls = ApplicationData.Current.LocalSettings;
+//        //    return false;
+//        //}
 
-            if (!ls.Containers.ContainsKey(name))
-                ls.CreateContainer(name, ApplicationDataCreateDisposition.Always);
+//        //static void PlatformRemoveAll()
+//        //{
+//        //    var settings = GetSettings(Alias);
 
-            return ls.Containers[name];
-        }
+//        //    settings.Values.Clear();
+//        //}
+//        static ApplicationDataContainer GetSettings(string name)
+//        {
+//            var ls = ApplicationData.Current.LocalSettings;
 
-    }
-}
+//            if (!ls.Containers.ContainsKey(name))
+//                ls.CreateContainer(name, ApplicationDataCreateDisposition.Always);
+
+//            return ls.Containers[name];
+//        }
+
+//    }
+//}

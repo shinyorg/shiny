@@ -10,8 +10,7 @@ namespace Shiny.Stores
 
         public void Clear() => this.Do(x => x.Clear());
         public bool Contains(string key) => this.Do(x => x.ContainsKey(key));
-        public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
-        public object Get(Type type, string key) => this.Do(x => x.ContainsKey(key) ? x[key] : null);
+        public object? Get(Type type, string key) => this.Do(x => x.ContainsKey(key) ? x[key] : null);
         public bool Remove(string key) => (bool)this.Do(x => x.Remove(key));
         public void Set(string key, object value) => this.Do(x => x[key] = value);
 

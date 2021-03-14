@@ -15,7 +15,9 @@ namespace Shiny.Stores
             services.AddSingleton<IKeyValueStore, FileKeyValueStore>();
 #if !NETSTANDARD
             services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
+#if !WINDOWS_UWP
             services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+#endif
 #endif
         }
     }

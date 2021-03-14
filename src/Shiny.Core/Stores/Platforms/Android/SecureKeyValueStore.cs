@@ -28,7 +28,6 @@ namespace Shiny.Stores
             this.settingsStore.Clear();
         }
         public bool Contains(string key) => this.settingsStore.Contains(SecureKey(key));
-        public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
         public object? Get(Type type, string key)
         {
             var encValue = this.settingsStore.Get<string>(SecureKey(key));

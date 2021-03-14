@@ -16,8 +16,10 @@ namespace Shiny.Tests.Stores
             this.currentStore = store;
             var dt = DateTimeOffset.Now;
             this.currentStore.Set("now", dt);
-            var result = this.currentStore.Get<DateTimeOffset>("now");
-            dt.Should().Be(result);
+            this.currentStore
+                .Get(typeof(DateTimeOffset), "now")
+                .Should()
+                .Be(dt);
         }
 
 
@@ -28,8 +30,10 @@ namespace Shiny.Tests.Stores
         {
             this.currentStore = store;
             this.currentStore.Set(nameof(EnumTest), MyTestEnum.Hi);
-            var value = this.currentStore.Get<MyTestEnum>(nameof(EnumTest));
-            value.Should().Be(MyTestEnum.Hi);
+            this.currentStore
+                .Get(typeof(MyTestEnum), nameof(EnumTest))
+                .Should()
+                .Be(MyTestEnum.Hi);
         }
 
 
@@ -39,10 +43,8 @@ namespace Shiny.Tests.Stores
         public void LongTest(IKeyValueStore store)
         {
             this.currentStore = store;
-            long value = 99;
-            this.currentStore.Set("LongTest", value);
-            var value2 = this.currentStore.Get<long>("LongTest");
-            Assert.Equal(value, value2);
+            this.currentStore.Set("LongTest", 99L);
+            this.currentStore.Get(typeof(long), "LongTest").Should().Be(99L);
         }
 
 
@@ -51,8 +53,10 @@ namespace Shiny.Tests.Stores
         public void EmptyGuidTest(IKeyValueStore store)
         {
             this.currentStore = store;
-            var empty = this.currentStore.Get<Guid>(nameof(EmptyGuidTest));
-            empty.Should().Be(Guid.Empty);
+            this.currentStore
+                .Get(typeof(Guid), nameof(EmptyGuidTest))
+                .Should()
+                .Be(Guid.Empty);
         }
 
 
@@ -64,7 +68,10 @@ namespace Shiny.Tests.Stores
 
             var guid = new Guid();
             this.currentStore.Set(nameof(GuidTest), guid);
-            this.currentStore.Get<Guid>(nameof(GuidTest)).Should().Be(guid);
+            this.currentStore
+                .Get(typeof(Guid), nameof(GuidTest))
+                .Should()
+                .Be(guid);
         }
 
         //[Theory]

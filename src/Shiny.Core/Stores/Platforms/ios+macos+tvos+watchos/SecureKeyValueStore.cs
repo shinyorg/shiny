@@ -37,7 +37,6 @@ namespace Shiny.Stores
         }
 
 
-        public T? Get<T>(string key) => (T?)this.Get(typeof(T), key);
         public object? Get(Type type, string key)
         {
             object? result = null;

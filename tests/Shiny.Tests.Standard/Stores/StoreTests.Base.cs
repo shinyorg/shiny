@@ -1,6 +1,7 @@
 ﻿using System;
-using Shiny.Stores;
+using FluentAssertions;
 using Xunit;
+using Shiny.Stores;
 
 
 namespace Shiny.Tests.Stores
@@ -15,8 +16,7 @@ namespace Shiny.Tests.Stores
             this.currentStore = store;
             this.currentStore.Set("Test", "1");
             this.currentStore.Set("Test", "2");
-            var r = this.currentStore.Get<string>("Test");
-            Assert.Equal("2", r);
+            this.currentStore.Get(typeof(string), "Test").Should().Be("2");
         }
 
 
@@ -26,10 +26,10 @@ namespace Shiny.Tests.Stores
         public void ContainsTest(IKeyValueStore store)
         {
             this.currentStore = store;
-            Assert.False(this.currentStore.Contains(Guid.NewGuid().ToString()), "Contains should have returned false");
+            this.currentStore.Contains(Guid.NewGuid().ToString()).Should().BeFalse("Contains should have returned false");
 
             this.currentStore.Set("Test", "1");
-            Assert.True(this.currentStore.Contains("Test"), "Contains should have returned true");
+            this.currentStore.Contains("Test").Should().BeTrue("Contains should have returned true");
         }
 
 
@@ -40,7 +40,7 @@ namespace Shiny.Tests.Stores
         {
             this.currentStore = store;
             this.currentStore.Set("Test", "1");
-            Assert.True(this.currentStore.Remove("Test"), "Remove should have returned success");
+            this.currentStore.Remove("Test").Should().BeTrue("Remove should have returned success");
         }
     }
 }

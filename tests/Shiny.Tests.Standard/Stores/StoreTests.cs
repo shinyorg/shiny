@@ -27,6 +27,7 @@ namespace Shiny.Tests.Stores
                 yield return new object[] { new SecureKeyValueStore(platform, serializer) };
                 yield return new object[] { new SettingsKeyValueStore(serializer) };
 #elif WINDOWS_UWP
+                platform = new TestPlatform(); // not UwpPlatform
                 //yield return new object[] { "settings" };
 #else
                 platform = new TestPlatform();
@@ -35,8 +36,8 @@ namespace Shiny.Tests.Stores
                 yield return new object[] { new FileKeyValueStore(platform, serializer) };
                 yield return new object[] { new MemoryKeyValueStore() };
 
-                var conn = new ShinySqliteConnection(platform);
-                yield return new object[] { new SqliteKeyValueStore(conn, serializer) };
+                //var conn = new ShinySqliteConnection(platform);
+                //yield return new object[] { new SqliteKeyValueStore(conn, serializer) };
             }
         }
 

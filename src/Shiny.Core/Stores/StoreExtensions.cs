@@ -8,6 +8,24 @@ namespace Shiny
     {
         static readonly object syncLock = new object();
 
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="store"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static T Get<T>(this IKeyValueStore store, string key)
+        {
+            var obj = store.Get(typeof(T), key);
+            if (obj == null)
+                return default;
+
+            return (T)obj;
+        }
+
+
         /// <summary>
         /// Thread safetied setting value incrementor
         /// </summary>

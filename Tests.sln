@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{482108EE-8D47-4693-80B4-B609B536491B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.github\workflows\build.yml = .github\workflows\build.yml
 		LICENSE.md = LICENSE.md
 		Packages.props = Packages.props
 		readme.md = readme.md
@@ -98,7 +99,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Tests.Standard", "tes
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Tests.Devices", "tests\Shiny.Tests.Devices\Shiny.Tests.Devices.shproj", "{B57B076C-2AE9-44C1-BF83-790649C2073C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{06B8EFD3-FF2F-4A55-9CB1-13D48B7AF5A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{06B8EFD3-FF2F-4A55-9CB1-13D48B7AF5A9}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

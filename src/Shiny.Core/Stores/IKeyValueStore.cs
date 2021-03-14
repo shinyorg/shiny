@@ -11,9 +11,7 @@ namespace Shiny.Stores
         void Clear();
         bool Contains(string key);
 
-        T? Get<T>(string key);
         object? Get(Type type, string key);
-
         void Set(string key, object value);
     }
 }
