@@ -72,7 +72,7 @@ namespace Shiny.Stores
 
             foreach (var prop in props)
             {
-                var key = this.GetBindingKey(type, prop);
+                var key = GetBindingKey(type, prop);
                 if (store.Contains(key))
                 {
                     var value = store.Get(prop.PropertyType, key);
@@ -88,8 +88,12 @@ namespace Shiny.Stores
             => obj.PropertyChanged -= this.OnPropertyChanged;
 
 
-        protected virtual string GetBindingKey(Type type, PropertyInfo prop)
-            => $"{type.FullName}.{prop.Name}";
+        public static string GetBindingKey(Type type, PropertyInfo prop)
+            => GetBindingKey(type, prop.Name);
+
+
+        public static string GetBindingKey(Type type, string propertyName)
+            => $"{type.Namespace}.{type.Name}.{propertyName}";
 
 
         protected virtual IEnumerable<PropertyInfo> GetTypeProperties(Type type) => type
@@ -109,7 +113,7 @@ namespace Shiny.Stores
 
             if (prop != null)
             {
-                var key = this.GetBindingKey(sender.GetType(), prop);
+                var key = GetBindingKey(sender.GetType(), prop);
                 var value = prop.GetValue(sender);
 
                 if (!this.bindings.ContainsKey(sender))
@@ -117,6 +121,7 @@ namespace Shiny.Stores
 
                 var store = this.bindings[sender];
                 if (IsNullOrDefault(value))
+                //if (value == null)
                 {
                     store.Remove(key);
                 }
@@ -130,17 +135,15 @@ namespace Shiny.Stores
 
         static bool IsNullOrDefault(object obj)
         {
-            var type = obj.GetType();
-            if (Nullable.GetUnderlyingType(type) != null)
-                return false;
+            var result = true;
 
-            if (type.IsValueType)
+            if (obj != null)
             {
-                var def = Activator.CreateInstance(type);
-                return obj.Equals(def);
+                var type = obj.GetType();
+                if (type.IsValueType)
+                    result = Activator.CreateInstance(type).Equals(obj);
             }
-
-            return false;
+            return result;
         }
     }
 }

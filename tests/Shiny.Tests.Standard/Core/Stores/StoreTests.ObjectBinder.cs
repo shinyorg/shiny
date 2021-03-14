@@ -16,11 +16,13 @@ namespace Shiny.Tests.Core.Stores
         [MemberData(nameof(Data))]
         public void Binding_Basic(IKeyValueStore store)
         {
+            var key = ObjectStoreBinder.GetBindingKey(typeof(TestBind), nameof(TestBind.StringProperty));
+            var random = Guid.NewGuid().ToString();
             var values = SetupBinder<TestBind>(store);
-            values.BoundObject.StringProperty = "Hi";
+            values.BoundObject.StringProperty = random;
 
-            store.Contains("TestBind.StringProperty").Should().BeTrue();
-            store.Get<string>("TestBind.StringProperty").Should().Be("Hi");
+            store.Contains(key).Should().BeTrue();
+            store.Get<string>(key).Should().Be(random);
         }
 
 
@@ -30,7 +32,7 @@ namespace Shiny.Tests.Core.Stores
         public void Binding_Persist(IKeyValueStore store)
         {
             var values = this.SetupBinder<TestBind>(store);
-            values.BoundObject.StringProperty = "Binding_Persist";
+            values.BoundObject.StringProperty = Guid.NewGuid().ToString();
 
             var obj2 = new TestBind();
             values.Binder.Bind(obj2, store);
@@ -44,12 +46,13 @@ namespace Shiny.Tests.Core.Stores
         public void NullifyingRemoves(IKeyValueStore store)
         {
             var values = this.SetupBinder<TestBind>(store);
+            var key = ObjectStoreBinder.GetBindingKey(typeof(TestBind), nameof(TestBind.StringProperty));
 
-            values.BoundObject.StringProperty = "Binding_Persist";
-            store.Contains("TestBind.StringProperty").Should().BeTrue();
+            values.BoundObject.StringProperty = Guid.NewGuid().ToString();
+            store.Contains(key).Should().BeTrue();
 
             values.BoundObject.StringProperty = null;
-            store.Contains("TestBind.StringProperty").Should().BeFalse();
+            store.Contains(key).Should().BeFalse();
         }
 
 
@@ -59,12 +62,13 @@ namespace Shiny.Tests.Core.Stores
         public void DefaultValueRemoves(IKeyValueStore store)
         {
             var values = this.SetupBinder<TestBind>(store);
+            var key = ObjectStoreBinder.GetBindingKey(typeof(TestBind), nameof(TestBind.IntValue));
 
             values.BoundObject.IntValue = 99;
-            store.Get<int>("TestBind.IntValue").Should().Be(99);
+            store.Get<int>(key).Should().Be(99);
 
             values.BoundObject.IntValue = 0;
-            store.Contains("TestBind.IntValue").Should().BeFalse();
+            store.Contains(key).Should().BeFalse();
         }
 
 
@@ -81,9 +85,10 @@ namespace Shiny.Tests.Core.Stores
             binder.Bind(obj);
             obj.TestString = random;
 
+            var key = ObjectStoreBinder.GetBindingKey(typeof(AttributeTestBind), nameof(AttributeTestBind.TestString));
             factory
                 .GetStore("file")
-                .Get<string>("AttributeTestBind.TestString")
+                .Get<string>(key)
                 .Should()
                 .Be(random);
         }
