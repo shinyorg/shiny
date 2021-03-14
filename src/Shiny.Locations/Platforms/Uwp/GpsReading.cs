@@ -1,17 +1,18 @@
 ﻿using System;
 using Windows.Devices.Geolocation;
 
+
 namespace Shiny.Locations
 {
-    public class GpsReading : IGpsReading
+    class GpsReading : IGpsReading
     {
         readonly Geocoordinate coordinate;
 
-        public GpsReading(Geocoordinate coordinate) 
-        { 
+        public GpsReading(Geocoordinate coordinate)
+        {
             this.coordinate = coordinate;
             this.Position = new Position(
-                coordinate.Point.Position.Latitude, 
+                coordinate.Point.Position.Latitude,
                 coordinate.Point.Position.Longitude
             );
         }
@@ -28,7 +29,7 @@ namespace Shiny.Locations
         /// <inheritdoc />
         public double Speed => this.coordinate.Speed ?? 0;
 
-        /// <inheritdoc /> 
+        /// <inheritdoc />
         public double SpeedAccuracy => -1; //this.coordinate.SpeedAccuracy;
 
         /// <inheritdoc />

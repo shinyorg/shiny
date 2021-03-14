@@ -35,7 +35,8 @@
     <WarningLevel>4</WarningLevel>
     <BundleAssemblies>true</BundleAssemblies>
     <AndroidUseAapt2>true</AndroidUseAapt2>
-    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <AndroidEnableMultiDex>false</AndroidEnableMultiDex>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -78,6 +79,10 @@
     <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
       <Project>{11ec9d9d-3502-4a4a-94aa-5bdb1b20bb8e}</Project>
       <Name>Shiny.Locations.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj">
+      <Project>{80421dcd-e1be-404f-b3a3-8bcee3b79dd2}</Project>
+      <Name>Shiny.Logging.Firebase</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
       <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
@@ -189,7 +194,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionSamplesAndroidHideInfoBar="True" TriggeredFromHotReload="False" XamarinHotReloadWrongLinkerErrorInfoBarSamplesAndroidHideInfoBar="True" />
+      <UserProperties XamarinHotReloadWrongLinkerErrorInfoBarSamplesAndroidHideInfoBar="True" TriggeredFromHotReload="False" XamarinHotReloadDebuggerTimeoutExceptionSamplesAndroidHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

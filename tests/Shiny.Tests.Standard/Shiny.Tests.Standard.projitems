@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>13ebf4bb-8a37-4aec-be65-611c8958e4d0</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Shiny.Tests.Standard</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\BeaconParserTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\BeaconRegionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Infrastructure\DependencyInjectionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Infrastructure\FullService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Infrastructure\MessageBusTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Infrastructure\TestModule.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Repositories\BaseRepositoryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Repositories\FileSystemRepositoryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Repositories\SqliteRepositoryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Serialization\BaseSerializationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Serialization\JsonSerializationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\AttributeTestBind.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\DistanceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\GeofenceRegionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\GpsGeofenceDelegateTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\MotionActivityTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\PositionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\MyTestEnum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\TestBind.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.ObjectBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Types.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Base.cs" />
+  </ItemGroup>
+</Project>

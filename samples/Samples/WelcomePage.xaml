@@ -7,12 +7,12 @@
     <ContentPage.Content>
         <StackLayout HorizontalOptions="FillAndExpand"
                      VerticalOptions="FillAndExpand">
-            
+
             <Label Text="Welcome to the Shiny Samples"
                    Style="{StaticResource NoDataLabel}" />
-            
-            <Image Source="logo" 
-                   HorizontalOptions="Center" 
+
+            <Image Source="logo"
+                   HorizontalOptions="Center"
                    VerticalOptions="Center" />
         </StackLayout>
     </ContentPage.Content>

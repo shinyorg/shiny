@@ -2,19 +2,14 @@
 using Microsoft.Extensions.Logging;
 
 
-namespace Shiny.Integrations.Sqlite
+namespace Shiny.Integrations.Sqlite.Logging
 {
     public class SqliteLoggerProvider : ILoggerProvider
     {
-        readonly ShinySqliteConnection conn;
-        //IOptionsMonitor<> bla
-        public SqliteLoggerProvider(ShinySqliteConnection conn)
-        {
-            this.conn = conn;
-        }
+        readonly LogLevel logLevel;
+        public SqliteLoggerProvider(LogLevel logLevel) => this.logLevel = logLevel;
 
-
-        public ILogger CreateLogger(string categoryName) => new SqliteLogger(this.conn);
+        public ILogger CreateLogger(string categoryName) => new SqliteLogger(this.logLevel, ShinyHost.Resolve<ShinySqliteConnection>());
         public void Dispose() { }
     }
 }

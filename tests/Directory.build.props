@@ -1,0 +1,18 @@
+<Project>
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <DisableExtraReferences>False</DisableExtraReferences>
+        <ExtrasUwpMetaPackageVersion>6.2.12</ExtrasUwpMetaPackageVersion>
+        <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
+        <PackageReference Include="Microsoft.Windows.SDK.Contracts" />
+    </ItemGroup>
+
+</Project>

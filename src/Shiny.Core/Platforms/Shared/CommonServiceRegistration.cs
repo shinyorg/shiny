@@ -5,7 +5,7 @@ using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
-using Shiny.Settings;
+using Shiny.Stores;
 
 
 namespace Shiny
@@ -15,6 +15,7 @@ namespace Shiny
         public static void RegisterCommonServices(this IServiceCollection services)
         {
             services.AddSingleton<ShinyCoreServices>();
+            services.RegisterModule<StoresModule>();
             services.TryAddSingleton<ISerializer, ShinySerializer>();
             services.TryAddSingleton<IMessageBus, MessageBus>();
             services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
@@ -25,7 +26,6 @@ namespace Shiny
 
             #if !NETSTANDARD
             services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
-            services.TryAddSingleton<ISettings, SettingsImpl>();
             #endif
 
             #if __TVOS__ || __WATCHOS__ || NETSTANDARD

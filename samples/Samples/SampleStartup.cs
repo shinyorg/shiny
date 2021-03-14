@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Shiny;
 using Shiny.Notifications;
 using Shiny.Testing;
-using Samples.Settings;
 using Samples.Infrastructure;
 using Samples.Jobs;
 using Samples.HttpTransfers;
@@ -16,6 +15,7 @@ using Samples.Geofences;
 using Samples.Gps;
 using Samples.Push;
 using Samples.Notifications;
+using Samples.Stores;
 
 [assembly: GenerateStaticClasses("Samples")]
 
@@ -29,30 +29,15 @@ namespace Samples
             builder.AddConsole(opts =>
                 opts.LogToStandardErrorThreshold = LogLevel.Debug
             );
-            builder.UseSqliteLogging();
-            builder.AddAppCenter(opts =>
-            {
-                opts.AppCenterAndroidSecret = Constants.AndroidAppCenterToken;
-                opts.AppCenteriOSSecret = Constants.iOSAppCenterToken;
-                opts.AppCenterUWPSecret = Constants.UwpAppCenterToken;
-                opts.AppCenterLogLevel = Microsoft.AppCenter.LogLevel.Warn;
-            });
+            builder.AddSqliteLogging(LogLevel.Warning);
+            //builder.AddFirebase(LogLevel.Warning);
+            builder.AddAppCenter(Constants.AppCenterToken, LogLevel.Warning);
         }
 
 
         public override void ConfigureServices(IServiceCollection services, IPlatform platform)
         {
-            //// THESE LOGGERS ARE ONLY GOOD FOR FOREGROUND LEVEL DEBUG TESTING
-            //Log.UseConsole();
-            //Log.UseDebug();
-
-            //// YOU REALLY NEED TO USE ONE OF THE FOLLOWING LOGGERS TO TEST BACKGROUND PROCESSES FOR CRASHES AND IN PRODUCTION
-            //Log.UseFile();
-            ////services.UseAppCenterLogging(Constants.AppCenterTokens, true, false);
-            //services.UseSqliteLogging(true, true);
-            //services.UseNotificationErrorLogging(); // NEVER USE IN PRODUCTION - limited testing for background processes in dev
-
-            //services.UseSqliteSettings();
+            services.UseSqliteStore();
             //services.UseSqliteStorage();
             services.AddSingleton<AppNotifications>();
             services.AddSingleton<IDialogs, Dialogs>();

@@ -1,0 +1,39 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+
+    <PropertyGroup>
+        <Description>Shiny Firebase Logging for Microsoft Extensions Logging</Description>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="readme.txt" pack="true" PackagePath="." />
+        <None Include="Platforms\**\*.cs" />
+        <Compile Remove="Platforms\**\*.cs" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.Contains('android')) ">
+        <PackageReference Include="Xamarin.Firebase.Crashlytics" />
+        <PackageReference Include="Xamarin.Firebase.Analytics" />
+        <PackageReference Include="Xamarin.Firebase.Analytics.Impl" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\Android\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.Contains('ios')) ">
+        <PackageReference Include="Xamarin.Firebase.iOS.Crashlytics" />
+        <PackageReference Include="Xamarin.FireBase.iOS.Analytics" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\iOS\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+
+</Project>

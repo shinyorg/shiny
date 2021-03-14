@@ -33,8 +33,8 @@ namespace Shiny.Push
         public static async Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, params string[] tags)
         {
             var result = await pushManager.RequestAccess();
-            if (pushManager is IPushTagSupport tagEnabled)
-                await tagEnabled.SetTags(tags);
+            if (result.Status == AccessState.Available)
+                await pushManager.TrySetTags(tags);
 
             return result;
         }
@@ -49,11 +49,44 @@ namespace Shiny.Push
         public static async Task<bool> TrySetTags(this IPushManager pushManager, params string[] tags)
         {
             if (pushManager is IPushTagSupport tagEnabled)
-            { 
-                await tagEnabled.SetTags(tags);
-                return true;
+            {
+                await tagEnabled.ClearTags();
+                foreach (var tag in tags)
+                {
+                    await tagEnabled.AddTag(tag);
+                    return true;
+                }
             }
             return false;
         }
+
+
+        /// <summary>
+        /// If the push manager supports tags, this will call the AddTag method
+        /// </summary>
+        /// <param name="pushManager"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public static Task TryAddTag(this IPushManager pushManager, string tag)
+            => (pushManager as IPushTagSupport)?.AddTag(tag) ?? Task.CompletedTask;
+
+
+        /// <summary>
+        /// If the push manager supports tags, this will call the RemoveTag method
+        /// </summary>
+        /// <param name="pushManager"></param>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public static Task TryRemoveTag(this IPushManager pushManager, string tag)
+            => (pushManager as IPushTagSupport)?.RemoveTag(tag) ?? Task.CompletedTask;
+
+
+        /// <summary>
+        /// If the push manager supports tags, this will call the ClearTags method
+        /// </summary>
+        /// <param name="pushManager"></param>
+        /// <returns></returns>
+        public static Task TryClearTags(this IPushManager pushManager)
+            => (pushManager as IPushTagSupport)?.ClearTags() ?? Task.CompletedTask;
     }
 }

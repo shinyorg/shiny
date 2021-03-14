@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Settings;
+using Shiny.Stores;
 
 
 namespace Shiny.Infrastructure.DependencyInjection
@@ -31,7 +31,7 @@ namespace Shiny.Infrastructure.DependencyInjection
                     resolveType,
                     sp =>
                     {
-                        sp.Resolve<ISettings>(true).Bind(npc);
+                        sp.Resolve<IObjectStoreBinder>(true).Bind(npc);
                         return npc;
                     }
                 );
@@ -46,7 +46,7 @@ namespace Shiny.Infrastructure.DependencyInjection
                     sp =>
                     {
                         var bindable = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, service.ImplementationType);
-                        sp.Resolve<ISettings>(true).Bind(bindable);
+                        sp.Resolve<IObjectStoreBinder>(true).Bind(bindable);
                         return bindable;
                     }
                 );

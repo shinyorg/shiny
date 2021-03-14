@@ -1,9 +1,10 @@
 ﻿using System;
 using Android.Locations;
 
+
 namespace Shiny.Locations
 {
-    public class GpsReading : IGpsReading
+    class GpsReading : IGpsReading
     {
         readonly Location location;
         DateTime? time;

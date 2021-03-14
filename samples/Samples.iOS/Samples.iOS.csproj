@@ -206,6 +206,10 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
+      <Project>{11ec9d9d-3502-4a4a-94aa-5bdb1b20bb8e}</Project>
+      <Name>Shiny.Locations.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
       <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
       <Name>Shiny.Push.AzureNotificationHubs</Name>
@@ -266,6 +270,10 @@
       <Project>{4273A168-9E9E-4E46-A6D6-96A3B788321F}</Project>
       <Name>Shiny.BluetoothLE.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj">
+      <Project>{CE8697F2-0F6E-4E05-BD46-5A20B9F4C4DC}</Project>
+      <Name>Shiny.Logging.AppCenter</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\60.png" />
@@ -276,7 +284,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadMonoInterpreterErrorInfoBarSamplesiOSHideInfoBar="True" TriggeredFromHotReload="False" />
+      <UserProperties TriggeredFromHotReload="False" XamarinHotReloadMonoInterpreterErrorInfoBarSamplesiOSHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

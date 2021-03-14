@@ -19,10 +19,28 @@ namespace Shiny.Testing.Push
         public Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default) => Task.FromResult(new PushAccessState(this.ResultStatus, this.CurrentRegistrationToken));
         public Task UnRegister() => Task.CompletedTask;
 
-        public string[]? RegisteredTags { get; private set; }
-        public Task SetTags(params string[] tags)
+
+        readonly List<string> tags = new List<string>();
+        public string[]? RegisteredTags => this.tags.ToArray();
+
+
+        public Task AddTag(string tag)
         {
-            this.RegisteredTags = tags;
+            this.tags.Add(tag);
+            return Task.CompletedTask;
+        }
+
+
+        public Task RemoveTag(string tag)
+        {
+            this.tags.Remove(tag);
+            return Task.CompletedTask;
+        }
+
+
+        public Task ClearTags()
+        {
+            this.tags.Clear();
             return Task.CompletedTask;
         }
     }

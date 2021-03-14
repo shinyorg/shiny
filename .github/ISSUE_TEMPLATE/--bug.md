@@ -19,13 +19,14 @@ assignees: ''
  - [ ] Android
  - [ ] UWP
 
- PLATFORMS THAT YOU CANNOT FILE ISSUES ON RIGHT NOW: Tizen, watchOS, tvOS, macOS
+PLATFORMS THAT YOU CANNOT FILE ISSUES ON RIGHT NOW: Tizen, watchOS, tvOS, macOS
+IF YOU HAVE AN ISSUE WITH DOCUMENTATION, DO NOT FILE AN ISSUE - PR'S ONLY!
 
 ## Feature Library
 
 
- - [ ] Core
- - [ ] Locations
+ - [ ] Core (Jobs, Settings, Initialization)
+ - [ ] Locations (GPS, Geofencing, Motion Activity)
  - [ ] HTTP Transfers
  - [ ] Notifications
  - [ ] NFC
@@ -33,7 +34,6 @@ assignees: ''
  - [ ] Push - Azure Notification Hub
  - [ ] Push - Firebase
  - [ ] Sensors
- - [ ] AppCenter Logging Integration
  - [ ] BluetoothLE Client
  - [ ] BluetoothLE Hosting
  - [ ] Beacons

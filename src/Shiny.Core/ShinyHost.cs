@@ -90,7 +90,7 @@ namespace Shiny
 
             services.BuildShinyServiceProvider(
                 ValidateScopes,
-                s => startup?.CreateServiceProvider(s),
+                s => startup?.CreateServiceProvider(s)!,
                 s => container = s
             );
         }

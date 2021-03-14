@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
@@ -68,25 +69,6 @@ namespace Shiny.Push
             => this.Services.Bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
 
 
-        public virtual async Task SetTags(params string[] tags)
-        {
-            if (this.RegisteredTags != null)
-            {
-                foreach (var tag in this.RegisteredTags)
-                {
-                    await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
-                }
-            }
-            if (tags != null)
-            {
-                foreach (var tag in tags)
-                {
-                    await FirebaseMessaging.Instance.SubscribeToTopic(tag);
-                }
-            }
-            this.RegisteredTags = tags;
-        }
-
 
         public virtual Task UpdateNativePushToken(string token)
         {
@@ -94,6 +76,35 @@ namespace Shiny.Push
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
 
             return Task.CompletedTask;
+        }
+
+
+        public virtual async Task AddTag(string tag)
+        {
+            var tags = this.RegisteredTags.ToList();
+            tags.Add(tag);
+
+            await FirebaseMessaging.Instance.SubscribeToTopic(tag);
+            this.RegisteredTags = tags.ToArray();
+        }
+
+
+        public virtual async Task RemoveTag(string tag)
+        {
+            var list = this.RegisteredTags.ToList();
+            if (list.Remove(tag))
+                this.RegisteredTags = list.ToArray();
+
+            await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
+        }
+
+
+        public virtual async Task ClearTags()
+        {
+            foreach (var tag in this.RegisteredTags)
+                await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
+
+            this.RegisteredTags = null;
         }
     }
 }

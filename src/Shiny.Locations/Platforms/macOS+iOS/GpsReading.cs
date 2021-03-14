@@ -1,6 +1,7 @@
 ﻿using System;
 using CoreLocation;
 
+
 namespace Shiny.Locations
 {
     class GpsReading : IGpsReading

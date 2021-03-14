@@ -1,5 +1,6 @@
 ﻿#if !NETSTANDARD2_0
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -125,19 +126,45 @@ namespace Shiny.Push.AzureNotificationHubs
 
 
 #if __ANDROID__
-        public override async Task SetTags(params string[] tags)
+        public override Task AddTag(string tag)
 #else
-        public async Task SetTags(params string[] tags)
+        public Task AddTag(string tag)
 #endif
+        {
+            var tags = this.RegisteredTags.ToList();
+            tags.Add(tag);
+            return this.SetTags(tags.ToArray());
+        }
+
+
+#if __ANDROID__
+        public override Task RemoveTag(string tag)
+#else
+        public Task RemoveTag(string tag)
+#endif
+        {
+            var tags = this.RegisteredTags.ToList();
+            tags.Remove(tag);
+            return this.SetTags(tags.ToArray());
+        }
+
+#if __ANDROID__
+        public override Task ClearTags() => this.SetTags(null);
+#else
+        public Task ClearTags() => this.SetTags(null);
+#endif
+
+
+
+        protected async Task SetTags(params string[]? tags)
         {
             if (this.InstallationId == null)
                 return;
 
             var install = await this.hub.GetInstallationAsync(this.InstallationId);
-            install.Tags = tags.ToList();
+            install.Tags = tags?.ToList() ?? new List<string>(0);
             await this.hub.CreateOrUpdateInstallationAsync(install);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-
             this.RegisteredTags = tags;
         }
 

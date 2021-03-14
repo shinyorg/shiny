@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
@@ -39,6 +40,7 @@ namespace Shiny.Push.FirebaseMessaging
             );
         }
 
+
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             var access = await base.RequestAccess(cancelToken);
@@ -62,23 +64,31 @@ namespace Shiny.Push.FirebaseMessaging
         }
 
 
-        public async Task SetTags(params string[] tags)
+        public async Task AddTag(string tag)
         {
-            if (this.RegisteredTags != null)
-            {
-                foreach (var tag in this.RegisteredTags)
-                {
-                    await Messaging.SharedInstance.UnsubscribeAsync(tag);
-                }
-            }
-            if (tags != null)
-            {
-                foreach (var tag in tags)
-                {
-                    await Messaging.SharedInstance.SubscribeAsync(tag);
-                }
-            }
-            this.RegisteredTags = tags;
+            var tags = this.RegisteredTags.ToList();
+            tags.Add(tag);
+
+            await Messaging.SharedInstance.SubscribeAsync(tag);
+            this.RegisteredTags = tags.ToArray();
+        }
+
+
+        public async Task RemoveTag(string tag)
+        {
+            await Messaging.SharedInstance.UnsubscribeAsync(tag);
+            var tags = this.RegisteredTags.ToList();
+            if (tags.Remove(tag))
+                this.RegisteredTags = tags.ToArray();
+        }
+
+
+        public async Task ClearTags()
+        {
+            foreach (var tag in this.RegisteredTags)
+                await Messaging.SharedInstance.UnsubscribeAsync(tag);
+
+            this.RegisteredTags = null;
         }
     }
 }

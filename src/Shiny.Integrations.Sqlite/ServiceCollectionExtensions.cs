@@ -2,10 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-
 using Shiny.Infrastructure;
 using Shiny.Integrations.Sqlite;
-using Shiny.Settings;
+using Shiny.Integrations.Sqlite.Logging;
+using Shiny.Stores;
 
 
 namespace Shiny
@@ -13,23 +13,21 @@ namespace Shiny
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// WARNING: this will not catch startup issues as the connection isn't ready until after startup - it will catch all delegates though
+        ///
         /// </summary>
-        /// <param name="services"></param>
-        /// <param name="enableCrashes"></param>
-        /// <param name="enableEvents"></param>
-        public static void UseSqliteLogging(this ILoggingBuilder builder)
+        /// <param name="builder"></param>
+        /// <param name="logLevel"></param>
+        public static void AddSqliteLogging(this ILoggingBuilder builder, LogLevel logLevel = LogLevel.Warning)
         {
             builder.Services.TryAddSingleton<ShinySqliteConnection>();
-            //services.RegisterPostBuildAction(sp =>
-            //{
-            //    var conn = sp.GetService<ShinySqliteConnection>();
-            //    var serializer = sp.GetService<ISerializer>();
-            //    //Log.AddLogger(new SqliteLog(conn, serializer), enableCrashes, enableEvents);
-            //});
+            builder.AddProvider(new SqliteLoggerProvider(logLevel));
         }
 
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="services"></param>
         public static void UseSqliteStorage(this IServiceCollection services)
         {
             services.TryAddSingleton<ShinySqliteConnection>();
@@ -37,10 +35,14 @@ namespace Shiny
         }
 
 
-        public static void UseSqliteSettings(this IServiceCollection services)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="services"></param>
+        public static void UseSqliteStore(this IServiceCollection services)
         {
             services.TryAddSingleton<ShinySqliteConnection>();
-            services.AddSingleton<ISettings, SqliteSettings>();
+            services.AddSingleton<IKeyValueStore, SqliteKeyValueStore>();
         }
     }
 }

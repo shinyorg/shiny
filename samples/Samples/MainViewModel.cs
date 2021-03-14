@@ -4,7 +4,6 @@ using Prism.Navigation;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Notifications;
-using Shiny;
 
 
 namespace Samples

@@ -10,7 +10,7 @@ namespace Shiny.Locations
 {
     public class ShinyLocationCallback : LocationCallback, Android.Locations.ILocationListener
     {
-        public Subject<GpsReading> ReadingSubject { get; } = new Subject<GpsReading>();
+        internal Subject<GpsReading> ReadingSubject { get; } = new Subject<GpsReading>();
 
 
         public void OnLocationChanged(Android.Locations.Location location)

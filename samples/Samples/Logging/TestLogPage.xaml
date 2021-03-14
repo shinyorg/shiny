@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Samples.Logging.TestLogPage"
+             Title="Test Loggers">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Button">
+                <Setter Property="HorizontalOptions" Value="FillAndExpand" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <Button Text="Critical Test" Command="{Binding Test}" CommandParameter="critical" />
+            <Button Text="Error Test" Command="{Binding Test}" CommandParameter="error" />
+            <Button Text="Warning Test" Command="{Binding Test}" CommandParameter="warning" />
+            <Button Text="Info Test" Command="{Binding Test}" CommandParameter="info" />
+            <Button Text="Debug Test" Command="{Binding Test}" CommandParameter="debug" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

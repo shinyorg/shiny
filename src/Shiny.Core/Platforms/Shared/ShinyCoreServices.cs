@@ -1,6 +1,6 @@
 ﻿using System;
-using Shiny.Settings;
 using Shiny.Jobs;
+using Shiny.Stores;
 
 
 namespace Shiny.Infrastructure
@@ -9,26 +9,26 @@ namespace Shiny.Infrastructure
     {
 #if __ANDROID__
         public ShinyCoreServices(IAndroidContext context,
-                                 ISettings settings,
+                                 IKeyValueStoreFactory store,
                                  IRepository repository,
                                  IServiceProvider services,
                                  ISerializer serializer,
                                  IMessageBus bus,
                                  IJobManager jobManager)
-            : this(settings, repository, services, serializer, bus, jobManager)
+            : this(store, repository, services, serializer, bus, jobManager)
         {
             this.Android = context;
         }
 
 #endif
-        public ShinyCoreServices(ISettings settings,
+        public ShinyCoreServices(IKeyValueStoreFactory store,
                                  IRepository repository,
                                  IServiceProvider services,
                                  ISerializer serializer,
                                  IMessageBus bus,
                                  IJobManager jobManager)
         {
-            this.Settings = settings;
+            this.Settings = store.DefaultStore;
             this.Repository = repository;
             this.Services = services;
             this.Serializer = serializer;
@@ -39,7 +39,7 @@ namespace Shiny.Infrastructure
         #if __ANDROID__
         public IAndroidContext Android { get; }
         #endif
-        public ISettings Settings { get; }
+        public IKeyValueStore Settings { get; }
         public IRepository Repository { get; }
         public IServiceProvider Services { get; }
         public ISerializer Serializer { get; }
