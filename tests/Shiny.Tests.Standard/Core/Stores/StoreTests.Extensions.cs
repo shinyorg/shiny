@@ -39,6 +39,39 @@ namespace Shiny.Tests.Core.Stores
         [Trait("Category", "Extensions")]
         [Theory]
         [MemberData(nameof(Data))]
+        public void DefaultBool(IKeyValueStore store)
+        {
+            this.currentStore = store;
+            this.currentStore.Get<Guid>(nameof(SetT_Nullable)).Should().Be(Guid.Empty);
+            this.currentStore.Get<Guid?>(nameof(SetT_Nullable)).Should().BeNull();
+
+            var guid = Guid.NewGuid();
+            this.currentStore.Set(nameof(SetT_Nullable), guid);
+            this.currentStore.Get<Guid?>(nameof(SetT_Nullable)).Should().Be(guid);
+        }
+
+
+        [Trait("Category", "Extensions")]
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void Bools(IKeyValueStore store)
+        {
+            this.currentStore = store;
+            this.currentStore.Get<bool>(nameof(Bools)).Should().BeFalse();
+            this.currentStore.Get<bool?>(nameof(Bools)).Should().BeNull();
+
+            this.currentStore.Set(nameof(Bools), true);
+            this.currentStore.Get<bool>(nameof(Bools)).Should().BeTrue();
+
+            this.currentStore.Set(nameof(Bools), false);
+            this.currentStore.Get<bool>(nameof(Bools)).Should().BeFalse();
+            this.currentStore.Get<bool?>(nameof(Bools)).Should().BeNull();
+        }
+
+
+        [Trait("Category", "Extensions")]
+        [Theory]
+        [MemberData(nameof(Data))]
         public void SetDefault(IKeyValueStore store)
         {
             this.currentStore = store;
