@@ -43,7 +43,8 @@ namespace Shiny.Stores
                 try
                 {
                     var value = this.keyStore.Decrypt(data);
-                    return this.serializer.Deserialize(type, value);
+                    var result = this.serializer.Deserialize(type, value);
+                    return result;
                 }
                 catch (AEADBadTagException)
                 {

@@ -21,9 +21,15 @@ namespace Shiny.Stores
         });
 
 
-        public bool Contains(string key) => this.Get(x => x.ValueForKey(new NSString(key)) != null);
-        public object Get(Type type, string key) => this.Get(prefs =>
+        public bool Contains(string key)
+            => this.GetValue(false, x => x.ValueForKey(new NSString(key)) != null);
+
+
+        public object? Get(Type type, string key) => this.GetValue(false, prefs =>
         {
+            if (prefs.ValueForKey(new NSString(key)) == null)
+                return null;
+
             var typeCode = Type.GetTypeCode(type);
 
             switch (typeCode)
@@ -50,16 +56,17 @@ namespace Shiny.Stores
         });
 
 
-        public bool Remove(string key)
+        public bool Remove(string key) => this.GetValue(true, prefs =>
         {
             var removed = false;
-            if (this.Contains(key))
+
+            if (prefs.ValueForKey(new NSString(key)) != null)
             {
-                this.Do(x => x.RemoveObject(key));
+                prefs.RemoveObject(key);
                 removed = true;
             }
             return removed;
-        }
+        });
 
 
         public void Set(string key, object value) => this.Do(prefs =>
@@ -92,13 +99,18 @@ namespace Shiny.Stores
 
 
         readonly object syncLock = new object();
-
-        protected virtual T Get<T>(Func<NSUserDefaults, T> getter)
+        protected virtual T GetValue<T>(bool flush, Func<NSUserDefaults, T> getter)
         {
             lock (this.syncLock)
             {
                 using (var native = NSUserDefaults.StandardUserDefaults)
-                    return getter(native);
+                {
+                    var result = getter(native);
+                    if (flush)
+                        native.Synchronize();
+
+                    return result;
+                }
             }
         }
 

@@ -19,6 +19,7 @@ namespace Shiny.Tests.Core.Infrastructure
             addSettings?.Invoke(settings);
 
             var services = new ShinyServiceCollection();
+            services.RegisterModule(new StoresModule());
             services.AddSingleton<IFullService, FullService>();
             services.AddSingleton<ISerializer>(serializer);
             services.AddSingleton<IKeyValueStore>(settings);
