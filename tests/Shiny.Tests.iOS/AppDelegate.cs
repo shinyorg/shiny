@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Foundation;
 using UIKit;
 using Xunit.Runner;
@@ -17,7 +16,7 @@ namespace Shiny.Tests.iOS
         {
             this.ShinyFinishedLaunching(new TestStartup());
             this.AddExecutionAssembly(typeof(ExtensibilityPointFactory).Assembly);
-            this.AddTestAssembly(Assembly.GetExecutingAssembly());
+            this.AddTestAssembly(this.GetType().Assembly);
 
             this.AutoStart = false;
             this.TerminateAfterExecution = false;

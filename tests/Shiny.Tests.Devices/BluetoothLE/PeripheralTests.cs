@@ -1,24 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-using Shiny.Devices.Tests.BluetoothLE;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Acr.UserDialogs;
+using Shiny.BluetoothLE;
 
 
-namespace Shiny.BluetoothLE.Tests
+namespace Shiny.Tests.BluetoothLE
 {
-    public class DeviceTests : IDisposable
+    [Trait("Category", "BluetoothLE")]
+    public class PeripheralTests : IDisposable
     {
         readonly IBleManager manager;
         IPeripheral peripheral;
 
 
-        public DeviceTests()
+        public PeripheralTests()
         {
             this.manager = ShinyHost.Container.GetService<IBleManager>();
         }

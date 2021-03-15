@@ -33,36 +33,38 @@ namespace Shiny.Stores
         public bool Contains(string key) => this.settingsStore.Contains(SecureKey(key));
         public object? Get(Type type, string key)
         {
+            var result = type.GetDefaultValue();
             var secureKey = SecureKey(key);
-            if (this.settingsStore.Contains(secureKey))
-                return type.GetDefaultValue();
 
-            var encValue = this.settingsStore.Get<string>(secureKey);
-            var data = Convert.FromBase64String(encValue);
-            lock (this.syncLock)
+            if (this.settingsStore.Contains(secureKey))
             {
-                try
+                var encValue = this.settingsStore.Get<string>(secureKey);
+                var data = Convert.FromBase64String(encValue);
+                lock (this.syncLock)
                 {
-                    var value = this.keyStore.Decrypt(data);
-                    var result = this.serializer.Deserialize(type, value);
-                    return result;
-                }
-                catch (AEADBadTagException)
-                {
-                    // unable to decrypt due to app uninstall, removing old key
-                    this.Remove(key);
+                    try
+                    {
+                        var value = this.keyStore.Decrypt(data);
+                        result = this.serializer.Deserialize(type, value);
+                    }
+                    catch (AEADBadTagException)
+                    {
+                        // unable to decrypt due to app uninstall, removing old key
+                        this.Remove(key);
+                    }
                 }
             }
-            return null;
+            return result;
         }
+
         public bool Remove(string key) => this.settingsStore.Remove(SecureKey(key));
         public void Set(string key, object value)
         {
             var content = this.serializer.Serialize(value);
             var data = this.keyStore.Encrypt(content);
             var encValue = Convert.ToBase64String(data);
-            this.settingsStore.Set(SecureKey(key), encValue);
-
+            var secureKey = SecureKey(key);
+            this.settingsStore.Set(secureKey, encValue);
         }
 
         static string SecureKey(string key) => "sec-" + key;

@@ -10,10 +10,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyAttributes.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\AdapterTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\BleManagerTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\CharacteristicTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\Constants.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\DeviceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\PeripheralTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\PlatformTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlatformTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestStartup.cs" />

@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Shiny.Devices.Tests.BluetoothLE
+namespace Shiny.Tests.BluetoothLE
 {
     public static class Constants
     {

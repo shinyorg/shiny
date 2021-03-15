@@ -17,7 +17,7 @@
 //#endif
 
 
-//namespace Shiny.Device.Tests.BluetoothLE
+//namespace Shiny.Tests.BluetoothLE
 //{
 //    public class PlatformTests
 //    {

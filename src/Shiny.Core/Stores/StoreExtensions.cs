@@ -16,13 +16,12 @@ namespace Shiny
         /// <param name="store"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static T Get<T>(this IKeyValueStore store, string key)
+        public static T Get<T>(this IKeyValueStore store, string key, T defaultValue = default)
         {
-            var obj = store.Get(typeof(T), key);
-            if (obj == null)
-                return default;
+            if (!store.Contains(key))
+                return defaultValue;
 
-            return (T)obj;
+            return (T)store.Get(typeof(T), key);
         }
 
 

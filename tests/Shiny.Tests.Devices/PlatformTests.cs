@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Shiny.Tests
 {
+    [Trait("Category", "Platform")]
     public class PlatformTests
     {
         [Fact]

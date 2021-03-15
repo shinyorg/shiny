@@ -39,7 +39,7 @@ namespace Shiny.Tests.Core.Stores
         [Trait("Category", "Extensions")]
         [Theory]
         [MemberData(nameof(Data))]
-        public void DefaultBool(IKeyValueStore store)
+        public void GuidTests(IKeyValueStore store)
         {
             this.currentStore = store;
             this.currentStore.Get<Guid>(nameof(SetT_Nullable)).Should().Be(Guid.Empty);
@@ -57,15 +57,11 @@ namespace Shiny.Tests.Core.Stores
         public void Bools(IKeyValueStore store)
         {
             this.currentStore = store;
-            this.currentStore.Get<bool>(nameof(Bools)).Should().BeFalse();
-            this.currentStore.Get<bool?>(nameof(Bools)).Should().BeNull();
+            this.currentStore.Get<bool>(nameof(Bools)).Should().BeFalse("Nothing set - should be return false");
+            this.currentStore.Get<bool?>(nameof(Bools)).Should().BeNull("Nothing set - nullable allowed - but not returning null");
 
             this.currentStore.Set(nameof(Bools), true);
-            this.currentStore.Get<bool>(nameof(Bools)).Should().BeTrue();
-
-            this.currentStore.Set(nameof(Bools), false);
-            this.currentStore.Get<bool>(nameof(Bools)).Should().BeFalse();
-            this.currentStore.Get<bool?>(nameof(Bools)).Should().BeNull();
+            this.currentStore.Get<bool>(nameof(Bools)).Should().BeTrue("Value should now be true");
         }
 
 

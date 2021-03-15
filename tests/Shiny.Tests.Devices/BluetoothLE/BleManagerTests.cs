@@ -9,15 +9,16 @@ using Xunit;
 using Xunit.Abstractions;
 
 
-namespace Shiny.Devices.Tests.BluetoothLE
+namespace Shiny.Tests.BluetoothLE
 {
-    public class AdapterTests
+    [Trait("Category", "BluetoothLE")]
+    public class BleManagerTests
     {
         readonly ITestOutputHelper output;
         readonly IBleManager manager;
 
 
-        public AdapterTests(ITestOutputHelper output)
+        public BleManagerTests(ITestOutputHelper output)
         {
             this.output = output;
             this.manager = ShinyHost.Resolve<IBleManager>();

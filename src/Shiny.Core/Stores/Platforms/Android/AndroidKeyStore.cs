@@ -25,9 +25,7 @@ namespace Shiny.Stores
         readonly Context appContext;
         readonly string alias;
         readonly bool alwaysUseAsymmetricKey;
-        readonly string useSymmetricPreferenceKey = "shiny_use_symmetric";
         readonly KeyStore keyStore;
-        bool useSymmetric = false;
 
 
         internal AndroidKeyStore(IAndroidContext context,
@@ -50,11 +48,8 @@ namespace Shiny.Stores
             // check to see if we need to get our key from past-versions or newer versions.
             // we want to use symmetric if we are >= 23 or we didn't set it previously.
 
-            //useSymmetric = Preferences.Get(useSymmetricPreferenceKey, Platform.HasApiLevel(BuildVersionCodes.M), SecureStorage.Alias);
-            this.useSymmetric = this.clearStore.Get<bool>(useSymmetricPreferenceKey); // TODO: add base key
-
             // If >= API 23 we can use the KeyStore's symmetric key
-            if (useSymmetric && !alwaysUseAsymmetricKey)
+            if (!alwaysUseAsymmetricKey)
                 return this.GetSymmetricKey();
 
             // NOTE: KeyStore in < API 23 can only store asymmetric keys
@@ -67,20 +62,17 @@ namespace Shiny.Stores
 
             // Get the asymmetric key pair
             var keyPair = this.GetAsymmetricKeyPair();
-
-            //var existingKeyStr = Preferences.Get(prefsMasterKey, null, alias);
             var existingKeyStr = this.clearStore.Get<string>(prefsMasterKey);
+            ISecretKey? secretKey = null;
 
-            if (!string.IsNullOrEmpty(existingKeyStr))
+            if (!existingKeyStr.IsEmpty())
             {
                 try
                 {
                     var wrappedKey = Convert.FromBase64String(existingKeyStr);
 
                     var unwrappedKey = UnwrapKey(wrappedKey, keyPair.Private);
-                    var kp = unwrappedKey.JavaCast<ISecretKey>();
-
-                    return kp;
+                    secretKey = unwrappedKey.JavaCast<ISecretKey>();
                 }
                 catch (InvalidKeyException ikEx)
                 {
@@ -97,21 +89,22 @@ namespace Shiny.Stores
                 this.clearStore.Clear(); // TODO: only want this to clear secure though
             }
 
-            var keyGenerator = KeyGenerator.GetInstance(aesAlgorithm);
-            var defSymmetricKey = keyGenerator.GenerateKey();
+            if (secretKey == null)
+            {
+                var keyGenerator = KeyGenerator.GetInstance(aesAlgorithm)!;
+                secretKey = keyGenerator.GenerateKey();
 
-            var newWrappedKey = this.WrapKey(defSymmetricKey, keyPair.Public);
-            this.clearStore.Set(prefsMasterKey, Convert.ToBase64String(newWrappedKey));
-
-            return defSymmetricKey;
+                var newWrappedKey = this.WrapKey(secretKey, keyPair.Public);
+                this.clearStore.Set(prefsMasterKey, Convert.ToBase64String(newWrappedKey));
+            }
+            return secretKey;
         }
 
 
         // API 23+ Only
         ISecretKey GetSymmetricKey()
         {
-            this.clearStore.Set(this.useSymmetricPreferenceKey, true);
-            var existingKey = this.keyStore.GetKey(alias, null);
+            var existingKey = this.keyStore.GetKey(this.alias, null);
 
             if (existingKey != null)
             {
@@ -134,8 +127,6 @@ namespace Shiny.Stores
         KeyPair GetAsymmetricKeyPair()
         {
             // set that we generated keys on pre-m device.
-            this.clearStore.Set(this.useSymmetricPreferenceKey, "TODO:alias");
-
             var asymmetricAlias = $"{alias}.asymmetric";
 
             var privateKey = this.keyStore.GetKey(asymmetricAlias, null)?.JavaCast<IPrivateKey>();
@@ -239,7 +230,7 @@ namespace Shiny.Stores
             if (data.Length < initializationVectorLen)
                 return null;
 
-            var key = GetKey();
+            var key = this.GetKey();
 
             // IV will be the first 16 bytes of the encrypted data
             var iv = new byte[initializationVectorLen];
@@ -266,8 +257,8 @@ namespace Shiny.Stores
 
             // Decrypt starting after the first 16 bytes from the IV
             var decryptedData = cipher.DoFinal(data, initializationVectorLen, data.Length - initializationVectorLen);
-
-            return Encoding.UTF8.GetString(decryptedData);
+            var result = Encoding.UTF8.GetString(decryptedData);
+            return result;
         }
     }
 }

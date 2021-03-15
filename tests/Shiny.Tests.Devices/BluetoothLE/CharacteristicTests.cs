@@ -10,8 +10,9 @@ using Xunit;
 using Xunit.Abstractions;
 
 
-namespace Shiny.Devices.Tests.BluetoothLE
+namespace Shiny.Tests.BluetoothLE
 {
+    [Trait("Category", "BluetoothLE")]
     public class CharacteristicTests : IDisposable
     {
         readonly ITestOutputHelper output;
