@@ -20,7 +20,14 @@ namespace Shiny.Stores
         const string cipherTransformationSymmetric = "AES/GCM/NoPadding";
         const string prefsMasterKey = "SecureStorageKey";
         const int initializationVectorLen = 12; // Android supports an IV of 12 for AES/GCM
+
         readonly IKeyValueStore clearStore;
+        readonly Context appContext;
+        readonly string alias;
+        readonly bool alwaysUseAsymmetricKey;
+        readonly string useSymmetricPreferenceKey = "shiny_use_symmetric";
+        readonly KeyStore keyStore;
+        bool useSymmetric = false;
 
 
         internal AndroidKeyStore(IAndroidContext context,
@@ -38,14 +45,6 @@ namespace Shiny.Stores
         }
 
 
-        readonly Context appContext;
-        readonly string alias;
-        readonly bool alwaysUseAsymmetricKey;
-        readonly string useSymmetricPreferenceKey = "essentials_use_symmetric";
-
-        KeyStore keyStore;
-        bool useSymmetric = false;
-
         ISecretKey GetKey()
         {
             // check to see if we need to get our key from past-versions or newer versions.
@@ -56,7 +55,7 @@ namespace Shiny.Stores
 
             // If >= API 23 we can use the KeyStore's symmetric key
             if (useSymmetric && !alwaysUseAsymmetricKey)
-                return GetSymmetricKey();
+                return this.GetSymmetricKey();
 
             // NOTE: KeyStore in < API 23 can only store asymmetric keys
             // specifically, only RSA/ECB/PKCS1Padding
@@ -107,12 +106,12 @@ namespace Shiny.Stores
             return defSymmetricKey;
         }
 
+
         // API 23+ Only
         ISecretKey GetSymmetricKey()
         {
-            //Preferences.Set(useSymmetricPreferenceKey, true, SecureStorage.Alias);
-
-            var existingKey = keyStore.GetKey(alias, null);
+            this.clearStore.Set(this.useSymmetricPreferenceKey, true);
+            var existingKey = this.keyStore.GetKey(alias, null);
 
             if (existingKey != null)
             {
@@ -197,7 +196,7 @@ namespace Shiny.Stores
 
         internal byte[] Encrypt(string data)
         {
-            var key = GetKey();
+            var key = this.GetKey();
 
             // Generate initialization vector
             var iv = new byte[initializationVectorLen];
