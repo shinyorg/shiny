@@ -31,6 +31,8 @@ namespace Shiny.Logging.AppCenter
             var message = formatter(state, exception);
             if (logLevel >= LogLevel.Error)
             {
+                exception ??= new Exception(message);
+
                 Crashes.TrackError(
                     exception,
                     new Dictionary<string, string>
