@@ -84,9 +84,5 @@ namespace Samples
             containerRegistry.RegisterForNavigation<AccessPage>("Access");
             containerRegistry.RegisterForNavigation<Stores.MainPage>("Stores");
         }
-
-
-        protected override IContainerExtension CreateContainerExtension()
-            => new DryIocContainerExtension(SampleStartup.Container);
     }
 }

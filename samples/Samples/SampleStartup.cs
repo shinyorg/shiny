@@ -3,6 +3,8 @@ using DryIoc;
 using DryIoc.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Prism.DryIoc;
+using Prism.Ioc;
 using Shiny;
 using Shiny.Notifications;
 using Shiny.Testing;
@@ -100,20 +102,13 @@ namespace Samples
         }
 
 
-        public static IContainer? Container { get; private set; }
         public override IServiceProvider CreateServiceProvider(IServiceCollection services)
         {
-            var container = new Container(Rules
-                .Default
-                .WithConcreteTypeDynamicRegistrations(reuse: Reuse.Transient)
-                .With(Made.Of(FactoryMethod.ConstructorWithResolvableArguments))
-                .WithFuncAndLazyWithoutRegistration()
-                .WithTrackingDisposableTransients()
-                .WithoutFastExpressionCompiler()
-                .WithFactorySelector(Rules.SelectLastRegisteredFactory())
-            );
+            // This registers and initializes the Container with Prism ensuring 
+            // that both Shiny & Prism use the same container
+            ContainerLocator.SetContainerExtension(() => new DryIocContainerExtension());
+            var container = ContainerLocator.Container.GetContainer();
             DryIocAdapter.Populate(container, services);
-            Container = container;
             return container.GetServiceProvider();
         }
     }
