@@ -28,7 +28,7 @@ namespace Shiny.Stores
         public object? Get(Type type, string key) => this.GetValue(false, prefs =>
         {
             if (prefs.ValueForKey(new NSString(key)) == null)
-                return null;
+                return type.GetDefaultValue();
 
             var typeCode = Type.GetTypeCode(type);
 

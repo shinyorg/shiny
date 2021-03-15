@@ -33,10 +33,11 @@ namespace Shiny.Stores
         public bool Contains(string key) => this.settingsStore.Contains(SecureKey(key));
         public object? Get(Type type, string key)
         {
-            var encValue = this.settingsStore.Get<string>(SecureKey(key));
-            if (encValue == null)
-                return null;
+            var secureKey = SecureKey(key);
+            if (this.settingsStore.Contains(secureKey))
+                return type.GetDefaultValue();
 
+            var encValue = this.settingsStore.Get<string>(secureKey);
             var data = Convert.FromBase64String(encValue);
             lock (this.syncLock)
             {

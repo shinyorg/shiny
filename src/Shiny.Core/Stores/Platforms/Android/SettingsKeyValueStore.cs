@@ -34,7 +34,7 @@ namespace Shiny.Stores
                 using (var prefs = this.GetPrefs())
                 {
                     if (!prefs.Contains(key))
-                        return null;
+                        return type.GetDefaultValue();
 
                     var typeCode = Type.GetTypeCode(type);
                     switch (typeCode)

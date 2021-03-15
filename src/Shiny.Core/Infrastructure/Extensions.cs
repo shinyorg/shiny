@@ -19,5 +19,14 @@ namespace Shiny.Infrastructure
             var property = sender.GetType().GetRuntimeProperty(member.Member.Name);
             return property;
         }
+
+
+        public static object? GetDefaultValue(this Type t)
+        {
+            if (t.IsValueType && Nullable.GetUnderlyingType(t) == null)
+                return Activator.CreateInstance(t);
+
+            return null;
+        }
     }
 }

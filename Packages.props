@@ -1,7 +1,6 @@
 <Project>
     <ItemGroup>
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-        <!--<PackageReference Update="Microsoft.CodeAnalysis" Version="3.9.0" />-->
         <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
         <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" />
         <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.9.0" />
