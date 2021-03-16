@@ -17,5 +17,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\PlatformTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlatformTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TestStartup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\AzureNotificationHubTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\FirebaseTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\TestPushDelegate.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Push\" />
   </ItemGroup>
 </Project>
