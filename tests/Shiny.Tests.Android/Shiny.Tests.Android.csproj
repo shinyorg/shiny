@@ -85,7 +85,6 @@
     <PackageReference Include="xunit.runner.devices" />
     <PackageReference Include="xunit" />
     <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Moq" />
     <PackageReference Include="Acr.UserDialogs" />
     <PackageReference Include="Microsoft.Azure.NotificationHubs" />
   </ItemGroup>

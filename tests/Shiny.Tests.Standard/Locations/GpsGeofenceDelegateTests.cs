@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETCOREAPP
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
@@ -40,3 +41,4 @@ namespace Shiny.Tests.Locations
         }
     }
 }
+#endif

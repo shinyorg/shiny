@@ -19,11 +19,16 @@ namespace Shiny.Jobs
         public static double? BackgroundFetchInterval { get; set; }
 
 
-        public JobManager(IServiceProvider container, IRepository repository, ILogger<IJobManager> logger) : base(container, repository, logger)
+        public JobManager(
+            IServiceProvider container,
+            IRepository repository,
+            ILogger<IJobManager> logger
+        ) : base(
+            container,
+            repository,
+            logger
+        )
         {
-            if (PlatformExtensions.HasBackgroundMode("fetch"))
-                UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum);
-            //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
         }
 
 
@@ -31,10 +36,10 @@ namespace Shiny.Jobs
         protected override void CancelNative(JobInfo jobInfo) { }
 
 
-        public override Task<AccessState> RequestAccess()
+        public override async Task<AccessState> RequestAccess()
         {
             if (!PlatformExtensions.HasBackgroundMode("fetch"))
-                return Task.FromResult(AccessState.NotSetup);
+                return AccessState.NotSetup;
 
             var app = UIApplication.SharedApplication;
             var fetch = BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum;
@@ -57,7 +62,15 @@ namespace Shiny.Jobs
                     break;
             }
 
-            return Task.FromResult(grantResult);
+            await Dispatcher.InvokeOnMainThreadAsync(() =>
+                UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(
+                    BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum
+                )
+            );
+                
+            //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
+
+            return grantResult;
         }
 
 
