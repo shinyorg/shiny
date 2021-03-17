@@ -38,22 +38,23 @@ namespace Shiny.Notifications
                     this.SetChannels(x.Result.ToArray())
                 );
 
-            this.nativeDelegate
-                .WhenPresented()
-                .Where(x => x.Notification?.Request?.Trigger?.GetType().Name != "UNPushNotificationTrigger")
-                .SubscribeAsync(async x =>
-                {
-                    var shiny = x.Notification.Request.FromNative();
-                    if (shiny != null)
-                    {
-                        await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnReceived(shiny));
-                        x.CompletionHandler.Invoke(UNNotificationPresentationOptions.Alert);
-                    }
-                });
+            //this.nativeDelegate
+            //    .WhenPresented()
+            //    .Where(x => x.Notification?.Request?.Trigger?.GetType().Name != "UNPushNotificationTrigger")
+            //    .SubscribeAsync(async x =>
+            //    {
+            //        var shiny = x.Notification.Request.FromNative();
+            //        if (shiny != null)
+            //        {
+            //            await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnReceived(shiny));
+            //            x.CompletionHandler.Invoke(UNNotificationPresentationOptions.Alert);
+            //        }
+            //    });
 
             this.nativeDelegate
                 .WhenResponse()
-                .Where(x => !(x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger))
+                //.Where(x => !(x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger))
+                .Where(x => x.Response.Notification?.Request?.Trigger?.GetType().Name != "UNPushNotificationTrigger")
                 .SubscribeAsync(async x =>
                 {
                     var shiny = x.Response.Notification.Request.FromNative();

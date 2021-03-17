@@ -18,7 +18,7 @@ namespace Shiny.Locations
             this.client = LocationServices.GetFusedLocationProviderClient(context.AppContext);
         }
 
-         
+
         public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>
         {
             (await this.RequestAccess(GpsRequest.Default)).Assert();

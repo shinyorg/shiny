@@ -80,12 +80,6 @@ namespace Shiny.Notifications
                 return;
             }
             this.manager.SendNative(notification.Id, builder.Build());
-            await this.core
-                .Services
-                .SafeResolveAndExecute<INotificationDelegate>(
-                    x => x.OnReceived(notification),
-                    false
-                );
         }
 
 
