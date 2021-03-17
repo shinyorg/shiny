@@ -18,6 +18,14 @@
                                  FontFamily="FAS" />
             </ContentPage.IconImageSource>
         </pushnotifications:SetupPage>
+
+        <pushnotifications:TagsPage>
+            <ContentPage.IconImageSource>
+                <FontImageSource Glyph="&#xf013;"
+                                 FontFamily="FAS" />
+            </ContentPage.IconImageSource>
+        </pushnotifications:TagsPage>
+
         <pushnotifications:EventListPage>
             <ContentPage.IconImageSource>
                 <FontImageSource Glyph="&#xf017;"

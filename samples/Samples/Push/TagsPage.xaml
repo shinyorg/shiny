@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:samples="clr-namespace:Samples"
+             x:Class="Samples.Push.TagsPage"
+             Title="Tags">
+
+    <ContentPage.Content>
+        <StackLayout>
+            <CollectionView ItemsSource="{Binding Tags}"
+                        VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand">
+                <CollectionView.EmptyView>
+                    <Label Text="No Tags"
+                        Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="samples:CommandItem">
+                        <samples:CommandCell Text="{Binding Text}"
+                                            PrimaryCommand="{Binding PrimaryCommand}" />
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="Clear"
+                    Command="{Binding Clear}" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

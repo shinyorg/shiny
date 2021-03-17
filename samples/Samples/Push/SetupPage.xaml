@@ -13,32 +13,30 @@
         <TableView Intent="Form">
             <TableRoot>
                 <TableSection Title="Registration">
-                    <TextCell Text="Status" 
+                    <TextCell Text="Status"
                               Detail="{Binding AccessStatus}"
                               Command="{Binding RequestAccess}" />
-                    <TextCell Text="Un-Register" 
+                    <TextCell Text="Un-Register"
                               Command="{Binding UnRegister}" />
                 </TableSection>
 
                 <TableSection Title="Tags">
-                    <SwitchCell Text="Tags Support" 
-                                On="{Binding IsTagsSupported}" 
+                    <SwitchCell Text="Tags Support"
+                                On="{Binding IsTagsSupported}"
                                 IsEnabled="False" />
-                    <EntryCell Label="Tag" 
+                    <EntryCell Label="Tag"
                                Text="{Binding Tag}"
                                IsEnabled="{Binding IsTagsSupported}" />
-                    <TextCell Text="Update Tag" 
-                              Command="{Binding UpdateTag}" />
                 </TableSection>
 
                 <TableSection Title="Info">
                     <TextCell Text="Implementation"
                               Detail="{Binding Implementation}" />
-                    <TextCell Text="Registration Token" 
+                    <TextCell Text="Registration Token"
                               Detail="{Binding RegToken}" />
-                    <TextCell Text="Registration Date" 
+                    <TextCell Text="Registration Date"
                               Detail="{Binding RegDate}" />
-                    <TextCell Text="ExpiryDate" 
+                    <TextCell Text="ExpiryDate"
                               Detail="{Binding ExpiryDate}" />
                 </TableSection>
             </TableRoot>

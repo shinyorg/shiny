@@ -40,17 +40,6 @@ namespace Samples.Push
                     x => !x.GetValue().IsEmpty()
                 )
             );
-            this.UpdateTag = ReactiveCommand.CreateFromTask(
-                () => this.Do(() => this.pushManager.TrySetTags(this.Tag)),
-                this.WhenAny(
-                    x => x.Tag,
-                    x => x.RegToken,
-                    (tag, token) =>
-                        this.pushManager?.IsTagsSupport() ?? false &&
-                        !tag.GetValue().IsEmpty() &&
-                        !token.GetValue().IsEmpty()
-                )
-            );
         }
 
 
