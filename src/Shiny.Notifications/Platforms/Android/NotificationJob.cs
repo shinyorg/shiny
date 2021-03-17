@@ -1,5 +1,4 @@
-﻿#if WINDOWS_UWP || __ANDROID__
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,4 +40,3 @@ namespace Shiny.Notifications
         }
     }
 }
-#endif

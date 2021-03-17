@@ -42,13 +42,10 @@ namespace Shiny.Notifications
 #if __ANDROID__
             services.TryAddSingleton<AndroidNotificationProcessor>();
             services.TryAddSingleton<AndroidNotificationManager>();
+            services.RegisterJob(typeof(NotificationJob), runInForeground: true);
+            services.UseJobForegroundService();
 #elif __IOS__
             services.TryAddSingleton<iOSNotificationDelegate>();
-#endif
-
-#if __ANDROID__ || WINDOWS_UWP
-            services.RegisterJob(typeof(NotificationJob));
-            services.UseJobForegroundService();
 #endif
         }
 

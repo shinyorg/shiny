@@ -45,36 +45,33 @@ namespace Shiny.Notifications
             if (notification.Id == 0)
                 notification.Id = this.services.Settings.IncrementValue("NotificationId");
 
-
-            if (notification.ScheduleDate != null && notification.ScheduleDate > DateTimeOffset.UtcNow)
-            {
-                await this.services.Repository.Set(notification.Id.ToString(), notification);
-                return;
-            }
-            if (notification.BadgeCount != null)
-                this.Badge = notification.BadgeCount.Value;
-
-            var custom = new CustomizeToast(x =>
-            {
-                //x.Activated += null;
-                //x.Dismissed += null;
-                x.Tag = notification.Id.ToString();
-                x.Group = "";
-                //x.Priority
-            });
             var builder = new ToastContentBuilder()
                 .AddText(notification.Title, AdaptiveTextStyle.Title)
                 .AddText(notification.Message, AdaptiveTextStyle.Subtitle)
                 .SetToastDuration(ToastDuration.Short)
                 .AddToastActivationInfo(notification.Id.ToString(), ToastActivationType.Foreground);
-
             await this.TrySetChannel(notification, builder);
 
-            await this.services
-                .Services
-                .SafeResolveAndExecute<INotificationDelegate>(
-                    x => x.OnReceived(notification)
-                );
+            if (notification.ScheduleDate != null)
+            {
+                await this.services.Repository.Set(notification.Id.ToString(), notification);
+                // TODO: set badge and fire notification fired?
+                builder.Schedule(notification.ScheduleDate.Value);
+            }
+            else
+            {
+                if (notification.BadgeCount != null)
+                    this.Badge = notification.BadgeCount.Value;
+
+                builder.Show(new CustomizeToast(x =>
+                {
+                    //x.Activated += null;
+                    //x.Dismissed += null;
+                    x.Tag = notification.Id.ToString();
+                    x.Group = "";
+                    //x.Priority
+                }));
+            }
         }
 
 
@@ -84,14 +81,14 @@ namespace Shiny.Notifications
 
         public async Task Clear()
         {
-            ToastNotificationManager.History.Clear();
+            ToastNotificationManagerCompat.History.Clear();
             await this.services.Repository.Clear<Notification>();
         }
 
 
         public async Task Cancel(int id)
         {
-            ToastNotificationManager.History.Remove(id.ToString());
+            ToastNotificationManagerCompat.History.Remove(id.ToString());
             await this.services.Repository.Remove<Notification>(id.ToString());
         }
 
