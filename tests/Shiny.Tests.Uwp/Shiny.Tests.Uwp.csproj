@@ -192,6 +192,18 @@
       <Project>{5a0dd7a1-e497-4051-84b0-2e16b015e012}</Project>
       <Name>Shiny.Locations</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
+      <Project>{e76db2cb-7a95-40b0-9a50-230320554b6b}</Project>
+      <Name>Shiny.Notifications</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
+      <Project>{da7ee0f6-e80e-4470-bec3-d5fee5a6073d}</Project>
+      <Name>Shiny.Push.AzureNotificationHubs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj">
+      <Project>{b7855e77-9363-4f36-9a0d-fc9277a88f8d}</Project>
+      <Name>Shiny.Push</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj">
       <Project>{204b1f42-0d9c-4349-87c5-34148e3d170a}</Project>
       <Name>Shiny.Testing</Name>

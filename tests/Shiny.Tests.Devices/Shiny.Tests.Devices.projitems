@@ -9,6 +9,7 @@
     <Import_RootNamespace>Shiny.Tests.Devices</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ActionStartup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyAttributes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\BleManagerTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\CharacteristicTests.cs" />

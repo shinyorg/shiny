@@ -21,14 +21,23 @@ namespace Shiny.Tests.Devices.Push
         NotificationHubClient hubClient;
 
 
+        const string fullListenerConfig = "Endpoint=sb://shinysamples.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=8Vng3Iav9v4+YABrGJdWDlEuybsl2JbZm+xNalTqPq4=";
+        const string listenOnlyListenerConfig = "Endpoint=sb://shinysamples.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=jI6ss5WOD//xPNuHFJmS7sWWzqndYQyz7wAVOMTZoLE=";
+        const string hubName = "shinysamples";
+
+
         public AzureNotificationHubTests()
         {
-            var services = new ShinyServiceCollection();
-            services.UsePushAzureNotificationHubs<TestPushDelegate>("", "");
-            var provider = services.BuildShinyServiceProvider(false, null, null);
+            ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
+            {
+                BuildServices = (services) =>
+                {
+                    services.UsePushAzureNotificationHubs<TestPushDelegate>(listenOnlyListenerConfig, hubName);
+                }
+            });
 
-            this.pushManager = (Shiny.Push.AzureNotificationHubs.PushManager)provider.Resolve<IPushManager>();
-            this.hubClient = NotificationHubClient.CreateClientFromConnectionString("PrimaryConnectionString", "HubName");
+            this.pushManager = (Shiny.Push.AzureNotificationHubs.PushManager)ShinyHost.Resolve<IPushManager>();
+            this.hubClient = NotificationHubClient.CreateClientFromConnectionString(fullListenerConfig, hubName);
         }
 
 
@@ -37,7 +46,7 @@ namespace Shiny.Tests.Devices.Push
         {
             var result = await this.pushManager.RequestAccess();
             if (result.Status != AccessState.Available)
-                throw new ArgumentException("User denied");
+                throw new ArgumentException("Permission status failure - " + result.Status);
 
             this.pushManager.InstallationId.Should().Be(result.RegistrationToken);
             this.pushManager.NativeRegistrationToken.Should().NotBeNull();
@@ -58,11 +67,11 @@ namespace Shiny.Tests.Devices.Push
         }
 
 
-        [Fact]
-        public async Task ReceiveNotification()
-        {
-            await this.hubClient.SendAppleNativeNotificationAsync("jsonPayload", new[] { "tag" });
-        }
+        //[Fact]
+        //public async Task ReceiveNotification()
+        //{
+        //    await this.hubClient.SendAppleNativeNotificationAsync("jsonPayload", new[] { "tag" });
+        //}
 
 
         [Fact]
@@ -76,28 +85,28 @@ namespace Shiny.Tests.Devices.Push
             await this.pushManager.AddTag(random + "3");
 
             var install = await this.hubClient.GetInstallationAsync(this.pushManager.InstallationId);
-            install.Tags.Any(x => x.Equals(random + "1")).Should().BeTrue();
-            install.Tags.Any(x => x.Equals(random + "2")).Should().BeTrue();
-            install.Tags.Any(x => x.Equals(random + "3")).Should().BeTrue();
+            install.Tags.Any(x => x.Equals(random + "1")).Should().BeTrue("tag1 not found");
+            install.Tags.Any(x => x.Equals(random + "2")).Should().BeTrue("tag2 not found");
+            install.Tags.Any(x => x.Equals(random + "3")).Should().BeTrue("tag3 not found");
 
             await this.pushManager.RemoveTag(random + "2");
             install = await this.hubClient.GetInstallationAsync(this.pushManager.InstallationId);
 
-            install.Tags.Any(x => x.Equals(random + "1")).Should().BeTrue();
-            install.Tags.Any(x => x.Equals(random + "2")).Should().BeFalse();
-            install.Tags.Any(x => x.Equals(random + "3")).Should().BeTrue();
+            install.Tags.Any(x => x.Equals(random + "1")).Should().BeTrue("tag1 not found");
+            install.Tags.Any(x => x.Equals(random + "2")).Should().BeFalse("tag2 found, but should be deleted");
+            install.Tags.Any(x => x.Equals(random + "3")).Should().BeTrue("tag3 not found");
 
             await this.pushManager.ClearTags();
             install = await this.hubClient.GetInstallationAsync(this.pushManager.InstallationId);
-            install.Tags.Count.Should().Be(0);
+            install.Tags.Count.Should().Be(0, "There should be 0 tags on this install now");
         }
 
 
 
-        async Task SendNotification(string deviceId)
-        {
+        //async Task SendNotification(string deviceId)
+        //{
 
-        }
+        //}
     }
 }
 
