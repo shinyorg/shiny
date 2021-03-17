@@ -6,5 +6,7 @@
 	<array>
 		<string>$(AppIdentifierPrefix)com.shiny.test</string>
 	</array>
+	<key>aps-environment</key>
+	<string>development</string>
 </dict>
 </plist>
