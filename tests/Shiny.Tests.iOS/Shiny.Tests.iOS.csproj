@@ -73,6 +73,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Entitlements.plist" />
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
+    <None Include="GoogleService-Info.plist" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
