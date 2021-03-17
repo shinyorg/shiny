@@ -27,6 +27,7 @@ namespace Shiny.Notifications
         {
             if (this.services.Services.GetService(typeof(INotificationDelegate)) != null)
             {
+                //ToastNotificationManagerCompat.OnActivated += null;
                 UwpPlatform.RegisterBackground<NotificationBackgroundTaskProcessor>(
                     builder => builder.SetTrigger(new ToastNotificationActionTrigger())
                 );
@@ -34,44 +35,6 @@ namespace Shiny.Notifications
         }
 
 
-        //https://docs.microsoft.com/en-us/windows/uwp/design/shell/tiles-and-notifications/notification-listener
-
-
-        //IReadOnlyList<UserNotification> notifs = await listener.GetNotificationsAsync(NotificationKinds.Toast);
-
-
-        //        // Get the listener
-        //        UserNotificationListener listener = UserNotificationListener.Current;
-
-        //        // And request access to the user's notifications (must be called from UI thread)
-        //        UserNotificationListenerAccessStatus accessStatus = await listener.RequestAccessAsync();
-
-        //switch (accessStatus)
-        //{
-        //    // This means the user has granted access.
-        //    case UserNotificationListenerAccessStatus.Allowed:
-
-        //        // Yay! Proceed as normal
-        //        break;
-
-        //    // This means the user has denied access.
-        //    // Any further calls to RequestAccessAsync will instantly
-        //    // return Denied. The user must go to the Windows settings
-        //    // and manually allow access.
-        //    case UserNotificationListenerAccessStatus.Denied:
-
-        //        // Show UI explaining that listener features will not
-        //        // work until user allows access.
-        //        break;
-
-        //    // This means the user closed the prompt without
-        //    // selecting either allow or deny. Further calls to
-        //    // RequestAccessAsync will show the dialog again.
-        //    case UserNotificationListenerAccessStatus.Unspecified:
-
-        //        // Show UI that allows the user to bring up the prompt again
-        //        break;
-        //}
         public Task<AccessState> RequestAccess()
             => this.services.Jobs.RequestAccess();
 
@@ -82,18 +45,30 @@ namespace Shiny.Notifications
             if (notification.Id == 0)
                 notification.Id = this.services.Settings.IncrementValue("NotificationId");
 
-            var content = await this.CreateContent(notification);
-            var native = this.CreateNativeNotification(content, notification);
 
             if (notification.ScheduleDate != null && notification.ScheduleDate > DateTimeOffset.UtcNow)
             {
                 await this.services.Repository.Set(notification.Id.ToString(), notification);
                 return;
             }
-
-            ToastNotificationManager.CreateToastNotifier().Show(native);
             if (notification.BadgeCount != null)
                 this.Badge = notification.BadgeCount.Value;
+
+            var custom = new CustomizeToast(x =>
+            {
+                //x.Activated += null;
+                //x.Dismissed += null;
+                x.Tag = notification.Id.ToString();
+                x.Group = "";
+                //x.Priority
+            });
+            var builder = new ToastContentBuilder()
+                .AddText(notification.Title, AdaptiveTextStyle.Title)
+                .AddText(notification.Message, AdaptiveTextStyle.Subtitle)
+                .SetToastDuration(ToastDuration.Short)
+                .AddToastActivationInfo(notification.Id.ToString(), ToastActivationType.Foreground);
+
+            await this.TrySetChannel(notification, builder);
 
             await this.services
                 .Services
@@ -134,14 +109,6 @@ namespace Shiny.Notifications
         }
 
 
-        protected virtual ToastNotification CreateNativeNotification(ToastContent toastContent, Notification notification)
-            => new ToastNotification(toastContent.GetXml())
-            {
-                Tag = notification.Id.ToString(),
-                Group = notification.Channel ?? Channel.Default.Identifier
-            };
-
-
         public async Task SetChannels(params Channel[] channels)
         {
             await this.services.Repository.DeleteAllChannels();
@@ -153,7 +120,7 @@ namespace Shiny.Notifications
         public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
 
 
-        protected async Task TrySetChannel(Notification notification, ToastContent content)
+        protected async Task TrySetChannel(Notification notification, ToastContentBuilder builder)
         {
             Channel? channel = null;
             if (!notification.Channel.IsEmpty())
@@ -161,74 +128,39 @@ namespace Shiny.Notifications
 
             channel ??= Channel.Default;
 
-            //if (!Notification.CustomSoundFilePath.IsEmpty())
-            //    toastContent.Audio = new ToastAudio { Src = new Uri(channel.CustomSoundPath) };
+            //if (!channel.CustomSoundPath.IsEmpty())
+            //    builder.AddAudio(new Uri(channel.CustomSoundPath));
 
             if (channel.Actions.Any())
             {
-                var nativeActions = new ToastActionsCustom();
-
                 foreach (var action in channel.Actions)
                 {
                     switch (action.ActionType)
                     {
                         case ChannelActionType.OpenApp:
-                            nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
-                            {
-                                ActivationType = ToastActivationType.Foreground
-                            });
+                            // foreground activation
+                            builder.AddButton(new ToastButton()
+                                .SetContent(action.Title)
+                                .AddArgument("action", action.Identifier)
+                            );
                             break;
 
                         case ChannelActionType.None:
                         case ChannelActionType.Destructive:
-                            nativeActions.Buttons.Add(new ToastButton(action.Title, action.Identifier)
-                            {
-                                ActivationType = ToastActivationType.Background
-                            });
+                            builder.AddButton(new ToastButton()
+                                .SetBackgroundActivation()
+                                .SetContent(action.Title)
+                                .AddArgument("action", action.Identifier)
+                            );
                             break;
 
                         case ChannelActionType.TextReply:
-                            nativeActions.Inputs.Add(new ToastTextBox(action.Identifier)
-                            {
-                                Title = notification.Title
-                                //DefaultInput = "",
-                                //PlaceholderContent = ""
-                            });
+                            builder.AddInputTextBox(action.Identifier, null, action.Title);
+                            // TODO: need  button?
                             break;
                     }
                 }
-                content.Actions = nativeActions;
             }
-        }
-
-
-        protected virtual async Task<ToastContent> CreateContent(Notification notification)
-        {
-            var content = new ToastContent
-            {
-                Duration = ToastDuration.Short,
-                ActivationType = ToastActivationType.Foreground,
-                Visual = new ToastVisual
-                {
-                    BindingGeneric = new ToastBindingGeneric
-                    {
-                        Children =
-                        {
-                            new AdaptiveText
-                            {
-                                Text = notification.Title
-                            },
-                            new AdaptiveText
-                            {
-                                Text = notification.Message
-                            }
-                        }
-                    }
-                }
-            };
-
-            await this.TrySetChannel(notification, content);
-            return content;
         }
 
 
@@ -245,201 +177,3 @@ namespace Shiny.Notifications
         //}
     }
 }
-
-//using System;
-//using System.Threading;
-//using Microsoft.Toolkit.Uwp.Notifications;
-//using Windows.UI.Notifications;
-
-
-//namespace Shiny.Notifications
-//{
-//    public class UwpPersistentNotification : IPersistentNotification
-//    {
-//        readonly ToastNotifier toastNotifier;
-//        static int current;
-//        int notificationId;
-//        int sequence;
-//        string channel;
-
-
-//        public UwpPersistentNotification(Notification initialNotification)
-//        {
-//            this.toastNotifier = ToastNotificationManager.CreateToastNotifier();
-
-//            this.title = initialNotification.Title;
-//            this.message = initialNotification.Message;
-//            this.channel = initialNotification.Channel ?? Channel.Default.Identifier;
-//        }
-
-
-//        public bool IsShowing { get; private set; }
-
-
-//        string title;
-//        public string Title
-//        {
-//            get => this.title;
-//            set
-//            {
-//                if (this.title == value)
-//                    return;
-
-//                this.title = value;
-//                this.Update();
-//            }
-//        }
-
-
-//        string message;
-//        public string Message
-//        {
-//            get => this.message;
-//            set
-//            {
-//                if (this.message == value)
-//                    return;
-
-//                this.message = value;
-//                this.Update();
-//            }
-//        }
-
-
-//        bool ind;
-//        public bool IsIndeterministic
-//        {
-//            get => this.ind;
-//            set
-//            {
-//                if (this.ind == value)
-//                    return;
-
-//                this.ind = value;
-//                if (this.IsShowing)
-//                {
-//                    this.Dismiss();
-//                    this.Show();
-//                }
-//            }
-//        }
-
-
-//        double total;
-//        public double Total
-//        {
-//            get => this.total;
-//            set
-//            {
-//                if (this.total == value)
-//                    return;
-
-//                this.total = value;
-//                this.Update();
-//            }
-//        }
-
-
-//        double progress;
-//        public double Progress
-//        {
-//            get => this.progress;
-//            set
-//            {
-//                if (this.progress == value)
-//                    return;
-
-//                this.progress = value;
-//                this.Update();
-//            }
-//        }
-
-
-//        public void Show()
-//        {
-//            if (this.IsShowing)
-//                throw new ArgumentException("Toast is already showing");
-
-//            this.notificationId = ++current;
-//            this.CreateToast();
-//            this.IsShowing = true;
-//        }
-//        public void Dismiss() => ToastNotificationManager.History.Remove(this.notificationId.ToString());
-//        public void Dispose() => this.Dismiss();
-
-
-//        void Update()
-//        {
-//            Interlocked.Increment(ref this.sequence);
-//            var data = new NotificationData
-//            {
-//                SequenceNumber = (uint)this.sequence
-//            };
-//            data.Values["Title"] = this.Title;
-//            data.Values["Message"] = this.Message;
-
-//            if (!this.IsIndeterministic && this.Total > 0)
-//            {
-//                data.Values["progressValue"] = (this.progress / this.total).ToString();
-//                data.Values["progressValueString"] = $"{this.progress}/{this.total}";
-//            }
-//            this.toastNotifier.Update(
-//                data,
-//                this.notificationId.ToString(),
-//                this.channel
-//            );
-//        }
-
-
-//        void CreateToast()
-//        {
-//            var toastContent = new ToastContent
-//            {
-//                Duration = ToastDuration.Short,
-//                ActivationType = ToastActivationType.Foreground,
-//                Visual = new ToastVisual
-//                {
-//                    BindingGeneric = new ToastBindingGeneric
-//                    {
-//                        Children =
-//                        {
-//                            new AdaptiveText
-//                            {
-//                                Text = new BindableString("Title")
-//                            },
-//                            new AdaptiveText
-//                            {
-//                                Text = new BindableString("Message")
-//                            }
-//                        }
-//                    }
-//                }
-//            };
-
-//            if (this.IsIndeterministic || this.Total > 0)
-//            {
-//                //Title = new BindableString("title"),
-//                var progressBar = new AdaptiveProgressBar();
-
-//                if (this.IsIndeterministic)
-//                {
-//                    progressBar.Value = AdaptiveProgressBarValue.Indeterminate;
-//                }
-//                else
-//                {
-//                    progressBar.Value = new BindableProgressBarValue("progressValue");
-//                    progressBar.ValueStringOverride = new BindableString("progressValueString");
-//                    progressBar.Status = new BindableString("progressStatus");
-//                }
-//                toastContent.Visual.BindingGeneric.Children.Add(progressBar);
-//            }
-
-//            this.toastNotifier.Show(new ToastNotification(toastContent.GetXml())
-//            {
-//                Tag = this.notificationId.ToString(),
-//                Group = this.channel
-//            });
-//            this.Update();
-//        }
-//    }
-//}
