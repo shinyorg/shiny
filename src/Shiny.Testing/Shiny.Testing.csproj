@@ -12,8 +12,6 @@
         <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
-        <ProjectReference Include="..\Shiny.Sensors\Shiny.Sensors.csproj" />
-        <ProjectReference Include="..\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
         <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
     </ItemGroup>
