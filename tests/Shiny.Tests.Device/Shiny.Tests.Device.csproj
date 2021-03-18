@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Mobile.BuildTools" />
+        <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="xunit" />
         <PackageReference Include="FirebaseAdmin" />
@@ -18,7 +18,6 @@
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
     </ItemGroup>
