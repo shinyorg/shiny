@@ -1,9 +1,5 @@
 ﻿## Shiny Samples
 
-Please note that this is always built against the dev version of Shiny libraries, thus some features may not be available yet on nuget.
-
-Use Samples.sln if you want to build the project.  The -Debug.sln is for testing with the raw source code which requires special setup.
-
 These samples make use of:
 * Prism
 * ReactiveUI & RX Principles
@@ -16,6 +12,7 @@ If you are looking to just use one part of Shiny, such as notifications, this pr
 * Your infrastructure to the background
 * Gives a clean & testable API surface for your code
 
+
 ## Builds
 
 OS|Status
@@ -24,13 +21,6 @@ Android|[![Build status](https://dev.azure.com/shinylib/Shiny/_apis/build/status
 iOS|[![Build status](https://dev.azure.com/shinylib/Shiny/_apis/build/status/iOS%20Sample)](https://dev.azure.com/shinylib/Shiny/_build/latest?definitionId=16)
 Tizen|[![Build status](https://dev.azure.com/shinylib/Shiny/_apis/build/status/Tizen%20Mobile)](https://dev.azure.com/shinylib/Shiny/_build/latest?definitionId=12)
 UWP|[![Build status](https://dev.azure.com/shinylib/Shiny/_apis/build/status/Sample%20UWP)](https://dev.azure.com/shinylib/Shiny/_build/latest?definitionId=9)
-
-## AppCenter Test Releases
-
-OS|Link
---|----
-Android|[Link](https://install.appcenter.ms/orgs/shinyorg/apps/shiny/distribution_groups/all)
-iOS|[Link](https://install.appcenter.ms/orgs/shinyorg/apps/shiny-1/distribution_groups/all)
 
 
 ## Compiling on iOS

@@ -23,7 +23,7 @@
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="Rg.Plugins.Popup" />
         <PackageReference Include="Xamarin.CommunityToolkit" />
-        <PackageReference Include="Mobile.BuildTools" />
+        <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
