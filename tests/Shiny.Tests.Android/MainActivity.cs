@@ -22,7 +22,8 @@ namespace Shiny.Tests.Droid
         protected override void OnCreate(Bundle bundle)
         {
             this.ShinyOnCreate();
-            this.AddTestAssembly(Assembly.GetExecutingAssembly());
+            this.AddTestAssembly(this.GetType().Assembly);
+            this.AddTestAssembly(typeof(TestStartup).Assembly);
 
             //CrossBleAdapter.UseNewScanner = false;
             //CrossBleAdapter.PauseBeforeServiceDiscovery = TimeSpan.FromSeconds(1);

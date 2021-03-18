@@ -17,6 +17,7 @@ namespace Shiny.Tests.iOS
             this.ShinyFinishedLaunching(new TestStartup());
             this.AddExecutionAssembly(typeof(ExtensibilityPointFactory).Assembly);
             this.AddTestAssembly(this.GetType().Assembly);
+            this.AddTestAssembly(typeof(TestStartup).Assembly);
 
             this.AutoStart = false;
             this.TerminateAfterExecution = false;
