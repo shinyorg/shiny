@@ -119,30 +119,8 @@ namespace Shiny.Stores
                 if (!this.bindings.ContainsKey(sender))
                     throw new ArgumentException("No key/value store found for current binding object - " + sender.GetType().FullName);
 
-                var store = this.bindings[sender];
-                if (IsNullOrDefault(value))
-                //if (value == null)
-                {
-                    store.Remove(key);
-                }
-                else
-                {
-                    store.Set(key, value);
-                }
+                this.bindings[sender].SetOrRemove(key, value);
             }
-        }
-
-
-        static bool IsNullOrDefault(object obj)
-        {
-            if (obj == null)
-                return true;
-
-            var type = obj.GetType();
-            if (type.IsValueType)
-                return Activator.CreateInstance(type).Equals(obj);
-
-            return false;
         }
     }
 }

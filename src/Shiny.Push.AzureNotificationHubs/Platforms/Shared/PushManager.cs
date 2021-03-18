@@ -40,14 +40,14 @@ namespace Shiny.Push.AzureNotificationHubs
         public string? InstallationId
         {
             get => this.Settings.Get<string>(nameof(this.InstallationId));
-            private set => this.Settings.Set(nameof(this.InstallationId), value);
+            private set => this.Settings.SetOrRemove(nameof(this.InstallationId), value);
         }
 
 
         public string? NativeRegistrationToken
         {
             get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
-            protected set => this.Settings.Set(nameof(NativeRegistrationToken), value);
+            protected set => this.Settings.SetOrRemove(nameof(NativeRegistrationToken), value);
         }
 
 
@@ -95,10 +95,9 @@ namespace Shiny.Push.AzureNotificationHubs
 
         public override async Task UnRegister()
         {
-            if (this.InstallationId == null)
-                return;
+            if (this.InstallationId != null)
+                await this.hub.DeleteInstallationAsync(this.InstallationId);
 
-            await this.hub.DeleteInstallationAsync(this.InstallationId);
             await base.UnRegister();
         }
 
@@ -110,28 +109,13 @@ namespace Shiny.Push.AzureNotificationHubs
         }
 
 
-        protected virtual bool IsRefreshNeeded(PushAccessState nativeToken)
-        {
-            if (this.CurrentRegistrationToken == null)
-                return true;
-
-            if (this.NativeRegistrationToken != nativeToken.RegistrationToken)
-                return true;
-
-            if (this.CurrentRegistrationExpiryDate < DateTime.Now)
-                return true;
-
-            return false;
-        }
-
-
 #if __ANDROID__
         public override Task AddTag(string tag)
 #else
         public Task AddTag(string tag)
 #endif
         {
-            var tags = this.RegisteredTags.ToList();
+            var tags = this.RegisteredTags?.ToList() ?? new List<string>(0);
             tags.Add(tag);
             return this.SetTags(tags.ToArray());
         }
@@ -143,7 +127,7 @@ namespace Shiny.Push.AzureNotificationHubs
         public Task RemoveTag(string tag)
 #endif
         {
-            var tags = this.RegisteredTags.ToList();
+            var tags = this.RegisteredTags?.ToList() ?? new List<string>(0);
             tags.Remove(tag);
             return this.SetTags(tags.ToArray());
         }
@@ -172,7 +156,7 @@ namespace Shiny.Push.AzureNotificationHubs
 #if __ANDROID__
         public override async Task UpdateNativePushToken(string token)
         {
-            if (this.InstallationId.IsEmpty())
+            if (this.InstallationId == null)
                 return;
 
             this.NativeRegistrationToken = token;

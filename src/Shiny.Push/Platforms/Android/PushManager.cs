@@ -17,12 +17,8 @@ namespace Shiny.Push
     public class PushManager : AbstractPushManager, IPushTagSupport, IAndroidTokenUpdate
     {
         readonly INotificationManager notificationManager;
-
-
         public PushManager(ShinyCoreServices services, INotificationManager notificationManager) : base(services)
-        {
-            this.notificationManager = notificationManager;
-        }
+            => this.notificationManager = notificationManager;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
@@ -57,10 +53,12 @@ namespace Shiny.Push
 
         public override async Task UnRegister()
         {
+            if (this.CurrentRegistrationToken == null)
+                return;
+
             this.ClearRegistration();
             FirebaseMessaging.Instance.AutoInitEnabled = false;
 
-            // must be executed off proc
             await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId());
         }
 

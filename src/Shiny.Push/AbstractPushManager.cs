@@ -30,29 +30,29 @@ namespace Shiny.Push
 
         public string? CurrentRegistrationToken
         {
-            get => this.Settings.Get<string>(nameof(this.CurrentRegistrationToken));
-            protected set => this.Settings.Set(nameof(this.CurrentRegistrationToken), value);
+            get => this.Settings.Get<string?>(nameof(this.CurrentRegistrationToken));
+            protected set => this.Settings.SetOrRemove(nameof(this.CurrentRegistrationToken), value);
         }
 
 
         public DateTime? CurrentRegistrationTokenDate
         {
             get => this.Settings.Get<DateTime?>(nameof(this.CurrentRegistrationTokenDate));
-            protected set => this.Settings.Set(nameof(this.CurrentRegistrationTokenDate), value);
+            protected set => this.Settings.SetOrRemove(nameof(this.CurrentRegistrationTokenDate), value);
         }
 
 
         public DateTime? CurrentRegistrationExpiryDate
         {
-            get => this.Settings.Get<DateTime>(nameof(this.CurrentRegistrationExpiryDate));
-            protected set => this.Settings.Set(nameof(this.CurrentRegistrationExpiryDate), value);
+            get => this.Settings.Get<DateTime?>(nameof(this.CurrentRegistrationExpiryDate));
+            protected set => this.Settings.SetOrRemove(nameof(this.CurrentRegistrationExpiryDate), value);
         }
 
 
         public string[]? RegisteredTags
         {
             get => this.Settings.Get<string[]?>(nameof(this.RegisteredTags));
-            protected set => this.Settings.Set(nameof(this.RegisteredTags), value);
+            protected set => this.Settings.SetOrRemove(nameof(this.RegisteredTags), value);
         }
     }
 }

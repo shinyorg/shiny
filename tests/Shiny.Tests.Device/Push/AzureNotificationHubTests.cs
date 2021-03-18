@@ -5,6 +5,8 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.NotificationHubs;
+using Microsoft.Azure.NotificationHubs.Messaging;
+
 using Shiny.Push;
 using Shiny.Testing.Push;
 using Xunit;
@@ -43,27 +45,35 @@ namespace Shiny.Tests.Push
         }
 
 
-        [Fact]
+        [Fact(DisplayName = "Push - ANH Register/UnRegister")]
         public Task Register_UnRegister() => this.WrapRegistration(async regToken =>
         {
             this.pushManager.CurrentRegistrationToken.Should().Be(regToken);
             this.pushManager.CurrentRegistrationTokenDate.Should().NotBeNull("TokenDate not set");
             this.pushManager.CurrentRegistrationExpiryDate.Should().NotBeNull("ExpiryDate not set");
 
-            var install = await this.hubClient.GetInstallationAsync(regToken);
-            install.Should().NotBeNull("Install was not found");
+            // did it remove off the server?
+            //var install = await this.hubClient.GetInstallationAsync(regToken);
+            //install.Should().NotBeNull("Install was not found");
 
             await this.pushManager.UnRegister();
             this.pushManager.CurrentRegistrationToken.Should().BeNull("Reg Token is still set");
             this.pushManager.CurrentRegistrationTokenDate.Should().BeNull("Reg Token Date is still set");
             this.pushManager.CurrentRegistrationExpiryDate.Should().BeNull("Reg Expiry Date is still set");
 
-            install = await this.hubClient.GetInstallationAsync(regToken);
-            install.Should().BeNull("Install was not deleted");
+            try
+            {
+                await this.hubClient.GetInstallationAsync(regToken);
+                throw new ArgumentException("This should not have been reached");
+            }
+            catch (MessagingEntityNotFoundException)
+            {
+                // this is what we want
+            }
         });
 
 
-        [Fact]
+        [Fact(DisplayName = "Push - ANH Receive Observable")]
         public Task ReceiveOnForegroundObservable() => this.WrapRegistration(async token =>
         {
             var task = this.pushManager
@@ -78,7 +88,7 @@ namespace Shiny.Tests.Push
         });
 
 
-        [Fact]
+        [Fact(DisplayName = "Push - ANH Receive Delegate")]
         public Task ReceiveOnDelegate() => this.WrapRegistration(async token =>
         {
             var tcs = new TaskCompletionSource<object?>();
@@ -89,7 +99,7 @@ namespace Shiny.Tests.Push
 
 
 
-        [Fact]
+        [Fact(DisplayName = "Push - ANH Tags")]
         public Task Tags() => this.WrapRegistration(async token =>
         {
             var random = Guid.NewGuid().ToString();
@@ -117,24 +127,33 @@ namespace Shiny.Tests.Push
 
         async Task WrapRegistration(Func<string, Task> innerTask)
         {
+            await this.pushManager.UnRegister();
             var result = await this.pushManager.RequestAccess();
             result.Assert();
-
-            try
-            {
-                await innerTask(result.RegistrationToken).ConfigureAwait(false);
-            }
-            finally
-            {
-                await this.pushManager.UnRegister();
-            }
+            await innerTask(result.RegistrationToken);
         }
 
 
         async Task DoSend()
         {
-            await this.hubClient.SendAppleNativeNotificationAsync(AppleSampleNotificationContent);
-            await this.hubClient.SendFcmNativeNotificationAsync(FcmSampleNotificationContent);
+            var name = TestStartup.CurrentPlatform.GetType().Name;
+
+            if (name.Equals("AndroidPlatform"))
+            {
+                await this.hubClient.SendFcmNativeNotificationAsync(FcmSampleNotificationContent);
+            }
+            else if (name.Equals("ApplePlatform"))
+            {
+                await this.hubClient.SendAppleNativeNotificationAsync(AppleSampleNotificationContent);
+            }
+            else if (name.Equals("UwpPlatform"))
+            {
+                await this.hubClient.SendWindowsNativeNotificationAsync(WnsSampleNotification);
+            }
+            else
+            {
+                throw new ArgumentException("Invalid Platform - " + name);
+            }
         }
     }
 }

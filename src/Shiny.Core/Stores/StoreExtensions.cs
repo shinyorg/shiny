@@ -10,7 +10,42 @@ namespace Shiny
 
 
         /// <summary>
-        ///
+        /// If obj is null or equivalent to the default for the object type
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static bool IsNullOrDefault(this object? obj)
+        {
+            if (obj == null)
+                return true;
+
+            var type = obj.GetType();
+            if (type.IsValueType)
+            {
+                var result = Activator.CreateInstance(type).Equals(obj);
+                return result;
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// If the value is null or default for the type, it will remove the key from the store - otherwise it will store it
+        /// </summary>
+        /// <param name="store"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public static void SetOrRemove(this IKeyValueStore store, string key, object? value)
+        {
+            if (value.IsNullOrDefault())
+                store.Remove(key);
+            else
+                store.Set(key, value!);
+        }
+
+
+        /// <summary>
+        /// Gets a generic object from the store
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="store"></param>
