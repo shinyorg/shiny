@@ -195,6 +195,7 @@
       <Name>Shiny.Testing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
+      <Project>{5b569bcc-b60c-4224-babc-77dd1f193f4b}</Project>
       <Name>Shiny</Name>
     </ProjectReference>
     <ProjectReference Include="..\Shiny.Tests.Device\Shiny.Tests.Device.csproj">
