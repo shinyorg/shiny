@@ -65,10 +65,13 @@ namespace Shiny.Push
                     await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
                     x.CompletionHandler();
                 });
-
-            // this will be on the main thread already
-            if (!this.CurrentRegistrationToken.IsEmpty())
-                UIApplication.SharedApplication.RegisterForRemoteNotifications();
+            //if (!this.CurrentRegistrationToken.IsEmpty())
+            //{
+            //    // do I need to do this?  I would normally be calling RequestAccess on startup anyhow
+            //    Dispatcher.InvokeOnMainThreadAsync(() =>
+            //        UIApplication.SharedApplication.RegisterForRemoteNotifications()
+            //    );
+            //}
         }
 
 
