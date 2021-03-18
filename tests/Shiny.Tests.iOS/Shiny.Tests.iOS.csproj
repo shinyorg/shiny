@@ -56,6 +56,7 @@
     <CodesignProvision>VS: com.shiny.test Development</CodesignProvision>
     <MtouchInterpreter>-all</MtouchInterpreter>
     <MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
+    <OptimizePNGs>true</OptimizePNGs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -90,14 +91,10 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-      <PackageReference Include="Google.Apis.FirebaseCloudMessaging.v1" />
     <PackageReference Include="xunit.runner.devices" />
     <PackageReference Include="xunit" />
     <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Xamarin.Essentials" />
     <PackageReference Include="Xamarin.Forms" />
-    <PackageReference Include="Acr.UserDialogs" />
-    <PackageReference Include="Microsoft.Azure.NotificationHubs" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
@@ -200,11 +197,11 @@
     <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
       <Name>Shiny</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
-      <Name>Shiny.Push.FirebaseMessaging</Name>
+    <ProjectReference Include="..\Shiny.Tests.Device\Shiny.Tests.Device.csproj">
+      <Project>{e1e4a77d-f07a-402e-bfac-2b356b86b089}</Project>
+      <Name>Shiny.Tests.Device</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\Shiny.Tests.Devices\Shiny.Tests.Devices.projitems" Label="Shared" />
   <Import Project="..\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ProjectExtensions>

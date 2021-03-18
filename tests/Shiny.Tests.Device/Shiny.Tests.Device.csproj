@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>Shiny.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Mobile.BuildTools" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="FirebaseAdmin" />
+        <PackageReference Include="Xamarin.Essentials" />
+        <PackageReference Include="Acr.UserDialogs" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
+    </ItemGroup>
+
+</Project>

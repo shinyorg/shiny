@@ -85,9 +85,6 @@
     <PackageReference Include="xunit.runner.devices" />
     <PackageReference Include="xunit" />
     <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Acr.UserDialogs" />
-    <PackageReference Include="Microsoft.Azure.NotificationHubs" />
-    <PackageReference Include="Google.Apis.FirebaseCloudMessaging.v1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">
@@ -124,6 +121,10 @@
       <Project>{5a0dd7a1-e497-4051-84b0-2e16b015e012}</Project>
       <Name>Shiny.Locations</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
+      <Project>{886f6ff7-2e92-488a-9011-b5c333b6bd54}</Project>
+      <Name>Shiny.Push.FirebaseMessaging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj">
       <Project>{204b1f42-0d9c-4349-87c5-34148e3d170a}</Project>
       <Name>Shiny.Testing</Name>
@@ -131,9 +132,6 @@
     <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
       <Project>{5b569bcc-b60c-4224-babc-77dd1f193f4b}</Project>
       <Name>Shiny</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
-      <Name>Shiny.Push.FirebaseMessaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
       <Name>Shiny.Push.AzureNotificationHubs</Name>
@@ -143,6 +141,10 @@
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
       <Name>Shiny.Notifications</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shiny.Tests.Device\Shiny.Tests.Device.csproj">
+      <Project>{e1e4a77d-f07a-402e-bfac-2b356b86b089}</Project>
+      <Name>Shiny.Tests.Device</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -291,7 +293,6 @@
       </Generator>
     </AndroidResource>
   </ItemGroup>
-  <Import Project="..\Shiny.Tests.Devices\Shiny.Tests.Devices.projitems" Label="Shared" />
   <Import Project="..\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

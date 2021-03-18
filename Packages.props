@@ -57,6 +57,7 @@
         -->
 
         <!--Samples-->
+        <PackageReference Update="Mobile.BuildTools" Version="2.0.109-pre" />
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.2012" />
         <PackageReference Update="Xamarin.CommunityToolkit" Version="1.0.3" />
         <PackageReference Update="Xamarin.Essentials" Version="1.6.1" />
@@ -74,7 +75,7 @@
         <PackageReference Update="coverlet.collector" Version="3.0.3" />
         <PackageReference Update="FluentAssertions" Version="5.10.3" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.9.1" />
-        <PackageReference Update="Google.Apis.FirebaseCloudMessaging.v1" Version="1.50.0.2230" />
+        <PackageReference Update="FirebaseAdmin" Version="2.0.0" />
         <PackageReference Update="Moq" Version="4.16.1" />
         <PackageReference Update="xunit" Version="2.4.1" />
         <PackageReference Update="xunit.runner.devices" Version="2.5.25" />

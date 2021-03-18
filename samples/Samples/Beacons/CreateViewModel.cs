@@ -13,6 +13,9 @@ namespace Samples.Beacons
 {
     public class CreateViewModel : ViewModel
     {
+        const string EstimoteUuid = "B9407F30-F5F8-466E-AFF9-25556B57FE6D";
+
+
         public CreateViewModel(INavigationService navigator,
                                IDialogs dialogs,
                                IBeaconRangingManager rangingManager,
@@ -23,7 +26,7 @@ namespace Samples.Beacons
             this.EstimoteDefaults = ReactiveCommand.Create(() =>
             {
                 this.Identifier = "Estimote";
-                this.Uuid = Constants.EstimoteUuid;
+                this.Uuid = EstimoteUuid;
             });
 
             this.WhenAnyValue(x => x.Major)

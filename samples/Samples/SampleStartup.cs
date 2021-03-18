@@ -33,7 +33,7 @@ namespace Samples
             );
             builder.AddSqliteLogging(LogLevel.Warning);
             //builder.AddFirebase(LogLevel.Warning);
-            builder.AddAppCenter(Constants.AppCenterToken, LogLevel.Warning);
+            //builder.AddAppCenter(Secrets.AppCenterToken, LogLevel.Warning);
         }
 
 
@@ -94,17 +94,17 @@ namespace Samples
 
             //services.UsePush<PushDelegate>(channels);
             //services.UseFirebaseMessaging<PushDelegate>(channels);
-            services.UsePushAzureNotificationHubs<PushDelegate>(
-                Constants.AnhListenerConnectionString,
-                Constants.AnhHubName,
-                channels
-            );
+            //services.UsePushAzureNotificationHubs<PushDelegate>(
+            //    Secrets.AzureNotificationHubListenerConnectionString,
+            //    Secrets.AzureNotificationHubName,
+            //    channels
+            //);
         }
 
 
         public override IServiceProvider CreateServiceProvider(IServiceCollection services)
         {
-            // This registers and initializes the Container with Prism ensuring 
+            // This registers and initializes the Container with Prism ensuring
             // that both Shiny & Prism use the same container
             ContainerLocator.SetContainerExtension(() => new DryIocContainerExtension());
             var container = ContainerLocator.Container.GetContainer();

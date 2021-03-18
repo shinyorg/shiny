@@ -150,7 +150,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-      <PackageReference Include="Google.Apis.FirebaseCloudMessaging.v1" />
+    <PackageReference Include="Google.Apis.FirebaseCloudMessaging.v1" />
     <PackageReference Include="xunit.runner.devices" />
     <PackageReference Include="Moq" />
     <PackageReference Include="xunit" />
@@ -214,7 +214,6 @@
       <Name>Shiny</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\Shiny.Tests.Devices\Shiny.Tests.Devices.projitems" Label="Shared" />
   <Import Project="..\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{3D16168F-A0F7-4B3F-BBF2-2AB1338B8840}"
 	ProjectSection(SolutionItems) = preProject
+		buildtools.json = buildtools.json
 		.github\workflows\samples.yml = .github\workflows\samples.yml
+		secrets.json = secrets.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Samples", "samples\Samples\Samples.csproj", "{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}"

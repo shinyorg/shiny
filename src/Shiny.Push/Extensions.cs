@@ -7,6 +7,17 @@ namespace Shiny.Push
     public static class Extensions
     {
         /// <summary>
+        /// Asserts necessary status for push notifications to operate
+        /// </summary>
+        /// <param name="state"></param>
+        public static void Assert(this PushAccessState state)
+        {
+            if (state.Status != AccessState.Available)
+                throw new PermissionException("Push registration fail", state.Status);
+        }
+
+
+        /// <summary>
         /// Returns if tags are supported by this push manager
         /// </summary>
         /// <param name="push"></param>
