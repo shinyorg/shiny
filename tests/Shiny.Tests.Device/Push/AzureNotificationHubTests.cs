@@ -25,21 +25,20 @@ namespace Shiny.Tests.Push
 
         public AzureNotificationHubTests()
         {
-            var cfg = global::Shiny.Tests.Secrets.Values;
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
                 BuildServices = (services) =>
                 {
                     services.UsePushAzureNotificationHubs<TestPushDelegate>(
-                        cfg.AzureNotificationHubListenerConnectionString,
-                        cfg.AzureNotificationHubName
+                        Secrets.Values.AzureNotificationHubListenerConnectionString,
+                        Secrets.Values.AzureNotificationHubName
                     );
                 }
             });
             this.pushManager = (IPushTagSupport)ShinyHost.Resolve<IPushManager>();
             this.hubClient = NotificationHubClient.CreateClientFromConnectionString(
-                cfg.AzureNotificationHubFullConnectionString,
-                cfg.AzureNotificationHubName
+                Secrets.Values.AzureNotificationHubFullConnectionString,
+                Secrets.Values.AzureNotificationHubName
             );
         }
 

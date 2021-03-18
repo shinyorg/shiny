@@ -34,7 +34,7 @@
 
 //            this.firebase = FirebaseApp.Create(new AppOptions
 //            {
-//                Credential = GoogleCredential.FromAccessToken("")
+//                Credential = GoogleCredential.FromAccessToken(Secrets.Values.FirebaseServerApiKey)
 //            });
 //            this.messaging = global::FirebaseAdmin.Messaging.FirebaseMessaging.DefaultInstance;
 //        }
