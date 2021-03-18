@@ -90,6 +90,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
+      <PackageReference Include="Google.Apis.FirebaseCloudMessaging.v1" />
     <PackageReference Include="xunit.runner.devices" />
     <PackageReference Include="xunit" />
     <PackageReference Include="FluentAssertions" />
@@ -198,6 +199,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
       <Name>Shiny</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
+      <Name>Shiny.Push.FirebaseMessaging</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\Shiny.Tests.Devices\Shiny.Tests.Devices.projitems" Label="Shared" />

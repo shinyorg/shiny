@@ -87,6 +87,7 @@
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Acr.UserDialogs" />
     <PackageReference Include="Microsoft.Azure.NotificationHubs" />
+    <PackageReference Include="Google.Apis.FirebaseCloudMessaging.v1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">

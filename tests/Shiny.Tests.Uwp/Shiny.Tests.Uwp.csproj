@@ -150,6 +150,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+      <PackageReference Include="Google.Apis.FirebaseCloudMessaging.v1" />
     <PackageReference Include="xunit.runner.devices" />
     <PackageReference Include="Moq" />
     <PackageReference Include="xunit" />
