@@ -274,3 +274,4 @@ __pycache__/
 .DS_Store
 
 .ionide
+secrets.json
