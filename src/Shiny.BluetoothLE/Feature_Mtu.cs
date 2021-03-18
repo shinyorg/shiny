@@ -3,7 +3,7 @@ using System.Reactive.Linq;
 
 namespace Shiny.BluetoothLE
 {
-    public interface ICanRequestMtu
+    public interface ICanRequestMtu : IPeripheral
     {
         IObservable<int> RequestMtu(int size);
 

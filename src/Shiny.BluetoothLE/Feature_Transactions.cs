@@ -6,7 +6,7 @@ using System.Reactive.Threading.Tasks;
 
 namespace Shiny.BluetoothLE
 {
-    public interface ICanDoTransactions
+    public interface ICanDoTransactions : IPeripheral
     {
         IGattReliableWriteTransaction BeginReliableWriteTransaction();
     }

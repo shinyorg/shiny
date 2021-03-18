@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Reactive;
 using System.Reactive.Linq;
+
 
 namespace Shiny.BluetoothLE
 {
-    public interface ICanControlAdapterState
+    public interface ICanControlAdapterState : IBleManager
     {
         /// <summary>
         /// Toggles the bluetooth adapter on/off - returns true if successful

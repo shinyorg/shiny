@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 
 namespace Shiny.Push
 {
-    public interface IPushTagSupport
+    public interface IPushTagSupport : IPushManager
     {
         Task AddTag(string tag);
         Task RemoveTag(string tag);
