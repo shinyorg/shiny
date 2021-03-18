@@ -20,26 +20,27 @@ namespace Shiny.Tests.Push
         private const string AppleSampleSilentNotificationContent = "{\"aps\":{\"content-available\":1}, \"foo\": 2 }";
         private const string WnsSampleNotification = "<?xml version=\"1.0\" encoding=\"utf-8\"?><toast><visual><binding template=\"ToastText01\"><text id=\"1\">Notification Hub test notification from SDK sample</text></binding></visual></toast>";
         readonly IPushTagSupport pushManager;
-        NotificationHubClient hubClient;
-
-
-        const string fullListenerConfig = "Endpoint=sb://shinysamples.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=8Vng3Iav9v4+YABrGJdWDlEuybsl2JbZm+xNalTqPq4=";
-        const string listenOnlyListenerConfig = "Endpoint=sb://shinysamples.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=jI6ss5WOD//xPNuHFJmS7sWWzqndYQyz7wAVOMTZoLE=";
-        const string hubName = "shinysamples";
+        readonly NotificationHubClient hubClient;
 
 
         public AzureNotificationHubTests()
         {
+            var cfg = global::Shiny.Tests.Secrets.Values;
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
                 BuildServices = (services) =>
                 {
-                    services.UsePushAzureNotificationHubs<TestPushDelegate>(listenOnlyListenerConfig, hubName);
+                    services.UsePushAzureNotificationHubs<TestPushDelegate>(
+                        cfg.AzureNotificationHubListenerConnectionString,
+                        cfg.AzureNotificationHubName
+                    );
                 }
             });
-
             this.pushManager = (IPushTagSupport)ShinyHost.Resolve<IPushManager>();
-            this.hubClient = NotificationHubClient.CreateClientFromConnectionString(fullListenerConfig, hubName);
+            this.hubClient = NotificationHubClient.CreateClientFromConnectionString(
+                cfg.AzureNotificationHubFullConnectionString,
+                cfg.AzureNotificationHubName
+            );
         }
 
 

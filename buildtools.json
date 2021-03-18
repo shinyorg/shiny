@@ -4,56 +4,53 @@
         "Shiny.Tests.Device": {
             "delimiter": ";",
             "disable": false,
-            "className": "ShinySecrets",
+            "namespace": "Secrets",
+            "className": "Values",
+            "properties": [
+                {
+                    "name": "AppCenterKey",
+                    "type": "String"
+                },
+                {
+                    "name": "FirebaseServerApiKey",
+                    "type": "String"
+                },
+                {
+                    "name": "AzureNotificationHubListenerConnectionString",
+                    "type": "String"
+                },
+                {
+                    "name": "AzureNotificationHubFullConnectionString",
+                    "type": "String"
+                },
+                {
+                    "name": "AzureNotificationHubName",
+                    "type": "String"
+                }
+            ]
+        },
+        "Samples": {
+            "delimiter": ";",
+            "disable": false,
+            "namespace": "Secrets",
+            "className": "Values",
             "properties": [
                 {
                     "name": "AppCenterKey",
                     "type": "String",
-                    "isArray": false
-                },
-                {
-                    "name": "FirebaseServerApiKey",
-                    "type": "String",
-                    "isArray": false
+                    "defaultValue": null
                 },
                 {
                     "name": "AzureNotificationHubListenerConnectionString",
                     "type": "String",
-                    "isArray": false
-                },
-                {
-                    "name": "AzureNotificationHubFullConnectionString",
-                    "type": "String",
-                    "isArray": false
+                    "defaultValue": null
                 },
                 {
                     "name": "AzureNotificationHubName",
                     "type": "String",
-                    "isArray": false
+                    "defaultValue": null
                 }
             ]
         }
-        //"Samples": {
-        //    "delimiter": ";",
-        //    "disable": false,
-        //    "className": "ShinySecrets",
-        //    "properties": [
-        //        {
-        //            "name": "AppCenterKey",
-        //            "type": "String",
-        //            "isArray": false
-        //        },
-        //        {
-        //            "name": "AzureNotificationHubListenerConnectionString",
-        //            "type": "String",
-        //            "isArray": false
-        //        },
-        //        {
-        //            "name": "AzureNotificationHubName",
-        //            "type": "String",
-        //            "isArray": false
-        //        }
-        //    ]
-        //}
     }
 }
