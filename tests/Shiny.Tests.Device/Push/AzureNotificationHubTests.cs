@@ -45,7 +45,7 @@ namespace Shiny.Tests.Push
         }
 
 
-        [Fact(DisplayName = "Push - ANH Register/UnRegister")]
+        [Fact(DisplayName = "Push - ANH - Register/UnRegister")]
         public Task Register_UnRegister() => this.WrapRegistration(async regToken =>
         {
             this.pushManager.CurrentRegistrationToken.Should().Be(regToken);
@@ -73,7 +73,7 @@ namespace Shiny.Tests.Push
         });
 
 
-        [Fact(DisplayName = "Push - ANH Receive Observable")]
+        [Fact(DisplayName = "Push - ANH - Receive Observable")]
         public Task ReceiveOnForegroundObservable() => this.WrapRegistration(async token =>
         {
             var task = this.pushManager
@@ -88,7 +88,7 @@ namespace Shiny.Tests.Push
         });
 
 
-        [Fact(DisplayName = "Push - ANH Receive Delegate")]
+        [Fact(DisplayName = "Push - ANH - Receive Delegate")]
         public Task ReceiveOnDelegate() => this.WrapRegistration(async token =>
         {
             var tcs = new TaskCompletionSource<object?>();
@@ -99,7 +99,7 @@ namespace Shiny.Tests.Push
 
 
 
-        [Fact(DisplayName = "Push - ANH Tags")]
+        [Fact(DisplayName = "Push - ANH - Tags")]
         public Task Tags() => this.WrapRegistration(async token =>
         {
             var random = Guid.NewGuid().ToString();

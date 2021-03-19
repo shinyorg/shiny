@@ -79,7 +79,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="Entitlements.plist" />
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
-    <None Include="GoogleService-Info.plist" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -202,6 +201,12 @@
       <Project>{e1e4a77d-f07a-402e-bfac-2b356b86b089}</Project>
       <Name>Shiny.Tests.Device</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
+      <Name>Shiny.Push.FirebaseMessaging</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="GoogleService-Info.plist" />
   </ItemGroup>
   <Import Project="..\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

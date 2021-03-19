@@ -12,10 +12,6 @@
                     "type": "String"
                 },
                 {
-                    "name": "FirebaseServerApiKey",
-                    "type": "String"
-                },
-                {
                     "name": "AzureNotificationHubListenerConnectionString",
                     "type": "String"
                 },
@@ -25,6 +21,30 @@
                 },
                 {
                     "name": "AzureNotificationHubName",
+                    "type": "String"
+                },
+                {
+                    "name": "GoogleCredentialProjectId",
+                    "type": "String"
+                },
+                {
+                    "name": "GoogleCredentialPrivateKeyId",
+                    "type": "String"
+                },
+                {
+                    "name": "GoogleCredentialPrivateKey",
+                    "type": "String"
+                },
+                {
+                    "name": "GoogleCredentialClientId",
+                    "type": "String"
+                },
+                {
+                    "name": "GoogleCredentialClientEmail",
+                    "type": "String"
+                },
+                {
+                    "name": "GoogleCredentialClientCertUrl",
                     "type": "String"
                 }
             ]

@@ -21,7 +21,9 @@ namespace Shiny.Push.FirebaseMessaging
         {
             base.Start();
 
-            Firebase.Core.App.Configure();
+            if (Messaging.SharedInstance == null)
+                Firebase.Core.App.Configure();
+
             //Messaging.Notifications.ObserveMessagesDeleted
             Messaging.SharedInstance.AutoInitEnabled = true;
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate
