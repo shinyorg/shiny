@@ -52,30 +52,32 @@ namespace Shiny.Tests.Push
 
 
         [Fact(DisplayName = "Push - Firebase - Receive Topic")]
-        public Task ReceiveTopic() => this.DoSend(Guid.NewGuid().ToString());
+        public Task ReceiveTopic() => this.WrapRegister(async () =>
+        {
+            var stamp = Guid.NewGuid().ToString();
+            var task = this.ListenForStamp(stamp);
+
+            await this.DoSend(stamp, Guid.NewGuid().ToString());
+            await task;
+        });
 
 
         [Fact(DisplayName = "Push - Firebase - Observable")]
-        public async Task ReceviedOnForegroundObservable()
+        public Task ReceviedOnForegroundObservable() => this.WrapRegister(async () =>
         {
-            var task = this.pushManager
-                .WhenReceived()
-                .Take(1)
-                .Where(x => x.ContainsKey("stamp") && x["stamp"] == stamp)
-                .Timeout(TimeSpan.FromSeconds(5))
-                .ToTask();
+            var stamp = Guid.NewGuid().ToString();
+            var task = this.ListenForStamp(stamp);
 
-            await this.DoSend(null);
+            await this.DoSend(stamp, null);
             await task;
-        }
+        });
 
 
         [Fact(DisplayName = "Push - Firebase - Delegate")]
-        public async Task ReceivedOnDelegate()
+        public Task ReceivedOnDelegate() => WrapRegister(async () =>
         {
             var stamp = Guid.NewGuid().ToString();
-            var result = await this.pushManager.RequestAccess();
-            var tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object?>();
 
             TestPushDelegate.Received = (data) =>
             {
@@ -84,7 +86,7 @@ namespace Shiny.Tests.Push
             };
             await FirebaseMessaging.DefaultInstance.SendAsync(new Message
             {
-                Token = result.RegistrationToken,
+                Token = this.pushManager.CurrentRegistrationToken,
                 Data = new Dictionary<string, string>
                 {
                     { "stamp", stamp }
@@ -92,17 +94,40 @@ namespace Shiny.Tests.Push
             });
             await tcs.Task.WithTimeout(10);
             tcs = null;
+        });
+
+
+
+        Task ListenForStamp(string stamp) => this.pushManager
+            .WhenReceived()
+            .Take(1)
+            .Where(x => x.ContainsKey("stamp") && x["stamp"] == stamp)
+            .Timeout(TimeSpan.FromSeconds(5))
+            .ToTask();
+
+
+        async Task WrapRegister(Func<Task> innerTask)
+        {
+            
+            await this.pushManager.RequestAccess();
+
+            try
+            {
+                await innerTask();
+            }
+            finally
+            {
+                await this.pushManager.UnRegister();
+            }
+
         }
 
 
-        async Task DoSend(string topic)
+        async Task DoSend(string stamp, string? topic)
         {
-            var stamp = Guid.NewGuid().ToString();
-            var result = await this.pushManager.RequestAccess();
-
             var msg = new Message
             {
-                Token = result.RegistrationToken,
+                Token = this.pushManager.CurrentRegistrationToken,
                 Data = new Dictionary<string, string>
                 {
                     { "stamp", stamp }

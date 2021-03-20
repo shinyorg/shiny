@@ -96,16 +96,11 @@ namespace Shiny.Push.AzureNotificationHubs
         public override async Task UnRegister()
         {
             if (this.InstallationId != null)
+            {
                 await this.hub.DeleteInstallationAsync(this.InstallationId);
-
+                this.InstallationId = null;
+            }
             await base.UnRegister();
-        }
-
-
-        protected override void ClearRegistration()
-        {
-            base.ClearRegistration();
-            this.InstallationId = null;
         }
 
 

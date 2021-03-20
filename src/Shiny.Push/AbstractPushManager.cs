@@ -20,7 +20,7 @@ namespace Shiny.Push
         public abstract Task UnRegister();
 
 
-        protected virtual void ClearRegistration()
+        protected void ClearRegistration()
         {
             this.CurrentRegistrationExpiryDate = null;
             this.CurrentRegistrationToken = null;
