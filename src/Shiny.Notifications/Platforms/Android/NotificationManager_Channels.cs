@@ -144,6 +144,8 @@ namespace Shiny.Notifications
                         .SetFlags(AudioFlags.AudibilityEnforced);
 
                     uri ??= Android.Provider.Settings.System.DefaultAlarmAlertUri;
+                    // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    native.CanBypassDnd();
                     break;
 
                 case ChannelImportance.High:
