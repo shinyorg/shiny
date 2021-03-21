@@ -37,6 +37,31 @@ namespace Shiny.Push.AzureNotificationHubs
         }
 
 
+#if __ANDROID__
+        public override void Start() =>
+            ShinyFirebaseService
+                .WhenTokenChanged()
+                .SubscribeAsync(async token =>
+                {
+                    try
+                    {
+                        this.NativeRegistrationToken = token;
+                        this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+
+                        if (this.InstallationId != null)
+                        {
+                            var install = await this.hub.GetInstallationAsync(this.InstallationId);
+                            install.PushChannel = token;
+                            await this.hub.CreateOrUpdateInstallationAsync(install);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO
+                    }
+                });
+#endif
+
         public string? InstallationId
         {
             get => this.Settings.Get<string>(nameof(this.InstallationId));
@@ -146,22 +171,6 @@ namespace Shiny.Push.AzureNotificationHubs
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.RegisteredTags = tags;
         }
-
-
-#if __ANDROID__
-        public override async Task UpdateNativePushToken(string token)
-        {
-            if (this.InstallationId == null)
-                return;
-
-            this.NativeRegistrationToken = token;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-
-            var install = await this.hub.GetInstallationAsync(this.InstallationId);
-            install.PushChannel = token;
-            await this.hub.CreateOrUpdateInstallationAsync(install);
-        }
-#endif
     }
 }
 #endif

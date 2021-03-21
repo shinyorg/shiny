@@ -10,44 +10,43 @@ using Shiny.Notifications;
 using Shiny.Infrastructure;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
-
+using System.Reactive.Threading.Tasks;
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager, IPushTagSupport, IAndroidTokenUpdate
+    public class PushManager : AbstractPushManager,
+                               IPushTagSupport,
+                               IShinyStartupTask
     {
         readonly INotificationManager notificationManager;
         public PushManager(ShinyCoreServices services, INotificationManager notificationManager) : base(services)
             => this.notificationManager = notificationManager;
 
 
+        public virtual void Start() =>
+            ShinyFirebaseService
+                .WhenTokenChanged()
+                .Subscribe(token =>
+                {
+                    this.CurrentRegistrationToken = token;
+                    this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                });
+
+
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            //var resultCode = GoogleApiAvailability
-            //    .Instance
-            //    .IsGooglePlayServicesAvailable(this.context.AppContext);
-
-            //if (resultCode == ConnectionResult.)
-            //if (resultCode != ConnectionResult.ServiceMissing)
-            //{
-            ////{
-            ////    if (GoogleApiAvailability.Instance.IsUserResolvableError(resultCode))
-            ////        msgText.Text = GoogleApiAvailability.Instance.GetErrorString(resultCode);
-            //}
             var nresult = await this.notificationManager.RequestAccess();
             if (nresult != AccessState.Available)
                 return new PushAccessState(nresult, null);
 
             FirebaseMessaging.Instance.AutoInitEnabled = true;
-            var result = await FirebaseInstanceId
-                .Instance
-                .GetInstanceId()
-                .AsAsync<IInstanceIdResult>();
+            var token = await ShinyFirebaseService
+                .WhenTokenChanged()
+                .Timeout(TimeSpan.FromSeconds(10))
+                .Take(1)
+                .ToTask(cancelToken);
 
-            this.CurrentRegistrationToken = result.Token;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-
-            return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
+            return new PushAccessState(AccessState.Available, token);
         }
 
 
@@ -59,27 +58,19 @@ namespace Shiny.Push
             this.ClearRegistration();
             FirebaseMessaging.Instance.AutoInitEnabled = false;
 
+            //Firebase.FirebaseApp.InitializeApp(null, new Firebase.FirebaseOptions { }, "");
+            //Firebase.FirebaseApp.Instance.Delete()
             await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId());
         }
 
 
         public override IObservable<IDictionary<string, string>> WhenReceived()
-            => this.Services.Bus.Listener<IDictionary<string, string>>(nameof(ShinyFirebaseService));
-
-
-
-        public virtual Task UpdateNativePushToken(string token)
-        {
-            this.CurrentRegistrationToken = token;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-
-            return Task.CompletedTask;
-        }
+            => ShinyFirebaseService.WhenDataReceived();
 
 
         public virtual async Task AddTag(string tag)
         {
-            var tags = this.RegisteredTags.ToList();
+            var tags = this.RegisteredTags?.ToList() ?? new List<string>(1);
             tags.Add(tag);
 
             await FirebaseMessaging.Instance.SubscribeToTopic(tag);
@@ -89,7 +80,7 @@ namespace Shiny.Push
 
         public virtual async Task RemoveTag(string tag)
         {
-            var list = this.RegisteredTags.ToList();
+            var list = this.RegisteredTags?.ToList() ?? new List<string>(0);
             if (list.Remove(tag))
                 this.RegisteredTags = list.ToArray();
 
@@ -99,8 +90,9 @@ namespace Shiny.Push
 
         public virtual async Task ClearTags()
         {
-            foreach (var tag in this.RegisteredTags)
-                await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
+            if (this.RegisteredTags != null)
+                foreach (var tag in this.RegisteredTags)
+                    await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
 
             this.RegisteredTags = null;
         }
