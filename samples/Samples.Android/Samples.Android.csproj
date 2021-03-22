@@ -36,7 +36,8 @@
     <BundleAssemblies>true</BundleAssemblies>
     <AndroidUseAapt2>true</AndroidUseAapt2>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidEnableMultiDex>false</AndroidEnableMultiDex>
+    <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+    <AndroidDexTool>d8</AndroidDexTool>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -80,13 +81,13 @@
       <Project>{11ec9d9d-3502-4a4a-94aa-5bdb1b20bb8e}</Project>
       <Name>Shiny.Locations.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj">
-      <Project>{80421dcd-e1be-404f-b3a3-8bcee3b79dd2}</Project>
-      <Name>Shiny.Logging.Firebase</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
       <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
       <Name>Shiny.Push.AzureNotificationHubs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
+      <Project>{130a7351-0eb6-4a17-8ea8-a392f2e4bdae}</Project>
+      <Name>Shiny.Push.FirebaseMessaging</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
       <Project>{B133232E-1A21-438D-8B40-F771D65BED1C}</Project>
@@ -190,6 +191,11 @@
   </ItemGroup>
   <ItemGroup>
     <LinkDescription Include="Linker.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResourceAnalysisConfig Include="Resources\values\strings.xml">
+      <SubType>Designer</SubType>
+    </AndroidResourceAnalysisConfig>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
