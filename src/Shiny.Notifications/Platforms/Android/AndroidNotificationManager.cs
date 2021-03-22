@@ -67,7 +67,79 @@ namespace Shiny.Notifications
                 builder.SetWhen(notification.Android.When.Value.ToUnixTimeMilliseconds());
 
             builder.SetChannelId(channel.Identifier);
+            if (channel.Actions != null)
+            {
+                foreach (var action in channel.Actions)
+                {
+                    switch (action.ActionType)
+                    {
+                        case ChannelActionType.OpenApp:
+                            break;
+
+                        case ChannelActionType.TextReply:
+                            var textReplyAction = this.CreateTextReply(notification, action);
+                            builder.AddAction(textReplyAction);
+                            break;
+
+                        case ChannelActionType.None:
+                        case ChannelActionType.Destructive:
+                            var destAction = this.CreateAction(notification, action);
+                            builder.AddAction(destAction);
+                            break;
+
+                        default:
+                            throw new ArgumentException("Invalid action type");
+                    }
+                }
+            }
             return builder;
+        }
+
+
+        static int counter = 100;
+        protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
+        {
+            var intent = this.core.Android.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.EntryIntentAction);
+            var content = this.core.Serializer.Serialize(notification);
+            intent
+                .PutExtra("Notification", content)
+                .PutExtra("Action", action.Identifier);
+
+            counter++;
+            var pendingIntent = PendingIntent.GetBroadcast(
+                this.core.Android.AppContext,
+                counter,
+                intent,
+                PendingIntentFlags.UpdateCurrent
+            )!;
+            return pendingIntent;
+        }
+
+
+        protected virtual NotificationCompat.Action CreateAction(Notification notification, ChannelAction action)
+        {
+            var pendingIntent = this.CreateActionIntent(notification, action);
+            var iconId = this.core.Android.GetResourceIdByName(action.Identifier);
+            var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent).Build();
+
+            return nativeAction;
+        }
+
+
+        protected virtual NotificationCompat.Action CreateTextReply(Notification notification, ChannelAction action)
+        {
+            var pendingIntent = this.CreateActionIntent(notification, action);
+            var input = new AndroidX.Core.App.RemoteInput.Builder("Result")
+                .SetLabel(action.Title)
+                .Build();
+
+            var iconId = this.core.Android.GetResourceIdByName(action.Identifier);
+            var nativeAction = new NotificationCompat.Action.Builder(iconId, action.Title, pendingIntent)
+                .SetAllowGeneratedReplies(true)
+                .AddRemoteInput(input)
+                .Build();
+
+            return nativeAction;
         }
 
 
