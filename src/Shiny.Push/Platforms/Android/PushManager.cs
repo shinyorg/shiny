@@ -28,8 +28,13 @@ namespace Shiny.Push
                 .WhenTokenChanged()
                 .Subscribe(token =>
                 {
-                    this.CurrentRegistrationToken = token;
-                    this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                    this.NativeRegistrationToken = token;
+
+                    if (this.CurrentRegistrationToken != null)
+                    {
+                        this.CurrentRegistrationToken = token;
+                        this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                    }
                 });
 
 
@@ -43,6 +48,7 @@ namespace Shiny.Push
             var token = await ShinyFirebaseService
                 .WhenTokenChanged()
                 .Timeout(TimeSpan.FromSeconds(10))
+                .StartWith(this.NativeRegistrationToken)
                 .Take(1)
                 .ToTask(cancelToken);
 
@@ -66,6 +72,16 @@ namespace Shiny.Push
 
         public override IObservable<IDictionary<string, string>> WhenReceived()
             => ShinyFirebaseService.WhenDataReceived();
+
+
+        /// <summary>
+        /// this value does not clear - it only updates
+        /// </summary>
+        string? NativeRegistrationToken
+        {
+            get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
+            set => this.Settings.Set(nameof(NativeRegistrationToken), value!);
+        }
 
 
         public virtual async Task AddTag(string tag)

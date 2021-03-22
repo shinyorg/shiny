@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.App;
 using Firebase.Messaging;
 using Shiny.Notifications;
 using Notification = Shiny.Notifications.Notification;
-using System.Reactive.Linq;
+
+
 
 namespace Shiny.Push
 {
@@ -17,14 +19,13 @@ namespace Shiny.Push
         public const string IntentAction = "com.google.firebase.MESSAGING_EVENT";
         static readonly Subject<string> tokenSubj = new Subject<string>();
         static readonly Subject<IDictionary<string, string>> dataSubj = new Subject<IDictionary<string, string>>();
-
         readonly Lazy<INotificationManager> notifications = ShinyHost.LazyResolve<INotificationManager>();
-        
+
 
         public override async void OnMessageReceived(RemoteMessage message)
         {
             dataSubj.OnNext(message.Data);
-            await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data));   
+            await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data));
 
             var native = message.GetNotification();
             if (native != null)
@@ -58,17 +59,13 @@ namespace Shiny.Push
         public override async void OnNewToken(string token)
         {
             tokenSubj.OnNext(token);
-            await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token));
+            await ShinyHost.Container.RunDelegates<IPushDelegate>(
+                x => x.OnTokenChanged(token)
+            );
         }
 
 
-        static IObservable<string>? obs;
-        public static IObservable<string> WhenTokenChanged()
-        {
-            //obs ??= tokenSubj.Timestamp().Replay(1).Where(xx.Timestamp.UtcDateTime;
-            obs ??= tokenSubj.Replay(1); // I really only want to replay if it is like a few seconds old
-            return obs;
-        }
+        public static IObservable<string> WhenTokenChanged() => tokenSubj;
 
 
         public static IObservable<IDictionary<string, string>> WhenDataReceived() => dataSubj;
