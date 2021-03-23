@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Prism.Navigation;
 using Samples.Models;
 using Shiny;
 using Shiny.Notifications;
@@ -13,7 +12,6 @@ namespace Samples.Notifications
         readonly SampleSqliteConnection conn;
         readonly IMessageBus messageBus;
         readonly INotificationManager notifications;
-        string? errorMessage;
 
 
         public NotificationDelegate(SampleSqliteConnection conn,
@@ -26,23 +24,8 @@ namespace Samples.Notifications
         }
 
 
-        public async Task<bool> TryNavigateFromNotification(INavigationService navigator)
-        {
-            if (this.errorMessage == null)
-                return false;
-
-            await navigator.ShowBigText(this.errorMessage, "ERROR");
-            this.errorMessage = null;
-            return true;
-        }
-
-
         public async Task OnEntry(NotificationResponse response)
         {
-            string? exception = null;
-            if (response.Notification.Payload?.TryGetValue("ERROR", out exception) ?? false)
-                this.errorMessage = exception;
-
             var @event = new NotificationEvent
             {
                 NotificationId = response.Notification.Id,
