@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Shiny.Notifications;
 
 
@@ -10,7 +9,6 @@ namespace Shiny
     {
         public static bool UseNotifications(this IServiceCollection services,
                                             Type? delegateType,
-                                            bool requestPermissionImmediately = false,
                                             AndroidOptions? androidConfig = null,
                                             params Channel[] channels)
         {
@@ -19,7 +17,6 @@ namespace Shiny
 #else
             services.RegisterModule(new NotificationModule(
                 delegateType,
-                requestPermissionImmediately,
                 androidConfig,
                 channels
             ));
@@ -29,20 +26,17 @@ namespace Shiny
 
 
         public static bool UseNotifications<TNotificationDelegate>(this IServiceCollection services,
-                                                                   bool requestPermissionImmediately = false,
                                                                    AndroidOptions? androidConfig = null,
                                                                    params Channel[] channels)
                 where TNotificationDelegate : class, INotificationDelegate
             => services.UseNotifications(
                 typeof(TNotificationDelegate),
-                requestPermissionImmediately,
                 androidConfig,
                 channels
             );
 
 
         public static bool UseNotifications(this IServiceCollection services,
-                                            bool requestPermissionImmediately = false,
                                             AndroidOptions? androidConfig = null,
                                             params Channel[] channels)
         {
@@ -51,7 +45,6 @@ namespace Shiny
 #else
             services.RegisterModule(new NotificationModule(
                 null,
-                requestPermissionImmediately,
                 androidConfig,
                 channels
             ));

@@ -102,8 +102,8 @@ namespace Shiny.Notifications
             var intent = this.core.Android.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.EntryIntentAction);
             var content = this.core.Serializer.Serialize(notification);
             intent
-                .PutExtra("Notification", content)
-                .PutExtra("Action", action.Identifier);
+                .PutExtra(AndroidNotificationProcessor.IntentNotificationKey, content)
+                .PutExtra(AndroidNotificationProcessor.IntentActionKey, action.Identifier);
 
             counter++;
             var pendingIntent = PendingIntent.GetBroadcast(
@@ -129,7 +129,7 @@ namespace Shiny.Notifications
         protected virtual NotificationCompat.Action CreateTextReply(Notification notification, ChannelAction action)
         {
             var pendingIntent = this.CreateActionIntent(notification, action);
-            var input = new AndroidX.Core.App.RemoteInput.Builder("Result")
+            var input = new AndroidX.Core.App.RemoteInput.Builder(AndroidNotificationProcessor.RemoteInputResultKey)
                 .SetLabel(action.Title)
                 .Build();
 
@@ -191,7 +191,7 @@ namespace Shiny.Notifications
             }
 
             var notificationString = this.core.Serializer.Serialize(notification);
-            launchIntent.PutExtra(AndroidNotificationProcessor.NOTIFICATION_KEY, notificationString);
+            launchIntent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notificationString);
             if (notification.Payload != null)
             {
                 foreach (var item in notification.Payload)

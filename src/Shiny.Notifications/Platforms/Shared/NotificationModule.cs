@@ -10,17 +10,14 @@ namespace Shiny.Notifications
     class NotificationModule : ShinyModule
     {
         readonly Type? delegateType;
-        readonly bool requestPermissionImmediately;
         readonly Channel[] channels;
 
 
         public NotificationModule(Type? delegateType,
-                                  bool requestPermissionImmediately,
                                   AndroidOptions? androidConfig = null,
                                   Channel[]? channels = null)
         {
             this.delegateType = delegateType;
-            this.requestPermissionImmediately = requestPermissionImmediately;
             this.channels = channels;
 
             if (androidConfig != null)
@@ -58,8 +55,6 @@ namespace Shiny.Notifications
             if (this.channels?.Any() ?? false)
                 await manager.SetChannels(this.channels);
 
-            if (requestPermissionImmediately)
-                await manager.RequestAccess();
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Shiny.Push
             services.TryAddSingleton(sp => (IAppDelegatePushNotificationHandler)sp.Resolve<IPushManager>());
             services.UseNotifications(); // this is only here to satisfy other deps
 #else
-            services.UseNotifications<PushNotificationDelegate>(false, null, this.channels);
+            services.UseNotifications<PushNotificationDelegate>(null, this.channels);
 #endif
         }
     }
