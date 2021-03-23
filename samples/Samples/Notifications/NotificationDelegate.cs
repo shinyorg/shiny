@@ -43,26 +43,19 @@ namespace Samples.Notifications
             if (response.Notification.Payload?.TryGetValue("ERROR", out exception) ?? false)
                 this.errorMessage = exception;
 
-            await this.Store(new NotificationEvent
+            var @event = new NotificationEvent
             {
                 NotificationId = response.Notification.Id,
                 NotificationTitle = response.Notification.Title ?? response.Notification.Message,
                 Action = response.ActionIdentifier,
                 ReplyText = response.Text,
-                IsEntry = true,
                 Timestamp = DateTime.Now
-            });
+            };
+            await this.conn.InsertAsync(@event);
+            this.messageBus.Publish(@event);
+
             await this.DoChat(response);
         }
-
-
-        public Task OnReceived(Notification notification) => this.Store(new NotificationEvent
-        {
-            NotificationId = notification.Id,
-            NotificationTitle = notification.Title ?? notification.Message,
-            IsEntry = false,
-            Timestamp = DateTime.Now
-        });
 
 
         async Task DoChat(NotificationResponse response)
@@ -78,7 +71,11 @@ namespace Samples.Notifications
                         if (!response.Text.IsEmpty())
                             name = response.Text.Trim();
 
-                        await notifications.Send("Shiny Chat", $"Hi {name}, do you like me?", "ChatAnswer");
+                        await notifications.Send(
+                            "Shiny Chat",
+                            $"Hi {name}, do you like me?",
+                            "ChatAnswer"
+                        );
                         break;
 
                     case "answer":
@@ -95,13 +92,6 @@ namespace Samples.Notifications
                         break;
                 }
             }
-        }
-
-
-        async Task Store(NotificationEvent @event)
-        {
-            await this.conn.InsertAsync(@event);
-            this.messageBus.Publish(@event);
         }
     }
 }

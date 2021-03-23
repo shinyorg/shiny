@@ -33,7 +33,7 @@ namespace Samples
             );
             builder.AddSqliteLogging(LogLevel.Warning);
             //builder.AddFirebase(LogLevel.Warning);
-            //builder.AddAppCenter(Secrets.AppCenterToken, LogLevel.Warning);
+            builder.AddAppCenter(Secrets.Values.AppCenterKey, LogLevel.Warning);
         }
 
 
@@ -90,13 +90,13 @@ namespace Samples
             };
 
             // only pass channels to push or here, not both - technically you don't need this with push
-            services.UseNotifications<NotificationDelegate>();
+            services.UseNotifications<NotificationDelegate>(null, channels);
 
             //services.UsePush<PushDelegate>(channels);
             //services.UseFirebaseMessaging<PushDelegate>(channels);
             //services.UsePushAzureNotificationHubs<PushDelegate>(
-            //    Secrets.AzureNotificationHubListenerConnectionString,
-            //    Secrets.AzureNotificationHubName,
+            //    Secrets.Values.AzureNotificationHubListenerConnectionString,
+            //    Secrets.Values.AzureNotificationHubName,
             //    channels
             //);
         }

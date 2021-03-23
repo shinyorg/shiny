@@ -38,6 +38,7 @@ namespace Samples.Notifications
                 .DisposedBy(this.DeactivateWith);
         }
 
+
         protected override Task ClearLogs() => this.conn.DeleteAllAsync<NotificationEvent>();
 
 
@@ -50,8 +51,7 @@ namespace Samples.Notifications
 
             return events.Select(x =>
             {
-                var mode = x.IsEntry ? "Entry" : "Received";
-                var detail = $"[{mode}] {x.Timestamp}";
+                var detail = $"[{x.Timestamp}]";
                 if (!x.Action.IsEmpty())
                     detail += $" - {x.Action}";
 
