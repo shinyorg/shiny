@@ -20,6 +20,7 @@ namespace Shiny.Stores
 
 
         public string Alias => "secure";
+        public bool IsReadOnly => false;
         public string Service { get; set; }
 
         public void Clear()

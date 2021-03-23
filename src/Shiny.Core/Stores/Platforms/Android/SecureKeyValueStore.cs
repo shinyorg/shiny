@@ -25,6 +25,9 @@ namespace Shiny.Stores
 
 
         public string Alias => "secure";
+        public bool IsReadOnly => false;
+
+
         public void Clear()
         {
             //this.settingsStore.ToList().Where(x => x.Key.StartsWith("sec-").Clear(); // TODO: only clear secure storage

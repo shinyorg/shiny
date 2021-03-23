@@ -6,6 +6,7 @@ namespace Shiny.Stores
     public interface IKeyValueStore
     {
         string Alias { get; }
+        bool IsReadOnly { get; }
 
         bool Remove(string key);
         void Clear();

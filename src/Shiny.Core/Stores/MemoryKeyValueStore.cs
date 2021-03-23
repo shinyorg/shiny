@@ -7,6 +7,7 @@ namespace Shiny.Stores
     public class MemoryKeyValueStore : IKeyValueStore
     {
         public string Alias => "memory";
+        public bool IsReadOnly => false;
 
         public void Clear() => this.Do(x => x.Clear());
         public bool Contains(string key) => this.Do(x => x.ContainsKey(key));

@@ -33,6 +33,7 @@ namespace Shiny.Stores
 
 
         public string Alias => "file";
+        public bool IsReadOnly => false;
         public string FileName { get; }
 
 

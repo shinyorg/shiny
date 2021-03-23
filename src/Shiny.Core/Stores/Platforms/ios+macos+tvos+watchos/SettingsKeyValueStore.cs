@@ -13,6 +13,8 @@ namespace Shiny.Stores
 
 
         public string Alias => "settings";
+        public bool IsReadOnly => false;
+
 
         public void Clear() => this.Do(prefs =>
         {

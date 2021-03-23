@@ -19,6 +19,7 @@ namespace Shiny.Stores
 
 
         public string Alias => "settings";
+        public bool IsReadOnly => false;
         public void Clear() => this.Do((_, edit) => edit.Clear());
         public bool Contains(string key)
         {
