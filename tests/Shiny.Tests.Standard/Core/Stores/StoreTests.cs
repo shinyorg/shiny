@@ -34,12 +34,11 @@ namespace Shiny.Tests.Core.Stores
 #else
                 platform = new TestPlatform();
 #endif
-
                 yield return new object[] { new FileKeyValueStore(platform, serializer) };
                 yield return new object[] { new MemoryKeyValueStore() };
 
-                //var conn = new ShinySqliteConnection(platform);
-                //yield return new object[] { new SqliteKeyValueStore(conn, serializer) };
+                var conn = new ShinySqliteConnection(platform);
+                yield return new object[] { new SqliteKeyValueStore(conn, serializer) };
             }
         }
 

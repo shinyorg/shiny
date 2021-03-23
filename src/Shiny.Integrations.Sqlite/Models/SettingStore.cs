@@ -22,7 +22,7 @@ namespace Shiny.Models
         public float? FloatValue { get; set; }
         public double? DoubleValue { get; set; }
         public decimal? DecimalValue { get; set; }
-        public DateTime? DateTimeValue { get; set; }
+        //public DateTime? DateTimeValue { get; set; }
 
 
         public object? GetValue()
@@ -66,14 +66,14 @@ namespace Shiny.Models
             if (this.DecimalValue != null)
                 return this.DecimalValue.Value;
 
-            if (this.DateTimeValue != null)
-                return this.DateTimeValue.Value;
+            //if (this.DateTimeValue != null)
+            //    return this.DateTimeValue.Value;
 
             return null;
         }
 
 
-        public void SetValue(object value)
+        public bool SetValue(object value)
         {
             this.Reset();
             if (value is ushort v1)
@@ -115,13 +115,16 @@ namespace Shiny.Models
             else if (value is string v13)
                 this.StringValue = v13;
 
-            else if (value is DateTime dt)
-                this.DateTimeValue = dt;
+            //else if (value is DateTime dt)
+            //    this.DateTimeValue = dt;
 
-            else if (value is DateTimeOffset dto)
-                this.DateTimeValue = dto.UtcDateTime;
+            //else if (value is DateTimeOffset dto)
+            //    this.DateTimeValue = dto.UtcDateTime;
 
-            // inserting null
+            else
+                return false;
+
+            return true;
         }
 
 
@@ -139,7 +142,7 @@ namespace Shiny.Models
             this.BoolValue = null;
             this.ByteValue = null;
             this.BytesValue = null;
-            this.DateTimeValue = null;
+            //this.DateTimeValue = null;
         }
     }
 }
