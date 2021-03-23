@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
-
 using Shiny.Push;
 using Shiny.Testing.Push;
 using Xunit;
@@ -17,9 +16,9 @@ namespace Shiny.Tests.Push
     public class AzureNotificationHubTests
     {
         private const string FcmSampleNotificationContent = "{\"data\":{\"message\":\"Notification Hub test notification from SDK sample\"}}";
-        private const string FcmSampleSilentNotificationContent = "{ \"message\":{\"data\":{ \"Nick\": \"Mario\", \"body\": \"great match!\", \"Room\": \"PortugalVSDenmark\" } }}";
+        //private const string FcmSampleSilentNotificationContent = "{ \"message\":{\"data\":{ \"Nick\": \"Mario\", \"body\": \"great match!\", \"Room\": \"PortugalVSDenmark\" } }}";
         private const string AppleSampleNotificationContent = "{\"aps\":{\"alert\":\"Notification Hub test notification from SDK sample\"}}";
-        private const string AppleSampleSilentNotificationContent = "{\"aps\":{\"content-available\":1}, \"foo\": 2 }";
+        //private const string AppleSampleSilentNotificationContent = "{\"aps\":{\"content-available\":1}, \"foo\": 2 }";
         private const string WnsSampleNotification = "<?xml version=\"1.0\" encoding=\"utf-8\"?><toast><visual><binding template=\"ToastText01\"><text id=\"1\">Notification Hub test notification from SDK sample</text></binding></visual></toast>";
         readonly IPushTagSupport pushManager;
         readonly NotificationHubClient hubClient;
@@ -50,16 +49,14 @@ namespace Shiny.Tests.Push
         {
             this.pushManager.CurrentRegistrationToken.Should().Be(regToken);
             this.pushManager.CurrentRegistrationTokenDate.Should().NotBeNull("TokenDate not set");
-            this.pushManager.CurrentRegistrationExpiryDate.Should().NotBeNull("ExpiryDate not set");
 
             // did it remove off the server?
-            //var install = await this.hubClient.GetInstallationAsync(regToken);
-            //install.Should().NotBeNull("Install was not found");
+            var install = await this.hubClient.GetInstallationAsync(regToken);
+            install.Should().NotBeNull("Install was not found");
 
             await this.pushManager.UnRegister();
             this.pushManager.CurrentRegistrationToken.Should().BeNull("Reg Token is still set");
             this.pushManager.CurrentRegistrationTokenDate.Should().BeNull("Reg Token Date is still set");
-            this.pushManager.CurrentRegistrationExpiryDate.Should().BeNull("Reg Expiry Date is still set");
 
             try
             {
@@ -102,35 +99,50 @@ namespace Shiny.Tests.Push
         [Fact(DisplayName = "Push - ANH - Tags")]
         public Task Tags() => this.WrapRegistration(async token =>
         {
-            var random = Guid.NewGuid().ToString();
-            await this.pushManager.AddTag(random + "1");
-            await this.pushManager.AddTag(random + "2");
-            await this.pushManager.AddTag(random + "3");
+            var tag1 = CreateRandomTag("1-");
+            var tag2 = CreateRandomTag("2-");
+            var tag3 = CreateRandomTag("3-");
+            await this.pushManager.SetTags(tag1, tag2, tag3);
 
-            var install = await this.hubClient.GetInstallationAsync(this.pushManager.CurrentRegistrationToken);
-            install.Tags.Any(x => x.Equals(random + "1")).Should().BeTrue("tag1 not found");
-            install.Tags.Any(x => x.Equals(random + "2")).Should().BeTrue("tag2 not found");
-            install.Tags.Any(x => x.Equals(random + "3")).Should().BeTrue("tag3 not found");
+            await Task.Delay(1000); // it's like azure takes a second to propagate even though it has returned all is good
+            var install = await this.hubClient.GetInstallationAsync(token);
+            install.Tags.Any(x => x.Equals(tag1, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag1 not found");
+            install.Tags.Any(x => x.Equals(tag2, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag2 not found");
+            install.Tags.Any(x => x.Equals(tag3, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag3 not found");
 
-            await this.pushManager.RemoveTag(random + "2");
-            install = await this.hubClient.GetInstallationAsync(this.pushManager.CurrentRegistrationToken);
+            await this.pushManager.RemoveTag(tag2);
+            await Task.Delay(1000);
+            install = await this.hubClient.GetInstallationAsync(token);
 
-            install.Tags.Any(x => x.Equals(random + "1")).Should().BeTrue("tag1 not found");
-            install.Tags.Any(x => x.Equals(random + "2")).Should().BeFalse("tag2 found, but should be deleted");
-            install.Tags.Any(x => x.Equals(random + "3")).Should().BeTrue("tag3 not found");
+            install.Tags.Any(x => x.Equals(tag1, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag1 not found");
+            install.Tags.Any(x => x.Equals(tag2, StringComparison.InvariantCultureIgnoreCase)).Should().BeFalse("tag2 found, but should be deleted");
+            install.Tags.Any(x => x.Equals(tag3, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag3 not found");
 
             await this.pushManager.ClearTags();
-            install = await this.hubClient.GetInstallationAsync(this.pushManager.CurrentRegistrationToken);
-            install.Tags.Count.Should().Be(0, "There should be 0 tags on this install now");
+            await Task.Delay(1000);
+            install = await this.hubClient.GetInstallationAsync(token);
+            install.Tags.Should().BeNull("There should be 0 tags on this install now");
         });
+
+
+        static string CreateRandomTag(string prefix)
+            => prefix + Guid.NewGuid().ToString().Replace("-", "").ToLower().Substring(0, 8);
 
 
         async Task WrapRegistration(Func<string, Task> innerTask)
         {
-            await this.pushManager.UnRegister();
             var result = await this.pushManager.RequestAccess();
             result.Assert();
-            await innerTask(result.RegistrationToken);
+
+            try
+            {
+                await Task.Delay(1000); // azure needs a sec
+                await innerTask(result.RegistrationToken!);
+            }
+            finally
+            {
+                await this.pushManager.UnRegister();
+            }
         }
 
 

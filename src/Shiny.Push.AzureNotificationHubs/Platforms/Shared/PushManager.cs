@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
+using Microsoft.Azure.NotificationHubs.Messaging;
 using Shiny.Infrastructure;
 
 
@@ -39,6 +40,8 @@ namespace Shiny.Push.AzureNotificationHubs
 
 #if __ANDROID__
         public override void Start() =>
+            // don't fire the base or the firebase start will overwrite the current
+            // registration token with the firebase token, not the AZH installationID
             ShinyFirebaseService
                 .WhenTokenChanged()
                 .SubscribeAsync(async token =>
@@ -62,17 +65,17 @@ namespace Shiny.Push.AzureNotificationHubs
                 });
 #endif
 
-        public string? InstallationId
+        string? InstallationId
         {
             get => this.Settings.Get<string>(nameof(this.InstallationId));
-            private set => this.Settings.SetOrRemove(nameof(this.InstallationId), value);
+            set => this.Settings.SetOrRemove(nameof(this.InstallationId), value);
         }
 
 
-        public string? NativeRegistrationToken
+        string? NativeRegistrationToken
         {
             get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
-            protected set => this.Settings.SetOrRemove(nameof(NativeRegistrationToken), value);
+            set => this.Settings.SetOrRemove(nameof(NativeRegistrationToken), value);
         }
 
 
@@ -82,37 +85,26 @@ namespace Shiny.Push.AzureNotificationHubs
 
             if (access.Status == AccessState.Available)
             {
-                try
-                {
-                    if (this.InstallationId == null)
-                        this.InstallationId = Guid.NewGuid().ToString().Replace("-", "");
+                this.NativeRegistrationToken = access.RegistrationToken;
+                this.InstallationId = Guid.NewGuid().ToString().Replace("-", "");
 
-                    var install = new Installation
-                    {
-                        InstallationId = this.InstallationId,
-                        PushChannel = access.RegistrationToken,
+                var install = new Installation
+                {
+                    InstallationId = this.InstallationId,
+                    PushChannel = this.NativeRegistrationToken,
 #if WINDOWS_UWP
-                        Platform = NotificationPlatform.Wns
+                    Platform = NotificationPlatform.Wns
 #elif __IOS__
-                        Platform = NotificationPlatform.Apns
+                    Platform = NotificationPlatform.Apns
 #elif __ANDROID__
-                        Platform = NotificationPlatform.Fcm
+                    Platform = NotificationPlatform.Fcm
 #endif
-                    };
-                    await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken);
+                };
+                await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken);
+                this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                this.CurrentRegistrationToken = this.InstallationId;
 
-                    this.NativeRegistrationToken = access.RegistrationToken;
-                    //this.CurrentRegistrationExpiryDate = reg.ExpirationTime;
-                    this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                    this.CurrentRegistrationToken = access.RegistrationToken;
-
-                    access = new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
-                }
-                catch
-                {
-                    this.ClearRegistration();
-                    throw;
-                }
+                access = new PushAccessState(AccessState.Available, this.InstallationId);
             }
             return access;
         }
@@ -122,9 +114,17 @@ namespace Shiny.Push.AzureNotificationHubs
         {
             if (this.InstallationId != null)
             {
-                await this.hub.DeleteInstallationAsync(this.InstallationId);
+                try
+                {
+                    await this.hub.DeleteInstallationAsync(this.InstallationId);
+                }
+                catch (MessagingEntityNotFoundException)
+                {
+                    // who cares - it was already unregistered somehow
+                }
                 this.InstallationId = null;
             }
+            this.NativeRegistrationToken = null;
             await base.UnRegister();
         }
 
@@ -158,15 +158,21 @@ namespace Shiny.Push.AzureNotificationHubs
         public Task ClearTags() => this.SetTags(null);
 #endif
 
-
-
-        protected async Task SetTags(params string[]? tags)
+#if __ANDROID__
+        public override async Task SetTags(params string[]? tags)
+#else
+        public async Task SetTags(params string[]? tags)
+#endif
         {
             if (this.InstallationId == null)
                 return;
 
             var install = await this.hub.GetInstallationAsync(this.InstallationId);
-            install.Tags = tags?.ToList() ?? new List<string>(0);
+            if (tags == null || tags.Length == 0)
+                install.Tags = null;
+            else
+                install.Tags = tags.ToList();
+
             await this.hub.CreateOrUpdateInstallationAsync(install);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.RegisteredTags = tags;

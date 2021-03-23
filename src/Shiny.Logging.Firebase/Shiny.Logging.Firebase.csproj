@@ -20,7 +20,7 @@
     <ItemGroup Condition=" $(TargetFramework.Contains('android')) ">
         <PackageReference Include="Xamarin.Firebase.Crashlytics" />
         <PackageReference Include="Xamarin.Firebase.Analytics" />
-        <PackageReference Include="Xamarin.Firebase.Analytics.Impl" />
+        <!--<PackageReference Include="Xamarin.Firebase.Analytics.Impl" />-->
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>

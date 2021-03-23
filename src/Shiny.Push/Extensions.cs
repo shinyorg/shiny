@@ -61,12 +61,8 @@ namespace Shiny.Push
         {
             if (pushManager is IPushTagSupport tagEnabled)
             {
-                await tagEnabled.ClearTags();
-                foreach (var tag in tags)
-                {
-                    await tagEnabled.AddTag(tag);
-                    return true;
-                }
+                await tagEnabled.SetTags(tags);
+                return true;
             }
             return false;
         }

@@ -31,7 +31,7 @@ namespace Shiny.Tests.Push
             });
 
             this.pushManager = (IPushTagSupport)ShinyHost.Resolve<IPushManager>();
-            
+
             var creds = GoogleCredential.FromJson(JsonConvert.SerializeObject(new TestGoogleCredential
             {
                 ProjectId = Secrets.Values.GoogleCredentialProjectId,
@@ -101,7 +101,7 @@ namespace Shiny.Tests.Push
 
         async Task WrapRegister(Func<Task> innerTask)
         {
-            
+
             await this.pushManager.RequestAccess();
 
             try
@@ -135,6 +135,7 @@ namespace Shiny.Tests.Push
                 topic = "test";
                 await this.pushManager.AddTag(topic);
                 msg.Topic = topic;
+                msg.Token = this.pushManager.CurrentRegistrationToken;
             }
             await FirebaseMessaging.DefaultInstance.SendAsync(msg);
 

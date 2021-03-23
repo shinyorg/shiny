@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,7 +69,7 @@ namespace Shiny.Push.FirebaseMessaging
 
         public async Task AddTag(string tag)
         {
-            var tags = this.RegisteredTags.ToList();
+            var tags = this.RegisteredTags?.ToList() ?? new List<string>(1);
             tags.Add(tag);
 
             await Messaging.SharedInstance.SubscribeAsync(tag);
@@ -79,18 +80,31 @@ namespace Shiny.Push.FirebaseMessaging
         public async Task RemoveTag(string tag)
         {
             await Messaging.SharedInstance.UnsubscribeAsync(tag);
-            var tags = this.RegisteredTags.ToList();
-            if (tags.Remove(tag))
-                this.RegisteredTags = tags.ToArray();
+            if (this.RegisteredTags != null)
+            {
+                var tags = this.RegisteredTags.ToList();
+                if (tags.Remove(tag))
+                    this.RegisteredTags = tags.ToArray();
+            }
         }
 
 
         public async Task ClearTags()
         {
-            foreach (var tag in this.RegisteredTags)
-                await Messaging.SharedInstance.UnsubscribeAsync(tag);
+            if (this.RegisteredTags != null)
+                foreach (var tag in this.RegisteredTags)
+                    await Messaging.SharedInstance.UnsubscribeAsync(tag);
 
             this.RegisteredTags = null;
+        }
+
+
+        public async Task SetTags(params string[]? tags)
+        {
+            await this.ClearTags();
+            if (tags != null)
+                foreach (var tag in tags)
+                    await this.AddTag(tag);
         }
     }
 }

@@ -29,6 +29,12 @@ namespace Shiny.Push
         }
 
 
+        DateTime? CurrentRegistrationExpiryDate
+        {
+            get => this.Settings.Get<DateTime?>(nameof(this.CurrentRegistrationExpiryDate));
+            set => this.Settings.SetOrRemove(nameof(this.CurrentRegistrationExpiryDate), value);
+        }
+
         public override IObservable<IDictionary<string, string>> WhenReceived() => Observable.Create<IDictionary<string, string>>(async ob =>
         {
             var handler = new TypedEventHandler<PushNotificationChannel, PushNotificationReceivedEventArgs>((sender, args) =>

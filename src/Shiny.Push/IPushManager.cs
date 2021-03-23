@@ -15,11 +15,6 @@ namespace Shiny.Push
         IObservable<IDictionary<string, string>> WhenReceived();
 
         /// <summary>
-        /// Expiry date (if available) for current token
-        /// </summary>
-        DateTime? CurrentRegistrationExpiryDate { get; }
-
-        /// <summary>
         /// This is when the token was registered
         /// </summary>
         DateTime? CurrentRegistrationTokenDate { get; }

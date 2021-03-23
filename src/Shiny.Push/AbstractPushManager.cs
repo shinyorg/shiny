@@ -22,9 +22,9 @@ namespace Shiny.Push
 
         protected void ClearRegistration()
         {
-            this.CurrentRegistrationExpiryDate = null;
             this.CurrentRegistrationToken = null;
             this.CurrentRegistrationTokenDate = null;
+            this.RegisteredTags = null;
         }
 
 
@@ -39,13 +39,6 @@ namespace Shiny.Push
         {
             get => this.Settings.Get<DateTime?>(nameof(this.CurrentRegistrationTokenDate));
             protected set => this.Settings.SetOrRemove(nameof(this.CurrentRegistrationTokenDate), value);
-        }
-
-
-        public DateTime? CurrentRegistrationExpiryDate
-        {
-            get => this.Settings.Get<DateTime?>(nameof(this.CurrentRegistrationExpiryDate));
-            protected set => this.Settings.SetOrRemove(nameof(this.CurrentRegistrationExpiryDate), value);
         }
 
 

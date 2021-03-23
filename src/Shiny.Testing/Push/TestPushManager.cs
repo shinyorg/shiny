@@ -43,5 +43,14 @@ namespace Shiny.Testing.Push
             this.tags.Clear();
             return Task.CompletedTask;
         }
+
+        public Task SetTags(params string[]? tags)
+        {
+            this.tags.Clear();
+            if (tags != null)
+                this.tags.AddRange(tags);
+
+            return Task.CompletedTask;
+        }
     }
 }

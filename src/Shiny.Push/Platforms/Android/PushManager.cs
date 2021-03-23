@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
+using Android.Runtime;
 using Android.Gms.Extensions;
 using Firebase.Iid;
 using Firebase.Messaging;
@@ -10,8 +11,7 @@ using Shiny.Notifications;
 using Shiny.Infrastructure;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
-using System.Reactive.Threading.Tasks;
-using Android.Runtime;
+
 
 namespace Shiny.Push
 {
@@ -98,6 +98,15 @@ namespace Shiny.Push
                     await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
 
             this.RegisteredTags = null;
+        }
+
+
+        public virtual async Task SetTags(params string[]? tags)
+        {
+            await this.ClearTags();
+            if (tags != null)
+                foreach (var tag in tags)
+                    await this.AddTag(tag);
         }
     }
 }
