@@ -9,7 +9,6 @@ using Shiny.Notifications;
 using Notification = Shiny.Notifications.Notification;
 
 
-
 namespace Shiny.Push
 {
     [Service]
@@ -66,8 +65,6 @@ namespace Shiny.Push
 
 
         public static IObservable<string> WhenTokenChanged() => tokenSubj;
-
-
-        public static IObservable<IDictionary<string, string>> WhenDataReceived() => dataSubj;
+        public static IObservable<IDictionary<string, string>> WhenDataReceived()=> dataSubj;
     }
 }

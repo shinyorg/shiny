@@ -11,6 +11,7 @@ using Shiny.Infrastructure;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
 using System.Reactive.Threading.Tasks;
+using Android.Runtime;
 
 namespace Shiny.Push
 {
@@ -28,8 +29,6 @@ namespace Shiny.Push
                 .WhenTokenChanged()
                 .Subscribe(token =>
                 {
-                    this.NativeRegistrationToken = token;
-
                     if (this.CurrentRegistrationToken != null)
                     {
                         this.CurrentRegistrationToken = token;
@@ -45,14 +44,14 @@ namespace Shiny.Push
                 return new PushAccessState(nresult, null);
 
             FirebaseMessaging.Instance.AutoInitEnabled = true;
-            var token = await ShinyFirebaseService
-                .WhenTokenChanged()
-                .Timeout(TimeSpan.FromSeconds(10))
-                .StartWith(this.NativeRegistrationToken)
-                .Take(1)
-                .ToTask(cancelToken);
 
-            return new PushAccessState(AccessState.Available, token);
+            var task = await FirebaseMessaging.Instance.GetToken();
+            var token = task.JavaCast<Java.Lang.String>().ToString();
+
+            this.CurrentRegistrationToken = token;
+            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+
+            return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
         }
 
 
@@ -62,26 +61,14 @@ namespace Shiny.Push
                 return;
 
             this.ClearRegistration();
-            FirebaseMessaging.Instance.AutoInitEnabled = false;
 
-            //Firebase.FirebaseApp.InitializeApp(null, new Firebase.FirebaseOptions { }, "");
-            //Firebase.FirebaseApp.Instance.Delete()
+            FirebaseMessaging.Instance.AutoInitEnabled = false;
             await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId());
         }
 
 
         public override IObservable<IDictionary<string, string>> WhenReceived()
             => ShinyFirebaseService.WhenDataReceived();
-
-
-        /// <summary>
-        /// this value does not clear - it only updates
-        /// </summary>
-        string? NativeRegistrationToken
-        {
-            get => this.Settings.Get<string?>(nameof(NativeRegistrationToken));
-            set => this.Settings.Set(nameof(NativeRegistrationToken), value!);
-        }
 
 
         public virtual async Task AddTag(string tag)

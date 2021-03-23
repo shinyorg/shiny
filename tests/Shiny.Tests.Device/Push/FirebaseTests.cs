@@ -57,7 +57,7 @@ namespace Shiny.Tests.Push
             var stamp = Guid.NewGuid().ToString();
             var task = this.ListenForStamp(stamp);
 
-            await this.DoSend(stamp, Guid.NewGuid().ToString());
+            await this.DoSend(stamp, stamp);
             await task;
         });
 
@@ -84,14 +84,7 @@ namespace Shiny.Tests.Push
                 if (data.ContainsKey("stamp") && data["stamp"] == stamp)
                     tcs?.SetResult(null);
             };
-            await FirebaseMessaging.DefaultInstance.SendAsync(new Message
-            {
-                Token = this.pushManager.CurrentRegistrationToken,
-                Data = new Dictionary<string, string>
-                {
-                    { "stamp", stamp }
-                }
-            });
+            await this.DoSend(stamp, null);
             await tcs.Task.WithTimeout(10);
             tcs = null;
         });
@@ -133,10 +126,15 @@ namespace Shiny.Tests.Push
                     { "stamp", stamp }
                 }
             };
-            if (!topic.IsEmpty())
+            if (topic.IsEmpty())
             {
-                msg.Topic = topic;
+                msg.Token = this.pushManager.CurrentRegistrationToken;
+            }
+            else
+            {
+                topic = "test";
                 await this.pushManager.AddTag(topic);
+                msg.Topic = topic;
             }
             await FirebaseMessaging.DefaultInstance.SendAsync(msg);
 
