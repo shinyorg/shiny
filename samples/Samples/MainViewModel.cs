@@ -28,16 +28,5 @@ namespace Samples
 
         public ICommand Navigate { get; }
         [Reactive] public bool IsPresented { get; set; }
-
-
-        public override async void OnAppearing()
-        {
-            base.OnAppearing();
-            if (this.notificationDelegate != null)
-                await this.notificationDelegate.TryNavigateFromNotification(this.navigator);
-
-            //var env = DependencyService.Get<IEnvironment>();
-            //Console.WriteLine($"ENV: {env?.ToString() ?? "NO"}");
-        }
     }
 }
