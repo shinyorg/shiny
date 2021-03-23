@@ -18,6 +18,7 @@ namespace Shiny.Integrations.Sqlite
 
 
         public string Alias => "sqlite";
+        public bool IsReadOnly => false;
 
         public bool Contains(string key)
             => this.conn.GetConnection().Find<SettingStore>(key) != null;

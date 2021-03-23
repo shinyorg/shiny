@@ -11,6 +11,7 @@ namespace Shiny.Testing.Stores
 
 
         public string Alias { get; set; } = "settings";
+        public bool IsReadOnly { get; set; } = false;
         public bool Contains(string key) => this.Values.ContainsKey(key);
 
         public T? Get<T>(string key) => (T?)(this.Values.ContainsKey(key) ? this.Values[key] : null);
