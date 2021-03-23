@@ -52,7 +52,6 @@ namespace Samples.Push
         [Reactive] public string Tag { get; set; }
         [Reactive] public string RegToken { get; private set; }
         [Reactive] public DateTime? RegDate { get; private set; }
-        [Reactive] public DateTime? ExpiryDate { get; private set; }
         [Reactive] public AccessState AccessStatus { get; private set; } = AccessState.Unknown;
 
 
@@ -67,7 +66,6 @@ namespace Samples.Push
         {
             this.RegToken = this.pushManager?.CurrentRegistrationToken ?? "-";
             this.RegDate = this.pushManager?.CurrentRegistrationTokenDate?.ToLocalTime();
-            this.ExpiryDate = this.pushManager?.CurrentRegistrationExpiryDate?.ToLocalTime();
             this.Tag = this.pushManager?.TryGetTags()?.FirstOrDefault() ?? String.Empty;
         }
 
