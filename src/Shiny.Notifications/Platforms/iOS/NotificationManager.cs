@@ -57,7 +57,7 @@ namespace Shiny.Notifications
                 .Where(x => x.Response.Notification?.Request?.Trigger?.GetType().Name != "UNPushNotificationTrigger")
                 .SubscribeAsync(async x =>
                 {
-                    var shiny = x.Response.Notification.Request.FromNative();
+                    var shiny = this.FromNative(x.Response.Notification.Request);
                     if (shiny != null)
                     {
                         NotificationResponse response = default;
@@ -84,13 +84,11 @@ namespace Shiny.Notifications
         public int Badge
         {
             get => this.services.Settings.Get<int>("Badge");
-            set
+            set => Dispatcher.InvokeOnMainThreadAsync(() =>
             {
+                UIApplication.SharedApplication.ApplicationIconBadgeNumber = value;
                 this.services.Settings.Set("Badge", value);
-                Dispatcher.InvokeOnMainThreadAsync(() =>
-                    UIApplication.SharedApplication.ApplicationIconBadgeNumber = value
-                );
-            }
+            });
         }
 
 
@@ -140,7 +138,7 @@ namespace Shiny.Notifications
                 .GetPendingNotificationRequestsAsync();
 
             var notifications = requests
-                .Select(x => x.FromNative())
+                .Select(this.FromNative)
                 .Where(x => x != null);
 
             tcs.SetResult(notifications);
@@ -316,6 +314,28 @@ namespace Shiny.Notifications
                 }, false);
             }
             return trigger;
+        }
+
+
+        protected virtual Notification? FromNative(UNNotificationRequest native)
+        {
+            if (!Int32.TryParse(native.Identifier, out var id))
+                return null;
+
+            var shiny = new Notification
+            {
+                Id = id,
+                Title = native.Content?.Title,
+                Message = native.Content?.Body,
+                Payload = native.Content?.UserInfo?.FromNsDictionary(),
+                BadgeCount = native.Content?.Badge?.Int32Value,
+                Channel = native.Content?.CategoryIdentifier
+            };
+
+            if (native.Trigger is UNCalendarNotificationTrigger calendar)
+                shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
+
+            return shiny;
         }
     }
 }

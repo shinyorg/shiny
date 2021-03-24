@@ -3,7 +3,7 @@ using System.Reactive.Subjects;
 using UserNotifications;
 
 
-namespace Shiny.Notifications  
+namespace Shiny.Notifications
 {
     public class iOSNotificationDelegate : UNUserNotificationCenterDelegate
     {
@@ -15,23 +15,20 @@ namespace Shiny.Notifications
         }
 
 
-        readonly Subject<ResponseArgs> responseSubj = new Subject<ResponseArgs>();
-        public IObservable<ResponseArgs> WhenResponse() => this.responseSubj;
+        readonly Subject<(UNNotificationResponse Response, Action CompletionHandler)> responseSubj = new Subject<(UNNotificationResponse Response, Action CompletionHandler)>();
+        public IObservable<(UNNotificationResponse Response, Action CompletionHandler)> WhenResponse() => this.responseSubj;
 
-
-        readonly Subject<PresentArgs> presentSubj = new Subject<PresentArgs>();
-        public IObservable<PresentArgs> WhenPresented() => this.presentSubj;
 
 
         public override void DidReceiveNotificationResponse(UNUserNotificationCenter center,
                                                             UNNotificationResponse response,
                                                             Action completionHandler)
-            => this.responseSubj.OnNext(new ResponseArgs(response, completionHandler));
+            => this.responseSubj.OnNext((response, completionHandler));
 
 
         public override void WillPresentNotification(UNUserNotificationCenter center,
                                                      UNNotification notification,
                                                      Action<UNNotificationPresentationOptions> completionHandler)
-            => this.presentSubj.OnNext(new PresentArgs(notification, completionHandler));
+        { }
     }
 }
