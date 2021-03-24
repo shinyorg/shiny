@@ -1,13 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Xml;
 
 
 namespace Shiny.Stores
 {
-    public class AppConfigKeyValueStore : ReadOnlyKeyValueStore
+    public class AppConfigKeyValueStore : AbstractFileKeyValueStore
     {
-        public AppConfigKeyValueStore() : base("appconfig") { }
+        public AppConfigKeyValueStore(IPlatform platform) : base(platform, "appconfig", true) { }
 
-        public override bool Contains(string key) => throw new NotImplementedException();
-        public override object? Get(Type type, string key) => throw new NotImplementedException();
+        protected override IDictionary<string, object> Load(string path)
+        {
+            var doc = new XmlDocument();
+            doc.Load(path);
+
+            return null;
+        }
     }
 }

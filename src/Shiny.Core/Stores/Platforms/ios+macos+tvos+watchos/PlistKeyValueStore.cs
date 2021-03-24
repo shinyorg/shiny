@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Xml;
 
 
 namespace Shiny.Stores
 {
-    public class PlistKeyValueStore : ReadOnlyKeyValueStore
+    public class PlistKeyValueStore : AbstractFileKeyValueStore
     {
-        public PlistKeyValueStore() : base("plist") { }
+        public PlistKeyValueStore(IPlatform platform) : base(platform, "plist", true)
+            => this.FileName = "Info.plist";
 
+        protected override IDictionary<string, object> Load(string path)
+        {
+            var doc = new XmlDocument();
+            doc.Load(path);
 
-        public override bool Contains(string key) => throw new NotImplementedException();
-        public override object? Get(Type type, string key) => throw new NotImplementedException();
+            return null;
+        }
     }
 }
