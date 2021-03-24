@@ -26,9 +26,13 @@ namespace Shiny.Notifications
             => this.responseSubj.OnNext((response, completionHandler));
 
 
+
+        readonly Subject<(UNNotification Notification, Action<UNNotificationPresentationOptions> CompletionHandler)> presentSubj = new Subject<(UNNotification Notification, Action<UNNotificationPresentationOptions> CompletionHandler)>();
+        public IObservable<(UNNotification Notification, Action<UNNotificationPresentationOptions> CompletionHandler)> WhenPresented() => this.presentSubj;
+
         public override void WillPresentNotification(UNUserNotificationCenter center,
                                                      UNNotification notification,
                                                      Action<UNNotificationPresentationOptions> completionHandler)
-        { }
+            => this.presentSubj.OnNext((notification, completionHandler));
     }
 }

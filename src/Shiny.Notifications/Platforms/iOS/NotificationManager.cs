@@ -48,13 +48,16 @@ namespace Shiny.Notifications
             //        {
             //            await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnReceived(shiny));
             //            x.CompletionHandler.Invoke(UNNotificationPresentationOptions.Alert);
-            //        }
+            //        } 
             //    });
 
             this.nativeDelegate
                 .WhenResponse()
-                //.Where(x => !(x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger))
-                .Where(x => x.Response.Notification?.Request?.Trigger?.GetType().Name != "UNPushNotificationTrigger")
+                .Where(x =>
+                {
+                    var t = x.Response.Notification?.Request?.Trigger;
+                    return t == null || t is UNCalendarNotificationTrigger;
+                })
                 .SubscribeAsync(async x =>
                 {
                     var shiny = this.FromNative(x.Response.Notification.Request);
@@ -263,7 +266,7 @@ namespace Shiny.Notifications
         protected virtual async Task ApplyChannel(Notification notification, UNMutableNotificationContent native)
         {
             var channel = Channel.Default;
-            if (notification.Channel.IsEmpty())
+            if (!notification.Channel.IsEmpty())
             {
                 channel = await this.services.Repository.GetChannel(notification.Channel);
                 if (channel == null)
