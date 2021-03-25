@@ -7,6 +7,7 @@ namespace Shiny.Notifications
 {
     public interface INotificationManager
     {
+
         /// <summary>
         /// Clears current channels and creates what is passed in
         /// </summary>

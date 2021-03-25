@@ -17,15 +17,16 @@ namespace Shiny.Push
 
         public async void Process(IBackgroundTaskInstance taskInstance)
         {
-            // TODO: push delegate OnEntry?
             var deferral = taskInstance.GetDeferral();
             var headers = PushManager.ExtractHeaders(taskInstance.TriggerDetails);
 
             var fire = taskInstance.TriggerDetails is RawNotification ||
                        taskInstance.TriggerDetails is ToastNotification ||
                        taskInstance.TriggerDetails is TileNotification;
+
+            // could translate one of those to the notification?
             if (fire)
-                await this.serviceProvider.RunDelegates<IPushDelegate>(x => x.OnReceived(headers));
+                await this.serviceProvider.RunDelegates<IPushDelegate>(x => x.OnReceived(headers, null));
 
             deferral.Complete();
         }

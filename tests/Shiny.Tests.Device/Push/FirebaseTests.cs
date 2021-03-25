@@ -79,7 +79,7 @@ namespace Shiny.Tests.Push
             var stamp = Guid.NewGuid().ToString();
             var tcs = new TaskCompletionSource<object?>();
 
-            TestPushDelegate.Received = (data) =>
+            TestPushDelegate.Received = (data, notification) =>
             {
                 if (data.ContainsKey("stamp") && data["stamp"] == stamp)
                     tcs?.SetResult(null);

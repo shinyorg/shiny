@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Shiny.Push;
+using Shiny.Notifications;
 using Samples.Models;
 using Samples.Infrastructure;
 
@@ -23,7 +24,7 @@ namespace Samples.Push
         public Task OnEntry(PushEntryArgs args)
             => this.Insert("PUSH ENTRY");
 
-        public Task OnReceived(IDictionary<string, string> data)
+        public Task OnReceived(IDictionary<string, string> data, Notification? notification)
             => this.Insert("PUSH RECEIVED");
 
         public Task OnTokenChanged(string token)

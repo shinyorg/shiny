@@ -38,10 +38,12 @@ namespace Shiny.Push
                 .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                 .SubscribeAsync(async x =>
                 {
+                    var notification = x.Notification.Request?.FromNative();
                     var payload = x.Notification.Request?.Content?.UserInfo?.FromNsDictionary();
+
                     await this.Services
                         .Services
-                        .RunDelegates<IPushDelegate>(x => x.OnReceived(payload))
+                        .RunDelegates<IPushDelegate>(x => x.OnReceived(payload, notification))
                         .ConfigureAwait(false);
 
                     this.payloadSubj.OnNext(payload);
@@ -65,13 +67,14 @@ namespace Shiny.Push
                     await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
                     x.CompletionHandler();
                 });
-            //if (!this.CurrentRegistrationToken.IsEmpty())
-            //{
-            //    // do I need to do this?  I would normally be calling RequestAccess on startup anyhow
-            //    Dispatcher.InvokeOnMainThreadAsync(() =>
-            //        UIApplication.SharedApplication.RegisterForRemoteNotifications()
-            //    );
-            //}
+
+            if (!this.CurrentRegistrationToken.IsEmpty())
+            {
+                // do I need to do this?  I would normally be calling RequestAccess on startup anyhow
+                Dispatcher.InvokeOnMainThreadAsync(() =>
+                    UIApplication.SharedApplication.RegisterForRemoteNotifications()
+                );
+            }
         }
 
 
@@ -137,7 +140,7 @@ namespace Shiny.Push
         public async void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         {
             var dict = userInfo.FromNsDictionary();
-            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict));
+            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict, null));
             completionHandler(UIBackgroundFetchResult.NewData);
         }
 

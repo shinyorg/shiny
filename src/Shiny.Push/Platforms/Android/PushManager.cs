@@ -24,7 +24,11 @@ namespace Shiny.Push
             => this.notificationManager = notificationManager;
 
 
-        public virtual void Start() =>
+        public virtual void Start()
+        {
+            // wireup firebase if it was active
+            FirebaseMessaging.Instance.AutoInitEnabled = this.CurrentRegistrationToken != null;
+
             ShinyFirebaseService
                 .WhenTokenChanged()
                 .Subscribe(token =>
@@ -35,6 +39,7 @@ namespace Shiny.Push
                         this.CurrentRegistrationTokenDate = DateTime.UtcNow;
                     }
                 });
+        }
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)

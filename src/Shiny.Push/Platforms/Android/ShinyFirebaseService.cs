@@ -24,10 +24,15 @@ namespace Shiny.Push
         public override async void OnMessageReceived(RemoteMessage message)
         {
             dataSubj.OnNext(message.Data);
-            await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data));
 
             var native = message.GetNotification();
-            if (native != null)
+            if (native == null)
+            {
+                await ShinyHost
+                    .Container
+                    .RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data, null));
+            }
+            else
             {
                 var notification = new Notification
                 {
@@ -49,7 +54,7 @@ namespace Shiny.Push
                 if (!native.Color.IsEmpty())
                     notification.Android.ColorResourceName = native.Color;
 
-                // TODO: I have to intercept the response for the IPushDelegate.OnEntry
+                await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data, notification));
                 await this.notifications.Value.Send(notification);
             }
         }

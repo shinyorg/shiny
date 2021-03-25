@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Push;
+using Shiny.Notifications;
 
 
 namespace Shiny.Testing.Push
@@ -16,10 +17,10 @@ namespace Shiny.Testing.Push
         }
 
 
-        public static Action<IDictionary<string, string>>? Received { get; set; }
-        public Task OnReceived(IDictionary<string, string> data)
+        public static Action<IDictionary<string, string>, Notification?>? Received { get; set; }
+        public Task OnReceived(IDictionary<string, string> data, Notification? notification)
         {
-            Received?.Invoke(data);
+            Received?.Invoke(data, notification);
             return Task.CompletedTask;
         }
 

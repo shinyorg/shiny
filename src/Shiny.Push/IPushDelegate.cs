@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Shiny.Notifications;
 
 namespace Shiny.Push
 {
@@ -17,9 +18,10 @@ namespace Shiny.Push
         /// <summary>
         /// Called when the notification is triggered to the OS
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">This is the data portion of the push notification</param>
+        /// <param name="notification">The notification content - this can be null on iOS when received in the background or if a body was not sent</param>
         /// <returns></returns>
-        Task OnReceived(IDictionary<string, string> data);
+        Task OnReceived(IDictionary<string, string> data, Notification? notification);
 
         /// <summary>
         /// This is called ONLY when the token changes, not during RequestAccess

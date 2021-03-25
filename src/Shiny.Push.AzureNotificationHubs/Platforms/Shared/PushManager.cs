@@ -39,7 +39,11 @@ namespace Shiny.Push.AzureNotificationHubs
 
 
 #if __ANDROID__
-        public override void Start() =>
+        public override void Start()
+        {
+            // wireup firebase if it was active
+            Firebase.Messaging.FirebaseMessaging.Instance.AutoInitEnabled = this.CurrentRegistrationToken != null;
+
             // don't fire the base or the firebase start will overwrite the current
             // registration token with the firebase token, not the AZH installationID
             ShinyFirebaseService
@@ -63,6 +67,7 @@ namespace Shiny.Push.AzureNotificationHubs
                         // TODO
                     }
                 });
+        }
 #endif
 
         string? InstallationId

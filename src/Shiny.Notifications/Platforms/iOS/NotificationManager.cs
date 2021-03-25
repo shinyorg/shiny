@@ -48,7 +48,7 @@ namespace Shiny.Notifications
             //        {
             //            await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnReceived(shiny));
             //            x.CompletionHandler.Invoke(UNNotificationPresentationOptions.Alert);
-            //        } 
+            //        }
             //    });
 
             this.nativeDelegate
@@ -60,26 +60,23 @@ namespace Shiny.Notifications
                 })
                 .SubscribeAsync(async x =>
                 {
-                    var shiny = this.FromNative(x.Response.Notification.Request);
-                    if (shiny != null)
+                    var shiny = x.Response.Notification.Request.FromNative();
+                    NotificationResponse response = default;
+                    if (x.Response is UNTextInputNotificationResponse textResponse)
                     {
-                        NotificationResponse response = default;
-                        if (x.Response is UNTextInputNotificationResponse textResponse)
-                        {
-                            response = new NotificationResponse(
-                                shiny,
-                                textResponse.ActionIdentifier,
-                                textResponse.UserText
-                            );
-                        }
-                        else
-                        {
-                            response = new NotificationResponse(shiny, x.Response.ActionIdentifier, null);
-                        }
-
-                        await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
-                        x.CompletionHandler();
+                        response = new NotificationResponse(
+                            shiny,
+                            textResponse.ActionIdentifier,
+                            textResponse.UserText
+                        );
                     }
+                    else
+                    {
+                        response = new NotificationResponse(shiny, x.Response.ActionIdentifier, null);
+                    }
+
+                    await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
+                    x.CompletionHandler();
                 });
         }
 
@@ -140,10 +137,7 @@ namespace Shiny.Notifications
                 .Current
                 .GetPendingNotificationRequestsAsync();
 
-            var notifications = requests
-                .Select(this.FromNative)
-                .Where(x => x != null);
-
+            var notifications = requests.Select(x => x.FromNative());
             tcs.SetResult(notifications);
         });
 
@@ -317,28 +311,6 @@ namespace Shiny.Notifications
                 }, false);
             }
             return trigger;
-        }
-
-
-        protected virtual Notification? FromNative(UNNotificationRequest native)
-        {
-            if (!Int32.TryParse(native.Identifier, out var id))
-                return null;
-
-            var shiny = new Notification
-            {
-                Id = id,
-                Title = native.Content?.Title,
-                Message = native.Content?.Body,
-                Payload = native.Content?.UserInfo?.FromNsDictionary(),
-                BadgeCount = native.Content?.Badge?.Int32Value,
-                Channel = native.Content?.CategoryIdentifier
-            };
-
-            if (native.Trigger is UNCalendarNotificationTrigger calendar)
-                shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
-
-            return shiny;
         }
     }
 }
