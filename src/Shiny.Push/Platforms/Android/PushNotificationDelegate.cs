@@ -8,21 +8,18 @@ namespace Shiny.Push
 {
     public class PushNotificationDelegate : INotificationDelegate
     {
+        static readonly IDictionary<string, string> EmptyDictionary = new Dictionary<string, string>(0);
+
         readonly IEnumerable<IPushDelegate> delegates;
         public PushNotificationDelegate(IEnumerable<IPushDelegate> delegates) => this.delegates = delegates;
 
 
-#if __ANDROID__
         public Task OnEntry(NotificationResponse response) => this
             .delegates?
-            .RunDelegates(x => x.OnEntry(new PushEntryArgs(
-                response.Notification.Channel,
-                response.ActionIdentifier,
-                response.Text,
-                response.Notification.Payload
-            ))) ?? Task.CompletedTask;
-#else
-        public Task OnEntry(NotificationResponse response) => Task.CompletedTask;
-#endif
+            .RunDelegates(x => x.OnAction(
+                response.Notification?.Payload ?? EmptyDictionary,
+                response.Notification,
+                true
+            )) ?? Task.CompletedTask;
     }
 }

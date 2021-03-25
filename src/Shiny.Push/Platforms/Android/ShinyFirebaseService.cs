@@ -30,7 +30,7 @@ namespace Shiny.Push
             {
                 await ShinyHost
                     .Container
-                    .RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data, null));
+                    .RunDelegates<IPushDelegate>(x => x.OnAction(message.Data, null, false));
             }
             else
             {
@@ -51,7 +51,9 @@ namespace Shiny.Push
                 if (!native.Color.IsEmpty())
                     notification.Android.ColorResourceName = native.Color;
 
-                await ShinyHost.Container.RunDelegates<IPushDelegate>(x => x.OnReceived(message.Data, notification));
+                await ShinyHost.Container.RunDelegates<IPushDelegate>(x =>
+                    x.OnAction(message.Data, notification, false)
+                );
                 await this.notifications.Value.Send(notification);
             }
         }

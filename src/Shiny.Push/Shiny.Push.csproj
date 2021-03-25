@@ -65,4 +65,5 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
+
 </Project>

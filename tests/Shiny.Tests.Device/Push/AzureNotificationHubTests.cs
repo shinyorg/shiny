@@ -89,7 +89,7 @@ namespace Shiny.Tests.Push
         public Task ReceiveOnDelegate() => this.WrapRegistration(async token =>
         {
             var tcs = new TaskCompletionSource<object?>();
-            TestPushDelegate.Received += (data, notification) => tcs.SetResult(null);
+            TestPushDelegate.Action += (data, notification, entry) => tcs.SetResult(null);
             await this.DoSend();
             await tcs.Task.WithTimeout(10);
         });

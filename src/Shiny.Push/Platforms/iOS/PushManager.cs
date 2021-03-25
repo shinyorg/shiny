@@ -42,7 +42,7 @@ namespace Shiny.Push
 
                     await this.Services
                         .Services
-                        .RunDelegates<IPushDelegate>(x => x.OnReceived(payload, notification))
+                        .RunDelegates<IPushDelegate>(x => x.OnAction(payload, notification, false))
                         .ConfigureAwait(false);
 
                     this.payloadSubj.OnNext(payload);
@@ -54,16 +54,14 @@ namespace Shiny.Push
                 .Where(x => x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                 .SubscribeAsync(async x =>
                 {
-                    var textReply = (x.Response as UNTextInputNotificationResponse)?.UserText;
                     var parameters = x.Response.Notification.Request.Content.UserInfo.FromNsDictionary() ?? new Dictionary<string, string>();
+                    var notification = x.Response.Notification.Request.FromNative();
 
-                    var args = new PushEntryArgs(
-                        x.Response.Notification.Request.Content.CategoryIdentifier,
-                        x.Response.ActionIdentifier,
-                        textReply,
-                        parameters
-                    );
-                    await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnEntry(args));
+                    await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnAction(
+                        parameters,
+                        notification,
+                        true
+                    ));
                     x.CompletionHandler();
                 });
 
@@ -139,7 +137,7 @@ namespace Shiny.Push
         public async void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         {
             var dict = userInfo.FromNsDictionary();
-            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(dict, null));
+            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnAction(dict, null, false));
             completionHandler(UIBackgroundFetchResult.NewData);
         }
 

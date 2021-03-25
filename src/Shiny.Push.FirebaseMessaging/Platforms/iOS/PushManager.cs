@@ -15,6 +15,7 @@ namespace Shiny.Push.FirebaseMessaging
     {
         public PushManager(ShinyCoreServices services, iOSNotificationDelegate ndelegate) : base(services, ndelegate)
         {
+            //new Shiny.Push.PushManager(services, null);
         }
 
 
@@ -22,10 +23,16 @@ namespace Shiny.Push.FirebaseMessaging
         {
             base.Start();
 
+            if (this.CurrentRegistrationToken != null)
+                this.TryStartFirebase();
+        }
+
+
+        protected virtual void TryStartFirebase()
+        {
             if (Messaging.SharedInstance == null)
                 Firebase.Core.App.Configure();
 
-            //Messaging.Notifications.ObserveMessagesDeleted
             Messaging.SharedInstance.AutoInitEnabled = true;
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate
             (
@@ -33,7 +40,9 @@ namespace Shiny.Push.FirebaseMessaging
                 {
                     // I can't get access to the notification here
                     var dict = msg.AppData.FromNsDictionary();
-                    await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnReceived(dict, null));
+                    await this.Services.Services.RunDelegates<IPushDelegate>(
+                        x => x.OnAction(dict, null, false)
+                    );
                 },
                 async token =>
                 {
@@ -51,6 +60,7 @@ namespace Shiny.Push.FirebaseMessaging
             if (access.Status != AccessState.Available)
                 return access;
 
+            this.TryStartFirebase();
             Messaging.SharedInstance.ApnsToken = access.RegistrationToken;
             //Messaging.SharedInstance.RetrieveFcmTokenAsync()
             var result = await InstanceId.SharedInstance.GetInstanceIdAsync();

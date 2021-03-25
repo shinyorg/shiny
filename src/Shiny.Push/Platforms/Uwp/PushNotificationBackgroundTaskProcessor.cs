@@ -26,7 +26,7 @@ namespace Shiny.Push
 
             // could translate one of those to the notification?
             if (fire)
-                await this.serviceProvider.RunDelegates<IPushDelegate>(x => x.OnReceived(headers, null));
+                await this.serviceProvider.RunDelegates<IPushDelegate>(x => x.OnAction(headers, null, false));
 
             deferral.Complete();
         }

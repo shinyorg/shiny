@@ -9,18 +9,10 @@ namespace Shiny.Testing.Push
 {
     public class TestPushDelegate : IPushDelegate
     {
-        public static Action<PushEntryArgs>? Entry { get; set; }
-        public Task OnEntry(PushEntryArgs args)
+        public static Action<IDictionary<string, string>, Notification?, bool>? Action { get; set; }
+        public Task OnAction(IDictionary<string, string> data, Notification? notification, bool entry)
         {
-            Entry?.Invoke(args);
-            return Task.CompletedTask;
-        }
-
-
-        public static Action<IDictionary<string, string>, Notification?>? Received { get; set; }
-        public Task OnReceived(IDictionary<string, string> data, Notification? notification)
-        {
-            Received?.Invoke(data, notification);
+            Action?.Invoke(data, notification, entry);
             return Task.CompletedTask;
         }
 
