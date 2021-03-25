@@ -45,9 +45,6 @@ namespace Shiny.Push
                         x => x.Value
                     )
                 };
-                if (!native.ChannelId.IsEmpty())
-                    notification.Channel = native.ChannelId;
-
                 if (!native.Icon.IsEmpty())
                     notification.Android.SmallIconResourceName = native.Icon;
 

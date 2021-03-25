@@ -23,8 +23,7 @@ namespace Shiny.Push
         Subject<NSData>? onToken;
 
 
-        public PushManager(ShinyCoreServices services,
-                           iOSNotificationDelegate nativeDelegate) : base(services)
+        public PushManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate) : base(services)
         {
             this.nativeDelegate = nativeDelegate;
             this.payloadSubj = new Subject<IDictionary<string, string>>();
