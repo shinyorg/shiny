@@ -9,15 +9,27 @@ namespace Shiny.Notifications
 {
     public partial class NotificationManager
     {
-        public async Task SetChannels(params Channel[] channels)
+        public async Task AddChannel(Channel channel)
+        {
+            channel.AssertValid();
+            this.CreateNativeChannel(channel);
+
+            await this.core.Repository.SetChannel(channel);
+        }
+
+
+        public async Task RemoveChannel(string channelId)
+        {
+            await this.core.Repository.RemoveChannel(channelId);
+            this.manager.NativeManager.DeleteNotificationChannel(channelId);
+        }
+
+
+        public async Task ClearChannels()
         {
             var existing = await this.core.Repository.GetChannels();
             foreach (var exist in existing)
-                this.manager.NativeManager.DeleteNotificationChannel(exist.Identifier);
-
-            await this.core.Repository.DeleteAllChannels();
-            foreach (var channel in channels)
-                await this.CreateChannel(channel);
+                await this.RemoveChannel(exist.Identifier);
         }
 
 
@@ -83,15 +95,6 @@ namespace Shiny.Notifications
                 native.SetSound(uri, attrBuilder.Build());
 
             this.manager.NativeManager.CreateNotificationChannel(native);
-        }
-
-
-        protected virtual async Task CreateChannel(Channel channel)
-        {
-            channel.AssertValid();
-            this.CreateNativeChannel(channel);
-
-            await this.core.Repository.SetChannel(channel);
         }
     }
 }

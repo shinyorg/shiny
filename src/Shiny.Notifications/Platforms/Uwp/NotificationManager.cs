@@ -106,15 +106,10 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task SetChannels(params Channel[] channels)
-        {
-            await this.services.Repository.DeleteAllChannels();
-            foreach (var channel in channels)
-                await this.services.Repository.SetChannel(channel);
-        }
-
-
         public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
+        public Task AddChannel(Channel channel) => this.services.Repository.SetChannel(channel);
+        public Task RemoveChannel(string channelId) => this.services.Repository.RemoveChannel(channelId);
+        public Task ClearChannels() => this.services.Repository.RemoveAllChannels();
 
 
         protected async Task TrySetChannel(Notification notification, ToastContentBuilder builder)

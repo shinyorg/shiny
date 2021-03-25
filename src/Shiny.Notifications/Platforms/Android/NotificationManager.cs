@@ -82,7 +82,6 @@ namespace Shiny.Notifications
             this.manager.SendNative(notification.Id, builder.Build());
         }
 
-
         public int Badge { get; set; }
     }
 }

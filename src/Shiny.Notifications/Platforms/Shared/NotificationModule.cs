@@ -50,10 +50,12 @@ namespace Shiny.Notifications
         public override async void OnContainerReady(IServiceProvider services)
         {
             base.OnContainerReady(services);
-            var manager = services.GetRequiredService<INotificationManager>();
-
             if (this.channels?.Any() ?? false)
-                await manager.SetChannels(this.channels);
+            {
+                await services
+                    .GetRequiredService<INotificationManager>()
+                    .SetChannels(channels);
+            }
 
         }
     }

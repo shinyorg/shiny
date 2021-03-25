@@ -179,9 +179,27 @@ namespace Shiny.Notifications
             => this.services.Repository.GetChannels();
 
 
-        public async Task SetChannels(params Channel[] channels)
+        public async Task AddChannel(Channel channel)
         {
-            await this.services.Repository.Clear<Channel>();
+            channel.AssertValid();
+            await this.services.Repository.SetChannel(channel);
+            await this.RebuildNativeCategories();
+        }
+
+
+        public async Task RemoveChannel(string channelId)
+        {
+            await this.services.Repository.RemoveChannel(channelId);
+            await this.RebuildNativeCategories();
+        }
+
+
+        public Task ClearChannels() => this.services.Repository.RemoveAllChannels();
+
+
+        protected async Task RebuildNativeCategories()
+        {
+            var channels = await this.services.Repository.GetChannels();
             var list = channels.ToList();
             list.Add(Channel.Default);
 

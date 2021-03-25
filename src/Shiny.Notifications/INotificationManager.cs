@@ -7,19 +7,34 @@ namespace Shiny.Notifications
 {
     public interface INotificationManager
     {
+        /// <summary>
+        /// Add a new channel
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        Task AddChannel(Channel channel);
+
 
         /// <summary>
-        /// Clears current channels and creates what is passed in
+        /// Remove a specific channel - any pending notifications on this channel will have the channel removed from them
         /// </summary>
-        /// <param name="channels"></param>
         /// <returns></returns>
-        Task SetChannels(params Channel[] channels);
+        Task RemoveChannel(string channelId);
+
+
+        /// <summary>
+        /// Removes all channels - this will remove all channels from all notifications
+        /// </summary>
+        /// <returns></returns>
+        Task ClearChannels();
+
 
         /// <summary>
         /// Gets list of channels
         /// </summary>
         /// <returns></returns>
         Task<IList<Channel>> GetChannels();
+
 
         /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
