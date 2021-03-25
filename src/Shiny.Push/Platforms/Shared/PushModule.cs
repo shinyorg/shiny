@@ -24,9 +24,8 @@ namespace Shiny.Push
             services.AddSingleton(typeof(IPushDelegate), this.delegateType);
             services.TryAddSingleton(typeof(IPushManager), this.pushManagerType);
 #if __IOS__
-            services.TryAddSingleton<iOSNotificationDelegate>();
             services.TryAddSingleton(sp => (IAppDelegatePushNotificationHandler)sp.Resolve<IPushManager>());
-            services.UseNotifications(); // this is only here to satisfy other deps
+            services.UseNotifications();
 #else
             services.UseNotifications<PushNotificationDelegate>(null);
 #endif
