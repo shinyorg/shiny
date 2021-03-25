@@ -33,7 +33,7 @@ namespace Shiny
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static bool IsEmpty(this string s) => String.IsNullOrWhiteSpace(s);
+        public static bool IsEmpty(this string? s) => String.IsNullOrWhiteSpace(s);
 
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Shiny
         /// <param name="string"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        public static bool HasMinLength(this string @string, int length)
+        public static bool HasMinLength(this string? @string, int length)
         {
             if (@string.IsEmpty())
                 return false;
