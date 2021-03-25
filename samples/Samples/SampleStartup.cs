@@ -71,7 +71,7 @@ namespace Samples
             //services.UseGpsDirectGeofencing<LocationDelegates>();
             services.UseGps<GpsDelegate>();
 
-            var channels = new [] {
+            services.UseNotifications<NotificationDelegate>(null, new[] {
                 Channel.Create(
                     "Test",
                     ChannelAction.Create("Reply", ChannelActionType.TextReply),
@@ -87,17 +87,13 @@ namespace Samples
                     ChannelAction.Create("Yes"),
                     ChannelAction.Create("No", ChannelActionType.Destructive)
                 )
-            };
+            });
 
-            // only pass channels to push or here, not both - technically you don't need this with push
-            services.UseNotifications<NotificationDelegate>(null, channels);
-
-            //services.UsePush<PushDelegate>(channels);
-            //services.UseFirebaseMessaging<PushDelegate>(channels);
+            //services.UsePush<PushDelegate>();
+            //services.UseFirebaseMessaging<PushDelegate>();
             //services.UsePushAzureNotificationHubs<PushDelegate>(
             //    Secrets.Values.AzureNotificationHubListenerConnectionString,
-            //    Secrets.Values.AzureNotificationHubName,
-            //    channels
+            //    Secrets.Values.AzureNotificationHubName
             //);
         }
 

@@ -52,7 +52,7 @@ namespace Samples.Notifications
                     case "name":
                         var name = "Shy Person";
                         if (!response.Text.IsEmpty())
-                            name = response.Text.Trim();
+                            name = response.Text!.Trim();
 
                         await notifications.Send(
                             "Shiny Chat",
@@ -62,7 +62,7 @@ namespace Samples.Notifications
                         break;
 
                     case "answer":
-                        switch (response.ActionIdentifier.ToLower())
+                        switch (response.ActionIdentifier?.ToLower())
                         {
                             case "yes":
                                 await this.notifications.Send("Shiny Chat", "YAY!!");
