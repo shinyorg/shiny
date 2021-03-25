@@ -29,6 +29,9 @@ namespace Samples.Gps
             this.ThrottledInterval = l?.ThrottledInterval?.TotalSeconds.ToString() ?? String.Empty;
             this.MinimumDistanceMeters = l?.MinimumDistance?.TotalMeters.ToString() ?? String.Empty;
 
+            this.NotificationTitle = manager.Title;
+            this.NotificationMessage = manager.Message;
+
             this.WhenAnyValue(x => x.UseBackground)
                 .Subscribe(x => this.Access = this.manager.GetCurrentStatus(
                     new GpsRequest { UseBackground = this.UseBackground }).ToString()
@@ -37,6 +40,16 @@ namespace Samples.Gps
             this.WhenAnyValue(x => x.IsUpdating)
                 .Select(x => x ? "Stop Listening" : "Start Updating")
                 .ToPropertyEx(this, x => x.ListenerText);
+
+            this.WhenAnyValue(x => x.NotificationTitle)
+                .Skip(1)
+                .Subscribe(x => this.manager.Title = x)
+                .DisposedBy(this.DestroyWith);
+
+            this.WhenAnyValue(x => x.NotificationMessage)
+                .Skip(1)
+                .Subscribe(x => this.manager.Message = x)
+                .DisposedBy(this.DestroyWith);
 
             this.GetCurrentPosition = ReactiveCommand.CreateFromTask(async _ =>
             {
@@ -182,6 +195,9 @@ namespace Samples.Gps
 
         public string ListenerText { [ObservableAsProperty] get; }
 
+        public bool IsAndroid => Xamarin.Essentials.DeviceInfo.Platform == Xamarin.Essentials.DevicePlatform.Android;
+        [Reactive] public string NotificationTitle { get; set; }
+        [Reactive] public string NotificationMessage { get; set; }
         [Reactive] public bool UseBackground { get; set; } = true;
         [Reactive] public GpsPriority Priority { get; set; } = GpsPriority.Normal;
         [Reactive] public string DesiredInterval { get; set; }

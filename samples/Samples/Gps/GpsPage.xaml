@@ -25,12 +25,22 @@
                         <TextCell Text="Longitude" Detail="{Binding Longitude}" />
                         <TextCell Text="Altitude" Detail="{Binding Altitude}" />
                         <TextCell Text="Accuracy" Detail="{Binding PositionAccuracy}" />
-                    </TableSection>
+                    </TableSection>                    
 
                     <TableSection>
                         <TextCell Text="Speed (m/s)" Detail="{Binding Speed}" />
                         <TextCell Text="Heading" Detail="{Binding Heading}" />
                         <TextCell Text="Accuracy" Detail="{Binding HeadingAccuracy}" />
+                    </TableSection>
+
+                    <TableSection Title="Android Foreground Notification">
+                        <EntryCell Label="Title"
+                                   Text="{Binding NotificationTitle}"
+                                   IsEnabled="{Binding IsAndroid, Mode=OneTime}" />
+
+                        <EntryCell Label="Message"
+                                   Text="{Binding NotificationMessage}"
+                                   IsEnabled="{Binding IsAndroid, Mode=OneTime}" />
                     </TableSection>
 
                     <TableSection Title="Listening">

@@ -6,12 +6,12 @@ namespace Shiny
 {
     public interface IShinyForegroundManager : INotifyPropertyChanged
     {
-        string? Title { get; }
-        string? Message { get; }
+        string? Title { get; set; }
+        string? Message { get; set; }
 
-        int Progress { get; }
-        int Total { get; }
-        bool IsIndeterministic { get; }
+        int Progress { get; set; }
+        int Total { get; set; }
+        bool IsIndeterministic { get; set; }
         //string? Channel { get; }
         //string? Ticker { get; }
     }
