@@ -21,6 +21,10 @@ namespace Shiny.Tests.BluetoothLE
         public BleManagerTests(ITestOutputHelper output)
         {
             this.output = output;
+            ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
+            {
+                BuildServices = x => x.UseBleClient()
+            });
             this.manager = ShinyHost.Resolve<IBleManager>();
         }
 

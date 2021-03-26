@@ -24,10 +24,7 @@ namespace Shiny.Tests.Push
         {
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
-                BuildServices = (services) =>
-                {
-                    services.UseFirebaseMessaging<TestPushDelegate>();
-                }
+                BuildServices = x => x.UseFirebaseMessaging<TestPushDelegate>()
             });
 
             this.pushManager = (IPushTagSupport)ShinyHost.Resolve<IPushManager>();

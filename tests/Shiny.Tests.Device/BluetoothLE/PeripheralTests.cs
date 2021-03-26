@@ -20,7 +20,11 @@ namespace Shiny.Tests.BluetoothLE
 
         public PeripheralTests()
         {
-            this.manager = ShinyHost.Container.GetService<IBleManager>();
+            ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
+            {
+                BuildServices = x => x.UseBleClient()
+            });
+            this.manager = ShinyHost.Resolve<IBleManager>();
         }
 
 
