@@ -73,13 +73,10 @@ namespace Shiny.Notifications
             var channel = await this.GetChannel(notification);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
 
-            if (notification.ScheduleDate != null)
-            {
-                await this.core.Repository.Set(notification.Id.ToString(), notification);
-                //this.SetAlarm(notification);
-                return;
-            }
-            this.manager.SendNative(notification.Id, builder.Build());
+            if (notification.ScheduleDate == null)
+                this.manager.SendNative(notification.Id, builder.Build());
+            else
+                await this.core.Repository.Set(notification.Id.ToString(), notification);        
         }
 
         public int Badge { get; set; }

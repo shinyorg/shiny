@@ -19,6 +19,7 @@ namespace Shiny.Tests.Push
             {
                 BuildServices = x => x.UseNotifications()
             });
+            this.notificationManager = ShinyHost.Resolve<INotificationManager>();
         }
 
 
@@ -29,7 +30,7 @@ namespace Shiny.Tests.Push
         }
 
 
-        [Fact]
+        [Fact(DisplayName = "Notifications - Standard")]
         public async Task StandardTest()
         {
             await this.CreateFullChannel(nameof(StandardTest));
@@ -37,7 +38,7 @@ namespace Shiny.Tests.Push
         }
 
 
-        [Fact]
+        [Fact(DisplayName = "Notifications - Channel Store")]
         public async Task ChannelStoreProperTest()
         {
             var created = await this.CreateFullChannel(nameof(ChannelStoreProperTest));
@@ -48,7 +49,7 @@ namespace Shiny.Tests.Push
         }
 
 
-        [Fact]
+        [Fact(DisplayName = "Notifications - SetChannels")]
         public async Task SetChannels()
         {
             await this.CreateChannel("1");
@@ -59,7 +60,7 @@ namespace Shiny.Tests.Push
 
             await this.notificationManager.SetChannels(
                 new Channel { Identifier = "1", Description = "1" },
-                new Channel { Identifier = "1", Description = "3" }
+                new Channel { Identifier = "3", Description = "3" }
             );
             var notifications = await notificationManager.GetPending();
             notifications.First(x => x.Id == 1).Channel.Should().Be("1");
@@ -74,7 +75,7 @@ namespace Shiny.Tests.Push
         }
 
 
-        [Fact]
+        [Fact(DisplayName = "Notifications - Clear Channels")]
         public async Task ClearChannelsTest()
         {
             await this.CreateChannel("1");
@@ -100,12 +101,12 @@ namespace Shiny.Tests.Push
             {
                 Identifier = identifier
             };
-            await this.notificationManager.CreateChannel(channel);
+            await this.notificationManager.AddChannel(channel);
             return channel;
         }
 
 
-        Task CreateChannel(string name) => this.notificationManager.CreateChannel(new Channel
+        Task CreateChannel(string name) => this.notificationManager.AddChannel(new Channel
         {
             Identifier = name,
             Description = name

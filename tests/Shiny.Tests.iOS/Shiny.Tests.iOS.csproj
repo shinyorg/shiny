@@ -203,6 +203,7 @@
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
       <Name>Shiny.Push.FirebaseMessaging</Name>
+      <Project>{886F6FF7-2E92-488A-9011-B5C333B6BD54}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -27,9 +27,11 @@ namespace Shiny.Notifications
 
         public async Task ClearChannels()
         {
-            var existing = await this.core.Repository.GetChannels();
-            foreach (var exist in existing)
-                await this.RemoveChannel(exist.Identifier);
+            var channels = await this.core.Repository.GetChannels();
+            foreach (var channel in channels)
+                this.manager.NativeManager.DeleteNotificationChannel(channel.Identifier);
+
+            await this.core.Repository.RemoveAllChannels();
         }
 
 

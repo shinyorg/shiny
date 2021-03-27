@@ -136,12 +136,15 @@
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
       <Name>Shiny.Push.AzureNotificationHubs</Name>
+      <Project>{DA7EE0F6-E80E-4470-BEC3-D5FEE5A6073D}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj">
       <Name>Shiny.Push</Name>
+      <Project>{B7855E77-9363-4F36-9A0D-FC9277A88F8D}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
       <Name>Shiny.Notifications</Name>
+      <Project>{E76DB2CB-7A95-40B0-9A50-230320554B6B}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Shiny.Tests.Device\Shiny.Tests.Device.csproj">
       <Project>{e1e4a77d-f07a-402e-bfac-2b356b86b089}</Project>

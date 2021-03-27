@@ -27,7 +27,7 @@ namespace Shiny.Notifications
                     currentChannel.Identifier, StringComparison.InvariantCultureIgnoreCase
                 ));
                 if (!exists)
-                    await manager.DeleteChannel(currentChannel.Identifier);
+                    await manager.RemoveChannel(currentChannel.Identifier);
             }
 
             // if the incoming channels don't exist in the current channels, create them
@@ -37,7 +37,7 @@ namespace Shiny.Notifications
                     channel.Identifier, StringComparison.InvariantCultureIgnoreCase
                 ));
                 if (!exists)
-                    await manager.CreateChannel(channel);
+                    await manager.AddChannel(channel);
             }
         }
 
@@ -66,32 +66,6 @@ namespace Shiny.Notifications
 
             if (action.Title.IsEmpty())
                 throw new ArgumentException("ChannelAction Title is required", nameof(action.Title));
-        }
-
-
-        public static async Task CreateChannel(this INotificationManager manager, Channel channel)
-        {
-            var channels = await manager.GetChannels();
-            var newChannels = channels.ToList();
-            newChannels.Add(channel);
-            await manager.SetChannels(newChannels.ToArray());
-        }
-
-
-        public static async Task DeleteChannel(this INotificationManager manager, string channelIdentifier)
-        {
-            var channels = await manager.GetChannels();
-            var newChannels = channels
-                .Where(x => x.Identifier != channelIdentifier)
-                .ToArray();
-            await manager.SetChannels(newChannels);
-        }
-
-
-        public static async Task UpdateChannel(this INotificationManager manager, Channel channel)
-        {
-            await manager.DeleteChannel(channel.Identifier);
-            await manager.CreateChannel(channel);
         }
 
 
