@@ -58,25 +58,11 @@ namespace Shiny.Notifications
                     var t = x.Response.Notification?.Request?.Trigger;
                     return t == null || t is UNCalendarNotificationTrigger;
                 })
-                .SubscribeAsync(async x =>
+                .SubscribeAsync(async native =>
                 {
-                    var shiny = x.Response.Notification.Request.FromNative();
-                    NotificationResponse response = default;
-                    if (x.Response is UNTextInputNotificationResponse textResponse)
-                    {
-                        response = new NotificationResponse(
-                            shiny,
-                            textResponse.ActionIdentifier,
-                            textResponse.UserText
-                        );
-                    }
-                    else
-                    {
-                        response = new NotificationResponse(shiny, x.Response.ActionIdentifier, null);
-                    }
-
+                    var response = native.Response.FromNative();
                     await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
-                    x.CompletionHandler();
+                    native.CompletionHandler();
                 });
         }
 

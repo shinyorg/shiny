@@ -76,9 +76,9 @@ namespace Shiny.Tests.Push
             var stamp = Guid.NewGuid().ToString();
             var tcs = new TaskCompletionSource<object?>();
 
-            TestPushDelegate.Action = (data, notification, entry) =>
+            TestPushDelegate.Receive = pr =>
             {
-                if (data.ContainsKey("stamp") && data["stamp"] == stamp)
+                if (pr.Data.ContainsKey("stamp") && pr.Data["stamp"] == stamp)
                     tcs?.SetResult(null);
             };
             await this.DoSend(stamp, null);
@@ -91,7 +91,7 @@ namespace Shiny.Tests.Push
         Task ListenForStamp(string stamp) => this.pushManager
             .WhenReceived()
             .Take(1)
-            .Where(x => x.ContainsKey("stamp") && x["stamp"] == stamp)
+            .Where(x => x.Data.ContainsKey("stamp") && x.Data["stamp"] == stamp)
             .Timeout(TimeSpan.FromSeconds(5))
             .ToTask();
 

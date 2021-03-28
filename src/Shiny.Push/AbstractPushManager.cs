@@ -1,5 +1,4 @@
 ﻿﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
@@ -15,7 +14,7 @@ namespace Shiny.Push
 
         protected ShinyCoreServices Services { get; }
         protected IKeyValueStore Settings => this.Services.Settings;
-        public abstract IObservable<IDictionary<string, string>> WhenReceived();
+        public abstract IObservable<PushNotification> WhenReceived();
         public abstract Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default);
         public abstract Task UnRegister();
 

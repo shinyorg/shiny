@@ -6,7 +6,7 @@ namespace Shiny.Notifications
 {
     public static class PlatformExtensions
     {
-        public static Notification? FromNative(this UNNotificationRequest native)
+        public static Notification FromNative(this UNNotificationRequest native)
         {
             var id = 0;
             Int32.TryParse(native.Identifier, out id);
@@ -25,6 +25,27 @@ namespace Shiny.Notifications
                 shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
 
             return shiny;
+        }
+
+
+        public static NotificationResponse FromNative(this UNNotificationResponse native)
+        {
+            var shiny = native.Notification.Request.FromNative();
+            NotificationResponse response = default;
+
+            if (native is UNTextInputNotificationResponse textResponse)
+            {
+                response = new NotificationResponse(
+                    shiny,
+                    textResponse.ActionIdentifier,
+                    textResponse.UserText
+                );
+            }
+            else
+            {
+                response = new NotificationResponse(shiny, native.ActionIdentifier, null);
+            }
+            return response;
         }
     }
 }

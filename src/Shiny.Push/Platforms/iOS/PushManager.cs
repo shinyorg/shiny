@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
@@ -19,14 +18,14 @@ namespace Shiny.Push
                                IAppDelegatePushNotificationHandler
     {
         readonly iOSNotificationDelegate nativeDelegate;
-        readonly Subject<IDictionary<string, string>> payloadSubj;
+        readonly Subject<PushNotification> payloadSubj;
         Subject<NSData>? onToken;
 
 
         public PushManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate) : base(services)
         {
             this.nativeDelegate = nativeDelegate;
-            this.payloadSubj = new Subject<IDictionary<string, string>>();
+            this.payloadSubj = new Subject<PushNotification>();
         }
 
 
@@ -37,15 +36,15 @@ namespace Shiny.Push
                 .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                 .SubscribeAsync(async x =>
                 {
-                    var notification = x.Notification.Request?.FromNative();
-                    var payload = x.Notification.Request?.Content?.UserInfo?.FromNsDictionary();
+                    var notification = x.Notification.Request.FromNative();
+                    var push = new PushNotification(notification.Payload, notification);
 
                     await this.Services
                         .Services
-                        .RunDelegates<IPushDelegate>(x => x.OnAction(payload, notification, false))
+                        .RunDelegates<IPushDelegate>(x => x.OnReceived(push))
                         .ConfigureAwait(false);
 
-                    this.payloadSubj.OnNext(payload);
+                    this.payloadSubj.OnNext(push);
                     x.CompletionHandler?.Invoke(UNNotificationPresentationOptions.Alert);
                 });
 
@@ -54,14 +53,17 @@ namespace Shiny.Push
                 .Where(x => x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                 .SubscribeAsync(async x =>
                 {
-                    var parameters = x.Response.Notification.Request.Content.UserInfo.FromNsDictionary() ?? new Dictionary<string, string>();
-                    var notification = x.Response.Notification.Request.FromNative();
+                    var response = x.Response.FromNative();
+                    var pr = new PushNotificationResponse(
+                        response.Notification,
+                        response.ActionIdentifier,
+                        response.Text
+                    );
 
-                    await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnAction(
-                        parameters,
-                        notification,
-                        true
-                    ));
+                    await this.Services
+                        .Services
+                        .RunDelegates<IPushDelegate>(x => x.OnEntry(pr))
+                        .ConfigureAwait(false);
                     x.CompletionHandler();
                 });
 
@@ -75,7 +77,7 @@ namespace Shiny.Push
         }
 
 
-        public override IObservable<IDictionary<string, string>> WhenReceived() => this.payloadSubj;
+        public override IObservable<PushNotification> WhenReceived() => this.payloadSubj;
 
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
@@ -137,7 +139,8 @@ namespace Shiny.Push
         public async void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         {
             var dict = userInfo.FromNsDictionary();
-            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnAction(dict, null, false));
+            var pr = new PushNotification(dict, null);
+            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(pr));
             completionHandler(UIBackgroundFetchResult.NewData);
         }
 
@@ -145,8 +148,10 @@ namespace Shiny.Push
         public async void RegisteredForRemoteNotifications(NSData deviceToken)
         {
             this.onToken?.OnNext(deviceToken);
+            var token = ToTokenString(deviceToken);
+
             await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(
-                x => x.OnTokenChanged(ToTokenString(deviceToken))
+                x => x.OnTokenChanged(token)
             );
         }
 

@@ -10,8 +10,8 @@ namespace Shiny.Testing.Push
 {
     public class TestPushManager : IPushManager, IPushTagSupport
     {
-        public Subject<IDictionary<string, string>> NotificationSubject { get; } = new Subject<IDictionary<string, string>>();
-        public IObservable<IDictionary<string, string>> WhenReceived() => this.NotificationSubject;
+        public Subject<PushNotification> ReceiveSubject { get; } = new Subject<PushNotification>();
+        public IObservable<PushNotification> WhenReceived() => this.ReceiveSubject;
         public AccessState ResultStatus { get; set; } = AccessState.Available;
         public DateTime? CurrentRegistrationTokenDate { get; set; }
         public string? CurrentRegistrationToken { get; set; }

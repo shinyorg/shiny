@@ -27,17 +27,33 @@ namespace Shiny.Push
         public virtual void Start()
         {
             // wireup firebase if it was active
-            FirebaseMessaging.Instance.AutoInitEnabled = this.CurrentRegistrationToken != null;
+            if (this.CurrentRegistrationToken != null)
+                FirebaseMessaging.Instance.AutoInitEnabled = true;
 
             ShinyFirebaseService
                 .WhenTokenChanged()
-                .Subscribe(token =>
+                .Where(_ => this.CurrentRegistrationToken != null)
+                .SubscribeAsync(async token =>
                 {
-                    if (this.CurrentRegistrationToken != null)
-                    {
-                        this.CurrentRegistrationToken = token;
-                        this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                    }
+                    this.CurrentRegistrationToken = token;
+                    this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+
+                    await this.Services.Services.RunDelegates<IPushDelegate>(
+                        x => x.OnTokenChanged(token)
+                    );
+                });
+
+            ShinyFirebaseService
+                .WhenReceived()
+                .Select(x => this.FromNative(x))
+                .SubscribeAsync(async pr =>
+                {
+                    if (pr.Notification != null)
+                        await this.notificationManager.Send(pr.Notification);
+
+                    await this.Services.Services.RunDelegates<IPushDelegate>(
+                        x => x.OnReceived(pr)
+                    );
                 });
         }
 
@@ -72,61 +88,8 @@ namespace Shiny.Push
         }
 
 
-        protected virtual PushNotification ToNotification(RemoteMessage message)
-        {
-            var notification = new Notification
-            {
-
-            };
-
-            return default;
-        }
-
-        //public override async void OnMessageReceived(RemoteMessage message)
-        //{
-        //    msgSubj.OnNext(message.Data);
-
-        //    var native = message.GetNotification();
-        //    if (native == null)
-        //    {
-        //        await ShinyHost
-        //            .Container
-        //            .RunDelegates<IPushDelegate>(x => x.OnAction(message.Data, null, false));
-        //    }
-        //    else
-        //    {
-        //        var notification = new Notification
-        //        {
-        //            Title = native.Title,
-        //            Message = native.Body,
-
-        //            // recast this as implementation types aren't serializing well
-        //            Payload = message.Data?.ToDictionary(
-        //                x => x.Key,
-        //                x => x.Value
-        //            )
-        //        };
-        //        if (!native.Icon.IsEmpty())
-        //            notification.Android.SmallIconResourceName = native.Icon;
-
-        //        if (!native.Color.IsEmpty())
-        //            notification.Android.ColorResourceName = native.Color;
-
-        //        await ShinyHost.Container.RunDelegates<IPushDelegate>(x =>
-        //            x.OnAction(message.Data, notification, false)
-        //        );
-        //        await this.notifications.Value.Send(notification);
-        //    }
-        //}
-
-
-        //await ShinyHost.Container.RunDelegates<IPushDelegate>(
-        //    x => x.OnTokenChanged(token)
-
-        //);
-
-        public override IObservable<IDictionary<string, string>> WhenReceived()
-            => ShinyFirebaseService.WhenDataReceived();
+        public override IObservable<PushNotification> WhenReceived()
+            => ShinyFirebaseService.WhenReceived().Select(x => this.FromNative(x));
 
 
         public virtual async Task AddTag(string tag)
@@ -165,6 +128,28 @@ namespace Shiny.Push
             if (tags != null)
                 foreach (var tag in tags)
                     await this.AddTag(tag);
+        }
+
+
+        protected virtual PushNotification FromNative(RemoteMessage message)
+        {
+            Notification? notification = null;
+            var native = message.GetNotification();
+
+            if (native != null)
+            {
+                notification = new Notification
+                {
+                    Title = native.Title,
+                    Message = native.Body,
+                };
+                if (!native.Icon.IsEmpty())
+                    notification.Android.SmallIconResourceName = native.Icon;
+
+                if (!native.Color.IsEmpty())
+                    notification.Android.ColorResourceName = native.Color;
+            }
+            return new PushNotification(message.Data, notification);
         }
     }
 }

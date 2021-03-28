@@ -33,7 +33,7 @@ namespace Shiny.Push.FirebaseMessaging
             if (Messaging.SharedInstance == null)
                 Firebase.Core.App.Configure();
 
-            Messaging.SharedInstance.AutoInitEnabled = true;
+            Messaging.SharedInstance!.AutoInitEnabled = true;
             Messaging.SharedInstance.Delegate = new FbMessagingDelegate
             (
                 async msg =>
@@ -41,7 +41,7 @@ namespace Shiny.Push.FirebaseMessaging
                     // I can't get access to the notification here
                     var dict = msg.AppData.FromNsDictionary();
                     await this.Services.Services.RunDelegates<IPushDelegate>(
-                        x => x.OnReceived(dict, null, false)
+                        x => x.OnReceived(new PushNotification(dict, null))
                     );
                 },
                 async token =>
