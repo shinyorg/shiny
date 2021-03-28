@@ -72,6 +72,59 @@ namespace Shiny.Push
         }
 
 
+        protected virtual PushNotification ToNotification(RemoteMessage message)
+        {
+            var notification = new Notification
+            {
+
+            };
+
+            return default;
+        }
+
+        //public override async void OnMessageReceived(RemoteMessage message)
+        //{
+        //    msgSubj.OnNext(message.Data);
+
+        //    var native = message.GetNotification();
+        //    if (native == null)
+        //    {
+        //        await ShinyHost
+        //            .Container
+        //            .RunDelegates<IPushDelegate>(x => x.OnAction(message.Data, null, false));
+        //    }
+        //    else
+        //    {
+        //        var notification = new Notification
+        //        {
+        //            Title = native.Title,
+        //            Message = native.Body,
+
+        //            // recast this as implementation types aren't serializing well
+        //            Payload = message.Data?.ToDictionary(
+        //                x => x.Key,
+        //                x => x.Value
+        //            )
+        //        };
+        //        if (!native.Icon.IsEmpty())
+        //            notification.Android.SmallIconResourceName = native.Icon;
+
+        //        if (!native.Color.IsEmpty())
+        //            notification.Android.ColorResourceName = native.Color;
+
+        //        await ShinyHost.Container.RunDelegates<IPushDelegate>(x =>
+        //            x.OnAction(message.Data, notification, false)
+        //        );
+        //        await this.notifications.Value.Send(notification);
+        //    }
+        //}
+
+
+        //await ShinyHost.Container.RunDelegates<IPushDelegate>(
+        //    x => x.OnTokenChanged(token)
+
+        //);
+
         public override IObservable<IDictionary<string, string>> WhenReceived()
             => ShinyFirebaseService.WhenDataReceived();
 

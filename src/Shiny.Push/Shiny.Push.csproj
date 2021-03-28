@@ -66,4 +66,12 @@
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="PushNotification.cs">
+        <SubType></SubType>
+      </Compile>
+      <Compile Update="PushNotificationResponse.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

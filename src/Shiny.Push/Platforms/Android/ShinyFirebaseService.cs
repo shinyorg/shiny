@@ -16,59 +16,17 @@ namespace Shiny.Push
     public class ShinyFirebaseService : FirebaseMessagingService
     {
         public const string IntentAction = "com.google.firebase.MESSAGING_EVENT";
+        
+        public override void OnMessageReceived(RemoteMessage message)
+            => msgSubj.OnNext(message);
+
+        public override void OnNewToken(string token)
+            => tokenSubj.OnNext(token);
+
         static readonly Subject<string> tokenSubj = new Subject<string>();
-        static readonly Subject<IDictionary<string, string>> dataSubj = new Subject<IDictionary<string, string>>();
-        readonly Lazy<INotificationManager> notifications = ShinyHost.LazyResolve<INotificationManager>();
-
-
-        public override async void OnMessageReceived(RemoteMessage message)
-        {
-            dataSubj.OnNext(message.Data);
-
-            var native = message.GetNotification();
-            if (native == null)
-            {
-                await ShinyHost
-                    .Container
-                    .RunDelegates<IPushDelegate>(x => x.OnAction(message.Data, null, false));
-            }
-            else
-            {
-                var notification = new Notification
-                {
-                    Title = native.Title,
-                    Message = native.Body,
-
-                    // recast this as implementation types aren't serializing well
-                    Payload = message.Data?.ToDictionary(
-                        x => x.Key,
-                        x => x.Value
-                    )
-                };
-                if (!native.Icon.IsEmpty())
-                    notification.Android.SmallIconResourceName = native.Icon;
-
-                if (!native.Color.IsEmpty())
-                    notification.Android.ColorResourceName = native.Color;
-
-                await ShinyHost.Container.RunDelegates<IPushDelegate>(x =>
-                    x.OnAction(message.Data, notification, false)
-                );
-                await this.notifications.Value.Send(notification);
-            }
-        }
-
-
-        public override async void OnNewToken(string token)
-        {
-            tokenSubj.OnNext(token);
-            await ShinyHost.Container.RunDelegates<IPushDelegate>(
-                x => x.OnTokenChanged(token)
-            );
-        }
-
-
         public static IObservable<string> WhenTokenChanged() => tokenSubj;
-        public static IObservable<IDictionary<string, string>> WhenDataReceived()=> dataSubj;
+
+        static readonly Subject<RemoteMessage> msgSubj = new Subject<RemoteMessage>();
+        public static IObservable<RemoteMessage> WhenReceived()=> msgSubj;
     }
 }
