@@ -67,7 +67,6 @@ namespace Shiny.Locations
                 .StartWith()
                 .Take(1)
                 .ToTask();
-
 #if __IOS__
             if (background)
                 locationManager.RequestAlwaysAuthorization();

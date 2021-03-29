@@ -52,6 +52,7 @@ namespace Shiny.Locations
         public Task<AccessState> RequestAccess(GpsRequest request) => this.locationManager.RequestAccess(request.UseBackground);
         public AccessState GetCurrentStatus(GpsRequest request) => this.locationManager.GetCurrentStatus(request.UseBackground);
 
+
         GpsRequest? request;
         public GpsRequest? CurrentListener
         {
@@ -76,8 +77,7 @@ namespace Shiny.Locations
             {
                 if (listen == null)
                 {
-                    var access = await this.RequestAccess(new GpsRequest());
-                    access.Assert();
+                    (await this.RequestAccess(new GpsRequest { UseBackground = false })).Assert(null, true);
                     this.locationManager.StartUpdatingLocation();
                 }
                 return await task.ConfigureAwait(false);
