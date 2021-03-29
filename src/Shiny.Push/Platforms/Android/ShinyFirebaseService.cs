@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.App;
 using Firebase.Messaging;
-using Shiny.Notifications;
-using Notification = Shiny.Notifications.Notification;
 
 
 namespace Shiny.Push

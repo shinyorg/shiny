@@ -27,7 +27,7 @@ namespace Shiny.Push
             services.TryAddSingleton(sp => (IAppDelegatePushNotificationHandler)sp.Resolve<IPushManager>());
             services.UseNotifications();
 #elif __ANDROID__
-            services.UseNotifications<PushNotificationDelegate>(null);
+            services.UseNotifications<PushNotificationDelegate>();
 #elif WINDOWS_UWP
             services.UseNotifications();
 #endif

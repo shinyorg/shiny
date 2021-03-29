@@ -35,12 +35,13 @@ namespace Shiny.Push
             set => this.Settings.SetOrRemove(nameof(this.CurrentRegistrationExpiryDate), value);
         }
 
-        public override IObservable<IDictionary<string, string>> WhenReceived() => Observable.Create<IDictionary<string, string>>(async ob =>
+
+        public override IObservable<PushNotification> WhenReceived() => Observable.Create<PushNotification>(ob =>
         {
             var handler = new TypedEventHandler<PushNotificationChannel, PushNotificationReceivedEventArgs>((sender, args) =>
             {
                 var headers = ExtractHeaders(args);
-                ob.OnNext(headers);
+                //ob.OnNext(headers);
             });
             this.channel.PushNotificationReceived += handler;
             return () => this.channel.PushNotificationReceived -= handler;
@@ -79,7 +80,7 @@ namespace Shiny.Push
 
         public static IDictionary<string, string> ExtractHeaders(PushNotificationReceivedEventArgs args)
         {
-            IDictionary<string, string> headers = new Dictionary<string, string>();
+            var headers = new Dictionary<string, string>();
 
             if (args.RawNotification != null)
             {

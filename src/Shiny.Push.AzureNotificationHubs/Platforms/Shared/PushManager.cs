@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
@@ -42,7 +43,8 @@ namespace Shiny.Push.AzureNotificationHubs
         public override void Start()
         {
             // wireup firebase if it was active
-            Firebase.Messaging.FirebaseMessaging.Instance.AutoInitEnabled = this.CurrentRegistrationToken != null;
+            if (this.CurrentRegistrationToken != null)
+                Firebase.Messaging.FirebaseMessaging.Instance.AutoInitEnabled = true;
 
             // don't fire the base or the firebase start will overwrite the current
             // registration token with the firebase token, not the AZH installationID
@@ -66,7 +68,14 @@ namespace Shiny.Push.AzureNotificationHubs
                     {
                         // TODO
                     }
-                });
+                })
+                .DisposedBy(this.Disposable);
+
+            ShinyFirebaseService
+                .WhenReceived()
+                .Select(x => this.FromNative(x))
+                .SubscribeAsync(pr => this.OnPushReceived(pr))
+                .DisposedBy(this.Disposable);
         }
 #endif
 

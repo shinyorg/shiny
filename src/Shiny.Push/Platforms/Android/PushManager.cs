@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using System.Reactive.Disposables;
 using Android.Runtime;
 using Android.Gms.Extensions;
 using Firebase.Iid;
@@ -17,11 +19,23 @@ namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager,
                                IPushTagSupport,
-                               IShinyStartupTask
+                               IShinyStartupTask,
+                               IDisposable
     {
+        readonly Subject<PushNotification> receiveSubj;
         readonly INotificationManager notificationManager;
+
+
         public PushManager(ShinyCoreServices services, INotificationManager notificationManager) : base(services)
-            => this.notificationManager = notificationManager;
+        { 
+            this.notificationManager = notificationManager;
+            this.receiveSubj = new Subject<PushNotification>();
+            this.Disposable = new CompositeDisposable();
+        }
+
+
+        protected CompositeDisposable Disposable { get; }
+        public void Dispose() => this.Disposable.Dispose();
 
 
         public virtual void Start()
@@ -41,20 +55,14 @@ namespace Shiny.Push
                     await this.Services.Services.RunDelegates<IPushDelegate>(
                         x => x.OnTokenChanged(token)
                     );
-                });
+                })
+                .DisposedBy(this.Disposable);
 
             ShinyFirebaseService
                 .WhenReceived()
                 .Select(x => this.FromNative(x))
-                .SubscribeAsync(async pr =>
-                {
-                    if (pr.Notification != null)
-                        await this.notificationManager.Send(pr.Notification);
-
-                    await this.Services.Services.RunDelegates<IPushDelegate>(
-                        x => x.OnReceived(pr)
-                    );
-                });
+                .SubscribeAsync(pr => this.OnPushReceived(pr))
+                .DisposedBy(this.Disposable);
         }
 
 
@@ -89,7 +97,7 @@ namespace Shiny.Push
 
 
         public override IObservable<PushNotification> WhenReceived()
-            => ShinyFirebaseService.WhenReceived().Select(x => this.FromNative(x));
+            => this.receiveSubj;
 
 
         public virtual async Task AddTag(string tag)
@@ -128,6 +136,19 @@ namespace Shiny.Push
             if (tags != null)
                 foreach (var tag in tags)
                     await this.AddTag(tag);
+        }
+
+
+        protected virtual async Task OnPushReceived(PushNotification push)
+        {
+            this.receiveSubj.OnNext(push);
+
+            await this.Services.Services.RunDelegates<IPushDelegate>(
+                x => x.OnReceived(push)
+            );
+
+            if (push.Notification != null)
+                await this.notificationManager.Send(push.Notification);
         }
 
 
