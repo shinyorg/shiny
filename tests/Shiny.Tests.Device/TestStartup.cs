@@ -12,13 +12,14 @@ namespace Shiny.Tests
 
         public override void ConfigureLogging(ILoggingBuilder builder, IPlatform platform)
         {
+
             //https://github.com/yorchideas/Xunit.Extensions.Logging
         }
 
 
         public override void ConfigureServices(IServiceCollection services, IPlatform platform)
         {
-            services.UseBleClient();
+            //services.UseBleClient();
             //services.UseSqliteStore();
             //services.UseBleHosting();
             CurrentPlatform = platform;
