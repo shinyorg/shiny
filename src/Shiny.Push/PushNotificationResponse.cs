@@ -13,7 +13,7 @@ namespace Shiny.Push
             this.ActionIdentifier = actionIdentifier;
             this.Text = text;
 
-            this.Data = new ReadOnlyDictionary<string, string>(notification.Payload); 
+            this.Data = new ReadOnlyDictionary<string, string>(notification.Payload);
         }
 
 

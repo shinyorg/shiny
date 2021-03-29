@@ -27,7 +27,12 @@ namespace Shiny.Push
             // could translate one of those to the notification?
             if (fire)
             {
-                var response = new PushNotificationResponse(headers, null, null);
+                var notification = new Shiny.Notifications.Notification
+                {
+                    Title = "",
+                    Payload = headers
+                };
+                var response = new PushNotificationResponse(notification, null, null);
                 await this.serviceProvider.RunDelegates<IPushDelegate>(x => x.OnEntry(response));
             }
             deferral.Complete();

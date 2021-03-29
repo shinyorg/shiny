@@ -27,7 +27,7 @@ namespace Shiny.Push
 
 
         public PushManager(ShinyCoreServices services, INotificationManager notificationManager) : base(services)
-        { 
+        {
             this.notificationManager = notificationManager;
             this.receiveSubj = new Subject<PushNotification>();
             this.Disposable = new CompositeDisposable();
@@ -163,6 +163,7 @@ namespace Shiny.Push
                 {
                     Title = native.Title,
                     Message = native.Body,
+                    Channel = native.ChannelId
                 };
                 if (!native.Icon.IsEmpty())
                     notification.Android.SmallIconResourceName = native.Icon;

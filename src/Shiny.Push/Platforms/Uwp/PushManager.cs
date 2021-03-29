@@ -41,7 +41,8 @@ namespace Shiny.Push
             var handler = new TypedEventHandler<PushNotificationChannel, PushNotificationReceivedEventArgs>((sender, args) =>
             {
                 var headers = ExtractHeaders(args);
-                //ob.OnNext(headers);
+                var pr = new PushNotification(headers, null);
+                ob.OnNext(pr);
             });
             this.channel.PushNotificationReceived += handler;
             return () => this.channel.PushNotificationReceived -= handler;
@@ -80,7 +81,7 @@ namespace Shiny.Push
 
         public static IDictionary<string, string> ExtractHeaders(PushNotificationReceivedEventArgs args)
         {
-            var headers = new Dictionary<string, string>();
+            IDictionary<string, string> headers = new Dictionary<string, string>();
 
             if (args.RawNotification != null)
             {
