@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.Locations;
 using Xunit;
+using Xunit.Abstractions;
 
 
 namespace Shiny.Tests.Gps
@@ -12,11 +14,12 @@ namespace Shiny.Tests.Gps
         readonly IGpsManager gps;
 
 
-        public GpsManagerTests()
+        public GpsManagerTests(ITestOutputHelper output)
         {
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
-                BuildServices = x => x.UseGps()
+                BuildServices = x => x.UseGps(),
+                BuildLogging = x => x.AddXUnit(output)
             });
             this.gps = ShinyHost.Resolve<IGpsManager>();
         }

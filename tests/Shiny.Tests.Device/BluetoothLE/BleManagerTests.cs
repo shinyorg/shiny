@@ -7,6 +7,7 @@ using Shiny.BluetoothLE;
 using Dialogs = Acr.UserDialogs.UserDialogs;
 using Xunit;
 using Xunit.Abstractions;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Tests.BluetoothLE
@@ -14,16 +15,15 @@ namespace Shiny.Tests.BluetoothLE
     [Trait("Category", "BluetoothLE")]
     public class BleManagerTests
     {
-        readonly ITestOutputHelper output;
         readonly IBleManager manager;
 
 
         public BleManagerTests(ITestOutputHelper output)
         {
-            this.output = output;
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
-                BuildServices = x => x.UseBleClient()
+                BuildServices = x => x.UseBleClient(),
+                BuildLogging = x => x.AddXUnit(output)
             });
             this.manager = ShinyHost.Resolve<IBleManager>();
         }

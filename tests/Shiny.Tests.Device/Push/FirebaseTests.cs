@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Shiny.Push;
 using Shiny.Testing.Push;
 using Xunit;
+using Xunit.Abstractions;
 
 
 namespace Shiny.Tests.Push
@@ -20,11 +22,12 @@ namespace Shiny.Tests.Push
 
 
 
-        public FirebaseTests()
+        public FirebaseTests(ITestOutputHelper output)
         {
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
-                BuildServices = x => x.UseFirebaseMessaging<TestPushDelegate>()
+                BuildServices = x => x.UseFirebaseMessaging<TestPushDelegate>(),
+                BuildLogging = x => x.AddXUnit(output)
             });
 
             this.pushManager = (IPushTagSupport)ShinyHost.Resolve<IPushManager>();

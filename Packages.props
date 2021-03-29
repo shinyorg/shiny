@@ -71,6 +71,7 @@
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
 
         <!--tests-->
+        <PackageReference Update="MartinCostello.Logging.XUnit" Version="0.1.1" />
         <PackageReference Update="DryIoc.Microsoft.DependencyInjection" Version="5.1.0" />
         <PackageReference Update="coverlet.collector" Version="3.0.3" />
         <PackageReference Update="FluentAssertions" Version="5.10.3" />

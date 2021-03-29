@@ -2,8 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Shiny.Notifications;
 using Xunit;
+using Xunit.Abstractions;
 
 
 namespace Shiny.Tests.Push
@@ -13,11 +15,12 @@ namespace Shiny.Tests.Push
         readonly INotificationManager notificationManager;
 
 
-        public NotificationTests()
+        public NotificationTests(ITestOutputHelper output)
         {
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
-                BuildServices = x => x.UseNotifications()
+                BuildServices = x => x.UseNotifications(),
+                BuildLogging = x => x.AddXUnit(output)
             });
             this.notificationManager = ShinyHost.Resolve<INotificationManager>();
         }

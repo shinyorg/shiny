@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.BluetoothLE;
 using Xunit;
 using Xunit.Abstractions;
@@ -26,7 +26,8 @@ namespace Shiny.Tests.BluetoothLE
             this.output = output;
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
-                BuildServices = x => x.UseBleClient()
+                BuildServices = x => x.UseBleClient(),
+                BuildLogging = x => x.AddXUnit(output)
             });
             this.manager = ShinyHost.Resolve<IBleManager>();
         }

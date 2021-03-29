@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
+using Microsoft.Extensions.Logging;
 using Shiny.Push;
 using Shiny.Testing.Push;
 using Xunit;
+using Xunit.Abstractions;
 
 
 namespace Shiny.Tests.Push
@@ -24,14 +26,15 @@ namespace Shiny.Tests.Push
         readonly NotificationHubClient hubClient;
 
 
-        public AzureNotificationHubTests()
+        public AzureNotificationHubTests(ITestOutputHelper output)
         {
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
                 BuildServices = x => x.UsePushAzureNotificationHubs<TestPushDelegate>(
                     Secrets.Values.AzureNotificationHubListenerConnectionString,
                     Secrets.Values.AzureNotificationHubName
-                )
+                ),
+                BuildLogging = x => x.AddXUnit(output)
             });
             this.pushManager = (IPushTagSupport)ShinyHost.Resolve<IPushManager>();
             this.hubClient = NotificationHubClient.CreateClientFromConnectionString(
