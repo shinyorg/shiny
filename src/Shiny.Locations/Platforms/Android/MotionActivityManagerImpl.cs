@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
@@ -20,6 +21,7 @@ namespace Shiny.Locations
         public static int HighConfidenceValue { get; set; } = 70;
         public static int MediumConfidenceValue { get; set; } = 40;
 
+        readonly Subject<MotionActivityEvent> eventSubj;
         readonly ActivityRecognitionClient client;
         readonly AndroidSqliteDatabase database;
         readonly ShinyCoreServices core;
@@ -35,6 +37,7 @@ namespace Shiny.Locations
             this.database = database;
             this.logger = logger;
             this.client = ActivityRecognition.GetClient(core.Android.AppContext);
+            this.eventSubj = new Subject<MotionActivityEvent>();
         }
 
 
@@ -48,6 +51,43 @@ namespace Shiny.Locations
 
         public async void Start()
         {
+            MotionActivityBroadcastReceiver.Process = async result =>
+            {
+                var type = MotionActivityType.Unknown;
+
+                foreach (var activity in result.ProbableActivities)
+                {
+                    switch (activity.Type)
+                    {
+                        case DetectedActivity.InVehicle:
+                            type |= MotionActivityType.Automotive;
+                            break;
+
+                        case DetectedActivity.OnBicycle:
+                            type |= MotionActivityType.Cycling;
+                            break;
+
+                        case DetectedActivity.OnFoot:
+                        case DetectedActivity.Walking:
+                            type |= MotionActivityType.Walking;
+                            break;
+
+                        case DetectedActivity.Running:
+                            type |= MotionActivityType.Running;
+                            break;
+
+                        case DetectedActivity.Still:
+                            type |= MotionActivityType.Stationary;
+                            break;
+                    }
+                }
+                var confidence = ToConfidence(result.MostProbableActivity.Confidence);
+                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                // DELETE FROM motion_activity WHERE Timestamp < DateTimeOffset.UtcNow.AddDays(-30).Ticks
+                await this.database.ExecuteNonQuery(
+                    $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
+                );
+            };
             if (this.IsStarted)
             {
                 try
@@ -126,7 +166,7 @@ ORDER BY
         }
 
         public IObservable<MotionActivityEvent> WhenActivityChanged()
-            => this.core.Bus.Listener<MotionActivityEvent>();
+            => this.eventSubj;
 
 
         protected virtual PendingIntent GetPendingIntent()
@@ -142,6 +182,18 @@ ORDER BY
                 PendingIntentFlags.UpdateCurrent
             );
             return this.pendingIntent;
+        }
+
+
+        static MotionActivityConfidence ToConfidence(int value)
+        {
+            if (value >= MotionActivityManagerImpl.HighConfidenceValue)
+                return MotionActivityConfidence.High;
+
+            if (value >= MotionActivityManagerImpl.MediumConfidenceValue)
+                return MotionActivityConfidence.Medium;
+
+            return MotionActivityConfidence.Low;
         }
     }
 }

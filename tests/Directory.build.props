@@ -7,12 +7,14 @@
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
     </PropertyGroup>
 
-    <!--<PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
+    <!--
+    <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
         <PackageReference Include="Microsoft.Windows.SDK.Contracts" />
-    </ItemGroup>-->
+    </ItemGroup>
+    -->
 
 </Project>

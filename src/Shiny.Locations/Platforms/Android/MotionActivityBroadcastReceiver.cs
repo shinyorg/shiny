@@ -18,63 +18,16 @@ namespace Shiny.Locations
     public class MotionActivityBroadcastReceiver : ShinyBroadcastReceiver
     {
         public const string ReceiverName = nameof(MotionActivityBroadcastReceiver);
-        readonly Lazy<AndroidSqliteDatabase> database = ShinyHost.LazyResolve<AndroidSqliteDatabase>();
+        public static Func<ActivityRecognitionResult, Task>? Process { get; set; }
 
 
         protected override async Task OnReceiveAsync(Context? context, Intent? intent)
         {
-            // DELETE FROM motion_activity WHERE Timestamp < DateTimeOffset.UtcNow.AddDays(-30).Ticks
-            if (!ActivityRecognitionResult.HasResult(intent))
-                return;
-
-            var result = ActivityRecognitionResult.ExtractResult(intent);
-            var type = MotionActivityType.Unknown;
-
-            foreach (var activity in result.ProbableActivities)
+            if (ActivityRecognitionResult.HasResult(intent) && Process != null)
             {
-                switch (activity.Type)
-                {
-                    case DetectedActivity.InVehicle:
-                        type |= MotionActivityType.Automotive;
-                        break;
-
-                    case DetectedActivity.OnBicycle:
-                        type |= MotionActivityType.Cycling;
-                        break;
-
-                    case DetectedActivity.OnFoot:
-                    case DetectedActivity.Walking:
-                        type |= MotionActivityType.Walking;
-                        break;
-
-                    case DetectedActivity.Running:
-                        type |= MotionActivityType.Running;
-                        break;
-
-                    case DetectedActivity.Still:
-                        type |= MotionActivityType.Stationary;
-                        break;
-                }
+                var result = ActivityRecognitionResult.ExtractResult(intent);
+                await Process(result);
             }
-            var confidence = this.ToConfidence(result.MostProbableActivity.Confidence);
-            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-            await this.database.Value.ExecuteNonQuery(
-                $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
-            );
-            this.Publish(new MotionActivityEvent(type, confidence, DateTimeOffset.UtcNow));
-        }
-
-
-        protected virtual MotionActivityConfidence ToConfidence(int value)
-        {
-            if (value >= MotionActivityManagerImpl.HighConfidenceValue)
-                return MotionActivityConfidence.High;
-
-            if (value >= MotionActivityManagerImpl.MediumConfidenceValue)
-                return MotionActivityConfidence.Medium;
-
-            return MotionActivityConfidence.Low;
         }
     }
 }

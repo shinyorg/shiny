@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 
 
@@ -7,10 +8,17 @@ namespace Shiny.Locations
 {
     public abstract partial class AbstractGpsManager : IGpsManager, IShinyStartupTask
     {
+        readonly Subject<IGpsReading> readingSubj;
+
+
         protected AbstractGpsManager(IAndroidContext context)
         {
+            this.readingSubj = new Subject<IGpsReading>();
             this.Context = context;
-            this.Callback = new ShinyLocationCallback();
+            this.Callback = new ShinyLocationCallback
+            {
+                OnReading = x => this.readingSubj.OnNext(new GpsReading(x))
+            };
         }
 
 
@@ -45,7 +53,7 @@ namespace Shiny.Locations
             => this.Context.RequestLocationAccess(request.UseBackground, true, true, false);
 
         public virtual IObservable<IGpsReading> WhenReading()
-            => this.Callback.ReadingSubject;
+            => this.readingSubj;
 
 
         public virtual async Task StartListener(GpsRequest request)
@@ -64,15 +72,16 @@ namespace Shiny.Locations
         }
 
 
-        public virtual async Task StopListener()
+        public virtual Task StopListener()
         {
-            if (this.CurrentListener == null)
-                return;
-
-            //await this.client.RemoveLocationUpdatesAsync(this.GetPendingIntent());
-            //await this.client.RemoveLocationUpdatesAsync(this.Callback);
-            this.Context.StopService(typeof(ShinyGpsService));
-            this.CurrentListener = null;
+            if (this.CurrentListener != null)
+            {
+                //await this.client.RemoveLocationUpdatesAsync(this.GetPendingIntent());
+                //await this.client.RemoveLocationUpdatesAsync(this.Callback);
+                this.Context.StopService(typeof(ShinyGpsService));
+                this.CurrentListener = null;
+            }
+            return Task.CompletedTask;
         }
 
 

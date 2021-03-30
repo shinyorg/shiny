@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Disposables;
 using Android.Runtime;
 using Android.Gms.Extensions;
 using Firebase.Iid;
@@ -19,8 +18,7 @@ namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager,
                                IPushTagSupport,
-                               IShinyStartupTask,
-                               IDisposable
+                               IShinyStartupTask
     {
         readonly Subject<PushNotification> receiveSubj;
         readonly INotificationManager notificationManager;
@@ -30,12 +28,7 @@ namespace Shiny.Push
         {
             this.notificationManager = notificationManager;
             this.receiveSubj = new Subject<PushNotification>();
-            this.Disposable = new CompositeDisposable();
         }
-
-
-        protected CompositeDisposable Disposable { get; }
-        public void Dispose() => this.Disposable.Dispose();
 
 
         public virtual void Start()
@@ -44,10 +37,9 @@ namespace Shiny.Push
             if (this.CurrentRegistrationToken != null)
                 FirebaseMessaging.Instance.AutoInitEnabled = true;
 
-            ShinyFirebaseService
-                .WhenTokenChanged()
-                .Where(_ => this.CurrentRegistrationToken != null)
-                .SubscribeAsync(async token =>
+            ShinyFirebaseService.NewToken = async token =>
+            {
+                if (this.CurrentRegistrationToken != null)
                 {
                     this.CurrentRegistrationToken = token;
                     this.CurrentRegistrationTokenDate = DateTime.UtcNow;
@@ -55,14 +47,14 @@ namespace Shiny.Push
                     await this.Services.Services.RunDelegates<IPushDelegate>(
                         x => x.OnTokenChanged(token)
                     );
-                })
-                .DisposedBy(this.Disposable);
+                }
+            };
 
-            ShinyFirebaseService
-                .WhenReceived()
-                .Select(x => this.FromNative(x))
-                .SubscribeAsync(pr => this.OnPushReceived(pr))
-                .DisposedBy(this.Disposable);
+            ShinyFirebaseService.MessageReceived = async message =>
+            {
+                var pr = this.FromNative(message);
+                await this.OnPushReceived(pr);
+            };
         }
 
 

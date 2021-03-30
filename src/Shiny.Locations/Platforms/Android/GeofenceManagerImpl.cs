@@ -8,7 +8,7 @@ using Android.App;
 using Android.Gms.Location;
 using Shiny.Infrastructure;
 using Shiny.Locations.Infrastructure;
-
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Locations
 {
@@ -18,21 +18,57 @@ namespace Shiny.Locations
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
         readonly IAndroidContext context;
         readonly GeofencingClient client;
+        readonly IServiceProvider services;
+        readonly ILogger logger;
         PendingIntent? geofencePendingIntent;
 
 
-        public GeofenceManagerImpl(IAndroidContext context, IRepository repository) : base(repository)
+        public GeofenceManagerImpl(IAndroidContext context,
+                                   IRepository repository,
+                                   IServiceProvider services,
+                                   ILogger<GeofenceManagerImpl> logger) : base(repository)
         {
             this.context = context;
+            this.logger = logger;
+            this.services = services;
             this.client = LocationServices.GetGeofencingClient(this.context.AppContext);
         }
 
 
         public async void Start()
         {
+            GeofenceBroadcastReceiver.Process = async e =>
+            {
+                if (e.HasError)
+                {
+                    var err = GeofenceStatusCodes.GetStatusCodeString(e.ErrorCode);
+                    this.logger.LogWarning("Geofence OS error - " + err);
+                }
+                else if (e.TriggeringGeofences != null)
+                {
+                    foreach (var triggeringGeofence in e.TriggeringGeofences)
+                    {
+                        var state = (GeofenceState)e.GeofenceTransition;
+                        var region = await this.Repository.Get(triggeringGeofence.RequestId);
+
+                        if (region == null)
+                        {
+                            this.logger.LogWarning("Geofence reported by OS not found in Shiny Repository - RequestID: " + triggeringGeofence.RequestId);
+                        }
+                        else
+                        {
+                            await this.services.RunDelegates<IGeofenceDelegate>(
+                                x => x.OnStatusChanged(state, region),
+                                ex => this.logger.LogError($"Error in geofence delegate - Region: {region.Identifier} State: {state}")
+                            );
+                        }
+                    }
+                }
+            };
             var regions = await this.Repository.GetAll();
             foreach (var region in regions)
                 await this.Create(region);
+
         }
 
 

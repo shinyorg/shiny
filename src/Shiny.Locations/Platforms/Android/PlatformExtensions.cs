@@ -17,7 +17,6 @@ namespace Shiny.Locations
                 .Create()
                 .SetInterval(request.Interval.ToMillis());
 
-
             switch (request.Priority)
             {
                 case GpsPriority.Low:

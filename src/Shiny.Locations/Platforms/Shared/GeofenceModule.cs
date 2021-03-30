@@ -29,7 +29,6 @@ namespace Shiny.Locations
             }
             else
             {
-                services.TryAddSingleton<GeofenceProcessor>();
                 services.TryAddSingleton(typeof(IGeofenceDelegate), this.delegateType);
                 services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             }

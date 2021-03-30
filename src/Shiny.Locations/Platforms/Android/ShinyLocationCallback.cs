@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Subjects;
 using Android.Gms.Location;
 using Android.Locations;
 using Android.OS;
@@ -10,13 +9,13 @@ namespace Shiny.Locations
 {
     public class ShinyLocationCallback : LocationCallback, Android.Locations.ILocationListener
     {
-        internal Subject<GpsReading> ReadingSubject { get; } = new Subject<GpsReading>();
+        public Action<Location>? OnReading { get; set; }
 
 
-        public void OnLocationChanged(Android.Locations.Location location)
+        public void OnLocationChanged(Location? location)
         {
-            var reading = new GpsReading(location);
-            this.ReadingSubject.OnNext(reading);
+            if (location != null)
+                this.OnReading?.Invoke(location);
         }
 
 
