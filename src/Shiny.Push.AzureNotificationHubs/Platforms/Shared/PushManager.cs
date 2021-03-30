@@ -48,34 +48,31 @@ namespace Shiny.Push.AzureNotificationHubs
 
             // don't fire the base or the firebase start will overwrite the current
             // registration token with the firebase token, not the AZH installationID
-            ShinyFirebaseService
-                .WhenTokenChanged()
-                .SubscribeAsync(async token =>
+            ShinyFirebaseService.NewToken = async token =>
+            {
+                try
                 {
-                    try
-                    {
-                        this.NativeRegistrationToken = token;
-                        this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                    this.NativeRegistrationToken = token;
+                    this.CurrentRegistrationTokenDate = DateTime.UtcNow;
 
-                        if (this.InstallationId != null)
-                        {
-                            var install = await this.hub.GetInstallationAsync(this.InstallationId);
-                            install.PushChannel = token;
-                            await this.hub.CreateOrUpdateInstallationAsync(install);
-                        }
-                    }
-                    catch (Exception ex)
+                    if (this.InstallationId != null)
                     {
-                        // TODO
+                        var install = await this.hub.GetInstallationAsync(this.InstallationId);
+                        install.PushChannel = token;
+                        await this.hub.CreateOrUpdateInstallationAsync(install);
                     }
-                })
-                .DisposedBy(this.Disposable);
+                }
+                catch (Exception ex)
+                {
+                    // TODO
+                }
+            };
 
-            ShinyFirebaseService
-                .WhenReceived()
-                .Select(x => this.FromNative(x))
-                .SubscribeAsync(pr => this.OnPushReceived(pr))
-                .DisposedBy(this.Disposable);
+            ShinyFirebaseService.MessageReceived = async message =>
+            {
+                var pr = this.FromNative(message);
+                await this.OnPushReceived(pr);
+            };
         }
 #endif
 
