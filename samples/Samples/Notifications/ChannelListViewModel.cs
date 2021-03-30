@@ -30,7 +30,7 @@ namespace Samples.Notifications
                             var confirm = await dialogs.Confirm("Are you sure you wish to delete this channel?");
                             if (confirm)
                             {
-                                await notifications.DeleteChannel(x.Identifier);
+                                await notifications.RemoveChannel(x.Identifier);
                                 this.LoadChannels.Execute(null);
                             }
                         })

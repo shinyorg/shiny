@@ -20,7 +20,7 @@ namespace Samples.Notifications
             (
                 async () =>
                 {
-                    await manager.CreateChannel(this.ToChannel());
+                    await manager.AddChannel(this.ToChannel());
                     await navigator.GoBack();
                 },
                 this.WhenAny(
