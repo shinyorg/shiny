@@ -11,12 +11,11 @@
 
         <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
         <PackageReference Update="Microsoft.Extensions.Logging" Version="5.0.0" />
-        <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
         <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-        <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="[4.1.0, 5)" />
+        <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
 
-        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.1.0" />
-        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.1.0" />
+        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.2.0" />
+        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.2.0" />
 
         <PackageReference Update="Xamarin.Firebase.iOS.Core" Version="6.10.4" />
         <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="4.7.1" />
@@ -48,7 +47,7 @@
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="118.0.0" />
 
         <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.12" />
-        <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="7.0.0" />
+        <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="7.0.1" />
         <PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
 
         <!--
@@ -57,17 +56,19 @@
         -->
 
         <!--Samples-->
+        <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
+
         <PackageReference Update="Mobile.BuildTools" Version="2.0.109-pre" />
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.2012" />
-        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.0.3" />
+        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.1.0" />
         <PackageReference Update="Xamarin.Essentials" Version="1.6.1" />
         <PackageReference Update="Acr.UserDialogs" Version="7.1.0.475" />
-        <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.10" />
+        <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.11" />
         <PackageReference Update="Bogus" Version="33.0.2" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.0.0.1909" />
         <PackageReference Update="ReactiveUI.Fody" Version="13.2.2" />
-        <PackageReference Update="XF.Material" Version="1.7.7" />
+        <PackageReference Update="XF.Material" Version="1.7.8" />
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
 
         <!--tests-->
