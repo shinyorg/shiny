@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Shiny.Locations;
 using Xunit;
@@ -25,10 +27,15 @@ namespace Shiny.Tests.Gps
         }
 
 
-        [Fact]
-        public async Task GetCurrentLocationTest()
+        [Fact(DisplayName = "GPS - Last Location")]
+        public async Task GetLastLocationTest()
         {
-            var reading = await this.gps.GetLastReading().ToTask();
+            var reading = await this.gps
+                .GetLastReading()
+                .Timeout(TimeSpan.FromSeconds(15))
+                .ToTask();
+
+            reading.Should().NotBeNull();
         }
     }
 }
