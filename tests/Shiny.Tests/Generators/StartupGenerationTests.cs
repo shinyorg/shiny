@@ -1,10 +1,11 @@
 ﻿using System;
 using FluentAssertions;
+using Shiny.Generators;
 using Xunit;
 using Xunit.Abstractions;
 
 
-namespace Shiny.Generators.Tests
+namespace Shiny.Tests.Generators
 {
     public class StartupGenerationTests : AbstractSourceGeneratorTests<AndroidApplicationSourceGenerator>
     {
@@ -26,47 +27,22 @@ namespace Shiny.Generators.Tests
         }
 
 
-        [Fact]
-        public void DetectsAndWiresInXfDependencyService()
-        {
-            this.Generator.AddReference("Xamarin.Forms.Core");
-            this.Generator.AddReference("Xamarin.Forms.Platform");
-            this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
-            this.RunGenerator();
-            this.Compilation.AssertContent("global::Xamarin.Forms.Internals.DependencyResolver.ResolveUsing(t => provider.GetService(t));");
-        }
+        //[Theory]
+        ////[InlineData("Shiny.Push", "services.UsePush<Test.TestPushDelegate>()")]
+        //[InlineData("Shiny.Push.AzureNotificationHubs", null)]
+        //[InlineData("Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging<Test.TestPushDelegate>()")]
+        //public void PushRegistration(string lib, string startupRegExpected)
+        //{
+        //    this.Generator.AddReference(lib);
+        //    this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
+        //    this.Generator.AddSource(CodeBlocks.PushDelegate);
+        //    this.RunGenerator();
 
-
-        [Theory]
-        [InlineData("Shiny.Push", "services.UsePush<Test.TestPushDelegate>()")]
-        [InlineData("Shiny.Push.AzureNotificationHubs", null)]
-        [InlineData("Shiny.Push.FirebaseMessaging", "services.UseFirebaseMessaging<Test.TestPushDelegate>()")]
-        public void PushRegistration(string lib, string startupRegExpected)
-        {
-            this.Generator.AddReference(lib);
-            this.Generator.AddReference("Shiny.Push");
-            this.Generator.AddSource(@"
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-[assembly: Shiny.ShinyApplicationAttribute]
-namespace Test
-{
-    public class TestPushDelegate : Shiny.Push.IPushDelegate
-    {
-        public async Task OnEntry(PushEntryArgs args) {}
-        public async Task OnReceived(IDictionary<string, string> data) {}
-        public async Task OnTokenChanged(string token) {}
-    }
-}");
-            this.RunGenerator();
-
-            if (startupRegExpected == null)
-                this.Compilation.AssertContent("services.Push", "Push should not be registered", false);
-            else
-                this.Compilation.AssertContent(startupRegExpected);
-        }
+        //    if (startupRegExpected == null)
+        //        this.Compilation.AssertContent("services.Push", "Push should not be registered", false);
+        //    else
+        //        this.Compilation.AssertContent(startupRegExpected);
+        //}
 
 
         [Fact]
@@ -138,22 +114,19 @@ namespace MyTest
         }
 
 
-        [Fact]
-        public void DelegateDetection()
+        [Theory]
+        //[InlineData("Shiny.Push.AzureNotificationHubs", CodeBlocks.PushDelegate, null)]
+        [InlineData("Shiny.Push.FirebaseMessaging", CodeBlocks.PushDelegate, "services.UseFirebaseMessaging<Test.TestPushDelegate>();")]
+        [InlineData("Shiny.Locations", CodeBlocks.GpsDelegate, "services.UseGps<Test.TestGpsDelegate>();")]
+        public void DelegateDetection(string reference, string delegateCodeBlock, string findContent)
         {
-            this.Generator.AddReference("Shiny.Locations");
-            this.Generator.AddSource(@"
-[assembly: Shiny.ShinyApplicationAttribute]
-namespace Test
-{
-    public class TestGpsDelegate : Shiny.Locations.IGpsDelegate
-    {
-        public Task OnReading(IGpsReading reading) => throw new NotImplementedException();
-    }
-}");
+            this.Generator.AddReference(reference);
+            this.Generator.AddReference("Shiny.Push");
+            this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
+            this.Generator.AddSource(delegateCodeBlock);
             this.RunGenerator();
 
-            this.Compilation.AssertContent("services.UseGps<Test.TestGpsDelegate>();");
+            this.Compilation.AssertContent(findContent);
         }
 
 

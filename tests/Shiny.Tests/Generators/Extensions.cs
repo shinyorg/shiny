@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 
 
-namespace Shiny.Generators.Tests
+namespace Shiny.Tests.Generators
 {
     public static class Extensions
     {

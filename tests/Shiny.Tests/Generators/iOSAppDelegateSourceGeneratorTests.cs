@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Linq;
-using Xunit;
 using FluentAssertions;
+using Xunit;
 using Xunit.Abstractions;
 using Microsoft.CodeAnalysis;
+using Shiny.Generators;
 
 
-namespace Shiny.Generators.Tests
+namespace Shiny.Tests.Generators
 {
     public class iOSAppDelegateSourceGeneratorTests : AbstractSourceGeneratorTests<iOSAppDelegateSourceGenerator>
     {
-        // TODO: test for auto-init of 3rd party (Xam Essentials)
-
-
         const string StandardAppDelegateClassName = "MyTest.TestAppDelegate";
         const string StandardAppDelegate = @"
 [assembly: Shiny.ShinyApplicationAttribute]
@@ -32,29 +30,29 @@ namespace MyTest
         };
 
 
-        [Fact(Skip = "iOS Xamarin.Forms lib needs to be included")]
-        public void XamarinFormsIntegratedOnFinishedLaunching()
-        {
-            this.generatorConfig.XamarinFormsAppTypeName = "Tests.MyXfApp";
-            this.Generator.AddReference("Xamarin.Forms");
-            this.Generator.AddSource(@"
-[assembly: Shiny.ShinyApplicationAttribute(XamarinFormsAppTypeName = ""Tests.MyXfApp"")]
+//        [Fact(Skip = "iOS Xamarin.Forms lib needs to be included")]
+//        public void XamarinFormsIntegratedOnFinishedLaunching()
+//        {
+//            this.generatorConfig.XamarinFormsAppTypeName = "Tests.MyXfApp";
+//            this.Generator.AddReference("Xamarin.Forms");
+//            this.Generator.AddSource(@"
+//[assembly: Shiny.ShinyApplicationAttribute(XamarinFormsAppTypeName = ""Tests.MyXfApp"")]
 
-namespace Tests
-{
-    public partial void MyTestAppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
-    {
-    }
+//namespace Tests
+//{
+//    public partial void MyTestAppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
+//    {
+//    }
 
-    public class MyXfApp : global::Xamarin.Forms.Application
-    {
-    }
-}
-");
-            this.RunGenerator();
-            this.CompilationHasContent("this.LoadApplication(new Tests.MyXfApp());", "Xamarin.Forms LoadApplication should have been applied");
-            this.CompilationHasContent("global::Xamarin.Forms.Forms.Init();", "Xamarin.Forms.Forms.Init should have been applied");
-        }
+//    public class MyXfApp : global::Xamarin.Forms.Application
+//    {
+//    }
+//}
+//");
+//            this.RunGenerator();
+//            this.CompilationHasContent("this.LoadApplication(new Tests.MyXfApp());", "Xamarin.Forms LoadApplication should have been applied");
+//            this.CompilationHasContent("global::Xamarin.Forms.Forms.Init();", "Xamarin.Forms.Forms.Init should have been applied");
+//        }
 
 
         [Fact]
@@ -101,8 +99,22 @@ namespace Tests
         public void HandleEventsForBackgroundUrlGeneration(bool includeHttpTransfers)
         {
             if (includeHttpTransfers)
+            {
                 this.Generator.AddReference("Shiny.Net.Http");
+                this.Generator.AddSource(@"
+using System;
+using System.Threading.Tasks;
+using Shiny.Net.Http;
 
+namespace Test
+{
+    public class MyHttpTransferDelegate : IHttpTransferDelegate
+    {
+        public Task OnCompleted(HttpTransfer transfer) => Task.CompletedTask;
+        public Task OnError(HttpTransfer transfer, Exception ex) => Task.CompletedTask;
+    }
+}");
+            }
             this.Generator.AddSource(StandardAppDelegate);
             this.RunGenerator();
             this.GetDefaultAppDelegate()
@@ -119,8 +131,8 @@ namespace Tests
         public void PushEventsGenerated(string libraryToInclude)
         {
             this.Generator.AddReference(libraryToInclude);
-            this.Generator.AddReference("Shiny.Push");
             this.Generator.AddSource(StandardAppDelegate);
+            this.Generator.AddSource(CodeBlocks.PushDelegate);
             this.RunGenerator();
 
             var appDelegate = this.GetDefaultAppDelegate();
@@ -134,8 +146,8 @@ namespace Tests
         [Fact]
         public void NoPushEventsGenerated()
         {
-            this.Generator.AddReference("Shiny.Push");
             this.Generator.AddSource(StandardAppDelegate);
+            this.Generator.AddSource(CodeBlocks.PushDelegate);
             this.RunGenerator();
 
             var appDelegate = this.GetDefaultAppDelegate();

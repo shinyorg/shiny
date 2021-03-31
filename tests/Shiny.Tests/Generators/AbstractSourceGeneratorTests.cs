@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-
 using Microsoft.CodeAnalysis;
 using Xunit.Abstractions;
 
 
-namespace Shiny.Generators.Tests
+namespace Shiny.Tests.Generators
 {
     public abstract class AbstractSourceGeneratorTests<T> : IDisposable where T : class, ISourceGenerator, new()
     {

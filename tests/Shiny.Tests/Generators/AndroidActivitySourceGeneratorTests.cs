@@ -1,9 +1,9 @@
 ﻿using System;
-using Xunit;
+using Shiny.Generators;
 using Xunit.Abstractions;
 
 
-namespace Shiny.Generators.Tests
+namespace Shiny.Tests.Generators
 {
     public class AndroidActivitySourceGeneratorTests : AbstractSourceGeneratorTests<AndroidActivitySourceGenerator>
     {

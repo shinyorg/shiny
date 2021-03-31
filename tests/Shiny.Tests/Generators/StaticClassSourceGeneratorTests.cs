@@ -1,10 +1,11 @@
 ﻿using System;
 using FluentAssertions;
+using Shiny.Generators;
 using Xunit;
 using Xunit.Abstractions;
 
 
-namespace Shiny.Generators.Tests
+namespace Shiny.Tests.Generators
 {
     public class StaticClassSourceGeneratorTests : AbstractSourceGeneratorTests<StaticClassSourceGenerator>
     {

@@ -137,6 +137,7 @@ namespace Shiny.Generators
 
         void RegisterWithDelegate() => this.FindAttributedAssemblies("Shiny.Attributes.AutoStartupWithDelegateAttribute", attributeData =>
         {
+            // Shiny.Locations has a GPS that does NOT require a delegate, but Geofencing does.  We should SKIP in this case
             var delegateTypeName = (string)attributeData.ConstructorArguments[0].Value;
             var startupRegistrationServiceExtensionMethodName = (string)attributeData.ConstructorArguments[1].Value;
             var oneDelegateRequiredToInstall = (bool)attributeData.ConstructorArguments[2].Value;
@@ -151,7 +152,7 @@ namespace Shiny.Generators
                 this.Context.Log(
                     "SHINYDELEGATE",
                     "Required delegate missing for services." + startupRegistrationServiceExtensionMethodName,
-                    DiagnosticSeverity.Error
+                    DiagnosticSeverity.Warning
                 );
                 return;
             }
@@ -194,7 +195,7 @@ namespace Shiny.Generators
             foreach (var symbol in this.allSymbols)
             {
                 var attrs = symbol.GetAttributes();
-                var hasService = attrs.Any(x => x.AttributeClass.Name.Equals("Shiny.ShinyServiceAttribute"));
+                var hasService = attrs.Any(x => x.AttributeClass.Name.Equals("ShinyServiceAttribute"));
 
                 if (hasService)
                 {

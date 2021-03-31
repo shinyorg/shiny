@@ -17,7 +17,7 @@ namespace Shiny.Generators
                     new DiagnosticDescriptor(
                         id,
                         message,
-                        null,
+                        message,
                         "Shiny",
                         severity,
                         true
@@ -152,7 +152,7 @@ namespace Shiny.Generators
         public static bool IsPublic(this IMethodSymbol symbol)
             => symbol.DeclaredAccessibility == Accessibility.Public;
         public static bool IsInterface(this ITypeSymbol type)
-            => type.TypeKind == TypeKind.Interface;
+            => type != null && type.TypeKind == TypeKind.Interface;
 
         public static string GetName(this IPropertySymbol property) => property
             .Name
@@ -162,6 +162,9 @@ namespace Shiny.Generators
 
         public static bool Implements(this INamedTypeSymbol symbol, ITypeSymbol type)
         {
+            if (type == null)
+                return false;
+
             if (!type.IsInterface())
                 throw new ArgumentException("Symbol is not an interface");
 
