@@ -108,6 +108,7 @@ namespace Shiny.Generators.Tests
         void ThrowAnyErrors(ImmutableArray<Diagnostic> diags)
         {
             foreach (var diag in diags)
+            {
                 if (diag.Severity == DiagnosticSeverity.Error)
                 {
                     var msg = diag.GetMessage();
@@ -116,6 +117,7 @@ namespace Shiny.Generators.Tests
 
                     throw new ArgumentException(msg);
                 }
+            }
         }
     }
 }

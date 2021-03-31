@@ -59,7 +59,6 @@ namespace Shiny.Generators
                     this.BuildStaticClass(typeName, genFileName);
                 }
             }
-            // TODO: this.BuildStaticClass("Shiny.Push.IPushManager", "ShinyPush");
         }
 
 

@@ -8,20 +8,23 @@ namespace Shiny.Generators.Tests
 {
     public class StaticClassSourceGeneratorTests : AbstractSourceGeneratorTests<StaticClassSourceGenerator>
     {
-        public StaticClassSourceGeneratorTests(ITestOutputHelper output) : base(output, "Shiny", "Shiny.Core") { }
+        public StaticClassSourceGeneratorTests(ITestOutputHelper output) : base(output, "Shiny", "Shiny.Core")
+        {
+            this.Generator.AddReference("Microsoft.Extensions.DependencyInjection");
+            this.Generator.AddReference("Microsoft.Extensions.DependencyInjection.Abstractions");
+        }
 
 
         [Fact]
         public void CoreClasses()
         {
             this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
-            this.RunGenerator(true);
+            this.RunGenerator(false);
 
             this.AssertTypes(
                 "Tests.ShinyJobs",
                 "Tests.ShinyConnectivity",
-                "Tests.ShinyPower",
-                "Tests.ShinySettings"
+                "Tests.ShinyPower"
             );
         }
 
@@ -31,7 +34,7 @@ namespace Shiny.Generators.Tests
         {
             this.Generator.AddReferences("Shiny.BluetoothLE");
             this.Generator.AddSource("[assembly:Shiny.GenerateStaticClassesAttribute(\"Tests\")]");
-            this.RunGenerator(true);
+            this.RunGenerator(false);
 
             this.AssertTypes("Tests.ShinyBle");
         }

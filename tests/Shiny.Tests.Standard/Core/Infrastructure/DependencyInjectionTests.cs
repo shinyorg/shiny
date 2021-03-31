@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 using Shiny.Infrastructure.DependencyInjection;
 using Shiny.Stores;
+using Shiny.Testing;
 using Shiny.Testing.Stores;
 using Xunit;
 
@@ -19,6 +20,7 @@ namespace Shiny.Tests.Core.Infrastructure
             addSettings?.Invoke(settings);
 
             var services = new ShinyServiceCollection();
+            services.AddSingleton<IPlatform, TestPlatform>();
             services.RegisterModule(new StoresModule());
             services.AddSingleton<IFullService, FullService>();
             services.AddSingleton<ISerializer>(serializer);
