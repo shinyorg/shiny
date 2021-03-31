@@ -2,6 +2,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Notifications;
 
 
 namespace Shiny.Push
@@ -10,12 +11,14 @@ namespace Shiny.Push
     {
         readonly Type pushManagerType;
         readonly Type delegateType;
+        readonly Channel[] channels;
 
 
-        public PushModule(Type pushManagerType, Type delegateType)
+        public PushModule(Type pushManagerType, Type delegateType, Channel[] channels)
         {
             this.pushManagerType = pushManagerType;
             this.delegateType = delegateType;
+            this.channels = channels;
         }
 
 
@@ -25,11 +28,11 @@ namespace Shiny.Push
             services.TryAddSingleton(typeof(IPushManager), this.pushManagerType);
 #if __IOS__
             services.TryAddSingleton(sp => (IAppDelegatePushNotificationHandler)sp.Resolve<IPushManager>());
-            services.UseNotifications();
+            services.UseNotifications(null, null, this.channels);
 #elif __ANDROID__
-            services.UseNotifications<PushNotificationDelegate>();
+            services.UseNotifications<PushNotificationDelegate>(null, this.channels);
 #elif WINDOWS_UWP
-            services.UseNotifications();
+            services.UseNotifications(null, null, this.channels);
 #endif
         }
     }
