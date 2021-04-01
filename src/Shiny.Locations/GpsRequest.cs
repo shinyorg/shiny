@@ -12,7 +12,7 @@ namespace Shiny.Locations
             UseBackground = backgroundMode
         };
 
-        public static GpsRequest Default => new GpsRequest
+        public static GpsRequest Foreground => new GpsRequest
         {
             Priority = GpsPriority.Normal,
             UseBackground = false

@@ -15,7 +15,7 @@ namespace Shiny.Locations
 
         public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>
         {
-            (await this.RequestAccess(GpsRequest.Default)).Assert(null, true);
+           (await this.RequestAccess(GpsRequest.Foreground)).Assert(null, true);
 
             var location = await this.client.GetLastLocationAsync();
             if (location == null)
