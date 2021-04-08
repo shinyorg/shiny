@@ -26,13 +26,10 @@ namespace Shiny.Push
         {
             services.AddSingleton(typeof(IPushDelegate), this.delegateType);
             services.TryAddSingleton(typeof(IPushManager), this.pushManagerType);
-#if __IOS__
-            services.TryAddSingleton(sp => (IAppDelegatePushNotificationHandler)sp.Resolve<IPushManager>());
+#if __IOS__ || WINDOWS_UWP
             services.UseNotifications(null, null, this.channels);
 #elif __ANDROID__
             services.UseNotifications<PushNotificationDelegate>(null, this.channels);
-#elif WINDOWS_UWP
-            services.UseNotifications(null, null, this.channels);
 #endif
         }
     }

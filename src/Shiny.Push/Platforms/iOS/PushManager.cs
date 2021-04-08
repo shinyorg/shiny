@@ -76,9 +76,7 @@ namespace Shiny.Push
             if (!this.CurrentRegistrationToken.IsEmpty())
             {
                 // do I need to do this?  I would normally be calling RequestAccess on startup anyhow
-                Dispatcher.InvokeOnMainThreadAsync(() =>
-                    UIApplication.SharedApplication.RegisterForRemoteNotifications()
-                );
+                this.RequestAccess().ContinueWith(x => { });
             }
         }
 

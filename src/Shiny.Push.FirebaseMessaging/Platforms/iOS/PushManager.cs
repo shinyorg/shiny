@@ -13,7 +13,16 @@ namespace Shiny.Push.FirebaseMessaging
 {
     public class PushManager : Shiny.Push.PushManager, IPushTagSupport
     {
-        public PushManager(ShinyCoreServices services, iOSNotificationDelegate ndelegate) : base(services, ndelegate)
+        public PushManager(
+            ShinyCoreServices services,
+            AppleLifecycle lifecycle,
+            iOSNotificationDelegate ndelegate
+        )
+        : base(
+              services,
+              lifecycle,
+              ndelegate
+        )
         {
             //new Shiny.Push.PushManager(services, null);
         }

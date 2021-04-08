@@ -22,7 +22,8 @@ namespace Shiny.Push.AzureNotificationHubs
 #elif __IOS__
         public PushManager(AzureNotificationConfig config,
                            ShinyCoreServices services,
-                           Shiny.Notifications.iOSNotificationDelegate ndelegate) : base(services, ndelegate)
+                           AppleLifecycle lifecycle,
+                           Shiny.Notifications.iOSNotificationDelegate ndelegate) : base(services, lifecycle, ndelegate)
 #elif __ANDROID__
         public PushManager(AzureNotificationConfig config,
                            ShinyCoreServices services,
