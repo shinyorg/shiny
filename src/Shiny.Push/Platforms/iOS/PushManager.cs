@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Reactive.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Foundation;
@@ -13,24 +12,31 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager,
-                               IShinyStartupTask,
-                               IAppDelegatePushNotificationHandler
+    public class PushManager : AbstractPushManager, IShinyStartupTask
     {
         readonly iOSNotificationDelegate nativeDelegate;
         readonly Subject<PushNotification> payloadSubj;
-        Subject<NSData>? onToken;
+        readonly AppleLifecycle lifecycle;
 
 
-        public PushManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate) : base(services)
+        public PushManager(ShinyCoreServices services, AppleLifecycle lifecycle, iOSNotificationDelegate nativeDelegate) : base(services)
         {
             this.nativeDelegate = nativeDelegate;
+            this.lifecycle = lifecycle;
             this.payloadSubj = new Subject<PushNotification>();
         }
 
 
         public virtual void Start()
         {
+            this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
+            {
+                var dict = userInfo.FromNsDictionary();
+                var pr = new PushNotification(dict, null);
+                await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(pr));
+                //completionHandler(UIBackgroundFetchResult.NewData);
+            });
+
             this.nativeDelegate
                 .WhenPresented()
                 .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
@@ -106,11 +112,25 @@ namespace Shiny.Push
 
         protected virtual async Task<NSData> RequestDeviceToken(CancellationToken cancelToken = default)
         {
-            this.onToken = new Subject<NSData>();
-            var remoteTask = this.onToken.Take(1).ToTask(cancelToken);
-            await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.RegisterForRemoteNotifications);
-            var data = await remoteTask;
-            return data;
+            var tcs = new TaskCompletionSource<NSData>();
+            IDisposable? caller = null;
+            try
+            {
+                caller = this.lifecycle.RegisterForRemoteNotificationToken(
+                    nsdata => tcs.TrySetResult(nsdata),
+                    err => tcs.TrySetException(new Exception(err.LocalizedDescription))
+                );
+                var rawToken = await tcs.Task;
+                var token = ToTokenString(rawToken);
+                await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(
+                    x => x.OnTokenChanged(token)
+                );
+                return token;
+            }
+            finally
+            {
+                caller?.Dispose();
+            }
         }
 
 
@@ -134,29 +154,5 @@ namespace Shiny.Push
             }
             return token;
         }
-
-
-        public async void DidReceiveRemoteNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-        {
-            var dict = userInfo.FromNsDictionary();
-            var pr = new PushNotification(dict, null);
-            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(pr));
-            completionHandler(UIBackgroundFetchResult.NewData);
-        }
-
-
-        public async void RegisteredForRemoteNotifications(NSData deviceToken)
-        {
-            this.onToken?.OnNext(deviceToken);
-            var token = ToTokenString(deviceToken);
-
-            await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(
-                x => x.OnTokenChanged(token)
-            );
-        }
-
-
-        public void FailedToRegisterForRemoteNotifications(NSError error)
-            => this.onToken?.OnError(new Exception(error.LocalizedDescription));
     }
 }

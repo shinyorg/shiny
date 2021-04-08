@@ -41,6 +41,7 @@ namespace Shiny
         public void Register(IServiceCollection services)
         {
             services.RegisterCommonServices();
+            services.TryAddSingleton<AppleLifecycle>();
 #if __IOS__
             services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             if (BgTasksJobManager.IsAvailable)

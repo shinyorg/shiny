@@ -12,18 +12,18 @@ namespace Shiny
             => ShinyHost.Init(new ApplePlatform(), startup);
 
         public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-            => ShinyHost.Container.RunDelegates<IAppDelegatePushNotificationHandler>(x => x.DidReceiveRemoteNotification(userInfo, completionHandler));
+            => ShinyHost.Resolve<AppleLifecycle>().DidReceiveRemoteNotification(userInfo, completionHandler);
 
         public static void ShinyRegisteredForRemoteNotifications(this UIApplicationDelegate app, NSData deviceToken)
-            => ShinyHost.Container.RunDelegates<IAppDelegatePushNotificationHandler>(x => x.RegisteredForRemoteNotifications(deviceToken));
+            => ShinyHost.Resolve<AppleLifecycle>().RegisteredForRemoteNotifications(deviceToken);
 
         public static void ShinyFailedToRegisterForRemoteNotifications(this UIApplicationDelegate app, NSError error)
-            => ShinyHost.Container.RunDelegates<IAppDelegatePushNotificationHandler>(x => x.FailedToRegisterForRemoteNotifications(error));
+            => ShinyHost.Resolve<AppleLifecycle>().FailedToRegisterForRemoteNotifications(error);
 
         public static void ShinyPerformFetch(this UIApplicationDelegate app, Action<UIBackgroundFetchResult> completionHandler)
             => JobManager.OnBackgroundFetch(completionHandler);
 
         public static void ShinyHandleEventsForBackgroundUrl(this UIApplicationDelegate app, string sessionIdentifier, Action completionHandler)
-            => ShinyHost.Container.RunDelegates<IAppDelegateBackgroundUrlHandler>(x => x.HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler));
+            => ShinyHost.Resolve<AppleLifecycle>().HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
     }
 }

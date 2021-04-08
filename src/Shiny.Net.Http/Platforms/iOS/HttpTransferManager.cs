@@ -9,15 +9,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Shiny.Net.Http
 {
-    public class HttpTransferManager : AbstractHttpTransferManager,
-                                       IShinyStartupTask,
-                                       IAppDelegateBackgroundUrlHandler
+    public class HttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
     {
         readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;
 
 
-        public HttpTransferManager(ILogger<IHttpTransferManager> logger, int maxConnectionsPerHost = 1)
+        public HttpTransferManager(AppleLifecycle lifecycle, ILogger<IHttpTransferManager> logger, int maxConnectionsPerHost = 1)
         {
             this.sessionDelegate = new ShinyUrlSessionDelegate(this, logger);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
@@ -25,6 +23,15 @@ namespace Shiny.Net.Http
             this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;
 
             var s = this.Session; // force load
+
+            lifecycle.RegisterHandleEventsForBackgroundUrl((sessionIdentifier, completionHandler) =>
+            {
+                if (!SessionName.Equals(sessionIdentifier))
+                    return false;
+
+                ShinyUrlSessionDelegate.CompletionHandler = completionHandler;
+                return true;
+            });
         }
 
 
@@ -36,12 +43,6 @@ namespace Shiny.Net.Http
 
         static string SessionName => $"{NSBundle.MainBundle.BundleIdentifier}.BackgroundTransferSession";
         internal void CompleteSession() => this.session = null;
-
-        public void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
-        {
-            if (SessionName.Equals(sessionIdentifier))
-                ShinyUrlSessionDelegate.CompletionHandler = completionHandler;
-        }
 
 
         protected override Task<HttpTransfer> CreateDownload(HttpTransferRequest request)
