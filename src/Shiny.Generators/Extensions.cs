@@ -62,6 +62,8 @@ namespace Shiny.Generators
         //public static bool HasXamarinForms(this GeneratorExecutionContext context)
         //    => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals("Xamarin.Forms", StringComparison.CurrentCultureIgnoreCase));
 
+        public static bool HasMsal(this GeneratorExecutionContext context)
+            => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals("System.IdentityModel.Client", StringComparison.CurrentCultureIgnoreCase));
 
         public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
             => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals("Xamarin.Essentials", StringComparison.CurrentCultureIgnoreCase));

@@ -64,6 +64,18 @@ namespace Shiny.Generators
                         "HandleEventsForBackgroundUrl",
                         "public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler) => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);"
                     );
+                    this.AppendMethodIf(
+                        appDelegate,
+                        builder,
+                        "Microsoft.IdentityModel.Client",
+                        "OpenUrl",
+                        @"
+public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
+{
+    global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url);
+    return true;
+}"
+                    );
                 }
             }
             this.Context.AddSource(appDelegate.Name, builder.ToString());

@@ -156,6 +156,9 @@ namespace Shiny.Generators
                     builder.AppendLine("base.OnActivityResult(requestCode, resultCode, data);");
                     builder.AppendLine();
                     builder.AppendLine("this.ShinyOnActivityResult(requestCode, resultCode, data);");
+
+                    if (this.context.HasMsal())
+                        builder.AppendLine("global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(requestCode, resultCode, data);");
                     builder.AppendLine();
                 }
             }
