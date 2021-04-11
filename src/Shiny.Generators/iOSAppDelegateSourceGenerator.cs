@@ -67,7 +67,7 @@ namespace Shiny.Generators
                     this.AppendMethodIf(
                         appDelegate,
                         builder,
-                        "Microsoft.IdentityModel.Client",
+                        "Microsoft.Identity.Client",
                         "OpenUrl",
                         @"
 public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
