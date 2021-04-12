@@ -32,6 +32,7 @@ namespace Shiny.Push
                 var dict = userInfo.FromNsDictionary();
                 var pr = new PushNotification(dict, null);
                 await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(pr));
+                this.payloadSubj.OnNext(pr);
                 //completionHandler(UIBackgroundFetchResult.NewData);
             });
 
@@ -114,7 +115,7 @@ namespace Shiny.Push
             {
                 //UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(UIRemoteNotificationType.Alert)
                 caller = this.Services.Lifecycle.RegisterForRemoteNotificationToken(
-                    nsdata => tcs.TrySetResult(nsdata),
+                    rawToken => tcs.TrySetResult(rawToken),
                     err => tcs.TrySetException(new Exception(err.LocalizedDescription))
                 );
                 await Dispatcher.InvokeOnMainThreadAsync(
