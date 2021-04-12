@@ -20,6 +20,19 @@ namespace Shiny.Infrastructure
             this.Android = context;
         }
 
+#elif __IOS__
+        public ShinyCoreServices(AppleLifecycle lifecycle,
+                                 IKeyValueStoreFactory store,
+                                 IRepository repository,
+                                 IServiceProvider services,
+                                 ISerializer serializer,
+                                 IMessageBus bus,
+                                 IJobManager jobManager)
+            : this(store, repository, services, serializer, bus, jobManager)
+        {
+            this.Lifecycle = lifecycle;
+        }
+
 #endif
         public ShinyCoreServices(IKeyValueStoreFactory store,
                                  IRepository repository,
@@ -36,9 +49,11 @@ namespace Shiny.Infrastructure
             this.Jobs = jobManager;
         }
 
-        #if __ANDROID__
+#if __ANDROID__
         public IAndroidContext Android { get; }
-        #endif
+#elif __IOS__
+        public AppleLifecycle Lifecycle { get; }
+#endif
         public IKeyValueStore Settings { get; }
         public IRepository Repository { get; }
         public IServiceProvider Services { get; }

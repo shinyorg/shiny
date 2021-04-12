@@ -16,20 +16,18 @@ namespace Shiny.Push
     {
         readonly iOSNotificationDelegate nativeDelegate;
         readonly Subject<PushNotification> payloadSubj;
-        readonly AppleLifecycle lifecycle;
 
 
-        public PushManager(ShinyCoreServices services, AppleLifecycle lifecycle, iOSNotificationDelegate nativeDelegate) : base(services)
+        public PushManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate) : base(services)
         {
             this.nativeDelegate = nativeDelegate;
-            this.lifecycle = lifecycle;
             this.payloadSubj = new Subject<PushNotification>();
         }
 
 
         public virtual void Start()
         {
-            this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
+            this.Services.Lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
             {
                 var dict = userInfo.FromNsDictionary();
                 var pr = new PushNotification(dict, null);
@@ -114,9 +112,13 @@ namespace Shiny.Push
             IDisposable? caller = null;
             try
             {
-                caller = this.lifecycle.RegisterForRemoteNotificationToken(
+                //UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(UIRemoteNotificationType.Alert)
+                caller = this.Services.Lifecycle.RegisterForRemoteNotificationToken(
                     nsdata => tcs.TrySetResult(nsdata),
                     err => tcs.TrySetException(new Exception(err.LocalizedDescription))
+                );
+                await Dispatcher.InvokeOnMainThreadAsync(
+                    () => UIApplication.SharedApplication.RegisterForRemoteNotifications()
                 );
                 var rawToken = await tcs.Task;
                 var token = ToTokenString(rawToken);
