@@ -66,9 +66,9 @@ namespace Shiny.Notifications
             );
             var attrBuilder = new AudioAttributes.Builder();
 
-            Android.Net.Uri uri = null;
+            Android.Net.Uri? uri = null;
             if (!channel.CustomSoundPath.IsEmpty())
-                uri = this.manager.GetSoundResourceUri(channel.CustomSoundPath);
+                uri = this.manager.GetSoundResourceUri(channel.CustomSoundPath!);
 
             switch (channel.Importance)
             {
