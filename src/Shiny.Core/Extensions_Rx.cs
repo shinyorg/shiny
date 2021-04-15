@@ -177,6 +177,31 @@ namespace Shiny
                 .Subscribe();
 
 
+        public static IDisposable SubscribeAsync<T>(this IObservable<T> observable,
+                                                    Func<T, Task> onNextAsync,
+                                                    Action<Exception> onError)
+            => observable
+                .Select(x => Observable.FromAsync(() => onNextAsync(x)))
+                .Concat()
+                .Subscribe(
+                    _ => { },
+                    onError
+                );
+
+
+        public static IDisposable SubscribeAsync<T>(this IObservable<T> observable,
+                                                    Func<T, Task> onNextAsync,
+                                                    Action<Exception> onError,
+                                                    Action onComplete)
+            => observable
+                .Select(x => Observable.FromAsync(() => onNextAsync(x)))
+                .Concat()
+                .Subscribe(
+                    _ => { },
+                    onError,
+                    onComplete
+                );
+
         public static IDisposable SubscribeAsyncConcurrent<T>(this IObservable<T> observable, Func<T, Task> onNextAsync)
             => observable
                 .Select(x => Observable.FromAsync(() => onNextAsync(x)))
