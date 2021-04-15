@@ -48,7 +48,7 @@ namespace Shiny.Generators
                 using (builder.BlockInvariant($"public partial class {appDelegate.Name}"))
                 {
                     this.GenerateFinishedLaunching(appDelegate, builder);
-                    this.TryAppendPush(builder);
+                    this.TryAppendPush(builder, appDelegate);
 
                     this.AppendMethodIf(
                         appDelegate,
@@ -82,7 +82,7 @@ public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         }
 
 
-        void TryAppendPush(IndentedStringBuilder builder)
+        void TryAppendPush(IndentedStringBuilder builder, INamedTypeSymbol appDelegate)
         {
             var hasPush = this.Context
                 .Compilation
@@ -91,10 +91,31 @@ public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
 
             if (hasPush)
             {
-                builder.AppendLineInvariant("public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) => this.ShinyRegisteredForRemoteNotifications(deviceToken);");
-                builder.AppendLineInvariant("public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);");
-                builder.AppendLineInvariant("public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);");
-                builder.AppendLineInvariant("public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) => this.ShinyFailedToRegisterForRemoteNotifications(error);");
+                this.AppendMethodIf(
+                    appDelegate,
+                    builder,
+                    "RegisteredForRemoteNotifications",
+                    "public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) => this.ShinyRegisteredForRemoteNotifications(deviceToken);"
+                );
+                this.AppendMethodIf(
+                    appDelegate,
+                    builder,
+                    "FailedToRegisterForRemoteNotifications",
+                    "public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) => this.ShinyFailedToRegisterForRemoteNotifications(error);"
+                );
+                this.AppendMethodIf(
+                    appDelegate,
+                    builder,
+                    "DidReceiveRemoteNotification",
+                    "public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);"
+                );
+                // old method - don't hook
+                //this.AppendMethodIf(
+                //    appDelegate,
+                //    builder,
+                //    "ReceivedRemoteNotification",
+                //    "public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);"
+                //);
             }
         }
 
@@ -105,6 +126,12 @@ public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
             if (!hasAssembly)
                 return;
 
+            this.AppendMethodIf(symbol, builder, methodName, append);
+        }
+
+
+        void AppendMethodIf(INamedTypeSymbol symbol, IndentedStringBuilder builder, string methodName, string append)
+        {
             var exists = symbol.HasMethod(methodName);
 
             if (exists)

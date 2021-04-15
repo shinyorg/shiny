@@ -16,6 +16,7 @@ namespace Shiny.Push
     {
         readonly iOSNotificationDelegate nativeDelegate;
         readonly Subject<PushNotification> payloadSubj;
+        IDisposable listener;
 
 
         public PushManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate) : base(services)
@@ -27,7 +28,7 @@ namespace Shiny.Push
 
         public virtual void Start()
         {
-            this.Services.Lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
+            this.listener = this.Services.Lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
             {
                 var dict = userInfo.FromNsDictionary();
                 var pr = new PushNotification(dict, null);

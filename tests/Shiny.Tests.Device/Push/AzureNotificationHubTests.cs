@@ -57,6 +57,7 @@ namespace Shiny.Tests.Push
             await this.pushManager.UnRegister();
             this.pushManager.CurrentRegistrationToken.Should().BeNull("Reg Token is still set");
             this.pushManager.CurrentRegistrationTokenDate.Should().BeNull("Reg Token Date is still set");
+            await Task.Delay(1000); // breath azure
 
             try
             {
@@ -76,7 +77,7 @@ namespace Shiny.Tests.Push
             var task = this.pushManager
                 .WhenReceived()
                 .Take(1)
-                .Timeout(TimeSpan.FromSeconds(10))
+                .Timeout(TimeSpan.FromSeconds(20))
                 .ToTask();
 
             await this.DoSend();
@@ -91,7 +92,7 @@ namespace Shiny.Tests.Push
             var tcs = new TaskCompletionSource<object?>();
             TestPushDelegate.Receive += _ => tcs.SetResult(null);
             await this.DoSend();
-            await tcs.Task.WithTimeout(10);
+            await tcs.Task.WithTimeout(20);
         });
 
 
@@ -148,19 +149,23 @@ namespace Shiny.Tests.Push
 
         async Task DoSend()
         {
+            await this.pushManager.AddTag(this.pushManager.CurrentRegistrationToken);
+            var tag = this.pushManager.CurrentRegistrationToken;
+            await Task.Delay(1000); // let azure breath
+
             var name = TestStartup.CurrentPlatform.GetType().Name;
 
             if (name.Equals("AndroidPlatform"))
             {
-                await this.hubClient.SendFcmNativeNotificationAsync(FcmSampleNotificationContent);
+                await this.hubClient.SendFcmNativeNotificationAsync(FcmSampleNotificationContent, tag);
             }
             else if (name.Equals("ApplePlatform"))
             {
-                await this.hubClient.SendAppleNativeNotificationAsync(AppleSampleNotificationContent);
+                await this.hubClient.SendAppleNativeNotificationAsync(AppleSampleNotificationContent, tag);
             }
             else if (name.Equals("UwpPlatform"))
             {
-                await this.hubClient.SendWindowsNativeNotificationAsync(WnsSampleNotification);
+                await this.hubClient.SendWindowsNativeNotificationAsync(WnsSampleNotification, tag);
             }
             else
             {

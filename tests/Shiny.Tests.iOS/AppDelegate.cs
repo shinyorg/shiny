@@ -25,5 +25,23 @@ namespace Shiny.Tests.iOS
 
             return base.FinishedLaunching(app, options);
         }
+
+
+        public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
+        {
+            this.ShinyRegisteredForRemoteNotifications(deviceToken);
+        }
+
+
+        public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
+        {
+            this.ShinyFailedToRegisterForRemoteNotifications(error);
+        }
+
+
+        public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+        {
+            this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);
+        }
     }
 }
