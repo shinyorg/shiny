@@ -93,7 +93,7 @@ namespace Shiny
         }
 
 
-        internal async void DidReceiveRemoteNotification(NSDictionary dictionary, Action<UIBackgroundFetchResult> completionHandler)
+        internal async void DidReceiveRemoteNotification(NSDictionary dictionary, Action<UIBackgroundFetchResult>? completionHandler)
         {
             foreach (var reg in this.receiveReg)
             {
@@ -106,7 +106,7 @@ namespace Shiny
                     this.logger.LogError(ex, "DidReceiveRemoteNotification");
                 }
             }
-            completionHandler(UIBackgroundFetchResult.NewData);
+            completionHandler?.Invoke(UIBackgroundFetchResult.NewData);
         }
     }
 }

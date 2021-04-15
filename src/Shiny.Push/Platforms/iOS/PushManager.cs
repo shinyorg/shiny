@@ -34,25 +34,24 @@ namespace Shiny.Push
                 var pr = new PushNotification(dict, null);
                 await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(pr));
                 this.payloadSubj.OnNext(pr);
-                //completionHandler(UIBackgroundFetchResult.NewData);
             });
 
-            this.nativeDelegate
-                .WhenPresented()
-                .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
-                .SubscribeAsync(async x =>
-                {
-                    var notification = x.Notification.Request.FromNative();
-                    var push = new PushNotification(notification.Payload, notification);
+            //this.nativeDelegate
+            //    .WhenPresented()
+            //    .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
+            //    .SubscribeAsync(async x =>
+            //    {
+            //        var notification = x.Notification.Request.FromNative();
+            //        var push = new PushNotification(notification.Payload, notification);
 
-                    await this.Services
-                        .Services
-                        .RunDelegates<IPushDelegate>(x => x.OnReceived(push))
-                        .ConfigureAwait(false);
+            //        await this.Services
+            //            .Services
+            //            .RunDelegates<IPushDelegate>(x => x.OnReceived(push))
+            //            .ConfigureAwait(false);
 
-                    this.payloadSubj.OnNext(push);
-                    x.CompletionHandler?.Invoke(UNNotificationPresentationOptions.Alert);
-                });
+            //        this.payloadSubj.OnNext(push);
+            //        x.CompletionHandler?.Invoke(UNNotificationPresentationOptions.Alert);
+            //    });
 
             this.nativeDelegate
                 .WhenResponse()

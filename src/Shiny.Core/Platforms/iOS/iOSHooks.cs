@@ -11,7 +11,7 @@ namespace Shiny
         public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null)
             => ShinyHost.Init(new ApplePlatform(), startup);
 
-        public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+        public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult>? completionHandler)
             => ShinyHost.Resolve<AppleLifecycle>().DidReceiveRemoteNotification(userInfo, completionHandler);
 
         public static void ShinyRegisteredForRemoteNotifications(this UIApplicationDelegate app, NSData deviceToken)

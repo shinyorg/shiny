@@ -77,12 +77,11 @@ namespace Shiny.Tests.Push
             var task = this.pushManager
                 .WhenReceived()
                 .Take(1)
-                .Timeout(TimeSpan.FromSeconds(20))
                 .ToTask();
 
             await this.DoSend();
 
-            await task;
+            await task.WithTimeout(20);
         });
 
 
@@ -153,24 +152,27 @@ namespace Shiny.Tests.Push
             var tag = this.pushManager.CurrentRegistrationToken;
             await Task.Delay(1000); // let azure breath
 
+            NotificationOutcome? outcome = null;
             var name = TestStartup.CurrentPlatform.GetType().Name;
 
             if (name.Equals("AndroidPlatform"))
             {
-                await this.hubClient.SendFcmNativeNotificationAsync(FcmSampleNotificationContent, tag);
+                outcome = await this.hubClient.SendFcmNativeNotificationAsync(FcmSampleNotificationContent, tag);
             }
             else if (name.Equals("ApplePlatform"))
             {
-                await this.hubClient.SendAppleNativeNotificationAsync(AppleSampleNotificationContent, tag);
+                outcome = await this.hubClient.SendAppleNativeNotificationAsync(AppleSampleNotificationContent, tag);
             }
             else if (name.Equals("UwpPlatform"))
             {
-                await this.hubClient.SendWindowsNativeNotificationAsync(WnsSampleNotification, tag);
+                outcome = await this.hubClient.SendWindowsNativeNotificationAsync(WnsSampleNotification, tag);
             }
             else
             {
                 throw new ArgumentException("Invalid Platform - " + name);
             }
+            //await this.hubClient.GetNotificationHubJobAsync(outcome.NotificationId)
+            //outcome.Success.Should().Be(1, "Should only have sent to 1 device");
         }
     }
 }
