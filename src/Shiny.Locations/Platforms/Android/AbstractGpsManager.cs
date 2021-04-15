@@ -25,9 +25,9 @@ namespace Shiny.Locations
         public virtual async void Start()
         {
             if (this.CurrentListener?.UseBackground ?? false)
-                await this.RequestLocationUpdates(this.CurrentListener);
-
-            this.CurrentListener = null;
+                await this.StartListener(this.CurrentListener);
+            else
+                this.CurrentListener = null;
         }
 
 
@@ -65,23 +65,21 @@ namespace Shiny.Locations
             (await this.RequestAccess(request)).Assert(allowRestricted: true);
 
             if (request.UseBackground && !ShinyGpsService.IsStarted)
-                this.Context.StartService(typeof(ShinyGpsService), true);
+                this.Context.StartService(typeof(ShinyGpsService));
 
             await this.RequestLocationUpdates(request);
             this.CurrentListener = request;
         }
 
 
-        public virtual Task StopListener()
+        public virtual async Task StopListener()
         {
-            if (this.CurrentListener != null)
-            {
-                //await this.client.RemoveLocationUpdatesAsync(this.GetPendingIntent());
-                //await this.client.RemoveLocationUpdatesAsync(this.Callback);
-                this.Context.StopService(typeof(ShinyGpsService));
-                this.CurrentListener = null;
-            }
-            return Task.CompletedTask;
+            if (this.CurrentListener == null)
+                return;
+
+            await this.RemoveLocationUpdates();
+            this.Context.StopService(typeof(ShinyGpsService));
+            this.CurrentListener = null;
         }
 
 

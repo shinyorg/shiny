@@ -99,18 +99,43 @@ namespace Shiny
             .GetPackageInfo(this.AppContext.PackageName, 0);
 
 
-        public void StartService(Type serviceType, bool foreground)
+        public const string ActionServiceStart = "ACTION_START_FOREGROUND_SERVICE";
+        public const string ActionServiceStop = "ACTION_STOP_FOREGROUND_SERVICE";
+
+        public void StartService(Type serviceType)
         {
+            //ActionServiceStart
             var intent = new Intent(this.AppContext, serviceType);
-            if (foreground && this.IsMinApiLevel(26))
+            if (this.IsMinApiLevel(26)&& this.IsShinyForegroundService(serviceType))
+            {
+                intent.SetAction(ActionServiceStart);
                 this.AppContext.StartForegroundService(intent);
+            }
             else
+            {
                 this.AppContext.StartService(intent);
+            }
         }
 
 
         public void StopService(Type serviceType)
-            => this.AppContext.StopService(new Intent(this.AppContext, serviceType));
+        {
+            if (!this.IsShinyForegroundService(serviceType))
+            {
+                this.AppContext.StopService(new Intent(this.AppContext, serviceType));
+            }
+            else
+            {
+                // HACK: this re-runs the intent to stop the service since OnTaskRemoved isn't running
+                var intent = new Intent(this.AppContext, serviceType);
+                intent.SetAction(ActionServiceStop);
+                this.AppContext.StartService(intent);
+            }
+        }
+
+
+        protected bool IsShinyForegroundService(Type serviceType)
+            => serviceType?.BaseType.Name.Contains("ShinyAndroidForegroundService") ?? false;
 
 
         public bool IsMinApiLevel(int apiLevel)

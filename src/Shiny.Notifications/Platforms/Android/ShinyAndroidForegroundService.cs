@@ -27,9 +27,6 @@ namespace Shiny
         protected Lazy<T> ResolveLazy<T>() => ShinyHost.LazyResolve<T>();
         protected CompositeDisposable DestroyWith { get; } = new CompositeDisposable();
 
-        //protected virtual void LogError<T>(Exception exception, string message)
-        //    => ShinyHost.LoggerFactory.CreateLogger<T>().LogError(exception, message);
-
 
         protected abstract void OnStart(Intent? intent);
         protected virtual void OnStop() { }
@@ -41,6 +38,30 @@ namespace Shiny
 
 
         public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
+        {
+            var action = intent?.Action ?? AndroidPlatform.ActionServiceStart;
+            switch (action)
+            {
+                case AndroidPlatform.ActionServiceStart:
+                    this.Start(intent);
+                    break;
+
+                case AndroidPlatform.ActionServiceStop:
+                    this.Stop();
+                    break;
+            }
+
+            return StartCommandResult.Sticky;
+        }
+
+
+        public override void OnTaskRemoved(Intent? rootIntent) => this.Stop();
+
+        public override IBinder? OnBind(Intent? intent) => null;
+        public static string NotificationChannelId { get; set; } = "Background";
+
+
+        protected virtual void Start(Intent? intent)
         {
             this.Service = this.Resolve<TService>();
             this.Delegates = this.ResolveAll<TDelegate>().ToList();
@@ -57,29 +78,20 @@ namespace Shiny
                 this.SetNotification();
             }
             this.OnStart(intent);
-            return StartCommandResult.Sticky;
         }
 
 
-        public override void OnDestroy()
+        protected virtual void Stop()
         {
             this.DestroyWith.Dispose();
 
             if (this.Context!.IsMinApiLevel(26))
                 this.StopForeground(true);
 
+            this.StopSelf();
             this.notificationId = null;
             this.OnStop();
-            base.OnDestroy();
         }
-
-
-        public override IBinder? OnBind(Intent? intent) => null;
-
-
-
-        public static string NotificationChannelId { get; set; } = "Background";
-
 
         NotificationCompat.Builder? builder;
         protected virtual void SetNotification()

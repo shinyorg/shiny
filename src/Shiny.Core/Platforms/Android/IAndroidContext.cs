@@ -27,7 +27,7 @@ namespace Shiny
 
         IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions);
         IObservable<AccessState> RequestAccess(string androidPermission);
-        void StartService(Type serviceType, bool foreground);
+        void StartService(Type serviceType);
         void StopService(Type serviceType);
         IObservable<ActivityChanged> WhenActivityStatusChanged();
         IObservable<Intent> WhenIntentReceived();

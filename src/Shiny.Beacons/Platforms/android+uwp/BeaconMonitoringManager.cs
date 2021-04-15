@@ -95,7 +95,7 @@ namespace Shiny.Beacons
         {
 #if MONOANDROID
             if (!ShinyBeaconMonitoringService.IsStarted)
-                this.context.StartService(typeof(ShinyBeaconMonitoringService), true);
+                this.context.StartService(typeof(ShinyBeaconMonitoringService));
             // TODO: uwp
 #endif
         }
