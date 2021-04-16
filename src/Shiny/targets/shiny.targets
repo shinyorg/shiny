@@ -1,0 +1,16 @@
+﻿<Project>
+    <PropertyGroup>
+        <_MSBuildMinVersion>16.8.0</_MSBuildMinVersion>
+    </PropertyGroup>
+
+    <Target Name="_ShinyMSBuildVersionCheck"
+            Condition=" '$([System.Version]::Parse($(_RefitMSBuildMinVersion)).CompareTo($([System.Version]::Parse($(MSBuildVersion)))))' &gt; '0' "
+            BeforeTargets="ResolveAssemblyReferences;Build;Rebuild" >
+        <Error Text="Projects using Shiny cannot build using MSBuild '$(MSBuildVersion)'. MSBuild '$(_MSBuildMinVersion)' or later is required." />
+    </Target>
+
+    <Target Name="_ShinyProjectRestoreTypeCheck" BeforeTargets="ResolveAssemblyReferences;Build;Rebuild" DependsOnTargets="_GetRestoreProjectStyle">
+        <Error Condition="'$(RestoreProjectStyle)' == 'PackagesConfig'"
+               Text="Packages.config does not support Analyzers, including Source Generators. Migrate to PackageReference: 'https://devblogs.microsoft.com/nuget/migrate-packages-config-to-package-reference/'" />
+    </Target>
+</Project>

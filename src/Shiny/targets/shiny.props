@@ -1,0 +1,6 @@
+﻿<Project>
+	<ItemGroup>
+		<CompilerVisibleProperty Include="OutputType" />
+		<CompilerVisibleProperty Include="TargetFrameworkIdentifier" />
+	</ItemGroup>
+</Project>

@@ -6,8 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="targets\shiny.targets" PackagePath="buildTransitive\netstandard2.0" Pack="true" />
+        <None Include="targets\shiny.props" PackagePath="buildTransitive\netstandard2.0" Pack="true" />
+        <None Include="targets\shiny.targets" PackagePath="build\netstandard2.0" Pack="true" />
         <None Include="readme.txt" pack="true" PackagePath="." />
-        <PackageReference Include="Microsoft.Net.Compilers.Toolset" />
+
+        <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>
