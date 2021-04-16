@@ -47,7 +47,8 @@ namespace Shiny
                     break;
 
                 case AndroidPlatform.ActionServiceStop:
-                    this.Stop();
+                    if (this.Context != null)
+                        this.Stop();
                     break;
             }
 
@@ -92,6 +93,7 @@ namespace Shiny
             this.notificationId = null;
             this.OnStop();
         }
+
 
         NotificationCompat.Builder? builder;
         protected virtual void SetNotification()

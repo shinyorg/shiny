@@ -78,7 +78,9 @@ namespace Shiny.Locations
                 return;
 
             await this.RemoveLocationUpdates();
-            this.Context.StopService(typeof(ShinyGpsService));
+            if (this.CurrentListener.UseBackground && ShinyGpsService.IsStarted)
+                this.Context.StopService(typeof(ShinyGpsService));
+
             this.CurrentListener = null;
         }
 
