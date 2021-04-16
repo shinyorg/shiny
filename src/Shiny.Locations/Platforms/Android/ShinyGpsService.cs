@@ -33,8 +33,7 @@ namespace Shiny.Locations
         }
 
 
-        public override void OnDestroy() => IsStarted = false;
-
+        protected override void OnStop() => IsStarted = false;
         public override IBinder? OnBind(Intent? intent) => null;
     }
 }

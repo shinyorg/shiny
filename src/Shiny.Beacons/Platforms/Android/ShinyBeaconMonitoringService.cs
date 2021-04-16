@@ -23,7 +23,7 @@ namespace Shiny.Beacons
         }
 
 
-        public override void OnDestroy()
+        protected override void OnStop()
         {
             this.backgroundTask?.StopScan();
             IsStarted = false;
