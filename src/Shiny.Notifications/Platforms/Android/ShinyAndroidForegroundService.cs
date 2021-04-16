@@ -16,20 +16,13 @@ namespace Shiny
         static int idCount = 7999;
         int? notificationId;
 
-        readonly Lazy<IMessageBus> messageBus = ShinyHost.LazyResolve<IMessageBus>();
-
-        protected void Publish<T>(T args) => this.messageBus.Value.Publish(args);
-        protected void Publish<T>(string name, T args) => this.messageBus.Value.Publish(name, args);
-        protected void Publish(string name) => this.messageBus.Value.Publish(name);
-
         protected T Resolve<T>() => ShinyHost.Resolve<T>();
         protected IEnumerable<T> ResolveAll<T>() => ShinyHost.ResolveAll<T>();
         protected Lazy<T> ResolveLazy<T>() => ShinyHost.LazyResolve<T>();
-        protected CompositeDisposable DestroyWith { get; } = new CompositeDisposable();
-
+        protected CompositeDisposable? DestroyWith { get; private set; }
 
         protected abstract void OnStart(Intent? intent);
-        protected virtual void OnStop() { }
+        protected abstract void OnStop();
 
         protected TService? Service { get; private set; }
         protected IList<TDelegate>? Delegates { get; private set; }
@@ -47,8 +40,7 @@ namespace Shiny
                     break;
 
                 case AndroidPlatform.ActionServiceStop:
-                    if (this.Context != null)
-                        this.Stop();
+                    this.Stop();
                     break;
             }
 
@@ -57,13 +49,13 @@ namespace Shiny
 
 
         public override void OnTaskRemoved(Intent? rootIntent) => this.Stop();
-
         public override IBinder? OnBind(Intent? intent) => null;
         public static string NotificationChannelId { get; set; } = "Background";
 
 
         protected virtual void Start(Intent? intent)
         {
+            this.DestroyWith = new CompositeDisposable();
             this.Service = this.Resolve<TService>();
             this.Delegates = this.ResolveAll<TDelegate>().ToList();
             this.Context = this.Resolve<IAndroidContext>();
@@ -84,7 +76,11 @@ namespace Shiny
 
         protected virtual void Stop()
         {
-            this.DestroyWith.Dispose();
+            if (this.DestroyWith == null)
+                return;
+
+            this.DestroyWith?.Dispose();
+            this.DestroyWith = null;
 
             if (this.Context!.IsMinApiLevel(26))
                 this.StopForeground(true);
