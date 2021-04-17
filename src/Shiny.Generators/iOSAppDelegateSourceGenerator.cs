@@ -72,8 +72,14 @@ namespace Shiny.Generators
                         @"
 public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
 {
-    global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url);
-    return true;
+    var result = true;
+    if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
+        global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
+
+    else if (!global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url))
+        result = false;
+
+    return result;
 }"
                     );
                 }
