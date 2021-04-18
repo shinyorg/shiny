@@ -17,15 +17,12 @@ namespace Shiny.Notifications
         /// This requires a special entitlement from Apple that is general disabled for anything but healt & public safety alerts
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
-
         readonly ShinyCoreServices services;
-        readonly iOSNotificationDelegate nativeDelegate;
 
 
-        public NotificationManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate)
+        public NotificationManager(ShinyCoreServices services)
         {
             this.services = services;
-            this.nativeDelegate = nativeDelegate;
         }
 
 
@@ -38,32 +35,15 @@ namespace Shiny.Notifications
                     this.SetChannels(x.Result.ToArray())
                 );
 
-            //this.nativeDelegate
-            //    .WhenPresented()
-            //    .Where(x => x.Notification?.Request?.Trigger?.GetType().Name != "UNPushNotificationTrigger")
-            //    .SubscribeAsync(async x =>
-            //    {
-            //        var shiny = x.Notification.Request.FromNative();
-            //        if (shiny != null)
-            //        {
-            //            await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnReceived(shiny));
-            //            x.CompletionHandler.Invoke(UNNotificationPresentationOptions.Alert);
-            //        }
-            //    });
-
-            this.nativeDelegate
-                .WhenResponse()
-                .Where(x =>
+            this.services.Lifecycle.RegisterForNotificationReceived(async response =>
+            {
+                var t = response.Notification?.Request?.Trigger;
+                if (t == null || t is UNCalendarNotificationTrigger)
                 {
-                    var t = x.Response.Notification?.Request?.Trigger;
-                    return t == null || t is UNCalendarNotificationTrigger;
-                })
-                .SubscribeAsync(async native =>
-                {
-                    var response = native.Response.FromNative();
-                    await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnEntry(response));
-                    native.CompletionHandler();
-                });
+                    var shiny = response.FromNative();
+                    await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnEntry(shiny));
+                }
+            });
         }
 
 

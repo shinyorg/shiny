@@ -5,17 +5,41 @@ using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using UIKit;
+using UserNotifications;
 
 
 namespace Shiny
 {
+
     /// <summary>
     /// Any services that are injecting this should also be marked with IShinyStartupTask
     /// </summary>
-    public class AppleLifecycle
+    public class AppleLifecycle : UNUserNotificationCenterDelegate
     {
         readonly ILogger logger;
         public AppleLifecycle(ILogger<AppleLifecycle> logger) => this.logger = logger;
+
+
+        ShinyUserNotificationDelegate ndelegate;
+        void EnsureNotificationDelegate()
+        {
+            this.ndelegate ??= new ShinyUserNotificationDelegate();
+            UNUserNotificationCenter.Current.Delegate = this.ndelegate;
+        }
+
+
+        public IDisposable RegisterForNotificationReceived(Func<UNNotificationResponse, Task> task)
+        {
+            this.EnsureNotificationDelegate();
+            return this.ndelegate.RegisterForNotificationReceived(task);
+        }
+
+
+        public IDisposable RegisterForNotificationPresentation(Func<UNNotification, Task> task)
+        {
+            this.EnsureNotificationDelegate();
+            return this.ndelegate.RegisterForNotificationPresentation(task);
+        }
 
 
         readonly List<Func<string, Action, bool>> handleEvents = new List<Func<string, Action, bool>>();

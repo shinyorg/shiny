@@ -41,8 +41,6 @@ namespace Shiny.Notifications
             services.TryAddSingleton<AndroidNotificationManager>();
             services.RegisterJob(typeof(NotificationJob), runInForeground: true);
             services.UseJobForegroundService();
-#elif __IOS__
-            services.TryAddSingleton<iOSNotificationDelegate>();
 #endif
         }
 

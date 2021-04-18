@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Foundation;
 using UIKit;
@@ -14,21 +13,13 @@ namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager, IShinyStartupTask
     {
-        readonly iOSNotificationDelegate nativeDelegate;
-        readonly Subject<PushNotification> payloadSubj;
-        IDisposable listener;
-
-
-        public PushManager(ShinyCoreServices services, iOSNotificationDelegate nativeDelegate) : base(services)
-        {
-            this.nativeDelegate = nativeDelegate;
-            this.payloadSubj = new Subject<PushNotification>();
-        }
+        readonly Subject<PushNotification> payloadSubj = new Subject<PushNotification>();
+        public PushManager(ShinyCoreServices services) : base(services) { }
 
 
         public virtual void Start()
         {
-            this.listener = this.Services.Lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
+            this.Services.Lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
             {
                 var dict = userInfo.FromNsDictionary();
                 var pr = new PushNotification(dict, null);
@@ -36,41 +27,23 @@ namespace Shiny.Push
                 this.payloadSubj.OnNext(pr);
             });
 
-            //this.nativeDelegate
-            //    .WhenPresented()
-            //    .Where(x => x.Notification?.Request?.Trigger is UNPushNotificationTrigger)
-            //    .SubscribeAsync(async x =>
-            //    {
-            //        var notification = x.Notification.Request.FromNative();
-            //        var push = new PushNotification(notification.Payload, notification);
-
-            //        await this.Services
-            //            .Services
-            //            .RunDelegates<IPushDelegate>(x => x.OnReceived(push))
-            //            .ConfigureAwait(false);
-
-            //        this.payloadSubj.OnNext(push);
-            //        x.CompletionHandler?.Invoke(UNNotificationPresentationOptions.Alert);
-            //    });
-
-            this.nativeDelegate
-                .WhenResponse()
-                .Where(x => x.Response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
-                .SubscribeAsync(async x =>
+            this.Services.Lifecycle.RegisterForNotificationReceived(async response =>
+            {
+                if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                 {
-                    var response = x.Response.FromNative();
+                    var shiny = response.FromNative();
                     var pr = new PushNotificationResponse(
-                        response.Notification,
-                        response.ActionIdentifier,
-                        response.Text
+                        shiny.Notification,
+                        shiny.ActionIdentifier,
+                        shiny.Text
                     );
 
                     await this.Services
                         .Services
                         .RunDelegates<IPushDelegate>(x => x.OnEntry(pr))
                         .ConfigureAwait(false);
-                    x.CompletionHandler();
-                });
+                }
+            });
 
             if (!this.CurrentRegistrationToken.IsEmpty())
             {

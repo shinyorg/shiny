@@ -6,24 +6,13 @@ using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.InstanceID;
 using Shiny.Infrastructure;
-using Shiny.Notifications;
 
 
 namespace Shiny.Push.FirebaseMessaging
 {
     public class PushManager : Shiny.Push.PushManager, IPushTagSupport
     {
-        public PushManager(
-            ShinyCoreServices services,
-            iOSNotificationDelegate ndelegate
-        )
-        : base(
-            services,
-            ndelegate
-        )
-        {
-            //new Shiny.Push.PushManager(services, null);
-        }
+        public PushManager(ShinyCoreServices services) : base(services) { }
 
 
         public override void Start()

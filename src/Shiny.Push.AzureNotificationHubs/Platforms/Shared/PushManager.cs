@@ -17,13 +17,7 @@ namespace Shiny.Push.AzureNotificationHubs
         readonly NotificationHubClient hub;
 
 
-#if WINDOWS_UWP
-        public PushManager(AzureNotificationConfig config, ShinyCoreServices services) : base(services)
-#elif __IOS__
-        public PushManager(AzureNotificationConfig config,
-                           ShinyCoreServices services,
-                           Shiny.Notifications.iOSNotificationDelegate ndelegate) : base(services, ndelegate)
-#elif __ANDROID__
+#if __ANDROID__
         public PushManager(AzureNotificationConfig config,
                            ShinyCoreServices services,
                            Shiny.Notifications.INotificationManager notifications)
