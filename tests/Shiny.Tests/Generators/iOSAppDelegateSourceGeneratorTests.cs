@@ -11,6 +11,7 @@ namespace Shiny.Tests.Generators
 {
     public class iOSAppDelegateSourceGeneratorTests : AbstractSourceGeneratorTests<iOSAppDelegateSourceGenerator>
     {
+        // TODO: test msal?
         const string StandardAppDelegateClassName = "MyTest.TestAppDelegate";
         const string StandardAppDelegate = @"
 [assembly: Shiny.ShinyApplicationAttribute]
@@ -136,7 +137,6 @@ namespace Test
             this.RunGenerator();
 
             var appDelegate = this.GetDefaultAppDelegate();
-            appDelegate.HasMethod("ReceivedRemoteNotification").Should().BeTrue("ReceivedRemoteNotification");
             appDelegate.HasMethod("DidReceiveRemoteNotification").Should().BeTrue("DidReceiveRemoteNotification");
             appDelegate.HasMethod("RegisteredForRemoteNotifications").Should().BeTrue("RegisteredForRemoteNotifications");
             appDelegate.HasMethod("FailedToRegisterForRemoteNotifications").Should().BeTrue("FailedToRegisterForRemoteNotifications");
