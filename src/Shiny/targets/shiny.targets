@@ -4,7 +4,7 @@
     </PropertyGroup>
 
     <Target Name="_ShinyMSBuildVersionCheck"
-            Condition=" '$([System.Version]::Parse($(_RefitMSBuildMinVersion)).CompareTo($([System.Version]::Parse($(MSBuildVersion)))))' &gt; '0' "
+            Condition=" '$([System.Version]::Parse($(_MSBuildMinVersion)).CompareTo($([System.Version]::Parse($(MSBuildVersion)))))' &gt; '0' "
             BeforeTargets="ResolveAssemblyReferences;Build;Rebuild" >
         <Error Text="Projects using Shiny cannot build using MSBuild '$(MSBuildVersion)'. MSBuild '$(_MSBuildMinVersion)' or later is required." />
     </Target>
