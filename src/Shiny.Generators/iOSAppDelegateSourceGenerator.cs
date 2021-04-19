@@ -196,6 +196,9 @@ return result;"
             {
                 // do XF stuff
                 builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+                if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
+                    builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init();");
+
                 builder.AppendLineInvariant($"this.LoadApplication(new {this.ShinyConfig.XamarinFormsAppTypeName}());");
             }
 
