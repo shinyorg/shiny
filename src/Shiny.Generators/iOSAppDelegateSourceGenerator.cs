@@ -64,24 +64,23 @@ namespace Shiny.Generators
                         "HandleEventsForBackgroundUrl",
                         "public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler) => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);"
                     );
-                    this.AppendMethodIf(
-                        appDelegate,
-                        builder,
-                        "Microsoft.Identity.Client",
-                        "OpenUrl",
-                        @"
-public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
-{
-    var result = true;
-    if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
-        global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
 
-    else if (!global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url))
-        result = false;
+                    if (!appDelegate.HasMethod("OpenUrl") && this.Context.HasReference("Microsoft.Identity.Client"))
+                    {
+                        using (builder.BlockInvariant("public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)"))
+                        {
+                            builder.Append(@"
+var result = true;
+if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
+    global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
 
-    return result;
-}"
-                    );
+else if (!global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url))
+    result = false;
+
+return result;"
+                            );
+                        }
+                    }
                 }
             }
             this.Context.AddSource(appDelegate.Name, builder.ToString());
@@ -115,6 +114,7 @@ public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
                     "DidReceiveRemoteNotification",
                     "public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);"
                 );
+
                 // old method - don't hook
                 //this.AppendMethodIf(
                 //    appDelegate,
@@ -128,7 +128,7 @@ public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
 
         void AppendMethodIf(INamedTypeSymbol symbol, IndentedStringBuilder builder, string neededLibrary, string methodName, string append)
         {
-            var hasAssembly = this.Context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals(neededLibrary));
+            var hasAssembly = this.Context.HasReference(neededLibrary);
             if (!hasAssembly)
                 return;
 

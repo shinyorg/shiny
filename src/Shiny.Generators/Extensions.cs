@@ -9,6 +9,10 @@ namespace Shiny.Generators
 {
     public static class Extensions
     {
+        public static bool HasReference(this GeneratorExecutionContext context, string neededLibrary)
+            => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals(neededLibrary));
+
+
         public static void Log(this GeneratorExecutionContext context, string id, string message, DiagnosticSeverity severity = DiagnosticSeverity.Warning, Location? location = null)
         {
             location ??= Location.None;
