@@ -10,19 +10,6 @@ namespace Shiny.BluetoothLE
         /// This will scan until the peripheral a specific peripheral is found, then cancel the scan
         /// </summary>
         /// <param name="bleManager"></param>
-        /// <param name="peripheralUuid"></param>
-        /// <returns></returns>
-        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this IBleManager bleManager, string peripheralUuid) => bleManager
-            .Scan()
-            .Where(x => x.Peripheral.Uuid.Equals(peripheralUuid))
-            .Take(1)
-            .Select(x => x.Peripheral);
-
-
-        /// <summary>
-        /// This will scan until the peripheral a specific peripheral is found, then cancel the scan
-        /// </summary>
-        /// <param name="bleManager"></param>
         /// <param name="peripheralName"></param>
         /// <param name="includeLocalName"></param>
         /// <returns></returns>
