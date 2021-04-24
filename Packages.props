@@ -6,7 +6,7 @@
         <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.9.0" />
 
         <PackageReference Update="sqlite-net-pcl" Version="1.7.335" />
-        <PackageReference Update="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />
 
         <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
