@@ -33,5 +33,5 @@ jobs:
         STATIQ_DEPLOY_BRANCH: ${{ secrets.STATIQ_DEPLOY_BRANCH }}
         STATIQ_DEPLOY_REMOTE: ${{ secrets.STATIQ_DEPLOY_REMOTE }}
       run: |
-        dotnet tool restore
-        dotnet run -- deploy
+        dotnet tool ./docs/docs.sln restore
+        dotnet run ./docs/docs.sln -- deploy
