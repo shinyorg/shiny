@@ -56,7 +56,6 @@
         -->
 
         <!--docs-->
-        <PackageReference Update="Statiq.Docs" Version="1.0.0-alpha.1" />
         <PackageReference Update="Statiq.Web" Version="1.0.0-beta.26" />
 
         <!--Samples-->
