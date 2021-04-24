@@ -10,6 +10,13 @@
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="Statiq.Web" />
+        <PackageReference Include="Devlead.Statiq" />
+        <!--
+        <PackageReference Include="MarkdownSnippets.MsBuild" Version="22.0.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        -->
     </ItemGroup>
 
 </Project>
