@@ -1,0 +1,11 @@
+﻿{
+    "name": "Shiny.Core",
+    "description": "",
+    "delegateRequired": false,
+
+    "platforms": {
+        "Android": "",
+        "iOS": "",
+        "UWP": ""
+    }
+}

@@ -1,0 +1,12 @@
+Title: Release Notes
+Order: 1000
+---
+
+<h1>Sections</h1>
+
+<ul>
+    @foreach (IDocument child in OutputPages.GetChildrenOf(Document).OrderByDescending(x => x.GetInt("Order")))
+    {
+        <li>@Html.DocumentLink(child)</li>
+    }
+</ul>

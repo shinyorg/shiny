@@ -1,0 +1,15 @@
+﻿{
+    "name": "Shiny.Core",
+    "description": "",
+    "service": "Shiny.Notifications.INotificationManager",
+    "static": "ShinyNotifications",
+    "startup": "services.UseNotifications",
+    "bgDelegate": "Shiny.Notifications.INotificationDelegate",
+    "delegateRequired": false,
+
+    "platforms": {
+        "Android": "",
+        "iOS": "",
+        "UWP": ""
+    }
+}

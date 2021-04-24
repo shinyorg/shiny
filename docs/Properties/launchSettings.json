@@ -1,0 +1,8 @@
+﻿{
+    "profiles": {
+        "Statiq.Dev": {
+            "commandName": "Project",
+            "commandLineArgs": "preview"
+        }
+    }
+}

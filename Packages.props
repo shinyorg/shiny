@@ -55,14 +55,16 @@
         <PackageReference Update="Tizen.NET.Sdk" Version="1.1.6" />
         -->
 
+        <!--docs-->
+        <PackageReference Update="Statiq.Docs" Version="1.0.0-alpha.1" />
+        <PackageReference Update="Statiq.Web" Version="1.0.0-beta.26" />
+
         <!--Samples-->
         <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-
         <PackageReference Update="Mobile.BuildTools" Version="2.0.109-pre" />
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.2012" />
         <PackageReference Update="Xamarin.CommunityToolkit" Version="1.1.0" />
         <PackageReference Update="Xamarin.Essentials" Version="1.6.1" />
-        <PackageReference Update="Acr.UserDialogs" Version="7.1.0.475" />
         <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.11" />
         <PackageReference Update="Bogus" Version="33.0.2" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
@@ -72,6 +74,7 @@
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
 
         <!--tests-->
+        <PackageReference Update="Acr.UserDialogs" Version="7.1.0.475" />
         <PackageReference Update="MartinCostello.Logging.XUnit" Version="0.1.1" />
         <PackageReference Update="DryIoc.Microsoft.DependencyInjection" Version="5.1.0" />
         <PackageReference Update="coverlet.collector" Version="3.0.3" />
