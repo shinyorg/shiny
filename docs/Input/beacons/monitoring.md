@@ -1,4 +1,5 @@
-# MONITORING
+Title: Monitoring
+---
 
 Beacon monitoring is quite a bit different than ranging.  Monitoring does not provide distance and has many limitations, but it works in the background.  Monitoring uses beacon regions much like ranging, however, the region is all that is returned in the delegate to protect user privacy
 

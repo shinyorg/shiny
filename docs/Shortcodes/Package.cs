@@ -27,7 +27,7 @@
     {
         public Platform Platform { get; set; }
         public string MinVersion { get; set; }
-        public bool HasCustomSetup { get; set; }
+        public bool RequiresConfig { get; set; }
     }
 
 

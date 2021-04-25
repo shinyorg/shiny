@@ -1,9 +1,8 @@
-﻿Title: Settings
+﻿Title: Key/Value Stores
 ---
 
 Settings is installed into the Shiny container automatically.  Settings are a fairly essential service of any framework.  You can resolve this using dependency injection or using the Shiny.ShinyHost.Resolve.  The interface to use is Shiny.Settings.ISettings
 
-## Interface: Shiny.Settings.ISettings
 
 ## To use, simply call:
 
@@ -15,7 +14,7 @@ settings.Set("Key", AnyObject); // your object is serialized under the hood
 var obj = settings.Get<AnyObject>("Key");
 ```
 
-## Strongly Typed Binding (works with all platforms - no fancy reflection that breaks on iOS)
+## Object Binding
 
 ```csharp
 var myInpcObj = settings.Bind<MyInpcObject>(); // Your object must implement INotifyPropertyChanged

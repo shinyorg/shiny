@@ -1,6 +1,9 @@
-Title: iOS
+Title: Platform - iOS
+Order: 1
 ---
 # iOS
+
+## AppDelegate
 
 |Method|Shiny Wire-In|Purpose|
 |------|-------------|-------|
@@ -68,3 +71,19 @@ public partial class AppDelegate
         => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
 }
 ```
+
+### Info.plist
+
+```xml
+<key>UIBackgroundModes</key>
+<array>
+    <string>fetch</string>
+    <string>processing</string>
+</array>
+<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array>
+    <string>com.shiny.job</string>
+    <string>com.shiny.jobpower</string>
+    <string>com.shiny.jobnet</string>
+    <string>com.shiny.jobpowernet</string>
+</array>

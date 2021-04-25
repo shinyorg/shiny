@@ -1,4 +1,5 @@
-# Platforms Supported
+Title: Heart Rate
+---
 |Platform|Version|
 |--------|-------|
 |Android|5|

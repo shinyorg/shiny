@@ -1,4 +1,5 @@
-# Advertising
+Title: Advertising
+---
 
 Advertising is severally downplayed by both operating systems.  On iOS, you are limited to advertising the local name and service UUIDs
 

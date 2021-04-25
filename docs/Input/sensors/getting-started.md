@@ -1,29 +1,6 @@
-# Getting Started
-
-## PLATFORMS
-|Platform|Version|
-|--------|-------|
-iOS|7+
-Android|4.3+
-Windows UWP (including core)|16299+
-Tizen|4.x+
-watchOS|4.x
-.NET Standard|2.0
-
-
-## SUPPORTED SENSORS
-
-* [Accelerometer](accelerometer.md)
-* [Ambient Light](ambientlight)
-* [Barometer](barometer)
-* [Compass](compass)
-* [Heart Rate Monitor](heartrate)
-* [Humidity](humidity)
-* [Gyroscope](gyroscope)
-* [Magnetometer](magnetometer)
-* [Pedometer](pedometer)
-* [Proximity](proximity)
-* [Temperature](temperature)
+Title: Getting Started
+Order: 1
+---
 
 
 ## SETUP

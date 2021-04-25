@@ -1,51 +1,91 @@
-# Getting Started
+Title: Getting Started
+Order: 1
+---
 
-#iOS
-As with all Core services, you don't need to do anything beyond the traditional shiny Init calls in each platform.  Jobs (Shiny.Job.IJobManager) is installed into the container by default.
+## FEATURES
+* Cross Platform Background Jobs Framework
+* Run adhoc jobs in the background (mainly for use on iOS)
+* Define jobs with runtime parameters to run at regular intervals
+* Internal logging to let you know how often jobs are running, if they complete successfully or error
+* Place criteria as to when jobs can run responsibly
+    * device is charging 
+    * battery is not low
+    * Internet connectivity via Mobile
+    * Internet connectivity via WiFi
 
-### FYI
-Please note that this framework uses background fetch on iOS.  Be aware of the following:
-* We cannot guarantee when/if background fetch will wake up
-* if you have other frameworks using background fetch, Shiny may not play nice with them since it needs to own the completion handler.
 
-### Setup
-1. Install From [![NuGet](https://img.shields.io/nuget/v/Shiny.Core.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Core/)
+* [Running Adhoc One-Time Tasks](#adhoc)
+* [Scheduling Background Jobs](#schedule)
+* [Cancelling Jobs](#cancel)
+* [Running Jobs On-Demand](#ondemand)
+* [Querying Jobs, Run Logs, & Events](other.md)
+* [FAQ - Frequently Asked Questions](faq.md)
+    
 
-2. In your AppDelegate.cs, add the following:
 
+#### <a name="adhoc"></a>Creating a One-Time Adhoc Job
 ```csharp
-public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler) 
-    => this.ShinyPerformFetch(completionHandler);
+
+// To issue an adhoc task that can continue to run in the background 
+CrossJobs.Current.RunTask(async () => 
+{
+    // your code
+});
 ```
 
+#### <a name="schedule"></a>Scheduling a background job
+```csharp
+// first define your job
+public class YourJob : IJob
+{
+    public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
+    {
+        var loops = jobInfo.GetValue("LoopCount", 25);
+
+        for (var i = 0; i < loops; i++)
+        {
+            if (cancelToken.IsCancellationRequested)
+                break;
+
+            await Task.Delay(1000, cancelToken).ConfigureAwait(false);
+        }
+    }
+}
+var job = new JobInfo
+{
+    Name = "YourJobName",
+    Type = typeof(YourJob),
+
+    // these are criteria that must be met in order for your job to run
+    BatteryNotLow = this.BatteryNotLow,
+    DeviceCharging = this.DeviceCharging
+    NetworkType = NetworkType.Any,
+    Repeat = true; //defaults to true, set to false to run once OR set it inside a job to cancel further execution
+};
+
+// you can pass variables to your job
+job.SetValue("LoopCount", 10);
 
 
-3.Add the following to your AndroidManifest.xml
-
-```xml
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<uses-permission android:name="android.permission.BATTERY_STATS" />	
-<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+// lastly, schedule it to go - don't worry about scheduling something more than once, we just update if your job name matches an existing one
+CrossJobs.Current.Schedule(job);
 ```
 
+#### <a name="cancel"></a>Cancelling Jobs
+```csharp
+// Cancelling A Job
+CrossJobs.Current.Cancel("YourJobName");
 
-### NOTES
-* If Doze is enabled, the reschedule period is not guaranteed to be an average of 10 mins.  It may be much longer. 
-* IF YOU ARE NOT SCHEDULING YOUR JOBS ON EVERY START - If you application force quits, Android will not restart the job scheduler.  For this, there is CrossJobs.EnsureJobServiceStarted
+// Cancelling All Jobs
+CrossJobs.Current.CancelAll();
+```
 
+#### <a name="ondemand"></a>Running Jobs On-Demand
+```csharp
+// Run All Jobs On-Demand
+var results = await CrossJobs.Current.RunAll();
 
-3. Add the following to your info.plist
-```xml
-<key>UIBackgroundModes</key>
-<array>
-    <string>fetch</string>
-    <string>processing</string>
-</array>
-<key>BGTaskSchedulerPermittedIdentifiers</key>
-<array>
-    <string>com.shiny.job</string>
-    <string>com.shiny.jobpower</string>
-    <string>com.shiny.jobnet</string>
-    <string>com.shiny.jobpowernet</string>
-</array>
+// Run A Specific Job On-Demand
+var result = await CrossJobs.Current.Run("YourJobName");
+
 ```

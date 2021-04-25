@@ -1,4 +1,5 @@
-# SQLite Integrations
+Title: SQLite Integrations
+---
 
 
 Install from NuGet: [![SqliteNugetShield]][SqliteNuget]

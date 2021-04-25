@@ -1,4 +1,0 @@
-Title: Printing
----
-
-# COMING SOON

@@ -2,6 +2,8 @@ Title: FAQ
 ---
 # Frequently Asked Questions
 
+* If Doze is enabled, the reschedule period is not guaranteed to be an average of 10 mins.  It may be much longer.
+* 
 Q. When should I schedule my defined jobs?  Should I do everytime I start the app.
 
 > When your app starts (Xamarin Forms App.OnStart is a good place).  It is a good practice to schedule every start.  The framework will only update jobs if one already exists.

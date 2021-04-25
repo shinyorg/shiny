@@ -1,5 +1,5 @@
-# Motion Activity
-
+Title: Motion Activity
+---
 Motion activity is a great mechanism for querying for how your user is moving.  This set of API's works slightly different than other APIs in Shiny.  iOS does not allow watching for these events in the background, but it allows you to query by date/time range (careful, the query can yield A LOT of data).  In order to emulate this same queryable mechanism on Android, Shiny starts up a broadcast receiver that continually receives events and stores them in a local SQLite database.
 
 The events captured by this API are

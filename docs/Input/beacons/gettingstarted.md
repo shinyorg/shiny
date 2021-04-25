@@ -1,3 +1,6 @@
+Title: Getting Started
+Order: 1
+---
 # GETTING STARTED WITH BEACONS
 
 This library deals specifically with iBeacons (Apple's beacon technology).  iBeacons are used to provide contextual location information to a device.  They are built upon BluetoothLE advertising.  They are basically radio'ing out a small piece of data every 700-1400ms that other devices can "hear" if they are listening properly. 
@@ -6,7 +9,6 @@ This library deals specifically with iBeacons (Apple's beacon technology).  iBea
 
 First - install the NuGet package into your shared code project: [![NuGet](https://img.shields.io/nuget/v/Shiny.Beacons.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Beacons/)
 
-<!-- snippet: BeaconStartup.cs -->
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
@@ -24,10 +26,8 @@ public class BeaconStartup : ShinyStartup
 }
 
 ```
-<sup>[snippet source](/src/Snippets/BeaconStartup.cs#L1-L15)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: BeaconRanging.cs -->
+
 ```cs
 using System;
 using Shiny;
@@ -55,10 +55,7 @@ public class BeaconRanging
 
 
 ```
-<sup>[snippet source](/src/Snippets/BeaconRanging.cs#L1-L25)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: BeaconMonitorDelegate.cs -->
 ```cs
 using System;
 using System.Threading.Tasks;
@@ -73,7 +70,7 @@ namespace Shiny.Beacons
 }
 
 ```
-<sup>[snippet source](/src/Shiny.Beacons.Abstractions/IBeaconMonitorDelegate.cs#L1-L12)</sup>
+
 ```cs
 using System.Threading.Tasks;
 using Shiny.Beacons;
@@ -88,8 +85,6 @@ public class BeaconMonitorDelegate : IBeaconMonitorDelegate
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/BeaconMonitorDelegate.cs#L1-L12)</sup>
-<!-- endsnippet -->
 
 ### Android & UWP
 Android & UWP piggyback their functionality with Shiny.BluetoothLE.  Use the following links to ensure your setup for those:

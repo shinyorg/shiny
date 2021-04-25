@@ -5,7 +5,7 @@ Order: 100
 <h1>Sections</h1>
 
 <ul>
-    @foreach (IDocument child in OutputPages.GetChildrenOf(Document))
+    @foreach (IDocument child in OutputPages.GetChildrenOf(Document).OrderBy(x => x.GetInt("Order", 1000)))
     {
         <li>@Html.DocumentLink(child)</li>
     }

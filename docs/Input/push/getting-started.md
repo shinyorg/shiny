@@ -1,4 +1,6 @@
-# PUSH - GETTING STARTED
+Title: Getting Started
+Order: 1
+---
 
 # Push
 Push notifications come in so many flavours these days.  The community needed one way of doing things, but the ability to swap providers in and out at will.  The reason, push providers, aside from native have been dropping

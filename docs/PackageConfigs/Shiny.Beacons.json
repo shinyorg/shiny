@@ -1,12 +1,12 @@
 ﻿{
-    "name": "Shiny.Core",
-    "description": "Core Services for Shiny",
+    "name": "Shiny.Beacons",
+    "description": "iBeacon Ranging & Background Monitoring",
 
     "services": [
         {
-            "name": "Shiny.Jobs.IJobManager",
-            "static": "ShinyJobs",
-            "startup": "services.RegisterJob",
+            "name": "Shiny.Beacons.IBeaconRangingManager",
+            "static": "ShinyBeaconRangingManager",
+            "startup": "services.UseBeaconRanging",
             "platforms": [
                 {
                     "platform": "iOS"

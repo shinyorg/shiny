@@ -1,8 +1,5 @@
 Title: Getting Started
 Order: 1
-RedirectFrom: 
-- docs/ble/client/index
-- docs/ble/index
 ---
 
 # DESCRIPTION
