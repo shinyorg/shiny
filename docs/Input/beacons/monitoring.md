@@ -15,3 +15,18 @@ Monitoring is limited to a maximum of 20 regions on iOS.  On Android & UWP, ther
 |Static Generated|ShinyBeaconMonitoring|
 |Manual Resolve|ShinyHost.Resolve<Shiny.Beacons.IBeaconMonitoringManager>()|
 |Xamarin.Forms|DependencyService.Get<Shiny.Beacons.IBeaconMonitoringManager>()|
+
+```cs
+using System.Threading.Tasks;
+using Shiny.Beacons;
+
+
+public class BeaconMonitorDelegate : IBeaconMonitorDelegate
+{
+    public async Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
+    {
+        // NOTE: you cannot not see the actual detected beacon here, only the region that was crossed
+        // this is done by the OS to protect privacy of the user
+    }
+}
+```

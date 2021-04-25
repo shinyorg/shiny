@@ -18,10 +18,6 @@ Order: 1
 * [Scheduling Background Jobs](#schedule)
 * [Cancelling Jobs](#cancel)
 * [Running Jobs On-Demand](#ondemand)
-* [Querying Jobs, Run Logs, & Events](other.md)
-* [FAQ - Frequently Asked Questions](faq.md)
-    
-
 
 #### <a name="adhoc"></a>Creating a One-Time Adhoc Job
 ```csharp

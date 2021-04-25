@@ -75,8 +75,16 @@ public partial class AppDelegate
 ### Info.plist
 
 ```xml
+<key>NSLocationAlwaysUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>The beacons or geofences or GPS always have you!</string>
+
 <key>UIBackgroundModes</key>
 <array>
+    <string>location</string>
     <string>fetch</string>
     <string>processing</string>
 </array>
