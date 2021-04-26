@@ -2,9 +2,11 @@ Title: Getting Started
 Order: 1
 ---
 
-# Push
 Push notifications come in so many flavours these days.  The community needed one way of doing things, but the ability to swap providers in and out at will.  The reason, push providers, aside from native have been dropping
-like flies the last several years.  The latest to go was AppCenter which it turns out the Xamarin community was heavily invested in.  
+like flies the last several years.  The latest to go was AppCenter which it turns out the Xamarin community was heavily invested in. 
+
+## Setup
+General OS setup is mostly the same on all platforms, but please review the specific provider you intend to use from the menu for more information
 
 
 ## Registration
@@ -60,24 +62,6 @@ public class PushRegistration
 
 
 ## Background Delegate
-```cs
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-
-namespace Shiny.Push
-{
-    public interface IPushDelegate
-    {
-        Task OnEntry(PushEntryArgs args);
-        Task OnReceived(IDictionary<string, string> data);
-        Task OnTokenChanged(string token);
-    }
-}
-
-```
-
 
 ```cs
 using System;
