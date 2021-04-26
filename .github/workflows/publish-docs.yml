@@ -1,7 +1,7 @@
 name: Publish Documentation
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, dev ]
     paths:
     - "docs/**"
 
@@ -29,9 +29,6 @@ jobs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        STATIQ_GITHUB_TOKEN: ${{ secrets.STATIQ_GITHUB_TOKEN }}
-        STATIQ_DEPLOY_BRANCH: ${{ secrets.STATIQ_DEPLOY_BRANCH }}
-        STATIQ_DEPLOY_REMOTE: ${{ secrets.STATIQ_DEPLOY_REMOTE }}
       run: |
         dotnet tool docs.sln restore
         dotnet run docs.sln -- deploy
