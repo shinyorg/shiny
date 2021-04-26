@@ -2,29 +2,10 @@ Title: Getting Started
 Order: 1
 ---
 
-## DESCRIPTION
-
 Notifications are a great way of letting your users know your app just figured something out in the background.  Thus, Shiny needed a decent local notification library.
 
+<?! PackageInfo "Shiny.Notifications" /?>
 
-## PLATFORMS
-
-|Platform|Version|
-|--------|-------|
-|iOS|9|
-|Android|8|
-|UWP|16299|
-
-## USAGE
-
-|Area|Info|
-|----|----|
-|NuGet| [![NotificationsNugetShield]][NotificationsNuget] |
-|Shiny Startup|services.UseNotifications|
-|Main Service|Shiny.Notifications.INotificationManager|
-|Background Delegate (optional)|Shiny.Notifications.INotificationDelegate|
-|Static Generated|ShinyNotifications|
-|Manual Resolve|ShinyHost.Resolve<Shiny.Notifications.INotificationManager>()|
 
 
 ```cs

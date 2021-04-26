@@ -3,6 +3,8 @@ Title: GPS
 
 The Global Position System (GPS) on Shiny is actually a bit more complicated than other Shiny modules as it can really "hammer" away on your resources if you set it up wrong.
 
+<?! PackageInfo "Shiny.Locations" "Shiny.Locations.IGpsManager" /?>
+
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 
@@ -261,7 +263,7 @@ public class GpsDelegate : IGpsDelegate
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/GpsDelegate.cs#L1-L9)</sup>
+
 ```cs
 using System;
 using System.Collections.Generic;

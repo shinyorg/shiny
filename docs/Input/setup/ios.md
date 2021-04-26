@@ -75,6 +75,7 @@ public partial class AppDelegate
 ### Info.plist
 
 ```xml
+<!-- required for location and beacons -->
 <key>NSLocationAlwaysUsageDescription</key>
 <string>The beacons or geofences or GPS always have you!</string>
 <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
@@ -82,12 +83,16 @@ public partial class AppDelegate
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>The beacons or geofences or GPS always have you!</string>
 
+<key>NSMotionUsageDescription</key>
+<string>Say something clever here</string>
+
 <key>UIBackgroundModes</key>
 <array>
     <string>location</string>
     <string>fetch</string>
     <string>processing</string>
 </array>
+
 <key>BGTaskSchedulerPermittedIdentifiers</key>
 <array>
     <string>com.shiny.job</string>

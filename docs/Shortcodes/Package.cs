@@ -4,7 +4,8 @@
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public string? Category { get; set; }
+        public string? Category { get; set; } = "main";
+        public int Order { get; set; } = 1000;
 
         public PackageService[] Services { get; set; }
     }
@@ -17,7 +18,7 @@
         public string? Startup { get; set; }
 
         public string? BgDelegate { get; set; }
-        public bool? BgDelegateRequired { get; set; }
+        public bool BgDelegateRequired { get; set; }
 
         public PlatformSupport[] Platforms { get; set; }
     }

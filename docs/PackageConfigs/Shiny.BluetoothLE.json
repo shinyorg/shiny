@@ -1,3 +1,23 @@
 ﻿{
-    "name":  "Shiny.BluetoothLE"
+    "name": "Shiny.BluetoothLE",
+    "services": [
+        {
+            "name": "Shiny.BluetoothLE.IBleManager",
+            "startup": "services.UseBleClient",
+            "bgDelegate": "Shiny.BluetoothLE.IBleDelegate",
+            "bgDelegateRequired": false,
+            "static": "ShinyBle",
+            "platforms": [
+                {
+                    "platform": "iOS"
+                },
+                {
+                    "platform": "Android"
+                },
+                {
+                    "platform": "UWP"
+                }
+            ]
+        }
+    ]
 }

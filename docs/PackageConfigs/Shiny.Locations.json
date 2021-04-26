@@ -1,3 +1,61 @@
 ﻿{
-    "name":  "Shiny.Locations"
+    "name": "Shiny.Locations",
+    "description": "GPS, Geofencing, & Motion Activity Recogntion Services",
+    "services": [
+        {
+            "name": "Shiny.Locations.IGpsManager",
+            "startup": "services.UseGps",
+            "bgDelegate": "Shiny.Locations.IGpsDelegate",
+            "bgDelegateRequired": false,
+            "static": "ShinyGps",
+            "platforms": [
+                {
+                    "platform": "iOS",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "Android"
+                },
+                {
+                    "platform": "UWP"
+                }
+            ]
+        },
+        {
+            "name": "Shiny.Locations.IGeofenceManager",
+            "startup": "services.UseGeofencing",
+            "bgDelegate": "Shiny.Locations.IGeofenceDelegate",
+            "bgDelegateRequired": true,
+            "static": "ShinyGeofencing",
+            "platforms": [
+                {
+                    "platform": "iOS",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "Android"
+                },
+                {
+                    "platform": "UWP"
+                }
+            ]
+        },
+        {
+            "name":  "Shiny.Locations.IMotionActivityManager",
+            "startup": "services.UseMotionActivity",
+            "static": "ShinyMotionActivity",
+            "platforms": [
+                {
+                    "platform": "iOS",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "Android"
+                },
+                {
+                    "platform": "UWP"
+                }
+            ]
+        }
+    ]
 }

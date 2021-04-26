@@ -1,3 +1,25 @@
 ﻿{
-    "name": "Shiny.Net.Http"
+    "name": "Shiny.Net.Http",
+    "description": "Background Uploads & Downloads with metrics",
+    "services": [
+        {
+            "name": "Shiny.Net.Http.IHttpTransferManager",
+            "startup": "services.UseHttpTransfers",
+            "bgDelegate": "Shiny.Net.Http.IHttpTransferDelegate",
+            "bgDelegateRequired": true,
+            "static": "ShinyHttpTransfers",
+            "platforms": [
+                {
+                    "platform": "iOS",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "Android"
+                },
+                {
+                    "platform": "UWP"
+                }
+            ]
+        }
+    ]
 }

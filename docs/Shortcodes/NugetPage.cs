@@ -12,18 +12,25 @@ namespace Docs.Shortcodes
     {
         public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {
-            // groupby category for separate tables
-            var list = Utils.GetAllPackages().OrderBy(x => x.Name).ToList();
+            //context.Phase == Phase.Process
+            var list = Utils
+                .GetAllPackages()
+                .OrderBy(x => x.Order)
+                .ThenBy(x => x.Name)
+                .ToList();
 
             var sb = new StringBuilder();
-            sb.Append("<table><tr><th>Name</th><th>Description</th><th>NuGet</th>");
+            sb
+                .AppendLine("# ")
+                .AppendLine()
+                .AppendLine("|Name|Description|NuGet|")
+                .AppendLine("|----|-----------|-----|");
 
             foreach (var obj in list)
             {
                 var shield = Utils.ToNugetShield(obj.Name, false);
-                sb.AppendLine($"<tr><td>{obj.Name}</td><td>{obj.Description}</td><td>{shield}</td></tr>");
+                sb.AppendLine($"|**{obj.Name}**|{obj.Description}|{shield}|");
             }
-            sb.AppendLine("</table>");
             return new [] { new ShortcodeResult(sb.ToString()) };
         }
     }

@@ -1,6 +1,7 @@
 ﻿{
     "name": "Shiny.Core",
     "description": "Core Services for Shiny",
+    "order":  1,
 
     "services": [
         {
@@ -10,25 +11,6 @@
             "platforms": [
                 {
                     "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
-        },
-        {
-            "name": "Shiny.Beacons.IBeaconMonitorManager",
-            "static": "ShinyBeaconMonitorManager",
-            "startup": "services.UseBeaconMonitoring",
-            "bgDelegate": "Shiny.Beacons.IBeaconMonitorDelegate",
-            "bgDelegateRequired": true,
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
                 },
                 {
                     "platform": "Android"

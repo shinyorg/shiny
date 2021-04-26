@@ -1,3 +1,21 @@
 ﻿{
-    "name": "Shiny.SpeechRecognition"
+    "name": "Shiny.SpeechRecognition",
+    "services": [
+        {
+            "name": "Shiny.SpeechRecognition.ISpeechRecognizer",
+            "startup": "services.UseSpeechRecognition",
+            "static": "ShinySpeechRecognition",
+            "platforms": [
+                {
+                    "platform": "iOS"
+                },
+                {
+                    "platform": "Android"
+                },
+                {
+                    "platform": "UWP"
+                }
+            ]
+        }
+    ]
 }

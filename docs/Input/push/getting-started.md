@@ -7,26 +7,6 @@ Push notifications come in so many flavours these days.  The community needed on
 like flies the last several years.  The latest to go was AppCenter which it turns out the Xamarin community was heavily invested in.  
 
 
-## Providers
-|Provider|iOS|Android|UWP|Server Setup|NuGet|
-|---|---|---|---|---|---|---|
-|Native|10+|6+|16299+|||
-|Azure Notification Hubs|10+|6+|16299+|[Link](https://docs.microsoft.com/en-ca/azure/notification-hubs/)||
-|Firebase|10+|6||||
-|OneSignal|10+|6||||
-|Amazon|10+|6|||
-
-|Area|Info|
-|----|----|
-|NuGet|Depends on provider|
-|Shiny Startup|Depends on provider|
-|Main Service|Shiny.Push.IPushnManager|
-|Background Delegate (required)|Shiny.Push.IPushDelegate|
-|Static Generated|ShinyNotifications|
-|Manual Resolve|ShinyHost.Resolve<Shiny.Push.IPushManager>()|
-|Xamarin.Forms|DependencyService.Get<Shiny.Push.IPushDelegate>>()|
-
-
 ## Registration
 Look to each appropriate provider to see setups for each.  The most important function otherwise, is RequestAccess shown below which will give you the push notification token that you can send to your backend. 
 

@@ -9,8 +9,7 @@ Order: 3
 this.ShinyInit(new YourStartup());
 ```
 
-2. Add the following to your Package.appxmanifest under the <Application><Extensions> node
-
+Manifest
 ```xml
 <Extension Category="windows.backgroundTasks" EntryPoint="Shiny.ShinyBackgroundTask">
     <BackgroundTasks>
@@ -19,4 +18,12 @@ this.ShinyInit(new YourStartup());
         <Task Type="timer"/>
     </BackgroundTasks>
 </Extension>
+```
+
+```xml
+<Capabilities>
+    <Capability Name="internetClient" />
+    <DeviceCapability Name="bluetooth" />
+    <DeviceCapability Name="location" />
+</Capabilities>
 ```

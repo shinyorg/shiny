@@ -9,34 +9,10 @@ The events captured by this API are
 * Running
 * Cycling
 
+<?! PackageInfo "Shiny.Locations" "Shiny.Locations.IMotionActivityManager" /?>
 
-## PLATFORMS
 
-|Platform|Version|
-|--------|-------|
-|iOS|9|
-|Android|5|
-
-## SETUP
-
-1. Be sure to install the Shiny.Locations nuget package in all of your main platform projects as well as your core/NETStandard project
-
-[![NuGet](https://img.shields.io/nuget/v/Shiny.Locations.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Locations/)
-
-2. In your Shiny startup, add the following:
-
-```csharp
-services.UseMotionActivity();
-```
-
-3. On iOS, you need to add the following to your Info.plist
-
-```xml
-<key>NSMotionUsageDescription</key>
-<string>Say something clever here</string>
-```
-
-## USAGE
+## Usage
 
 You can either inject this service or resolve it via the Shiny.ShinyHost.Resolve method.  The interface being used here is Shiny.Locations.IMotionActivity
 
