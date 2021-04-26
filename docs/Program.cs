@@ -15,9 +15,12 @@ namespace Docs
                 .Factory
                 .CreateWeb(args)
                 .AddSetting(Keys.Host, "shinyorg.github.io")
-                //.AddSetting(Keys.LinkRoot, "/docs")
                 .AddSetting(Keys.LinksUseHttps, true)
-                //.AddSetting(Constants.EditLink, ConfigureEditLink())
+                .DeployToGitHubPages(
+                    "shinyorg",
+                    "shinyorg.github.io",
+                    Config.FromSetting<string>("GITHUB_TOKEN")
+                )
                 .AddShortcode<PackageInfo>(nameof(PackageInfo))
                 .AddShortcode<NugetShield>(nameof(NugetShield))
                 .AddShortcode<NugetPage>(nameof(NugetPage))

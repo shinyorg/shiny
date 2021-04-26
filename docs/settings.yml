@@ -2,10 +2,5 @@ Host: shinyorg.github.io
 Title: Shiny.NET
 SiteTitle: Documentation
 SubTitle: Documentation
-Image: images/toronto_pan.jpg
 LinksUseHttps: true
-GitHubOwner: shinyorg
-GitHubName: shinyorg.github.io
-GitHubToken: => Config.FromSetting<string>("GITHUB_TOKEN")
-GitHubBranch: master
 TwitterHandle: shinydotnet
