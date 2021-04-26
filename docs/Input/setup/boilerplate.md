@@ -1,4 +1,6 @@
 Title: Boilerplate
+Order: 1
+Xref: boilerplate
 ---
 
 Don't like the platform boilerplate?  This is easy to avoid with Shiny as of version 2.

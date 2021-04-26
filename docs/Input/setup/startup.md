@@ -1,4 +1,6 @@
-﻿Title: Logging
+﻿Title: Startup
+Order: 0
+Xref: startup
 ---
 
 <?# NugetShield "Shiny.Logging.AppCenter" /?>

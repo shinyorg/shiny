@@ -1,7 +1,7 @@
 Title: Platform - Android
-Order: 2
+Order: 3
+Xref: android
 ---
-# Android
 
 Shiny integrates well with Android, but requires several hook points.  Unlike Xamarin Forms applications where you only need to hook into an activity, Shiny
 requires an Android application.  From an architectural standpoint, this is to ensure all of the Shiny services can be spun up before an Android broadcast receiver 

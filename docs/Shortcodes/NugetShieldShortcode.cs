@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Docs.Shortcodes
 {
     //https://statiq.dev/framework/content/shortcodes
-    public class NugetShield : IShortcode
+    public class NugetShieldShortcode : IShortcode
     {
         public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {

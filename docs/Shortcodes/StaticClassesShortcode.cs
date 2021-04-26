@@ -8,7 +8,7 @@ using Statiq.Common;
 
 namespace Docs.Shortcodes
 {
-    public class StaticClasses : IShortcode
+    public class StaticClassesShortcode : IShortcode
     {
         public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {

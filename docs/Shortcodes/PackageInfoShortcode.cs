@@ -8,7 +8,7 @@ using Statiq.Common;
 
 namespace Docs.Shortcodes
 {
-    public class PackageInfo : IShortcode
+    public class PackageInfoShortcode : IShortcode
     {
         public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {
@@ -29,7 +29,7 @@ namespace Docs.Shortcodes
                     break;
 
                 case 1:
-                    RenderService(context, sb, package.Services!.First());
+                    RenderService(sb, package.Services!.First());
                     break;
 
                 default:
@@ -44,7 +44,7 @@ namespace Docs.Shortcodes
                     if (service == null)
                         throw new ArgumentException("No service found called " + sn);
 
-                    RenderService(context, sb, service);
+                    RenderService(sb, service);
                     break;
             }
             return new[] { new ShortcodeResult(sb.ToString()) };
@@ -58,7 +58,7 @@ namespace Docs.Shortcodes
         }
 
 
-        static void RenderService(IExecutionContext context, StringBuilder sb, PackageService service)
+        static void RenderService(StringBuilder sb, PackageService service)
         {
             AppendIf(sb, "Service", service.Name);
             AppendIf(sb, "Startup", service.Startup);
@@ -77,20 +77,19 @@ namespace Docs.Shortcodes
             {
                 foreach (var platform in service.Platforms)
                 {
-                    RenderPlatform(context, sb, platform);
+                    RenderPlatform(sb, platform);
                 }
             }
         }
 
 
-        static void RenderPlatform(IExecutionContext context, StringBuilder sb, PlatformSupport platform)
+        static void RenderPlatform(StringBuilder sb, PlatformSupport platform)
         {
             var value = platform.MinVersion ?? DefaultPlatformVersion(platform.Platform);
 
             if (platform.RequiresConfig)
             {
-                var link = context.GetLink("/setup/" + platform.Platform.ToString().ToLower());
-                value += $" ([OS Configuration Required]({link}))";
+                value += $" ([OS Configuration Required](xref: {platform.Platform}))";
             }
             sb.AppendLine($"| - *{platform.Platform}*|{value}|");
         }

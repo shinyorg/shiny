@@ -19,6 +19,14 @@ public class YourModule : ShinyModule
 }
 ```
 
+And then to register this with your startup
+
+<?! Startup ?>
+services.RegisterModule(new YourModule());
+<?!/ Startup ?>
+
+
+
 ## Startup Tasks
 
 Startup tasks are great for wiring up events and spinning up infrastructure.  These fire immediately after the container is built.  However, don't do any sort of blocking operation in them as this will cause your app to pause starting up causing a poor user experience.
@@ -38,6 +46,12 @@ public class YourStartupTask : IShinyStartupTask
 }
 ```
 
+To register them and have them automatically run:
+
+<?! Startup ?>
+services.AddSingleton<YourStartupTask>();
+<?!/ Startup ?>
+
 ## State Restorable Services
 
 This is pretty cool, imagine you want the state of your service preserved across restarts - Shiny does this in epic fashion
@@ -47,11 +61,7 @@ Simply turn your service implement INotifyPropertyChanged (or the easy Shiny.Not
 ```cs
 using Shiny;
 
-#region RestorableServices
-public class MyBadAssService :
-    NotifyPropertyChanged,
-    IMyBadAssService,
-    IShinyStartupTask
+public class MyBadAssService : NotifyPropertyChanged, IShinyStartupTask
 {
     int count;
 
@@ -66,10 +76,10 @@ public class MyBadAssService :
         this.Count++;
     }
 }
-
-#endregion
-
-public interface IMyBadAssService
-{
-}
 ```
+
+and the same to register this guy
+
+<?! Startup ?>
+services.AddSingleton<MyBadAssService>();
+<?!/ Startup ?>

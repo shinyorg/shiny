@@ -1,5 +1,6 @@
 Title: Platform - UWP
-Order: 3
+Xref: uwp
+Order: 5
 ---
 # UWP
 

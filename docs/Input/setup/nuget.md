@@ -1,4 +1,5 @@
 Title: NuGet Packages
+Xref: nuget
 ---
 
 ## Packages

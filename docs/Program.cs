@@ -21,10 +21,11 @@ namespace Docs
                     "shinyorg.github.io",
                     Config.FromSetting<string>("GITHUB_TOKEN")
                 )
-                .AddShortcode<PackageInfo>(nameof(PackageInfo))
-                .AddShortcode<NugetShield>(nameof(NugetShield))
-                .AddShortcode<NugetPage>(nameof(NugetPage))
-                .AddShortcode<StaticClasses>(nameof(StaticClasses))
+                .AddShortcode<StartupShortcode>("Startup")
+                .AddShortcode<PackageInfoShortcode>("PackageInfo")
+                .AddShortcode<NugetShieldShortcode>("NugetShield")
+                .AddShortcode<NugetPageShortcode>("NugetPage")
+                .AddShortcode<StaticClassesShortcode>("StaticClasses")
                 .RunAsync();
 
         //static Config<string> ConfigureEditLink() => Config.FromDocument((doc, ctx) =>
