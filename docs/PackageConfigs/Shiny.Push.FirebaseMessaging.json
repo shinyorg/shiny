@@ -1,0 +1,23 @@
+﻿{
+    "name": "Shiny.Push.FirebaseMessaging",
+    "description": "Push Provider for Firebase Messaging",
+    "category": "Integrations",
+    "services": [
+        {
+            "name": "Shiny.Push.IPushManager",
+            "startup": "services.UseFirebaseMessaging",
+            "bgDelegate": "Shiny.Push.IPushDelegate",
+            "bgDelegateRequired": true,
+            "platforms": [
+                {
+                    "platform": "iOS",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "Android",
+                    "requiresConfig": true
+                }
+            ]
+        }
+    ]
+}

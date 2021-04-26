@@ -1,3 +1,5 @@
+Title: Barometer
+---
 # Platforms Supported
 |Platform|Version|
 |--------|-------|

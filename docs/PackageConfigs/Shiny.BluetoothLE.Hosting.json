@@ -1,13 +1,10 @@
 ﻿{
-    "name": "Shiny.Core",
-    "description": "Core Services for Shiny",
-    "order":  1,
-
+    "name": "Shiny.BluetoothLE.Hosting",
     "services": [
         {
-            "name": "Shiny.Jobs.IJobManager",
-            "static": "ShinyJobs",
-            "startup": "services.RegisterJob",
+            "name": "Shiny.BluetoothLE.IBleHostingManager",
+            "startup": "services.UseBleHosting",
+            "static": "ShinyBleHosting",
             "platforms": [
                 {
                     "platform": "iOS"

@@ -1,5 +1,7 @@
 ﻿{
     "name": "Shiny.Core",
+    "order": 1,
+    "category": "main",
     "service": "Shiny.Notifications.INotificationManager",
     "startup": "services.UseNotifications",
     "bgDelegate": "Shiny.Notifications.INotificationDelegate",

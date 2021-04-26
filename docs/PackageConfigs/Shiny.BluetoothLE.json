@@ -1,13 +1,12 @@
 ﻿{
-    "name": "Shiny.Core",
-    "description": "Core Services for Shiny",
-    "order":  1,
-
+    "name": "Shiny.BluetoothLE",
     "services": [
         {
-            "name": "Shiny.Jobs.IJobManager",
-            "static": "ShinyJobs",
-            "startup": "services.RegisterJob",
+            "name": "Shiny.BluetoothLE.IBleManager",
+            "startup": "services.UseBleClient",
+            "bgDelegate": "Shiny.BluetoothLE.IBleDelegate",
+            "bgDelegateRequired": false,
+            "static": "ShinyBle",
             "platforms": [
                 {
                     "platform": "iOS"

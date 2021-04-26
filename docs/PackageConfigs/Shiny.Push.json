@@ -1,0 +1,26 @@
+﻿{
+    "name": "Shiny.Push",
+    "description": "Native OS Poush Providers",
+    "services": [
+        {
+            "name": "Shiny.Push.IPushManager",
+            "startup": "services.UsePush",
+            "bgDelegate": "Shiny.Push.IPushDelegate",
+            "bgDelegateRequired": true,
+            "static": "ShinyPush",
+            "platforms": [
+                {
+                    "platform": "iOS",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "Android",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "UWP"
+                }
+            ]
+        }
+    ]
+}

@@ -2,12 +2,12 @@ Title: SQLite Integrations
 ---
 
 
-Install from NuGet: [![SqliteNugetShield]][SqliteNuget]
+Install from NuGet: <?# NugetShield "Shiny.Integrations.Sqlite" /?>
 
 The SQLite integration provides several overrides to the built-in modules within Shiny.  
 
-* Storage
-* Settings
+* Service Storage
+* Key/Value Storage
 * Logging
 
 ## Registering Them
@@ -47,5 +47,3 @@ There are 3 main points to consider when swapping in SQLite
 |Storage|The benefit here is that you can use SQLite encryption to potentially protect values|
 |Settings|Same benefits of potential encryption.  However, if you are doing frequent (many changes in a second) writes to settings, you will lose performance|
 |Logging|There is no performance benefits to using this, however, it does centralize the logs for shipping purposes if you want|
-
-<?! Include "../../nuget.md" /?>

@@ -60,6 +60,3 @@ public class NfcUsage
     }
 }
 ```
-
-
-<?! Include "../nuget.md" /?>

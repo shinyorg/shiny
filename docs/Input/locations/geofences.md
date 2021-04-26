@@ -1,15 +1,7 @@
 Title: Geofencing
 ---
 
-|Area|Info|
-|----|----|
-|NuGet| [![LocationsNugetShield]][LocationsNuget] |
-|Shiny Startup|services.UseGeofencing<YourDelegate>()|
-|Main Service|Shiny.Locations.IGeofenceManager|
-|Background Delegate|Shiny.Beacons.IGeofenceDelegate (required)|
-|Static Generated|ShinyGeofences|
-|Manual Resolve|ShinyHost.Resolve<Shiny.Locations.IGeofenceManager>()|
-|Xamarin.Forms|DependencyService.Get<Shiny.Locations.IGeofenceManager>()|
+<?! PackageInfo "Shiny.Locations" "Shiny.Locations.IGeofenceManager" /?>
 
 
 ```cs
@@ -18,7 +10,7 @@ using Shiny;
 
 public class GeofenceStartup : ShinyStartup
 {
-    public override void ConfigureServices(IServiceCollection services)
+    public override void ConfigureServices(IServiceCollection services, IPlatform platform)
     {
         services.UseGeofencing<GeofenceDelegate>();
     }
@@ -105,7 +97,7 @@ namespace Shiny.Locations
 }
 
 ```
-<sup>[snippet source](/src/Shiny.Locations.Abstractions/IGeofenceDelegate.cs#L1-L18)</sup>
+
 ```cs
 using System;
 using System.Threading.Tasks;
@@ -159,7 +151,7 @@ namespace Shiny.Locations.Sync.Infrastructure
 }
 
 ```
-<sup>[snippet source](/src/Shiny.Locations.Sync/Infrastructure/SyncGeofenceDelegate.cs#L1-L51)</sup>
+
 ```cs
 using System.Threading.Tasks;
 using Shiny.Locations;
@@ -172,7 +164,7 @@ public class GeofenceDelegate : IGeofenceDelegate
 }
 
 ```
-<sup>[snippet source](/src/Snippets/GeofenceDelegate.cs#L1-L10)</sup>
+
 ```cs
 using System;
 using System.Collections.Generic;
@@ -188,10 +180,7 @@ public class LocationSyncGeofenceDelegate : IGeofenceSyncDelegate
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/LocationSyncGeofenceDelegate.cs#L1-L13)</sup>
-<!-- endsnippet -->
 
-<!-- snippet: GeofenceUsage.cs -->
 ```cs
 using System.Threading.Tasks;
 using Shiny;
@@ -224,5 +213,3 @@ public class GeofenceUsage
     }
 }
 ```
-<sup>[snippet source](/src/Snippets/GeofenceUsage.cs#L1-L30)</sup>
-<!-- endsnippet -->

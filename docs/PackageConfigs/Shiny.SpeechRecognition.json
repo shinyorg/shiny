@@ -1,13 +1,10 @@
 ﻿{
-    "name": "Shiny.Core",
-    "description": "Core Services for Shiny",
-    "order":  1,
-
+    "name": "Shiny.SpeechRecognition",
     "services": [
         {
-            "name": "Shiny.Jobs.IJobManager",
-            "static": "ShinyJobs",
-            "startup": "services.RegisterJob",
+            "name": "Shiny.SpeechRecognition.ISpeechRecognizer",
+            "startup": "services.UseSpeechRecognition",
+            "static": "ShinySpeechRecognition",
             "platforms": [
                 {
                     "platform": "iOS"

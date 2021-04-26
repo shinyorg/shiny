@@ -1,0 +1,25 @@
+﻿{
+    "name": "Shiny.Push.AzureNotificationHubs",
+    "category": "Integrations",
+    "services": [
+        {
+            "name": "Shiny.Push.IPushManager",
+            "startup": "services.UsePushAzureNotificationHubs",
+            "bgDelegate": "Shiny.Push.IPushDelegate",
+            "bgDelegateRequired": true,
+            "platforms": [
+                {
+                    "platform": "iOS",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "Android",
+                    "requiresConfig": true
+                },
+                {
+                    "platform": "UWP"
+                }
+            ]
+        }
+    ]
+}
