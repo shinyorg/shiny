@@ -1,4 +1,4 @@
-Title: Advanced Dependency Injection
+Title: Dependency Injection
 Order: 99
 ---
 
@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 public class YourModule : ShinyModule
 {
-    public override void Register(IServiceCollection services)
+    public override void Register(IServiceCollection services, IPlatform platform)
     {
 
     }
@@ -22,6 +22,8 @@ public class YourModule : ShinyModule
 ## Startup Tasks
 
 Startup tasks are great for wiring up events and spinning up infrastructure.  These fire immediately after the container is built.  However, don't do any sort of blocking operation in them as this will cause your app to pause starting up causing a poor user experience.
+
+**CAUTION:** You can do async processes here, but your app could start before the process finishes, so if you are pre-loading data, it may not be ready for use before your app starts
 
 ```cs
 using Shiny;

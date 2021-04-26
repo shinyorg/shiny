@@ -1,28 +1,76 @@
 ﻿Title: Key/Value Stores
 ---
 
-Settings is installed into the Shiny container automatically.  Settings are a fairly essential service of any framework.  You can resolve this using dependency injection or using the Shiny.ShinyHost.Resolve.  The interface to use is Shiny.Settings.ISettings
+Shiny has several ways of storing key/values such as
+* OS Settings/Preferences
+* Secure Storage (NOTE: not currently support on UWP)
+* In Memory (per session)
+* File
+
+## Key/Value
+
+Shiny automatically registers the following stores
+To access the various key/values, simply use Shiny.Stores.IKeyValueStoreFactory.
 
 
-## To use, simply call:
-
-```csharp
-var int1 = settings.Get<int>("Key");
-var int2 = settings.Get<int?>("Key");
-
-settings.Set("Key", AnyObject); // your object is serialized under the hood
-var obj = settings.Get<AnyObject>("Key");
-```
 
 ## Object Binding
 
+But what makes key/value storage particularily unique in Shiny is the object binding.  You can bind
+any object that support INotifyPropertyChanged & has public get/set values
+
 ```csharp
-var myInpcObj = settings.Bind<MyInpcObject>(); // Your object must implement INotifyPropertyChanged
-myInpcObj.SomeProperty = "Hi"; // everything is automatically synchronized to settings right here
+public class MySettings : Shiny.NotifyPropertyChanged 
+{
+    string myProperty?;
+    public string? MyProperty 
+    {
+        get => this.myProperty;
+        set => this.Set(ref this.myProperty, value);
+    }
+}
+```
 
-//From your viewmodel
-settings.Bind(this);
+Now, to start using this is simple - first add this to your shiny startup
 
-// make sure to unbind when your model is done
-settings.UnBind(obj);
+```csharp
+services.AddSingleton<MySettings>();
+```
+
+Now to use it
+
+```chsarp
+// inject or 
+var mySettings = ShinyHost.Resolve<MySettings>();
+
+mySettings.MyProperty = null; // to remove it 
+
+mySettings.MyProperty = "hello";
+```
+
+And to make things EVEN COOLER.  Object bindings like this also support different key/value stores by
+adding the attribute [Shiny.ObjectBinder("alias of store")] on top of your class like so:
+
+```csharp
+[Shiny.ObjectBinderAttribute("secure")]
+public class MySettings ...
+```
+
+There are 4 values currently supported by Shiny object binder - settings (default), secure, memory, and file
+
+
+## Manual Binding
+
+There may be cases where you want to manual restore an object, maybe you want to save viewmodel state in something like 
+
+**EXAMPLE**
+```csharp
+// within your viewmodel
+var binder = ShinyHost.Resolve<Shiny.Stores.IObjectBinder>();
+
+// when starting or navigating to your viewmodel
+binder.Bind(this);
+
+// NOTE: most viewmodels are transient (as they should be), so be sure to unbind the instance upon your viewmodel being navigated away from
+binder.UnBind(obj);
 ```

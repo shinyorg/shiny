@@ -99,7 +99,7 @@ namespace Docs.Shortcodes
         static string DefaultPlatformVersion(Platform platform) => platform switch
         {
             Platform.Android => "8.0",
-            Platform.iOS => "10",
+            Platform.iOS => "9",
             Platform.Uwp => "17763"
         };
     }
