@@ -29,7 +29,7 @@ jobs:
     - name: Publish-Documentation
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}
       run: |
         dotnet restore ./docs/docs.csproj
         dotnet run -p ./docs/docs.csproj -- deploy
