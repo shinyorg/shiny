@@ -48,7 +48,6 @@ namespace Shiny
         }
 
 
-        //public override void OnTaskRemoved(Intent? rootIntent) => this.Stop();
         public override IBinder? OnBind(Intent? intent) => null;
         public static string NotificationChannelId { get; set; } = "Background";
 
@@ -67,8 +66,6 @@ namespace Shiny
                     .WhenAnyProperty()
                     .Subscribe(_ => this.SetNotification())
                     .DisposedBy(this.DestroyWith);
-
-                //this.SetNotification();
             }
             this.OnStart(intent);
         }
