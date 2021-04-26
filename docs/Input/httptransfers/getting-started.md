@@ -16,3 +16,36 @@ As developers, we often take internet connectivity and speed for granted.  Mobil
   * Estimated Completion Time
 
 <?! PackageInfo "Shiny.Net.Http" /?>
+
+## Setup
+
+1. Create a delegate in your shared code
+
+```csharp
+using System;
+using System.Threading.Tasks;
+using Shiny;
+using Shiny.Net.Http;
+
+namespace YourNamespace
+{
+    public class MyHttpTransferDelegate : IHttpTransferDelegate
+    {
+
+        public Task OnError(HttpTransfer transfer, Exception ex) 
+        {
+        }
+
+        public async Task OnCompleted(HttpTransfer transfer)
+        {
+        }
+    }
+}
+
+```
+
+2. Add the following to your [Shiny Startup](xref:startup)
+
+<?! Startup ?>
+services.UseHttpTransfers<YourNamespace.MyHttpTransferDelegate>();
+<?!/ Startup ?>

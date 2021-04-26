@@ -89,7 +89,7 @@ namespace Docs.Shortcodes
 
             if (platform.RequiresConfig)
             {
-                value += $" ([OS Configuration Required](xref: {platform.Platform}))";
+                value += $" ([OS Configuration Required](xref:{platform.Platform}))";
             }
             sb.AppendLine($"| - *{platform.Platform}*|{value}|");
         }

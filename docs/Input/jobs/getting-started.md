@@ -2,7 +2,7 @@ Title: Getting Started
 Order: 1
 ---
 
-## FEATURES
+## Features
 * Cross Platform Background Jobs Framework
 * Run adhoc jobs in the background (mainly for use on iOS)
 * Define jobs with runtime parameters to run at regular intervals

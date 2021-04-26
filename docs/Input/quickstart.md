@@ -28,7 +28,7 @@ As another alternative, you can have Shiny generate a startup file automatically
 )]
 ```
 
-3. iOS: Make sure your AppDelegate is marked as a partial class.  If you implement any of the methods in it, consider removing them.  If you have any custom code in them, take a look at [boilerplate](xref: boilerplate) for more custom scenarios
+3. iOS: Make sure your AppDelegate is marked as a partial class.  If you implement any of the methods in it, consider removing them.  If you have any custom code in them, take a look at [boilerplate](xref:boilerplate) for more custom scenarios
 3. Android: Consider deleting any Android application classes you have and make sure all of your activities are marked partial.
 
 Out of the box, Shiny automatically adds all of the services for Jobs, file system, power monitoring, and key/value storage (as well as several other services need by the Shiny internals)
