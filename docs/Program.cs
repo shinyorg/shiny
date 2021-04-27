@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Docs.Shortcodes;
+using Devlead.Statiq.Code;
+using Devlead.Statiq.Tabs;
 using Statiq.App;
 using Statiq.Common;
 using Statiq.Web;
+using Docs.Shortcodes;
 
 
 namespace Docs
@@ -21,20 +23,13 @@ namespace Docs
                     "shinyorg.github.io",
                     Config.FromSetting<string>("GITHUB_TOKEN")
                 )
+                .AddTabGroupShortCode()
+                .AddIncludeCodeShortCode()
                 .AddShortcode<StartupShortcode>("Startup")
                 .AddShortcode<PackageInfoShortcode>("PackageInfo")
                 .AddShortcode<NugetShieldShortcode>("NugetShield")
                 .AddShortcode<NugetPageShortcode>("NugetPage")
                 .AddShortcode<StaticClassesShortcode>("StaticClasses")
                 .RunAsync();
-
-        //static Config<string> ConfigureEditLink() => Config.FromDocument((doc, ctx) =>
-        //{
-        //    string.Format("https://github.com/{0}/{1}/edit/{2}/docs/input/{3}",
-        //        ctx.GetString(Constants.Site.Owner),
-        //        ctx.GetString(Constants.Site.Repository),
-        //        ctx.GetString(Constants.Site.Branch),
-        //        doc.Source.GetRelativeInputPath());
-        //});
     }
 }
