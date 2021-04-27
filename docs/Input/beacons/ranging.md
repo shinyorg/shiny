@@ -5,6 +5,10 @@ Ranging is a foreground only operation.  You can scan for "all" beacons with a p
 
 <?! PackageInfo "Shiny.Beacons" "Shiny.Beacons.IBeaconRangingManager" /?>
 
+<?! Startup ?>
+services.UseBeaconRanging();
+<?!/ Startup ?>
+
 ```cs
 using System;
 using Shiny;

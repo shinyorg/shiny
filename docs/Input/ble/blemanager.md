@@ -1,12 +1,11 @@
 Title: BLE Manager
 Order: 2
 ---
-# Adapter
+# BleManager
 
 The adapter is where everything begins and ends.  Unlike the platform implementations of the adapter scan, the BLE plugin Scan()
 method will scan continuously (or restart the scan when the cycle completes) until you dispose of the Scan() token.
 
-**NOTE:** The samples refer to **BleManager** which is resolved from dependency injection or ShinyHost.Resolve<Shiny.BluetoothLE.IBleManager>()
 
 ## General
 
@@ -46,13 +45,27 @@ CrossBleAdapter.Current.Scan(
 })
 ```
 
-**Open Device Settings**
+## General Scan
 
-_Currently support by iOS8, iOS9, and Android only_
 ```csharp
-if (IBleManager.CanOpenSettings)
-    CrossBleAdapter.Current.OpenSettings();
+var scan = CentralManager.Scan().Subscribe(scanResult => {});
+
+// to stop scan 
+scan.Dispose();
+
 ```
+
+## Specific Scans
+
+_Find a named peripheral_
+
+```csharp
+// this will return a single result and complete - you can await it if you want
+var peripheral = CentralManager.ScanForPeripheral("YourDevice");
+
+var peripheral = CentralManager.ScanForPeripheral(YourDevice);
+```
+
 
 **Change Adapter State (Power on/off)**
 
@@ -60,13 +73,6 @@ _Supported by Android only_
 ```csharp
 if (CrossBleAdapter.Current.CanChangeAdapterState)
     CrossBleAdapter.Current.SetAdapterState(true); // or false to disable
-```
-
-**Listen to scans for decoupled components**
-
-_With the use of observables everywhere, the option to hook up to the scan result events were taken away.  There are good cases to have listening options without actually starting a scan.  This is that option!__
-```csharp
-BleAdapter.Current.ScanListen().Subscribe(scanResult => {});
 ```
 
 **Get Connected Devices**
@@ -91,17 +97,4 @@ CrossBleAdapter.Current.ScanInterval(TimeSpan).Subscribe(scanResult => {});
 ```csharp
 // returns true if successful
 CrossBleAdapter.Current.ToggleAdapterState();
-```
-
-## Open Settings
-
-```csharp
-CrossBleAdapter.Current.OpenSettings();
-```
-
-## Get Known Device
-
-_Allows you to get a known device by the device ID (GUID/UUID).  Note that this ID will be different platform to platform_
-```csharp
-var device = CrossBleAdapter.Current.GetKnownDevice(Guid);
 ```

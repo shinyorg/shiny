@@ -1,7 +1,31 @@
-Title: Characteristics
-Order: 4 
+Title: Services, Characteristics, & Descriptors
+Order: 3
 ---
-# Characteristics
+
+* [Services](#services)
+* [Characteristics](#characteristics)
+* [Descriptors](#descriptors)
+
+## Services
+
+Once connected to a device, you can initiate service discovery (it is pretty much all you can do against services).  It is important
+not to hold a reference to a service in your code as it will be invalidated with new connections.  You can called for WhenServicesDiscovered() 
+with or without a connection.  When the device becomes connected, it will initiate the discovery process.  Note that you can call WhenServicesDiscovered() repeatedly
+and it will simply replay what has been discovered since the connection occurred.
+
+**Discover services on a device**
+
+```csharp
+Device.GetServices().Subscribe(services => 
+{
+});
+```
+
+**Skip the Services**
+
+In a lot of cases, you won't care about the service discovery portion.  You can use the extension 
+device.WhenAnyCharacteristicDiscovered() to bypass and just discover all characteristics across all services.
+
 
 Characteristics are the heart and soul of the BLE GATT connections.  You can read, write, and monitor the values (depending on permissions) with this plugin.
 
@@ -97,7 +121,6 @@ characteristic.BlobWrite(bytes).Subscribe(x => {});
 // TODO
 ```
 
-## Extensions
 
 ```csharp
 
@@ -114,4 +137,29 @@ device.WhenAnyCharacteristicDiscovered().Subscribe(characteristic => {});
 
 // will continue to read in a loop until ending bytes (argument) is detected
 device.ReadUntil(new byte[] { 0x0 }).Subscribe(result => { result.Data... });
+```
+
+
+## Descriptors
+
+Descriptors have minimal functionality.  You can read & write their values. 
+
+_It is important (like services and characteristics) that you do not maintain an instance to descriptors across connections_
+
+**Read/Write to a Descriptor**
+```csharp
+// once you have your characteristic instance from the characteristic
+await descriptor.Write(bytes);
+
+await descriptor.Read();
+```
+
+**Monitor Descriptor Read/Writes**
+```csharp
+
+descriptor.WhenRead().Subscribe(x => {});
+
+
+descriptor.WhenWritten().Subscribe(x => {});
+
 ```

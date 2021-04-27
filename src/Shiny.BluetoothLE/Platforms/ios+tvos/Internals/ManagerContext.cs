@@ -113,7 +113,6 @@ namespace Shiny.BluetoothLE.Internals
                 new AdvertisementData(advertisementData)
             );
             this.ScanResultReceived.OnNext(result);
-            this.Services.RunDelegates<IBleDelegate>(x => x.OnScanResult(result));
         }
 
 

@@ -13,19 +13,24 @@ Monitoring is limited to a maximum of 20 regions on iOS.  On Android & UWP, ther
     3. Minor
 * You must always have an initial filter of a UUID for ranging or monitoring
 * iOS limits the amount of beacons you are allowed to monitor to 20.  This value is also shared with your geofences, so you need to think about your strategy when using beacons
+* Monitoring beacons does not allow you to see which actual beacon was detected, only the region filter is returned to your background scan.  This is done by the OS to protect user privacy.
 
-
+## Setup
+1. Create a delegate to receive background events
 ```cs
 using System.Threading.Tasks;
 using Shiny.Beacons;
 
 
-public class BeaconMonitorDelegate : IBeaconMonitorDelegate
+public class MyBeaconMonitorDelegate : IBeaconMonitorDelegate
 {
     public async Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region)
     {
-        // NOTE: you cannot not see the actual detected beacon here, only the region that was crossed
-        // this is done by the OS to protect privacy of the user
     }
 }
 ```
+
+2. Add the following to your [Shiny Startup](xref:startup)
+<?! Startup ?>
+service.UseBeaconMonitoring<MyBeaconMonitorDelegate>();
+<?!/ Startup ?>
