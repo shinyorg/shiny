@@ -1,8 +1,9 @@
 ﻿<Project>
-	<ItemGroup>
-		<CompilerVisibleProperty Include="OutputType" />
-		<CompilerVisibleProperty Include="TargetFrameworkIdentifier" />
-        <!--<AdditionalFiles Include="Info.plist" />
-        <AdditionalFiles Include="Entitlements.plist" />-->
-	</ItemGroup>
+  <ItemGroup>
+    <CompilerVisibleProperty Include="OutputType" />
+    <CompilerVisibleProperty Include="TargetFrameworkIdentifier" />
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <!--<AdditionalFiles Include="Info.plist" />
+    <AdditionalFiles Include="Entitlements.plist" />-->
+  </ItemGroup>
 </Project>
