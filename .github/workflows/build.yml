@@ -22,6 +22,12 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - script: |
+       dotnet tool install --global boots
+        boots --preview Mono
+        boots --preview Xamarin.iOS
+        boots --preview Xamarin.Android
+
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
     #  with:
