@@ -1,10 +1,9 @@
 name: Publish Documentation
 on:
   push:
-    branches: [ master, main, dev ]
+    branches: [ master, main ]
     paths:
     - "docs/**"
-    - ".github/workflows/**"
 
 jobs:
 
