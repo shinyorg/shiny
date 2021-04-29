@@ -46,8 +46,23 @@ namespace Shiny
         public DirectoryInfo Public { get; }
         public Activity? CurrentActivity => this.callbacks.Activity;
         public IObservable<ActivityChanged> WhenActivityChanged() => this.callbacks.ActivitySubject;
-        [Lifecycle.Event.OnResume] public void OnResume() => this.stateSubj.OnNext(PlatformState.Foreground);
-        [Lifecycle.Event.OnPause] public void OnPause() => this.stateSubj.OnNext(PlatformState.Background);
+
+
+        [Lifecycle.Event.OnResume] public void OnResume()
+        {
+            this.Status = PlatformState.Foreground;
+            this.stateSubj.OnNext(PlatformState.Foreground);
+        }
+
+
+        [Lifecycle.Event.OnPause]
+        public void OnPause()
+        {
+            this.Status = PlatformState.Background;
+            this.stateSubj.OnNext(PlatformState.Background);
+        }
+
+
         public IObservable<PlatformState> WhenStateChanged() => this.stateSubj.OnErrorResumeNext(Observable.Empty<PlatformState>());
         public void Register(IServiceCollection services)
         {
@@ -72,6 +87,8 @@ namespace Shiny
         public IObservable<Intent> WhenIntentReceived() => this.intentSubject;
         public T GetSystemService<T>(string key) where T : Java.Lang.Object
             => (T)this.AppContext.GetSystemService(key);
+
+        public PlatformState Status { get; private set; } = PlatformState.Foreground;
 
 
         public TValue GetSystemServiceValue<TValue, TSysType>(string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object

@@ -14,6 +14,7 @@ namespace Shiny
 
     public interface IPlatform
     {
+        PlatformState Status { get; }
         DirectoryInfo AppData { get; }
         DirectoryInfo Cache { get; }
         DirectoryInfo Public { get; }

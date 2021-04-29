@@ -37,6 +37,12 @@ namespace Shiny
         public string Manufacturer { get; } = "Apple";
         public string Model { get; } = "";
 
+        public PlatformState Status => UIApplication.SharedApplication.ApplicationState switch
+        {
+            UIApplicationState.Active => PlatformState.Foreground,
+            _ => PlatformState.Background
+        };
+
 
         public void Register(IServiceCollection services)
         {

@@ -47,31 +47,34 @@ namespace Shiny
         public string OperatingSystemVersion => "";
         public string MachineName => "";
 
+        public PlatformState Status { get; private set; } = PlatformState.Foreground;
 
         //https://docs.microsoft.com/en-us/uwp/api/Windows.UI.Xaml.Application?view=winrt-19041
-        public IObservable<PlatformState> WhenStateChanged() => Observable.Create<PlatformState>(ob =>
-        {
-            var fgHandler = new LeavingBackgroundEventHandler((sender, target) => ob.OnNext(PlatformState.Foreground));
-            var bgHandler = new EnteredBackgroundEventHandler((sender, target) => ob.OnNext(PlatformState.Background));
+        public IObservable<PlatformState> WhenStateChanged() => Observable
+            .Create<PlatformState>(ob =>
+            {
+                var fgHandler = new LeavingBackgroundEventHandler((sender, target) => ob.OnNext(PlatformState.Foreground));
+                var bgHandler = new EnteredBackgroundEventHandler((sender, target) => ob.OnNext(PlatformState.Background));
 
-            if (this.app == null)
-            {
-                ob.OnNext(PlatformState.Background);
-            }
-            else
-            {
-                this.app.LeavingBackground += fgHandler;
-                this.app.EnteredBackground += bgHandler;
-            }
-            return () =>
-            {
-                if (this.app != null)
+                if (this.app == null)
                 {
-                    this.app.LeavingBackground -= fgHandler;
-                    this.app.EnteredBackground -= bgHandler;
+                    ob.OnNext(PlatformState.Background);
                 }
-            };
-        });
+                else
+                {
+                    this.app.LeavingBackground += fgHandler;
+                    this.app.EnteredBackground += bgHandler;
+                }
+                return () =>
+                {
+                    if (this.app != null)
+                    {
+                        this.app.LeavingBackground -= fgHandler;
+                        this.app.EnteredBackground -= bgHandler;
+                    }
+                };
+            })
+            .Do(x => this.Status = x);
 
 
         public void Register(IServiceCollection services) => services.RegisterCommonServices();
