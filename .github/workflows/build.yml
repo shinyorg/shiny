@@ -23,11 +23,12 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - script: |
+    - name: Boots Update
+      run: |
        dotnet tool install --global boots
-        boots --preview Mono
-        boots --preview Xamarin.iOS
-        boots --preview Xamarin.Android
+       boots --preview Mono
+       boots --preview Xamarin.iOS
+       boots --preview Xamarin.Android
 
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
@@ -59,6 +60,7 @@ jobs:
       with:
         name: nuget-artifacts
         path: '**/*.nupkg'
+
     - name: Publish to NuGet
       if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
       run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGETAPIKEY}} --skip-duplicate
