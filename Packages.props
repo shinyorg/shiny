@@ -74,7 +74,7 @@
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
 
         <!--tests-->
-        <PackageReference Update="Acr.UserDialogs" Version="7.1.0.475" />
+        <PackageReference Update="Acr.UserDialogs" Version="7.1.0.483" />
         <PackageReference Update="DryIoc.Microsoft.DependencyInjection" Version="5.1.0" />
         <PackageReference Update="coverlet.collector" Version="3.0.3" />
         <PackageReference Update="FluentAssertions" Version="5.10.3" />
