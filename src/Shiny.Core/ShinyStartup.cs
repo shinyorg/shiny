@@ -9,7 +9,7 @@ namespace Shiny
     {
         void ConfigureLogging(ILoggingBuilder builder, IPlatform platform);
         void ConfigureServices(IServiceCollection services, IPlatform platform);
-        IServiceProvider CreateServiceProvider(IServiceCollection services);
+        IServiceProvider? CreateServiceProvider(IServiceCollection services);
     }
 
 
@@ -34,6 +34,6 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public virtual IServiceProvider CreateServiceProvider(IServiceCollection services) => null;
+        public virtual IServiceProvider? CreateServiceProvider(IServiceCollection services) => null;
     }
 }
