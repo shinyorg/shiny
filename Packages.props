@@ -6,7 +6,7 @@
         <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.9.0" />
 
         <PackageReference Update="sqlite-net-pcl" Version="1.7.335" />
-        <PackageReference Update="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />
 
         <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
@@ -33,8 +33,8 @@
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="2.2.6" />
 
         <PackageReference Update="Xamarin.AndroidX.Core" Version="1.3.2.3" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.3.0.1" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.3.0.1" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.3.1" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.3.1.1" />
         <PackageReference Update="Xamarin.AndroidX.Arch.Core.Runtime" Version="2.1.0.8" />
         <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.2.0.7" />
         <PackageReference Update="Xamarin.AndroidX.Concurrent.Futures" Version="1.1.0.2" />
@@ -56,8 +56,8 @@
         -->
 
         <!--docs-->
-        <PackageReference Update="Statiq.Web" Version="1.0.0-beta.26" />
-        <PackageReference Update="Devlead.Statiq" Version="0.7.0" />
+        <PackageReference Update="Statiq.Web" Version="1.0.0-beta.27" />
+        <PackageReference Update="Devlead.Statiq" Version="0.8.0" />
 
         <!--Samples-->
         <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
@@ -74,12 +74,12 @@
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
 
         <!--tests-->
-        <PackageReference Update="Acr.UserDialogs" Version="7.1.0.475" />
+        <PackageReference Update="Acr.UserDialogs" Version="7.1.0.483" />
         <PackageReference Update="DryIoc.Microsoft.DependencyInjection" Version="5.1.0" />
         <PackageReference Update="coverlet.collector" Version="3.0.3" />
         <PackageReference Update="FluentAssertions" Version="5.10.3" />
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.9.1" />
-        <PackageReference Update="FirebaseAdmin" Version="2.0.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+        <PackageReference Update="FirebaseAdmin" Version="2.1.0" />
         <PackageReference Update="Moq" Version="4.16.1" />
         <PackageReference Update="xunit" Version="2.4.1" />
         <PackageReference Update="xunit.runner.devices" Version="2.5.25" />
