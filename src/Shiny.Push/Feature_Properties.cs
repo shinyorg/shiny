@@ -20,10 +20,6 @@ namespace Shiny.Push
         }
 
 
-        public static string[]? TryGetSupportedProperties(this IPushManager push)
-            => (push as IPushPropertySupport)?.SupportedProperties;
-
-
         public static bool IsPropertiesSupported(this IPushManager push)
             => push is IPushPropertySupport;
 
