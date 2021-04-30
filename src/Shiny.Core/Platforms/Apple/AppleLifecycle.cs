@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
@@ -52,7 +53,9 @@ namespace Shiny
 
         internal void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
         {
-            foreach (var handler in this.handleEvents)
+            var events = this.handleEvents.ToList();
+
+            foreach (var handler in events)
             {
                 try
                 {
@@ -79,7 +82,8 @@ namespace Shiny
 
         internal void RegisteredForRemoteNotifications(NSData deviceToken)
         {
-            foreach (var reg in this.remoteReg)
+            var events = this.remoteReg.ToList();
+            foreach (var reg in events)
             {
                 try
                 {
@@ -95,7 +99,8 @@ namespace Shiny
 
         internal void FailedToRegisterForRemoteNotifications(NSError error)
         {
-            foreach (var reg in this.remoteReg)
+            var events = this.remoteReg.ToList();
+            foreach (var reg in events)
             {
                 try
                 {
@@ -113,13 +118,15 @@ namespace Shiny
         public IDisposable RegisterToReceiveRemoteNotifications(Func<NSDictionary, Task> task)
         {
             this.receiveReg.Add(task);
-            return Disposable.Create(() => this.receiveReg.Add(task));
+            return Disposable.Create(() => this.receiveReg.Remove(task));
         }
 
 
         internal async void DidReceiveRemoteNotification(NSDictionary dictionary, Action<UIBackgroundFetchResult>? completionHandler)
         {
-            foreach (var reg in this.receiveReg)
+            var events = this.receiveReg.ToList();
+
+            foreach (var reg in events)
             {
                 try
                 {
