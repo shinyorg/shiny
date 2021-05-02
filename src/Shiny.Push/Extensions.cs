@@ -15,12 +15,5 @@ namespace Shiny.Push
             if (state.Status != AccessState.Available)
                 throw new PermissionException("Push registration fail", state.Status);
         }
-
-
-      
-
-
-        //public static string[] TryGetSupportedProperties(this IPushManager push) 
-        //    => (PushManager as IPushPropertySupport)?.Get
     }
 }

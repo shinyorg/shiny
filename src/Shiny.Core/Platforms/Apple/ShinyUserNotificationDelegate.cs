@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Logging;
-
 using UserNotifications;
 
 
@@ -33,7 +32,9 @@ namespace Shiny
 
         public override async void DidReceiveNotificationResponse(UNUserNotificationCenter center, UNNotificationResponse response, Action completionHandler)
         {
-            foreach (var receive in this.receiveNotifications)
+            var events = this.receiveNotifications.ToList();
+
+            foreach (var receive in events)
             {
                 try
                 {
@@ -50,7 +51,9 @@ namespace Shiny
 
         public override async void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
         {
-            foreach (var present in this.presentNotifications)
+            var events = this.presentNotifications.ToList();
+
+            foreach (var present in events)
             {
                 try
                 {
