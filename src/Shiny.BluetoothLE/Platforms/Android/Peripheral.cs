@@ -142,21 +142,18 @@ namespace Shiny.BluetoothLE
             else
             {
                 PairingRequestPin = pin;
-                disp.Add(this.Context
+                this.Context
                     .ManagerContext
                     .ListenForMe(ManagerContext.BlePairingFailed, this)
                     .Subscribe(_ => ob.Respond(false))
-                );
-                disp.Add(this.Context
+                    .DisposedBy(disp);
+
+                this.Context
                     .ManagerContext
                     .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
-                    .Where(x => this.Context.NativeDevice.BondState != Bond.Bonding)
-                    .Subscribe(x =>
-                    {
-                        var result = this.PairingStatus == PairingState.Paired;
-                        ob.Respond(result);
-                    })
-                );
+                    .Where(x => this.Context.NativeDevice.BondState == Bond.Bonded)
+                    .Subscribe(_ => ob.Respond(true))
+                    .DisposedBy(disp);
 
                 if (!this.Context.NativeDevice.CreateBond())
                     ob.Respond(false);
