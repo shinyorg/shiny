@@ -1,7 +1,10 @@
 ﻿using System;
+using System.IO;
+
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
+using Cake.Core.IO;
 using Cake.Frosting;
 using Cake.Git;
 
@@ -13,7 +16,13 @@ namespace ShinyBuild
         public BuildContext(ICakeContext context) : base(context)
         {
             this.MsBuildConfiguration = context.Argument("configuration", "Release");
-            //context.Environment.WorkingDirectory
+
+            // walk backwards until git directory found - that's root
+            var dir = new DirectoryPath(".");
+            while (!context.GitIsValidRepository(dir))
+                dir = new DirectoryPath(Directory.GetParent(dir.FullPath).FullName);
+
+            context.Environment.WorkingDirectory = dir;
             this.Branch = context.GitBranchCurrent(".");
         }
 
