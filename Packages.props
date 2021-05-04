@@ -57,7 +57,7 @@
 
         <!--docs-->
         <PackageReference Update="Statiq.Web" Version="1.0.0-beta.27" />
-        <PackageReference Update="Devlead.Statiq" Version="0.8.0" />
+        <PackageReference Update="Devlead.Statiq" Version="0.9.0" />
 
         <!--build-->
         <PackageReference Update="Cake.Frosting" Version="1.1.0" />
@@ -66,6 +66,7 @@
         <PackageReference Update="Cake.AndroidAppManifest" Version="1.1.2" />
         <PackageReference Update="Cake.Plist" Version="0.7.0" />
         <PackageReference Update="Cake.Git" Version="1.0.1" />
+        <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0096" />
 
         <!--Samples-->
         <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="5.0.0" />

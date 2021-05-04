@@ -2,7 +2,6 @@
 using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.DotNetCore.Run;
 using Cake.Frosting;
-using Cake.Git;
 
 
 namespace ShinyBuild.Tasks
@@ -10,18 +9,28 @@ namespace ShinyBuild.Tasks
     [TaskName("Documentation")]
     public sealed class DocTask : FrostingTask<BuildContext>
     {
+        const string Project = "../docs/docs.csproj";
+        static readonly DotNetCoreRunSettings Settings = new DotNetCoreRunSettings
+        {
+            Framework = "net5.0",
+            Configuration = "Release"
+        };
+
+
         public override void Run(BuildContext context)
         {
-            var branch = context.GitBranchCurrent("../");
-            if (branch.FriendlyName != "main" || !context.IsRunningInCI)
-                return;
+            if (!context.IsRunningInCI)
+                RunIt(context, null);
 
-            context.DotNetCoreRestore("../docs/docs.csproj");
-            context.DotNetCoreRun("../docs/docs.csproj", "--deploy", new DotNetCoreRunSettings
-            {
-                Framework = "net5.0",
-                Configuration = "Release"
-            });
+            else if (context.IsMainBranch)
+                RunIt(context, "--deploy");
+        }
+
+
+        static void RunIt(BuildContext context, string? args)
+        {
+            context.DotNetCoreRestore(Project);
+            context.DotNetCoreRun(Project, args, Settings);
         }
     }
 }

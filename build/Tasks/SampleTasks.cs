@@ -81,6 +81,9 @@ namespace ShinyBuild.Tasks
     {
         public override void Run(BuildContext context)
         {
+            if (!context.IsMainBranch || !context.IsRunningInCI)
+                return;
+
             // TODO: deploy Android, iOS, & UWP
             context.AppCenterDistributeGroupsPublish(new AppCenterDistributeGroupsPublishSettings
             {

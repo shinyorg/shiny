@@ -14,6 +14,9 @@ namespace ShinyBuild.Tasks
 
         public override async Task RunAsync(BuildContext context)
         {
+            if (!context.IsRunningInCI)
+                return;
+
             await context.Boots(Product.Mono, Channel);
             await context.Boots(Product.XamarinAndroid, Channel);
             await context.Boots(Product.XamariniOS, Channel);
