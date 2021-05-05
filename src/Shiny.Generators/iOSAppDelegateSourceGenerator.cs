@@ -190,18 +190,6 @@ return result;"
 
         void TryAppendThirdParty(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
         {
-
-            var xfFormsDelegate = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate");
-            if (xfFormsDelegate != null && appDelegate.Inherits(xfFormsDelegate))
-            {
-                // do XF stuff
-                builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
-                if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
-                    builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init();");
-
-                builder.AppendLineInvariant($"this.LoadApplication(new {this.ShinyConfig.XamarinFormsAppTypeName}());");
-            }
-
             if (this.ShinyConfig.ExcludeThirdParty)
                 return;
 
@@ -214,6 +202,19 @@ return result;"
                 builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
             else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
                 builder.AppendLineInvariant("Rg.Plugins.Popup.Popup.Init();");
+
+            if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
+                builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init();");
+
+            var xfFormsDelegate = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate");
+            if (!String.IsNullOrWhiteSpace(this.ShinyConfig.XamarinFormsAppTypeName) &&
+                xfFormsDelegate != null &&
+                appDelegate.Inherits(xfFormsDelegate))
+            {
+                // do XF stuff
+                builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+                builder.AppendLineInvariant($"this.LoadApplication(new {this.ShinyConfig.XamarinFormsAppTypeName}());");
+            }
         }
     }
 }

@@ -100,6 +100,7 @@ namespace Shiny.Generators
                 {
                     builder.AppendLineInvariant("this.ShinyOnCreate();");
                     builder.AppendLineInvariant("this.OnBeforeCreate(savedInstanceState);");
+                    this.TryAppendOnCreateThirdParty(activity, builder);
 
                     if (String.IsNullOrWhiteSpace(this.values.XamarinFormsAppTypeName))
                     {
@@ -122,7 +123,6 @@ namespace Shiny.Generators
                             builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
                         }
                     }
-                    this.TryAppendOnCreateThirdParty(activity, builder);
                     builder.AppendLineInvariant("this.OnAfterCreate(savedInstanceState);");
                 }
             }
