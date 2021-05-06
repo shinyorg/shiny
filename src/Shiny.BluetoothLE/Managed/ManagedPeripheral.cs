@@ -217,7 +217,7 @@ namespace Shiny.BluetoothLE.Managed
                     .Subscribe(x => this.notifySub.OnNext(x))
                     .DisposedBy(this.notifyDispose!)
                 )
-                .Select(y => y.EnableNotifications(true, x.IsNotificationsEnabled))
+                .Select(y => y.EnableNotifications(true, x.UseIndicationIfAvailable))
                 .Switch()
             )
             .Switch()
