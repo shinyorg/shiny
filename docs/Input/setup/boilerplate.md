@@ -34,8 +34,7 @@ This will auto-generate several things for you
     b. any custom services will be auto-registered
     c. all delegates will be registered with their corresponding library (ie. services.UseGps<MyGpsDelegate>() )
 4. Xamarin Forms app can be hooked and Init called for you automatically
-5. If you use Xamarin Forms dependency service, Shiny will auto-inject itself and all of the services you register with Shiny into it.  (ie. DependencyService.Get<IJobManager>())
-6. Any classes marked with [Shiny.ShinyServiceAttribute] will be added and available to the container under all interfaces it implements
+5. Any classes marked with [Shiny.ShinyServiceAttribute] will be added and available to the container under all interfaces it implements
 
 
 ## Shiny also auto-adds popular 3rd party initialization for 
@@ -46,6 +45,7 @@ This will auto-generate several things for you
 * [AIForms Settings View](https://github.com/muak/AiForms.SettingsView)
 * [XF Material](https://github.com/Baseflow/XF-Material-Library)
 * [RG Popups](https://github.com/rotorgames/Rg.Plugins.Popup)
+* [Microsoft Identity Client (MSAL)](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet)
 
 ## Special Considerations
 1. All of your Android activities must be marked as a "partial class"

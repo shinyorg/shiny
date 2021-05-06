@@ -8,17 +8,11 @@
             "name": "Shiny.Jobs.IJobManager",
             "static": "ShinyJobs",
             "startup": "services.RegisterJob",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "usesJobs": true
+            },
+            "android": {},
+            "uwp": {}
         }
     ]
 }

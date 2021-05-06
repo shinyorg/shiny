@@ -11,7 +11,9 @@
             "ios": {
                 "UsesBgTransfers": true
             },
-            "android": {},
+            "android": {
+
+            },
             "uwp": {}
         }
     ]

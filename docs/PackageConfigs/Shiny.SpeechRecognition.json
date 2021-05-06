@@ -6,7 +6,10 @@
             "startup": "services.UseSpeechRecognition",
             "static": "ShinySpeechRecognition",
             "ios": {
-                "infoPlistValues": [ "NSSpeechRecognitionUsageDescription" ]
+                "infoPlistValues": [
+                    "NSSpeechRecognitionUsageDescription",
+                    "NSMicrophoneUsageDescription"
+                ]
             },
             "android": {
                 "manifestUsesPermissions": [] // "microphone"

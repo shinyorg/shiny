@@ -5,17 +5,8 @@
             "name": "Shiny.BluetoothLE.IBleHostingManager",
             "startup": "services.UseBleHosting",
             "static": "ShinyBleHosting",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {},
+            "android": {}
         }
     ]
 }

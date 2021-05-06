@@ -1,148 +1,83 @@
 ﻿{
     "name": "Shiny.Sensors",
-    "description": "Reactive Based Snesors",
+
     "services": [
         {
             "name": "Shiny.Sensors.IAccelerometer",
+            "description": "Accelerometer",
             "static": "ShinyAccelerometer",
             "startup": "services.UseAccelerometer",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {},
+            "android": {},
+            "uwp": {}
         },
         {
             "name": "Shiny.Sensors.IAmbientLight",
             "static": "ShinyAmbientLight",
             "startup": "services.UseAmbientLight",
-            "platforms": [
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "android": {},
+            "uwp": {}
         },
         {
             "name": "Shiny.Sensors.IBarometer",
             "static": "ShinyBarometer",
             "startup": "services.UseBarometer",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {},
+            "android": {},
+            "uwp": {}
         },
         {
             "name": "Shiny.Sensors.ICompass",
             "static": "ShinyCompass",
             "startup": "services.UseCompass",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {},
+            "android": {},
+            "uwp": {}
         },
         {
             "name": "Shiny.Sensors.IGyroscope",
             "static": "ShinyGyroscope",
             "startup": "services.UseGyroscope",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {},
+            "android": {},
+            "uwp": {}
         },
         {
             "name": "Shiny.Sensors.IHumidity",
             "static": "ShinyHumidity",
             "startup": "services.UseHumidity",
-            "platforms": [
-                {
-                    "platform": "Android"
-                }
-            ]
+            "android": {}
         },
         {
             "name": "Shiny.Sensors.IMagnetometer",
             "static": "ShinyMagnetometer",
             "startup": "services.UseMagnetometer",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {},
+            "android": {},
+            "uwp": {}
         },
         {
             "name": "Shiny.Sensors.IPedometer",
             "static": "ShinyPedometer",
             "startup": "services.UsePedometer",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "infoPlistValues": [ "NSMotionUsageDescription" ]
+            },
+            "android": {},
+            "uwp": {}
         },
         {
             "name": "Shiny.Sensors.IProximity",
             "static": "ShinyProximity",
             "startup": "services.UseProximity",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                }
-            ]
+            "ios": {},
+            "android": {}
         },
         {
             "name": "Shiny.Sensors.ITemperature",
             "static": "ShinyTemperature",
             "startup": "services.UseTemperature",
-            "platforms": [
-                {
-                    "platform": "Android"
-                }
-            ]
+            "android": {}
         }
     ]
 }
