@@ -18,8 +18,17 @@
                 "deviceCapabilities": [ "bluetooth" ]
             },
             "android": {
-                "manifestUsesPermissions": [ "" ],
-                "manifestUseFeatures": [ "ble" ]
+                "manifestUsesPermissions": [
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.BLUETOOTH_PRIVILEGED",
+                    "android.permission.BLUETOOTH_ADMIN",
+                    "android.permission.BLUETOOTH"
+                ],
+                "manifestUseFeatures": [
+                    "android.hardware.bluetooth",
+                    "android.hardware.bluetooth_le"
+                ]
             }
         }
     ]

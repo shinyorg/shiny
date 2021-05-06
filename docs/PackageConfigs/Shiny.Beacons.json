@@ -7,17 +7,24 @@
             "name": "Shiny.Beacons.IBeaconRangingManager",
             "static": "ShinyBeaconRangingManager",
             "startup": "services.UseBeaconRanging",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "infoPlistValues": [
+                    "NSLocationWhenInUseUsageDescription"
+                ]
+            },
+            "android": {
+                "manifestUsesPermissions": [
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.BLUETOOTH_PRIVILEGED",
+                    "android.permission.BLUETOOTH_ADMIN",
+                    "android.permission.BLUETOOTH"
+                ],
+                "manifestUseFeatures": [
+                    "android.hardware.bluetooth",
+                    "android.hardware.bluetooth_le"
+                ]
+            }
         },
         {
             "name": "Shiny.Beacons.IBeaconMonitorManager",
@@ -25,18 +32,26 @@
             "startup": "services.UseBeaconMonitoring",
             "bgDelegate": "Shiny.Beacons.IBeaconMonitorDelegate",
             "bgDelegateRequired": true,
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "infoPlistValues": [
+                    "NSLocationAlwaysUsageDescription",
+                    "NSLocationAlwaysAndWhenInUseUsageDescription",
+                    "NSLocationWhenInUseUsageDescription"
+                ]
+            },
+            "android": {
+                "manifestUsesPermissions": [
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.BLUETOOTH_PRIVILEGED",
+                    "android.permission.BLUETOOTH_ADMIN",
+                    "android.permission.BLUETOOTH"
+                ],
+                "manifestUseFeatures": [
+                    "android.hardware.bluetooth",
+                    "android.hardware.bluetooth_le"
+                ]
+            }
         }
     ]
 }
