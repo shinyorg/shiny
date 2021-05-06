@@ -9,6 +9,16 @@ namespace Shiny.Generators
 {
     public static class Extensions
     {
+        public static string GetRootNamespace(this GeneratorExecutionContext context)
+        {
+            string? rootNamespace = null;
+            if (!context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.RootNamespace", out rootNamespace))
+                rootNamespace = context.Compilation.AssemblyName;
+
+            return rootNamespace ?? "ShinyApp";
+        }
+
+
         public static bool HasReference(this GeneratorExecutionContext context, string neededLibrary)
             => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals(neededLibrary));
 

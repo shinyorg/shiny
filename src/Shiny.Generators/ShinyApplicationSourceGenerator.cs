@@ -16,13 +16,11 @@ namespace Shiny.Generators
         protected ShinyApplicationSourceGenerator(string osApplicationTypeName) => this.osApplicationTypeName = osApplicationTypeName;
         protected GeneratorExecutionContext Context { get; private set; }
         public ShinyApplicationValues ShinyConfig { get; set; }
-        protected string RootNamespace { get; private set; }
+
 
         public virtual void Execute(GeneratorExecutionContext context)
         {
             context.TryDebug();
-
-            this.RootNamespace = context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.RootNamespace", out var rootNamespace) ? rootNamespace : context.Compilation.AssemblyName ?? "ShinyApp";
 
             this.Context = context;
             var shinyAppAttributeData = context.GetCurrentAssemblyAttribute(Constants.ShinyApplicationAttributeTypeName);
@@ -38,7 +36,8 @@ namespace Shiny.Generators
 
             if (String.IsNullOrWhiteSpace(this.ShinyConfig.ShinyStartupTypeName))
             {
-                this.GenerateStartup(RootNamespace);
+                var ns = context.GetRootNamespace();
+                this.GenerateStartup(ns);
                 this.ShinyConfig.ShinyStartupTypeName = GENERATED_STARTUP_TYPE_NAME;
             }
 

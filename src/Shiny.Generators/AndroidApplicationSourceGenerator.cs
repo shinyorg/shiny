@@ -23,33 +23,7 @@ namespace Shiny.Generators
             if (osAppTypeSymbols.Any())
                 return;
 
-            // TODO: this is supposed to run when there are NO android apps - should we try to change it or error right here?
-            // TODO: what if not partial?  why did user mark the assembly then?
-            var nameSpace = this.Context.Compilation.AssemblyName;
-
-            //var source = CompilationUnit()
-            //    .AddUsings(
-            //        UsingDirective(IdentifierName("System")),
-            //        UsingDirective(IdentifierName("Shiny"))
-            //    )
-            //    .AddMembers(
-            //        NamespaceDeclaration(IdentifierName(nameSpace)).AddMembers(
-            //            ClassDeclaration(ApplicationName)
-            //                .AddModifiers(
-            //                    Token(SyntaxKind.PublicKeyword),
-            //                    Token(SyntaxKind.PartialKeyword)
-            //                )
-            //                .AddAttributeLists(
-            //                    AttributeList(SingletonSeparatedList(
-            //                        Attribute(IdentifierName("Android.App.ApplicationAttribute"))
-            //                    ))
-            //                )
-            //                .AddMembers(
-            //                    ConstructorDeclaration(
-            //                )
-            //        )
-            //    );
-
+            var nameSpace = this.Context.GetRootNamespace();
             var builder = new IndentedStringBuilder();
             builder.AppendNamespaces("Android.App", "Android.Content", "Android.Runtime");
 
