@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Android.OS;
 using Android.Bluetooth;
 using Exception = System.Exception;
-
+using System.Threading;
+using System.Reactive.Disposables;
+using System.Reactive.Threading.Tasks;
 
 namespace Shiny.BluetoothLE.Internals
 {
@@ -61,38 +63,33 @@ namespace Shiny.BluetoothLE.Internals
         });
 
 
-        readonly object syncLock = new object();
+        readonly SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
         public IObservable<T> Invoke<T>(IObservable<T> observable)
         {
             if (!this.ManagerContext.Configuration.AndroidUseInternalSyncQueue)
                 return observable;
 
-            return observable.Synchronize(this.syncLock);
-            //return Observable.Create<T>(ob =>
-            //{
-            //    var cancel = false;
-            //    this.Actions.Enqueue(async () =>
-            //    {
-            //        if (cancel)
-            //            return;
+            return Observable.Create<T>(async ob =>
+            {
+                await this.semaphore.WaitAsync();
+                try
+                {
+                    var result = await observable.ToTask();
+                    ob.OnNext(result);
+                }
+                catch (Exception ex)
+                {
+                    ob.OnError(ex);
+                }
+                finally
+                {
+                    // TODO: release on disconnect as well!?  likely
+                    this.semaphore.Release();
+                }
 
-            //        try
-            //        {
-            //            var result = await observable
-            //                .ToTask(this.cancelSrc.Token)
-            //                .ConfigureAwait(false);
-            //            ob.Respond(result);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            ob.OnError(ex);
-            //        }
-            //    });
-            //    this.ProcessQueue(); // fire and forget
-
-            //    return () => cancel = true;
-            //});
+                return Disposable.Empty;
+            });
         }
 
 
