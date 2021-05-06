@@ -71,7 +71,7 @@ namespace Shiny.Generators
                         {
                             builder.Append(@"
 var result = true;
-if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
+if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(app))
     global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
 
 else if (!global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url))
