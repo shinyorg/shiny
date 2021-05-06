@@ -36,8 +36,9 @@ public partial class AppDelegate
     {
         this.OnPreFinishedLaunching(app, options);
         this.ShinyFinishedLaunching(new Samples.SampleStartup());
+        this.LoadApplication(new Samples.App());        
         global::Xamarin.Forms.Forms.Init();
-        this.LoadApplication(new Samples.App());
+        
         global::XF.Material.iOS.Material.Init();
         this.OnPostFinishedLaunching(app, options);
         return base.FinishedLaunching(app, options);
@@ -50,14 +51,11 @@ public partial class AppDelegate
     public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken) 
         => this.ShinyRegisteredForRemoteNotifications(deviceToken);
 
-    public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) 
-        => this.ShinyDidReceiveRemoteNotification(userInfo, null);
+    public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) 
+        => this.ShinyFailedToRegisterForRemoteNotifications(error);
 
     public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) 
         => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);
-
-    public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) 
-        => this.ShinyFailedToRegisterForRemoteNotifications(error);
 
     /*
     THIS METHOD IS NEEDED BY MOST OF SHINY - ALWAYS ADD IT

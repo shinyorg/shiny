@@ -5,21 +5,17 @@
         {
             "name": "Shiny.Push.IPushManager",
             "startup": "services.UsePushAzureNotificationHubs",
+            "startupArgs": "\"Your Listener Connectionstring\", \"Your Hub Name\"",
+            "autoRegister": false,
             "bgDelegate": "Shiny.Push.IPushDelegate",
             "bgDelegateRequired": true,
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "Android",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "usesPush": true
+            },
+            "android": {},
+            "uwp": {
+                "backgroundTasks": [ "pushNotification" ]
+            }
         }
     ]
 }

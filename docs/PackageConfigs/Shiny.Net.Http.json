@@ -8,18 +8,11 @@
             "bgDelegate": "Shiny.Net.Http.IHttpTransferDelegate",
             "bgDelegateRequired": true,
             "static": "ShinyHttpTransfers",
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "UsesBgTransfers": true
+            },
+            "android": {},
+            "uwp": {}
         }
     ]
 }

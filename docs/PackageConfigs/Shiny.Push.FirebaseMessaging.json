@@ -8,16 +8,10 @@
             "startup": "services.UseFirebaseMessaging",
             "bgDelegate": "Shiny.Push.IPushDelegate",
             "bgDelegateRequired": true,
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "Android",
-                    "requiresConfig": true
-                }
-            ]
+            "ios": {
+                "usesPush": true
+            },
+            "android": {}
         }
     ]
 }

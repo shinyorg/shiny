@@ -8,9 +8,9 @@ using Statiq.Common;
 
 namespace Docs.Shortcodes
 {
-    public class NugetPageShortcode : IShortcode
+    public class NugetPageShortcode : SyncShortcode
     {
-        public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
+        public override ShortcodeResult Execute(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {
             //context.Phase == Phase.Process
             var list = Utils
@@ -28,10 +28,10 @@ namespace Docs.Shortcodes
 
             foreach (var obj in list)
             {
-                var shield = Utils.ToNugetShield(obj.Name, false);
+                var shield = Utils.ToNugetShield(obj.Name);
                 sb.AppendLine($"|**{obj.Name}**|{obj.Description}|{shield}|");
             }
-            return new [] { new ShortcodeResult(sb.ToString()) };
+            return new ShortcodeResult(sb.ToString());
         }
     }
 }

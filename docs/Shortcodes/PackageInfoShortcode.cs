@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Devlead.Statiq.Tabs;
+
 using Statiq.Common;
 
 
@@ -20,7 +22,7 @@ namespace Docs.Shortcodes
                 .AppendLine("|Area|Info|")
                 .AppendLine("|----|----|");
 
-            AppendIf(sb, "NuGet", Utils.ToNugetShield(package.Name, true));
+            AppendIf(sb, "NuGet", Utils.ToNugetShield(package.Name));
 
             var scount = package.Services?.Length ?? 0;
             switch (scount)
@@ -48,6 +50,8 @@ namespace Docs.Shortcodes
                     break;
             }
             return new[] { new ShortcodeResult(sb.ToString()) };
+
+            //new TabGroupShortcode().Execute()
         }
 
 
@@ -58,48 +62,35 @@ namespace Docs.Shortcodes
         }
 
 
+        // main tab (package name, description, nuget shield, static name),
+        // startup tab (can auto register, service reg),
+        // ios (appdelegate, info.plist, entitlements),
+        // android (manifest),
+        // UWP (manifest)
+
         static void RenderService(StringBuilder sb, PackageService service)
         {
-            AppendIf(sb, "Service", service.Name);
-            AppendIf(sb, "Startup", service.Startup);
+            //AppendIf(sb, "Service", service.Name);
+            //AppendIf(sb, "Startup", service.Startup);
 
-            if (!service.BgDelegate.IsNullOrEmpty())
-            {
-                var bg = service.BgDelegate;
-                if (service.BgDelegateRequired)
-                    bg += " (Required)";
+            //if (!service.BgDelegate.IsNullOrEmpty())
+            //{
+            //    var bg = service.BgDelegate;
+            //    if (service.BgDelegateRequired)
+            //        bg += " (Required)";
 
-                AppendIf(sb, "Delegate", bg);
-            }
-            AppendIf(sb, "Static", service.Static);
+            //    AppendIf(sb, "Delegate", bg);
+            //}
+            //AppendIf(sb, "Static", service.Static);
 
-            if (service.Platforms != null)
-            {
-                foreach (var platform in service.Platforms)
-                {
-                    RenderPlatform(sb, platform);
-                }
-            }
+            //if (service.Platforms != null)
+            //{
+            //    foreach (var platform in service.Platforms)
+            //    {
+            //        RenderPlatform(sb, platform);
+            //    }
+            //}
         }
 
-
-        static void RenderPlatform(StringBuilder sb, PlatformSupport platform)
-        {
-            var value = platform.MinVersion ?? DefaultPlatformVersion(platform.Platform);
-
-            if (platform.RequiresConfig)
-            {
-                value += $" ([OS Configuration Required](xref:{platform.Platform}))";
-            }
-            sb.AppendLine($"| - *{platform.Platform}*|{value}|");
-        }
-
-
-        static string DefaultPlatformVersion(Platform platform) => platform switch
-        {
-            Platform.Android => "8.0",
-            Platform.iOS => "9",
-            Platform.Uwp => "17763"
-        };
     }
 }

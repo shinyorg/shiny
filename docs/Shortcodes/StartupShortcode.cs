@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Statiq.Common;
 
 
 namespace Docs.Shortcodes
 {
-    public class StartupShortcode : IShortcode
+    public class StartupShortcode : SyncShortcode
     {
         const string StartupLayout = @"
 ```csharp
@@ -25,10 +24,11 @@ namespace YourNamespace
 }
 ```
 ";
-        public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
+
+        public override ShortcodeResult Execute(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {
             var full = StartupLayout.Replace("{{BODY}}", content);
-            return new [] { new ShortcodeResult(full) };
+            return new ShortcodeResult(full);
         }
     }
 }

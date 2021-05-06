@@ -1,6 +1,6 @@
 ﻿{
     "name": "Shiny.Push",
-    "description": "Native OS Poush Providers",
+    "description": "Native OS Push Providers",
     "services": [
         {
             "name": "Shiny.Push.IPushManager",
@@ -8,19 +8,14 @@
             "bgDelegate": "Shiny.Push.IPushDelegate",
             "bgDelegateRequired": true,
             "static": "ShinyPush",
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "Android",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "usesPush": true
+            },
+            "android": {
+            },
+            "uwp": {
+                "backgroundTasks": [ "pushNotification" ]
+            }
         }
     ]
 }

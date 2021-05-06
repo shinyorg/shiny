@@ -8,18 +8,24 @@
             "bgDelegate": "Shiny.Locations.IGpsDelegate",
             "bgDelegateRequired": false,
             "static": "ShinyGps",
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "infoPlistValues": [
+                    "NSLocationAlwaysUsageDescription",
+                    "NSLocationAlwaysAndWhenInUseUsageDescription",
+                    "NSLocationWhenInUseUsageDescription"
+                ]
+            },
+            "android": {
+                "manifestUsesPermissions": [
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.ACCESS_BACKGROUND_LOCATION",
+                    "android.permission.FOREGROUND_SERVICE"
+                ]
+            },
+            "uwp": {
+                "deviceCapabilities": [ "location" ]
+            }
         },
         {
             "name": "Shiny.Locations.IGeofenceManager",
@@ -27,35 +33,35 @@
             "bgDelegate": "Shiny.Locations.IGeofenceDelegate",
             "bgDelegateRequired": true,
             "static": "ShinyGeofencing",
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "infoPlistValues": [
+                    "NSLocationAlwaysUsageDescription",
+                    "NSLocationAlwaysAndWhenInUseUsageDescription",
+                    "NSLocationWhenInUseUsageDescription"
+                ]
+            },
+            "android": {
+                "manifestUsesPermissions": [
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.ACCESS_BACKGROUND_LOCATION",
+                    "android.permission.FOREGROUND_SERVICE"
+                ]
+            },
+            "uwp": {
+                "deviceCapabilities": [ "location" ]
+            }
         },
         {
-            "name":  "Shiny.Locations.IMotionActivityManager",
+            "name": "Shiny.Locations.IMotionActivityManager",
             "startup": "services.UseMotionActivity",
             "static": "ShinyMotionActivity",
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "requiresConfig": true
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "infoPlistValues": [ "NSMotionUsageDescription" ]
+            },
+            "android": {
+                "manifestUsesPermissions": [ "android.permission.ACTIVITY_RECOGNITION" ]
+            }
         }
     ]
 }

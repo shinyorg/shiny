@@ -5,18 +5,13 @@
             "name": "Shiny.SpeechRecognition.ISpeechRecognizer",
             "startup": "services.UseSpeechRecognition",
             "static": "ShinySpeechRecognition",
-            "platforms": [
-                {
-                    "platform": "iOS",
-                    "minVersion": "10"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "infoPlistValues": [ "NSSpeechRecognitionUsageDescription" ]
+            },
+            "android": {
+                "manifestUsesPermissions": [] // "microphone"
+            },
+            "uwp": {}
         }
     ]
 }

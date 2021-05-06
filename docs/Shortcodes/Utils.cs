@@ -11,11 +11,11 @@ namespace Docs.Shortcodes
         const string PackageDirectory = "./PackageConfigs";
 
 
-        public static string ToNugetShield(string packageName, bool usePackageLabel)
+        public static string ToNugetShield(string packageName, string? label = null)
         {
             var imageUrl = $"https://img.shields.io/nuget/v/{packageName}.svg?style=for-the-badge";
-            if (usePackageLabel)
-                imageUrl += $"&label={packageName}";
+            if (label != null)
+                imageUrl += $"&label={label}";
 
             var hrefUrl = $"https://www.nuget.org/packages/{packageName}/";
 

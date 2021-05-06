@@ -7,17 +7,20 @@
             "bgDelegate": "Shiny.BluetoothLE.IBleDelegate",
             "bgDelegateRequired": false,
             "static": "ShinyBle",
-            "platforms": [
-                {
-                    "platform": "iOS"
-                },
-                {
-                    "platform": "Android"
-                },
-                {
-                    "platform": "UWP"
-                }
-            ]
+            "ios": {
+                "backgroundModes": [ "bluetooth-central" ],
+                "infoPlistValues": [
+                    "NSBluetoothPeripheralUsageDescription",
+                    "NSBluetoothAlwaysUsageDescription"
+                ]
+            },
+            "uwp": {
+                "deviceCapabilities": [ "bluetooth" ]
+            },
+            "android": {
+                "manifestUsesPermissions": [ "" ],
+                "manifestUseFeatures": [ "ble" ]
+            }
         }
     ]
 }

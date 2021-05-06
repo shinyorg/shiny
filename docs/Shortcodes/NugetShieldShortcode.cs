@@ -1,21 +1,18 @@
 ﻿using Statiq.Common;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 
 namespace Docs.Shortcodes
 {
-    //https://statiq.dev/framework/content/shortcodes
-    public class NugetShieldShortcode : IShortcode
+    public class NugetShieldShortcode : SyncShortcode
     {
-        public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
+        public override ShortcodeResult Execute(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {
-            var packageName = args.FirstOrDefault().Value;
-            var usePackageLabel = args.Any(x => x.Key?.Equals("label") ?? false);
-            var a = Utils.ToNugetShield(packageName, usePackageLabel);
+            var packageName = args[0].Value;
+            var label = args.Length == 2 ? args[1].Value : null;
+            var a = Utils.ToNugetShield(packageName, label);
 
-            return new[] { new ShortcodeResult(a) };
+            return new ShortcodeResult(a);
         }
     }
 }

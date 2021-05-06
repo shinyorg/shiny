@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Statiq.Common;
 
 
 namespace Docs.Shortcodes
 {
-    public class StaticClassesShortcode : IShortcode
+    public class StaticClassesShortcode : SyncShortcode
     {
-        public async Task<IEnumerable<ShortcodeResult>> ExecuteAsync(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
+        public override ShortcodeResult Execute(KeyValuePair<string, string>[] args, string content, IDocument document, IExecutionContext context)
         {
             var services = Utils
                 .GetAllPackages()
@@ -31,7 +30,7 @@ namespace Docs.Shortcodes
             foreach (var service in services)
                 sb.AppendLine($"|{service.Name}|{service.Static}|");
 
-            return new [] { new ShortcodeResult(sb.ToString()) };
+            return new ShortcodeResult(sb.ToString());
         }
     }
 }
