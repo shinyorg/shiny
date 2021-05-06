@@ -15,10 +15,10 @@ things like dependency injection & logging in a structured way to your code!
 * BLE Client & Hosting
 * Beacons Ranging & Monitoring
 * Locations - GPS, Geofencing, & Activity Monitoring (driving, walking, etc)
-* Local Notifications
 * Push Notification - Native, Azure Notifications Hubs, Firebase, and more
 * Local Notifications - best of breed local notifications supporting almost all features across all of the supported platforms
 * Near Field Communications (NFC) - easy to use NFC tag reader
+* Sensors - every sensor available on your mobile phone is here
 
 ## Builds
 
