@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using Newtonsoft.Json;
+
 namespace Docs.Shortcodes
 {
     public class Package
@@ -16,9 +18,10 @@ namespace Docs.Shortcodes
     public class PackageService
     {
         public string Name { get; set; }
+        public string Description { get; set; }
         public string Static { get; set; }
         public string? Startup { get; set; }
-        public string? StartArgs { get; set; }
+        public string? StartupArgs { get; set; }
 
         public bool AutoRegister { get; set; } = true;
         public string? BgDelegate { get; set; }
@@ -33,8 +36,12 @@ namespace Docs.Shortcodes
     public class iOSConfig
     {
         public string MinVersion { get; set; } = "10";
+
+        [JsonProperty("infoPlistValues")]
         public string[] InfoPlistValues { get; set; }
-        public string[] EntitlementPlistValues { get; set; }
+
+        [JsonProperty("entitlementPlistValues")]
+        public Dictionary<string, string> EntitlementPlistValues { get; set; }
         public string[] BackgroundModes { get; set; }
         public bool UsesJobs { get; set; } // will show BGTaskSchedulerPermittedIdentifiers in info.plist
         public bool UsesPush { get; set; } // will show entitlements, info.plist uibackgroundmodes, and appdelegate overrides

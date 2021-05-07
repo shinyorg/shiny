@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 
 
@@ -9,6 +10,13 @@ namespace Docs.Shortcodes
     public static class Utils
     {
         const string PackageDirectory = "./PackageConfigs";
+
+
+        public static StringBuilder AppendXmlCode(this StringBuilder sb, string header) => sb
+            .AppendLine("### " + header)
+            .AppendLine()
+            .AppendLine("```xml")
+            .AppendLine("<?xml version=\"1.0\" encoding=\"utf-8\" ?>");
 
 
         public static string ToNugetShield(string packageName, string? label = null)
