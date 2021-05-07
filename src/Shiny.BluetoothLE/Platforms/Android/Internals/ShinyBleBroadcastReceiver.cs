@@ -15,7 +15,8 @@ namespace Shiny.BluetoothLE.Internals
     [IntentFilter(new[] {
         BluetoothDevice.ActionNameChanged,
         BluetoothDevice.ActionBondStateChanged,
-        BluetoothDevice.ActionPairingRequest
+        BluetoothDevice.ActionPairingRequest,
+        BluetoothDevice.ActionAclConnected
     })]
     public class ShinyBleBroadcastReceiver : BroadcastReceiver
     {
