@@ -28,7 +28,6 @@ namespace Docs
                 .AddShortcode<StartupShortcode>("Startup")
                 .AddShortcode<PackageInfoShortcode>("PackageInfo")
                 .AddShortcode<NugetShieldShortcode>("NugetShield")
-                .AddShortcode<NugetPageShortcode>("NugetPage")
                 .AddShortcode<StaticClassesShortcode>("StaticClasses")
                 .RunAsync();
     }
