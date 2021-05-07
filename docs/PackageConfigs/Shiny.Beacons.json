@@ -6,7 +6,7 @@
         {
             "name": "Shiny.Beacons.IBeaconRangingManager",
             "static": "ShinyBeaconRangingManager",
-            "startup": "services.UseBeaconRanging",
+            "startup": "UseBeaconRanging",
             "ios": {
                 "infoPlistValues": [
                     "NSLocationWhenInUseUsageDescription"
@@ -29,7 +29,7 @@
         {
             "name": "Shiny.Beacons.IBeaconMonitorManager",
             "static": "ShinyBeaconMonitorManager",
-            "startup": "services.UseBeaconMonitoring",
+            "startup": "UseBeaconMonitoring",
             "bgDelegate": "Shiny.Beacons.IBeaconMonitorDelegate",
             "bgDelegateRequired": true,
             "ios": {

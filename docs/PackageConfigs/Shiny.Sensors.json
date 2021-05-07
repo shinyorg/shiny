@@ -6,7 +6,7 @@
             "name": "Shiny.Sensors.IAccelerometer",
             "description": "Accelerometer",
             "static": "ShinyAccelerometer",
-            "startup": "services.UseAccelerometer",
+            "startup": "UseAccelerometer",
             "ios": {},
             "android": {},
             "uwp": {}
@@ -14,14 +14,14 @@
         {
             "name": "Shiny.Sensors.IAmbientLight",
             "static": "ShinyAmbientLight",
-            "startup": "services.UseAmbientLight",
+            "startup": "UseAmbientLight",
             "android": {},
             "uwp": {}
         },
         {
             "name": "Shiny.Sensors.IBarometer",
             "static": "ShinyBarometer",
-            "startup": "services.UseBarometer",
+            "startup": "UseBarometer",
             "ios": {},
             "android": {},
             "uwp": {}
@@ -29,7 +29,7 @@
         {
             "name": "Shiny.Sensors.ICompass",
             "static": "ShinyCompass",
-            "startup": "services.UseCompass",
+            "startup": "UseCompass",
             "ios": {},
             "android": {},
             "uwp": {}
@@ -37,7 +37,7 @@
         {
             "name": "Shiny.Sensors.IGyroscope",
             "static": "ShinyGyroscope",
-            "startup": "services.UseGyroscope",
+            "startup": "UseGyroscope",
             "ios": {},
             "android": {},
             "uwp": {}
@@ -45,13 +45,13 @@
         {
             "name": "Shiny.Sensors.IHumidity",
             "static": "ShinyHumidity",
-            "startup": "services.UseHumidity",
+            "startup": "UseHumidity",
             "android": {}
         },
         {
             "name": "Shiny.Sensors.IMagnetometer",
             "static": "ShinyMagnetometer",
-            "startup": "services.UseMagnetometer",
+            "startup": "UseMagnetometer",
             "ios": {},
             "android": {},
             "uwp": {}
@@ -59,7 +59,7 @@
         {
             "name": "Shiny.Sensors.IPedometer",
             "static": "ShinyPedometer",
-            "startup": "services.UsePedometer",
+            "startup": "UsePedometer",
             "ios": {
                 "infoPlistValues": [ "NSMotionUsageDescription" ]
             },
@@ -69,14 +69,14 @@
         {
             "name": "Shiny.Sensors.IProximity",
             "static": "ShinyProximity",
-            "startup": "services.UseProximity",
+            "startup": "UseProximity",
             "ios": {},
             "android": {}
         },
         {
             "name": "Shiny.Sensors.ITemperature",
             "static": "ShinyTemperature",
-            "startup": "services.UseTemperature",
+            "startup": "UseTemperature",
             "android": {}
         }
     ]

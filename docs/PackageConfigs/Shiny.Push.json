@@ -4,7 +4,7 @@
     "services": [
         {
             "name": "Shiny.Push.IPushManager",
-            "startup": "services.UsePush",
+            "startup": "UsePush",
             "bgDelegate": "Shiny.Push.IPushDelegate",
             "bgDelegateRequired": true,
             "static": "ShinyPush",

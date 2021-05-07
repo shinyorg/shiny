@@ -3,11 +3,9 @@
     "services": [
         {
             "ios": {
-                "entitlementPlistValues": [
-                    {
-                        "com.apple.developer.nfc.readersession.formats": "<array><string>NDEF</string></array>"
-                    }
-                ],
+                //"entitlementPlistValues": {
+                //    "com.apple.developer.nfc.readersession.formats": "<array><string>NDEF</string></array>"
+                //},
                 "infoPlistValues": [ "NFCReaderUsageDescription" ]
             },
             "android": {

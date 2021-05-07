@@ -4,7 +4,7 @@
     "services": [
         {
             "name": "Shiny.Locations.IGpsManager",
-            "startup": "services.UseGps",
+            "startup": "UseGps",
             "bgDelegate": "Shiny.Locations.IGpsDelegate",
             "bgDelegateRequired": false,
             "static": "ShinyGps",
@@ -33,7 +33,7 @@
         },
         {
             "name": "Shiny.Locations.IGeofenceManager",
-            "startup": "services.UseGeofencing",
+            "startup": "UseGeofencing",
             "bgDelegate": "Shiny.Locations.IGeofenceDelegate",
             "bgDelegateRequired": true,
             "static": "ShinyGeofencing",
@@ -62,7 +62,7 @@
         },
         {
             "name": "Shiny.Locations.IMotionActivityManager",
-            "startup": "services.UseMotionActivity",
+            "startup": "UseMotionActivity",
             "static": "ShinyMotionActivity",
             "ios": {
                 "infoPlistValues": [ "NSMotionUsageDescription" ]

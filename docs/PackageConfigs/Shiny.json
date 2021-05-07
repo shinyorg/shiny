@@ -1,15 +1,4 @@
 ﻿{
-    "name": "Shiny.Core",
-    "order": 1,
-    "category": "main",
-    "service": "Shiny.Notifications.INotificationManager",
-    "startup": "services.UseNotifications",
-    "bgDelegate": "Shiny.Notifications.INotificationDelegate",
-    "delegateRequired": false,
-
-    "platforms": {
-        "Android": "",
-        "iOS": "",
-        "UWP": ""
-    }
+    "name": "Shiny",
+    "order": 1
 }

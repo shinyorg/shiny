@@ -3,7 +3,7 @@
     "services": [
         {
             "name": "Shiny.SpeechRecognition.ISpeechRecognizer",
-            "startup": "services.UseSpeechRecognition",
+            "startup": "UseSpeechRecognition",
             "static": "ShinySpeechRecognition",
             "ios": {
                 "infoPlistValues": [

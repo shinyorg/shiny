@@ -3,7 +3,7 @@
     "services": [
         {
             "name": "Shiny.BluetoothLE.IBleHostingManager",
-            "startup": "services.UseBleHosting",
+            "startup": "UseBleHosting",
             "static": "ShinyBleHosting",
             "ios": {},
             "android": {}

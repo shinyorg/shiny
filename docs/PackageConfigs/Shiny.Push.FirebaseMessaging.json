@@ -5,7 +5,7 @@
     "services": [
         {
             "name": "Shiny.Push.IPushManager",
-            "startup": "services.UseFirebaseMessaging",
+            "startup": "UseFirebaseMessaging",
             "bgDelegate": "Shiny.Push.IPushDelegate",
             "bgDelegateRequired": true,
             "ios": {

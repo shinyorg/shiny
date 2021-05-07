@@ -4,7 +4,7 @@
     "services": [
         {
             "name": "Shiny.Push.IPushManager",
-            "startup": "services.UsePushAzureNotificationHubs",
+            "startup": "UsePushAzureNotificationHubs",
             "startupArgs": "\"Your Listener Connectionstring\", \"Your Hub Name\"",
             "autoRegister": false,
             "bgDelegate": "Shiny.Push.IPushDelegate",

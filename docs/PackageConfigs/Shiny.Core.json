@@ -7,7 +7,7 @@
         {
             "name": "Shiny.Jobs.IJobManager",
             "static": "ShinyJobs",
-            "startup": "services.RegisterJob",
+            "startup": "RegisterJob",
             "ios": {
                 "usesJobs": true
             },
