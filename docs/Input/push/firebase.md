@@ -12,7 +12,6 @@ how to setup firebase within your Android application.
 
 ## iOS
 
-
 Follow the exact same setup process as the [native push provider](xref:pushnative) with one addition
 
 After setting up your iOS app within the firebase admin portal, add GoogleService-Info.plist to your iOS head project

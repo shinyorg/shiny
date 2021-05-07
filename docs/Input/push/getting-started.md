@@ -12,28 +12,6 @@ General OS setup is mostly the same on all platforms, but please review the spec
 ## Registration
 Look to each appropriate provider to see setups for each.  The most important function otherwise, is RequestAccess shown below which will give you the push notification token that you can send to your backend. 
 
-```cs
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using Shiny;
-
-
-public class PushStartup : ShinyStartup
-{
-    public override void ConfigureServices(IServiceCollection services)
-    {
-        // you can only register one :)
-        // NOTE: these also all take a notification category if you wish to have actions available
-        // on the user notification
-        services.UsePush<PushDelegate>();
-
-        services.UsePushAzureNotificationHubs<PushDelegate>("connection string", "hub name");
-        services.UseFirebaseMessaging<PushDelegate>();
-        services.UseOneSignalPush<PushDelegate>(new Shiny.Push.OneSignal.OneSignalPushConfig("onesignal appId"));
-    }
-}
-```
-
 All providers use the native implementations on the platform to some degree, as such, you will always need to call
 
 ```cs

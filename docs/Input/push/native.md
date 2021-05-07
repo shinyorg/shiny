@@ -16,7 +16,7 @@ If you don't intend to use a 3rd party provider, this library still uses everyth
 services.UsePush<MyPushDelegate>();
 ```
 
-## Android Setup
+## Android Additional Setup
 The process of setting up Android is a bit of process
 
 ```csharp
@@ -28,13 +28,4 @@ The process of setting up Android is a bit of process
     <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="The same version Shiny.Push is using" />
 </ItemGroup>
 
-```
-
-## iOS Specific
-1. Add the following to your Info.plist
-```xml
-```
-
-2. Add the following to your Entitlements.plist
-```xml
 ```
