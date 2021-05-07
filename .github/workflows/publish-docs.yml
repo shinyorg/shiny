@@ -1,7 +1,7 @@
 name: Publish Documentation
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, docupdate ]
     paths:
     - "docs/**"
 
