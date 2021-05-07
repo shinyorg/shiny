@@ -3,7 +3,7 @@ name: Lock
 # yamllint disable-line rule:truthy
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: '0 13 * * *'
 
 jobs:
   lock:
