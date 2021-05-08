@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
@@ -16,6 +15,7 @@ namespace ShinyBuild
         public BuildContext(ICakeContext context) : base(context)
         {
             this.MsBuildConfiguration = context.Argument("configuration", "Release");
+            this.NugetApiKey = context.EnvironmentVariable("NugetApiKey");
 
             // walk backwards until git directory found - that's root
             var dir = new DirectoryPath(".");
@@ -24,11 +24,14 @@ namespace ShinyBuild
 
             context.Environment.WorkingDirectory = dir;
             this.Branch = context.GitBranchCurrent(".");
+
+            this.GitVersionLog = new FilePath("./gitversion.log");
         }
 
 
-        public string NugetApiKey { get; } = "";
-
+        public string MsBuildConfiguration { get; }
+        public string NugetApiKey { get; }
+        public FilePath GitVersionLog { get; }
         public GitBranch Branch { get; }
         public bool IsMainBranch
         {
@@ -52,8 +55,5 @@ namespace ShinyBuild
                 return true;
             }
         }
-
-
-        public string MsBuildConfiguration { get; set; }
     }
 }
