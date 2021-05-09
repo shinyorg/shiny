@@ -48,7 +48,7 @@ namespace Shiny
 #endif
             services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
             services.TryAddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
-            return false;
+            return true;
 #endif
         }
 
