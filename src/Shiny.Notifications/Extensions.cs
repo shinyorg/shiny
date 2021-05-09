@@ -79,11 +79,11 @@ namespace Shiny.Notifications
             });
 
 
-        public static Task SetChannel(this IRepository repository, Channel channel)
+        internal static Task SetChannel(this IRepository repository, Channel channel)
             => repository.Set(channel.Identifier, channel);
 
 
-        public static async Task RemoveChannel(this IRepository repository, string channelId)
+        internal static async Task RemoveChannel(this IRepository repository, string channelId)
         {
             await repository.Remove<Channel>(channelId);
 
@@ -99,7 +99,7 @@ namespace Shiny.Notifications
         }
 
 
-        public static async Task RemoveAllChannels(this IRepository repository)
+        internal static async Task RemoveAllChannels(this IRepository repository)
         {
             await repository.Clear<Channel>();
 
@@ -114,14 +114,14 @@ namespace Shiny.Notifications
             }
         }
 
-        public static Task<Channel?> GetChannel(this IRepository repository, string channelIdentifier)
+        internal static Task<Channel?> GetChannel(this IRepository repository, string channelIdentifier)
             => repository.Get<Channel>(channelIdentifier);
 
-        public static Task<IList<Channel>> GetChannels(this IRepository repository)
+        internal static Task<IList<Channel>> GetChannels(this IRepository repository)
             => repository.GetAll<Channel>();
 
 
-        public static async Task RemoveChannelFromPendingNotificationsByChannel(this IRepository repository, string channelId)
+        internal static async Task RemoveChannelFromPendingNotificationsByChannel(this IRepository repository, string channelId)
         {
             var notifications = await repository.GetAll<Notification>();
             foreach (var notification in notifications)
