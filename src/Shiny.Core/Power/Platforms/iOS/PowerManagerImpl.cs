@@ -56,7 +56,7 @@ namespace Shiny.Power
                 }
             }
         }
-       
+
 
         IObservable<int> WhenBatteryPercentageChanged() => Observable.Create<int>(ob =>
         {
