@@ -10,7 +10,7 @@
             },
             "android": {
                 "manifestUsesPermissions": [ "android.permission.NFC" ],
-                "manifestUsesFeatures": [ "android.permission.NFC" ]
+                "manifestUsesFeatures": [ "android.hardware.nfc" ]
             }
         }
     ]
