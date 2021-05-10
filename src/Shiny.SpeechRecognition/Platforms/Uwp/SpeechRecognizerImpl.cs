@@ -5,7 +5,7 @@ using Windows.Foundation;
 using Windows.Media.Capture;
 using Windows.Media.SpeechRecognition;
 using WinSpeechRecognizer = Windows.Media.SpeechRecognition.SpeechRecognizer;
-
+using System.Globalization;
 
 namespace Shiny.SpeechRecognition
 {
@@ -46,9 +46,10 @@ namespace Shiny.SpeechRecognition
         }
 
 
-        public override IObservable<string> ListenUntilPause() => Observable.FromAsync(async ct =>
+        public override IObservable<string> ListenUntilPause(CultureInfo? culture = null) => Observable.FromAsync(async ct =>
         {
-            var speech = new WinSpeechRecognizer();
+            var speech = this.Create(culture);
+
             await speech.CompileConstraintsAsync();
             this.ListenSubject.OnNext(true);
             var result = await speech.RecognizeAsync();
@@ -58,9 +59,9 @@ namespace Shiny.SpeechRecognition
         });
 
 
-        public override IObservable<string> ContinuousDictation() => Observable.Create<string>(async ob =>
+        public override IObservable<string> ContinuousDictation(CultureInfo? culture = null) => Observable.Create<string>(async ob =>
         {
-            var speech = new WinSpeechRecognizer();
+            var speech = this.Create(culture);
             await speech.CompileConstraintsAsync();
 
             var handler = new TypedEventHandler<SpeechContinuousRecognitionSession, SpeechContinuousRecognitionResultGeneratedEventArgs>((sender, args) =>
@@ -80,6 +81,15 @@ namespace Shiny.SpeechRecognition
         });
 
 
+
+        protected WinSpeechRecognizer Create(CultureInfo? culture)
+        {
+            if (culture == null)
+                return new WinSpeechRecognizer();
+
+            var lang = new Windows.Globalization.Language(culture.Name);
+            return new WinSpeechRecognizer(lang);
+        }
         //        //{
         //        //    var grammar = new SpeechRecognitionTopicConstraint(SpeechRecognitionScenario.Dictation, "webSearch");
         //        //    speech.UIOptions.AudiblePrompt = "Say what you want to search for...";

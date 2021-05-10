@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using AVFoundation;
+
+using Foundation;
+
 using Speech;
 using UIKit;
 
@@ -15,8 +19,9 @@ namespace Shiny.SpeechRecognition
             var status = AccessState.Available;
 
             if (!UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
+            {
                 status = AccessState.NotSupported;
-
+            }
             else
             {
                 var nativeStatus = SFSpeechRecognizer.AuthorizationStatus;
@@ -53,13 +58,16 @@ namespace Shiny.SpeechRecognition
         }
 
 
-        public override IObservable<string> ListenUntilPause() => this.Listen(true);
-        public override IObservable<string> ContinuousDictation() => this.Listen(false);
+        public override IObservable<string> ListenUntilPause(CultureInfo? culture = null) => this.Listen(true, culture);
+        public override IObservable<string> ContinuousDictation(CultureInfo? culture = null) => this.Listen(false, culture);
 
 
-        protected virtual IObservable<string> Listen(bool completeOnEndOfSpeech) => Observable.Create<string>(ob =>
+        protected virtual IObservable<string> Listen(bool completeOnEndOfSpeech, CultureInfo? culture) => Observable.Create<string>(ob =>
         {
-            var speechRecognizer = new SFSpeechRecognizer();
+            var speechRecognizer = culture == null
+                ? new SFSpeechRecognizer()
+                : new SFSpeechRecognizer(NSLocale.FromLocaleIdentifier(culture.Name));
+
             if (!speechRecognizer.Available)
                 throw new ArgumentException("Speech recognizer is not available");
 

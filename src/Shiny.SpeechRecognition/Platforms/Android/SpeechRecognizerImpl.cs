@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android;
@@ -29,7 +30,7 @@ namespace Shiny.SpeechRecognition
         }
 
 
-        public override IObservable<string> ListenUntilPause() => Observable.Create<string>(ob =>
+        public override IObservable<string> ListenUntilPause(CultureInfo? culture) => Observable.Create<string>(ob =>
         {
             var final = "";
             var listener = new SpeechRecognitionListener
@@ -58,8 +59,7 @@ namespace Shiny.SpeechRecognition
             };
             var speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.context.AppContext);
             speechRecognizer.SetRecognitionListener(listener);
-            speechRecognizer.StartListening(this.CreateSpeechIntent(true));
-            //speechRecognizer.StartListening(this.CreateSpeechIntent(false));
+            speechRecognizer.StartListening(this.CreateSpeechIntent(true, culture));
 
             return () =>
             {
@@ -70,7 +70,7 @@ namespace Shiny.SpeechRecognition
         });
 
 
-        public override IObservable<string> ContinuousDictation() => Observable.Create<string>(ob =>
+        public override IObservable<string> ContinuousDictation(CultureInfo? culture = null) => Observable.Create<string>(ob =>
         {
             var stop = false;
             var currentIndex = 0;
@@ -101,7 +101,7 @@ namespace Shiny.SpeechRecognition
 
                     speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.context.AppContext);
                     speechRecognizer.SetRecognitionListener(listener);
-                    speechRecognizer.StartListening(this.CreateSpeechIntent(true));
+                    speechRecognizer.StartListening(this.CreateSpeechIntent(true, culture));
                 }
             };
             listener.Error = ex =>
@@ -120,7 +120,7 @@ namespace Shiny.SpeechRecognition
 
                             speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.context.AppContext);
                             speechRecognizer.SetRecognitionListener(listener);
-                            speechRecognizer.StartListening(this.CreateSpeechIntent(true));
+                            speechRecognizer.StartListening(this.CreateSpeechIntent(true, culture));
                         }
                         break;
 
@@ -130,7 +130,7 @@ namespace Shiny.SpeechRecognition
                 }
             };
             speechRecognizer.SetRecognitionListener(listener);
-            speechRecognizer.StartListening(this.CreateSpeechIntent(true));
+            speechRecognizer.StartListening(this.CreateSpeechIntent(true, culture));
 
 
             return () =>
@@ -143,11 +143,20 @@ namespace Shiny.SpeechRecognition
         });
 
 
-        protected virtual Intent CreateSpeechIntent(bool partialResults)
+        protected virtual Intent CreateSpeechIntent(bool partialResults, CultureInfo? culture)
         {
             var intent = new Intent(RecognizerIntent.ActionRecognizeSpeech);
             intent.PutExtra(RecognizerIntent.ExtraLanguagePreference, Java.Util.Locale.Default);
-            intent.PutExtra(RecognizerIntent.ExtraLanguage, Java.Util.Locale.Default);
+
+            if (culture == null)
+            {
+                intent.PutExtra(RecognizerIntent.ExtraLanguage, Java.Util.Locale.Default);
+            }
+            else
+            {
+                var javaLocale = Java.Util.Locale.ForLanguageTag(culture.Name);
+                intent.PutExtra(RecognizerIntent.ExtraLanguage, javaLocale);
+            }
             intent.PutExtra(RecognizerIntent.ExtraLanguageModel, RecognizerIntent.LanguageModelFreeForm);
             intent.PutExtra(RecognizerIntent.ExtraCallingPackage, this.context.Package.PackageName);
             //intent.PutExtra(RecognizerIntent.ExtraMaxResults, 1);

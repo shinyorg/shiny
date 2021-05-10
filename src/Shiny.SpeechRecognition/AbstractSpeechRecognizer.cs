@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 
@@ -11,8 +12,8 @@ namespace Shiny.SpeechRecognition
 
 
         public IObservable<bool> WhenListeningStatusChanged() => this.ListenSubject;
-        public abstract IObservable<string> ListenUntilPause();
-        public abstract IObservable<string> ContinuousDictation();
+        public abstract IObservable<string> ListenUntilPause(CultureInfo? culture = null);
+        public abstract IObservable<string> ContinuousDictation(CultureInfo? culture = null);
         public abstract Task<AccessState> RequestAccess();
     }
 }

@@ -12,7 +12,9 @@
                 ]
             },
             "android": {
-                "manifestUsesPermissions": [] // "microphone"
+                "manifestUsesPermissions": [
+                    "android.permission.RECORD_AUDIO"
+                ]
             },
             "uwp": {}
         }
