@@ -1,0 +1,14 @@
+﻿{
+    "name": "Shiny.DataSync",
+    "description": "Jobs done right",
+    "sponsors": true
+    //"services": [
+    //    {
+    //        "name": "Shiny.DataSync.ITagManager",
+    //        "startup": "UseGeofencingSync",
+    //        "ios": {
+    //        },
+    //        "android": {}
+    //    }
+    //]
+}

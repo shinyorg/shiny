@@ -8,8 +8,8 @@ namespace Docs.Shortcodes
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public string? Category { get; set; } = "main";
         public int Order { get; set; } = 1000;
+        public bool Sponsors { get; set; }
 
         public PackageService[] Services { get; set; }
     }

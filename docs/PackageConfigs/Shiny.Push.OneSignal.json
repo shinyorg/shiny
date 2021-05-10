@@ -1,0 +1,18 @@
+﻿{
+    "name": "Shiny.Push.OneSignal",
+    "description": "Push Provider for OneSignal",
+    "sponsors": true,
+    "services": [
+        {
+            "name": "Shiny.Push.IPushManager",
+            "startup": "UseOneSignalPush",
+            "startupArgs": "YourOneSignalAppId",
+            "bgDelegate": "Shiny.Push.IPushDelegate",
+            "bgDelegateRequired": true,
+            "ios": {
+                "usesPush": true
+            },
+            "android": {}
+        }
+    ]
+}

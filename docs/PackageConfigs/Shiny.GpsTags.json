@@ -1,0 +1,14 @@
+﻿{
+    "name": "Shiny.GpsTags",
+    "description": "Beacons + GPS + Notifications - It's xplat AirTags ;)",
+    "sponsors": true,
+    "services": [
+        {
+            "name": "Shiny.GpsTags.ITagManager",
+            "startup": "UseGpsTags",
+            "ios": {
+            },
+            "android": {}
+        }
+    ]
+}
