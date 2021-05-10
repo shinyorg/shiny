@@ -38,6 +38,29 @@ namespace Shiny
             => ob.Scan(Tuple.Create(default(T), default(T)), (acc, current) => Tuple.Create(acc.Item2, current));
 
 
+        /// <summary>
+        /// Quick helper method to execute an async select
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="task"></param>
+        /// <returns></returns>
+        public static IObservable<U> SelectAsync<T, U>(this IObservable<T> observable, Func<Task<U>> task)
+            => observable.Select(x => Observable.FromAsync(() => task())).Switch();
+
+
+        /// <summary>
+        /// Quick helper method to execute an async select
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="task"></param>
+        /// <returns></returns>
+        public static IObservable<U> SelectAsync<T, U>(this IObservable<T> observable, Func<CancellationToken, Task<U>> task)
+            => observable.Select(x => Observable.FromAsync(ct => task(ct))).Switch();
+
 
         /// <summary>
         /// This is to make chaining easier when a scheduler is null
