@@ -3,8 +3,8 @@ Shiny.Integrations.SQLite
 -------------------------
 
 GitHub: https://github.com/shinyorg/Shiny
-Samples: https://github.com/shinyorg/shiny/tree/master/samples
+Samples: https://samples.shinylib.net
 Docs: https://shinylib.net
 Blog: https://allanritchie.com
 
-Please star this project on GitHub if you use it in your projects
+Please star this project on GitHub if you use it in your projects or even considering sponsorship at https://sponsor.shinylib.net
