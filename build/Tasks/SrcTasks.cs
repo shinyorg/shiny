@@ -20,37 +20,22 @@ namespace ShinyBuild.Tasks
     }
 
 
-    //[TaskName("Tests")]
-    //public sealed class BasicTestsTask : FrostingTask<BuildContext>
-    //{
-    //    public override void Run(BuildContext context)
-    //    {
-    //        context.XUnit2("../tests/");
-    //    }
-    //}
-
-
-    [TaskName("Default")]
+    [TaskName("Build")]
     [IsDependentOn(typeof(CleanTask))]
     public sealed class BuildTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
         {
-            var version = "1.0.0";
+            var versionInfo = context.GitVersion(new GitVersionSettings
+            {
+                UpdateAssemblyInfo = false,
+                OutputType = GitVersionOutput.Json,
+                LogFilePath = context.GitVersionLog.MakeAbsolute(context.Environment)
+            });
+            var version = versionInfo.InformationalVersion;
             if (!context.IsMainBranch)
-            {
                 version += "-preview";
-            }
-            else
-            {
-                var versionInfo = context.GitVersion(new GitVersionSettings
-                {
-                    UpdateAssemblyInfo = false,
-                    OutputType = GitVersionOutput.Json,
-                    LogFilePath = context.GitVersionLog.MakeAbsolute(context.Environment)
-                });
-                version = versionInfo.InformationalVersion;
-            }
+
             var os = context.Environment.Platform.Family == Cake.Core.PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
 
             context.MSBuild("Build.sln", x => x
@@ -86,4 +71,10 @@ namespace ShinyBuild.Tasks
                 context.DotNetCoreNuGetPush(package.FullPath, settings);
         }
     }
+
+
+    [TaskName("Default")]
+    [IsDependentOn(typeof(NugetDeployTask))]
+    [IsDependentOn(typeof(DocTask))]
+    public sealed class DefaultTask : FrostingTask<BuildContext> { }
 }

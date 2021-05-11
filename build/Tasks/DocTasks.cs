@@ -19,11 +19,10 @@ namespace ShinyBuild.Tasks
 
         public override void Run(BuildContext context)
         {
-            if (!context.IsRunningInCI)
-                RunIt(context, null);
-
-            else if (context.IsMainBranch)
+            if (context.IsRunningInCI && context.IsMainBranch)
                 RunIt(context, "--deploy");
+            else
+                RunIt(context, null);
         }
 
 
