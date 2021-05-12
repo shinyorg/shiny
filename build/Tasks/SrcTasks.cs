@@ -27,14 +27,13 @@ namespace ShinyBuild.Tasks
         public override void Run(BuildContext context)
         {
             var version = GetNugetVersion(context);
-            var os = context.Environment.Platform.Family == Cake.Core.PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
 
             context.MSBuild("Build.sln", x => x
                 .WithRestore()
                 .WithTarget("Clean")
                 .WithTarget("Build")
                 .WithProperty("ShinyVersion", version)
-                .WithProperty("OS", os)
+                .WithProperty("OS", context.OperatingSystemString)
                 .SetConfiguration(context.MsBuildConfiguration)
             );
         }
@@ -42,21 +41,13 @@ namespace ShinyBuild.Tasks
 
         static string GetNugetVersion(BuildContext context)
         {
-            var version = $"2.0.{context.BuildNumber}";
+            var version = $"{context.MajorMinorVersion}.{context.BuildNumber}";
             if (!context.IsMainBranch)
                 version += "-preview";
 
             context.Log.Information("Shiny Version: " + version);
             return version;
         }
-
-        //var versionInfo = context.GitVersion(new GitVersionSettings
-        //{
-        //    UpdateAssemblyInfo = false,
-        //    OutputType = GitVersionOutput.Json,
-        //    LogFilePath = context.GitVersionLog.MakeAbsolute(context.Environment)
-        //});
-        //context.Log.Information("Using Version: " + versionInfo.NuGetVersionV2);
     }
 
 
@@ -76,15 +67,9 @@ namespace ShinyBuild.Tasks
                 Source = "https://api.nuget.org/v3/index.json",
                 SkipDuplicate = true
             };
-            var packages = context.GetFiles("../src/**/*.nupkg");
+            var packages = context.GetFiles("src/**/*.nupkg");
             foreach (var package in packages)
                 context.DotNetCoreNuGetPush(package.FullPath, settings);
         }
     }
-
-
-    [TaskName("Default")]
-    [IsDependentOn(typeof(NugetDeployTask))]
-    [IsDependentOn(typeof(DocTask))]
-    public sealed class DefaultTask : FrostingTask<BuildContext> { }
 }
