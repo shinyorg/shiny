@@ -18,14 +18,12 @@ namespace ShinyBuild
             this.NugetApiKey = context.EnvironmentVariable("NugetApiKey");
 
             // walk backwards until git directory found - that's root
-            var dir = new DirectoryPath(".");
-            while (!context.GitIsValidRepository(dir))
-                dir = new DirectoryPath(Directory.GetParent(dir.FullPath).FullName);
+            //var dir = new DirectoryPath(".");
+            //while (!context.GitIsValidRepository(dir))
+            //    dir = new DirectoryPath(Directory.GetParent(dir.FullPath).FullName);
 
-            context.Environment.WorkingDirectory = dir;
+            //context.Environment.WorkingDirectory = dir;
             this.Branch = context.GitBranchCurrent(".");
-
-            this.GitVersionLog = new FilePath("./gitversion.log");
         }
 
 
@@ -36,7 +34,6 @@ namespace ShinyBuild
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration { get; }
         public string NugetApiKey { get; }
-        public FilePath GitVersionLog { get; }
         public GitBranch Branch { get; }
         public bool IsMainBranch
         {
