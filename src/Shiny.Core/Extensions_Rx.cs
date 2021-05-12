@@ -36,7 +36,7 @@ namespace Shiny
         /// <param name="cancelToken"></param>
         /// <returns></returns>
         public static Task WithTimeout(this Task task, int milliseconds, CancellationToken cancelToken = default) =>
-            => task.WithTimeout(TimeSpan.FromMilliseconds(milliseconds), cancelToken);
+            task.WithTimeout(TimeSpan.FromMilliseconds(milliseconds), cancelToken);
 
 
         /// <summary>

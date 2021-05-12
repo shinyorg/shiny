@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docs", "docs\Docs.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{331434F9-5C7F-4267-8373-B8F7C8974AE6}"
 	ProjectSection(SolutionItems) = preProject
+		build.ps1 = build.ps1
+		build.sh = build.sh
+		.github\workflows\build.yml = .github\workflows\build.yml
 		src\Directory.build.props = src\Directory.build.props
 		Packages.props = Packages.props
-		.github\workflows\publish-docs.yml = .github\workflows\publish-docs.yml
 		readme.md = readme.md
 		version.json = version.json
 	EndProjectSection

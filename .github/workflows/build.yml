@@ -23,17 +23,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    #- name: Boots Update
-    #  run: |
-    #   dotnet tool install --global boots
-    #   boots --preview Mono
-    #   boots --preview Xamarin.iOS
-    #   boots --preview Xamarin.Android
-
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
-    #  with:
-    #    vs-version: '[16.7,16.8)'
     - uses: actions/checkout@v2
       with:
         submodules: true
@@ -50,17 +39,4 @@ jobs:
         token: ${{secrets.github_token}}
 
     - name: Build
-      run: msbuild Build.sln /t:Clean,Build /restore -m -property:Configuration=Release -property:BUILD_BUILDNUMBER=${{steps.buildnumber.outputs.build_number}} -property:BUILD_SOURCEBRANCHNAME=${{github.ref}}
-
- #   - name: Test Core
-  #    run: dotnet test Build.sln
-
-    - name: Post NuGet Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: nuget-artifacts
-        path: '**/*.nupkg'
-
-    - name: Publish to NuGet
-      if: ${{ github.ref == 'refs/heads/preview' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' }}
-      run: dotnet nuget push **\*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{secrets.NUGETAPIKEY}} --skip-duplicate
+      run: dotnet run --project build/ShinyBuild.csproj --GitHubToken=${{secrets.github_token}} --DocGitHubToken=${{ secrets.DOCS_GITHUB_TOKEN }} --BuilderNumber=${{steps.buildnumber.outputs.build_number}} --NugetApiKey ${{secrets.NUGETAPIKEY}}
