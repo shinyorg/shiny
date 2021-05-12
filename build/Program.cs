@@ -5,14 +5,11 @@ namespace ShinyBuild
 {
     class Program
     {
-        // TODO: build samples on src or samples
-        // TODO: build src on src changes
-        // TODO: build docs on main
         //https://cakebuild.net/docs/running-builds/runners/cake-frosting#bootstrapping-for-cake-frosting
         public static int Main(string[] args)
             => new CakeHost()
                 .UseContext<BuildContext>()
-                //.InstallTool(new Uri("nuget:?package=NUnit.ConsoleRunner&version=3.11.1"))
+                .InstallTool(new Uri("dotnet:n?package=GitVersion.Tool&version=5.6.9"))
                 .Run(args);
     }
 }

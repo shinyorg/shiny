@@ -4,6 +4,7 @@ using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.DotNetCore.NuGet.Push;
 using Cake.Common.Tools.GitVersion;
 using Cake.Common.Tools.MSBuild;
+using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
 
@@ -32,17 +33,14 @@ namespace ShinyBuild.Tasks
                 OutputType = GitVersionOutput.Json,
                 LogFilePath = context.GitVersionLog.MakeAbsolute(context.Environment)
             });
-            var version = versionInfo.InformationalVersion;
-            if (!context.IsMainBranch)
-                version += "-preview";
-
+            context.Log.Information("Using Version: " + versionInfo.NuGetVersionV2);
             var os = context.Environment.Platform.Family == Cake.Core.PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
 
             context.MSBuild("Build.sln", x => x
                 .WithRestore()
                 .WithTarget("Clean")
                 .WithTarget("Build")
-                .WithProperty("ShinyVersion", version)
+                .WithProperty("ShinyVersion", versionInfo.NuGetVersionV2)
                 .WithProperty("OS", os)
                 .SetConfiguration(context.MsBuildConfiguration)
             );
