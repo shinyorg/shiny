@@ -76,9 +76,14 @@ namespace Shiny.Notifications
             if (notification.ScheduleDate == null)
                 this.manager.SendNative(notification.Id, builder.Build());
             else
-                await this.core.Repository.Set(notification.Id.ToString(), notification);        
+                await this.core.Repository.Set(notification.Id.ToString(), notification);
         }
 
-        public int Badge { get; set; }
+
+        public int Badge
+        {
+            get => this.core.GetBadgeCount();
+            set => this.core.SetBadgeCount(value);
+        }
     }
 }

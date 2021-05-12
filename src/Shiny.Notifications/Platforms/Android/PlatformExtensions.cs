@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Content;
+using Shiny.Infrastructure;
 using Shiny.Notifications;
 
 
@@ -14,6 +15,23 @@ namespace Shiny
             return native;
         }
 
+
+        const string AndroidBadgeCountKey = "AndroidBadge";
+
+
+        internal static int GetBadgeCount(this ShinyCoreServices core)
+            => core.Settings.Get(AndroidBadgeCountKey, 0);
+
+        internal static void SetBadgeCount(this ShinyCoreServices core, int value)
+        {
+            core.Settings.Set(AndroidBadgeCountKey, value);
+
+            if (value <= 0)
+                global::XamarinShortcutBadger.ShortcutBadger.RemoveCount(core.Android.AppContext);
+            else
+                global::XamarinShortcutBadger.ShortcutBadger.ApplyCount(core.Android.AppContext, value);
+
+        }
 
         internal static NotificationImportance ToNative(this ChannelImportance importance) => importance switch
         {

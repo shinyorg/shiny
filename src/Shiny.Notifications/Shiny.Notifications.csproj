@@ -52,6 +52,7 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
+        <PackageReference Include="Xamarin.ShortcutBadger" />
         <PackageReference Include="Xamarin.AndroidX.AppCompat" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
     </ItemGroup>

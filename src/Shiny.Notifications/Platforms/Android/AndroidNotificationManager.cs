@@ -52,7 +52,7 @@ namespace Shiny.Notifications
             this.TrySetLargeIconResource(notification, builder);
 
             if (notification.BadgeCount != null)
-                builder.SetNumber(notification.BadgeCount.Value);
+                this.core.SetBadgeCount(notification.BadgeCount.Value);
 
             if (!notification.Android.ColorResourceName.IsEmpty())
             {
