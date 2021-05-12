@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reactive;
@@ -125,34 +124,6 @@ namespace Shiny
         }
 
 
-        /// <summary>
-        /// This will buffer observable pings and timestamp them until the predicate check does not pass
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="thisObs"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public static IObservable<List<Timestamped<T>>> BufferWhile<T>(this IObservable<T> thisObs, Func<T, bool> predicate)
-            => Observable.Create<List<Timestamped<T>>>(ob =>
-            {
-                var list = new List<Timestamped<T>>();
-                return thisObs
-                    .Timestamp()
-                    .Subscribe(x =>
-                    {
-                        if (predicate(x.Value))
-                        {
-                            list.Add(x);
-                        }
-                        else if (list != null)
-                        {
-                            ob.OnNext(list);
-                            list.Clear();
-                        }
-                    });
-            });
-
-
         public static IObservable<TRet> WhenAnyProperty<TSender, TRet>(this TSender This, Expression<Func<TSender, TRet>> expression) where TSender : INotifyPropertyChanged
         {
             var p = This.GetPropertyInfo(expression);
@@ -173,24 +144,6 @@ namespace Shiny
                 .FromEventPattern<PropertyChangedEventArgs>(This, nameof(INotifyPropertyChanged.PropertyChanged))
                 .Select(x => new ItemChanged<TSender, string>(This, x.EventArgs.PropertyName));
 
-
-        public static IDisposable SubscribeVoid<T>(this IObservable<T> observable, Action onNext)
-            => observable.Subscribe(_ => onNext());
-
-
-        public static IDisposable SubscribeVoid<T>(this IObservable<T> observable, Action onNext, Action<Exception> onError)
-            => observable.Subscribe(
-                _ => onNext(),
-                onError
-            );
-
-
-        public static IDisposable SubscribeVoid<T>(this IObservable<T> observable, Action onNext, Action<Exception> onError, Action onComplete)
-            => observable.Subscribe(
-                _ => onNext(),
-                onError,
-                onComplete
-            );
 
 
         public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, Task> onNextAsync)
