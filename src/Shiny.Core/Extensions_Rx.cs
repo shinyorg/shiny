@@ -5,6 +5,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
@@ -27,6 +28,30 @@ namespace Shiny
 
     public static partial class Extensions
     {
+        /// <summary>
+        /// Adds a timeout to a task - make sure to trap the timeout exception
+        /// </summary>
+        /// <param name="task"></param>
+        /// <param name="milliseconds"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public static Task WithTimeout(this Task task, int milliseconds, CancellationToken cancelToken = default) =>
+            => task.WithTimeout(TimeSpan.FromMilliseconds(milliseconds), cancelToken);
+
+
+        /// <summary>
+        /// Adds a timeout to a task - make sure to trap the timeout exception
+        /// </summary>
+        /// <param name="task"></param>
+        /// <param name="timeSpan"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public static Task WithTimeout(this Task task, TimeSpan timeSpan, CancellationToken cancelToken = default) =>
+            Observable
+                .FromAsync(() => task)
+                .Timeout(timeSpan)
+                .ToTask(cancelToken);
+
         /// <summary>
         /// Passes the last and current values from the stream
         /// </summary>
