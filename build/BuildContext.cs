@@ -29,6 +29,10 @@ namespace ShinyBuild
         }
 
 
+        public int BuildNumber => this.EnvironmentVariable("BuildNumber", 0);
+        //public string GitHubToken => this.EnvironmentVariable(nameof(GitHubToken));
+        public string DocsDeployGitHubToken => this.EnvironmentVariable(nameof(DocsDeployGitHubToken));
+
         public string MsBuildConfiguration { get; }
         public string NugetApiKey { get; }
         public FilePath GitVersionLog { get; }
