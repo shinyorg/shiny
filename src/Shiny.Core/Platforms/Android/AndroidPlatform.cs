@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Disposables;
@@ -8,6 +9,7 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using AndroidX.Core.App;
+using AndroidX.Core.Content;
 using AndroidX.Lifecycle;
 using Microsoft.Extensions.DependencyInjection;
 using B = global::Android.OS.Build;
@@ -48,7 +50,8 @@ namespace Shiny
         public IObservable<ActivityChanged> WhenActivityChanged() => this.callbacks.ActivitySubject;
 
 
-        [Lifecycle.Event.OnResume] public void OnResume()
+        [Lifecycle.Event.OnResume]
+        public void OnResume()
         {
             this.Status = PlatformState.Foreground;
             this.stateSubj.OnNext(PlatformState.Foreground);
@@ -208,37 +211,41 @@ namespace Shiny
 
         public IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions) => Observable.Create<PermissionRequestResult>(ob =>
         {
-            //var currentGrant = this.GetCurrentAccessState(androidPermission);
-            //if (currentGrant == AccessState.Available)
-            //{
-            //    ob.Respond(AccessState.Available);
-            //    return () => { };
-            //}
-
-            //if (!ActivityCompat.ShouldShowRequestPermissionRationale(this.AppContext, androidPermission))
-            //{
-            //    ob.Respond()
-            //    return () => { };
-            //}
             var comp = new CompositeDisposable();
-            var current = Interlocked.Increment(ref this.requestCode);
-            comp.Add(this
-                .permissionSubject
-                .Where(x => x.RequestCode == current)
-                .Subscribe(x => ob.Respond(x))
-            );
 
-            comp.Add(this
-                .WhenActivityStatusChanged()
-                .Take(1)
-                .Subscribe(x =>
-                    ActivityCompat.RequestPermissions(
-                        x.Activity,
-                        androidPermissions,
-                        current
+            //https://developer.android.com/training/permissions/requesting
+            var allGood = androidPermissions.Any(p => ContextCompat.CheckSelfPermission(this.AppContext, p) == Permission.Granted);
+            if (allGood)
+            {
+                // everything is already good
+                var grants = Enumerable.Repeat(Permission.Granted, androidPermissions.Length).ToArray();
+                ob.Respond(new PermissionRequestResult(0, androidPermissions, grants));
+            }
+            else
+            {
+                if (this.Status == PlatformState.Background)
+                    throw new ApplicationException("You cannot make permission requests while your application is in the background.  Please call RequestAccess in the Shiny library you are using while your app is in the foreground so your user can respond.  You are getting this message because your user has either not granted these permissions or has removed them.");
+
+                var current = Interlocked.Increment(ref this.requestCode);
+                comp.Add(this
+                    .permissionSubject
+                    .Where(x => x.RequestCode == current)
+                    .Subscribe(x => ob.Respond(x))
+                );
+
+                comp.Add(this
+                    .WhenActivityStatusChanged()
+                    .Take(1)
+                    .Subscribe(x =>
+                        ActivityCompat.RequestPermissions(
+                            x.Activity,
+                            androidPermissions,
+                            current
+                        )
                     )
-                )
-            );
+                );
+            }
+
             return comp;
         });
 
