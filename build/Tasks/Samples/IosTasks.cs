@@ -13,6 +13,7 @@ namespace ShinyBuild.Samples.Tasks
         const string InfoPlist = "samples/Samples.iOS/Info.plist";
         const string EntitlementsPlist = "samples/Samples.iOS/Entitlements.plist";
 
+
         public override void Run(BuildContext context)
         {
             var infoPath = context.File(InfoPlist);
@@ -36,7 +37,7 @@ namespace ShinyBuild.Samples.Tasks
 
     [TaskName("IosBuild")]
     [IsDependentOn(typeof(IosPlistTask))]
-    public sealed class SampleBuildTask : FrostingTask<BuildContext>
+    public sealed class BuildIosTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
         {
@@ -54,7 +55,17 @@ namespace ShinyBuild.Samples.Tasks
     }
 
 
-    [IsDependentOn(typeof(SampleBuildTask))]
+    public sealed class SignIosBuildTask : FrostingTask<BuildContext>
+    {
+        public override void Run(BuildContext context)
+        {
+
+        }
+    }
+
+
+    [IsDependentOn(typeof(BuildIosTask))]
+    [IsDependentOn(typeof(SignIosBuildTask))]
     public sealed class IosDeployTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)

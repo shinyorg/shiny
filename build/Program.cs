@@ -9,6 +9,7 @@ namespace ShinyBuild
         public static int Main(string[] args)
             => new CakeHost()
                 .UseContext<BuildContext>()
+                .UseLifetime<BuildLifetime>()
                 //.InstallTool(new Uri("dotnet:n?package=GitVersion.Tool&version=5.6.9"))
                 .Run(args);
     }

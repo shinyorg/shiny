@@ -14,27 +14,31 @@ namespace ShinyBuild
     {
         public BuildContext(ICakeContext context) : base(context)
         {
-            this.MsBuildConfiguration = context.Argument("configuration", "Release");
-            this.NugetApiKey = context.EnvironmentVariable("NugetApiKey");
+#if DEBUG
+            //walk backwards until git directory found -that's root
+            if (!context.GitIsValidRepository(context.Environment.WorkingDirectory))
+            {
+                var dir = new DirectoryPath(".");
+                while (!context.GitIsValidRepository(dir))
+                    dir = new DirectoryPath(Directory.GetParent(dir.FullPath).FullName);
 
-            // walk backwards until git directory found - that's root
-            //var dir = new DirectoryPath(".");
-            //while (!context.GitIsValidRepository(dir))
-            //    dir = new DirectoryPath(Directory.GetParent(dir.FullPath).FullName);
-
-            //context.Environment.WorkingDirectory = dir;
+                context.Environment.WorkingDirectory = dir;
+            }
+#endif
             this.Branch = context.GitBranchCurrent(".");
         }
 
 
         public string MajorMinorVersion => "2.0";
-        public int BuildNumber => this.EnvironmentVariable("BuildNumber", 0);
-        //public string GitHubToken => this.EnvironmentVariable(nameof(GitHubToken));
-        public string DocsDeployGitHubToken => this.EnvironmentVariable(nameof(DocsDeployGitHubToken));
+        public int BuildNumber => this.Argument("BuildNumber", 0);
+        //public string GitHubToken => this.Argument<string>(nameof(GitHubToken));
+        public string DocsDeployGitHubToken => this.Argument<string>(nameof(DocsDeployGitHubToken));
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows? "WINDOWS_NT" : "MAC";
-        public string MsBuildConfiguration { get; }
-        public string NugetApiKey { get; }
+        public string MsBuildConfiguration => this.Argument("configuration", "Release");
+        public string NugetApiKey => this.Argument<string>("NugetApiKey");
         public GitBranch Branch { get; }
+
+
         public bool IsMainBranch
         {
             get
@@ -57,5 +61,18 @@ namespace ShinyBuild
                 return true;
             }
         }
+
+
+        public bool IsNugetDeployBranch
+        {
+            get
+            {
+                var bn = this.Branch.FriendlyName.ToLower();
+                return bn.Equals("main") || bn.Equals("master") || bn.Equals("preview");
+            }
+        }
+
+
+        public bool IsDocsDeployBranch => this.IsNugetDeployBranch;
     }
 }

@@ -1,9 +1,6 @@
 ﻿using System;
-
 using Cake.AndroidAppManifest;
-using Cake.AppCenter;
 using Cake.Common.Tools.MSBuild;
-using Cake.Core.Diagnostics;
 using Cake.Frosting;
 
 
@@ -39,6 +36,7 @@ namespace ShinyBuild.Tasks
         }
     }
 
+    // TODO: sign and deploy tasks
 
     //[IsDependentOn(typeof(SampleBuildTask))]
     //public sealed class UwpDeployTask : FrostingTask<BuildContext>

@@ -16,7 +16,7 @@ namespace ShinyBuild.Tasks
 
         public override void Run(BuildContext context)
         {
-            if (context.IsRunningInCI && context.IsMainBranch)
+            if (context.IsRunningInCI && context.IsDocsDeployBranch)
             {
                 context.Log.Information("Building & Deploying Documentation");
                 RunIt(context, "--deploy");
@@ -37,8 +37,9 @@ namespace ShinyBuild.Tasks
 
             var settings = new DotNetCoreRunSettings
             {
-                Framework = "net5.0",
-                Configuration = "Release",
+                //Framework = "net5.0",
+                Configuration = context.MsBuildConfiguration,
+                //ArgumentCustomization = args => args.Append("--l Debug"),
                 EnvironmentVariables = new Dictionary<string, string>
                 {
                     { "GITHUB_TOKEN", context.DocsDeployGitHubToken }
