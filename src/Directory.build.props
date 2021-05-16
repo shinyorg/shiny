@@ -24,8 +24,10 @@
         <ExtrasUwpMetaPackageVersion>6.2.12</ExtrasUwpMetaPackageVersion>
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-        <!--<PackageReadmeFile>README.md</PackageReadmeFile>-->
-        <!--ItemGroup of project<None Include="docs\README.md" Pack="true" PackagePath="\"/>-->
+        <!--
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        ItemGroup of project<None Include="docs\README.md" Pack="true" PackagePath="\"/>
+        -->
     </PropertyGroup>
 
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
