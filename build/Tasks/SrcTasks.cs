@@ -59,7 +59,7 @@ namespace ShinyBuild.Tasks
     {
         public override void Run(BuildContext context)
         {
-            if (!context.IsDocsDeployBranch)
+            if (!context.IsNugetDeployBranch)
                 return;
 
             var settings = new DotNetCoreNuGetPushSettings
