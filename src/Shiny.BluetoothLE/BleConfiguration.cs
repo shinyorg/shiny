@@ -11,21 +11,11 @@ namespace Shiny.BluetoothLE
         /// </summary>
         public bool AndroidUseInternalSyncQueue { get; set; } = true;
 
-        ///// <summary>
-        ///// This is only necessary on niche cases and thus must be enabled by default
-        ///// </summary>
-        //public bool RefreshServices { get; set; }
-
-        ///// <summary>
-        ///// Suggests whether main thread is to be used
-        ///// </summary>
-        //public static bool IsMainThreadSuggested { get; internal set; }
-
         /// <summary>
         /// If you disable this, you need to manage serial/sequential access to ALL bluetooth operations yourself!
         /// DO NOT CHANGE this if you don't know what this is!
         /// </summary>
-        public bool AndroidShouldInvokeOnMainThread { get; set; } = true;
+        public bool AndroidShouldInvokeOnMainThread { get; set; }
 
         /// <summary>
         /// Time span to pause before service discovery (helps in combating GATT133 error) when service discovery is performed immediately after connection

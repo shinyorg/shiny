@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
 using Android.OS;
 using Android.Bluetooth;
 using Exception = System.Exception;
-using System.Threading;
-using System.Reactive.Disposables;
-using System.Reactive.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.BluetoothLE.Internals
 {
@@ -70,25 +70,19 @@ namespace Shiny.BluetoothLE.Internals
             if (!this.ManagerContext.Configuration.AndroidUseInternalSyncQueue)
                 return observable;
 
-            return Observable.Create<T>(async ob =>
+            return Observable.FromAsync(async ct =>
             {
-                await this.semaphore.WaitAsync();
+                await this.semaphore.WaitAsync(ct);
                 try
                 {
-                    var result = await observable.ToTask();
-                    ob.OnNext(result);
-                }
-                catch (Exception ex)
-                {
-                    ob.OnError(ex);
+                    return await observable
+                        .ToTask(ct)
+                        .ConfigureAwait(false);
                 }
                 finally
                 {
-                    // TODO: release on disconnect as well!?  likely
                     this.semaphore.Release();
                 }
-
-                return Disposable.Empty;
             });
         }
 
@@ -136,7 +130,10 @@ namespace Shiny.BluetoothLE.Internals
             }
             catch (Exception ex)
             {
-                //Log.Write(BleLogCategory.Peripheral, "Unclean disconnect - " + ex);
+                ShinyHost
+                    .LoggerFactory
+                    .CreateLogger("BlePeripheral")
+                    .LogWarning(ex, "BLE Peripheral did not cleanly disconnect");
             }
         }
 
