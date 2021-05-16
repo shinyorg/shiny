@@ -33,6 +33,7 @@ namespace ShinyBuild.Tasks
                 .WithTarget("Clean")
                 .WithTarget("Build")
                 .WithProperty("ShinyVersion", version)
+                .WithProperty("CI", context.IsRunningInCI ? "true" : "")
                 .WithProperty("OS", context.OperatingSystemString)
                 .SetConfiguration(context.MsBuildConfiguration)
             );
