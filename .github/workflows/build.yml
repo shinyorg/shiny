@@ -40,4 +40,4 @@ jobs:
         token: ${{secrets.github_token}}
 
     - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj --GitHubToken=${{secrets.github_token}} --DocGitHubToken=${{ secrets.DOCS_GITHUB_TOKEN }} --BuildNumber=${{steps.buildnumber.outputs.build_number}} --NugetApiKey ${{secrets.NUGETAPIKEY}}
+      run: dotnet run --project build/ShinyBuild.csproj --DocsDeployGitHubToken=${{ secrets.DOCS_GITHUB_TOKEN }} --BuildNumber=${{steps.buildnumber.outputs.build_number}} --NugetApiKey=${{secrets.NUGETAPIKEY}}
