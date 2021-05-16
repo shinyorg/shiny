@@ -32,7 +32,7 @@ namespace ShinyBuild
         public string MajorMinorVersion => "2.0";
         public int BuildNumber => this.Argument("BuildNumber", 0);
         //public string GitHubToken => this.Argument<string>(nameof(GitHubToken));
-        public string DocsDeployGitHubToken => this.Argument<string>(nameof(DocsDeployGitHubToken));
+        public string DocsDeployGitHubToken => this.Argument<string>(nameof(DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.Argument("configuration", "Release");
         public string NugetApiKey => this.Argument<string>("NugetApiKey");

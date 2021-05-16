@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <!--<TargetFramework>netcoreapp3.1</TargetFramework>-->
         <TargetFramework>net5.0</TargetFramework>
         <LangVersion>9.0</LangVersion>
         <Nullable>enable</Nullable>
@@ -12,12 +11,6 @@
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="Statiq.Web" />
         <PackageReference Include="Devlead.Statiq" />
-        <!--
-        <PackageReference Include="MarkdownSnippets.MsBuild" Version="22.0.3">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        -->
     </ItemGroup>
 
 </Project>

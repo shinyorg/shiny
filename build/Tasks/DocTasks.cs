@@ -38,8 +38,8 @@ namespace ShinyBuild.Tasks
             var settings = new DotNetCoreRunSettings
             {
                 //Framework = "net5.0",
-                Configuration = context.MsBuildConfiguration,
                 //ArgumentCustomization = args => args.Append("--l Debug"),
+                Configuration = context.MsBuildConfiguration,
                 EnvironmentVariables = new Dictionary<string, string>
                 {
                     { "GITHUB_TOKEN", context.DocsDeployGitHubToken }
