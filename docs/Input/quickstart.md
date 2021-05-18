@@ -4,21 +4,13 @@ Order: 1
 
 ## Setup
 
-1. The first thing is to install Shiny.Core as it used by all of the Shiny libraries (or Shiny which contains the code gen, but we'll get to that later).  
+### WARNING: This method does require a later build of MSBuild - 16.8+ which is not yet available in most CI systems.  You can
+use a utility like boots to install the latest beta of Mono, Xamarin Android, & Xamarin iOS on macOS to build your app.
 
-2. In your shared code project.  Create a Shiny startup file:
+1. The first thing is to install <?! NugetShield "Shiny" /?> to your application head project (ie. MyProject.iOS and MyProject.Android).  This library contains the Shiny.Core and source generators designed to plugin
+all of the boilerplate code you'll need.
 
-<?! Startup ?>
-// this is where you'll load things like BLE, GPS, etc - those are covered in other sections
-// things like the jobs, environment, power, are all installed automatically
-<?!/ Startup ?>
-
-As another alternative, you can have Shiny generate a startup file automatically at compile time.
-
-### Android & iOS
-
-1. The best option is to install the <?# NugetShield "Shiny" /?> in your head Android, iOS, and UWP head projects.  
-2. In each head project, add the following anywhere in your project:
+2. Add the following anywhere in each head project
 
 ```csharp
 // NOTE THE USE OF THE FULL TYPE NAME INCLUDING NAMESPACE
@@ -26,9 +18,35 @@ As another alternative, you can have Shiny generate a startup file automatically
     ShinyStartupTypeName = "YourNamespace.YourApp",
     XamarinFormsAppTypeName = "YourNamespace.YourXamarinFormsApp"
 )]
-```
+```  
 
-3. iOS: Make sure your AppDelegate is marked as a partial class.  If you implement any of the methods in it, consider removing them.  If you have any custom code in them, take a look at [boilerplate](xref:boilerplate) for more custom scenarios
-3. Android: Consider deleting any Android application classes you have and make sure all of your activities are marked partial.
+3. In your shared code project.  Create a Shiny startup file:
 
-Out of the box, Shiny automatically adds all of the services for Jobs, file system, power monitoring, and key/value storage (as well as several other services need by the Shiny internals)
+<?! Startup ?>
+// this is where you'll load things like BLE, GPS, etc - those are covered in other sections
+// things like the jobs, environment, power, are all installed automatically
+<?!/ Startup ?>
+
+
+4. For iOS AppDelegate is marked partial.  If you have any methods that Shiny uses already implemented, you'll receive
+a build warning to manually hook the method.
+
+5. For Android, Shiny will automatically create the necessary Android application class.  For your main activity (or multiple activities),
+ensure each one is marked as partial.  Shiny will again, auto hook the necessary methods.
+
+6. Install any of the service modules Shiny has to offer and register them with your startup.  Be sure to follow any special
+OS setup instructions in each module.
+
+---
+The Shiny source generators also automatically wire the following 3rd party libraries for you:
+
+* [Xamarin Forms](https://github.com/xamarin/xamarin.forms)
+* [Xamarin Essentials](https://github.com/xamarin/essentials)
+* [ACR User Dialogs](https://github.com/aritchie/userdialogs)
+* [AIForms Settings View](https://github.com/muak/AiForms.SettingsView)
+* [XF Material](https://github.com/Baseflow/XF-Material-Library)
+* [RG Popups](https://github.com/rotorgames/Rg.Plugins.Popup)
+* [Microsoft Identity Client (MSAL)](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet)
+
+If you have a truly custom application and you have a great deal of code in your AppDelegate or Android classes, you can manually
+hook Shiny into these methods.  Take a look at [iOS Setup](xref:ios) and [Android Setup](xref:android) for how to do this.
