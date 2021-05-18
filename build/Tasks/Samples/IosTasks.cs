@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using Cake.AppCenter;
 using Cake.Common.IO;
+using Cake.Common.Tools.MSBuild;
 using Cake.Frosting;
 using Cake.Plist;
 
 
-namespace ShinyBuild.Samples.Tasks
+namespace ShinyBuild.Tasks.Samples
 {
     public sealed class IosPlistTask : FrostingTask<BuildContext>
     {
@@ -14,8 +15,13 @@ namespace ShinyBuild.Samples.Tasks
         const string EntitlementsPlist = "samples/Samples.iOS/Entitlements.plist";
 
 
+//        security unlock-keychain -p<my keychain password>
+//security import Certificate.p12 -k ~/Library/Keychains/login.keychain -P password -T /usr/bin/codesign
         public override void Run(BuildContext context)
         {
+            if (!context.IsRunningInCI)
+                return;
+
             var infoPath = context.File(InfoPlist);
 
             var info = (Dictionary<string, object>)context.DeserializePlist(infoPath);
@@ -37,20 +43,18 @@ namespace ShinyBuild.Samples.Tasks
 
     [TaskName("IosBuild")]
     [IsDependentOn(typeof(IosPlistTask))]
-    public sealed class BuildIosTask : FrostingTask<BuildContext>
+    public sealed class IosBuildTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
         {
             context.CleanDirectory($"../samples/**/bin/{context.MsBuildConfiguration}");
-            //MSBuild("./MyDirectory/MyProject.sln", settings =>
-            //settings.SetConfiguration("Release")
-            //    .WithTarget("Build")
-            //    .WithProperty("Platform", "iPhone")
-            //    .WithProperty("BuildIpa", "true")
+            context.MSBuild("Build.sln", x => x
+                .WithTarget("Clean")
+                .WithTarget("Build")
+                .WithProperty("Platform", "iPhone")
+                .WithProperty("BuildIpa", "true")
             //    .WithProperty("OutputPath", "bin/Release/")
-            //    .WithProperty("TreatWarningsAsErrors", "false"));
-            // TODO: mobile.buildtools handles secrets well in the IDE and therefore can also be used here
-            // TODO: separate iOS and android for build and deploy
+            );
         }
     }
 
@@ -80,3 +84,27 @@ namespace ShinyBuild.Samples.Tasks
         }
     }
 }
+
+//static void InstallProvisioningProfile(string envVarName)
+//{
+//    var rx = "\\<key\\>UUID\\</key\\>\\s+?\\<string\\>(?<udid>[a-zA-Z0-9\\-]+)\\</string\\>";
+
+//    var ppEnv = System.Environment.GetEnvironmentVariable(envVarName);
+
+//    if (string.IsNullOrEmpty(ppEnv))
+//        return;
+
+//    var ppData = System.Convert.FromBase64String(System.Environment.GetEnvironmentVariable(envVarName));
+//    var pp = System.Text.Encoding.Default.GetString(ppData);
+
+//    var udid = System.Text.RegularExpressions.Regex.Match(pp, rx)?.Groups?["udid"]?.Value;
+//    System.Console.WriteLine("{0} UDID: {1}", envVarName, udid);
+
+//    var ppDir = System.IO.Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile), "Library", "MobileDevice", "Provisioning Profiles");
+//    if (!System.IO.Directory.Exists(ppDir))
+//        System.IO.Directory.CreateDirectory(ppDir);
+
+//    var ppFile = System.IO.Path.Combine(ppDir, udid + ".mobileprovision");
+//    System.Console.WriteLine("{0} File: {1}", envVarName, ppFile);
+//    System.IO.File.WriteAllBytes(ppFile, ppData);
+//}

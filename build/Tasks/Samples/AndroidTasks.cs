@@ -4,14 +4,16 @@ using Cake.Common.Tools.MSBuild;
 using Cake.Frosting;
 
 
-namespace ShinyBuild.Tasks
+namespace ShinyBuild.Tasks.Samples
 {
-    [TaskName("Sample-AndroidManifest")]
-    public sealed class SampleAndroidManifestTask : FrostingTask<BuildContext>
+    public sealed class AndroidManifestTask : FrostingTask<BuildContext>
     {
         const string DroidManifest = "samples/Samples.Android/Properties/AndroidManifest.xml";
         public override void Run(BuildContext context)
         {
+            if (!context.IsRunningInCI)
+                return;
+
             var manifest = context.DeserializeAppManifest(DroidManifest);
             manifest.VersionName = "1.0";
             manifest.VersionCode = 1;
@@ -22,7 +24,8 @@ namespace ShinyBuild.Tasks
 
 
     [TaskName("AndroidBuild")]
-    public sealed class SampleBuildTask : FrostingTask<BuildContext>
+    [IsDependentOn(typeof(AndroidManifestTask))]
+    public sealed class AndroidBuildTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
         {

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+
 using Cake.Boots;
 using Cake.Common.IO;
 using Cake.Core.Diagnostics;
@@ -7,6 +8,15 @@ using Cake.Frosting;
 
 namespace ShinyBuild.Tasks.Samples
 {
+    [TaskName("Samples")]
+    [IsDependentOn(BootsTask)]
+    [IsDependentOn(typeof(AndroidBuildTask))]
+    [IsDependentOn(typeof(IosBuildTask))]
+    public sealed class BuildAllSamplesTask : FrostingTask<BuildContext>
+    {
+    }
+
+
     public sealed class CleanTask : FrostingTask<BuildContext>
     {
         public override void Run(BuildContext context)
@@ -27,6 +37,7 @@ namespace ShinyBuild.Tasks.Samples
             {
                 context.Log.Information($"Installing Boots - {Channel} Channel");
 
+                //context.VSToolSetup();
                 await context.Boots(Product.Mono, Channel);
                 await context.Boots(Product.XamarinAndroid, Channel);
                 await context.Boots(Product.XamariniOS, Channel);
