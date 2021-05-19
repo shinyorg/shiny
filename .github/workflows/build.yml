@@ -9,10 +9,6 @@ on:
         default: 'warning'
   push:
     branches: [ master, main, dev, preview ]
-    paths:
-    - "src/**"
-    - "build/**"
-    - ".github/workflows/**"
   pull_request:
     branches: [ master, main, dev ]
     paths:

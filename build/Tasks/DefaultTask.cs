@@ -1,12 +1,12 @@
 ﻿using System;
 using Cake.Frosting;
+using ShinyBuild.Tasks.Library;
 
 
 namespace ShinyBuild.Tasks
 {
     [TaskName("Default")]
-    //[IsDependentOn(typeof(SampleBuildTask))]
     [IsDependentOn(typeof(NugetDeployTask))]
     [IsDependentOn(typeof(DocTask))]
-    public sealed class DefaultTask : FrostingTask<BuildContext> { }
+    public sealed class DefaultTarget : FrostingTask<BuildContext> { }
 }

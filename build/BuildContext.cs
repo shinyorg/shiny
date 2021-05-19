@@ -31,6 +31,7 @@ namespace ShinyBuild
 
         public string MajorMinorVersion => "2.0";
         public int BuildNumber => this.Argument("BuildNumber", 0);
+        public bool UseXamarinPreview => this.HasArgument("UseXamarinPreview");
         public bool IsWindows => this.Environment.Platform.Family == PlatformFamily.Windows;
         public string DocsDeployGitHubToken => this.Argument<string>(nameof(DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";

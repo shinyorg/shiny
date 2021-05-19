@@ -18,6 +18,9 @@ namespace ShinyBuild.Tasks
         {
             if (context.IsRunningInCI && context.IsDocsDeployBranch)
             {
+                if (String.IsNullOrWhiteSpace(context.DocsDeployGitHubToken))
+                    throw new ArgumentException("Docs GitHub Deployment Token is missing");
+
                 context.Log.Information("Building & Deploying Documentation");
                 RunIt(context, "--deploy");
                 context.Log.Information("Documentation Deployed");
