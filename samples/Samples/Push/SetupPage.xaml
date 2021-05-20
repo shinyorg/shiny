@@ -24,9 +24,6 @@
                     <SwitchCell Text="Tags Support"
                                 On="{Binding IsTagsSupported}"
                                 IsEnabled="False" />
-                    <EntryCell Label="Tag"
-                               Text="{Binding Tag}"
-                               IsEnabled="{Binding IsTagsSupported}" />
                 </TableSection>
 
                 <TableSection Title="Info">

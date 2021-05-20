@@ -45,7 +45,6 @@ namespace Samples.Push
 
         public ICommand RequestAccess { get; }
         public ICommand UnRegister { get; }
-        public ICommand UpdateTag { get; }
 
         public bool IsTagsSupported => this.pushManager?.IsTagsSupport() ?? false;
         public string Implementation => this.pushManager?.GetType().FullName ?? "None";
