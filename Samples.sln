@@ -7,7 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{3D1616
 	ProjectSection(SolutionItems) = preProject
 		buildtools.json = buildtools.json
 		samples\readme.md = samples\readme.md
-		.github\workflows\samples.yml = .github\workflows\samples.yml
 		secrets.json = secrets.json
 	EndProjectSection
 EndProject
