@@ -19,7 +19,7 @@ namespace Shiny.Tests.Push
     {
         private const string FcmSampleNotificationContent = "{\"data\":{\"message\":\"Notification Hub test notification from SDK sample\"}}";
         //private const string FcmSampleSilentNotificationContent = "{ \"message\":{\"data\":{ \"Nick\": \"Mario\", \"body\": \"great match!\", \"Room\": \"PortugalVSDenmark\" } }}";
-        private const string AppleSampleNotificationContent = "{\"aps\":{\"alert\":\"Notification Hub test notification from SDK sample\"}}";
+        private const string AppleSampleNotificationContent = "{\"aps\":{\"alert\":\"Notification Hub test notification from SDK sample\",\"content-available\":1}}";
         //private const string AppleSampleSilentNotificationContent = "{\"aps\":{\"content-available\":1}, \"foo\": 2 }";
         private const string WnsSampleNotification = "<?xml version=\"1.0\" encoding=\"utf-8\"?><toast><visual><binding template=\"ToastText01\"><text id=\"1\">Notification Hub test notification from SDK sample</text></binding></visual></toast>";
         readonly IPushTagSupport pushManager;
@@ -148,8 +148,10 @@ namespace Shiny.Tests.Push
 
         async Task DoSend()
         {
-            await this.pushManager.AddTag(this.pushManager.CurrentRegistrationToken);
-            var tag = this.pushManager.CurrentRegistrationToken;
+            //var tag = this.pushManager.CurrentRegistrationToken;
+            
+            var tag = "UnitTest";
+            await this.pushManager.AddTag(tag);
             await Task.Delay(1000); // let azure breath
 
             var p = TestStartup.CurrentPlatform;
