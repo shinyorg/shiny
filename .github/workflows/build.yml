@@ -44,7 +44,7 @@ jobs:
 
     # pass cert/pass and provisioning profile
     - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj --target=iOSSample --DocsDeployGitHubToken=${{ secrets.DOCS_GITHUB_TOKEN }} --BuildNumber=${{steps.buildnumber.outputs.build_number}} --NugetApiKey=${{secrets.NUGETAPIKEY}}
+      run: dotnet run --project build/ShinyBuild.csproj --target=iOSSample
 
   androidsample:
     runs-on: macos-latest
@@ -54,4 +54,4 @@ jobs:
 
     # pass signing key, alias and pass
     - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj --target=AndroidSample --DocsDeployGitHubToken=${{ secrets.DOCS_GITHUB_TOKEN }} --BuildNumber=${{steps.buildnumber.outputs.build_number}} --NugetApiKey=${{secrets.NUGETAPIKEY}}
+      run: dotnet run --project build/ShinyBuild.csproj --target=AndroidSample
