@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -34,21 +32,6 @@ namespace Shiny
         /// <param name="s"></param>
         /// <returns></returns>
         public static bool IsEmpty(this string? s) => String.IsNullOrWhiteSpace(s);
-
-
-        /// <summary>
-        /// Safetied string length check
-        /// </summary>
-        /// <param name="string"></param>
-        /// <param name="length"></param>
-        /// <returns></returns>
-        public static bool HasMinLength(this string? @string, int length)
-        {
-            if (@string.IsEmpty())
-                return false;
-
-            return @string.Length >= length;
-        }
 
 
         /// <summary>
@@ -88,31 +71,6 @@ namespace Shiny
                 return;
 
             throw new ArgumentException(message ?? $"Invalid State " + state);
-        }
-
-
-        public static IEnumerable<IEnumerable<T>> Page<T>(this IEnumerable<T> source, int pageSize)
-        {
-            Contract.Requires(source != null);
-            Contract.Requires(pageSize > 0);
-            Contract.Ensures(Contract.Result<IEnumerable<IEnumerable<T>>>() != null);
-
-            using (var enumerator = source.GetEnumerator())
-            {
-                while (enumerator.MoveNext())
-                {
-                    var currentPage = new List<T>(pageSize)
-                    {
-                        enumerator.Current
-                    };
-
-                    while (currentPage.Count < pageSize && enumerator.MoveNext())
-                    {
-                        currentPage.Add(enumerator.Current);
-                    }
-                    yield return new ReadOnlyCollection<T>(currentPage);
-                }
-            }
         }
 
 

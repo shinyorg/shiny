@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Samples.Infrastructure;
-
 using Shiny;
 using Shiny.Jobs;
 
