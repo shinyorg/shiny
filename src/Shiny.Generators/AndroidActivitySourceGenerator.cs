@@ -140,7 +140,7 @@ namespace Shiny.Generators
             if (this.context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
                 builder.AppendLineInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
             else if (this.context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this, savedInstanceState);");
+                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this);");
         }
 
 
