@@ -90,10 +90,10 @@ namespace Samples
 
             //services.UsePush<PushDelegate>();
             //services.UseFirebaseMessaging<PushDelegate>();
-            //services.UsePushAzureNotificationHubs<PushDelegate>(
-            //    Secrets.Values.AzureNotificationHubListenerConnectionString,
-            //    Secrets.Values.AzureNotificationHubName
-            //);
+            services.UsePushAzureNotificationHubs<PushDelegate>(
+                Secrets.Values.AzureNotificationHubListenerConnectionString,
+                Secrets.Values.AzureNotificationHubName
+            );
         }
 
 

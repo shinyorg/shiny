@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 
 
@@ -15,17 +16,22 @@ namespace Shiny.Push.AzureNotificationHubs
     public class PushManager : Shiny.Push.PushManager, IPushTagSupport
     {
         readonly NotificationHubClient hub;
+        readonly ILogger logger;
 
 
 #if __ANDROID__
         public PushManager(AzureNotificationConfig config,
                            ShinyCoreServices services,
+                           ILogger<PushManager> logger,
                            Shiny.Notifications.INotificationManager notifications)
                            : base(services, notifications)
 #else
-        public PushManager(AzureNotificationConfig config, ShinyCoreServices services) : base(services)
+        public PushManager(AzureNotificationConfig config,
+                           ILogger<PushManager> logger,
+                           ShinyCoreServices services) : base(services)
 #endif
         {
+            this.logger = logger;
             this.hub = new NotificationHubClient(
                 config.ListenerConnectionString,
                 config.HubName
@@ -58,7 +64,8 @@ namespace Shiny.Push.AzureNotificationHubs
                 }
                 catch (Exception ex)
                 {
-                    // TODO
+                    // should I unreg here?
+                    this.logger.LogError(ex, "There was an registering the new firebase token to Azure Notification Hub");
                 }
             };
 
@@ -87,11 +94,19 @@ namespace Shiny.Push.AzureNotificationHubs
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             var access = await base.RequestAccess(cancelToken);
+            this.logger.LogInformation($"OS Permission: " + access.Status);
 
             if (access.Status == AccessState.Available)
             {
+                this.InstallationId ??= Guid.NewGuid().ToString().Replace("-", "");
+
+#if __IOS__
+                this.NativeRegistrationToken = await this.GetPushChannel(cancelToken);
+                //this.NativeRegistrationToken = rawToken.ToArray().ToHex();
+#else
                 this.NativeRegistrationToken = access.RegistrationToken;
-                this.InstallationId = Guid.NewGuid().ToString().Replace("-", "");
+#endif
+                this.logger.LogInformation("Native Notification Token: " + this.NativeRegistrationToken);
 
                 var install = new Installation
                 {
@@ -106,6 +121,8 @@ namespace Shiny.Push.AzureNotificationHubs
 #endif
                 };
                 await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken);
+                this.logger.LogInformation("Azure Notification Hub InstallationID: " + this.InstallationId);
+
                 this.CurrentRegistrationTokenDate = DateTime.UtcNow;
                 this.CurrentRegistrationToken = this.InstallationId;
 
@@ -132,6 +149,17 @@ namespace Shiny.Push.AzureNotificationHubs
             this.NativeRegistrationToken = null;
             await base.UnRegister();
         }
+
+
+#if __IOS__
+
+        protected virtual async Task<string> GetPushChannel(CancellationToken cancelToken)
+        {
+            var deviceToken = await this.RequestDeviceToken(cancelToken);
+            var token = System.Text.Encoding.UTF8.GetString(deviceToken.ToArray());
+            return token;
+        }
+#endif
 
 
 #if __ANDROID__

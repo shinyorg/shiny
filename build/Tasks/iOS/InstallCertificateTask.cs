@@ -1,23 +1,29 @@
 ﻿using System;
+using Cake.Common.IO;
+using Cake.Core.IO;
 using Cake.Frosting;
 
 
 namespace ShinyBuild.Tasks.iOS
 {
+    [TaskName("ioscertificate")]
     public sealed class InstallCertificateTask : FrostingTask<BuildContext>
     {
-        public override bool ShouldRun(BuildContext context)
-            => context.IsRunningInCI && !context.IsWindows;
+        //public override bool ShouldRun(BuildContext context)
+            //=> context.IsRunningInCI && !context.IsWindows;
 
 
         public override void Run(BuildContext context)
         {
-            //        security unlock-keychain -p<my keychain password>
             //security import Certificate.p12 -k ~/Library/Keychains/login.keychain -P password -T /usr/bin/codesign
-            //var result = context.ProcessRunner.Start(new Cake.Core.IO.FilePath(""), new Cake.Core.IO.ProcessSettings
-            //{
+            var exe = context.File("security");
 
-            //});
+            var process = context.Execute(exe, "unlock-keychain -u");
+            process.WaitForExit();
+            //if (process.GetStandardError)
+
+            //process = context.Execute(exe, "import Certificate.p12 -k ~/Library/Keychains/login.keychain -P password -T /usr/bin/codesign");
+            //process.WaitForExit();
         }
     }
 }

@@ -2,8 +2,14 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:samples="clr-namespace:Samples"
+             xmlns:push="clr-namespace:Samples.Push"
+             x:DataType="push:TagsViewModel"
              x:Class="Samples.Push.TagsPage"
              Title="Tags">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Add" Command="{Binding Add}" />
+    </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
         <StackLayout>

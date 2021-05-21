@@ -52,10 +52,10 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>ARM64</MtouchArch>
-    <CodesignKey>Apple Development: Allan Ritchie %2834FQ4253P2%29</CodesignKey>
+    <CodesignKey>Apple Development: Allan Ritchie (34FQ4253P2)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <CodesignProvision>VS: com.shiny.test Development</CodesignProvision>
+    <CodesignProvision>Shiny Samples</CodesignProvision>
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchLink>None</MtouchLink>
   </PropertyGroup>

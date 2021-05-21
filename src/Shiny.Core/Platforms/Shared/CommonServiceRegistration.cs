@@ -14,6 +14,7 @@ namespace Shiny
     {
         public static void RegisterCommonServices(this IServiceCollection services)
         {
+            //services.PostConfigureAll<ShinyOptions>(opts => opts.Services = services);
             services.AddSingleton<ShinyCoreServices>();
             services.RegisterModule<StoresModule>();
             services.TryAddSingleton<ISerializer, ShinySerializer>();
