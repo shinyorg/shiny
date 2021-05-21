@@ -52,22 +52,7 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="jobInfo"></param>
         public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-        {
-            services.RegisterPostBuildAction(async sp =>
-            {
-                var jobs = sp.GetRequiredService<IJobManager>();
-                var access = await jobs.RequestAccess();
-                if (access == AccessState.Available)
-                    await jobs.Register(jobInfo);
-                else
-                {
-                    ShinyHost
-                        .LoggerFactory
-                        .CreateLogger<ILogger<IJobManager>>()
-                        .LogError("Job permission failed - " + access);
-                }
-            });
-        }
+            => StartupModule.AddJob(jobInfo);
 
 
         /// <summary>

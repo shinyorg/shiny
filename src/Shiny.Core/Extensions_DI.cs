@@ -4,29 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
+using Shiny.Infrastructure;
 
 namespace Shiny
 {
     public static partial class Extensions
     {
-        readonly static IDictionary<int, List<Action<IServiceProvider>>> postBuild = new Dictionary<int, List<Action<IServiceProvider>>>();
-
-
-        /// <summary>
-        /// Registers a post container build step
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="action"></param>
-        public static void RegisterPostBuildAction(this IServiceCollection services, Action<IServiceProvider> action)
-        {
-            var hash = services.GetHashCode();
-            if (!postBuild.ContainsKey(hash))
-                postBuild.Add(hash, new List<Action<IServiceProvider>>());
-            postBuild[hash].Add(action);
-        }
-
-
         /// <summary>
         /// Attempts to resolve or build an instance from a service provider
         /// </summary>
@@ -54,7 +37,7 @@ namespace Shiny
         public static void RegisterModule(this IServiceCollection services, ShinyModule module)
         {
             module.Register(services);
-            services.RegisterPostBuildAction(module.OnContainerReady);
+            StartupModule.AddModule(module);
         }
 
 
@@ -76,23 +59,6 @@ namespace Shiny
         /// <returns></returns>
         public static T Resolve<T>(this IServiceProvider serviceProvider, bool requiredService = false)
             => requiredService ? serviceProvider.GetRequiredService<T>() : serviceProvider.GetService<T>();
-
-
-        public static IServiceProvider BuildShinyServiceProvider(this IServiceCollection services,
-                                                                 bool validateScopes,
-                                                                 Func<IServiceCollection, IServiceProvider>? containerBuild = null,
-                                                                 Action<IServiceProvider>? assignBeforeEvents = null)
-        {
-            var provider = containerBuild?.Invoke(services) ?? services.BuildServiceProvider(validateScopes);
-            assignBeforeEvents?.Invoke(provider);
-
-            var hash = services.GetHashCode();
-            if (postBuild.ContainsKey(hash))
-                foreach (var action in postBuild[hash])
-                    action(provider);
-
-            return provider;
-        }
 
 
         /// <summary>

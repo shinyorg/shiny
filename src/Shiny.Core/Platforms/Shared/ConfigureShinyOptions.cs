@@ -30,6 +30,7 @@ namespace Shiny
 
         public void Configure(ShinyOptions options)
         {
+            // TODO: modules post configure
             var objectBinder = this.serviceProvider.GetRequiredService<IObjectStoreBinder>();
 
             var singletons = options

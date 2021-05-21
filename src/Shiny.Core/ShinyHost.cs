@@ -4,7 +4,6 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
-using Shiny.Infrastructure.DependencyInjection;
 
 
 namespace Shiny
@@ -73,7 +72,7 @@ namespace Shiny
 
         public static void Init(IPlatform platform, IShinyStartup? startup = null)
         {
-            var services = new ShinyServiceCollection();
+            var services = new ServiceCollection();
             services.AddSingleton(platform);
             services.AddLogging(builder => startup?.ConfigureLogging(builder, platform));
 
@@ -87,12 +86,7 @@ namespace Shiny
             platform.Register(services);
 
             Services = services;
-
-            services.BuildShinyServiceProvider(
-                ValidateScopes,
-                s => startup?.CreateServiceProvider(s)!,
-                s => container = s
-            );
+            container = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
         }
     }
 }
