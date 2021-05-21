@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Net;
@@ -14,7 +16,19 @@ namespace Shiny
     {
         public static void RegisterCommonServices(this IServiceCollection services)
         {
-            services.PostConfigureAll<ShinyOptions>(opts => opts.Services = services);
+            //.UseDefaultServiceProvider((context, options) =>
+            // {
+            //     bool isDevelopment = context.HostingEnvironment.IsDevelopment();
+            //     options.ValidateScopes = isDevelopment;
+            //     options.ValidateOnBuild = isDevelopment;
+            // });
+            services
+                .AddOptions()
+                .ConfigureOptions<ConfigureShinyOptions>()
+                .Configure<ShinyOptions>(opts => {
+                    opts.Services = services;
+                });
+
             services.AddSingleton<StartupModule>();
             services.AddSingleton<ShinyCoreServices>();
             services.RegisterModule<StoresModule>();

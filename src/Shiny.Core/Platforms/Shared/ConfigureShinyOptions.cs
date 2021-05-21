@@ -9,13 +9,13 @@ using Shiny.Stores;
 
 namespace Shiny
 {
-    internal class ShinyOptions
+    public class ShinyOptions
     {
         public IServiceCollection? Services { get; set; }
     }
 
 
-    internal class ConfigureShinyOptions : IConfigureOptions<ShinyOptions>
+    public class ConfigureShinyOptions : IConfigureOptions<ShinyOptions>
     {
         readonly IServiceProvider serviceProvider;
         readonly ILogger logger;
@@ -30,7 +30,6 @@ namespace Shiny
 
         public void Configure(ShinyOptions options)
         {
-            // TODO: modules post configure
             var objectBinder = this.serviceProvider.GetRequiredService<IObjectStoreBinder>();
 
             var singletons = options

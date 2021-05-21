@@ -77,6 +77,30 @@ namespace Shiny.Tests.Core.Infrastructure
                 .Should()
                 .Be(postValue);
         }
+
+
+        [Fact]
+        public void StartupTaskRuns()
+        {
+            var sp = Create(null, x =>
+            {
+                x.AddSingleton<TestStartupTask>();
+            });
+            TestStartupTask.Value.Should().Be(99);
+            TestStartupTask.Value = 0;
+        }
+    }
+
+
+    public class TestStartupTask : IShinyStartupTask
+    {
+        public static int Value { get; set; }
+
+
+        public void Start()
+        {
+            Value = 99;
+        }
     }
 }
 

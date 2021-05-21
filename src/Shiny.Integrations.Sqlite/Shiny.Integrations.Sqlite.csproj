@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="readme.txt" pack="true" PackagePath="." />
         <PackageReference Include="sqlite-net-pcl" />
     </ItemGroup>
 

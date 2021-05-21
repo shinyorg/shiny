@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="readme.txt" pack="true" PackagePath="." />
         <None Include="Platforms\**\*.cs" />
         <Compile Remove="Platforms\**\*.cs" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
