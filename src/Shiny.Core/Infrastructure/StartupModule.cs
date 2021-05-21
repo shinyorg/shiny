@@ -17,10 +17,13 @@ namespace Shiny.Infrastructure
 
 
         readonly IJobManager jobManager;
+        readonly IServiceProvider serviceProvider;
         readonly ILogger logger;
 
 
-        public StartupModule(IJobManager jobManager, ILogger<StartupModule> logger)
+        public StartupModule(IJobManager jobManager,
+                             IServiceProvider serviceProvider,
+                             ILogger<StartupModule> logger)
         {
             this.jobManager = jobManager;
             this.logger = logger;
@@ -42,6 +45,12 @@ namespace Shiny.Infrastructure
                     this.logger.LogWarning("Permissions to run jobs insufficient: " + access);
                 }
             }
+
+            foreach (var module in modules)
+                module.OnContainerReady(this.serviceProvider);
+
+            jobs.Clear();
+            modules.Clear();
         }
     }
 }

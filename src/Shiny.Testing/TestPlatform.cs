@@ -16,6 +16,7 @@ namespace Shiny.Testing
 
         public virtual void Register(IServiceCollection services)
         {
+            services.RegisterCommonServices();
         }
 
 

@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
-using Shiny.Infrastructure.DependencyInjection;
 using Shiny.Stores;
 using Shiny.Testing;
 using Shiny.Testing.Stores;
@@ -13,21 +12,20 @@ namespace Shiny.Tests.Core.Infrastructure
 {
     public class DependencyInjectionTests
     {
-        static IServiceProvider Create(Action<IKeyValueStore> addSettings = null, Action<IServiceCollection> addServices = null)
+        static IServiceProvider Create(Action<IKeyValueStore>? addSettings = null, Action<IServiceCollection>? addServices = null)
         {
             var serializer = new ShinySerializer();
             var settings = new TestKeyValueStore();
             addSettings?.Invoke(settings);
 
-            var services = new ShinyServiceCollection();
+            var services = new ServiceCollection();
+            var platform = new TestPlatform();
             services.AddSingleton<IPlatform, TestPlatform>();
-            services.RegisterModule(new StoresModule());
-            services.AddSingleton<IFullService, FullService>();
-            services.AddSingleton<ISerializer>(serializer);
             services.AddSingleton<IKeyValueStore>(settings);
             addServices?.Invoke(services);
+            platform.Register(services);
 
-            var sp = services.BuildShinyServiceProvider(true);
+            var sp = services.BuildServiceProvider(true);
             return sp;
         }
 
