@@ -90,7 +90,7 @@ namespace Shiny
                 return (T)Convert.ChangeType(value, typeof(T));
 
             if (value is string s && typeof(T) != typeof(string))
-                return ShinyHost.Container.GetService<ISerializer>().Deserialize<T>(s);
+                return ShinyHost.Resolve<ISerializer>().Deserialize<T>(s);
 
             return (T)value;
         }

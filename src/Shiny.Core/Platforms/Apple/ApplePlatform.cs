@@ -2,10 +2,6 @@
 using System.Reactive.Linq;
 using System.IO;
 using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shiny.Jobs;
-using Shiny.Net;
 using UIKit;
 using Foundation;
 
@@ -24,6 +20,7 @@ namespace Shiny
         static DirectoryInfo ToDirectory(NSSearchPathDirectory dir) => new DirectoryInfo(NSSearchPath.GetDirectories(dir, NSSearchPathDomain.User).First());
 
 
+        public string Name => KnownPlatforms.iOS; // TODO: others
         public DirectoryInfo AppData { get; }
         public DirectoryInfo Cache { get; }
         public DirectoryInfo Public { get; }
@@ -44,17 +41,16 @@ namespace Shiny
         };
 
 
-        public void Register(IServiceCollection services)
+        public void InvokeOnMainThread(Action action)
         {
-            services.RegisterCommonServices();
-            services.TryAddSingleton<AppleLifecycle>();
-#if __IOS__
-            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
-            if (BgTasksJobManager.IsAvailable)
-                services.TryAddSingleton<IJobManager, BgTasksJobManager>();
+            if (NSThread.Current.IsMainThread)
+            {
+                action();
+            }
             else
-                services.TryAddSingleton<IJobManager, JobManager>();
-#endif
+            {
+                NSRunLoop.Main.BeginInvokeOnMainThread(action);
+            }
         }
 
 

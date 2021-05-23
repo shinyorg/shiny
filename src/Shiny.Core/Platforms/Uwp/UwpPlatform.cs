@@ -2,19 +2,20 @@
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using Windows.Security.ExchangeActiveSyncProvisioning;
-using Windows.ApplicationModel;
-using Windows.UI.Xaml;
-using Windows.ApplicationModel.Background;
-using Windows.Storage;
 using Microsoft.Extensions.DependencyInjection;
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
+using Windows.Security.ExchangeActiveSyncProvisioning;
+using Windows.Storage;
 using Shiny.Jobs;
-using Shiny.Infrastructure;
 
 
 namespace Shiny
 {
-    public class UwpPlatform : IPlatform, IStartupInitializer
+    public class UwpPlatform : IPlatform
     {
         readonly EasClientDeviceInformation deviceInfo = new EasClientDeviceInformation();
         public static string BackgroundTaskName => typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
@@ -33,6 +34,7 @@ namespace Shiny
         }
 
 
+        public string Name => KnownPlatforms.Uwp;
         public DirectoryInfo AppData { get; }
         public DirectoryInfo Cache { get; }
         public DirectoryInfo Public { get; }
@@ -48,6 +50,21 @@ namespace Shiny
         public string MachineName => "";
 
         public PlatformState Status { get; private set; } = PlatformState.Foreground;
+
+
+        public void InvokeOnMainThread(Action action)
+        {
+            var dispatcher = CoreApplication.MainView.CoreWindow?.Dispatcher;
+
+            if (dispatcher == null)
+                throw new NullReferenceException("Main thread missing");
+
+            if (dispatcher.HasThreadAccess)
+                action();
+            else
+                dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action());
+        }
+
 
         //https://docs.microsoft.com/en-us/uwp/api/Windows.UI.Xaml.Application?view=winrt-19041
         public IObservable<PlatformState> WhenStateChanged() => Observable
@@ -77,9 +94,6 @@ namespace Shiny
             .Do(x => this.Status = x);
 
 
-        public void Register(IServiceCollection services) => services.RegisterCommonServices();
-
-
         public void Initialize(IShinyStartup startup, IServiceCollection services)
         {
             if (hydrated)
@@ -93,26 +107,26 @@ namespace Shiny
         static bool hydrated;
         public static void BackgroundRun(IBackgroundTaskInstance taskInstance)
         {
-            if (!ShinyHost.IsInitialized)
-            {
-                var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
-                hydrated = true;
-                ShinyHost.Init(new UwpPlatform(), startup);
-            }
-            if (taskInstance.Task.Name.StartsWith("JOB-"))
-            {
-                ShinyHost
-                    .Container
-                    .ResolveOrInstantiate<JobManager>()
-                    .Process(taskInstance);
-            }
-            else
-            {
+            //if (!ShinyHost.IsInitialized)
+            //{
+            //    var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
+            //    hydrated = true;
+            //    ShinyHost.Init(new UwpPlatform(), startup);
+            //}
+            //if (taskInstance.Task.Name.StartsWith("JOB-"))
+            //{
+            //    ShinyHost
+            //        .Container
+            //        .ResolveOrInstantiate<JobManager>()
+            //        .Process(taskInstance);
+            //}
+            //else
+            //{
 
-                var targetType = Type.GetType(taskInstance.Task.Name);
-                var processor = ShinyHost.Container.ResolveOrInstantiate(targetType) as IBackgroundTaskProcessor;
-                processor?.Process(taskInstance);
-            }
+            //    var targetType = Type.GetType(taskInstance.Task.Name);
+            //    var processor = ShinyHost.Container.ResolveOrInstantiate(targetType) as IBackgroundTaskProcessor;
+            //    processor?.Process(taskInstance);
+            //}
         }
 
 

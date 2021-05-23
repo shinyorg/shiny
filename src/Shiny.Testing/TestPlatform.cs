@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reactive.Subjects;
-using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Shiny.Testing
@@ -14,12 +13,8 @@ namespace Shiny.Testing
         }
 
 
-        public virtual void Register(IServiceCollection services)
-        {
-            services.RegisterCommonServices();
-        }
 
-
+        public string Name => "Test";
         public PlatformState Status { get; set; } = PlatformState.Foreground;
         public DirectoryInfo AppData { get; set; }
         public DirectoryInfo Cache { get; set; }
@@ -35,6 +30,8 @@ namespace Shiny.Testing
         public string Model { get; set; } = "Computer";
 
         public Subject<PlatformState> PlatformSubject { get; } = new Subject<PlatformState>();
+
+        public void InvokeOnMainThread(Action action) => action();
         public virtual IObservable<PlatformState> WhenStateChanged()
             => this.PlatformSubject;
     }

@@ -50,7 +50,7 @@ namespace Shiny.Notifications
         public int Badge
         {
             get => this.services.Settings.Get<int>("Badge");
-            set => Dispatcher.InvokeOnMainThreadAsync(() =>
+            set => this.services.Platform.InvokeOnMainThread(() =>
             {
                 UIApplication.SharedApplication.ApplicationIconBadgeNumber = value;
                 this.services.Settings.Set("Badge", value);
@@ -108,7 +108,7 @@ namespace Shiny.Notifications
         });
 
 
-        public Task Clear() => Dispatcher.InvokeOnMainThreadAsync(() =>
+        public Task Clear() => this.services.Platform.InvokeOnMainThreadAsync(() =>
         {
             UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
             UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
@@ -132,7 +132,7 @@ namespace Shiny.Notifications
         }
 
 
-        public Task Cancel(int notificationId) => Dispatcher.InvokeOnMainThreadAsync(() =>
+        public Task Cancel(int notificationId) => this.services.Platform.InvokeOnMainThreadAsync(() =>
         {
             var ids = new[] { notificationId.ToString() };
 

@@ -23,7 +23,6 @@ namespace Shiny.Tests.Core.Infrastructure
             services.AddSingleton<IPlatform, TestPlatform>();
             services.AddSingleton<IKeyValueStore>(settings);
             addServices?.Invoke(services);
-            platform.Register(services);
 
             var sp = services.BuildServiceProvider(true);
             return sp;

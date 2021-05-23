@@ -10,6 +10,7 @@ using Android.Bluetooth;
 using Exception = System.Exception;
 using Microsoft.Extensions.Logging;
 
+
 namespace Shiny.BluetoothLE.Internals
 {
     public class PeripheralContext

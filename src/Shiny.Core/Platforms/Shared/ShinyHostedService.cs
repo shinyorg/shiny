@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shiny.Stores;
@@ -9,30 +12,31 @@ using Shiny.Stores;
 
 namespace Shiny
 {
-    public class ShinyOptions
+    class ShinyHostedService : IHostedService
     {
-        public IServiceCollection? Services { get; set; }
-    }
-
-
-    public class ConfigureShinyOptions : IConfigureOptions<ShinyOptions>
-    {
+        readonly IOptions<ShinyOptions> options;
         readonly IServiceProvider serviceProvider;
+        readonly IObjectStoreBinder binder;
         readonly ILogger logger;
 
 
-        public ConfigureShinyOptions(IServiceProvider serviceProvider, ILogger<ConfigureShinyOptions> logger)
+        public ShinyHostedService(IOptions<ShinyOptions> options,
+                                  IServiceProvider serviceProvider,
+                                  ILogger<ShinyHostedService> logger,
+                                  IObjectStoreBinder binder)
         {
+            ShinyHost.ServiceProvider = serviceProvider;
+            this.options = options;
             this.serviceProvider = serviceProvider;
+            this.binder = binder;
             this.logger = logger;
         }
 
 
-        public void Configure(ShinyOptions options)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            var objectBinder = this.serviceProvider.GetRequiredService<IObjectStoreBinder>();
-
-            var singletons = options
+            var singletons = this.options
+                .Value
                 .Services
                 .Where(x =>
                     x.Lifetime == ServiceLifetime.Singleton &&
@@ -44,7 +48,7 @@ namespace Shiny
             {
                 if (service.ImplementationInstance != null)
                 {
-                    this.TryRun(service.ImplementationInstance, objectBinder);
+                    this.TryRun(service.ImplementationInstance);
                 }
                 else
                 {
@@ -55,21 +59,26 @@ namespace Shiny
                     {
                         // downfall here is that all INPC's are also getting warmed up right away
                         var instance = this.serviceProvider.GetService(service.ServiceType ?? service.ImplementationType);
-                        this.TryRun(instance, objectBinder);
+                        this.TryRun(instance);
                     }
                 }
             }
+            return Task.CompletedTask;
         }
 
 
-        void TryRun(object instance, IObjectStoreBinder binder)
+        public Task StopAsync(CancellationToken cancellationToken)
+            => Task.CompletedTask;
+
+
+        void TryRun(object instance)
         {
             // TODO: I may not want to do this in MAUI since the viewmodels may live on the container
             if (instance is INotifyPropertyChanged npc)
             {
                 try
                 {
-                    binder.Bind(npc);
+                    this.binder.Bind(npc);
                     this.logger.LogInformation($"Successfully bound model - {instance.GetType().FullName}");
                 }
                 catch (Exception ex)

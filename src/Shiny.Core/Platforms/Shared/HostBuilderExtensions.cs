@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
-
+using Microsoft.Extensions.Hosting;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Net;
@@ -12,22 +11,23 @@ using Shiny.Stores;
 
 namespace Shiny
 {
-    public static class CommonServiceRegistration
+    public static class HostBuilderExtensions
     {
+        public static IHostBuilder AddShiny(this IHostBuilder hostBuilder)
+            => hostBuilder
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddHostedService<ShinyHostedService>();
+#if MONOANDROID
+                    //services.AddSingleton<IAndroidContext>(this);
+#endif
+                    services.RegisterCommonServices();
+                });
+
+
         public static void RegisterCommonServices(this IServiceCollection services)
         {
-            //.UseDefaultServiceProvider((context, options) =>
-            // {
-            //     bool isDevelopment = context.HostingEnvironment.IsDevelopment();
-            //     options.ValidateScopes = isDevelopment;
-            //     options.ValidateOnBuild = isDevelopment;
-            // });
-            services
-                .AddOptions()
-                .ConfigureOptions<ConfigureShinyOptions>()
-                .Configure<ShinyOptions>(opts => {
-                    opts.Services = services;
-                });
+            services.Configure<ShinyOptions>(x => x.Services = services);
 
             services.AddSingleton<StartupModule>();
             services.AddSingleton<ShinyCoreServices>();
@@ -49,6 +49,16 @@ namespace Shiny
             #else
             services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             #endif
+
+#if __IOS__
+            services.TryAddSingleton<AppleLifecycle>();
+
+            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
+            if (BgTasksJobManager.IsAvailable)
+                services.TryAddSingleton<IJobManager, BgTasksJobManager>();
+            else
+                services.TryAddSingleton<IJobManager, JobManager>();
+#endif
         }
     }
 }
