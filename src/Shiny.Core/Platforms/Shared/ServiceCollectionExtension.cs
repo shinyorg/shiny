@@ -12,8 +12,6 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        //AndroidPlatform(AndroidApp)
-        //services.AddSingleton<IAndroidContext>(this);
         public static void RegisterCommonServices(this IServiceCollection services)
         {
             services.RegisterModule<StoresModule>();

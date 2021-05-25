@@ -13,11 +13,16 @@ using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using AndroidX.Lifecycle;
 using B = global::Android.OS.Build;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Shiny
 {
-    public class AndroidPlatform : Java.Lang.Object, ILifecycleObserver, IAndroidContext, IPlatform
+    public class AndroidPlatform : Java.Lang.Object,
+                                   ILifecycleObserver,
+                                   IAndroidContext,
+                                   IPlatform,
+                                   IPlatformBuilder
     {
         int requestCode;
         readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
@@ -40,6 +45,13 @@ namespace Shiny
             var publicDir = this.app.GetExternalFilesDir(null);
             if (publicDir != null)
                 this.Public = new DirectoryInfo(publicDir.AbsolutePath);
+        }
+
+
+        public void Register(IServiceCollection services)
+        {
+            services.AddSingleton<IAndroidContext>(this);
+            services.RegisterCommonServices();
         }
 
 
@@ -133,7 +145,7 @@ namespace Shiny
         {
             //ActionServiceStart
             var intent = new Intent(this.AppContext, serviceType);
-            if (this.IsMinApiLevel(26)&& this.IsShinyForegroundService(serviceType))
+            if (this.IsMinApiLevel(26) && this.IsShinyForegroundService(serviceType))
             {
                 intent.SetAction(ActionServiceStart);
                 this.AppContext.StartForegroundService(intent);

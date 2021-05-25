@@ -68,4 +68,9 @@
         <Compile Include="**\Platforms\*macOS*\**\*.cs" />
         <Reference Include="netstandard" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="IPlatformBuilder.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

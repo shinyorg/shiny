@@ -64,9 +64,13 @@ namespace Shiny
             services.AddSingleton(platform);
             services.AddLogging(builder => startup?.ConfigureLogging(builder, platform));
             startup?.ConfigureServices(services, platform);
+            if (platform is IPlatformBuilder builder)
+                builder.Register(services);
+            else
+                services.RegisterCommonServices();
 
             ServiceProvider = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
-            ServiceProvider.GetRequiredService<StartupModule>().Start();
+            ServiceProvider.GetRequiredService<StartupModule>().Start(services);
         }
     }
 }
