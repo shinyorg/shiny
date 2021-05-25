@@ -10,7 +10,7 @@ using Shiny.Stores;
 
 namespace Shiny.Infrastructure
 {
-    class StartupModule
+    public class StartupModule
     {
         static readonly List<ShinyModule> modules = new List<ShinyModule>();
         public static void AddModule(ShinyModule module)

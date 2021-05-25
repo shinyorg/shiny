@@ -2,8 +2,10 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
+using Shiny.Jobs;
 using Shiny.Stores;
 using Shiny.Testing;
+using Shiny.Testing.Jobs;
 using Shiny.Testing.Stores;
 using Xunit;
 
@@ -14,18 +16,20 @@ namespace Shiny.Tests.Core.Infrastructure
     {
         static IServiceProvider Create(Action<IKeyValueStore>? addSettings = null, Action<IServiceCollection>? addServices = null)
         {
-            var serializer = new ShinySerializer();
             var settings = new TestKeyValueStore();
             addSettings?.Invoke(settings);
 
             var services = new ServiceCollection();
-            var platform = new TestPlatform();
-            services.AddSingleton<IPlatform, TestPlatform>();
+            services.AddLogging();
+            services.AddSingleton<IJobManager, TestJobManager>();
+            services.AddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+            services.AddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
             services.AddSingleton<IKeyValueStore>(settings);
-            services.RegisterCommonServices();
+            services.AddSingleton<StartupModule>();
             addServices?.Invoke(services);
 
             var sp = services.BuildServiceProvider(true);
+            sp.Resolve<StartupModule>().Start(services);
             return sp;
         }
 
@@ -70,7 +74,10 @@ namespace Shiny.Tests.Core.Infrastructure
             var setValue = new Random().Next(1, 9999);
             var postValue = setValue + 1;
 
-            var services = Create(s => SetCountKey(s, setValue));
+            var services = Create(
+                s => SetCountKey(s, setValue),
+                s => s.AddSingleton<IFullService, FullService>()
+            );
             services
                 .GetService<IFullService>()
                 .Count
