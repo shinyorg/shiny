@@ -11,12 +11,8 @@
     <ItemGroup>
         <None Include="**\Platforms\**\*.cs" />
         <Compile Remove="**\Platforms\**\*.cs" />
-        <None Remove="Platforms\Shared\ShinyHostBuilder.cs" />
-        <None Remove="Platforms\Shared\ShinyHostedService.cs" />
-        <None Remove="Platforms\Shared\ShinyOptions.cs" />
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="System.Reactive" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
     </ItemGroup>

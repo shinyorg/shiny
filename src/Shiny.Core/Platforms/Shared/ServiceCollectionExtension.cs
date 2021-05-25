@@ -11,27 +11,15 @@ using Shiny.Stores;
 
 namespace Shiny
 {
-    public static class HostBuilderExtensions
+    public static class ServiceCollectionExtensions
     {
-        public static IHostBuilder AddShiny(this IHostBuilder hostBuilder)
-            => hostBuilder
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddHostedService<ShinyHostedService>();
-#if MONOANDROID
-                    //services.AddSingleton<IAndroidContext>(this);
-#endif
-                    services.RegisterCommonServices();
-                });
-
-
+        //AndroidPlatform(AndroidApp)
+        //services.AddSingleton<IAndroidContext>(this);
         public static void RegisterCommonServices(this IServiceCollection services)
         {
-            services.Configure<ShinyOptions>(x => x.Services = services);
-
-            services.AddSingleton<StartupModule>();
-            services.AddSingleton<ShinyCoreServices>();
             services.RegisterModule<StoresModule>();
+            services.TryAddSingleton<StartupModule>();
+            services.TryAddSingleton<ShinyCoreServices>();
             services.TryAddSingleton<ISerializer, ShinySerializer>();
             services.TryAddSingleton<IMessageBus, MessageBus>();
             services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
@@ -53,7 +41,6 @@ namespace Shiny
 #if __IOS__
             services.TryAddSingleton<AppleLifecycle>();
 
-            services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             if (BgTasksJobManager.IsAvailable)
                 services.TryAddSingleton<IJobManager, BgTasksJobManager>();
             else

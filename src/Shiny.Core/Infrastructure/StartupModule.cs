@@ -5,7 +5,7 @@ using Shiny.Jobs;
 
 namespace Shiny.Infrastructure
 {
-    class StartupModule : IShinyStartupTask
+    class StartupModule
     {
         static readonly List<ShinyModule> modules = new List<ShinyModule>();
         public static void AddModule(ShinyModule module)

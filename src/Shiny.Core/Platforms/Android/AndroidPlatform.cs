@@ -70,6 +70,7 @@ namespace Shiny
         public IObservable<PlatformState> WhenStateChanged()
             => this.stateSubj.OnErrorResumeNext(Observable.Empty<PlatformState>());
 
+
         readonly Handler handler = new Handler(Looper.MainLooper);
         public void InvokeOnMainThread(Action action)
         {
