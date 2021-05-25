@@ -6,29 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 
+
 namespace Shiny
 {
     public static partial class Extensions
     {
-        /// <summary>
-        /// Attempts to resolve or build an instance from a service provider
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static object ResolveOrInstantiate(this IServiceProvider services, Type type)
-            => ActivatorUtilities.GetServiceOrCreateInstance(services, type);
-
-
-        /// <summary>
-        /// Attempts to resolve or build an instance from a service provider
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static T ResolveOrInstantiate<T>(this IServiceProvider services)
-            => (T)ActivatorUtilities.GetServiceOrCreateInstance(services, typeof(T));
-
-
         /// <summary>
         /// Register a module (like a category) of services
         /// </summary>
@@ -57,7 +39,7 @@ namespace Shiny
         /// <param name="serviceProvider"></param>
         /// <param name="requiredService"></param>
         /// <returns></returns>
-        public static T Resolve<T>(this IServiceProvider serviceProvider, bool requiredService = false)
+        public static T? Resolve<T>(this IServiceProvider serviceProvider, bool requiredService = false)
             => requiredService ? serviceProvider.GetRequiredService<T>() : serviceProvider.GetService<T>();
 
 

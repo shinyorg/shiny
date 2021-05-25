@@ -2,23 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
+
 
 namespace Shiny
 {
     public static class ShinyHost
     {
-        public static IHostBuilder CreateDefaultBuilder()
-        {
-            var builder = new ShinyHostBuilder()
-                .AddShiny();
-
-            return builder;
-        }
-
-
         static IServiceProvider? services;
         public static IServiceProvider ServiceProvider
         {
@@ -60,6 +51,12 @@ namespace Shiny
         /// <returns></returns>
         public static IEnumerable<T> ResolveAll<T>()
             => ServiceProvider.GetServices<T>() ?? Enumerable.Empty<T>();
+
+        /// <summary>
+        ///
+        /// </summary>
+        public static bool IsInitialized => services != null;
+
 
         public static void Init(IPlatform platform, IShinyStartup? startup = null)
         {

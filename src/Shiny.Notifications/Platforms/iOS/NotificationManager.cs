@@ -97,14 +97,14 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<IEnumerable<Notification>> GetPending() => Dispatcher.InvokeOnMainThread<IEnumerable<Notification>>(async tcs =>
+        public Task<IEnumerable<Notification>> GetPending() => this.services.Platform.InvokeOnMainThreadAsync(async () =>
         {
             var requests = await UNUserNotificationCenter
                 .Current
                 .GetPendingNotificationRequestsAsync();
 
             var notifications = requests.Select(x => x.FromNative());
-            tcs.SetResult(notifications);
+            return notifications;
         });
 
 

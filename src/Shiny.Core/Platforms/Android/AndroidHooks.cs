@@ -24,10 +24,7 @@ namespace Shiny
         public static void ShinyOnCreate(this Activity activity)
             => activity.ShinyOnNewIntent(activity.Intent);
 
-        public static void ShinyOnNewIntent(this Activity activity, Intent intent)
-        {
-            if (intent != null)
-                ShinyHost.Resolve<IAndroidContext>()?.OnNewIntent(intent);
-        }
+        public static void ShinyOnNewIntent(this Activity activity, Intent? intent)
+            => ShinyHost.Resolve<IAndroidContext>()?.OnNewIntent(intent);
     }
 }

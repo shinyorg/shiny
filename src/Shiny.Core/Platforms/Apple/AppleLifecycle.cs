@@ -20,10 +20,10 @@ namespace Shiny
         public AppleLifecycle(ILogger<AppleLifecycle> logger)
         {
             this.logger = logger;
-            var app = UIApplication.SharedApplication;
+            //var app = UIApplication.SharedApplication;
 
-            var selector = new ObjCRuntime.Selector("");
-            //app.RespondsToSelector(selector);
+            //var selector = new ObjCRuntime.Selector("");
+            ////app.RespondsToSelector(selector);
         }
 
 
