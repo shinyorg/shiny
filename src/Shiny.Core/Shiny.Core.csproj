@@ -40,10 +40,6 @@
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <ProjectReference Include="..\Shiny.Support.Uwp\Shiny.Support.Uwp.csproj">
-            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-            <IncludeAssets>Shiny.Support.Uwp.*</IncludeAssets>
-        </ProjectReference>
         <Compile Include="**\Platforms\Uwp\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
@@ -72,10 +68,4 @@
         <Compile Include="**\Platforms\*macOS*\**\*.cs" />
         <Reference Include="netstandard" />
     </ItemGroup>
-
-    <Target DependsOnTargets="ResolveReferences" Name="CopyProjectReferencesToPackage">
-        <ItemGroup>
-            <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
-        </ItemGroup>
-    </Target>
 </Project>
