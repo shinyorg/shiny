@@ -21,7 +21,7 @@ namespace Samples.UWP
             this.InitializeComponent();
             //UwpShinyHost.ClearBackgroundTasks();
             this.Suspending += this.OnSuspending;
-            this.ShinyInit<MyShinyBackgroundTask, SampleStartup>();
+            this.ShinyInit<MyShinyBackgroundTask>(new SampleStartup());
         }
 
 

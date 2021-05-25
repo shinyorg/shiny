@@ -9,7 +9,8 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.Storage;
-
+using Microsoft.Extensions.DependencyInjection;
+using Shiny.Jobs;
 
 namespace Shiny
 {
@@ -89,6 +90,11 @@ namespace Shiny
             .Do(x => this.Status = x);
 
 
+        public static string BackgroundTaskName { get; private set; }
+        public static void SetBackgroundTask(Type backgroundTask)
+            => BackgroundTaskName = $"{backgroundTask.Namespace}.{backgroundTask.Name}";
+
+
         public static void RegisterBackground<TService>(Action<BackgroundTaskBuilder>? builderAction = null) where TService : IBackgroundTaskProcessor
         {
             var taskName = typeof(TService).AssemblyQualifiedName;
@@ -96,10 +102,34 @@ namespace Shiny
             {
                 var builder = new BackgroundTaskBuilder();
                 builder.Name = taskName;
-                //builder.TaskEntryPoint = BackgroundTaskName;
+                builder.TaskEntryPoint = BackgroundTaskName;
 
                 builderAction?.Invoke(builder);
                 builder.Register();
+            }
+        }
+
+
+        public static void RunBackgroundTask(IBackgroundTask task, IBackgroundTaskInstance taskInstance, IShinyStartup startup)
+        {
+            if (!ShinyHost.IsInitialized)
+            {
+                UwpPlatform.SetBackgroundTask(task.GetType());
+                ShinyHost.Init(new UwpPlatform(null), startup);
+            }
+
+            var services = ShinyHost.ServiceProvider;
+            if (taskInstance.Task.Name.StartsWith("JOB-"))
+            {
+                services
+                    .Resolve<JobManager>(true)!
+                    .Process(taskInstance);
+            }
+            else
+            {
+                var targetType = Type.GetType(taskInstance.Task.Name);
+                var processor = ActivatorUtilities.GetServiceOrCreateInstance(services, targetType) as IBackgroundTaskProcessor;
+                processor?.Process(taskInstance);
             }
         }
 

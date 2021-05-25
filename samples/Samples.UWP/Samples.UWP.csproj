@@ -11,7 +11,7 @@
     <AssemblyName>Samples.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
@@ -172,6 +172,10 @@
     <PackageReference Include="Xamarin.Essentials" />
     <PackageReference Include="Xamarin.Forms" />
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" />
+    <ProjectReference Include="..\Samples.Uwp.Background\Samples.Uwp.Background.csproj">
+      <Project>{e2097e03-249a-4c43-9341-f67ead55842f}</Project>
+      <Name>Samples.Uwp.Background</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Samples\Samples.csproj">
       <Name>Samples</Name>
     </ProjectReference>
