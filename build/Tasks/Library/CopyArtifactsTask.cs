@@ -13,7 +13,9 @@ namespace ShinyBuild.Tasks.Library
         {
             context.DeleteFiles("src/**/*.symbols.nupkg");
             var directory = context.Directory(context.ArtifactDirectory);
-            if (!Directory.Exists(directory.Path.FullPath))
+            if (Directory.Exists(directory.Path.FullPath))
+                context.CleanDirectory(directory);
+            else
                 Directory.CreateDirectory(directory.Path.FullPath);
 
             context.CopyFiles("src/**/*.nupkg", directory);
