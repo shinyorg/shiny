@@ -55,7 +55,10 @@ namespace ShinyBuild.Tasks.Library
                 }
                 catch (Exception ex)
                 {
-                    context.Error($"Error Upload: {package.FullPath} - Exception: {ex}");
+                    if (context.AllowNugetUploadFailures)
+                        context.Error($"Error Upload: {package.FullPath} - Exception: {ex}");
+                    else
+                        throw; // break build
                 }
             }
         }

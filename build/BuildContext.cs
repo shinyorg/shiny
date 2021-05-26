@@ -38,6 +38,7 @@ namespace ShinyBuild
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.Argument("configuration", "Release");
         public string NugetApiKey => this.Argument<string>("NugetApiKey");
+        public bool AllowNugetUploadFailures => this.HasArgument("AllowNugetUploadFailures");
         public GitBranch Branch { get; }
 
 
