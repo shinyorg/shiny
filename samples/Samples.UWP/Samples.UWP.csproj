@@ -98,6 +98,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MyShinyBackgroundTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -172,10 +173,6 @@
     <PackageReference Include="Xamarin.Essentials" />
     <PackageReference Include="Xamarin.Forms" />
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" />
-    <ProjectReference Include="..\Samples.Uwp.Background\Samples.Uwp.Background.csproj">
-      <Project>{e2097e03-249a-4c43-9341-f67ead55842f}</Project>
-      <Name>Samples.Uwp.Background</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Samples\Samples.csproj">
       <Name>Samples</Name>
     </ProjectReference>

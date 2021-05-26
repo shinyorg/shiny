@@ -15,11 +15,9 @@ namespace Samples.UWP
     {
         public App()
         {
-            //app.EnteredBackground
-            //app.LeavingBackground
-            //app.Suspending
             this.InitializeComponent();
-            //UwpShinyHost.ClearBackgroundTasks();
+            //UwpPlatform.ClearBackgroundTasks();
+            UwpPlatform.RunInProc = true; // this is for Shiny debugging only - do not use in your project!
             this.Suspending += this.OnSuspending;
             this.ShinyInit<MyShinyBackgroundTask>(new SampleStartup());
         }
