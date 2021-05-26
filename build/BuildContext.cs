@@ -24,6 +24,7 @@ namespace ShinyBuild
 
                 context.Environment.WorkingDirectory = dir;
             }
+            //context.GitHubActions().Environment.Workflow.
 #endif
             this.Branch = context.GitBranchCurrent(".");
         }
@@ -37,6 +38,7 @@ namespace ShinyBuild
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.Argument("configuration", "Release");
         public string NugetApiKey => this.Argument<string>("NugetApiKey");
+        public string ArtifactDirectory => this.GitHubActions().Environment.Workflow.Workspace + "/artifacts";
         public GitBranch Branch { get; }
 
 

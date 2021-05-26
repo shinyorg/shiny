@@ -36,6 +36,13 @@ jobs:
     - name: Build
       run: dotnet run --project build/ShinyBuild.csproj --DocsDeployGitHubToken=${{ secrets.DOCS_GITHUB_TOKEN }} --BuildNumber=${{steps.buildnumber.outputs.build_number}} --NugetApiKey=${{secrets.NUGETAPIKEY}}
 
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: nugets
+        path: ${{ github.workspace }}/artifacts
+        retention-days: 5
+
   #iossample:
   #  runs-on: macos-latest
 
