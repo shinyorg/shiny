@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
@@ -39,6 +40,17 @@ namespace ShinyBuild
         public string NugetApiKey => this.Argument<string>("NugetApiKey");
         public GitBranch Branch { get; }
 
+
+        public string ArtifactDirectory
+        {
+            get
+            {
+                if (this.IsRunningInCI)
+                    return this.GitHubActions().Environment.Workflow.Workspace + "/artifacts";
+
+                return System.IO.Path.Combine(this.Environment.WorkingDirectory.FullPath, "artifacts");
+            }
+        }
 
         public bool IsMainBranch
         {

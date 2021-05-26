@@ -1,4 +1,6 @@
 ﻿using System;
+
+using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.DotNetCore.NuGet.Push;
@@ -46,7 +48,16 @@ namespace ShinyBuild.Tasks.Library
 
             var packages = context.GetFiles("src/**/*.nupkg");
             foreach (var package in packages)
-                context.DotNetCoreNuGetPush(package.FullPath, settings);
+            {
+                try
+                {
+                    context.DotNetCoreNuGetPush(package.FullPath, settings);
+                }
+                catch (Exception ex)
+                {
+                    context.Error($"Error Upload: {package.FullPath} - Exception: {ex}");
+                }
+            }
         }
     }
 }

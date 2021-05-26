@@ -25,6 +25,7 @@ namespace ShinyBuild.Tasks.Library
 
         public override void Run(BuildContext context)
         {
+            context.CleanDirectories($"./src/**/obj/");
             context.CleanDirectories($"./src/**/bin/{context.MsBuildConfiguration}");
 
             var version = GetNugetVersion(context);
