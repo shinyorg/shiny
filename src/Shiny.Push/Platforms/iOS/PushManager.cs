@@ -75,7 +75,7 @@ namespace Shiny.Push
 
         public override async Task UnRegister()
         {
-            await Dispatcher.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);
+            await this.Services.Platform.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);
             this.ClearRegistration();
         }
 
@@ -91,7 +91,7 @@ namespace Shiny.Push
                     rawToken => tcs.TrySetResult(rawToken),
                     err => tcs.TrySetException(new Exception(err.LocalizedDescription))
                 );
-                await Dispatcher.InvokeOnMainThreadAsync(
+                await this.Services.Platform.InvokeOnMainThreadAsync(
                     () => UIApplication.SharedApplication.RegisterForRemoteNotifications()
                 );
                 var rawToken = await tcs.Task;

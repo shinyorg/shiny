@@ -10,13 +10,13 @@ using Shiny.Stores;
 
 namespace Shiny
 {
-    public static class CommonServiceRegistration
+    public static class ServiceCollectionExtensions
     {
         public static void RegisterCommonServices(this IServiceCollection services)
         {
-            //services.PostConfigureAll<ShinyOptions>(opts => opts.Services = services);
-            services.AddSingleton<ShinyCoreServices>();
             services.RegisterModule<StoresModule>();
+            services.TryAddSingleton<StartupModule>();
+            services.TryAddSingleton<ShinyCoreServices>();
             services.TryAddSingleton<ISerializer, ShinySerializer>();
             services.TryAddSingleton<IMessageBus, MessageBus>();
             services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
@@ -34,6 +34,15 @@ namespace Shiny
             #else
             services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
             #endif
+
+#if __IOS__
+            services.TryAddSingleton<AppleLifecycle>();
+
+            if (BgTasksJobManager.IsAvailable)
+                services.TryAddSingleton<IJobManager, BgTasksJobManager>();
+            else
+                services.TryAddSingleton<IJobManager, JobManager>();
+#endif
         }
     }
 }

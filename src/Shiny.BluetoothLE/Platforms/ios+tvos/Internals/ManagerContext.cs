@@ -72,20 +72,17 @@ namespace Shiny.BluetoothLE.Internals
             .ForEach(x => this.peripherals.TryRemove(x.Key, out var device));
 
 
-        public override void WillRestoreState(CBCentralManager central, NSDictionary dict)
+        public override async void WillRestoreState(CBCentralManager central, NSDictionary dict)
         {
 #if __IOS__
             //this.Manager = central;
-            Dispatcher.ExecuteBackgroundTask(async () =>
+            var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
+            for (nuint i = 0; i < peripheralArray.Count; i++)
             {
-                var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
-                for (nuint i = 0; i < peripheralArray.Count; i++)
-                {
-                    var item = peripheralArray.GetItem<CBPeripheral>(i);
-                    var peripheral = this.GetPeripheral(item);
-                    await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
-                }
-            });
+                var item = peripheralArray.GetItem<CBPeripheral>(i);
+                var peripheral = this.GetPeripheral(item);
+                await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
+            }
             // TODO: restore scan? CBCentralManager.RestoredStateScanOptionsKey
 #endif
         }

@@ -45,13 +45,13 @@ namespace Shiny.Locations
         }
 
 
-        void InvokeChanges(CLLocation[] locations) => Dispatcher.ExecuteBackgroundTask(async () =>
+        async void InvokeChanges(CLLocation[] locations)
         {
             var loc = locations.Last();
             var reading = new GpsReading(loc);
             await this.delegates.Value.RunDelegates(x => x.OnReading(reading));
             this.readingSubject.OnNext(reading);
-        });
+        }
 
 
         //public override void Failed(CLLocationManager manager, NSError error)

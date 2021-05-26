@@ -51,6 +51,8 @@ namespace Shiny.BluetoothLE.Managed
         }
 
 
+        public TimeSpan BufferTimeSpan { get; set; } = TimeSpan.FromSeconds(3);
+
         IScheduler? scheduler;
         public IScheduler? Scheduler
         {
@@ -118,7 +120,8 @@ namespace Shiny.BluetoothLE.Managed
             this.scanSub = this.bleManager
                 .Scan(this.ScanConfig)
                 .DoOnce(x => tcs.TrySetResult(null))
-                .Buffer(TimeSpan.FromSeconds(3))
+                .Buffer(this.BufferTimeSpan)
+                .Where(x => x?.Any() ?? false)
                 .ObserveOnIf(this.Scheduler)
                 .Synchronize(this.Peripherals)
                 .Subscribe(

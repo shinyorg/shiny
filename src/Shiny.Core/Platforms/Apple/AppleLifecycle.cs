@@ -11,14 +11,21 @@ using UserNotifications;
 
 namespace Shiny
 {
-
     /// <summary>
     /// Any services that are injecting this should also be marked with IShinyStartupTask
     /// </summary>
     public class AppleLifecycle : UNUserNotificationCenterDelegate
     {
         readonly ILogger logger;
-        public AppleLifecycle(ILogger<AppleLifecycle> logger) => this.logger = logger;
+        public AppleLifecycle(ILogger<AppleLifecycle> logger)
+        {
+            this.logger = logger;
+            //var app = UIApplication.SharedApplication;
+
+            //var selector = new ObjCRuntime.Selector("");
+            ////app.RespondsToSelector(selector);
+        }
+
 
 
         ShinyUserNotificationDelegate ndelegate;

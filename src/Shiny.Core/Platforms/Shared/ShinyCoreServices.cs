@@ -9,38 +9,42 @@ namespace Shiny.Infrastructure
     {
 #if __ANDROID__
         public ShinyCoreServices(IAndroidContext context,
+                                 IPlatform platform,
                                  IKeyValueStoreFactory store,
                                  IRepository repository,
                                  IServiceProvider services,
                                  ISerializer serializer,
                                  IMessageBus bus,
                                  IJobManager jobManager)
-            : this(store, repository, services, serializer, bus, jobManager)
+            : this(platform, store, repository, services, serializer, bus, jobManager)
         {
             this.Android = context;
         }
 
 #elif __IOS__
         public ShinyCoreServices(AppleLifecycle lifecycle,
+                                 IPlatform platform,
                                  IKeyValueStoreFactory store,
                                  IRepository repository,
                                  IServiceProvider services,
                                  ISerializer serializer,
                                  IMessageBus bus,
                                  IJobManager jobManager)
-            : this(store, repository, services, serializer, bus, jobManager)
+            : this(platform, store, repository, services, serializer, bus, jobManager)
         {
             this.Lifecycle = lifecycle;
         }
 
 #endif
-        public ShinyCoreServices(IKeyValueStoreFactory store,
+        public ShinyCoreServices(IPlatform platform,
+                                 IKeyValueStoreFactory store,
                                  IRepository repository,
                                  IServiceProvider services,
                                  ISerializer serializer,
                                  IMessageBus bus,
                                  IJobManager jobManager)
         {
+            this.Platform = platform;
             this.Settings = store.DefaultStore;
             this.Repository = repository;
             this.Services = services;
@@ -54,6 +58,7 @@ namespace Shiny.Infrastructure
 #elif __IOS__
         public AppleLifecycle Lifecycle { get; }
 #endif
+        public IPlatform Platform { get; }
         public IKeyValueStore Settings { get; }
         public IRepository Repository { get; }
         public IServiceProvider Services { get; }

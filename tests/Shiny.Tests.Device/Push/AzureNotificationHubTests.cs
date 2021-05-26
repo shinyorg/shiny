@@ -149,7 +149,7 @@ namespace Shiny.Tests.Push
         async Task DoSend()
         {
             //var tag = this.pushManager.CurrentRegistrationToken;
-            
+
             var tag = "UnitTest";
             await this.pushManager.AddTag(tag);
             await Task.Delay(1000); // let azure breath
@@ -170,7 +170,7 @@ namespace Shiny.Tests.Push
             }
             else
             {
-                throw new ArgumentException("Invalid Platform - " + p.CurrentPlatform());
+                throw new ArgumentException("Invalid Platform - " + p.Name);
             }
         }
     }

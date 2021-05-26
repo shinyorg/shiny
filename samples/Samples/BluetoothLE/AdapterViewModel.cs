@@ -47,6 +47,7 @@ namespace Samples.BluetoothLE
                     {
                         var poweredOn = bleManager.Status == AccessState.Available;
                         await bleManager.TrySetAdapterState(!poweredOn);
+                        await dialogs.Snackbar("New BLE Adapter Status: " + bleManager.Status);
                     }
                 }
             );
@@ -71,6 +72,7 @@ namespace Samples.BluetoothLE
                         this.scanSub = bleManager
                             .Scan()
                             .Buffer(TimeSpan.FromSeconds(1))
+                            .Where(x => x?.Any() ?? false)
                             .SubOnMainThread(
                                 results =>
                                 {

@@ -4,7 +4,6 @@
              xmlns:sample="clr-namespace:Samples.Beacons"
              x:DataType="sample:CreateViewModel"
              x:Class="Samples.Beacons.CreatePage"
-             Style="{StaticResource ContentPage}"
              Title="Create Beacon Region">
 
     <ContentPage.Content>
@@ -48,6 +47,16 @@
 
                 <TextCell Text="Start Ranging"
                           Command="{Binding StartRanging}" />
+            </TableSection>
+
+            <TableSection Title="Android Notification">
+                <EntryCell Label="Title"
+                           Text="{Binding NotificationTitle}"
+                           IsEnabled="{Binding IsMonitoringSupported}" />
+
+                <EntryCell Label="Message"
+                           Text="{Binding NotificationMessage}"
+                           IsEnabled="{Binding IsMonitoringSupported}" />
             </TableSection>
         </TableView>
     </ContentPage.Content>

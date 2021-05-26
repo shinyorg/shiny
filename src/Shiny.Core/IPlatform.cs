@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Shiny
@@ -14,6 +13,8 @@ namespace Shiny
 
     public interface IPlatform
     {
+        string Name { get; }
+
         PlatformState Status { get; }
         DirectoryInfo AppData { get; }
         DirectoryInfo Cache { get; }
@@ -29,9 +30,7 @@ namespace Shiny
         string Manufacturer { get; }
         string Model { get; }
 
-        //void InvokeOnMainThread(Action action);
+        void InvokeOnMainThread(Action action);
         IObservable<PlatformState> WhenStateChanged();
-
-        void Register(IServiceCollection services);
     }
 }

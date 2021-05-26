@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Logging;
-
 using Shiny.Infrastructure;
 using UIKit;
 
@@ -17,9 +14,11 @@ namespace Shiny.Jobs
         /// If you don't know what this does, don't touch it :)
         /// </summary>
         public static double? BackgroundFetchInterval { get; set; }
+        readonly IPlatform platform;
 
 
         public JobManager(
+            IPlatform platform,
             IServiceProvider container,
             IRepository repository,
             ILogger<IJobManager> logger
@@ -29,6 +28,7 @@ namespace Shiny.Jobs
             logger
         )
         {
+            this.platform = platform;
         }
 
 
@@ -62,12 +62,12 @@ namespace Shiny.Jobs
                     break;
             }
 
-            await Dispatcher.InvokeOnMainThreadAsync(() =>
+            await this.platform.InvokeOnMainThreadAsync(() =>
                 UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(
                     BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum
                 )
             );
-                
+
             //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
 
             return grantResult;

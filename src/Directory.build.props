@@ -13,7 +13,7 @@
         <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
         <PackageVersion>$(ShinyVersion)</PackageVersion>
         <PackageIcon>icon.png</PackageIcon>
-        <PackageReleaseNotes>https://github.com/shinyorg/shiny/blob/master/ChangeLog.md</PackageReleaseNotes>
+        <PackageReleaseNotes>https://shinylib.net/release-notes/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble bluetooth bluetoothle push notifications sensors geofences gps location backgroundjobs settings environment speech sensors</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -24,10 +24,7 @@
         <ExtrasUwpMetaPackageVersion>6.2.12</ExtrasUwpMetaPackageVersion>
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-        <!--
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        ItemGroup of project<None Include="docs\README.md" Pack="true" PackagePath="\"/>
-        -->
+        <PackageReadmeFile>readme.md</PackageReadmeFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
@@ -38,7 +35,7 @@
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT' ">
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'WINDOWS_NT' ">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <IncludeSymbols>True</IncludeSymbols>
@@ -47,16 +44,11 @@
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
     </PropertyGroup>
 
-    <!--<PropertyGroup Condition=" $(TargetFramework.Contains('android')) ">
-        <MonoAndroidResourcePrefix></MonoAndroidResourcePrefix>
-        <AndroidResgenFile></AndroidResgenFile>
-        <AndroidResgenClass></AndroidResgenClass>
-    </PropertyGroup>-->
-
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png" />
+        <None Include="$(MSBuildThisFileDirectory)nuget.txt" Pack="true" PackagePath="readme.txt" />
+        <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-        <!--<Compile Include="$(MSBuildThisFileDirectory)CSharp9Hack.cs" />-->
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">

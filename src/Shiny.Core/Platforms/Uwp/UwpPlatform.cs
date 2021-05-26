@@ -2,30 +2,27 @@
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.ApplicationModel;
-using Windows.UI.Xaml;
 using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
+using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Jobs;
-using Shiny.Infrastructure;
-
 
 namespace Shiny
 {
-    public class UwpPlatform : IPlatform, IStartupInitializer
+    public class UwpPlatform : IPlatform
     {
         readonly EasClientDeviceInformation deviceInfo = new EasClientDeviceInformation();
-        public static string BackgroundTaskName => typeof(Shiny.Support.Uwp.ShinyBackgroundTask).FullName;
-
-        const string STARTUP_KEY = "ShinyStartupTypeName";
         readonly Application? app;
 
 
-        public UwpPlatform(Application app) : this() => this.app = app;
-        UwpPlatform()
+        public UwpPlatform(Application? app = null)
         {
+            this.app = app;
             var path = ApplicationData.Current.LocalFolder.Path;
             this.AppData = new DirectoryInfo(path);
             this.Cache = new DirectoryInfo(Path.Combine(path, "Cache"));
@@ -33,6 +30,7 @@ namespace Shiny
         }
 
 
+        public string Name => KnownPlatforms.Uwp;
         public DirectoryInfo AppData { get; }
         public DirectoryInfo Cache { get; }
         public DirectoryInfo Public { get; }
@@ -48,6 +46,21 @@ namespace Shiny
         public string MachineName => "";
 
         public PlatformState Status { get; private set; } = PlatformState.Foreground;
+
+
+        public void InvokeOnMainThread(Action action)
+        {
+            var dispatcher = CoreApplication.MainView.CoreWindow?.Dispatcher;
+
+            if (dispatcher == null)
+                throw new NullReferenceException("Main thread missing");
+
+            if (dispatcher.HasThreadAccess)
+                action();
+            else
+                dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => action());
+        }
+
 
         //https://docs.microsoft.com/en-us/uwp/api/Windows.UI.Xaml.Application?view=winrt-19041
         public IObservable<PlatformState> WhenStateChanged() => Observable
@@ -77,43 +90,10 @@ namespace Shiny
             .Do(x => this.Status = x);
 
 
-        public void Register(IServiceCollection services) => services.RegisterCommonServices();
-
-
-        public void Initialize(IShinyStartup startup, IServiceCollection services)
-        {
-            if (hydrated)
-                return;
-
-            startup.ConfigureServices(services, this);
-            Dehydrate(STARTUP_KEY, startup);
-        }
-
-
-        static bool hydrated;
-        public static void BackgroundRun(IBackgroundTaskInstance taskInstance)
-        {
-            if (!ShinyHost.IsInitialized)
-            {
-                var startup = Hydrate<IShinyStartup>(STARTUP_KEY);
-                hydrated = true;
-                ShinyHost.Init(new UwpPlatform(), startup);
-            }
-            if (taskInstance.Task.Name.StartsWith("JOB-"))
-            {
-                ShinyHost
-                    .Container
-                    .ResolveOrInstantiate<JobManager>()
-                    .Process(taskInstance);
-            }
-            else
-            {
-
-                var targetType = Type.GetType(taskInstance.Task.Name);
-                var processor = ShinyHost.Container.ResolveOrInstantiate(targetType) as IBackgroundTaskProcessor;
-                processor?.Process(taskInstance);
-            }
-        }
+        public static bool RunInProc { get; set; }
+        public static string? BackgroundTaskName { get; private set; }
+        public static void SetBackgroundTask(Type backgroundTask)
+            => BackgroundTaskName = $"{backgroundTask.Namespace}.{backgroundTask.Name}";
 
 
         public static void RegisterBackground<TService>(Action<BackgroundTaskBuilder>? builderAction = null) where TService : IBackgroundTaskProcessor
@@ -123,40 +103,45 @@ namespace Shiny
             {
                 var builder = new BackgroundTaskBuilder();
                 builder.Name = taskName;
-                builder.TaskEntryPoint = BackgroundTaskName;
+                if (!RunInProc)
+                {
+                    if (BackgroundTaskName.IsEmpty())
+                        throw new ArgumentException("UwpPlatform.BackgroundTaskName has not been set properly. This would only happen if Shiny has not been bootstrapped properly");
 
+                    builder.TaskEntryPoint = BackgroundTaskName;
+                }
                 builderAction?.Invoke(builder);
                 builder.Register();
             }
         }
 
 
+        public static void RunBackgroundTask(IBackgroundTask task, IBackgroundTaskInstance taskInstance, IShinyStartup startup)
+        {
+            if (!ShinyHost.IsInitialized)
+            {
+                UwpPlatform.SetBackgroundTask(task.GetType());
+                ShinyHost.Init(new UwpPlatform(null), startup);
+            }
+
+            var services = ShinyHost.ServiceProvider;
+            if (taskInstance.Task.Name.StartsWith("JOB-"))
+            {
+                services
+                    .Resolve<JobManager>(true)!
+                    .Process(taskInstance);
+            }
+            else
+            {
+                var targetType = Type.GetType(taskInstance.Task.Name);
+                var processor = ActivatorUtilities.GetServiceOrCreateInstance(services, targetType) as IBackgroundTaskProcessor;
+                processor?.Process(taskInstance);
+            }
+        }
+
+
         public void UnRegisterBackground<TService>() where TService : IBackgroundTaskProcessor
             => GetTask(typeof(TService).AssemblyQualifiedName)?.Unregister(true);
-
-
-        static void Dehydrate(string key, object? obj)
-        {
-            if (obj != null)
-                ApplicationData.Current.LocalSettings.Values[key] = obj.GetType().AssemblyQualifiedName;
-        }
-
-
-        static T? Hydrate<T>(string key) where T : class
-        {
-            var settings = ApplicationData.Current.LocalSettings.Values;
-            if (!settings.ContainsKey(key))
-                return null;
-
-            var typeName = settings[key].ToString();
-            var type = Type.GetType(typeName);
-            if (type != null)
-            {
-                var obj = Activator.CreateInstance(type) as T;
-                return obj;
-            }
-            return null;
-        }
 
 
         public static IBackgroundTaskRegistration GetTask(string taskName) => BackgroundTaskRegistration

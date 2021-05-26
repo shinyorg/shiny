@@ -101,7 +101,7 @@
       <Name>Shiny.BluetoothLE</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj">
-      <Project>{d7f94901-2960-4ba0-acb2-280761e70af0}</Project>
+      <Project>{6E3ADF29-8660-4AD5-A9C3-5B2B7B4F99E7}</Project>
       <Name>Shiny.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj">

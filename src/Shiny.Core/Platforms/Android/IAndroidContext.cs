@@ -6,15 +6,14 @@ using Android.Content.PM;
 
 namespace Shiny
 {
-    public interface IAndroidContext
+    public interface IAndroidContext : IPlatform
     {
         Application AppContext { get; }
         Activity CurrentActivity { get; }
         PackageInfo Package { get; }
         IObservable<ActivityChanged> WhenActivityChanged();
-        void OnNewIntent(Intent intent);
+        void OnNewIntent(Intent? intent);
         void OnActivityResult(int requestCode, Result resultCode, Intent data);
-
 
         Intent CreateIntent<T>(params string[] actions);
         AccessState GetCurrentAccessState(string androidPermission);

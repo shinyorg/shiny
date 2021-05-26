@@ -13,6 +13,14 @@
   <Resources>
     <Resource Language="x-generate" />
   </Resources>
+    <Extensions>
+        <Extension Category="windows.activatableClass.inProcessServer">
+            <InProcessServer>
+                <Path>CLRHost.dll</Path>
+                <ActivatableClass ActivatableClassId="Samples.UWP.MyShinyBackgroundTask" ThreadingModel="both" />
+            </InProcessServer>
+        </Extension>
+    </Extensions>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Samples.UWP.App">
       <uap:VisualElements DisplayName="Shiny" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" Description="Shiny samples" BackgroundColor="transparent">
@@ -25,8 +33,9 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
+      <!-- 
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="Shiny.Support.Uwp.ShinyBackgroundTask">
+        <Extension Category="windows.backgroundTasks" EntryPoint="Samples.UWP.MyShinyBackgroundTask">
           <BackgroundTasks>
             <Task Type="bluetooth"/>
             <Task Type="deviceConnectionChange"/>
@@ -38,13 +47,13 @@
             <Task Type="pushNotification"/>
             <Task Type="timer"/>
           </BackgroundTasks>
-        </Extension>             
+        </Extension>
       </Extensions>
+      -->
     </Application>
   </Applications>
   <Capabilities>
     <Capability Name="internetClient" />
-    <uap3:Capability Name="backgroundMediaPlayback" />
     <uap3:Capability Name="userNotificationListener"/>
     <DeviceCapability Name="bluetooth" />
     <DeviceCapability Name="microphone" />

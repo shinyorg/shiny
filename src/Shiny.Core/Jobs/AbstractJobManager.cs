@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using Shiny.Jobs.Infrastructure;
@@ -221,7 +223,7 @@ namespace Shiny.Jobs
 
 
         protected virtual IJob ResolveJob(JobInfo jobInfo)
-            => (IJob)this.container.ResolveOrInstantiate(jobInfo.Type);
+            => (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, jobInfo.Type);
 
 
         protected virtual void LogJob(JobState state,

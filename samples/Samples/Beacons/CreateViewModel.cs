@@ -21,6 +21,8 @@ namespace Samples.Beacons
                                IBeaconRangingManager rangingManager,
                                IBeaconMonitoringManager? monitorManager = null)
         {
+            this.NotificationTitle = monitorManager?.Title;
+            this.NotificationMessage = monitorManager?.Message;
             this.IsMonitoringSupported = monitorManager != null;
 
             this.EstimoteDefaults = ReactiveCommand.Create(() =>
@@ -38,7 +40,9 @@ namespace Samples.Beacons
                 {
                     var result = await monitorManager.RequestAccess();
                     if (result != AccessState.Available)
+                    {
                         await dialogs.AlertAccess(result);
+                    }
                     else
                     {
                         await monitorManager.StartMonitoring(this.GetBeaconRegion());
@@ -72,9 +76,11 @@ namespace Samples.Beacons
                 {
                     var result = await rangingManager.RequestAccess();
                     if (result != AccessState.Available)
-                        await dialogs.AlertAccess(result);
-                    else
                     {
+                        await dialogs.AlertAccess(result);
+                    }
+                    else
+                        {
                         var region = this.GetBeaconRegion();
                         await navigator.GoBack(false, (nameof(BeaconRegion), region));
                     }
@@ -87,6 +93,16 @@ namespace Samples.Beacons
                     (idValue, uuidValue, majorValue, minorValue) => this.IsValid()
                 )
             );
+
+            this.WhenAnyValue(x => x.NotificationTitle)
+                .Skip(1)
+                .Subscribe(x => monitorManager.Title = x)
+                .DisposedBy(this.DestroyWith);
+
+            this.WhenAnyValue(x => x.NotificationMessage)
+                .Skip(1)
+                .Subscribe(x => monitorManager.Message = x)
+                .DisposedBy(this.DestroyWith);
         }
 
 
@@ -102,6 +118,8 @@ namespace Samples.Beacons
         [Reactive] public string Minor { get; set; }
         [Reactive] public bool NotifyOnEntry { get; set; } = true;
         [Reactive] public bool NotifyOnExit { get; set; } = true;
+        [Reactive] public string NotificationTitle { get; set; }
+        [Reactive] public string NotificationMessage { get; set; }
         public bool IsMonitoringSupported { get; }
 
 

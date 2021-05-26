@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="readme.txt" pack="true" PackagePath="." />
         <Compile Remove="Platforms\**\*.cs" />
         <None Include="Platforms\**\*.cs" />
         <PackageReference Include="Microsoft.Azure.NotificationHubs" />

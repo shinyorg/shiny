@@ -6,16 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Net\Http\**" />
       <Compile Remove="Sensors\**" />
-      <EmbeddedResource Remove="Net\Http\**" />
       <EmbeddedResource Remove="Sensors\**" />
-      <None Remove="Net\Http\**" />
       <None Remove="Sensors\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="readme.txt" pack="true" PackagePath="." />
         <ProjectReference Include="..\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />

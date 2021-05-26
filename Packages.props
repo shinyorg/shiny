@@ -1,10 +1,7 @@
 <Project>
     <!--lib-->
     <ItemGroup>
-        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
-        <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
-        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" />
-        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.9.0" />
+
 
         <PackageReference Update="sqlite-net-pcl" Version="1.7.335" />
         <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
@@ -13,8 +10,13 @@
         <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
         <PackageReference Update="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-        <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
 
+        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+        <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
+        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" />
+        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.9.0" />
+
+        <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
         <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.2.0" />
         <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.2.0" />
 

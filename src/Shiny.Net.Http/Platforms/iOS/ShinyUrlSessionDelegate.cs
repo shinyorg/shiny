@@ -54,7 +54,7 @@ namespace Shiny.Net.Http
         }
 
 
-        public override void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error) => Dispatcher.ExecuteBackgroundTask(async () =>
+        public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
         {
             var transfer = task.FromNative();
 
@@ -64,7 +64,7 @@ namespace Shiny.Net.Http
                 await this.tdelegate.Value.OnError(transfer, transfer.Exception);
             }
             this.onEvent.OnNext(transfer);
-        });
+        }
 
 
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
@@ -79,7 +79,7 @@ namespace Shiny.Net.Http
             => this.onEvent.OnNext(downloadTask.FromNative());
 
 
-        public override void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location) => Dispatcher.ExecuteBackgroundTask(async () =>
+        public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
         {
             var transfer = downloadTask.FromNative();
 
@@ -89,6 +89,6 @@ namespace Shiny.Net.Http
 
             await this.tdelegate.Value.OnCompleted(transfer);
             this.onEvent.OnNext(transfer);
-        });
+        }
     }
 }

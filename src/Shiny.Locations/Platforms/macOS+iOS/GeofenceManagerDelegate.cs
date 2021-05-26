@@ -44,7 +44,7 @@ namespace Shiny.Locations
         }
 
 
-        void Broadcast(CLLocationManager manager, CLRegion region, GeofenceState status) => Dispatcher.ExecuteBackgroundTask(async () =>
+        async void Broadcast(CLLocationManager manager, CLRegion region, GeofenceState status)
         {
             if (region is CLCircularRegion native)
             {
@@ -59,6 +59,6 @@ namespace Shiny.Locations
                     }
                 }
             }
-        });
+        }
     }
 }

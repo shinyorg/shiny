@@ -52,22 +52,7 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="jobInfo"></param>
         public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo)
-        {
-            services.RegisterPostBuildAction(async sp =>
-            {
-                var jobs = sp.GetRequiredService<IJobManager>();
-                var access = await jobs.RequestAccess();
-                if (access == AccessState.Available)
-                    await jobs.Register(jobInfo);
-                else
-                {
-                    ShinyHost
-                        .LoggerFactory
-                        .CreateLogger<ILogger<IJobManager>>()
-                        .LogError("Job permission failed - " + access);
-                }
-            });
-        }
+            => StartupModule.AddJob(jobInfo);
 
 
         /// <summary>
@@ -105,7 +90,7 @@ namespace Shiny
                 return (T)Convert.ChangeType(value, typeof(T));
 
             if (value is string s && typeof(T) != typeof(string))
-                return ShinyHost.Container.GetService<ISerializer>().Deserialize<T>(s);
+                return ShinyHost.Resolve<ISerializer>().Deserialize<T>(s);
 
             return (T)value;
         }
