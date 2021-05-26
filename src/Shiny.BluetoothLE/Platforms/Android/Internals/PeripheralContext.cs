@@ -22,15 +22,15 @@ namespace Shiny.BluetoothLE.Internals
         {
             this.ManagerContext = context;
             this.NativeDevice = device;
-            this.Actions = new ConcurrentQueue<Func<Task>>();
             this.connErrorSubject = new Subject<BleException>();
+            this.Callbacks = new GattCallbacks();
         }
 
 
-        public GattCallbacks Callbacks { get; } = new GattCallbacks();
         public ManagerContext ManagerContext { get; }
         public BluetoothGatt? Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
+        public GattCallbacks Callbacks { get; }
 
         public ConnectionState Status => this
             .ManagerContext
@@ -39,7 +39,6 @@ namespace Shiny.BluetoothLE.Internals
             .ToStatus();
 
 
-        public ConcurrentQueue<Func<Task>> Actions { get; }
         public IObservable<BleException> ConnectionFailed => this.connErrorSubject;
 
 
