@@ -27,13 +27,13 @@ namespace Samples.BluetoothLE
             this.ConnectionToggle = ReactiveCommand.Create(() =>
             {
                 // don't cleanup connection - force user to d/c
-                if (this.peripheral.Status == ConnectionState.Disconnected)
+                if (this.peripheral.Status == ConnectionState.Connected || this.peripheral.Status == ConnectionState.Connecting)
                 {
-                    this.peripheral.Connect();
+                    this.peripheral.CancelConnection();
                 }
                 else
                 {
-                    this.peripheral.CancelConnection();
+                    this.peripheral.Connect();
                 }
             });
 
@@ -51,14 +51,9 @@ namespace Samples.BluetoothLE
                 }
                 else
                 {
-                    pair
-                        .PairingRequest()
-                        .Subscribe(x =>
-                        {
-                            var txt = x ? "Peripheral Paired Successfully" : "Peripheral Pairing Failed";
-                            dialogs.Snackbar(txt);
-                            this.RaisePropertyChanged(nameof(this.PairingText));
-                        });
+                    var result = await pair.PairingRequest().Timeout(TimeSpan.FromSeconds(10));
+                    await dialogs.Snackbar(result ? "Peripheral Paired Successfully" : "Peripheral Pairing Failed");
+                    this.RaisePropertyChanged(nameof(this.PairingText));
                 }
             });
 
@@ -112,11 +107,6 @@ namespace Samples.BluetoothLE
 
             this.peripheral
                 .WhenStatusChanged()
-                .Do(x =>
-                {
-                    if (x == ConnectionState.Connected)
-                        this.GattCharacteristics.Clear();
-                })
                 .Select(x => x switch
                 {
                     ConnectionState.Connecting => "Cancel Connection",
@@ -124,11 +114,15 @@ namespace Samples.BluetoothLE
                     ConnectionState.Disconnected => "Connect",
                     ConnectionState.Disconnecting => "Disconnecting..."
                 })
-                .SubOnMainThread(x => this.ConnectText = x)
+                .SubOnMainThread(x =>
+                {
+                    this.ConnectText = x;
+                })
                 .DisposedBy(this.DeactivateWith);
 
             this.peripheral
                 .WhenConnected()
+                .Do(x => this.GattCharacteristics.Clear())
                 .SelectMany(x => x.GetAllCharacteristics())
                 .Select(x => x.Select(y => new GattCharacteristicViewModel(y, this.dialogs)))
                 .SubOnMainThread(
