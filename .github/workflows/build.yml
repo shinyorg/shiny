@@ -36,22 +36,22 @@ jobs:
     - name: Build
       run: dotnet run --project build/ShinyBuild.csproj --DocsDeployGitHubToken=${{ secrets.DOCS_GITHUB_TOKEN }} --BuildNumber=${{steps.buildnumber.outputs.build_number}} --NugetApiKey=${{secrets.NUGETAPIKEY}}
 
-  iossample:
-    runs-on: macos-latest
+  #iossample:
+  #  runs-on: macos-latest
 
-    steps:
-    - uses: actions/checkout@v2
+  #  steps:
+  #  - uses: actions/checkout@v2
 
-    # pass cert/pass and provisioning profile
-    - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj --target=iOSSample
+  #  # pass cert/pass and provisioning profile
+  #  - name: Build
+  #    run: dotnet run --project build/ShinyBuild.csproj --target=iOSSample
 
-  androidsample:
-    runs-on: macos-latest
+  #androidsample:
+  #  runs-on: macos-latest
 
-    steps:
-    - uses: actions/checkout@v2
+  #  steps:
+  #  - uses: actions/checkout@v2
 
-    # pass signing key, alias and pass
-    - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj --target=AndroidSample
+  #  # pass signing key, alias and pass
+  #  - name: Build
+  #    run: dotnet run --project build/ShinyBuild.csproj --target=AndroidSample
