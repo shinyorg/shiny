@@ -125,9 +125,9 @@ namespace Shiny.BluetoothLE
                     }
                     return scanResult;
                 }))
+                .Switch()
                 .Where(x => x != null)
-                .Finally(() => this.IsScanning = false)
-                .Switch()!;
+                .Finally(() => this.IsScanning = false);
         }
 
 

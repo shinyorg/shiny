@@ -71,6 +71,7 @@ namespace Samples.BluetoothLE
                         this.scanSub = bleManager
                             .Scan()
                             .Buffer(TimeSpan.FromSeconds(1))
+                            .Where(x => x?.Any() ?? false)
                             .SubOnMainThread(
                                 results =>
                                 {
