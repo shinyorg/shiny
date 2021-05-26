@@ -30,6 +30,9 @@ namespace ShinyBuild.Tasks.Library
                 Source = "https://api.nuget.org/v3/index.json",
                 SkipDuplicate = true
             };
+            // delete symbols for now
+            context.DeleteFiles("src/**/*.symbols.nupkg");
+
             var packages = context.GetFiles("src/**/*.nupkg");
             foreach (var package in packages)
                 context.DotNetCoreNuGetPush(package.FullPath, settings);
