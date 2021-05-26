@@ -12,6 +12,8 @@ namespace ShinyBuild.Tasks.Library
     //[IsDependeeOf(typeof(BasicTestsTask))]
     public sealed class NugetDeployTask : FrostingTask<BuildContext>
     {
+        const string MainNuget = "https://api.nuget.org/v3/index.json";
+
         public override bool ShouldRun(BuildContext context)
         {
             var result = context.IsNugetDeployBranch && context.IsRunningInCI;
@@ -24,10 +26,19 @@ namespace ShinyBuild.Tasks.Library
 
         public override void Run(BuildContext context)
         {
+            // delete symbols for now
+            context.DeleteFiles("src/**/*.symbols.nupkg");
+
+            DoDeploy(context, context.NugetApiKey, MainNuget);
+        }
+
+
+        static void DoDeploy(BuildContext context, string apiKey, string sourceUrl)
+        {
             var settings = new DotNetCoreNuGetPushSettings
             {
-                ApiKey = context.NugetApiKey,
-                Source = "https://api.nuget.org/v3/index.json",
+                ApiKey = apiKey,
+                Source = sourceUrl,
                 SkipDuplicate = true
             };
             // delete symbols for now
