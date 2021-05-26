@@ -90,7 +90,8 @@ namespace Shiny
             .Do(x => this.Status = x);
 
 
-        public static string BackgroundTaskName { get; private set; }
+        public static bool RunInProc { get; set; }
+        public static string? BackgroundTaskName { get; private set; }
         public static void SetBackgroundTask(Type backgroundTask)
             => BackgroundTaskName = $"{backgroundTask.Namespace}.{backgroundTask.Name}";
 
@@ -102,8 +103,13 @@ namespace Shiny
             {
                 var builder = new BackgroundTaskBuilder();
                 builder.Name = taskName;
-                builder.TaskEntryPoint = BackgroundTaskName;
+                if (!RunInProc)
+                {
+                    if (BackgroundTaskName.IsEmpty())
+                        throw new ArgumentException("UwpPlatform.BackgroundTaskName has not been set properly. This would only happen if Shiny has not been bootstrapped properly");
 
+                    builder.TaskEntryPoint = BackgroundTaskName;
+                }
                 builderAction?.Invoke(builder);
                 builder.Register();
             }
