@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using AndroidX.Core.App;
+using Microsoft.Extensions.Logging;
 using Shiny.Notifications;
 
 
@@ -64,8 +66,12 @@ namespace Shiny
             {
                 this.Service
                     .WhenAnyProperty()
+                    .Skip(1)
+                    .Throttle(TimeSpan.FromMilliseconds(400))
                     .Subscribe(_ => this.SetNotification())
                     .DisposedBy(this.DestroyWith);
+
+                this.SetNotification();
             }
             this.OnStart(intent);
         }
@@ -91,12 +97,41 @@ namespace Shiny
         NotificationCompat.Builder? builder;
         protected virtual void SetNotification()
         {
-            this.EnsureChannel();
+            try
+            {
+                this.EnsureChannel();
+                this.SendNotification();
+            }
+            catch (Exception ex)
+            {
+                ShinyHost
+                    .LoggerFactory
+                    .CreateLogger(this.GetType().AssemblyQualifiedName)
+                    .LogError(ex, "Failed to send notification - your android foreground service will fail because of this error");
+            }
+        }
 
+
+        protected virtual void EnsureChannel()
+        {
+            var nm = this.AndroidNotifications.NativeManager;
+            if (nm.GetNotificationChannel(NotificationChannelId) != null)
+                return;
+
+            nm.CreateNotificationChannel(new NotificationChannel(
+                NotificationChannelId,
+                "Background",
+                NotificationImportance.Default
+            ));
+        }
+
+
+        protected virtual void SendNotification()
+        {
             this.builder ??= new NotificationCompat.Builder(this.Context.AppContext)
-                .SetChannelId(NotificationChannelId)
-                .SetSmallIcon(this.AndroidNotifications.GetSmallIconResource(null))
-                .SetOngoing(true);
+                            .SetChannelId(NotificationChannelId)
+                            .SetSmallIcon(this.AndroidNotifications.GetSmallIconResource(null))
+                            .SetOngoing(true);
 
             this.builder
                 .SetProgress(
@@ -117,20 +152,6 @@ namespace Shiny
             {
                 this.AndroidNotifications.NativeManager.Notify(this.notificationId.Value, this.builder.Build());
             }
-        }
-
-
-        public virtual void EnsureChannel()
-        {
-            var nm = this.AndroidNotifications.NativeManager;
-            if (nm.GetNotificationChannel(NotificationChannelId) != null)
-                return;
-
-            nm.CreateNotificationChannel(new NotificationChannel(
-                NotificationChannelId,
-                "Background",
-                NotificationImportance.Default
-            ));
         }
     }
 }
