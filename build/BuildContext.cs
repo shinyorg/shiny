@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
@@ -30,13 +29,13 @@ namespace ShinyBuild
         }
 
 
-        public string MajorMinorVersion => "2.0";
+        public string MajorMinorVersion => this.Argument<string>("ShinyVersion", Constants.MajorMinorVersion);
         public int BuildNumber => this.Argument("BuildNumber", 0);
         public bool UseXamarinPreview => this.HasArgument("UseXamarinPreview");
         public bool IsWindows => this.Environment.Platform.Family == PlatformFamily.Windows;
         public string DocsDeployGitHubToken => this.Argument<string>(nameof(DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
-        public string MsBuildConfiguration => this.Argument("configuration", "Release");
+        public string MsBuildConfiguration => this.Argument("configuration", Constants.DefaultBuildConfiguration);
         public string NugetApiKey => this.Argument<string>("NugetApiKey");
         public bool AllowNugetUploadFailures => this.HasArgument("AllowNugetUploadFailures");
         public GitBranch Branch { get; }
