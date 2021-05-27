@@ -62,11 +62,26 @@ namespace Shiny
         }
 
 
-        public static Task InvokeOnMainThreadAsync(this IPlatform platform, Action action) => platform.InvokeOnMainThreadAsync<object>(() =>
+        public static async Task InvokeOnMainThreadAsync(this IPlatform platform, Action action, CancellationToken cancelToken = default)
         {
-            action();
-            return default;
-        });
+            var tcs = new TaskCompletionSource<object>();
+            using (cancelToken.Register(() => tcs.TrySetCanceled()))
+            {
+                platform.InvokeOnMainThread(() =>
+                {
+                    try
+                    {
+                        action();
+                        tcs.TrySetResult(null);
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.TrySetException(ex);
+                    }
+                });
+            }
+            await tcs.Task.ConfigureAwait(false);
+        }
 
 
         public static string ResourceToFilePath(this IPlatform platform, Assembly assembly, string resourceName)

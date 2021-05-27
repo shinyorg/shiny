@@ -22,22 +22,7 @@ namespace Shiny.Tests
         [Fact(DisplayName = "Platform - App Version")]
         public void AppVersion()
             => Assert.Equal("1", ShinyHost.Resolve<IPlatform>().AppVersion);
-
-
-        [Fact(DisplayName = "Platform - InvokeOnMainThread Sync")]
-        public async Task InvokeOnMainThread()
-        {
-            var platform = ShinyHost.Resolve<IPlatform>();
-            var value = 1;
-            await Task.Run(() => value = 2).ConfigureAwait(false);
-
-            platform.InvokeOnMainThread(() =>
-            {
-                value = 99;
-            });
-            value.Should().Be(99);
-        }
-
+    
 
         [Fact(DisplayName = "Platform - InvokeOnMainThread Async /w Result")]
         public async Task InvokeOnMainThreadAsyncWithResult()
@@ -60,15 +45,25 @@ namespace Shiny.Tests
             });
         }
 
-        [Fact(DisplayName = "Platform - InvokeOnMainThread /w Error")]
-        public async Task InvokeOnMainThreadError()
+
+        [Fact(DisplayName = "Platform - InvokeOnMainThread Async /w Error")]
+        public async Task InvokeOnMainThreadAsyncError()
         {
-            await Task.Run(() =>
+            try
             {
-                ShinyHost
-                    .Resolve<IPlatform>()
-                    .InvokeOnMainThread(() => throw new ArgumentException("Test"));
-            });
+                await Task.Run(async () =>
+                {
+                    await ShinyHost
+                        .Resolve<IPlatform>()
+                        .InvokeOnMainThreadAsync(() => throw new ArgumentException("Test"));
+
+                    throw new Exception("If you got here, the test failed");
+                });
+            }
+            catch (ArgumentException ex) when (ex.Message.Equals("Test"))
+            {
+                // swallow, good here
+            }
         }
 
         //// TODO: based on device
