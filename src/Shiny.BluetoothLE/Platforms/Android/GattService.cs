@@ -44,8 +44,9 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false)
             => Observable.Create<IGattCharacteristic?>(ob =>
             {
-                var uuid = UUID.FromString(characteristicUuid);
+                var uuid = Utils.ToUuidType(characteristicUuid);
                 var cs = this.native.GetCharacteristic(uuid);
+
                 if (cs == null)
                 {
                     ob.Respond(null);

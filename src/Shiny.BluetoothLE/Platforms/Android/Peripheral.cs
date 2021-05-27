@@ -59,14 +59,19 @@ namespace Shiny.BluetoothLE
 
 
         // android does not have a find "1" service - it must discover all services.... seems shit
-        public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false) => this
-            .GetServices()
-            .Select(x => x.FirstOrDefault(y => y
-                .Uuid
-                .Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase)
-            ))
-            .Take(1)
-            .Assert(serviceUuid, throwIfNotFound);
+        public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false)
+        {
+            var uuid = Utils.ToUuidString(serviceUuid);
+
+            return this
+                .GetServices()
+                .Select(x => x.FirstOrDefault(y => y
+                    .Uuid
+                    .Equals(uuid, StringComparison.InvariantCultureIgnoreCase)
+                ))
+                .Take(1)
+                .Assert(serviceUuid, throwIfNotFound);
+        }
 
 
         public override IObservable<string> WhenNameUpdated() => this.Context

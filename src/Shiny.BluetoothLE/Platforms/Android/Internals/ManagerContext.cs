@@ -168,7 +168,8 @@ namespace Shiny.BluetoothLE.Internals
             {
                 foreach (var uuid in config.ServiceUuids)
                 {
-                    var parcel = new ParcelUuid(UUID.FromString(uuid));
+                    var fullUuid = Utils.ToUuidType(uuid);
+                    var parcel = new ParcelUuid(fullUuid);
                     scanFilters.Add(new ScanFilter.Builder()
                         .SetServiceUuid(parcel)
                         .Build()
