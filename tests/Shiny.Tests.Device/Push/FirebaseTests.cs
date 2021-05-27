@@ -21,7 +21,6 @@ namespace Shiny.Tests.Push
         readonly IPushTagSupport pushManager;
 
 
-
         public FirebaseTests(ITestOutputHelper output)
         {
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
