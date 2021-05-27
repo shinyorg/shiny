@@ -51,7 +51,7 @@ namespace Samples.BluetoothLE
                 }
                 else
                 {
-                    var result = await pair.PairingRequest().Timeout(TimeSpan.FromSeconds(10));
+                    var result = await pair.PairingRequest(); //.Timeout(TimeSpan.FromSeconds(10));
                     await dialogs.Snackbar(result ? "Peripheral Paired Successfully" : "Peripheral Pairing Failed");
                     this.RaisePropertyChanged(nameof(this.PairingText));
                 }
