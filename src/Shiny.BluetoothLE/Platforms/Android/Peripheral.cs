@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
-
+using Android.Content;
 
 namespace Shiny.BluetoothLE
 {
@@ -161,24 +161,59 @@ namespace Shiny.BluetoothLE
             }
             else
             {
-                PairingRequestPin = pin;
-                this.Context
-                    .ManagerContext
-                    .ListenForMe(ManagerContext.BlePairingFailed, this)
-                    .Subscribe(_ => ob.Respond(false))
-                    .DisposedBy(disp);
+                var pairingIntent = new Intent(BluetoothDevice.ActionPairingRequest);
+                pairingIntent.PutExtra(BluetoothDevice.ExtraDevice, this.Native);
+                pairingIntent.SetFlags(ActivityFlags.NewTask);
+
+                if (pin.IsEmpty())
+                {
+                    pairingIntent.PutExtra(BluetoothDevice.ExtraPairingVariant, BluetoothDevice.PairingVariantPin);
+                }
+                else
+                {
+                    pairingIntent.PutExtra(BluetoothDevice.ExtraPairingVariant, BluetoothDevice.PairingVariantPasskeyConfirmation);
+                    pairingIntent.PutExtra(BluetoothDevice.ExtraPairingKey, pin);
+                }
 
                 this.Context
                     .ManagerContext
-                    .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
-                    .Where(x => this.Context.NativeDevice.BondState == Bond.Bonded)
-                    .Subscribe(_ => ob.Respond(true))
-                    .DisposedBy(disp);
+                    .Android
+                    .RequestActivityResult(pairingIntent)
+                    .Subscribe(result =>
+                    {
+                        switch (result.Result)
+                        {
+                            case Android.App.Result.Canceled:
+                                ob.Respond(false);
+                                break;
 
-                if (!this.Context.NativeDevice.CreateBond())
-                    ob.Respond(false);
+                            case Android.App.Result.Ok:
+                                ob.Respond(true);
+                                break;
+                        }
+                    })
+                    .DisposedBy(disp);
             }
             return disp;
+            //    PairingRequestPin = pin;
+            //    this.Context
+            //        .ManagerContext
+            //        .ListenForMe(ManagerContext.BlePairingFailed, this)
+            //        .Subscribe(_ => ob.Respond(false))
+            //        .DisposedBy(disp);
+
+            //    this.Context
+            //        .ManagerContext
+            //        .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
+            //        .Where(x =>
+            //        {
+            //            return this.Context.NativeDevice.BondState == Bond.Bonded;
+            //        })
+            //        .Subscribe(_ => ob.Respond(true))
+            //        .DisposedBy(disp);
+
+            //    if (!this.Context.NativeDevice.CreateBond())
+            //        ob.Respond(false);
         });
 
 
