@@ -64,6 +64,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C114E37
 		buildtools.json = buildtools.json
 		tests\Directory.build.props = tests\Directory.build.props
 		tests\global.json = tests\global.json
+		tests\readme.md = tests\readme.md
 		secrets.json = secrets.json
 		tests\xunit.runner.json = tests\xunit.runner.json
 	EndProjectSection
