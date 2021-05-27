@@ -43,7 +43,6 @@
         <array>
             <string>audio</string>
             <string>location</string>
-            <string>external-accessory</string>
             <string>bluetooth-central</string>
             <string>bluetooth-peripheral</string>
             <string>fetch</string>
@@ -75,11 +74,5 @@
         <string>Put your friendly message as to why here!</string>
         <key>NSMotionUsageDescription</key>
         <string>Required for pedometer</string>
-        <key>NSPhotoLibraryUsageDescription</key>
-        <string>Media sync needs access to your media</string>
-        <key>NSAppleMusicUsageDescription</key>
-        <string>Media sync needs access to your media</string>
-        <key>NSPhotoLibraryAddUsageDescription</key>
-        <string>Media sync needs access to your media</string>
     </dict>
 </plist>
