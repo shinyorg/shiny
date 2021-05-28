@@ -79,7 +79,7 @@ namespace Shiny.Notifications
 
                     uri ??= Android.Provider.Settings.System.DefaultAlarmAlertUri;
                     // if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    native.CanBypassDnd();
+                    native.SetBypassDnd(true);
                     break;
 
                 case ChannelImportance.High:
