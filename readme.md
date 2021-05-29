@@ -35,6 +35,8 @@ Depending on your Sponsorship Tier, you may also get access to some great benefi
 
 [https://sponsor.shinylib.net](https://sponsor.shinylib.net)
 
+How about some [Shiny Gear](https://www.redbubble.com/shop/ap/45038461)
+
 ## Builds
 
 Branch|Status
