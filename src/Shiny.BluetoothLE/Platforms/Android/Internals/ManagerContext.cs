@@ -9,7 +9,7 @@ using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.Content;
 using Android.OS;
-using Java.Util;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using ScanMode = Android.Bluetooth.LE.ScanMode;
 using Observable = System.Reactive.Linq.Observable;
@@ -19,26 +19,26 @@ namespace Shiny.BluetoothLE.Internals
 {
     public class ManagerContext
     {
-        public const string BlePairingFailed = nameof(BlePairingFailed);
+        //public const string BlePairingFailed = nameof(BlePairingFailed);
         readonly ConcurrentDictionary<string, Peripheral> devices;
-        readonly Subject<NamedMessage<Peripheral>> peripheralSubject;
+        readonly Subject<(Intent Intent, Peripheral Peripheral)> peripheralSubject;
         readonly ShinyCoreServices services;
+        readonly ILogger logger;
         LollipopScanCallback? callbacks;
 
 
-        public ManagerContext(ShinyCoreServices services, BleConfiguration config)
+        public ManagerContext(ShinyCoreServices services,
+                              BleConfiguration config,
+                              ILogger<ManagerContext> logger)
         {
             this.Configuration = config;
             this.services = services;
+            this.logger = logger;
 
             this.devices = new ConcurrentDictionary<string, Peripheral>();
-            this.peripheralSubject = new Subject<NamedMessage<Peripheral>>();
+            this.peripheralSubject = new Subject<(Intent Intent, Peripheral Peripheral)>();
             this.Manager = services.Android.GetBluetooth();
-            //this.StatusChanged
-            //    .Skip(1)
-            //    .SubscribeAsync(status => Log.SafeExecute(
-            //        async () => await this.sdelegate.Value?.OnAdapterStateChanged(status)
-            //    ));
+            ShinyBleBroadcastReceiver.OnBleEvent = intent => this.DeviceEvent(intent);
         }
 
 
@@ -50,73 +50,42 @@ namespace Shiny.BluetoothLE.Internals
             .Select(x => x.FromNative())
             .StartWith(this.Status);
 
-        public IObservable<NamedMessage<Peripheral>> PeripheralEvents => this.peripheralSubject;
+        public IObservable<(Intent Intent, Peripheral Peripheral)> PeripheralEvents
+            => this.peripheralSubject;
 
         public BleConfiguration Configuration { get; }
         public BluetoothManager Manager { get; }
         public IAndroidContext Android => this.services.Android;
 
 
-        internal async void DeviceEvent(Intent intent)
+        async void DeviceEvent(Intent intent)
         {
-            var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
-            var peripheral = this.GetDevice(device);
-            var action = intent.Action;
-
-            switch (action)
+            try
             {
-                case BluetoothDevice.ActionAclConnected:
+                var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
+                var peripheral = this.GetDevice(device);
+
+                if (intent.Action.Equals(BluetoothDevice.ActionAclConnected))
                     await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
-                    break;
 
-                case BluetoothDevice.ActionPairingRequest:
-                    var pin = peripheral.PairingRequestPin;
-                    peripheral.PairingRequestPin = null;
-
-                    if (!pin.IsEmpty())
-                    {
-                        var bytes = Encoding.UTF8.GetBytes(pin);
-
-                        if (!device.SetPin(bytes))
-                            action = BlePairingFailed;
-                        //else
-                        //{
-                        //    Log.Write("BlePairing", "Auto-Pairing PIN was sent successfully apparently");
-                        //    //device.SetPairingConfirmation(true);
-                        //}
-                    }
-                    break;
+                this.peripheralSubject.OnNext((intent, peripheral));
             }
-            this.peripheralSubject.OnNext(new NamedMessage<Peripheral>(action, peripheral));
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "DeviceEvent error");
+            }
         }
 
 
-        public IObservable<IPeripheral> ListenForMe(string eventName, Peripheral me) => this
+        public IObservable<Intent> ListenForMe(Peripheral me) => this
             .peripheralSubject
-            .Where(x =>
-            {
-                if (!x.Arg.Native.Address.Equals(me.Native.Address))
-                    return false;
-
-                if (!x.Name.Equals(eventName, StringComparison.CurrentCultureIgnoreCase))
-                    return false;
-
-                return true;
-            })
-            .Select(x => x.Arg);
+            .Where(x => x.Peripheral.Native.Address.Equals(me.Native.Address))
+            .Select(x => x.Intent);
 
 
-        public string? GetPairingPinRequestForDevice(BluetoothDevice device)
-        {
-            string? pin = null;
-            var p = this.GetDevice(device);
-            if (p != null)
-            {
-                pin = p.PairingRequestPin;
-                p.PairingRequestPin = null;
-            }
-            return pin;
-        }
+        public IObservable<Intent> ListenForMe(string eventName, Peripheral me) => this
+            .ListenForMe(me)
+            .Where(intent => intent.Action.Equals(eventName, StringComparison.InvariantCultureIgnoreCase));
 
 
         public Peripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(

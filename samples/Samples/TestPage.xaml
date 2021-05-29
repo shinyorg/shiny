@@ -1,13 +1,20 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:samples="clr-namespace:Samples"
+             x:DataType="samples:TestViewModel"
              x:Class="Samples.TestPage"
              Title="Test">
 
     <ContentPage.Content>
         <StackLayout>
-            <Button Text="Start"
-                    Command="{Binding Start}" />
+            <Button Text="Start OBD Test"
+                    Command="{Binding Start}"
+                    CommandParameter="obd" />
+
+            <Button Text="Start Pairing Test"
+                    Command="{Binding Start}"
+                    CommandParameter="pairing" />
 
             <Button Text="Stop"
                     Command="{Binding Stop}" />

@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
 using Android.Content;
+using Shiny.BluetoothLE.Internals;
+using System.Text;
 
 namespace Shiny.BluetoothLE
 {
@@ -77,7 +78,7 @@ namespace Shiny.BluetoothLE
         public override IObservable<string> WhenNameUpdated() => this.Context
             .ManagerContext
             .ListenForMe(BluetoothDevice.ActionNameChanged, this)
-            .Select(x => x.Name);
+            .Select(_ => this.Name);
 
 
         public override IObservable<ConnectionState> WhenStatusChanged() => Observable.Create<ConnectionState>(ob =>
@@ -145,8 +146,6 @@ namespace Shiny.BluetoothLE
         }
 
 
-        internal string? PairingRequestPin { get; set; }
-
         public IGattReliableWriteTransaction BeginReliableWriteTransaction() =>
             new GattReliableWriteTransaction(this.Context);
 
@@ -161,59 +160,44 @@ namespace Shiny.BluetoothLE
             }
             else
             {
-                var pairingIntent = new Intent(BluetoothDevice.ActionPairingRequest);
-                pairingIntent.PutExtra(BluetoothDevice.ExtraDevice, this.Native);
-                pairingIntent.SetFlags(ActivityFlags.NewTask);
-
-                if (pin.IsEmpty())
-                {
-                    pairingIntent.PutExtra(BluetoothDevice.ExtraPairingVariant, BluetoothDevice.PairingVariantPin);
-                }
-                else
-                {
-                    pairingIntent.PutExtra(BluetoothDevice.ExtraPairingVariant, BluetoothDevice.PairingVariantPasskeyConfirmation);
-                    pairingIntent.PutExtra(BluetoothDevice.ExtraPairingKey, pin);
-                }
-
                 this.Context
                     .ManagerContext
-                    .Android
-                    .RequestActivityResult(pairingIntent)
-                    .Subscribe(result =>
+                    .ListenForMe(this)
+                    .Subscribe(intent =>
                     {
-                        switch (result.Result)
+                        switch (intent.Action)
                         {
-                            case Android.App.Result.Canceled:
-                                ob.Respond(false);
+                            case BluetoothDevice.ActionBondStateChanged:
+                                var prev = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraPreviousBondState, (int)Bond.None);
+                                var current = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraBondState, (int)Bond.None);
+
+                                if (prev == Bond.Bonding)
+                                {
+                                    // it is done now
+                                    var bond = current == Bond.Bonded;
+                                    ob.Respond(bond);
+                                }
+
                                 break;
 
-                            case Android.App.Result.Ok:
-                                ob.Respond(true);
+                            case BluetoothDevice.ActionPairingRequest:
+                                if (!pin.IsEmpty())
+                                {
+                                    var bytes = Encoding.UTF8.GetBytes(pin);
+                                    if (!this.Native.SetPin(bytes))
+                                    {
+                                        ob.OnError(new ArgumentException("Failed to set PIN"));
+                                    }
+                                }
                                 break;
                         }
                     })
                     .DisposedBy(disp);
+
+                if (!this.Context.NativeDevice.CreateBond())
+                    ob.Respond(false);
             }
             return disp;
-            //    PairingRequestPin = pin;
-            //    this.Context
-            //        .ManagerContext
-            //        .ListenForMe(ManagerContext.BlePairingFailed, this)
-            //        .Subscribe(_ => ob.Respond(false))
-            //        .DisposedBy(disp);
-
-            //    this.Context
-            //        .ManagerContext
-            //        .ListenForMe(BluetoothDevice.ActionBondStateChanged, this)
-            //        .Where(x =>
-            //        {
-            //            return this.Context.NativeDevice.BondState == Bond.Bonded;
-            //        })
-            //        .Subscribe(_ => ob.Respond(true))
-            //        .DisposedBy(disp);
-
-            //    if (!this.Context.NativeDevice.CreateBond())
-            //        ob.Respond(false);
         });
 
 
