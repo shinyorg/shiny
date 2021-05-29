@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Reactive.Subjects;
 using Android.App;
 using Android.Bluetooth;
 using Android.Content;
-using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.BluetoothLE.Internals
@@ -20,20 +20,8 @@ namespace Shiny.BluetoothLE.Internals
     })]
     public class ShinyBleBroadcastReceiver : BroadcastReceiver
     {
-        // TODO: may need to be async if broadcast receiver has a quick stop
+        internal static Action<Intent>? OnBleEvent { get; set; }
         public override void OnReceive(Context context, Intent intent)
-        {
-            try
-            {
-                ShinyHost.Resolve<ManagerContext>().DeviceEvent(intent);
-            }
-            catch (Exception ex)
-            {
-                ShinyHost
-                    .LoggerFactory
-                    .CreateLogger<ILogger<ShinyBleBroadcastReceiver>>()
-                    .LogError(ex, "Error executing in broadcast receiver");
-            }
-        }
+            => OnBleEvent?.Invoke(intent);
     }
 }
