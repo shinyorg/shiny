@@ -24,10 +24,13 @@ namespace Shiny.Tests.Push
         private const string WnsSampleNotification = "<?xml version=\"1.0\" encoding=\"utf-8\"?><toast><visual><binding template=\"ToastText01\"><text id=\"1\">Notification Hub test notification from SDK sample</text></binding></visual></toast>";
         readonly IPushTagSupport pushManager;
         readonly NotificationHubClient hubClient;
+        readonly ITestOutputHelper output;
 
 
         public AzureNotificationHubTests(ITestOutputHelper output)
         {
+            this.output = output;
+
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
                 BuildServices = x => x.UsePushAzureNotificationHubs<TestPushDelegate>(
@@ -153,6 +156,10 @@ namespace Shiny.Tests.Push
             var tag = "UnitTest";
             await this.pushManager.AddTag(tag);
             await Task.Delay(1000); // let azure breath
+
+            var regs = await this.hubClient.GetRegistrationsByTagAsync(tag, 5);
+            regs.Count().Should().Be(1, "Invalid Registration Count");
+            this.output.WriteLine("Using push token " + tag);
 
             var p = TestStartup.CurrentPlatform;
 
