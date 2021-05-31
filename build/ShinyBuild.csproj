@@ -15,6 +15,7 @@
         <PackageReference Include="Cake.Plist" />
         <PackageReference Include="Cake.Git" />
         <PackageReference Include="LibGit2Sharp" />
+        <PackageReference Include="TweetinviAPI" />
     </ItemGroup>
 
 </Project>
