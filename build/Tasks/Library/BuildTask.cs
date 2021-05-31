@@ -28,28 +28,15 @@ namespace ShinyBuild.Tasks.Library
             context.CleanDirectories($"./src/**/obj/");
             context.CleanDirectories($"./src/**/bin/{context.MsBuildConfiguration}");
 
-            var version = GetNugetVersion(context);
-
             context.MSBuild("Build.sln", x => x
                 .WithRestore()
                 .WithTarget("Clean")
                 .WithTarget("Build")
-                .WithProperty("ShinyVersion", version)
+                .WithProperty("ShinyVersion", context.NugetVersion)
                 .WithProperty("CI", context.IsRunningInCI ? "true" : "")
                 .WithProperty("OS", context.OperatingSystemString)
                 .SetConfiguration(context.MsBuildConfiguration)
             );
-        }
-
-
-        static string GetNugetVersion(BuildContext context)
-        {
-            var version = $"{context.MajorMinorVersion}.{context.BuildNumber}";
-            if (!context.IsMainBranch)
-                version += "-preview";
-
-            context.Log.Information("Shiny Version: " + version);
-            return version;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.IO;
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
+using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
 using Cake.Git;
@@ -26,6 +27,13 @@ namespace ShinyBuild
             }
 #endif
             this.Branch = context.GitBranchCurrent(".");
+
+            var version = $"{this.MajorMinorVersion}.{this.BuildNumber}";
+            if (!this.IsMainBranch)
+                version += "-preview";
+
+            this.Log.Information("Shiny Version: " + version);
+            this.NugetVersion = version;
         }
 
 
@@ -39,6 +47,7 @@ namespace ShinyBuild
         public string NugetApiKey => this.Argument<string>("NugetApiKey");
         public bool AllowNugetUploadFailures => this.HasArgument("AllowNugetUploadFailures");
         public GitBranch Branch { get; }
+        public string NugetVersion { get; }
 
 
         public string ArtifactDirectory
