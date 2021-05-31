@@ -33,7 +33,9 @@ namespace Shiny.Push
                     Payload = headers
                 };
                 var response = new PushNotificationResponse(notification, null, null);
-                await this.serviceProvider.RunDelegates<IPushDelegate>(x => x.OnEntry(response));
+                await this.serviceProvider
+                    .RunDelegates<IPushDelegate>(x => x.OnEntry(response))
+                    .ConfigureAwait(false);
             }
             deferral.Complete();
         }

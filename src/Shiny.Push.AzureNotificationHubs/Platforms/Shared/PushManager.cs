@@ -57,9 +57,9 @@ namespace Shiny.Push.AzureNotificationHubs
 
                     if (this.InstallationId != null)
                     {
-                        var install = await this.hub.GetInstallationAsync(this.InstallationId);
+                        var install = await this.hub.GetInstallationAsync(this.InstallationId).ConfigureAwait(false);
                         install.PushChannel = token;
-                        await this.hub.CreateOrUpdateInstallationAsync(install);
+                        await this.hub.CreateOrUpdateInstallationAsync(install).ConfigureAwait(false);
                     }
                 }
                 catch (Exception ex)
@@ -72,7 +72,7 @@ namespace Shiny.Push.AzureNotificationHubs
             ShinyFirebaseService.MessageReceived = async message =>
             {
                 var pr = this.FromNative(message);
-                await this.OnPushReceived(pr);
+                await this.OnPushReceived(pr).ConfigureAwait(false);
             };
         }
 #endif
@@ -93,7 +93,7 @@ namespace Shiny.Push.AzureNotificationHubs
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var access = await base.RequestAccess(cancelToken);
+            var access = await base.RequestAccess(cancelToken).ConfigureAwait(false);
             this.logger.LogInformation($"OS Permission: " + access.Status);
 
             if (access.Status == AccessState.Available)
@@ -101,7 +101,7 @@ namespace Shiny.Push.AzureNotificationHubs
                 this.InstallationId ??= Guid.NewGuid().ToString().Replace("-", "");
 
 #if __IOS__
-                this.NativeRegistrationToken = await this.GetPushChannel(cancelToken);
+                this.NativeRegistrationToken = await this.GetPushChannel(cancelToken).ConfigureAwait(false);
                 //this.NativeRegistrationToken = rawToken.ToArray().ToHex();
 #else
                 this.NativeRegistrationToken = access.RegistrationToken;
@@ -120,7 +120,7 @@ namespace Shiny.Push.AzureNotificationHubs
                     Platform = NotificationPlatform.Fcm
 #endif
                 };
-                await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken);
+                await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken).ConfigureAwait(false);
                 this.logger.LogInformation("Azure Notification Hub InstallationID: " + this.InstallationId);
 
                 this.CurrentRegistrationTokenDate = DateTime.UtcNow;
@@ -138,7 +138,7 @@ namespace Shiny.Push.AzureNotificationHubs
             {
                 try
                 {
-                    await this.hub.DeleteInstallationAsync(this.InstallationId);
+                    await this.hub.DeleteInstallationAsync(this.InstallationId).ConfigureAwait(false);
                 }
                 catch (MessagingEntityNotFoundException)
                 {
@@ -147,7 +147,7 @@ namespace Shiny.Push.AzureNotificationHubs
                 this.InstallationId = null;
             }
             this.NativeRegistrationToken = null;
-            await base.UnRegister();
+            await base.UnRegister().ConfigureAwait(false);
         }
 
 
@@ -155,7 +155,7 @@ namespace Shiny.Push.AzureNotificationHubs
 
         protected virtual async Task<string> GetPushChannel(CancellationToken cancelToken)
         {
-            var deviceToken = await this.RequestDeviceToken(cancelToken);
+            var deviceToken = await this.RequestDeviceToken(cancelToken).ConfigureAwait(false);
             var token = System.Text.Encoding.UTF8.GetString(deviceToken.ToArray());
             return token;
         }
@@ -200,13 +200,13 @@ namespace Shiny.Push.AzureNotificationHubs
             if (this.InstallationId == null)
                 return;
 
-            var install = await this.hub.GetInstallationAsync(this.InstallationId);
+            var install = await this.hub.GetInstallationAsync(this.InstallationId).ConfigureAwait(false);
             if (tags == null || tags.Length == 0)
                 install.Tags = null;
             else
                 install.Tags = tags.ToList();
 
-            await this.hub.CreateOrUpdateInstallationAsync(install);
+            await this.hub.CreateOrUpdateInstallationAsync(install).ConfigureAwait(false);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.RegisteredTags = tags;
         }

@@ -44,16 +44,19 @@ namespace Shiny.Push
                     this.CurrentRegistrationToken = token;
                     this.CurrentRegistrationTokenDate = DateTime.UtcNow;
 
-                    await this.Services.Services.RunDelegates<IPushDelegate>(
-                        x => x.OnTokenChanged(token)
-                    );
+                    await this.Services
+                        .Services
+                        .RunDelegates<IPushDelegate>(
+                            x => x.OnTokenChanged(token)
+                        )
+                        .ConfigureAwait(false);
                 }
             };
 
             ShinyFirebaseService.MessageReceived = async message =>
             {
                 var pr = this.FromNative(message);
-                await this.OnPushReceived(pr);
+                await this.OnPushReceived(pr).ConfigureAwait(false);
             };
         }
 
@@ -84,7 +87,7 @@ namespace Shiny.Push
             this.ClearRegistration();
 
             FirebaseMessaging.Instance.AutoInitEnabled = false;
-            await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId());
+            await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId()).ConfigureAwait(false);
         }
 
 
