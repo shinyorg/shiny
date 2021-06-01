@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
+using System.Text;
 using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Android.Bluetooth;
-using Android.Content;
 using Shiny.BluetoothLE.Internals;
-using System.Text;
+
 
 namespace Shiny.BluetoothLE
 {
