@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using Cake.Common;
 using Cake.Frosting;
 
 
@@ -7,10 +7,6 @@ namespace ShinyBuild.Tasks.iOS
 {
     public sealed class InstallProvisioningProfileTask : FrostingTask<BuildContext>
     {
-        public override bool ShouldRun(BuildContext context)
-            => context.IsRunningInCI && !context.IsWindows;
-
-
         public override void Run(BuildContext context)
         {
             //static void InstallProvisioningProfile(string envVarName)

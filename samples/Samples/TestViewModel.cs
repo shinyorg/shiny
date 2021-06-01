@@ -77,7 +77,7 @@ namespace Samples
                 .ToTask(this.cancelSrc.Token);
 
             this.Append("Device Found");
-            await this.peripheral.WithConnectIf().ToTask(this.cancelSrc.Token);
+            //await this.peripheral.WithConnectIf().ToTask(this.cancelSrc.Token);
             this.Append("Device Connected - trying to pair");
 
             var result = await this.peripheral.TryPairingRequest().ToTask(this.cancelSrc.Token);

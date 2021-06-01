@@ -13,10 +13,6 @@ namespace ShinyBuild.Tasks.iOS
         const string EntitlementsPlist = "samples/Samples.iOS/Entitlements.plist";
 
 
-        public override bool ShouldRun(BuildContext context)
-            => context.IsRunningInCI;
-
-
         public override void Run(BuildContext context)
         {
             var infoPath = context.File(InfoPlist);

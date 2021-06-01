@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Cake.Common.IO;
 using Cake.Common.Tools.MSBuild;
 using Cake.Frosting;

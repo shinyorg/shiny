@@ -10,7 +10,7 @@ namespace ShinyBuild.Tasks.Android
     public sealed class DeployTask : FrostingTask<BuildContext>
     {
         public override bool ShouldRun(BuildContext context)
-            => context.IsRunningInCI;
+            => context.IsRunningInCI && !context.IsPullRequest;
 
 
         public override void Run(BuildContext context)
