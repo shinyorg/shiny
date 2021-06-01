@@ -24,7 +24,7 @@ namespace Shiny.Push.AzureNotificationHubs
                            ShinyCoreServices services,
                            ILogger<PushManager> logger,
                            Shiny.Notifications.INotificationManager notifications)
-                           : base(services, notifications)
+                           : base(services, notifications, logger)
 #else
         public PushManager(AzureNotificationConfig config,
                            ILogger<PushManager> logger,
@@ -71,8 +71,15 @@ namespace Shiny.Push.AzureNotificationHubs
 
             ShinyFirebaseService.MessageReceived = async message =>
             {
-                var pr = this.FromNative(message);
-                await this.OnPushReceived(pr);
+                try
+                {
+                    var pr = this.FromNative(message);
+                    await this.OnPushReceived(pr);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "There was an error processing received message");
+                }
             };
         }
 #endif
