@@ -60,6 +60,7 @@
 
     <!--setup-->
     <ItemGroup>
+        <PackageReference Update="TweetinviAPI" Version="5.0.4" />
         <PackageReference Update="Statiq.Web" Version="1.0.0-beta.27" />
         <PackageReference Update="Devlead.Statiq" Version="0.9.0" />
         <PackageReference Update="Cake.Frosting" Version="1.1.0" />

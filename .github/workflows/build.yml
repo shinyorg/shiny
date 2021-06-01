@@ -14,6 +14,14 @@ on:
     paths:
     - "src/**"
 
+env:
+  DocsDeployGitHubToken: ${{ secrets.DOCS_GITHUB_TOKEN }}
+  NugetApiKey: ${{secrets.NUGETAPIKEY}}
+  TwitterConsumerKey: ${{secrets.TWITTER_CONSUMER_KEY}}
+  TwitterConsumerSecret: ${{secrets.TWITTER_CONSUMER_SECRET}}
+  TwitterAccessToken: ${{secrets.TWITTER_ACCESS_TOKEN}}
+  TwitterAccessTokenSecret: ${{secrets.TWITTER_ACCESS_TOKEN_SECRET}}
+
 jobs:
   build:
 
@@ -34,7 +42,7 @@ jobs:
         token: ${{secrets.github_token}}
 
     - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj --DocsDeployGitHubToken=${{ secrets.DOCS_GITHUB_TOKEN }} --BuildNumber=${{steps.buildnumber.outputs.build_number}} --NugetApiKey=${{secrets.NUGETAPIKEY}}
+      run: dotnet run --project build/ShinyBuild.csproj --BuildNumber=${{steps.buildnumber.outputs.build_number}}
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v2

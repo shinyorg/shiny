@@ -9,5 +9,6 @@ namespace ShinyBuild.Tasks
     [IsDependentOn(typeof(CopyArtifactsTask))]
     [IsDependentOn(typeof(NugetDeployTask))]
     [IsDependentOn(typeof(DocTask))]
+    [IsDependentOn(typeof(TweetVersionTask))]
     public sealed class DefaultTarget : FrostingTask<BuildContext> { }
 }

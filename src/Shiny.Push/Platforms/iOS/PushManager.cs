@@ -23,7 +23,10 @@ namespace Shiny.Push
             {
                 var dict = userInfo.FromNsDictionary();
                 var pr = new PushNotification(dict, null);
-                await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(pr));
+                await this.Services
+                    .Services
+                    .SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(pr))
+                    .ConfigureAwait(false);
                 this.payloadSubj.OnNext(pr);
             });
 
@@ -66,7 +69,7 @@ namespace Shiny.Push
             if (!result.Item1)
                 return PushAccessState.Denied;
 
-            var deviceToken = await this.RequestDeviceToken(cancelToken);
+            var deviceToken = await this.RequestDeviceToken(cancelToken).ConfigureAwait(false);
             this.CurrentRegistrationToken = ToTokenString(deviceToken);
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
@@ -75,7 +78,10 @@ namespace Shiny.Push
 
         public override async Task UnRegister()
         {
-            await this.Services.Platform.InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications);
+            await this.Services
+                .Platform
+                .InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications)
+                .ConfigureAwait(false);
             this.ClearRegistration();
         }
 
@@ -91,9 +97,12 @@ namespace Shiny.Push
                     rawToken => tcs.TrySetResult(rawToken),
                     err => tcs.TrySetException(new Exception(err.LocalizedDescription))
                 );
-                await this.Services.Platform.InvokeOnMainThreadAsync(
-                    () => UIApplication.SharedApplication.RegisterForRemoteNotifications()
-                );
+                await this.Services
+                    .Platform
+                    .InvokeOnMainThreadAsync(
+                        () => UIApplication.SharedApplication.RegisterForRemoteNotifications()
+                    )
+                    .ConfigureAwait(false);
                 var rawToken = await tcs.Task;
                 var token = ToTokenString(rawToken);
                 await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(

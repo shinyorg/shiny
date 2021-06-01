@@ -36,15 +36,21 @@ namespace Shiny.Push.FirebaseMessaging
                 {
                     // I can't get access to the notification here
                     var dict = msg.AppData.FromNsDictionary();
-                    await this.Services.Services.RunDelegates<IPushDelegate>(
-                        x => x.OnReceived(new PushNotification(dict, null))
-                    );
+                    await this.Services
+                        .Services
+                        .RunDelegates<IPushDelegate>(
+                            x => x.OnReceived(new PushNotification(dict, null))
+                        )
+                        .ConfigureAwait(false);
                 },
                 async token =>
                 {
                     this.CurrentRegistrationToken = token;
                     this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                    await this.Services.Services.RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token));
+                    await this.Services
+                        .Services
+                        .RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token))
+                        .ConfigureAwait(false);
                 }
             );
         }

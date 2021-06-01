@@ -65,29 +65,6 @@ namespace Shiny
         }
 
 
-        public static void RunDelegates<T>(this IServiceProvider serviceProvider, Action<T> execute, Action<Exception>? onError = null)
-        {
-            var services = serviceProvider.GetServices<T>();
-            if (services == null)
-                return;
-
-            var logger = serviceProvider.Resolve<ILogger<T>>();
-            foreach (var service in services)
-            {
-                try
-                {
-                    execute(service);
-                }
-                catch (Exception ex)
-                {
-                    if (onError == null)
-                        logger.LogError(ex, "Error executing delegate");
-                    else
-                        onError(ex);
-                }
-            }
-        }
-
 
         public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)
             => services.GetServices<T>().RunDelegates(execute, onError);

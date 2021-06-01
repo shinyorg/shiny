@@ -3,6 +3,7 @@ using System.IO;
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
+using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
 using Cake.Git;
@@ -26,20 +27,33 @@ namespace ShinyBuild
             }
 #endif
             this.Branch = context.GitBranchCurrent(".");
+
+            var version = $"{this.MajorMinorVersion}.{this.BuildNumber}";
+            if (!this.IsMainBranch)
+                version += "-preview";
+
+            this.Log.Information("Shiny Version: " + version);
+            this.NugetVersion = version;
         }
 
 
-        public string MajorMinorVersion => this.Argument<string>("ShinyVersion", Constants.MajorMinorVersion);
+        public string MajorMinorVersion => this.ArgumentOrEnvironment("ShinyVersion", Constants.MajorMinorVersion);
         public int BuildNumber => this.Argument("BuildNumber", 0);
-        public bool UseXamarinPreview => this.HasArgument("UseXamarinPreview");
+        public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
         public bool IsWindows => this.Environment.Platform.Family == PlatformFamily.Windows;
-        public string DocsDeployGitHubToken => this.Argument<string>(nameof(DocsDeployGitHubToken), null);
+        public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
-        public string MsBuildConfiguration => this.Argument("configuration", Constants.DefaultBuildConfiguration);
+        public string MsBuildConfiguration => this.ArgumentOrEnvironment("configuration", Constants.DefaultBuildConfiguration);
         public string NugetApiKey => this.Argument<string>("NugetApiKey");
         public bool AllowNugetUploadFailures => this.HasArgument("AllowNugetUploadFailures");
         public GitBranch Branch { get; }
+        public string NugetVersion { get; }
 
+        public T ArgumentOrEnvironment<T>(string name, T defaultValue = default)
+            => this.HasArgument(name) ? this.Argument<T>(name) : this.EnvironmentVariable<T>(name, defaultValue);
+
+        public bool HasArgumentOrEnvironment(string name)
+            => this.HasArgument(name) || this.HasEnvironmentVariable(name);
 
         public string ArtifactDirectory
         {

@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <!--<TargetFramework>netcoreapp3.1</TargetFramework>-->
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -15,6 +14,7 @@
         <PackageReference Include="Cake.Plist" />
         <PackageReference Include="Cake.Git" />
         <PackageReference Include="LibGit2Sharp" />
+        <PackageReference Include="TweetinviAPI" />
     </ItemGroup>
 
 </Project>
