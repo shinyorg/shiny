@@ -157,9 +157,9 @@ namespace Shiny.Tests.Push
             await this.pushManager.AddTag(tag);
             await Task.Delay(1000); // let azure breath
 
-            var regs = await this.hubClient.GetRegistrationsByTagAsync(tag, 5);
-            regs.Count().Should().Be(1, "Invalid Registration Count");
-            this.output.WriteLine("Using push token " + tag);
+            //var regs = await this.hubClient.GetRegistrationsByTagAsync(tag, 5);
+            //regs.Count().Should().Be(1, "Invalid Registration Count");
+            //this.output.WriteLine("Using push token " + tag);
 
             var p = TestStartup.CurrentPlatform;
 
