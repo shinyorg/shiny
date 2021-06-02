@@ -1,7 +1,8 @@
 ﻿using System;
+
+using Cake.Common;
 using Cake.Common.IO;
 using Cake.Common.Tools.MSBuild;
-using Cake.Core.Diagnostics;
 using Cake.Frosting;
 
 
@@ -13,7 +14,7 @@ namespace ShinyBuild.Tasks.Library
         // needs to be windows build for UWP
         public override bool ShouldRun(BuildContext context)
         {
-            if (!context.IsWindows)
+            if (!context.IsRunningOnWindows())
                 return false;
 
             if (context.IsRunningInCI && context.BuildNumber == 0)

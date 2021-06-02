@@ -40,7 +40,6 @@ namespace ShinyBuild
         public string MajorMinorVersion => this.ArgumentOrEnvironment("ShinyVersion", Constants.MajorMinorVersion);
         public int BuildNumber => this.Argument("BuildNumber", 0);
         public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
-        public bool IsWindows => this.Environment.Platform.Family == PlatformFamily.Windows;
         public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.ArgumentOrEnvironment("configuration", Constants.DefaultBuildConfiguration);
@@ -76,30 +75,27 @@ namespace ShinyBuild
         }
 
 
-        public bool IsRunningInCI
-        {
-            get
-            {
-                var ga = this.GitHubActions();
-                if (!ga.IsRunningOnGitHubActions)
-                    return false;
+        public bool IsPullRequest =>
+            this.IsRunningInCI &&
+            this.GitHubActions().Environment.PullRequest.IsPullRequest;
 
-                //if (ga.Environment.PullRequest.IsPullRequest)
-                return true;
-            }
-        }
+        public bool IsRunningInCI
+            => this.GitHubActions()?.IsRunningOnGitHubActions ?? false;
 
 
         public bool IsNugetDeployBranch
         {
             get
             {
+                if (this.IsPullRequest)
+                    return false;
+
                 var bn = this.Branch.FriendlyName.ToLower();
                 return bn.Equals("main") || bn.Equals("master") || bn.Equals("preview");
             }
         }
 
 
-        public bool IsDocsDeployBranch => this.IsNugetDeployBranch;
+        public bool IsDocsDeployBranch => this.IsNugetDeployBranch && !this.IsPullRequest;
     }
 }

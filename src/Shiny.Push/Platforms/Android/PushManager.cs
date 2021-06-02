@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Microsoft.Extensions.Logging;
 using Android.Runtime;
 using Android.Gms.Extensions;
 using Firebase.Iid;
@@ -22,11 +23,15 @@ namespace Shiny.Push
     {
         readonly Subject<PushNotification> receiveSubj;
         readonly INotificationManager notificationManager;
+        readonly ILogger logger;
 
 
-        public PushManager(ShinyCoreServices services, INotificationManager notificationManager) : base(services)
+        public PushManager(ShinyCoreServices services,
+                           INotificationManager notificationManager,
+                           ILogger<PushManager> logger) : base(services)
         {
             this.notificationManager = notificationManager;
+            this.logger = logger;
             this.receiveSubj = new Subject<PushNotification>();
         }
 
@@ -55,8 +60,15 @@ namespace Shiny.Push
 
             ShinyFirebaseService.MessageReceived = async message =>
             {
-                var pr = this.FromNative(message);
-                await this.OnPushReceived(pr).ConfigureAwait(false);
+                try
+                {
+                    var pr = this.FromNative(message);
+                    await this.OnPushReceived(pr).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "Error processing received message");
+                }
             };
         }
 

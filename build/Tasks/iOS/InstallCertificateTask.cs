@@ -1,12 +1,11 @@
 ﻿using System;
 using Cake.Common.IO;
-using Cake.Core.IO;
 using Cake.Frosting;
 
 
 namespace ShinyBuild.Tasks.iOS
 {
-    [TaskName("ioscertificate")]
+    //[TaskName("ioscertificate")]
     public sealed class InstallCertificateTask : FrostingTask<BuildContext>
     {
         //public override bool ShouldRun(BuildContext context)

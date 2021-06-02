@@ -1,4 +1,5 @@
 ﻿using System;
+using Cake.Common;
 using Cake.Common.IO;
 using Cake.Common.Tools.MSBuild;
 using Cake.Frosting;
@@ -13,7 +14,8 @@ namespace ShinyBuild.Tasks.iOS
     [IsDependentOn(typeof(BootsTask))]
     public sealed class BuildTask : FrostingTask<BuildContext>
     {
-        public override bool ShouldRun(BuildContext context) => !context.IsWindows;
+        public override bool ShouldRun(BuildContext context)
+            => context.IsRunningInCI && context.IsRunningOnMacOs();
 
 
         public override void Run(BuildContext context)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive.Subjects;
 using Android.App;
 using Android.Bluetooth;
 using Android.Content;
@@ -20,8 +19,8 @@ namespace Shiny.BluetoothLE.Internals
     })]
     public class ShinyBleBroadcastReceiver : BroadcastReceiver
     {
-        internal static Action<Intent>? OnBleEvent { get; set; }
-        public override void OnReceive(Context context, Intent intent)
+        internal static Action<Intent?>? OnBleEvent { get; set; }
+        public override void OnReceive(Context? context, Intent? intent)
             => OnBleEvent?.Invoke(intent);
     }
 }
