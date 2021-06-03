@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 using Shiny.BluetoothLE;
-using Shiny.Infrastructure;
 using Microsoft.Extensions.Logging;
 
 
@@ -15,20 +14,23 @@ namespace Shiny.Beacons
         readonly IBleManager bleManager;
         readonly IBeaconMonitoringManager beaconManager;
         readonly ILogger logger;
-        readonly ShinyCoreServices core;
+        readonly IMessageBus messageBus;
+        readonly IEnumerable<IBeaconMonitorDelegate> delegates;
         readonly IDictionary<string, BeaconRegionStatus> states;
         IDisposable? scanSub;
 
 
-        public BackgroundTask(ShinyCoreServices core,
+        public BackgroundTask(IMessageBus messageBus,
                               IBleManager centralManager,
                               IBeaconMonitoringManager beaconManager,
+                              IEnumerable<IBeaconMonitorDelegate> delegates,
                               ILogger<IBeaconMonitorDelegate> logger)
         {
+            this.messageBus = messageBus;
             this.bleManager = centralManager;
             this.beaconManager = beaconManager;
             this.logger = logger;
-            this.core = core;
+            this.delegates = delegates;
             this.states = new Dictionary<string, BeaconRegionStatus>();
         }
 
@@ -38,8 +40,7 @@ namespace Shiny.Beacons
             this.logger.LogInformation("Starting Beacon Monitoring");
 
             // I record state of the beacon region so I can fire stuff without going into initial state from unknown
-            this.core
-                .Bus
+            this.messageBus
                 .Listener<BeaconRegisterEvent>()
                 .Subscribe(ev =>
                 {
@@ -107,7 +108,7 @@ namespace Shiny.Beacons
             }
             catch (Exception ex)
             {
-                this.logger.LogInformation("Beacon Monitoring Scan Starting");
+                this.logger.LogError(ex, "Beacon Monitoring Scan Starting");
             }
         }
 
@@ -139,7 +140,6 @@ namespace Shiny.Beacons
         async Task CheckStates(IList<Beacon> beacons)
         {
             var copy = this.GetCopy();
-            var maxAge = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(20));
 
             foreach (var state in copy)
             {
@@ -148,16 +148,14 @@ namespace Shiny.Beacons
                     if (state.Region.IsBeaconInRegion(beacon))
                     {
                         state.LastPing = DateTime.UtcNow;
-                        if (state.IsInRange == null)
-                        {
-                            state.IsInRange = true;
-                        }
-                        else if (!state.IsInRange.Value)
+                        state.IsInRange ??= true;
+
+                        if (!state.IsInRange.Value)
                         {
                             state.IsInRange = true;
                             if (state.Region.NotifyOnEntry)
                             {
-                                await this.core.Services.RunDelegates<IBeaconMonitorDelegate>(
+                                await this.delegates.RunDelegates(
                                     x => x.OnStatusChanged(BeaconRegionState.Entered, state.Region)
                                 );
                             }
@@ -165,14 +163,16 @@ namespace Shiny.Beacons
                     }
                 }
             }
+
+            var cutoffTime = DateTime.UtcNow.Subtract(TimeSpan.FromSeconds(20));
             foreach (var state in copy)
             {
-                if (state.IsInRange != null && state.IsInRange.Value && state.LastPing > maxAge)
+                if ((state.IsInRange ?? false) && state.LastPing < cutoffTime)
                 {
                     state.IsInRange = false;
                     if (state.Region.NotifyOnExit)
                     {
-                        await this.core.Services.RunDelegates<IBeaconMonitorDelegate>(
+                        await this.delegates.RunDelegates(
                             x => x.OnStatusChanged(BeaconRegionState.Exited, state.Region)
                         );
                     }
