@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Cake.Core.Diagnostics;
 using Cake.Frosting;
@@ -12,8 +13,7 @@ namespace ShinyBuild.Tasks
     public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
     {
         public override bool ShouldRun(BuildContext context)
-            => context.IsNugetDeployBranch && context.IsRunningInCI;
-        //=> context.IsMainBranch && context.IsRunningInCI;
+            => context.IsRunningInCI;
 
 
         public override Task RunAsync(BuildContext context)
@@ -28,6 +28,9 @@ namespace ShinyBuild.Tasks
 
         async Task Twitter(BuildContext context, string message)
         {
+            if (!context.IsMainBranch)
+                return;
+
             try
             {
                 var consumerKey = context.ArgumentOrEnvironment<string>("TwitterConsumerKey");
@@ -37,6 +40,8 @@ namespace ShinyBuild.Tasks
 
                 var client = new TwitterClient(consumerKey, consumerSecret, accessToken, accessTokenSecret);
                 await client.Tweets.PublishTweetAsync(message);
+
+                context.Log.Information("Tweet Published - " + message);
             }
             catch (Exception ex)
             {
@@ -48,15 +53,35 @@ namespace ShinyBuild.Tasks
 
         async Task Discord(BuildContext context, string message)
         {
+            if (!context.IsNugetDeployBranch)
+                return;
+
             try
             {
                 var discordToken = context.ArgumentOrEnvironment<string>("DiscordToken");
+                var discordGuildId = context.ArgumentOrEnvironment<ulong>("DiscordGuildId");
                 var discordChannel = context.ArgumentOrEnvironment<ulong>("DiscordChannelId"); // 803717285986566174 - #shinylib on sponsorconnect
 
                 var client = new DiscordSocketClient();
                 await client.LoginAsync(TokenType.Bot, discordToken, true);
-                var channel = client.GetChannel(discordChannel) as IMessageChannel;
-                await channel.SendMessageAsync(message);
+                await client.StartAsync();
+                SocketGuild? guild = null;
+                var count = 0;
+                while (guild == null)
+                {
+                    guild = client.GetGuild(679761126598115336);
+                    await Task.Delay(2000);
+                    count++;
+                    if (count == 5)
+                        throw new ArgumentException("Could not retrieve guild");
+                }
+
+                await guild
+                    .TextChannels
+                    .First(x => x.Id == discordGuildId)
+                    .SendMessageAsync(message);
+
+                context.Log.Information("Discord Message Published");
             }
             catch (Exception ex)
             {
