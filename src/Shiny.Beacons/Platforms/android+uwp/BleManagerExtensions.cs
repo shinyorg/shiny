@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using Shiny.BluetoothLE;
 
@@ -14,6 +15,12 @@ namespace Shiny.Beacons
                 ScanType = forMonitoring
                     ? BleScanType.LowPowered
                     : BleScanType.Balanced
+//#if MONOANDROID
+//                , ServiceUuids = new List<string>
+//                {
+
+//                }
+//#endif
             })
             .Where(x => x.IsBeacon())
             .Select(x => x.AdvertisementData.ManufacturerData.Data.Parse(x.Rssi));

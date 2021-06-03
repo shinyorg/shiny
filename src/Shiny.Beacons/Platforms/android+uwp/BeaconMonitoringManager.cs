@@ -35,7 +35,6 @@ namespace Shiny.Beacons
         }
 
 
-
         public async void Start()
         {
             var regions = await this.GetMonitoredRegions();
@@ -80,6 +79,7 @@ namespace Shiny.Beacons
         {
             var access = await this.bleManager.RequestAccess().ToTask();
 #if MONOANDROID
+            await this.context.RequestLocationAccess(true, true, true, false);
             if (access == AccessState.Available && this.context.IsMinApiLevel(26))
                 access = await this.context.RequestAccess(Android.Manifest.Permission.ForegroundService).ToTask();
 #endif

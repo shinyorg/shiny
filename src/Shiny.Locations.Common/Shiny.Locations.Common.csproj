@@ -19,4 +19,9 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <Compile Include="Platforms\ios\**\*.cs" />
     </ItemGroup>
+
+    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <Compile Include="Platforms\android\**\*.cs" />
+    </ItemGroup>
 </Project>
