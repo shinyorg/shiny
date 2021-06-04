@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
 using Shiny.Infrastructure;
+#if MONOANDROID
 using Shiny.Locations;
-
+#endif
 
 namespace Shiny.Beacons
 {
