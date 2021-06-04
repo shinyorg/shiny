@@ -10,7 +10,7 @@ namespace Shiny.Locations
 {
     public static class PlatformExtensions
     {
-        internal static AccessState GetLocationManagerStatus(this IAndroidContext context, bool gpsRequired, bool networkRequired)
+        public static AccessState GetLocationManagerStatus(this IAndroidContext context, bool gpsRequired, bool networkRequired)
         {
             var lm = context.GetSystemService<LocationManager>(Context.LocationService);
 
@@ -46,7 +46,7 @@ namespace Shiny.Locations
         }
 
 
-        internal static async Task<AccessState> RequestLocationAccess(this IAndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
+        public static async Task<AccessState> RequestLocationAccess(this IAndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
         {
             var status = context.GetLocationManagerStatus(gpsRequired, networkRequired);
             if (status != AccessState.Available)

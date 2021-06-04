@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
 using Shiny.Infrastructure;
+using Shiny.Locations;
 
 
 namespace Shiny.Beacons
