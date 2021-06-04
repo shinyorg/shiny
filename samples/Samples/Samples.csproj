@@ -4,8 +4,6 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <EmitCompilerGeneratedFiles>True</EmitCompilerGeneratedFiles>
-        <!--<CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>-->
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -19,10 +17,10 @@
         <PackageReference Include="Prism.DryIoc.Forms" />
         <PackageReference Include="sqlite-net-pcl" />
         <PackageReference Include="Xamarin.Forms" />
+        <PackageReference Include="Xamarin.CommunityToolkit" />
         <PackageReference Include="XF.Material" />
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="Rg.Plugins.Popup" />
-        <PackageReference Include="Xamarin.CommunityToolkit" />
         <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />

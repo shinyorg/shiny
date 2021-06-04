@@ -9,12 +9,11 @@ using Xamarin.Forms.Xaml;
 
 namespace Samples.HttpTransfers
 {
-    [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class LogPage : ContentPage
     {
         public LogPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }
