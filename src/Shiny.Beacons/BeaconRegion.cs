@@ -23,7 +23,7 @@ namespace Shiny.Beacons
                 if (major == null)
                     throw new ArgumentException("You must provide a major value if you are setting minor");
 
-                if (major < 1)
+                if (minor < 1)
                     throw new ArgumentException("Invalid Minor Value");
 
                 this.Minor = minor;
