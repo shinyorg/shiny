@@ -65,13 +65,13 @@ namespace Shiny.Generators
                         "public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler) => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);"
                     );
 
-                    if (!appDelegate.HasMethod("OpenUrl") && this.Context.HasReference("Microsoft.Identity.Client"))
+                    if (!appDelegate.HasMethod("OpenUrl") && this.Context.HasMsal())
                     {
-                        using (builder.BlockInvariant("public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)"))
+                        using (builder.BlockInvariant("public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)"))
                         {
                             builder.Append(@"
 var result = true;
-if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(app))
+if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
     global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
 
 else if (!global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url))
