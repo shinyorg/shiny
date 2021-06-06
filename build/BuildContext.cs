@@ -38,13 +38,13 @@ namespace ShinyBuild
 
 
         public string MajorMinorVersion => this.ArgumentOrEnvironment("ShinyVersion", Constants.MajorMinorVersion);
-        public int BuildNumber => this.Argument("BuildNumber", 0);
+        public int BuildNumber => this.ArgumentOrEnvironment("BuildNumber", 0);
         public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
         public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.ArgumentOrEnvironment("configuration", Constants.DefaultBuildConfiguration);
-        public string NugetApiKey => this.Argument<string>("NugetApiKey");
-        public bool AllowNugetUploadFailures => this.HasArgument("AllowNugetUploadFailures");
+        public string NugetApiKey => this.ArgumentOrEnvironment<string>("NugetApiKey");
+        public bool AllowNugetUploadFailures => this.ArgumentOrEnvironment("AllowNugetUploadFailures", false);
         public GitBranch Branch { get; }
         public string NugetVersion { get; }
 
