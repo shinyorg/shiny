@@ -68,7 +68,7 @@ namespace Shiny.Notifications
                     //x.Activated += null;
                     //x.Dismissed += null;
                     x.Tag = notification.Id.ToString();
-                    x.Group = "";
+                    //x.Group = "";
                     //x.Priority
                 }));
             }

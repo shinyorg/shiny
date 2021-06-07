@@ -55,7 +55,7 @@ namespace Shiny.BluetoothLE
                 .ToArray();
 
             var hexAddress = BitConverter.ToString(address).Replace("-", "");
-            if (ulong.TryParse(hexAddress, NumberStyles.HexNumber, null, out ulong mac))
+            if (ulong.TryParse(hexAddress, NumberStyles.HexNumber, null, out var mac))
                 return mac;
 
             return 0L;

@@ -33,7 +33,7 @@ namespace Shiny.Stores
         {
             var s = this.serializer.Serialize(value);
             if (this.Contains(key))
-                this.Container.Values[key] = value;
+                this.Container.Values[key] = s;
             else
                 this.Container.Values.Add(key, s);
         }
