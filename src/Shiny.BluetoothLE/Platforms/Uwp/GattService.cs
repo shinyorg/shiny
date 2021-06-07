@@ -26,8 +26,9 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattCharacteristic?> GetKnownCharacteristic(string characteristicUuid, bool throwIfNotFound = false) =>
             Observable.FromAsync(async () =>
             {
+                var uuid = PlatformExtensions.ToUuidType(characteristicUuid);
                 var result = await this.native.GetCharacteristicsForUuidAsync(
-                    Guid.Parse(characteristicUuid),
+                    uuid,
                     BluetoothCacheMode.Cached
                 );
                 if (result.Status != GattCommunicationStatus.Success)

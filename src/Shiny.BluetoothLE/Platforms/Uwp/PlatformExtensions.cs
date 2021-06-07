@@ -12,8 +12,21 @@ using Characteristic = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCha
 
 namespace Shiny.BluetoothLE
 {
-    public static class UwpExtensions
+    public static class PlatformExtensions
     {
+        public static string ToUuidString(string value)
+        {
+            if (value.Length == 4)
+                value = $"0000{value}-0000-1000-8000-00805F9B34FB";
+
+            return value;
+        }
+
+
+        public static Guid ToUuidType(string value)
+            => Guid.Parse(ToUuidString(value));
+
+
         public static async Task Execute(this IAsyncOperation<GattCommunicationStatus> operation, CancellationToken ct)
         {
             var result = await operation.AsTask(ct).ConfigureAwait(false);

@@ -34,7 +34,8 @@ namespace Shiny.BluetoothLE
         public override IObservable<IGattService?> GetKnownService(string serviceUuid, bool throwIfNotFound = false) => Observable
             .FromAsync(async ct =>
             {
-                var result = await this.context.NativeDevice.GetGattServicesForUuidAsync(Guid.Parse(serviceUuid), BluetoothCacheMode.Cached);
+                var uuid = PlatformExtensions.ToUuidType(serviceUuid);
+                var result = await this.context.NativeDevice.GetGattServicesForUuidAsync(uuid, BluetoothCacheMode.Cached);
                 if (result.Status != GattCommunicationStatus.Success)
                     throw new ArgumentException("Could not find GATT service - " + result.Status);
 
