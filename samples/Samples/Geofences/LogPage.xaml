@@ -12,24 +12,21 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="No Events Recorded"
-                   Style="{StaticResource NoDataLabel}"
-                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}" />
+        <RefreshView IsRefreshing="{Binding IsBusy}"
+                     Command="{Binding Load}">
+            <CollectionView ItemsSource="{Binding Logs}">
+                <CollectionView.EmptyView>
+                    <Label Text="No Events Record"
+                           Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
 
-            <ListView ItemsSource="{Binding Logs}"
-                      IsRefreshing="{Binding IsBusy}"
-                      RefreshCommand="{Binding Load}"
-                      IsVisible="{Binding HasLogs}"
-                      IsPullToRefreshEnabled="True">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextCell x:DataType="samples:CommandItem"
-                                  Text="{Binding Text}"
-                                  Detail="{Binding Detail}" />
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="samples:CommandItem">
+                        <samples:CommandCell Text="{Binding Text}"
+                                             Detail="{Binding Detail}" />
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackLayout>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
     </ContentPage.Content>
 </ContentPage>

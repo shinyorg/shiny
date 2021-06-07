@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Shiny;
 
+using Shiny;
 
 namespace Samples.Infrastructure
 {
@@ -21,14 +19,6 @@ namespace Samples.Infrastructure
             this.Dialogs = dialogs;
 
             this.Logs = new ObservableList<TItem>();
-
-            this.Logs
-                .WhenCollectionChanged()
-                .Synchronize(this.syncLock)
-                .Select(_ => this.Logs.Any())
-                .Subscribe(x => this.HasLogs = x)
-                .DisposedBy(this.DestroyWith);
-
             this.Load = ReactiveCommand.CreateFromTask(async () =>
             {
                 var logs = await this.LoadLogs();
@@ -36,14 +26,21 @@ namespace Samples.Infrastructure
             });
             this.Clear = ReactiveCommand.CreateFromTask(this.DoClear);
             this.BindBusyCommand(this.Load);
+
+            this.WhenAnyValue(x => x.SelectedItem)
+                .WhereNotNull()
+                .SubscribeAsync(x => this.OnSelected(x))
+                .DisposedBy(this.DestroyWith);
         }
 
 
+        protected virtual Task OnSelected(TItem item) => Task.CompletedTask;
+
         protected IDialogs Dialogs { get; }
         public ObservableList<TItem> Logs { get; }
+        [Reactive] public TItem SelectedItem { get; set; }
         public ICommand Load { get; }
         public ICommand Clear { get; }
-        [Reactive] public bool HasLogs { get; private set; }
 
 
         public override void OnAppearing()

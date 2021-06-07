@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Prism.Navigation;
@@ -43,19 +42,12 @@ namespace Samples.Logging
             return results.Select(x => this.ToItem(
                 x.TimestampUtc,
                 x.Description,
-                () =>
-                {
-                    return null;
-                    //if (x.Parameters.IsEmpty())
-                    //    return null;
-
-                    //return this.serializer.Deserialize<Dictionary<string, string>>(x.Parameters);
-                }
+                _ = x.Parameters
             ));
         }
 
 
-        CommandItem ToItem(DateTime date, string exception, Func<IDictionary<string, string>?> getParameters)
+        CommandItem ToItem(DateTime date, string exception, string value)
         {
             var title = date.ToLocalTime().ToString("MMM dd, hh:dd:ss tt");
             return new CommandItem
@@ -64,12 +56,12 @@ namespace Samples.Logging
                 Detail = exception,
                 PrimaryCommand = ReactiveCommand.CreateFromTask(async () =>
                 {
-                    var s = $"{title}{Environment.NewLine}{exception}{Environment.NewLine}";
-                    var parameters = getParameters();
+                    var s = $"{title}{Environment.NewLine}{exception}{Environment.NewLine}{value}";
+                    //var parameters = getParameters();
 
-                    if (parameters != null && parameters.Any())
-                        foreach (var p in parameters)
-                            s += $"{Environment.NewLine}{p.Key}: {p.Value}";
+                    //if (parameters != null && parameters.Any())
+                    //    foreach (var p in parameters)
+                    //        s += $"{Environment.NewLine}{p.Key}: {p.Value}";
 
                     await this.navigator.ShowBigText(s, title);
                 })
