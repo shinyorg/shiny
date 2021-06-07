@@ -32,7 +32,10 @@ namespace Shiny.Stores
         public void Set(string key, object value)
         {
             var s = this.serializer.Serialize(value);
-            this.Container.Values.Add(key, s);
+            if (this.Contains(key))
+                this.Container.Values[key] = value;
+            else
+                this.Container.Values.Add(key, s);
         }
 
 

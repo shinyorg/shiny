@@ -5,15 +5,29 @@ namespace Shiny.Beacons
 {
     public class BeaconRegion : IEquatable<BeaconRegion>
     {
-        public BeaconRegion(string identifier, Guid uuid, ushort? major = 0, ushort? minor = 0)
+        public BeaconRegion(string identifier, Guid uuid, ushort? major = null, ushort? minor = null)
         {
             this.Identifier = identifier;
             this.Uuid = uuid;
-            if (major > 0)
-                this.Major = major;
 
-            if (minor > 0)
+            if (major != null)
+            {
+                if (major < 1)
+                    throw new ArgumentException("Invalid Major Value");
+
+                this.Major = major;
+            }
+
+            if (minor != null)
+            {
+                if (major == null)
+                    throw new ArgumentException("You must provide a major value if you are setting minor");
+
+                if (minor < 1)
+                    throw new ArgumentException("Invalid Minor Value");
+
                 this.Minor = minor;
+            }
         }
 
 

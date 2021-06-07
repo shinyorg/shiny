@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Android.App;
@@ -28,8 +29,8 @@ namespace Shiny.Net.Http
             if (intent.Action != Native.ActionDownloadComplete)
                 return;
 
-            var tdelegate = ShinyHost.Resolve<IHttpTransferDelegate>();
-            if (tdelegate == null)
+            var delegates = ShinyHost.ResolveAll<IHttpTransferDelegate>();
+            if (!delegates.Any())
                 return;
 
             HttpTransfer? transfer = null;
@@ -44,7 +45,7 @@ namespace Shiny.Net.Http
                     transfer = cursor.ToLib();
                     if (transfer.Value.Exception != null)
                     {
-                        await tdelegate.OnError(transfer.Value, transfer.Value.Exception);
+                        await delegates.RunDelegates(x => x.OnError(transfer.Value, transfer.Value.Exception));
                     }
                     else
                     {
@@ -61,7 +62,7 @@ namespace Shiny.Net.Http
                             File.Move(file.FullName, to);
                         });
 
-                        await tdelegate.OnCompleted(transfer.Value);
+                        await delegates.RunDelegates(x => x.OnCompleted(transfer.Value));
                     }
                     HttpEvents.OnNext(transfer.Value);
                 }
