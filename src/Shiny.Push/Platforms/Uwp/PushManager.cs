@@ -99,27 +99,5 @@ namespace Shiny.Push
             }
             return headers;
         }
-
-
-        public static IDictionary<string, string> ExtractHeaders(object args)
-        {
-            IDictionary<string, string> headers = new Dictionary<string, string>();
-
-            if (args is RawNotification raw)
-            {
-                if (raw.Headers != null)
-                    headers = raw.Headers.ToDictionary(x => x.Key, x => x.Value);
-            }
-            else if (args is ToastNotification toast)
-            {
-                if (toast.Data?.Values != null)
-                    headers = toast.Data.Values;
-            }
-            else if (args is TileNotification tile)
-            {
-                headers.Add("Tag", tile.Tag);
-            }
-            return headers;
-        }
     }
 }

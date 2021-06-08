@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
@@ -11,14 +13,16 @@ namespace Shiny.Notifications
     public class NotificationBackgroundTaskProcessor : IBackgroundTaskProcessor
     {
         readonly ISerializer serializer;
-        readonly IServiceProvider serviceProvider;
+        readonly IEnumerable<INotificationDelegate> delegates;
         readonly ILogger logger;
 
 
-        public NotificationBackgroundTaskProcessor(ISerializer serializer, IServiceProvider serviceProvider, ILogger<INotificationDelegate> logger)
+        public NotificationBackgroundTaskProcessor(ISerializer serializer,
+                                                   IEnumerable<INotificationDelegate> delegates,
+                                                   ILogger<INotificationDelegate> logger)
         {
             this.serializer = serializer;
-            this.serviceProvider = serviceProvider;
+            this.delegates = delegates;
             this.logger = logger;
         }
 
@@ -32,6 +36,9 @@ namespace Shiny.Notifications
 
             try
             {
+                //details.UserInput["Text"];
+                //this.delegates.RunDelegates(x => x.OnEntry(null));
+
                 //string arguments = details.Argument;
                 //if (arguments == null || !arguments.Equals("quickReply"))
                 //{
@@ -61,11 +68,7 @@ namespace Shiny.Notifications
                 //{
                 //    //native.Notification.Visual.Bindings.
                 //}
-                var ndelegate = this.serviceProvider.GetService<INotificationDelegate>();
-                if (ndelegate != null)
-                {
                     //ndelegate.OnEntry()
-                }
             }
             catch (Exception ex)
             {
