@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:samples="clr-namespace:Samples.Models"
+             xmlns:httptransfers="clr-namespace:Samples.HttpTransfers"
+             x:DataType="httptransfers:LogViewModel"
              x:Class="Samples.HttpTransfers.LogPage"
              Title="Logs">
 
@@ -9,37 +12,31 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="No HTTP Transfer Logs"
-                   Style="{StaticResource NoDataLabel}"
-                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}"/>
+        <RefreshView IsRefreshing="{Binding IsBusy}"
+                     Command="{Binding Load}">
+            <CollectionView ItemsSource="{Binding Logs}">
+                <CollectionView.EmptyView>
+                    <Label Text="No HTTP Transfer Logs"
+                           Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
 
-            <ListView ItemsSource="{Binding Logs}"
-                      IsVisible="{Binding HasLogs}"
-                      IsRefreshing="{Binding IsBusy}"
-                      RefreshCommand="{Binding Load}"
-                      IsPullToRefreshEnabled="True">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <ViewCell.View>
-                                <StackLayout>
-                                    <Label Text="{Binding Description}"
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="samples:HttpEvent">
+                        <StackLayout>
+                            <Label Text="{Binding Description}"
                                            FontSize="Medium"
                                            LineBreakMode="TailTruncation" />
 
-                                    <Label Text="{Binding Uri}"
+                            <Label Text="{Binding Uri}"
                                            FontSize="Micro"
                                            LineBreakMode="TailTruncation" />
 
-                                    <Label Text="{Binding DateCreated, StringFormat='{0}'}"
+                            <Label Text="{Binding DateCreated, StringFormat='{0}'}"
                                            FontSize="Small" />
-                                </StackLayout>
-                            </ViewCell.View>
-                        </ViewCell>
+                        </StackLayout>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackLayout>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
     </ContentPage.Content>
 </ContentPage>

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:samples="clr-namespace:Samples"
              x:Class="Samples.Notifications.LogPage"
              Title="Logs">
 
@@ -9,22 +10,22 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="No Events Recorded"
-                   Style="{StaticResource NoDataLabel}"
-                   IsVisible="{Binding HasLogs, Converter={StaticResource Not}}" />
+        <RefreshView IsRefreshing="{Binding IsBusy}"
+                     Command="{Binding Load}">
+            <CollectionView ItemsSource="{Binding Logs}">
+                <CollectionView.EmptyView>
+                    <Label Text="No Errors have been logged"
+                           Style="{StaticResource NoDataLabel}" />
+                </CollectionView.EmptyView>
 
-            <ListView ItemsSource="{Binding Logs}"
-                      IsRefreshing="{Binding IsBusy}"
-                      RefreshCommand="{Binding Load}"
-                      IsVisible="{Binding HasLogs}"
-                      IsPullToRefreshEnabled="True">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextCell Text="{Binding Text}" Detail="{Binding Detail}" />
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="samples:CommandItem">
+                        <samples:CommandCell Text="{Binding Text}"
+                                             Detail="{Binding Detail}"
+                                             PrimaryCommand="{Binding PrimaryCommand}" />
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </StackLayout>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
     </ContentPage.Content>
 </ContentPage>
