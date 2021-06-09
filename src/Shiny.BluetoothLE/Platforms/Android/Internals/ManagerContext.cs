@@ -38,17 +38,23 @@ namespace Shiny.BluetoothLE.Internals
             this.devices = new ConcurrentDictionary<string, Peripheral>();
             this.peripheralSubject = new Subject<(Intent Intent, Peripheral Peripheral)>();
             this.Manager = services.Android.GetBluetooth();
-            ShinyBleBroadcastReceiver.OnBleEvent = intent => this.DeviceEvent(intent);
+
+            ShinyBleBroadcastReceiver
+                .WhenBleEvent()
+                .Subscribe(intent => this.DeviceEvent(intent));
+
+            ShinyBleAdapterStateBroadcastReceiver
+                .WhenStateChanged()
+                .Subscribe(status => services.Services.RunDelegates<IBleDelegate>(del => del.OnAdapterStateChanged(status)));
         }
 
 
         public IServiceProvider Services => this.services.Services;
         public AccessState Status => this.Manager.GetAccessState();
-        public IObservable<AccessState> StatusChanged => this.services
-            .Bus
-            .Listener<State>()
-            .Select(x => x.FromNative())
+        public IObservable<AccessState> StatusChanged() => ShinyBleAdapterStateBroadcastReceiver
+            .WhenStateChanged()
             .StartWith(this.Status);
+
 
         public IObservable<(Intent Intent, Peripheral Peripheral)> PeripheralEvents
             => this.peripheralSubject;

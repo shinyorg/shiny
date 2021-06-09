@@ -69,7 +69,7 @@ namespace Shiny.BluetoothLE
 
         public override AccessState Status => this.context.Status;
         public override IObservable<AccessState> WhenStatusChanged() => this.context
-            .StatusChanged
+            .StatusChanged()
             .StartWith(this.Status);
 
 

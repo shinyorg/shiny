@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Android.App;
 using Android.Bluetooth;
 using Android.Content;
@@ -13,26 +15,20 @@ namespace Shiny.BluetoothLE
     )]
     [IntentFilter(new[] {
         BluetoothAdapter.ActionStateChanged
-        //Intent.ActionAirplaneModeChanged
     })]
     public class ShinyBleAdapterStateBroadcastReceiver : BroadcastReceiver
     {
-        readonly Lazy<IMessageBus> messageBus = new Lazy<IMessageBus>(() => ShinyHost.Resolve<IMessageBus>());
-        //android.intent.action.AIRPLANE_MOD
+        static readonly Subject<State> stateSubj = new Subject<State>();
+        public static IObservable<AccessState> WhenStateChanged() => stateSubj.Select(x => x.FromNative());
 
-        public override void OnReceive(Context context, Intent intent)
+
+        public override void OnReceive(Context? context, Intent? intent)
         {
-            switch (intent.Action)
+            switch (intent?.Action)
             {
-                //case Intent.ActionAirplaneModeChanged:
-                //    var mode = intent.GetBooleanExtra("state", false);
-                //    if (mode)
-                //        this.messageBus.Value.Publish(State.Off);
-                //    break;
-
                 case BluetoothAdapter.ActionConnectionStateChanged:
-                    var newState = intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
-                    this.messageBus.Value.Publish(newState);
+                    var newState = (State)intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
+                    stateSubj.OnNext(newState);
                     break;
             }
         }
