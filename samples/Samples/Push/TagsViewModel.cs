@@ -13,11 +13,11 @@ namespace Samples.Push
 {
     public class TagsViewModel : ViewModel
     {
-        readonly IPushManager push;
+        readonly IPushManager? push;
         readonly IDialogs dialogs;
 
 
-        public TagsViewModel(IPushManager pushManager, IDialogs dialogs)
+        public TagsViewModel(IDialogs dialogs, IPushManager? pushManager = null)
         {
             this.push = pushManager;
             this.dialogs = dialogs;
@@ -27,7 +27,6 @@ namespace Samples.Push
                 x => x.IsSupported,
                 x => x.GetValue()
             );
-
 
             this.Add = ReactiveCommand.CreateFromTask(
                 async () =>
@@ -88,7 +87,7 @@ namespace Samples.Push
 
         public ICommand Load { get; }
         public ICommand Add { get; }
-        public ICommand Clear { get; }        
+        public ICommand Clear { get; }
         public IList<CommandItem> Tags { get; private set; }
         [Reactive] public bool IsSupported { get; private set; }
 
@@ -96,10 +95,12 @@ namespace Samples.Push
         public override async void OnAppearing()
         {
             base.OnAppearing();
-            if (this.push is not IPushTagSupport)
-                await this.dialogs.Alert("Tags not supported");
+            if (this.push is null)
+                await this.dialogs.Snackbar("Push Not Supported");
+            else if (this.push is not IPushTagSupport)
+                await this.dialogs.Snackbar("Tags not supported");
             else if (this.push.CurrentRegistrationToken == null)
-                await this.dialogs.Alert("Not Registered");
+                await this.dialogs.Snackbar("Not Registered");
             else
             {
                 this.IsSupported = true;

@@ -19,12 +19,12 @@
             </ContentPage.IconImageSource>
         </pushnotifications:SetupPage>
 
-        <pushnotifications:TagsPage>
+        <!--<pushnotifications:TagsPage>
             <ContentPage.IconImageSource>
                 <FontImageSource Glyph="&#xf013;"
                                  FontFamily="FAS" />
             </ContentPage.IconImageSource>
-        </pushnotifications:TagsPage>
+        </pushnotifications:TagsPage>-->
 
         <pushnotifications:EventListPage>
             <ContentPage.IconImageSource>

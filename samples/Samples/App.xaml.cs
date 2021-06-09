@@ -75,6 +75,11 @@ namespace Samples
             containerRegistry.RegisterForNavigation<Jobs.CreatePage>("CreateJob");
 
             containerRegistry.RegisterForNavigation<Push.PushPage>("Push");
+            containerRegistry.RegisterForNavigation<Push.SetupPage, Push.SetupViewModel>();
+            containerRegistry.RegisterForNavigation<Push.EventListPage, Push.EventListViewModel>();
+            containerRegistry.RegisterForNavigation<Push.TagsPage, Push.TagsViewModel>();
+
+
             containerRegistry.RegisterForNavigation<Notifications.MainPage>("Notifications");
             containerRegistry.RegisterForNavigation<Notifications.ChannelListPage>("NotificationChannels");
             containerRegistry.RegisterForNavigation<Notifications.ChannelCreatePage>("NotificationChannelCreate");
