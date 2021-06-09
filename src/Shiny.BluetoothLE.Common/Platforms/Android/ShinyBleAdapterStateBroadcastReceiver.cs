@@ -26,7 +26,7 @@ namespace Shiny.BluetoothLE
         {
             switch (intent?.Action)
             {
-                case BluetoothAdapter.ActionConnectionStateChanged:
+                case BluetoothAdapter.ActionStateChanged:
                     var newState = (State)intent.GetIntExtra(BluetoothAdapter.ExtraState, -1);
                     stateSubj.OnNext(newState);
                     break;

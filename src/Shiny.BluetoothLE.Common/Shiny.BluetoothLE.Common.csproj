@@ -46,5 +46,4 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\tizen\**\*.cs" />
     </ItemGroup>
-
 </Project>

@@ -189,7 +189,7 @@ namespace Shiny.BluetoothLE
                  {
                      foreach (var serviceUuid in config.ServiceUuids)
                      {
-                         adWatcher.AdvertisementFilter.Advertisement.ServiceUuids.Add(PlatformExtensions.ToUuidType(serviceUuid));
+                         adWatcher.AdvertisementFilter.Advertisement.ServiceUuids.Add(Utils.ToUuidType(serviceUuid));
                      }
                 }
 

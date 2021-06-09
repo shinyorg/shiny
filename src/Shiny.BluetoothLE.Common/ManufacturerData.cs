@@ -5,7 +5,7 @@ namespace Shiny.BluetoothLE
 {
     public class ManufacturerData
     {
-        public ManufacturerData() {}
+        //public ManufacturerData() {}
         public ManufacturerData(ushort companyId, byte[] data)
         {
             this.CompanyId = companyId;
@@ -13,7 +13,7 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public ushort CompanyId { get; set; }
-        public byte[] Data { get; set; }
+        public ushort CompanyId { get; } // set; }
+        public byte[] Data { get; } //set; }
     }
 }

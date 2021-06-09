@@ -12,7 +12,7 @@ using Characteristic = Windows.Devices.Bluetooth.GenericAttributeProfile.GattCha
 
 namespace Shiny.BluetoothLE
 {
-    public static class PlatformExtensions
+    public static class Utils
     {
         public static string ToUuidString(string value)
         {

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Text;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
 using Android.Content;
@@ -17,9 +16,8 @@ using Observable = System.Reactive.Linq.Observable;
 
 namespace Shiny.BluetoothLE.Internals
 {
-    public class ManagerContext
+    public class ManagerContext : IShinyStartupTask
     {
-        //public const string BlePairingFailed = nameof(BlePairingFailed);
         readonly ConcurrentDictionary<string, Peripheral> devices;
         readonly Subject<(Intent Intent, Peripheral Peripheral)> peripheralSubject;
         readonly ShinyCoreServices services;
@@ -39,13 +37,21 @@ namespace Shiny.BluetoothLE.Internals
             this.peripheralSubject = new Subject<(Intent Intent, Peripheral Peripheral)>();
             this.Manager = services.Android.GetBluetooth();
 
+
+        }
+
+
+        public void Start()
+        {
             ShinyBleBroadcastReceiver
                 .WhenBleEvent()
                 .Subscribe(intent => this.DeviceEvent(intent));
 
             ShinyBleAdapterStateBroadcastReceiver
                 .WhenStateChanged()
-                .Subscribe(status => services.Services.RunDelegates<IBleDelegate>(del => del.OnAdapterStateChanged(status)));
+                .Subscribe(status =>
+                    services.Services.RunDelegates<IBleDelegate>(del => del.OnAdapterStateChanged(status))
+                );
         }
 
 

@@ -109,8 +109,10 @@ namespace Shiny.BluetoothLE.Hosting
                 : options.ServiceUuids;
 
             foreach (var serviceUuid in serviceUuids)
-                this.publisher.Advertisement.ServiceUuids.Add(Guid.Parse(serviceUuid));
-
+            {
+                var uuid = Utils.ToUuidType(serviceUuid);
+                this.publisher.Advertisement.ServiceUuids.Add(uuid);
+            }
             this.publisher.Start();
             return Task.CompletedTask;
         }

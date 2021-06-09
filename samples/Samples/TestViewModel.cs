@@ -68,6 +68,23 @@ namespace Samples
         void Append(string txt) => this.Logs = $"{txt}{Environment.NewLine}{this.Logs}";
 
 
+        //public override void OnAppearing()
+        //{
+        //    this.bleManager
+        //        .Scan()
+        //        .Subscribe(x =>
+        //        {
+
+        //        })
+        //        .DisposeWith(this.DeactivateWith);
+        //}
+
+
+        //public override void OnDisappearing()
+        //{
+        //    Console.WriteLine("ONDISAPPEARING CALLED");
+        //}
+
         async Task PairingTest()
         {
             this.Append("Scanning..");

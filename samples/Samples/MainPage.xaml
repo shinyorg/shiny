@@ -25,7 +25,6 @@
                     <TableSection Title="Bluetooth">
                         <TextCell Text="Peripheral Scan" Command="{Binding Navigate}" CommandParameter="Nav/BleCentral" />
                         <TextCell Text="Peripheral Scan (Managed)" Command="{Binding Navigate}" CommandParameter="Nav/BleManagedScan" />
-                        <TextCell Text="Perf Tests" Command="{Binding Navigate}" CommandParameter="Nav/BlePerformance" />
                         <TextCell Text="Hosting" Command="{Binding Navigate}" CommandParameter="Nav/BleHosting" />
                     </TableSection>
                     <TableSection Title="Locations">

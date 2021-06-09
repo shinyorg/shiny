@@ -58,7 +58,6 @@ namespace Samples
 
             containerRegistry.RegisterForNavigation<BluetoothLE.AdapterPage>("BleCentral");
             containerRegistry.RegisterForNavigation<BluetoothLE.PeripheralPage>("Peripheral");
-            containerRegistry.RegisterForNavigation<BluetoothLE.PerformancePage>("BlePerformance");
             containerRegistry.RegisterForNavigation<BleHosting.GattServerPage>("BleHosting");
             containerRegistry.RegisterForNavigation<BluetoothLE.ManagedScanPage>("BleManagedScan");
 

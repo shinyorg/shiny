@@ -72,10 +72,12 @@ namespace Shiny.BluetoothLE.Hosting
                 ReadProtectionLevel = this.readProtection,
                 WriteProtectionLevel = this.writeProtection
             };
+
+            var uuid = Utils.ToUuidType(this.Uuid);
             var characteristic = await native
                 .ServiceProvider
                 .Service
-                .CreateCharacteristicAsync(Guid.Parse(this.Uuid), parameters);
+                .CreateCharacteristicAsync(uuid, parameters);
         }
 
         public void Dispose()

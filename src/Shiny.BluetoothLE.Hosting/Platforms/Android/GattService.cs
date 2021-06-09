@@ -18,7 +18,8 @@ namespace Shiny.BluetoothLE.Hosting
         {
             this.context = context;
             var type = primary ? GattServiceType.Primary : GattServiceType.Secondary;
-            this.Native = new BluetoothGattService(UUID.FromString(uuid), type);
+
+            this.Native = new BluetoothGattService(Utils.ToUuidType(uuid), type);
             this.characteristics = new List<GattCharacteristic>();
 
             this.Uuid = uuid;

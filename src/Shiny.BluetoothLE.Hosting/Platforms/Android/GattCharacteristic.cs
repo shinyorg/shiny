@@ -112,8 +112,10 @@ namespace Shiny.BluetoothLE.Hosting
 
         public void Build()
         {
+            var nativeUuid = Utils.ToUuidType(this.Uuid);
+
             this.Native = new BluetoothGattCharacteristic(
-                UUID.FromString(this.Uuid),
+                nativeUuid,
                 this.properties,
                 this.permissions
             );
