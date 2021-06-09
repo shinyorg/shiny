@@ -28,7 +28,7 @@ namespace Shiny.Push
 
         public PushManager(ShinyCoreServices services,
                            INotificationManager notificationManager,
-                           ILogger<PushManager> logger) : base(services)
+                           ILogger<IPushManager> logger) : base(services)
         {
             this.notificationManager = notificationManager;
             this.logger = logger;

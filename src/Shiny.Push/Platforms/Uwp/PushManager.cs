@@ -7,25 +7,38 @@ using System.Reactive.Linq;
 using Windows.Foundation;
 using Windows.Networking.PushNotifications;
 using Windows.ApplicationModel.Background;
-using Windows.UI.Notifications;
 using Shiny.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Push
 {
     public class PushManager : AbstractPushManager, IShinyStartupTask
     {
+        readonly ILogger logger;
         PushNotificationChannel channel;
-        public PushManager(ShinyCoreServices services) : base(services) {}
 
 
-        public void Start()
+        public PushManager(ShinyCoreServices services, ILogger<IPushManager> logger) : base(services)
         {
-            UwpPlatform.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
-                builder => builder.SetTrigger(new PushNotificationTrigger())
-            );
-            if (this.CurrentRegistrationExpiryDate != null)
-                this.RequestAccess();
+            this.logger = logger;
+         }
+
+
+        public async void Start()
+        {
+            try
+            {
+                UwpPlatform.RegisterBackground<PushNotificationBackgroundTaskProcessor>(
+                    builder => builder.SetTrigger(new PushNotificationTrigger())
+                );
+                if (this.CurrentRegistrationExpiryDate != null)
+                    await this.RequestAccess();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Unable to register push");
+            }
         }
 
 

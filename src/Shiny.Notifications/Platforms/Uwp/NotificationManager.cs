@@ -132,7 +132,7 @@ namespace Shiny.Notifications
                         case ChannelActionType.OpenApp:
                             // foreground activation
                             builder.AddButton(new ToastButton()
-                                .SetBackgroundActivation()
+                                .SetProtocolActivation(new Uri("empty"))
                                 .SetContent(action.Title)
                                 .AddArgument("action", action.Identifier)
                             );

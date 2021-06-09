@@ -22,13 +22,15 @@ namespace Shiny.Push.AzureNotificationHubs
 #if __ANDROID__
         public PushManager(AzureNotificationConfig config,
                            ShinyCoreServices services,
-                           ILogger<PushManager> logger,
+                           ILogger<IPushManager> logger,
                            Shiny.Notifications.INotificationManager notifications)
                            : base(services, notifications, logger)
-#else
+#elif WINDOWS_UWP
         public PushManager(AzureNotificationConfig config,
-                           ILogger<PushManager> logger,
-                           ShinyCoreServices services) : base(services)
+                           ILogger<IPushManager> logger,
+                           ShinyCoreServices services) : base(services, logger)
+#else
+        public PushManager(AzureNotificationConfig config, ShinyCoreServices services) : base(services)
 #endif
         {
             this.logger = logger;
