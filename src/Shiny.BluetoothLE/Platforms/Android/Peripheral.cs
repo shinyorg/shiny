@@ -165,13 +165,20 @@ namespace Shiny.BluetoothLE
                     .ListenForMe(this)
                     .Subscribe(intent =>
                     {
+
                         switch (intent.Action)
                         {
+                            case BluetoothDevice.ActionAclConnected:
+                                // if we're getting a connection for this device here, the bonding should be good
+                                var success = this.PairingStatus == PairingState.Paired;
+                                ob.Respond(success);
+                                break;
+
                             case BluetoothDevice.ActionBondStateChanged:
                                 var prev = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraPreviousBondState, (int)Bond.None);
                                 var current = (Bond)intent.GetIntExtra(BluetoothDevice.ExtraBondState, (int)Bond.None);
 
-                                if (prev == Bond.Bonding)
+                                if (prev == Bond.Bonding || current == Bond.Bonded)
                                 {
                                     // it is done now
                                     var bond = current == Bond.Bonded;
