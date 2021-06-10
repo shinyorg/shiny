@@ -19,7 +19,7 @@
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>
     </PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>830C408FDFB364FA97D8F745C40A419B3E043DED</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>B7A8D9E845F2D03EFC8ACC5659849FE4C3650E1A</PackageCertificateThumbprint>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
@@ -173,6 +173,10 @@
     <PackageReference Include="Xamarin.Essentials" />
     <PackageReference Include="Xamarin.Forms" />
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" />
+    <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
+      <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
+      <Name>Shiny.Push.AzureNotificationHubs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Samples\Samples.csproj">
       <Name>Samples</Name>
     </ProjectReference>
