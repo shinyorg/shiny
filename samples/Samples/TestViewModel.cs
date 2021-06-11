@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Samples.Infrastructure;
 using Shiny.BluetoothLE;
 
 
@@ -17,19 +18,21 @@ namespace Samples
     public class TestViewModel : ViewModel
     {
         readonly IBleManager bleManager;
+        readonly IDialogs dialogs;
+
         IPeripheral peripheral;
         CancellationTokenSource? cancelSrc;
         CompositeDisposable? disp;
 
 
-        public TestViewModel(IBleManager bleManager)
+        public TestViewModel(IBleManager bleManager, IDialogs dialogs)
         {
             this.bleManager = bleManager;
+            this.dialogs = dialogs;
 
             this.Start = ReactiveCommand.CreateFromTask<string>(
                 async arg =>
                 {
-                    this.IsBusy = true;
                     this.disp = new CompositeDisposable();
                     this.cancelSrc = new CancellationTokenSource();
                     this.Logs = String.Empty;
@@ -44,9 +47,10 @@ namespace Samples
                             await this.PairingTest();
                             break;
                     }
-                },
-                this.WhenAny(x => x.IsBusy, x => !x.GetValue())
+                }
             );
+            this.BindBusyCommand(this.Start);
+
             this.Stop = ReactiveCommand.Create(
                 () =>
                 {
@@ -68,23 +72,6 @@ namespace Samples
         void Append(string txt) => this.Logs = $"{txt}{Environment.NewLine}{this.Logs}";
 
 
-        //public override void OnAppearing()
-        //{
-        //    this.bleManager
-        //        .Scan()
-        //        .Subscribe(x =>
-        //        {
-
-        //        })
-        //        .DisposeWith(this.DeactivateWith);
-        //}
-
-
-        //public override void OnDisappearing()
-        //{
-        //    Console.WriteLine("ONDISAPPEARING CALLED");
-        //}
-
         async Task PairingTest()
         {
             this.Append("Scanning..");
@@ -97,7 +84,8 @@ namespace Samples
             //await this.peripheral.WithConnectIf().ToTask(this.cancelSrc.Token);
             this.Append("Device Connected - trying to pair");
 
-            var result = await this.peripheral.TryPairingRequest().ToTask(this.cancelSrc.Token);
+            var pin = await this.dialogs.Input("Set PIN?");
+            var result = await this.peripheral.TryPairingRequest(pin).ToTask(this.cancelSrc.Token);
             if (result == null)
             {
                 this.Append("Pairing Not Supported");

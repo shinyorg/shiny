@@ -21,12 +21,6 @@ namespace Samples.BluetoothLE
         }
 
 
-        //public override Task OnConnected(IPeripheral peripheral) =>
-        //    this.services.Connection.InsertAsync(new BleEvent
-        //    {
-        //        Timestamp = DateTime.Now
-        //    });
-
         public override async Task OnConnected(IPeripheral peripheral)
         {
             await this.services.Connection.InsertAsync(new BleEvent

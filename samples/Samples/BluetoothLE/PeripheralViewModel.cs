@@ -51,7 +51,8 @@ namespace Samples.BluetoothLE
                 }
                 else
                 {
-                    var result = await pair.PairingRequest(); //.Timeout(TimeSpan.FromSeconds(10));
+                    var pin = await this.dialogs.Input("Use PIN?  Cancel to not use one");
+                    var result = await pair.PairingRequest(pin);
                     await dialogs.Snackbar(result ? "Peripheral Paired Successfully" : "Peripheral Pairing Failed");
                     this.RaisePropertyChanged(nameof(this.PairingText));
                 }
