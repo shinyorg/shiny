@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using Cake.Common.Tools.DotNetCore;
 using Cake.Common.Tools.DotNetCore.Run;
+using Cake.Core;
 using Cake.Core.Diagnostics;
+using Cake.Core.IO;
 using Cake.Frosting;
 
 
@@ -22,32 +24,34 @@ namespace ShinyBuild.Tasks
                     throw new ArgumentException("Docs GitHub Deployment Token is missing");
 
                 context.Log.Information("Building & Deploying Documentation");
-                RunIt(context, "--deploy");
+                RunIt(context, true);
                 context.Log.Information("Documentation Deployed");
             }
             else
             {
                 context.Log.Information("Building Documentation");
-                RunIt(context, null);
+                RunIt(context, false);
                 context.Log.Information("Documentation Built");
             }
         }
 
 
-        static void RunIt(BuildContext context, string? args)
+        static void RunIt(BuildContext context, bool deploy)
         {
             context.DotNetCoreRestore(Project);
 
             var settings = new DotNetCoreRunSettings
             {
-                //Framework = "net5.0",
-                //ArgumentCustomization = args => args.Append("--l Debug"),
                 Configuration = context.MsBuildConfiguration,
                 EnvironmentVariables = new Dictionary<string, string>
                 {
                     { "GITHUB_TOKEN", context.DocsDeployGitHubToken }
                 }
             };
+            var args = new ProcessArgumentBuilder();
+            if (deploy)
+                args.Append("deploy");
+
             context.DotNetCoreRun(Project, args, settings);
         }
     }
