@@ -22,8 +22,8 @@ env:
   TwitterAccessToken: ${{secrets.TWITTER_ACCESS_TOKEN}}
   TwitterAccessTokenSecret: ${{secrets.TWITTER_ACCESS_TOKEN_SECRET}}
   DiscordToken: ${{secrets.DISCORD_TOKEN}}
-  DiscordGuildId: 679761126598115336,
-  DiscordChannelId: 803717285986566174
+  DiscordGuildId: '679761126598115336'
+  DiscordChannelId: '803717285986566174'
 
 jobs:
   build:

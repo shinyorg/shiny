@@ -6,7 +6,7 @@ using Cake.Frosting;
 using Discord;
 using Discord.WebSocket;
 using Tweetinvi;
-
+using Tweetinvi.Models;
 
 namespace ShinyBuild.Tasks
 {
@@ -33,12 +33,19 @@ namespace ShinyBuild.Tasks
 
             try
             {
+                context.Log.Information("Attempting to publish to Twitter");
+
                 var consumerKey = context.ArgumentOrEnvironment<string>("TwitterConsumerKey");
                 var consumerSecret = context.ArgumentOrEnvironment<string>("TwitterConsumerSecret");
                 var accessToken = context.ArgumentOrEnvironment<string>("TwitterAccessToken");
                 var accessTokenSecret = context.ArgumentOrEnvironment<string>("TwitterAccessTokenSecret");
+                var client = new TwitterClient(
+                    consumerKey,
+                    consumerSecret,
+                    accessToken,
+                    accessTokenSecret
+                );
 
-                var client = new TwitterClient(consumerKey, consumerSecret, accessToken, accessTokenSecret);
                 await client.Tweets.PublishTweetAsync(message);
 
                 context.Log.Information("Tweet Published - " + message);
@@ -58,6 +65,8 @@ namespace ShinyBuild.Tasks
 
             try
             {
+                context.Log.Information("Attempting to publish Discord message");
+
                 var discordToken = context.ArgumentOrEnvironment<string>("DiscordToken");
                 var discordGuildId = context.ArgumentOrEnvironment<ulong>("DiscordGuildId");
                 var discordChannel = context.ArgumentOrEnvironment<ulong>("DiscordChannelId"); // 803717285986566174 - #shinylib on sponsorconnect
@@ -69,7 +78,7 @@ namespace ShinyBuild.Tasks
                 var count = 0;
                 while (guild == null)
                 {
-                    guild = client.GetGuild(679761126598115336);
+                    guild = client.GetGuild(discordGuildId);
                     await Task.Delay(2000);
                     count++;
                     if (count == 5)
@@ -78,7 +87,7 @@ namespace ShinyBuild.Tasks
 
                 await guild
                     .TextChannels
-                    .First(x => x.Id == discordGuildId)
+                    .First(x => x.Id == discordChannel)
                     .SendMessageAsync(message);
 
                 context.Log.Information("Discord Message Published");
