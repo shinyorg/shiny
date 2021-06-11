@@ -1,11 +1,13 @@
 ﻿using Android.App;
+using static Android.Manifest;
 
-[assembly: UsesPermission(Android.Manifest.Permission.AccessFineLocation)]
-[assembly: UsesPermission(Android.Manifest.Permission.AccessCoarseLocation)]
-[assembly: UsesPermission(Android.Manifest.Permission.AccessBackgroundLocation)]
-[assembly: UsesPermission(Android.Manifest.Permission.Bluetooth)]
-[assembly: UsesPermission(Android.Manifest.Permission.BluetoothAdmin)]
-[assembly: UsesPermission(Android.Manifest.Permission.BluetoothPrivileged)]
+[assembly: UsesPermission(Permission.AccessFineLocation)]
+[assembly: UsesPermission(Permission.AccessCoarseLocation)]
+[assembly: UsesPermission(Permission.AccessBackgroundLocation)]
+[assembly: UsesPermission(Permission.Bluetooth)]
+[assembly: UsesPermission(Permission.BluetoothAdmin)]
+[assembly: UsesPermission(Permission.BluetoothPrivileged)]
+[assembly: UsesPermission(Permission.ReceiveBootCompleted)]
 
 [assembly: UsesFeature("android.hardware.bluetooth")]
 [assembly: UsesFeature("android.hardware.bluetooth_le")]

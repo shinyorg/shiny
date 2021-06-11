@@ -12,9 +12,6 @@ namespace Shiny.Locations
         Enabled = true,
         Exported = true
     )]
-    [IntentFilter(new[] {
-        MotionActivityManagerImpl.IntentAction
-    })]
     public class MotionActivityBroadcastReceiver : ShinyBroadcastReceiver
     {
         public const string ReceiverName = nameof(MotionActivityBroadcastReceiver);

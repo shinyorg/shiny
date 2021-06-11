@@ -4,10 +4,10 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content;
 using Android.Gms.Location;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
-
 using static Android.Manifest;
 
 
@@ -51,6 +51,10 @@ namespace Shiny.Locations
 
         public async void Start()
         {
+            this.core.Android.RegisterBroadcastReceiver<MotionActivityBroadcastReceiver>(
+                MotionActivityManagerImpl.IntentAction,
+                Intent.ActionBootCompleted
+            );
             MotionActivityBroadcastReceiver.Process = async result =>
             {
                 var type = MotionActivityType.Unknown;

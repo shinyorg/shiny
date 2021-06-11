@@ -13,10 +13,10 @@ namespace Shiny.Locations
         Enabled = true,
         Exported = true
     )]
-    [IntentFilter(new [] {
-        GeofenceManagerImpl.IntentAction,
-        Permission.ReceiveBootCompleted
-    })]
+    //[IntentFilter(new [] {
+    //    GeofenceManagerImpl.IntentAction,
+    //    Permission.ReceiveBootCompleted
+    //})]
     public class GeofenceBroadcastReceiver : ShinyBroadcastReceiver
     {
         public static Func<GeofencingEvent, Task>? Process { get; set; }

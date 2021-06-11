@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 using Native = Android.App.DownloadManager;
 
@@ -16,9 +15,6 @@ namespace Shiny.Net.Http
         Enabled = true,
         Exported = true
     )]
-    [IntentFilter(new[] {
-        Native.ActionDownloadComplete
-    })]
     public class HttpTransferBroadcastReceiver : ShinyBroadcastReceiver
     {
         public static Subject<HttpTransfer> HttpEvents { get; } = new Subject<HttpTransfer>();

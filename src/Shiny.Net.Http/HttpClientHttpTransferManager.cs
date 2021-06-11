@@ -114,7 +114,7 @@ namespace Shiny.Net.Http
             => this.Services.Bus.Listener<HttpTransfer>();
 
 
-        public async void Start()
+        public virtual async void Start()
         {
             try
             {

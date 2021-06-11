@@ -13,13 +13,10 @@ namespace Shiny.BluetoothLE
         Enabled = true,
         Exported = true
     )]
-    [IntentFilter(new[] {
-        BluetoothAdapter.ActionStateChanged
-    })]
     public class ShinyBleAdapterStateBroadcastReceiver : BroadcastReceiver
     {
         static readonly Subject<State> stateSubj = new Subject<State>();
-        public static IObservable<AccessState> WhenStateChanged() => stateSubj.Select(x => x.FromNative());
+        public static IObservable<State> WhenStateChanged() => stateSubj;
 
 
         public override void OnReceive(Context? context, Intent? intent)

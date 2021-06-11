@@ -5,10 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Android.App;
+using Android.Content;
 using Android.Gms.Location;
 using Shiny.Infrastructure;
 using Shiny.Locations.Infrastructure;
 using Microsoft.Extensions.Logging;
+
 
 namespace Shiny.Locations
 {
@@ -169,7 +171,10 @@ namespace Shiny.Locations
             if (this.geofencePendingIntent != null)
                 return this.geofencePendingIntent;
 
-            var intent = this.context.CreateIntent<GeofenceBroadcastReceiver>(IntentAction);
+            var intent = this.context.CreateIntent<GeofenceBroadcastReceiver>(
+                IntentAction,
+                Intent.ActionBootCompleted
+            );
             this.geofencePendingIntent = PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,

@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Http;
 using Shiny.Infrastructure;
+using Microsoft.Extensions.Logging;
 using Android;
+using Android.Content;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
-using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Net.Http
@@ -17,9 +18,16 @@ namespace Shiny.Net.Http
     public class HttpTransferManager : HttpClientHttpTransferManager
     {
         IObservable<HttpTransfer>? httpObs;
-
-
         public HttpTransferManager(ShinyCoreServices services, ILogger<IHttpTransferManager> logger) : base(services, logger) {}
+
+
+        public override void Start()
+        {
+            this.Services.Android.RegisterBroadcastReceiver<HttpTransferBroadcastReceiver>(
+                Native.ActionDownloadComplete,
+                Intent.ActionBootCompleted
+            );
+        }
 
 
         public override async Task Cancel(string identifier)

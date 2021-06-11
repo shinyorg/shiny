@@ -1,10 +1,11 @@
 ﻿using Android.App;
+using static Android.Manifest;
 
-[assembly: UsesPermission(Android.Manifest.Permission.AccessFineLocation)]
-[assembly: UsesPermission(Android.Manifest.Permission.AccessCoarseLocation)]
-[assembly: UsesPermission(Android.Manifest.Permission.AccessBackgroundLocation)]
-[assembly: UsesPermission(Android.Manifest.Permission.ActivityRecognition)]
-//[assembly: UsesPermission(Android.Manifest.Permission.ReceiveBootCompleted)]
+[assembly: UsesPermission(Permission.AccessFineLocation)]
+[assembly: UsesPermission(Permission.AccessCoarseLocation)]
+[assembly: UsesPermission(Permission.AccessBackgroundLocation)]
+[assembly: UsesPermission(Permission.ActivityRecognition)]
+[assembly: UsesPermission(Permission.ReceiveBootCompleted)]
 
 [assembly: UsesFeature("android.hardware.location.gps")]
 [assembly: UsesFeature("android.hardware.location.network")]

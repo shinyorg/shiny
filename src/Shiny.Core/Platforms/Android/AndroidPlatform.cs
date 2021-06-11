@@ -113,6 +113,16 @@ namespace Shiny
         public PlatformState Status { get; private set; } = PlatformState.Foreground;
 
 
+        public void RegisterBroadcastReceiver<T>(params string[] actions) where T : BroadcastReceiver, new()
+        {
+            var filter = new IntentFilter();
+            foreach (var e in actions)
+                filter.AddAction(e);
+
+            this.AppContext.RegisterReceiver(new T(), filter);
+        }
+
+
         public TValue GetSystemServiceValue<TValue, TSysType>(string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
         {
             using (var type = this.GetSystemService<TSysType>(systemTypeName))

@@ -12,12 +12,6 @@ namespace Shiny.BluetoothLE.Internals
         Enabled = true,
         Exported = true
     )]
-    [IntentFilter(new[] {
-        BluetoothDevice.ActionNameChanged,
-        BluetoothDevice.ActionBondStateChanged,
-        BluetoothDevice.ActionPairingRequest,
-        BluetoothDevice.ActionAclConnected
-    })]
     public class ShinyBleBroadcastReceiver : BroadcastReceiver
     {
         static readonly Subject<Intent> bleSubj = new Subject<Intent>();

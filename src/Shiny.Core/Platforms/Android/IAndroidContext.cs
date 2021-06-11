@@ -23,6 +23,7 @@ namespace Shiny
         bool IsInManifest(string androidPermission);
         bool IsMinApiLevel(int apiLevel);
         void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResult);
+        void RegisterBroadcastReceiver<T>(params string[] actions) where T : BroadcastReceiver, new();
 
         IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions);
         IObservable<AccessState> RequestAccess(string androidPermission);
