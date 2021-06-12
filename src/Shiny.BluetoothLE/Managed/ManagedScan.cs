@@ -92,18 +92,18 @@ namespace Shiny.BluetoothLE.Managed
         }
 
 
-        public async Task<bool> Toggle()
+        public bool Toggle()
         {
             if (this.IsScanning)
                 this.Stop();
             else
-                await this.Start();
+                this.Start();
 
             return this.IsScanning;
         }
 
 
-        public async Task Start()
+        public void Start()
         {
             if (this.IsScanning)
                 return;
@@ -116,10 +116,8 @@ namespace Shiny.BluetoothLE.Managed
                 this.actionSubj.OnNext((ManagedScanListAction.Clear, null));
             }
 
-            var tcs = new TaskCompletionSource<object>();
             this.scanSub = this.bleManager
                 .Scan(this.ScanConfig)
-                .DoOnce(x => tcs.TrySetResult(null))
                 .Buffer(this.BufferTimeSpan)
                 .Where(x => x?.Any() ?? false)
                 .ObserveOnIf(this.Scheduler)
@@ -144,11 +142,8 @@ namespace Shiny.BluetoothLE.Managed
                             result.LastSeen = DateTimeOffset.UtcNow;
                             this.actionSubj.OnNext((action, result));
                         }
-                    },
-                    ex => tcs.TrySetException(ex)
+                    }
                 );
-
-            await tcs.Task.ConfigureAwait(false);
         }
 
 
