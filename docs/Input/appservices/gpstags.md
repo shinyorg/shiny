@@ -1,4 +1,5 @@
 ﻿Title: GPS Tags
 ---
 
-Beacons + GPS
+Beacons + GPS - Now you can create your own AirTags with any iBeacon.
+
