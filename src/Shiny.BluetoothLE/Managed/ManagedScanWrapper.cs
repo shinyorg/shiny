@@ -45,7 +45,7 @@ namespace Shiny.BluetoothLE.Managed
 
 
         public ManagedScan ManagedScan { get; }
-        public Task Start() => this.ManagedScan.Start();
+        public void Start() => this.ManagedScan.Start();
         public void Stop() => this.ManagedScan.Stop();
 
         public ObservableCollection<T> Peripherals { get; } = new ObservableCollection<T>();

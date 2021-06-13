@@ -23,8 +23,8 @@ namespace Samples.BluetoothLE
                 .CreateManagedScanner(RxApp.MainThreadScheduler, TimeSpan.FromSeconds(10))
                 .DisposedBy(this.DeactivateWith);
 
-            this.Toggle = ReactiveCommand.CreateFromTask(async () =>
-                this.IsBusy = await this.scanner.Toggle()
+            this.Toggle = ReactiveCommand.Create(() =>
+                this.IsBusy = this.scanner.Toggle()
             );
 
             this.WhenAnyValue(x => x.SelectedPeripheral)
