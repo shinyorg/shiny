@@ -1,7 +1,7 @@
 <Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;monoandroid10.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
         <Description>Shiny Push Integration - Firebase Messaging</Description>
     </PropertyGroup>
 
