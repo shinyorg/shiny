@@ -56,7 +56,7 @@ namespace Samples
             //services.UseJobForegroundService(TimeSpan.FromSeconds(30));
             services.UseHttpTransfers<HttpTransferDelegate>();
             services.UseBeaconRanging();
-            services.UseBeaconMonitoring<BeaconDelegate>();
+            services.UseBeaconMonitoring<BeaconDelegate>(new Shiny.Beacons.BeaconMonitorConfig().UseEstimote());
             services.UseBleClient<BleClientDelegate>();
             services.UseBleHosting();
             services.UseSpeechRecognition();

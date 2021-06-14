@@ -51,7 +51,7 @@ namespace Shiny.Beacons
 
                 return new Beacon(uuid, major, minor, proximity, rssi, accuracy);
             }
-            throw new ArgumentException("TODO");
+            throw new ArgumentException("Invalid beacon packet");
         }
 
 
@@ -91,7 +91,7 @@ namespace Shiny.Beacons
         }
 
 
-        public static bool IsBeaconPacket(this byte[] data, bool skipManufacturerByte = true)
+        public static bool IsBeaconPacket(this byte[] data)
         {
             if (data == null)
                 return false;
@@ -99,8 +99,7 @@ namespace Shiny.Beacons
             if (data.Length != 23)
                 return false;
 
-            // apple manufacturerID - https://www.bluetooth.com/specifications/assigned-numbers/company-Identifiers
-            if (!skipManufacturerByte && data[0] != 76)
+            if (data[0] != 0x02 || data[1] != 0x15)
                 return false;
 
             return true;

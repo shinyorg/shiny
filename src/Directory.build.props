@@ -10,7 +10,7 @@
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
-        <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.0.0</ShinyVersion>
+        <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.2.0</ShinyVersion>
         <PackageVersion>$(ShinyVersion)</PackageVersion>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReleaseNotes>https://shinylib.net/release-notes/</PackageReleaseNotes>

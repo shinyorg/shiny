@@ -22,18 +22,19 @@ namespace Shiny.Beacons
 
 
         public BeaconMonitoringManager(IBleManager bleManager,
+                                       IRepository repository,
+                                       IMessageBus messageBus
 #if __ANDROID__
-                                       IAndroidContext context,
+                                       , IAndroidContext context
 #endif
-                                       IMessageBus messageBus,
-                                       IRepository repository)
+                                       )
         {
             this.bleManager = bleManager;
+            this.messageBus = messageBus;
+            this.repository = repository;
 #if __ANDROID__
             this.context = context;
 #endif
-            this.messageBus = messageBus;
-            this.repository = repository;
         }
 
 
@@ -98,7 +99,6 @@ namespace Shiny.Beacons
 #if MONOANDROID
             if (!ShinyBeaconMonitoringService.IsStarted)
                 this.context.StartService(typeof(ShinyBeaconMonitoringService));
-            // TODO: uwp
 #endif
         }
 
@@ -108,7 +108,6 @@ namespace Shiny.Beacons
 #if MONOANDROID
             if (ShinyBeaconMonitoringService.IsStarted)
                 this.context.StopService(typeof(ShinyBeaconMonitoringService));
-// TODO: uwp
 #endif
         }
     }

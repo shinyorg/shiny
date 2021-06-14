@@ -10,18 +10,21 @@ namespace Shiny.Beacons
     public class BeaconRangingManager : IBeaconRangingManager
     {
         readonly IBleManager centralManager;
-        IObservable<Beacon>? beaconScanner;
+        readonly IObservable<Beacon> scanner;
 
 
         public BeaconRangingManager(IBleManager centralManager)
-            => this.centralManager = centralManager;
+        {
+            this.centralManager = centralManager;
+            this.scanner = this.centralManager
+                .ScanForBeacons(null)
+                .Publish()
+                .RefCount();
+        }
 
 
         public Task<AccessState> RequestAccess() => this.centralManager.RequestAccess().ToTask();
-        public IObservable<Beacon> WhenBeaconRanged(BeaconRegion region) => this.beaconScanner ??= this.centralManager
-            .ScanForBeacons(false)
-            .Where(region.IsBeaconInRegion)
-            .Publish()
-            .RefCount();
+        public IObservable<Beacon> WhenBeaconRanged(BeaconRegion region)
+            => this.scanner.Where(region.IsBeaconInRegion);
     }
 }

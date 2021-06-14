@@ -8,12 +8,19 @@ namespace Shiny.Tests.Beacons
 {
     public class BeaconParserTests
     {
-        [Theory(Skip = "TODO")]
+        [Theory]
         [InlineData(
             "02-15-B9-40-7F-30-F5-F8-46-6E-AF-F9-25-55-6B-57-FE-6D-39-B0-57-CA-BE",
             "B9407F30-F5F8-466E-AFF9-25556B57FE6D",
+            14768,
+            22474,
+            Proximity.Immediate
+        )]
+        [InlineData(
+            "02-15-A7-AE-2E-B7-1F-00-41-68-B9-9B-A7-49-BA-C1-CA-64-00-01-00-40-C5-58",
+            "A7AE2EB7-1F00-4168-B99B-A749BAC1CA64",
             1,
-            1,
+            64,
             Proximity.Immediate
         )]
         public void ParseBeaconPacketSuccess(string hexData, string beaconIdentifier, ushort major, ushort minor, Proximity prox)

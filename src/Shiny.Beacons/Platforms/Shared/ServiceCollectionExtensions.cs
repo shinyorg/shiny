@@ -33,7 +33,7 @@ namespace Shiny
         /// <param name="services"></param>
         /// <param name="delegateType"></param>
         /// <returns></returns>
-        public static bool UseBeaconMonitoring(this IServiceCollection services, Type delegateType)
+        public static bool UseBeaconMonitoring(this IServiceCollection services, Type delegateType, BeaconMonitorConfig config)
         {
 #if NETSTANDARD
             return false;
@@ -42,6 +42,7 @@ namespace Shiny
                 throw new ArgumentException("You can't register monitoring regions without a delegate type");
 
 #if __ANDROID__ || WINDOWS_UWP
+            services.AddSingleton(config);
             services.TryAddSingleton<BackgroundTask>();
             services.UseBleClient();
             services.UseNotifications();
@@ -59,7 +60,7 @@ namespace Shiny
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static bool UseBeaconMonitoring<T>(this IServiceCollection services) where T : class, IBeaconMonitorDelegate
-            => services.UseBeaconMonitoring(typeof(T));
+        public static bool UseBeaconMonitoring<T>(this IServiceCollection services, BeaconMonitorConfig config) where T : class, IBeaconMonitorDelegate
+            => services.UseBeaconMonitoring(typeof(T), config);
     }
 }
