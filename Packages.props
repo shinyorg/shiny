@@ -82,7 +82,7 @@
         <PackageReference Update="Xamarin.Essentials" Version="1.6.1" />
         <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.11" />
         <PackageReference Update="Bogus" Version="33.0.2" />
-        <PackageReference Update="Humanizer" Version="2.8.25" />
+        <PackageReference Update="Humanizer" Version="2.11.10" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.1.97" />
         <PackageReference Update="ReactiveUI.Fody" Version="13.3.2" />
         <PackageReference Update="XF.Material" Version="1.7.8" />
