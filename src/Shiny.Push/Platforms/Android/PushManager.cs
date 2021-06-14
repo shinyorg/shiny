@@ -7,7 +7,6 @@ using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 using Android.Runtime;
 using Android.Gms.Extensions;
-using Firebase.Iid;
 using Firebase.Messaging;
 using Shiny.Notifications;
 using Shiny.Infrastructure;
@@ -99,7 +98,7 @@ namespace Shiny.Push
             this.ClearRegistration();
 
             FirebaseMessaging.Instance.AutoInitEnabled = false;
-            await Task.Run(() => FirebaseInstanceId.Instance.DeleteInstanceId()).ConfigureAwait(false);
+            await Task.Run(() => FirebaseMessaging.Instance.DeleteToken()).ConfigureAwait(false);
         }
 
 
