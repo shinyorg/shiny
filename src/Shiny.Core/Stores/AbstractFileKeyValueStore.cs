@@ -22,7 +22,7 @@ namespace Shiny.Stores
             this.flushReq = new Subject<object>();
 
             this.flushReq
-                .Throttle(TimeSpan.FromSeconds(500))
+                .Throttle(TimeSpan.FromMilliseconds(250))
                 .Subscribe(_ => this.Store(this.path!, this.values!));
         }
 
