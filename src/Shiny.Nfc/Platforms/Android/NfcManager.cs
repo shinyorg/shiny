@@ -8,7 +8,7 @@ using Android.Nfc;
 using Android.Nfc.Tech;
 
 [assembly: UsesPermission(Manifest.Permission.Nfc)]
-[assembly: UsesFeature("android.hardware.nfc")]
+[assembly: UsesFeature("android.hardware.nfc", Required = false)]
 
 
 namespace Shiny.Nfc

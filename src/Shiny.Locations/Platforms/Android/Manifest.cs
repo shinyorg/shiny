@@ -7,5 +7,5 @@ using static Android.Manifest;
 [assembly: UsesPermission(Permission.ActivityRecognition)]
 [assembly: UsesPermission(Permission.ReceiveBootCompleted)]
 
-[assembly: UsesFeature("android.hardware.location.gps")]
-[assembly: UsesFeature("android.hardware.location.network")]
+[assembly: UsesFeature("android.hardware.location.gps", Required = false)]
+[assembly: UsesFeature("android.hardware.location.network", Required = false)]

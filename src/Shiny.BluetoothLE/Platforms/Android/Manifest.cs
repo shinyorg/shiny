@@ -9,5 +9,5 @@ using static Android.Manifest;
 [assembly: UsesPermission(Permission.BluetoothPrivileged)]
 [assembly: UsesPermission(Permission.ReceiveBootCompleted)]
 
-[assembly: UsesFeature("android.hardware.bluetooth")]
-[assembly: UsesFeature("android.hardware.bluetooth_le")]
+[assembly: UsesFeature("android.hardware.bluetooth", Required = false)]
+[assembly: UsesFeature("android.hardware.bluetooth_le", Required = false)]
