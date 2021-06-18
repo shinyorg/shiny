@@ -2,7 +2,7 @@
 using Xamarin.Forms;
 
 
-namespace Samples
+namespace Samples.BluetoothLE
 {
     public partial class TestPage : ContentPage
     {

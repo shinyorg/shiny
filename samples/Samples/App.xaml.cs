@@ -37,8 +37,6 @@ namespace Samples
 #if DEBUG
             Xamarin.Forms.Internals.Log.Listeners.Add(new TraceLogListener());
 #endif
-            containerRegistry.RegisterForNavigation<TestPage>("Test");
-
             containerRegistry.RegisterForNavigation<NavigationPage>("Nav");
             containerRegistry.RegisterForNavigation<MainPage>("Main");
             containerRegistry.RegisterForNavigation<WelcomePage>("Welcome");
@@ -60,6 +58,7 @@ namespace Samples
             containerRegistry.RegisterForNavigation<BluetoothLE.PeripheralPage>("Peripheral");
             containerRegistry.RegisterForNavigation<BleHosting.GattServerPage>("BleHosting");
             containerRegistry.RegisterForNavigation<BluetoothLE.ManagedScanPage>("BleManagedScan");
+            containerRegistry.RegisterForNavigation<BluetoothLE.TestPage>("Test");
 
             containerRegistry.RegisterForNavigation<HttpTransfers.MainPage>("HttpTransfers");
             containerRegistry.RegisterForNavigation<HttpTransfers.CreatePage>("CreateTransfer");

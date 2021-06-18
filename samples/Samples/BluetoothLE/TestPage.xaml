@@ -1,20 +1,22 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:samples="clr-namespace:Samples"
+             xmlns:samples="clr-namespace:Samples.BluetoothLE"
              x:DataType="samples:TestViewModel"
-             x:Class="Samples.TestPage"
+             x:Class="Samples.BluetoothLE.TestPage"
              Title="Test">
 
     <ContentPage.Content>
         <StackLayout>
-            <Button Text="Start OBD Test"
-                    Command="{Binding Start}"
-                    CommandParameter="obd" />
+            <Label Text="This page is for custom testing by the OSS maintainer" />
 
             <Button Text="Start Pairing Test"
                     Command="{Binding Start}"
                     CommandParameter="pairing" />
+
+            <Button Text="Managed Peripheral"
+                    Command="{Binding Start}"
+                    CommandParameter="managedperipheral" />
 
             <Button Text="Stop"
                     Command="{Binding Stop}" />
