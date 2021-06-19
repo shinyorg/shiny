@@ -30,7 +30,9 @@ namespace Shiny.Push.AzureNotificationHubs
                            ILogger<IPushManager> logger,
                            ShinyCoreServices services) : base(services, logger)
 #else
-        public PushManager(AzureNotificationConfig config, ShinyCoreServices services) : base(services)
+        public PushManager(AzureNotificationConfig config,
+                           ShinyCoreServices services,
+                           ILogger<IPushManager> logger) : base(services)
 #endif
         {
             this.logger = logger;
