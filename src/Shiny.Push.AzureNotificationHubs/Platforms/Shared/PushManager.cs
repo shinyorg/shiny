@@ -27,8 +27,8 @@ namespace Shiny.Push.AzureNotificationHubs
                            : base(services, notifications, logger)
 #elif WINDOWS_UWP
         public PushManager(AzureNotificationConfig config,
-                           ILogger<IPushManager> logger,
-                           ShinyCoreServices services) : base(services, logger)
+                           ShinyCoreServices services,
+                           ILogger<IPushManager> logger) : base(services, logger)
 #else
         public PushManager(AzureNotificationConfig config,
                            ShinyCoreServices services,
