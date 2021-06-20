@@ -23,7 +23,7 @@
         <DefineConstants Condition=" $(TargetFramework.StartsWith('tizen')) ">$(DefineConstants);__TIZEN__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.12</ExtrasUwpMetaPackageVersion>
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
-        <AndroidTargetFramework>monoandroid11.0</AndroidTargetFramework>
+        <AndroidTargetFramework>monoandroid10.0</AndroidTargetFramework>
         <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
     </PropertyGroup>
