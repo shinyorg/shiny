@@ -25,7 +25,7 @@
         <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="4.6.2" />
         <PackageReference Update="Xamarin.Firebase.iOS.Analytics" Version="6.9.0" />
 
-        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.0.0" />
+        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.0.1" />
         <PackageReference Update="Xamarin.Firebase.Analytics" Version="119.0.0" />
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="122.0.0" />
 
