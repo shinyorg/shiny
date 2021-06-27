@@ -208,9 +208,9 @@ namespace Shiny.Generators
                 using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
                 {
                     builder.AppendLine("base.OnNewIntent(intent);");
-                    builder.AppendLine();
                     builder.AppendLine("this.ShinyOnNewIntent(intent);");
-                    builder.AppendLine();
+                    if (this.context.HasXamarinEssentials())
+                        builder.AppendLine("global::Xamarin.Essentials.Platform.OnNewIntent(intent);");
                 }
             }
         }
