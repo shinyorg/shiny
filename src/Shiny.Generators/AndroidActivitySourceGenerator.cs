@@ -116,7 +116,7 @@ namespace Shiny.Generators
                             builder.AppendLineInvariant("ToolbarResource = Resource.Layout.Toolbar;");
                             builder.AppendLineInvariant("base.OnCreate(savedInstanceState);");
                             builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init(this, savedInstanceState);");
-                            builder.AppendLineInvariant($"this.LoadApplication(new {this.values.XamarinFormsAppTypeName}());");
+                            builder.AppendLineInvariant($"this.LoadApplication(new global::{this.values.XamarinFormsAppTypeName}());");
                         }
                         else
                         {

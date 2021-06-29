@@ -178,7 +178,7 @@ return result;"
                 using (builder.BlockInvariant("public override bool FinishedLaunching(UIApplication app, NSDictionary options)"))
                 {
                     builder.AppendLineInvariant("this.OnPreFinishedLaunching(app, options);");
-                    builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new {this.ShinyConfig.ShinyStartupTypeName}());");
+                    builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new global::{this.ShinyConfig.ShinyStartupTypeName}());");
 
                     this.TryAppendThirdParty(appDelegate, builder);
                     builder.AppendLineInvariant("this.OnPostFinishedLaunching(app, options);");
@@ -213,7 +213,7 @@ return result;"
             {
                 // do XF stuff
                 builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
-                builder.AppendLineInvariant($"this.LoadApplication(new {this.ShinyConfig.XamarinFormsAppTypeName}());");
+                builder.AppendLineInvariant($"this.LoadApplication(new global::{this.ShinyConfig.XamarinFormsAppTypeName}());");
             }
         }
     }

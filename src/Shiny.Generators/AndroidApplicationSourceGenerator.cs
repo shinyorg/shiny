@@ -47,7 +47,7 @@ namespace Shiny.Generators
         {
             using (builder.BlockInvariant("public override void OnCreate()"))
             {
-                builder.AppendLineInvariant($"this.ShinyOnCreate(new {this.ShinyConfig.ShinyStartupTypeName}());");
+                builder.AppendLineInvariant($"this.ShinyOnCreate(new global::{this.ShinyConfig.ShinyStartupTypeName}());");
 
                 if (this.Context.HasXamarinEssentials())
                     builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");
