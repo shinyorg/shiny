@@ -12,11 +12,15 @@ namespace Shiny.Locations
 {
     public class GpsGeofenceManagerImpl : AbstractGeofenceManager, IShinyStartupTask
     {
-        static readonly GpsRequest Request = new GpsRequest { UseBackground = true };
-        readonly IGpsManager? gpsManager;
+        readonly IGpsManager gpsManager;
+        static readonly GpsRequest defaultRequest = new GpsRequest
+        {
+            Interval = TimeSpan.FromMinutes(1),
+            UseBackground = true
+        };
 
 
-        public GpsGeofenceManagerImpl(IRepository repository, IGpsManager? gpsManager = null) : base(repository)
+        public GpsGeofenceManagerImpl(IRepository repository, IGpsManager gpsManager) : base(repository)
             => this.gpsManager = gpsManager;
 
 
@@ -28,21 +32,13 @@ namespace Shiny.Locations
         }
 
 
-        public override AccessState Status => this.gpsManager?.GetCurrentStatus(Request) ?? AccessState.NotSupported;
-        public override async Task<AccessState> RequestAccess()
-        {
-            if (this.gpsManager == null)
-                return AccessState.NotSupported;
-
-            return await this.gpsManager.RequestAccess(new GpsRequest { UseBackground = true });
-        }
+        public override Task<AccessState> RequestAccess()
+            => this.gpsManager.RequestAccess(defaultRequest);
 
 
         public override async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
         {
-            this.Assert();
-
-            var reading = await this.gpsManager
+            var reading = await this.gpsManager!
                 .GetLastReading()
                 .Timeout(TimeSpan.FromSeconds(10))
                 .ToTask();
@@ -60,7 +56,6 @@ namespace Shiny.Locations
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
-            this.Assert();
             await this.Repository.Set(region.Identifier, region);
             this.TryStartGps();
         }
@@ -68,7 +63,6 @@ namespace Shiny.Locations
 
         public override async Task StopAllMonitoring()
         {
-            this.Assert();
             await this.Repository.Clear();
             await this.gpsManager.StopListener();
         }
@@ -76,41 +70,18 @@ namespace Shiny.Locations
 
         public override async Task StopMonitoring(string identifier)
         {
-            this.Assert();
             await this.Repository.Remove(identifier);
             var geofences = await this.Repository.GetAll();
 
             if (geofences.Count == 0)
-                await this.gpsManager.StopListener();
-        }
-
-
-        public override IObservable<AccessState> WhenAccessStatusChanged()
-        {
-            this.Assert();
-            return this.gpsManager.WhenAccessStatusChanged(Request);
+                await this.gpsManager!.StopListener();
         }
 
 
         protected async void TryStartGps()
         {
             if (this.gpsManager.CurrentListener == null)
-            {
-                await this.gpsManager.StartListener(new GpsRequest
-                {
-                    Interval = TimeSpan.FromMinutes(1),
-                    UseBackground = true
-                });
-            }
-        }
-
-
-        protected void Assert()
-        {
-            if (this.gpsManager == null)
-                throw new ArgumentException("GPS Manager is not available");
-
-            this.gpsManager.GetCurrentStatus(Request).Assert();
+                await this.gpsManager.StartListener(defaultRequest);
         }
     }
 }
