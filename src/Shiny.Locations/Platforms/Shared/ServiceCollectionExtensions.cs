@@ -1,6 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Locations;
+#if __ANDROID__
+using Android.App;
+using Android.Gms.Common;
+#endif
 
 
 namespace Shiny
@@ -28,15 +33,30 @@ namespace Shiny
         ///
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="requestPermissionOnStart"></param>
+        /// <param name="delegateType"></param>
         /// <returns></returns>
-        public static bool UseGeofencing(this IServiceCollection services, Type geofenceDelegateType)
+        public static bool UseGeofencing(this IServiceCollection services, Type delegateType)
         {
-#if NETSTANDARD
-            return false;
-#else
-            services.RegisterModule(new GeofenceModule(geofenceDelegateType));
+#if __ANDROID__
+            var resultCode = GoogleApiAvailability
+                .Instance
+                .IsGooglePlayServicesAvailable(Application.Context);
+
+            if (resultCode == ConnectionResult.ServiceMissing)
+                return services.UseGpsDirectGeofencing(delegateType);
+
+            services.TryAddSingleton(typeof(IGeofenceDelegate), delegateType);
+            services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             return true;
+#elif WINDOWS_UWP
+            services.TryAddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
+            services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            return true;
+#elif __IOS__
+            services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
+            return true;
+#else
+            return false;
 #endif
         }
 
@@ -46,17 +66,9 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
         public static bool UseGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
-        {
-#if NETSTANDARD
-            return false;
-#else
-            services.RegisterModule(new GeofenceModule(typeof(T)));
-            return true;
-#endif
-        }
+            => services.UseGeofencing(typeof(T));
 
 
         /// <summary>
@@ -65,7 +77,6 @@ namespace Shiny
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
         public static bool UseGpsDirectGeofencing<T>(this IServiceCollection services) where T : class, IGeofenceDelegate
             => services.UseGpsDirectGeofencing(typeof(T));
@@ -77,14 +88,19 @@ namespace Shiny
         /// </summary>
         /// <param name="services"></param>
         /// <param name="delegateType"></param>
-        /// <param name="requestPermissionOnStart"></param>
         /// <returns></returns>
         public static bool UseGpsDirectGeofencing(this IServiceCollection services, Type delegateType)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.RegisterModule(new GeofenceGpsDirectModule(delegateType));
+            if (!services.UseGps<GpsGeofenceDelegate>())
+                return false;
+
+            if (delegateType != null)
+                services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
+
+            services.TryAddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
             return true;
 #endif
         }
