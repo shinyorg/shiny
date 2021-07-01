@@ -32,11 +32,6 @@ namespace Samples.Gps
             this.NotificationTitle = manager.Title;
             this.NotificationMessage = manager.Message;
 
-            this.WhenAnyValue(x => x.UseBackground)
-                .Subscribe(x => this.Access = this.manager.GetCurrentStatus(
-                    new GpsRequest { UseBackground = this.UseBackground }).ToString()
-                );
-
             this.WhenAnyValue(x => x.IsUpdating)
                 .Select(x => x ? "Stop Listening" : "Start Updating")
                 .ToPropertyEx(this, x => x.ListenerText);
