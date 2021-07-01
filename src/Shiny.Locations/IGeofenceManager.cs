@@ -15,17 +15,6 @@ namespace Shiny.Locations
         Task<AccessState> RequestAccess();
 
         /// <summary>
-        /// Observes changes in the access state
-        /// </summary>
-        /// <returns></returns>
-        IObservable<AccessState> WhenAccessStatusChanged();
-
-        /// <summary>
-        /// Geofencing Status
-        /// </summary>
-        AccessState Status { get; }
-
-        /// <summary>
         /// Current set of geofences being monitored
         /// </summary>
         Task<IEnumerable<GeofenceRegion>> GetMonitorRegions();

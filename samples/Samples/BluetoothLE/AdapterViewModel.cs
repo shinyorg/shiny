@@ -45,16 +45,16 @@ namespace Samples.BluetoothLE
                     }
                     else
                     {
-                        if (bleManager.Status == AccessState.Available)
-                        {
-                            await bleManager.TrySetAdapterState(false);
-                            await dialogs.Snackbar("Bluetooth Adapter Disabled");
-                        }
-                        else
-                        {
-                            await bleManager.TrySetAdapterState(true);
-                            await dialogs.Snackbar("Bluetooth Adapter Enabled");
-                        }
+                        //if (bleManager.Status == AccessState.Available)
+                        //{
+                        //    await bleManager.TrySetAdapterState(false);
+                        //    await dialogs.Snackbar("Bluetooth Adapter Disabled");
+                        //}
+                        //else
+                        //{
+                        //    await bleManager.TrySetAdapterState(true);
+                        //    await dialogs.Snackbar("Bluetooth Adapter Enabled");
+                        //}
                     }
                 }
             );

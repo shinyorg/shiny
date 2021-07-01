@@ -12,18 +12,6 @@ namespace Shiny.Locations
         GpsRequest? CurrentListener { get; }
 
         /// <summary>
-        /// The current status of the GPS manager
-        /// </summary>
-        AccessState GetCurrentStatus(GpsRequest request);
-
-        /// <summary>
-        /// Observes changes in the access state
-        /// </summary>
-        /// <param name="forBackground"></param>
-        /// <returns></returns>
-        IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request);
-
-        /// <summary>
         /// Request access to use GPS hardware
         /// </summary>
         /// <param name="request"></param>

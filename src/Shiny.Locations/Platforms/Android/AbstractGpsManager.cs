@@ -43,12 +43,6 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request)
-            => Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ => this.GetCurrentStatus(request));
-
-        public AccessState GetCurrentStatus(GpsRequest request)
-            => this.Context.GetCurrentLocationAccess(request.UseBackground, true, true, false);
-
         public Task<AccessState> RequestAccess(GpsRequest request)
             => this.Context.RequestLocationAccess(request.UseBackground, true, true, false);
 

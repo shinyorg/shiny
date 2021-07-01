@@ -10,7 +10,7 @@ namespace Shiny.Locations
 {
     public static class PlatformExtensions
     {
-        public static AccessState GetLocationManagerStatus(this IAndroidContext context, bool gpsRequired, bool networkRequired)
+        static AccessState GetLocationManagerStatus(IAndroidContext context, bool gpsRequired, bool networkRequired)
         {
             var lm = context.GetSystemService<LocationManager>(Context.LocationService);
 
@@ -27,28 +27,28 @@ namespace Shiny.Locations
         }
 
 
-        public static AccessState GetCurrentLocationAccess(this IAndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
-        {
-            var status = context.GetLocationManagerStatus(gpsRequired, networkRequired);
-            if (status != AccessState.Available)
-                return status;
+        //static AccessState GetCurrentLocationAccess(this IAndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
+        //{
+        //    var status = context.GetLocationManagerStatus(gpsRequired, networkRequired);
+        //    if (status != AccessState.Available)
+        //        return status;
 
-            if (context.IsMinApiLevel(29) && background)
-            {
-                status = context.GetCurrentAccessState(P.AccessBackgroundLocation);
-                if (status != AccessState.Available)
-                    return status;
-            }
-            var next = fineAccess ? P.AccessFineLocation : P.AccessCoarseLocation;
-            status = context.GetCurrentAccessState(next);
+        //    if (context.IsMinApiLevel(29) && background)
+        //    {
+        //        status = context.GetCurrentAccessState(P.AccessBackgroundLocation);
+        //        if (status != AccessState.Available)
+        //            return status;
+        //    }
+        //    var next = fineAccess ? P.AccessFineLocation : P.AccessCoarseLocation;
+        //    status = context.GetCurrentAccessState(next);
 
-            return status;
-        }
+        //    return status;
+        //}
 
 
         public static async Task<AccessState> RequestLocationAccess(this IAndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
         {
-            var status = context.GetLocationManagerStatus(gpsRequired, networkRequired);
+            var status = GetLocationManagerStatus(context, gpsRequired, networkRequired);
             if (status != AccessState.Available)
                 return status;
 

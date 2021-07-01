@@ -14,12 +14,8 @@ namespace Shiny.Locations
     //https://docs.microsoft.com/en-us/windows/uwp/maps-and-location/set-up-a-geofence
     public class GeofenceManagerImpl : AbstractGeofenceManager
     {
-        public GeofenceManagerImpl(IRepository repository) : base(repository)
-        {
-        }
+        public GeofenceManagerImpl(IRepository repository) : base(repository) {}
 
-
-        public override IObservable<AccessState> WhenAccessStatusChanged() => Observable.Return(AccessState.Available);
 
         public override async Task<AccessState> RequestAccess()
         {
@@ -30,34 +26,11 @@ namespace Shiny.Locations
                     return AccessState.Denied;
 
                 case GeolocationAccessStatus.Allowed:
-                    //return AccessState.Available;
-                    return this.Status;
+                    return GeofenceMonitor.Current.Status.FromNative();
 
                 case GeolocationAccessStatus.Unspecified:
                 default:
                     return AccessState.Unknown;
-            }
-        }
-
-
-        public override AccessState Status
-        {
-            get
-            {
-                switch (GeofenceMonitor.Current.Status)
-                {
-                    case GeofenceMonitorStatus.Ready:
-                        return AccessState.Available;
-
-                    case GeofenceMonitorStatus.Disabled:
-                        return AccessState.Disabled;
-
-                    case GeofenceMonitorStatus.NotAvailable:
-                        return AccessState.NotSupported;
-
-                    default:
-                        return AccessState.Unknown;
-                }
             }
         }
 

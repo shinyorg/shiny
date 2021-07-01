@@ -42,10 +42,6 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public override AccessState Status
-            => this.context.Manager.State.FromNative();
-
-
         public override IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid)
         {
             var uuid = new NSUuid(peripheralUuid);
@@ -75,12 +71,6 @@ namespace Shiny.BluetoothLE
                 .ToList()
             );
         }
-
-
-        public override IObservable<AccessState> WhenStatusChanged() => this.context
-            .StateUpdated
-            .Select(_ => this.Status)
-            .StartWith(this.Status);
 
 
         public override IObservable<ScanResult> Scan(ScanConfig? config = null)

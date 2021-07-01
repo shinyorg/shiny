@@ -242,7 +242,7 @@ namespace Shiny
             var comp = new CompositeDisposable();
 
             //https://developer.android.com/training/permissions/requesting
-            var allGood = androidPermissions.Any(p => ContextCompat.CheckSelfPermission(this.AppContext, p) == Permission.Granted);
+            var allGood = androidPermissions.All(p => ContextCompat.CheckSelfPermission(this.AppContext, p) == Permission.Granted);
             if (allGood)
             {
                 // everything is already good

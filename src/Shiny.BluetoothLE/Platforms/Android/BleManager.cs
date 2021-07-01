@@ -63,14 +63,8 @@ namespace Shiny.BluetoothLE
             if (result != AccessState.Available)
                 return result;
 
-            return this.Status;
+            return this.context.Status;
         });
-
-
-        public override AccessState Status => this.context.Status;
-        public override IObservable<AccessState> WhenStatusChanged() => this.context
-            .StatusChanged()
-            .StartWith(this.Status);
 
 
         public override IObservable<ScanResult> Scan(ScanConfig? config = null)

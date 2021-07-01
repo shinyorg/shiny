@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Windows.Devices.Bluetooth;
@@ -46,7 +45,7 @@ namespace Shiny.BluetoothLE
         public override bool IsScanning { get; protected set; }
 
 
-        public override AccessState Status
+        AccessState Status
         {
             get
             {
@@ -134,32 +133,32 @@ namespace Shiny.BluetoothLE
         public override void StopScan() => this.scanSubject.OnNext(false);
 
 
-        public override IObservable<AccessState> WhenStatusChanged() => Observable.Create<AccessState>(ob =>
-        {
-            Radio? r = null;
-            var handler = new TypedEventHandler<Radio, object>((sender, args) =>
-                ob.OnNext(this.Status)
-            );
-            var sub = this
-                .GetRadio()
-                .Subscribe(
-                    rdo =>
-                    {
-                        r = rdo;
-                        ob.OnNext(this.Status);
-                        r.StateChanged += handler;
-                    },
-                    ob.OnError
-                );
+        //public override IObservable<AccessState> WhenStatusChanged() => Observable.Create<AccessState>(ob =>
+        //{
+        //    Radio? r = null;
+        //    var handler = new TypedEventHandler<Radio, object>((sender, args) =>
+        //        ob.OnNext(this.Status)
+        //    );
+        //    var sub = this
+        //        .GetRadio()
+        //        .Subscribe(
+        //            rdo =>
+        //            {
+        //                r = rdo;
+        //                ob.OnNext(this.Status);
+        //                r.StateChanged += handler;
+        //            },
+        //            ob.OnError
+        //        );
 
-            return () =>
-            {
-                sub.Dispose();
-                if (r != null)
-                    r.StateChanged -= handler;
-            };
-        })
-        .StartWith(this.Status);
+        //    return () =>
+        //    {
+        //        sub.Dispose();
+        //        if (r != null)
+        //            r.StateChanged -= handler;
+        //    };
+        //})
+        //.StartWith(this.Status);
 
 
         public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => this.GetDevices(

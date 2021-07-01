@@ -10,30 +10,18 @@ namespace Shiny.Locations
     public static class LocationExtensions
     {
         public static IObservable<AccessState> WhenAccessStatusChanged(this CLLocationManager locationManager, bool background)
-                    => ((ShinyLocationDelegate)locationManager.Delegate).WhenAccessStatusChanged(background);
+            => ((ShinyLocationDelegate)locationManager.Delegate).WhenAccessStatusChanged(background);
 
 
-        public static AccessState FromNative(this CLAuthorizationStatus status, bool background)
+        public static AccessState FromNative(this CLAuthorizationStatus status, bool background) => status switch
         {
-            switch (status)
-            {
-                case CLAuthorizationStatus.Restricted:
-                    return AccessState.Restricted;
-
-                case CLAuthorizationStatus.Denied:
-                    return AccessState.Denied;
-
-                case CLAuthorizationStatus.AuthorizedWhenInUse:
-                    return background ? AccessState.Restricted : AccessState.Available;
-
-                case CLAuthorizationStatus.AuthorizedAlways:
-                    return AccessState.Available;
-
-                case CLAuthorizationStatus.NotDetermined:
-                default:
-                    return AccessState.Unknown;
-            }
-        }
+            CLAuthorizationStatus.Denied => AccessState.Denied,
+            CLAuthorizationStatus.Restricted => AccessState.Restricted,
+            CLAuthorizationStatus.AuthorizedWhenInUse => background ? AccessState.Restricted : AccessState.Available,
+            CLAuthorizationStatus.AuthorizedAlways => AccessState.Available,
+            //CLAuthorizationStatus.NotDetermined
+            _ => AccessState.Unknown
+        };
 
 
         public static AccessState GetCurrentStatus(this CLLocationManager locationManager, bool background)
@@ -67,16 +55,15 @@ namespace Shiny.Locations
                 .StartWith()
                 .Take(1)
                 .ToTask();
-#if __IOS__
+//#if __IOS__
             if (background)
                 locationManager.RequestAlwaysAuthorization();
             else
                 locationManager.RequestWhenInUseAuthorization();
-#elif !__TVOS__
-            locationManager.RequestAlwaysAuthorization();
-#endif
-
-            status = await task;
+//#elif !__TVOS__
+//            locationManager.RequestAlwaysAuthorization();
+//#endif
+            status = await task.ConfigureAwait(false);
             return status;
         }
     }

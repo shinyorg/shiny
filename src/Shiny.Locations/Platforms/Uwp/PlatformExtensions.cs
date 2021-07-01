@@ -1,22 +1,26 @@
 ﻿using System;
+using Windows.Devices.Geolocation.Geofencing;
+using Native = Windows.Devices.Geolocation.Geofencing.GeofenceState;
+
 
 namespace Shiny.Locations
 {
-    static class PlatformExtensions
+    public static class PlatformExtensions
     {
-        internal static GeofenceState FromNative(this Windows.Devices.Geolocation.Geofencing.GeofenceState state)
+        public static GeofenceState FromNative(this Native state) => state switch
         {
-            switch (state)
-            {
-                case Windows.Devices.Geolocation.Geofencing.GeofenceState.Entered:
-                    return GeofenceState.Entered;
+            Native.Entered => GeofenceState.Entered,
+            Native.Exited => GeofenceState.Exited,
+            _ => GeofenceState.Unknown
+        };
 
-                case Windows.Devices.Geolocation.Geofencing.GeofenceState.Exited:
-                    return GeofenceState.Exited;
 
-                default:
-                    return GeofenceState.Unknown;
-            }
-        }
+        public static AccessState FromNative(this GeofenceMonitorStatus state) => GeofenceMonitor.Current.Status switch
+        {
+            GeofenceMonitorStatus.Ready => AccessState.Available,
+            GeofenceMonitorStatus.Disabled => AccessState.Disabled,
+            GeofenceMonitorStatus.NotAvailable => AccessState.NotSupported,
+            _ => AccessState.Unknown
+        };
     }
 }

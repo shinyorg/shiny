@@ -17,9 +17,7 @@ namespace Shiny.Locations.Infrastructure
 
         public RepositoryWrapper<GeofenceRegion, GeofenceRegionStore> Repository { get; }
 
-        public abstract AccessState Status { get; }
         public abstract Task<AccessState> RequestAccess();
-        public abstract IObservable<AccessState> WhenAccessStatusChanged();
         public abstract Task StartMonitoring(GeofenceRegion region);
         public abstract Task StopMonitoring(string identifier);
         public abstract Task StopAllMonitoring();

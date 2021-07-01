@@ -19,11 +19,6 @@ namespace Shiny.BluetoothLE
         IObservable<IPeripheral?> GetKnownPeripheral(string peripheralUuid);
 
         /// <summary>
-        /// Returns current status of adapter (on/off/permission)
-        /// </summary>
-        AccessState Status { get; }
-
-        /// <summary>
         /// Get current scanning status
         /// </summary>
         bool IsScanning { get; }
@@ -46,11 +41,5 @@ namespace Shiny.BluetoothLE
         /// </summary>
         /// <returns></returns>
         IObservable<ScanResult> Scan(ScanConfig? config = null);
-
-        /// <summary>
-        /// Monitor for status changes with adapter (on/off/permissions)
-        /// </summary>
-        /// <returns></returns>
-        IObservable<AccessState> WhenStatusChanged();
     }
 }

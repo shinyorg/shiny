@@ -26,9 +26,8 @@ namespace Shiny.Locations
         }
 
 
-        public override IObservable<AccessState> WhenAccessStatusChanged() => this.locationManager.WhenAccessStatusChanged(true);
-        public override Task<AccessState> RequestAccess() => this.locationManager.RequestAccess(true);
-        public override AccessState Status => this.locationManager.GetCurrentStatus<CLCircularRegion>(true);
+        public override Task<AccessState> RequestAccess()
+            => this.locationManager.RequestAccess(true);
 
 
         public override async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
