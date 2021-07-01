@@ -41,7 +41,7 @@ namespace Samples.Geofences
             //geofenceManager
             //    .WhenAccessStatusChanged()
             //    .ToPropertyEx(this, x => x.AccessStatus);
-            this.AccessStatus = geofenceManager.Status;
+            //this.AccessStatus = geofenceManager.Status;
 
             this.SetCurrentLocation = ReactiveCommand.CreateFromTask(async ct =>
             {
@@ -52,7 +52,10 @@ namespace Samples.Geofences
             this.BindBusyCommand(this.SetCurrentLocation);
 
             this.RequestAccess = ReactiveCommand.CreateFromTask(
-                async () => this.AccessStatus = await geofenceManager.RequestAccess()
+                async () =>
+                {
+                    this.AccessStatus = await geofenceManager.RequestAccess();
+                }
             );
 
             this.AddCnTower = ReactiveCommand.CreateFromTask(
