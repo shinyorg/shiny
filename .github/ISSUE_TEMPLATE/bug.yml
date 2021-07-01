@@ -1,0 +1,73 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: [s/unverified, t/bug]
+body:
+- type: dropdown
+  id: component
+  attributes:
+    label: Component
+    description: The component you are filing against
+    options:
+      - Core (Jobs, Settings, Initialization)
+      - Locations (GPS, Geofencing, Motion Activity)
+      - HTTP Transfers
+      - Notifications
+      - NFC
+      - Push - Native
+      - Push - Azure Notification Hub
+      - Push - Firebase
+      - Sensors
+      - BluetoothLE Client
+      - BluetoothLE Hosting
+      - Beacons
+      - SQLite Integration
+  validations:
+    required: true
+- type: checkboxes
+  id: platforms
+  attributes:
+    label: What platform(s) are effected?
+    description: You may select more than one.  Only platforms and versions listed here are supported!
+    options:
+    - label: iOS 12
+    - label: iOS 13
+    - label: iOS 14
+    - label: Android 8
+    - label: Android 9
+    - label: Android 10
+    - label: Android 11
+    - label: UWP
+- type: textarea
+  attributes:
+    label: Steps To Reproduce
+    description: Steps to reproduce the behavior.
+    validations:
+      required: true
+    placeholder: |
+      1. 
+      2. 
+      3. 
+- type: textarea
+  attributes:
+    label: Expected Behavior
+    validations:
+      required: true
+- type: textarea
+  attributes:
+    label: Actual Behavior
+    validations:
+      required: true
+- type: textarea
+  id: exception
+  attributes:
+    label: Exception or Log output
+    description: Please copy and paste any relevant log output
+- type: checkboxes
+  id: terms
+  attributes:
+    label: Code of Conduct
+    description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
+    options:
+      - label: I agree to follow this project's Code of Conduct
+        required: true

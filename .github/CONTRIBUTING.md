@@ -7,13 +7,11 @@ Thanks you for your interest in contributing to Shiny - Please see our our [Code
 
 If you're looking for something to fix, please browse [open issues](https://github.com/shinyorg/shiny/issues).
 
-Follow the style used by the [.NET Foundation](https://github.com/dotnet/corefx/blob/master/Documentation/coding-guidelines/coding-style.md), with a few exceptions:
+Please follow the style used within the project
 
 - Don't use the `private` keyword as it is the default accessibility level in C#
 - Apply readonly on class level private variables that are assigned in the constructor
 - 4 SPACES - tabs do not exist :)
-
-Read and follow our [Pull Request template](PULL_REQUEST_TEMPLATE.md) if you are submitting fixes.
 
 ### Feature Requests
 
