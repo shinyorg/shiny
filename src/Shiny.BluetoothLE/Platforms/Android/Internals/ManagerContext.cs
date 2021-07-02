@@ -54,6 +54,8 @@ namespace Shiny.BluetoothLE.Internals
             this.services.Android.RegisterBroadcastReceiver<ShinyBleAdapterStateBroadcastReceiver>(
                 BluetoothAdapter.ActionStateChanged
             );
+
+            // TODO: convert this to an async func
             ShinyBleAdapterStateBroadcastReceiver
                 .WhenStateChanged()
                 .Where(x =>

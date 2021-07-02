@@ -15,7 +15,6 @@
             <TableView Intent="Menu">
                 <TableRoot>
                     <TableSection>
-                        <TextCell Text="Test" Command="{Binding Navigate}" CommandParameter="Nav/Test" />
                         <TextCell Text="Welcome" Command="{Binding Navigate}" CommandParameter="Nav/Welcome" />
                         <TextCell Text="Access" Command="{Binding Navigate}" CommandParameter="Nav/Access" />
                         <TextCell Text="Logs" Command="{Binding Navigate}" CommandParameter="Nav/Logs" />
@@ -53,6 +52,9 @@
                         <TextCell Text="Platform" Command="{Binding Navigate}" CommandParameter="Nav/Platform" />
                         <TextCell Text="Jobs" Command="{Binding Navigate}" CommandParameter="Nav/Jobs" />
                         <TextCell Text="Settings/Secure Storage" Command="{Binding Navigate}" CommandParameter="Nav/Stores" />
+                    </TableSection>
+                    <TableSection>
+                        <TextCell Text="Dev Testing" Command="{Binding Navigate}" CommandParameter="Nav/DevTest" />
                     </TableSection>
                 </TableRoot>
             </TableView>

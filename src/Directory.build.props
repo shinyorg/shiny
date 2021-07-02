@@ -17,8 +17,8 @@
         <PackageTags>xamarin uwp ios android tizen tvos watchos ble bluetooth bluetoothle push notifications sensors geofences gps location backgroundjobs settings environment speech sensors</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <DebugType Condition=" $(Configuration) == 'Release' ">embedded</DebugType>
-        <DebugType Condition=" $(Configuration) == 'Debug' ">full</DebugType>
+        <!--<DebugType Condition=" $(Configuration) == 'Release' ">embedded</DebugType>
+        <DebugType Condition=" $(Configuration) == 'Debug' ">full</DebugType>-->
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('tizen')) ">$(DefineConstants);__TIZEN__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.12</ExtrasUwpMetaPackageVersion>

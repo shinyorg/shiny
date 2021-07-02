@@ -10,13 +10,15 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Infrastructure;
 using Shiny.BluetoothLE;
+using Shiny.Locations;
 
 
-namespace Samples.BluetoothLE
+namespace Samples.Dev
 {
     public class TestViewModel : ViewModel
     {
         readonly IBleManager bleManager;
+        readonly IGeofenceManager geofenceManager;
         readonly IDialogs dialogs;
 
         IPeripheral peripheral;
@@ -24,9 +26,12 @@ namespace Samples.BluetoothLE
         CompositeDisposable? disp;
 
 
-        public TestViewModel(IBleManager bleManager, IDialogs dialogs)
+        public TestViewModel(IBleManager bleManager,
+                             IGeofenceManager geofenceManager,
+                             IDialogs dialogs)
         {
             this.bleManager = bleManager;
+            this.geofenceManager = geofenceManager;
             this.dialogs = dialogs;
 
             this.Start = ReactiveCommand.CreateFromTask<string>(
@@ -38,12 +43,24 @@ namespace Samples.BluetoothLE
 
                     switch (arg)
                     {
-                        case "managedperipheral":
+                        case "managedbleperipheral":
                             await this.DoManagedPeripheral();
                             break;
 
-                        case "pairing":
+                        case "managedblescan":
+                            await this.DoManagedScan();
+                            break;
+
+                        case "locationpermission":
+                            await this.DoLocationPermissionTest();
+                            break;
+
+                        case "blepairing":
                             await this.PairingTest();
+                            break;
+
+                        default:
+                            await dialogs.Snackbar("Invalid Test - " + arg);
                             break;
                     }
                 }
@@ -69,6 +86,35 @@ namespace Samples.BluetoothLE
         [Reactive] public string Logs { get; private set; }
 
         void Append(string txt) => this.Logs = $"{txt}{Environment.NewLine}{this.Logs}";
+
+
+        async Task DoLocationPermissionTest()
+        {
+            var result = await this.geofenceManager.RequestAccess();
+            await this.dialogs.Snackbar("Location Access: " + result);
+        }
+
+
+        async Task DoManagedScan()
+        {
+            this.Append("Looking for device - Classic Scan");
+            await this.bleManager
+                .Scan(new ScanConfig
+                {
+                    ServiceUuids = { "79AC5233-A36F-43B9-988F-5C651B12B560" }
+                })
+                .Take(1)
+                .ToTask(this.cancelSrc!.Token);
+            this.Append("Device Found");
+
+            this.Append("Looking for device - Managed Scan");
+            var scanner = this.bleManager.CreateManagedScanner().DisposeWith(this.disp!);
+            var scan = scanner.WhenScan().Take(1).ToTask(this.cancelSrc.Token);
+            scanner.Start();
+
+            await scan.ConfigureAwait(false);
+            this.Append("Device Found");
+        }
 
 
         async Task DoManagedPeripheral()
