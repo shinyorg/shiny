@@ -10,20 +10,20 @@ namespace Shiny.Locations
 {
     public static class PlatformExtensions
     {
-        static AccessState GetLocationManagerStatus(IAndroidContext context, bool gpsRequired, bool networkRequired)
+        static bool IsLocationEnabled(IAndroidContext context, bool gpsRequired, bool networkRequired)
         {
             var lm = context.GetSystemService<LocationManager>(Context.LocationService);
 
             if (context.IsMinApiLevel(28) && !lm.IsLocationEnabled)
-                return AccessState.Disabled;
+                return false;
 
             if (networkRequired && !lm.IsProviderEnabled(LocationManager.NetworkProvider))
-                return AccessState.Disabled;
+                return false;
 
             if (gpsRequired && !lm.IsProviderEnabled(LocationManager.GpsProvider))
-                return AccessState.Disabled;
+                return false;
 
-            return AccessState.Available;
+            return true;
         }
 
 
@@ -48,9 +48,8 @@ namespace Shiny.Locations
 
         public static async Task<AccessState> RequestLocationAccess(this IAndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
         {
-            var status = GetLocationManagerStatus(context, gpsRequired, networkRequired);
-            if (status != AccessState.Available)
-                return status;
+            if (!IsLocationEnabled(context, gpsRequired, networkRequired))
+                return AccessState.Disabled;
 
             var locationPerm = fineAccess ? P.AccessFineLocation : P.AccessCoarseLocation;
             if (!context.IsMinApiLevel(29) || !background)
