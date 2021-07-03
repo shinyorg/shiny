@@ -16,8 +16,8 @@
         <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.10.0" />
 
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
-        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.2.0" />
-        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.2.0" />
+        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.3.0" />
+        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.3.0" />
 
         <PackageReference Update="Xamarin.Firebase.iOS.Core" Version="6.10.4" />
         <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="4.7.1" />
@@ -25,11 +25,11 @@
         <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="4.6.2" />
         <PackageReference Update="Xamarin.Firebase.iOS.Analytics" Version="6.9.0" />
 
-        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.0.0" />
+        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.0.1" />
         <PackageReference Update="Xamarin.Firebase.Analytics" Version="119.0.0" />
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="122.0.0" />
 
-        <PackageReference Update="Xamarin.Google.Dagger" Version="2.27.0" />
+        <PackageReference Update="Xamarin.Google.Dagger" Version="2.37.0" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="3.0.0" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="3.0.0" />
 
@@ -42,9 +42,9 @@
         <PackageReference Update="Xamarin.AndroidX.Concurrent.Futures" Version="1.1.0.2" />
         <PackageReference Update="Xamarin.AndroidX.Room.Common" Version="2.3.0.1" />
         <PackageReference Update="Xamarin.AndroidX.Room.Runtime" Version="2.3.0.1" />
-        <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.5.0.1" />
+        <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.5.0.2" />
 
-        <PackageReference Update="Xamarin.GooglePlayServices.Basement" Version="117.6.0" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Basement" Version="117.6.0.1" />
         <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.2.1" />
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="118.0.0" />
 
@@ -78,13 +78,13 @@
         <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
         <PackageReference Update="Mobile.BuildTools" Version="2.0.109-pre" />
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.2012" />
-        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.1.0" />
+        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.2.0" />
         <PackageReference Update="Xamarin.Essentials" Version="1.6.1" />
-        <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.11" />
+        <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.12" />
         <PackageReference Update="Bogus" Version="33.0.2" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.1.97" />
-        <PackageReference Update="ReactiveUI.Fody" Version="13.3.2" />
+        <PackageReference Update="ReactiveUI.Fody" Version="14.1.1" />
         <PackageReference Update="XF.Material" Version="1.7.8" />
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
     </ItemGroup>
