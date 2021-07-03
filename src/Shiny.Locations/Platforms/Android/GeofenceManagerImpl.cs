@@ -68,7 +68,6 @@ namespace Shiny.Locations
             var regions = await this.Repository.GetAll();
             foreach (var region in regions)
                 await this.Create(region);
-
         }
 
 
