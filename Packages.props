@@ -69,7 +69,7 @@
         <PackageReference Update="Cake.AndroidAppManifest" Version="1.1.2" />
         <PackageReference Update="Cake.Plist" Version="0.7.0" />
         <PackageReference Update="Cake.Git" Version="1.0.1" />
-        <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0096" />
+        <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0102" />
         <PackageReference Update="Discord.Net" Version="2.4.0" />
     </ItemGroup>
 
