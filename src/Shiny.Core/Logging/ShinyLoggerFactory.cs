@@ -22,6 +22,7 @@ namespace Shiny.Logging
 
         public ILogger CreateLogger(string categoryName)
         {
+
             return null;
         }
 
