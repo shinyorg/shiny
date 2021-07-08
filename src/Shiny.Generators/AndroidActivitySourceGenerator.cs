@@ -74,6 +74,7 @@ namespace Shiny.Generators
                 using (builder.BlockInvariant($"public partial class {activity.Name}"))
                 {
                     this.TryAppendOnCreate(activity, builder);
+                    this.TryAppendOnResume(activity, builder);
                     this.TryAppendNewIntent(activity, builder);
                     this.TryAppendActivityResult(activity, builder);
                     this.TryAppendRequestPermissionResult(activity, builder);
@@ -214,6 +215,19 @@ namespace Shiny.Generators
                     if (this.context.HasXamarinEssentials())
                         builder.AppendLine("global::Xamarin.Essentials.Platform.OnNewIntent(intent);");
                 }
+            }
+        }
+
+
+        void TryAppendOnResume(INamedTypeSymbol activity, IndentedStringBuilder builder)
+        {
+            if (activity.HasMethod("OnResume") || !this.context.HasXamarinEssentials())
+                return;
+
+            using (builder.BlockInvariant("protected override void OnResume()"))
+            {
+                builder.AppendLine("base.OnResume();");
+                builder.AppendLine("global::Xamarin.Essentials.Platform.OnResume(this);");
             }
         }
     }
