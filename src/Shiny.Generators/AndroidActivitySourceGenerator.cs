@@ -131,6 +131,8 @@ namespace Shiny.Generators
 
         void TryAppendOnCreateThirdParty(INamedTypeSymbol activity, IndentedStringBuilder builder)
         {
+            if (this.context.HasMobileBuildToolsConfig())
+                builder.AppendLineInvariant("global::Mobile.BuildTools.Configuration.ConfigurationManager.Init(this);");
 
             // AiForms.SettingsView
             if (this.context.Compilation.GetTypeByMetadataName("AiForms.Renderers.Droid.SettingsViewInit") != null)

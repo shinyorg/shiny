@@ -206,6 +206,9 @@ return result;"
             if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
                 builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init();");
 
+            if (this.Context.HasMobileBuildToolsConfig())
+                builder.AppendLineInvariant("global::Mobile.BuildTools.Configuration.ConfigurationManager.Init();");
+
             var xfFormsDelegate = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate");
             if (!String.IsNullOrWhiteSpace(this.ShinyConfig.XamarinFormsAppTypeName) &&
                 xfFormsDelegate != null &&
