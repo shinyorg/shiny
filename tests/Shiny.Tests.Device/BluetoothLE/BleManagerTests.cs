@@ -29,32 +29,32 @@ namespace Shiny.Tests.BluetoothLE
         }
 
 
-        [Fact]
-        public async Task Status_Monitor()
-        {
-            var on = 0;
-            var off = 0;
-            this.manager
-                .WhenStatusChanged()
-                .Skip(1) // skip startwith
-                .Subscribe(x =>
-                {
-                    switch (x)
-                    {
-                        case AccessState.Available:
-                            on++;
-                            break;
+        //[Fact]
+        //public async Task Status_Monitor()
+        //{
+        //    var on = 0;
+        //    var off = 0;
+        //    this.manager
+        //        .WhenStatusChanged()
+        //        .Skip(1) // skip startwith
+        //        .Subscribe(x =>
+        //        {
+        //            switch (x)
+        //            {
+        //                case AccessState.Available:
+        //                    on++;
+        //                    break;
 
-                        case AccessState.Disabled:
-                            off++;
-                            break;
-                    }
-                });
-            await Dialogs.Instance.AlertAsync("Now turn the adapter off and then back on - press ok once done");
+        //                case AccessState.Disabled:
+        //                    off++;
+        //                    break;
+        //            }
+        //        });
+        //    await Dialogs.Instance.AlertAsync("Now turn the adapter off and then back on - press ok once done");
 
-            Assert.True(on >= 1);
-            Assert.True(off >= 1);
-        }
+        //    Assert.True(on >= 1);
+        //    Assert.True(off >= 1);
+        //}
 
 
         [Fact]

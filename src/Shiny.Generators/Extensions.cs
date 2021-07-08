@@ -76,12 +76,17 @@ namespace Shiny.Generators
         //public static bool HasXamarinForms(this GeneratorExecutionContext context)
         //    => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals("Xamarin.Forms", StringComparison.CurrentCultureIgnoreCase));
 
+        public static bool HasLibrary(this GeneratorExecutionContext context, string libName)
+            => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals(libName, StringComparison.CurrentCultureIgnoreCase));
+
         public static bool HasMsal(this GeneratorExecutionContext context)
-            => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals("Microsoft.Identity.Client", StringComparison.CurrentCultureIgnoreCase));
+            => context.HasLibrary("Microsoft.Identity.Client");
 
         public static bool HasXamarinEssentials(this GeneratorExecutionContext context)
-            => context.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Equals("Xamarin.Essentials", StringComparison.CurrentCultureIgnoreCase));
+            => context.HasLibrary("Xamarin.Essentials");
 
+        public static bool HasMobileBuildToolsConfig(this GeneratorExecutionContext context)
+            => context.HasLibrary("Mobile.BuildTools.Configuration");
 
         public static IEnumerable<IAssemblySymbol> GetAllAssemblies(this GeneratorExecutionContext context)
         {

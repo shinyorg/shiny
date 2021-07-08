@@ -65,21 +65,54 @@ namespace Shiny.Generators
                         "public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler) => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);"
                     );
 
-                    if (!appDelegate.HasMethod("OpenUrl") && this.Context.HasMsal())
+                    this.AppendMethodIf(
+                        appDelegate,
+                        builder,
+                        "Xamarin.Essentials",
+                        "PerformActionForShortcutItem",
+                        "public override void PerformActionForShortcutItem(UIApplication application, UIApplicationShortcutItem shortcutItem, UIOperationHandler completionHandler => Xamarin.Essentials.Platform.PerformActionForShortcutItem(application, shortcutItem, completionHandler);"
+                    );
+
+                    if (this.Context.HasMsal())
                     {
-                        using (builder.BlockInvariant("public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)"))
-                        {
-                            builder.Append(@"
-var result = true;
-if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
-    global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
+                        this.AppendMethodIf(
+                            appDelegate,
+                            builder,
+                            "Microsoft.Identity.Client",
+                            "OpenUrl",
+@"
+public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
+{
+    if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
+    {
+        global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
+        return true;
+    }
 
-else if (!global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url))
-    result = false;
+    if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url))
+    {
+        return true;
+    }
+    return base.OpenUrl(application, url, sourceApplication, annotation);
+}"
+                        );
+                    }
+                    else
+                    {
+                        this.AppendMethodIf(
+                            appDelegate,
+                            builder,
+                            "Xamarin.Essentials",
+                            "OpenUrl",
+@"
+public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
+{
+    if (global::Xamarin.Essentials.Platform.OpenUrl(app, url, options))
+        return true;
 
-return result;"
-                            );
-                        }
+    return base.OpenUrl(app, url, options);
+}"
+                        );
                     }
                 }
             }
@@ -114,14 +147,6 @@ return result;"
                     "DidReceiveRemoteNotification",
                     "public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyDidReceiveRemoteNotification(userInfo, completionHandler);"
                 );
-
-                // old method - don't hook
-                //this.AppendMethodIf(
-                //    appDelegate,
-                //    builder,
-                //    "ReceivedRemoteNotification",
-                //    "public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo) => this.ShinyDidReceiveRemoteNotification(userInfo, null);"
-                //);
             }
         }
 
@@ -205,6 +230,9 @@ return result;"
 
             if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
                 builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init();");
+
+            if (this.Context.HasMobileBuildToolsConfig())
+                builder.AppendLineInvariant("global::Mobile.BuildTools.Configuration.ConfigurationManager.Init();");
 
             var xfFormsDelegate = this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.Platform.iOS.FormsApplicationDelegate");
             if (!String.IsNullOrWhiteSpace(this.ShinyConfig.XamarinFormsAppTypeName) &&
