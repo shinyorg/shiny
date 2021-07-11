@@ -70,7 +70,7 @@ namespace Shiny.Generators
                         builder,
                         "Xamarin.Essentials",
                         "PerformActionForShortcutItem",
-                        "public override void PerformActionForShortcutItem(UIApplication application, UIApplicationShortcutItem shortcutItem, UIOperationHandler completionHandler => Xamarin.Essentials.Platform.PerformActionForShortcutItem(application, shortcutItem, completionHandler);"
+                        "public override void PerformActionForShortcutItem(UIApplication application, UIApplicationShortcutItem shortcutItem, UIOperationHandler completionHandler) => Xamarin.Essentials.Platform.PerformActionForShortcutItem(application, shortcutItem, completionHandler);"
                     );
 
                     if (this.Context.HasMsal())
