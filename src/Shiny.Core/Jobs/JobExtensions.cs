@@ -56,6 +56,13 @@ namespace Shiny
 
 
         /// <summary>
+        /// This will clear any previously registered jobs before registering new startup jobs - this is useful if you only use startup jobs and you want to clean up potentially old versions of jobs
+        /// </summary>
+        /// <param name="services"></param>
+        public static void ClearJobQueueBeforeRegistration(this IServiceCollection services)
+            => StartupModule.ClearJobsBeforeRegistering = true;
+
+        /// <summary>
         /// Registers a job on the job manager
         /// </summary>
         /// <param name="services"></param>
@@ -66,15 +73,20 @@ namespace Shiny
                                        string? identifier = null,
                                        InternetAccess requiredNetwork = InternetAccess.None,
                                        bool runInForeground = false,
+                                       bool clearJobQueueFirst = false,
                                        params (string Key, object value)[] parameters)
-            => services.RegisterJob(new JobInfo(jobType, identifier)
+        {
+            if (clearJobQueueFirst)
+                services.ClearJobQueueBeforeRegistration();
+
+            services.RegisterJob(new JobInfo(jobType, identifier)
             {
                 RequiredInternetAccess = requiredNetwork,
                 RunOnForeground = runInForeground,
                 Repeat = true,
                 Parameters = parameters?.ToDictionary()
             });
-
+        }
 
         public static void SetParameter<T>(this JobInfo job, string key, T value)
             => job.Parameters[key] = value;

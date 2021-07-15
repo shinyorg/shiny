@@ -63,6 +63,8 @@ namespace Samples
             services.UseTestMotionActivity();
             //services.UseMotionActivity();
 
+            services.RegisterJob(typeof(SampleJob), runInForeground: true);
+
             services.UseGeofencing<GeofenceDelegate>();
             //services.UseGpsDirectGeofencing<LocationDelegates>();
             services.UseGps<GpsDelegate>();

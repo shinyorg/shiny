@@ -34,6 +34,7 @@ namespace Samples.Jobs
             );
         }
 
+
         public void Start()
             => this.services.Notifications.Register(this.GetType(), true, "Jobs");
     }

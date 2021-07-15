@@ -49,17 +49,12 @@ namespace Shiny.Jobs.Infrastructure
             this.disposer ??= new CompositeDisposable();
             Observable
                 .Interval(Interval)
-                .Select(_ => this.jobManager.GetJobs().ToObservable())
-                .Switch()
-                .Select(jobs => jobs.Where(job =>
-                    job.RunOnForeground &&
-                    this.HasPowerLevel(job) &&
-                    this.HasReqInternet(job) &&
-                    this.HasChargeStatus(job)
-                ))
-                .Select(jobs => Observable.FromAsync(async ct =>
+                .Select(_ => Observable.FromAsync(async ct =>
                 {
-                    foreach (var job in jobs)
+                    var jobs = await this.jobManager.GetJobs();
+                    var toRun = jobs.Where(job => !this.IsFiltered(job)).ToList();
+
+                    foreach (var job in toRun)
                     {
                         if (!ct.IsCancellationRequested)
                         {
@@ -78,6 +73,24 @@ namespace Shiny.Jobs.Infrastructure
         {
             this.disposer?.Dispose();
             this.disposer = null;
+        }
+
+
+        bool IsFiltered(JobInfo job)
+        {
+            if (!job.RunOnForeground)
+                return true;
+
+            if (!this.HasPowerLevel(job))
+                return true;
+
+            if (!this.HasReqInternet(job))
+                return true;
+
+            if (!this.HasChargeStatus(job))
+                return true;
+
+            return false;
         }
 
 
@@ -102,7 +115,7 @@ namespace Shiny.Jobs.Infrastructure
         bool HasChargeStatus(JobInfo job)
         {
             if (!job.DeviceCharging)
-                return false;
+                return true;
 
             return this.powerManager.IsPluggedIn();
         }
