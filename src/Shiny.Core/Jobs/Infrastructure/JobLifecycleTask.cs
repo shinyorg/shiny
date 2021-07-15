@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
+using System.Reactive.Threading.Tasks;
 using Shiny.Net;
 using Shiny.Power;
 
@@ -11,7 +11,23 @@ namespace Shiny.Jobs.Infrastructure
 {
     public class JobLifecycleTask : ShinyLifecycleTask
     {
-        public static TimeSpan Interval { get; set; } = TimeSpan.FromSeconds(60);
+        static TimeSpan interval = TimeSpan.FromSeconds(60);
+        public static TimeSpan Interval
+        {
+            get => interval;
+            set
+            {
+                if (interval.TotalSeconds < 15)
+                    throw new ArgumentException("Job foreground timer intervals cannot be less than 15 seconds");
+
+                if (interval.TotalMinutes > 5)
+                    throw new ArgumentException("Job foreground timer intervals cannot be greater than 5 minutes");
+
+                interval = value;
+            }
+        }
+
+
         readonly IJobManager jobManager;
         readonly IPowerManager powerManager;
         readonly IConnectivity connectivity;
@@ -28,17 +44,33 @@ namespace Shiny.Jobs.Infrastructure
         }
 
 
-        public override void Start()
-        {
-            this.Set();
-            this.TryRun();
-        }
-
-
         public override void OnForeground()
         {
-            this.Set();
-            this.TryRun();
+            this.disposer ??= new CompositeDisposable();
+            Observable
+                .Interval(Interval)
+                .Select(_ => this.jobManager.GetJobs().ToObservable())
+                .Switch()
+                .Select(jobs => jobs.Where(job =>
+                    job.RunOnForeground &&
+                    this.HasPowerLevel(job) &&
+                    this.HasReqInternet(job) &&
+                    this.HasChargeStatus(job)
+                ))
+                .Select(jobs => Observable.FromAsync(async ct =>
+                {
+                    foreach (var job in jobs)
+                    {
+                        if (!ct.IsCancellationRequested)
+                        {
+                            // the ct doesn't really get used down in this level as it will be delegated to the background task and cancelled
+                            // if ran too long
+                            await this.jobManager.RunJobAsTask(job.Identifier);
+                        }
+                    }
+                }))
+                .Subscribe()
+                .DisposedBy(this.disposer);
         }
 
 
@@ -46,86 +78,33 @@ namespace Shiny.Jobs.Infrastructure
         {
             this.disposer?.Dispose();
             this.disposer = null;
-            this.TryRun();
         }
 
 
-        static bool running = false;
-        async Task TryRun(Func<JobInfo, bool>? predicate = null)
+        bool HasPowerLevel(JobInfo job)
         {
-            if (running)
-                return;
+            if (!job.BatteryNotLow)
+                return true;
 
-            var jobs = await this.jobManager.GetJobs();
-            if (predicate != null)
-                jobs = jobs.Where(predicate);
-
-            if (jobs.Any())
-            {
-                running = true;
-
-                this.jobManager.RunTask(
-                    nameof(JobLifecycleTask),
-                    async ct =>
-                    {
-                        using (ct.Register(() => running = false))
-                        {
-                            foreach (var job in jobs)
-                                if (!ct.IsCancellationRequested)
-                                    await this.jobManager.Run(job.Identifier, ct);
-                        }
-                        running = false;
-                    }
-                );
-            }
+            return this.powerManager.BatteryLevel > 20 || this.powerManager.IsPluggedIn();
         }
 
 
-        void Set()
+        bool HasReqInternet(JobInfo job) => job.RequiredInternetAccess switch
         {
-            this.disposer ??= new CompositeDisposable();
+            InternetAccess.Any => this.connectivity.IsInternetAvailable(),
+            InternetAccess.Unmetered => !this.connectivity.Reach.HasFlag(NetworkReach.ConstrainedInternet),
+            InternetAccess.None => true,
+            _ => false
+        };
 
-            this.disposer.Add
-            (
-                Observable
-                    .Interval(Interval)
-                    .Subscribe(_ => this.TryRun(x => x.RunOnForeground))
-            );
-            this.disposer.Add
-            (
-                this.powerManager
-                    .WhenChargingChanged()
-                    .Where(x => x == true)
-                    .Subscribe(x => this.TryRun(x =>
-                        x.RunOnForeground &&
-                        x.DeviceCharging
-                    ))
-            );
 
-            this.connectivity
-                .WhenInternetStatusChanged()
-                .Where(x => x == true)
-                .Subscribe(x =>
-                {
-                    if (this.connectivity.IsDirectConnect())
-                    {
-                        this.TryRun(x =>
-                            x.RunOnForeground &&
-                            x.RunOnForeground &&
-                            (
-                                x.RequiredInternetAccess == InternetAccess.Any ||
-                                x.RequiredInternetAccess == InternetAccess.Unmetered
-                            )
-                        );
-                    }
-                    else
-                    {
-                        this.TryRun(x =>
-                            x.RunOnForeground &&
-                            x.RequiredInternetAccess == InternetAccess.Any
-                        );
-                    }
-                });
+        bool HasChargeStatus(JobInfo job)
+        {
+            if (!job.DeviceCharging)
+                return false;
+
+            return this.powerManager.IsPluggedIn();
         }
     }
 }
