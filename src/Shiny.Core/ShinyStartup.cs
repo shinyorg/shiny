@@ -15,6 +15,10 @@ namespace Shiny
 
     public abstract class ShinyStartup : IShinyStartup
     {
+        readonly Action<IServiceCollection>? registerPlatformServices;
+        protected ShinyStartup(Action<IServiceCollection>? registerPlatformServices = null)
+            => this.registerPlatformServices = registerPlatformServices;
+
         /// <summary>
         ///
         /// </summary>
@@ -22,11 +26,13 @@ namespace Shiny
         /// <param name="platform"></param>
         public virtual void ConfigureLogging(ILoggingBuilder builder, IPlatform platform) { }
 
+
         /// <summary>
         /// Configure the service collection
         /// </summary>
         /// <param name="services"></param>
-        public abstract void ConfigureServices(IServiceCollection services, IPlatform platform);
+        public virtual void ConfigureServices(IServiceCollection services, IPlatform platform)
+            => this.registerPlatformServices?.Invoke(services);
 
 
         /// <summary>
