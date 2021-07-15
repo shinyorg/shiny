@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
+using System.Timers;
 using Shiny.Net;
 using Shiny.Power;
 
@@ -28,69 +26,59 @@ namespace Shiny.Jobs.Infrastructure
         }
 
 
-        readonly IJobManager jobManager;
         readonly IPowerManager powerManager;
         readonly IConnectivity connectivity;
-        CompositeDisposable? disposer;
+        readonly Timer timer;
 
 
         public JobLifecycleTask(IJobManager jobManager,
                                 IPowerManager powerManager,
                                 IConnectivity connectivity)
         {
-            this.jobManager = jobManager;
             this.powerManager = powerManager;
             this.connectivity = connectivity;
+
+            this.timer = new Timer();
+            this.timer.Elapsed += async (sender, args) =>
+            {
+                this.timer.Stop();
+                var jobs = await jobManager.GetJobs();
+                var toRun = jobs.Where(this.CanRun).ToList();
+
+                foreach (var job in toRun)
+                    await jobManager.RunJobAsTask(job.Identifier);
+
+                if (this.IsInForeground)
+                    this.timer.Start();
+            };
         }
 
 
         public override void OnForeground()
         {
-            this.disposer ??= new CompositeDisposable();
-            Observable
-                .Interval(Interval)
-                .Select(_ => Observable.FromAsync(async ct =>
-                {
-                    var jobs = await this.jobManager.GetJobs();
-                    var toRun = jobs.Where(job => !this.IsFiltered(job)).ToList();
-
-                    foreach (var job in toRun)
-                    {
-                        if (!ct.IsCancellationRequested)
-                        {
-                            // the ct doesn't really get used down in this level as it will be delegated to the background task and cancelled
-                            // if ran too long
-                            await this.jobManager.RunJobAsTask(job.Identifier);
-                        }
-                    }
-                }))
-                .Subscribe()
-                .DisposedBy(this.disposer);
+            this.timer.Interval = Interval.TotalMilliseconds;
+            this.timer.Start();
         }
 
 
-        public override void OnBackground()
-        {
-            this.disposer?.Dispose();
-            this.disposer = null;
-        }
+        public override void OnBackground() => this.timer.Stop();
 
 
-        bool IsFiltered(JobInfo job)
+        bool CanRun(JobInfo job)
         {
             if (!job.RunOnForeground)
-                return true;
+                return false;
 
             if (!this.HasPowerLevel(job))
-                return true;
+                return false;
 
             if (!this.HasReqInternet(job))
-                return true;
+                return false;
 
             if (!this.HasChargeStatus(job))
-                return true;
+                return false;
 
-            return false;
+            return true;
         }
 
 
