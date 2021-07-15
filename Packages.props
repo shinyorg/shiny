@@ -34,7 +34,7 @@
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="3.0.0" />
 
         <PackageReference Update="Xamarin.ShortcutBadger" Version="1.1.21" />
-        <PackageReference Update="Xamarin.AndroidX.Core" Version="1.5.0" />
+        <PackageReference Update="Xamarin.AndroidX.Core" Version="1.6.0" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.3.1" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.3.1.1" />
         <PackageReference Update="Xamarin.AndroidX.Arch.Core.Runtime" Version="2.1.0.8" />
@@ -69,14 +69,14 @@
         <PackageReference Update="Cake.AndroidAppManifest" Version="1.1.2" />
         <PackageReference Update="Cake.Plist" Version="0.7.0" />
         <PackageReference Update="Cake.Git" Version="1.0.1" />
-        <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0096" />
+        <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0102" />
         <PackageReference Update="Discord.Net" Version="2.4.0" />
     </ItemGroup>
 
     <!--Samples-->
     <ItemGroup>
         <PackageReference Update="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-        <PackageReference Update="Mobile.BuildTools" Version="2.0.109-pre" />
+        <PackageReference Update="Mobile.BuildTools" Version="2.0.245" />
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.2012" />
         <PackageReference Update="Xamarin.CommunityToolkit" Version="1.2.0" />
         <PackageReference Update="Xamarin.Essentials" Version="1.6.1" />
@@ -96,7 +96,7 @@
         <PackageReference Update="coverlet.collector" Version="3.0.3" />
         <PackageReference Update="FluentAssertions" Version="5.10.3" />
         <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.10.0" />
-        <PackageReference Update="FirebaseAdmin" Version="2.1.0" />
+        <PackageReference Update="FirebaseAdmin" Version="2.2.0" />
         <PackageReference Update="Moq" Version="4.16.1" />
         <PackageReference Update="xunit" Version="2.4.1" />
         <PackageReference Update="xunit.runner.devices" Version="2.5.25" />
