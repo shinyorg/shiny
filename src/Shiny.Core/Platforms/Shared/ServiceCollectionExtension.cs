@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
@@ -14,26 +13,24 @@ namespace Shiny
     {
         public static void RegisterCommonServices(this IServiceCollection services)
         {
-            services.RegisterModule<StoresModule>();
+#if !NETSTANDARD
+            // stores
+            services.AddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
+            services.AddSingleton<IKeyValueStoreFactory, KeyValueStoreFactory>();
+            services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
+            services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+
+            // do not register by default
+            //services.AddSingleton<IKeyValueStore, MemoryKeyValueStore>();
+            //services.AddSingleton<IKeyValueStore, FileKeyValueStore>();
+
             services.TryAddSingleton<StartupModule>();
             services.TryAddSingleton<ShinyCoreServices>();
             services.TryAddSingleton<ISerializer, ShinySerializer>();
             services.TryAddSingleton<IMessageBus, MessageBus>();
             services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
-
-            #if !TIZEN
-            services.TryAddSingleton<IJobManager, JobManager>();
-            #endif
-
-            #if !NETSTANDARD
             services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
-            #endif
-
-            #if __TVOS__ || __WATCHOS__ || NETSTANDARD
-            services.TryAddSingleton<IConnectivity, SharedConnectivityImpl>();
-            #else
             services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
-            #endif
 
 #if __IOS__
             services.TryAddSingleton<AppleLifecycle>();
@@ -42,6 +39,10 @@ namespace Shiny
                 services.TryAddSingleton<IJobManager, BgTasksJobManager>();
             else
                 services.TryAddSingleton<IJobManager, JobManager>();
+#else
+            services.TryAddSingleton<IJobManager, JobManager>();
+#endif
+
 #endif
         }
     }

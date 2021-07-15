@@ -17,6 +17,8 @@ namespace Shiny.Infrastructure
             => modules.Add(module);
 
 
+        public static bool ClearJobsBeforeRegistering { get; set; }
+
         static readonly List<JobInfo> jobs = new List<JobInfo>();
         public static void AddJob(JobInfo jobInfo) => jobs.Add(jobInfo);
 
@@ -42,6 +44,18 @@ namespace Shiny.Infrastructure
         public async void Start(IServiceCollection services)
         {
             this.Bind(services);
+
+            if (ClearJobsBeforeRegistering)
+            {
+                try
+                {
+                    await this.jobManager.CancelAll();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning(ex, "Unable to cancel all existing jobs");
+                }
+            }
 
             if (jobs.Count > 0)
             {

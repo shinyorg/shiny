@@ -11,7 +11,7 @@ namespace Shiny.Jobs.Infrastructure
 {
     public class JobLifecycleTask : ShinyLifecycleTask
     {
-        static TimeSpan interval = TimeSpan.FromSeconds(60);
+        static TimeSpan interval = TimeSpan.FromSeconds(30);
         public static TimeSpan Interval
         {
             get => interval;
