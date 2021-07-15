@@ -14,7 +14,7 @@ using AndroidX.Core.Content;
 using AndroidX.Lifecycle;
 using B = global::Android.OS.Build;
 using Microsoft.Extensions.DependencyInjection;
-
+using Java.Interop;
 
 namespace Shiny
 {
@@ -64,6 +64,7 @@ namespace Shiny
 
 
         [Lifecycle.Event.OnResume]
+        [Export]
         public void OnResume()
         {
             this.Status = PlatformState.Foreground;
@@ -72,6 +73,7 @@ namespace Shiny
 
 
         [Lifecycle.Event.OnPause]
+        [Export]
         public void OnPause()
         {
             this.Status = PlatformState.Background;

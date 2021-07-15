@@ -41,7 +41,7 @@ namespace Shiny
         public void OnActivityResumed(Activity activity)
         {
             this.Activity = activity;
-            this.Fire(activity, ActivityState.Paused);
+            this.Fire(activity, ActivityState.Resumed);
         }
 
 
