@@ -27,9 +27,6 @@ namespace Samples
     {
         public override void ConfigureLogging(ILoggingBuilder builder, IPlatform platform)
         {
-            builder.AddConsole(opts =>
-                opts.LogToStandardErrorThreshold = LogLevel.Debug
-            );
             builder.AddSqliteLogging(LogLevel.Warning);
             //builder.AddFirebase(LogLevel.Warning);
             builder.AddAppCenter(Secrets.Values.AppCenterKey, LogLevel.Warning);

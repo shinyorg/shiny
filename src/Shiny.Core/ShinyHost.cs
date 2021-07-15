@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
-
+using Shiny.Logging;
 
 namespace Shiny
 {
@@ -60,9 +60,13 @@ namespace Shiny
 
         public static void Init(IPlatform platform, IShinyStartup? startup = null)
         {
-            var services = new ServiceCollection();
+            IServiceCollection services = new ServiceCollection();
             services.AddSingleton(platform);
-            services.AddLogging(builder => startup?.ConfigureLogging(builder, platform));
+            var loggingBuilder = new ShinyLoggingBuilder(services);
+            startup?.ConfigureLogging(loggingBuilder, platform);
+            services.AddSingleton<ILoggerFactory, ShinyLoggerFactory>();
+            services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
+
             startup?.ConfigureServices(services, platform);
             if (platform is IPlatformBuilder builder)
                 builder.Register(services);

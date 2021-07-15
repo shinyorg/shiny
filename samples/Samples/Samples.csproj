@@ -22,7 +22,6 @@
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="Rg.Plugins.Popup" />
         <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />

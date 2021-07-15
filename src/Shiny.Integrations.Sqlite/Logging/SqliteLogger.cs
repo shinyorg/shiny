@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Reactive.Disposables;
+
 using Microsoft.Extensions.Logging;
+
+using Shiny.Logging;
 using Shiny.Models;
 
 
@@ -18,10 +22,13 @@ namespace Shiny.Integrations.Sqlite.Logging
         }
 
 
-        public IDisposable BeginScope<TState>(TState state) => NullScope.Instance;
+        public IDisposable BeginScope<TState>(TState state) => Disposable.Empty;
         public bool IsEnabled(LogLevel logLevel) => logLevel >= this.configLogLevel;
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
+            if (!this.IsEnabled(logLevel))
+                return;
+
             var message = formatter(state, exception);
             this.conn.GetConnection().Insert(new LogStore
             {
