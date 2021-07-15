@@ -10,10 +10,25 @@ namespace Shiny.Jobs
 {
     public class JobManager : AbstractJobManager
     {
+        static double? backgroundFetchInterval;
+
         /// <summary>
         /// If you don't know what this does, don't touch it :)
         /// </summary>
-        public static double? BackgroundFetchInterval { get; set; }
+        public static double? BackgroundFetchInterval
+        {
+            get => backgroundFetchInterval;
+            set
+            {
+                backgroundFetchInterval = value;
+                if (value != null)
+                {
+                    UIApplication
+                        .SharedApplication
+                        .SetMinimumBackgroundFetchInterval(value.Value);
+                }
+            }
+        }
         readonly IPlatform platform;
 
 

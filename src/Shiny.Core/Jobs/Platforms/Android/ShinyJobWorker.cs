@@ -5,8 +5,8 @@ using Android.Content;
 using AndroidX.Concurrent.Futures;
 using AndroidX.Work;
 using Google.Common.Util.Concurrent;
-
 using Microsoft.Extensions.Logging;
+
 
 namespace Shiny.Jobs
 {
