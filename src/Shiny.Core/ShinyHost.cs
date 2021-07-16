@@ -62,12 +62,15 @@ namespace Shiny
         {
             IServiceCollection services = new ServiceCollection();
             services.AddSingleton(platform);
+
             var loggingBuilder = new ShinyLoggingBuilder(services);
             startup?.ConfigureLogging(loggingBuilder, platform);
             services.AddSingleton<ILoggerFactory, ShinyLoggerFactory>();
             services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
 
             startup?.ConfigureServices(services, platform);
+            startup?.RegisterPlatformServices?.Invoke(services);
+
             if (platform is IPlatformBuilder builder)
                 builder.Register(services);
             else

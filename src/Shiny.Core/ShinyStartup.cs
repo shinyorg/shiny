@@ -7,6 +7,7 @@ namespace Shiny
 {
     public interface IShinyStartup
     {
+        Action<IServiceCollection>? RegisterPlatformServices { get; set; }
         void ConfigureLogging(ILoggingBuilder builder, IPlatform platform);
         void ConfigureServices(IServiceCollection services, IPlatform platform);
         IServiceProvider? CreateServiceProvider(IServiceCollection services);
@@ -15,9 +16,10 @@ namespace Shiny
 
     public abstract class ShinyStartup : IShinyStartup
     {
-        readonly Action<IServiceCollection>? registerPlatformServices;
+        public Action<IServiceCollection>? RegisterPlatformServices { get; set; }
+
         protected ShinyStartup(Action<IServiceCollection>? registerPlatformServices = null)
-            => this.registerPlatformServices = registerPlatformServices;
+            => this.RegisterPlatformServices = registerPlatformServices;
 
         /// <summary>
         ///
@@ -31,8 +33,7 @@ namespace Shiny
         /// Configure the service collection
         /// </summary>
         /// <param name="services"></param>
-        public virtual void ConfigureServices(IServiceCollection services, IPlatform platform)
-            => this.registerPlatformServices?.Invoke(services);
+        public abstract void ConfigureServices(IServiceCollection services, IPlatform platform);
 
 
         /// <summary>
