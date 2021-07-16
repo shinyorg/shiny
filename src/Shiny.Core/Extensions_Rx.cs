@@ -102,6 +102,28 @@ namespace Shiny
         }
 
 
+        ///// <summary>
+        ///// Warning - this will block until completed
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="source"></param>
+        ///// <param name="onFinally"></param>
+        ///// <param name="timeout"></param>
+        ///// <returns></returns>
+        //public static IObservable<T> DoFinally<T>(this IObservable<T> source, IObservable<Unit> onFinally, TimeSpan? timeout = null) => source.Finally(() =>
+        //{
+        //    var mre = new ManualResetEvent(false);
+        //    onFinally
+        //        .SubscribeOn(ThreadPoolScheduler.Instance) // hmmmm.... hmmmmmmmmmmmmmmmmmm...
+        //        .Subscribe(
+        //            _ => mre.Set(), // there is only one take - I don't care if it completes or not - 1 and done
+        //            _ => mre.Set()  // if erroring - also done
+        //        );
+
+        //    mre.WaitOne(timeout ?? TimeSpan.FromSeconds(5));
+        //});
+
+
         /// <summary>
         /// Runs an action only once when the first result is received
         /// </summary>
@@ -121,6 +143,7 @@ namespace Shiny
                 }
             });
         }
+
 
         /// <summary>
         /// A function from ReactiveUI - useful for non-ui stuff too ;)
