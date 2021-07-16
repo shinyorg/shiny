@@ -1,46 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:samples="clr-namespace:Samples"
+             xmlns:geofences="clr-namespace:Samples.Geofences"
              x:Class="Samples.Geofences.ListPage"
+             x:DataType="geofences:ListViewModel"
              Title="Geofences">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Create" Command="{Binding Create}" />
+        <ToolbarItem Text="Clear" Command="{Binding DropAllFences}" />
     </ContentPage.ToolbarItems>
 
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="No Geofences Configured"
-                   Style="{StaticResource NoDataLabel}"
-                   IsVisible="{Binding HasGeofences, Converter={StaticResource Not}}" />
+        <CollectionView ItemsSource="{Binding Geofences}">
 
-            <Grid IsVisible="{Binding HasGeofences}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <CollectionView.EmptyView>
+                <Label Text="No Geofences"
+                       Style="{StaticResource NoDataLabel}" />
+            </CollectionView.EmptyView>
 
-                <ListView ItemsSource="{Binding Geofences}" Grid.Row="0">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextCell Text="{Binding Text}" Detail="{Binding Detail}">
-                                <TextCell.ContextActions>
-                                    <MenuItem Text="Get Status"
-                                          Command="{Binding RequestCurrentState}" />
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="geofences:GeofenceRegionViewModel">
+                    <samples:CommandCell Text="{Binding Text}"
+                                         Detail="{Binding Detail}"
+                                         PrimaryCommand="{Binding RequestCurrentState}"
+                                         SecondaryCommand="{Binding Remove}" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
 
-                                    <MenuItem Text="Remove"
-                                          IsDestructive="True"
-                                          Command="{Binding Remove}"/>
-                                </TextCell.ContextActions>
-                            </TextCell>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-
-                <Button Text="Clear All Geofences"
-                        Command="{Binding DropAllFences}"
-                        Grid.Row="1" />
-            </Grid>
-        </StackLayout>
+        </CollectionView>
     </ContentPage.Content>
 </ContentPage>

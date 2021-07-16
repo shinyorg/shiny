@@ -36,11 +36,7 @@ namespace Samples.Geofences
                         await this.geofenceManager.StopAllMonitoring();
                         await this.LoadRegions();
                     }
-                },
-                this.WhenAny(
-                    x => x.HasGeofences,
-                    x => x.GetValue()
-                )
+                }
             );
         }
 
@@ -48,9 +44,7 @@ namespace Samples.Geofences
         public ICommand Create { get; }
         public ICommand DropAllFences { get; }
 
-        public bool HasGeofences => this.Geofences.Any();
         public IList<GeofenceRegionViewModel> Geofences { get; private set; } = new List<GeofenceRegionViewModel>();
-        public bool HasEvents => this.Events.Any();
         public IList<GeofenceEvent> Events { get; private set; } = new List<GeofenceEvent>();
 
 
@@ -97,7 +91,6 @@ namespace Samples.Geofences
                 .ToList();
 
             this.RaisePropertyChanged(nameof(this.Geofences));
-            this.RaisePropertyChanged(nameof(this.HasGeofences));
         }
     }
 }

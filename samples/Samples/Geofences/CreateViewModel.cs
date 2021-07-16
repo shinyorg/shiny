@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reactive;
-using System.Reactive.Threading.Tasks;
+﻿using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ReactiveUI;
@@ -32,17 +30,21 @@ namespace Samples.Geofences
             this.gpsManager = gpsManager;
             this.dialogs = dialogs;
 
-            var hasEventType = this.WhenAny(
+            var isValid = this.WhenAny(
                 x => x.NotifyOnEntry,
                 x => x.NotifyOnExit,
-                (entry, exit) => entry.GetValue() || exit.GetValue()
+                x => x.RadiusMeters,
+                (entry, exit, rad) =>
+                    (
+                        entry.GetValue() ||
+                        exit.GetValue()
+                    )
+                    &&
+                    (
+                        rad.GetValue() >= 100 &&
+                        rad.GetValue() < 5000
+                    )
             );
-
-            //geofenceManager
-            //    .WhenAccessStatusChanged()
-            //    .ToPropertyEx(this, x => x.AccessStatus);
-            //this.AccessStatus = geofenceManager.Status;
-
             this.SetCurrentLocation = ReactiveCommand.CreateFromTask(async ct =>
             {
                 var loc = await this.gpsManager.GetLastReading().ToTask(ct);
@@ -63,9 +65,9 @@ namespace Samples.Geofences
                     "CNTowerToronto",
                     43.6425662,
                     -79.3892508,
-                    DEFAULT_DISTANCE_METERS
+                    this.RadiusMeters
                 ),
-                hasEventType
+                isValid
             );
 
             this.AddAppleHQ = ReactiveCommand.CreateFromTask(
@@ -73,9 +75,9 @@ namespace Samples.Geofences
                     "AppleHQ",
                     37.3320045,
                     -122.0329699,
-                    DEFAULT_DISTANCE_METERS
+                    this.RadiusMeters
                 ),
-                hasEventType
+                isValid
             );
 
             this.CreateGeofence = ReactiveCommand.CreateFromTask(
@@ -103,7 +105,7 @@ namespace Samples.Geofences
                             return false;
 
                         var radius = rad.GetValue();
-                        if (radius < 200 || radius > 5000)
+                        if (radius < 100 || radius > 5000)
                             return false;
 
                         var latv = lat.GetValue();
@@ -130,7 +132,6 @@ namespace Samples.Geofences
         public ICommand AddCnTower { get; }
         public ICommand AddAppleHQ { get; }
 
-        //public AccessState AccessStatus { [ObservableAsProperty] get; }
         [Reactive] public AccessState AccessStatus { get; private set; }
         [Reactive] public string Identifier { get; set; }
         [Reactive] public double? CenterLatitude { get; set; }
