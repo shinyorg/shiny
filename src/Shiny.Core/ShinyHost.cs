@@ -60,14 +60,14 @@ namespace Shiny
 
         public static void Init(IPlatform platform, IShinyStartup? startup = null)
         {
-            IServiceCollection services = new ServiceCollection();
-            services.AddSingleton(platform);
-
+            var services = new ServiceCollection();
             var loggingBuilder = new ShinyLoggingBuilder(services);
-            startup?.ConfigureLogging(loggingBuilder, platform);
+
             services.AddSingleton<ILoggerFactory, ShinyLoggerFactory>();
             services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
+            services.AddSingleton(platform);
 
+            startup?.ConfigureLogging(loggingBuilder, platform);
             startup?.ConfigureServices(services, platform);
             startup?.RegisterPlatformServices?.Invoke(services);
 
