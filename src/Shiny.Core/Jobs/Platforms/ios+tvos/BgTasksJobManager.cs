@@ -6,7 +6,8 @@ using UIKit;
 using Shiny.Infrastructure;
 using ObjCRuntime;
 using Microsoft.Extensions.Logging;
-
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Shiny.Jobs
 {
@@ -127,8 +128,50 @@ namespace Shiny.Jobs
                     {
                         task.ExpirationHandler = cancelSrc.Cancel;
 
-                        var result = await this.Run(task.Identifier, cancelSrc.Token);
-                        task.SetTaskCompleted(result.Exception != null);
+                        var jobs = await this.GetJobs();
+                        List<JobInfo>? jobList = null;
+
+                        switch (task.Identifier)
+                        {
+                            case "com.shiny.job":
+                                jobList = jobs.ToList();
+                                break;
+
+                            case "com.shiny.jobpower":
+                                jobList = jobs
+                                    .Where(x => x.DeviceCharging)
+                                    .ToList();
+                                break;
+
+                            case "com.shiny.jobnet":
+                                jobList = jobs
+                                    .Where(x =>
+                                        x.RequiredInternetAccess == InternetAccess.Any &&
+                                        x.RequiredInternetAccess == InternetAccess.Unmetered
+                                    )
+                                    .ToList();
+                                break;
+
+                            case "com.shiny.jobpowernet":
+                                jobList = jobs
+                                    .Where(x =>
+                                        (
+                                            x.RequiredInternetAccess == InternetAccess.Any &&
+                                            x.RequiredInternetAccess == InternetAccess.Unmetered
+                                        )
+                                        && x.DeviceCharging
+                                    )
+                                    .ToList();
+                                break;
+                        }
+                        if (jobList != null)
+                        {
+                            foreach (var job in jobList)
+                            {
+                                await this.Run(job.Identifier, cancelSrc.Token);
+                            }
+                        }
+                        task.SetTaskCompleted(true);
                     }
                 }
             );
