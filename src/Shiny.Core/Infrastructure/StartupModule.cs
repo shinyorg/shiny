@@ -57,6 +57,9 @@ namespace Shiny.Infrastructure
                 }
             }
 
+            foreach (var module in modules)
+                module.OnContainerReady(this.serviceProvider);
+
             if (jobs.Count > 0)
             {
                 var access = await this.jobManager.RequestAccess();
@@ -70,10 +73,6 @@ namespace Shiny.Infrastructure
                     this.logger.LogWarning("Permissions to run jobs insufficient: " + access);
                 }
             }
-
-            foreach (var module in modules)
-                module.OnContainerReady(this.serviceProvider);
-
             jobs.Clear();
             modules.Clear();
         }
@@ -88,105 +87,65 @@ namespace Shiny.Infrastructure
                 )
                 .ToList();
 
-            foreach (var service in singletons)
-            {
-                if (service.ImplementationInstance != null)
-                {
-                    this.TryRun(service.ImplementationInstance);
-                }
-                else
-                {
-                    // before resolve, ensure implementationtype implements
-                    var shouldRun = service.ImplementationType.GetInterface(typeof(INotifyPropertyChanged).FullName) != null ||
-                                    service.ImplementationType.GetInterface(typeof(IShinyStartupTask).FullName) != null;
-                    if (shouldRun)
-                    {
-                        // downfall here is that all INPC's are also getting warmed up right away
-                        var instance = this.serviceProvider.GetService(service.ServiceType ?? service.ImplementationType);
-                        this.TryRun(instance);
-                    }
-                }
-            }
+            this.DoBindables(singletons);
+            this.DoStartups(singletons);
         }
 
 
-        void TryRun(object instance)
+        void DoBindables(IList<ServiceDescriptor> singletons)
         {
-            // TODO: I may not want to do this in MAUI since the viewmodels may live on the container
-            if (instance is INotifyPropertyChanged npc)
+            // check if service instance is set first
+            var services = singletons
+                .Where(x => x
+                    .ImplementationType!
+                    .GetInterface(typeof(INotifyPropertyChanged).FullName) != null
+                )
+                .ToList();
+
+            foreach (var service in services)
             {
+                INotifyPropertyChanged? instance = null;
                 try
                 {
-                    this.binder.Bind(npc);
+                    instance = (INotifyPropertyChanged)this.Get(service);
+                    this.binder.Bind(instance);
                     this.logger.LogInformation($"Successfully bound model - {instance.GetType().FullName}");
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, $"Failed to bind stateful model - {instance.GetType().FullName}");
+                    this.logger.LogError(ex, $"Failed to bind stateful model - {instance?.GetType().FullName ?? "Unknown"}");
                 }
             }
+        }
 
-            if (instance is IShinyStartupTask startup)
+
+        void DoStartups(IList<ServiceDescriptor> singletons)
+        {
+            var services = singletons
+                .Where(x => x
+                    .ImplementationType!
+                    .GetInterface(typeof(IShinyStartupTask).FullName) != null
+                )
+                .ToList();
+
+            // these don't get error managed since startup errors are on the user to fix
+            foreach (var service in services)
             {
+                var instance = (IShinyStartupTask)this.Get(service);
+
                 this.logger.LogInformation($"Starting up - {instance.GetType().FullName}");
-                startup.Start();
+                instance.Start();
                 this.logger.LogInformation($"Started up - {instance.GetType().FullName}");
             }
         }
+
+
+        object Get(ServiceDescriptor service)
+        {
+            if (service.ImplementationInstance != null)
+                return service.ImplementationInstance;
+
+            return this.serviceProvider.GetService(service.ServiceType ?? service.ImplementationType);
+        }
     }
 }
-
-//    public void Configure(ShinyOptions options)
-//        public Task StartAsync(CancellationToken cancellationToken)
-//    {
-//        var objectBinder = this.serviceProvider.GetRequiredService<IObjectStoreBinder>();
-
-//        var singletons = options
-//            var singletons = this.options
-//                .Value
-//                .Services
-//                .Where(x =>
-//                    x.Lifetime == ServiceLifetime.Singleton &&
-//@ -44, 7 + 48, 7 @@ namespace Shiny
-//{
-//                if (service.ImplementationInstance != null)
-//                {
-//                    this.TryRun(service.ImplementationInstance, objectBinder);
-//                    this.TryRun(service.ImplementationInstance);
-//                }
-//                else
-//                {
-//@ -55,21 +59,26 @@ namespace Shiny
-//    {
-//        // downfall here is that all INPC's are also getting warmed up right away
-//        var instance = this.serviceProvider.GetService(service.ServiceType ?? service.ImplementationType);
-//                        this.TryRun(instance, objectBinder);
-//                        this.TryRun(instance);
-//                    }
-//    }
-//}
-//return Task.CompletedTask;
-//        }
-
-
-//        void TryRun(object instance, IObjectStoreBinder binder)
-//        public Task StopAsync(CancellationToken cancellationToken)
-//            => Task.CompletedTask;
-
-
-//void TryRun(object instance)
-//{
-//    // TODO: I may not want to do this in MAUI since the viewmodels may live on the container
-//    if (instance is INotifyPropertyChanged npc)
-//    {
-//        try
-//        {
-//            binder.Bind(npc);
-//            this.binder.Bind(npc);
-//            this.logger.LogInformation($"Successfully bound model - {instance.GetType().FullName}");
-//        }
-//        catch (Exception ex)
-//@ -86,4 + 95,4 @@ namespace Shiny
-//            }
-//        }
-//    }
