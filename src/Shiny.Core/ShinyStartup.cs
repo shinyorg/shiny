@@ -18,7 +18,8 @@ namespace Shiny
     {
         public Action<IServiceCollection>? RegisterPlatformServices { get; set; }
 
-        protected ShinyStartup(Action<IServiceCollection>? registerPlatformServices = null)
+        protected ShinyStartup() { }
+        protected ShinyStartup(Action<IServiceCollection> registerPlatformServices)
             => this.RegisterPlatformServices = registerPlatformServices;
 
         /// <summary>
