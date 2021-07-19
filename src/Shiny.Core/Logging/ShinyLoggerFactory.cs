@@ -26,8 +26,13 @@ namespace Shiny.Logging
                 var logger = provider.CreateLogger(categoryName);
                 loggers.Add(logger);
             }
+
+#if DEBUG
+            loggers.Add(new DebugLogger());
+#else
             if (loggers.Count == 0)
                 loggers.Add(new DebugLogger());
+#endif
 
             return new ShinyLogger(loggers.ToArray());
         }
