@@ -28,7 +28,7 @@ namespace Shiny.Locations
         {
             var restore = await this.GetMonitorRegions();
             if (restore.Any())
-                this.TryStartGps();
+                await this.TryStartGps();
         }
 
 
@@ -56,8 +56,8 @@ namespace Shiny.Locations
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
+            await this.TryStartGps();
             await this.Repository.Set(region.Identifier, region);
-            this.TryStartGps();
         }
 
 
@@ -78,7 +78,7 @@ namespace Shiny.Locations
         }
 
 
-        protected async void TryStartGps()
+        protected async Task TryStartGps()
         {
             if (this.gpsManager.CurrentListener == null)
                 await this.gpsManager.StartListener(defaultRequest);

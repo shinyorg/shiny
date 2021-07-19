@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BackgroundTasks;
 using UIKit;
-using Shiny.Infrastructure;
 using ObjCRuntime;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Linq;
+using Shiny.Infrastructure;
+
 
 namespace Shiny.Jobs
 {
