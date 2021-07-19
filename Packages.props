@@ -31,7 +31,7 @@
 
         <PackageReference Update="Xamarin.Google.Dagger" Version="2.37.0" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="3.0.0" />
-        <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="3.0.0" />
+        <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="3.0.1" />
 
         <PackageReference Update="Xamarin.ShortcutBadger" Version="1.1.21" />
         <PackageReference Update="Xamarin.AndroidX.Core" Version="1.5.0" />
