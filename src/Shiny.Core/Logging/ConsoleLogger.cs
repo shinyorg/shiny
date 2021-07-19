@@ -1,21 +1,26 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Logging
 {
-    public class DebugLogger : ILogger
+    public class ConsoleLogger : ILogger
     {
         readonly string categoryName;
-        public DebugLogger(string categoryName)
-            => this.categoryName = categoryName;
+        readonly LogLevel level;
+
+
+        public ConsoleLogger(string categoryName, LogLevel logLevel)
+        {
+            this.categoryName = categoryName;
+            this.level = logLevel;
+        }
 
         public IDisposable BeginScope<TState>(TState state)
             => NullScope.Instance;
 
         public bool IsEnabled(LogLevel logLevel)
-            => Debugger.IsAttached && logLevel != LogLevel.None;
+            => this.level >= logLevel;
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
@@ -33,7 +38,7 @@ namespace Shiny.Logging
             if (exception != null)
                 message += $"{Environment.NewLine}{Environment.NewLine} {exception}";
 
-            Debug.WriteLine(message);
+            Console.WriteLine(message);
         }
     }
 }

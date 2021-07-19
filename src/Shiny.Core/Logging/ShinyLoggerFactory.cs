@@ -27,7 +27,7 @@ namespace Shiny.Logging
                 loggers.Add(logger);
             }
             if (loggers.Count == 0)
-                loggers.Add(new DebugLogger());
+                loggers.Add(new ConsoleLogger("Default", LogLevel.Warning));
 
             return new ShinyLogger(loggers.ToArray());
         }

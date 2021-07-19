@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
+using Shiny.Logging;
 
 
 namespace Shiny
@@ -22,6 +23,21 @@ namespace Shiny
             StartupModule.AddModule(module);
         }
 
+
+        /// <summary>
+        /// Add the debug logger - this will only output if the debugger is attached
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddDebug(this ILoggingBuilder builder)
+            => builder.Services.AddSingleton<DebugLoggerProvider>();
+
+
+        /// <summary>
+        /// Add the console logger - this is also used if you have not provided a logging provider to shiny
+        /// </summary>
+        /// <param name="builder"></param>
+        public static void AddConsole(this ILoggingBuilder builder, LogLevel logLevel = LogLevel.Warning)
+            => builder.Services.AddSingleton(new ConsoleLoggerProvider(logLevel));
 
         /// <summary>
         /// Register a module (like a category) of services
