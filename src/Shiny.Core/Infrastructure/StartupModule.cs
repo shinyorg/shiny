@@ -96,9 +96,9 @@ namespace Shiny.Infrastructure
         {
             // check if service instance is set first
             var services = singletons
-                .Where(x => x
-                    .ImplementationType!
-                    .GetInterface(typeof(INotifyPropertyChanged).FullName) != null
+                .Where(x =>
+                    x.ImplementationInstance is INotifyPropertyChanged ||
+                    x.ImplementationType?.GetInterface(typeof(INotifyPropertyChanged).FullName) != null
                 )
                 .ToList();
 
@@ -122,9 +122,9 @@ namespace Shiny.Infrastructure
         void DoStartups(IList<ServiceDescriptor> singletons)
         {
             var services = singletons
-                .Where(x => x
-                    .ImplementationType!
-                    .GetInterface(typeof(IShinyStartupTask).FullName) != null
+                .Where(x =>
+                    x.ImplementationInstance is IShinyStartupTask ||
+                    x.ImplementationType?.GetInterface(typeof(IShinyStartupTask).FullName) != null
                 )
                 .ToList();
 

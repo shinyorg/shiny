@@ -9,6 +9,7 @@ namespace Shiny.Tests
     {
         public Action<ILoggingBuilder>? BuildLogging { get; set; }
         public Action<IServiceCollection>? BuildServices { get; set; }
+        public Action<IServiceCollection>? RegisterPlatformServices { get; set; }
 
         public void UseXUnitLogging(ITestOutputHelper output)
             => this.BuildLogging = builder => builder.AddXUnit(output);
