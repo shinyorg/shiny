@@ -28,6 +28,7 @@ namespace Shiny.Locations
                 .Instance
                 .IsGooglePlayServicesAvailable(Application.Context);
 
+            services.UseNotifications();
             if (resultCode == ConnectionResult.ServiceMissing)
                 services.TryAddSingleton<IGpsManager, LocationServicesGpsManagerImpl>();
             else
