@@ -14,7 +14,7 @@ namespace Shiny.Locations
             => this.client = context.GetSystemService<LocationManager>(AContext.LocationService);
 
 
-        public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async () =>
+        public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
         {
             (await this.RequestAccess(GpsRequest.Foreground)).Assert(null, true);
 
@@ -24,11 +24,21 @@ namespace Shiny.Locations
                 AltitudeRequired = false,
                 SpeedRequired = true
             };
-            var loc = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, false));
-            if (loc == null)
-                return null;
+            var location = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, false));
+            if (location != null)
+                return new GpsReading(location);
 
-            return new GpsReading(loc);
+            try
+            {
+                var task = this.WhenReading().Take(1).ToTask(ct);
+                await this.RequestLocationUpdates(GpsRequest.Foreground);
+                var reading = await task.ConfigureAwait(false);
+                return reading;
+            }
+            finally
+            {
+                await this.RemoveLocationUpdates();
+            }            
         });
 
 
