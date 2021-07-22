@@ -20,7 +20,7 @@ namespace Samples.Sensors
                              IBarometer? barometer = null,
                              IPedometer? pedometer = null,
                              IProximity? proximity = null,
-                             IHeartRateMonitor? heartRate = null,
+                             //IHeartRateMonitor? heartRate = null,
                              IHumidity? humidity = null,
                              ITemperature? temperature = null)
         {
@@ -35,7 +35,7 @@ namespace Samples.Sensors
             this.AddIf(pedometer, "Steps");
             this.AddIf(proximity, "Near");
 
-            this.AddIf(heartRate, "Heart Rate (bpm)");
+            //this.AddIf(heartRate, "Heart Rate (bpm)");
             this.AddIf(humidity, "Humidity");
             this.AddIf(temperature, "Temp");
         }
