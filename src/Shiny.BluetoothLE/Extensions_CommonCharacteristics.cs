@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text;
 
 
 namespace Shiny.BluetoothLE
@@ -19,30 +20,34 @@ namespace Shiny.BluetoothLE
                     var dev = new DeviceInfo();
                     foreach (var item in data)
                     {
-                        switch (item.Characteristic.Uuid[3])
+                        switch (item.Characteristic.Uuid.ToLower())
                         {
-                            case '4':
-                                dev.ModelNumber = BitConverter.ToString(item.Data);
+                            case "00002a23-0000-1000-8000-00805f9b34fb":
+                                dev.SystemId = Encoding.UTF8.GetString(item.Data);
                                 break;
 
-                            case '5':
-                                dev.SerialNumber = BitConverter.ToString(item.Data);
+                            case "00002a24-0000-1000-8000-00805f9b34fb":
+                                dev.ModelNumber = Encoding.UTF8.GetString(item.Data);
                                 break;
 
-                            case '6':
-                                dev.FirmwareRevision = BitConverter.ToString(item.Data);
+                            case "00002a25-0000-1000-8000-00805f9b34fb":
+                                dev.SerialNumber = Encoding.UTF8.GetString(item.Data);
                                 break;
 
-                            case '7':
-                                dev.HardwareRevision = BitConverter.ToString(item.Data);
+                            case "00002a26-0000-1000-8000-00805f9b34fb":
+                                dev.FirmwareRevision = Encoding.UTF8.GetString(item.Data);
                                 break;
 
-                            case '8':
-                                dev.SoftwareRevision = BitConverter.ToString(item.Data);
+                            case "00002a27-0000-1000-8000-00805f9b34fb":
+                                dev.HardwareRevision = Encoding.UTF8.GetString(item.Data);
                                 break;
 
-                            case '9':
-                                dev.ManufacturerName = BitConverter.ToString(item.Data);
+                            case "00002a28-0000-1000-8000-00805f9b34fb":
+                                dev.SoftwareRevision = Encoding.UTF8.GetString(item.Data);
+                                break;
+
+                            case "00002a29-0000-1000-8000-00805f9b34fb":
+                                dev.ManufacturerName = Encoding.UTF8.GetString(item.Data);
                                 break;
                         }
                     }

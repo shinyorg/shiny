@@ -11,14 +11,19 @@ namespace Shiny.BluetoothLE
         /// </summary>
         /// <param name="bleManager"></param>
         /// <param name="peripheralName"></param>
-        /// <param name="includeLocalName"></param>
         /// <returns></returns>
-        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this IBleManager bleManager, string peripheralName, bool includeLocalName = true) => bleManager
+        public static IObservable<IPeripheral> ScanUntilPeripheralFound(this IBleManager bleManager, string peripheralName) => bleManager
             .Scan()
-            .Where(x =>
-                x.Peripheral.Name?.Equals(peripheralName, StringComparison.OrdinalIgnoreCase) ?? false
-                || (includeLocalName && (x.AdvertisementData?.LocalName?.Equals(peripheralName, StringComparison.InvariantCultureIgnoreCase) ?? false))
-            )
+            .Where(scanResult =>
+            {
+                if (scanResult.Peripheral.Name?.Equals(peripheralName, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                    return true;
+
+                if (scanResult.AdvertisementData?.LocalName?.Equals(peripheralName, StringComparison.CurrentCultureIgnoreCase) ?? false)
+                    return true;
+
+                return false;
+            })
             .Take(1)
             .Select(x => x.Peripheral);
 

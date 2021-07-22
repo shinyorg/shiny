@@ -11,6 +11,10 @@
             <StackLayout>
                 <Label Text="This page is for custom testing by the OSS maintainer" />
 
+                <Button Text="BLE Device Info"
+                        Command="{Binding Start}"
+                        CommandParameter="bledeviceinfo" />
+
                 <Button Text="Location Permission Test"
                         Command="{Binding Start}"
                         CommandParameter="locationpermission" />

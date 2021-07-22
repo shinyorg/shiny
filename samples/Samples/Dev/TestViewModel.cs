@@ -59,6 +59,10 @@ namespace Samples.Dev
                             await this.PairingTest();
                             break;
 
+                        case "bledeviceinfo":
+                            await this.BleDeviceInfo();
+                            break;
+
                         default:
                             await dialogs.Snackbar("Invalid Test - " + arg);
                             break;
@@ -87,6 +91,30 @@ namespace Samples.Dev
 
         void Append(string txt) => this.Logs = $"{txt}{Environment.NewLine}{this.Logs}";
 
+
+        async Task BleDeviceInfo()
+        {
+            this.Append("Looking for device");
+            this.peripheral = await this.bleManager.ScanUntilPeripheralFound("STL-500").ToTask(this.cancelSrc);
+            this.Append("Device Found");
+
+            this.Append("Querying Device Info");
+            var info = await this.peripheral
+                .WithConnectIf()
+                .Select(x => x.ReadDeviceInformation())
+                .Switch()
+                .ToTask(this.cancelSrc);
+
+            this.Append(@$"
+System ID: {info.SystemId}
+Manufacturer: {info.ManufacturerName}
+Model #: {info.ModelNumber}
+Serial #: {info.SerialNumber}
+Firmware: {info.FirmwareRevision}
+HW: {info.HardwareRevision}
+SW: {info.SoftwareRevision}
+");
+        }
 
         async Task DoLocationPermissionTest()
         {

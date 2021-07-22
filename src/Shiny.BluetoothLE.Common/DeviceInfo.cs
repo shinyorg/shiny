@@ -5,6 +5,7 @@ namespace Shiny.BluetoothLE
 {
     public class DeviceInfo
     {
+        public string? SystemId { get; set; }
         public string? ManufacturerName { get; set; }
         public string? ModelNumber { get; set; }
         public string? SerialNumber { get; set; }
