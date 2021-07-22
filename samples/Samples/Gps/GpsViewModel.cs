@@ -227,7 +227,7 @@ namespace Samples.Gps
         {
             IReactiveCommand command = ReactiveCommand.CreateFromTask(async ct =>
             {
-                var reading = await (current ? this.manager.GetLastReading() : this.manager.GetCurrentPosition());
+                var reading = await (current ? this.manager.GetCurrentPosition() : this.manager.GetLastReading());
                 if (reading == null)
                     await dialogs.Alert("Could not getting GPS coordinates");
                 else

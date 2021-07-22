@@ -10,7 +10,7 @@ namespace Shiny.Notifications
     class NotificationModule : ShinyModule
     {
         readonly Type? delegateType;
-        readonly Channel[] channels;
+        readonly Channel[]? channels;
 
 
         public NotificationModule(Type? delegateType,
@@ -39,7 +39,6 @@ namespace Shiny.Notifications
 #if __ANDROID__
             services.TryAddSingleton<AndroidNotificationProcessor>();
             services.TryAddSingleton<AndroidNotificationManager>();
-
 
             services.RegisterJob(new Shiny.Jobs.JobInfo(typeof(NotificationJob))
             {
