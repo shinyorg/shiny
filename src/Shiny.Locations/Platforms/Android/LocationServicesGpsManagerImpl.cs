@@ -22,23 +22,13 @@ namespace Shiny.Locations
             {
                 BearingRequired = false,
                 AltitudeRequired = false,
-                SpeedRequired = true
+                SpeedRequired = false
             };
             var location = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, false));
             if (location != null)
                 return new GpsReading(location);
 
-            try
-            {
-                var task = this.WhenReading().Take(1).ToTask(ct);
-                await this.RequestLocationUpdates(GpsRequest.Foreground);
-                var reading = await task.ConfigureAwait(false);
-                return reading;
-            }
-            finally
-            {
-                await this.RemoveLocationUpdates();
-            }            
+            return null;
         });
 
 
@@ -46,8 +36,8 @@ namespace Shiny.Locations
         {
             var criteria = new Criteria
             {
-                BearingRequired = false,
-                AltitudeRequired = false,
+                BearingRequired = true,
+                AltitudeRequired = true,
                 SpeedRequired = true
             };
 

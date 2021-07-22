@@ -48,9 +48,12 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => this.gdelegate.WhenAccessStatusChanged(request.UseBackground);
-        public Task<AccessState> RequestAccess(GpsRequest request) => this.locationManager.RequestAccess(request.UseBackground);
-        public AccessState GetCurrentStatus(GpsRequest request) => this.locationManager.GetCurrentStatus(request.UseBackground);
+        public Task<AccessState> RequestAccess(GpsRequest request)
+            => this.locationManager.RequestAccess(request.UseBackground);
+
+
+        public AccessState GetCurrentStatus(GpsRequest request)
+            => this.locationManager.GetCurrentStatus(request.UseBackground);
 
 
         GpsRequest? request;
@@ -100,6 +103,8 @@ namespace Shiny.Locations
             this.gdelegate.Request = request;
 #if __IOS__
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
+            //this.locationManager.ShowsBackgroundLocationIndicator
+            //this.locationManager.AccuracyAuthorization = CLAccuracyAuthorization.FullAccuracy;
             var throttledInterval = request.ThrottledInterval?.TotalSeconds ?? 0;
             var minDistance = request.MinimumDistance?.TotalMeters ?? 0;
 

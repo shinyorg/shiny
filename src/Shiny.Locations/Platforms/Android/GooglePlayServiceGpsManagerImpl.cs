@@ -21,17 +21,7 @@ namespace Shiny.Locations
             if (location != null)
                 return new GpsReading(location);
 
-            try
-            {
-                var task = this.WhenReading().Take(1).ToTask(ct);
-                await this.RequestLocationUpdates(GpsRequest.Foreground);
-                var reading = await task.ConfigureAwait(false);
-                return reading;
-            }
-            finally
-            {
-                await this.RemoveLocationUpdates();
-            }
+            return null;
         });
 
 
@@ -46,9 +36,6 @@ namespace Shiny.Locations
 
 
         protected override Task RemoveLocationUpdates()
-        {
-            if (this.Callback != null)
-                this.client.RemoveLocationUpdatesAsync(this.Callback);
-        }
+            => this.client.RemoveLocationUpdatesAsync(this.Callback);
     }
 }
