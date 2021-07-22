@@ -63,9 +63,7 @@ namespace Shiny.Locations
         });
 
 
-
-
-        public IObservable<IGpsReading> GetLastReading() => Observable.FromAsync(async ct =>
+        public IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
         {
             var geolocator = new Geolocator();
             geolocator.AllowFallbackToConsentlessPositions();

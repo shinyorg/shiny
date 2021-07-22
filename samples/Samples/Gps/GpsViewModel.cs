@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Windows.Input;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Infrastructure;
@@ -46,19 +48,8 @@ namespace Samples.Gps
                 .Subscribe(x => this.manager.Message = x)
                 .DisposedBy(this.DestroyWith);
 
-            this.GetCurrentPosition = ReactiveCommand.CreateFromTask(async _ =>
-            {
-                var result = await dialogs.RequestAccess(() => this.manager.RequestAccess(new GpsRequest()));
-                if (!result)
-                    return;
-
-                var reading = await this.manager.GetLastReading();
-                if (reading == null)
-                    await dialogs.Alert("Could not getting GPS coordinates");
-                else
-                    this.SetValues(reading);
-            });
-            this.BindBusyCommand(this.GetCurrentPosition);
+            this.GetCurrentPosition = this.CreateOneReading(dialogs, true);
+            this.GetLastReading = this.CreateOneReading(dialogs, false);
 
             ReactiveCommand.Create(() => dialogs.ActionSheet(
                 "Select Priority",
@@ -177,12 +168,14 @@ namespace Samples.Gps
                 this.Heading = reading.Heading;
                 this.HeadingAccuracy = reading.HeadingAccuracy;
                 this.Speed = reading.Speed;
+                this.Timestamp = reading.Timestamp;
             }
         }
 
 
         public IReactiveCommand UseRealtime { get; }
         public IReactiveCommand SelectPriority { get; }
+        public IReactiveCommand GetLastReading { get; }
         public IReactiveCommand GetCurrentPosition { get; }
         public IReactiveCommand ToggleUpdates { get; }
         public IReactiveCommand RequestAccess { get; }
@@ -207,6 +200,7 @@ namespace Samples.Gps
         [Reactive] public double Heading { get; private set; }
         [Reactive] public double HeadingAccuracy { get; private set; }
         [Reactive] public double Speed { get; private set; }
+        [Reactive] public DateTime Timestamp { get; private set; }
 
 
         static bool IsNumeric(string value)
@@ -226,6 +220,21 @@ namespace Samples.Gps
             var i = Int32.Parse(value);
             var ts = TimeSpan.FromSeconds(i);
             return ts;
+        }
+
+
+        IReactiveCommand CreateOneReading(IDialogs dialogs, bool current)
+        {
+            IReactiveCommand command = ReactiveCommand.CreateFromTask(async ct =>
+            {
+                var reading = await (current ? this.manager.GetLastReading() : this.manager.GetCurrentPosition());
+                if (reading == null)
+                    await dialogs.Alert("Could not getting GPS coordinates");
+                else
+                    this.SetValues(reading);
+            });
+            this.BindBusyCommand(command);
+            return command;
         }
     }
 }
