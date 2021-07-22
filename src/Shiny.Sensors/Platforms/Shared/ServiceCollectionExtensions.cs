@@ -17,7 +17,7 @@ namespace Shiny
             services.UseMagnetometer();
             services.UsePedometer();
             services.UseProximitySensor();
-            services.UseHeartRateMonitor();
+            //services.UseHeartRateMonitor();
             services.UseTemperature();
             services.UseHumidity();
         }
@@ -116,15 +116,15 @@ namespace Shiny
         }
 
 
-        public static bool UseHeartRateMonitor(this IServiceCollection services)
-        {
-#if __ANDROID__ || __WATCHOS__ || TIZEN
-            services.TryAddSingleton<IHeartRateMonitor, HeartRateMonitorImpl>();
-            return true;
-#else
-            return false;
-#endif
-        }
+//        public static bool UseHeartRateMonitor(this IServiceCollection services)
+//        {
+//#if __ANDROID__ || __WATCHOS__ || TIZEN
+//            services.TryAddSingleton<IHeartRateMonitor, HeartRateMonitorImpl>();
+//            return true;
+//#else
+//            return false;
+//#endif
+//        }
 
 
         public static bool UsePedometer(this IServiceCollection services)

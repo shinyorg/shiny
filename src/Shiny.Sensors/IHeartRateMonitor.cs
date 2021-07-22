@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿//using System;
+//using System.Threading.Tasks;
 
 
-namespace Shiny.Sensors
-{
-    public interface IHeartRateMonitor : ISensor<ushort>
-    {
-        Task<AccessState> RequestAccess();
-    }
-}
+//namespace Shiny.Sensors
+//{
+//    public interface IHeartRateMonitor : ISensor<ushort>
+//    {
+//        Task<AccessState> RequestAccess();
+//    }
+//}
