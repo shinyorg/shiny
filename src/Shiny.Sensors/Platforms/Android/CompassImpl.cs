@@ -16,8 +16,8 @@ namespace Shiny.Sensors
         readonly IObservable<CompassReading> readOb;
         readonly float[] rMatrix = new float[9];
         readonly float[] orientation = new float[3];
-        float[]? lastAccel;
-        float[]? lastMag;
+        SensorEvent? lastAccel;
+        SensorEvent? lastMag;
 
 
         public CompassImpl()
@@ -32,7 +32,7 @@ namespace Shiny.Sensors
                 {
                     lock (this.syncLock)
                     {
-                        this.lastAccel = e.Values.ToArray();
+                        this.lastAccel = e; //.Values.ToArray();
                         this.Calc(ob);
                     }
                 });
@@ -40,7 +40,7 @@ namespace Shiny.Sensors
                 {
                     lock (this.syncLock)
                     {
-                        this.lastMag = e.Values.ToArray();
+                        this.lastMag = e; //.Values.ToArray();
                         this.Calc(ob);
                     }
                 });
@@ -65,13 +65,19 @@ namespace Shiny.Sensors
             if (this.lastMag == null || this.lastAccel == null)
                 return;
 
-            SensorManager.GetRotationMatrix(this.rMatrix, null, this.lastAccel, this.lastMag);
+            SensorManager.GetRotationMatrix(this.rMatrix, null, this.lastAccel.Values.ToArray(), this.lastMag.Values.ToArray());
             SensorManager.GetOrientation(this.rMatrix, this.orientation);
             var degrees = (Math.ToDegrees(this.orientation[0]) + 360) % 360;
 
-            // TODO: get compass accuracy
+            var accuracy = this.lastAccel.Accuracy switch
+            {
+                SensorStatus.AccuracyHigh => CompassAccuracy.High,
+                SensorStatus.AccuracyLow => CompassAccuracy.Approximate,
+                SensorStatus.Unreliable => CompassAccuracy.Unreliable,
+                _ => CompassAccuracy.Unknown
+            };
             // TODO: calculate true north
-            ob.OnNext(new CompassReading(CompassAccuracy.Approximate, degrees, null));
+            ob.OnNext(new CompassReading(accuracy, degrees, null));
 
             // clear for fresh read
             this.lastMag = null;
