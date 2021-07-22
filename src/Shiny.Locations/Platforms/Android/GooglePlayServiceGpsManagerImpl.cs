@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.Gms.Location;
 
@@ -46,9 +47,6 @@ namespace Shiny.Locations
 
 
         protected override Task RemoveLocationUpdates()
-        {
-            if (this.Callback != null)
-                this.client.RemoveLocationUpdatesAsync(this.Callback);
-        }
+            => this.client.RemoveLocationUpdatesAsync(this.Callback);
     }
 }
