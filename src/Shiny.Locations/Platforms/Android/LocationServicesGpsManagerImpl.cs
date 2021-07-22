@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Android.Locations;
 using AContext = Android.Content.Context;
@@ -39,7 +38,7 @@ namespace Shiny.Locations
             finally
             {
                 await this.RemoveLocationUpdates();
-            }
+            }            
         });
 
 
