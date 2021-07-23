@@ -29,15 +29,16 @@ namespace Shiny
         /// </summary>
         /// <param name="builder"></param>
         public static void AddDebug(this ILoggingBuilder builder)
-            => builder.Services.AddSingleton<DebugLoggerProvider>();
+            => builder.AddProvider(new DebugLoggerProvider());
 
 
         /// <summary>
         /// Add the console logger - this is also used if you have not provided a logging provider to shiny
         /// </summary>
         /// <param name="builder"></param>
+        /// <param name="logLevel"></param>
         public static void AddConsole(this ILoggingBuilder builder, LogLevel logLevel = LogLevel.Warning)
-            => builder.Services.AddSingleton(new ConsoleLoggerProvider(logLevel));
+            => builder.AddProvider(new ConsoleLoggerProvider(logLevel));
 
         /// <summary>
         /// Register a module (like a category) of services
