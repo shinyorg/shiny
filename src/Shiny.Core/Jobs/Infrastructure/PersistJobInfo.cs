@@ -22,7 +22,9 @@ namespace Shiny.Jobs.Infrastructure
         public void Assert()
         {
             if (Type.GetType(this.TypeName) == null)
-                throw new ArgumentException("Job type not found - did you delete/move this class from your library?");
+                throw new ArgumentException(
+                    "Job type not found - did you delete/move this class from your library? Type Name: "
+                    + this.TypeName);
         }
 
 
