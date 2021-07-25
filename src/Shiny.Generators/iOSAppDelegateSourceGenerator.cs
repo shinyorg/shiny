@@ -72,48 +72,7 @@ namespace Shiny.Generators
                         "PerformActionForShortcutItem",
                         "public override void PerformActionForShortcutItem(UIApplication application, UIApplicationShortcutItem shortcutItem, UIOperationHandler completionHandler) => Xamarin.Essentials.Platform.PerformActionForShortcutItem(application, shortcutItem, completionHandler);"
                     );
-
-                    if (this.Context.HasMsal())
-                    {
-                        this.AppendMethodIf(
-                            appDelegate,
-                            builder,
-                            "Microsoft.Identity.Client",
-                            "OpenUrl",
-@"
-public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
-{
-    if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))
-    {
-        global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);
-        return true;
-    }
-
-    if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url))
-    {
-        return true;
-    }
-    return base.OpenUrl(application, url, sourceApplication, annotation);
-}"
-                        );
-                    }
-                    else
-                    {
-                        this.AppendMethodIf(
-                            appDelegate,
-                            builder,
-                            "Xamarin.Essentials",
-                            "OpenUrl",
-@"
-public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
-{
-    if (global::Xamarin.Essentials.Platform.OpenUrl(app, url, options))
-        return true;
-
-    return base.OpenUrl(app, url, options);
-}"
-                        );
-                    }
+                    this.DoOpenUrl(appDelegate, builder);
                 }
             }
             this.Context.AddSource(appDelegate.Name, builder.ToString());
@@ -151,6 +110,75 @@ public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         }
 
 
+        void DoOpenUrl(INamedTypeSymbol appDelegate, IndentedStringBuilder builder)
+        {
+            if (this.Context.HasMsal())
+            {
+                this.AppendMethodIf(
+                    appDelegate,
+                    builder,
+                    "Microsoft.Identity.Client",
+                    "OpenUrl",
+                    b =>
+                    {
+                        using (b.BlockInvariant("public override bool OpenUrl(UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)"))
+                        {
+                            using (b.BlockInvariant("if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.IsBrokerResponse(sourceApplication))"))
+                            {
+                                b.AppendLineInvariant("global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetBrokerContinuationEventArgs(url);");
+                                b.AppendLineInvariant("return true;");
+                            }
+                            b.AppendLineInvariant("if (global::Microsoft.Identity.Client.AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(url)) return true;");
+                            b.AppendLineInvariant("return base.OpenUrl(application, url, sourceApplication, annotation);");
+                        }
+                    }
+                );
+            }
+            else
+            {
+                this.AppendMethodIf(
+                    appDelegate,
+                    builder,
+                    "Xamarin.Essentials",
+                    "OpenUrl",
+                    b =>
+                    {
+                        using (b.BlockInvariant("public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)"))
+                        {
+                            b.AppendLineInvariant("if (global::Xamarin.Essentials.Platform.OpenUrl(app, url, options)) return true;");
+                            b.AppendLineInvariant("return base.OpenUrl(app, url, options);");
+                        }
+                    }
+                );
+            }
+        }
+
+
+        void AppendMethodIf(INamedTypeSymbol symbol, IndentedStringBuilder builder, string neededLibrary, string methodName, Action<IndentedStringBuilder> doBuild)
+        {
+            var hasAssembly = this.Context.HasReference(neededLibrary);
+            if (!hasAssembly)
+                return;
+
+            var exists = symbol.HasMethod(methodName);
+
+            if (exists)
+            {
+                this.MethodExists(methodName);
+            }
+            else
+            {
+                doBuild(builder);
+            }
+        }
+
+
+        void MethodExists(string methodName) => this.Context.Log(
+            "SHINY002",
+            $"Method '{methodName}' already exists on your appdelegate, make sure you call the Shiny hook for this"
+        );
+
+
         void AppendMethodIf(INamedTypeSymbol symbol, IndentedStringBuilder builder, string neededLibrary, string methodName, string append)
         {
             var hasAssembly = this.Context.HasReference(neededLibrary);
@@ -167,10 +195,7 @@ public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
 
             if (exists)
             {
-                this.Context.Log(
-                    "SHINY002",
-                    $"Method '{methodName}' already exists on your appdelegate, make sure you call the Shiny hook for this"
-                );
+                this.MethodExists(methodName);
             }
             else
             {
