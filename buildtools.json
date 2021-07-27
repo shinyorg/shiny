@@ -7,6 +7,7 @@
         "className": "Values",
         "accessibility": "Internal",
         "namespace": "Secrets",
+        "rootNamespace": null,
         "properties": [
           {
             "name": "AppCenterKey",
@@ -57,6 +58,7 @@
         "className": "Values",
         "accessibility": "Internal",
         "namespace": "Secrets",
+        "rootNamespace": null,
         "properties": [
           {
             "name": "AppCenterKey",

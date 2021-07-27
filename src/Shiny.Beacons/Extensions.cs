@@ -96,7 +96,10 @@ namespace Shiny.Beacons
             if (data == null)
                 return false;
 
-            if (data.Length != 23)
+            if (data.Length < 23)
+                return false;
+
+            if (data.Length > 24)
                 return false;
 
             if (data[0] != 0x02 || data[1] != 0x15)

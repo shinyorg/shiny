@@ -23,6 +23,20 @@ namespace Shiny.Tests.Beacons
             64,
             Proximity.Immediate
         )]
+        [InlineData(
+            "02-15-F7-82-6D-A6-4F-A2-4E-98-80-24-BC-5B-71-E0-89-3E-04-56-00-10-BF-3E",
+            "f7826da6-4fa2-4e98-8024-bc5b71e0893e",
+            1110,
+            16,
+            Proximity.Immediate
+        )]
+        [InlineData(
+            "02-15-F7-82-6D-A6-4F-A2-4E-98-80-24-BC-5B-71-E0-89-3E-04-56-00-10-BF",
+            "f7826da6-4fa2-4e98-8024-bc5b71e0893e",
+            1110,
+            16,
+            Proximity.Immediate
+        )]
         public void ParseBeaconPacketSuccess(string hexData, string beaconIdentifier, ushort major, ushort minor, Proximity prox)
         {
             var bytes = hexData.FromHex();
