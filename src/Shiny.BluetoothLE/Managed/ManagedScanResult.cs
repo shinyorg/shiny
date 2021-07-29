@@ -42,6 +42,14 @@ namespace Shiny.BluetoothLE.Managed
         }
 
 
+        int? txPower;
+        public int? TxPower
+        {
+            get => this.txPower;
+            internal set => this.Set(ref this.txPower, value);
+        }
+
+
         ManufacturerData? manufacturerData;
         public ManufacturerData? ManufacturerData
         {

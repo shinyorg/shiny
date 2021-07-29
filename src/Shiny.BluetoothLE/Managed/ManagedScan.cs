@@ -139,6 +139,7 @@ namespace Shiny.BluetoothLE.Managed
                             result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
                             result.Name = scanResult.Peripheral.Name;
                             result.Rssi = scanResult.Rssi;
+                            result.TxPower = scanResult.AdvertisementData?.TxPower;
                             result.LastSeen = DateTimeOffset.UtcNow;
                             this.actionSubj.OnNext((action, result));
                         }
