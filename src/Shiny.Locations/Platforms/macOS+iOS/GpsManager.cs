@@ -64,13 +64,14 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<IGpsReading?> GetLastReading()
+        public IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync<IGpsReading?>(async ct =>
         {
+            (await this.RequestAccess(GpsRequest.Foreground)).Assert();
             if (this.locationManager.Location == null)
-                return Observable.Return<IGpsReading?>(null);
+                return null;
 
-            return Observable.Return(new GpsReading(this.locationManager.Location!));
-        }
+            return new GpsReading(this.locationManager.Location);
+        });
 
 
         public async Task StartListener(GpsRequest request)
