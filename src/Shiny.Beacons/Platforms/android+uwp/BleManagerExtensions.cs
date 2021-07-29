@@ -12,7 +12,7 @@ namespace Shiny.Beacons
         public static IObservable<Beacon> ScanForBeacons(this IBleManager manager, BeaconMonitorConfig? config)
         {
             var scanType = config == null
-                ? BleScanType.Balanced
+                ? BleScanType.LowLatency
                 : BleScanType.LowPowered;
 
             var cfg = new ScanConfig { ScanType = scanType };
