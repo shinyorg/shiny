@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Windows.Input;
 
 using ReactiveUI;
@@ -48,8 +49,9 @@ namespace Samples.Gps
                 .Subscribe(x => this.manager.Message = x)
                 .DisposedBy(this.DestroyWith);
 
-            this.GetCurrentPosition = this.CreateOneReading(dialogs, true);
-            this.GetLastReading = this.CreateOneReading(dialogs, false);
+            this.GetCurrentPosition = this.CreateOneReading(dialogs, LocationRetrieve.Current);
+            this.GetLastReading = this.CreateOneReading(dialogs, LocationRetrieve.Last);
+            this.GetLastOrCurrent = this.CreateOneReading(dialogs, LocationRetrieve.LastOrCurrent);
 
             ReactiveCommand.Create(() => dialogs.ActionSheet(
                 "Select Priority",
@@ -177,6 +179,7 @@ namespace Samples.Gps
         public IReactiveCommand SelectPriority { get; }
         public IReactiveCommand GetLastReading { get; }
         public IReactiveCommand GetCurrentPosition { get; }
+        public IReactiveCommand GetLastOrCurrent { get; }
         public IReactiveCommand ToggleUpdates { get; }
         public IReactiveCommand RequestAccess { get; }
 
@@ -223,11 +226,18 @@ namespace Samples.Gps
         }
 
 
-        IReactiveCommand CreateOneReading(IDialogs dialogs, bool current)
+        IReactiveCommand CreateOneReading(IDialogs dialogs, LocationRetrieve retrieve)
         {
             IReactiveCommand command = ReactiveCommand.CreateFromTask(async ct =>
             {
-                var reading = await (current ? this.manager.GetCurrentPosition() : this.manager.GetLastReading());
+                var observable = retrieve switch
+                {
+                    LocationRetrieve.Last => this.manager.GetLastReading(),
+                    LocationRetrieve.Current => this.manager.GetCurrentPosition(),
+                    _ => this.manager.GetLastReadingOrCurrentPosition()
+                };
+                var reading = await observable.ToTask(ct);
+
                 if (reading == null)
                     await dialogs.Alert("Could not getting GPS coordinates");
                 else
@@ -235,6 +245,14 @@ namespace Samples.Gps
             });
             this.BindBusyCommand(command);
             return command;
+        }
+
+
+        enum LocationRetrieve
+        {
+            Last,
+            Current,
+            LastOrCurrent
         }
     }
 }

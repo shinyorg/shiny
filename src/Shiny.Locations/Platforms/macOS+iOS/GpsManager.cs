@@ -66,7 +66,7 @@ namespace Shiny.Locations
 
         public IObservable<IGpsReading?> GetLastReading()
         {
-            if (this.locationManager.Location != null)
+            if (this.locationManager.Location == null)
                 return Observable.Return<IGpsReading?>(null);
 
             return Observable.Return(new GpsReading(this.locationManager.Location!));
