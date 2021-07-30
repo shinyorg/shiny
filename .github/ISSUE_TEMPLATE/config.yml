@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: "\U0001F99FBug"
-    url: https://github.community/
+    url: bug.md
     about: Report a bug or unexpected behavior here
   - name: "\U0001F354Feature Request"
-    url: https://bounty.github.com/
+    url: feature.md
     about: Feature and enhancement requests go here
   - name: "\U0001F62C Question"
-    url: https://bounty.github.com/
+    url: question.md
     about: Having Trouble?? ONLY OSS maintainers of other projects OR ACTIVE project sponsors can use this! If you aren't one of these, expect the ban hammer to fall
