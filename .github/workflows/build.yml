@@ -9,6 +9,8 @@ on:
         default: 'warning'
   push:
     branches: [ master, main, dev, preview ]
+    paths:
+    - "src/**"
   pull_request:
     branches: [ master, main, dev ]
     paths:
