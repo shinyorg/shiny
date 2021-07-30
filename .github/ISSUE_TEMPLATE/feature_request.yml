@@ -1,28 +1,28 @@
 name: Feature Request
+description: You have an idea for an enhancement within Shiny
 title: "[Feature Request]: "
-labels: [s/unverified, t/enhancement]
 body:
-- type: markdown
-  attributes:
-    label: Summary
-    description: Steps to reproduce the behavior.
-    validations:
-      required: true
-- type: markdown
-  attributes:
-    label: API Changes
-    validations:
-      required: true
-- type: markdown
-  attributes:
-    label: Intended Use Case
-    validations:
-      required: true
-- type: checkboxes
-  id: terms
-  attributes:
-    label: Code of Conduct
-    description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
-    options:
-      - label: I agree to follow this project's Code of Conduct
+  - type: markdown
+    attributes:
+      label: Summary
+      description: Steps to reproduce the behavior.
+      validations:
         required: true
+  - type: markdown
+    attributes:
+      label: API Changes
+      validations:
+        required: true
+  - type: markdown
+    attributes:
+      label: Intended Use Case
+      validations:
+        required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
