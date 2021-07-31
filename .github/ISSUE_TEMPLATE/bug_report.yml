@@ -1,6 +1,7 @@
 name: Bug Report
 description: You have found something wrong with Shiny
 title: "[Bug]: "
+labels: [bug, unverified]
 body:
   - type: dropdown
     id: component
