@@ -1,19 +1,20 @@
 name: Feature Request
 description: You have an idea for an enhancement within Shiny
 title: "[Feature Request]: "
+label: 
 body:
-  - type: markdown
+  - type: textarea
     attributes:
       label: Summary
       description: Steps to reproduce the behavior.
     validations:
       required: true
-  - type: markdown
+  - type: textarea
     attributes:
       label: API Changes
     validations:
       required: true
-  - type: markdown
+  - type: textarea
     attributes:
       label: Intended Use Case
     validations:
