@@ -38,11 +38,11 @@ body:
       - label: Android 11
       - label: UWP
   - type: textarea
+    validations:
+      required: true
     attributes:
       label: Steps To Reproduce
       description: Steps to reproduce the behavior.
-      validations:
-        required: true
       placeholder: |
         1. 
         2. 
@@ -50,13 +50,13 @@ body:
   - type: textarea
     attributes:
       label: Expected Behavior
-      validations:
-        required: true
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Actual Behavior
-      validations:
-        required: true
+    validations:
+      required: true
   - type: textarea
     id: exception
     attributes:

@@ -6,18 +6,18 @@ body:
     attributes:
       label: Summary
       description: Steps to reproduce the behavior.
-      validations:
-        required: true
+    validations:
+      required: true
   - type: markdown
     attributes:
       label: API Changes
-      validations:
-        required: true
+    validations:
+      required: true
   - type: markdown
     attributes:
       label: Intended Use Case
-      validations:
-        required: true
+    validations:
+      required: true
   - type: checkboxes
     id: terms
     attributes:

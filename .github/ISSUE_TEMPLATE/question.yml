@@ -9,8 +9,8 @@ body:
   attributes:
     label: Question
     description: Please be a concise as possible
-    validations:
-      required: true
+  validations:
+    required: true
 - type: checkboxes
   id: terms
   attributes:
