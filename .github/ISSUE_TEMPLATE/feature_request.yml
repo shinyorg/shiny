@@ -1,7 +1,7 @@
 name: Feature Request
 description: You have an idea for an enhancement within Shiny
 title: "[Feature Request]: "
-labels: [bug, unverified]
+labels: [feature request, unverified]
 body:
   - type: textarea
     attributes:
