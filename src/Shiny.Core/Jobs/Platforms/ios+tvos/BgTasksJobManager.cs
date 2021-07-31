@@ -135,20 +135,31 @@ namespace Shiny.Jobs
                         switch (task.Identifier)
                         {
                             case "com.shiny.job":
-                                jobList = jobs.ToList();
+                                jobList = jobs
+                                    .Where(x =>
+                                        !x.DeviceCharging &&
+                                        x.RequiredInternetAccess == InternetAccess.None
+                                    )
+                                    .ToList();
                                 break;
 
                             case "com.shiny.jobpower":
                                 jobList = jobs
-                                    .Where(x => x.DeviceCharging)
+                                    .Where(x =>
+                                        x.DeviceCharging &&
+                                        x.RequiredInternetAccess == InternetAccess.None
+                                    )
                                     .ToList();
                                 break;
 
                             case "com.shiny.jobnet":
                                 jobList = jobs
                                     .Where(x =>
-                                        x.RequiredInternetAccess == InternetAccess.Any &&
-                                        x.RequiredInternetAccess == InternetAccess.Unmetered
+                                        !x.DeviceCharging &&
+                                        (
+                                            x.RequiredInternetAccess == InternetAccess.Any ||
+                                            x.RequiredInternetAccess == InternetAccess.Unmetered
+                                        )
                                     )
                                     .ToList();
                                 break;
@@ -157,8 +168,11 @@ namespace Shiny.Jobs
                                 jobList = jobs
                                     .Where(x =>
                                         (
-                                            x.RequiredInternetAccess == InternetAccess.Any &&
-                                            x.RequiredInternetAccess == InternetAccess.Unmetered
+                                            x.DeviceCharging &&
+                                            (
+                                                x.RequiredInternetAccess == InternetAccess.Any ||
+                                                x.RequiredInternetAccess == InternetAccess.Unmetered
+                                            )
                                         )
                                         && x.DeviceCharging
                                     )
