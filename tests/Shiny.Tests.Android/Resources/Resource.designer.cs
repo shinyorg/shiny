@@ -568,7 +568,6 @@ namespace Shiny.Tests.Android
 			global::Acr.UserDialogs.Resource.Attribute.windowMinWidthMinor = global::Shiny.Tests.Android.Resource.Attribute.windowMinWidthMinor;
 			global::Acr.UserDialogs.Resource.Attribute.windowNoTitle = global::Shiny.Tests.Android.Resource.Attribute.windowNoTitle;
 			global::Acr.UserDialogs.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Acr.UserDialogs.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Acr.UserDialogs.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Acr.UserDialogs.Resource.Boolean.mtrl_btn_textappearance_all_caps = global::Shiny.Tests.Android.Resource.Boolean.mtrl_btn_textappearance_all_caps;
 			global::Acr.UserDialogs.Resource.Color.abc_background_cache_hint_selector_material_dark = global::Shiny.Tests.Android.Resource.Color.abc_background_cache_hint_selector_material_dark;
@@ -944,12 +943,6 @@ namespace Shiny.Tests.Android
 			global::Acr.UserDialogs.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Acr.UserDialogs.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Acr.UserDialogs.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Acr.UserDialogs.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Acr.UserDialogs.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Acr.UserDialogs.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Acr.UserDialogs.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Acr.UserDialogs.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Acr.UserDialogs.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Acr.UserDialogs.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Acr.UserDialogs.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Acr.UserDialogs.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -990,12 +983,6 @@ namespace Shiny.Tests.Android
 			global::Acr.UserDialogs.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Acr.UserDialogs.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Acr.UserDialogs.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Acr.UserDialogs.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Acr.UserDialogs.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Acr.UserDialogs.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Acr.UserDialogs.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Acr.UserDialogs.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Acr.UserDialogs.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
 			global::Acr.UserDialogs.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Acr.UserDialogs.Resource.Drawable.avd_hide_password = global::Shiny.Tests.Android.Resource.Drawable.avd_hide_password;
 			global::Acr.UserDialogs.Resource.Drawable.avd_show_password = global::Shiny.Tests.Android.Resource.Drawable.avd_show_password;
@@ -2725,6 +2712,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Attribute.actionMenuTextColor = global::Shiny.Tests.Android.Resource.Attribute.actionMenuTextColor;
 			global::Shiny.Beacons.Resource.Attribute.actionModeBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeBackground;
 			global::Shiny.Beacons.Resource.Attribute.actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseContentDescription;
 			global::Shiny.Beacons.Resource.Attribute.actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseDrawable;
 			global::Shiny.Beacons.Resource.Attribute.actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCopyDrawable;
 			global::Shiny.Beacons.Resource.Attribute.actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCutDrawable;
@@ -2735,6 +2723,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Attribute.actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeShareDrawable;
 			global::Shiny.Beacons.Resource.Attribute.actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeSplitBackground;
 			global::Shiny.Beacons.Resource.Attribute.actionModeStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeStyle;
+			global::Shiny.Beacons.Resource.Attribute.actionModeTheme = global::Shiny.Tests.Android.Resource.Attribute.actionModeTheme;
 			global::Shiny.Beacons.Resource.Attribute.actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeWebSearchDrawable;
 			global::Shiny.Beacons.Resource.Attribute.actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowButtonStyle;
 			global::Shiny.Beacons.Resource.Attribute.actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowMenuStyle;
@@ -2839,6 +2828,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.Beacons.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.Beacons.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Beacons.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.Beacons.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.Beacons.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Beacons.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
@@ -2987,7 +2977,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Attribute.windowMinWidthMinor = global::Shiny.Tests.Android.Resource.Attribute.windowMinWidthMinor;
 			global::Shiny.Beacons.Resource.Attribute.windowNoTitle = global::Shiny.Tests.Android.Resource.Attribute.windowNoTitle;
 			global::Shiny.Beacons.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Shiny.Beacons.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Shiny.Beacons.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Shiny.Beacons.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
 			global::Shiny.Beacons.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
@@ -3139,6 +3128,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Dimension.abc_seekbar_track_background_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_background_height_material;
 			global::Shiny.Beacons.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_progress_height_material;
 			global::Shiny.Beacons.Resource.Dimension.abc_select_dialog_padding_start_material = global::Shiny.Tests.Android.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Shiny.Beacons.Resource.Dimension.abc_star_big = global::Shiny.Tests.Android.Resource.Dimension.abc_star_big;
+			global::Shiny.Beacons.Resource.Dimension.abc_star_medium = global::Shiny.Tests.Android.Resource.Dimension.abc_star_medium;
+			global::Shiny.Beacons.Resource.Dimension.abc_star_small = global::Shiny.Tests.Android.Resource.Dimension.abc_star_small;
 			global::Shiny.Beacons.Resource.Dimension.abc_switch_padding = global::Shiny.Tests.Android.Resource.Dimension.abc_switch_padding;
 			global::Shiny.Beacons.Resource.Dimension.abc_text_size_body_1_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_1_material;
 			global::Shiny.Beacons.Resource.Dimension.abc_text_size_body_2_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_2_material;
@@ -3231,12 +3223,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Shiny.Beacons.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Shiny.Beacons.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Shiny.Beacons.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Shiny.Beacons.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Shiny.Beacons.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Shiny.Beacons.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -3267,6 +3253,8 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Drawable.abc_seekbar_track_material = global::Shiny.Tests.Android.Resource.Drawable.abc_seekbar_track_material;
 			global::Shiny.Beacons.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_mtrl_am_alpha;
 			global::Shiny.Beacons.Resource.Drawable.abc_spinner_textfield_background_material = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Shiny.Beacons.Resource.Drawable.abc_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_black_48dp;
+			global::Shiny.Beacons.Resource.Drawable.abc_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_half_black_48dp;
 			global::Shiny.Beacons.Resource.Drawable.abc_switch_thumb_material = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_thumb_material;
 			global::Shiny.Beacons.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_track_mtrl_alpha;
 			global::Shiny.Beacons.Resource.Drawable.abc_tab_indicator_material = global::Shiny.Tests.Android.Resource.Drawable.abc_tab_indicator_material;
@@ -3277,12 +3265,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Shiny.Beacons.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Shiny.Beacons.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_left_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_middle_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl;
+			global::Shiny.Beacons.Resource.Drawable.abc_text_select_handle_right_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl;
 			global::Shiny.Beacons.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Shiny.Beacons.Resource.Drawable.btn_checkbox_checked_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_mtrl;
 			global::Shiny.Beacons.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
@@ -3453,10 +3438,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Beacons.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.Beacons.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Beacons.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Beacons.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Beacons.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.Beacons.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Beacons.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.Beacons.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.Beacons.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.Beacons.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Beacons.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.Beacons.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.Beacons.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.Beacons.Resource.Id.textSpacerNoButtons = global::Shiny.Tests.Android.Resource.Id.textSpacerNoButtons;
@@ -4034,6 +4024,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeBackground;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
@@ -4044,6 +4035,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeTheme = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeTheme;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
 			global::Shiny.Beacons.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
@@ -4182,6 +4174,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Beacons.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Beacons.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Beacons.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Beacons.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.Beacons.Resource.Styleable.Fragment = global::Shiny.Tests.Android.Resource.Styleable.Fragment;
 			global::Shiny.Beacons.Resource.Styleable.FragmentContainerView = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView;
 			global::Shiny.Beacons.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView_android_name;
@@ -4391,14 +4384,11 @@ namespace Shiny.Tests.Android
 			global::Shiny.BluetoothLE.Common.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.BluetoothLE.Common.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.BluetoothLE.Common.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.BluetoothLE.Common.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.BluetoothLE.Common.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.BluetoothLE.Common.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.BluetoothLE.Common.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
 			global::Shiny.BluetoothLE.Common.Resource.Attribute.ttcIndex = global::Shiny.Tests.Android.Resource.Attribute.ttcIndex;
-			global::Shiny.BluetoothLE.Common.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
-			global::Shiny.BluetoothLE.Common.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
-			global::Shiny.BluetoothLE.Common.Resource.Boolean.enable_system_job_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_job_service_default;
-			global::Shiny.BluetoothLE.Common.Resource.Boolean.workmanager_test_configuration = global::Shiny.Tests.Android.Resource.Boolean.workmanager_test_configuration;
 			global::Shiny.BluetoothLE.Common.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_ripple_material_light;
 			global::Shiny.BluetoothLE.Common.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.BluetoothLE.Common.Resource.Color.notification_action_color_filter = global::Shiny.Tests.Android.Resource.Color.notification_action_color_filter;
@@ -4496,10 +4486,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.BluetoothLE.Common.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.BluetoothLE.Common.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.BluetoothLE.Common.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.BluetoothLE.Common.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.BluetoothLE.Common.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.BluetoothLE.Common.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.BluetoothLE.Common.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.BluetoothLE.Common.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.BluetoothLE.Common.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.BluetoothLE.Common.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.BluetoothLE.Common.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.BluetoothLE.Common.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.BluetoothLE.Common.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.BluetoothLE.Common.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.BluetoothLE.Common.Resource.Id.time = global::Shiny.Tests.Android.Resource.Id.time;
@@ -4543,6 +4538,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.BluetoothLE.Common.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.BluetoothLE.Common.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.BluetoothLE.Common.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.BluetoothLE.Common.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.BluetoothLE.Common.Resource.Styleable.GradientColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor;
 			global::Shiny.BluetoothLE.Common.Resource.Styleable.GradientColorItem = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem;
 			global::Shiny.BluetoothLE.Common.Resource.Styleable.GradientColorItem_android_color = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem_android_color;
@@ -4567,14 +4563,11 @@ namespace Shiny.Tests.Android
 			global::Shiny.BluetoothLE.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.BluetoothLE.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.BluetoothLE.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.BluetoothLE.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.BluetoothLE.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.BluetoothLE.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.BluetoothLE.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
 			global::Shiny.BluetoothLE.Resource.Attribute.ttcIndex = global::Shiny.Tests.Android.Resource.Attribute.ttcIndex;
-			global::Shiny.BluetoothLE.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
-			global::Shiny.BluetoothLE.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
-			global::Shiny.BluetoothLE.Resource.Boolean.enable_system_job_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_job_service_default;
-			global::Shiny.BluetoothLE.Resource.Boolean.workmanager_test_configuration = global::Shiny.Tests.Android.Resource.Boolean.workmanager_test_configuration;
 			global::Shiny.BluetoothLE.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_ripple_material_light;
 			global::Shiny.BluetoothLE.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.BluetoothLE.Resource.Color.notification_action_color_filter = global::Shiny.Tests.Android.Resource.Color.notification_action_color_filter;
@@ -4672,10 +4665,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.BluetoothLE.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.BluetoothLE.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.BluetoothLE.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.BluetoothLE.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.BluetoothLE.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.BluetoothLE.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.BluetoothLE.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.BluetoothLE.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.BluetoothLE.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.BluetoothLE.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.BluetoothLE.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.BluetoothLE.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.BluetoothLE.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.BluetoothLE.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.BluetoothLE.Resource.Id.time = global::Shiny.Tests.Android.Resource.Id.time;
@@ -4719,6 +4717,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.BluetoothLE.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.BluetoothLE.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.BluetoothLE.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.BluetoothLE.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.BluetoothLE.Resource.Styleable.GradientColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor;
 			global::Shiny.BluetoothLE.Resource.Styleable.GradientColorItem = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem;
 			global::Shiny.BluetoothLE.Resource.Styleable.GradientColorItem_android_color = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem_android_color;
@@ -4743,14 +4742,11 @@ namespace Shiny.Tests.Android
 			global::Shiny.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
 			global::Shiny.Resource.Attribute.ttcIndex = global::Shiny.Tests.Android.Resource.Attribute.ttcIndex;
-			global::Shiny.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
-			global::Shiny.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
-			global::Shiny.Resource.Boolean.enable_system_job_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_job_service_default;
-			global::Shiny.Resource.Boolean.workmanager_test_configuration = global::Shiny.Tests.Android.Resource.Boolean.workmanager_test_configuration;
 			global::Shiny.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_ripple_material_light;
 			global::Shiny.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_secondary_text_default_material_light;
 			global::Shiny.Resource.Color.notification_action_color_filter = global::Shiny.Tests.Android.Resource.Color.notification_action_color_filter;
@@ -4848,10 +4844,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.Resource.Id.time = global::Shiny.Tests.Android.Resource.Id.time;
@@ -4895,6 +4896,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.Resource.Styleable.GradientColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor;
 			global::Shiny.Resource.Styleable.GradientColorItem = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem;
 			global::Shiny.Resource.Styleable.GradientColorItem_android_color = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem_android_color;
@@ -4911,6 +4913,368 @@ namespace Shiny.Tests.Android
 			global::Shiny.Resource.Styleable.GradientColor_android_startY = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_startY;
 			global::Shiny.Resource.Styleable.GradientColor_android_tileMode = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_tileMode;
 			global::Shiny.Resource.Styleable.GradientColor_android_type = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_type;
+			global::Shiny.Jobs.Resource.Attribute.alpha = global::Shiny.Tests.Android.Resource.Attribute.alpha;
+			global::Shiny.Jobs.Resource.Attribute.font = global::Shiny.Tests.Android.Resource.Attribute.font;
+			global::Shiny.Jobs.Resource.Attribute.fontProviderAuthority = global::Shiny.Tests.Android.Resource.Attribute.fontProviderAuthority;
+			global::Shiny.Jobs.Resource.Attribute.fontProviderCerts = global::Shiny.Tests.Android.Resource.Attribute.fontProviderCerts;
+			global::Shiny.Jobs.Resource.Attribute.fontProviderFetchStrategy = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchStrategy;
+			global::Shiny.Jobs.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
+			global::Shiny.Jobs.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
+			global::Shiny.Jobs.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Jobs.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
+			global::Shiny.Jobs.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
+			global::Shiny.Jobs.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
+			global::Shiny.Jobs.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
+			global::Shiny.Jobs.Resource.Attribute.ttcIndex = global::Shiny.Tests.Android.Resource.Attribute.ttcIndex;
+			global::Shiny.Jobs.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
+			global::Shiny.Jobs.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
+			global::Shiny.Jobs.Resource.Boolean.enable_system_job_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_job_service_default;
+			global::Shiny.Jobs.Resource.Boolean.workmanager_test_configuration = global::Shiny.Tests.Android.Resource.Boolean.workmanager_test_configuration;
+			global::Shiny.Jobs.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.Jobs.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_secondary_text_default_material_light;
+			global::Shiny.Jobs.Resource.Color.notification_action_color_filter = global::Shiny.Tests.Android.Resource.Color.notification_action_color_filter;
+			global::Shiny.Jobs.Resource.Color.notification_icon_bg_color = global::Shiny.Tests.Android.Resource.Color.notification_icon_bg_color;
+			global::Shiny.Jobs.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Tests.Android.Resource.Dimension.compat_button_inset_horizontal_material;
+			global::Shiny.Jobs.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Tests.Android.Resource.Dimension.compat_button_inset_vertical_material;
+			global::Shiny.Jobs.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Tests.Android.Resource.Dimension.compat_button_padding_horizontal_material;
+			global::Shiny.Jobs.Resource.Dimension.compat_button_padding_vertical_material = global::Shiny.Tests.Android.Resource.Dimension.compat_button_padding_vertical_material;
+			global::Shiny.Jobs.Resource.Dimension.compat_control_corner_material = global::Shiny.Tests.Android.Resource.Dimension.compat_control_corner_material;
+			global::Shiny.Jobs.Resource.Dimension.compat_notification_large_icon_max_height = global::Shiny.Tests.Android.Resource.Dimension.compat_notification_large_icon_max_height;
+			global::Shiny.Jobs.Resource.Dimension.compat_notification_large_icon_max_width = global::Shiny.Tests.Android.Resource.Dimension.compat_notification_large_icon_max_width;
+			global::Shiny.Jobs.Resource.Dimension.notification_action_icon_size = global::Shiny.Tests.Android.Resource.Dimension.notification_action_icon_size;
+			global::Shiny.Jobs.Resource.Dimension.notification_action_text_size = global::Shiny.Tests.Android.Resource.Dimension.notification_action_text_size;
+			global::Shiny.Jobs.Resource.Dimension.notification_big_circle_margin = global::Shiny.Tests.Android.Resource.Dimension.notification_big_circle_margin;
+			global::Shiny.Jobs.Resource.Dimension.notification_content_margin_start = global::Shiny.Tests.Android.Resource.Dimension.notification_content_margin_start;
+			global::Shiny.Jobs.Resource.Dimension.notification_large_icon_height = global::Shiny.Tests.Android.Resource.Dimension.notification_large_icon_height;
+			global::Shiny.Jobs.Resource.Dimension.notification_large_icon_width = global::Shiny.Tests.Android.Resource.Dimension.notification_large_icon_width;
+			global::Shiny.Jobs.Resource.Dimension.notification_main_column_padding_top = global::Shiny.Tests.Android.Resource.Dimension.notification_main_column_padding_top;
+			global::Shiny.Jobs.Resource.Dimension.notification_media_narrow_margin = global::Shiny.Tests.Android.Resource.Dimension.notification_media_narrow_margin;
+			global::Shiny.Jobs.Resource.Dimension.notification_right_icon_size = global::Shiny.Tests.Android.Resource.Dimension.notification_right_icon_size;
+			global::Shiny.Jobs.Resource.Dimension.notification_right_side_padding_top = global::Shiny.Tests.Android.Resource.Dimension.notification_right_side_padding_top;
+			global::Shiny.Jobs.Resource.Dimension.notification_small_icon_background_padding = global::Shiny.Tests.Android.Resource.Dimension.notification_small_icon_background_padding;
+			global::Shiny.Jobs.Resource.Dimension.notification_small_icon_size_as_large = global::Shiny.Tests.Android.Resource.Dimension.notification_small_icon_size_as_large;
+			global::Shiny.Jobs.Resource.Dimension.notification_subtext_size = global::Shiny.Tests.Android.Resource.Dimension.notification_subtext_size;
+			global::Shiny.Jobs.Resource.Dimension.notification_top_pad = global::Shiny.Tests.Android.Resource.Dimension.notification_top_pad;
+			global::Shiny.Jobs.Resource.Dimension.notification_top_pad_large_text = global::Shiny.Tests.Android.Resource.Dimension.notification_top_pad_large_text;
+			global::Shiny.Jobs.Resource.Drawable.notification_action_background = global::Shiny.Tests.Android.Resource.Drawable.notification_action_background;
+			global::Shiny.Jobs.Resource.Drawable.notification_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_bg;
+			global::Shiny.Jobs.Resource.Drawable.notification_bg_low = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low;
+			global::Shiny.Jobs.Resource.Drawable.notification_bg_low_normal = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low_normal;
+			global::Shiny.Jobs.Resource.Drawable.notification_bg_low_pressed = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low_pressed;
+			global::Shiny.Jobs.Resource.Drawable.notification_bg_normal = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_normal;
+			global::Shiny.Jobs.Resource.Drawable.notification_bg_normal_pressed = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_normal_pressed;
+			global::Shiny.Jobs.Resource.Drawable.notification_icon_background = global::Shiny.Tests.Android.Resource.Drawable.notification_icon_background;
+			global::Shiny.Jobs.Resource.Drawable.notification_template_icon_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_template_icon_bg;
+			global::Shiny.Jobs.Resource.Drawable.notification_template_icon_low_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_template_icon_low_bg;
+			global::Shiny.Jobs.Resource.Drawable.notification_tile_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_tile_bg;
+			global::Shiny.Jobs.Resource.Drawable.notify_panel_notification_icon_bg = global::Shiny.Tests.Android.Resource.Drawable.notify_panel_notification_icon_bg;
+			global::Shiny.Jobs.Resource.Id.accessibility_action_clickable_span = global::Shiny.Tests.Android.Resource.Id.accessibility_action_clickable_span;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_0 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_0;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_1 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_1;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_10 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_10;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_11 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_11;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_12 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_12;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_13 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_13;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_14 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_14;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_15 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_15;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_16 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_16;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_17 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_17;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_18 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_18;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_19 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_19;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_2 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_2;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_20 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_20;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_21 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_21;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_22 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_22;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_23 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_23;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_24 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_24;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_25 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_25;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_26 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_26;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_27 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_27;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_28 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_28;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_29 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_29;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_3 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_3;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_30 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_30;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_31 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_31;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_4 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_4;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_5 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_5;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_6 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_6;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_7 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_7;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_8 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_8;
+			global::Shiny.Jobs.Resource.Id.accessibility_custom_action_9 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_9;
+			global::Shiny.Jobs.Resource.Id.actions = global::Shiny.Tests.Android.Resource.Id.actions;
+			global::Shiny.Jobs.Resource.Id.action_container = global::Shiny.Tests.Android.Resource.Id.action_container;
+			global::Shiny.Jobs.Resource.Id.action_divider = global::Shiny.Tests.Android.Resource.Id.action_divider;
+			global::Shiny.Jobs.Resource.Id.action_image = global::Shiny.Tests.Android.Resource.Id.action_image;
+			global::Shiny.Jobs.Resource.Id.action_text = global::Shiny.Tests.Android.Resource.Id.action_text;
+			global::Shiny.Jobs.Resource.Id.async = global::Shiny.Tests.Android.Resource.Id.async;
+			global::Shiny.Jobs.Resource.Id.blocking = global::Shiny.Tests.Android.Resource.Id.blocking;
+			global::Shiny.Jobs.Resource.Id.chronometer = global::Shiny.Tests.Android.Resource.Id.chronometer;
+			global::Shiny.Jobs.Resource.Id.dialog_button = global::Shiny.Tests.Android.Resource.Id.dialog_button;
+			global::Shiny.Jobs.Resource.Id.forever = global::Shiny.Tests.Android.Resource.Id.forever;
+			global::Shiny.Jobs.Resource.Id.icon = global::Shiny.Tests.Android.Resource.Id.icon;
+			global::Shiny.Jobs.Resource.Id.icon_group = global::Shiny.Tests.Android.Resource.Id.icon_group;
+			global::Shiny.Jobs.Resource.Id.info = global::Shiny.Tests.Android.Resource.Id.info;
+			global::Shiny.Jobs.Resource.Id.italic = global::Shiny.Tests.Android.Resource.Id.italic;
+			global::Shiny.Jobs.Resource.Id.line1 = global::Shiny.Tests.Android.Resource.Id.line1;
+			global::Shiny.Jobs.Resource.Id.line3 = global::Shiny.Tests.Android.Resource.Id.line3;
+			global::Shiny.Jobs.Resource.Id.normal = global::Shiny.Tests.Android.Resource.Id.normal;
+			global::Shiny.Jobs.Resource.Id.notification_background = global::Shiny.Tests.Android.Resource.Id.notification_background;
+			global::Shiny.Jobs.Resource.Id.notification_main_column = global::Shiny.Tests.Android.Resource.Id.notification_main_column;
+			global::Shiny.Jobs.Resource.Id.notification_main_column_container = global::Shiny.Tests.Android.Resource.Id.notification_main_column_container;
+			global::Shiny.Jobs.Resource.Id.right_icon = global::Shiny.Tests.Android.Resource.Id.right_icon;
+			global::Shiny.Jobs.Resource.Id.right_side = global::Shiny.Tests.Android.Resource.Id.right_side;
+			global::Shiny.Jobs.Resource.Id.tag_accessibility_actions = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_actions;
+			global::Shiny.Jobs.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
+			global::Shiny.Jobs.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
+			global::Shiny.Jobs.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Jobs.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Jobs.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Jobs.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
+			global::Shiny.Jobs.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Jobs.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
+			global::Shiny.Jobs.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
+			global::Shiny.Jobs.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
+			global::Shiny.Jobs.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Jobs.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
+			global::Shiny.Jobs.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
+			global::Shiny.Jobs.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
+			global::Shiny.Jobs.Resource.Id.time = global::Shiny.Tests.Android.Resource.Id.time;
+			global::Shiny.Jobs.Resource.Id.title = global::Shiny.Tests.Android.Resource.Id.title;
+			global::Shiny.Jobs.Resource.Id.view_tree_lifecycle_owner = global::Shiny.Tests.Android.Resource.Id.view_tree_lifecycle_owner;
+			global::Shiny.Jobs.Resource.Integer.status_bar_notification_info_maxnum = global::Shiny.Tests.Android.Resource.Integer.status_bar_notification_info_maxnum;
+			global::Shiny.Jobs.Resource.Layout.custom_dialog = global::Shiny.Tests.Android.Resource.Layout.custom_dialog;
+			global::Shiny.Jobs.Resource.Layout.notification_action = global::Shiny.Tests.Android.Resource.Layout.notification_action;
+			global::Shiny.Jobs.Resource.Layout.notification_action_tombstone = global::Shiny.Tests.Android.Resource.Layout.notification_action_tombstone;
+			global::Shiny.Jobs.Resource.Layout.notification_template_custom_big = global::Shiny.Tests.Android.Resource.Layout.notification_template_custom_big;
+			global::Shiny.Jobs.Resource.Layout.notification_template_icon_group = global::Shiny.Tests.Android.Resource.Layout.notification_template_icon_group;
+			global::Shiny.Jobs.Resource.Layout.notification_template_part_chronometer = global::Shiny.Tests.Android.Resource.Layout.notification_template_part_chronometer;
+			global::Shiny.Jobs.Resource.Layout.notification_template_part_time = global::Shiny.Tests.Android.Resource.Layout.notification_template_part_time;
+			global::Shiny.Jobs.Resource.String.status_bar_notification_info_overflow = global::Shiny.Tests.Android.Resource.String.status_bar_notification_info_overflow;
+			global::Shiny.Jobs.Resource.Style.TextAppearance_Compat_Notification = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification;
+			global::Shiny.Jobs.Resource.Style.TextAppearance_Compat_Notification_Info = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification_Info;
+			global::Shiny.Jobs.Resource.Style.TextAppearance_Compat_Notification_Line2 = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification_Line2;
+			global::Shiny.Jobs.Resource.Style.TextAppearance_Compat_Notification_Time = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification_Time;
+			global::Shiny.Jobs.Resource.Style.TextAppearance_Compat_Notification_Title = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification_Title;
+			global::Shiny.Jobs.Resource.Style.Widget_Compat_NotificationActionContainer = global::Shiny.Tests.Android.Resource.Style.Widget_Compat_NotificationActionContainer;
+			global::Shiny.Jobs.Resource.Style.Widget_Compat_NotificationActionText = global::Shiny.Tests.Android.Resource.Style.Widget_Compat_NotificationActionText;
+			global::Shiny.Jobs.Resource.Styleable.ColorStateListItem = global::Shiny.Tests.Android.Resource.Styleable.ColorStateListItem;
+			global::Shiny.Jobs.Resource.Styleable.ColorStateListItem_alpha = global::Shiny.Tests.Android.Resource.Styleable.ColorStateListItem_alpha;
+			global::Shiny.Jobs.Resource.Styleable.ColorStateListItem_android_alpha = global::Shiny.Tests.Android.Resource.Styleable.ColorStateListItem_android_alpha;
+			global::Shiny.Jobs.Resource.Styleable.ColorStateListItem_android_color = global::Shiny.Tests.Android.Resource.Styleable.ColorStateListItem_android_color;
+			global::Shiny.Jobs.Resource.Styleable.FontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_android_font = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_font;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_android_fontStyle = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_fontStyle;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_android_fontVariationSettings = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_fontVariationSettings;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_android_fontWeight = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_fontWeight;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_android_ttcIndex = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_ttcIndex;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_font = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_font;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_fontStyle = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_fontStyle;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_fontVariationSettings = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_fontVariationSettings;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_fontWeight = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_fontWeight;
+			global::Shiny.Jobs.Resource.Styleable.FontFamilyFont_ttcIndex = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_ttcIndex;
+			global::Shiny.Jobs.Resource.Styleable.FontFamily_fontProviderAuthority = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderAuthority;
+			global::Shiny.Jobs.Resource.Styleable.FontFamily_fontProviderCerts = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderCerts;
+			global::Shiny.Jobs.Resource.Styleable.FontFamily_fontProviderFetchStrategy = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchStrategy;
+			global::Shiny.Jobs.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
+			global::Shiny.Jobs.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
+			global::Shiny.Jobs.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Jobs.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor;
+			global::Shiny.Jobs.Resource.Styleable.GradientColorItem = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem;
+			global::Shiny.Jobs.Resource.Styleable.GradientColorItem_android_color = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem_android_color;
+			global::Shiny.Jobs.Resource.Styleable.GradientColorItem_android_offset = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem_android_offset;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_centerColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_centerColor;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_centerX = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_centerX;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_centerY = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_centerY;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_endColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_endColor;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_endX = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_endX;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_endY = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_endY;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_gradientRadius = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_gradientRadius;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_startColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_startColor;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_startX = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_startX;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_startY = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_startY;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_tileMode = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_tileMode;
+			global::Shiny.Jobs.Resource.Styleable.GradientColor_android_type = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_type;
+			global::Shiny.Locations.Common.Resource.Attribute.alpha = global::Shiny.Tests.Android.Resource.Attribute.alpha;
+			global::Shiny.Locations.Common.Resource.Attribute.font = global::Shiny.Tests.Android.Resource.Attribute.font;
+			global::Shiny.Locations.Common.Resource.Attribute.fontProviderAuthority = global::Shiny.Tests.Android.Resource.Attribute.fontProviderAuthority;
+			global::Shiny.Locations.Common.Resource.Attribute.fontProviderCerts = global::Shiny.Tests.Android.Resource.Attribute.fontProviderCerts;
+			global::Shiny.Locations.Common.Resource.Attribute.fontProviderFetchStrategy = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchStrategy;
+			global::Shiny.Locations.Common.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
+			global::Shiny.Locations.Common.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
+			global::Shiny.Locations.Common.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Locations.Common.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
+			global::Shiny.Locations.Common.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
+			global::Shiny.Locations.Common.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
+			global::Shiny.Locations.Common.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
+			global::Shiny.Locations.Common.Resource.Attribute.ttcIndex = global::Shiny.Tests.Android.Resource.Attribute.ttcIndex;
+			global::Shiny.Locations.Common.Resource.Color.androidx_core_ripple_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_ripple_material_light;
+			global::Shiny.Locations.Common.Resource.Color.androidx_core_secondary_text_default_material_light = global::Shiny.Tests.Android.Resource.Color.androidx_core_secondary_text_default_material_light;
+			global::Shiny.Locations.Common.Resource.Color.notification_action_color_filter = global::Shiny.Tests.Android.Resource.Color.notification_action_color_filter;
+			global::Shiny.Locations.Common.Resource.Color.notification_icon_bg_color = global::Shiny.Tests.Android.Resource.Color.notification_icon_bg_color;
+			global::Shiny.Locations.Common.Resource.Dimension.compat_button_inset_horizontal_material = global::Shiny.Tests.Android.Resource.Dimension.compat_button_inset_horizontal_material;
+			global::Shiny.Locations.Common.Resource.Dimension.compat_button_inset_vertical_material = global::Shiny.Tests.Android.Resource.Dimension.compat_button_inset_vertical_material;
+			global::Shiny.Locations.Common.Resource.Dimension.compat_button_padding_horizontal_material = global::Shiny.Tests.Android.Resource.Dimension.compat_button_padding_horizontal_material;
+			global::Shiny.Locations.Common.Resource.Dimension.compat_button_padding_vertical_material = global::Shiny.Tests.Android.Resource.Dimension.compat_button_padding_vertical_material;
+			global::Shiny.Locations.Common.Resource.Dimension.compat_control_corner_material = global::Shiny.Tests.Android.Resource.Dimension.compat_control_corner_material;
+			global::Shiny.Locations.Common.Resource.Dimension.compat_notification_large_icon_max_height = global::Shiny.Tests.Android.Resource.Dimension.compat_notification_large_icon_max_height;
+			global::Shiny.Locations.Common.Resource.Dimension.compat_notification_large_icon_max_width = global::Shiny.Tests.Android.Resource.Dimension.compat_notification_large_icon_max_width;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_action_icon_size = global::Shiny.Tests.Android.Resource.Dimension.notification_action_icon_size;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_action_text_size = global::Shiny.Tests.Android.Resource.Dimension.notification_action_text_size;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_big_circle_margin = global::Shiny.Tests.Android.Resource.Dimension.notification_big_circle_margin;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_content_margin_start = global::Shiny.Tests.Android.Resource.Dimension.notification_content_margin_start;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_large_icon_height = global::Shiny.Tests.Android.Resource.Dimension.notification_large_icon_height;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_large_icon_width = global::Shiny.Tests.Android.Resource.Dimension.notification_large_icon_width;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_main_column_padding_top = global::Shiny.Tests.Android.Resource.Dimension.notification_main_column_padding_top;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_media_narrow_margin = global::Shiny.Tests.Android.Resource.Dimension.notification_media_narrow_margin;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_right_icon_size = global::Shiny.Tests.Android.Resource.Dimension.notification_right_icon_size;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_right_side_padding_top = global::Shiny.Tests.Android.Resource.Dimension.notification_right_side_padding_top;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_small_icon_background_padding = global::Shiny.Tests.Android.Resource.Dimension.notification_small_icon_background_padding;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_small_icon_size_as_large = global::Shiny.Tests.Android.Resource.Dimension.notification_small_icon_size_as_large;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_subtext_size = global::Shiny.Tests.Android.Resource.Dimension.notification_subtext_size;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_top_pad = global::Shiny.Tests.Android.Resource.Dimension.notification_top_pad;
+			global::Shiny.Locations.Common.Resource.Dimension.notification_top_pad_large_text = global::Shiny.Tests.Android.Resource.Dimension.notification_top_pad_large_text;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_action_background = global::Shiny.Tests.Android.Resource.Drawable.notification_action_background;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_bg;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_bg_low = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_bg_low_normal = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low_normal;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_bg_low_pressed = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low_pressed;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_bg_normal = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_normal;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_bg_normal_pressed = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_normal_pressed;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_icon_background = global::Shiny.Tests.Android.Resource.Drawable.notification_icon_background;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_template_icon_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_template_icon_bg;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_template_icon_low_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_template_icon_low_bg;
+			global::Shiny.Locations.Common.Resource.Drawable.notification_tile_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_tile_bg;
+			global::Shiny.Locations.Common.Resource.Drawable.notify_panel_notification_icon_bg = global::Shiny.Tests.Android.Resource.Drawable.notify_panel_notification_icon_bg;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_action_clickable_span = global::Shiny.Tests.Android.Resource.Id.accessibility_action_clickable_span;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_0 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_0;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_1 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_1;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_10 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_10;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_11 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_11;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_12 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_12;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_13 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_13;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_14 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_14;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_15 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_15;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_16 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_16;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_17 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_17;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_18 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_18;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_19 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_19;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_2 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_2;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_20 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_20;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_21 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_21;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_22 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_22;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_23 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_23;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_24 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_24;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_25 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_25;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_26 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_26;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_27 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_27;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_28 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_28;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_29 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_29;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_3 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_3;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_30 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_30;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_31 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_31;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_4 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_4;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_5 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_5;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_6 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_6;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_7 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_7;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_8 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_8;
+			global::Shiny.Locations.Common.Resource.Id.accessibility_custom_action_9 = global::Shiny.Tests.Android.Resource.Id.accessibility_custom_action_9;
+			global::Shiny.Locations.Common.Resource.Id.actions = global::Shiny.Tests.Android.Resource.Id.actions;
+			global::Shiny.Locations.Common.Resource.Id.action_container = global::Shiny.Tests.Android.Resource.Id.action_container;
+			global::Shiny.Locations.Common.Resource.Id.action_divider = global::Shiny.Tests.Android.Resource.Id.action_divider;
+			global::Shiny.Locations.Common.Resource.Id.action_image = global::Shiny.Tests.Android.Resource.Id.action_image;
+			global::Shiny.Locations.Common.Resource.Id.action_text = global::Shiny.Tests.Android.Resource.Id.action_text;
+			global::Shiny.Locations.Common.Resource.Id.async = global::Shiny.Tests.Android.Resource.Id.async;
+			global::Shiny.Locations.Common.Resource.Id.blocking = global::Shiny.Tests.Android.Resource.Id.blocking;
+			global::Shiny.Locations.Common.Resource.Id.chronometer = global::Shiny.Tests.Android.Resource.Id.chronometer;
+			global::Shiny.Locations.Common.Resource.Id.dialog_button = global::Shiny.Tests.Android.Resource.Id.dialog_button;
+			global::Shiny.Locations.Common.Resource.Id.forever = global::Shiny.Tests.Android.Resource.Id.forever;
+			global::Shiny.Locations.Common.Resource.Id.icon = global::Shiny.Tests.Android.Resource.Id.icon;
+			global::Shiny.Locations.Common.Resource.Id.icon_group = global::Shiny.Tests.Android.Resource.Id.icon_group;
+			global::Shiny.Locations.Common.Resource.Id.info = global::Shiny.Tests.Android.Resource.Id.info;
+			global::Shiny.Locations.Common.Resource.Id.italic = global::Shiny.Tests.Android.Resource.Id.italic;
+			global::Shiny.Locations.Common.Resource.Id.line1 = global::Shiny.Tests.Android.Resource.Id.line1;
+			global::Shiny.Locations.Common.Resource.Id.line3 = global::Shiny.Tests.Android.Resource.Id.line3;
+			global::Shiny.Locations.Common.Resource.Id.normal = global::Shiny.Tests.Android.Resource.Id.normal;
+			global::Shiny.Locations.Common.Resource.Id.notification_background = global::Shiny.Tests.Android.Resource.Id.notification_background;
+			global::Shiny.Locations.Common.Resource.Id.notification_main_column = global::Shiny.Tests.Android.Resource.Id.notification_main_column;
+			global::Shiny.Locations.Common.Resource.Id.notification_main_column_container = global::Shiny.Tests.Android.Resource.Id.notification_main_column_container;
+			global::Shiny.Locations.Common.Resource.Id.right_icon = global::Shiny.Tests.Android.Resource.Id.right_icon;
+			global::Shiny.Locations.Common.Resource.Id.right_side = global::Shiny.Tests.Android.Resource.Id.right_side;
+			global::Shiny.Locations.Common.Resource.Id.tag_accessibility_actions = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_actions;
+			global::Shiny.Locations.Common.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
+			global::Shiny.Locations.Common.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
+			global::Shiny.Locations.Common.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Locations.Common.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Locations.Common.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Locations.Common.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
+			global::Shiny.Locations.Common.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Locations.Common.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
+			global::Shiny.Locations.Common.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
+			global::Shiny.Locations.Common.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
+			global::Shiny.Locations.Common.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Locations.Common.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
+			global::Shiny.Locations.Common.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
+			global::Shiny.Locations.Common.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
+			global::Shiny.Locations.Common.Resource.Id.time = global::Shiny.Tests.Android.Resource.Id.time;
+			global::Shiny.Locations.Common.Resource.Id.title = global::Shiny.Tests.Android.Resource.Id.title;
+			global::Shiny.Locations.Common.Resource.Id.view_tree_lifecycle_owner = global::Shiny.Tests.Android.Resource.Id.view_tree_lifecycle_owner;
+			global::Shiny.Locations.Common.Resource.Integer.status_bar_notification_info_maxnum = global::Shiny.Tests.Android.Resource.Integer.status_bar_notification_info_maxnum;
+			global::Shiny.Locations.Common.Resource.Layout.custom_dialog = global::Shiny.Tests.Android.Resource.Layout.custom_dialog;
+			global::Shiny.Locations.Common.Resource.Layout.notification_action = global::Shiny.Tests.Android.Resource.Layout.notification_action;
+			global::Shiny.Locations.Common.Resource.Layout.notification_action_tombstone = global::Shiny.Tests.Android.Resource.Layout.notification_action_tombstone;
+			global::Shiny.Locations.Common.Resource.Layout.notification_template_custom_big = global::Shiny.Tests.Android.Resource.Layout.notification_template_custom_big;
+			global::Shiny.Locations.Common.Resource.Layout.notification_template_icon_group = global::Shiny.Tests.Android.Resource.Layout.notification_template_icon_group;
+			global::Shiny.Locations.Common.Resource.Layout.notification_template_part_chronometer = global::Shiny.Tests.Android.Resource.Layout.notification_template_part_chronometer;
+			global::Shiny.Locations.Common.Resource.Layout.notification_template_part_time = global::Shiny.Tests.Android.Resource.Layout.notification_template_part_time;
+			global::Shiny.Locations.Common.Resource.String.status_bar_notification_info_overflow = global::Shiny.Tests.Android.Resource.String.status_bar_notification_info_overflow;
+			global::Shiny.Locations.Common.Resource.Style.TextAppearance_Compat_Notification = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification;
+			global::Shiny.Locations.Common.Resource.Style.TextAppearance_Compat_Notification_Info = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification_Info;
+			global::Shiny.Locations.Common.Resource.Style.TextAppearance_Compat_Notification_Line2 = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification_Line2;
+			global::Shiny.Locations.Common.Resource.Style.TextAppearance_Compat_Notification_Time = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification_Time;
+			global::Shiny.Locations.Common.Resource.Style.TextAppearance_Compat_Notification_Title = global::Shiny.Tests.Android.Resource.Style.TextAppearance_Compat_Notification_Title;
+			global::Shiny.Locations.Common.Resource.Style.Widget_Compat_NotificationActionContainer = global::Shiny.Tests.Android.Resource.Style.Widget_Compat_NotificationActionContainer;
+			global::Shiny.Locations.Common.Resource.Style.Widget_Compat_NotificationActionText = global::Shiny.Tests.Android.Resource.Style.Widget_Compat_NotificationActionText;
+			global::Shiny.Locations.Common.Resource.Styleable.ColorStateListItem = global::Shiny.Tests.Android.Resource.Styleable.ColorStateListItem;
+			global::Shiny.Locations.Common.Resource.Styleable.ColorStateListItem_alpha = global::Shiny.Tests.Android.Resource.Styleable.ColorStateListItem_alpha;
+			global::Shiny.Locations.Common.Resource.Styleable.ColorStateListItem_android_alpha = global::Shiny.Tests.Android.Resource.Styleable.ColorStateListItem_android_alpha;
+			global::Shiny.Locations.Common.Resource.Styleable.ColorStateListItem_android_color = global::Shiny.Tests.Android.Resource.Styleable.ColorStateListItem_android_color;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_android_font = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_font;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_android_fontStyle = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_fontStyle;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_android_fontVariationSettings = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_fontVariationSettings;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_android_fontWeight = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_fontWeight;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_android_ttcIndex = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_android_ttcIndex;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_font = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_font;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_fontStyle = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_fontStyle;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_fontVariationSettings = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_fontVariationSettings;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_fontWeight = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_fontWeight;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamilyFont_ttcIndex = global::Shiny.Tests.Android.Resource.Styleable.FontFamilyFont_ttcIndex;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamily_fontProviderAuthority = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderAuthority;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamily_fontProviderCerts = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderCerts;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamily_fontProviderFetchStrategy = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchStrategy;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Locations.Common.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColorItem = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColorItem_android_color = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem_android_color;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColorItem_android_offset = global::Shiny.Tests.Android.Resource.Styleable.GradientColorItem_android_offset;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_centerColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_centerColor;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_centerX = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_centerX;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_centerY = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_centerY;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_endColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_endColor;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_endX = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_endX;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_endY = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_endY;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_gradientRadius = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_gradientRadius;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_startColor = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_startColor;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_startX = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_startX;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_startY = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_startY;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_tileMode = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_tileMode;
+			global::Shiny.Locations.Common.Resource.Styleable.GradientColor_android_type = global::Shiny.Tests.Android.Resource.Styleable.GradientColor_android_type;
 			global::Shiny.Locations.Resource.Animation.abc_fade_in = global::Shiny.Tests.Android.Resource.Animation.abc_fade_in;
 			global::Shiny.Locations.Resource.Animation.abc_fade_out = global::Shiny.Tests.Android.Resource.Animation.abc_fade_out;
 			global::Shiny.Locations.Resource.Animation.abc_grow_fade_in_from_bottom = global::Shiny.Tests.Android.Resource.Animation.abc_grow_fade_in_from_bottom;
@@ -4960,6 +5324,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Attribute.actionMenuTextColor = global::Shiny.Tests.Android.Resource.Attribute.actionMenuTextColor;
 			global::Shiny.Locations.Resource.Attribute.actionModeBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeBackground;
 			global::Shiny.Locations.Resource.Attribute.actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Shiny.Locations.Resource.Attribute.actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseContentDescription;
 			global::Shiny.Locations.Resource.Attribute.actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseDrawable;
 			global::Shiny.Locations.Resource.Attribute.actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCopyDrawable;
 			global::Shiny.Locations.Resource.Attribute.actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCutDrawable;
@@ -4970,6 +5335,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Attribute.actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeShareDrawable;
 			global::Shiny.Locations.Resource.Attribute.actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeSplitBackground;
 			global::Shiny.Locations.Resource.Attribute.actionModeStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeStyle;
+			global::Shiny.Locations.Resource.Attribute.actionModeTheme = global::Shiny.Tests.Android.Resource.Attribute.actionModeTheme;
 			global::Shiny.Locations.Resource.Attribute.actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeWebSearchDrawable;
 			global::Shiny.Locations.Resource.Attribute.actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowButtonStyle;
 			global::Shiny.Locations.Resource.Attribute.actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowMenuStyle;
@@ -5077,6 +5443,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.Locations.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.Locations.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Locations.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.Locations.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.Locations.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Locations.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
@@ -5228,7 +5595,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Attribute.windowMinWidthMinor = global::Shiny.Tests.Android.Resource.Attribute.windowMinWidthMinor;
 			global::Shiny.Locations.Resource.Attribute.windowNoTitle = global::Shiny.Tests.Android.Resource.Attribute.windowNoTitle;
 			global::Shiny.Locations.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Shiny.Locations.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Shiny.Locations.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Shiny.Locations.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
 			global::Shiny.Locations.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
@@ -5391,6 +5757,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Dimension.abc_seekbar_track_background_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_background_height_material;
 			global::Shiny.Locations.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_progress_height_material;
 			global::Shiny.Locations.Resource.Dimension.abc_select_dialog_padding_start_material = global::Shiny.Tests.Android.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Shiny.Locations.Resource.Dimension.abc_star_big = global::Shiny.Tests.Android.Resource.Dimension.abc_star_big;
+			global::Shiny.Locations.Resource.Dimension.abc_star_medium = global::Shiny.Tests.Android.Resource.Dimension.abc_star_medium;
+			global::Shiny.Locations.Resource.Dimension.abc_star_small = global::Shiny.Tests.Android.Resource.Dimension.abc_star_small;
 			global::Shiny.Locations.Resource.Dimension.abc_switch_padding = global::Shiny.Tests.Android.Resource.Dimension.abc_switch_padding;
 			global::Shiny.Locations.Resource.Dimension.abc_text_size_body_1_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_1_material;
 			global::Shiny.Locations.Resource.Dimension.abc_text_size_body_2_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_2_material;
@@ -5483,12 +5852,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Shiny.Locations.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Shiny.Locations.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Shiny.Locations.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Shiny.Locations.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Shiny.Locations.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Shiny.Locations.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Shiny.Locations.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Shiny.Locations.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Shiny.Locations.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Shiny.Locations.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Shiny.Locations.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -5519,6 +5882,8 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Drawable.abc_seekbar_track_material = global::Shiny.Tests.Android.Resource.Drawable.abc_seekbar_track_material;
 			global::Shiny.Locations.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_mtrl_am_alpha;
 			global::Shiny.Locations.Resource.Drawable.abc_spinner_textfield_background_material = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Shiny.Locations.Resource.Drawable.abc_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_black_48dp;
+			global::Shiny.Locations.Resource.Drawable.abc_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_half_black_48dp;
 			global::Shiny.Locations.Resource.Drawable.abc_switch_thumb_material = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_thumb_material;
 			global::Shiny.Locations.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_track_mtrl_alpha;
 			global::Shiny.Locations.Resource.Drawable.abc_tab_indicator_material = global::Shiny.Tests.Android.Resource.Drawable.abc_tab_indicator_material;
@@ -5529,12 +5894,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Shiny.Locations.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Shiny.Locations.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_left_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_middle_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl;
+			global::Shiny.Locations.Resource.Drawable.abc_text_select_handle_right_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl;
 			global::Shiny.Locations.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Shiny.Locations.Resource.Drawable.btn_checkbox_checked_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_mtrl;
 			global::Shiny.Locations.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
@@ -5733,10 +6095,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Locations.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.Locations.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Locations.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Locations.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Locations.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.Locations.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Locations.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.Locations.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.Locations.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.Locations.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Locations.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.Locations.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.Locations.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.Locations.Resource.Id.textSpacerNoButtons = global::Shiny.Tests.Android.Resource.Id.textSpacerNoButtons;
@@ -6334,6 +6701,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeBackground;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
@@ -6344,6 +6712,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeTheme = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeTheme;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
 			global::Shiny.Locations.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
@@ -6482,6 +6851,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Locations.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Locations.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Locations.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Locations.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.Locations.Resource.Styleable.Fragment = global::Shiny.Tests.Android.Resource.Styleable.Fragment;
 			global::Shiny.Locations.Resource.Styleable.FragmentContainerView = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView;
 			global::Shiny.Locations.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView_android_name;
@@ -6740,6 +7110,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Attribute.actionMenuTextColor = global::Shiny.Tests.Android.Resource.Attribute.actionMenuTextColor;
 			global::Shiny.Notifications.Resource.Attribute.actionModeBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeBackground;
 			global::Shiny.Notifications.Resource.Attribute.actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Shiny.Notifications.Resource.Attribute.actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseContentDescription;
 			global::Shiny.Notifications.Resource.Attribute.actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseDrawable;
 			global::Shiny.Notifications.Resource.Attribute.actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCopyDrawable;
 			global::Shiny.Notifications.Resource.Attribute.actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCutDrawable;
@@ -6750,6 +7121,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Attribute.actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeShareDrawable;
 			global::Shiny.Notifications.Resource.Attribute.actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeSplitBackground;
 			global::Shiny.Notifications.Resource.Attribute.actionModeStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeStyle;
+			global::Shiny.Notifications.Resource.Attribute.actionModeTheme = global::Shiny.Tests.Android.Resource.Attribute.actionModeTheme;
 			global::Shiny.Notifications.Resource.Attribute.actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeWebSearchDrawable;
 			global::Shiny.Notifications.Resource.Attribute.actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowButtonStyle;
 			global::Shiny.Notifications.Resource.Attribute.actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowMenuStyle;
@@ -6854,6 +7226,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.Notifications.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.Notifications.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Notifications.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.Notifications.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.Notifications.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Notifications.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
@@ -7002,7 +7375,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Attribute.windowMinWidthMinor = global::Shiny.Tests.Android.Resource.Attribute.windowMinWidthMinor;
 			global::Shiny.Notifications.Resource.Attribute.windowNoTitle = global::Shiny.Tests.Android.Resource.Attribute.windowNoTitle;
 			global::Shiny.Notifications.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Shiny.Notifications.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Shiny.Notifications.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Shiny.Notifications.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
 			global::Shiny.Notifications.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
@@ -7154,6 +7526,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Dimension.abc_seekbar_track_background_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_background_height_material;
 			global::Shiny.Notifications.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_progress_height_material;
 			global::Shiny.Notifications.Resource.Dimension.abc_select_dialog_padding_start_material = global::Shiny.Tests.Android.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Shiny.Notifications.Resource.Dimension.abc_star_big = global::Shiny.Tests.Android.Resource.Dimension.abc_star_big;
+			global::Shiny.Notifications.Resource.Dimension.abc_star_medium = global::Shiny.Tests.Android.Resource.Dimension.abc_star_medium;
+			global::Shiny.Notifications.Resource.Dimension.abc_star_small = global::Shiny.Tests.Android.Resource.Dimension.abc_star_small;
 			global::Shiny.Notifications.Resource.Dimension.abc_switch_padding = global::Shiny.Tests.Android.Resource.Dimension.abc_switch_padding;
 			global::Shiny.Notifications.Resource.Dimension.abc_text_size_body_1_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_1_material;
 			global::Shiny.Notifications.Resource.Dimension.abc_text_size_body_2_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_2_material;
@@ -7246,12 +7621,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Shiny.Notifications.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Shiny.Notifications.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Shiny.Notifications.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Shiny.Notifications.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Shiny.Notifications.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Shiny.Notifications.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Shiny.Notifications.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Shiny.Notifications.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Shiny.Notifications.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Shiny.Notifications.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Shiny.Notifications.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -7282,6 +7651,8 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Drawable.abc_seekbar_track_material = global::Shiny.Tests.Android.Resource.Drawable.abc_seekbar_track_material;
 			global::Shiny.Notifications.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_mtrl_am_alpha;
 			global::Shiny.Notifications.Resource.Drawable.abc_spinner_textfield_background_material = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Shiny.Notifications.Resource.Drawable.abc_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_black_48dp;
+			global::Shiny.Notifications.Resource.Drawable.abc_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_half_black_48dp;
 			global::Shiny.Notifications.Resource.Drawable.abc_switch_thumb_material = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_thumb_material;
 			global::Shiny.Notifications.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_track_mtrl_alpha;
 			global::Shiny.Notifications.Resource.Drawable.abc_tab_indicator_material = global::Shiny.Tests.Android.Resource.Drawable.abc_tab_indicator_material;
@@ -7292,12 +7663,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Shiny.Notifications.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Shiny.Notifications.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
+			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_left_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl;
+			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_middle_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl;
+			global::Shiny.Notifications.Resource.Drawable.abc_text_select_handle_right_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl;
 			global::Shiny.Notifications.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Shiny.Notifications.Resource.Drawable.btn_checkbox_checked_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_mtrl;
 			global::Shiny.Notifications.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
@@ -7468,10 +7836,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Notifications.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.Notifications.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Notifications.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Notifications.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Notifications.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.Notifications.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Notifications.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.Notifications.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.Notifications.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.Notifications.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Notifications.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.Notifications.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.Notifications.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.Notifications.Resource.Id.textSpacerNoButtons = global::Shiny.Tests.Android.Resource.Id.textSpacerNoButtons;
@@ -8049,6 +8422,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeBackground;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
@@ -8059,6 +8433,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeTheme = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeTheme;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
 			global::Shiny.Notifications.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
@@ -8197,6 +8572,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Notifications.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Notifications.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Notifications.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Notifications.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.Notifications.Resource.Styleable.Fragment = global::Shiny.Tests.Android.Resource.Styleable.Fragment;
 			global::Shiny.Notifications.Resource.Styleable.FragmentContainerView = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView;
 			global::Shiny.Notifications.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView_android_name;
@@ -8447,6 +8823,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionMenuTextColor = global::Shiny.Tests.Android.Resource.Attribute.actionMenuTextColor;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeBackground;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseContentDescription;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseDrawable;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCopyDrawable;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCutDrawable;
@@ -8457,6 +8834,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeShareDrawable;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeSplitBackground;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeStyle;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeTheme = global::Shiny.Tests.Android.Resource.Attribute.actionModeTheme;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeWebSearchDrawable;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowButtonStyle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowMenuStyle;
@@ -8494,14 +8872,12 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.buttonGravity = global::Shiny.Tests.Android.Resource.Attribute.buttonGravity;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.buttonIconDimen = global::Shiny.Tests.Android.Resource.Attribute.buttonIconDimen;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.buttonPanelSideLayout = global::Shiny.Tests.Android.Resource.Attribute.buttonPanelSideLayout;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.buttonSize = global::Shiny.Tests.Android.Resource.Attribute.buttonSize;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.buttonStyle = global::Shiny.Tests.Android.Resource.Attribute.buttonStyle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.buttonStyleSmall = global::Shiny.Tests.Android.Resource.Attribute.buttonStyleSmall;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.buttonTint = global::Shiny.Tests.Android.Resource.Attribute.buttonTint;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.buttonTintMode = global::Shiny.Tests.Android.Resource.Attribute.buttonTintMode;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.checkboxStyle = global::Shiny.Tests.Android.Resource.Attribute.checkboxStyle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.checkedTextViewStyle = global::Shiny.Tests.Android.Resource.Attribute.checkedTextViewStyle;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.circleCrop = global::Shiny.Tests.Android.Resource.Attribute.circleCrop;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.closeIcon = global::Shiny.Tests.Android.Resource.Attribute.closeIcon;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.closeItemLayout = global::Shiny.Tests.Android.Resource.Attribute.closeItemLayout;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.collapseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.collapseContentDescription;
@@ -8516,7 +8892,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.colorError = global::Shiny.Tests.Android.Resource.Attribute.colorError;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.colorPrimary = global::Shiny.Tests.Android.Resource.Attribute.colorPrimary;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.colorPrimaryDark = global::Shiny.Tests.Android.Resource.Attribute.colorPrimaryDark;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.colorScheme = global::Shiny.Tests.Android.Resource.Attribute.colorScheme;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.colorSwitchThumbNormal = global::Shiny.Tests.Android.Resource.Attribute.colorSwitchThumbNormal;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.commitIcon = global::Shiny.Tests.Android.Resource.Attribute.commitIcon;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.contentDescription = global::Shiny.Tests.Android.Resource.Attribute.contentDescription;
@@ -8564,6 +8939,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
@@ -8577,8 +8953,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.iconifiedByDefault = global::Shiny.Tests.Android.Resource.Attribute.iconifiedByDefault;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.iconTint = global::Shiny.Tests.Android.Resource.Attribute.iconTint;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.iconTintMode = global::Shiny.Tests.Android.Resource.Attribute.iconTintMode;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.imageAspectRatio = global::Shiny.Tests.Android.Resource.Attribute.imageAspectRatio;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.imageAspectRatioAdjust = global::Shiny.Tests.Android.Resource.Attribute.imageAspectRatioAdjust;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.imageButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.imageButtonStyle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.indeterminateProgressStyle = global::Shiny.Tests.Android.Resource.Attribute.indeterminateProgressStyle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.initialActivityCount = global::Shiny.Tests.Android.Resource.Attribute.initialActivityCount;
@@ -8632,7 +9006,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.ratingBarStyle = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.ratingBarStyleIndicator = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyleIndicator;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.ratingBarStyleSmall = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyleSmall;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.scopeUris = global::Shiny.Tests.Android.Resource.Attribute.scopeUris;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.searchHintIcon = global::Shiny.Tests.Android.Resource.Attribute.searchHintIcon;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.searchIcon = global::Shiny.Tests.Android.Resource.Attribute.searchIcon;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.searchViewStyle = global::Shiny.Tests.Android.Resource.Attribute.searchViewStyle;
@@ -8715,7 +9088,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.windowMinWidthMinor = global::Shiny.Tests.Android.Resource.Attribute.windowMinWidthMinor;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Attribute.windowNoTitle = global::Shiny.Tests.Android.Resource.Attribute.windowNoTitle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
@@ -8762,17 +9134,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Color.bright_foreground_material_light = global::Shiny.Tests.Android.Resource.Color.bright_foreground_material_light;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Color.button_material_dark = global::Shiny.Tests.Android.Resource.Color.button_material_dark;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Color.button_material_light = global::Shiny.Tests.Android.Resource.Color.button_material_light;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_dark = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_dark_default = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_default;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_dark_disabled = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_disabled;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_dark_focused = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_focused;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_dark_pressed = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_pressed;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_light = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_light_default = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_default;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_light_disabled = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_disabled;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_light_focused = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_focused;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_text_light_pressed = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_pressed;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Color.common_google_signin_btn_tint = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_tint;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Color.dim_foreground_disabled_material_dark = global::Shiny.Tests.Android.Resource.Color.dim_foreground_disabled_material_dark;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Color.dim_foreground_disabled_material_light = global::Shiny.Tests.Android.Resource.Color.dim_foreground_disabled_material_light;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Color.dim_foreground_material_dark = global::Shiny.Tests.Android.Resource.Color.dim_foreground_material_dark;
@@ -8878,6 +9239,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_seekbar_track_background_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_background_height_material;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_progress_height_material;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_select_dialog_padding_start_material = global::Shiny.Tests.Android.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_star_big = global::Shiny.Tests.Android.Resource.Dimension.abc_star_big;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_star_medium = global::Shiny.Tests.Android.Resource.Dimension.abc_star_medium;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_star_small = global::Shiny.Tests.Android.Resource.Dimension.abc_star_small;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_switch_padding = global::Shiny.Tests.Android.Resource.Dimension.abc_switch_padding;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_text_size_body_1_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_1_material;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Dimension.abc_text_size_body_2_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_2_material;
@@ -8970,12 +9334,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -9006,6 +9364,8 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_seekbar_track_material = global::Shiny.Tests.Android.Resource.Drawable.abc_seekbar_track_material;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_mtrl_am_alpha;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_spinner_textfield_background_material = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_black_48dp;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_half_black_48dp;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_switch_thumb_material = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_thumb_material;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_track_mtrl_alpha;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_tab_indicator_material = global::Shiny.Tests.Android.Resource.Drawable.abc_tab_indicator_material;
@@ -9016,12 +9376,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_left_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_middle_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_text_select_handle_right_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.btn_checkbox_checked_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_mtrl;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
@@ -9031,27 +9388,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.btn_radio_off_to_on_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_off_to_on_mtrl_animation;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.btn_radio_on_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_on_mtrl;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.btn_radio_on_to_off_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_on_to_off_mtrl_animation;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_full_open_on_phone = global::Shiny.Tests.Android.Resource.Drawable.common_full_open_on_phone;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_dark = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_dark_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_focused;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_dark_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_normal;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_dark_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_normal_background;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_disabled = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_disabled;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_light = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_light_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_focused;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_light_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_normal;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_icon_light_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_normal_background;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_dark = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_dark_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_focused;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_dark_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_normal;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_dark_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_normal_background;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_disabled = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_disabled;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_light = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_light_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_focused;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_light_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_normal;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.common_google_signin_btn_text_light_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_normal_background;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.googleg_disabled_color_18 = global::Shiny.Tests.Android.Resource.Drawable.googleg_disabled_color_18;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.googleg_standard_color_18 = global::Shiny.Tests.Android.Resource.Drawable.googleg_standard_color_18;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.notification_action_background = global::Shiny.Tests.Android.Resource.Drawable.notification_action_background;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.notification_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_bg;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Drawable.notification_bg_low = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low;
@@ -9119,13 +9455,10 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.action_text = global::Shiny.Tests.Android.Resource.Id.action_text;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.activity_chooser_view_content = global::Shiny.Tests.Android.Resource.Id.activity_chooser_view_content;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.add = global::Shiny.Tests.Android.Resource.Id.add;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Id.adjust_height = global::Shiny.Tests.Android.Resource.Id.adjust_height;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Id.adjust_width = global::Shiny.Tests.Android.Resource.Id.adjust_width;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.alertTitle = global::Shiny.Tests.Android.Resource.Id.alertTitle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.ALT = global::Shiny.Tests.Android.Resource.Id.ALT;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.always = global::Shiny.Tests.Android.Resource.Id.always;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.async = global::Shiny.Tests.Android.Resource.Id.async;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Id.auto = global::Shiny.Tests.Android.Resource.Id.auto;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.beginning = global::Shiny.Tests.Android.Resource.Id.beginning;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.blocking = global::Shiny.Tests.Android.Resource.Id.blocking;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.bottom = global::Shiny.Tests.Android.Resource.Id.bottom;
@@ -9140,7 +9473,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.CTRL = global::Shiny.Tests.Android.Resource.Id.CTRL;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.custom = global::Shiny.Tests.Android.Resource.Id.custom;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.customPanel = global::Shiny.Tests.Android.Resource.Id.customPanel;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Id.dark = global::Shiny.Tests.Android.Resource.Id.dark;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.decor_content_parent = global::Shiny.Tests.Android.Resource.Id.decor_content_parent;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.default_activity_button = global::Shiny.Tests.Android.Resource.Id.default_activity_button;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.dialog_button = global::Shiny.Tests.Android.Resource.Id.dialog_button;
@@ -9157,12 +9489,10 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.homeAsUp = global::Shiny.Tests.Android.Resource.Id.homeAsUp;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.icon = global::Shiny.Tests.Android.Resource.Id.icon;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.icon_group = global::Shiny.Tests.Android.Resource.Id.icon_group;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Id.icon_only = global::Shiny.Tests.Android.Resource.Id.icon_only;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.ifRoom = global::Shiny.Tests.Android.Resource.Id.ifRoom;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.image = global::Shiny.Tests.Android.Resource.Id.image;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.info = global::Shiny.Tests.Android.Resource.Id.info;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.italic = global::Shiny.Tests.Android.Resource.Id.italic;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Id.light = global::Shiny.Tests.Android.Resource.Id.light;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.line1 = global::Shiny.Tests.Android.Resource.Id.line1;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.line3 = global::Shiny.Tests.Android.Resource.Id.line3;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.listMode = global::Shiny.Tests.Android.Resource.Id.listMode;
@@ -9211,7 +9541,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.src_atop = global::Shiny.Tests.Android.Resource.Id.src_atop;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.src_in = global::Shiny.Tests.Android.Resource.Id.src_in;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.src_over = global::Shiny.Tests.Android.Resource.Id.src_over;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Id.standard = global::Shiny.Tests.Android.Resource.Id.standard;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.submenuarrow = global::Shiny.Tests.Android.Resource.Id.submenuarrow;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.submit_area = global::Shiny.Tests.Android.Resource.Id.submit_area;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.SYM = global::Shiny.Tests.Android.Resource.Id.SYM;
@@ -9220,10 +9549,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.textSpacerNoButtons = global::Shiny.Tests.Android.Resource.Id.textSpacerNoButtons;
@@ -9242,7 +9576,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.view_tree_saved_state_registry_owner = global::Shiny.Tests.Android.Resource.Id.view_tree_saved_state_registry_owner;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.view_tree_view_model_store_owner = global::Shiny.Tests.Android.Resource.Id.view_tree_view_model_store_owner;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.visible_removing_fragment_view_tag = global::Shiny.Tests.Android.Resource.Id.visible_removing_fragment_view_tag;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Id.wide = global::Shiny.Tests.Android.Resource.Id.wide;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.withText = global::Shiny.Tests.Android.Resource.Id.withText;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Id.wrap_content = global::Shiny.Tests.Android.Resource.Id.wrap_content;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Integer.abc_config_activityDefaultDur = global::Shiny.Tests.Android.Resource.Integer.abc_config_activityDefaultDur;
@@ -9324,24 +9657,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.String.abc_shareactionprovider_share_with = global::Shiny.Tests.Android.Resource.String.abc_shareactionprovider_share_with;
 			global::Shiny.Push.AzureNotificationHubs.Resource.String.abc_shareactionprovider_share_with_application = global::Shiny.Tests.Android.Resource.String.abc_shareactionprovider_share_with_application;
 			global::Shiny.Push.AzureNotificationHubs.Resource.String.abc_toolbar_collapse_description = global::Shiny.Tests.Android.Resource.String.abc_toolbar_collapse_description;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_enable_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_button;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_enable_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_text;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_enable_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_title;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_install_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_button;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_install_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_text;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_install_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_title;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_notification_channel_name = global::Shiny.Tests.Android.Resource.String.common_google_play_services_notification_channel_name;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_notification_ticker = global::Shiny.Tests.Android.Resource.String.common_google_play_services_notification_ticker;
 			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_unknown_issue = global::Shiny.Tests.Android.Resource.String.common_google_play_services_unknown_issue;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_unsupported_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_unsupported_text;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_update_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_button;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_update_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_text;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_update_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_title;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_updating_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_updating_text;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_google_play_services_wear_update_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_wear_update_text;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_open_on_phone = global::Shiny.Tests.Android.Resource.String.common_open_on_phone;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_signin_button_text = global::Shiny.Tests.Android.Resource.String.common_signin_button_text;
-			global::Shiny.Push.AzureNotificationHubs.Resource.String.common_signin_button_text_long = global::Shiny.Tests.Android.Resource.String.common_signin_button_text_long;
 			global::Shiny.Push.AzureNotificationHubs.Resource.String.fcm_fallback_notification_channel_label = global::Shiny.Tests.Android.Resource.String.fcm_fallback_notification_channel_label;
 			global::Shiny.Push.AzureNotificationHubs.Resource.String.search_menu_title = global::Shiny.Tests.Android.Resource.String.search_menu_title;
 			global::Shiny.Push.AzureNotificationHubs.Resource.String.status_bar_notification_info_overflow = global::Shiny.Tests.Android.Resource.String.status_bar_notification_info_overflow;
@@ -9822,6 +10138,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeBackground;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
@@ -9832,6 +10149,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeTheme = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeTheme;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
@@ -9970,6 +10288,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.Fragment = global::Shiny.Tests.Android.Resource.Styleable.Fragment;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.FragmentContainerView = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView_android_name;
@@ -10011,10 +10330,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.ListPopupWindow = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.LoadingImageView = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.LoadingImageView_circleCrop = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_circleCrop;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.LoadingImageView_imageAspectRatio = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_imageAspectRatio;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.LoadingImageView_imageAspectRatioAdjust = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_imageAspectRatioAdjust;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.MenuGroup = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.MenuGroup_android_checkableBehavior = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup_android_checkableBehavior;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.MenuGroup_android_enabled = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup_android_enabled;
@@ -10083,10 +10398,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.SearchView_submitBackground = global::Shiny.Tests.Android.Resource.Styleable.SearchView_submitBackground;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.SearchView_suggestionRowLayout = global::Shiny.Tests.Android.Resource.Styleable.SearchView_suggestionRowLayout;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.SearchView_voiceIcon = global::Shiny.Tests.Android.Resource.Styleable.SearchView_voiceIcon;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.SignInButton = global::Shiny.Tests.Android.Resource.Styleable.SignInButton;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.SignInButton_buttonSize = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_buttonSize;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.SignInButton_colorScheme = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_colorScheme;
-			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.SignInButton_scopeUris = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_scopeUris;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.Spinner = global::Shiny.Tests.Android.Resource.Styleable.Spinner;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.Spinner_android_dropDownWidth = global::Shiny.Tests.Android.Resource.Styleable.Spinner_android_dropDownWidth;
 			global::Shiny.Push.AzureNotificationHubs.Resource.Styleable.Spinner_android_entries = global::Shiny.Tests.Android.Resource.Styleable.Spinner_android_entries;
@@ -10228,6 +10539,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Attribute.actionMenuTextColor = global::Shiny.Tests.Android.Resource.Attribute.actionMenuTextColor;
 			global::Shiny.Push.Resource.Attribute.actionModeBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeBackground;
 			global::Shiny.Push.Resource.Attribute.actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Shiny.Push.Resource.Attribute.actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseContentDescription;
 			global::Shiny.Push.Resource.Attribute.actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseDrawable;
 			global::Shiny.Push.Resource.Attribute.actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCopyDrawable;
 			global::Shiny.Push.Resource.Attribute.actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCutDrawable;
@@ -10238,6 +10550,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Attribute.actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeShareDrawable;
 			global::Shiny.Push.Resource.Attribute.actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeSplitBackground;
 			global::Shiny.Push.Resource.Attribute.actionModeStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeStyle;
+			global::Shiny.Push.Resource.Attribute.actionModeTheme = global::Shiny.Tests.Android.Resource.Attribute.actionModeTheme;
 			global::Shiny.Push.Resource.Attribute.actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeWebSearchDrawable;
 			global::Shiny.Push.Resource.Attribute.actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowButtonStyle;
 			global::Shiny.Push.Resource.Attribute.actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowMenuStyle;
@@ -10275,14 +10588,12 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Attribute.buttonGravity = global::Shiny.Tests.Android.Resource.Attribute.buttonGravity;
 			global::Shiny.Push.Resource.Attribute.buttonIconDimen = global::Shiny.Tests.Android.Resource.Attribute.buttonIconDimen;
 			global::Shiny.Push.Resource.Attribute.buttonPanelSideLayout = global::Shiny.Tests.Android.Resource.Attribute.buttonPanelSideLayout;
-			global::Shiny.Push.Resource.Attribute.buttonSize = global::Shiny.Tests.Android.Resource.Attribute.buttonSize;
 			global::Shiny.Push.Resource.Attribute.buttonStyle = global::Shiny.Tests.Android.Resource.Attribute.buttonStyle;
 			global::Shiny.Push.Resource.Attribute.buttonStyleSmall = global::Shiny.Tests.Android.Resource.Attribute.buttonStyleSmall;
 			global::Shiny.Push.Resource.Attribute.buttonTint = global::Shiny.Tests.Android.Resource.Attribute.buttonTint;
 			global::Shiny.Push.Resource.Attribute.buttonTintMode = global::Shiny.Tests.Android.Resource.Attribute.buttonTintMode;
 			global::Shiny.Push.Resource.Attribute.checkboxStyle = global::Shiny.Tests.Android.Resource.Attribute.checkboxStyle;
 			global::Shiny.Push.Resource.Attribute.checkedTextViewStyle = global::Shiny.Tests.Android.Resource.Attribute.checkedTextViewStyle;
-			global::Shiny.Push.Resource.Attribute.circleCrop = global::Shiny.Tests.Android.Resource.Attribute.circleCrop;
 			global::Shiny.Push.Resource.Attribute.closeIcon = global::Shiny.Tests.Android.Resource.Attribute.closeIcon;
 			global::Shiny.Push.Resource.Attribute.closeItemLayout = global::Shiny.Tests.Android.Resource.Attribute.closeItemLayout;
 			global::Shiny.Push.Resource.Attribute.collapseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.collapseContentDescription;
@@ -10297,7 +10608,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Attribute.colorError = global::Shiny.Tests.Android.Resource.Attribute.colorError;
 			global::Shiny.Push.Resource.Attribute.colorPrimary = global::Shiny.Tests.Android.Resource.Attribute.colorPrimary;
 			global::Shiny.Push.Resource.Attribute.colorPrimaryDark = global::Shiny.Tests.Android.Resource.Attribute.colorPrimaryDark;
-			global::Shiny.Push.Resource.Attribute.colorScheme = global::Shiny.Tests.Android.Resource.Attribute.colorScheme;
 			global::Shiny.Push.Resource.Attribute.colorSwitchThumbNormal = global::Shiny.Tests.Android.Resource.Attribute.colorSwitchThumbNormal;
 			global::Shiny.Push.Resource.Attribute.commitIcon = global::Shiny.Tests.Android.Resource.Attribute.commitIcon;
 			global::Shiny.Push.Resource.Attribute.contentDescription = global::Shiny.Tests.Android.Resource.Attribute.contentDescription;
@@ -10345,6 +10655,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.Push.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.Push.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Push.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.Push.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.Push.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Push.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
@@ -10358,8 +10669,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Attribute.iconifiedByDefault = global::Shiny.Tests.Android.Resource.Attribute.iconifiedByDefault;
 			global::Shiny.Push.Resource.Attribute.iconTint = global::Shiny.Tests.Android.Resource.Attribute.iconTint;
 			global::Shiny.Push.Resource.Attribute.iconTintMode = global::Shiny.Tests.Android.Resource.Attribute.iconTintMode;
-			global::Shiny.Push.Resource.Attribute.imageAspectRatio = global::Shiny.Tests.Android.Resource.Attribute.imageAspectRatio;
-			global::Shiny.Push.Resource.Attribute.imageAspectRatioAdjust = global::Shiny.Tests.Android.Resource.Attribute.imageAspectRatioAdjust;
 			global::Shiny.Push.Resource.Attribute.imageButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.imageButtonStyle;
 			global::Shiny.Push.Resource.Attribute.indeterminateProgressStyle = global::Shiny.Tests.Android.Resource.Attribute.indeterminateProgressStyle;
 			global::Shiny.Push.Resource.Attribute.initialActivityCount = global::Shiny.Tests.Android.Resource.Attribute.initialActivityCount;
@@ -10413,7 +10722,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Attribute.ratingBarStyle = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyle;
 			global::Shiny.Push.Resource.Attribute.ratingBarStyleIndicator = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyleIndicator;
 			global::Shiny.Push.Resource.Attribute.ratingBarStyleSmall = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyleSmall;
-			global::Shiny.Push.Resource.Attribute.scopeUris = global::Shiny.Tests.Android.Resource.Attribute.scopeUris;
 			global::Shiny.Push.Resource.Attribute.searchHintIcon = global::Shiny.Tests.Android.Resource.Attribute.searchHintIcon;
 			global::Shiny.Push.Resource.Attribute.searchIcon = global::Shiny.Tests.Android.Resource.Attribute.searchIcon;
 			global::Shiny.Push.Resource.Attribute.searchViewStyle = global::Shiny.Tests.Android.Resource.Attribute.searchViewStyle;
@@ -10496,7 +10804,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Attribute.windowMinWidthMinor = global::Shiny.Tests.Android.Resource.Attribute.windowMinWidthMinor;
 			global::Shiny.Push.Resource.Attribute.windowNoTitle = global::Shiny.Tests.Android.Resource.Attribute.windowNoTitle;
 			global::Shiny.Push.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Shiny.Push.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Shiny.Push.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Shiny.Push.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
 			global::Shiny.Push.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
@@ -10543,17 +10850,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Color.bright_foreground_material_light = global::Shiny.Tests.Android.Resource.Color.bright_foreground_material_light;
 			global::Shiny.Push.Resource.Color.button_material_dark = global::Shiny.Tests.Android.Resource.Color.button_material_dark;
 			global::Shiny.Push.Resource.Color.button_material_light = global::Shiny.Tests.Android.Resource.Color.button_material_light;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_dark = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_dark_default = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_default;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_dark_disabled = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_disabled;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_dark_focused = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_focused;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_dark_pressed = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_pressed;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_light = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_light_default = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_default;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_light_disabled = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_disabled;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_light_focused = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_focused;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_text_light_pressed = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_pressed;
-			global::Shiny.Push.Resource.Color.common_google_signin_btn_tint = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_tint;
 			global::Shiny.Push.Resource.Color.dim_foreground_disabled_material_dark = global::Shiny.Tests.Android.Resource.Color.dim_foreground_disabled_material_dark;
 			global::Shiny.Push.Resource.Color.dim_foreground_disabled_material_light = global::Shiny.Tests.Android.Resource.Color.dim_foreground_disabled_material_light;
 			global::Shiny.Push.Resource.Color.dim_foreground_material_dark = global::Shiny.Tests.Android.Resource.Color.dim_foreground_material_dark;
@@ -10659,6 +10955,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Dimension.abc_seekbar_track_background_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_background_height_material;
 			global::Shiny.Push.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_progress_height_material;
 			global::Shiny.Push.Resource.Dimension.abc_select_dialog_padding_start_material = global::Shiny.Tests.Android.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Shiny.Push.Resource.Dimension.abc_star_big = global::Shiny.Tests.Android.Resource.Dimension.abc_star_big;
+			global::Shiny.Push.Resource.Dimension.abc_star_medium = global::Shiny.Tests.Android.Resource.Dimension.abc_star_medium;
+			global::Shiny.Push.Resource.Dimension.abc_star_small = global::Shiny.Tests.Android.Resource.Dimension.abc_star_small;
 			global::Shiny.Push.Resource.Dimension.abc_switch_padding = global::Shiny.Tests.Android.Resource.Dimension.abc_switch_padding;
 			global::Shiny.Push.Resource.Dimension.abc_text_size_body_1_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_1_material;
 			global::Shiny.Push.Resource.Dimension.abc_text_size_body_2_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_2_material;
@@ -10751,12 +11050,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Shiny.Push.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Shiny.Push.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Shiny.Push.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Shiny.Push.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Shiny.Push.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Shiny.Push.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Shiny.Push.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Shiny.Push.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Shiny.Push.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Shiny.Push.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Shiny.Push.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -10787,6 +11080,8 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Drawable.abc_seekbar_track_material = global::Shiny.Tests.Android.Resource.Drawable.abc_seekbar_track_material;
 			global::Shiny.Push.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_mtrl_am_alpha;
 			global::Shiny.Push.Resource.Drawable.abc_spinner_textfield_background_material = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Shiny.Push.Resource.Drawable.abc_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_black_48dp;
+			global::Shiny.Push.Resource.Drawable.abc_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_half_black_48dp;
 			global::Shiny.Push.Resource.Drawable.abc_switch_thumb_material = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_thumb_material;
 			global::Shiny.Push.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_track_mtrl_alpha;
 			global::Shiny.Push.Resource.Drawable.abc_tab_indicator_material = global::Shiny.Tests.Android.Resource.Drawable.abc_tab_indicator_material;
@@ -10797,12 +11092,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Shiny.Push.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Shiny.Push.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
+			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_left_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl;
+			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_middle_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl;
+			global::Shiny.Push.Resource.Drawable.abc_text_select_handle_right_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl;
 			global::Shiny.Push.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Shiny.Push.Resource.Drawable.btn_checkbox_checked_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_mtrl;
 			global::Shiny.Push.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
@@ -10812,27 +11104,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Drawable.btn_radio_off_to_on_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_off_to_on_mtrl_animation;
 			global::Shiny.Push.Resource.Drawable.btn_radio_on_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_on_mtrl;
 			global::Shiny.Push.Resource.Drawable.btn_radio_on_to_off_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_on_to_off_mtrl_animation;
-			global::Shiny.Push.Resource.Drawable.common_full_open_on_phone = global::Shiny.Tests.Android.Resource.Drawable.common_full_open_on_phone;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_dark = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_dark_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_focused;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_dark_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_normal;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_dark_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_normal_background;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_disabled = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_disabled;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_light = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_light_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_focused;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_light_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_normal;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_icon_light_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_normal_background;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_dark = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_dark_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_focused;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_dark_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_normal;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_dark_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_normal_background;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_disabled = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_disabled;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_light = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_light_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_focused;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_light_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_normal;
-			global::Shiny.Push.Resource.Drawable.common_google_signin_btn_text_light_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_normal_background;
-			global::Shiny.Push.Resource.Drawable.googleg_disabled_color_18 = global::Shiny.Tests.Android.Resource.Drawable.googleg_disabled_color_18;
-			global::Shiny.Push.Resource.Drawable.googleg_standard_color_18 = global::Shiny.Tests.Android.Resource.Drawable.googleg_standard_color_18;
 			global::Shiny.Push.Resource.Drawable.notification_action_background = global::Shiny.Tests.Android.Resource.Drawable.notification_action_background;
 			global::Shiny.Push.Resource.Drawable.notification_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_bg;
 			global::Shiny.Push.Resource.Drawable.notification_bg_low = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low;
@@ -10900,13 +11171,10 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Id.action_text = global::Shiny.Tests.Android.Resource.Id.action_text;
 			global::Shiny.Push.Resource.Id.activity_chooser_view_content = global::Shiny.Tests.Android.Resource.Id.activity_chooser_view_content;
 			global::Shiny.Push.Resource.Id.add = global::Shiny.Tests.Android.Resource.Id.add;
-			global::Shiny.Push.Resource.Id.adjust_height = global::Shiny.Tests.Android.Resource.Id.adjust_height;
-			global::Shiny.Push.Resource.Id.adjust_width = global::Shiny.Tests.Android.Resource.Id.adjust_width;
 			global::Shiny.Push.Resource.Id.alertTitle = global::Shiny.Tests.Android.Resource.Id.alertTitle;
 			global::Shiny.Push.Resource.Id.ALT = global::Shiny.Tests.Android.Resource.Id.ALT;
 			global::Shiny.Push.Resource.Id.always = global::Shiny.Tests.Android.Resource.Id.always;
 			global::Shiny.Push.Resource.Id.async = global::Shiny.Tests.Android.Resource.Id.async;
-			global::Shiny.Push.Resource.Id.auto = global::Shiny.Tests.Android.Resource.Id.auto;
 			global::Shiny.Push.Resource.Id.beginning = global::Shiny.Tests.Android.Resource.Id.beginning;
 			global::Shiny.Push.Resource.Id.blocking = global::Shiny.Tests.Android.Resource.Id.blocking;
 			global::Shiny.Push.Resource.Id.bottom = global::Shiny.Tests.Android.Resource.Id.bottom;
@@ -10921,7 +11189,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Id.CTRL = global::Shiny.Tests.Android.Resource.Id.CTRL;
 			global::Shiny.Push.Resource.Id.custom = global::Shiny.Tests.Android.Resource.Id.custom;
 			global::Shiny.Push.Resource.Id.customPanel = global::Shiny.Tests.Android.Resource.Id.customPanel;
-			global::Shiny.Push.Resource.Id.dark = global::Shiny.Tests.Android.Resource.Id.dark;
 			global::Shiny.Push.Resource.Id.decor_content_parent = global::Shiny.Tests.Android.Resource.Id.decor_content_parent;
 			global::Shiny.Push.Resource.Id.default_activity_button = global::Shiny.Tests.Android.Resource.Id.default_activity_button;
 			global::Shiny.Push.Resource.Id.dialog_button = global::Shiny.Tests.Android.Resource.Id.dialog_button;
@@ -10938,12 +11205,10 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Id.homeAsUp = global::Shiny.Tests.Android.Resource.Id.homeAsUp;
 			global::Shiny.Push.Resource.Id.icon = global::Shiny.Tests.Android.Resource.Id.icon;
 			global::Shiny.Push.Resource.Id.icon_group = global::Shiny.Tests.Android.Resource.Id.icon_group;
-			global::Shiny.Push.Resource.Id.icon_only = global::Shiny.Tests.Android.Resource.Id.icon_only;
 			global::Shiny.Push.Resource.Id.ifRoom = global::Shiny.Tests.Android.Resource.Id.ifRoom;
 			global::Shiny.Push.Resource.Id.image = global::Shiny.Tests.Android.Resource.Id.image;
 			global::Shiny.Push.Resource.Id.info = global::Shiny.Tests.Android.Resource.Id.info;
 			global::Shiny.Push.Resource.Id.italic = global::Shiny.Tests.Android.Resource.Id.italic;
-			global::Shiny.Push.Resource.Id.light = global::Shiny.Tests.Android.Resource.Id.light;
 			global::Shiny.Push.Resource.Id.line1 = global::Shiny.Tests.Android.Resource.Id.line1;
 			global::Shiny.Push.Resource.Id.line3 = global::Shiny.Tests.Android.Resource.Id.line3;
 			global::Shiny.Push.Resource.Id.listMode = global::Shiny.Tests.Android.Resource.Id.listMode;
@@ -10992,7 +11257,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Id.src_atop = global::Shiny.Tests.Android.Resource.Id.src_atop;
 			global::Shiny.Push.Resource.Id.src_in = global::Shiny.Tests.Android.Resource.Id.src_in;
 			global::Shiny.Push.Resource.Id.src_over = global::Shiny.Tests.Android.Resource.Id.src_over;
-			global::Shiny.Push.Resource.Id.standard = global::Shiny.Tests.Android.Resource.Id.standard;
 			global::Shiny.Push.Resource.Id.submenuarrow = global::Shiny.Tests.Android.Resource.Id.submenuarrow;
 			global::Shiny.Push.Resource.Id.submit_area = global::Shiny.Tests.Android.Resource.Id.submit_area;
 			global::Shiny.Push.Resource.Id.SYM = global::Shiny.Tests.Android.Resource.Id.SYM;
@@ -11001,10 +11265,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Push.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.Push.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Push.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Push.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Push.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.Push.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Push.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.Push.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.Push.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.Push.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Push.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.Push.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.Push.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.Push.Resource.Id.textSpacerNoButtons = global::Shiny.Tests.Android.Resource.Id.textSpacerNoButtons;
@@ -11023,7 +11292,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Id.view_tree_saved_state_registry_owner = global::Shiny.Tests.Android.Resource.Id.view_tree_saved_state_registry_owner;
 			global::Shiny.Push.Resource.Id.view_tree_view_model_store_owner = global::Shiny.Tests.Android.Resource.Id.view_tree_view_model_store_owner;
 			global::Shiny.Push.Resource.Id.visible_removing_fragment_view_tag = global::Shiny.Tests.Android.Resource.Id.visible_removing_fragment_view_tag;
-			global::Shiny.Push.Resource.Id.wide = global::Shiny.Tests.Android.Resource.Id.wide;
 			global::Shiny.Push.Resource.Id.withText = global::Shiny.Tests.Android.Resource.Id.withText;
 			global::Shiny.Push.Resource.Id.wrap_content = global::Shiny.Tests.Android.Resource.Id.wrap_content;
 			global::Shiny.Push.Resource.Integer.abc_config_activityDefaultDur = global::Shiny.Tests.Android.Resource.Integer.abc_config_activityDefaultDur;
@@ -11105,24 +11373,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.String.abc_shareactionprovider_share_with = global::Shiny.Tests.Android.Resource.String.abc_shareactionprovider_share_with;
 			global::Shiny.Push.Resource.String.abc_shareactionprovider_share_with_application = global::Shiny.Tests.Android.Resource.String.abc_shareactionprovider_share_with_application;
 			global::Shiny.Push.Resource.String.abc_toolbar_collapse_description = global::Shiny.Tests.Android.Resource.String.abc_toolbar_collapse_description;
-			global::Shiny.Push.Resource.String.common_google_play_services_enable_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_button;
-			global::Shiny.Push.Resource.String.common_google_play_services_enable_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_text;
-			global::Shiny.Push.Resource.String.common_google_play_services_enable_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_title;
-			global::Shiny.Push.Resource.String.common_google_play_services_install_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_button;
-			global::Shiny.Push.Resource.String.common_google_play_services_install_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_text;
-			global::Shiny.Push.Resource.String.common_google_play_services_install_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_title;
-			global::Shiny.Push.Resource.String.common_google_play_services_notification_channel_name = global::Shiny.Tests.Android.Resource.String.common_google_play_services_notification_channel_name;
-			global::Shiny.Push.Resource.String.common_google_play_services_notification_ticker = global::Shiny.Tests.Android.Resource.String.common_google_play_services_notification_ticker;
 			global::Shiny.Push.Resource.String.common_google_play_services_unknown_issue = global::Shiny.Tests.Android.Resource.String.common_google_play_services_unknown_issue;
-			global::Shiny.Push.Resource.String.common_google_play_services_unsupported_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_unsupported_text;
-			global::Shiny.Push.Resource.String.common_google_play_services_update_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_button;
-			global::Shiny.Push.Resource.String.common_google_play_services_update_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_text;
-			global::Shiny.Push.Resource.String.common_google_play_services_update_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_title;
-			global::Shiny.Push.Resource.String.common_google_play_services_updating_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_updating_text;
-			global::Shiny.Push.Resource.String.common_google_play_services_wear_update_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_wear_update_text;
-			global::Shiny.Push.Resource.String.common_open_on_phone = global::Shiny.Tests.Android.Resource.String.common_open_on_phone;
-			global::Shiny.Push.Resource.String.common_signin_button_text = global::Shiny.Tests.Android.Resource.String.common_signin_button_text;
-			global::Shiny.Push.Resource.String.common_signin_button_text_long = global::Shiny.Tests.Android.Resource.String.common_signin_button_text_long;
 			global::Shiny.Push.Resource.String.fcm_fallback_notification_channel_label = global::Shiny.Tests.Android.Resource.String.fcm_fallback_notification_channel_label;
 			global::Shiny.Push.Resource.String.search_menu_title = global::Shiny.Tests.Android.Resource.String.search_menu_title;
 			global::Shiny.Push.Resource.String.status_bar_notification_info_overflow = global::Shiny.Tests.Android.Resource.String.status_bar_notification_info_overflow;
@@ -11603,6 +11854,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeBackground;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
@@ -11613,6 +11865,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeTheme = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeTheme;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
 			global::Shiny.Push.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
@@ -11751,6 +12004,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Push.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Push.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Push.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.Push.Resource.Styleable.Fragment = global::Shiny.Tests.Android.Resource.Styleable.Fragment;
 			global::Shiny.Push.Resource.Styleable.FragmentContainerView = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView;
 			global::Shiny.Push.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView_android_name;
@@ -11792,10 +12046,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Styleable.ListPopupWindow = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow;
 			global::Shiny.Push.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset;
 			global::Shiny.Push.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset;
-			global::Shiny.Push.Resource.Styleable.LoadingImageView = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView;
-			global::Shiny.Push.Resource.Styleable.LoadingImageView_circleCrop = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_circleCrop;
-			global::Shiny.Push.Resource.Styleable.LoadingImageView_imageAspectRatio = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_imageAspectRatio;
-			global::Shiny.Push.Resource.Styleable.LoadingImageView_imageAspectRatioAdjust = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_imageAspectRatioAdjust;
 			global::Shiny.Push.Resource.Styleable.MenuGroup = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup;
 			global::Shiny.Push.Resource.Styleable.MenuGroup_android_checkableBehavior = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup_android_checkableBehavior;
 			global::Shiny.Push.Resource.Styleable.MenuGroup_android_enabled = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup_android_enabled;
@@ -11864,10 +12114,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.Resource.Styleable.SearchView_submitBackground = global::Shiny.Tests.Android.Resource.Styleable.SearchView_submitBackground;
 			global::Shiny.Push.Resource.Styleable.SearchView_suggestionRowLayout = global::Shiny.Tests.Android.Resource.Styleable.SearchView_suggestionRowLayout;
 			global::Shiny.Push.Resource.Styleable.SearchView_voiceIcon = global::Shiny.Tests.Android.Resource.Styleable.SearchView_voiceIcon;
-			global::Shiny.Push.Resource.Styleable.SignInButton = global::Shiny.Tests.Android.Resource.Styleable.SignInButton;
-			global::Shiny.Push.Resource.Styleable.SignInButton_buttonSize = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_buttonSize;
-			global::Shiny.Push.Resource.Styleable.SignInButton_colorScheme = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_colorScheme;
-			global::Shiny.Push.Resource.Styleable.SignInButton_scopeUris = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_scopeUris;
 			global::Shiny.Push.Resource.Styleable.Spinner = global::Shiny.Tests.Android.Resource.Styleable.Spinner;
 			global::Shiny.Push.Resource.Styleable.Spinner_android_dropDownWidth = global::Shiny.Tests.Android.Resource.Styleable.Spinner_android_dropDownWidth;
 			global::Shiny.Push.Resource.Styleable.Spinner_android_entries = global::Shiny.Tests.Android.Resource.Styleable.Spinner_android_entries;
@@ -12009,6 +12255,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionMenuTextColor = global::Shiny.Tests.Android.Resource.Attribute.actionMenuTextColor;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeBackground;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseButtonStyle;
+			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseContentDescription;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCloseDrawable;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCopyDrawable;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeCutDrawable;
@@ -12019,6 +12266,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeShareDrawable;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Attribute.actionModeSplitBackground;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeStyle = global::Shiny.Tests.Android.Resource.Attribute.actionModeStyle;
+			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeTheme = global::Shiny.Tests.Android.Resource.Attribute.actionModeTheme;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Attribute.actionModeWebSearchDrawable;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowButtonStyle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Attribute.actionOverflowMenuStyle;
@@ -12056,14 +12304,12 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.buttonGravity = global::Shiny.Tests.Android.Resource.Attribute.buttonGravity;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.buttonIconDimen = global::Shiny.Tests.Android.Resource.Attribute.buttonIconDimen;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.buttonPanelSideLayout = global::Shiny.Tests.Android.Resource.Attribute.buttonPanelSideLayout;
-			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.buttonSize = global::Shiny.Tests.Android.Resource.Attribute.buttonSize;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.buttonStyle = global::Shiny.Tests.Android.Resource.Attribute.buttonStyle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.buttonStyleSmall = global::Shiny.Tests.Android.Resource.Attribute.buttonStyleSmall;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.buttonTint = global::Shiny.Tests.Android.Resource.Attribute.buttonTint;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.buttonTintMode = global::Shiny.Tests.Android.Resource.Attribute.buttonTintMode;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.checkboxStyle = global::Shiny.Tests.Android.Resource.Attribute.checkboxStyle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.checkedTextViewStyle = global::Shiny.Tests.Android.Resource.Attribute.checkedTextViewStyle;
-			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.circleCrop = global::Shiny.Tests.Android.Resource.Attribute.circleCrop;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.closeIcon = global::Shiny.Tests.Android.Resource.Attribute.closeIcon;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.closeItemLayout = global::Shiny.Tests.Android.Resource.Attribute.closeItemLayout;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.collapseContentDescription = global::Shiny.Tests.Android.Resource.Attribute.collapseContentDescription;
@@ -12078,7 +12324,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.colorError = global::Shiny.Tests.Android.Resource.Attribute.colorError;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.colorPrimary = global::Shiny.Tests.Android.Resource.Attribute.colorPrimary;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.colorPrimaryDark = global::Shiny.Tests.Android.Resource.Attribute.colorPrimaryDark;
-			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.colorScheme = global::Shiny.Tests.Android.Resource.Attribute.colorScheme;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.colorSwitchThumbNormal = global::Shiny.Tests.Android.Resource.Attribute.colorSwitchThumbNormal;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.commitIcon = global::Shiny.Tests.Android.Resource.Attribute.commitIcon;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.contentDescription = global::Shiny.Tests.Android.Resource.Attribute.contentDescription;
@@ -12126,6 +12371,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Attribute.fontProviderFetchTimeout;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.fontProviderPackage = global::Shiny.Tests.Android.Resource.Attribute.fontProviderPackage;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.fontProviderQuery = global::Shiny.Tests.Android.Resource.Attribute.fontProviderQuery;
+			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Attribute.fontProviderSystemFontFamily;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.fontStyle = global::Shiny.Tests.Android.Resource.Attribute.fontStyle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.fontVariationSettings = global::Shiny.Tests.Android.Resource.Attribute.fontVariationSettings;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.fontWeight = global::Shiny.Tests.Android.Resource.Attribute.fontWeight;
@@ -12139,8 +12385,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.iconifiedByDefault = global::Shiny.Tests.Android.Resource.Attribute.iconifiedByDefault;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.iconTint = global::Shiny.Tests.Android.Resource.Attribute.iconTint;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.iconTintMode = global::Shiny.Tests.Android.Resource.Attribute.iconTintMode;
-			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.imageAspectRatio = global::Shiny.Tests.Android.Resource.Attribute.imageAspectRatio;
-			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.imageAspectRatioAdjust = global::Shiny.Tests.Android.Resource.Attribute.imageAspectRatioAdjust;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.imageButtonStyle = global::Shiny.Tests.Android.Resource.Attribute.imageButtonStyle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.indeterminateProgressStyle = global::Shiny.Tests.Android.Resource.Attribute.indeterminateProgressStyle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.initialActivityCount = global::Shiny.Tests.Android.Resource.Attribute.initialActivityCount;
@@ -12194,7 +12438,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.ratingBarStyle = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.ratingBarStyleIndicator = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyleIndicator;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.ratingBarStyleSmall = global::Shiny.Tests.Android.Resource.Attribute.ratingBarStyleSmall;
-			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.scopeUris = global::Shiny.Tests.Android.Resource.Attribute.scopeUris;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.searchHintIcon = global::Shiny.Tests.Android.Resource.Attribute.searchHintIcon;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.searchIcon = global::Shiny.Tests.Android.Resource.Attribute.searchIcon;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.searchViewStyle = global::Shiny.Tests.Android.Resource.Attribute.searchViewStyle;
@@ -12277,7 +12520,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.windowMinWidthMinor = global::Shiny.Tests.Android.Resource.Attribute.windowMinWidthMinor;
 			global::Shiny.Push.FirebaseMessaging.Resource.Attribute.windowNoTitle = global::Shiny.Tests.Android.Resource.Attribute.windowNoTitle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Shiny.Push.FirebaseMessaging.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Shiny.Push.FirebaseMessaging.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Shiny.Push.FirebaseMessaging.Resource.Boolean.enable_system_alarm_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_alarm_service_default;
 			global::Shiny.Push.FirebaseMessaging.Resource.Boolean.enable_system_foreground_service_default = global::Shiny.Tests.Android.Resource.Boolean.enable_system_foreground_service_default;
@@ -12324,17 +12566,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Color.bright_foreground_material_light = global::Shiny.Tests.Android.Resource.Color.bright_foreground_material_light;
 			global::Shiny.Push.FirebaseMessaging.Resource.Color.button_material_dark = global::Shiny.Tests.Android.Resource.Color.button_material_dark;
 			global::Shiny.Push.FirebaseMessaging.Resource.Color.button_material_light = global::Shiny.Tests.Android.Resource.Color.button_material_light;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_dark = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_dark_default = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_default;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_dark_disabled = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_disabled;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_dark_focused = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_focused;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_dark_pressed = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_dark_pressed;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_light = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_light_default = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_default;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_light_disabled = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_disabled;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_light_focused = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_focused;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_text_light_pressed = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_text_light_pressed;
-			global::Shiny.Push.FirebaseMessaging.Resource.Color.common_google_signin_btn_tint = global::Shiny.Tests.Android.Resource.Color.common_google_signin_btn_tint;
 			global::Shiny.Push.FirebaseMessaging.Resource.Color.dim_foreground_disabled_material_dark = global::Shiny.Tests.Android.Resource.Color.dim_foreground_disabled_material_dark;
 			global::Shiny.Push.FirebaseMessaging.Resource.Color.dim_foreground_disabled_material_light = global::Shiny.Tests.Android.Resource.Color.dim_foreground_disabled_material_light;
 			global::Shiny.Push.FirebaseMessaging.Resource.Color.dim_foreground_material_dark = global::Shiny.Tests.Android.Resource.Color.dim_foreground_material_dark;
@@ -12440,6 +12671,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_seekbar_track_background_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_background_height_material;
 			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_seekbar_track_progress_height_material = global::Shiny.Tests.Android.Resource.Dimension.abc_seekbar_track_progress_height_material;
 			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_select_dialog_padding_start_material = global::Shiny.Tests.Android.Resource.Dimension.abc_select_dialog_padding_start_material;
+			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_star_big = global::Shiny.Tests.Android.Resource.Dimension.abc_star_big;
+			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_star_medium = global::Shiny.Tests.Android.Resource.Dimension.abc_star_medium;
+			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_star_small = global::Shiny.Tests.Android.Resource.Dimension.abc_star_small;
 			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_switch_padding = global::Shiny.Tests.Android.Resource.Dimension.abc_switch_padding;
 			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_text_size_body_1_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_1_material;
 			global::Shiny.Push.FirebaseMessaging.Resource.Dimension.abc_text_size_body_2_material = global::Shiny.Tests.Android.Resource.Dimension.abc_text_size_body_2_material;
@@ -12532,12 +12766,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -12568,6 +12796,8 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_seekbar_track_material = global::Shiny.Tests.Android.Resource.Drawable.abc_seekbar_track_material;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_spinner_mtrl_am_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_mtrl_am_alpha;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_spinner_textfield_background_material = global::Shiny.Tests.Android.Resource.Drawable.abc_spinner_textfield_background_material;
+			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_black_48dp;
+			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_star_half_black_48dp;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_switch_thumb_material = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_thumb_material;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_switch_track_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_switch_track_mtrl_alpha;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_tab_indicator_material = global::Shiny.Tests.Android.Resource.Drawable.abc_tab_indicator_material;
@@ -12578,12 +12808,9 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
+			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_left_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl;
+			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_middle_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl;
+			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_text_select_handle_right_mtrl = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.btn_checkbox_checked_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_mtrl;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_checkbox_checked_to_unchecked_mtrl_animation;
@@ -12593,27 +12820,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.btn_radio_off_to_on_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_off_to_on_mtrl_animation;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.btn_radio_on_mtrl = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_on_mtrl;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.btn_radio_on_to_off_mtrl_animation = global::Shiny.Tests.Android.Resource.Drawable.btn_radio_on_to_off_mtrl_animation;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_full_open_on_phone = global::Shiny.Tests.Android.Resource.Drawable.common_full_open_on_phone;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_dark = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_dark_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_focused;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_dark_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_normal;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_dark_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_dark_normal_background;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_disabled = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_disabled;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_light = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_light_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_focused;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_light_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_normal;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_icon_light_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_icon_light_normal_background;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_dark = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_dark_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_focused;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_dark_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_normal;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_dark_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_dark_normal_background;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_disabled = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_disabled;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_light = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_light_focused = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_focused;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_light_normal = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_normal;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.common_google_signin_btn_text_light_normal_background = global::Shiny.Tests.Android.Resource.Drawable.common_google_signin_btn_text_light_normal_background;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.googleg_disabled_color_18 = global::Shiny.Tests.Android.Resource.Drawable.googleg_disabled_color_18;
-			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.googleg_standard_color_18 = global::Shiny.Tests.Android.Resource.Drawable.googleg_standard_color_18;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.notification_action_background = global::Shiny.Tests.Android.Resource.Drawable.notification_action_background;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.notification_bg = global::Shiny.Tests.Android.Resource.Drawable.notification_bg;
 			global::Shiny.Push.FirebaseMessaging.Resource.Drawable.notification_bg_low = global::Shiny.Tests.Android.Resource.Drawable.notification_bg_low;
@@ -12681,13 +12887,10 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.action_text = global::Shiny.Tests.Android.Resource.Id.action_text;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.activity_chooser_view_content = global::Shiny.Tests.Android.Resource.Id.activity_chooser_view_content;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.add = global::Shiny.Tests.Android.Resource.Id.add;
-			global::Shiny.Push.FirebaseMessaging.Resource.Id.adjust_height = global::Shiny.Tests.Android.Resource.Id.adjust_height;
-			global::Shiny.Push.FirebaseMessaging.Resource.Id.adjust_width = global::Shiny.Tests.Android.Resource.Id.adjust_width;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.alertTitle = global::Shiny.Tests.Android.Resource.Id.alertTitle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.ALT = global::Shiny.Tests.Android.Resource.Id.ALT;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.always = global::Shiny.Tests.Android.Resource.Id.always;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.async = global::Shiny.Tests.Android.Resource.Id.async;
-			global::Shiny.Push.FirebaseMessaging.Resource.Id.auto = global::Shiny.Tests.Android.Resource.Id.auto;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.beginning = global::Shiny.Tests.Android.Resource.Id.beginning;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.blocking = global::Shiny.Tests.Android.Resource.Id.blocking;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.bottom = global::Shiny.Tests.Android.Resource.Id.bottom;
@@ -12702,7 +12905,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.CTRL = global::Shiny.Tests.Android.Resource.Id.CTRL;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.custom = global::Shiny.Tests.Android.Resource.Id.custom;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.customPanel = global::Shiny.Tests.Android.Resource.Id.customPanel;
-			global::Shiny.Push.FirebaseMessaging.Resource.Id.dark = global::Shiny.Tests.Android.Resource.Id.dark;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.decor_content_parent = global::Shiny.Tests.Android.Resource.Id.decor_content_parent;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.default_activity_button = global::Shiny.Tests.Android.Resource.Id.default_activity_button;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.dialog_button = global::Shiny.Tests.Android.Resource.Id.dialog_button;
@@ -12719,12 +12921,10 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.homeAsUp = global::Shiny.Tests.Android.Resource.Id.homeAsUp;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.icon = global::Shiny.Tests.Android.Resource.Id.icon;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.icon_group = global::Shiny.Tests.Android.Resource.Id.icon_group;
-			global::Shiny.Push.FirebaseMessaging.Resource.Id.icon_only = global::Shiny.Tests.Android.Resource.Id.icon_only;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.ifRoom = global::Shiny.Tests.Android.Resource.Id.ifRoom;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.image = global::Shiny.Tests.Android.Resource.Id.image;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.info = global::Shiny.Tests.Android.Resource.Id.info;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.italic = global::Shiny.Tests.Android.Resource.Id.italic;
-			global::Shiny.Push.FirebaseMessaging.Resource.Id.light = global::Shiny.Tests.Android.Resource.Id.light;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.line1 = global::Shiny.Tests.Android.Resource.Id.line1;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.line3 = global::Shiny.Tests.Android.Resource.Id.line3;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.listMode = global::Shiny.Tests.Android.Resource.Id.listMode;
@@ -12773,7 +12973,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.src_atop = global::Shiny.Tests.Android.Resource.Id.src_atop;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.src_in = global::Shiny.Tests.Android.Resource.Id.src_in;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.src_over = global::Shiny.Tests.Android.Resource.Id.src_over;
-			global::Shiny.Push.FirebaseMessaging.Resource.Id.standard = global::Shiny.Tests.Android.Resource.Id.standard;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.submenuarrow = global::Shiny.Tests.Android.Resource.Id.submenuarrow;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.submit_area = global::Shiny.Tests.Android.Resource.Id.submit_area;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.SYM = global::Shiny.Tests.Android.Resource.Id.SYM;
@@ -12782,10 +12981,15 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_accessibility_clickable_spans = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_clickable_spans;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_accessibility_heading = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_heading;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_accessibility_pane_title = global::Shiny.Tests.Android.Resource.Id.tag_accessibility_pane_title;
+			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_on_apply_window_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_apply_window_listener;
+			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_on_receive_content_listener = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_listener;
+			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_on_receive_content_mime_types = global::Shiny.Tests.Android.Resource.Id.tag_on_receive_content_mime_types;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_screen_reader_focusable = global::Shiny.Tests.Android.Resource.Id.tag_screen_reader_focusable;
+			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_state_description = global::Shiny.Tests.Android.Resource.Id.tag_state_description;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_transition_group = global::Shiny.Tests.Android.Resource.Id.tag_transition_group;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_unhandled_key_event_manager = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_event_manager;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_unhandled_key_listeners = global::Shiny.Tests.Android.Resource.Id.tag_unhandled_key_listeners;
+			global::Shiny.Push.FirebaseMessaging.Resource.Id.tag_window_insets_animation_callback = global::Shiny.Tests.Android.Resource.Id.tag_window_insets_animation_callback;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.text = global::Shiny.Tests.Android.Resource.Id.text;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.text2 = global::Shiny.Tests.Android.Resource.Id.text2;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.textSpacerNoButtons = global::Shiny.Tests.Android.Resource.Id.textSpacerNoButtons;
@@ -12804,7 +13008,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.view_tree_saved_state_registry_owner = global::Shiny.Tests.Android.Resource.Id.view_tree_saved_state_registry_owner;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.view_tree_view_model_store_owner = global::Shiny.Tests.Android.Resource.Id.view_tree_view_model_store_owner;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.visible_removing_fragment_view_tag = global::Shiny.Tests.Android.Resource.Id.visible_removing_fragment_view_tag;
-			global::Shiny.Push.FirebaseMessaging.Resource.Id.wide = global::Shiny.Tests.Android.Resource.Id.wide;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.withText = global::Shiny.Tests.Android.Resource.Id.withText;
 			global::Shiny.Push.FirebaseMessaging.Resource.Id.wrap_content = global::Shiny.Tests.Android.Resource.Id.wrap_content;
 			global::Shiny.Push.FirebaseMessaging.Resource.Integer.abc_config_activityDefaultDur = global::Shiny.Tests.Android.Resource.Integer.abc_config_activityDefaultDur;
@@ -12886,24 +13089,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.String.abc_shareactionprovider_share_with = global::Shiny.Tests.Android.Resource.String.abc_shareactionprovider_share_with;
 			global::Shiny.Push.FirebaseMessaging.Resource.String.abc_shareactionprovider_share_with_application = global::Shiny.Tests.Android.Resource.String.abc_shareactionprovider_share_with_application;
 			global::Shiny.Push.FirebaseMessaging.Resource.String.abc_toolbar_collapse_description = global::Shiny.Tests.Android.Resource.String.abc_toolbar_collapse_description;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_enable_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_button;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_enable_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_text;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_enable_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_enable_title;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_install_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_button;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_install_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_text;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_install_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_install_title;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_notification_channel_name = global::Shiny.Tests.Android.Resource.String.common_google_play_services_notification_channel_name;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_notification_ticker = global::Shiny.Tests.Android.Resource.String.common_google_play_services_notification_ticker;
 			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_unknown_issue = global::Shiny.Tests.Android.Resource.String.common_google_play_services_unknown_issue;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_unsupported_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_unsupported_text;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_update_button = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_button;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_update_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_text;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_update_title = global::Shiny.Tests.Android.Resource.String.common_google_play_services_update_title;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_updating_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_updating_text;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_google_play_services_wear_update_text = global::Shiny.Tests.Android.Resource.String.common_google_play_services_wear_update_text;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_open_on_phone = global::Shiny.Tests.Android.Resource.String.common_open_on_phone;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_signin_button_text = global::Shiny.Tests.Android.Resource.String.common_signin_button_text;
-			global::Shiny.Push.FirebaseMessaging.Resource.String.common_signin_button_text_long = global::Shiny.Tests.Android.Resource.String.common_signin_button_text_long;
 			global::Shiny.Push.FirebaseMessaging.Resource.String.fcm_fallback_notification_channel_label = global::Shiny.Tests.Android.Resource.String.fcm_fallback_notification_channel_label;
 			global::Shiny.Push.FirebaseMessaging.Resource.String.search_menu_title = global::Shiny.Tests.Android.Resource.String.search_menu_title;
 			global::Shiny.Push.FirebaseMessaging.Resource.String.status_bar_notification_info_overflow = global::Shiny.Tests.Android.Resource.String.status_bar_notification_info_overflow;
@@ -13384,6 +13570,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionMenuTextColor = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionMenuTextColor;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeBackground;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseButtonStyle;
+			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseContentDescription;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCloseDrawable;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCopyDrawable;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeCutDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeCutDrawable;
@@ -13394,6 +13581,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeShareDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeShareDrawable;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeSplitBackground = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeSplitBackground;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeStyle;
+			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeTheme = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeTheme;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionModeWebSearchDrawable;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowButtonStyle;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle = global::Shiny.Tests.Android.Resource.Styleable.AppCompatTheme_actionOverflowMenuStyle;
@@ -13532,6 +13720,7 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.FontFamily_fontProviderFetchTimeout = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderFetchTimeout;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.FontFamily_fontProviderPackage = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderPackage;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.FontFamily_fontProviderQuery = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderQuery;
+			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.FontFamily_fontProviderSystemFontFamily = global::Shiny.Tests.Android.Resource.Styleable.FontFamily_fontProviderSystemFontFamily;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.Fragment = global::Shiny.Tests.Android.Resource.Styleable.Fragment;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.FragmentContainerView = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.FragmentContainerView_android_name = global::Shiny.Tests.Android.Resource.Styleable.FragmentContainerView_android_name;
@@ -13573,10 +13762,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.ListPopupWindow = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow_android_dropDownHorizontalOffset;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset = global::Shiny.Tests.Android.Resource.Styleable.ListPopupWindow_android_dropDownVerticalOffset;
-			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.LoadingImageView = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView;
-			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.LoadingImageView_circleCrop = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_circleCrop;
-			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.LoadingImageView_imageAspectRatio = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_imageAspectRatio;
-			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.LoadingImageView_imageAspectRatioAdjust = global::Shiny.Tests.Android.Resource.Styleable.LoadingImageView_imageAspectRatioAdjust;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.MenuGroup = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.MenuGroup_android_checkableBehavior = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup_android_checkableBehavior;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.MenuGroup_android_enabled = global::Shiny.Tests.Android.Resource.Styleable.MenuGroup_android_enabled;
@@ -13645,10 +13830,6 @@ namespace Shiny.Tests.Android
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.SearchView_submitBackground = global::Shiny.Tests.Android.Resource.Styleable.SearchView_submitBackground;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.SearchView_suggestionRowLayout = global::Shiny.Tests.Android.Resource.Styleable.SearchView_suggestionRowLayout;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.SearchView_voiceIcon = global::Shiny.Tests.Android.Resource.Styleable.SearchView_voiceIcon;
-			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.SignInButton = global::Shiny.Tests.Android.Resource.Styleable.SignInButton;
-			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.SignInButton_buttonSize = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_buttonSize;
-			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.SignInButton_colorScheme = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_colorScheme;
-			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.SignInButton_scopeUris = global::Shiny.Tests.Android.Resource.Styleable.SignInButton_scopeUris;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.Spinner = global::Shiny.Tests.Android.Resource.Styleable.Spinner;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.Spinner_android_dropDownWidth = global::Shiny.Tests.Android.Resource.Styleable.Spinner_android_dropDownWidth;
 			global::Shiny.Push.FirebaseMessaging.Resource.Styleable.Spinner_android_entries = global::Shiny.Tests.Android.Resource.Styleable.Spinner_android_entries;
@@ -14641,7 +14822,6 @@ namespace Shiny.Tests.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.yearStyle = global::Shiny.Tests.Android.Resource.Attribute.yearStyle;
 			global::Xamarin.Forms.Platform.Android.Resource.Attribute.yearTodayStyle = global::Shiny.Tests.Android.Resource.Attribute.yearTodayStyle;
 			global::Xamarin.Forms.Platform.Android.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Xamarin.Forms.Platform.Android.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Xamarin.Forms.Platform.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Xamarin.Forms.Platform.Android.Resource.Boolean.mtrl_btn_textappearance_all_caps = global::Shiny.Tests.Android.Resource.Boolean.mtrl_btn_textappearance_all_caps;
 			global::Xamarin.Forms.Platform.Android.Resource.Color.abc_background_cache_hint_selector_material_dark = global::Shiny.Tests.Android.Resource.Color.abc_background_cache_hint_selector_material_dark;
@@ -15223,12 +15403,6 @@ namespace Shiny.Tests.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -15269,12 +15443,6 @@ namespace Shiny.Tests.Android
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.avd_hide_password = global::Shiny.Tests.Android.Resource.Drawable.avd_hide_password;
 			global::Xamarin.Forms.Platform.Android.Resource.Drawable.avd_show_password = global::Shiny.Tests.Android.Resource.Drawable.avd_show_password;
@@ -18260,7 +18428,6 @@ namespace Shiny.Tests.Android
 			global::Xamarin.Forms.Platform.Resource.Attribute.yearStyle = global::Shiny.Tests.Android.Resource.Attribute.yearStyle;
 			global::Xamarin.Forms.Platform.Resource.Attribute.yearTodayStyle = global::Shiny.Tests.Android.Resource.Attribute.yearTodayStyle;
 			global::Xamarin.Forms.Platform.Resource.Boolean.abc_action_bar_embed_tabs = global::Shiny.Tests.Android.Resource.Boolean.abc_action_bar_embed_tabs;
-			global::Xamarin.Forms.Platform.Resource.Boolean.abc_allow_stacked_button_bar = global::Shiny.Tests.Android.Resource.Boolean.abc_allow_stacked_button_bar;
 			global::Xamarin.Forms.Platform.Resource.Boolean.abc_config_actionMenuItemAllCaps = global::Shiny.Tests.Android.Resource.Boolean.abc_config_actionMenuItemAllCaps;
 			global::Xamarin.Forms.Platform.Resource.Boolean.mtrl_btn_textappearance_all_caps = global::Shiny.Tests.Android.Resource.Boolean.mtrl_btn_textappearance_all_caps;
 			global::Xamarin.Forms.Platform.Resource.Color.abc_background_cache_hint_selector_material_dark = global::Shiny.Tests.Android.Resource.Color.abc_background_cache_hint_selector_material_dark;
@@ -18842,12 +19009,6 @@ namespace Shiny.Tests.Android
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_selectall_mtrl_alpha;
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_menu_share_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_menu_share_mtrl_alpha;
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_search_api_material;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_star_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_16dp;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_star_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_36dp;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_star_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_black_48dp;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_star_half_black_16dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_16dp;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_star_half_black_36dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_36dp;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_star_half_black_48dp = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_star_half_black_48dp;
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_ic_voice_search_api_material = global::Shiny.Tests.Android.Resource.Drawable.abc_ic_voice_search_api_material;
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_item_background_holo_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_dark;
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_item_background_holo_light = global::Shiny.Tests.Android.Resource.Drawable.abc_item_background_holo_light;
@@ -18888,12 +19049,6 @@ namespace Shiny.Tests.Android
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_textfield_search_default_mtrl_alpha = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_default_mtrl_alpha;
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_textfield_search_material = global::Shiny.Tests.Android.Resource.Drawable.abc_textfield_search_material;
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_text_cursor_material = global::Shiny.Tests.Android.Resource.Drawable.abc_text_cursor_material;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_text_select_handle_left_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_dark;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_text_select_handle_left_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_left_mtrl_light;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_dark;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_text_select_handle_middle_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_middle_mtrl_light;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_text_select_handle_right_mtrl_dark = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_dark;
-			global::Xamarin.Forms.Platform.Resource.Drawable.abc_text_select_handle_right_mtrl_light = global::Shiny.Tests.Android.Resource.Drawable.abc_text_select_handle_right_mtrl_light;
 			global::Xamarin.Forms.Platform.Resource.Drawable.abc_vector_test = global::Shiny.Tests.Android.Resource.Drawable.abc_vector_test;
 			global::Xamarin.Forms.Platform.Resource.Drawable.avd_hide_password = global::Shiny.Tests.Android.Resource.Drawable.avd_hide_password;
 			global::Xamarin.Forms.Platform.Resource.Drawable.avd_show_password = global::Shiny.Tests.Android.Resource.Drawable.avd_show_password;
@@ -21426,1978 +21581,1987 @@ namespace Shiny.Tests.Android
 			public const int actionModeCloseButtonStyle = 2130903057;
 			
 			// aapt resource value: 0x7F030012
-			public const int actionModeCloseDrawable = 2130903058;
+			public const int actionModeCloseContentDescription = 2130903058;
 			
 			// aapt resource value: 0x7F030013
-			public const int actionModeCopyDrawable = 2130903059;
+			public const int actionModeCloseDrawable = 2130903059;
 			
 			// aapt resource value: 0x7F030014
-			public const int actionModeCutDrawable = 2130903060;
+			public const int actionModeCopyDrawable = 2130903060;
 			
 			// aapt resource value: 0x7F030015
-			public const int actionModeFindDrawable = 2130903061;
+			public const int actionModeCutDrawable = 2130903061;
 			
 			// aapt resource value: 0x7F030016
-			public const int actionModePasteDrawable = 2130903062;
+			public const int actionModeFindDrawable = 2130903062;
 			
 			// aapt resource value: 0x7F030017
-			public const int actionModePopupWindowStyle = 2130903063;
+			public const int actionModePasteDrawable = 2130903063;
 			
 			// aapt resource value: 0x7F030018
-			public const int actionModeSelectAllDrawable = 2130903064;
+			public const int actionModePopupWindowStyle = 2130903064;
 			
 			// aapt resource value: 0x7F030019
-			public const int actionModeShareDrawable = 2130903065;
+			public const int actionModeSelectAllDrawable = 2130903065;
 			
 			// aapt resource value: 0x7F03001A
-			public const int actionModeSplitBackground = 2130903066;
+			public const int actionModeShareDrawable = 2130903066;
 			
 			// aapt resource value: 0x7F03001B
-			public const int actionModeStyle = 2130903067;
+			public const int actionModeSplitBackground = 2130903067;
 			
 			// aapt resource value: 0x7F03001C
-			public const int actionModeWebSearchDrawable = 2130903068;
+			public const int actionModeStyle = 2130903068;
 			
 			// aapt resource value: 0x7F03001D
-			public const int actionOverflowButtonStyle = 2130903069;
+			public const int actionModeTheme = 2130903069;
 			
 			// aapt resource value: 0x7F03001E
-			public const int actionOverflowMenuStyle = 2130903070;
+			public const int actionModeWebSearchDrawable = 2130903070;
 			
 			// aapt resource value: 0x7F03001F
-			public const int actionProviderClass = 2130903071;
+			public const int actionOverflowButtonStyle = 2130903071;
 			
 			// aapt resource value: 0x7F030020
-			public const int actionTextColorAlpha = 2130903072;
+			public const int actionOverflowMenuStyle = 2130903072;
 			
 			// aapt resource value: 0x7F030021
-			public const int actionViewClass = 2130903073;
+			public const int actionProviderClass = 2130903073;
 			
 			// aapt resource value: 0x7F030022
-			public const int activityChooserViewStyle = 2130903074;
+			public const int actionTextColorAlpha = 2130903074;
 			
 			// aapt resource value: 0x7F030023
-			public const int ahBarColor = 2130903075;
+			public const int actionViewClass = 2130903075;
 			
 			// aapt resource value: 0x7F030024
-			public const int ahBarLength = 2130903076;
+			public const int activityChooserViewStyle = 2130903076;
 			
 			// aapt resource value: 0x7F030025
-			public const int ahBarWidth = 2130903077;
+			public const int ahBarColor = 2130903077;
 			
 			// aapt resource value: 0x7F030026
-			public const int ahCircleColor = 2130903078;
+			public const int ahBarLength = 2130903078;
 			
 			// aapt resource value: 0x7F030027
-			public const int ahDelayMillis = 2130903079;
+			public const int ahBarWidth = 2130903079;
 			
 			// aapt resource value: 0x7F030028
-			public const int ahRadius = 2130903080;
+			public const int ahCircleColor = 2130903080;
 			
 			// aapt resource value: 0x7F030029
-			public const int ahRimColor = 2130903081;
+			public const int ahDelayMillis = 2130903081;
 			
 			// aapt resource value: 0x7F03002A
-			public const int ahRimWidth = 2130903082;
+			public const int ahRadius = 2130903082;
 			
 			// aapt resource value: 0x7F03002B
-			public const int ahSpinSpeed = 2130903083;
+			public const int ahRimColor = 2130903083;
 			
 			// aapt resource value: 0x7F03002C
-			public const int ahText = 2130903084;
+			public const int ahRimWidth = 2130903084;
 			
 			// aapt resource value: 0x7F03002D
-			public const int ahTextColor = 2130903085;
+			public const int ahSpinSpeed = 2130903085;
 			
 			// aapt resource value: 0x7F03002E
-			public const int ahTextSize = 2130903086;
+			public const int ahText = 2130903086;
 			
 			// aapt resource value: 0x7F03002F
-			public const int alertDialogButtonGroupStyle = 2130903087;
+			public const int ahTextColor = 2130903087;
 			
 			// aapt resource value: 0x7F030030
-			public const int alertDialogCenterButtons = 2130903088;
+			public const int ahTextSize = 2130903088;
 			
 			// aapt resource value: 0x7F030031
-			public const int alertDialogStyle = 2130903089;
+			public const int alertDialogButtonGroupStyle = 2130903089;
 			
 			// aapt resource value: 0x7F030032
-			public const int alertDialogTheme = 2130903090;
+			public const int alertDialogCenterButtons = 2130903090;
 			
 			// aapt resource value: 0x7F030033
-			public const int allowStacking = 2130903091;
+			public const int alertDialogStyle = 2130903091;
 			
 			// aapt resource value: 0x7F030034
-			public const int alpha = 2130903092;
+			public const int alertDialogTheme = 2130903092;
 			
 			// aapt resource value: 0x7F030035
-			public const int alphabeticModifiers = 2130903093;
+			public const int allowStacking = 2130903093;
 			
 			// aapt resource value: 0x7F030036
-			public const int animationMode = 2130903094;
+			public const int alpha = 2130903094;
 			
 			// aapt resource value: 0x7F030037
-			public const int appBarLayoutStyle = 2130903095;
+			public const int alphabeticModifiers = 2130903095;
 			
 			// aapt resource value: 0x7F030038
-			public const int arrowHeadLength = 2130903096;
+			public const int animationMode = 2130903096;
 			
 			// aapt resource value: 0x7F030039
-			public const int arrowShaftLength = 2130903097;
+			public const int appBarLayoutStyle = 2130903097;
 			
 			// aapt resource value: 0x7F03003A
-			public const int autoCompleteTextViewStyle = 2130903098;
+			public const int arrowHeadLength = 2130903098;
 			
 			// aapt resource value: 0x7F03003B
-			public const int autoSizeMaxTextSize = 2130903099;
+			public const int arrowShaftLength = 2130903099;
 			
 			// aapt resource value: 0x7F03003C
-			public const int autoSizeMinTextSize = 2130903100;
+			public const int autoCompleteTextViewStyle = 2130903100;
 			
 			// aapt resource value: 0x7F03003D
-			public const int autoSizePresetSizes = 2130903101;
+			public const int autoSizeMaxTextSize = 2130903101;
 			
 			// aapt resource value: 0x7F03003E
-			public const int autoSizeStepGranularity = 2130903102;
+			public const int autoSizeMinTextSize = 2130903102;
 			
 			// aapt resource value: 0x7F03003F
-			public const int autoSizeTextType = 2130903103;
+			public const int autoSizePresetSizes = 2130903103;
 			
 			// aapt resource value: 0x7F030040
-			public const int background = 2130903104;
+			public const int autoSizeStepGranularity = 2130903104;
 			
 			// aapt resource value: 0x7F030041
-			public const int backgroundColor = 2130903105;
+			public const int autoSizeTextType = 2130903105;
 			
 			// aapt resource value: 0x7F030042
-			public const int backgroundInsetBottom = 2130903106;
+			public const int background = 2130903106;
 			
 			// aapt resource value: 0x7F030043
-			public const int backgroundInsetEnd = 2130903107;
+			public const int backgroundColor = 2130903107;
 			
 			// aapt resource value: 0x7F030044
-			public const int backgroundInsetStart = 2130903108;
+			public const int backgroundInsetBottom = 2130903108;
 			
 			// aapt resource value: 0x7F030045
-			public const int backgroundInsetTop = 2130903109;
+			public const int backgroundInsetEnd = 2130903109;
 			
 			// aapt resource value: 0x7F030046
-			public const int backgroundOverlayColorAlpha = 2130903110;
+			public const int backgroundInsetStart = 2130903110;
 			
 			// aapt resource value: 0x7F030047
-			public const int backgroundSplit = 2130903111;
+			public const int backgroundInsetTop = 2130903111;
 			
 			// aapt resource value: 0x7F030048
-			public const int backgroundStacked = 2130903112;
+			public const int backgroundOverlayColorAlpha = 2130903112;
 			
 			// aapt resource value: 0x7F030049
-			public const int backgroundTint = 2130903113;
+			public const int backgroundSplit = 2130903113;
 			
 			// aapt resource value: 0x7F03004A
-			public const int backgroundTintMode = 2130903114;
+			public const int backgroundStacked = 2130903114;
 			
 			// aapt resource value: 0x7F03004B
-			public const int badgeGravity = 2130903115;
+			public const int backgroundTint = 2130903115;
 			
 			// aapt resource value: 0x7F03004C
-			public const int badgeStyle = 2130903116;
+			public const int backgroundTintMode = 2130903116;
 			
 			// aapt resource value: 0x7F03004D
-			public const int badgeTextColor = 2130903117;
+			public const int badgeGravity = 2130903117;
 			
 			// aapt resource value: 0x7F03004E
-			public const int barLength = 2130903118;
+			public const int badgeStyle = 2130903118;
 			
 			// aapt resource value: 0x7F03004F
-			public const int behavior_autoHide = 2130903119;
+			public const int badgeTextColor = 2130903119;
 			
 			// aapt resource value: 0x7F030050
-			public const int behavior_autoShrink = 2130903120;
+			public const int barLength = 2130903120;
 			
 			// aapt resource value: 0x7F030051
-			public const int behavior_draggable = 2130903121;
+			public const int behavior_autoHide = 2130903121;
 			
 			// aapt resource value: 0x7F030052
-			public const int behavior_expandedOffset = 2130903122;
+			public const int behavior_autoShrink = 2130903122;
 			
 			// aapt resource value: 0x7F030053
-			public const int behavior_fitToContents = 2130903123;
+			public const int behavior_draggable = 2130903123;
 			
 			// aapt resource value: 0x7F030054
-			public const int behavior_halfExpandedRatio = 2130903124;
+			public const int behavior_expandedOffset = 2130903124;
 			
 			// aapt resource value: 0x7F030055
-			public const int behavior_hideable = 2130903125;
+			public const int behavior_fitToContents = 2130903125;
 			
 			// aapt resource value: 0x7F030056
-			public const int behavior_overlapTop = 2130903126;
+			public const int behavior_halfExpandedRatio = 2130903126;
 			
 			// aapt resource value: 0x7F030057
-			public const int behavior_peekHeight = 2130903127;
+			public const int behavior_hideable = 2130903127;
 			
 			// aapt resource value: 0x7F030058
-			public const int behavior_saveFlags = 2130903128;
+			public const int behavior_overlapTop = 2130903128;
 			
 			// aapt resource value: 0x7F030059
-			public const int behavior_skipCollapsed = 2130903129;
-			
-			// aapt resource value: 0x7F03005B
-			public const int borderlessButtonStyle = 2130903131;
+			public const int behavior_peekHeight = 2130903129;
 			
 			// aapt resource value: 0x7F03005A
-			public const int borderWidth = 2130903130;
+			public const int behavior_saveFlags = 2130903130;
 			
-			// aapt resource value: 0x7F03005C
-			public const int bottomAppBarStyle = 2130903132;
+			// aapt resource value: 0x7F03005B
+			public const int behavior_skipCollapsed = 2130903131;
 			
 			// aapt resource value: 0x7F03005D
-			public const int bottomNavigationStyle = 2130903133;
+			public const int borderlessButtonStyle = 2130903133;
+			
+			// aapt resource value: 0x7F03005C
+			public const int borderWidth = 2130903132;
 			
 			// aapt resource value: 0x7F03005E
-			public const int bottomSheetDialogTheme = 2130903134;
+			public const int bottomAppBarStyle = 2130903134;
 			
 			// aapt resource value: 0x7F03005F
-			public const int bottomSheetStyle = 2130903135;
+			public const int bottomNavigationStyle = 2130903135;
 			
 			// aapt resource value: 0x7F030060
-			public const int boxBackgroundColor = 2130903136;
+			public const int bottomSheetDialogTheme = 2130903136;
 			
 			// aapt resource value: 0x7F030061
-			public const int boxBackgroundMode = 2130903137;
+			public const int bottomSheetStyle = 2130903137;
 			
 			// aapt resource value: 0x7F030062
-			public const int boxCollapsedPaddingTop = 2130903138;
+			public const int boxBackgroundColor = 2130903138;
 			
 			// aapt resource value: 0x7F030063
-			public const int boxCornerRadiusBottomEnd = 2130903139;
+			public const int boxBackgroundMode = 2130903139;
 			
 			// aapt resource value: 0x7F030064
-			public const int boxCornerRadiusBottomStart = 2130903140;
+			public const int boxCollapsedPaddingTop = 2130903140;
 			
 			// aapt resource value: 0x7F030065
-			public const int boxCornerRadiusTopEnd = 2130903141;
+			public const int boxCornerRadiusBottomEnd = 2130903141;
 			
 			// aapt resource value: 0x7F030066
-			public const int boxCornerRadiusTopStart = 2130903142;
+			public const int boxCornerRadiusBottomStart = 2130903142;
 			
 			// aapt resource value: 0x7F030067
-			public const int boxStrokeColor = 2130903143;
+			public const int boxCornerRadiusTopEnd = 2130903143;
 			
 			// aapt resource value: 0x7F030068
-			public const int boxStrokeErrorColor = 2130903144;
+			public const int boxCornerRadiusTopStart = 2130903144;
 			
 			// aapt resource value: 0x7F030069
-			public const int boxStrokeWidth = 2130903145;
+			public const int boxStrokeColor = 2130903145;
 			
 			// aapt resource value: 0x7F03006A
-			public const int boxStrokeWidthFocused = 2130903146;
+			public const int boxStrokeErrorColor = 2130903146;
 			
 			// aapt resource value: 0x7F03006B
-			public const int buttonBarButtonStyle = 2130903147;
+			public const int boxStrokeWidth = 2130903147;
 			
 			// aapt resource value: 0x7F03006C
-			public const int buttonBarNegativeButtonStyle = 2130903148;
+			public const int boxStrokeWidthFocused = 2130903148;
 			
 			// aapt resource value: 0x7F03006D
-			public const int buttonBarNeutralButtonStyle = 2130903149;
+			public const int buttonBarButtonStyle = 2130903149;
 			
 			// aapt resource value: 0x7F03006E
-			public const int buttonBarPositiveButtonStyle = 2130903150;
+			public const int buttonBarNegativeButtonStyle = 2130903150;
 			
 			// aapt resource value: 0x7F03006F
-			public const int buttonBarStyle = 2130903151;
+			public const int buttonBarNeutralButtonStyle = 2130903151;
 			
 			// aapt resource value: 0x7F030070
-			public const int buttonCompat = 2130903152;
+			public const int buttonBarPositiveButtonStyle = 2130903152;
 			
 			// aapt resource value: 0x7F030071
-			public const int buttonGravity = 2130903153;
+			public const int buttonBarStyle = 2130903153;
 			
 			// aapt resource value: 0x7F030072
-			public const int buttonIconDimen = 2130903154;
+			public const int buttonCompat = 2130903154;
 			
 			// aapt resource value: 0x7F030073
-			public const int buttonPanelSideLayout = 2130903155;
+			public const int buttonGravity = 2130903155;
 			
 			// aapt resource value: 0x7F030074
-			public const int buttonSize = 2130903156;
+			public const int buttonIconDimen = 2130903156;
 			
 			// aapt resource value: 0x7F030075
-			public const int buttonStyle = 2130903157;
+			public const int buttonPanelSideLayout = 2130903157;
 			
 			// aapt resource value: 0x7F030076
-			public const int buttonStyleSmall = 2130903158;
+			public const int buttonSize = 2130903158;
 			
 			// aapt resource value: 0x7F030077
-			public const int buttonTint = 2130903159;
+			public const int buttonStyle = 2130903159;
 			
 			// aapt resource value: 0x7F030078
-			public const int buttonTintMode = 2130903160;
+			public const int buttonStyleSmall = 2130903160;
 			
 			// aapt resource value: 0x7F030079
-			public const int cardBackgroundColor = 2130903161;
+			public const int buttonTint = 2130903161;
 			
 			// aapt resource value: 0x7F03007A
-			public const int cardCornerRadius = 2130903162;
+			public const int buttonTintMode = 2130903162;
 			
 			// aapt resource value: 0x7F03007B
-			public const int cardElevation = 2130903163;
+			public const int cardBackgroundColor = 2130903163;
 			
 			// aapt resource value: 0x7F03007C
-			public const int cardForegroundColor = 2130903164;
+			public const int cardCornerRadius = 2130903164;
 			
 			// aapt resource value: 0x7F03007D
-			public const int cardMaxElevation = 2130903165;
+			public const int cardElevation = 2130903165;
 			
 			// aapt resource value: 0x7F03007E
-			public const int cardPreventCornerOverlap = 2130903166;
+			public const int cardForegroundColor = 2130903166;
 			
 			// aapt resource value: 0x7F03007F
-			public const int cardUseCompatPadding = 2130903167;
+			public const int cardMaxElevation = 2130903167;
 			
 			// aapt resource value: 0x7F030080
-			public const int cardViewStyle = 2130903168;
+			public const int cardPreventCornerOverlap = 2130903168;
 			
 			// aapt resource value: 0x7F030081
-			public const int checkboxStyle = 2130903169;
+			public const int cardUseCompatPadding = 2130903169;
 			
 			// aapt resource value: 0x7F030082
-			public const int checkedButton = 2130903170;
+			public const int cardViewStyle = 2130903170;
 			
 			// aapt resource value: 0x7F030083
-			public const int checkedChip = 2130903171;
+			public const int checkboxStyle = 2130903171;
 			
 			// aapt resource value: 0x7F030084
-			public const int checkedIcon = 2130903172;
+			public const int checkedButton = 2130903172;
 			
 			// aapt resource value: 0x7F030085
-			public const int checkedIconEnabled = 2130903173;
+			public const int checkedChip = 2130903173;
 			
 			// aapt resource value: 0x7F030086
-			public const int checkedIconTint = 2130903174;
+			public const int checkedIcon = 2130903174;
 			
 			// aapt resource value: 0x7F030087
-			public const int checkedIconVisible = 2130903175;
+			public const int checkedIconEnabled = 2130903175;
 			
 			// aapt resource value: 0x7F030088
-			public const int checkedTextViewStyle = 2130903176;
+			public const int checkedIconTint = 2130903176;
 			
 			// aapt resource value: 0x7F030089
-			public const int chipBackgroundColor = 2130903177;
+			public const int checkedIconVisible = 2130903177;
 			
 			// aapt resource value: 0x7F03008A
-			public const int chipCornerRadius = 2130903178;
+			public const int checkedTextViewStyle = 2130903178;
 			
 			// aapt resource value: 0x7F03008B
-			public const int chipEndPadding = 2130903179;
+			public const int chipBackgroundColor = 2130903179;
 			
 			// aapt resource value: 0x7F03008C
-			public const int chipGroupStyle = 2130903180;
+			public const int chipCornerRadius = 2130903180;
 			
 			// aapt resource value: 0x7F03008D
-			public const int chipIcon = 2130903181;
+			public const int chipEndPadding = 2130903181;
 			
 			// aapt resource value: 0x7F03008E
-			public const int chipIconEnabled = 2130903182;
+			public const int chipGroupStyle = 2130903182;
 			
 			// aapt resource value: 0x7F03008F
-			public const int chipIconSize = 2130903183;
+			public const int chipIcon = 2130903183;
 			
 			// aapt resource value: 0x7F030090
-			public const int chipIconTint = 2130903184;
+			public const int chipIconEnabled = 2130903184;
 			
 			// aapt resource value: 0x7F030091
-			public const int chipIconVisible = 2130903185;
+			public const int chipIconSize = 2130903185;
 			
 			// aapt resource value: 0x7F030092
-			public const int chipMinHeight = 2130903186;
+			public const int chipIconTint = 2130903186;
 			
 			// aapt resource value: 0x7F030093
-			public const int chipMinTouchTargetSize = 2130903187;
+			public const int chipIconVisible = 2130903187;
 			
 			// aapt resource value: 0x7F030094
-			public const int chipSpacing = 2130903188;
+			public const int chipMinHeight = 2130903188;
 			
 			// aapt resource value: 0x7F030095
-			public const int chipSpacingHorizontal = 2130903189;
+			public const int chipMinTouchTargetSize = 2130903189;
 			
 			// aapt resource value: 0x7F030096
-			public const int chipSpacingVertical = 2130903190;
+			public const int chipSpacing = 2130903190;
 			
 			// aapt resource value: 0x7F030097
-			public const int chipStandaloneStyle = 2130903191;
+			public const int chipSpacingHorizontal = 2130903191;
 			
 			// aapt resource value: 0x7F030098
-			public const int chipStartPadding = 2130903192;
+			public const int chipSpacingVertical = 2130903192;
 			
 			// aapt resource value: 0x7F030099
-			public const int chipStrokeColor = 2130903193;
+			public const int chipStandaloneStyle = 2130903193;
 			
 			// aapt resource value: 0x7F03009A
-			public const int chipStrokeWidth = 2130903194;
+			public const int chipStartPadding = 2130903194;
 			
 			// aapt resource value: 0x7F03009B
-			public const int chipStyle = 2130903195;
+			public const int chipStrokeColor = 2130903195;
 			
 			// aapt resource value: 0x7F03009C
-			public const int chipSurfaceColor = 2130903196;
+			public const int chipStrokeWidth = 2130903196;
 			
 			// aapt resource value: 0x7F03009D
-			public const int circleCrop = 2130903197;
+			public const int chipStyle = 2130903197;
 			
 			// aapt resource value: 0x7F03009E
-			public const int closeIcon = 2130903198;
+			public const int chipSurfaceColor = 2130903198;
 			
 			// aapt resource value: 0x7F03009F
-			public const int closeIconEnabled = 2130903199;
+			public const int circleCrop = 2130903199;
 			
 			// aapt resource value: 0x7F0300A0
-			public const int closeIconEndPadding = 2130903200;
+			public const int closeIcon = 2130903200;
 			
 			// aapt resource value: 0x7F0300A1
-			public const int closeIconSize = 2130903201;
+			public const int closeIconEnabled = 2130903201;
 			
 			// aapt resource value: 0x7F0300A2
-			public const int closeIconStartPadding = 2130903202;
+			public const int closeIconEndPadding = 2130903202;
 			
 			// aapt resource value: 0x7F0300A3
-			public const int closeIconTint = 2130903203;
+			public const int closeIconSize = 2130903203;
 			
 			// aapt resource value: 0x7F0300A4
-			public const int closeIconVisible = 2130903204;
+			public const int closeIconStartPadding = 2130903204;
 			
 			// aapt resource value: 0x7F0300A5
-			public const int closeItemLayout = 2130903205;
+			public const int closeIconTint = 2130903205;
 			
 			// aapt resource value: 0x7F0300A6
-			public const int collapseContentDescription = 2130903206;
-			
-			// aapt resource value: 0x7F0300A8
-			public const int collapsedTitleGravity = 2130903208;
-			
-			// aapt resource value: 0x7F0300A9
-			public const int collapsedTitleTextAppearance = 2130903209;
+			public const int closeIconVisible = 2130903206;
 			
 			// aapt resource value: 0x7F0300A7
-			public const int collapseIcon = 2130903207;
+			public const int closeItemLayout = 2130903207;
+			
+			// aapt resource value: 0x7F0300A8
+			public const int collapseContentDescription = 2130903208;
 			
 			// aapt resource value: 0x7F0300AA
-			public const int collectionViewStyle = 2130903210;
+			public const int collapsedTitleGravity = 2130903210;
 			
 			// aapt resource value: 0x7F0300AB
-			public const int color = 2130903211;
+			public const int collapsedTitleTextAppearance = 2130903211;
+			
+			// aapt resource value: 0x7F0300A9
+			public const int collapseIcon = 2130903209;
 			
 			// aapt resource value: 0x7F0300AC
-			public const int colorAccent = 2130903212;
+			public const int collectionViewStyle = 2130903212;
 			
 			// aapt resource value: 0x7F0300AD
-			public const int colorBackgroundFloating = 2130903213;
+			public const int color = 2130903213;
 			
 			// aapt resource value: 0x7F0300AE
-			public const int colorButtonNormal = 2130903214;
+			public const int colorAccent = 2130903214;
 			
 			// aapt resource value: 0x7F0300AF
-			public const int colorControlActivated = 2130903215;
+			public const int colorBackgroundFloating = 2130903215;
 			
 			// aapt resource value: 0x7F0300B0
-			public const int colorControlHighlight = 2130903216;
+			public const int colorButtonNormal = 2130903216;
 			
 			// aapt resource value: 0x7F0300B1
-			public const int colorControlNormal = 2130903217;
+			public const int colorControlActivated = 2130903217;
 			
 			// aapt resource value: 0x7F0300B2
-			public const int colorError = 2130903218;
+			public const int colorControlHighlight = 2130903218;
 			
 			// aapt resource value: 0x7F0300B3
-			public const int colorOnBackground = 2130903219;
+			public const int colorControlNormal = 2130903219;
 			
 			// aapt resource value: 0x7F0300B4
-			public const int colorOnError = 2130903220;
+			public const int colorError = 2130903220;
 			
 			// aapt resource value: 0x7F0300B5
-			public const int colorOnPrimary = 2130903221;
+			public const int colorOnBackground = 2130903221;
 			
 			// aapt resource value: 0x7F0300B6
-			public const int colorOnPrimarySurface = 2130903222;
+			public const int colorOnError = 2130903222;
 			
 			// aapt resource value: 0x7F0300B7
-			public const int colorOnSecondary = 2130903223;
+			public const int colorOnPrimary = 2130903223;
 			
 			// aapt resource value: 0x7F0300B8
-			public const int colorOnSurface = 2130903224;
+			public const int colorOnPrimarySurface = 2130903224;
 			
 			// aapt resource value: 0x7F0300B9
-			public const int colorPrimary = 2130903225;
+			public const int colorOnSecondary = 2130903225;
 			
 			// aapt resource value: 0x7F0300BA
-			public const int colorPrimaryDark = 2130903226;
+			public const int colorOnSurface = 2130903226;
 			
 			// aapt resource value: 0x7F0300BB
-			public const int colorPrimarySurface = 2130903227;
+			public const int colorPrimary = 2130903227;
 			
 			// aapt resource value: 0x7F0300BC
-			public const int colorPrimaryVariant = 2130903228;
+			public const int colorPrimaryDark = 2130903228;
 			
 			// aapt resource value: 0x7F0300BD
-			public const int colorScheme = 2130903229;
+			public const int colorPrimarySurface = 2130903229;
 			
 			// aapt resource value: 0x7F0300BE
-			public const int colorSecondary = 2130903230;
+			public const int colorPrimaryVariant = 2130903230;
 			
 			// aapt resource value: 0x7F0300BF
-			public const int colorSecondaryVariant = 2130903231;
+			public const int colorScheme = 2130903231;
 			
 			// aapt resource value: 0x7F0300C0
-			public const int colorSurface = 2130903232;
+			public const int colorSecondary = 2130903232;
 			
 			// aapt resource value: 0x7F0300C1
-			public const int colorSwitchThumbNormal = 2130903233;
+			public const int colorSecondaryVariant = 2130903233;
 			
 			// aapt resource value: 0x7F0300C2
-			public const int commitIcon = 2130903234;
+			public const int colorSurface = 2130903234;
 			
 			// aapt resource value: 0x7F0300C3
-			public const int contentDescription = 2130903235;
+			public const int colorSwitchThumbNormal = 2130903235;
 			
 			// aapt resource value: 0x7F0300C4
-			public const int contentInsetEnd = 2130903236;
+			public const int commitIcon = 2130903236;
 			
 			// aapt resource value: 0x7F0300C5
-			public const int contentInsetEndWithActions = 2130903237;
+			public const int contentDescription = 2130903237;
 			
 			// aapt resource value: 0x7F0300C6
-			public const int contentInsetLeft = 2130903238;
+			public const int contentInsetEnd = 2130903238;
 			
 			// aapt resource value: 0x7F0300C7
-			public const int contentInsetRight = 2130903239;
+			public const int contentInsetEndWithActions = 2130903239;
 			
 			// aapt resource value: 0x7F0300C8
-			public const int contentInsetStart = 2130903240;
+			public const int contentInsetLeft = 2130903240;
 			
 			// aapt resource value: 0x7F0300C9
-			public const int contentInsetStartWithNavigation = 2130903241;
+			public const int contentInsetRight = 2130903241;
 			
 			// aapt resource value: 0x7F0300CA
-			public const int contentPadding = 2130903242;
+			public const int contentInsetStart = 2130903242;
 			
 			// aapt resource value: 0x7F0300CB
-			public const int contentPaddingBottom = 2130903243;
+			public const int contentInsetStartWithNavigation = 2130903243;
 			
 			// aapt resource value: 0x7F0300CC
-			public const int contentPaddingLeft = 2130903244;
+			public const int contentPadding = 2130903244;
 			
 			// aapt resource value: 0x7F0300CD
-			public const int contentPaddingRight = 2130903245;
+			public const int contentPaddingBottom = 2130903245;
 			
 			// aapt resource value: 0x7F0300CE
-			public const int contentPaddingTop = 2130903246;
+			public const int contentPaddingLeft = 2130903246;
 			
 			// aapt resource value: 0x7F0300CF
-			public const int contentScrim = 2130903247;
+			public const int contentPaddingRight = 2130903247;
 			
 			// aapt resource value: 0x7F0300D0
-			public const int controlBackground = 2130903248;
+			public const int contentPaddingTop = 2130903248;
 			
 			// aapt resource value: 0x7F0300D1
-			public const int coordinatorLayoutStyle = 2130903249;
+			public const int contentScrim = 2130903249;
 			
 			// aapt resource value: 0x7F0300D2
-			public const int cornerFamily = 2130903250;
+			public const int controlBackground = 2130903250;
 			
 			// aapt resource value: 0x7F0300D3
-			public const int cornerFamilyBottomLeft = 2130903251;
+			public const int coordinatorLayoutStyle = 2130903251;
 			
 			// aapt resource value: 0x7F0300D4
-			public const int cornerFamilyBottomRight = 2130903252;
+			public const int cornerFamily = 2130903252;
 			
 			// aapt resource value: 0x7F0300D5
-			public const int cornerFamilyTopLeft = 2130903253;
+			public const int cornerFamilyBottomLeft = 2130903253;
 			
 			// aapt resource value: 0x7F0300D6
-			public const int cornerFamilyTopRight = 2130903254;
+			public const int cornerFamilyBottomRight = 2130903254;
 			
 			// aapt resource value: 0x7F0300D7
-			public const int cornerRadius = 2130903255;
+			public const int cornerFamilyTopLeft = 2130903255;
 			
 			// aapt resource value: 0x7F0300D8
-			public const int cornerSize = 2130903256;
+			public const int cornerFamilyTopRight = 2130903256;
 			
 			// aapt resource value: 0x7F0300D9
-			public const int cornerSizeBottomLeft = 2130903257;
+			public const int cornerRadius = 2130903257;
 			
 			// aapt resource value: 0x7F0300DA
-			public const int cornerSizeBottomRight = 2130903258;
+			public const int cornerSize = 2130903258;
 			
 			// aapt resource value: 0x7F0300DB
-			public const int cornerSizeTopLeft = 2130903259;
+			public const int cornerSizeBottomLeft = 2130903259;
 			
 			// aapt resource value: 0x7F0300DC
-			public const int cornerSizeTopRight = 2130903260;
+			public const int cornerSizeBottomRight = 2130903260;
 			
 			// aapt resource value: 0x7F0300DD
-			public const int counterEnabled = 2130903261;
+			public const int cornerSizeTopLeft = 2130903261;
 			
 			// aapt resource value: 0x7F0300DE
-			public const int counterMaxLength = 2130903262;
+			public const int cornerSizeTopRight = 2130903262;
 			
 			// aapt resource value: 0x7F0300DF
-			public const int counterOverflowTextAppearance = 2130903263;
+			public const int counterEnabled = 2130903263;
 			
 			// aapt resource value: 0x7F0300E0
-			public const int counterOverflowTextColor = 2130903264;
+			public const int counterMaxLength = 2130903264;
 			
 			// aapt resource value: 0x7F0300E1
-			public const int counterTextAppearance = 2130903265;
+			public const int counterOverflowTextAppearance = 2130903265;
 			
 			// aapt resource value: 0x7F0300E2
-			public const int counterTextColor = 2130903266;
+			public const int counterOverflowTextColor = 2130903266;
 			
 			// aapt resource value: 0x7F0300E3
-			public const int customNavigationLayout = 2130903267;
+			public const int counterTextAppearance = 2130903267;
 			
 			// aapt resource value: 0x7F0300E4
-			public const int dayInvalidStyle = 2130903268;
+			public const int counterTextColor = 2130903268;
 			
 			// aapt resource value: 0x7F0300E5
-			public const int daySelectedStyle = 2130903269;
+			public const int customNavigationLayout = 2130903269;
 			
 			// aapt resource value: 0x7F0300E6
-			public const int dayStyle = 2130903270;
+			public const int dayInvalidStyle = 2130903270;
 			
 			// aapt resource value: 0x7F0300E7
-			public const int dayTodayStyle = 2130903271;
+			public const int daySelectedStyle = 2130903271;
 			
 			// aapt resource value: 0x7F0300E8
-			public const int defaultQueryHint = 2130903272;
+			public const int dayStyle = 2130903272;
 			
 			// aapt resource value: 0x7F0300E9
-			public const int dialogCornerRadius = 2130903273;
+			public const int dayTodayStyle = 2130903273;
 			
 			// aapt resource value: 0x7F0300EA
-			public const int dialogPreferredPadding = 2130903274;
+			public const int defaultQueryHint = 2130903274;
 			
 			// aapt resource value: 0x7F0300EB
-			public const int dialogTheme = 2130903275;
+			public const int dialogCornerRadius = 2130903275;
 			
 			// aapt resource value: 0x7F0300EC
-			public const int displayOptions = 2130903276;
+			public const int dialogPreferredPadding = 2130903276;
 			
 			// aapt resource value: 0x7F0300ED
-			public const int divider = 2130903277;
+			public const int dialogTheme = 2130903277;
 			
 			// aapt resource value: 0x7F0300EE
-			public const int dividerHorizontal = 2130903278;
+			public const int displayOptions = 2130903278;
 			
 			// aapt resource value: 0x7F0300EF
-			public const int dividerPadding = 2130903279;
+			public const int divider = 2130903279;
 			
 			// aapt resource value: 0x7F0300F0
-			public const int dividerVertical = 2130903280;
+			public const int dividerHorizontal = 2130903280;
 			
 			// aapt resource value: 0x7F0300F1
-			public const int drawableBottomCompat = 2130903281;
+			public const int dividerPadding = 2130903281;
 			
 			// aapt resource value: 0x7F0300F2
-			public const int drawableEndCompat = 2130903282;
+			public const int dividerVertical = 2130903282;
 			
 			// aapt resource value: 0x7F0300F3
-			public const int drawableLeftCompat = 2130903283;
+			public const int drawableBottomCompat = 2130903283;
 			
 			// aapt resource value: 0x7F0300F4
-			public const int drawableRightCompat = 2130903284;
+			public const int drawableEndCompat = 2130903284;
 			
 			// aapt resource value: 0x7F0300F5
-			public const int drawableSize = 2130903285;
+			public const int drawableLeftCompat = 2130903285;
 			
 			// aapt resource value: 0x7F0300F6
-			public const int drawableStartCompat = 2130903286;
+			public const int drawableRightCompat = 2130903286;
 			
 			// aapt resource value: 0x7F0300F7
-			public const int drawableTint = 2130903287;
+			public const int drawableSize = 2130903287;
 			
 			// aapt resource value: 0x7F0300F8
-			public const int drawableTintMode = 2130903288;
+			public const int drawableStartCompat = 2130903288;
 			
 			// aapt resource value: 0x7F0300F9
-			public const int drawableTopCompat = 2130903289;
+			public const int drawableTint = 2130903289;
 			
 			// aapt resource value: 0x7F0300FA
-			public const int drawerArrowStyle = 2130903290;
+			public const int drawableTintMode = 2130903290;
 			
 			// aapt resource value: 0x7F0300FB
-			public const int drawerLayoutStyle = 2130903291;
-			
-			// aapt resource value: 0x7F0300FD
-			public const int dropdownListPreferredItemHeight = 2130903293;
+			public const int drawableTopCompat = 2130903291;
 			
 			// aapt resource value: 0x7F0300FC
-			public const int dropDownListViewStyle = 2130903292;
+			public const int drawerArrowStyle = 2130903292;
 			
-			// aapt resource value: 0x7F0300FE
-			public const int editTextBackground = 2130903294;
+			// aapt resource value: 0x7F0300FD
+			public const int drawerLayoutStyle = 2130903293;
 			
 			// aapt resource value: 0x7F0300FF
-			public const int editTextColor = 2130903295;
+			public const int dropdownListPreferredItemHeight = 2130903295;
+			
+			// aapt resource value: 0x7F0300FE
+			public const int dropDownListViewStyle = 2130903294;
 			
 			// aapt resource value: 0x7F030100
-			public const int editTextStyle = 2130903296;
+			public const int editTextBackground = 2130903296;
 			
 			// aapt resource value: 0x7F030101
-			public const int elevation = 2130903297;
+			public const int editTextColor = 2130903297;
 			
 			// aapt resource value: 0x7F030102
-			public const int elevationOverlayColor = 2130903298;
+			public const int editTextStyle = 2130903298;
 			
 			// aapt resource value: 0x7F030103
-			public const int elevationOverlayEnabled = 2130903299;
+			public const int elevation = 2130903299;
 			
 			// aapt resource value: 0x7F030104
-			public const int endIconCheckable = 2130903300;
+			public const int elevationOverlayColor = 2130903300;
 			
 			// aapt resource value: 0x7F030105
-			public const int endIconContentDescription = 2130903301;
+			public const int elevationOverlayEnabled = 2130903301;
 			
 			// aapt resource value: 0x7F030106
-			public const int endIconDrawable = 2130903302;
+			public const int endIconCheckable = 2130903302;
 			
 			// aapt resource value: 0x7F030107
-			public const int endIconMode = 2130903303;
+			public const int endIconContentDescription = 2130903303;
 			
 			// aapt resource value: 0x7F030108
-			public const int endIconTint = 2130903304;
+			public const int endIconDrawable = 2130903304;
 			
 			// aapt resource value: 0x7F030109
-			public const int endIconTintMode = 2130903305;
+			public const int endIconMode = 2130903305;
 			
 			// aapt resource value: 0x7F03010A
-			public const int enforceMaterialTheme = 2130903306;
+			public const int endIconTint = 2130903306;
 			
 			// aapt resource value: 0x7F03010B
-			public const int enforceTextAppearance = 2130903307;
+			public const int endIconTintMode = 2130903307;
 			
 			// aapt resource value: 0x7F03010C
-			public const int ensureMinTouchTargetSize = 2130903308;
+			public const int enforceMaterialTheme = 2130903308;
 			
 			// aapt resource value: 0x7F03010D
-			public const int errorContentDescription = 2130903309;
+			public const int enforceTextAppearance = 2130903309;
 			
 			// aapt resource value: 0x7F03010E
-			public const int errorEnabled = 2130903310;
+			public const int ensureMinTouchTargetSize = 2130903310;
 			
 			// aapt resource value: 0x7F03010F
-			public const int errorIconDrawable = 2130903311;
+			public const int errorContentDescription = 2130903311;
 			
 			// aapt resource value: 0x7F030110
-			public const int errorIconTint = 2130903312;
+			public const int errorEnabled = 2130903312;
 			
 			// aapt resource value: 0x7F030111
-			public const int errorIconTintMode = 2130903313;
+			public const int errorIconDrawable = 2130903313;
 			
 			// aapt resource value: 0x7F030112
-			public const int errorTextAppearance = 2130903314;
+			public const int errorIconTint = 2130903314;
 			
 			// aapt resource value: 0x7F030113
-			public const int errorTextColor = 2130903315;
+			public const int errorIconTintMode = 2130903315;
 			
 			// aapt resource value: 0x7F030114
-			public const int expandActivityOverflowButtonDrawable = 2130903316;
+			public const int errorTextAppearance = 2130903316;
 			
 			// aapt resource value: 0x7F030115
-			public const int expanded = 2130903317;
+			public const int errorTextColor = 2130903317;
 			
 			// aapt resource value: 0x7F030116
-			public const int expandedTitleGravity = 2130903318;
+			public const int expandActivityOverflowButtonDrawable = 2130903318;
 			
 			// aapt resource value: 0x7F030117
-			public const int expandedTitleMargin = 2130903319;
+			public const int expanded = 2130903319;
 			
 			// aapt resource value: 0x7F030118
-			public const int expandedTitleMarginBottom = 2130903320;
+			public const int expandedTitleGravity = 2130903320;
 			
 			// aapt resource value: 0x7F030119
-			public const int expandedTitleMarginEnd = 2130903321;
+			public const int expandedTitleMargin = 2130903321;
 			
 			// aapt resource value: 0x7F03011A
-			public const int expandedTitleMarginStart = 2130903322;
+			public const int expandedTitleMarginBottom = 2130903322;
 			
 			// aapt resource value: 0x7F03011B
-			public const int expandedTitleMarginTop = 2130903323;
+			public const int expandedTitleMarginEnd = 2130903323;
 			
 			// aapt resource value: 0x7F03011C
-			public const int expandedTitleTextAppearance = 2130903324;
-			
-			// aapt resource value: 0x7F03011E
-			public const int extendedFloatingActionButtonStyle = 2130903326;
+			public const int expandedTitleMarginStart = 2130903324;
 			
 			// aapt resource value: 0x7F03011D
-			public const int extendMotionSpec = 2130903325;
+			public const int expandedTitleMarginTop = 2130903325;
 			
-			// aapt resource value: 0x7F03011F
-			public const int fabAlignmentMode = 2130903327;
+			// aapt resource value: 0x7F03011E
+			public const int expandedTitleTextAppearance = 2130903326;
 			
 			// aapt resource value: 0x7F030120
-			public const int fabAnimationMode = 2130903328;
+			public const int extendedFloatingActionButtonStyle = 2130903328;
+			
+			// aapt resource value: 0x7F03011F
+			public const int extendMotionSpec = 2130903327;
 			
 			// aapt resource value: 0x7F030121
-			public const int fabCradleMargin = 2130903329;
+			public const int fabAlignmentMode = 2130903329;
 			
 			// aapt resource value: 0x7F030122
-			public const int fabCradleRoundedCornerRadius = 2130903330;
+			public const int fabAnimationMode = 2130903330;
 			
 			// aapt resource value: 0x7F030123
-			public const int fabCradleVerticalOffset = 2130903331;
+			public const int fabCradleMargin = 2130903331;
 			
 			// aapt resource value: 0x7F030124
-			public const int fabCustomSize = 2130903332;
+			public const int fabCradleRoundedCornerRadius = 2130903332;
 			
 			// aapt resource value: 0x7F030125
-			public const int fabSize = 2130903333;
+			public const int fabCradleVerticalOffset = 2130903333;
 			
 			// aapt resource value: 0x7F030126
-			public const int fastScrollEnabled = 2130903334;
+			public const int fabCustomSize = 2130903334;
 			
 			// aapt resource value: 0x7F030127
-			public const int fastScrollHorizontalThumbDrawable = 2130903335;
+			public const int fabSize = 2130903335;
 			
 			// aapt resource value: 0x7F030128
-			public const int fastScrollHorizontalTrackDrawable = 2130903336;
+			public const int fastScrollEnabled = 2130903336;
 			
 			// aapt resource value: 0x7F030129
-			public const int fastScrollVerticalThumbDrawable = 2130903337;
+			public const int fastScrollHorizontalThumbDrawable = 2130903337;
 			
 			// aapt resource value: 0x7F03012A
-			public const int fastScrollVerticalTrackDrawable = 2130903338;
+			public const int fastScrollHorizontalTrackDrawable = 2130903338;
 			
 			// aapt resource value: 0x7F03012B
-			public const int firstBaselineToTopHeight = 2130903339;
+			public const int fastScrollVerticalThumbDrawable = 2130903339;
 			
 			// aapt resource value: 0x7F03012C
-			public const int floatingActionButtonStyle = 2130903340;
+			public const int fastScrollVerticalTrackDrawable = 2130903340;
 			
 			// aapt resource value: 0x7F03012D
-			public const int font = 2130903341;
+			public const int firstBaselineToTopHeight = 2130903341;
 			
 			// aapt resource value: 0x7F03012E
-			public const int fontFamily = 2130903342;
+			public const int floatingActionButtonStyle = 2130903342;
 			
 			// aapt resource value: 0x7F03012F
-			public const int fontProviderAuthority = 2130903343;
+			public const int font = 2130903343;
 			
 			// aapt resource value: 0x7F030130
-			public const int fontProviderCerts = 2130903344;
+			public const int fontFamily = 2130903344;
 			
 			// aapt resource value: 0x7F030131
-			public const int fontProviderFetchStrategy = 2130903345;
+			public const int fontProviderAuthority = 2130903345;
 			
 			// aapt resource value: 0x7F030132
-			public const int fontProviderFetchTimeout = 2130903346;
+			public const int fontProviderCerts = 2130903346;
 			
 			// aapt resource value: 0x7F030133
-			public const int fontProviderPackage = 2130903347;
+			public const int fontProviderFetchStrategy = 2130903347;
 			
 			// aapt resource value: 0x7F030134
-			public const int fontProviderQuery = 2130903348;
+			public const int fontProviderFetchTimeout = 2130903348;
 			
 			// aapt resource value: 0x7F030135
-			public const int fontStyle = 2130903349;
+			public const int fontProviderPackage = 2130903349;
 			
 			// aapt resource value: 0x7F030136
-			public const int fontVariationSettings = 2130903350;
+			public const int fontProviderQuery = 2130903350;
 			
 			// aapt resource value: 0x7F030137
-			public const int fontWeight = 2130903351;
+			public const int fontProviderSystemFontFamily = 2130903351;
 			
 			// aapt resource value: 0x7F030138
-			public const int foregroundInsidePadding = 2130903352;
+			public const int fontStyle = 2130903352;
 			
 			// aapt resource value: 0x7F030139
-			public const int gapBetweenBars = 2130903353;
+			public const int fontVariationSettings = 2130903353;
 			
 			// aapt resource value: 0x7F03013A
-			public const int gestureInsetBottomIgnored = 2130903354;
+			public const int fontWeight = 2130903354;
 			
 			// aapt resource value: 0x7F03013B
-			public const int goIcon = 2130903355;
+			public const int foregroundInsidePadding = 2130903355;
 			
 			// aapt resource value: 0x7F03013C
-			public const int haloColor = 2130903356;
+			public const int gapBetweenBars = 2130903356;
 			
 			// aapt resource value: 0x7F03013D
-			public const int haloRadius = 2130903357;
+			public const int gestureInsetBottomIgnored = 2130903357;
 			
 			// aapt resource value: 0x7F03013E
-			public const int headerLayout = 2130903358;
+			public const int goIcon = 2130903358;
 			
 			// aapt resource value: 0x7F03013F
-			public const int height = 2130903359;
+			public const int haloColor = 2130903359;
 			
 			// aapt resource value: 0x7F030140
-			public const int helperText = 2130903360;
+			public const int haloRadius = 2130903360;
 			
 			// aapt resource value: 0x7F030141
-			public const int helperTextEnabled = 2130903361;
+			public const int headerLayout = 2130903361;
 			
 			// aapt resource value: 0x7F030142
-			public const int helperTextTextAppearance = 2130903362;
+			public const int height = 2130903362;
 			
 			// aapt resource value: 0x7F030143
-			public const int helperTextTextColor = 2130903363;
+			public const int helperText = 2130903363;
 			
 			// aapt resource value: 0x7F030144
-			public const int hideMotionSpec = 2130903364;
+			public const int helperTextEnabled = 2130903364;
 			
 			// aapt resource value: 0x7F030145
-			public const int hideOnContentScroll = 2130903365;
+			public const int helperTextTextAppearance = 2130903365;
 			
 			// aapt resource value: 0x7F030146
-			public const int hideOnScroll = 2130903366;
+			public const int helperTextTextColor = 2130903366;
 			
 			// aapt resource value: 0x7F030147
-			public const int hintAnimationEnabled = 2130903367;
+			public const int hideMotionSpec = 2130903367;
 			
 			// aapt resource value: 0x7F030148
-			public const int hintEnabled = 2130903368;
+			public const int hideOnContentScroll = 2130903368;
 			
 			// aapt resource value: 0x7F030149
-			public const int hintTextAppearance = 2130903369;
+			public const int hideOnScroll = 2130903369;
 			
 			// aapt resource value: 0x7F03014A
-			public const int hintTextColor = 2130903370;
+			public const int hintAnimationEnabled = 2130903370;
 			
 			// aapt resource value: 0x7F03014B
-			public const int homeAsUpIndicator = 2130903371;
+			public const int hintEnabled = 2130903371;
 			
 			// aapt resource value: 0x7F03014C
-			public const int homeLayout = 2130903372;
+			public const int hintTextAppearance = 2130903372;
 			
 			// aapt resource value: 0x7F03014D
-			public const int horizontalOffset = 2130903373;
+			public const int hintTextColor = 2130903373;
 			
 			// aapt resource value: 0x7F03014E
-			public const int hoveredFocusedTranslationZ = 2130903374;
+			public const int homeAsUpIndicator = 2130903374;
 			
 			// aapt resource value: 0x7F03014F
-			public const int icon = 2130903375;
+			public const int homeLayout = 2130903375;
 			
 			// aapt resource value: 0x7F030150
-			public const int iconEndPadding = 2130903376;
+			public const int horizontalOffset = 2130903376;
 			
 			// aapt resource value: 0x7F030151
-			public const int iconGravity = 2130903377;
-			
-			// aapt resource value: 0x7F030157
-			public const int iconifiedByDefault = 2130903383;
+			public const int hoveredFocusedTranslationZ = 2130903377;
 			
 			// aapt resource value: 0x7F030152
-			public const int iconPadding = 2130903378;
+			public const int icon = 2130903378;
 			
 			// aapt resource value: 0x7F030153
-			public const int iconSize = 2130903379;
+			public const int iconEndPadding = 2130903379;
 			
 			// aapt resource value: 0x7F030154
-			public const int iconStartPadding = 2130903380;
-			
-			// aapt resource value: 0x7F030155
-			public const int iconTint = 2130903381;
-			
-			// aapt resource value: 0x7F030156
-			public const int iconTintMode = 2130903382;
-			
-			// aapt resource value: 0x7F030158
-			public const int imageAspectRatio = 2130903384;
-			
-			// aapt resource value: 0x7F030159
-			public const int imageAspectRatioAdjust = 2130903385;
+			public const int iconGravity = 2130903380;
 			
 			// aapt resource value: 0x7F03015A
-			public const int imageButtonStyle = 2130903386;
+			public const int iconifiedByDefault = 2130903386;
+			
+			// aapt resource value: 0x7F030155
+			public const int iconPadding = 2130903381;
+			
+			// aapt resource value: 0x7F030156
+			public const int iconSize = 2130903382;
+			
+			// aapt resource value: 0x7F030157
+			public const int iconStartPadding = 2130903383;
+			
+			// aapt resource value: 0x7F030158
+			public const int iconTint = 2130903384;
+			
+			// aapt resource value: 0x7F030159
+			public const int iconTintMode = 2130903385;
 			
 			// aapt resource value: 0x7F03015B
-			public const int indeterminateProgressStyle = 2130903387;
+			public const int imageAspectRatio = 2130903387;
 			
 			// aapt resource value: 0x7F03015C
-			public const int initialActivityCount = 2130903388;
+			public const int imageAspectRatioAdjust = 2130903388;
 			
 			// aapt resource value: 0x7F03015D
-			public const int insetForeground = 2130903389;
+			public const int imageButtonStyle = 2130903389;
 			
 			// aapt resource value: 0x7F03015E
-			public const int isLightTheme = 2130903390;
+			public const int indeterminateProgressStyle = 2130903390;
 			
 			// aapt resource value: 0x7F03015F
-			public const int isMaterialTheme = 2130903391;
+			public const int initialActivityCount = 2130903391;
 			
 			// aapt resource value: 0x7F030160
-			public const int itemBackground = 2130903392;
+			public const int insetForeground = 2130903392;
 			
 			// aapt resource value: 0x7F030161
-			public const int itemFillColor = 2130903393;
+			public const int isLightTheme = 2130903393;
 			
 			// aapt resource value: 0x7F030162
-			public const int itemHorizontalPadding = 2130903394;
+			public const int isMaterialTheme = 2130903394;
 			
 			// aapt resource value: 0x7F030163
-			public const int itemHorizontalTranslationEnabled = 2130903395;
+			public const int itemBackground = 2130903395;
 			
 			// aapt resource value: 0x7F030164
-			public const int itemIconPadding = 2130903396;
+			public const int itemFillColor = 2130903396;
 			
 			// aapt resource value: 0x7F030165
-			public const int itemIconSize = 2130903397;
+			public const int itemHorizontalPadding = 2130903397;
 			
 			// aapt resource value: 0x7F030166
-			public const int itemIconTint = 2130903398;
+			public const int itemHorizontalTranslationEnabled = 2130903398;
 			
 			// aapt resource value: 0x7F030167
-			public const int itemMaxLines = 2130903399;
+			public const int itemIconPadding = 2130903399;
 			
 			// aapt resource value: 0x7F030168
-			public const int itemPadding = 2130903400;
+			public const int itemIconSize = 2130903400;
 			
 			// aapt resource value: 0x7F030169
-			public const int itemRippleColor = 2130903401;
+			public const int itemIconTint = 2130903401;
 			
 			// aapt resource value: 0x7F03016A
-			public const int itemShapeAppearance = 2130903402;
+			public const int itemMaxLines = 2130903402;
 			
 			// aapt resource value: 0x7F03016B
-			public const int itemShapeAppearanceOverlay = 2130903403;
+			public const int itemPadding = 2130903403;
 			
 			// aapt resource value: 0x7F03016C
-			public const int itemShapeFillColor = 2130903404;
+			public const int itemRippleColor = 2130903404;
 			
 			// aapt resource value: 0x7F03016D
-			public const int itemShapeInsetBottom = 2130903405;
+			public const int itemShapeAppearance = 2130903405;
 			
 			// aapt resource value: 0x7F03016E
-			public const int itemShapeInsetEnd = 2130903406;
+			public const int itemShapeAppearanceOverlay = 2130903406;
 			
 			// aapt resource value: 0x7F03016F
-			public const int itemShapeInsetStart = 2130903407;
+			public const int itemShapeFillColor = 2130903407;
 			
 			// aapt resource value: 0x7F030170
-			public const int itemShapeInsetTop = 2130903408;
+			public const int itemShapeInsetBottom = 2130903408;
 			
 			// aapt resource value: 0x7F030171
-			public const int itemSpacing = 2130903409;
+			public const int itemShapeInsetEnd = 2130903409;
 			
 			// aapt resource value: 0x7F030172
-			public const int itemStrokeColor = 2130903410;
+			public const int itemShapeInsetStart = 2130903410;
 			
 			// aapt resource value: 0x7F030173
-			public const int itemStrokeWidth = 2130903411;
+			public const int itemShapeInsetTop = 2130903411;
 			
 			// aapt resource value: 0x7F030174
-			public const int itemTextAppearance = 2130903412;
+			public const int itemSpacing = 2130903412;
 			
 			// aapt resource value: 0x7F030175
-			public const int itemTextAppearanceActive = 2130903413;
+			public const int itemStrokeColor = 2130903413;
 			
 			// aapt resource value: 0x7F030176
-			public const int itemTextAppearanceInactive = 2130903414;
+			public const int itemStrokeWidth = 2130903414;
 			
 			// aapt resource value: 0x7F030177
-			public const int itemTextColor = 2130903415;
+			public const int itemTextAppearance = 2130903415;
 			
 			// aapt resource value: 0x7F030178
-			public const int keylines = 2130903416;
+			public const int itemTextAppearanceActive = 2130903416;
 			
 			// aapt resource value: 0x7F030179
-			public const int labelBehavior = 2130903417;
+			public const int itemTextAppearanceInactive = 2130903417;
 			
 			// aapt resource value: 0x7F03017A
-			public const int labelStyle = 2130903418;
+			public const int itemTextColor = 2130903418;
 			
 			// aapt resource value: 0x7F03017B
-			public const int labelVisibilityMode = 2130903419;
+			public const int keylines = 2130903419;
 			
 			// aapt resource value: 0x7F03017C
-			public const int lastBaselineToBottomHeight = 2130903420;
+			public const int labelBehavior = 2130903420;
 			
 			// aapt resource value: 0x7F03017D
-			public const int layout = 2130903421;
+			public const int labelStyle = 2130903421;
 			
 			// aapt resource value: 0x7F03017E
-			public const int layoutManager = 2130903422;
+			public const int labelVisibilityMode = 2130903422;
 			
 			// aapt resource value: 0x7F03017F
-			public const int layout_anchor = 2130903423;
+			public const int lastBaselineToBottomHeight = 2130903423;
 			
 			// aapt resource value: 0x7F030180
-			public const int layout_anchorGravity = 2130903424;
+			public const int layout = 2130903424;
 			
 			// aapt resource value: 0x7F030181
-			public const int layout_behavior = 2130903425;
+			public const int layoutManager = 2130903425;
 			
 			// aapt resource value: 0x7F030182
-			public const int layout_collapseMode = 2130903426;
+			public const int layout_anchor = 2130903426;
 			
 			// aapt resource value: 0x7F030183
-			public const int layout_collapseParallaxMultiplier = 2130903427;
+			public const int layout_anchorGravity = 2130903427;
 			
 			// aapt resource value: 0x7F030184
-			public const int layout_dodgeInsetEdges = 2130903428;
+			public const int layout_behavior = 2130903428;
 			
 			// aapt resource value: 0x7F030185
-			public const int layout_insetEdge = 2130903429;
+			public const int layout_collapseMode = 2130903429;
 			
 			// aapt resource value: 0x7F030186
-			public const int layout_keyline = 2130903430;
+			public const int layout_collapseParallaxMultiplier = 2130903430;
 			
 			// aapt resource value: 0x7F030187
-			public const int layout_scrollFlags = 2130903431;
+			public const int layout_dodgeInsetEdges = 2130903431;
 			
 			// aapt resource value: 0x7F030188
-			public const int layout_scrollInterpolator = 2130903432;
+			public const int layout_insetEdge = 2130903432;
 			
 			// aapt resource value: 0x7F030189
-			public const int liftOnScroll = 2130903433;
+			public const int layout_keyline = 2130903433;
 			
 			// aapt resource value: 0x7F03018A
-			public const int liftOnScrollTargetViewId = 2130903434;
+			public const int layout_scrollFlags = 2130903434;
 			
 			// aapt resource value: 0x7F03018B
-			public const int lineHeight = 2130903435;
+			public const int layout_scrollInterpolator = 2130903435;
 			
 			// aapt resource value: 0x7F03018C
-			public const int lineSpacing = 2130903436;
+			public const int liftOnScroll = 2130903436;
 			
 			// aapt resource value: 0x7F03018D
-			public const int listChoiceBackgroundIndicator = 2130903437;
+			public const int liftOnScrollTargetViewId = 2130903437;
 			
 			// aapt resource value: 0x7F03018E
-			public const int listChoiceIndicatorMultipleAnimated = 2130903438;
+			public const int lineHeight = 2130903438;
 			
 			// aapt resource value: 0x7F03018F
-			public const int listChoiceIndicatorSingleAnimated = 2130903439;
+			public const int lineSpacing = 2130903439;
 			
 			// aapt resource value: 0x7F030190
-			public const int listDividerAlertDialog = 2130903440;
+			public const int listChoiceBackgroundIndicator = 2130903440;
 			
 			// aapt resource value: 0x7F030191
-			public const int listItemLayout = 2130903441;
+			public const int listChoiceIndicatorMultipleAnimated = 2130903441;
 			
 			// aapt resource value: 0x7F030192
-			public const int listLayout = 2130903442;
+			public const int listChoiceIndicatorSingleAnimated = 2130903442;
 			
 			// aapt resource value: 0x7F030193
-			public const int listMenuViewStyle = 2130903443;
+			public const int listDividerAlertDialog = 2130903443;
 			
 			// aapt resource value: 0x7F030194
-			public const int listPopupWindowStyle = 2130903444;
+			public const int listItemLayout = 2130903444;
 			
 			// aapt resource value: 0x7F030195
-			public const int listPreferredItemHeight = 2130903445;
+			public const int listLayout = 2130903445;
 			
 			// aapt resource value: 0x7F030196
-			public const int listPreferredItemHeightLarge = 2130903446;
+			public const int listMenuViewStyle = 2130903446;
 			
 			// aapt resource value: 0x7F030197
-			public const int listPreferredItemHeightSmall = 2130903447;
+			public const int listPopupWindowStyle = 2130903447;
 			
 			// aapt resource value: 0x7F030198
-			public const int listPreferredItemPaddingEnd = 2130903448;
+			public const int listPreferredItemHeight = 2130903448;
 			
 			// aapt resource value: 0x7F030199
-			public const int listPreferredItemPaddingLeft = 2130903449;
+			public const int listPreferredItemHeightLarge = 2130903449;
 			
 			// aapt resource value: 0x7F03019A
-			public const int listPreferredItemPaddingRight = 2130903450;
+			public const int listPreferredItemHeightSmall = 2130903450;
 			
 			// aapt resource value: 0x7F03019B
-			public const int listPreferredItemPaddingStart = 2130903451;
+			public const int listPreferredItemPaddingEnd = 2130903451;
 			
 			// aapt resource value: 0x7F03019C
-			public const int logo = 2130903452;
+			public const int listPreferredItemPaddingLeft = 2130903452;
 			
 			// aapt resource value: 0x7F03019D
-			public const int logoDescription = 2130903453;
+			public const int listPreferredItemPaddingRight = 2130903453;
 			
 			// aapt resource value: 0x7F03019E
-			public const int materialAlertDialogBodyTextStyle = 2130903454;
+			public const int listPreferredItemPaddingStart = 2130903454;
 			
 			// aapt resource value: 0x7F03019F
-			public const int materialAlertDialogTheme = 2130903455;
+			public const int logo = 2130903455;
 			
 			// aapt resource value: 0x7F0301A0
-			public const int materialAlertDialogTitleIconStyle = 2130903456;
+			public const int logoDescription = 2130903456;
 			
 			// aapt resource value: 0x7F0301A1
-			public const int materialAlertDialogTitlePanelStyle = 2130903457;
+			public const int materialAlertDialogBodyTextStyle = 2130903457;
 			
 			// aapt resource value: 0x7F0301A2
-			public const int materialAlertDialogTitleTextStyle = 2130903458;
+			public const int materialAlertDialogTheme = 2130903458;
 			
 			// aapt resource value: 0x7F0301A3
-			public const int materialButtonOutlinedStyle = 2130903459;
+			public const int materialAlertDialogTitleIconStyle = 2130903459;
 			
 			// aapt resource value: 0x7F0301A4
-			public const int materialButtonStyle = 2130903460;
+			public const int materialAlertDialogTitlePanelStyle = 2130903460;
 			
 			// aapt resource value: 0x7F0301A5
-			public const int materialButtonToggleGroupStyle = 2130903461;
+			public const int materialAlertDialogTitleTextStyle = 2130903461;
 			
 			// aapt resource value: 0x7F0301A6
-			public const int materialCalendarDay = 2130903462;
+			public const int materialButtonOutlinedStyle = 2130903462;
 			
 			// aapt resource value: 0x7F0301A7
-			public const int materialCalendarFullscreenTheme = 2130903463;
+			public const int materialButtonStyle = 2130903463;
 			
 			// aapt resource value: 0x7F0301A8
-			public const int materialCalendarHeaderConfirmButton = 2130903464;
+			public const int materialButtonToggleGroupStyle = 2130903464;
 			
 			// aapt resource value: 0x7F0301A9
-			public const int materialCalendarHeaderDivider = 2130903465;
+			public const int materialCalendarDay = 2130903465;
 			
 			// aapt resource value: 0x7F0301AA
-			public const int materialCalendarHeaderLayout = 2130903466;
+			public const int materialCalendarFullscreenTheme = 2130903466;
 			
 			// aapt resource value: 0x7F0301AB
-			public const int materialCalendarHeaderSelection = 2130903467;
+			public const int materialCalendarHeaderConfirmButton = 2130903467;
 			
 			// aapt resource value: 0x7F0301AC
-			public const int materialCalendarHeaderTitle = 2130903468;
+			public const int materialCalendarHeaderDivider = 2130903468;
 			
 			// aapt resource value: 0x7F0301AD
-			public const int materialCalendarHeaderToggleButton = 2130903469;
+			public const int materialCalendarHeaderLayout = 2130903469;
 			
 			// aapt resource value: 0x7F0301AE
-			public const int materialCalendarStyle = 2130903470;
+			public const int materialCalendarHeaderSelection = 2130903470;
 			
 			// aapt resource value: 0x7F0301AF
-			public const int materialCalendarTheme = 2130903471;
+			public const int materialCalendarHeaderTitle = 2130903471;
 			
 			// aapt resource value: 0x7F0301B0
-			public const int materialCardViewStyle = 2130903472;
+			public const int materialCalendarHeaderToggleButton = 2130903472;
 			
 			// aapt resource value: 0x7F0301B1
-			public const int materialThemeOverlay = 2130903473;
+			public const int materialCalendarStyle = 2130903473;
 			
 			// aapt resource value: 0x7F0301B2
-			public const int maxActionInlineWidth = 2130903474;
+			public const int materialCalendarTheme = 2130903474;
 			
 			// aapt resource value: 0x7F0301B3
-			public const int maxButtonHeight = 2130903475;
+			public const int materialCardViewStyle = 2130903475;
 			
 			// aapt resource value: 0x7F0301B4
-			public const int maxCharacterCount = 2130903476;
+			public const int materialThemeOverlay = 2130903476;
 			
 			// aapt resource value: 0x7F0301B5
-			public const int maxImageSize = 2130903477;
+			public const int maxActionInlineWidth = 2130903477;
 			
 			// aapt resource value: 0x7F0301B6
-			public const int maxLines = 2130903478;
+			public const int maxButtonHeight = 2130903478;
 			
 			// aapt resource value: 0x7F0301B7
-			public const int measureWithLargestChild = 2130903479;
+			public const int maxCharacterCount = 2130903479;
 			
 			// aapt resource value: 0x7F0301B8
-			public const int menu = 2130903480;
+			public const int maxImageSize = 2130903480;
 			
 			// aapt resource value: 0x7F0301B9
-			public const int minTouchTargetSize = 2130903481;
+			public const int maxLines = 2130903481;
 			
 			// aapt resource value: 0x7F0301BA
-			public const int multiChoiceItemLayout = 2130903482;
+			public const int measureWithLargestChild = 2130903482;
 			
 			// aapt resource value: 0x7F0301BB
-			public const int navigationContentDescription = 2130903483;
+			public const int menu = 2130903483;
 			
 			// aapt resource value: 0x7F0301BC
-			public const int navigationIcon = 2130903484;
+			public const int minTouchTargetSize = 2130903484;
 			
 			// aapt resource value: 0x7F0301BD
-			public const int navigationMode = 2130903485;
+			public const int multiChoiceItemLayout = 2130903485;
 			
 			// aapt resource value: 0x7F0301BE
-			public const int navigationViewStyle = 2130903486;
+			public const int navigationContentDescription = 2130903486;
 			
 			// aapt resource value: 0x7F0301BF
-			public const int number = 2130903487;
+			public const int navigationIcon = 2130903487;
 			
 			// aapt resource value: 0x7F0301C0
-			public const int numericModifiers = 2130903488;
+			public const int navigationMode = 2130903488;
 			
 			// aapt resource value: 0x7F0301C1
-			public const int overlapAnchor = 2130903489;
+			public const int navigationViewStyle = 2130903489;
 			
 			// aapt resource value: 0x7F0301C2
-			public const int paddingBottomNoButtons = 2130903490;
+			public const int number = 2130903490;
 			
 			// aapt resource value: 0x7F0301C3
-			public const int paddingBottomSystemWindowInsets = 2130903491;
+			public const int numericModifiers = 2130903491;
 			
 			// aapt resource value: 0x7F0301C4
-			public const int paddingEnd = 2130903492;
+			public const int overlapAnchor = 2130903492;
 			
 			// aapt resource value: 0x7F0301C5
-			public const int paddingLeftSystemWindowInsets = 2130903493;
+			public const int paddingBottomNoButtons = 2130903493;
 			
 			// aapt resource value: 0x7F0301C6
-			public const int paddingRightSystemWindowInsets = 2130903494;
+			public const int paddingBottomSystemWindowInsets = 2130903494;
 			
 			// aapt resource value: 0x7F0301C7
-			public const int paddingStart = 2130903495;
+			public const int paddingEnd = 2130903495;
 			
 			// aapt resource value: 0x7F0301C8
-			public const int paddingTopNoTitle = 2130903496;
+			public const int paddingLeftSystemWindowInsets = 2130903496;
 			
 			// aapt resource value: 0x7F0301C9
-			public const int panelBackground = 2130903497;
+			public const int paddingRightSystemWindowInsets = 2130903497;
 			
 			// aapt resource value: 0x7F0301CA
-			public const int panelMenuListTheme = 2130903498;
+			public const int paddingStart = 2130903498;
 			
 			// aapt resource value: 0x7F0301CB
-			public const int panelMenuListWidth = 2130903499;
+			public const int paddingTopNoTitle = 2130903499;
 			
 			// aapt resource value: 0x7F0301CC
-			public const int passwordToggleContentDescription = 2130903500;
+			public const int panelBackground = 2130903500;
 			
 			// aapt resource value: 0x7F0301CD
-			public const int passwordToggleDrawable = 2130903501;
+			public const int panelMenuListTheme = 2130903501;
 			
 			// aapt resource value: 0x7F0301CE
-			public const int passwordToggleEnabled = 2130903502;
+			public const int panelMenuListWidth = 2130903502;
 			
 			// aapt resource value: 0x7F0301CF
-			public const int passwordToggleTint = 2130903503;
+			public const int passwordToggleContentDescription = 2130903503;
 			
 			// aapt resource value: 0x7F0301D0
-			public const int passwordToggleTintMode = 2130903504;
+			public const int passwordToggleDrawable = 2130903504;
 			
 			// aapt resource value: 0x7F0301D1
-			public const int placeholderText = 2130903505;
+			public const int passwordToggleEnabled = 2130903505;
 			
 			// aapt resource value: 0x7F0301D2
-			public const int placeholderTextAppearance = 2130903506;
+			public const int passwordToggleTint = 2130903506;
 			
 			// aapt resource value: 0x7F0301D3
-			public const int placeholderTextColor = 2130903507;
+			public const int passwordToggleTintMode = 2130903507;
 			
 			// aapt resource value: 0x7F0301D4
-			public const int popupMenuBackground = 2130903508;
+			public const int placeholderText = 2130903508;
 			
 			// aapt resource value: 0x7F0301D5
-			public const int popupMenuStyle = 2130903509;
+			public const int placeholderTextAppearance = 2130903509;
 			
 			// aapt resource value: 0x7F0301D6
-			public const int popupTheme = 2130903510;
+			public const int placeholderTextColor = 2130903510;
 			
 			// aapt resource value: 0x7F0301D7
-			public const int popupWindowStyle = 2130903511;
+			public const int popupMenuBackground = 2130903511;
 			
 			// aapt resource value: 0x7F0301D8
-			public const int prefixText = 2130903512;
+			public const int popupMenuStyle = 2130903512;
 			
 			// aapt resource value: 0x7F0301D9
-			public const int prefixTextAppearance = 2130903513;
+			public const int popupTheme = 2130903513;
 			
 			// aapt resource value: 0x7F0301DA
-			public const int prefixTextColor = 2130903514;
+			public const int popupWindowStyle = 2130903514;
 			
 			// aapt resource value: 0x7F0301DB
-			public const int preserveIconSpacing = 2130903515;
+			public const int prefixText = 2130903515;
 			
 			// aapt resource value: 0x7F0301DC
-			public const int pressedTranslationZ = 2130903516;
+			public const int prefixTextAppearance = 2130903516;
 			
 			// aapt resource value: 0x7F0301DD
-			public const int progressBarPadding = 2130903517;
+			public const int prefixTextColor = 2130903517;
 			
 			// aapt resource value: 0x7F0301DE
-			public const int progressBarStyle = 2130903518;
+			public const int preserveIconSpacing = 2130903518;
 			
 			// aapt resource value: 0x7F0301DF
-			public const int queryBackground = 2130903519;
+			public const int pressedTranslationZ = 2130903519;
 			
 			// aapt resource value: 0x7F0301E0
-			public const int queryHint = 2130903520;
+			public const int progressBarPadding = 2130903520;
 			
 			// aapt resource value: 0x7F0301E1
-			public const int radioButtonStyle = 2130903521;
+			public const int progressBarStyle = 2130903521;
 			
 			// aapt resource value: 0x7F0301E2
-			public const int rangeFillColor = 2130903522;
+			public const int queryBackground = 2130903522;
 			
 			// aapt resource value: 0x7F0301E3
-			public const int ratingBarStyle = 2130903523;
+			public const int queryHint = 2130903523;
 			
 			// aapt resource value: 0x7F0301E4
-			public const int ratingBarStyleIndicator = 2130903524;
+			public const int radioButtonStyle = 2130903524;
 			
 			// aapt resource value: 0x7F0301E5
-			public const int ratingBarStyleSmall = 2130903525;
+			public const int rangeFillColor = 2130903525;
 			
 			// aapt resource value: 0x7F0301E6
-			public const int recyclerViewStyle = 2130903526;
+			public const int ratingBarStyle = 2130903526;
 			
 			// aapt resource value: 0x7F0301E7
-			public const int reverseLayout = 2130903527;
+			public const int ratingBarStyleIndicator = 2130903527;
 			
 			// aapt resource value: 0x7F0301E8
-			public const int rippleColor = 2130903528;
+			public const int ratingBarStyleSmall = 2130903528;
 			
 			// aapt resource value: 0x7F0301E9
-			public const int scopeUris = 2130903529;
+			public const int recyclerViewStyle = 2130903529;
 			
 			// aapt resource value: 0x7F0301EA
-			public const int scrimAnimationDuration = 2130903530;
+			public const int reverseLayout = 2130903530;
 			
 			// aapt resource value: 0x7F0301EB
-			public const int scrimBackground = 2130903531;
+			public const int rippleColor = 2130903531;
 			
 			// aapt resource value: 0x7F0301EC
-			public const int scrimVisibleHeightTrigger = 2130903532;
+			public const int scopeUris = 2130903532;
 			
 			// aapt resource value: 0x7F0301ED
-			public const int scrollViewStyle = 2130903533;
+			public const int scrimAnimationDuration = 2130903533;
 			
 			// aapt resource value: 0x7F0301EE
-			public const int searchHintIcon = 2130903534;
+			public const int scrimBackground = 2130903534;
 			
 			// aapt resource value: 0x7F0301EF
-			public const int searchIcon = 2130903535;
+			public const int scrimVisibleHeightTrigger = 2130903535;
 			
 			// aapt resource value: 0x7F0301F0
-			public const int searchViewStyle = 2130903536;
+			public const int scrollViewStyle = 2130903536;
 			
 			// aapt resource value: 0x7F0301F1
-			public const int seekBarStyle = 2130903537;
+			public const int searchHintIcon = 2130903537;
 			
 			// aapt resource value: 0x7F0301F2
-			public const int selectableItemBackground = 2130903538;
+			public const int searchIcon = 2130903538;
 			
 			// aapt resource value: 0x7F0301F3
-			public const int selectableItemBackgroundBorderless = 2130903539;
+			public const int searchViewStyle = 2130903539;
 			
 			// aapt resource value: 0x7F0301F4
-			public const int selectionRequired = 2130903540;
+			public const int seekBarStyle = 2130903540;
 			
 			// aapt resource value: 0x7F0301F5
-			public const int shapeAppearance = 2130903541;
+			public const int selectableItemBackground = 2130903541;
 			
 			// aapt resource value: 0x7F0301F6
-			public const int shapeAppearanceLargeComponent = 2130903542;
+			public const int selectableItemBackgroundBorderless = 2130903542;
 			
 			// aapt resource value: 0x7F0301F7
-			public const int shapeAppearanceMediumComponent = 2130903543;
+			public const int selectionRequired = 2130903543;
 			
 			// aapt resource value: 0x7F0301F8
-			public const int shapeAppearanceOverlay = 2130903544;
+			public const int shapeAppearance = 2130903544;
 			
 			// aapt resource value: 0x7F0301F9
-			public const int shapeAppearanceSmallComponent = 2130903545;
+			public const int shapeAppearanceLargeComponent = 2130903545;
 			
 			// aapt resource value: 0x7F0301FA
-			public const int showAsAction = 2130903546;
+			public const int shapeAppearanceMediumComponent = 2130903546;
 			
 			// aapt resource value: 0x7F0301FB
-			public const int showDividers = 2130903547;
+			public const int shapeAppearanceOverlay = 2130903547;
 			
 			// aapt resource value: 0x7F0301FC
-			public const int showMotionSpec = 2130903548;
+			public const int shapeAppearanceSmallComponent = 2130903548;
 			
 			// aapt resource value: 0x7F0301FD
-			public const int showText = 2130903549;
+			public const int showAsAction = 2130903549;
 			
 			// aapt resource value: 0x7F0301FE
-			public const int showTitle = 2130903550;
+			public const int showDividers = 2130903550;
 			
 			// aapt resource value: 0x7F0301FF
-			public const int shrinkMotionSpec = 2130903551;
+			public const int showMotionSpec = 2130903551;
 			
 			// aapt resource value: 0x7F030200
-			public const int singleChoiceItemLayout = 2130903552;
+			public const int showText = 2130903552;
 			
 			// aapt resource value: 0x7F030201
-			public const int singleLine = 2130903553;
+			public const int showTitle = 2130903553;
 			
 			// aapt resource value: 0x7F030202
-			public const int singleSelection = 2130903554;
+			public const int shrinkMotionSpec = 2130903554;
 			
 			// aapt resource value: 0x7F030203
-			public const int sliderStyle = 2130903555;
+			public const int singleChoiceItemLayout = 2130903555;
 			
 			// aapt resource value: 0x7F030204
-			public const int snackbarButtonStyle = 2130903556;
+			public const int singleLine = 2130903556;
 			
 			// aapt resource value: 0x7F030205
-			public const int snackbarStyle = 2130903557;
+			public const int singleSelection = 2130903557;
 			
 			// aapt resource value: 0x7F030206
-			public const int snackbarTextViewStyle = 2130903558;
+			public const int sliderStyle = 2130903558;
 			
 			// aapt resource value: 0x7F030207
-			public const int spanCount = 2130903559;
+			public const int snackbarButtonStyle = 2130903559;
 			
 			// aapt resource value: 0x7F030208
-			public const int spinBars = 2130903560;
+			public const int snackbarStyle = 2130903560;
 			
 			// aapt resource value: 0x7F030209
-			public const int spinnerDropDownItemStyle = 2130903561;
+			public const int snackbarTextViewStyle = 2130903561;
 			
 			// aapt resource value: 0x7F03020A
-			public const int spinnerStyle = 2130903562;
+			public const int spanCount = 2130903562;
 			
 			// aapt resource value: 0x7F03020B
-			public const int splitTrack = 2130903563;
+			public const int spinBars = 2130903563;
 			
 			// aapt resource value: 0x7F03020C
-			public const int srcCompat = 2130903564;
+			public const int spinnerDropDownItemStyle = 2130903564;
 			
 			// aapt resource value: 0x7F03020D
-			public const int stackFromEnd = 2130903565;
+			public const int spinnerStyle = 2130903565;
 			
 			// aapt resource value: 0x7F03020E
-			public const int startIconCheckable = 2130903566;
+			public const int splitTrack = 2130903566;
 			
 			// aapt resource value: 0x7F03020F
-			public const int startIconContentDescription = 2130903567;
+			public const int srcCompat = 2130903567;
 			
 			// aapt resource value: 0x7F030210
-			public const int startIconDrawable = 2130903568;
+			public const int stackFromEnd = 2130903568;
 			
 			// aapt resource value: 0x7F030211
-			public const int startIconTint = 2130903569;
+			public const int startIconCheckable = 2130903569;
 			
 			// aapt resource value: 0x7F030212
-			public const int startIconTintMode = 2130903570;
+			public const int startIconContentDescription = 2130903570;
 			
 			// aapt resource value: 0x7F030213
-			public const int state_above_anchor = 2130903571;
+			public const int startIconDrawable = 2130903571;
 			
 			// aapt resource value: 0x7F030214
-			public const int state_collapsed = 2130903572;
+			public const int startIconTint = 2130903572;
 			
 			// aapt resource value: 0x7F030215
-			public const int state_collapsible = 2130903573;
+			public const int startIconTintMode = 2130903573;
 			
 			// aapt resource value: 0x7F030216
-			public const int state_dragged = 2130903574;
+			public const int state_above_anchor = 2130903574;
 			
 			// aapt resource value: 0x7F030217
-			public const int state_liftable = 2130903575;
+			public const int state_collapsed = 2130903575;
 			
 			// aapt resource value: 0x7F030218
-			public const int state_lifted = 2130903576;
+			public const int state_collapsible = 2130903576;
 			
 			// aapt resource value: 0x7F030219
-			public const int statusBarBackground = 2130903577;
+			public const int state_dragged = 2130903577;
 			
 			// aapt resource value: 0x7F03021A
-			public const int statusBarForeground = 2130903578;
+			public const int state_liftable = 2130903578;
 			
 			// aapt resource value: 0x7F03021B
-			public const int statusBarScrim = 2130903579;
+			public const int state_lifted = 2130903579;
 			
 			// aapt resource value: 0x7F03021C
-			public const int strokeColor = 2130903580;
+			public const int statusBarBackground = 2130903580;
 			
 			// aapt resource value: 0x7F03021D
-			public const int strokeWidth = 2130903581;
+			public const int statusBarForeground = 2130903581;
 			
 			// aapt resource value: 0x7F03021E
-			public const int subMenuArrow = 2130903582;
+			public const int statusBarScrim = 2130903582;
 			
 			// aapt resource value: 0x7F03021F
-			public const int submitBackground = 2130903583;
+			public const int strokeColor = 2130903583;
 			
 			// aapt resource value: 0x7F030220
-			public const int subtitle = 2130903584;
+			public const int strokeWidth = 2130903584;
 			
 			// aapt resource value: 0x7F030221
-			public const int subtitleTextAppearance = 2130903585;
+			public const int subMenuArrow = 2130903585;
 			
 			// aapt resource value: 0x7F030222
-			public const int subtitleTextColor = 2130903586;
+			public const int submitBackground = 2130903586;
 			
 			// aapt resource value: 0x7F030223
-			public const int subtitleTextStyle = 2130903587;
+			public const int subtitle = 2130903587;
 			
 			// aapt resource value: 0x7F030224
-			public const int suffixText = 2130903588;
+			public const int subtitleTextAppearance = 2130903588;
 			
 			// aapt resource value: 0x7F030225
-			public const int suffixTextAppearance = 2130903589;
+			public const int subtitleTextColor = 2130903589;
 			
 			// aapt resource value: 0x7F030226
-			public const int suffixTextColor = 2130903590;
+			public const int subtitleTextStyle = 2130903590;
 			
 			// aapt resource value: 0x7F030227
-			public const int suggestionRowLayout = 2130903591;
+			public const int suffixText = 2130903591;
 			
 			// aapt resource value: 0x7F030228
-			public const int swipeRefreshLayoutProgressSpinnerBackgroundColor = 2130903592;
+			public const int suffixTextAppearance = 2130903592;
 			
 			// aapt resource value: 0x7F030229
-			public const int switchMinWidth = 2130903593;
+			public const int suffixTextColor = 2130903593;
 			
 			// aapt resource value: 0x7F03022A
-			public const int switchPadding = 2130903594;
+			public const int suggestionRowLayout = 2130903594;
 			
 			// aapt resource value: 0x7F03022B
-			public const int switchStyle = 2130903595;
+			public const int swipeRefreshLayoutProgressSpinnerBackgroundColor = 2130903595;
 			
 			// aapt resource value: 0x7F03022C
-			public const int switchTextAppearance = 2130903596;
+			public const int switchMinWidth = 2130903596;
 			
 			// aapt resource value: 0x7F03022D
-			public const int tabBackground = 2130903597;
+			public const int switchPadding = 2130903597;
 			
 			// aapt resource value: 0x7F03022E
-			public const int tabContentStart = 2130903598;
+			public const int switchStyle = 2130903598;
 			
 			// aapt resource value: 0x7F03022F
-			public const int tabGravity = 2130903599;
+			public const int switchTextAppearance = 2130903599;
 			
 			// aapt resource value: 0x7F030230
-			public const int tabIconTint = 2130903600;
+			public const int tabBackground = 2130903600;
 			
 			// aapt resource value: 0x7F030231
-			public const int tabIconTintMode = 2130903601;
+			public const int tabContentStart = 2130903601;
 			
 			// aapt resource value: 0x7F030232
-			public const int tabIndicator = 2130903602;
+			public const int tabGravity = 2130903602;
 			
 			// aapt resource value: 0x7F030233
-			public const int tabIndicatorAnimationDuration = 2130903603;
+			public const int tabIconTint = 2130903603;
 			
 			// aapt resource value: 0x7F030234
-			public const int tabIndicatorColor = 2130903604;
+			public const int tabIconTintMode = 2130903604;
 			
 			// aapt resource value: 0x7F030235
-			public const int tabIndicatorFullWidth = 2130903605;
+			public const int tabIndicator = 2130903605;
 			
 			// aapt resource value: 0x7F030236
-			public const int tabIndicatorGravity = 2130903606;
+			public const int tabIndicatorAnimationDuration = 2130903606;
 			
 			// aapt resource value: 0x7F030237
-			public const int tabIndicatorHeight = 2130903607;
+			public const int tabIndicatorColor = 2130903607;
 			
 			// aapt resource value: 0x7F030238
-			public const int tabInlineLabel = 2130903608;
+			public const int tabIndicatorFullWidth = 2130903608;
 			
 			// aapt resource value: 0x7F030239
-			public const int tabMaxWidth = 2130903609;
+			public const int tabIndicatorGravity = 2130903609;
 			
 			// aapt resource value: 0x7F03023A
-			public const int tabMinWidth = 2130903610;
+			public const int tabIndicatorHeight = 2130903610;
 			
 			// aapt resource value: 0x7F03023B
-			public const int tabMode = 2130903611;
+			public const int tabInlineLabel = 2130903611;
 			
 			// aapt resource value: 0x7F03023C
-			public const int tabPadding = 2130903612;
+			public const int tabMaxWidth = 2130903612;
 			
 			// aapt resource value: 0x7F03023D
-			public const int tabPaddingBottom = 2130903613;
+			public const int tabMinWidth = 2130903613;
 			
 			// aapt resource value: 0x7F03023E
-			public const int tabPaddingEnd = 2130903614;
+			public const int tabMode = 2130903614;
 			
 			// aapt resource value: 0x7F03023F
-			public const int tabPaddingStart = 2130903615;
+			public const int tabPadding = 2130903615;
 			
 			// aapt resource value: 0x7F030240
-			public const int tabPaddingTop = 2130903616;
+			public const int tabPaddingBottom = 2130903616;
 			
 			// aapt resource value: 0x7F030241
-			public const int tabRippleColor = 2130903617;
+			public const int tabPaddingEnd = 2130903617;
 			
 			// aapt resource value: 0x7F030242
-			public const int tabSelectedTextColor = 2130903618;
+			public const int tabPaddingStart = 2130903618;
 			
 			// aapt resource value: 0x7F030243
-			public const int tabStyle = 2130903619;
+			public const int tabPaddingTop = 2130903619;
 			
 			// aapt resource value: 0x7F030244
-			public const int tabTextAppearance = 2130903620;
+			public const int tabRippleColor = 2130903620;
 			
 			// aapt resource value: 0x7F030245
-			public const int tabTextColor = 2130903621;
+			public const int tabSelectedTextColor = 2130903621;
 			
 			// aapt resource value: 0x7F030246
-			public const int tabUnboundedRipple = 2130903622;
+			public const int tabStyle = 2130903622;
 			
 			// aapt resource value: 0x7F030247
-			public const int textAllCaps = 2130903623;
+			public const int tabTextAppearance = 2130903623;
 			
 			// aapt resource value: 0x7F030248
-			public const int textAppearanceBody1 = 2130903624;
+			public const int tabTextColor = 2130903624;
 			
 			// aapt resource value: 0x7F030249
-			public const int textAppearanceBody2 = 2130903625;
+			public const int tabUnboundedRipple = 2130903625;
 			
 			// aapt resource value: 0x7F03024A
-			public const int textAppearanceButton = 2130903626;
+			public const int textAllCaps = 2130903626;
 			
 			// aapt resource value: 0x7F03024B
-			public const int textAppearanceCaption = 2130903627;
+			public const int textAppearanceBody1 = 2130903627;
 			
 			// aapt resource value: 0x7F03024C
-			public const int textAppearanceHeadline1 = 2130903628;
+			public const int textAppearanceBody2 = 2130903628;
 			
 			// aapt resource value: 0x7F03024D
-			public const int textAppearanceHeadline2 = 2130903629;
+			public const int textAppearanceButton = 2130903629;
 			
 			// aapt resource value: 0x7F03024E
-			public const int textAppearanceHeadline3 = 2130903630;
+			public const int textAppearanceCaption = 2130903630;
 			
 			// aapt resource value: 0x7F03024F
-			public const int textAppearanceHeadline4 = 2130903631;
+			public const int textAppearanceHeadline1 = 2130903631;
 			
 			// aapt resource value: 0x7F030250
-			public const int textAppearanceHeadline5 = 2130903632;
+			public const int textAppearanceHeadline2 = 2130903632;
 			
 			// aapt resource value: 0x7F030251
-			public const int textAppearanceHeadline6 = 2130903633;
+			public const int textAppearanceHeadline3 = 2130903633;
 			
 			// aapt resource value: 0x7F030252
-			public const int textAppearanceLargePopupMenu = 2130903634;
+			public const int textAppearanceHeadline4 = 2130903634;
 			
 			// aapt resource value: 0x7F030253
-			public const int textAppearanceLineHeightEnabled = 2130903635;
+			public const int textAppearanceHeadline5 = 2130903635;
 			
 			// aapt resource value: 0x7F030254
-			public const int textAppearanceListItem = 2130903636;
+			public const int textAppearanceHeadline6 = 2130903636;
 			
 			// aapt resource value: 0x7F030255
-			public const int textAppearanceListItemSecondary = 2130903637;
+			public const int textAppearanceLargePopupMenu = 2130903637;
 			
 			// aapt resource value: 0x7F030256
-			public const int textAppearanceListItemSmall = 2130903638;
+			public const int textAppearanceLineHeightEnabled = 2130903638;
 			
 			// aapt resource value: 0x7F030257
-			public const int textAppearanceOverline = 2130903639;
+			public const int textAppearanceListItem = 2130903639;
 			
 			// aapt resource value: 0x7F030258
-			public const int textAppearancePopupMenuHeader = 2130903640;
+			public const int textAppearanceListItemSecondary = 2130903640;
 			
 			// aapt resource value: 0x7F030259
-			public const int textAppearanceSearchResultSubtitle = 2130903641;
+			public const int textAppearanceListItemSmall = 2130903641;
 			
 			// aapt resource value: 0x7F03025A
-			public const int textAppearanceSearchResultTitle = 2130903642;
+			public const int textAppearanceOverline = 2130903642;
 			
 			// aapt resource value: 0x7F03025B
-			public const int textAppearanceSmallPopupMenu = 2130903643;
+			public const int textAppearancePopupMenuHeader = 2130903643;
 			
 			// aapt resource value: 0x7F03025C
-			public const int textAppearanceSubtitle1 = 2130903644;
+			public const int textAppearanceSearchResultSubtitle = 2130903644;
 			
 			// aapt resource value: 0x7F03025D
-			public const int textAppearanceSubtitle2 = 2130903645;
+			public const int textAppearanceSearchResultTitle = 2130903645;
 			
 			// aapt resource value: 0x7F03025E
-			public const int textColorAlertDialogListItem = 2130903646;
+			public const int textAppearanceSmallPopupMenu = 2130903646;
 			
 			// aapt resource value: 0x7F03025F
-			public const int textColorSearchUrl = 2130903647;
+			public const int textAppearanceSubtitle1 = 2130903647;
 			
 			// aapt resource value: 0x7F030260
-			public const int textEndPadding = 2130903648;
+			public const int textAppearanceSubtitle2 = 2130903648;
 			
 			// aapt resource value: 0x7F030261
-			public const int textInputLayoutFocusedRectEnabled = 2130903649;
+			public const int textColorAlertDialogListItem = 2130903649;
 			
 			// aapt resource value: 0x7F030262
-			public const int textInputStyle = 2130903650;
+			public const int textColorSearchUrl = 2130903650;
 			
 			// aapt resource value: 0x7F030263
-			public const int textLocale = 2130903651;
+			public const int textEndPadding = 2130903651;
 			
 			// aapt resource value: 0x7F030264
-			public const int textStartPadding = 2130903652;
+			public const int textInputLayoutFocusedRectEnabled = 2130903652;
 			
 			// aapt resource value: 0x7F030265
-			public const int theme = 2130903653;
+			public const int textInputStyle = 2130903653;
 			
 			// aapt resource value: 0x7F030266
-			public const int themeLineHeight = 2130903654;
+			public const int textLocale = 2130903654;
 			
 			// aapt resource value: 0x7F030267
-			public const int thickness = 2130903655;
+			public const int textStartPadding = 2130903655;
 			
 			// aapt resource value: 0x7F030268
-			public const int thumbColor = 2130903656;
+			public const int theme = 2130903656;
 			
 			// aapt resource value: 0x7F030269
-			public const int thumbElevation = 2130903657;
+			public const int themeLineHeight = 2130903657;
 			
 			// aapt resource value: 0x7F03026A
-			public const int thumbRadius = 2130903658;
+			public const int thickness = 2130903658;
 			
 			// aapt resource value: 0x7F03026B
-			public const int thumbTextPadding = 2130903659;
+			public const int thumbColor = 2130903659;
 			
 			// aapt resource value: 0x7F03026C
-			public const int thumbTint = 2130903660;
+			public const int thumbElevation = 2130903660;
 			
 			// aapt resource value: 0x7F03026D
-			public const int thumbTintMode = 2130903661;
+			public const int thumbRadius = 2130903661;
 			
 			// aapt resource value: 0x7F03026E
-			public const int tickColor = 2130903662;
+			public const int thumbTextPadding = 2130903662;
 			
 			// aapt resource value: 0x7F03026F
-			public const int tickColorActive = 2130903663;
+			public const int thumbTint = 2130903663;
 			
 			// aapt resource value: 0x7F030270
-			public const int tickColorInactive = 2130903664;
+			public const int thumbTintMode = 2130903664;
 			
 			// aapt resource value: 0x7F030271
-			public const int tickMark = 2130903665;
+			public const int tickColor = 2130903665;
 			
 			// aapt resource value: 0x7F030272
-			public const int tickMarkTint = 2130903666;
+			public const int tickColorActive = 2130903666;
 			
 			// aapt resource value: 0x7F030273
-			public const int tickMarkTintMode = 2130903667;
+			public const int tickColorInactive = 2130903667;
 			
 			// aapt resource value: 0x7F030274
-			public const int tint = 2130903668;
+			public const int tickMark = 2130903668;
 			
 			// aapt resource value: 0x7F030275
-			public const int tintMode = 2130903669;
+			public const int tickMarkTint = 2130903669;
 			
 			// aapt resource value: 0x7F030276
-			public const int title = 2130903670;
+			public const int tickMarkTintMode = 2130903670;
 			
 			// aapt resource value: 0x7F030277
-			public const int titleEnabled = 2130903671;
+			public const int tint = 2130903671;
 			
 			// aapt resource value: 0x7F030278
-			public const int titleMargin = 2130903672;
+			public const int tintMode = 2130903672;
 			
 			// aapt resource value: 0x7F030279
-			public const int titleMarginBottom = 2130903673;
+			public const int title = 2130903673;
 			
 			// aapt resource value: 0x7F03027A
-			public const int titleMarginEnd = 2130903674;
-			
-			// aapt resource value: 0x7F03027D
-			public const int titleMargins = 2130903677;
+			public const int titleEnabled = 2130903674;
 			
 			// aapt resource value: 0x7F03027B
-			public const int titleMarginStart = 2130903675;
+			public const int titleMargin = 2130903675;
 			
 			// aapt resource value: 0x7F03027C
-			public const int titleMarginTop = 2130903676;
+			public const int titleMarginBottom = 2130903676;
 			
-			// aapt resource value: 0x7F03027E
-			public const int titleTextAppearance = 2130903678;
-			
-			// aapt resource value: 0x7F03027F
-			public const int titleTextColor = 2130903679;
+			// aapt resource value: 0x7F03027D
+			public const int titleMarginEnd = 2130903677;
 			
 			// aapt resource value: 0x7F030280
-			public const int titleTextStyle = 2130903680;
+			public const int titleMargins = 2130903680;
+			
+			// aapt resource value: 0x7F03027E
+			public const int titleMarginStart = 2130903678;
+			
+			// aapt resource value: 0x7F03027F
+			public const int titleMarginTop = 2130903679;
 			
 			// aapt resource value: 0x7F030281
-			public const int toolbarId = 2130903681;
+			public const int titleTextAppearance = 2130903681;
 			
 			// aapt resource value: 0x7F030282
-			public const int toolbarNavigationButtonStyle = 2130903682;
+			public const int titleTextColor = 2130903682;
 			
 			// aapt resource value: 0x7F030283
-			public const int toolbarStyle = 2130903683;
+			public const int titleTextStyle = 2130903683;
 			
 			// aapt resource value: 0x7F030284
-			public const int tooltipForegroundColor = 2130903684;
+			public const int toolbarId = 2130903684;
 			
 			// aapt resource value: 0x7F030285
-			public const int tooltipFrameBackground = 2130903685;
+			public const int toolbarNavigationButtonStyle = 2130903685;
 			
 			// aapt resource value: 0x7F030286
-			public const int tooltipStyle = 2130903686;
+			public const int toolbarStyle = 2130903686;
 			
 			// aapt resource value: 0x7F030287
-			public const int tooltipText = 2130903687;
+			public const int tooltipForegroundColor = 2130903687;
 			
 			// aapt resource value: 0x7F030288
-			public const int track = 2130903688;
+			public const int tooltipFrameBackground = 2130903688;
 			
 			// aapt resource value: 0x7F030289
-			public const int trackColor = 2130903689;
+			public const int tooltipStyle = 2130903689;
 			
 			// aapt resource value: 0x7F03028A
-			public const int trackColorActive = 2130903690;
+			public const int tooltipText = 2130903690;
 			
 			// aapt resource value: 0x7F03028B
-			public const int trackColorInactive = 2130903691;
+			public const int track = 2130903691;
 			
 			// aapt resource value: 0x7F03028C
-			public const int trackHeight = 2130903692;
+			public const int trackColor = 2130903692;
 			
 			// aapt resource value: 0x7F03028D
-			public const int trackTint = 2130903693;
+			public const int trackColorActive = 2130903693;
 			
 			// aapt resource value: 0x7F03028E
-			public const int trackTintMode = 2130903694;
+			public const int trackColorInactive = 2130903694;
 			
 			// aapt resource value: 0x7F03028F
-			public const int transitionShapeAppearance = 2130903695;
+			public const int trackHeight = 2130903695;
 			
 			// aapt resource value: 0x7F030290
-			public const int ttcIndex = 2130903696;
+			public const int trackTint = 2130903696;
 			
 			// aapt resource value: 0x7F030291
-			public const int useCompatPadding = 2130903697;
+			public const int trackTintMode = 2130903697;
 			
 			// aapt resource value: 0x7F030292
-			public const int useMaterialThemeColors = 2130903698;
+			public const int transitionShapeAppearance = 2130903698;
 			
 			// aapt resource value: 0x7F030293
-			public const int values = 2130903699;
+			public const int ttcIndex = 2130903699;
 			
 			// aapt resource value: 0x7F030294
-			public const int verticalOffset = 2130903700;
+			public const int useCompatPadding = 2130903700;
 			
 			// aapt resource value: 0x7F030295
-			public const int viewInflaterClass = 2130903701;
+			public const int useMaterialThemeColors = 2130903701;
 			
 			// aapt resource value: 0x7F030296
-			public const int voiceIcon = 2130903702;
+			public const int values = 2130903702;
 			
 			// aapt resource value: 0x7F030297
-			public const int windowActionBar = 2130903703;
+			public const int verticalOffset = 2130903703;
 			
 			// aapt resource value: 0x7F030298
-			public const int windowActionBarOverlay = 2130903704;
+			public const int viewInflaterClass = 2130903704;
 			
 			// aapt resource value: 0x7F030299
-			public const int windowActionModeOverlay = 2130903705;
+			public const int voiceIcon = 2130903705;
 			
 			// aapt resource value: 0x7F03029A
-			public const int windowFixedHeightMajor = 2130903706;
+			public const int windowActionBar = 2130903706;
 			
 			// aapt resource value: 0x7F03029B
-			public const int windowFixedHeightMinor = 2130903707;
+			public const int windowActionBarOverlay = 2130903707;
 			
 			// aapt resource value: 0x7F03029C
-			public const int windowFixedWidthMajor = 2130903708;
+			public const int windowActionModeOverlay = 2130903708;
 			
 			// aapt resource value: 0x7F03029D
-			public const int windowFixedWidthMinor = 2130903709;
+			public const int windowFixedHeightMajor = 2130903709;
 			
 			// aapt resource value: 0x7F03029E
-			public const int windowMinWidthMajor = 2130903710;
+			public const int windowFixedHeightMinor = 2130903710;
 			
 			// aapt resource value: 0x7F03029F
-			public const int windowMinWidthMinor = 2130903711;
+			public const int windowFixedWidthMajor = 2130903711;
 			
 			// aapt resource value: 0x7F0302A0
-			public const int windowNoTitle = 2130903712;
+			public const int windowFixedWidthMinor = 2130903712;
 			
 			// aapt resource value: 0x7F0302A1
-			public const int yearSelectedStyle = 2130903713;
+			public const int windowMinWidthMajor = 2130903713;
 			
 			// aapt resource value: 0x7F0302A2
-			public const int yearStyle = 2130903714;
+			public const int windowMinWidthMinor = 2130903714;
 			
 			// aapt resource value: 0x7F0302A3
-			public const int yearTodayStyle = 2130903715;
+			public const int windowNoTitle = 2130903715;
+			
+			// aapt resource value: 0x7F0302A4
+			public const int yearSelectedStyle = 2130903716;
+			
+			// aapt resource value: 0x7F0302A5
+			public const int yearStyle = 2130903717;
+			
+			// aapt resource value: 0x7F0302A6
+			public const int yearTodayStyle = 2130903718;
 			
 			static Attribute()
 			{
@@ -23416,25 +23580,22 @@ namespace Shiny.Tests.Android
 			public const int abc_action_bar_embed_tabs = 2130968576;
 			
 			// aapt resource value: 0x7F040001
-			public const int abc_allow_stacked_button_bar = 2130968577;
+			public const int abc_config_actionMenuItemAllCaps = 2130968577;
 			
 			// aapt resource value: 0x7F040002
-			public const int abc_config_actionMenuItemAllCaps = 2130968578;
+			public const int enable_system_alarm_service_default = 2130968578;
 			
 			// aapt resource value: 0x7F040003
-			public const int enable_system_alarm_service_default = 2130968579;
+			public const int enable_system_foreground_service_default = 2130968579;
 			
 			// aapt resource value: 0x7F040004
-			public const int enable_system_foreground_service_default = 2130968580;
+			public const int enable_system_job_service_default = 2130968580;
 			
 			// aapt resource value: 0x7F040005
-			public const int enable_system_job_service_default = 2130968581;
+			public const int mtrl_btn_textappearance_all_caps = 2130968581;
 			
 			// aapt resource value: 0x7F040006
-			public const int mtrl_btn_textappearance_all_caps = 2130968582;
-			
-			// aapt resource value: 0x7F040007
-			public const int workmanager_test_configuration = 2130968583;
+			public const int workmanager_test_configuration = 2130968582;
 			
 			static Boolean()
 			{
@@ -24300,868 +24461,877 @@ namespace Shiny.Tests.Android
 			public const int abc_select_dialog_padding_start_material = 2131099706;
 			
 			// aapt resource value: 0x7F06003B
-			public const int abc_switch_padding = 2131099707;
+			public const int abc_star_big = 2131099707;
 			
 			// aapt resource value: 0x7F06003C
-			public const int abc_text_size_body_1_material = 2131099708;
+			public const int abc_star_medium = 2131099708;
 			
 			// aapt resource value: 0x7F06003D
-			public const int abc_text_size_body_2_material = 2131099709;
+			public const int abc_star_small = 2131099709;
 			
 			// aapt resource value: 0x7F06003E
-			public const int abc_text_size_button_material = 2131099710;
+			public const int abc_switch_padding = 2131099710;
 			
 			// aapt resource value: 0x7F06003F
-			public const int abc_text_size_caption_material = 2131099711;
+			public const int abc_text_size_body_1_material = 2131099711;
 			
 			// aapt resource value: 0x7F060040
-			public const int abc_text_size_display_1_material = 2131099712;
+			public const int abc_text_size_body_2_material = 2131099712;
 			
 			// aapt resource value: 0x7F060041
-			public const int abc_text_size_display_2_material = 2131099713;
+			public const int abc_text_size_button_material = 2131099713;
 			
 			// aapt resource value: 0x7F060042
-			public const int abc_text_size_display_3_material = 2131099714;
+			public const int abc_text_size_caption_material = 2131099714;
 			
 			// aapt resource value: 0x7F060043
-			public const int abc_text_size_display_4_material = 2131099715;
+			public const int abc_text_size_display_1_material = 2131099715;
 			
 			// aapt resource value: 0x7F060044
-			public const int abc_text_size_headline_material = 2131099716;
+			public const int abc_text_size_display_2_material = 2131099716;
 			
 			// aapt resource value: 0x7F060045
-			public const int abc_text_size_large_material = 2131099717;
+			public const int abc_text_size_display_3_material = 2131099717;
 			
 			// aapt resource value: 0x7F060046
-			public const int abc_text_size_medium_material = 2131099718;
+			public const int abc_text_size_display_4_material = 2131099718;
 			
 			// aapt resource value: 0x7F060047
-			public const int abc_text_size_menu_header_material = 2131099719;
+			public const int abc_text_size_headline_material = 2131099719;
 			
 			// aapt resource value: 0x7F060048
-			public const int abc_text_size_menu_material = 2131099720;
+			public const int abc_text_size_large_material = 2131099720;
 			
 			// aapt resource value: 0x7F060049
-			public const int abc_text_size_small_material = 2131099721;
+			public const int abc_text_size_medium_material = 2131099721;
 			
 			// aapt resource value: 0x7F06004A
-			public const int abc_text_size_subhead_material = 2131099722;
+			public const int abc_text_size_menu_header_material = 2131099722;
 			
 			// aapt resource value: 0x7F06004B
-			public const int abc_text_size_subtitle_material_toolbar = 2131099723;
+			public const int abc_text_size_menu_material = 2131099723;
 			
 			// aapt resource value: 0x7F06004C
-			public const int abc_text_size_title_material = 2131099724;
+			public const int abc_text_size_small_material = 2131099724;
 			
 			// aapt resource value: 0x7F06004D
-			public const int abc_text_size_title_material_toolbar = 2131099725;
+			public const int abc_text_size_subhead_material = 2131099725;
 			
 			// aapt resource value: 0x7F06004E
-			public const int action_bar_size = 2131099726;
+			public const int abc_text_size_subtitle_material_toolbar = 2131099726;
 			
 			// aapt resource value: 0x7F06004F
-			public const int appcompat_dialog_background_inset = 2131099727;
+			public const int abc_text_size_title_material = 2131099727;
 			
 			// aapt resource value: 0x7F060050
-			public const int browser_actions_context_menu_max_width = 2131099728;
+			public const int abc_text_size_title_material_toolbar = 2131099728;
 			
 			// aapt resource value: 0x7F060051
-			public const int browser_actions_context_menu_min_padding = 2131099729;
+			public const int action_bar_size = 2131099729;
 			
 			// aapt resource value: 0x7F060052
-			public const int cardview_compat_inset_shadow = 2131099730;
+			public const int appcompat_dialog_background_inset = 2131099730;
 			
 			// aapt resource value: 0x7F060053
-			public const int cardview_default_elevation = 2131099731;
+			public const int browser_actions_context_menu_max_width = 2131099731;
 			
 			// aapt resource value: 0x7F060054
-			public const int cardview_default_radius = 2131099732;
+			public const int browser_actions_context_menu_min_padding = 2131099732;
 			
 			// aapt resource value: 0x7F060055
-			public const int compat_button_inset_horizontal_material = 2131099733;
+			public const int cardview_compat_inset_shadow = 2131099733;
 			
 			// aapt resource value: 0x7F060056
-			public const int compat_button_inset_vertical_material = 2131099734;
+			public const int cardview_default_elevation = 2131099734;
 			
 			// aapt resource value: 0x7F060057
-			public const int compat_button_padding_horizontal_material = 2131099735;
+			public const int cardview_default_radius = 2131099735;
 			
 			// aapt resource value: 0x7F060058
-			public const int compat_button_padding_vertical_material = 2131099736;
+			public const int compat_button_inset_horizontal_material = 2131099736;
 			
 			// aapt resource value: 0x7F060059
-			public const int compat_control_corner_material = 2131099737;
+			public const int compat_button_inset_vertical_material = 2131099737;
 			
 			// aapt resource value: 0x7F06005A
-			public const int compat_notification_large_icon_max_height = 2131099738;
+			public const int compat_button_padding_horizontal_material = 2131099738;
 			
 			// aapt resource value: 0x7F06005B
-			public const int compat_notification_large_icon_max_width = 2131099739;
-			
-			// aapt resource value: 0x7F06005D
-			public const int default_dimension = 2131099741;
+			public const int compat_button_padding_vertical_material = 2131099739;
 			
 			// aapt resource value: 0x7F06005C
-			public const int def_drawer_elevation = 2131099740;
+			public const int compat_control_corner_material = 2131099740;
+			
+			// aapt resource value: 0x7F06005D
+			public const int compat_notification_large_icon_max_height = 2131099741;
 			
 			// aapt resource value: 0x7F06005E
-			public const int design_appbar_elevation = 2131099742;
-			
-			// aapt resource value: 0x7F06005F
-			public const int design_bottom_navigation_active_item_max_width = 2131099743;
+			public const int compat_notification_large_icon_max_width = 2131099742;
 			
 			// aapt resource value: 0x7F060060
-			public const int design_bottom_navigation_active_item_min_width = 2131099744;
+			public const int default_dimension = 2131099744;
+			
+			// aapt resource value: 0x7F06005F
+			public const int def_drawer_elevation = 2131099743;
 			
 			// aapt resource value: 0x7F060061
-			public const int design_bottom_navigation_active_text_size = 2131099745;
+			public const int design_appbar_elevation = 2131099745;
 			
 			// aapt resource value: 0x7F060062
-			public const int design_bottom_navigation_elevation = 2131099746;
+			public const int design_bottom_navigation_active_item_max_width = 2131099746;
 			
 			// aapt resource value: 0x7F060063
-			public const int design_bottom_navigation_height = 2131099747;
+			public const int design_bottom_navigation_active_item_min_width = 2131099747;
 			
 			// aapt resource value: 0x7F060064
-			public const int design_bottom_navigation_icon_size = 2131099748;
+			public const int design_bottom_navigation_active_text_size = 2131099748;
 			
 			// aapt resource value: 0x7F060065
-			public const int design_bottom_navigation_item_max_width = 2131099749;
+			public const int design_bottom_navigation_elevation = 2131099749;
 			
 			// aapt resource value: 0x7F060066
-			public const int design_bottom_navigation_item_min_width = 2131099750;
+			public const int design_bottom_navigation_height = 2131099750;
 			
 			// aapt resource value: 0x7F060067
-			public const int design_bottom_navigation_margin = 2131099751;
+			public const int design_bottom_navigation_icon_size = 2131099751;
 			
 			// aapt resource value: 0x7F060068
-			public const int design_bottom_navigation_shadow_height = 2131099752;
+			public const int design_bottom_navigation_item_max_width = 2131099752;
 			
 			// aapt resource value: 0x7F060069
-			public const int design_bottom_navigation_text_size = 2131099753;
+			public const int design_bottom_navigation_item_min_width = 2131099753;
 			
 			// aapt resource value: 0x7F06006A
-			public const int design_bottom_sheet_elevation = 2131099754;
+			public const int design_bottom_navigation_margin = 2131099754;
 			
 			// aapt resource value: 0x7F06006B
-			public const int design_bottom_sheet_modal_elevation = 2131099755;
+			public const int design_bottom_navigation_shadow_height = 2131099755;
 			
 			// aapt resource value: 0x7F06006C
-			public const int design_bottom_sheet_peek_height_min = 2131099756;
+			public const int design_bottom_navigation_text_size = 2131099756;
 			
 			// aapt resource value: 0x7F06006D
-			public const int design_fab_border_width = 2131099757;
+			public const int design_bottom_sheet_elevation = 2131099757;
 			
 			// aapt resource value: 0x7F06006E
-			public const int design_fab_elevation = 2131099758;
+			public const int design_bottom_sheet_modal_elevation = 2131099758;
 			
 			// aapt resource value: 0x7F06006F
-			public const int design_fab_image_size = 2131099759;
+			public const int design_bottom_sheet_peek_height_min = 2131099759;
 			
 			// aapt resource value: 0x7F060070
-			public const int design_fab_size_mini = 2131099760;
+			public const int design_fab_border_width = 2131099760;
 			
 			// aapt resource value: 0x7F060071
-			public const int design_fab_size_normal = 2131099761;
+			public const int design_fab_elevation = 2131099761;
 			
 			// aapt resource value: 0x7F060072
-			public const int design_fab_translation_z_hovered_focused = 2131099762;
+			public const int design_fab_image_size = 2131099762;
 			
 			// aapt resource value: 0x7F060073
-			public const int design_fab_translation_z_pressed = 2131099763;
+			public const int design_fab_size_mini = 2131099763;
 			
 			// aapt resource value: 0x7F060074
-			public const int design_navigation_elevation = 2131099764;
+			public const int design_fab_size_normal = 2131099764;
 			
 			// aapt resource value: 0x7F060075
-			public const int design_navigation_icon_padding = 2131099765;
+			public const int design_fab_translation_z_hovered_focused = 2131099765;
 			
 			// aapt resource value: 0x7F060076
-			public const int design_navigation_icon_size = 2131099766;
+			public const int design_fab_translation_z_pressed = 2131099766;
 			
 			// aapt resource value: 0x7F060077
-			public const int design_navigation_item_horizontal_padding = 2131099767;
+			public const int design_navigation_elevation = 2131099767;
 			
 			// aapt resource value: 0x7F060078
-			public const int design_navigation_item_icon_padding = 2131099768;
+			public const int design_navigation_icon_padding = 2131099768;
 			
 			// aapt resource value: 0x7F060079
-			public const int design_navigation_max_width = 2131099769;
+			public const int design_navigation_icon_size = 2131099769;
 			
 			// aapt resource value: 0x7F06007A
-			public const int design_navigation_padding_bottom = 2131099770;
+			public const int design_navigation_item_horizontal_padding = 2131099770;
 			
 			// aapt resource value: 0x7F06007B
-			public const int design_navigation_separator_vertical_padding = 2131099771;
+			public const int design_navigation_item_icon_padding = 2131099771;
 			
 			// aapt resource value: 0x7F06007C
-			public const int design_snackbar_action_inline_max_width = 2131099772;
+			public const int design_navigation_max_width = 2131099772;
 			
 			// aapt resource value: 0x7F06007D
-			public const int design_snackbar_action_text_color_alpha = 2131099773;
+			public const int design_navigation_padding_bottom = 2131099773;
 			
 			// aapt resource value: 0x7F06007E
-			public const int design_snackbar_background_corner_radius = 2131099774;
+			public const int design_navigation_separator_vertical_padding = 2131099774;
 			
 			// aapt resource value: 0x7F06007F
-			public const int design_snackbar_elevation = 2131099775;
+			public const int design_snackbar_action_inline_max_width = 2131099775;
 			
 			// aapt resource value: 0x7F060080
-			public const int design_snackbar_extra_spacing_horizontal = 2131099776;
+			public const int design_snackbar_action_text_color_alpha = 2131099776;
 			
 			// aapt resource value: 0x7F060081
-			public const int design_snackbar_max_width = 2131099777;
+			public const int design_snackbar_background_corner_radius = 2131099777;
 			
 			// aapt resource value: 0x7F060082
-			public const int design_snackbar_min_width = 2131099778;
+			public const int design_snackbar_elevation = 2131099778;
 			
 			// aapt resource value: 0x7F060083
-			public const int design_snackbar_padding_horizontal = 2131099779;
+			public const int design_snackbar_extra_spacing_horizontal = 2131099779;
 			
 			// aapt resource value: 0x7F060084
-			public const int design_snackbar_padding_vertical = 2131099780;
+			public const int design_snackbar_max_width = 2131099780;
 			
 			// aapt resource value: 0x7F060085
-			public const int design_snackbar_padding_vertical_2lines = 2131099781;
+			public const int design_snackbar_min_width = 2131099781;
 			
 			// aapt resource value: 0x7F060086
-			public const int design_snackbar_text_size = 2131099782;
+			public const int design_snackbar_padding_horizontal = 2131099782;
 			
 			// aapt resource value: 0x7F060087
-			public const int design_tab_max_width = 2131099783;
+			public const int design_snackbar_padding_vertical = 2131099783;
 			
 			// aapt resource value: 0x7F060088
-			public const int design_tab_scrollable_min_width = 2131099784;
+			public const int design_snackbar_padding_vertical_2lines = 2131099784;
 			
 			// aapt resource value: 0x7F060089
-			public const int design_tab_text_size = 2131099785;
+			public const int design_snackbar_text_size = 2131099785;
 			
 			// aapt resource value: 0x7F06008A
-			public const int design_tab_text_size_2line = 2131099786;
+			public const int design_tab_max_width = 2131099786;
 			
 			// aapt resource value: 0x7F06008B
-			public const int design_textinput_caption_translate_y = 2131099787;
+			public const int design_tab_scrollable_min_width = 2131099787;
 			
 			// aapt resource value: 0x7F06008C
-			public const int disabled_alpha_material_dark = 2131099788;
+			public const int design_tab_text_size = 2131099788;
 			
 			// aapt resource value: 0x7F06008D
-			public const int disabled_alpha_material_light = 2131099789;
+			public const int design_tab_text_size_2line = 2131099789;
 			
 			// aapt resource value: 0x7F06008E
-			public const int fastscroll_default_thickness = 2131099790;
+			public const int design_textinput_caption_translate_y = 2131099790;
 			
 			// aapt resource value: 0x7F06008F
-			public const int fastscroll_margin = 2131099791;
+			public const int disabled_alpha_material_dark = 2131099791;
 			
 			// aapt resource value: 0x7F060090
-			public const int fastscroll_minimum_range = 2131099792;
+			public const int disabled_alpha_material_light = 2131099792;
 			
 			// aapt resource value: 0x7F060091
-			public const int highlight_alpha_material_colored = 2131099793;
+			public const int fastscroll_default_thickness = 2131099793;
 			
 			// aapt resource value: 0x7F060092
-			public const int highlight_alpha_material_dark = 2131099794;
+			public const int fastscroll_margin = 2131099794;
 			
 			// aapt resource value: 0x7F060093
-			public const int highlight_alpha_material_light = 2131099795;
+			public const int fastscroll_minimum_range = 2131099795;
 			
 			// aapt resource value: 0x7F060094
-			public const int hint_alpha_material_dark = 2131099796;
+			public const int highlight_alpha_material_colored = 2131099796;
 			
 			// aapt resource value: 0x7F060095
-			public const int hint_alpha_material_light = 2131099797;
+			public const int highlight_alpha_material_dark = 2131099797;
 			
 			// aapt resource value: 0x7F060096
-			public const int hint_pressed_alpha_material_dark = 2131099798;
+			public const int highlight_alpha_material_light = 2131099798;
 			
 			// aapt resource value: 0x7F060097
-			public const int hint_pressed_alpha_material_light = 2131099799;
+			public const int hint_alpha_material_dark = 2131099799;
 			
 			// aapt resource value: 0x7F060098
-			public const int item_touch_helper_max_drag_scroll_per_frame = 2131099800;
+			public const int hint_alpha_material_light = 2131099800;
 			
 			// aapt resource value: 0x7F060099
-			public const int item_touch_helper_swipe_escape_max_velocity = 2131099801;
+			public const int hint_pressed_alpha_material_dark = 2131099801;
 			
 			// aapt resource value: 0x7F06009A
-			public const int item_touch_helper_swipe_escape_velocity = 2131099802;
+			public const int hint_pressed_alpha_material_light = 2131099802;
 			
 			// aapt resource value: 0x7F06009B
-			public const int material_emphasis_disabled = 2131099803;
+			public const int item_touch_helper_max_drag_scroll_per_frame = 2131099803;
 			
 			// aapt resource value: 0x7F06009C
-			public const int material_emphasis_high_type = 2131099804;
+			public const int item_touch_helper_swipe_escape_max_velocity = 2131099804;
 			
 			// aapt resource value: 0x7F06009D
-			public const int material_emphasis_medium = 2131099805;
+			public const int item_touch_helper_swipe_escape_velocity = 2131099805;
 			
 			// aapt resource value: 0x7F06009E
-			public const int material_text_view_test_line_height = 2131099806;
+			public const int material_emphasis_disabled = 2131099806;
 			
 			// aapt resource value: 0x7F06009F
-			public const int material_text_view_test_line_height_override = 2131099807;
+			public const int material_emphasis_high_type = 2131099807;
 			
 			// aapt resource value: 0x7F0600A0
-			public const int mtrl_alert_dialog_background_inset_bottom = 2131099808;
+			public const int material_emphasis_medium = 2131099808;
 			
 			// aapt resource value: 0x7F0600A1
-			public const int mtrl_alert_dialog_background_inset_end = 2131099809;
+			public const int material_text_view_test_line_height = 2131099809;
 			
 			// aapt resource value: 0x7F0600A2
-			public const int mtrl_alert_dialog_background_inset_start = 2131099810;
+			public const int material_text_view_test_line_height_override = 2131099810;
 			
 			// aapt resource value: 0x7F0600A3
-			public const int mtrl_alert_dialog_background_inset_top = 2131099811;
+			public const int mtrl_alert_dialog_background_inset_bottom = 2131099811;
 			
 			// aapt resource value: 0x7F0600A4
-			public const int mtrl_alert_dialog_picker_background_inset = 2131099812;
+			public const int mtrl_alert_dialog_background_inset_end = 2131099812;
 			
 			// aapt resource value: 0x7F0600A5
-			public const int mtrl_badge_horizontal_edge_offset = 2131099813;
+			public const int mtrl_alert_dialog_background_inset_start = 2131099813;
 			
 			// aapt resource value: 0x7F0600A6
-			public const int mtrl_badge_long_text_horizontal_padding = 2131099814;
+			public const int mtrl_alert_dialog_background_inset_top = 2131099814;
 			
 			// aapt resource value: 0x7F0600A7
-			public const int mtrl_badge_radius = 2131099815;
+			public const int mtrl_alert_dialog_picker_background_inset = 2131099815;
 			
 			// aapt resource value: 0x7F0600A8
-			public const int mtrl_badge_text_horizontal_edge_offset = 2131099816;
+			public const int mtrl_badge_horizontal_edge_offset = 2131099816;
 			
 			// aapt resource value: 0x7F0600A9
-			public const int mtrl_badge_text_size = 2131099817;
+			public const int mtrl_badge_long_text_horizontal_padding = 2131099817;
 			
 			// aapt resource value: 0x7F0600AA
-			public const int mtrl_badge_with_text_radius = 2131099818;
+			public const int mtrl_badge_radius = 2131099818;
 			
 			// aapt resource value: 0x7F0600AB
-			public const int mtrl_bottomappbar_fabOffsetEndMode = 2131099819;
+			public const int mtrl_badge_text_horizontal_edge_offset = 2131099819;
 			
 			// aapt resource value: 0x7F0600AC
-			public const int mtrl_bottomappbar_fab_bottom_margin = 2131099820;
+			public const int mtrl_badge_text_size = 2131099820;
 			
 			// aapt resource value: 0x7F0600AD
-			public const int mtrl_bottomappbar_fab_cradle_margin = 2131099821;
+			public const int mtrl_badge_with_text_radius = 2131099821;
 			
 			// aapt resource value: 0x7F0600AE
-			public const int mtrl_bottomappbar_fab_cradle_rounded_corner_radius = 2131099822;
+			public const int mtrl_bottomappbar_fabOffsetEndMode = 2131099822;
 			
 			// aapt resource value: 0x7F0600AF
-			public const int mtrl_bottomappbar_fab_cradle_vertical_offset = 2131099823;
+			public const int mtrl_bottomappbar_fab_bottom_margin = 2131099823;
 			
 			// aapt resource value: 0x7F0600B0
-			public const int mtrl_bottomappbar_height = 2131099824;
+			public const int mtrl_bottomappbar_fab_cradle_margin = 2131099824;
 			
 			// aapt resource value: 0x7F0600B1
-			public const int mtrl_btn_corner_radius = 2131099825;
+			public const int mtrl_bottomappbar_fab_cradle_rounded_corner_radius = 2131099825;
 			
 			// aapt resource value: 0x7F0600B2
-			public const int mtrl_btn_dialog_btn_min_width = 2131099826;
+			public const int mtrl_bottomappbar_fab_cradle_vertical_offset = 2131099826;
 			
 			// aapt resource value: 0x7F0600B3
-			public const int mtrl_btn_disabled_elevation = 2131099827;
+			public const int mtrl_bottomappbar_height = 2131099827;
 			
 			// aapt resource value: 0x7F0600B4
-			public const int mtrl_btn_disabled_z = 2131099828;
+			public const int mtrl_btn_corner_radius = 2131099828;
 			
 			// aapt resource value: 0x7F0600B5
-			public const int mtrl_btn_elevation = 2131099829;
+			public const int mtrl_btn_dialog_btn_min_width = 2131099829;
 			
 			// aapt resource value: 0x7F0600B6
-			public const int mtrl_btn_focused_z = 2131099830;
+			public const int mtrl_btn_disabled_elevation = 2131099830;
 			
 			// aapt resource value: 0x7F0600B7
-			public const int mtrl_btn_hovered_z = 2131099831;
+			public const int mtrl_btn_disabled_z = 2131099831;
 			
 			// aapt resource value: 0x7F0600B8
-			public const int mtrl_btn_icon_btn_padding_left = 2131099832;
+			public const int mtrl_btn_elevation = 2131099832;
 			
 			// aapt resource value: 0x7F0600B9
-			public const int mtrl_btn_icon_padding = 2131099833;
+			public const int mtrl_btn_focused_z = 2131099833;
 			
 			// aapt resource value: 0x7F0600BA
-			public const int mtrl_btn_inset = 2131099834;
+			public const int mtrl_btn_hovered_z = 2131099834;
 			
 			// aapt resource value: 0x7F0600BB
-			public const int mtrl_btn_letter_spacing = 2131099835;
+			public const int mtrl_btn_icon_btn_padding_left = 2131099835;
 			
 			// aapt resource value: 0x7F0600BC
-			public const int mtrl_btn_padding_bottom = 2131099836;
+			public const int mtrl_btn_icon_padding = 2131099836;
 			
 			// aapt resource value: 0x7F0600BD
-			public const int mtrl_btn_padding_left = 2131099837;
+			public const int mtrl_btn_inset = 2131099837;
 			
 			// aapt resource value: 0x7F0600BE
-			public const int mtrl_btn_padding_right = 2131099838;
+			public const int mtrl_btn_letter_spacing = 2131099838;
 			
 			// aapt resource value: 0x7F0600BF
-			public const int mtrl_btn_padding_top = 2131099839;
+			public const int mtrl_btn_padding_bottom = 2131099839;
 			
 			// aapt resource value: 0x7F0600C0
-			public const int mtrl_btn_pressed_z = 2131099840;
+			public const int mtrl_btn_padding_left = 2131099840;
 			
 			// aapt resource value: 0x7F0600C1
-			public const int mtrl_btn_stroke_size = 2131099841;
+			public const int mtrl_btn_padding_right = 2131099841;
 			
 			// aapt resource value: 0x7F0600C2
-			public const int mtrl_btn_text_btn_icon_padding = 2131099842;
+			public const int mtrl_btn_padding_top = 2131099842;
 			
 			// aapt resource value: 0x7F0600C3
-			public const int mtrl_btn_text_btn_padding_left = 2131099843;
+			public const int mtrl_btn_pressed_z = 2131099843;
 			
 			// aapt resource value: 0x7F0600C4
-			public const int mtrl_btn_text_btn_padding_right = 2131099844;
+			public const int mtrl_btn_stroke_size = 2131099844;
 			
 			// aapt resource value: 0x7F0600C5
-			public const int mtrl_btn_text_size = 2131099845;
+			public const int mtrl_btn_text_btn_icon_padding = 2131099845;
 			
 			// aapt resource value: 0x7F0600C6
-			public const int mtrl_btn_z = 2131099846;
+			public const int mtrl_btn_text_btn_padding_left = 2131099846;
 			
 			// aapt resource value: 0x7F0600C7
-			public const int mtrl_calendar_action_height = 2131099847;
+			public const int mtrl_btn_text_btn_padding_right = 2131099847;
 			
 			// aapt resource value: 0x7F0600C8
-			public const int mtrl_calendar_action_padding = 2131099848;
+			public const int mtrl_btn_text_size = 2131099848;
 			
 			// aapt resource value: 0x7F0600C9
-			public const int mtrl_calendar_bottom_padding = 2131099849;
+			public const int mtrl_btn_z = 2131099849;
 			
 			// aapt resource value: 0x7F0600CA
-			public const int mtrl_calendar_content_padding = 2131099850;
-			
-			// aapt resource value: 0x7F0600D1
-			public const int mtrl_calendar_days_of_week_height = 2131099857;
+			public const int mtrl_calendar_action_height = 2131099850;
 			
 			// aapt resource value: 0x7F0600CB
-			public const int mtrl_calendar_day_corner = 2131099851;
+			public const int mtrl_calendar_action_padding = 2131099851;
 			
 			// aapt resource value: 0x7F0600CC
-			public const int mtrl_calendar_day_height = 2131099852;
+			public const int mtrl_calendar_bottom_padding = 2131099852;
 			
 			// aapt resource value: 0x7F0600CD
-			public const int mtrl_calendar_day_horizontal_padding = 2131099853;
-			
-			// aapt resource value: 0x7F0600CE
-			public const int mtrl_calendar_day_today_stroke = 2131099854;
-			
-			// aapt resource value: 0x7F0600CF
-			public const int mtrl_calendar_day_vertical_padding = 2131099855;
-			
-			// aapt resource value: 0x7F0600D0
-			public const int mtrl_calendar_day_width = 2131099856;
-			
-			// aapt resource value: 0x7F0600D2
-			public const int mtrl_calendar_dialog_background_inset = 2131099858;
-			
-			// aapt resource value: 0x7F0600D3
-			public const int mtrl_calendar_header_content_padding = 2131099859;
+			public const int mtrl_calendar_content_padding = 2131099853;
 			
 			// aapt resource value: 0x7F0600D4
-			public const int mtrl_calendar_header_content_padding_fullscreen = 2131099860;
+			public const int mtrl_calendar_days_of_week_height = 2131099860;
+			
+			// aapt resource value: 0x7F0600CE
+			public const int mtrl_calendar_day_corner = 2131099854;
+			
+			// aapt resource value: 0x7F0600CF
+			public const int mtrl_calendar_day_height = 2131099855;
+			
+			// aapt resource value: 0x7F0600D0
+			public const int mtrl_calendar_day_horizontal_padding = 2131099856;
+			
+			// aapt resource value: 0x7F0600D1
+			public const int mtrl_calendar_day_today_stroke = 2131099857;
+			
+			// aapt resource value: 0x7F0600D2
+			public const int mtrl_calendar_day_vertical_padding = 2131099858;
+			
+			// aapt resource value: 0x7F0600D3
+			public const int mtrl_calendar_day_width = 2131099859;
 			
 			// aapt resource value: 0x7F0600D5
-			public const int mtrl_calendar_header_divider_thickness = 2131099861;
+			public const int mtrl_calendar_dialog_background_inset = 2131099861;
 			
 			// aapt resource value: 0x7F0600D6
-			public const int mtrl_calendar_header_height = 2131099862;
+			public const int mtrl_calendar_header_content_padding = 2131099862;
 			
 			// aapt resource value: 0x7F0600D7
-			public const int mtrl_calendar_header_height_fullscreen = 2131099863;
+			public const int mtrl_calendar_header_content_padding_fullscreen = 2131099863;
 			
 			// aapt resource value: 0x7F0600D8
-			public const int mtrl_calendar_header_selection_line_height = 2131099864;
+			public const int mtrl_calendar_header_divider_thickness = 2131099864;
 			
 			// aapt resource value: 0x7F0600D9
-			public const int mtrl_calendar_header_text_padding = 2131099865;
+			public const int mtrl_calendar_header_height = 2131099865;
 			
 			// aapt resource value: 0x7F0600DA
-			public const int mtrl_calendar_header_toggle_margin_bottom = 2131099866;
+			public const int mtrl_calendar_header_height_fullscreen = 2131099866;
 			
 			// aapt resource value: 0x7F0600DB
-			public const int mtrl_calendar_header_toggle_margin_top = 2131099867;
+			public const int mtrl_calendar_header_selection_line_height = 2131099867;
 			
 			// aapt resource value: 0x7F0600DC
-			public const int mtrl_calendar_landscape_header_width = 2131099868;
+			public const int mtrl_calendar_header_text_padding = 2131099868;
 			
 			// aapt resource value: 0x7F0600DD
-			public const int mtrl_calendar_maximum_default_fullscreen_minor_axis = 2131099869;
+			public const int mtrl_calendar_header_toggle_margin_bottom = 2131099869;
 			
 			// aapt resource value: 0x7F0600DE
-			public const int mtrl_calendar_month_horizontal_padding = 2131099870;
+			public const int mtrl_calendar_header_toggle_margin_top = 2131099870;
 			
 			// aapt resource value: 0x7F0600DF
-			public const int mtrl_calendar_month_vertical_padding = 2131099871;
+			public const int mtrl_calendar_landscape_header_width = 2131099871;
 			
 			// aapt resource value: 0x7F0600E0
-			public const int mtrl_calendar_navigation_bottom_padding = 2131099872;
+			public const int mtrl_calendar_maximum_default_fullscreen_minor_axis = 2131099872;
 			
 			// aapt resource value: 0x7F0600E1
-			public const int mtrl_calendar_navigation_height = 2131099873;
+			public const int mtrl_calendar_month_horizontal_padding = 2131099873;
 			
 			// aapt resource value: 0x7F0600E2
-			public const int mtrl_calendar_navigation_top_padding = 2131099874;
+			public const int mtrl_calendar_month_vertical_padding = 2131099874;
 			
 			// aapt resource value: 0x7F0600E3
-			public const int mtrl_calendar_pre_l_text_clip_padding = 2131099875;
+			public const int mtrl_calendar_navigation_bottom_padding = 2131099875;
 			
 			// aapt resource value: 0x7F0600E4
-			public const int mtrl_calendar_selection_baseline_to_top_fullscreen = 2131099876;
+			public const int mtrl_calendar_navigation_height = 2131099876;
 			
 			// aapt resource value: 0x7F0600E5
-			public const int mtrl_calendar_selection_text_baseline_to_bottom = 2131099877;
+			public const int mtrl_calendar_navigation_top_padding = 2131099877;
 			
 			// aapt resource value: 0x7F0600E6
-			public const int mtrl_calendar_selection_text_baseline_to_bottom_fullscreen = 2131099878;
+			public const int mtrl_calendar_pre_l_text_clip_padding = 2131099878;
 			
 			// aapt resource value: 0x7F0600E7
-			public const int mtrl_calendar_selection_text_baseline_to_top = 2131099879;
+			public const int mtrl_calendar_selection_baseline_to_top_fullscreen = 2131099879;
 			
 			// aapt resource value: 0x7F0600E8
-			public const int mtrl_calendar_text_input_padding_top = 2131099880;
+			public const int mtrl_calendar_selection_text_baseline_to_bottom = 2131099880;
 			
 			// aapt resource value: 0x7F0600E9
-			public const int mtrl_calendar_title_baseline_to_top = 2131099881;
+			public const int mtrl_calendar_selection_text_baseline_to_bottom_fullscreen = 2131099881;
 			
 			// aapt resource value: 0x7F0600EA
-			public const int mtrl_calendar_title_baseline_to_top_fullscreen = 2131099882;
+			public const int mtrl_calendar_selection_text_baseline_to_top = 2131099882;
 			
 			// aapt resource value: 0x7F0600EB
-			public const int mtrl_calendar_year_corner = 2131099883;
+			public const int mtrl_calendar_text_input_padding_top = 2131099883;
 			
 			// aapt resource value: 0x7F0600EC
-			public const int mtrl_calendar_year_height = 2131099884;
+			public const int mtrl_calendar_title_baseline_to_top = 2131099884;
 			
 			// aapt resource value: 0x7F0600ED
-			public const int mtrl_calendar_year_horizontal_padding = 2131099885;
+			public const int mtrl_calendar_title_baseline_to_top_fullscreen = 2131099885;
 			
 			// aapt resource value: 0x7F0600EE
-			public const int mtrl_calendar_year_vertical_padding = 2131099886;
+			public const int mtrl_calendar_year_corner = 2131099886;
 			
 			// aapt resource value: 0x7F0600EF
-			public const int mtrl_calendar_year_width = 2131099887;
+			public const int mtrl_calendar_year_height = 2131099887;
 			
 			// aapt resource value: 0x7F0600F0
-			public const int mtrl_card_checked_icon_margin = 2131099888;
+			public const int mtrl_calendar_year_horizontal_padding = 2131099888;
 			
 			// aapt resource value: 0x7F0600F1
-			public const int mtrl_card_checked_icon_size = 2131099889;
+			public const int mtrl_calendar_year_vertical_padding = 2131099889;
 			
 			// aapt resource value: 0x7F0600F2
-			public const int mtrl_card_corner_radius = 2131099890;
+			public const int mtrl_calendar_year_width = 2131099890;
 			
 			// aapt resource value: 0x7F0600F3
-			public const int mtrl_card_dragged_z = 2131099891;
+			public const int mtrl_card_checked_icon_margin = 2131099891;
 			
 			// aapt resource value: 0x7F0600F4
-			public const int mtrl_card_elevation = 2131099892;
+			public const int mtrl_card_checked_icon_size = 2131099892;
 			
 			// aapt resource value: 0x7F0600F5
-			public const int mtrl_card_spacing = 2131099893;
+			public const int mtrl_card_corner_radius = 2131099893;
 			
 			// aapt resource value: 0x7F0600F6
-			public const int mtrl_chip_pressed_translation_z = 2131099894;
+			public const int mtrl_card_dragged_z = 2131099894;
 			
 			// aapt resource value: 0x7F0600F7
-			public const int mtrl_chip_text_size = 2131099895;
+			public const int mtrl_card_elevation = 2131099895;
 			
 			// aapt resource value: 0x7F0600F8
-			public const int mtrl_edittext_rectangle_top_offset = 2131099896;
+			public const int mtrl_card_spacing = 2131099896;
 			
 			// aapt resource value: 0x7F0600F9
-			public const int mtrl_exposed_dropdown_menu_popup_elevation = 2131099897;
+			public const int mtrl_chip_pressed_translation_z = 2131099897;
 			
 			// aapt resource value: 0x7F0600FA
-			public const int mtrl_exposed_dropdown_menu_popup_vertical_offset = 2131099898;
+			public const int mtrl_chip_text_size = 2131099898;
 			
 			// aapt resource value: 0x7F0600FB
-			public const int mtrl_exposed_dropdown_menu_popup_vertical_padding = 2131099899;
+			public const int mtrl_edittext_rectangle_top_offset = 2131099899;
 			
 			// aapt resource value: 0x7F0600FC
-			public const int mtrl_extended_fab_bottom_padding = 2131099900;
+			public const int mtrl_exposed_dropdown_menu_popup_elevation = 2131099900;
 			
 			// aapt resource value: 0x7F0600FD
-			public const int mtrl_extended_fab_corner_radius = 2131099901;
+			public const int mtrl_exposed_dropdown_menu_popup_vertical_offset = 2131099901;
 			
 			// aapt resource value: 0x7F0600FE
-			public const int mtrl_extended_fab_disabled_elevation = 2131099902;
+			public const int mtrl_exposed_dropdown_menu_popup_vertical_padding = 2131099902;
 			
 			// aapt resource value: 0x7F0600FF
-			public const int mtrl_extended_fab_disabled_translation_z = 2131099903;
+			public const int mtrl_extended_fab_bottom_padding = 2131099903;
 			
 			// aapt resource value: 0x7F060100
-			public const int mtrl_extended_fab_elevation = 2131099904;
+			public const int mtrl_extended_fab_corner_radius = 2131099904;
 			
 			// aapt resource value: 0x7F060101
-			public const int mtrl_extended_fab_end_padding = 2131099905;
+			public const int mtrl_extended_fab_disabled_elevation = 2131099905;
 			
 			// aapt resource value: 0x7F060102
-			public const int mtrl_extended_fab_end_padding_icon = 2131099906;
+			public const int mtrl_extended_fab_disabled_translation_z = 2131099906;
 			
 			// aapt resource value: 0x7F060103
-			public const int mtrl_extended_fab_icon_size = 2131099907;
+			public const int mtrl_extended_fab_elevation = 2131099907;
 			
 			// aapt resource value: 0x7F060104
-			public const int mtrl_extended_fab_icon_text_spacing = 2131099908;
+			public const int mtrl_extended_fab_end_padding = 2131099908;
 			
 			// aapt resource value: 0x7F060105
-			public const int mtrl_extended_fab_min_height = 2131099909;
+			public const int mtrl_extended_fab_end_padding_icon = 2131099909;
 			
 			// aapt resource value: 0x7F060106
-			public const int mtrl_extended_fab_min_width = 2131099910;
+			public const int mtrl_extended_fab_icon_size = 2131099910;
 			
 			// aapt resource value: 0x7F060107
-			public const int mtrl_extended_fab_start_padding = 2131099911;
+			public const int mtrl_extended_fab_icon_text_spacing = 2131099911;
 			
 			// aapt resource value: 0x7F060108
-			public const int mtrl_extended_fab_start_padding_icon = 2131099912;
+			public const int mtrl_extended_fab_min_height = 2131099912;
 			
 			// aapt resource value: 0x7F060109
-			public const int mtrl_extended_fab_top_padding = 2131099913;
+			public const int mtrl_extended_fab_min_width = 2131099913;
 			
 			// aapt resource value: 0x7F06010A
-			public const int mtrl_extended_fab_translation_z_base = 2131099914;
+			public const int mtrl_extended_fab_start_padding = 2131099914;
 			
 			// aapt resource value: 0x7F06010B
-			public const int mtrl_extended_fab_translation_z_hovered_focused = 2131099915;
+			public const int mtrl_extended_fab_start_padding_icon = 2131099915;
 			
 			// aapt resource value: 0x7F06010C
-			public const int mtrl_extended_fab_translation_z_pressed = 2131099916;
+			public const int mtrl_extended_fab_top_padding = 2131099916;
 			
 			// aapt resource value: 0x7F06010D
-			public const int mtrl_fab_elevation = 2131099917;
+			public const int mtrl_extended_fab_translation_z_base = 2131099917;
 			
 			// aapt resource value: 0x7F06010E
-			public const int mtrl_fab_min_touch_target = 2131099918;
+			public const int mtrl_extended_fab_translation_z_hovered_focused = 2131099918;
 			
 			// aapt resource value: 0x7F06010F
-			public const int mtrl_fab_translation_z_hovered_focused = 2131099919;
+			public const int mtrl_extended_fab_translation_z_pressed = 2131099919;
 			
 			// aapt resource value: 0x7F060110
-			public const int mtrl_fab_translation_z_pressed = 2131099920;
+			public const int mtrl_fab_elevation = 2131099920;
 			
 			// aapt resource value: 0x7F060111
-			public const int mtrl_high_ripple_default_alpha = 2131099921;
+			public const int mtrl_fab_min_touch_target = 2131099921;
 			
 			// aapt resource value: 0x7F060112
-			public const int mtrl_high_ripple_focused_alpha = 2131099922;
+			public const int mtrl_fab_translation_z_hovered_focused = 2131099922;
 			
 			// aapt resource value: 0x7F060113
-			public const int mtrl_high_ripple_hovered_alpha = 2131099923;
+			public const int mtrl_fab_translation_z_pressed = 2131099923;
 			
 			// aapt resource value: 0x7F060114
-			public const int mtrl_high_ripple_pressed_alpha = 2131099924;
+			public const int mtrl_high_ripple_default_alpha = 2131099924;
 			
 			// aapt resource value: 0x7F060115
-			public const int mtrl_large_touch_target = 2131099925;
+			public const int mtrl_high_ripple_focused_alpha = 2131099925;
 			
 			// aapt resource value: 0x7F060116
-			public const int mtrl_low_ripple_default_alpha = 2131099926;
+			public const int mtrl_high_ripple_hovered_alpha = 2131099926;
 			
 			// aapt resource value: 0x7F060117
-			public const int mtrl_low_ripple_focused_alpha = 2131099927;
+			public const int mtrl_high_ripple_pressed_alpha = 2131099927;
 			
 			// aapt resource value: 0x7F060118
-			public const int mtrl_low_ripple_hovered_alpha = 2131099928;
+			public const int mtrl_large_touch_target = 2131099928;
 			
 			// aapt resource value: 0x7F060119
-			public const int mtrl_low_ripple_pressed_alpha = 2131099929;
+			public const int mtrl_low_ripple_default_alpha = 2131099929;
 			
 			// aapt resource value: 0x7F06011A
-			public const int mtrl_min_touch_target_size = 2131099930;
+			public const int mtrl_low_ripple_focused_alpha = 2131099930;
 			
 			// aapt resource value: 0x7F06011B
-			public const int mtrl_navigation_elevation = 2131099931;
+			public const int mtrl_low_ripple_hovered_alpha = 2131099931;
 			
 			// aapt resource value: 0x7F06011C
-			public const int mtrl_navigation_item_horizontal_padding = 2131099932;
+			public const int mtrl_low_ripple_pressed_alpha = 2131099932;
 			
 			// aapt resource value: 0x7F06011D
-			public const int mtrl_navigation_item_icon_padding = 2131099933;
+			public const int mtrl_min_touch_target_size = 2131099933;
 			
 			// aapt resource value: 0x7F06011E
-			public const int mtrl_navigation_item_icon_size = 2131099934;
+			public const int mtrl_navigation_elevation = 2131099934;
 			
 			// aapt resource value: 0x7F06011F
-			public const int mtrl_navigation_item_shape_horizontal_margin = 2131099935;
+			public const int mtrl_navigation_item_horizontal_padding = 2131099935;
 			
 			// aapt resource value: 0x7F060120
-			public const int mtrl_navigation_item_shape_vertical_margin = 2131099936;
+			public const int mtrl_navigation_item_icon_padding = 2131099936;
 			
 			// aapt resource value: 0x7F060121
-			public const int mtrl_shape_corner_size_large_component = 2131099937;
+			public const int mtrl_navigation_item_icon_size = 2131099937;
 			
 			// aapt resource value: 0x7F060122
-			public const int mtrl_shape_corner_size_medium_component = 2131099938;
+			public const int mtrl_navigation_item_shape_horizontal_margin = 2131099938;
 			
 			// aapt resource value: 0x7F060123
-			public const int mtrl_shape_corner_size_small_component = 2131099939;
+			public const int mtrl_navigation_item_shape_vertical_margin = 2131099939;
 			
 			// aapt resource value: 0x7F060124
-			public const int mtrl_slider_halo_radius = 2131099940;
+			public const int mtrl_shape_corner_size_large_component = 2131099940;
 			
 			// aapt resource value: 0x7F060125
-			public const int mtrl_slider_label_padding = 2131099941;
+			public const int mtrl_shape_corner_size_medium_component = 2131099941;
 			
 			// aapt resource value: 0x7F060126
-			public const int mtrl_slider_label_radius = 2131099942;
+			public const int mtrl_shape_corner_size_small_component = 2131099942;
 			
 			// aapt resource value: 0x7F060127
-			public const int mtrl_slider_label_square_side = 2131099943;
+			public const int mtrl_slider_halo_radius = 2131099943;
 			
 			// aapt resource value: 0x7F060128
-			public const int mtrl_slider_thumb_elevation = 2131099944;
+			public const int mtrl_slider_label_padding = 2131099944;
 			
 			// aapt resource value: 0x7F060129
-			public const int mtrl_slider_thumb_radius = 2131099945;
+			public const int mtrl_slider_label_radius = 2131099945;
 			
 			// aapt resource value: 0x7F06012A
-			public const int mtrl_slider_track_height = 2131099946;
+			public const int mtrl_slider_label_square_side = 2131099946;
 			
 			// aapt resource value: 0x7F06012B
-			public const int mtrl_slider_track_side_padding = 2131099947;
+			public const int mtrl_slider_thumb_elevation = 2131099947;
 			
 			// aapt resource value: 0x7F06012C
-			public const int mtrl_slider_track_top = 2131099948;
+			public const int mtrl_slider_thumb_radius = 2131099948;
 			
 			// aapt resource value: 0x7F06012D
-			public const int mtrl_slider_widget_height = 2131099949;
+			public const int mtrl_slider_track_height = 2131099949;
 			
 			// aapt resource value: 0x7F06012E
-			public const int mtrl_snackbar_action_text_color_alpha = 2131099950;
+			public const int mtrl_slider_track_side_padding = 2131099950;
 			
 			// aapt resource value: 0x7F06012F
-			public const int mtrl_snackbar_background_corner_radius = 2131099951;
+			public const int mtrl_slider_track_top = 2131099951;
 			
 			// aapt resource value: 0x7F060130
-			public const int mtrl_snackbar_background_overlay_color_alpha = 2131099952;
+			public const int mtrl_slider_widget_height = 2131099952;
 			
 			// aapt resource value: 0x7F060131
-			public const int mtrl_snackbar_margin = 2131099953;
+			public const int mtrl_snackbar_action_text_color_alpha = 2131099953;
 			
 			// aapt resource value: 0x7F060132
-			public const int mtrl_switch_thumb_elevation = 2131099954;
+			public const int mtrl_snackbar_background_corner_radius = 2131099954;
 			
 			// aapt resource value: 0x7F060133
-			public const int mtrl_textinput_box_corner_radius_medium = 2131099955;
+			public const int mtrl_snackbar_background_overlay_color_alpha = 2131099955;
 			
 			// aapt resource value: 0x7F060134
-			public const int mtrl_textinput_box_corner_radius_small = 2131099956;
+			public const int mtrl_snackbar_margin = 2131099956;
 			
 			// aapt resource value: 0x7F060135
-			public const int mtrl_textinput_box_label_cutout_padding = 2131099957;
+			public const int mtrl_switch_thumb_elevation = 2131099957;
 			
 			// aapt resource value: 0x7F060136
-			public const int mtrl_textinput_box_stroke_width_default = 2131099958;
+			public const int mtrl_textinput_box_corner_radius_medium = 2131099958;
 			
 			// aapt resource value: 0x7F060137
-			public const int mtrl_textinput_box_stroke_width_focused = 2131099959;
+			public const int mtrl_textinput_box_corner_radius_small = 2131099959;
 			
 			// aapt resource value: 0x7F060138
-			public const int mtrl_textinput_counter_margin_start = 2131099960;
+			public const int mtrl_textinput_box_label_cutout_padding = 2131099960;
 			
 			// aapt resource value: 0x7F060139
-			public const int mtrl_textinput_end_icon_margin_start = 2131099961;
+			public const int mtrl_textinput_box_stroke_width_default = 2131099961;
 			
 			// aapt resource value: 0x7F06013A
-			public const int mtrl_textinput_outline_box_expanded_padding = 2131099962;
+			public const int mtrl_textinput_box_stroke_width_focused = 2131099962;
 			
 			// aapt resource value: 0x7F06013B
-			public const int mtrl_textinput_start_icon_margin_end = 2131099963;
+			public const int mtrl_textinput_counter_margin_start = 2131099963;
 			
 			// aapt resource value: 0x7F06013C
-			public const int mtrl_toolbar_default_height = 2131099964;
+			public const int mtrl_textinput_end_icon_margin_start = 2131099964;
 			
 			// aapt resource value: 0x7F06013D
-			public const int mtrl_tooltip_arrowSize = 2131099965;
+			public const int mtrl_textinput_outline_box_expanded_padding = 2131099965;
 			
 			// aapt resource value: 0x7F06013E
-			public const int mtrl_tooltip_cornerSize = 2131099966;
+			public const int mtrl_textinput_start_icon_margin_end = 2131099966;
 			
 			// aapt resource value: 0x7F06013F
-			public const int mtrl_tooltip_minHeight = 2131099967;
+			public const int mtrl_toolbar_default_height = 2131099967;
 			
 			// aapt resource value: 0x7F060140
-			public const int mtrl_tooltip_minWidth = 2131099968;
+			public const int mtrl_tooltip_arrowSize = 2131099968;
 			
 			// aapt resource value: 0x7F060141
-			public const int mtrl_tooltip_padding = 2131099969;
+			public const int mtrl_tooltip_cornerSize = 2131099969;
 			
 			// aapt resource value: 0x7F060142
-			public const int mtrl_transition_shared_axis_slide_distance = 2131099970;
+			public const int mtrl_tooltip_minHeight = 2131099970;
 			
 			// aapt resource value: 0x7F060143
-			public const int notification_action_icon_size = 2131099971;
+			public const int mtrl_tooltip_minWidth = 2131099971;
 			
 			// aapt resource value: 0x7F060144
-			public const int notification_action_text_size = 2131099972;
+			public const int mtrl_tooltip_padding = 2131099972;
 			
 			// aapt resource value: 0x7F060145
-			public const int notification_big_circle_margin = 2131099973;
+			public const int mtrl_transition_shared_axis_slide_distance = 2131099973;
 			
 			// aapt resource value: 0x7F060146
-			public const int notification_content_margin_start = 2131099974;
+			public const int notification_action_icon_size = 2131099974;
 			
 			// aapt resource value: 0x7F060147
-			public const int notification_large_icon_height = 2131099975;
+			public const int notification_action_text_size = 2131099975;
 			
 			// aapt resource value: 0x7F060148
-			public const int notification_large_icon_width = 2131099976;
+			public const int notification_big_circle_margin = 2131099976;
 			
 			// aapt resource value: 0x7F060149
-			public const int notification_main_column_padding_top = 2131099977;
+			public const int notification_content_margin_start = 2131099977;
 			
 			// aapt resource value: 0x7F06014A
-			public const int notification_media_narrow_margin = 2131099978;
+			public const int notification_large_icon_height = 2131099978;
 			
 			// aapt resource value: 0x7F06014B
-			public const int notification_right_icon_size = 2131099979;
+			public const int notification_large_icon_width = 2131099979;
 			
 			// aapt resource value: 0x7F06014C
-			public const int notification_right_side_padding_top = 2131099980;
+			public const int notification_main_column_padding_top = 2131099980;
 			
 			// aapt resource value: 0x7F06014D
-			public const int notification_small_icon_background_padding = 2131099981;
+			public const int notification_media_narrow_margin = 2131099981;
 			
 			// aapt resource value: 0x7F06014E
-			public const int notification_small_icon_size_as_large = 2131099982;
+			public const int notification_right_icon_size = 2131099982;
 			
 			// aapt resource value: 0x7F06014F
-			public const int notification_subtext_size = 2131099983;
+			public const int notification_right_side_padding_top = 2131099983;
 			
 			// aapt resource value: 0x7F060150
-			public const int notification_top_pad = 2131099984;
+			public const int notification_small_icon_background_padding = 2131099984;
 			
 			// aapt resource value: 0x7F060151
-			public const int notification_top_pad_large_text = 2131099985;
+			public const int notification_small_icon_size_as_large = 2131099985;
 			
 			// aapt resource value: 0x7F060152
-			public const int test_mtrl_calendar_day_cornerSize = 2131099986;
+			public const int notification_subtext_size = 2131099986;
 			
 			// aapt resource value: 0x7F060153
-			public const int tooltip_corner_radius = 2131099987;
+			public const int notification_top_pad = 2131099987;
 			
 			// aapt resource value: 0x7F060154
-			public const int tooltip_horizontal_padding = 2131099988;
+			public const int notification_top_pad_large_text = 2131099988;
 			
 			// aapt resource value: 0x7F060155
-			public const int tooltip_margin = 2131099989;
+			public const int test_mtrl_calendar_day_cornerSize = 2131099989;
 			
 			// aapt resource value: 0x7F060156
-			public const int tooltip_precise_anchor_extra_offset = 2131099990;
+			public const int tooltip_corner_radius = 2131099990;
 			
 			// aapt resource value: 0x7F060157
-			public const int tooltip_precise_anchor_threshold = 2131099991;
+			public const int tooltip_horizontal_padding = 2131099991;
 			
 			// aapt resource value: 0x7F060158
-			public const int tooltip_vertical_padding = 2131099992;
+			public const int tooltip_margin = 2131099992;
 			
 			// aapt resource value: 0x7F060159
-			public const int tooltip_y_offset_non_touch = 2131099993;
+			public const int tooltip_precise_anchor_extra_offset = 2131099993;
 			
 			// aapt resource value: 0x7F06015A
-			public const int tooltip_y_offset_touch = 2131099994;
+			public const int tooltip_precise_anchor_threshold = 2131099994;
+			
+			// aapt resource value: 0x7F06015B
+			public const int tooltip_vertical_padding = 2131099995;
+			
+			// aapt resource value: 0x7F06015C
+			public const int tooltip_y_offset_non_touch = 2131099996;
+			
+			// aapt resource value: 0x7F06015D
+			public const int tooltip_y_offset_touch = 2131099997;
 			
 			static Dimension()
 			{
@@ -25276,406 +25446,385 @@ namespace Shiny.Tests.Android
 			public const int abc_ic_search_api_material = 2131165222;
 			
 			// aapt resource value: 0x7F070027
-			public const int abc_ic_star_black_16dp = 2131165223;
+			public const int abc_ic_voice_search_api_material = 2131165223;
 			
 			// aapt resource value: 0x7F070028
-			public const int abc_ic_star_black_36dp = 2131165224;
+			public const int abc_item_background_holo_dark = 2131165224;
 			
 			// aapt resource value: 0x7F070029
-			public const int abc_ic_star_black_48dp = 2131165225;
+			public const int abc_item_background_holo_light = 2131165225;
 			
 			// aapt resource value: 0x7F07002A
-			public const int abc_ic_star_half_black_16dp = 2131165226;
+			public const int abc_list_divider_material = 2131165226;
 			
 			// aapt resource value: 0x7F07002B
-			public const int abc_ic_star_half_black_36dp = 2131165227;
+			public const int abc_list_divider_mtrl_alpha = 2131165227;
 			
 			// aapt resource value: 0x7F07002C
-			public const int abc_ic_star_half_black_48dp = 2131165228;
+			public const int abc_list_focused_holo = 2131165228;
 			
 			// aapt resource value: 0x7F07002D
-			public const int abc_ic_voice_search_api_material = 2131165229;
+			public const int abc_list_longpressed_holo = 2131165229;
 			
 			// aapt resource value: 0x7F07002E
-			public const int abc_item_background_holo_dark = 2131165230;
+			public const int abc_list_pressed_holo_dark = 2131165230;
 			
 			// aapt resource value: 0x7F07002F
-			public const int abc_item_background_holo_light = 2131165231;
+			public const int abc_list_pressed_holo_light = 2131165231;
 			
 			// aapt resource value: 0x7F070030
-			public const int abc_list_divider_material = 2131165232;
+			public const int abc_list_selector_background_transition_holo_dark = 2131165232;
 			
 			// aapt resource value: 0x7F070031
-			public const int abc_list_divider_mtrl_alpha = 2131165233;
+			public const int abc_list_selector_background_transition_holo_light = 2131165233;
 			
 			// aapt resource value: 0x7F070032
-			public const int abc_list_focused_holo = 2131165234;
+			public const int abc_list_selector_disabled_holo_dark = 2131165234;
 			
 			// aapt resource value: 0x7F070033
-			public const int abc_list_longpressed_holo = 2131165235;
+			public const int abc_list_selector_disabled_holo_light = 2131165235;
 			
 			// aapt resource value: 0x7F070034
-			public const int abc_list_pressed_holo_dark = 2131165236;
+			public const int abc_list_selector_holo_dark = 2131165236;
 			
 			// aapt resource value: 0x7F070035
-			public const int abc_list_pressed_holo_light = 2131165237;
+			public const int abc_list_selector_holo_light = 2131165237;
 			
 			// aapt resource value: 0x7F070036
-			public const int abc_list_selector_background_transition_holo_dark = 2131165238;
+			public const int abc_menu_hardkey_panel_mtrl_mult = 2131165238;
 			
 			// aapt resource value: 0x7F070037
-			public const int abc_list_selector_background_transition_holo_light = 2131165239;
+			public const int abc_popup_background_mtrl_mult = 2131165239;
 			
 			// aapt resource value: 0x7F070038
-			public const int abc_list_selector_disabled_holo_dark = 2131165240;
+			public const int abc_ratingbar_indicator_material = 2131165240;
 			
 			// aapt resource value: 0x7F070039
-			public const int abc_list_selector_disabled_holo_light = 2131165241;
+			public const int abc_ratingbar_material = 2131165241;
 			
 			// aapt resource value: 0x7F07003A
-			public const int abc_list_selector_holo_dark = 2131165242;
+			public const int abc_ratingbar_small_material = 2131165242;
 			
 			// aapt resource value: 0x7F07003B
-			public const int abc_list_selector_holo_light = 2131165243;
+			public const int abc_scrubber_control_off_mtrl_alpha = 2131165243;
 			
 			// aapt resource value: 0x7F07003C
-			public const int abc_menu_hardkey_panel_mtrl_mult = 2131165244;
+			public const int abc_scrubber_control_to_pressed_mtrl_000 = 2131165244;
 			
 			// aapt resource value: 0x7F07003D
-			public const int abc_popup_background_mtrl_mult = 2131165245;
+			public const int abc_scrubber_control_to_pressed_mtrl_005 = 2131165245;
 			
 			// aapt resource value: 0x7F07003E
-			public const int abc_ratingbar_indicator_material = 2131165246;
+			public const int abc_scrubber_primary_mtrl_alpha = 2131165246;
 			
 			// aapt resource value: 0x7F07003F
-			public const int abc_ratingbar_material = 2131165247;
+			public const int abc_scrubber_track_mtrl_alpha = 2131165247;
 			
 			// aapt resource value: 0x7F070040
-			public const int abc_ratingbar_small_material = 2131165248;
+			public const int abc_seekbar_thumb_material = 2131165248;
 			
 			// aapt resource value: 0x7F070041
-			public const int abc_scrubber_control_off_mtrl_alpha = 2131165249;
+			public const int abc_seekbar_tick_mark_material = 2131165249;
 			
 			// aapt resource value: 0x7F070042
-			public const int abc_scrubber_control_to_pressed_mtrl_000 = 2131165250;
+			public const int abc_seekbar_track_material = 2131165250;
 			
 			// aapt resource value: 0x7F070043
-			public const int abc_scrubber_control_to_pressed_mtrl_005 = 2131165251;
+			public const int abc_spinner_mtrl_am_alpha = 2131165251;
 			
 			// aapt resource value: 0x7F070044
-			public const int abc_scrubber_primary_mtrl_alpha = 2131165252;
+			public const int abc_spinner_textfield_background_material = 2131165252;
 			
 			// aapt resource value: 0x7F070045
-			public const int abc_scrubber_track_mtrl_alpha = 2131165253;
+			public const int abc_star_black_48dp = 2131165253;
 			
 			// aapt resource value: 0x7F070046
-			public const int abc_seekbar_thumb_material = 2131165254;
+			public const int abc_star_half_black_48dp = 2131165254;
 			
 			// aapt resource value: 0x7F070047
-			public const int abc_seekbar_tick_mark_material = 2131165255;
+			public const int abc_switch_thumb_material = 2131165255;
 			
 			// aapt resource value: 0x7F070048
-			public const int abc_seekbar_track_material = 2131165256;
+			public const int abc_switch_track_mtrl_alpha = 2131165256;
 			
 			// aapt resource value: 0x7F070049
-			public const int abc_spinner_mtrl_am_alpha = 2131165257;
+			public const int abc_tab_indicator_material = 2131165257;
 			
 			// aapt resource value: 0x7F07004A
-			public const int abc_spinner_textfield_background_material = 2131165258;
-			
-			// aapt resource value: 0x7F07004B
-			public const int abc_switch_thumb_material = 2131165259;
-			
-			// aapt resource value: 0x7F07004C
-			public const int abc_switch_track_mtrl_alpha = 2131165260;
-			
-			// aapt resource value: 0x7F07004D
-			public const int abc_tab_indicator_material = 2131165261;
-			
-			// aapt resource value: 0x7F07004E
-			public const int abc_tab_indicator_mtrl_alpha = 2131165262;
-			
-			// aapt resource value: 0x7F070056
-			public const int abc_textfield_activated_mtrl_alpha = 2131165270;
-			
-			// aapt resource value: 0x7F070057
-			public const int abc_textfield_default_mtrl_alpha = 2131165271;
-			
-			// aapt resource value: 0x7F070058
-			public const int abc_textfield_search_activated_mtrl_alpha = 2131165272;
-			
-			// aapt resource value: 0x7F070059
-			public const int abc_textfield_search_default_mtrl_alpha = 2131165273;
-			
-			// aapt resource value: 0x7F07005A
-			public const int abc_textfield_search_material = 2131165274;
+			public const int abc_tab_indicator_mtrl_alpha = 2131165258;
 			
 			// aapt resource value: 0x7F07004F
-			public const int abc_text_cursor_material = 2131165263;
+			public const int abc_textfield_activated_mtrl_alpha = 2131165263;
 			
 			// aapt resource value: 0x7F070050
-			public const int abc_text_select_handle_left_mtrl_dark = 2131165264;
+			public const int abc_textfield_default_mtrl_alpha = 2131165264;
 			
 			// aapt resource value: 0x7F070051
-			public const int abc_text_select_handle_left_mtrl_light = 2131165265;
+			public const int abc_textfield_search_activated_mtrl_alpha = 2131165265;
 			
 			// aapt resource value: 0x7F070052
-			public const int abc_text_select_handle_middle_mtrl_dark = 2131165266;
+			public const int abc_textfield_search_default_mtrl_alpha = 2131165266;
 			
 			// aapt resource value: 0x7F070053
-			public const int abc_text_select_handle_middle_mtrl_light = 2131165267;
+			public const int abc_textfield_search_material = 2131165267;
+			
+			// aapt resource value: 0x7F07004B
+			public const int abc_text_cursor_material = 2131165259;
+			
+			// aapt resource value: 0x7F07004C
+			public const int abc_text_select_handle_left_mtrl = 2131165260;
+			
+			// aapt resource value: 0x7F07004D
+			public const int abc_text_select_handle_middle_mtrl = 2131165261;
+			
+			// aapt resource value: 0x7F07004E
+			public const int abc_text_select_handle_right_mtrl = 2131165262;
 			
 			// aapt resource value: 0x7F070054
-			public const int abc_text_select_handle_right_mtrl_dark = 2131165268;
+			public const int abc_vector_test = 2131165268;
 			
 			// aapt resource value: 0x7F070055
-			public const int abc_text_select_handle_right_mtrl_light = 2131165269;
+			public const int arrow = 2131165269;
+			
+			// aapt resource value: 0x7F070056
+			public const int avd_hide_password = 2131165270;
+			
+			// aapt resource value: 0x7F070057
+			public const int avd_show_password = 2131165271;
+			
+			// aapt resource value: 0x7F070058
+			public const int btn_checkbox_checked_mtrl = 2131165272;
+			
+			// aapt resource value: 0x7F070059
+			public const int btn_checkbox_checked_to_unchecked_mtrl_animation = 2131165273;
+			
+			// aapt resource value: 0x7F07005A
+			public const int btn_checkbox_unchecked_mtrl = 2131165274;
 			
 			// aapt resource value: 0x7F07005B
-			public const int abc_vector_test = 2131165275;
+			public const int btn_checkbox_unchecked_to_checked_mtrl_animation = 2131165275;
 			
 			// aapt resource value: 0x7F07005C
-			public const int arrow = 2131165276;
+			public const int btn_radio_off_mtrl = 2131165276;
 			
 			// aapt resource value: 0x7F07005D
-			public const int avd_hide_password = 2131165277;
+			public const int btn_radio_off_to_on_mtrl_animation = 2131165277;
 			
 			// aapt resource value: 0x7F07005E
-			public const int avd_show_password = 2131165278;
+			public const int btn_radio_on_mtrl = 2131165278;
 			
 			// aapt resource value: 0x7F07005F
-			public const int btn_checkbox_checked_mtrl = 2131165279;
+			public const int btn_radio_on_to_off_mtrl_animation = 2131165279;
 			
 			// aapt resource value: 0x7F070060
-			public const int btn_checkbox_checked_to_unchecked_mtrl_animation = 2131165280;
+			public const int common_full_open_on_phone = 2131165280;
 			
 			// aapt resource value: 0x7F070061
-			public const int btn_checkbox_unchecked_mtrl = 2131165281;
+			public const int common_google_signin_btn_icon_dark = 2131165281;
 			
 			// aapt resource value: 0x7F070062
-			public const int btn_checkbox_unchecked_to_checked_mtrl_animation = 2131165282;
+			public const int common_google_signin_btn_icon_dark_focused = 2131165282;
 			
 			// aapt resource value: 0x7F070063
-			public const int btn_radio_off_mtrl = 2131165283;
+			public const int common_google_signin_btn_icon_dark_normal = 2131165283;
 			
 			// aapt resource value: 0x7F070064
-			public const int btn_radio_off_to_on_mtrl_animation = 2131165284;
+			public const int common_google_signin_btn_icon_dark_normal_background = 2131165284;
 			
 			// aapt resource value: 0x7F070065
-			public const int btn_radio_on_mtrl = 2131165285;
+			public const int common_google_signin_btn_icon_disabled = 2131165285;
 			
 			// aapt resource value: 0x7F070066
-			public const int btn_radio_on_to_off_mtrl_animation = 2131165286;
+			public const int common_google_signin_btn_icon_light = 2131165286;
 			
 			// aapt resource value: 0x7F070067
-			public const int common_full_open_on_phone = 2131165287;
+			public const int common_google_signin_btn_icon_light_focused = 2131165287;
 			
 			// aapt resource value: 0x7F070068
-			public const int common_google_signin_btn_icon_dark = 2131165288;
+			public const int common_google_signin_btn_icon_light_normal = 2131165288;
 			
 			// aapt resource value: 0x7F070069
-			public const int common_google_signin_btn_icon_dark_focused = 2131165289;
+			public const int common_google_signin_btn_icon_light_normal_background = 2131165289;
 			
 			// aapt resource value: 0x7F07006A
-			public const int common_google_signin_btn_icon_dark_normal = 2131165290;
+			public const int common_google_signin_btn_text_dark = 2131165290;
 			
 			// aapt resource value: 0x7F07006B
-			public const int common_google_signin_btn_icon_dark_normal_background = 2131165291;
+			public const int common_google_signin_btn_text_dark_focused = 2131165291;
 			
 			// aapt resource value: 0x7F07006C
-			public const int common_google_signin_btn_icon_disabled = 2131165292;
+			public const int common_google_signin_btn_text_dark_normal = 2131165292;
 			
 			// aapt resource value: 0x7F07006D
-			public const int common_google_signin_btn_icon_light = 2131165293;
+			public const int common_google_signin_btn_text_dark_normal_background = 2131165293;
 			
 			// aapt resource value: 0x7F07006E
-			public const int common_google_signin_btn_icon_light_focused = 2131165294;
+			public const int common_google_signin_btn_text_disabled = 2131165294;
 			
 			// aapt resource value: 0x7F07006F
-			public const int common_google_signin_btn_icon_light_normal = 2131165295;
+			public const int common_google_signin_btn_text_light = 2131165295;
 			
 			// aapt resource value: 0x7F070070
-			public const int common_google_signin_btn_icon_light_normal_background = 2131165296;
+			public const int common_google_signin_btn_text_light_focused = 2131165296;
 			
 			// aapt resource value: 0x7F070071
-			public const int common_google_signin_btn_text_dark = 2131165297;
+			public const int common_google_signin_btn_text_light_normal = 2131165297;
 			
 			// aapt resource value: 0x7F070072
-			public const int common_google_signin_btn_text_dark_focused = 2131165298;
+			public const int common_google_signin_btn_text_light_normal_background = 2131165298;
 			
 			// aapt resource value: 0x7F070073
-			public const int common_google_signin_btn_text_dark_normal = 2131165299;
+			public const int compass = 2131165299;
 			
 			// aapt resource value: 0x7F070074
-			public const int common_google_signin_btn_text_dark_normal_background = 2131165300;
+			public const int design_bottom_navigation_item_background = 2131165300;
 			
 			// aapt resource value: 0x7F070075
-			public const int common_google_signin_btn_text_disabled = 2131165301;
+			public const int design_fab_background = 2131165301;
 			
 			// aapt resource value: 0x7F070076
-			public const int common_google_signin_btn_text_light = 2131165302;
+			public const int design_ic_visibility = 2131165302;
 			
 			// aapt resource value: 0x7F070077
-			public const int common_google_signin_btn_text_light_focused = 2131165303;
+			public const int design_ic_visibility_off = 2131165303;
 			
 			// aapt resource value: 0x7F070078
-			public const int common_google_signin_btn_text_light_normal = 2131165304;
+			public const int design_password_eye = 2131165304;
 			
 			// aapt resource value: 0x7F070079
-			public const int common_google_signin_btn_text_light_normal_background = 2131165305;
+			public const int design_snackbar_background = 2131165305;
 			
 			// aapt resource value: 0x7F07007A
-			public const int compass = 2131165306;
+			public const int googleg_disabled_color_18 = 2131165306;
 			
 			// aapt resource value: 0x7F07007B
-			public const int design_bottom_navigation_item_background = 2131165307;
+			public const int googleg_standard_color_18 = 2131165307;
 			
 			// aapt resource value: 0x7F07007C
-			public const int design_fab_background = 2131165308;
+			public const int ic_errorstatus = 2131165308;
 			
 			// aapt resource value: 0x7F07007D
-			public const int design_ic_visibility = 2131165309;
+			public const int ic_mtrl_checked_circle = 2131165309;
 			
 			// aapt resource value: 0x7F07007E
-			public const int design_ic_visibility_off = 2131165310;
+			public const int ic_mtrl_chip_checked_black = 2131165310;
 			
 			// aapt resource value: 0x7F07007F
-			public const int design_password_eye = 2131165311;
+			public const int ic_mtrl_chip_checked_circle = 2131165311;
 			
 			// aapt resource value: 0x7F070080
-			public const int design_snackbar_background = 2131165312;
+			public const int ic_mtrl_chip_close_circle = 2131165312;
 			
 			// aapt resource value: 0x7F070081
-			public const int googleg_disabled_color_18 = 2131165313;
+			public const int ic_successstatus = 2131165313;
 			
 			// aapt resource value: 0x7F070082
-			public const int googleg_standard_color_18 = 2131165314;
+			public const int logo = 2131165314;
 			
 			// aapt resource value: 0x7F070083
-			public const int ic_errorstatus = 2131165315;
+			public const int material_ic_calendar_black_24dp = 2131165315;
 			
 			// aapt resource value: 0x7F070084
-			public const int ic_mtrl_checked_circle = 2131165316;
+			public const int material_ic_clear_black_24dp = 2131165316;
 			
 			// aapt resource value: 0x7F070085
-			public const int ic_mtrl_chip_checked_black = 2131165317;
+			public const int material_ic_edit_black_24dp = 2131165317;
 			
 			// aapt resource value: 0x7F070086
-			public const int ic_mtrl_chip_checked_circle = 2131165318;
+			public const int material_ic_keyboard_arrow_left_black_24dp = 2131165318;
 			
 			// aapt resource value: 0x7F070087
-			public const int ic_mtrl_chip_close_circle = 2131165319;
+			public const int material_ic_keyboard_arrow_right_black_24dp = 2131165319;
 			
 			// aapt resource value: 0x7F070088
-			public const int ic_successstatus = 2131165320;
+			public const int material_ic_menu_arrow_down_black_24dp = 2131165320;
 			
 			// aapt resource value: 0x7F070089
-			public const int logo = 2131165321;
+			public const int material_ic_menu_arrow_up_black_24dp = 2131165321;
 			
 			// aapt resource value: 0x7F07008A
-			public const int material_ic_calendar_black_24dp = 2131165322;
+			public const int mtrl_dialog_background = 2131165322;
 			
 			// aapt resource value: 0x7F07008B
-			public const int material_ic_clear_black_24dp = 2131165323;
+			public const int mtrl_dropdown_arrow = 2131165323;
 			
 			// aapt resource value: 0x7F07008C
-			public const int material_ic_edit_black_24dp = 2131165324;
+			public const int mtrl_ic_arrow_drop_down = 2131165324;
 			
 			// aapt resource value: 0x7F07008D
-			public const int material_ic_keyboard_arrow_left_black_24dp = 2131165325;
+			public const int mtrl_ic_arrow_drop_up = 2131165325;
 			
 			// aapt resource value: 0x7F07008E
-			public const int material_ic_keyboard_arrow_right_black_24dp = 2131165326;
+			public const int mtrl_ic_cancel = 2131165326;
 			
 			// aapt resource value: 0x7F07008F
-			public const int material_ic_menu_arrow_down_black_24dp = 2131165327;
+			public const int mtrl_ic_error = 2131165327;
 			
 			// aapt resource value: 0x7F070090
-			public const int material_ic_menu_arrow_up_black_24dp = 2131165328;
+			public const int mtrl_popupmenu_background = 2131165328;
 			
 			// aapt resource value: 0x7F070091
-			public const int mtrl_dialog_background = 2131165329;
+			public const int mtrl_popupmenu_background_dark = 2131165329;
 			
 			// aapt resource value: 0x7F070092
-			public const int mtrl_dropdown_arrow = 2131165330;
+			public const int mtrl_tabs_default_indicator = 2131165330;
 			
 			// aapt resource value: 0x7F070093
-			public const int mtrl_ic_arrow_drop_down = 2131165331;
+			public const int navigation_empty_icon = 2131165331;
 			
 			// aapt resource value: 0x7F070094
-			public const int mtrl_ic_arrow_drop_up = 2131165332;
+			public const int notification = 2131165332;
 			
 			// aapt resource value: 0x7F070095
-			public const int mtrl_ic_cancel = 2131165333;
+			public const int notification_action_background = 2131165333;
 			
 			// aapt resource value: 0x7F070096
-			public const int mtrl_ic_error = 2131165334;
+			public const int notification_bg = 2131165334;
 			
 			// aapt resource value: 0x7F070097
-			public const int mtrl_popupmenu_background = 2131165335;
+			public const int notification_bg_low = 2131165335;
 			
 			// aapt resource value: 0x7F070098
-			public const int mtrl_popupmenu_background_dark = 2131165336;
+			public const int notification_bg_low_normal = 2131165336;
 			
 			// aapt resource value: 0x7F070099
-			public const int mtrl_tabs_default_indicator = 2131165337;
+			public const int notification_bg_low_pressed = 2131165337;
 			
 			// aapt resource value: 0x7F07009A
-			public const int navigation_empty_icon = 2131165338;
+			public const int notification_bg_normal = 2131165338;
 			
 			// aapt resource value: 0x7F07009B
-			public const int notification = 2131165339;
+			public const int notification_bg_normal_pressed = 2131165339;
 			
 			// aapt resource value: 0x7F07009C
-			public const int notification_action_background = 2131165340;
+			public const int notification_icon_background = 2131165340;
 			
 			// aapt resource value: 0x7F07009D
-			public const int notification_bg = 2131165341;
+			public const int notification_template_icon_bg = 2131165341;
 			
 			// aapt resource value: 0x7F07009E
-			public const int notification_bg_low = 2131165342;
+			public const int notification_template_icon_low_bg = 2131165342;
 			
 			// aapt resource value: 0x7F07009F
-			public const int notification_bg_low_normal = 2131165343;
+			public const int notification_tile_bg = 2131165343;
 			
 			// aapt resource value: 0x7F0700A0
-			public const int notification_bg_low_pressed = 2131165344;
+			public const int notify_panel_notification_icon_bg = 2131165344;
 			
 			// aapt resource value: 0x7F0700A1
-			public const int notification_bg_normal = 2131165345;
+			public const int roundedbg = 2131165345;
 			
 			// aapt resource value: 0x7F0700A2
-			public const int notification_bg_normal_pressed = 2131165346;
+			public const int roundedbgdark = 2131165346;
 			
 			// aapt resource value: 0x7F0700A3
-			public const int notification_icon_background = 2131165347;
+			public const int test_custom_background = 2131165347;
 			
 			// aapt resource value: 0x7F0700A4
-			public const int notification_template_icon_bg = 2131165348;
+			public const int tooltip_frame_dark = 2131165348;
 			
 			// aapt resource value: 0x7F0700A5
-			public const int notification_template_icon_low_bg = 2131165349;
-			
-			// aapt resource value: 0x7F0700A6
-			public const int notification_tile_bg = 2131165350;
-			
-			// aapt resource value: 0x7F0700A7
-			public const int notify_panel_notification_icon_bg = 2131165351;
-			
-			// aapt resource value: 0x7F0700A8
-			public const int roundedbg = 2131165352;
-			
-			// aapt resource value: 0x7F0700A9
-			public const int roundedbgdark = 2131165353;
-			
-			// aapt resource value: 0x7F0700AA
-			public const int test_custom_background = 2131165354;
-			
-			// aapt resource value: 0x7F0700AB
-			public const int tooltip_frame_dark = 2131165355;
-			
-			// aapt resource value: 0x7F0700AC
-			public const int tooltip_frame_light = 2131165356;
+			public const int tooltip_frame_light = 2131165349;
 			
 			static Drawable()
 			{
@@ -26522,94 +26671,109 @@ namespace Shiny.Tests.Android
 			public const int tag_accessibility_pane_title = 2131230998;
 			
 			// aapt resource value: 0x7F080117
-			public const int tag_screen_reader_focusable = 2131230999;
+			public const int tag_on_apply_window_listener = 2131230999;
 			
 			// aapt resource value: 0x7F080118
-			public const int tag_transition_group = 2131231000;
+			public const int tag_on_receive_content_listener = 2131231000;
 			
 			// aapt resource value: 0x7F080119
-			public const int tag_unhandled_key_event_manager = 2131231001;
+			public const int tag_on_receive_content_mime_types = 2131231001;
 			
 			// aapt resource value: 0x7F08011A
-			public const int tag_unhandled_key_listeners = 2131231002;
+			public const int tag_screen_reader_focusable = 2131231002;
 			
 			// aapt resource value: 0x7F08011B
-			public const int test_checkbox_android_button_tint = 2131231003;
+			public const int tag_state_description = 2131231003;
 			
 			// aapt resource value: 0x7F08011C
-			public const int test_checkbox_app_button_tint = 2131231004;
+			public const int tag_transition_group = 2131231004;
 			
 			// aapt resource value: 0x7F08011D
-			public const int test_radiobutton_android_button_tint = 2131231005;
+			public const int tag_unhandled_key_event_manager = 2131231005;
 			
 			// aapt resource value: 0x7F08011E
-			public const int test_radiobutton_app_button_tint = 2131231006;
+			public const int tag_unhandled_key_listeners = 2131231006;
 			
 			// aapt resource value: 0x7F08011F
-			public const int text = 2131231007;
+			public const int tag_window_insets_animation_callback = 2131231007;
 			
 			// aapt resource value: 0x7F080120
-			public const int text2 = 2131231008;
+			public const int test_checkbox_android_button_tint = 2131231008;
 			
 			// aapt resource value: 0x7F080121
-			public const int textEnd = 2131231009;
-			
-			// aapt resource value: 0x7F080128
-			public const int textinput_counter = 2131231016;
-			
-			// aapt resource value: 0x7F080129
-			public const int textinput_error = 2131231017;
-			
-			// aapt resource value: 0x7F08012A
-			public const int textinput_helper_text = 2131231018;
-			
-			// aapt resource value: 0x7F08012B
-			public const int textinput_placeholder = 2131231019;
-			
-			// aapt resource value: 0x7F08012C
-			public const int textinput_prefix_text = 2131231020;
-			
-			// aapt resource value: 0x7F08012D
-			public const int textinput_suffix_text = 2131231021;
+			public const int test_checkbox_app_button_tint = 2131231009;
 			
 			// aapt resource value: 0x7F080122
-			public const int textSpacerNoButtons = 2131231010;
+			public const int test_radiobutton_android_button_tint = 2131231010;
 			
 			// aapt resource value: 0x7F080123
-			public const int textSpacerNoTitle = 2131231011;
+			public const int test_radiobutton_app_button_tint = 2131231011;
 			
 			// aapt resource value: 0x7F080124
-			public const int textStart = 2131231012;
+			public const int text = 2131231012;
 			
 			// aapt resource value: 0x7F080125
-			public const int textViewStatus = 2131231013;
+			public const int text2 = 2131231013;
 			
 			// aapt resource value: 0x7F080126
-			public const int text_input_end_icon = 2131231014;
+			public const int textEnd = 2131231014;
 			
-			// aapt resource value: 0x7F080127
-			public const int text_input_start_icon = 2131231015;
+			// aapt resource value: 0x7F08012D
+			public const int textinput_counter = 2131231021;
 			
 			// aapt resource value: 0x7F08012E
-			public const int time = 2131231022;
+			public const int textinput_error = 2131231022;
 			
 			// aapt resource value: 0x7F08012F
-			public const int title = 2131231023;
+			public const int textinput_helper_text = 2131231023;
 			
 			// aapt resource value: 0x7F080130
-			public const int titleDividerNoCustom = 2131231024;
+			public const int textinput_placeholder = 2131231024;
 			
 			// aapt resource value: 0x7F080131
-			public const int title_template = 2131231025;
+			public const int textinput_prefix_text = 2131231025;
 			
 			// aapt resource value: 0x7F080132
-			public const int toolbar = 2131231026;
+			public const int textinput_suffix_text = 2131231026;
+			
+			// aapt resource value: 0x7F080127
+			public const int textSpacerNoButtons = 2131231015;
+			
+			// aapt resource value: 0x7F080128
+			public const int textSpacerNoTitle = 2131231016;
+			
+			// aapt resource value: 0x7F080129
+			public const int textStart = 2131231017;
+			
+			// aapt resource value: 0x7F08012A
+			public const int textViewStatus = 2131231018;
+			
+			// aapt resource value: 0x7F08012B
+			public const int text_input_end_icon = 2131231019;
+			
+			// aapt resource value: 0x7F08012C
+			public const int text_input_start_icon = 2131231020;
 			
 			// aapt resource value: 0x7F080133
-			public const int top = 2131231027;
+			public const int time = 2131231027;
 			
 			// aapt resource value: 0x7F080134
-			public const int topPanel = 2131231028;
+			public const int title = 2131231028;
+			
+			// aapt resource value: 0x7F080135
+			public const int titleDividerNoCustom = 2131231029;
+			
+			// aapt resource value: 0x7F080136
+			public const int title_template = 2131231030;
+			
+			// aapt resource value: 0x7F080137
+			public const int toolbar = 2131231031;
+			
+			// aapt resource value: 0x7F080138
+			public const int top = 2131231032;
+			
+			// aapt resource value: 0x7F080139
+			public const int topPanel = 2131231033;
 			
 			// aapt resource value: 0x7F080008
 			public const int TOP_END = 2131230728;
@@ -26617,71 +26781,71 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 0x7F080009
 			public const int TOP_START = 2131230729;
 			
-			// aapt resource value: 0x7F080135
-			public const int touch_outside = 2131231029;
-			
-			// aapt resource value: 0x7F080136
-			public const int transition_current_scene = 2131231030;
-			
-			// aapt resource value: 0x7F080137
-			public const int transition_layout_save = 2131231031;
-			
-			// aapt resource value: 0x7F080138
-			public const int transition_position = 2131231032;
-			
-			// aapt resource value: 0x7F080139
-			public const int transition_scene_layoutid_cache = 2131231033;
-			
 			// aapt resource value: 0x7F08013A
-			public const int transition_transform = 2131231034;
+			public const int touch_outside = 2131231034;
 			
 			// aapt resource value: 0x7F08013B
-			public const int @unchecked = 2131231035;
+			public const int transition_current_scene = 2131231035;
 			
 			// aapt resource value: 0x7F08013C
-			public const int uniform = 2131231036;
+			public const int transition_layout_save = 2131231036;
 			
 			// aapt resource value: 0x7F08013D
-			public const int unlabeled = 2131231037;
+			public const int transition_position = 2131231037;
 			
 			// aapt resource value: 0x7F08013E
-			public const int up = 2131231038;
+			public const int transition_scene_layoutid_cache = 2131231038;
 			
 			// aapt resource value: 0x7F08013F
-			public const int useLogo = 2131231039;
+			public const int transition_transform = 2131231039;
 			
 			// aapt resource value: 0x7F080140
-			public const int view_offset_helper = 2131231040;
+			public const int @unchecked = 2131231040;
 			
 			// aapt resource value: 0x7F080141
-			public const int view_tree_lifecycle_owner = 2131231041;
+			public const int uniform = 2131231041;
 			
 			// aapt resource value: 0x7F080142
-			public const int view_tree_saved_state_registry_owner = 2131231042;
+			public const int unlabeled = 2131231042;
 			
 			// aapt resource value: 0x7F080143
-			public const int view_tree_view_model_store_owner = 2131231043;
+			public const int up = 2131231043;
 			
 			// aapt resource value: 0x7F080144
-			public const int visible = 2131231044;
+			public const int useLogo = 2131231044;
 			
 			// aapt resource value: 0x7F080145
-			public const int visible_removing_fragment_view_tag = 2131231045;
+			public const int view_offset_helper = 2131231045;
 			
 			// aapt resource value: 0x7F080146
-			public const int wide = 2131231046;
-			
-			// aapt resource value: 0x7F080148
-			public const int withinBounds = 2131231048;
+			public const int view_tree_lifecycle_owner = 2131231046;
 			
 			// aapt resource value: 0x7F080147
-			public const int withText = 2131231047;
+			public const int view_tree_saved_state_registry_owner = 2131231047;
+			
+			// aapt resource value: 0x7F080148
+			public const int view_tree_view_model_store_owner = 2131231048;
 			
 			// aapt resource value: 0x7F080149
-			public const int wrap_content = 2131231049;
+			public const int visible = 2131231049;
 			
 			// aapt resource value: 0x7F08014A
-			public const int zero_corner_chip = 2131231050;
+			public const int visible_removing_fragment_view_tag = 2131231050;
+			
+			// aapt resource value: 0x7F08014B
+			public const int wide = 2131231051;
+			
+			// aapt resource value: 0x7F08014D
+			public const int withinBounds = 2131231053;
+			
+			// aapt resource value: 0x7F08014C
+			public const int withText = 2131231052;
+			
+			// aapt resource value: 0x7F08014E
+			public const int wrap_content = 2131231054;
+			
+			// aapt resource value: 0x7F08014F
+			public const int zero_corner_chip = 2131231055;
 			
 			static Id()
 			{
@@ -29731,37 +29895,37 @@ namespace Shiny.Tests.Android
 		public partial class Styleable
 		{
 			
-			// aapt resource value: { 0x7F030040,0x7F030047,0x7F030048,0x7F0300C4,0x7F0300C5,0x7F0300C6,0x7F0300C7,0x7F0300C8,0x7F0300C9,0x7F0300E3,0x7F0300EC,0x7F0300ED,0x7F030101,0x7F03013F,0x7F030145,0x7F03014B,0x7F03014C,0x7F03014F,0x7F03015B,0x7F030168,0x7F03019C,0x7F0301BD,0x7F0301D6,0x7F0301DD,0x7F0301DE,0x7F030220,0x7F030223,0x7F030276,0x7F030280 }
+			// aapt resource value: { 0x7F030042,0x7F030049,0x7F03004A,0x7F0300C6,0x7F0300C7,0x7F0300C8,0x7F0300C9,0x7F0300CA,0x7F0300CB,0x7F0300E5,0x7F0300EE,0x7F0300EF,0x7F030103,0x7F030142,0x7F030148,0x7F03014E,0x7F03014F,0x7F030152,0x7F03015E,0x7F03016B,0x7F03019F,0x7F0301C0,0x7F0301D9,0x7F0301E0,0x7F0301E1,0x7F030223,0x7F030226,0x7F030279,0x7F030283 }
 			public static int[] ActionBar = new int[] {
-					2130903104,
-					2130903111,
-					2130903112,
-					2130903236,
-					2130903237,
+					2130903106,
+					2130903113,
+					2130903114,
 					2130903238,
 					2130903239,
 					2130903240,
 					2130903241,
-					2130903267,
-					2130903276,
-					2130903277,
-					2130903297,
-					2130903359,
-					2130903365,
-					2130903371,
-					2130903372,
+					2130903242,
+					2130903243,
+					2130903269,
+					2130903278,
+					2130903279,
+					2130903299,
+					2130903362,
+					2130903368,
+					2130903374,
 					2130903375,
-					2130903387,
-					2130903400,
-					2130903452,
-					2130903485,
-					2130903510,
-					2130903517,
-					2130903518,
-					2130903584,
+					2130903378,
+					2130903390,
+					2130903403,
+					2130903455,
+					2130903488,
+					2130903513,
+					2130903520,
+					2130903521,
 					2130903587,
-					2130903670,
-					2130903680};
+					2130903590,
+					2130903673,
+					2130903683};
 			
 			// aapt resource value: { 0x10100B3 }
 			public static int[] ActionBarLayout = new int[] {
@@ -29868,14 +30032,14 @@ namespace Shiny.Tests.Android
 			public static int[] ActionMenuView = new int[] {
 					-1};
 			
-			// aapt resource value: { 0x7F030040,0x7F030047,0x7F0300A5,0x7F03013F,0x7F030223,0x7F030280 }
+			// aapt resource value: { 0x7F030042,0x7F030049,0x7F0300A7,0x7F030142,0x7F030226,0x7F030283 }
 			public static int[] ActionMode = new int[] {
-					2130903104,
-					2130903111,
-					2130903205,
-					2130903359,
-					2130903587,
-					2130903680};
+					2130903106,
+					2130903113,
+					2130903207,
+					2130903362,
+					2130903590,
+					2130903683};
 			
 			// aapt resource value: 0
 			public const int ActionMode_background = 0;
@@ -29895,10 +30059,10 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 5
 			public const int ActionMode_titleTextStyle = 5;
 			
-			// aapt resource value: { 0x7F030114,0x7F03015C }
+			// aapt resource value: { 0x7F030116,0x7F03015F }
 			public static int[] ActivityChooserView = new int[] {
-					2130903316,
-					2130903388};
+					2130903318,
+					2130903391};
 			
 			// aapt resource value: 0
 			public const int ActivityChooserView_expandActivityOverflowButtonDrawable = 0;
@@ -29906,16 +30070,16 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int ActivityChooserView_initialActivityCount = 1;
 			
-			// aapt resource value: { 0x10100F2,0x7F030072,0x7F030073,0x7F030191,0x7F030192,0x7F0301BA,0x7F0301FE,0x7F030200 }
+			// aapt resource value: { 0x10100F2,0x7F030074,0x7F030075,0x7F030194,0x7F030195,0x7F0301BD,0x7F030201,0x7F030203 }
 			public static int[] AlertDialog = new int[] {
 					16842994,
-					2130903154,
-					2130903155,
-					2130903441,
-					2130903442,
-					2130903482,
-					2130903550,
-					2130903552};
+					2130903156,
+					2130903157,
+					2130903444,
+					2130903445,
+					2130903485,
+					2130903553,
+					2130903555};
 			
 			// aapt resource value: 0
 			public const int AlertDialog_android_layout = 0;
@@ -29998,23 +30162,23 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int AnimatedStateListDrawableTransition_android_toId = 1;
 			
-			// aapt resource value: { 0x10100D4,0x101048F,0x1010540,0x7F030101,0x7F030115,0x7F030189,0x7F03018A,0x7F03021A }
+			// aapt resource value: { 0x10100D4,0x101048F,0x1010540,0x7F030103,0x7F030117,0x7F03018C,0x7F03018D,0x7F03021D }
 			public static int[] AppBarLayout = new int[] {
 					16842964,
 					16843919,
 					16844096,
-					2130903297,
-					2130903317,
-					2130903433,
-					2130903434,
-					2130903578};
+					2130903299,
+					2130903319,
+					2130903436,
+					2130903437,
+					2130903581};
 			
-			// aapt resource value: { 0x7F030214,0x7F030215,0x7F030217,0x7F030218 }
+			// aapt resource value: { 0x7F030217,0x7F030218,0x7F03021A,0x7F03021B }
 			public static int[] AppBarLayoutStates = new int[] {
-					2130903572,
-					2130903573,
 					2130903575,
-					2130903576};
+					2130903576,
+					2130903578,
+					2130903579};
 			
 			// aapt resource value: 0
 			public const int AppBarLayoutStates_state_collapsed = 0;
@@ -30043,10 +30207,10 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 4
 			public const int AppBarLayout_expanded = 4;
 			
-			// aapt resource value: { 0x7F030187,0x7F030188 }
+			// aapt resource value: { 0x7F03018A,0x7F03018B }
 			public static int[] AppBarLayout_Layout = new int[] {
-					2130903431,
-					2130903432};
+					2130903434,
+					2130903435};
 			
 			// aapt resource value: 0
 			public const int AppBarLayout_Layout_layout_scrollFlags = 0;
@@ -30063,12 +30227,12 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 7
 			public const int AppBarLayout_statusBarForeground = 7;
 			
-			// aapt resource value: { 0x1010119,0x7F03020C,0x7F030274,0x7F030275 }
+			// aapt resource value: { 0x1010119,0x7F03020F,0x7F030277,0x7F030278 }
 			public static int[] AppCompatImageView = new int[] {
 					16843033,
-					2130903564,
-					2130903668,
-					2130903669};
+					2130903567,
+					2130903671,
+					2130903672};
 			
 			// aapt resource value: 0
 			public const int AppCompatImageView_android_src = 0;
@@ -30082,12 +30246,12 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 3
 			public const int AppCompatImageView_tintMode = 3;
 			
-			// aapt resource value: { 0x1010142,0x7F030271,0x7F030272,0x7F030273 }
+			// aapt resource value: { 0x1010142,0x7F030274,0x7F030275,0x7F030276 }
 			public static int[] AppCompatSeekBar = new int[] {
 					16843074,
-					2130903665,
-					2130903666,
-					2130903667};
+					2130903668,
+					2130903669,
+					2130903670};
 			
 			// aapt resource value: 0
 			public const int AppCompatSeekBar_android_thumb = 0;
@@ -30132,29 +30296,29 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 0
 			public const int AppCompatTextHelper_android_textAppearance = 0;
 			
-			// aapt resource value: { 0x1010034,0x7F03003B,0x7F03003C,0x7F03003D,0x7F03003E,0x7F03003F,0x7F0300F1,0x7F0300F2,0x7F0300F3,0x7F0300F4,0x7F0300F6,0x7F0300F7,0x7F0300F8,0x7F0300F9,0x7F03012B,0x7F03012E,0x7F030136,0x7F03017C,0x7F03018B,0x7F030247,0x7F030263 }
+			// aapt resource value: { 0x1010034,0x7F03003D,0x7F03003E,0x7F03003F,0x7F030040,0x7F030041,0x7F0300F3,0x7F0300F4,0x7F0300F5,0x7F0300F6,0x7F0300F8,0x7F0300F9,0x7F0300FA,0x7F0300FB,0x7F03012D,0x7F030130,0x7F030139,0x7F03017F,0x7F03018E,0x7F03024A,0x7F030266 }
 			public static int[] AppCompatTextView = new int[] {
 					16842804,
-					2130903099,
-					2130903100,
 					2130903101,
 					2130903102,
 					2130903103,
-					2130903281,
-					2130903282,
+					2130903104,
+					2130903105,
 					2130903283,
 					2130903284,
+					2130903285,
 					2130903286,
-					2130903287,
 					2130903288,
 					2130903289,
-					2130903339,
-					2130903342,
-					2130903350,
-					2130903420,
-					2130903435,
-					2130903623,
-					2130903651};
+					2130903290,
+					2130903291,
+					2130903341,
+					2130903344,
+					2130903353,
+					2130903423,
+					2130903438,
+					2130903626,
+					2130903654};
 			
 			// aapt resource value: 0
 			public const int AppCompatTextView_android_textAppearance = 0;
@@ -30219,7 +30383,7 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 20
 			public const int AppCompatTextView_textLocale = 20;
 			
-			// aapt resource value: { 0x1010057,0x10100AE,0x7F030000,0x7F030001,0x7F030002,0x7F030003,0x7F030004,0x7F030005,0x7F030006,0x7F030007,0x7F030008,0x7F030009,0x7F03000A,0x7F03000B,0x7F03000C,0x7F03000E,0x7F03000F,0x7F030010,0x7F030011,0x7F030012,0x7F030013,0x7F030014,0x7F030015,0x7F030016,0x7F030017,0x7F030018,0x7F030019,0x7F03001A,0x7F03001B,0x7F03001C,0x7F03001D,0x7F03001E,0x7F030022,0x7F03002F,0x7F030030,0x7F030031,0x7F030032,0x7F03003A,0x7F03005B,0x7F03006B,0x7F03006C,0x7F03006D,0x7F03006E,0x7F03006F,0x7F030075,0x7F030076,0x7F030081,0x7F030088,0x7F0300AC,0x7F0300AD,0x7F0300AE,0x7F0300AF,0x7F0300B0,0x7F0300B1,0x7F0300B2,0x7F0300B9,0x7F0300BA,0x7F0300C1,0x7F0300D0,0x7F0300E9,0x7F0300EA,0x7F0300EB,0x7F0300EE,0x7F0300F0,0x7F0300FC,0x7F0300FD,0x7F0300FE,0x7F0300FF,0x7F030100,0x7F03014B,0x7F03015A,0x7F03018D,0x7F03018E,0x7F03018F,0x7F030190,0x7F030193,0x7F030194,0x7F030195,0x7F030196,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F0301C9,0x7F0301CA,0x7F0301CB,0x7F0301D5,0x7F0301D7,0x7F0301E1,0x7F0301E3,0x7F0301E4,0x7F0301E5,0x7F0301F0,0x7F0301F1,0x7F0301F2,0x7F0301F3,0x7F030209,0x7F03020A,0x7F03022B,0x7F030252,0x7F030254,0x7F030255,0x7F030256,0x7F030258,0x7F030259,0x7F03025A,0x7F03025B,0x7F03025E,0x7F03025F,0x7F030282,0x7F030283,0x7F030284,0x7F030285,0x7F030295,0x7F030297,0x7F030298,0x7F030299,0x7F03029A,0x7F03029B,0x7F03029C,0x7F03029D,0x7F03029E,0x7F03029F,0x7F0302A0 }
+			// aapt resource value: { 0x1010057,0x10100AE,0x7F030000,0x7F030001,0x7F030002,0x7F030003,0x7F030004,0x7F030005,0x7F030006,0x7F030007,0x7F030008,0x7F030009,0x7F03000A,0x7F03000B,0x7F03000C,0x7F03000E,0x7F03000F,0x7F030010,0x7F030011,0x7F030012,0x7F030013,0x7F030014,0x7F030015,0x7F030016,0x7F030017,0x7F030018,0x7F030019,0x7F03001A,0x7F03001B,0x7F03001C,0x7F03001D,0x7F03001E,0x7F03001F,0x7F030020,0x7F030024,0x7F030031,0x7F030032,0x7F030033,0x7F030034,0x7F03003C,0x7F03005D,0x7F03006D,0x7F03006E,0x7F03006F,0x7F030070,0x7F030071,0x7F030077,0x7F030078,0x7F030083,0x7F03008A,0x7F0300AE,0x7F0300AF,0x7F0300B0,0x7F0300B1,0x7F0300B2,0x7F0300B3,0x7F0300B4,0x7F0300BB,0x7F0300BC,0x7F0300C3,0x7F0300D2,0x7F0300EB,0x7F0300EC,0x7F0300ED,0x7F0300F0,0x7F0300F2,0x7F0300FE,0x7F0300FF,0x7F030100,0x7F030101,0x7F030102,0x7F03014E,0x7F03015D,0x7F030190,0x7F030191,0x7F030192,0x7F030193,0x7F030196,0x7F030197,0x7F030198,0x7F030199,0x7F03019A,0x7F03019B,0x7F03019C,0x7F03019D,0x7F03019E,0x7F0301CC,0x7F0301CD,0x7F0301CE,0x7F0301D8,0x7F0301DA,0x7F0301E4,0x7F0301E6,0x7F0301E7,0x7F0301E8,0x7F0301F3,0x7F0301F4,0x7F0301F5,0x7F0301F6,0x7F03020C,0x7F03020D,0x7F03022E,0x7F030255,0x7F030257,0x7F030258,0x7F030259,0x7F03025B,0x7F03025C,0x7F03025D,0x7F03025E,0x7F030261,0x7F030262,0x7F030285,0x7F030286,0x7F030287,0x7F030288,0x7F030298,0x7F03029A,0x7F03029B,0x7F03029C,0x7F03029D,0x7F03029E,0x7F03029F,0x7F0302A0,0x7F0302A1,0x7F0302A2,0x7F0302A3 }
 			public static int[] AppCompatTheme = new int[] {
 					16842839,
 					16842926,
@@ -30253,99 +30417,101 @@ namespace Shiny.Tests.Android
 					2130903068,
 					2130903069,
 					2130903070,
-					2130903074,
-					2130903087,
-					2130903088,
+					2130903071,
+					2130903072,
+					2130903076,
 					2130903089,
 					2130903090,
-					2130903098,
-					2130903131,
-					2130903147,
-					2130903148,
+					2130903091,
+					2130903092,
+					2130903100,
+					2130903133,
 					2130903149,
 					2130903150,
 					2130903151,
-					2130903157,
-					2130903158,
-					2130903169,
-					2130903176,
-					2130903212,
-					2130903213,
+					2130903152,
+					2130903153,
+					2130903159,
+					2130903160,
+					2130903171,
+					2130903178,
 					2130903214,
 					2130903215,
 					2130903216,
 					2130903217,
 					2130903218,
-					2130903225,
-					2130903226,
-					2130903233,
-					2130903248,
-					2130903273,
-					2130903274,
+					2130903219,
+					2130903220,
+					2130903227,
+					2130903228,
+					2130903235,
+					2130903250,
 					2130903275,
-					2130903278,
+					2130903276,
+					2130903277,
 					2130903280,
-					2130903292,
-					2130903293,
+					2130903282,
 					2130903294,
 					2130903295,
 					2130903296,
-					2130903371,
-					2130903386,
-					2130903437,
-					2130903438,
-					2130903439,
+					2130903297,
+					2130903298,
+					2130903374,
+					2130903389,
 					2130903440,
+					2130903441,
+					2130903442,
 					2130903443,
-					2130903444,
-					2130903445,
 					2130903446,
 					2130903447,
 					2130903448,
 					2130903449,
 					2130903450,
 					2130903451,
-					2130903497,
-					2130903498,
-					2130903499,
-					2130903509,
-					2130903511,
-					2130903521,
-					2130903523,
+					2130903452,
+					2130903453,
+					2130903454,
+					2130903500,
+					2130903501,
+					2130903502,
+					2130903512,
+					2130903514,
 					2130903524,
-					2130903525,
-					2130903536,
-					2130903537,
-					2130903538,
+					2130903526,
+					2130903527,
+					2130903528,
 					2130903539,
-					2130903561,
-					2130903562,
-					2130903595,
-					2130903634,
-					2130903636,
+					2130903540,
+					2130903541,
+					2130903542,
+					2130903564,
+					2130903565,
+					2130903598,
 					2130903637,
-					2130903638,
+					2130903639,
 					2130903640,
 					2130903641,
-					2130903642,
 					2130903643,
+					2130903644,
+					2130903645,
 					2130903646,
-					2130903647,
-					2130903682,
-					2130903683,
-					2130903684,
+					2130903649,
+					2130903650,
 					2130903685,
-					2130903701,
-					2130903703,
+					2130903686,
+					2130903687,
+					2130903688,
 					2130903704,
-					2130903705,
 					2130903706,
 					2130903707,
 					2130903708,
 					2130903709,
 					2130903710,
 					2130903711,
-					2130903712};
+					2130903712,
+					2130903713,
+					2130903714,
+					2130903715};
 			
 			// aapt resource value: 2
 			public const int AppCompatTheme_actionBarDivider = 2;
@@ -30399,58 +30565,64 @@ namespace Shiny.Tests.Android
 			public const int AppCompatTheme_actionModeCloseButtonStyle = 18;
 			
 			// aapt resource value: 19
-			public const int AppCompatTheme_actionModeCloseDrawable = 19;
+			public const int AppCompatTheme_actionModeCloseContentDescription = 19;
 			
 			// aapt resource value: 20
-			public const int AppCompatTheme_actionModeCopyDrawable = 20;
+			public const int AppCompatTheme_actionModeCloseDrawable = 20;
 			
 			// aapt resource value: 21
-			public const int AppCompatTheme_actionModeCutDrawable = 21;
+			public const int AppCompatTheme_actionModeCopyDrawable = 21;
 			
 			// aapt resource value: 22
-			public const int AppCompatTheme_actionModeFindDrawable = 22;
+			public const int AppCompatTheme_actionModeCutDrawable = 22;
 			
 			// aapt resource value: 23
-			public const int AppCompatTheme_actionModePasteDrawable = 23;
+			public const int AppCompatTheme_actionModeFindDrawable = 23;
 			
 			// aapt resource value: 24
-			public const int AppCompatTheme_actionModePopupWindowStyle = 24;
+			public const int AppCompatTheme_actionModePasteDrawable = 24;
 			
 			// aapt resource value: 25
-			public const int AppCompatTheme_actionModeSelectAllDrawable = 25;
+			public const int AppCompatTheme_actionModePopupWindowStyle = 25;
 			
 			// aapt resource value: 26
-			public const int AppCompatTheme_actionModeShareDrawable = 26;
+			public const int AppCompatTheme_actionModeSelectAllDrawable = 26;
 			
 			// aapt resource value: 27
-			public const int AppCompatTheme_actionModeSplitBackground = 27;
+			public const int AppCompatTheme_actionModeShareDrawable = 27;
 			
 			// aapt resource value: 28
-			public const int AppCompatTheme_actionModeStyle = 28;
+			public const int AppCompatTheme_actionModeSplitBackground = 28;
 			
 			// aapt resource value: 29
-			public const int AppCompatTheme_actionModeWebSearchDrawable = 29;
+			public const int AppCompatTheme_actionModeStyle = 29;
 			
 			// aapt resource value: 30
-			public const int AppCompatTheme_actionOverflowButtonStyle = 30;
+			public const int AppCompatTheme_actionModeTheme = 30;
 			
 			// aapt resource value: 31
-			public const int AppCompatTheme_actionOverflowMenuStyle = 31;
+			public const int AppCompatTheme_actionModeWebSearchDrawable = 31;
 			
 			// aapt resource value: 32
-			public const int AppCompatTheme_activityChooserViewStyle = 32;
+			public const int AppCompatTheme_actionOverflowButtonStyle = 32;
 			
 			// aapt resource value: 33
-			public const int AppCompatTheme_alertDialogButtonGroupStyle = 33;
+			public const int AppCompatTheme_actionOverflowMenuStyle = 33;
 			
 			// aapt resource value: 34
-			public const int AppCompatTheme_alertDialogCenterButtons = 34;
+			public const int AppCompatTheme_activityChooserViewStyle = 34;
 			
 			// aapt resource value: 35
-			public const int AppCompatTheme_alertDialogStyle = 35;
+			public const int AppCompatTheme_alertDialogButtonGroupStyle = 35;
 			
 			// aapt resource value: 36
-			public const int AppCompatTheme_alertDialogTheme = 36;
+			public const int AppCompatTheme_alertDialogCenterButtons = 36;
+			
+			// aapt resource value: 37
+			public const int AppCompatTheme_alertDialogStyle = 37;
+			
+			// aapt resource value: 38
+			public const int AppCompatTheme_alertDialogTheme = 38;
 			
 			// aapt resource value: 1
 			public const int AppCompatTheme_android_windowAnimationStyle = 1;
@@ -30458,279 +30630,279 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 0
 			public const int AppCompatTheme_android_windowIsFloating = 0;
 			
-			// aapt resource value: 37
-			public const int AppCompatTheme_autoCompleteTextViewStyle = 37;
-			
-			// aapt resource value: 38
-			public const int AppCompatTheme_borderlessButtonStyle = 38;
-			
 			// aapt resource value: 39
-			public const int AppCompatTheme_buttonBarButtonStyle = 39;
+			public const int AppCompatTheme_autoCompleteTextViewStyle = 39;
 			
 			// aapt resource value: 40
-			public const int AppCompatTheme_buttonBarNegativeButtonStyle = 40;
+			public const int AppCompatTheme_borderlessButtonStyle = 40;
 			
 			// aapt resource value: 41
-			public const int AppCompatTheme_buttonBarNeutralButtonStyle = 41;
+			public const int AppCompatTheme_buttonBarButtonStyle = 41;
 			
 			// aapt resource value: 42
-			public const int AppCompatTheme_buttonBarPositiveButtonStyle = 42;
+			public const int AppCompatTheme_buttonBarNegativeButtonStyle = 42;
 			
 			// aapt resource value: 43
-			public const int AppCompatTheme_buttonBarStyle = 43;
+			public const int AppCompatTheme_buttonBarNeutralButtonStyle = 43;
 			
 			// aapt resource value: 44
-			public const int AppCompatTheme_buttonStyle = 44;
+			public const int AppCompatTheme_buttonBarPositiveButtonStyle = 44;
 			
 			// aapt resource value: 45
-			public const int AppCompatTheme_buttonStyleSmall = 45;
+			public const int AppCompatTheme_buttonBarStyle = 45;
 			
 			// aapt resource value: 46
-			public const int AppCompatTheme_checkboxStyle = 46;
+			public const int AppCompatTheme_buttonStyle = 46;
 			
 			// aapt resource value: 47
-			public const int AppCompatTheme_checkedTextViewStyle = 47;
+			public const int AppCompatTheme_buttonStyleSmall = 47;
 			
 			// aapt resource value: 48
-			public const int AppCompatTheme_colorAccent = 48;
+			public const int AppCompatTheme_checkboxStyle = 48;
 			
 			// aapt resource value: 49
-			public const int AppCompatTheme_colorBackgroundFloating = 49;
+			public const int AppCompatTheme_checkedTextViewStyle = 49;
 			
 			// aapt resource value: 50
-			public const int AppCompatTheme_colorButtonNormal = 50;
+			public const int AppCompatTheme_colorAccent = 50;
 			
 			// aapt resource value: 51
-			public const int AppCompatTheme_colorControlActivated = 51;
+			public const int AppCompatTheme_colorBackgroundFloating = 51;
 			
 			// aapt resource value: 52
-			public const int AppCompatTheme_colorControlHighlight = 52;
+			public const int AppCompatTheme_colorButtonNormal = 52;
 			
 			// aapt resource value: 53
-			public const int AppCompatTheme_colorControlNormal = 53;
+			public const int AppCompatTheme_colorControlActivated = 53;
 			
 			// aapt resource value: 54
-			public const int AppCompatTheme_colorError = 54;
+			public const int AppCompatTheme_colorControlHighlight = 54;
 			
 			// aapt resource value: 55
-			public const int AppCompatTheme_colorPrimary = 55;
+			public const int AppCompatTheme_colorControlNormal = 55;
 			
 			// aapt resource value: 56
-			public const int AppCompatTheme_colorPrimaryDark = 56;
+			public const int AppCompatTheme_colorError = 56;
 			
 			// aapt resource value: 57
-			public const int AppCompatTheme_colorSwitchThumbNormal = 57;
+			public const int AppCompatTheme_colorPrimary = 57;
 			
 			// aapt resource value: 58
-			public const int AppCompatTheme_controlBackground = 58;
+			public const int AppCompatTheme_colorPrimaryDark = 58;
 			
 			// aapt resource value: 59
-			public const int AppCompatTheme_dialogCornerRadius = 59;
+			public const int AppCompatTheme_colorSwitchThumbNormal = 59;
 			
 			// aapt resource value: 60
-			public const int AppCompatTheme_dialogPreferredPadding = 60;
+			public const int AppCompatTheme_controlBackground = 60;
 			
 			// aapt resource value: 61
-			public const int AppCompatTheme_dialogTheme = 61;
+			public const int AppCompatTheme_dialogCornerRadius = 61;
 			
 			// aapt resource value: 62
-			public const int AppCompatTheme_dividerHorizontal = 62;
+			public const int AppCompatTheme_dialogPreferredPadding = 62;
 			
 			// aapt resource value: 63
-			public const int AppCompatTheme_dividerVertical = 63;
-			
-			// aapt resource value: 65
-			public const int AppCompatTheme_dropdownListPreferredItemHeight = 65;
+			public const int AppCompatTheme_dialogTheme = 63;
 			
 			// aapt resource value: 64
-			public const int AppCompatTheme_dropDownListViewStyle = 64;
+			public const int AppCompatTheme_dividerHorizontal = 64;
 			
-			// aapt resource value: 66
-			public const int AppCompatTheme_editTextBackground = 66;
+			// aapt resource value: 65
+			public const int AppCompatTheme_dividerVertical = 65;
 			
 			// aapt resource value: 67
-			public const int AppCompatTheme_editTextColor = 67;
+			public const int AppCompatTheme_dropdownListPreferredItemHeight = 67;
+			
+			// aapt resource value: 66
+			public const int AppCompatTheme_dropDownListViewStyle = 66;
 			
 			// aapt resource value: 68
-			public const int AppCompatTheme_editTextStyle = 68;
+			public const int AppCompatTheme_editTextBackground = 68;
 			
 			// aapt resource value: 69
-			public const int AppCompatTheme_homeAsUpIndicator = 69;
+			public const int AppCompatTheme_editTextColor = 69;
 			
 			// aapt resource value: 70
-			public const int AppCompatTheme_imageButtonStyle = 70;
+			public const int AppCompatTheme_editTextStyle = 70;
 			
 			// aapt resource value: 71
-			public const int AppCompatTheme_listChoiceBackgroundIndicator = 71;
+			public const int AppCompatTheme_homeAsUpIndicator = 71;
 			
 			// aapt resource value: 72
-			public const int AppCompatTheme_listChoiceIndicatorMultipleAnimated = 72;
+			public const int AppCompatTheme_imageButtonStyle = 72;
 			
 			// aapt resource value: 73
-			public const int AppCompatTheme_listChoiceIndicatorSingleAnimated = 73;
+			public const int AppCompatTheme_listChoiceBackgroundIndicator = 73;
 			
 			// aapt resource value: 74
-			public const int AppCompatTheme_listDividerAlertDialog = 74;
+			public const int AppCompatTheme_listChoiceIndicatorMultipleAnimated = 74;
 			
 			// aapt resource value: 75
-			public const int AppCompatTheme_listMenuViewStyle = 75;
+			public const int AppCompatTheme_listChoiceIndicatorSingleAnimated = 75;
 			
 			// aapt resource value: 76
-			public const int AppCompatTheme_listPopupWindowStyle = 76;
+			public const int AppCompatTheme_listDividerAlertDialog = 76;
 			
 			// aapt resource value: 77
-			public const int AppCompatTheme_listPreferredItemHeight = 77;
+			public const int AppCompatTheme_listMenuViewStyle = 77;
 			
 			// aapt resource value: 78
-			public const int AppCompatTheme_listPreferredItemHeightLarge = 78;
+			public const int AppCompatTheme_listPopupWindowStyle = 78;
 			
 			// aapt resource value: 79
-			public const int AppCompatTheme_listPreferredItemHeightSmall = 79;
+			public const int AppCompatTheme_listPreferredItemHeight = 79;
 			
 			// aapt resource value: 80
-			public const int AppCompatTheme_listPreferredItemPaddingEnd = 80;
+			public const int AppCompatTheme_listPreferredItemHeightLarge = 80;
 			
 			// aapt resource value: 81
-			public const int AppCompatTheme_listPreferredItemPaddingLeft = 81;
+			public const int AppCompatTheme_listPreferredItemHeightSmall = 81;
 			
 			// aapt resource value: 82
-			public const int AppCompatTheme_listPreferredItemPaddingRight = 82;
+			public const int AppCompatTheme_listPreferredItemPaddingEnd = 82;
 			
 			// aapt resource value: 83
-			public const int AppCompatTheme_listPreferredItemPaddingStart = 83;
+			public const int AppCompatTheme_listPreferredItemPaddingLeft = 83;
 			
 			// aapt resource value: 84
-			public const int AppCompatTheme_panelBackground = 84;
+			public const int AppCompatTheme_listPreferredItemPaddingRight = 84;
 			
 			// aapt resource value: 85
-			public const int AppCompatTheme_panelMenuListTheme = 85;
+			public const int AppCompatTheme_listPreferredItemPaddingStart = 85;
 			
 			// aapt resource value: 86
-			public const int AppCompatTheme_panelMenuListWidth = 86;
+			public const int AppCompatTheme_panelBackground = 86;
 			
 			// aapt resource value: 87
-			public const int AppCompatTheme_popupMenuStyle = 87;
+			public const int AppCompatTheme_panelMenuListTheme = 87;
 			
 			// aapt resource value: 88
-			public const int AppCompatTheme_popupWindowStyle = 88;
+			public const int AppCompatTheme_panelMenuListWidth = 88;
 			
 			// aapt resource value: 89
-			public const int AppCompatTheme_radioButtonStyle = 89;
+			public const int AppCompatTheme_popupMenuStyle = 89;
 			
 			// aapt resource value: 90
-			public const int AppCompatTheme_ratingBarStyle = 90;
+			public const int AppCompatTheme_popupWindowStyle = 90;
 			
 			// aapt resource value: 91
-			public const int AppCompatTheme_ratingBarStyleIndicator = 91;
+			public const int AppCompatTheme_radioButtonStyle = 91;
 			
 			// aapt resource value: 92
-			public const int AppCompatTheme_ratingBarStyleSmall = 92;
+			public const int AppCompatTheme_ratingBarStyle = 92;
 			
 			// aapt resource value: 93
-			public const int AppCompatTheme_searchViewStyle = 93;
+			public const int AppCompatTheme_ratingBarStyleIndicator = 93;
 			
 			// aapt resource value: 94
-			public const int AppCompatTheme_seekBarStyle = 94;
+			public const int AppCompatTheme_ratingBarStyleSmall = 94;
 			
 			// aapt resource value: 95
-			public const int AppCompatTheme_selectableItemBackground = 95;
+			public const int AppCompatTheme_searchViewStyle = 95;
 			
 			// aapt resource value: 96
-			public const int AppCompatTheme_selectableItemBackgroundBorderless = 96;
+			public const int AppCompatTheme_seekBarStyle = 96;
 			
 			// aapt resource value: 97
-			public const int AppCompatTheme_spinnerDropDownItemStyle = 97;
+			public const int AppCompatTheme_selectableItemBackground = 97;
 			
 			// aapt resource value: 98
-			public const int AppCompatTheme_spinnerStyle = 98;
+			public const int AppCompatTheme_selectableItemBackgroundBorderless = 98;
 			
 			// aapt resource value: 99
-			public const int AppCompatTheme_switchStyle = 99;
+			public const int AppCompatTheme_spinnerDropDownItemStyle = 99;
 			
 			// aapt resource value: 100
-			public const int AppCompatTheme_textAppearanceLargePopupMenu = 100;
+			public const int AppCompatTheme_spinnerStyle = 100;
 			
 			// aapt resource value: 101
-			public const int AppCompatTheme_textAppearanceListItem = 101;
+			public const int AppCompatTheme_switchStyle = 101;
 			
 			// aapt resource value: 102
-			public const int AppCompatTheme_textAppearanceListItemSecondary = 102;
+			public const int AppCompatTheme_textAppearanceLargePopupMenu = 102;
 			
 			// aapt resource value: 103
-			public const int AppCompatTheme_textAppearanceListItemSmall = 103;
+			public const int AppCompatTheme_textAppearanceListItem = 103;
 			
 			// aapt resource value: 104
-			public const int AppCompatTheme_textAppearancePopupMenuHeader = 104;
+			public const int AppCompatTheme_textAppearanceListItemSecondary = 104;
 			
 			// aapt resource value: 105
-			public const int AppCompatTheme_textAppearanceSearchResultSubtitle = 105;
+			public const int AppCompatTheme_textAppearanceListItemSmall = 105;
 			
 			// aapt resource value: 106
-			public const int AppCompatTheme_textAppearanceSearchResultTitle = 106;
+			public const int AppCompatTheme_textAppearancePopupMenuHeader = 106;
 			
 			// aapt resource value: 107
-			public const int AppCompatTheme_textAppearanceSmallPopupMenu = 107;
+			public const int AppCompatTheme_textAppearanceSearchResultSubtitle = 107;
 			
 			// aapt resource value: 108
-			public const int AppCompatTheme_textColorAlertDialogListItem = 108;
+			public const int AppCompatTheme_textAppearanceSearchResultTitle = 108;
 			
 			// aapt resource value: 109
-			public const int AppCompatTheme_textColorSearchUrl = 109;
+			public const int AppCompatTheme_textAppearanceSmallPopupMenu = 109;
 			
 			// aapt resource value: 110
-			public const int AppCompatTheme_toolbarNavigationButtonStyle = 110;
+			public const int AppCompatTheme_textColorAlertDialogListItem = 110;
 			
 			// aapt resource value: 111
-			public const int AppCompatTheme_toolbarStyle = 111;
+			public const int AppCompatTheme_textColorSearchUrl = 111;
 			
 			// aapt resource value: 112
-			public const int AppCompatTheme_tooltipForegroundColor = 112;
+			public const int AppCompatTheme_toolbarNavigationButtonStyle = 112;
 			
 			// aapt resource value: 113
-			public const int AppCompatTheme_tooltipFrameBackground = 113;
+			public const int AppCompatTheme_toolbarStyle = 113;
 			
 			// aapt resource value: 114
-			public const int AppCompatTheme_viewInflaterClass = 114;
+			public const int AppCompatTheme_tooltipForegroundColor = 114;
 			
 			// aapt resource value: 115
-			public const int AppCompatTheme_windowActionBar = 115;
+			public const int AppCompatTheme_tooltipFrameBackground = 115;
 			
 			// aapt resource value: 116
-			public const int AppCompatTheme_windowActionBarOverlay = 116;
+			public const int AppCompatTheme_viewInflaterClass = 116;
 			
 			// aapt resource value: 117
-			public const int AppCompatTheme_windowActionModeOverlay = 117;
+			public const int AppCompatTheme_windowActionBar = 117;
 			
 			// aapt resource value: 118
-			public const int AppCompatTheme_windowFixedHeightMajor = 118;
+			public const int AppCompatTheme_windowActionBarOverlay = 118;
 			
 			// aapt resource value: 119
-			public const int AppCompatTheme_windowFixedHeightMinor = 119;
+			public const int AppCompatTheme_windowActionModeOverlay = 119;
 			
 			// aapt resource value: 120
-			public const int AppCompatTheme_windowFixedWidthMajor = 120;
+			public const int AppCompatTheme_windowFixedHeightMajor = 120;
 			
 			// aapt resource value: 121
-			public const int AppCompatTheme_windowFixedWidthMinor = 121;
+			public const int AppCompatTheme_windowFixedHeightMinor = 121;
 			
 			// aapt resource value: 122
-			public const int AppCompatTheme_windowMinWidthMajor = 122;
+			public const int AppCompatTheme_windowFixedWidthMajor = 122;
 			
 			// aapt resource value: 123
-			public const int AppCompatTheme_windowMinWidthMinor = 123;
+			public const int AppCompatTheme_windowFixedWidthMinor = 123;
 			
 			// aapt resource value: 124
-			public const int AppCompatTheme_windowNoTitle = 124;
+			public const int AppCompatTheme_windowMinWidthMajor = 124;
 			
-			// aapt resource value: { 0x7F030041,0x7F03004B,0x7F03004D,0x7F03014D,0x7F0301B4,0x7F0301BF,0x7F030294 }
+			// aapt resource value: 125
+			public const int AppCompatTheme_windowMinWidthMinor = 125;
+			
+			// aapt resource value: 126
+			public const int AppCompatTheme_windowNoTitle = 126;
+			
+			// aapt resource value: { 0x7F030043,0x7F03004D,0x7F03004F,0x7F030150,0x7F0301B7,0x7F0301C2,0x7F030297 }
 			public static int[] Badge = new int[] {
-					2130903105,
-					2130903115,
+					2130903107,
 					2130903117,
-					2130903373,
-					2130903476,
-					2130903487,
-					2130903700};
+					2130903119,
+					2130903376,
+					2130903479,
+					2130903490,
+					2130903703};
 			
 			// aapt resource value: 0
 			public const int Badge_backgroundColor = 0;
@@ -30753,19 +30925,19 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 6
 			public const int Badge_verticalOffset = 6;
 			
-			// aapt resource value: { 0x7F030049,0x7F030101,0x7F03011F,0x7F030120,0x7F030121,0x7F030122,0x7F030123,0x7F030146,0x7F0301C3,0x7F0301C5,0x7F0301C6 }
+			// aapt resource value: { 0x7F03004B,0x7F030103,0x7F030121,0x7F030122,0x7F030123,0x7F030124,0x7F030125,0x7F030149,0x7F0301C6,0x7F0301C8,0x7F0301C9 }
 			public static int[] BottomAppBar = new int[] {
-					2130903113,
-					2130903297,
-					2130903327,
-					2130903328,
+					2130903115,
+					2130903299,
 					2130903329,
 					2130903330,
 					2130903331,
-					2130903366,
-					2130903491,
-					2130903493,
-					2130903494};
+					2130903332,
+					2130903333,
+					2130903369,
+					2130903494,
+					2130903496,
+					2130903497};
 			
 			// aapt resource value: 0
 			public const int BottomAppBar_backgroundTint = 0;
@@ -30800,20 +30972,20 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 10
 			public const int BottomAppBar_paddingRightSystemWindowInsets = 10;
 			
-			// aapt resource value: { 0x7F030049,0x7F030101,0x7F030160,0x7F030163,0x7F030165,0x7F030166,0x7F030169,0x7F030175,0x7F030176,0x7F030177,0x7F03017B,0x7F0301B8 }
+			// aapt resource value: { 0x7F03004B,0x7F030103,0x7F030163,0x7F030166,0x7F030168,0x7F030169,0x7F03016C,0x7F030178,0x7F030179,0x7F03017A,0x7F03017E,0x7F0301BB }
 			public static int[] BottomNavigationView = new int[] {
-					2130903113,
-					2130903297,
-					2130903392,
+					2130903115,
+					2130903299,
 					2130903395,
-					2130903397,
 					2130903398,
+					2130903400,
 					2130903401,
-					2130903413,
-					2130903414,
-					2130903415,
-					2130903419,
-					2130903480};
+					2130903404,
+					2130903416,
+					2130903417,
+					2130903418,
+					2130903422,
+					2130903483};
 			
 			// aapt resource value: 0
 			public const int BottomNavigationView_backgroundTint = 0;
@@ -30851,21 +31023,21 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 11
 			public const int BottomNavigationView_menu = 11;
 			
-			// aapt resource value: { 0x1010440,0x7F030049,0x7F030051,0x7F030052,0x7F030053,0x7F030054,0x7F030055,0x7F030057,0x7F030058,0x7F030059,0x7F03013A,0x7F0301F5,0x7F0301F8 }
+			// aapt resource value: { 0x1010440,0x7F03004B,0x7F030053,0x7F030054,0x7F030055,0x7F030056,0x7F030057,0x7F030059,0x7F03005A,0x7F03005B,0x7F03013D,0x7F0301F8,0x7F0301FB }
 			public static int[] BottomSheetBehavior_Layout = new int[] {
 					16843840,
-					2130903113,
-					2130903121,
-					2130903122,
+					2130903115,
 					2130903123,
 					2130903124,
 					2130903125,
+					2130903126,
 					2130903127,
-					2130903128,
 					2130903129,
-					2130903354,
-					2130903541,
-					2130903544};
+					2130903130,
+					2130903131,
+					2130903357,
+					2130903544,
+					2130903547};
 			
 			// aapt resource value: 0
 			public const int BottomSheetBehavior_Layout_android_elevation = 0;
@@ -30906,28 +31078,28 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 12
 			public const int BottomSheetBehavior_Layout_shapeAppearanceOverlay = 12;
 			
-			// aapt resource value: { 0x7F030033 }
+			// aapt resource value: { 0x7F030035 }
 			public static int[] ButtonBarLayout = new int[] {
-					2130903091};
+					2130903093};
 			
 			// aapt resource value: 0
 			public const int ButtonBarLayout_allowStacking = 0;
 			
-			// aapt resource value: { 0x101013F,0x1010140,0x7F030079,0x7F03007A,0x7F03007B,0x7F03007D,0x7F03007E,0x7F03007F,0x7F0300CA,0x7F0300CB,0x7F0300CC,0x7F0300CD,0x7F0300CE }
+			// aapt resource value: { 0x101013F,0x1010140,0x7F03007B,0x7F03007C,0x7F03007D,0x7F03007F,0x7F030080,0x7F030081,0x7F0300CC,0x7F0300CD,0x7F0300CE,0x7F0300CF,0x7F0300D0 }
 			public static int[] CardView = new int[] {
 					16843071,
 					16843072,
-					2130903161,
-					2130903162,
 					2130903163,
+					2130903164,
 					2130903165,
-					2130903166,
 					2130903167,
-					2130903242,
-					2130903243,
+					2130903168,
+					2130903169,
 					2130903244,
 					2130903245,
-					2130903246};
+					2130903246,
+					2130903247,
+					2130903248};
 			
 			// aapt resource value: 1
 			public const int CardView_android_minHeight = 1;
@@ -30968,7 +31140,7 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 12
 			public const int CardView_contentPaddingTop = 12;
 			
-			// aapt resource value: { 0x1010034,0x1010098,0x10100AB,0x101011F,0x101014F,0x10101E5,0x7F030084,0x7F030085,0x7F030086,0x7F030087,0x7F030089,0x7F03008A,0x7F03008B,0x7F03008D,0x7F03008E,0x7F03008F,0x7F030090,0x7F030091,0x7F030092,0x7F030093,0x7F030098,0x7F030099,0x7F03009A,0x7F03009C,0x7F03009E,0x7F03009F,0x7F0300A0,0x7F0300A1,0x7F0300A2,0x7F0300A3,0x7F0300A4,0x7F03010C,0x7F030144,0x7F030150,0x7F030154,0x7F0301E8,0x7F0301F5,0x7F0301F8,0x7F0301FC,0x7F030260,0x7F030264 }
+			// aapt resource value: { 0x1010034,0x1010098,0x10100AB,0x101011F,0x101014F,0x10101E5,0x7F030086,0x7F030087,0x7F030088,0x7F030089,0x7F03008B,0x7F03008C,0x7F03008D,0x7F03008F,0x7F030090,0x7F030091,0x7F030092,0x7F030093,0x7F030094,0x7F030095,0x7F03009A,0x7F03009B,0x7F03009C,0x7F03009E,0x7F0300A0,0x7F0300A1,0x7F0300A2,0x7F0300A3,0x7F0300A4,0x7F0300A5,0x7F0300A6,0x7F03010E,0x7F030147,0x7F030153,0x7F030157,0x7F0301EB,0x7F0301F8,0x7F0301FB,0x7F0301FF,0x7F030263,0x7F030267 }
 			public static int[] Chip = new int[] {
 					16842804,
 					16842904,
@@ -30976,51 +31148,51 @@ namespace Shiny.Tests.Android
 					16843039,
 					16843087,
 					16843237,
-					2130903172,
-					2130903173,
 					2130903174,
 					2130903175,
+					2130903176,
 					2130903177,
-					2130903178,
 					2130903179,
+					2130903180,
 					2130903181,
-					2130903182,
 					2130903183,
 					2130903184,
 					2130903185,
 					2130903186,
 					2130903187,
-					2130903192,
-					2130903193,
+					2130903188,
+					2130903189,
 					2130903194,
+					2130903195,
 					2130903196,
 					2130903198,
-					2130903199,
 					2130903200,
 					2130903201,
 					2130903202,
 					2130903203,
 					2130903204,
-					2130903308,
-					2130903364,
-					2130903376,
-					2130903380,
-					2130903528,
-					2130903541,
+					2130903205,
+					2130903206,
+					2130903310,
+					2130903367,
+					2130903379,
+					2130903383,
+					2130903531,
 					2130903544,
-					2130903548,
-					2130903648,
-					2130903652};
+					2130903547,
+					2130903551,
+					2130903651,
+					2130903655};
 			
-			// aapt resource value: { 0x7F030083,0x7F030094,0x7F030095,0x7F030096,0x7F0301F4,0x7F030201,0x7F030202 }
+			// aapt resource value: { 0x7F030085,0x7F030096,0x7F030097,0x7F030098,0x7F0301F7,0x7F030204,0x7F030205 }
 			public static int[] ChipGroup = new int[] {
-					2130903171,
-					2130903188,
-					2130903189,
+					2130903173,
 					2130903190,
-					2130903540,
-					2130903553,
-					2130903554};
+					2130903191,
+					2130903192,
+					2130903543,
+					2130903556,
+					2130903557};
 			
 			// aapt resource value: 0
 			public const int ChipGroup_checkedChip = 0;
@@ -31166,25 +31338,25 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 40
 			public const int Chip_textStartPadding = 40;
 			
-			// aapt resource value: { 0x7F0300A8,0x7F0300A9,0x7F0300CF,0x7F030116,0x7F030117,0x7F030118,0x7F030119,0x7F03011A,0x7F03011B,0x7F03011C,0x7F0301B6,0x7F0301EA,0x7F0301EC,0x7F03021B,0x7F030276,0x7F030277,0x7F030281 }
+			// aapt resource value: { 0x7F0300AA,0x7F0300AB,0x7F0300D1,0x7F030118,0x7F030119,0x7F03011A,0x7F03011B,0x7F03011C,0x7F03011D,0x7F03011E,0x7F0301B9,0x7F0301ED,0x7F0301EF,0x7F03021E,0x7F030279,0x7F03027A,0x7F030284 }
 			public static int[] CollapsingToolbarLayout = new int[] {
-					2130903208,
-					2130903209,
-					2130903247,
-					2130903318,
-					2130903319,
+					2130903210,
+					2130903211,
+					2130903249,
 					2130903320,
 					2130903321,
 					2130903322,
 					2130903323,
 					2130903324,
-					2130903478,
-					2130903530,
-					2130903532,
-					2130903579,
-					2130903670,
-					2130903671,
-					2130903681};
+					2130903325,
+					2130903326,
+					2130903481,
+					2130903533,
+					2130903535,
+					2130903582,
+					2130903673,
+					2130903674,
+					2130903684};
 			
 			// aapt resource value: 0
 			public const int CollapsingToolbarLayout_collapsedTitleGravity = 0;
@@ -31216,10 +31388,10 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 9
 			public const int CollapsingToolbarLayout_expandedTitleTextAppearance = 9;
 			
-			// aapt resource value: { 0x7F030182,0x7F030183 }
+			// aapt resource value: { 0x7F030185,0x7F030186 }
 			public static int[] CollapsingToolbarLayout_Layout = new int[] {
-					2130903426,
-					2130903427};
+					2130903429,
+					2130903430};
 			
 			// aapt resource value: 0
 			public const int CollapsingToolbarLayout_Layout_layout_collapseMode = 0;
@@ -31248,11 +31420,11 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 16
 			public const int CollapsingToolbarLayout_toolbarId = 16;
 			
-			// aapt resource value: { 0x10101A5,0x101031F,0x7F030034 }
+			// aapt resource value: { 0x10101A5,0x101031F,0x7F030036 }
 			public static int[] ColorStateListItem = new int[] {
 					16843173,
 					16843551,
-					2130903092};
+					2130903094};
 			
 			// aapt resource value: 2
 			public const int ColorStateListItem_alpha = 2;
@@ -31263,12 +31435,12 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 0
 			public const int ColorStateListItem_android_color = 0;
 			
-			// aapt resource value: { 0x1010107,0x7F030070,0x7F030077,0x7F030078 }
+			// aapt resource value: { 0x1010107,0x7F030072,0x7F030079,0x7F03007A }
 			public static int[] CompoundButton = new int[] {
 					16843015,
-					2130903152,
-					2130903159,
-					2130903160};
+					2130903154,
+					2130903161,
+					2130903162};
 			
 			// aapt resource value: 0
 			public const int CompoundButton_android_button = 0;
@@ -31282,23 +31454,23 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 3
 			public const int CompoundButton_buttonTintMode = 3;
 			
-			// aapt resource value: { 0x7F030178,0x7F030219 }
+			// aapt resource value: { 0x7F03017B,0x7F03021C }
 			public static int[] CoordinatorLayout = new int[] {
-					2130903416,
-					2130903577};
+					2130903419,
+					2130903580};
 			
 			// aapt resource value: 0
 			public const int CoordinatorLayout_keylines = 0;
 			
-			// aapt resource value: { 0x10100B3,0x7F03017F,0x7F030180,0x7F030181,0x7F030184,0x7F030185,0x7F030186 }
+			// aapt resource value: { 0x10100B3,0x7F030182,0x7F030183,0x7F030184,0x7F030187,0x7F030188,0x7F030189 }
 			public static int[] CoordinatorLayout_Layout = new int[] {
 					16842931,
-					2130903423,
-					2130903424,
-					2130903425,
+					2130903426,
+					2130903427,
 					2130903428,
-					2130903429,
-					2130903430};
+					2130903431,
+					2130903432,
+					2130903433};
 			
 			// aapt resource value: 0
 			public const int CoordinatorLayout_Layout_android_layout_gravity = 0;
@@ -31324,16 +31496,16 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int CoordinatorLayout_statusBarBackground = 1;
 			
-			// aapt resource value: { 0x7F030038,0x7F030039,0x7F03004E,0x7F0300AB,0x7F0300F5,0x7F030139,0x7F030208,0x7F030267 }
+			// aapt resource value: { 0x7F03003A,0x7F03003B,0x7F030050,0x7F0300AD,0x7F0300F7,0x7F03013C,0x7F03020B,0x7F03026A }
 			public static int[] DrawerArrowToggle = new int[] {
-					2130903096,
-					2130903097,
-					2130903118,
-					2130903211,
-					2130903285,
-					2130903353,
-					2130903560,
-					2130903655};
+					2130903098,
+					2130903099,
+					2130903120,
+					2130903213,
+					2130903287,
+					2130903356,
+					2130903563,
+					2130903658};
 			
 			// aapt resource value: 0
 			public const int DrawerArrowToggle_arrowHeadLength = 0;
@@ -31359,25 +31531,25 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 7
 			public const int DrawerArrowToggle_thickness = 7;
 			
-			// aapt resource value: { 0x7F030101 }
+			// aapt resource value: { 0x7F030103 }
 			public static int[] DrawerLayout = new int[] {
-					2130903297};
+					2130903299};
 			
 			// aapt resource value: 0
 			public const int DrawerLayout_elevation = 0;
 			
-			// aapt resource value: { 0x7F030101,0x7F03011D,0x7F030144,0x7F0301FC,0x7F0301FF }
+			// aapt resource value: { 0x7F030103,0x7F03011F,0x7F030147,0x7F0301FF,0x7F030202 }
 			public static int[] ExtendedFloatingActionButton = new int[] {
-					2130903297,
-					2130903325,
-					2130903364,
-					2130903548,
-					2130903551};
+					2130903299,
+					2130903327,
+					2130903367,
+					2130903551,
+					2130903554};
 			
-			// aapt resource value: { 0x7F03004F,0x7F030050 }
+			// aapt resource value: { 0x7F030051,0x7F030052 }
 			public static int[] ExtendedFloatingActionButton_Behavior_Layout = new int[] {
-					2130903119,
-					2130903120};
+					2130903121,
+					2130903122};
 			
 			// aapt resource value: 0
 			public const int ExtendedFloatingActionButton_Behavior_Layout_behavior_autoHide = 0;
@@ -31400,25 +31572,25 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 4
 			public const int ExtendedFloatingActionButton_shrinkMotionSpec = 4;
 			
-			// aapt resource value: { 0x101000E,0x7F030049,0x7F03004A,0x7F03005A,0x7F030101,0x7F03010C,0x7F030124,0x7F030125,0x7F030144,0x7F03014E,0x7F0301B5,0x7F0301DC,0x7F0301E8,0x7F0301F5,0x7F0301F8,0x7F0301FC,0x7F030291 }
+			// aapt resource value: { 0x101000E,0x7F03004B,0x7F03004C,0x7F03005C,0x7F030103,0x7F03010E,0x7F030126,0x7F030127,0x7F030147,0x7F030151,0x7F0301B8,0x7F0301DF,0x7F0301EB,0x7F0301F8,0x7F0301FB,0x7F0301FF,0x7F030294 }
 			public static int[] FloatingActionButton = new int[] {
 					16842766,
-					2130903113,
-					2130903114,
-					2130903130,
-					2130903297,
-					2130903308,
-					2130903332,
-					2130903333,
-					2130903364,
-					2130903374,
-					2130903477,
-					2130903516,
-					2130903528,
-					2130903541,
+					2130903115,
+					2130903116,
+					2130903132,
+					2130903299,
+					2130903310,
+					2130903334,
+					2130903335,
+					2130903367,
+					2130903377,
+					2130903480,
+					2130903519,
+					2130903531,
 					2130903544,
-					2130903548,
-					2130903697};
+					2130903547,
+					2130903551,
+					2130903700};
 			
 			// aapt resource value: 0
 			public const int FloatingActionButton_android_enabled = 0;
@@ -31429,9 +31601,9 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int FloatingActionButton_backgroundTintMode = 2;
 			
-			// aapt resource value: { 0x7F03004F }
+			// aapt resource value: { 0x7F030051 }
 			public static int[] FloatingActionButton_Behavior_Layout = new int[] {
-					2130903119};
+					2130903121};
 			
 			// aapt resource value: 0
 			public const int FloatingActionButton_Behavior_Layout_behavior_autoHide = 0;
@@ -31478,10 +31650,10 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 16
 			public const int FloatingActionButton_useCompatPadding = 16;
 			
-			// aapt resource value: { 0x7F030171,0x7F03018C }
+			// aapt resource value: { 0x7F030174,0x7F03018F }
 			public static int[] FlowLayout = new int[] {
-					2130903409,
-					2130903436};
+					2130903412,
+					2130903439};
 			
 			// aapt resource value: 0
 			public const int FlowLayout_itemSpacing = 0;
@@ -31489,27 +31661,28 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int FlowLayout_lineSpacing = 1;
 			
-			// aapt resource value: { 0x7F03012F,0x7F030130,0x7F030131,0x7F030132,0x7F030133,0x7F030134 }
+			// aapt resource value: { 0x7F030131,0x7F030132,0x7F030133,0x7F030134,0x7F030135,0x7F030136,0x7F030137 }
 			public static int[] FontFamily = new int[] {
-					2130903343,
-					2130903344,
 					2130903345,
 					2130903346,
 					2130903347,
-					2130903348};
+					2130903348,
+					2130903349,
+					2130903350,
+					2130903351};
 			
-			// aapt resource value: { 0x1010532,0x1010533,0x101053F,0x101056F,0x1010570,0x7F03012D,0x7F030135,0x7F030136,0x7F030137,0x7F030290 }
+			// aapt resource value: { 0x1010532,0x1010533,0x101053F,0x101056F,0x1010570,0x7F03012F,0x7F030138,0x7F030139,0x7F03013A,0x7F030293 }
 			public static int[] FontFamilyFont = new int[] {
 					16844082,
 					16844083,
 					16844095,
 					16844143,
 					16844144,
-					2130903341,
-					2130903349,
-					2130903350,
-					2130903351,
-					2130903696};
+					2130903343,
+					2130903352,
+					2130903353,
+					2130903354,
+					2130903699};
 			
 			// aapt resource value: 0
 			public const int FontFamilyFont_android_font = 0;
@@ -31559,11 +31732,14 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 5
 			public const int FontFamily_fontProviderQuery = 5;
 			
-			// aapt resource value: { 0x1010109,0x1010200,0x7F030138 }
+			// aapt resource value: 6
+			public const int FontFamily_fontProviderSystemFontFamily = 6;
+			
+			// aapt resource value: { 0x1010109,0x1010200,0x7F03013B }
 			public static int[] ForegroundLinearLayout = new int[] {
 					16843017,
 					16843264,
-					2130903352};
+					2130903355};
 			
 			// aapt resource value: 0
 			public const int ForegroundLinearLayout_android_foreground = 0;
@@ -31662,11 +31838,11 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int GradientColor_android_type = 2;
 			
-			// aapt resource value: { 0x7F0301C3,0x7F0301C5,0x7F0301C6 }
+			// aapt resource value: { 0x7F0301C6,0x7F0301C8,0x7F0301C9 }
 			public static int[] Insets = new int[] {
-					2130903491,
-					2130903493,
-					2130903494};
+					2130903494,
+					2130903496,
+					2130903497};
 			
 			// aapt resource value: 0
 			public const int Insets_paddingBottomSystemWindowInsets = 0;
@@ -31677,24 +31853,24 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int Insets_paddingRightSystemWindowInsets = 2;
 			
-			// aapt resource value: { 0x7F0300AA }
+			// aapt resource value: { 0x7F0300AC }
 			public static int[] ItemsViewRendererTheme = new int[] {
-					2130903210};
+					2130903212};
 			
 			// aapt resource value: 0
 			public const int ItemsViewRendererTheme_collectionViewStyle = 0;
 			
-			// aapt resource value: { 0x10100AF,0x10100C4,0x1010126,0x1010127,0x1010128,0x7F0300ED,0x7F0300EF,0x7F0301B7,0x7F0301FB }
+			// aapt resource value: { 0x10100AF,0x10100C4,0x1010126,0x1010127,0x1010128,0x7F0300EF,0x7F0300F1,0x7F0301BA,0x7F0301FE }
 			public static int[] LinearLayoutCompat = new int[] {
 					16842927,
 					16842948,
 					16843046,
 					16843047,
 					16843048,
-					2130903277,
 					2130903279,
-					2130903479,
-					2130903547};
+					2130903281,
+					2130903482,
+					2130903550};
 			
 			// aapt resource value: 2
 			public const int LinearLayoutCompat_android_baselineAligned = 2;
@@ -31753,11 +31929,11 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int ListPopupWindow_android_dropDownVerticalOffset = 1;
 			
-			// aapt resource value: { 0x7F03009D,0x7F030158,0x7F030159 }
+			// aapt resource value: { 0x7F03009F,0x7F03015B,0x7F03015C }
 			public static int[] LoadingImageView = new int[] {
-					2130903197,
-					2130903384,
-					2130903385};
+					2130903199,
+					2130903387,
+					2130903388};
 			
 			// aapt resource value: 0
 			public const int LoadingImageView_circleCrop = 0;
@@ -31768,20 +31944,20 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int LoadingImageView_imageAspectRatioAdjust = 2;
 			
-			// aapt resource value: { 0x7F030042,0x7F030043,0x7F030044,0x7F030045 }
+			// aapt resource value: { 0x7F030044,0x7F030045,0x7F030046,0x7F030047 }
 			public static int[] MaterialAlertDialog = new int[] {
-					2130903106,
-					2130903107,
 					2130903108,
-					2130903109};
+					2130903109,
+					2130903110,
+					2130903111};
 			
-			// aapt resource value: { 0x7F03019E,0x7F03019F,0x7F0301A0,0x7F0301A1,0x7F0301A2 }
+			// aapt resource value: { 0x7F0301A1,0x7F0301A2,0x7F0301A3,0x7F0301A4,0x7F0301A5 }
 			public static int[] MaterialAlertDialogTheme = new int[] {
-					2130903454,
-					2130903455,
-					2130903456,
 					2130903457,
-					2130903458};
+					2130903458,
+					2130903459,
+					2130903460,
+					2130903461};
 			
 			// aapt resource value: 0
 			public const int MaterialAlertDialogTheme_materialAlertDialogBodyTextStyle = 0;
@@ -31817,7 +31993,7 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 0
 			public const int MaterialAutoCompleteTextView_android_inputType = 0;
 			
-			// aapt resource value: { 0x10100D4,0x10101B7,0x10101B8,0x10101B9,0x10101BA,0x10101E5,0x7F030049,0x7F03004A,0x7F0300D7,0x7F030101,0x7F03014F,0x7F030151,0x7F030152,0x7F030153,0x7F030155,0x7F030156,0x7F0301E8,0x7F0301F5,0x7F0301F8,0x7F03021C,0x7F03021D }
+			// aapt resource value: { 0x10100D4,0x10101B7,0x10101B8,0x10101B9,0x10101BA,0x10101E5,0x7F03004B,0x7F03004C,0x7F0300D9,0x7F030103,0x7F030152,0x7F030154,0x7F030155,0x7F030156,0x7F030158,0x7F030159,0x7F0301EB,0x7F0301F8,0x7F0301FB,0x7F03021F,0x7F030220 }
 			public static int[] MaterialButton = new int[] {
 					16842964,
 					16843191,
@@ -31825,27 +32001,27 @@ namespace Shiny.Tests.Android
 					16843193,
 					16843194,
 					16843237,
-					2130903113,
-					2130903114,
-					2130903255,
-					2130903297,
-					2130903375,
-					2130903377,
+					2130903115,
+					2130903116,
+					2130903257,
+					2130903299,
 					2130903378,
-					2130903379,
+					2130903380,
 					2130903381,
 					2130903382,
-					2130903528,
-					2130903541,
+					2130903384,
+					2130903385,
+					2130903531,
 					2130903544,
-					2130903580,
-					2130903581};
+					2130903547,
+					2130903583,
+					2130903584};
 			
-			// aapt resource value: { 0x7F030082,0x7F0301F4,0x7F030202 }
+			// aapt resource value: { 0x7F030084,0x7F0301F7,0x7F030205 }
 			public static int[] MaterialButtonToggleGroup = new int[] {
-					2130903170,
-					2130903540,
-					2130903554};
+					2130903172,
+					2130903543,
+					2130903557};
 			
 			// aapt resource value: 0
 			public const int MaterialButtonToggleGroup_checkedButton = 0;
@@ -31919,30 +32095,30 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 20
 			public const int MaterialButton_strokeWidth = 20;
 			
-			// aapt resource value: { 0x101020D,0x7F0300E4,0x7F0300E5,0x7F0300E6,0x7F0300E7,0x7F0301E2,0x7F0302A1,0x7F0302A2,0x7F0302A3 }
+			// aapt resource value: { 0x101020D,0x7F0300E6,0x7F0300E7,0x7F0300E8,0x7F0300E9,0x7F0301E5,0x7F0302A4,0x7F0302A5,0x7F0302A6 }
 			public static int[] MaterialCalendar = new int[] {
 					16843277,
-					2130903268,
-					2130903269,
 					2130903270,
 					2130903271,
-					2130903522,
-					2130903713,
-					2130903714,
-					2130903715};
+					2130903272,
+					2130903273,
+					2130903525,
+					2130903716,
+					2130903717,
+					2130903718};
 			
-			// aapt resource value: { 0x10101B7,0x10101B8,0x10101B9,0x10101BA,0x7F030161,0x7F03016A,0x7F03016B,0x7F030172,0x7F030173,0x7F030177 }
+			// aapt resource value: { 0x10101B7,0x10101B8,0x10101B9,0x10101BA,0x7F030164,0x7F03016D,0x7F03016E,0x7F030175,0x7F030176,0x7F03017A }
 			public static int[] MaterialCalendarItem = new int[] {
 					16843191,
 					16843192,
 					16843193,
 					16843194,
-					2130903393,
-					2130903402,
-					2130903403,
-					2130903410,
-					2130903411,
-					2130903415};
+					2130903396,
+					2130903405,
+					2130903406,
+					2130903413,
+					2130903414,
+					2130903418};
 			
 			// aapt resource value: 3
 			public const int MaterialCalendarItem_android_insetBottom = 3;
@@ -32001,18 +32177,18 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 8
 			public const int MaterialCalendar_yearTodayStyle = 8;
 			
-			// aapt resource value: { 0x10101E5,0x7F03007C,0x7F030084,0x7F030086,0x7F0301E8,0x7F0301F5,0x7F0301F8,0x7F030216,0x7F03021C,0x7F03021D }
+			// aapt resource value: { 0x10101E5,0x7F03007E,0x7F030086,0x7F030088,0x7F0301EB,0x7F0301F8,0x7F0301FB,0x7F030219,0x7F03021F,0x7F030220 }
 			public static int[] MaterialCardView = new int[] {
 					16843237,
-					2130903164,
-					2130903172,
+					2130903166,
 					2130903174,
-					2130903528,
-					2130903541,
+					2130903176,
+					2130903531,
 					2130903544,
-					2130903574,
-					2130903580,
-					2130903581};
+					2130903547,
+					2130903577,
+					2130903583,
+					2130903584};
 			
 			// aapt resource value: 0
 			public const int MaterialCardView_android_checkable = 0;
@@ -32044,10 +32220,10 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 9
 			public const int MaterialCardView_strokeWidth = 9;
 			
-			// aapt resource value: { 0x7F030077,0x7F030292 }
+			// aapt resource value: { 0x7F030079,0x7F030295 }
 			public static int[] MaterialCheckBox = new int[] {
-					2130903159,
-					2130903698};
+					2130903161,
+					2130903701};
 			
 			// aapt resource value: 0
 			public const int MaterialCheckBox_buttonTint = 0;
@@ -32055,10 +32231,10 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int MaterialCheckBox_useMaterialThemeColors = 1;
 			
-			// aapt resource value: { 0x7F030077,0x7F030292 }
+			// aapt resource value: { 0x7F030079,0x7F030295 }
 			public static int[] MaterialRadioButton = new int[] {
-					2130903159,
-					2130903698};
+					2130903161,
+					2130903701};
 			
 			// aapt resource value: 0
 			public const int MaterialRadioButton_buttonTint = 0;
@@ -32066,10 +32242,10 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int MaterialRadioButton_useMaterialThemeColors = 1;
 			
-			// aapt resource value: { 0x7F0301F5,0x7F0301F8 }
+			// aapt resource value: { 0x7F0301F8,0x7F0301FB }
 			public static int[] MaterialShape = new int[] {
-					2130903541,
-					2130903544};
+					2130903544,
+					2130903547};
 			
 			// aapt resource value: 0
 			public const int MaterialShape_shapeAppearance = 0;
@@ -32077,10 +32253,10 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int MaterialShape_shapeAppearanceOverlay = 1;
 			
-			// aapt resource value: { 0x101057F,0x7F03018B }
+			// aapt resource value: { 0x101057F,0x7F03018E }
 			public static int[] MaterialTextAppearance = new int[] {
 					16844159,
-					2130903435};
+					2130903438};
 			
 			// aapt resource value: 0
 			public const int MaterialTextAppearance_android_lineHeight = 0;
@@ -32088,11 +32264,11 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int MaterialTextAppearance_lineHeight = 1;
 			
-			// aapt resource value: { 0x1010034,0x101057F,0x7F03018B }
+			// aapt resource value: { 0x1010034,0x101057F,0x7F03018E }
 			public static int[] MaterialTextView = new int[] {
 					16842804,
 					16844159,
-					2130903435};
+					2130903438};
 			
 			// aapt resource value: 1
 			public const int MaterialTextView_android_lineHeight = 1;
@@ -32130,7 +32306,7 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int MenuGroup_android_visible = 2;
 			
-			// aapt resource value: { 0x1010002,0x101000E,0x10100D0,0x1010106,0x1010194,0x10101DE,0x10101DF,0x10101E1,0x10101E2,0x10101E3,0x10101E4,0x10101E5,0x101026F,0x7F03000D,0x7F03001F,0x7F030021,0x7F030035,0x7F0300C3,0x7F030155,0x7F030156,0x7F0301C0,0x7F0301FA,0x7F030287 }
+			// aapt resource value: { 0x1010002,0x101000E,0x10100D0,0x1010106,0x1010194,0x10101DE,0x10101DF,0x10101E1,0x10101E2,0x10101E3,0x10101E4,0x10101E5,0x101026F,0x7F03000D,0x7F030021,0x7F030023,0x7F030037,0x7F0300C5,0x7F030158,0x7F030159,0x7F0301C3,0x7F0301FD,0x7F03028A }
 			public static int[] MenuItem = new int[] {
 					16842754,
 					16842766,
@@ -32146,15 +32322,15 @@ namespace Shiny.Tests.Android
 					16843237,
 					16843375,
 					2130903053,
-					2130903071,
 					2130903073,
-					2130903093,
-					2130903235,
-					2130903381,
-					2130903382,
-					2130903488,
-					2130903546,
-					2130903687};
+					2130903075,
+					2130903095,
+					2130903237,
+					2130903384,
+					2130903385,
+					2130903491,
+					2130903549,
+					2130903690};
 			
 			// aapt resource value: 13
 			public const int MenuItem_actionLayout = 13;
@@ -32225,7 +32401,7 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 22
 			public const int MenuItem_tooltipText = 22;
 			
-			// aapt resource value: { 0x10100AE,0x101012C,0x101012D,0x101012E,0x101012F,0x1010130,0x1010131,0x7F0301DB,0x7F03021E }
+			// aapt resource value: { 0x10100AE,0x101012C,0x101012D,0x101012E,0x101012F,0x1010130,0x1010131,0x7F0301DE,0x7F030221 }
 			public static int[] MenuView = new int[] {
 					16842926,
 					16843052,
@@ -32234,8 +32410,8 @@ namespace Shiny.Tests.Android
 					16843055,
 					16843056,
 					16843057,
-					2130903515,
-					2130903582};
+					2130903518,
+					2130903585};
 			
 			// aapt resource value: 4
 			public const int MenuView_android_headerBackground = 4;
@@ -32264,29 +32440,29 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 8
 			public const int MenuView_subMenuArrow = 8;
 			
-			// aapt resource value: { 0x10100D4,0x10100DD,0x101011F,0x7F030101,0x7F03013E,0x7F030160,0x7F030162,0x7F030164,0x7F030165,0x7F030166,0x7F030167,0x7F03016A,0x7F03016B,0x7F03016C,0x7F03016D,0x7F03016E,0x7F03016F,0x7F030170,0x7F030174,0x7F030177,0x7F0301B8 }
+			// aapt resource value: { 0x10100D4,0x10100DD,0x101011F,0x7F030103,0x7F030141,0x7F030163,0x7F030165,0x7F030167,0x7F030168,0x7F030169,0x7F03016A,0x7F03016D,0x7F03016E,0x7F03016F,0x7F030170,0x7F030171,0x7F030172,0x7F030173,0x7F030177,0x7F03017A,0x7F0301BB }
 			public static int[] NavigationView = new int[] {
 					16842964,
 					16842973,
 					16843039,
-					2130903297,
-					2130903358,
-					2130903392,
-					2130903394,
-					2130903396,
+					2130903299,
+					2130903361,
+					2130903395,
 					2130903397,
-					2130903398,
 					2130903399,
+					2130903400,
+					2130903401,
 					2130903402,
-					2130903403,
-					2130903404,
 					2130903405,
 					2130903406,
 					2130903407,
 					2130903408,
-					2130903412,
+					2130903409,
+					2130903410,
+					2130903411,
 					2130903415,
-					2130903480};
+					2130903418,
+					2130903483};
 			
 			// aapt resource value: 0
 			public const int NavigationView_android_background = 0;
@@ -32351,15 +32527,15 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 20
 			public const int NavigationView_menu = 20;
 			
-			// aapt resource value: { 0x1010176,0x10102C9,0x7F0301C1 }
+			// aapt resource value: { 0x1010176,0x10102C9,0x7F0301C4 }
 			public static int[] PopupWindow = new int[] {
 					16843126,
 					16843465,
-					2130903489};
+					2130903492};
 			
-			// aapt resource value: { 0x7F030213 }
+			// aapt resource value: { 0x7F030216 }
 			public static int[] PopupWindowBackgroundState = new int[] {
-					2130903571};
+					2130903574};
 			
 			// aapt resource value: 0
 			public const int PopupWindowBackgroundState_state_above_anchor = 0;
@@ -32373,10 +32549,8 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int PopupWindow_overlapAnchor = 2;
 			
-			// aapt resource value: { 0x7F030023,0x7F030024,0x7F030025,0x7F030026,0x7F030027,0x7F030028,0x7F030029,0x7F03002A,0x7F03002B,0x7F03002C,0x7F03002D,0x7F03002E }
+			// aapt resource value: { 0x7F030025,0x7F030026,0x7F030027,0x7F030028,0x7F030029,0x7F03002A,0x7F03002B,0x7F03002C,0x7F03002D,0x7F03002E,0x7F03002F,0x7F030030 }
 			public static int[] ProgressWheel = new int[] {
-					2130903075,
-					2130903076,
 					2130903077,
 					2130903078,
 					2130903079,
@@ -32386,7 +32560,9 @@ namespace Shiny.Tests.Android
 					2130903083,
 					2130903084,
 					2130903085,
-					2130903086};
+					2130903086,
+					2130903087,
+					2130903088};
 			
 			// aapt resource value: 0
 			public const int ProgressWheel_ahBarColor = 0;
@@ -32424,17 +32600,17 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 11
 			public const int ProgressWheel_ahTextSize = 11;
 			
-			// aapt resource value: { 0x7F030293 }
+			// aapt resource value: { 0x7F030296 }
 			public static int[] RangeSlider = new int[] {
-					2130903699};
+					2130903702};
 			
 			// aapt resource value: 0
 			public const int RangeSlider_values = 0;
 			
-			// aapt resource value: { 0x7F0301C2,0x7F0301C8 }
+			// aapt resource value: { 0x7F0301C5,0x7F0301CB }
 			public static int[] RecycleListView = new int[] {
-					2130903490,
-					2130903496};
+					2130903493,
+					2130903499};
 			
 			// aapt resource value: 0
 			public const int RecycleListView_paddingBottomNoButtons = 0;
@@ -32442,20 +32618,20 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int RecycleListView_paddingTopNoTitle = 1;
 			
-			// aapt resource value: { 0x10100C4,0x10100EB,0x10100F1,0x7F030126,0x7F030127,0x7F030128,0x7F030129,0x7F03012A,0x7F03017E,0x7F0301E7,0x7F030207,0x7F03020D }
+			// aapt resource value: { 0x10100C4,0x10100EB,0x10100F1,0x7F030128,0x7F030129,0x7F03012A,0x7F03012B,0x7F03012C,0x7F030181,0x7F0301EA,0x7F03020A,0x7F030210 }
 			public static int[] RecyclerView = new int[] {
 					16842948,
 					16842987,
 					16842993,
-					2130903334,
-					2130903335,
 					2130903336,
 					2130903337,
 					2130903338,
-					2130903422,
-					2130903527,
-					2130903559,
-					2130903565};
+					2130903339,
+					2130903340,
+					2130903425,
+					2130903530,
+					2130903562,
+					2130903568};
 			
 			// aapt resource value: 1
 			public const int RecyclerView_android_clipToPadding = 1;
@@ -32493,46 +32669,46 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 11
 			public const int RecyclerView_stackFromEnd = 11;
 			
-			// aapt resource value: { 0x7F03015D }
+			// aapt resource value: { 0x7F030160 }
 			public static int[] ScrimInsetsFrameLayout = new int[] {
-					2130903389};
+					2130903392};
 			
 			// aapt resource value: 0
 			public const int ScrimInsetsFrameLayout_insetForeground = 0;
 			
-			// aapt resource value: { 0x7F030056 }
+			// aapt resource value: { 0x7F030058 }
 			public static int[] ScrollingViewBehavior_Layout = new int[] {
-					2130903126};
+					2130903128};
 			
 			// aapt resource value: 0
 			public const int ScrollingViewBehavior_Layout_behavior_overlapTop = 0;
 			
-			// aapt resource value: { 0x7F0301ED }
+			// aapt resource value: { 0x7F0301F0 }
 			public static int[] ScrollViewRendererTheme = new int[] {
-					2130903533};
+					2130903536};
 			
 			// aapt resource value: 0
 			public const int ScrollViewRendererTheme_scrollViewStyle = 0;
 			
-			// aapt resource value: { 0x10100DA,0x101011F,0x1010220,0x1010264,0x7F03009E,0x7F0300C2,0x7F0300E8,0x7F03013B,0x7F030157,0x7F03017D,0x7F0301DF,0x7F0301E0,0x7F0301EE,0x7F0301EF,0x7F03021F,0x7F030227,0x7F030296 }
+			// aapt resource value: { 0x10100DA,0x101011F,0x1010220,0x1010264,0x7F0300A0,0x7F0300C4,0x7F0300EA,0x7F03013E,0x7F03015A,0x7F030180,0x7F0301E2,0x7F0301E3,0x7F0301F1,0x7F0301F2,0x7F030222,0x7F03022A,0x7F030299 }
 			public static int[] SearchView = new int[] {
 					16842970,
 					16843039,
 					16843296,
 					16843364,
-					2130903198,
-					2130903234,
-					2130903272,
-					2130903355,
-					2130903383,
-					2130903421,
-					2130903519,
-					2130903520,
-					2130903534,
-					2130903535,
-					2130903583,
-					2130903591,
-					2130903702};
+					2130903200,
+					2130903236,
+					2130903274,
+					2130903358,
+					2130903386,
+					2130903424,
+					2130903522,
+					2130903523,
+					2130903537,
+					2130903538,
+					2130903586,
+					2130903594,
+					2130903705};
 			
 			// aapt resource value: 0
 			public const int SearchView_android_focusable = 0;
@@ -32585,12 +32761,12 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 16
 			public const int SearchView_voiceIcon = 16;
 			
-			// aapt resource value: { 0x7F0301F5,0x7F0301F8,0x7F03021C,0x7F03021D }
+			// aapt resource value: { 0x7F0301F8,0x7F0301FB,0x7F03021F,0x7F030220 }
 			public static int[] ShapeableImageView = new int[] {
-					2130903541,
 					2130903544,
-					2130903580,
-					2130903581};
+					2130903547,
+					2130903583,
+					2130903584};
 			
 			// aapt resource value: 0
 			public const int ShapeableImageView_shapeAppearance = 0;
@@ -32604,18 +32780,18 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 3
 			public const int ShapeableImageView_strokeWidth = 3;
 			
-			// aapt resource value: { 0x7F0300D2,0x7F0300D3,0x7F0300D4,0x7F0300D5,0x7F0300D6,0x7F0300D8,0x7F0300D9,0x7F0300DA,0x7F0300DB,0x7F0300DC }
+			// aapt resource value: { 0x7F0300D4,0x7F0300D5,0x7F0300D6,0x7F0300D7,0x7F0300D8,0x7F0300DA,0x7F0300DB,0x7F0300DC,0x7F0300DD,0x7F0300DE }
 			public static int[] ShapeAppearance = new int[] {
-					2130903250,
-					2130903251,
 					2130903252,
 					2130903253,
 					2130903254,
+					2130903255,
 					2130903256,
-					2130903257,
 					2130903258,
 					2130903259,
-					2130903260};
+					2130903260,
+					2130903261,
+					2130903262};
 			
 			// aapt resource value: 0
 			public const int ShapeAppearance_cornerFamily = 0;
@@ -32647,11 +32823,11 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 9
 			public const int ShapeAppearance_cornerSizeTopRight = 9;
 			
-			// aapt resource value: { 0x7F030074,0x7F0300BD,0x7F0301E9 }
+			// aapt resource value: { 0x7F030076,0x7F0300BF,0x7F0301EC }
 			public static int[] SignInButton = new int[] {
-					2130903156,
-					2130903229,
-					2130903529};
+					2130903158,
+					2130903231,
+					2130903532};
 			
 			// aapt resource value: 0
 			public const int SignInButton_buttonSize = 0;
@@ -32662,27 +32838,27 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int SignInButton_scopeUris = 2;
 			
-			// aapt resource value: { 0x101000E,0x1010024,0x1010146,0x10102DE,0x10102DF,0x7F03013C,0x7F03013D,0x7F030179,0x7F03017A,0x7F030268,0x7F030269,0x7F03026A,0x7F03026E,0x7F03026F,0x7F030270,0x7F030289,0x7F03028A,0x7F03028B,0x7F03028C }
+			// aapt resource value: { 0x101000E,0x1010024,0x1010146,0x10102DE,0x10102DF,0x7F03013F,0x7F030140,0x7F03017C,0x7F03017D,0x7F03026B,0x7F03026C,0x7F03026D,0x7F030271,0x7F030272,0x7F030273,0x7F03028C,0x7F03028D,0x7F03028E,0x7F03028F }
 			public static int[] Slider = new int[] {
 					16842766,
 					16842788,
 					16843078,
 					16843486,
 					16843487,
-					2130903356,
-					2130903357,
-					2130903417,
-					2130903418,
-					2130903656,
-					2130903657,
-					2130903658,
-					2130903662,
-					2130903663,
-					2130903664,
-					2130903689,
-					2130903690,
-					2130903691,
-					2130903692};
+					2130903359,
+					2130903360,
+					2130903420,
+					2130903421,
+					2130903659,
+					2130903660,
+					2130903661,
+					2130903665,
+					2130903666,
+					2130903667,
+					2130903692,
+					2130903693,
+					2130903694,
+					2130903695};
 			
 			// aapt resource value: 0
 			public const int Slider_android_enabled = 0;
@@ -32741,22 +32917,22 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 18
 			public const int Slider_trackHeight = 18;
 			
-			// aapt resource value: { 0x7F030204,0x7F030205,0x7F030206 }
+			// aapt resource value: { 0x7F030207,0x7F030208,0x7F030209 }
 			public static int[] Snackbar = new int[] {
-					2130903556,
-					2130903557,
-					2130903558};
+					2130903559,
+					2130903560,
+					2130903561};
 			
-			// aapt resource value: { 0x101011F,0x7F030020,0x7F030036,0x7F030046,0x7F030049,0x7F03004A,0x7F030101,0x7F0301B2 }
+			// aapt resource value: { 0x101011F,0x7F030022,0x7F030038,0x7F030048,0x7F03004B,0x7F03004C,0x7F030103,0x7F0301B5 }
 			public static int[] SnackbarLayout = new int[] {
 					16843039,
-					2130903072,
-					2130903094,
-					2130903110,
-					2130903113,
-					2130903114,
-					2130903297,
-					2130903474};
+					2130903074,
+					2130903096,
+					2130903112,
+					2130903115,
+					2130903116,
+					2130903299,
+					2130903477};
 			
 			// aapt resource value: 1
 			public const int SnackbarLayout_actionTextColorAlpha = 1;
@@ -32791,13 +32967,13 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int Snackbar_snackbarTextViewStyle = 2;
 			
-			// aapt resource value: { 0x10100B2,0x1010176,0x101017B,0x1010262,0x7F0301D6 }
+			// aapt resource value: { 0x10100B2,0x1010176,0x101017B,0x1010262,0x7F0301D9 }
 			public static int[] Spinner = new int[] {
 					16842930,
 					16843126,
 					16843131,
 					16843362,
-					2130903510};
+					2130903513};
 			
 			// aapt resource value: 3
 			public const int Spinner_android_dropDownWidth = 3;
@@ -32848,29 +33024,29 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 1
 			public const int StateListDrawable_android_visible = 1;
 			
-			// aapt resource value: { 0x7F030228 }
+			// aapt resource value: { 0x7F03022B }
 			public static int[] SwipeRefreshLayout = new int[] {
-					2130903592};
+					2130903595};
 			
 			// aapt resource value: 0
 			public const int SwipeRefreshLayout_swipeRefreshLayoutProgressSpinnerBackgroundColor = 0;
 			
-			// aapt resource value: { 0x1010124,0x1010125,0x1010142,0x7F0301FD,0x7F03020B,0x7F030229,0x7F03022A,0x7F03022C,0x7F03026B,0x7F03026C,0x7F03026D,0x7F030288,0x7F03028D,0x7F03028E }
+			// aapt resource value: { 0x1010124,0x1010125,0x1010142,0x7F030200,0x7F03020E,0x7F03022C,0x7F03022D,0x7F03022F,0x7F03026E,0x7F03026F,0x7F030270,0x7F03028B,0x7F030290,0x7F030291 }
 			public static int[] SwitchCompat = new int[] {
 					16843044,
 					16843045,
 					16843074,
-					2130903549,
-					2130903563,
-					2130903593,
-					2130903594,
+					2130903552,
+					2130903566,
 					2130903596,
-					2130903659,
-					2130903660,
-					2130903661,
-					2130903688,
-					2130903693,
-					2130903694};
+					2130903597,
+					2130903599,
+					2130903662,
+					2130903663,
+					2130903664,
+					2130903691,
+					2130903696,
+					2130903697};
 			
 			// aapt resource value: 1
 			public const int SwitchCompat_android_textOff = 1;
@@ -32914,9 +33090,9 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 13
 			public const int SwitchCompat_trackTintMode = 13;
 			
-			// aapt resource value: { 0x7F030292 }
+			// aapt resource value: { 0x7F030295 }
 			public static int[] SwitchMaterial = new int[] {
-					2130903698};
+					2130903701};
 			
 			// aapt resource value: 0
 			public const int SwitchMaterial_useMaterialThemeColors = 0;
@@ -32936,11 +33112,8 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int TabItem_android_text = 2;
 			
-			// aapt resource value: { 0x7F03022D,0x7F03022E,0x7F03022F,0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023C,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030244,0x7F030245,0x7F030246 }
+			// aapt resource value: { 0x7F030230,0x7F030231,0x7F030232,0x7F030233,0x7F030234,0x7F030235,0x7F030236,0x7F030237,0x7F030238,0x7F030239,0x7F03023A,0x7F03023B,0x7F03023C,0x7F03023D,0x7F03023E,0x7F03023F,0x7F030240,0x7F030241,0x7F030242,0x7F030243,0x7F030244,0x7F030245,0x7F030247,0x7F030248,0x7F030249 }
 			public static int[] TabLayout = new int[] {
-					2130903597,
-					2130903598,
-					2130903599,
 					2130903600,
 					2130903601,
 					2130903602,
@@ -32960,9 +33133,12 @@ namespace Shiny.Tests.Android
 					2130903616,
 					2130903617,
 					2130903618,
+					2130903619,
 					2130903620,
 					2130903621,
-					2130903622};
+					2130903623,
+					2130903624,
+					2130903625};
 			
 			// aapt resource value: 0
 			public const int TabLayout_tabBackground = 0;
@@ -33039,7 +33215,7 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 24
 			public const int TabLayout_tabUnboundedRipple = 24;
 			
-			// aapt resource value: { 0x1010095,0x1010096,0x1010097,0x1010098,0x101009A,0x101009B,0x1010161,0x1010162,0x1010163,0x1010164,0x10103AC,0x1010585,0x7F03012E,0x7F030136,0x7F030247,0x7F030263 }
+			// aapt resource value: { 0x1010095,0x1010096,0x1010097,0x1010098,0x101009A,0x101009B,0x1010161,0x1010162,0x1010163,0x1010164,0x10103AC,0x1010585,0x7F030130,0x7F030139,0x7F03024A,0x7F030266 }
 			public static int[] TextAppearance = new int[] {
 					16842901,
 					16842902,
@@ -33053,10 +33229,10 @@ namespace Shiny.Tests.Android
 					16843108,
 					16843692,
 					16844165,
-					2130903342,
-					2130903350,
-					2130903623,
-					2130903651};
+					2130903344,
+					2130903353,
+					2130903626,
+					2130903654};
 			
 			// aapt resource value: 10
 			public const int TextAppearance_android_fontFamily = 10;
@@ -33106,20 +33282,18 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 15
 			public const int TextAppearance_textLocale = 15;
 			
-			// aapt resource value: { 0x7F030261 }
+			// aapt resource value: { 0x7F030264 }
 			public static int[] TextInputEditText = new int[] {
-					2130903649};
+					2130903652};
 			
 			// aapt resource value: 0
 			public const int TextInputEditText_textInputLayoutFocusedRectEnabled = 0;
 			
-			// aapt resource value: { 0x101000E,0x101009A,0x1010150,0x7F030060,0x7F030061,0x7F030062,0x7F030063,0x7F030064,0x7F030065,0x7F030066,0x7F030067,0x7F030068,0x7F030069,0x7F03006A,0x7F0300DD,0x7F0300DE,0x7F0300DF,0x7F0300E0,0x7F0300E1,0x7F0300E2,0x7F030104,0x7F030105,0x7F030106,0x7F030107,0x7F030108,0x7F030109,0x7F03010D,0x7F03010E,0x7F03010F,0x7F030110,0x7F030111,0x7F030112,0x7F030113,0x7F030140,0x7F030141,0x7F030142,0x7F030143,0x7F030147,0x7F030148,0x7F030149,0x7F03014A,0x7F0301CC,0x7F0301CD,0x7F0301CE,0x7F0301CF,0x7F0301D0,0x7F0301D1,0x7F0301D2,0x7F0301D3,0x7F0301D8,0x7F0301D9,0x7F0301DA,0x7F0301F5,0x7F0301F8,0x7F03020E,0x7F03020F,0x7F030210,0x7F030211,0x7F030212,0x7F030224,0x7F030225,0x7F030226 }
+			// aapt resource value: { 0x101000E,0x101009A,0x1010150,0x7F030062,0x7F030063,0x7F030064,0x7F030065,0x7F030066,0x7F030067,0x7F030068,0x7F030069,0x7F03006A,0x7F03006B,0x7F03006C,0x7F0300DF,0x7F0300E0,0x7F0300E1,0x7F0300E2,0x7F0300E3,0x7F0300E4,0x7F030106,0x7F030107,0x7F030108,0x7F030109,0x7F03010A,0x7F03010B,0x7F03010F,0x7F030110,0x7F030111,0x7F030112,0x7F030113,0x7F030114,0x7F030115,0x7F030143,0x7F030144,0x7F030145,0x7F030146,0x7F03014A,0x7F03014B,0x7F03014C,0x7F03014D,0x7F0301CF,0x7F0301D0,0x7F0301D1,0x7F0301D2,0x7F0301D3,0x7F0301D4,0x7F0301D5,0x7F0301D6,0x7F0301DB,0x7F0301DC,0x7F0301DD,0x7F0301F8,0x7F0301FB,0x7F030211,0x7F030212,0x7F030213,0x7F030214,0x7F030215,0x7F030227,0x7F030228,0x7F030229 }
 			public static int[] TextInputLayout = new int[] {
 					16842766,
 					16842906,
 					16843088,
-					2130903136,
-					2130903137,
 					2130903138,
 					2130903139,
 					2130903140,
@@ -33129,54 +33303,56 @@ namespace Shiny.Tests.Android
 					2130903144,
 					2130903145,
 					2130903146,
-					2130903261,
-					2130903262,
+					2130903147,
+					2130903148,
 					2130903263,
 					2130903264,
 					2130903265,
 					2130903266,
-					2130903300,
-					2130903301,
+					2130903267,
+					2130903268,
 					2130903302,
 					2130903303,
 					2130903304,
 					2130903305,
-					2130903309,
-					2130903310,
+					2130903306,
+					2130903307,
 					2130903311,
 					2130903312,
 					2130903313,
 					2130903314,
 					2130903315,
-					2130903360,
-					2130903361,
-					2130903362,
+					2130903316,
+					2130903317,
 					2130903363,
-					2130903367,
-					2130903368,
-					2130903369,
+					2130903364,
+					2130903365,
+					2130903366,
 					2130903370,
-					2130903500,
-					2130903501,
-					2130903502,
+					2130903371,
+					2130903372,
+					2130903373,
 					2130903503,
 					2130903504,
 					2130903505,
 					2130903506,
 					2130903507,
-					2130903512,
-					2130903513,
-					2130903514,
-					2130903541,
+					2130903508,
+					2130903509,
+					2130903510,
+					2130903515,
+					2130903516,
+					2130903517,
 					2130903544,
-					2130903566,
-					2130903567,
-					2130903568,
+					2130903547,
 					2130903569,
 					2130903570,
-					2130903588,
-					2130903589,
-					2130903590};
+					2130903571,
+					2130903572,
+					2130903573,
+					2130903591,
+					2130903592,
+					2130903593};
 			
 			// aapt resource value: 0
 			public const int TextInputLayout_android_enabled = 0;
@@ -33364,11 +33540,11 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 61
 			public const int TextInputLayout_suffixTextColor = 61;
 			
-			// aapt resource value: { 0x1010034,0x7F03010A,0x7F03010B }
+			// aapt resource value: { 0x1010034,0x7F03010C,0x7F03010D }
 			public static int[] ThemeEnforcement = new int[] {
 					16842804,
-					2130903306,
-					2130903307};
+					2130903308,
+					2130903309};
 			
 			// aapt resource value: 0
 			public const int ThemeEnforcement_android_textAppearance = 0;
@@ -33379,38 +33555,38 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 2
 			public const int ThemeEnforcement_enforceTextAppearance = 2;
 			
-			// aapt resource value: { 0x10100AF,0x1010140,0x7F030071,0x7F0300A6,0x7F0300A7,0x7F0300C4,0x7F0300C5,0x7F0300C6,0x7F0300C7,0x7F0300C8,0x7F0300C9,0x7F03019C,0x7F03019D,0x7F0301B3,0x7F0301B8,0x7F0301BB,0x7F0301BC,0x7F0301D6,0x7F030220,0x7F030221,0x7F030222,0x7F030276,0x7F030278,0x7F030279,0x7F03027A,0x7F03027B,0x7F03027C,0x7F03027D,0x7F03027E,0x7F03027F }
+			// aapt resource value: { 0x10100AF,0x1010140,0x7F030073,0x7F0300A8,0x7F0300A9,0x7F0300C6,0x7F0300C7,0x7F0300C8,0x7F0300C9,0x7F0300CA,0x7F0300CB,0x7F03019F,0x7F0301A0,0x7F0301B6,0x7F0301BB,0x7F0301BE,0x7F0301BF,0x7F0301D9,0x7F030223,0x7F030224,0x7F030225,0x7F030279,0x7F03027B,0x7F03027C,0x7F03027D,0x7F03027E,0x7F03027F,0x7F030280,0x7F030281,0x7F030282 }
 			public static int[] Toolbar = new int[] {
 					16842927,
 					16843072,
-					2130903153,
-					2130903206,
-					2130903207,
-					2130903236,
-					2130903237,
+					2130903155,
+					2130903208,
+					2130903209,
 					2130903238,
 					2130903239,
 					2130903240,
 					2130903241,
-					2130903452,
-					2130903453,
-					2130903475,
-					2130903480,
+					2130903242,
+					2130903243,
+					2130903455,
+					2130903456,
+					2130903478,
 					2130903483,
-					2130903484,
-					2130903510,
-					2130903584,
-					2130903585,
-					2130903586,
-					2130903670,
-					2130903672,
+					2130903486,
+					2130903487,
+					2130903513,
+					2130903587,
+					2130903588,
+					2130903589,
 					2130903673,
-					2130903674,
 					2130903675,
 					2130903676,
 					2130903677,
 					2130903678,
-					2130903679};
+					2130903679,
+					2130903680,
+					2130903681,
+					2130903682};
 			
 			// aapt resource value: 0
 			public const int Toolbar_android_gravity = 0;
@@ -33502,7 +33678,7 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 29
 			public const int Toolbar_titleTextColor = 29;
 			
-			// aapt resource value: { 0x1010034,0x10100D5,0x10100F6,0x101013F,0x1010140,0x101014F,0x7F030049 }
+			// aapt resource value: { 0x1010034,0x10100D5,0x10100F6,0x101013F,0x1010140,0x101014F,0x7F03004B }
 			public static int[] Tooltip = new int[] {
 					16842804,
 					16842965,
@@ -33510,7 +33686,7 @@ namespace Shiny.Tests.Android
 					16843071,
 					16843072,
 					16843087,
-					2130903113};
+					2130903115};
 			
 			// aapt resource value: 2
 			public const int Tooltip_android_layout_margin = 2;
@@ -33533,19 +33709,19 @@ namespace Shiny.Tests.Android
 			// aapt resource value: 6
 			public const int Tooltip_backgroundTint = 6;
 			
-			// aapt resource value: { 0x1010000,0x10100DA,0x7F0301C4,0x7F0301C7,0x7F030265 }
+			// aapt resource value: { 0x1010000,0x10100DA,0x7F0301C7,0x7F0301CA,0x7F030268 }
 			public static int[] View = new int[] {
 					16842752,
 					16842970,
-					2130903492,
 					2130903495,
-					2130903653};
+					2130903498,
+					2130903656};
 			
-			// aapt resource value: { 0x10100D4,0x7F030049,0x7F03004A }
+			// aapt resource value: { 0x10100D4,0x7F03004B,0x7F03004C }
 			public static int[] ViewBackgroundHelper = new int[] {
 					16842964,
-					2130903113,
-					2130903114};
+					2130903115,
+					2130903116};
 			
 			// aapt resource value: 0
 			public const int ViewBackgroundHelper_android_background = 0;

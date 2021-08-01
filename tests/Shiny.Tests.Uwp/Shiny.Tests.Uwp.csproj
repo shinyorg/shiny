@@ -182,6 +182,10 @@
       <Project>{271e5317-66e3-4e0f-a08b-7ce89b395237}</Project>
       <Name>Shiny.Integrations.Sqlite</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj">
+      <Project>{38783c53-ae80-4979-b4bc-5ce5a7ef8736}</Project>
+      <Name>Shiny.Jobs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
       <Project>{4ee9f1ff-ee8c-4d1f-8687-7dfe368c13a4}</Project>
       <Name>Shiny.Locations.Common</Name>

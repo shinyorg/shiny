@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Stores;
-using Shiny.Testing;
 using Shiny.Testing.Jobs;
 using Shiny.Testing.Stores;
 using Xunit;

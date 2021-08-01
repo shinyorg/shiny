@@ -17,22 +17,22 @@ namespace Shiny.Tests.Android.Tests
         }
 
 
-        [Fact]
-        public void ControlAdapterStates()
-        {
-            var manager = (ICanControlAdapterState)ShinyHost.Resolve<IBleManager>();
+        //[Fact]
+        //public void ControlAdapterStates()
+        //{
+        //    var manager = (ICanControlAdapterState)ShinyHost.Resolve<IBleManager>();
 
-            var stateChanges = 0;
-            manager.WhenStatusChanged().Subscribe(_ => stateChanges++);
+        //    var stateChanges = 0;
+        //    manager.WhenStatusChanged().Subscribe(_ => stateChanges++);
 
-            manager.Status.Should().Be(AccessState.Available);
-            manager.SetAdapterState(false);
+        //    manager.Status.Should().Be(AccessState.Available);
+        //    manager.SetAdapterState(false);
 
-            manager.Status.Should().Be(AccessState.Disabled);
-            manager.SetAdapterState(true);
+        //    manager.Status.Should().Be(AccessState.Disabled);
+        //    manager.SetAdapterState(true);
 
-            manager.Status.Should().Be(AccessState.Available);
-            stateChanges.Should().Be(3);
-        }
+        //    manager.Status.Should().Be(AccessState.Available);
+        //    stateChanges.Should().Be(3);
+        //}
     }
 }
