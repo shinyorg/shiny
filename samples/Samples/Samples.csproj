@@ -23,6 +23,7 @@
         <PackageReference Include="Rg.Plugins.Popup" />
         <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />

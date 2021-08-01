@@ -6,6 +6,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.UI.Notifications;
 using Windows.ApplicationModel.Background;
 using Shiny.Infrastructure;
+using Shiny.Jobs;
 
 
 namespace Shiny.Notifications
@@ -13,13 +14,15 @@ namespace Shiny.Notifications
     public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         readonly ShinyCoreServices services;
+        readonly IJobManager jobManager;
         readonly BadgeUpdater badgeUpdater;
 
 
-        public NotificationManager(ShinyCoreServices services)
+        public NotificationManager(ShinyCoreServices services, IJobManager jobManager)
         {
             this.badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
             this.services = services;
+            this.jobManager = jobManager;
         }
 
 
@@ -36,7 +39,7 @@ namespace Shiny.Notifications
 
 
         public Task<AccessState> RequestAccess()
-            => this.services.Jobs.RequestAccess();
+            => this.jobManager.RequestAccess();
 
 
         public async Task Send(Notification notification)

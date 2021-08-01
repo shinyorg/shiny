@@ -206,6 +206,10 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <OutputItemType>Analyzer</OutputItemType>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj">
+      <Project>{b66ad908-214e-4921-aceb-ccf80dea4a8a}</Project>
+      <Name>Shiny.Jobs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
       <Project>{11ec9d9d-3502-4a4a-94aa-5bdb1b20bb8e}</Project>
       <Name>Shiny.Locations.Common</Name>
@@ -284,7 +288,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadMonoInterpreterErrorInfoBarSamplesiOSHideInfoBar="True" TriggeredFromHotReload="False" />
+      <UserProperties TriggeredFromHotReload="False" XamarinHotReloadMonoInterpreterErrorInfoBarSamplesiOSHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

@@ -12,12 +12,16 @@ namespace Shiny.Net.Http
 {
     public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
     {
+        readonly IJobManager jobManager;
         readonly ILogger logger;
 
 
-        public HttpClientHttpTransferManager(ShinyCoreServices services, ILogger logger)
+        public HttpClientHttpTransferManager(ShinyCoreServices services,
+                                             IJobManager jobManager,
+                                             ILogger logger)
         {
             this.Services = services;
+            this.jobManager = jobManager;
             this.logger = logger;
         }
 
@@ -60,7 +64,7 @@ namespace Shiny.Net.Http
 
 
         public override Task Cancel(string id) => Task.WhenAll(
-            this.Services.Jobs.Cancel(id),
+            this.jobManager.Cancel(id),
             this.Services.Repository.Remove<HttpTransferStore>(id)
         );
 
@@ -87,7 +91,7 @@ namespace Shiny.Net.Http
                 HttpMethod = request.HttpMethod.ToString(),
                 Headers = request.Headers
             });
-            await this.Services.Jobs.Register(new JobInfo(typeof(TransferJob), id)
+            await this.jobManager.Register(new JobInfo(typeof(TransferJob), id)
             {
                 RequiredInternetAccess = InternetAccess.Any,
                 Repeat = true
@@ -104,7 +108,7 @@ namespace Shiny.Net.Http
                 HttpTransferState.Pending
             );
             // fire and forget
-            this.Services.Jobs.Run(id);
+            this.jobManager.Run(id);
             return transfer;
         }
 
@@ -120,7 +124,7 @@ namespace Shiny.Net.Http
             {
                 var requests = await this.Services.Repository.GetAll<HttpTransferStore>();
                 foreach (var request in requests)
-                    await this.Services.Jobs.Run(request.Id);
+                    await this.jobManager.Run(request.Id);
             }
             catch (Exception ex)
             {

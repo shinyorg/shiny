@@ -5,12 +5,13 @@ using System.Reactive.Disposables;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Http;
-using Shiny.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Android;
 using Android.Content;
 using Observable = System.Reactive.Linq.Observable;
 using Native = Android.App.DownloadManager;
+using Shiny.Infrastructure;
+using Shiny.Jobs;
 
 
 namespace Shiny.Net.Http
@@ -18,7 +19,15 @@ namespace Shiny.Net.Http
     public class HttpTransferManager : HttpClientHttpTransferManager
     {
         IObservable<HttpTransfer>? httpObs;
-        public HttpTransferManager(ShinyCoreServices services, ILogger<IHttpTransferManager> logger) : base(services, logger) {}
+        public HttpTransferManager(
+            ShinyCoreServices services,
+            IJobManager jobManager,
+            ILogger<IHttpTransferManager> logger
+        ) : base(
+            services,
+            jobManager,
+            logger
+        ) {}
 
 
         public override void Start()

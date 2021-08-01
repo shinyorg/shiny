@@ -173,6 +173,10 @@
     <PackageReference Include="Xamarin.Essentials" />
     <PackageReference Include="Xamarin.Forms" />
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" />
+    <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj">
+      <Project>{b66ad908-214e-4921-aceb-ccf80dea4a8a}</Project>
+      <Name>Shiny.Jobs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
       <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
       <Name>Shiny.Push.AzureNotificationHubs</Name>
