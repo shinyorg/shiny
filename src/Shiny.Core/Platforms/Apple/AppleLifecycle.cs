@@ -27,12 +27,19 @@ namespace Shiny
         }
 
 
-
         ShinyUserNotificationDelegate ndelegate;
         void EnsureNotificationDelegate()
         {
             this.ndelegate ??= new ShinyUserNotificationDelegate();
             UNUserNotificationCenter.Current.Delegate = this.ndelegate;
+        }
+
+
+        readonly List<Func<Task>> handleFetch = new List<Func<Task>>();
+        public IDisposable RegisterForPerformFetch(Func<Task> task)
+        {
+            this.handleFetch.Add(task);
+            return Disposable.Create(() => this.handleFetch.Remove(task));
         }
 
 
@@ -142,6 +149,26 @@ namespace Shiny
                 catch (Exception ex)
                 {
                     this.logger.LogError(ex, "DidReceiveRemoteNotification");
+                }
+            }
+            completionHandler?.Invoke(UIBackgroundFetchResult.NewData);
+        }
+
+
+
+        internal async void OnPerformFetch(Action<UIBackgroundFetchResult> completionHandler)
+        {
+            var events = this.handleFetch.ToList();
+
+            foreach (var reg in events)
+            {
+                try
+                {
+                    await reg.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "PerformFetch");
                 }
             }
             completionHandler?.Invoke(UIBackgroundFetchResult.NewData);

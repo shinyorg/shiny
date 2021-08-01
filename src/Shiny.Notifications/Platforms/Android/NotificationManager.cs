@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
+using Shiny.Jobs;
 
 
 namespace Shiny.Notifications
@@ -11,12 +12,16 @@ namespace Shiny.Notifications
     {
         readonly ShinyCoreServices core;
         readonly AndroidNotificationManager manager;
+        readonly IJobManager jobManager;
 
 
-        public NotificationManager(ShinyCoreServices core, AndroidNotificationManager manager)
+        public NotificationManager(ShinyCoreServices core,
+                                   AndroidNotificationManager manager,
+                                   IJobManager jobManager)
         {
             this.core = core;
             this.manager = manager;
+            this.jobManager = jobManager;
 
             this.core
                 .Android
@@ -59,7 +64,7 @@ namespace Shiny.Notifications
             if (!this.manager.NativeManager.AreNotificationsEnabled())
                 return AccessState.Disabled;
 
-            var result = await this.core.Jobs.RequestAccess();
+            var result = await this.jobManager.RequestAccess();
             return result;
         }
 

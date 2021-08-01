@@ -16,6 +16,7 @@ using B = global::Android.OS.Build;
 using Microsoft.Extensions.DependencyInjection;
 using Java.Interop;
 
+
 namespace Shiny
 {
     public class AndroidPlatform : Java.Lang.Object,

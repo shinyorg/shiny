@@ -9,7 +9,6 @@
         <None Include="targets\shiny.targets" PackagePath="buildTransitive\netstandard2.0" Pack="true" />
         <None Include="targets\shiny.props" PackagePath="buildTransitive\netstandard2.0" Pack="true" />
         <None Include="targets\shiny.targets" PackagePath="build\netstandard2.0" Pack="true" />
-        <!--<None Include="docs\README.md" Pack="true" PackagePath="\"/>-->
 
         <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />

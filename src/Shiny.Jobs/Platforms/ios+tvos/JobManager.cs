@@ -33,6 +33,7 @@ namespace Shiny.Jobs
 
 
         public JobManager(
+            AppleLifecycle lifecycle,
             IPlatform platform,
             IServiceProvider container,
             IRepository repository,
@@ -44,6 +45,8 @@ namespace Shiny.Jobs
         )
         {
             this.platform = platform;
+
+            lifecycle.RegisterForPerformFetch(this.OnBackgroundFetch);
         }
 
 
@@ -131,11 +134,8 @@ namespace Shiny.Jobs
         }
 
 
-        public static async void OnBackgroundFetch(Action<UIBackgroundFetchResult> completionHandler)
+        async Task OnBackgroundFetch()
         {
-            var jobManager = ShinyHost.Resolve<IJobManager>();
-
-            var result = UIBackgroundFetchResult.NoData;
             var app = UIApplication.SharedApplication;
             var taskId = 0;
 
@@ -144,21 +144,17 @@ namespace Shiny.Jobs
                 using (var cancelSrc = new CancellationTokenSource())
                 {
                     taskId = (int)app.BeginBackgroundTask("RunAll", cancelSrc.Cancel);
-                    var results = await jobManager
+                    var results = await this
                         .RunAll(cancelSrc.Token, true)
                         .ConfigureAwait(false);
-
-                    result = UIBackgroundFetchResult.NewData;
                 }
             }
             catch (Exception ex)
             {
-                result = UIBackgroundFetchResult.Failed;
-                ShinyHost.LoggerFactory.CreateLogger<ILogger<IJobManager>>().LogError(ex, "Failed to run background fetch");
+                this.Log.LogError(ex, "Failed to run background fetch");
             }
             finally
             {
-                completionHandler(result);
                 app.EndBackgroundTask(taskId);
             }
         }

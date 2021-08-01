@@ -53,7 +53,7 @@ namespace Shiny.Generators
                     this.AppendMethodIf(
                         appDelegate,
                         builder,
-                        "Shiny",
+                        "Shiny.Jobs",
                         "PerformFetch",
                         "public override void PerformFetch(UIApplication application, Action<UIBackgroundFetchResult> completionHandler) => this.ShinyPerformFetch(completionHandler);"
                     );
