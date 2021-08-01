@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Jobs;
 using Shiny.Stores;
 
 
@@ -17,24 +16,15 @@ namespace Shiny.Infrastructure
             => modules.Add(module);
 
 
-        public static bool ClearJobsBeforeRegistering { get; set; }
-
-        static readonly List<JobInfo> jobs = new List<JobInfo>();
-        public static void AddJob(JobInfo jobInfo) => jobs.Add(jobInfo);
-
-
-        readonly IJobManager jobManager;
         readonly IServiceProvider serviceProvider;
         readonly IObjectStoreBinder binder;
         readonly ILogger logger;
 
 
-        public StartupModule(IJobManager jobManager,
-                             IServiceProvider serviceProvider,
+        public StartupModule(IServiceProvider serviceProvider,
                              IObjectStoreBinder binder,
                              ILogger<StartupModule> logger)
         {
-            this.jobManager = jobManager;
             this.logger = logger;
             this.serviceProvider = serviceProvider;
             this.binder = binder;
@@ -45,35 +35,9 @@ namespace Shiny.Infrastructure
         {
             this.Bind(services);
 
-            if (ClearJobsBeforeRegistering)
-            {
-                try
-                {
-                    await this.jobManager.CancelAll();
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogWarning(ex, "Unable to cancel all existing jobs");
-                }
-            }
-
             foreach (var module in modules)
                 module.OnContainerReady(this.serviceProvider);
 
-            if (jobs.Count > 0)
-            {
-                var access = await this.jobManager.RequestAccess();
-                if (access == AccessState.Available)
-                {
-                    foreach (var job in jobs)
-                        await this.jobManager.Register(job);
-                }
-                else
-                {
-                    this.logger.LogWarning("Permissions to run jobs insufficient: " + access);
-                }
-            }
-            jobs.Clear();
             modules.Clear();
         }
 

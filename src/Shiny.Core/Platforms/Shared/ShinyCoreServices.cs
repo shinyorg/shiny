@@ -1,5 +1,4 @@
 ﻿using System;
-using Shiny.Jobs;
 using Shiny.Stores;
 
 
@@ -14,9 +13,8 @@ namespace Shiny.Infrastructure
                                  IRepository repository,
                                  IServiceProvider services,
                                  ISerializer serializer,
-                                 IMessageBus bus,
-                                 IJobManager jobManager)
-            : this(platform, store, repository, services, serializer, bus, jobManager)
+                                 IMessageBus bus)
+            : this(platform, store, repository, services, serializer, bus)
         {
             this.Android = context;
         }
@@ -28,9 +26,8 @@ namespace Shiny.Infrastructure
                                  IRepository repository,
                                  IServiceProvider services,
                                  ISerializer serializer,
-                                 IMessageBus bus,
-                                 IJobManager jobManager)
-            : this(platform, store, repository, services, serializer, bus, jobManager)
+                                 IMessageBus bus)
+            : this(platform, store, repository, services, serializer, bus)
         {
             this.Lifecycle = lifecycle;
         }
@@ -41,8 +38,7 @@ namespace Shiny.Infrastructure
                                  IRepository repository,
                                  IServiceProvider services,
                                  ISerializer serializer,
-                                 IMessageBus bus,
-                                 IJobManager jobManager)
+                                 IMessageBus bus)
         {
             this.Platform = platform;
             this.Settings = store.DefaultStore;
@@ -50,7 +46,6 @@ namespace Shiny.Infrastructure
             this.Services = services;
             this.Serializer = serializer;
             this.Bus = bus;
-            this.Jobs = jobManager;
         }
 
 #if __ANDROID__
@@ -64,6 +59,5 @@ namespace Shiny.Infrastructure
         public IServiceProvider Services { get; }
         public ISerializer Serializer { get; }
         public IMessageBus Bus { get; }
-        public IJobManager Jobs { get; }
     }
 }

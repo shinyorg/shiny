@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <RootNamespace>Shiny</RootNamespace>
-        <Description>The Shiny Core containing all of the major functionality like hosting, logging, connectivity, environment, IO, power, settings, and jobs as well as many other utilities</Description>
+        <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
@@ -24,13 +24,9 @@
     <ItemGroup Condition=" $(TargetFramework.Contains('android')) ">
         <Compile Include="**\Platforms\Android\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Common" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
-        <PackageReference Include="Xamarin.AndroidX.Work.Runtime" />
-        <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">

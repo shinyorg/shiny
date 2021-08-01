@@ -1,6 +1,5 @@
 ﻿using System;
 using Foundation;
-using Shiny.Jobs;
 using UIKit;
 
 
@@ -20,8 +19,9 @@ namespace Shiny
         public static void ShinyFailedToRegisterForRemoteNotifications(this UIApplicationDelegate app, NSError error)
             => ShinyHost.Resolve<AppleLifecycle>().FailedToRegisterForRemoteNotifications(error);
 
-        public static void ShinyPerformFetch(this UIApplicationDelegate app, Action<UIBackgroundFetchResult> completionHandler)
-            => JobManager.OnBackgroundFetch(completionHandler);
+        // TODO: move to apple lifecycle
+        //public static void ShinyPerformFetch(this UIApplicationDelegate app, Action<UIBackgroundFetchResult> completionHandler)
+        //    => JobManager.OnBackgroundFetch(completionHandler);
 
         public static void ShinyHandleEventsForBackgroundUrl(this UIApplicationDelegate app, string sessionIdentifier, Action completionHandler)
             => ShinyHost.Resolve<AppleLifecycle>().HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);

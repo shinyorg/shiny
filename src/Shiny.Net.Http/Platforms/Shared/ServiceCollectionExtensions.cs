@@ -10,6 +10,7 @@ namespace Shiny
     {
         public static void UseHttpTransfers(this IServiceCollection services, Type transferDelegateType)
         {
+            services.UseJobs();
             services.AddSingleton(typeof(IHttpTransferDelegate), transferDelegateType);
 #if NETSTANDARD
             services.TryAddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();

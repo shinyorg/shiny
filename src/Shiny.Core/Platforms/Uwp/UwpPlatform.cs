@@ -10,7 +10,7 @@ using Windows.UI.Xaml;
 using Windows.Security.ExchangeActiveSyncProvisioning;
 using Windows.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using Shiny.Jobs;
+
 
 namespace Shiny
 {
@@ -125,18 +125,18 @@ namespace Shiny
             }
 
             var services = ShinyHost.ServiceProvider;
-            if (taskInstance.Task.Name.StartsWith("JOB-"))
-            {
-                services
-                    .Resolve<JobManager>(true)!
-                    .Process(taskInstance);
-            }
-            else
-            {
-                var targetType = Type.GetType(taskInstance.Task.Name);
-                var processor = ActivatorUtilities.GetServiceOrCreateInstance(services, targetType) as IBackgroundTaskProcessor;
-                processor?.Process(taskInstance);
-            }
+            //if (taskInstance.Task.Name.StartsWith("JOB-"))
+            //{
+            //    services
+            //        .Resolve<JobManager>(true)!
+            //        .Process(taskInstance);
+            //}
+            //else
+            //{
+            //    var targetType = Type.GetType(taskInstance.Task.Name);
+            //    var processor = ActivatorUtilities.GetServiceOrCreateInstance(services, targetType) as IBackgroundTaskProcessor;
+            //    processor?.Process(taskInstance);
+            //}
         }
 
 

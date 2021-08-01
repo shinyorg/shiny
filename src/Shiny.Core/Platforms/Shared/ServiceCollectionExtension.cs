@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Infrastructure;
-using Shiny.Jobs;
 using Shiny.Net;
 using Shiny.Power;
 using Shiny.Stores;
@@ -13,6 +12,10 @@ namespace Shiny
     {
         public static void RegisterCommonServices(this IServiceCollection services)
         {
+#if __IOS__
+            services.TryAddSingleton<AppleLifecycle>();
+#endif
+
 #if !NETSTANDARD
             // stores
             services.AddSingleton<IObjectStoreBinder, ObjectStoreBinder>();
@@ -31,18 +34,6 @@ namespace Shiny
             services.TryAddSingleton<IRepository, FileSystemRepositoryImpl>();
             services.TryAddSingleton<IPowerManager, PowerManagerImpl>();
             services.TryAddSingleton<IConnectivity, ConnectivityImpl>();
-
-#if __IOS__
-            services.TryAddSingleton<AppleLifecycle>();
-
-            if (BgTasksJobManager.IsAvailable)
-                services.TryAddSingleton<IJobManager, BgTasksJobManager>();
-            else
-                services.TryAddSingleton<IJobManager, JobManager>();
-#else
-            services.TryAddSingleton<IJobManager, JobManager>();
-#endif
-
 #endif
         }
     }

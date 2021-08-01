@@ -45,7 +45,6 @@ namespace Shiny.Notifications
                 RunOnForeground = true,
                 IsSystemJob = true
             });
-            services.UseJobForegroundService();
 #endif
         }
 
