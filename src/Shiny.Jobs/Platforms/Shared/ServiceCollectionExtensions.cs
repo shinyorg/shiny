@@ -9,10 +9,13 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-
-        public static void UseJobs(this IServiceCollection services, bool clearPrevJobs = false, TimeSpan? foregroundJobTimer = null)
+        public static void UseJobs(this IServiceCollection services, bool? clearPrevJobs = null)
         {
+            if (clearPrevJobs != null)
+                JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs.Value;
+
             services.TryAddSingleton<JobsStartup>();
+            services.TryAddSingleton<JobLifecycleTask>();
 #if __IOS__
             if (BgTasksJobManager.IsAvailable)
                 services.TryAddSingleton<IJobManager, BgTasksJobManager>();
@@ -21,16 +24,6 @@ namespace Shiny
 #else
             services.TryAddSingleton<IJobManager, JobManager>();
 #endif
-            if (!JobsStartup.ClearJobsBeforeRegistering)
-                JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs;
-
-            if (foregroundJobTimer != null)
-            {
-                if (JobLifecycleTask.Interval == null || JobLifecycleTask.Interval > foregroundJobTimer.Value)
-                    JobLifecycleTask.Interval = foregroundJobTimer.Value;
-
-                services.TryAddSingleton<JobLifecycleTask>();
-            }
         }
     }
 }

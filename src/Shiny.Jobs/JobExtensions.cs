@@ -38,10 +38,10 @@ namespace Shiny
         /// <param name="services">The service collection to register with</param>
         /// <param name="jobInfo">The job info to register</param>
         /// <param name="clearJobQueueFirst">If set to true, before registering all new jobs during startup, an command will be issued to clear out any previous jobs - this is useful during application upgrades or if you aren't manually registering jobs</param>
-        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo, bool clearJobQueueFirst = false)
+        public static void RegisterJob(this IServiceCollection services, JobInfo jobInfo, bool? clearJobQueueFirst = null)
         {
+            services.UseJobs(clearJobQueueFirst);
             JobsStartup.AddJob(jobInfo);
-            services.UseJobs(clearJobQueueFirst, jobInfo.RunOnForeground ? TimeSpan.FromSeconds(30) : null);
         }
 
 
@@ -56,7 +56,7 @@ namespace Shiny
                                        string? identifier = null,
                                        InternetAccess requiredNetwork = InternetAccess.None,
                                        bool runInForeground = false,
-                                       bool clearJobQueueFirst = false,
+                                       bool? clearJobQueueFirst = null,
                                        params (string Key, object value)[] parameters)
         {
             services.RegisterJob(new JobInfo(jobType, identifier)

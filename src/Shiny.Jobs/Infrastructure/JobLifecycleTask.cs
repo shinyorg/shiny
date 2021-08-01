@@ -15,10 +15,10 @@ namespace Shiny.Jobs.Infrastructure
             get => interval;
             set
             {
-                if (interval.TotalSeconds < 15)
+                if (value.TotalSeconds < 15)
                     throw new ArgumentException("Job foreground timer intervals cannot be less than 15 seconds");
 
-                if (interval.TotalMinutes > 5)
+                if (value.TotalMinutes > 5)
                     throw new ArgumentException("Job foreground timer intervals cannot be greater than 5 minutes");
 
                 interval = value;
@@ -51,6 +51,12 @@ namespace Shiny.Jobs.Infrastructure
                 if (this.IsInForeground)
                     this.timer.Start();
             };
+        }
+
+
+        public override void Start()
+        {
+
         }
 
 
