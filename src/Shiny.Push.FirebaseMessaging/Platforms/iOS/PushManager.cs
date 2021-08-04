@@ -49,7 +49,7 @@ namespace Shiny.Push.FirebaseMessaging
                     this.CurrentRegistrationTokenDate = DateTime.UtcNow;
                     await this.Services
                         .Services
-                        .RunDelegates<IPushDelegate>(x => x.OnTokenChanged(token))
+                        .RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(token))
                         .ConfigureAwait(false);
                 }
             );

@@ -134,6 +134,7 @@ namespace Shiny.Notifications
                     notification.Id,
                     launchIntent,
                     PendingIntentFlags.OneShot
+                );
             }
             return pendingIntent;
         }

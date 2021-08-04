@@ -61,7 +61,7 @@ namespace Shiny.Push
                     await this.Services
                         .Services
                         .RunDelegates<IPushDelegate>(
-                            x => x.OnTokenChanged(token)
+                            x => x.OnTokenRefreshed(token)
                         )
                         .ConfigureAwait(false);
                 }

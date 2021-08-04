@@ -27,6 +27,6 @@ namespace Shiny.Push
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        Task OnTokenChanged(string token);
+        Task OnTokenRefreshed(string token);
     }
 }

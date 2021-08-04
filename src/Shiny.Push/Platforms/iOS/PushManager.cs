@@ -104,11 +104,7 @@ namespace Shiny.Push
                     )
                     .ConfigureAwait(false);
                 var rawToken = await tcs.Task;
-                var token = ToTokenString(rawToken);
-                await this.Services.Services.SafeResolveAndExecute<IPushDelegate>(
-                    x => x.OnTokenChanged(token)
-                );
-                return token;
+                return rawToken;
             }
             finally
             {
