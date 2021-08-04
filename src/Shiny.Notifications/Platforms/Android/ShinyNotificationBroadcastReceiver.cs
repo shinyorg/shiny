@@ -19,8 +19,10 @@ namespace Shiny.Notifications
 
         protected override async Task OnReceiveAsync(Context? context, Intent? intent)
         {
-            switch (intent.Action)
+            if (intent?.Action?.Equals(EntryIntentAction) ?? false)
             {
+                await this.Resolve<AndroidNotificationProcessor>().TryProcessIntent(intent);
+                context?.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
                 //case AlarmIntentAction:
                 //    var notificationId = intent.GetIntExtra("NotificationId", 0);
                 //    if (notificationId > 0)
@@ -32,11 +34,6 @@ namespace Shiny.Notifications
                 //        await repo.Remove<Notification>(notificationId.ToString());
                 //    }
                 //    break;
-
-                case EntryIntentAction:
-                    await this.Resolve<AndroidNotificationProcessor>().TryProcessIntent(intent);
-                    context?.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
-                    break;
             }
         }
     }

@@ -31,6 +31,7 @@ namespace Shiny.Notifications
             if (intent == null || !this.delegates.Any())
                 return;
 
+            // push notifications won't contain this value - we don't want Shiny.Notifications to process push anyhow
             if (intent.HasExtra(IntentNotificationKey))
             {
                 var notificationString = intent.GetStringExtra(IntentNotificationKey);

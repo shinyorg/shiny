@@ -37,6 +37,16 @@ namespace Shiny.Push
 
         public virtual void Start()
         {
+            //this.core
+            //              .Android
+            //              .WhenIntentReceived()
+            //              .Subscribe(x => this
+            //                  .core
+            //                  .Services
+            //                  .Resolve<AndroidNotificationProcessor>()
+            //                  .TryProcessIntent(x)
+            //              );
+
             // wireup firebase if it was active
             if (this.CurrentRegistrationToken != null)
                 FirebaseMessaging.Instance.AutoInitEnabled = true;
