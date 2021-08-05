@@ -18,9 +18,9 @@ namespace Shiny.Notifications
 
         protected override async Task OnReceiveAsync(Context? context, Intent? intent)
         {
-            if (intent.Action == EntryIntentAction)
+            if (intent?.Action == EntryIntentAction)
             {
-                //await this.Resolve<AndroidNotificationProcessor>().TryProcessIntent(intent);
+                //await this.Resolve<AndroidPushProcessor>().TryProcessIntent(intent);
                 context?.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
             }
         }

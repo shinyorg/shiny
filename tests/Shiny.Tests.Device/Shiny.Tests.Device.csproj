@@ -14,6 +14,7 @@
         <PackageReference Include="Xamarin.Essentials" />
         <PackageReference Include="Acr.UserDialogs" />
         <PackageReference Include="Microsoft.Azure.NotificationHubs" />
+        <PackageReference Include="CorePush" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj" />
