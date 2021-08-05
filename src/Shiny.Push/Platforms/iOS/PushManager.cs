@@ -4,37 +4,44 @@ using System.Threading.Tasks;
 using System.Reactive.Subjects;
 using UserNotifications;
 using Shiny.Notifications;
-using Shiny.Infrastructure;
 
 
 namespace Shiny.Push
 {
-    public sealed class PushManager : AbstractPushManager, IShinyStartupTask
+    public sealed class PushManager : IPushManager, IShinyStartupTask
     {
         readonly ApnManager apnManager;
+        readonly AppleLifecycle lifecycle;
+        readonly PushContainer container;
         readonly Subject<PushNotification> payloadSubj;
 
-        public PushManager(ShinyCoreServices services, ApnManager apnManager) : base(services)
+
+        public PushManager(PushContainer container,
+                           AppleLifecycle lifecycle,
+                           ApnManager apnManager)
         {
             this.payloadSubj = new Subject<PushNotification>();
             this.apnManager = apnManager;
+            this.lifecycle = lifecycle;
+            this.container = container;
         }
+
+
+        public DateTime? CurrentRegistrationTokenDate => this.container.CurrentRegistrationTokenDate;
+        public string? CurrentRegistrationToken => this.container.CurrentRegistrationToken;
 
 
         public void Start()
         {
-            this.Services.Lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
+            this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
             {
                 var dict = userInfo.FromNsDictionary();
                 var pr = new PushNotification(dict, null);
-                await this.Services
-                    .Services
-                    .SafeResolveAndExecute<IPushDelegate>(x => x.OnReceived(pr))
-                    .ConfigureAwait(false);
+                await this.container.OnReceived(pr).ConfigureAwait(false);
                 this.payloadSubj.OnNext(pr);
             });
 
-            this.Services.Lifecycle.RegisterForNotificationReceived(async response =>
+            this.lifecycle.RegisterForNotificationReceived(async response =>
             {
                 if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                 {
@@ -44,11 +51,7 @@ namespace Shiny.Push
                         shiny.ActionIdentifier,
                         shiny.Text
                     );
-
-                    await this.Services
-                        .Services
-                        .RunDelegates<IPushDelegate>(x => x.OnEntry(pr))
-                        .ConfigureAwait(false);
+                    await this.container.OnEntry(pr).ConfigureAwait(false);
                 }
             });
 
@@ -61,20 +64,22 @@ namespace Shiny.Push
                         if (x.IsCompletedSuccessfully &&
                             (!x.Result?.Equals(this.CurrentRegistrationToken) ?? false))
                         {
-                            this.CurrentRegistrationToken = x.Result!;
-                            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                            this.container.SetCurrentToken(x.Result!);
                         }
                     });
             }
         }
 
 
-        public override IObservable<PushNotification> WhenReceived() => this.payloadSubj;
+        public IObservable<PushNotification> WhenReceived() => this.payloadSubj;
 
 
-        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+        public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var result = await this.apnManager.RequestPermission().ConfigureAwait(false);
+            var result = await this.apnManager
+                .RequestPermission()
+                .ConfigureAwait(false);
+
             if (!result)
                 return PushAccessState.Denied;
 
@@ -82,16 +87,18 @@ namespace Shiny.Push
                 .RequestToken(cancelToken)
                 .ConfigureAwait(false);
 
-            this.CurrentRegistrationToken = token;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            if (token.IsEmpty())
+                return PushAccessState.Denied;
+
+            this.container.SetCurrentToken(token!);
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
         }
 
 
-        public override async Task UnRegister()
+        public async Task UnRegister()
         {
             await this.apnManager.UnRegister().ConfigureAwait(false);
-            this.ClearRegistration();
+            this.container.ClearRegistration();
         }
     }
 }

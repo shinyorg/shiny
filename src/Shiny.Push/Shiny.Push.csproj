@@ -65,4 +65,8 @@
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Platforms\Shared\PushContainer.cs" />
+    </ItemGroup>
+
 </Project>

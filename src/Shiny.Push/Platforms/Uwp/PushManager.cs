@@ -49,7 +49,7 @@ namespace Shiny.Push
         }
 
 
-        public override IObservable<PushNotification> WhenReceived() => Observable.Create<PushNotification>(ob =>
+        public IObservable<PushNotification> WhenReceived() => Observable.Create<PushNotification>(ob =>
         {
             var handler = new TypedEventHandler<PushNotificationChannel, PushNotificationReceivedEventArgs>((sender, args) =>
             {
