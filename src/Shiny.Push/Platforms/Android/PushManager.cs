@@ -22,14 +22,17 @@ namespace Shiny.Push
     {
         readonly Subject<PushNotification> receiveSubj;
         readonly INotificationManager notificationManager;
+        readonly AndroidPushProcessor processor;
         readonly ILogger logger;
 
 
         public PushManager(ShinyCoreServices services,
                            INotificationManager notificationManager,
+                           AndroidPushProcessor processor,
                            ILogger<IPushManager> logger) : base(services)
         {
             this.notificationManager = notificationManager;
+            this.processor = processor;
             this.logger = logger;
             this.receiveSubj = new Subject<PushNotification>();
         }
@@ -37,15 +40,10 @@ namespace Shiny.Push
 
         public virtual void Start()
         {
-            //this.core
-            //              .Android
-            //              .WhenIntentReceived()
-            //              .Subscribe(x => this
-            //                  .core
-            //                  .Services
-            //                  .Resolve<AndroidNotificationProcessor>()
-            //                  .TryProcessIntent(x)
-            //              );
+            this.Services
+                .Android
+                .WhenIntentReceived()
+                .SubscribeAsync(x => this.processor.TryProcessIntent(x));
 
             // wireup firebase if it was active
             if (this.CurrentRegistrationToken != null)

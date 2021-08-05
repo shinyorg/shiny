@@ -31,18 +31,16 @@ namespace Shiny.Push
             if (intent == null || !this.delegates.Any())
                 return;
 
-            // push notifications won't contain this value - we don't want Shiny.Notifications to process push anyhow
             if (intent.HasExtra(IntentNotificationKey))
             {
                 var notificationString = intent.GetStringExtra(IntentNotificationKey);
-                var notification = this.serializer.Deserialize<Notification>(notificationString);
+                var notification = this.serializer.Deserialize<Shiny.Notifications.Notification>(notificationString);
 
                 var action = intent.GetStringExtra(IntentActionKey);
                 var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
-                //var response = new PushNotificationResponse(notification, action, text);
+                var response = new PushNotificationResponse(notification, action, text);
 
-                // the notification lives within the intent since it has already been removed from the repo
-                //await this.delegates.RunDelegates(x => x.OnEntry(response));
+                await this.delegates.RunDelegates(x => x.OnEntry(response));
             }
         }
     }
