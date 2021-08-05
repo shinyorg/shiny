@@ -2,8 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reactive.Subjects;
-using Foundation;
-using UIKit;
 using UserNotifications;
 using Shiny.Notifications;
 using Shiny.Infrastructure;
@@ -11,13 +9,19 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager, IShinyStartupTask
+    public sealed class PushManager : AbstractPushManager, IShinyStartupTask
     {
-        readonly Subject<PushNotification> payloadSubj = new Subject<PushNotification>();
-        public PushManager(ShinyCoreServices services) : base(services) { }
+        readonly ApnManager apnManager;
+        readonly Subject<PushNotification> payloadSubj;
+
+        public PushManager(ShinyCoreServices services, ApnManager apnManager) : base(services)
+        {
+            this.payloadSubj = new Subject<PushNotification>();
+            this.apnManager = apnManager;
+        }
 
 
-        public virtual void Start()
+        public void Start()
         {
             this.Services.Lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
             {
@@ -50,8 +54,17 @@ namespace Shiny.Push
 
             if (!this.CurrentRegistrationToken.IsEmpty())
             {
-                // do I need to do this?  I would normally be calling RequestAccess on startup anyhow
-                this.RequestAccess().ContinueWith(x => { });
+                this.apnManager
+                    .RequestToken()
+                    .ContinueWith(x =>
+                    {
+                        if (x.IsCompletedSuccessfully &&
+                            (!x.Result?.Equals(this.CurrentRegistrationToken) ?? false))
+                        {
+                            this.CurrentRegistrationToken = x.Result!;
+                            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+                        }
+                    });
             }
         }
 
@@ -61,16 +74,15 @@ namespace Shiny.Push
 
         public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var result = await UNUserNotificationCenter.Current.RequestAuthorizationAsync(
-                UNAuthorizationOptions.Alert |
-                UNAuthorizationOptions.Badge |
-                UNAuthorizationOptions.Sound
-            );
-            if (!result.Item1)
+            var result = await this.apnManager.RequestPermission().ConfigureAwait(false);
+            if (!result)
                 return PushAccessState.Denied;
 
-            var deviceToken = await this.RequestDeviceToken(cancelToken).ConfigureAwait(false);
-            this.CurrentRegistrationToken = ToTokenString(deviceToken);
+            var token = await this.apnManager
+                .RequestToken(cancelToken)
+                .ConfigureAwait(false);
+
+            this.CurrentRegistrationToken = token;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
         }
@@ -78,60 +90,8 @@ namespace Shiny.Push
 
         public override async Task UnRegister()
         {
-            await this.Services
-                .Platform
-                .InvokeOnMainThreadAsync(UIApplication.SharedApplication.UnregisterForRemoteNotifications)
-                .ConfigureAwait(false);
+            await this.apnManager.UnRegister().ConfigureAwait(false);
             this.ClearRegistration();
-        }
-
-
-        protected virtual async Task<NSData> RequestDeviceToken(CancellationToken cancelToken = default)
-        {
-            var tcs = new TaskCompletionSource<NSData>();
-            IDisposable? caller = null;
-            try
-            {
-                //UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(UIRemoteNotificationType.Alert)
-                caller = this.Services.Lifecycle.RegisterForRemoteNotificationToken(
-                    rawToken => tcs.TrySetResult(rawToken),
-                    err => tcs.TrySetException(new Exception(err.LocalizedDescription))
-                );
-                await this.Services
-                    .Platform
-                    .InvokeOnMainThreadAsync(
-                        () => UIApplication.SharedApplication.RegisterForRemoteNotifications()
-                    )
-                    .ConfigureAwait(false);
-                var rawToken = await tcs.Task;
-                return rawToken;
-            }
-            finally
-            {
-                caller?.Dispose();
-            }
-        }
-
-
-        protected static string? ToTokenString(NSData deviceToken)
-        {
-            string? token = null;
-            if (deviceToken.Length > 0)
-            {
-                if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
-                {
-                    var data = deviceToken.ToArray();
-                    token = BitConverter
-                        .ToString(data)
-                        .Replace("-", "")
-                        .Replace("\"", "");
-                }
-                else if (!deviceToken.Description.IsEmpty())
-                {
-                    token = deviceToken.Description.Trim('<', '>');
-                }
-            }
-            return token;
         }
     }
 }

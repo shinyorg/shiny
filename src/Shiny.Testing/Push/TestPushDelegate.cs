@@ -23,10 +23,10 @@ namespace Shiny.Testing.Push
         }
 
 
-        public static Action<string>? TokenChanged { get; set; }
-        public Task OnTokenChanged(string token)
+        public static Action<string>? TokenRefreshed { get; set; }
+        public Task OnTokenRefreshed(string token)
         {
-            TokenChanged?.Invoke(token);
+            TokenRefreshed?.Invoke(token);
             return Task.CompletedTask;
         }
     }

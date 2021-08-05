@@ -26,6 +26,8 @@ namespace Shiny.Push
 #if __ANDROID__
             services.TryAddSingleton<AndroidPushNotificationManager>();
             services.TryAddSingleton<AndroidPushProcessor>();
+#elif __IOS__
+            services.TryAddSingleton<ApnManager>();
 #endif
         }
     }

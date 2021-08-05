@@ -26,7 +26,7 @@ namespace Samples.Push
         public Task OnReceived(PushNotification push)
             => this.Insert("PUSH RECEIVED");
 
-        public Task OnTokenChanged(string token)
+        public Task OnTokenRefreshed(string token)
             => this.Insert("PUSH TOKEN CHANGE");
 
         Task Insert(string info) => this.services.Connection.InsertAsync(new PushEvent
