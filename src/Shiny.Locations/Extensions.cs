@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 
@@ -7,6 +8,46 @@ namespace Shiny.Locations
 {
     public static class Extensions
     {
+        /// <summary>
+        /// This method will start the GPS with realtime and close on disposable (or when the app backgrounds)
+        /// </summary>
+        /// <param name="gpsManager"></param>
+        /// <returns></returns>
+        public static IObservable<IGpsReading> StartAndReceive(this IGpsManager gpsManager) => Observable.Create<IGpsReading>(ob =>
+        {
+            var composite = new CompositeDisposable();
+            var platform = ShinyHost.Resolve<IPlatform>();
+            gpsManager
+                .WhenReading()
+                .Subscribe(
+                    ob.OnNext,
+                    ob.OnError
+                )
+                .DisposedBy(composite);
+
+            platform
+                .WhenStateChanged()
+                .Where(x => x == PlatformState.Background)
+                .Subscribe(_ => ob.Respond(null))
+                .DisposedBy(composite);
+
+            gpsManager
+                .StartListener(GpsRequest.Foreground)
+                .ContinueWith(x =>
+                {
+                    if (x.IsFaulted)
+                        ob.OnError(x.Exception);
+                });
+
+            return () =>
+            {
+                composite.Dispose();
+                gpsManager.StopListener();
+            };
+        });
+
+
+
         /// <summary>
         /// Requests a single GPS reading by starting the listener and stopping once a reading is received
         /// </summary>
