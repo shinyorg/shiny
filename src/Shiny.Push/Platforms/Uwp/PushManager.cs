@@ -7,20 +7,26 @@ using System.Reactive.Linq;
 using Windows.Foundation;
 using Windows.Networking.PushNotifications;
 using Windows.ApplicationModel.Background;
-using Shiny.Infrastructure;
 using Microsoft.Extensions.Logging;
+using Shiny.Stores;
 
 
 namespace Shiny.Push
 {
-    public class PushManager : AbstractPushManager, IShinyStartupTask
+    public class PushManager : IPushManager, IShinyStartupTask
     {
+        readonly PushContainer container;
+        readonly IKeyValueStore store;
         readonly ILogger logger;
         PushNotificationChannel channel;
 
 
-        public PushManager(ShinyCoreServices services, ILogger<IPushManager> logger) : base(services)
+        public PushManager(PushContainer container,
+                           IKeyValueStoreFactory storeFactory,
+                           ILogger<IPushManager> logger)
         {
+            this.container = container;
+            this.store = storeFactory.DefaultStore;
             this.logger = logger;
          }
 
@@ -44,9 +50,11 @@ namespace Shiny.Push
 
         DateTime? CurrentRegistrationExpiryDate
         {
-            get => this.Settings.Get<DateTime?>(nameof(this.CurrentRegistrationExpiryDate));
-            set => this.Settings.SetOrRemove(nameof(this.CurrentRegistrationExpiryDate), value);
+            get => this.store.Get<DateTime?>(nameof(this.CurrentRegistrationExpiryDate));
+            set => this.store.SetOrRemove(nameof(this.CurrentRegistrationExpiryDate), value);
         }
+        public DateTime? CurrentRegistrationTokenDate => this.container.CurrentRegistrationTokenDate;
+        public string? CurrentRegistrationToken => this.container.CurrentRegistrationToken;
 
 
         public IObservable<PushNotification> WhenReceived() => Observable.Create<PushNotification>(ob =>
@@ -62,27 +70,29 @@ namespace Shiny.Push
         });
 
 
-        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+        public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             this.channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
             this.CurrentRegistrationExpiryDate = this.channel.ExpirationTime.DateTime.ToUniversalTime();
-            this.CurrentRegistrationToken = this.channel.Uri;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            this.container.SetCurrentToken(this.channel.Uri);
             this.InitializeExpirationTimer();
             return new PushAccessState(AccessState.Available, channel.Uri);
         }
 
 
-        public override Task UnRegister()
+        public Task UnRegister()
         {
             this.channel?.Close();
             this.expiryTimer?.Dispose();
+            this.container.ClearRegistration();
+            this.CurrentRegistrationExpiryDate = null;
+
             return Task.CompletedTask;
         }
 
 
         IDisposable expiryTimer;
-        protected virtual void InitializeExpirationTimer()
+        void InitializeExpirationTimer()
         {
             this.expiryTimer = Observable
                 .Interval(TimeSpan.FromMinutes(15))

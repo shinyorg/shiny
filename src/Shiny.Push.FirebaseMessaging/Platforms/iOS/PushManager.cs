@@ -5,22 +5,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.InstanceID;
-using Shiny.Infrastructure;
 
 
 namespace Shiny.Push.FirebaseMessaging
 {
-    public class PushManager : Shiny.Push.PushManager, IPushTagSupport
+    public class PushManager : IPushManager, IPushTagSupport
     {
-        public PushManager(ShinyCoreServices services) : base(services) { }
+        readonly ApnManager apnManager;
+        readonly PushContainer container;
 
 
-        public override void Start()
+        public PushManager(ApnManager apnManager, PushContainer container)
         {
-            base.Start();
+            this.apnManager = apnManager;
+            this.container = container;
+        }
 
-            if (this.CurrentRegistrationToken != null)
-                this.TryStartFirebase();
+
+        public void Start()
+        {
+            //if (this.CurrentRegistrationToken != null)
+            //    this.TryStartFirebase();
         }
 
 
@@ -36,47 +41,39 @@ namespace Shiny.Push.FirebaseMessaging
                 {
                     // I can't get access to the notification here
                     var dict = msg.AppData.FromNsDictionary();
-                    await this.Services
-                        .Services
-                        .RunDelegates<IPushDelegate>(
-                            x => x.OnReceived(new PushNotification(dict, null))
-                        )
-                        .ConfigureAwait(false);
+                    var pr = new PushNotification(dict, null);
+                    await this.container.OnReceived(pr).ConfigureAwait(false);
                 },
                 async token =>
                 {
-                    this.CurrentRegistrationToken = token;
-                    this.CurrentRegistrationTokenDate = DateTime.UtcNow;
-                    await this.Services
-                        .Services
-                        .RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(token))
-                        .ConfigureAwait(false);
+                    this.container.SetCurrentToken(token);
+                    await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
                 }
             );
         }
 
 
-        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+        public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var access = await base.RequestAccess(cancelToken);
-            if (access.Status != AccessState.Available)
-                return access;
+            //var access = await base.RequestAccess(cancelToken);
+            //if (access.Status != AccessState.Available)
+            //    return access;
 
-            this.TryStartFirebase();
-            Messaging.SharedInstance.ApnsToken = access.RegistrationToken;
-            //Messaging.SharedInstance.RetrieveFcmTokenAsync()
-            var result = await InstanceId.SharedInstance.GetInstanceIdAsync();
-            this.CurrentRegistrationToken = result.Token;
-            this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            //this.TryStartFirebase();
+            //Messaging.SharedInstance.ApnsToken = access.RegistrationToken;
+            ////Messaging.SharedInstance.RetrieveFcmTokenAsync()
+            //var result = await InstanceId.SharedInstance.GetInstanceIdAsync();
+            //this.CurrentRegistrationToken = result.Token;
+            //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
 
             return new PushAccessState(AccessState.Available, result.Token);
         }
 
 
-        public override async Task UnRegister()
+        public async Task UnRegister()
         {
-            await InstanceId.SharedInstance.DeleteIdAsync();
-            await base.UnRegister();
+            await InstanceId.SharedInstance.DeleteIdAsync().ConfigureAwait(false);
+            await this.apnManager.UnRegister().ConfigureAwait(false);
         }
 
 

@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
-using Android.Runtime;
 using Android.Gms.Extensions;
 using Firebase.Messaging;
 using Shiny.Notifications;
-using Shiny.Infrastructure;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
 
@@ -21,6 +19,7 @@ namespace Shiny.Push
                                       IShinyStartupTask
     {
         readonly Subject<PushNotification> receiveSubj;
+        readonly IAndroidContext context;
         readonly INotificationManager notificationManager;
         readonly AndroidPushProcessor processor;
         readonly PushContainer container;
@@ -28,13 +27,14 @@ namespace Shiny.Push
         readonly ILogger logger;
 
 
-        public PushManager(ShinyCoreServices services,
+        public PushManager(IAndroidContext context,
                            INotificationManager notificationManager,
                            FirebaseManager firebase,
                            AndroidPushProcessor processor,
                            PushContainer container,
                            ILogger<IPushManager> logger)
         {
+            this.context = context;
             this.notificationManager = notificationManager;
             this.firebase = firebase;
             this.processor = processor;
@@ -44,10 +44,14 @@ namespace Shiny.Push
         }
 
 
+        public DateTime? CurrentRegistrationTokenDate => this.container.CurrentRegistrationTokenDate;
+        public string? CurrentRegistrationToken => this.container.CurrentRegistrationToken;
+        public string[]? RegisteredTags => this.container.RegisteredTags;
+
+
         public void Start()
         {
-            this.Services
-                .Android
+            this.context
                 .WhenIntentReceived()
                 .SubscribeAsync(x => this.processor.TryProcessIntent(x));
 
@@ -89,48 +93,48 @@ namespace Shiny.Push
         }
 
 
-        public override async Task UnRegister()
+        public async Task UnRegister()
         {
             this.container.ClearRegistration();
             await this.firebase.UnRegister();
         }
 
 
-        public override IObservable<PushNotification> WhenReceived()
+        public IObservable<PushNotification> WhenReceived()
             => this.receiveSubj;
 
 
-        public virtual async Task AddTag(string tag)
+        public async Task AddTag(string tag)
         {
-            var tags = this.RegisteredTags?.ToList() ?? new List<string>(1);
+            var tags = this.container.RegisteredTags?.ToList() ?? new List<string>(1);
             tags.Add(tag);
 
             await FirebaseMessaging.Instance.SubscribeToTopic(tag);
-            this.RegisteredTags = tags.ToArray();
+            this.container.RegisteredTags = tags.ToArray();
         }
 
 
-        public virtual async Task RemoveTag(string tag)
+        public async Task RemoveTag(string tag)
         {
-            var list = this.RegisteredTags?.ToList() ?? new List<string>(0);
+            var list = this.container.RegisteredTags?.ToList() ?? new List<string>(0);
             if (list.Remove(tag))
-                this.RegisteredTags = list.ToArray();
+                this.container.RegisteredTags = list.ToArray();
 
             await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
         }
 
 
-        public virtual async Task ClearTags()
+        public async Task ClearTags()
         {
-            if (this.RegisteredTags != null)
-                foreach (var tag in this.RegisteredTags)
+            if (this.container.RegisteredTags != null)
+                foreach (var tag in this.container.RegisteredTags)
                     await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
 
-            this.RegisteredTags = null;
+            this.container.RegisteredTags = null;
         }
 
 
-        public virtual async Task SetTags(params string[]? tags)
+        public async Task SetTags(params string[]? tags)
         {
             await this.ClearTags();
             if (tags != null)

@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CorePush.Apple;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Shiny.Push;
 using Shiny.Testing.Push;
 using Xunit;
@@ -43,11 +47,51 @@ namespace Shiny.Tests.Push
 
 
         [Fact]
-        public async Task Test()
+        public async Task EndToEnd()
         {
-            var token = await this.push.RequestAccess();
+            var access = await this.push.RequestAccess();
+            var task = this.push.WhenReceived().Take(1).Timeout(TimeSpan.FromSeconds(20)).ToTask();
 
-            //this.apnSender.SendAsync("")
+            var response = await this.apnSender.SendAsync(
+                new AppleNotification
+                {
+                    AlertBody = new AppleNotification.Alert
+                    {
+                        Title = "Test Title",
+                        Body = "Test Body"
+                    }
+                },
+                access.RegistrationToken
+            );
+
+            var result = await task.ConfigureAwait(false);
+            result.Notification.Should().NotBeNull("Notification is null");
+            result.Notification.Title.Should().Be("Test Title");
+            result.Notification.Message.Should().Be("Test Body");
         }
+
+
+    }
+
+
+    public class AppleNotification
+    {
+        public class Alert
+        {
+            [JsonProperty("title")]
+            public string Title { get; set; }
+
+            [JsonProperty("body")]
+            public string Body { get; set; }
+        }
+
+        [JsonProperty("content-available")]
+        public int ContentAvailable { get; set; } = 1;
+
+        [JsonProperty("alert")]
+        public Alert AlertBody { get; set; }
+
+        [JsonProperty("apns-push-type")]
+        public string PushType { get; set; } = "alert";
     }
 }
