@@ -9,13 +9,12 @@ namespace Shiny.Push
 {
     public class PushContainer : NotifyPropertyChanged
     {
-        readonly IKeyValueStore store;
         readonly IEnumerable<IPushDelegate> delegates;
 
 
         public PushContainer(IKeyValueStoreFactory storeFactory, IEnumerable<IPushDelegate> delegates)
         {
-            this.store = storeFactory.DefaultStore;
+            this.Store = storeFactory.DefaultStore;
             this.delegates = delegates;
         }
 
@@ -30,6 +29,7 @@ namespace Shiny.Push
             => this.delegates.RunDelegates(x => x.OnEntry(response));
 
 
+        public IKeyValueStore Store { get; }
         public void SetCurrentToken(string token)
         {
             this.CurrentRegistrationToken = token;
@@ -47,22 +47,22 @@ namespace Shiny.Push
 
         public string? CurrentRegistrationToken
         {
-            get => this.store.Get<string?>(nameof(this.CurrentRegistrationToken));
-            set => this.store.SetOrRemove(nameof(this.CurrentRegistrationToken), value);
+            get => this.Store.Get<string?>(nameof(this.CurrentRegistrationToken));
+            set => this.Store.SetOrRemove(nameof(this.CurrentRegistrationToken), value);
         }
 
 
         public DateTime? CurrentRegistrationTokenDate
         {
-            get => this.store.Get<DateTime?>(nameof(this.CurrentRegistrationTokenDate));
-            set => this.store.SetOrRemove(nameof(this.CurrentRegistrationTokenDate), value);
+            get => this.Store.Get<DateTime?>(nameof(this.CurrentRegistrationTokenDate));
+            set => this.Store.SetOrRemove(nameof(this.CurrentRegistrationTokenDate), value);
         }
 
 
         public string[]? RegisteredTags
         {
-            get => this.store.Get<string[]?>(nameof(this.RegisteredTags));
-            set => this.store.SetOrRemove(nameof(this.RegisteredTags), value);
+            get => this.Store.Get<string[]?>(nameof(this.RegisteredTags));
+            set => this.Store.SetOrRemove(nameof(this.RegisteredTags), value);
         }
     }
 }

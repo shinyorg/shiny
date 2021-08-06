@@ -24,6 +24,7 @@
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\Uwp\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
@@ -31,6 +32,7 @@
         <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
@@ -40,4 +42,5 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
+
 </Project>
