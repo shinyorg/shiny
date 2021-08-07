@@ -49,7 +49,7 @@ namespace Shiny.Notifications
             }
             else
             {
-                channel = await this.core.Repository.GetChannel(notification.Channel);
+                channel = await this.core.Repository.GetChannel(notification.Channel!);
                 if (channel == null)
                     throw new ArgumentException($"{notification.Channel} does not exist");
             }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
@@ -26,18 +25,12 @@ namespace Shiny.Notifications
             this.core
                 .Android
                 .WhenIntentReceived()
-                .Subscribe(x => this
+                .SubscribeAsync(x => this
                     .core
                     .Services
-                    .Resolve<AndroidNotificationProcessor>()
+                    .Resolve<AndroidNotificationProcessor>()!
                     .TryProcessIntent(x)
                 );
-
-            // auto process intent?
-            //this.context
-            //    .WhenActivityStatusChanged()
-            //    .Where(x => x.Status == ActivityState.Created)
-            //    .Subscribe(x => TryProcessIntent(x.Activity.Intent));
         }
 
 
