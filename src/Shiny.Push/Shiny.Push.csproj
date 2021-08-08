@@ -67,6 +67,7 @@
 
     <ItemGroup>
       <None Remove="Platforms\Shared\PushContainer.cs" />
+      <None Remove="Platforms\Uwp\INativeAdapter.cs" />
     </ItemGroup>
 
 </Project>

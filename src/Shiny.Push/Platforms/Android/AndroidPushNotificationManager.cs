@@ -17,7 +17,7 @@ namespace Shiny.Push
         {
             var intent = this.Services.Android.CreateIntent<ShinyPushNotificationBroadcastReceiver>(ShinyPushNotificationBroadcastReceiver.EntryIntentAction);
             this.PopulateIntent(intent, notification);
-            intent.PutExtra(AndroidPushProcessor.IntentActionKey, action.Identifier);
+            //intent.PutExtra(AndroidPushProcessor.IntentActionKey, action.Identifier);
 
             counter++;
             var pendingIntent = PendingIntent.GetBroadcast(
@@ -33,7 +33,7 @@ namespace Shiny.Push
         protected override void PopulateIntent(Intent intent, Notification notification)
         {
             var content = this.Services.Serializer.Serialize(notification);
-            intent.PutExtra(AndroidPushProcessor.IntentNotificationKey, content);
+            //intent.PutExtra(AndroidPushProcessor.IntentNotificationKey, content);
         }
     }
 }

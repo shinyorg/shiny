@@ -3,6 +3,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+using Shiny.Push.Infrastructure;
 
 namespace Shiny.Push
 {
@@ -25,13 +26,12 @@ namespace Shiny.Push
             services.TryAddSingleton(typeof(IPushManager), this.pushManagerType);
 #if !NETSTANDARD
             services.TryAddSingleton<PushContainer>();
+            services.TryAddSingleton<INativeAdapter, NativeAdapter>();
 #endif
 
 #if __ANDROID__
             services.TryAddSingleton<AndroidPushNotificationManager>();
             services.TryAddSingleton<AndroidPushProcessor>();
-#elif __IOS__
-            services.TryAddSingleton<ApnManager>();
 #endif
         }
     }

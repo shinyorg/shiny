@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Android.Content;
+using Shiny.Push.Infrastructure;
 
 
 namespace Shiny.Push
@@ -14,13 +15,14 @@ namespace Shiny.Push
     {
         public const string ReceiverName = "com.shiny.push." + nameof(ShinyPushNotificationBroadcastReceiver);
         public const string EntryIntentAction = ReceiverName + ".ENTRY_ACTION";
+        internal static Func<Intent, Task>? ProcessIntent { get; set; }
 
 
         protected override async Task OnReceiveAsync(Context? context, Intent? intent)
         {
-            if (intent?.Action == EntryIntentAction)
+            if (intent?.Action == EntryIntentAction && ProcessIntent != null)
             {
-                await this.Resolve<AndroidPushProcessor>().TryProcessIntent(intent);
+                await ProcessIntent.Invoke(intent).ConfigureAwait(false);
                 context?.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
             }
         }

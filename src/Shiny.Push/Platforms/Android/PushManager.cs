@@ -3,11 +3,10 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using Microsoft.Extensions.Logging;
 using Android.Gms.Extensions;
 using Firebase.Messaging;
 using Shiny.Notifications;
+using Shiny.Push.Infrastructure;
 using Task = System.Threading.Tasks.Task;
 using CancellationToken = System.Threading.CancellationToken;
 
@@ -18,29 +17,18 @@ namespace Shiny.Push
                                       IPushTagSupport,
                                       IShinyStartupTask
     {
-        readonly Subject<PushNotification> receiveSubj;
-        readonly IAndroidContext context;
         readonly INotificationManager notificationManager;
-        readonly AndroidPushProcessor processor;
         readonly PushContainer container;
-        readonly FirebaseManager firebase;
-        readonly ILogger logger;
+        readonly INativeAdapter adapter;
 
 
-        public PushManager(IAndroidContext context,
-                           INotificationManager notificationManager,
-                           FirebaseManager firebase,
-                           AndroidPushProcessor processor,
-                           PushContainer container,
-                           ILogger<IPushManager> logger)
+        public PushManager(INotificationManager notificationManager,
+                           INativeAdapter adapter,
+                           PushContainer container)
         {
-            this.context = context;
             this.notificationManager = notificationManager;
-            this.firebase = firebase;
-            this.processor = processor;
+            this.adapter = adapter;
             this.container = container;
-            this.logger = logger;
-            this.receiveSubj = new Subject<PushNotification>();
         }
 
 
@@ -51,32 +39,24 @@ namespace Shiny.Push
 
         public void Start()
         {
-            this.context
-                .WhenIntentReceived()
-                .SubscribeAsync(x => this.processor.TryProcessIntent(x));
+            this.adapter.OnTokenRefreshed = async token =>
+            {
+                this.container.SetCurrentToken(token, false);
+                await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
+            };
+
+            this.adapter.OnReceived = async push =>
+            {
+                await this.container.OnReceived(push);
+                if (push.Notification != null)
+                    await this.notificationManager.Send(push.Notification);
+            };
+
+            this.adapter.OnResponse = push => this.container.OnEntry(push);
 
             // wireup firebase if it was active
             if (this.CurrentRegistrationToken != null)
                 FirebaseMessaging.Instance.AutoInitEnabled = true;
-
-            ShinyFirebaseService.NewToken = async token =>
-            {
-                this.container.SetCurrentToken(token);
-                await this.container.OnTokenRefreshed(token);
-            };
-
-            ShinyFirebaseService.MessageReceived = async message =>
-            {
-                try
-                {
-                    var pr = this.FromNative(message);
-                    await this.OnPushReceived(pr).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError(ex, "Error processing received message");
-                }
-            };
         }
 
 
@@ -86,8 +66,8 @@ namespace Shiny.Push
             if (nresult != AccessState.Available)
                 return new PushAccessState(nresult, null);
 
-            var token = await this.firebase.RequestToken().ConfigureAwait(false);
-            this.container.SetCurrentToken(token);
+            var result = await this.adapter.RequestAccess().ConfigureAwait(false);
+            this.container.SetCurrentToken(result.RegistrationToken!, false);
 
             return new PushAccessState(AccessState.Available, this.CurrentRegistrationToken);
         }
@@ -96,12 +76,12 @@ namespace Shiny.Push
         public async Task UnRegister()
         {
             this.container.ClearRegistration();
-            await this.firebase.UnRegister();
+            await this.adapter.UnRegister();
         }
 
 
         public IObservable<PushNotification> WhenReceived()
-            => this.receiveSubj;
+            => this.container.WhenReceived();
 
 
         public async Task AddTag(string tag)
@@ -140,39 +120,6 @@ namespace Shiny.Push
             if (tags != null)
                 foreach (var tag in tags)
                     await this.AddTag(tag);
-        }
-
-
-        async Task OnPushReceived(PushNotification push)
-        {
-            await this.container.OnReceived(push);
-            this.receiveSubj.OnNext(push);
-
-            if (push.Notification != null)
-                await this.notificationManager.Send(push.Notification);
-        }
-
-
-        PushNotification FromNative(RemoteMessage message)
-        {
-            Notification? notification = null;
-            var native = message.GetNotification();
-
-            if (native != null)
-            {
-                notification = new Notification
-                {
-                    Title = native.Title,
-                    Message = native.Body,
-                    Channel = native.ChannelId
-                };
-                if (!native.Icon.IsEmpty())
-                    notification.Android.SmallIconResourceName = native.Icon;
-
-                if (!native.Color.IsEmpty())
-                    notification.Android.ColorResourceName = native.Color;
-            }
-            return new PushNotification(message.Data, notification);
         }
     }
 }

@@ -9,9 +9,8 @@ namespace Shiny.Push.Infrastructure
         Task<PushAccessState> RequestAccess();
         Task UnRegister();
 
-        Action<PushNotification>? OnReceived { get; set; }
-        Action<PushNotificationResponse>? OnResponse { get; set; }
-        Action<string>? OnTokenRefreshed { get; set; }
-        // TODO: register tags/properties
+        Func<PushNotification, Task>? OnReceived { get; set; }
+        Func<PushNotificationResponse, Task>? OnResponse { get; set; }
+        Func<string, Task>? OnTokenRefreshed { get; set; }
     }
 }

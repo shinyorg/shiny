@@ -1,6 +1,7 @@
 ﻿#if !NETSTANDARD
 using System;
 using System.Collections.Generic;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Shiny.Stores;
 
@@ -10,10 +11,12 @@ namespace Shiny.Push
     public class PushContainer : NotifyPropertyChanged
     {
         readonly IEnumerable<IPushDelegate> delegates;
+        readonly Subject<PushNotification> recvSubj;
 
 
         public PushContainer(IKeyValueStoreFactory storeFactory, IEnumerable<IPushDelegate> delegates)
         {
+            this.recvSubj = new Subject<PushNotification>();
             this.Store = storeFactory.DefaultStore;
             this.delegates = delegates;
         }
@@ -28,12 +31,20 @@ namespace Shiny.Push
         public Task OnEntry(PushNotificationResponse response)
             => this.delegates.RunDelegates(x => x.OnEntry(response));
 
+        public IObservable<PushNotification> WhenReceived() => this.recvSubj;
 
         public IKeyValueStore Store { get; }
-        public void SetCurrentToken(string token)
+        public void SetCurrentToken(string token, bool fireChangeIfApplicable)
         {
+            var fireEvent = fireChangeIfApplicable &&
+                            this.CurrentRegistrationToken != null &&
+                            this.CurrentRegistrationToken.Equals(token, StringComparison.InvariantCultureIgnoreCase);
+
             this.CurrentRegistrationToken = token;
             this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+
+            if (fireEvent)
+                this.OnTokenRefreshed(token);
         }
 
 
