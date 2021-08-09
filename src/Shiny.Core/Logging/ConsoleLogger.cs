@@ -7,20 +7,20 @@ namespace Shiny.Logging
     public class ConsoleLogger : ILogger
     {
         readonly string categoryName;
-        readonly LogLevel level;
+        readonly LogLevel configLogLevel;
 
 
         public ConsoleLogger(string categoryName, LogLevel logLevel)
         {
             this.categoryName = categoryName;
-            this.level = logLevel;
+            this.configLogLevel = logLevel;
         }
 
         public IDisposable BeginScope<TState>(TState state)
             => NullScope.Instance;
 
         public bool IsEnabled(LogLevel logLevel)
-            => this.level >= logLevel;
+            => logLevel >= this.configLogLevel;
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
