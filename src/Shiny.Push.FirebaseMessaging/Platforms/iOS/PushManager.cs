@@ -5,25 +5,38 @@ using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
 using Firebase.InstanceID;
+using Microsoft.Extensions.Logging;
+using Shiny.Push.Infrastructure;
 
 
 namespace Shiny.Push.FirebaseMessaging
 {
     public class PushManager : IPushManager, IPushTagSupport
     {
-        readonly ApnManager apnManager;
+        readonly INativeAdapter adapter;
         readonly PushContainer container;
+        readonly ILogger logger;
 
 
-        public PushManager(ApnManager apnManager, PushContainer container)
+        public PushManager(INativeAdapter adapter,
+                           PushContainer container,
+                           ILogger<PushManager> logger)
         {
-            this.apnManager = apnManager;
+            this.adapter = adapter;
             this.container = container;
+            this.logger = logger;
         }
+
+
+        public DateTime? CurrentRegistrationTokenDate => this.container.CurrentRegistrationTokenDate;
+        public string? CurrentRegistrationToken => this.container.CurrentRegistrationToken;
+        public string[]? RegisteredTags => this.container.RegisteredTags;
+        public IObservable<PushNotification> WhenReceived() => this.container.WhenReceived();
 
 
         public void Start()
         {
+            // TODO
             //if (this.CurrentRegistrationToken != null)
             //    this.TryStartFirebase();
         }
@@ -46,7 +59,7 @@ namespace Shiny.Push.FirebaseMessaging
                 },
                 async token =>
                 {
-                    this.container.SetCurrentToken(token);
+                    this.container.SetCurrentToken(token, true);
                     await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
                 }
             );
@@ -55,25 +68,21 @@ namespace Shiny.Push.FirebaseMessaging
 
         public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            //var access = await base.RequestAccess(cancelToken);
-            //if (access.Status != AccessState.Available)
-            //    return access;
+            var result = await this.adapter.RequestAccess().ConfigureAwait(false);
+            this.TryStartFirebase();
+            Messaging.SharedInstance.ApnsToken = result.RegistrationToken;
 
-            //this.TryStartFirebase();
-            //Messaging.SharedInstance.ApnsToken = access.RegistrationToken;
-            ////Messaging.SharedInstance.RetrieveFcmTokenAsync()
-            //var result = await InstanceId.SharedInstance.GetInstanceIdAsync();
-            //this.CurrentRegistrationToken = result.Token;
-            //this.CurrentRegistrationTokenDate = DateTime.UtcNow;
+            var fcmToken = await InstanceId.SharedInstance.GetInstanceIdAsync();
+            this.container.SetCurrentToken(fcmToken.Token, false);
 
-            return new PushAccessState(AccessState.Available, result.Token);
+            return new PushAccessState(result.Status, fcmToken.Token);
         }
 
 
         public async Task UnRegister()
         {
             await InstanceId.SharedInstance.DeleteIdAsync().ConfigureAwait(false);
-            await this.apnManager.UnRegister().ConfigureAwait(false);
+            await this.adapter.UnRegister().ConfigureAwait(false);
         }
 
 
@@ -83,7 +92,7 @@ namespace Shiny.Push.FirebaseMessaging
             tags.Add(tag);
 
             await Messaging.SharedInstance.SubscribeAsync(tag);
-            this.RegisteredTags = tags.ToArray();
+            this.container.RegisteredTags = tags.ToArray();
         }
 
 
@@ -94,7 +103,7 @@ namespace Shiny.Push.FirebaseMessaging
             {
                 var tags = this.RegisteredTags.ToList();
                 if (tags.Remove(tag))
-                    this.RegisteredTags = tags.ToArray();
+                    this.container.RegisteredTags = tags.ToArray();
             }
         }
 
@@ -105,7 +114,7 @@ namespace Shiny.Push.FirebaseMessaging
                 foreach (var tag in this.RegisteredTags)
                     await Messaging.SharedInstance.UnsubscribeAsync(tag);
 
-            this.RegisteredTags = null;
+            this.container.RegisteredTags = null;
         }
 
 

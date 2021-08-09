@@ -9,7 +9,7 @@ namespace Shiny.Push
     public class NativeAdapter : INativeAdapter
     {
         public Func<PushNotification, Task>? OnReceived { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Func<PushNotificationResponse, Task>? OnResponse { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Func<PushNotificationResponse, Task>? OnEntry { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public Func<string, Task>? OnTokenRefreshed { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public Task<PushAccessState> RequestAccess() => throw new NotImplementedException();

@@ -74,7 +74,7 @@ namespace Shiny.Push
         {
             this.channel = await PushNotificationChannelManager.CreatePushNotificationChannelForApplicationAsync();
             this.CurrentRegistrationExpiryDate = this.channel.ExpirationTime.DateTime.ToUniversalTime();
-            this.container.SetCurrentToken(this.channel.Uri);
+            this.container.SetCurrentToken(this.channel.Uri, false);
             this.InitializeExpirationTimer();
             return new PushAccessState(AccessState.Available, channel.Uri);
         }

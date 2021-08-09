@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-
 using Android.Content;
 using Android.Gms.Extensions;
 using Android.Runtime;
@@ -48,13 +47,13 @@ namespace Shiny.Push
         {
             //if (intent.HasExtra(IntentNotificationKey))
             var pr = this.FromIntent(intent);
-            if (pr != null && this.OnResponse != null)
-                await this.OnResponse.Invoke(pr.Value).ConfigureAwait(false);
+            if (pr != null && this.OnEntry != null)
+                await this.OnEntry.Invoke(pr.Value).ConfigureAwait(false);
         }
 
 
         public Func<PushNotification, Task>? OnReceived { get; set; }
-        public Func<PushNotificationResponse, Task>? OnResponse { get; set; }
+        public Func<PushNotificationResponse, Task>? OnEntry { get; set; }
         public Func<string, Task>? OnTokenRefreshed { get; set; }
 
 

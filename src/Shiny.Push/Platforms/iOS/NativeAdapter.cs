@@ -20,35 +20,69 @@ namespace Shiny.Push
         {
             this.platform = platform;
             this.lifecycle = lifecycle;
-
-            this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
-            {
-                if (this.OnReceived != null)
-                {
-                    var dict = userInfo.FromNsDictionary();
-                    var pr = new PushNotification(dict, null);
-                    await this.OnReceived.Invoke(pr).ConfigureAwait(false);
-                }
-            });
-
-            this.lifecycle.RegisterForNotificationReceived(async response =>
-            {
-                if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger && this.OnResponse != null)
-                {
-                    var shiny = response.FromNative();
-                    var pr = new PushNotificationResponse(
-                        shiny.Notification,
-                        shiny.ActionIdentifier,
-                        shiny.Text
-                    );
-                    await this.OnResponse.Invoke(pr).ConfigureAwait(false);
-                }
-            });
         }
 
 
-        public Func<PushNotification, Task>? OnReceived { get; set; }
-        public Func<PushNotificationResponse, Task>? OnResponse { get; set; }
+        IDisposable? onReceviedSub;
+        Func<PushNotification, Task>? onReceived;
+        public Func<PushNotification, Task>? OnReceived
+        {
+            get => this.onReceived;
+            set
+            {
+                this.onReceived = value;
+                if (value == null)
+                {
+                    this.onReceviedSub?.Dispose();
+                }
+                else
+                {
+                    this.onReceviedSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
+                    {
+                        if (this.OnReceived != null)
+                        {
+                            var dict = userInfo.FromNsDictionary();
+                            var pr = new PushNotification(dict, null);
+                            await this.onReceived.Invoke(pr).ConfigureAwait(false);
+                        }
+                    });
+                }
+            }
+        }
+
+
+        IDisposable? onEntrySub;
+        Func<PushNotificationResponse, Task>? onEntry;
+        public Func<PushNotificationResponse, Task>? OnEntry
+        {
+            get => this.onEntry;
+            set
+            {
+                this.onEntry = value;
+                if (value == null)
+                {
+                    this.onEntrySub?.Dispose();
+                }
+                else
+                {
+                    this.onEntrySub = this.lifecycle.RegisterForNotificationReceived(async response =>
+                    {
+                        if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger && this.onEntry != null)
+                        {
+                            var shiny = response.FromNative();
+                            var pr = new PushNotificationResponse(
+                                shiny.Notification,
+                                shiny.ActionIdentifier,
+                                shiny.Text
+                            );
+                            await this.onEntry.Invoke(pr).ConfigureAwait(false);
+                        }
+                    });
+                }
+            }
+        }
+
+
         public Func<string, Task>? OnTokenRefreshed { get; set; }
 
 

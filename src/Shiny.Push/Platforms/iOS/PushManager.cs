@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Shiny.Push.Infrastructure;
 
 
@@ -10,12 +11,16 @@ namespace Shiny.Push
     {
         readonly PushContainer container;
         readonly INativeAdapter adapter;
+        readonly ILogger logger;
 
 
-        public PushManager(PushContainer container, INativeAdapter adapter)
+        public PushManager(PushContainer container,
+                           INativeAdapter adapter,
+                           ILogger<PushManager> logger)
         {
             this.adapter = adapter;
             this.container = container;
+            this.logger = logger;
         }
 
 
@@ -23,23 +28,13 @@ namespace Shiny.Push
         public string? CurrentRegistrationToken => this.container.CurrentRegistrationToken;
 
 
-        public void Start()
+        public async void Start()
         {
-            // TODO: should force hooks for adapter here
-            if (!this.CurrentRegistrationToken.IsEmpty())
-            {
-                this.adapter
-                    .RequestAccess()
-                    .ContinueWith(x =>
-                    {
-                        // check if token empty
-                        //if (x.IsCompletedSuccessfully &&
-                        //    (!x.Result.RegistrationToken.Equals(this.CurrentRegistrationToken) ?? false))
-                        //{
-                        //    this.container.SetCurrentToken(x.Result!.RegistrationToken, true);
-                        //}
-                    });
-            }
+            this.adapter.OnReceived = push => this.container.OnReceived(push);
+            this.adapter.OnEntry = push => this.container.OnEntry(push);
+            await this.adapter
+                .AutoStartIfApplicable(this.container, this.logger)
+                .ConfigureAwait(false);
         }
 
 

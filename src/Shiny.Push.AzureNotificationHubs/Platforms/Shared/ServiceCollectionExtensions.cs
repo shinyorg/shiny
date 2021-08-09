@@ -1,9 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Push;
 using Shiny.Push.AzureNotificationHubs;
-using Shiny.Push.AzureNotificationHubs.Infrastructure;
 
 
 namespace Shiny
@@ -18,7 +16,6 @@ namespace Shiny
 #if NETSTANDARD2_0
             return false;
 #else
-            services.TryAddSingleton<INativeAdapter, NativeAdapter>();
             services.UseNotifications();
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Push.AzureNotificationHubs.PushManager),

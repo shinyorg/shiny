@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
 using Microsoft.Extensions.Logging;
-using Shiny.Push.AzureNotificationHubs.Infrastructure;
+using Shiny.Push.Infrastructure;
 
 
 namespace Shiny.Push.AzureNotificationHubs
@@ -21,11 +21,6 @@ namespace Shiny.Push.AzureNotificationHubs
         readonly PushContainer container;
         readonly NotificationHubClient hub;
 
-
-        // TODO: need different native managers - ApnManager, FirebaseManager, UWP??
-        // TODO: need different startups per platform
-        // TODO: need different listening events per platform
-        // TODO: watch for different native token changes
 
         protected PushManager(INativeAdapter native,
                               ILogger<PushManager> logger,
@@ -55,7 +50,7 @@ namespace Shiny.Push.AzureNotificationHubs
 
         public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var access = await this.native.RequestAccess();
+            var access = await this.native.RequestAccess().ConfigureAwait(false);
             this.logger.LogInformation($"OS Permission: {access.Status} - Native Token: {access.RegistrationToken}");
 
             if (access.Status == AccessState.Available)
@@ -77,7 +72,7 @@ namespace Shiny.Push.AzureNotificationHubs
                 this.logger.LogInformation($"ANH Token: {this.InstallationId}");
 
                 await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken).ConfigureAwait(false);
-                this.container.SetCurrentToken(access.RegistrationToken!);
+                this.container.SetCurrentToken(access.RegistrationToken!, false);
 
                 access = new PushAccessState(AccessState.Available, this.InstallationId);
             }

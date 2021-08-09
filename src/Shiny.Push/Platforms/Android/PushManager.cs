@@ -52,7 +52,7 @@ namespace Shiny.Push
                     await this.notificationManager.Send(push.Notification);
             };
 
-            this.adapter.OnResponse = push => this.container.OnEntry(push);
+            this.adapter.OnEntry = push => this.container.OnEntry(push);
 
             // wireup firebase if it was active
             if (this.CurrentRegistrationToken != null)
