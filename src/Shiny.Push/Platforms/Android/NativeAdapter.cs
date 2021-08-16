@@ -23,6 +23,7 @@ namespace Shiny.Push
                              IAndroidContext context)
         {
             this.notifications = notifications;
+            this.serializer = serializer;
 
             // on activity
             context
@@ -85,6 +86,7 @@ namespace Shiny.Push
             //await this.delegates.RunDelegates(x => x.OnEntry(response));
             return null;
         }
+
 
         PushNotification FromNative(RemoteMessage message)
         {

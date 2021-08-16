@@ -36,33 +36,39 @@ namespace Shiny.Push.FirebaseMessaging
 
         public void Start()
         {
-            // TODO
-            //if (this.CurrentRegistrationToken != null)
-            //    this.TryStartFirebase();
+            if (this.CurrentRegistrationToken != null)
+                this.TryStartFirebase();
         }
 
 
         protected virtual void TryStartFirebase()
         {
-            if (Messaging.SharedInstance == null)
-                Firebase.Core.App.Configure();
+            try
+            {
+                if (Messaging.SharedInstance == null)
+                    Firebase.Core.App.Configure();
 
-            Messaging.SharedInstance!.AutoInitEnabled = true;
-            Messaging.SharedInstance.Delegate = new FbMessagingDelegate
-            (
-                async msg =>
-                {
-                    // I can't get access to the notification here
-                    var dict = msg.AppData.FromNsDictionary();
-                    var pr = new PushNotification(dict, null);
-                    await this.container.OnReceived(pr).ConfigureAwait(false);
-                },
-                async token =>
-                {
-                    this.container.SetCurrentToken(token, true);
-                    await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
-                }
-            );
+                Messaging.SharedInstance!.AutoInitEnabled = true;
+                Messaging.SharedInstance.Delegate = new FbMessagingDelegate
+                (
+                    async msg =>
+                    {
+                        // I can't get access to the notification here
+                        var dict = msg.AppData.FromNsDictionary();
+                        var pr = new PushNotification(dict, null);
+                        await this.container.OnReceived(pr).ConfigureAwait(false);
+                    },
+                    async token =>
+                    {
+                        this.container.SetCurrentToken(token, true);
+                        await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning("Failed to start Firebase Push", ex);
+            }
         }
 
 

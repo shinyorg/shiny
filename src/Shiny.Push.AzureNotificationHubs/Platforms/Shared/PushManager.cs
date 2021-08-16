@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
@@ -13,10 +12,11 @@ using Shiny.Push.Infrastructure;
 
 namespace Shiny.Push.AzureNotificationHubs
 {
-    public partial class PushManager : IPushManager, IPushTagSupport
+    public partial class PushManager : IPushManager,
+                                       IPushTagSupport,
+                                       IShinyStartupTask
     {
         readonly INativeAdapter native;
-        readonly Subject<PushNotification> pushSubj;
         readonly ILogger logger;
         readonly PushContainer container;
         readonly NotificationHubClient hub;
@@ -27,7 +27,6 @@ namespace Shiny.Push.AzureNotificationHubs
                               PushContainer container,
                               AzureNotificationConfig config)
         {
-            this.pushSubj = new Subject<PushNotification>();
             this.native = native;
             this.container = container;
             this.logger = logger;
@@ -38,6 +37,13 @@ namespace Shiny.Push.AzureNotificationHubs
         }
 
 
+        public void Start()
+        {
+
+        }
+
+
+        public IObservable<PushNotification> WhenReceived() => this.container.WhenReceived();
         public string? CurrentRegistrationToken => this.InstallationId;
         public DateTime? CurrentRegistrationTokenDate => this.container.CurrentRegistrationTokenDate;
         public string[]? RegisteredTags => this.container.RegisteredTags;
@@ -133,8 +139,6 @@ namespace Shiny.Push.AzureNotificationHubs
             this.container.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.container.RegisteredTags = tags;
         }
-
-        public IObservable<PushNotification> WhenReceived() => this.pushSubj;
     }
 }
 #endif

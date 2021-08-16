@@ -31,7 +31,7 @@ namespace Shiny.Push
             set
             {
                 this.onReceived = value;
-                if (value == null)
+                if (this.onReceived == null)
                 {
                     this.onReceviedSub?.Dispose();
                 }
@@ -39,12 +39,9 @@ namespace Shiny.Push
                 {
                     this.onReceviedSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
                     {
-                        if (this.OnReceived != null)
-                        {
-                            var dict = userInfo.FromNsDictionary();
-                            var pr = new PushNotification(dict, null);
-                            await this.onReceived.Invoke(pr).ConfigureAwait(false);
-                        }
+                        var dict = userInfo.FromNsDictionary();
+                        var pr = new PushNotification(dict, null);
+                        await this.onReceived.Invoke(pr).ConfigureAwait(false);
                     });
                 }
             }
@@ -59,7 +56,7 @@ namespace Shiny.Push
             set
             {
                 this.onEntry = value;
-                if (value == null)
+                if (this.onEntry == null)
                 {
                     this.onEntrySub?.Dispose();
                 }
@@ -67,7 +64,7 @@ namespace Shiny.Push
                 {
                     this.onEntrySub = this.lifecycle.RegisterForNotificationReceived(async response =>
                     {
-                        if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger && this.onEntry != null)
+                        if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                         {
                             var shiny = response.FromNative();
                             var pr = new PushNotificationResponse(
