@@ -24,7 +24,7 @@ namespace Shiny.Logging
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            if (!IsEnabled(logLevel))
+            if (!this.IsEnabled(logLevel))
                 return;
 
             if (formatter == null)
