@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CoreLocation;
 using Microsoft.Extensions.Logging;
@@ -60,7 +58,13 @@ namespace Shiny.Locations
         public GpsRequest? CurrentListener
         {
             get => this.request;
-            set => this.Set(ref this.request, value);
+            set
+            {
+                if (value?.UseBackground ?? true)
+                    this.Set(ref this.request, value);
+                else
+                    this.request = value;
+            }
         }
 
 
@@ -100,6 +104,7 @@ namespace Shiny.Locations
         protected virtual async Task StartListenerInternal(GpsRequest request)
         {
             var access = await this.RequestAccess(request);
+            //if (request.UseBackground && access == AccessState.Available || access == AccessState.Restricted)
             access.Assert();
             this.gdelegate.Request = request;
 #if __IOS__

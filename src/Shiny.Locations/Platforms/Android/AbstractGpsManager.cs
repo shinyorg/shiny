@@ -39,7 +39,13 @@ namespace Shiny.Locations
         public GpsRequest? CurrentListener
         {
             get => this.request;
-            set => this.Set(ref this.request, value);
+            set
+            {
+                if (value?.UseBackground ?? true)
+                    this.Set(ref this.request, value);
+                else
+                    this.request = value;
+            }
         }
 
 
