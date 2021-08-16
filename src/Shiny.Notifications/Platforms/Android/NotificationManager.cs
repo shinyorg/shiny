@@ -71,10 +71,16 @@ namespace Shiny.Notifications
             var channel = await this.GetChannel(notification);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
 
-            if (notification.ScheduleDate == null)
-                this.manager.SendNative(notification.Id, builder.Build());
-            else
+            if (notification.ScheduleDate != null)
+            {
                 await this.core.Repository.Set(notification.Id.ToString(), notification);
+            }
+            else
+            {
+                this.manager.SendNative(notification.Id, builder.Build());
+                //if (notification.BadgeCount != null)
+                //    this.Services.SetBadgeCount(notification.BadgeCount.Value);
+            }
         }
 
 

@@ -30,14 +30,13 @@ namespace Shiny.Notifications
 
         public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification, Channel channel)
         {
-            var pendingIntent = this.GetLaunchPendingIntent(notification);
             var builder = new NotificationCompat.Builder(this.Services.Android.AppContext)
                 .SetContentTitle(notification.Title)
                 .SetSmallIcon(this.GetSmallIconResource(notification.Android.SmallIconResourceName))
                 .SetAutoCancel(notification.Android.AutoCancel)
-                .SetOngoing(notification.Android.OnGoing)
-                .SetContentIntent(pendingIntent);
+                .SetOngoing(notification.Android.OnGoing);
 
+            this.ApplyLaunchIntent(builder, notification);
             if (!notification.Android.ContentInfo.IsEmpty())
                 builder.SetContentInfo(notification.Android.ContentInfo);
 
@@ -51,9 +50,6 @@ namespace Shiny.Notifications
 
             this.TrySetLargeIconResource(notification, builder);
 
-            if (notification.BadgeCount != null)
-                this.Services.SetBadgeCount(notification.BadgeCount.Value);
-
             if (!notification.Android.ColorResourceName.IsEmpty())
             {
                 var color = this.GetColor(notification.Android.ColorResourceName);
@@ -66,6 +62,20 @@ namespace Shiny.Notifications
             if (notification.Android.When != null)
                 builder.SetWhen(notification.Android.When.Value.ToUnixTimeMilliseconds());
 
+            this.ApplyChannel(builder, notification, channel);
+            return builder;
+        }
+
+
+        public virtual void ApplyLaunchIntent(NotificationCompat.Builder builder, Notification notification)
+        {
+            var pendingIntent = this.GetLaunchPendingIntent(notification);
+            builder.SetContentIntent(pendingIntent);
+        }
+
+
+        public virtual void ApplyChannel(NotificationCompat.Builder builder, Notification notification, Channel channel)
+        {
             builder.SetChannelId(channel.Identifier);
             if (channel.Actions != null)
             {
@@ -92,7 +102,6 @@ namespace Shiny.Notifications
                     }
                 }
             }
-            return builder;
         }
 
 
