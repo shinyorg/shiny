@@ -33,10 +33,9 @@ namespace Shiny.Locations
             {
                 try
                 {
-                    if (this.CurrentListener.UseBackground)
+                    // only auto-start if auth status was changed to FULL authorized, not restricted
+                    if (this.locationManager.AuthorizationStatus == CLAuthorizationStatus.Authorized)
                         await this.StartListenerInternal(this.CurrentListener);
-                    else
-                        this.CurrentListener = null;
                 }
                 catch (Exception ex)
                 {
@@ -89,14 +88,12 @@ namespace Shiny.Locations
 
         public Task StopListener()
         {
-            if (this.CurrentListener != null)
-            {
 #if __IOS__
-                this.locationManager.AllowsBackgroundLocationUpdates = false;
+            this.locationManager.AllowsBackgroundLocationUpdates = false;
 #endif
-                this.locationManager.StopUpdatingLocation();
-                this.CurrentListener = null;
-            }
+            this.locationManager.StopUpdatingLocation();
+            this.CurrentListener = null;
+
             return Task.CompletedTask;
         }
 

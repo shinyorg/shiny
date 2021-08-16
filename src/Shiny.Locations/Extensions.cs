@@ -8,22 +8,29 @@ namespace Shiny.Locations
     public static class Extensions
     {
         /// <summary>
-        /// Requests a single GPS reading by starting the listener and stopping once a reading is received
+        /// Requests a single GPS reading - This will start & stop the gps listener if wasn't running already
         /// </summary>
         /// <param name="gpsManager"></param>
         /// <returns></returns>
         public static IObservable<IGpsReading> GetCurrentPosition(this IGpsManager gpsManager) => Observable.FromAsync(async ct =>
         {
+            var iStarted = false;
             try
             {
                 var task = gpsManager.WhenReading().Take(1).ToTask(ct);
-                await gpsManager.StartListener(GpsRequest.Foreground);
+                if (!gpsManager.IsListening())
+                {
+                    iStarted = true;
+                    await gpsManager.StartListener(GpsRequest.Foreground);
+                }
+
                 var reading = await task.ConfigureAwait(false);
                 return reading;
             }
             finally
             {
-                await gpsManager.StopListener();
+                if (iStarted)
+                    await gpsManager.StopListener();
             }
         });
 

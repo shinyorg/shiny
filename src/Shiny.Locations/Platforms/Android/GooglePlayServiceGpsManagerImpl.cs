@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Gms.Location;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Locations
@@ -9,7 +10,7 @@ namespace Shiny.Locations
     public class GooglePlayServiceGpsManagerImpl : AbstractGpsManager
     {
         readonly FusedLocationProviderClient client;
-        public GooglePlayServiceGpsManagerImpl(IAndroidContext context) : base(context)
+        public GooglePlayServiceGpsManagerImpl(IAndroidContext context, ILogger<GooglePlayServiceGpsManagerImpl> logger) : base(context, logger)
             => this.client = LocationServices.GetFusedLocationProviderClient(context.AppContext);
 
 

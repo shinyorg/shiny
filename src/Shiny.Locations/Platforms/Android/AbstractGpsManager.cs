@@ -3,18 +3,21 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Locations
 {
     public abstract partial class AbstractGpsManager : IGpsManager, IShinyStartupTask
     {
         readonly Subject<IGpsReading> readingSubj;
+        readonly ILogger logger;
 
 
-        protected AbstractGpsManager(IAndroidContext context)
+        protected AbstractGpsManager(IAndroidContext context, ILogger logger)
         {
             this.readingSubj = new Subject<IGpsReading>();
             this.Context = context;
+            this.logger = logger;
             this.Callback = new ShinyLocationCallback
             {
                 OnReading = x => this.readingSubj.OnNext(new GpsReading(x))
@@ -24,10 +27,17 @@ namespace Shiny.Locations
 
         public virtual async void Start()
         {
-            if (this.CurrentListener?.UseBackground ?? false)
-                await this.StartListener(this.CurrentListener);
-            else
-                this.CurrentListener = null;
+            if (this.CurrentListener != null)
+            {
+                try
+                {
+                    await this.StartListener(this.CurrentListener);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning("Failed to auto-start GPS", ex);
+                }
+            }
         }
 
 

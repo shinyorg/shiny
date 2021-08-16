@@ -17,6 +17,12 @@ namespace Shiny.Stores
 
     public class KeyValueStoreFactory : IKeyValueStoreFactory
     {
+#if __IOS__
+        public static string DefaultStoreName { get; set; } = "secure";
+#else
+        public static string DefaultStoreName { get; set; } = "settings";
+#endif
+
         readonly IEnumerable<IKeyValueStore> keyStores;
         public KeyValueStoreFactory(IEnumerable<IKeyValueStore> keyStores)
             => this.keyStores = keyStores;
@@ -27,7 +33,7 @@ namespace Shiny.Stores
         {
             get
             {
-                this.defaultStore ??= this.GetStore("settings");
+                this.defaultStore ??= this.GetStore(DefaultStoreName);
                 return defaultStore;
             }
         }
