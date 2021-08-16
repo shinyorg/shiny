@@ -39,7 +39,28 @@ namespace Shiny.Push.AzureNotificationHubs
 
         public void Start()
         {
+            // this only runs on Android/Firebase
+            this.native.OnTokenRefreshed = async token =>
+            {
+                // TODO: update installation - if installation update fails - we'll need to try again somehow (job?)
+                //this.container.SetCurrentToken(token, false);
+                //await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
+            };
 
+            this.native.OnReceived = async push =>
+            {
+                await this.container.OnReceived(push).ConfigureAwait(false);
+#if __ANDROID__
+                //if (push.Notification != null)
+                //    await this.notificationManager.Send(push.Notification);
+#endif
+            };
+
+            this.native.OnEntry = push => this.container.OnEntry(push);
+
+            //await this.native
+            //    .TryAutoStart(this.adapter, this.logger)
+            //    .ConfigureAwait(false);
         }
 
 

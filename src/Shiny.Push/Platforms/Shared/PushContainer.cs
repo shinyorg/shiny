@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Shiny.Push.Infrastructure;
 using Shiny.Stores;
 
 
@@ -19,6 +21,41 @@ namespace Shiny.Push
             this.recvSubj = new Subject<PushNotification>();
             this.Store = storeFactory.DefaultStore;
             this.delegates = delegates;
+        }
+
+
+        // TODO: I want the reg token to be the install ID on ANH - this may not work
+        public async Task TryAutoStart(INativeAdapter adapter, ILogger logger)
+        {
+            if (this.CurrentRegistrationToken.IsEmpty())
+                return;
+
+            try
+            {
+                logger.LogInformation("Container has active push registration token - attempting to start");
+                var result = await adapter.RequestAccess().ConfigureAwait(false);
+                logger.LogDebug($"Auto-Start Permission: {result.Status} - {result.RegistrationToken}");
+
+                if (result.RegistrationToken.IsEmpty())
+                {
+                    logger.LogDebug("No registration token - removing stored tokens");
+
+                    // TODO: change this?
+                    this.ClearRegistration();
+                }
+                else if (result.RegistrationToken?.Equals(this.CurrentRegistrationToken) ?? false)
+                {
+                    logger.LogInformation("Push registration token updated");
+
+                    // TODO: change this?
+                    this.SetCurrentToken(result.RegistrationToken!, true);
+                    await this.OnTokenRefreshed(this.CurrentRegistrationToken!).ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning("Failed to auto-start push", ex);
+            }
         }
 
 

@@ -13,15 +13,14 @@ namespace Shiny
                                                         string listenerConnectionString,
                                                         string hubName)
         {
-#if NETSTANDARD2_0
+#if NETSTANDARD
             return false;
 #else
-            services.UseNotifications();
+            services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Push.AzureNotificationHubs.PushManager),
                 delegateType
             ));
-            services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
             return true;
 #endif
         }

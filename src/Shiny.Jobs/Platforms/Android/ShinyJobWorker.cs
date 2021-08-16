@@ -24,14 +24,15 @@ namespace Shiny.Jobs
         public Java.Lang.Object AttachCompleter(CallbackToFutureAdapter.Completer completer)
         {
             var jobName = this.InputData.GetString(ShinyJobIdentifier);
-            if (jobName.IsEmpty())
+            var jobManager = ShinyHost.Resolve<IJobManager>();
+
+            if (jobName.IsEmpty() || jobManager == null)
             {
                 completer.Set(Result.InvokeFailure());
             }
             else
             {
-                ShinyHost
-                    .Resolve<IJobManager>()
+                jobManager
                     .Run(jobName, this.cancelSource.Token)
                     .ContinueWith(x =>
                     {

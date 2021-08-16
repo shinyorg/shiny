@@ -29,6 +29,7 @@ namespace Shiny.Jobs
 
         public override async void RunTask(string taskName, Func<CancellationToken, Task> task)
         {
+            // TODO: I could run this through unique job work
             if (!this.context.IsInManifest(P.WakeLock))
             {
                 base.RunTask(taskName, task);
@@ -86,7 +87,7 @@ namespace Shiny.Jobs
                     .SetInputData(data.Build())
                     .Build();
 
-                WorkManager.Instance.EnqueueUniquePeriodicWork(
+                this.Instance.EnqueueUniquePeriodicWork(
                     jobInfo.Identifier,
                     ExistingPeriodicWorkPolicy.Replace,
                     request
@@ -99,7 +100,7 @@ namespace Shiny.Jobs
                     .SetConstraints(constraints)
                     .Build();
 
-                WorkManager.Instance.EnqueueUniqueWork(
+                this.Instance.EnqueueUniqueWork(
                     jobInfo.Identifier,
                     ExistingWorkPolicy.Append,
                     worker
@@ -108,30 +109,25 @@ namespace Shiny.Jobs
         }
 
 
-        static NetworkType ToNative(InternetAccess access)
+        static NetworkType ToNative(InternetAccess access) => access switch
         {
-            switch (access)
-            {
-                case InternetAccess.Any:
-                    return NetworkType.Connected;
+            InternetAccess.Any => NetworkType.Connected,
+            InternetAccess.Unmetered => NetworkType.Unmetered,
+            _ => NetworkType.NotRequired
+        };
 
-                case InternetAccess.Unmetered:
-                    return NetworkType.Unmetered;
-
-                case InternetAccess.None:
-                default:
-                    return NetworkType.NotRequired;
-            }
-        }
 
         protected override void CancelNative(JobInfo jobInfo)
-            => WorkManager.Instance.CancelUniqueWork(jobInfo.Identifier);
+            => this.Instance.CancelUniqueWork(jobInfo.Identifier);
 
 
         public override async Task CancelAll()
         {
             await base.CancelAll();
-            WorkManager.Instance.CancelAllWork();
+            this.Instance.CancelAllWork();
         }
+
+
+        WorkManager Instance => WorkManager.GetInstance(this.context.AppContext);
     }
 }

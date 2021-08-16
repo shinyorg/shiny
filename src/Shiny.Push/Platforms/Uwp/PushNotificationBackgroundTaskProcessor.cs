@@ -20,6 +20,7 @@ namespace Shiny.Push
 
         public async void Process(IBackgroundTaskInstance taskInstance)
         {
+            // TODO: resolve native adapter
             var deferral = taskInstance.GetDeferral();
             var notification = new Notification();
             var fire = true;
