@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Locations;
+using Microsoft.Extensions.Logging;
 using AContext = Android.Content.Context;
 
 
@@ -10,7 +11,7 @@ namespace Shiny.Locations
     public class LocationServicesGpsManagerImpl : AbstractGpsManager
     {
         readonly LocationManager client;
-        public LocationServicesGpsManagerImpl(IAndroidContext context) : base(context)
+        public LocationServicesGpsManagerImpl(IAndroidContext context, ILogger<LocationServicesGpsManagerImpl> logger) : base(context, logger)
             => this.client = context.GetSystemService<LocationManager>(AContext.LocationService);
 
 

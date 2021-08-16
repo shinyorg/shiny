@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using CoreLocation;
 using Microsoft.Extensions.Logging;
@@ -35,10 +33,9 @@ namespace Shiny.Locations
             {
                 try
                 {
-                    if (this.CurrentListener.UseBackground)
+                    // only auto-start if auth status was changed to FULL authorized, not restricted
+                    if (this.locationManager.AuthorizationStatus == CLAuthorizationStatus.Authorized)
                         await this.StartListenerInternal(this.CurrentListener);
-                    else
-                        this.CurrentListener = null;
                 }
                 catch (Exception ex)
                 {
@@ -60,7 +57,13 @@ namespace Shiny.Locations
         public GpsRequest? CurrentListener
         {
             get => this.request;
-            set => this.Set(ref this.request, value);
+            set
+            {
+                if (value?.UseBackground ?? true)
+                    this.Set(ref this.request, value);
+                else
+                    this.request = value;
+            }
         }
 
 
@@ -85,14 +88,12 @@ namespace Shiny.Locations
 
         public Task StopListener()
         {
-            if (this.CurrentListener != null)
-            {
 #if __IOS__
-                this.locationManager.AllowsBackgroundLocationUpdates = false;
+            this.locationManager.AllowsBackgroundLocationUpdates = false;
 #endif
-                this.locationManager.StopUpdatingLocation();
-                this.CurrentListener = null;
-            }
+            this.locationManager.StopUpdatingLocation();
+            this.CurrentListener = null;
+
             return Task.CompletedTask;
         }
 
@@ -100,6 +101,7 @@ namespace Shiny.Locations
         protected virtual async Task StartListenerInternal(GpsRequest request)
         {
             var access = await this.RequestAccess(request);
+            //if (request.UseBackground && access == AccessState.Available || access == AccessState.Restricted)
             access.Assert();
             this.gdelegate.Request = request;
 #if __IOS__
