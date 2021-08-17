@@ -52,6 +52,4 @@
     <ItemGroup Condition=" $(OS) != 'WINDOWS_NT' ">
 
     </ItemGroup>
-
-    <Import Project="..\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems" Label="Shared" />
 </Project>

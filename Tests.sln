@@ -85,8 +85,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6374E4D9-1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{08764824-81F8-4A4B-8E33-8F61B2C13CB4}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Tests.Standard", "tests\Shiny.Tests.Standard\Shiny.Tests.Standard.shproj", "{13EBF4BB-8A37-4AEC-BE65-611C8958E4D0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{54500F5E-0AED-4C83-932B-0C3A51BC2874}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Tests.Device", "tests\Shiny.Tests.Device\Shiny.Tests.Device.csproj", "{E1E4A77D-F07A-402E-BFAC-2B356B86B089}"
@@ -105,13 +103,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Jobs", "src\Shiny.Jobs\Shiny.Jobs.csproj", "{38783C53-AE80-4979-B4BC-5CE5A7EF8736}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		tests\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems*{13ebf4bb-8a37-4aec-be65-611c8958e4d0}*SharedItemsImports = 13
-		tests\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems*{44d55acd-4df7-41c7-9ad9-59eb4ad427d0}*SharedItemsImports = 4
-		tests\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems*{54500f5e-0aed-4c83-932b-0c3a51bc2874}*SharedItemsImports = 5
-		tests\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems*{8206c665-dcde-48ef-894b-54068197f5c5}*SharedItemsImports = 4
-		tests\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems*{cfb76876-c9b0-4567-a078-1e89df744073}*SharedItemsImports = 4
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
 		Ad-Hoc|ARM = Ad-Hoc|ARM
@@ -1430,7 +1421,6 @@ Global
 		{8206C665-DCDE-48EF-894B-54068197F5C5} = {08764824-81F8-4A4B-8E33-8F61B2C13CB4}
 		{44D55ACD-4DF7-41C7-9AD9-59EB4AD427D0} = {08764824-81F8-4A4B-8E33-8F61B2C13CB4}
 		{08764824-81F8-4A4B-8E33-8F61B2C13CB4} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
-		{13EBF4BB-8A37-4AEC-BE65-611C8958E4D0} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
 		{54500F5E-0AED-4C83-932B-0C3A51BC2874} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
 		{E1E4A77D-F07A-402E-BFAC-2B356B86B089} = {7C114E37-36C8-4971-91C6-E2557DDCB4E8}
 		{3BF25B68-89CE-4A2B-A7B7-C91A6C1F9BC1} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}

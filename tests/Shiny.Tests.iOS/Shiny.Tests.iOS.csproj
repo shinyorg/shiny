@@ -216,7 +216,6 @@
   <ItemGroup>
     <BundleResource Include="GoogleService-Info.plist" />
   </ItemGroup>
-  <Import Project="..\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
