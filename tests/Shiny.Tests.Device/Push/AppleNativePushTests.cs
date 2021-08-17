@@ -24,7 +24,6 @@ namespace Shiny.Tests.Push
         public AppleNativePushTests(ITestOutputHelper output)
         {
             this.output = output;
-            //services.AddHttpClient<ApnSender>();
             this.apnSender = new ApnSender(
                 new ApnSettings
                 {
@@ -69,8 +68,6 @@ namespace Shiny.Tests.Push
             result.Notification.Title.Should().Be("Test Title");
             result.Notification.Message.Should().Be("Test Body");
         }
-
-
     }
 
 

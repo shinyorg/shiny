@@ -12,9 +12,9 @@ using Shiny.Push.Infrastructure;
 
 namespace Shiny.Push.AzureNotificationHubs
 {
-    public partial class PushManager : IPushManager,
-                                       IPushTagSupport,
-                                       IShinyStartupTask
+    public class PushManager : IPushManager,
+                               IPushTagSupport,
+                               IShinyStartupTask
     {
         readonly INativeAdapter native;
         readonly ILogger logger;
@@ -22,10 +22,10 @@ namespace Shiny.Push.AzureNotificationHubs
         readonly NotificationHubClient hub;
 
 
-        protected PushManager(INativeAdapter native,
-                              ILogger<PushManager> logger,
-                              PushContainer container,
-                              AzureNotificationConfig config)
+        public PushManager(INativeAdapter native,
+                           ILogger<PushManager> logger,
+                           PushContainer container,
+                           AzureNotificationConfig config)
         {
             this.native = native;
             this.container = container;
