@@ -59,11 +59,14 @@
         -->
     </ItemGroup>
 
-    <!--setup-->
+    <!--docs-->
     <ItemGroup>
-        <PackageReference Update="TweetinviAPI" Version="5.0.4" />
         <PackageReference Update="Statiq.Web" Version="1.0.0-beta.27" />
         <PackageReference Update="Devlead.Statiq" Version="0.10.0" />
+    </ItemGroup>
+
+    <!--build-->
+    <ItemGroup>
         <PackageReference Update="Cake.Frosting" Version="1.1.0" />
         <PackageReference Update="Cake.AppCenter" Version="1.3.1" />
         <PackageReference Update="Cake.Boots" Version="1.0.3.556" />
@@ -71,7 +74,13 @@
         <PackageReference Update="Cake.Plist" Version="0.7.0" />
         <PackageReference Update="Cake.Git" Version="1.0.1" />
         <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0102" />
+        <PackageReference Update="TweetinviAPI" Version="5.0.4" />
         <PackageReference Update="Discord.Net" Version="2.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Nuke.Common" Version="5.3.0" />
+        <PackageReference Update="Octokit" Version="0.50.0" />
     </ItemGroup>
 
     <!--Samples-->
