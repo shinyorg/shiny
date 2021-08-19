@@ -60,6 +60,14 @@
                     {
                         "name": "ApnTeamId",
                         "type": "String"
+                    },
+                    {
+                        "name": "OneSignalRestApiKey",
+                        "type": "String"
+                    },
+                    {
+                        "name": "OneSignalAppId",
+                        "type": "String"
                     }
                 ]
             }
@@ -82,6 +90,14 @@
                     },
                     {
                         "name": "AzureNotificationHubName",
+                        "type": "String"
+                    },
+                    {
+                        "name": "OneSignalRestApiKey",
+                        "type": "String"
+                    },
+                    {
+                        "name": "OneSignalAppId",
                         "type": "String"
                     }
                 ]
