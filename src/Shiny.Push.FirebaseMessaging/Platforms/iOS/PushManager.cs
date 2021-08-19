@@ -16,11 +16,13 @@ namespace Shiny.Push.FirebaseMessaging
         readonly INativeAdapter adapter;
         readonly PushContainer container;
         readonly ILogger logger;
+        readonly FirebaseConfiguration? config;
 
 
         public PushManager(INativeAdapter adapter,
                            PushContainer container,
-                           ILogger<PushManager> logger)
+                           ILogger<PushManager> logger,
+                           FirebaseConfiguration? config = null)
         {
             this.adapter = adapter;
             this.container = container;
@@ -46,8 +48,17 @@ namespace Shiny.Push.FirebaseMessaging
             try
             {
                 if (Messaging.SharedInstance == null)
-                    Firebase.Core.App.Configure();
-
+                {
+                    //if (this.config == null)
+                    //{
+                        Firebase.Core.App.Configure();
+                    //}
+                    //else
+                    //{
+                    //    //new Firebase.Core.Options(this.config.AppId, this.config.Sen)
+                    //    Firebase.Core.App.Configure();
+                    //}
+                }
                 Messaging.SharedInstance!.AutoInitEnabled = true;
                 Messaging.SharedInstance.Delegate = new FbMessagingDelegate
                 (

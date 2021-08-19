@@ -11,16 +11,36 @@ namespace Shiny
             => services.UseFirebaseMessaging(typeof(TPushDelegate));
 
 
-        public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType)
+        public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType, FirebaseConfiguration? config = null)
         {
 #if __IOS__
+            if (config != null)
+                services.AddSingleton(config);
+
             services.RegisterModule(new PushModule(
                 typeof(Shiny.Push.FirebaseMessaging.PushManager),
                 delegateType
             ));
             return true;
 #elif __ANDROID__
-            return services.UsePush(delegateType);
+
+            if (config != null)
+            {
+                services.UsePush(
+                    delegateType,
+                    new FirebaseConfig(
+                        config.AppId,
+                        config.ProjectId,
+                        config.ApiKey,
+                        config.AppName
+                    )
+                );
+            }
+            else
+            {
+                services.UsePush(delegateType);
+            }
+            return true;
 #else
             return false;
 #endif
