@@ -27,10 +27,9 @@ namespace Shiny.Push
             services.TryAddSingleton<PushContainer>();
             services.TryAddSingleton<INativeAdapter, NativeAdapter>();
             services.UseNotifications();
-//#if __ANDROID__
-//            services.TryAddSingleton<AndroidPushNotificationManager>();
-//            services.TryAddSingleton<AndroidPushProcessor>();
-//#endif
+#if __ANDROID__
+            services.TryAddSingleton<AndroidPushNotificationManager>();
+#endif
         }
     }
 }

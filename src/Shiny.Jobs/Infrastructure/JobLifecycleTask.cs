@@ -46,7 +46,7 @@ namespace Shiny.Jobs.Infrastructure
                 var toRun = jobs.Where(this.CanRun).ToList();
 
                 foreach (var job in toRun)
-                    await jobManager.RunJobAsTask(job.Identifier);
+                    await jobManager.RunJobAsTask(job.Identifier).ConfigureAwait(false);
 
                 if (this.IsInForeground)
                     this.timer.Start();

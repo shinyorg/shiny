@@ -26,9 +26,11 @@ namespace Shiny.Jobs
             var jobName = this.InputData.GetString(ShinyJobIdentifier);
             var jobManager = ShinyHost.Resolve<IJobManager>();
 
+            //if (jobManager != null && !jobName.IsEmpty())
             if (jobName.IsEmpty() || jobManager == null)
             {
-                completer.Set(Result.InvokeFailure());
+                //completer.Set(Result.InvokeFailure());
+                completer.Set(Result.InvokeSuccess());
             }
             else
             {

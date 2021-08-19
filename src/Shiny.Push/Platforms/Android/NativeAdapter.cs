@@ -14,33 +14,18 @@ namespace Shiny.Push
 {
     public class NativeAdapter : INativeAdapter
     {
-        readonly INotificationManager notifications;
+        readonly AndroidPushNotificationManager notifications;
         readonly ISerializer serializer;
+        readonly IAndroidContext context;
 
 
-        public NativeAdapter(INotificationManager notifications,
+        public NativeAdapter(AndroidPushNotificationManager notifications,
                              ISerializer serializer,
                              IAndroidContext context)
         {
             this.notifications = notifications;
             this.serializer = serializer;
-
-            // on activity
-            context
-                .WhenIntentReceived()
-                .SubscribeAsync(intent => this.TryProcessIntent(intent));
-
-            // broadcast
-            ShinyPushNotificationBroadcastReceiver.ProcessIntent = intent => this.TryProcessIntent(intent);
-            ShinyFirebaseService.NewToken = token => this.OnTokenRefreshed?.Invoke(token);
-            ShinyFirebaseService.MessageReceived = async msg =>
-            {
-                if (this.OnReceived != null)
-                {
-                    var pr = this.FromNative(msg);
-                    await this.OnReceived.Invoke(pr).ConfigureAwait(false);
-                }
-            };
+            this.context = context;
         }
 
 
@@ -53,13 +38,82 @@ namespace Shiny.Push
         }
 
 
-        public Func<PushNotification, Task>? OnReceived { get; set; }
-        public Func<PushNotificationResponse, Task>? OnEntry { get; set; }
-        public Func<string, Task>? OnTokenRefreshed { get; set; }
+        Func<PushNotification, Task>? onReceived;
+        public Func<PushNotification, Task>? OnReceived
+        {
+            get => this.onReceived;
+            set
+            {
+                this.onReceived = value;
+                if (this.onReceived == null)
+                {
+                    ShinyFirebaseService.MessageReceived = null;
+                }
+                else
+                {
+                    ShinyFirebaseService.MessageReceived = async msg =>
+                    {
+                        var pr = this.FromNative(msg);
+                        await this.onReceived.Invoke(pr).ConfigureAwait(false);
+                    };
+                }
+            }
+        }
+
+
+        IDisposable? onEntrySub;
+        Func<PushNotificationResponse, Task>? onEntry;
+        public Func<PushNotificationResponse, Task>? OnEntry
+        {
+            get => this.onEntry;
+            set
+            {
+                this.onEntry = value;
+                if (this.onEntry == null)
+                {
+                    this.onEntrySub?.Dispose();
+                    ShinyPushNotificationBroadcastReceiver.ProcessIntent = null;
+                }
+                else
+                {
+                    this.onEntrySub = this.context
+                        .WhenIntentReceived()
+                        .SubscribeAsync(intent => this.TryProcessIntent(intent));
+
+                    ShinyPushNotificationBroadcastReceiver.ProcessIntent = intent => this.TryProcessIntent(intent);
+                }
+            }
+        }
+
+
+        Func<string, Task>? onToken;
+        public Func<string, Task>? OnTokenRefreshed
+        {
+            get => this.onToken;
+            set
+            {
+                this.onToken = value;
+                if (this.onToken == null)
+                {
+                    ShinyFirebaseService.NewToken = null;
+                }
+                else
+                {
+                    ShinyFirebaseService.NewToken = async token => await this.onToken.Invoke(token).ConfigureAwait(false);
+                }
+            }
+        }
 
 
         public async Task<PushAccessState> RequestAccess()
         {
+            //var options = new FirebaseOptions.Builder()
+            //    //.SetApplicationId("") // Required for Analytics
+            //    .SetProjectId("") // Required for Firebase Installations
+            //    .SetApiKey("GOOGLE API KEY") // Required for Auth
+            //    .Build();
+            //FirebaseApp.InitializeApp(this.context.AppContext, options, "APP NAME");\
+
             FirebaseMessaging.Instance.AutoInitEnabled = true;
             var task = await FirebaseMessaging.Instance.GetToken();
             var token = task.JavaCast<Java.Lang.String>().ToString();
@@ -106,6 +160,9 @@ namespace Shiny.Push
 
                 if (!native.Color.IsEmpty())
                     notification.Android.ColorResourceName = native.Color;
+
+                //var nn = this.notifications.CreateNativeNotification(notification, null);
+                //this.notifications.SendNative(0, nn);
             }
             return new PushNotification(message.Data, notification);
         }

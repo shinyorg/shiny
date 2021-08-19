@@ -21,14 +21,14 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDZv4VUpwHSsnenr_o7kIOfVRsFhL-0neo"
+          "current_key": "AIzaSyCxG6J4hPwqnLouBoiY8buU_FCfqg8y9Ho"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "29585461192-76rucjrejqdfeln8t505gbaafh01tk5v.apps.googleusercontent.com",
+              "client_id": "29585461192-1brhg1umt48tnb7l42eiemudq815f0ih.apps.googleusercontent.com",
               "client_type": 3
             },
             {
@@ -44,7 +44,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:29585461192:android:f3ec6f7522d483e8313afd",
+        "mobilesdk_app_id": "1:29585461192:android:e06bed143840a8fe313afd",
         "android_client_info": {
           "package_name": "com.shiny.test"
         }
@@ -57,14 +57,14 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDZv4VUpwHSsnenr_o7kIOfVRsFhL-0neo"
+          "current_key": "AIzaSyCxG6J4hPwqnLouBoiY8buU_FCfqg8y9Ho"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "29585461192-76rucjrejqdfeln8t505gbaafh01tk5v.apps.googleusercontent.com",
+              "client_id": "29585461192-1brhg1umt48tnb7l42eiemudq815f0ih.apps.googleusercontent.com",
               "client_type": 3
             },
             {
