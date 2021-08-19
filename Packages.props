@@ -101,6 +101,7 @@
 
     <!--tests-->
     <ItemGroup>
+        <PackageReference Update="OneSignal.net" Version="1.0.6" />
         <PackageReference Update="Acr.UserDialogs" Version="7.1.0.514" />
         <PackageReference Update="DryIoc.Microsoft.DependencyInjection" Version="5.1.0" />
         <PackageReference Update="coverlet.collector" Version="3.0.3" />

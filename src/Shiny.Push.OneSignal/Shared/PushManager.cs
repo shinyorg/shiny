@@ -1,4 +1,4 @@
-﻿#if __ANDROID__ || XAMARIN_IOS
+﻿#if !NETSTANDARD
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using Shiny.Notifications;
 
 namespace Shiny.Push.OneSignal
 {
-    public class PushManager : AbstractPushManager,
+    public class PushManager : IPushManager,
                                IPushPropertySupport,
                                IShinyStartupTask
     {
@@ -22,7 +22,8 @@ namespace Shiny.Push.OneSignal
         readonly Subject<PushNotification> receivedSubj;
 
 
-        public PushManager(OneSignalPushConfig config, ShinyCoreServices core) : base(core)
+        public PushManager(OneSignalPushConfig config,
+                           ShinyCoreServices core)
         {
             this.receivedSubj = new Subject<PushNotification>();
             this.config = config;

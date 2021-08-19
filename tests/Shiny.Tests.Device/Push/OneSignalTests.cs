@@ -4,16 +4,11 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-
 using FluentAssertions;
-
 using Microsoft.Extensions.Logging;
-
 using OneSignal;
-
 using Shiny;
 using Shiny.Push;
-
 using Xunit;
 using Xunit.Abstractions;
 
