@@ -89,6 +89,7 @@ namespace Samples
 
             //services.UsePush<PushDelegate>();
             //services.UseFirebaseMessaging<PushDelegate>();
+            //services.UseOneSignalPush<PushDelegate>("oneSignalAppId");
             services.UsePushAzureNotificationHubs<PushDelegate>(
                 Secrets.Values.AzureNotificationHubListenerConnectionString,
                 Secrets.Values.AzureNotificationHubName
