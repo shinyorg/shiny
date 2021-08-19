@@ -16,7 +16,7 @@ namespace Shiny.BluetoothLE
 
             this.manufacturerData = new Lazy<ManufacturerData?>(() =>
             {
-                var md = this.result.ScanRecord.ManufacturerSpecificData;
+                var md = this.result.ScanRecord?.ManufacturerSpecificData;
                 if (md == null || md.Size() == 0)
                     return null;
 
@@ -24,21 +24,21 @@ namespace Shiny.BluetoothLE
                 if (manufacturerId == 0)
                     return null;
 
-                var data = this.result.ScanRecord.GetManufacturerSpecificData(manufacturerId);
-                return new ManufacturerData(manufacturerId, data);
+                var data = this.result.ScanRecord!.GetManufacturerSpecificData(manufacturerId);
+                return new ManufacturerData(manufacturerId, data!);
             });
 
-            this.serviceUuids = new Lazy<string[]>(() =>
+            this.serviceUuids = new Lazy<string[]?>(() =>
                 result
-                    .ScanRecord
+                    .ScanRecord?
                     .ServiceUuids?
                     .Select(x => x.Uuid.ToString())
-                    .ToArray() ?? Array.Empty<string>()
+                    .ToArray()
             );
 
-            this.serviceData = new Lazy<AdvertisementServiceData[]>(() =>
+            this.serviceData = new Lazy<AdvertisementServiceData[]?>(() =>
                 result
-                    .ScanRecord
+                    .ScanRecord?
                     .ServiceData?
                     .Select(x => new AdvertisementServiceData(x.Key.Uuid.ToString(), x.Value))
                     .ToArray() ?? Array.Empty<AdvertisementServiceData>()
@@ -62,12 +62,12 @@ namespace Shiny.BluetoothLE
         readonly Lazy<ManufacturerData?> manufacturerData;
         public ManufacturerData? ManufacturerData => this.manufacturerData.Value;
 
-        readonly Lazy<string[]> serviceUuids;
-        public string[] ServiceUuids => this.serviceUuids.Value;
+        readonly Lazy<string[]?> serviceUuids;
+        public string[]? ServiceUuids => this.serviceUuids.Value;
 
-        readonly Lazy<AdvertisementServiceData[]> serviceData;
-        public AdvertisementServiceData[] ServiceData => this.serviceData.Value;
+        readonly Lazy<AdvertisementServiceData[]?> serviceData;
+        public AdvertisementServiceData[]? ServiceData => this.serviceData.Value;
 
-        public int TxPower => this.result.ScanRecord.TxPowerLevel;
+        public int? TxPower => this.result.ScanRecord?.TxPowerLevel;
     }
 }

@@ -65,12 +65,12 @@ namespace Shiny.BluetoothLE
         }
 
 
-        public string LocalName => this.localName.Value;
+        public string? LocalName => this.localName.Value;
         public bool? IsConnectable => this.connectable.Value;
-        public ManufacturerData ManufacturerData => this.manufacturerData.Value;
-        public string[] ServiceUuids => this.serviceUuids.Value;
-        public AdvertisementServiceData[] ServiceData => this.serviceData.Value;
-        public int TxPower => this.txpower.Value;
+        public ManufacturerData? ManufacturerData => this.manufacturerData.Value;
+        public string[]? ServiceUuids => this.serviceUuids.Value;
+        public AdvertisementServiceData[]? ServiceData => this.serviceData.Value;
+        public int? TxPower => this.txpower.Value;
 
 
         protected Lazy<T> GetLazy<T>(NSString key, Func<NSObject, T> transform) => new Lazy<T>(() =>
