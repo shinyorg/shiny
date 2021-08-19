@@ -26,6 +26,7 @@
         <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
         <ProjectReference Include="..\Samples.SqliteGenerator\Samples.SqliteGenerator.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj" />
