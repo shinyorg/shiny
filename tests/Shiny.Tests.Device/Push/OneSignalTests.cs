@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using OneSignal;
-using Shiny;
 using Shiny.Push;
+using Shiny.Testing.Push;
 using Xunit;
 using Xunit.Abstractions;
 

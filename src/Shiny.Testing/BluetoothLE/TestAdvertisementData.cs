@@ -11,6 +11,6 @@ namespace Shiny.Testing.BluetoothLE
         public AdvertisementServiceData[]? ServiceData { get; set; }
         public ManufacturerData? ManufacturerData { get; set; }
         public string[]? ServiceUuids { get; set; }
-        public int TxPower { get; set; }
+        public int? TxPower { get; set; }
     }
 }
