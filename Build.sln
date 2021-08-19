@@ -57,18 +57,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.AppCenter", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.Firebase", "src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj", "{0DF350C4-A140-40E8-8901-D7558D2BD3D1}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Tests.Standard", "tests\Shiny.Tests.Standard\Shiny.Tests.Standard.shproj", "{13EBF4BB-8A37-4AEC-BE65-611C8958E4D0}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{55F6D124-390D-4952-9231-D49562795B9C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Jobs", "src\Shiny.Jobs\Shiny.Jobs.csproj", "{C8130B3E-F485-4070-9C1D-BC62CB0362A7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.OneSignal", "src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj", "{67786EE0-E9B0-48A3-A9FA-19959E69E3DD}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		tests\Shiny.Tests.Standard\Shiny.Tests.Standard.projitems*{13ebf4bb-8a37-4aec-be65-611c8958e4d0}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
 		Ad-Hoc|ARM = Ad-Hoc|ARM
@@ -1276,62 +1269,6 @@ Global
 		{0DF350C4-A140-40E8-8901-D7558D2BD3D1}.Release|x64.Build.0 = Release|Any CPU
 		{0DF350C4-A140-40E8-8901-D7558D2BD3D1}.Release|x86.ActiveCfg = Release|Any CPU
 		{0DF350C4-A140-40E8-8901-D7558D2BD3D1}.Release|x86.Build.0 = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|Any CPU.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|Any CPU.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|ARM.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|ARM.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|ARM64.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|ARM64.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|iPhone.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|iPhone.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|x64.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|x64.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|x86.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Ad-Hoc|x86.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|Any CPU.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|Any CPU.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|ARM.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|ARM.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|ARM64.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|ARM64.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|iPhone.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|iPhone.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|x64.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|x64.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|x86.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.AppStore|x86.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|ARM.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|ARM64.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|x64.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Debug|x86.Build.0 = Debug|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|ARM.ActiveCfg = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|ARM.Build.0 = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|ARM64.ActiveCfg = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|ARM64.Build.0 = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|iPhone.Build.0 = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|x64.ActiveCfg = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|x64.Build.0 = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|x86.ActiveCfg = Release|Any CPU
-		{55F6D124-390D-4952-9231-D49562795B9C}.Release|x86.Build.0 = Release|Any CPU
 		{C8130B3E-F485-4070-9C1D-BC62CB0362A7}.Ad-Hoc|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8130B3E-F485-4070-9C1D-BC62CB0362A7}.Ad-Hoc|Any CPU.Build.0 = Debug|Any CPU
 		{C8130B3E-F485-4070-9C1D-BC62CB0362A7}.Ad-Hoc|ARM.ActiveCfg = Debug|Any CPU
