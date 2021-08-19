@@ -23,5 +23,19 @@ namespace Shiny
             return true;
 #endif
         }
+
+
+#if __ANDROID__
+        public static bool UsePush<TDelegate>(this IServiceCollection services, FirebaseConfig config) where TDelegate : class, IPushDelegate
+            => services.UsePush(typeof(TDelegate), config);
+
+
+        public static bool UsePush(this IServiceCollection services, Type delegateType, FirebaseConfig config)
+        {
+            services.AddSingleton(config);
+            services.UsePush(delegateType);
+            return true;
+        }
+#endif
     }
 }

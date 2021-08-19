@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
 using Android.Runtime;
+using Firebase;
 using Firebase.Messaging;
 using Shiny.Infrastructure;
-using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
+using Notification = Shiny.Notifications.Notification;
 
 
 namespace Shiny.Push
@@ -17,15 +19,18 @@ namespace Shiny.Push
         readonly AndroidPushNotificationManager notifications;
         readonly ISerializer serializer;
         readonly IAndroidContext context;
+        readonly FirebaseConfig? config;
 
 
         public NativeAdapter(AndroidPushNotificationManager notifications,
                              ISerializer serializer,
-                             IAndroidContext context)
+                             IAndroidContext context,
+                             FirebaseConfig? config = null)
         {
             this.notifications = notifications;
             this.serializer = serializer;
             this.context = context;
+            this.config = config;
         }
 
 
@@ -55,6 +60,12 @@ namespace Shiny.Push
                     {
                         var pr = this.FromNative(msg);
                         await this.onReceived.Invoke(pr).ConfigureAwait(false);
+                        if (pr.Notification != null)
+                        {
+                            // TODO: channel
+                            var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
+                            this.notifications.SendNative(0, nn);
+                        }
                     };
                 }
             }
@@ -107,14 +118,21 @@ namespace Shiny.Push
 
         public async Task<PushAccessState> RequestAccess()
         {
-            //var options = new FirebaseOptions.Builder()
-            //    //.SetApplicationId("") // Required for Analytics
-            //    .SetProjectId("") // Required for Firebase Installations
-            //    .SetApiKey("GOOGLE API KEY") // Required for Auth
-            //    .Build();
-            //FirebaseApp.InitializeApp(this.context.AppContext, options, "APP NAME");\
+            if (this.config == null)
+            {
+                FirebaseMessaging.Instance.AutoInitEnabled = true;
+            }
+            else
+            {
+                var options = new FirebaseOptions.Builder()
+                    .SetApplicationId(this.config.AppId)
+                    .SetProjectId(this.config.ProjectId)
+                    .SetApiKey(this.config.ApiKey)
+                    .Build();
+                FirebaseApp.InitializeApp(this.context.AppContext, options, this.config.AppName);
 
-            FirebaseMessaging.Instance.AutoInitEnabled = true;
+            }
+
             var task = await FirebaseMessaging.Instance.GetToken();
             var token = task.JavaCast<Java.Lang.String>().ToString();
             return new PushAccessState(AccessState.Available, token);
@@ -130,15 +148,14 @@ namespace Shiny.Push
 
         PushNotificationResponse? FromIntent(Intent intent)
         {
-            //var notificationString = intent.GetStringExtra(IntentNotificationKey);
-            //var notification = this.serializer.Deserialize<Shiny.Notifications.Notification>(notificationString);
+            var notificationString = intent.GetStringExtra("TODO");
+            var notification = this.serializer.Deserialize<Shiny.Notifications.Notification>(notificationString);
 
-            //var action = intent.GetStringExtra(IntentActionKey);
-            //var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
-            //var response = new PushNotificationResponse(notification, action, text);
+            var action = intent.GetStringExtra("TODO");
+            var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
+            var response = new PushNotificationResponse(notification, action, text);
 
-            //await this.delegates.RunDelegates(x => x.OnEntry(response));
-            return null;
+            return response;
         }
 
 
@@ -160,9 +177,6 @@ namespace Shiny.Push
 
                 if (!native.Color.IsEmpty())
                     notification.Android.ColorResourceName = native.Color;
-
-                //var nn = this.notifications.CreateNativeNotification(notification, null);
-                //this.notifications.SendNative(0, nn);
             }
             return new PushNotification(message.Data, notification);
         }
