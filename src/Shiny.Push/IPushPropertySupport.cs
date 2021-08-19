@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Shiny.Push
 {
-    public interface IPushPropertySupport
+    public interface IPushPropertySupport : IPushManager
     {
         IReadOnlyDictionary<string, string> CurrentProperties { get; }
 

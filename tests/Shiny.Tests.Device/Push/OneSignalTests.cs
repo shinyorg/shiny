@@ -18,7 +18,7 @@ namespace Shiny.Tests.Push
     public class OneSignalTests
     {
         readonly NotificationService service;
-        readonly Shiny.Push.OneSignal.PushManager push;
+        readonly IPushPropertySupport push;
 
 
         public OneSignalTests(ITestOutputHelper output)
@@ -35,7 +35,7 @@ namespace Shiny.Tests.Push
                 },
                 BuildLogging = x => x.AddXUnit(output)
             });
-            this.push = (Shiny.Push.OneSignal.PushManager)ShinyHost.Resolve<IPushManager>();
+            this.push = (IPushPropertySupport)ShinyHost.Resolve<IPushManager>();
         }
 
 
