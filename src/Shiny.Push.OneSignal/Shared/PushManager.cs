@@ -4,10 +4,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Reactive.Subjects;
 using Com.OneSignal.Abstractions;
 using OS = global::Com.OneSignal.OneSignal;
-using Shiny.Infrastructure;
 using Shiny.Notifications;
 
 
@@ -18,16 +16,13 @@ namespace Shiny.Push.OneSignal
                                IShinyStartupTask
     {
         readonly OneSignalPushConfig config;
-        readonly ShinyCoreServices core;
-        readonly Subject<PushNotification> receivedSubj;
+        readonly PushContainer container;
 
 
-        public PushManager(OneSignalPushConfig config,
-                           ShinyCoreServices core)
+        public PushManager(OneSignalPushConfig config, PushContainer container)
         {
-            this.receivedSubj = new Subject<PushNotification>();
             this.config = config;
-            this.core = core;
+            this.container = container;
         }
 
 
@@ -40,7 +35,7 @@ namespace Shiny.Push.OneSignal
                 {
                     var notification = ToNotification(x.notification?.payload);
                     var pr = new PushNotificationResponse(notification, x.action?.actionID, null);
-                    await this.core.Services.RunDelegates<IPushDelegate>(x => x.OnEntry(pr));
+                    await this.container.OnEntry(pr).ConfigureAwait(false);
                 })
                 .HandleNotificationReceived(async x =>
                 {
@@ -50,8 +45,7 @@ namespace Shiny.Push.OneSignal
                     // could also build channel here
                     var notification = ToNotification(x.payload);
                     var pn = new PushNotification(notification.Payload, notification);
-                    await this.core.Services.RunDelegates<IPushDelegate>(x => x.OnReceived(pn));
-                    this.receivedSubj.OnNext(pn);
+                    await this.container.OnReceived(pn).ConfigureAwait(false);
                 })
                 .Settings(new Dictionary<string, bool>
                 {
@@ -63,23 +57,29 @@ namespace Shiny.Push.OneSignal
         }
 
 
-        public override async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
+        public DateTime? CurrentRegistrationTokenDate => this.container.CurrentRegistrationTokenDate;
+        public string? CurrentRegistrationToken => this.container.CurrentRegistrationToken;
+
+
+        public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
             OS.Current.SetSubscription(true);
             OS.Current.RegisterForPushNotifications();
             var ids = await OS.Current.IdsAvailableAsync();
+            this.container.SetCurrentToken(ids.PushToken, false);
+
             return new PushAccessState(AccessState.Available, ids.PushToken);
         }
 
 
-        public override Task UnRegister()
+        public Task UnRegister()
         {
             OS.Current.SetSubscription(false);
             return Task.CompletedTask;
         }
 
 
-        public override IObservable<PushNotification> WhenReceived() => this.receivedSubj;
+        public IObservable<PushNotification> WhenReceived() => this.container.WhenReceived();
         public IReadOnlyDictionary<string, string> CurrentProperties => this.Properties;
 
 
@@ -160,8 +160,8 @@ namespace Shiny.Push.OneSignal
         {
             get
             {
-                this.props ??= this.Services
-                    .Settings
+                this.props ??= this.container
+                    .Store
                     .Get<Dictionary<string, string>>(nameof(this.Properties))
                     ?? new Dictionary<string, string>(0);
                 return props;
@@ -169,7 +169,7 @@ namespace Shiny.Push.OneSignal
         }
 
 
-        void WriteProps() => this.Services.Settings.Set(
+        void WriteProps() => this.container.Store.Set(
             nameof(this.Properties),
             this.Properties
         );
