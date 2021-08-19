@@ -7,14 +7,14 @@
         <PackageReference Update="System.Reactive" Version="5.0.0" />
         <PackageReference Update="Com.OneSignal" Version="3.10.6" />
 
-        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
         <PackageReference Update="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
 
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" />
-        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.10.0" />
-        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.10.0" />
+        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
+        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.11.0" />
 
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
         <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.3.0" />
@@ -26,7 +26,7 @@
         <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="4.6.2" />
         <PackageReference Update="Xamarin.Firebase.iOS.Analytics" Version="6.9.0" />
 
-        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.0.1" />
+        <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="118.1.0" />
         <PackageReference Update="Xamarin.Firebase.Analytics" Version="119.0.0" />
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="122.0.0" />
 
@@ -73,7 +73,7 @@
         <PackageReference Update="Cake.Boots" Version="1.0.3.556" />
         <PackageReference Update="Cake.AndroidAppManifest" Version="1.1.2" />
         <PackageReference Update="Cake.Plist" Version="0.7.0" />
-        <PackageReference Update="Cake.Git" Version="1.0.1" />
+        <PackageReference Update="Cake.Git" Version="1.1.0" />
         <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0102" />
         <PackageReference Update="TweetinviAPI" Version="5.0.4" />
         <PackageReference Update="Discord.Net" Version="2.4.0" />
@@ -94,7 +94,7 @@
         <PackageReference Update="Bogus" Version="33.0.2" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.1.97" />
-        <PackageReference Update="ReactiveUI.Fody" Version="14.1.1" />
+        <PackageReference Update="ReactiveUI.Fody" Version="15.1.1" />
         <PackageReference Update="XF.Material" Version="1.7.8" />
         <PackageReference Update="ZNetCS.AspNetCore.ResumingFileResults" Version="2.2.0" />
     </ItemGroup>
