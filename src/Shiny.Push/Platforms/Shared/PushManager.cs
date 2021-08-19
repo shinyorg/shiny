@@ -32,22 +32,13 @@ namespace Shiny.Push
 
         public async void Start()
         {
-            // this only runs on Android/Firebase
             this.adapter.OnTokenRefreshed = async token =>
             {
                 this.container.SetCurrentToken(token, false);
                 await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
             };
 
-            this.adapter.OnReceived = async push =>
-            {
-                await this.container.OnReceived(push).ConfigureAwait(false);
-#if __ANDROID__
-                //if (push.Notification != null)
-                //    await this.notificationManager.Send(push.Notification);
-#endif
-            };
-
+            this.adapter.OnReceived = push => this.container.OnReceived(push);
             this.adapter.OnEntry = push => this.container.OnEntry(push);
 
             await this.container

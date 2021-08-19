@@ -49,15 +49,18 @@ namespace Shiny.Push.FirebaseMessaging
             {
                 if (Messaging.SharedInstance == null)
                 {
-                    //if (this.config == null)
-                    //{
+                    if (this.config == null)
+                    {
                         Firebase.Core.App.Configure();
-                    //}
-                    //else
-                    //{
-                    //    //new Firebase.Core.Options(this.config.AppId, this.config.Sen)
-                    //    Firebase.Core.App.Configure();
-                    //}
+                    }
+                    else
+                    {
+
+                        Firebase.Core.App.Configure(new Firebase.Core.Options(
+                            this.config.AppId,
+                            this.config.ProjectId
+                        ));
+                    }
                 }
                 Messaging.SharedInstance!.AutoInitEnabled = true;
                 Messaging.SharedInstance.Delegate = new FbMessagingDelegate

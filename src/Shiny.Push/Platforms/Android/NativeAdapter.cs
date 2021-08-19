@@ -36,7 +36,7 @@ namespace Shiny.Push
 
         public async Task TryProcessIntent(Intent intent)
         {
-            //if (intent.HasExtra(IntentNotificationKey))
+            // TODO: if (intent.HasExtra(IntentNotificationKey))
             var pr = this.FromIntent(intent);
             if (pr != null && this.OnEntry != null)
                 await this.OnEntry.Invoke(pr.Value).ConfigureAwait(false);
@@ -124,6 +124,7 @@ namespace Shiny.Push
             }
             else
             {
+                //new FirebaseOptions.Builder().SetGcmSenderId
                 var options = new FirebaseOptions.Builder()
                     .SetApplicationId(this.config.AppId)
                     .SetProjectId(this.config.ProjectId)
