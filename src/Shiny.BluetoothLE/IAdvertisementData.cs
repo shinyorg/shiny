@@ -10,6 +10,6 @@ namespace Shiny.BluetoothLE
         AdvertisementServiceData[]? ServiceData { get; }
         ManufacturerData? ManufacturerData { get; }
         string[]? ServiceUuids { get; }
-        int TxPower { get; }
+        int? TxPower { get; }
     }
 }

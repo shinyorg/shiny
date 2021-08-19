@@ -3,23 +3,21 @@
 
 namespace Shiny.BluetoothLE.Managed
 {
-    public class ManagedScanResult : NotifyPropertyChanged
+    public class ManagedScanResult : NotifyPropertyChanged, IAdvertisementData
     {
-        public ManagedScanResult(IPeripheral peripheral, string[]? serviceUuids)
+        public ManagedScanResult(IPeripheral peripheral)
         {
             this.Peripheral = peripheral;
-            this.ServiceUuids = serviceUuids;
         }
 
 
         public IPeripheral Peripheral { get; }
-        public string[]? ServiceUuids { get; }
         public bool IsConnected => this.Peripheral.IsConnected();
         public string Uuid => this.Peripheral.Uuid;
 
 
         bool? connectable;
-        public bool? Connectable
+        public bool? IsConnectable
         {
             get => this.connectable;
             internal set => this.Set(ref this.connectable, value);
@@ -64,5 +62,17 @@ namespace Shiny.BluetoothLE.Managed
             get => this.lastSeen;
             internal set => this.Set(ref this.lastSeen, value);
         }
+
+
+        string? localName;
+        public string? LocalName
+        {
+            get => this.localName;
+            internal set => this.Set(ref this.localName, value);
+        }
+
+
+        public string[]? ServiceUuids { get; internal set; }
+        public AdvertisementServiceData[]? ServiceData { get; internal set; }
     }
 }

@@ -132,12 +132,17 @@ namespace Shiny.BluetoothLE.Managed
                             if (result == null)
                             {
                                 action = ManagedScanListAction.Add;
-                                result = new ManagedScanResult(scanResult.Peripheral, scanResult.AdvertisementData?.ServiceUuids);
+                                result = new ManagedScanResult(scanResult.Peripheral)
+                                {
+                                    ServiceUuids = scanResult.AdvertisementData?.ServiceUuids,
+                                    ServiceData = scanResult.AdvertisementData?.ServiceData
+                                };
                                 this.Peripherals.Add(result);
                             }
-                            result.Connectable = scanResult.AdvertisementData?.IsConnectable;
+                            result.IsConnectable = scanResult.AdvertisementData?.IsConnectable;
                             result.ManufacturerData = scanResult.AdvertisementData?.ManufacturerData;
                             result.Name = scanResult.Peripheral.Name;
+                            result.LocalName = scanResult.AdvertisementData?.LocalName;
                             result.Rssi = scanResult.Rssi;
                             result.TxPower = scanResult.AdvertisementData?.TxPower;
                             result.LastSeen = DateTimeOffset.UtcNow;
