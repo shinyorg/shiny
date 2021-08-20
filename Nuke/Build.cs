@@ -30,19 +30,20 @@ using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 class Build : NukeBuild,
               ILibraryBuild,
               INugetPublish,
-              IAnnounce
+              ISolutionAccess,
+              IGitHubRelease,
+              ITweetAnnouncement,
+              IDiscordAnnounce
 {
     public static int Main () => Execute<Build>(x => x.Compile);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-    [Solution] readonly Solution Solution;
-    [GitRepository] readonly GitRepository GitRepository;
-
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath OutputDirectory => RootDirectory / "output";
+
 
     Target Clean => _ => _
         .Before(Restore)
@@ -73,4 +74,5 @@ class Build : NukeBuild,
                 .SetNodeReuse(IsLocalBuild));
         });
 
+    public string Message => throw new NotImplementedException();
 }

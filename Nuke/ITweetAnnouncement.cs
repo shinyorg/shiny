@@ -1,10 +1,8 @@
-﻿using System;
-
-using Nuke.Common;
-
+﻿using Nuke.Common;
 using Tweetinvi;
 
-interface ITweetAnnouncement : ITwitterCredentials, IAnnounceMessage
+
+interface ITweetAnnouncement : INukeBuild, ITwitterCredentials, IAnnounceMessage
 {
     Target Tweet => _ => _
         .TriggeredBy<INugetPublish>()

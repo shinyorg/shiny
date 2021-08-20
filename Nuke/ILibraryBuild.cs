@@ -2,7 +2,7 @@
 using Nuke.Common;
 
 
-interface ILibraryBuild : INukeBuild
+interface ILibraryBuild : INukeBuild, ISolutionAccess
 {
     Target Build => _ => _.Executes(() =>
     {
