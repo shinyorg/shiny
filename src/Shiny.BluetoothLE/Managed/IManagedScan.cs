@@ -17,9 +17,8 @@ namespace Shiny.BluetoothLE.Managed
         IScheduler? Scheduler { get; set; }
 
         IEnumerable<IPeripheral> GetConnectedPeripherals();
-        void Start();
+        Task Start();
         void Stop();
-        bool Toggle();
         IObservable<(ManagedScanListAction Action, ManagedScanResult? ScanResult)> WhenScan();
     }
 }
