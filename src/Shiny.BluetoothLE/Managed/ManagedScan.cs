@@ -143,6 +143,9 @@ namespace Shiny.BluetoothLE.Managed
                             result.LastSeen = DateTimeOffset.UtcNow;
                             this.actionSubj.OnNext((action, result));
                         }
+                    }, e =>
+                    {
+                        this.actionSubj.OnError(e);
                     }
                 );
         }
