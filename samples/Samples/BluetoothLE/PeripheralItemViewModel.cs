@@ -39,7 +39,7 @@ namespace Samples.BluetoothLE
                 this.ServiceCount = ad.ServiceUuids?.Length ?? 0;
                 this.Connectable = ad?.IsConnectable?.ToString() ?? "Unknown";
                 this.LocalName = ad.LocalName;
-                this.TxPower = ad.TxPower;
+                this.TxPower = ad.TxPower ?? 0;
                 //this.ManufacturerData = ad.ManufacturerData == null
                 //    ? null
                 //    : BitConverter.ToString(ad.ManufacturerData);

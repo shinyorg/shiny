@@ -55,7 +55,7 @@
                                    Grid.ColumnSpan="2"
                                    FontAttributes="Italic" />
 
-                            <Label Text="{Binding Connectable, StringFormat='Connectable: {0}'}"
+                            <Label Text="{Binding IsConnectable, StringFormat='Connectable: {0}'}"
                                    Grid.Row="2"
                                    Grid.Column="0" />
 
