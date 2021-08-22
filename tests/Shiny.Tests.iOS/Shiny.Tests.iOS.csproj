@@ -192,6 +192,10 @@
       <Project>{da7ee0f6-e80e-4470-bec3-d5fee5a6073d}</Project>
       <Name>Shiny.Push.AzureNotificationHubs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
+      <Project>{e2febf2f-fb6a-47ab-9b16-da0cf0d7d429}</Project>
+      <Name>Shiny.Push.OneSignal</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj">
       <Project>{b7855e77-9363-4f36-9a0d-fc9277a88f8d}</Project>
       <Name>Shiny.Push</Name>

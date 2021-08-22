@@ -22,6 +22,7 @@ namespace Shiny
         {
 #if __ANDROID__ || XAMARIN_IOS
             services.AddSingleton(config);
+            services.TryAddSingleton<PushContainer>();
             services.TryAddSingleton(typeof(IPushManager), typeof(Shiny.Push.OneSignal.PushManager));
             services.AddSingleton(typeof(IPushDelegate), delegateType);
             return true;

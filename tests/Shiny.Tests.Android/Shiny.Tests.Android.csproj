@@ -131,6 +131,10 @@
       <Project>{886f6ff7-2e92-488a-9011-b5c333b6bd54}</Project>
       <Name>Shiny.Push.FirebaseMessaging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
+      <Project>{e2febf2f-fb6a-47ab-9b16-da0cf0d7d429}</Project>
+      <Name>Shiny.Push.OneSignal</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj">
       <Project>{204b1f42-0d9c-4349-87c5-34148e3d170a}</Project>
       <Name>Shiny.Testing</Name>
