@@ -39,50 +39,51 @@ namespace Shiny.Push.FirebaseMessaging
         public void Start()
         {
             if (this.CurrentRegistrationToken != null)
+            {
+                try
+                { 
                 this.TryStartFirebase();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning("Failed to start Firebase Push", ex);
+                }
+            }
         }
 
 
         protected virtual void TryStartFirebase()
         {
-            try
+            if (Messaging.SharedInstance == null)
             {
-                if (Messaging.SharedInstance == null)
+                if (this.config == null)
                 {
-                    if (this.config == null)
-                    {
-                        Firebase.Core.App.Configure();
-                    }
-                    else
-                    {
-
-                        Firebase.Core.App.Configure(new Firebase.Core.Options(
-                            this.config.AppId,
-                            this.config.ProjectId
-                        ));
-                    }
+                    Firebase.Core.App.Configure();
+                    Messaging.SharedInstance!.AutoInitEnabled = true;
                 }
-                Messaging.SharedInstance!.AutoInitEnabled = true;
-                Messaging.SharedInstance.Delegate = new FbMessagingDelegate
-                (
-                    async msg =>
-                    {
-                        // I can't get access to the notification here
-                        var dict = msg.AppData.FromNsDictionary();
-                        var pr = new PushNotification(dict, null);
-                        await this.container.OnReceived(pr).ConfigureAwait(false);
-                    },
-                    async token =>
-                    {
-                        this.container.SetCurrentToken(token, true);
-                        await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
-                    }
-                );
+                else
+                {
+                    Firebase.Core.App.Configure(new Firebase.Core.Options(
+                        this.config.AppId,
+                        this.config.ProjectId
+                    ));
+                }
             }
-            catch (Exception ex)
-            {
-                this.logger.LogWarning("Failed to start Firebase Push", ex);
-            }
+            Messaging.SharedInstance!.Delegate = new FbMessagingDelegate
+            (
+                async msg =>
+                {
+                    // I can't get access to the notification here
+                    var dict = msg.AppData.FromNsDictionary();
+                    var pr = new PushNotification(dict, null);
+                    await this.container.OnReceived(pr).ConfigureAwait(false);
+                },
+                async token =>
+                {
+                    this.container.SetCurrentToken(token, true);
+                    await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
+                }
+            );
         }
 
 
@@ -101,6 +102,7 @@ namespace Shiny.Push.FirebaseMessaging
 
         public async Task UnRegister()
         {
+            this.container.ClearRegistration();
             await InstanceId.SharedInstance.DeleteIdAsync().ConfigureAwait(false);
             await this.adapter.UnRegister().ConfigureAwait(false);
         }

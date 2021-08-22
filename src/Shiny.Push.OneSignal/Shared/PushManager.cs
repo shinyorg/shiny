@@ -74,6 +74,8 @@ namespace Shiny.Push.OneSignal
 
         public Task UnRegister()
         {
+            this.container.ClearRegistration();
+            this.ClearProperties();
             OS.Current.SetSubscription(false);
             return Task.CompletedTask;
         }

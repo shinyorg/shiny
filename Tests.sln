@@ -20,30 +20,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Notifications", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Beacons", "src\Shiny.Beacons\Shiny.Beacons.csproj", "{B2E9F094-425F-4899-A979-338C940A917B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1DC43C21-5765-4B46-95F9-CDECB851DF94}"
-	ProjectSection(SolutionItems) = preProject
-		.github\CODE_OF_CONDUCT.md = .github\CODE_OF_CONDUCT.md
-		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
-		.github\FUNDING.yml = .github\FUNDING.yml
-		.github\issue-close-app.yml = .github\issue-close-app.yml
-		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
-		.github\noresponse.yml = .github\noresponse.yml
-		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
-		.github\stale.yml = .github\stale.yml
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Testing", "src\Shiny.Testing\Shiny.Testing.csproj", "{204B1F42-0D9C-4349-87C5-34148E3D170A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Integrations.Sqlite", "src\Shiny.Integrations.Sqlite\Shiny.Integrations.Sqlite.csproj", "{271E5317-66E3-4E0F-A08B-7CE89B395237}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{48AE87AB-C0FE-4426-860C-2C5808E10238}"
-	ProjectSection(SolutionItems) = preProject
-		.github\ISSUE_TEMPLATE\---support-request.md = .github\ISSUE_TEMPLATE\---support-request.md
-		.github\ISSUE_TEMPLATE\--bug.md = .github\ISSUE_TEMPLATE\--bug.md
-		.github\ISSUE_TEMPLATE\--feature-request.md = .github\ISSUE_TEMPLATE\--feature-request.md
-		.github\ISSUE_TEMPLATE\--thank-you.md = .github\ISSUE_TEMPLATE\--thank-you.md
-		.github\config.yml = .github\config.yml
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push", "src\Shiny.Push\Shiny.Push.csproj", "{B7855E77-9363-4F36-9A0D-FC9277A88F8D}"
 EndProject
@@ -1467,7 +1446,6 @@ Global
 		{B2E9F094-425F-4899-A979-338C940A917B} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{204B1F42-0D9C-4349-87C5-34148E3D170A} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{271E5317-66E3-4E0F-A08B-7CE89B395237} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
-		{48AE87AB-C0FE-4426-860C-2C5808E10238} = {1DC43C21-5765-4B46-95F9-CDECB851DF94}
 		{B7855E77-9363-4F36-9A0D-FC9277A88F8D} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{DA7EE0F6-E80E-4470-BEC3-D5FEE5A6073D} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{886F6FF7-2E92-488A-9011-B5C333B6BD54} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
