@@ -5,7 +5,7 @@
             {
                 "delimiter": ";",
                 "className": "Values",
-                "accessibility": "Internal",
+                "accessibility": "Public",
                 "namespace": "Secrets",
                 "rootNamespace": null,
                 "properties": [
