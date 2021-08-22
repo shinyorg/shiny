@@ -1,4 +1,6 @@
-on: 
+name: Sponsor Label
+
+on:
   issues:
     types: [opened]
   pull_request:
