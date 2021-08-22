@@ -63,7 +63,10 @@ namespace Shiny.Push
             => this.delegates.RunDelegates(x => x.OnTokenRefreshed(token));
 
         public Task OnReceived(PushNotification push)
-            => this.delegates.RunDelegates(x => x.OnReceived(push));
+        {
+            this.recvSubj.OnNext(push);
+            return this.delegates.RunDelegates(x => x.OnReceived(push));
+        }
 
         public Task OnEntry(PushNotificationResponse response)
             => this.delegates.RunDelegates(x => x.OnEntry(response));
