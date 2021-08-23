@@ -6,11 +6,7 @@
     "services": [
         {
             "name": "Shiny.Jobs.IJobManager",
-            "static": "ShinyJobs",
-            "startup": "RegisterJob",
-            "ios": {
-                "usesJobs": true
-            },
+            "ios": {},
             "android": {
                 "manifestUsesPermissions": [
                     "android.permission.ACCESS_NETWORK_STATE",

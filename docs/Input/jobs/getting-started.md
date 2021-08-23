@@ -2,6 +2,8 @@ Title: Getting Started
 Order: 1
 ---
 
+<?! PackageInfo "Shiny.Jobs" /?>
+
 ## Features
 * Cross Platform Background Jobs Framework
 * Run adhoc jobs in the background (mainly for use on iOS)

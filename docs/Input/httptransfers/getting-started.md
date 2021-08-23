@@ -2,6 +2,8 @@ Title: Getting Started
 Order: 1
 ---
 
+<?! PackageInfo "Shiny.Net.Http" /?>
+
 As developers, we often take internet connectivity and speed for granted.  Mobile phones are taking HUGE sized photos these days that can take quite some time to upload.
 
 ## Features

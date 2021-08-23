@@ -17,6 +17,7 @@ body:
         - Push - Native
         - Push - Azure Notification Hub
         - Push - Firebase
+        - Push - OneSignal
         - Sensors
         - BluetoothLE Client
         - BluetoothLE Hosting

@@ -1,7 +1,6 @@
 ﻿{
     "name": "Shiny.Push.OneSignal",
     "description": "Push Provider for OneSignal",
-    "sponsors": true,
     "services": [
         {
             "name": "Shiny.Push.IPushManager",

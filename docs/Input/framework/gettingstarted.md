@@ -2,6 +2,8 @@ Title: Getting Started
 Order: 1
 ---
 
+<?! PackageInfo "Shiny.Framework" /?>
+
 > Shiny Framework brings together Prism, Reactive UI, and Shiny with a bunch of best practices 
 
 
