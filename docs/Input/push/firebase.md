@@ -1,4 +1,5 @@
 Title: Firebase Messaging
+Order: 4
 ---
 
 <?! PackageInfo "Shiny.Push.FirebaseMessaging" /?>
