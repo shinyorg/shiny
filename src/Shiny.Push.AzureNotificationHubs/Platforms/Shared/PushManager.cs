@@ -52,15 +52,7 @@ namespace Shiny.Push.AzureNotificationHubs
                 }
             };
 
-            this.native.OnReceived = async push =>
-            {
-                await this.container.OnReceived(push).ConfigureAwait(false);
-#if __ANDROID__
-                //if (push.Notification != null)
-                //    await ShinyHost.Resolve<AndroidPushNotificationManager>().Send(push.Notification);
-#endif
-            };
-
+            this.native.OnReceived = push => this.container.OnReceived(push);
             this.native.OnEntry = push => this.container.OnEntry(push);
 
             // TODO: run native adapter startup
