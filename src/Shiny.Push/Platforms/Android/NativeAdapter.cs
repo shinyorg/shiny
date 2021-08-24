@@ -149,14 +149,16 @@ namespace Shiny.Push
 
         PushNotificationResponse? FromIntent(Intent intent)
         {
-            var notificationString = intent.GetStringExtra("TODO");
-            var notification = this.serializer.Deserialize<Shiny.Notifications.Notification>(notificationString);
+            // TODO: returning null until I'm ready to check the tags
+            //var notificationString = intent.GetStringExtra("TODO");
+            //var notification = this.serializer.Deserialize<Shiny.Notifications.Notification>(notificationString);
 
-            var action = intent.GetStringExtra("TODO");
-            var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
-            var response = new PushNotificationResponse(notification, action, text);
+            //var action = intent.GetStringExtra("TODO");
+            //var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
+            //var response = new PushNotificationResponse(notification, action, text);
 
-            return response;
+            //return response;
+            return null;
         }
 
 

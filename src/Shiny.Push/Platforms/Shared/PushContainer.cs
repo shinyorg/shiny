@@ -12,15 +12,15 @@ namespace Shiny.Push
 {
     public class PushContainer : NotifyPropertyChanged
     {
-        readonly IEnumerable<IPushDelegate> delegates;
+        readonly IServiceProvider services;
         readonly Subject<PushNotification> recvSubj;
 
 
-        public PushContainer(IKeyValueStoreFactory storeFactory, IEnumerable<IPushDelegate> delegates)
+        public PushContainer(IKeyValueStoreFactory storeFactory, IServiceProvider services)
         {
             this.recvSubj = new Subject<PushNotification>();
             this.Store = storeFactory.DefaultStore;
-            this.delegates = delegates;
+            this.services = services;
         }
 
 
@@ -60,16 +60,16 @@ namespace Shiny.Push
 
 
         public Task OnTokenRefreshed(string token)
-            => this.delegates.RunDelegates(x => x.OnTokenRefreshed(token));
+            => this.services.RunDelegates<IPushDelegate>(x => x.OnTokenRefreshed(token));
 
         public Task OnReceived(PushNotification push)
         {
             this.recvSubj.OnNext(push);
-            return this.delegates.RunDelegates(x => x.OnReceived(push));
+            return this.services.RunDelegates<IPushDelegate>(x => x.OnReceived(push));
         }
 
         public Task OnEntry(PushNotificationResponse response)
-            => this.delegates.RunDelegates(x => x.OnEntry(response));
+            => this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(response));
 
         public IObservable<PushNotification> WhenReceived() => this.recvSubj;
 

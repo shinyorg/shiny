@@ -19,8 +19,8 @@ namespace Shiny.Push.AzureNotificationHubs
         readonly INativeAdapter native;
         readonly ILogger logger;
         readonly PushContainer container;
-        readonly NotificationHubClient hub;
-
+        readonly AzureNotificationConfig config;
+        // TODO: watch push channel expiration?
 
         public PushManager(INativeAdapter native,
                            ILogger<PushManager> logger,
@@ -30,11 +30,10 @@ namespace Shiny.Push.AzureNotificationHubs
             this.native = native;
             this.container = container;
             this.logger = logger;
-            this.hub = new NotificationHubClient(
-                config.ListenerConnectionString,
-                config.HubName
-            );
+            this.config = config;
         }
+
+
 
 
         public void Start()
@@ -42,9 +41,15 @@ namespace Shiny.Push.AzureNotificationHubs
             // this only runs on Android/Firebase
             this.native.OnTokenRefreshed = async token =>
             {
-                // TODO: update installation - if installation update fails - we'll need to try again somehow (job?)
-                //this.container.SetCurrentToken(token, false);
-                //await this.container.OnTokenRefreshed(token).ConfigureAwait(false);
+                this.container.SetCurrentToken(token, false);
+                try
+                {
+                    await this.Update(token).ConfigureAwait(false); // if this fails, we should have a backup plan like a job
+                }
+                catch (Exception ex)
+                {
+                    // TODO
+                }
             };
 
             this.native.OnReceived = async push =>
@@ -52,15 +57,13 @@ namespace Shiny.Push.AzureNotificationHubs
                 await this.container.OnReceived(push).ConfigureAwait(false);
 #if __ANDROID__
                 //if (push.Notification != null)
-                //    await this.notificationManager.Send(push.Notification);
+                //    await ShinyHost.Resolve<AndroidPushNotificationManager>().Send(push.Notification);
 #endif
             };
 
             this.native.OnEntry = push => this.container.OnEntry(push);
 
-            //await this.native
-            //    .TryAutoStart(this.adapter, this.logger)
-            //    .ConfigureAwait(false);
+            // TODO: run native adapter startup
         }
 
 
@@ -77,29 +80,15 @@ namespace Shiny.Push.AzureNotificationHubs
 
         public async Task<PushAccessState> RequestAccess(CancellationToken cancelToken = default)
         {
-            var access = await this.native.RequestAccess().ConfigureAwait(false);
+            var access = await this.native
+                .RequestAccess()
+                .ConfigureAwait(false);
             this.logger.LogInformation($"OS Permission: {access.Status} - Native Token: {access.RegistrationToken}");
 
             if (access.Status == AccessState.Available)
             {
                 this.InstallationId ??= Guid.NewGuid().ToString().Replace("-", "");
-
-                var install = new Installation
-                {
-                    InstallationId = this.InstallationId,
-                    PushChannel = access.RegistrationToken,
-#if __IOS__
-                    Platform = NotificationPlatform.Apns
-#elif __ANDROID__
-                    Platform = NotificationPlatform.Fcm
-#elif WINDOWS_UWP
-                    Platform = NotificationPlatform.Wns
-#endif
-                };
-                this.logger.LogInformation($"ANH Token: {this.InstallationId}");
-
-                await this.hub.CreateOrUpdateInstallationAsync(install, cancelToken).ConfigureAwait(false);
-                this.container.SetCurrentToken(access.RegistrationToken!, false);
+                await this.Update(access.RegistrationToken!).ConfigureAwait(false);
 
                 access = new PushAccessState(AccessState.Available, this.InstallationId);
             }
@@ -113,7 +102,9 @@ namespace Shiny.Push.AzureNotificationHubs
             {
                 try
                 {
-                    await this.hub.DeleteInstallationAsync(this.InstallationId).ConfigureAwait(false);
+                    await this.CreateClient()
+                        .DeleteInstallationAsync(this.InstallationId)
+                        .ConfigureAwait(false);
                 }
                 catch (MessagingEntityNotFoundException)
                 {
@@ -150,16 +141,53 @@ namespace Shiny.Push.AzureNotificationHubs
             if (this.InstallationId == null)
                 return;
 
-            var install = await this.hub.GetInstallationAsync(this.InstallationId).ConfigureAwait(false);
+            var hub = this.CreateClient();
+            var install = this.CreateInstall(this.container.CurrentRegistrationToken!);
             if (tags == null || tags.Length == 0)
                 install.Tags = null;
             else
                 install.Tags = tags.ToList();
 
-            await this.hub.CreateOrUpdateInstallationAsync(install).ConfigureAwait(false);
+            await hub
+                .CreateOrUpdateInstallationAsync(install)
+                .ConfigureAwait(false);
+
             this.container.CurrentRegistrationTokenDate = DateTime.UtcNow;
             this.container.RegisteredTags = tags;
         }
+
+
+        protected async Task Update(string nativeRegToken, CancellationToken cancelToken = default)
+        {
+            var install = this.CreateInstall(nativeRegToken);
+            this.logger.LogInformation($"ANH Token: {this.InstallationId}");
+
+            await this.CreateClient()
+                .CreateOrUpdateInstallationAsync(install, cancelToken)
+                .ConfigureAwait(false);
+            this.container.SetCurrentToken(nativeRegToken, false);
+        }
+
+
+        protected Installation CreateInstall(string nativeRegToken) => new Installation
+        {
+            InstallationId = this.InstallationId,
+            PushChannel = nativeRegToken,
+            Tags = this.RegisteredTags?.ToList(),
+#if __IOS__
+            Platform = NotificationPlatform.Apns
+#elif __ANDROID__
+            Platform = NotificationPlatform.Fcm
+#elif WINDOWS_UWP
+            Platform = NotificationPlatform.Wns
+#endif
+        };
+
+
+        protected NotificationHubClient CreateClient() => new NotificationHubClient(
+            this.config.ListenerConnectionString,
+            this.config.HubName
+        );
     }
 }
 #endif
