@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
 using Android.Runtime;
 using Firebase;
 using Firebase.Messaging;
-using Shiny.Infrastructure;
 using Shiny.Push.Infrastructure;
-using Notification = Shiny.Notifications.Notification;
 
 
 namespace Shiny.Push
@@ -17,18 +14,15 @@ namespace Shiny.Push
     public class NativeAdapter : INativeAdapter
     {
         readonly AndroidPushNotificationManager notifications;
-        readonly ISerializer serializer;
         readonly IAndroidContext context;
         readonly FirebaseConfig? config;
 
 
         public NativeAdapter(AndroidPushNotificationManager notifications,
-                             ISerializer serializer,
                              IAndroidContext context,
                              FirebaseConfig? config = null)
         {
             this.notifications = notifications;
-            this.serializer = serializer;
             this.context = context;
             this.config = config;
         }
@@ -36,8 +30,7 @@ namespace Shiny.Push
 
         public async Task TryProcessIntent(Intent intent)
         {
-            // TODO: if (intent.HasExtra(IntentNotificationKey))
-            var pr = this.FromIntent(intent);
+            var pr = this.notifications.FromIntent(intent);
             if (pr != null && this.OnEntry != null)
                 await this.OnEntry.Invoke(pr.Value).ConfigureAwait(false);
         }
@@ -58,7 +51,7 @@ namespace Shiny.Push
                 {
                     ShinyFirebaseService.MessageReceived = async msg =>
                     {
-                        var pr = this.FromNative(msg);
+                        var pr = AndroidPushNotificationManager.FromNative(msg);
                         await this.onReceived.Invoke(pr).ConfigureAwait(false);
                         if (pr.Notification != null)
                         {
@@ -131,7 +124,6 @@ namespace Shiny.Push
                     .SetApiKey(this.config.ApiKey)
                     .Build();
                 FirebaseApp.InitializeApp(this.context.AppContext, options, this.config.AppName);
-
             }
 
             var task = await FirebaseMessaging.Instance.GetToken();
@@ -144,44 +136,6 @@ namespace Shiny.Push
         {
             FirebaseMessaging.Instance.AutoInitEnabled = false;
             await Task.Run(() => FirebaseMessaging.Instance.DeleteToken()).ConfigureAwait(false);
-        }
-
-
-        PushNotificationResponse? FromIntent(Intent intent)
-        {
-            // TODO: returning null until I'm ready to check the tags
-            //var notificationString = intent.GetStringExtra("TODO");
-            //var notification = this.serializer.Deserialize<Shiny.Notifications.Notification>(notificationString);
-
-            //var action = intent.GetStringExtra("TODO");
-            //var text = RemoteInput.GetResultsFromIntent(intent)?.GetString("Result");
-            //var response = new PushNotificationResponse(notification, action, text);
-
-            //return response;
-            return null;
-        }
-
-
-        PushNotification FromNative(RemoteMessage message)
-        {
-            Notification? notification = null;
-            var native = message.GetNotification();
-
-            if (native != null)
-            {
-                notification = new Notification
-                {
-                    Title = native.Title,
-                    Message = native.Body,
-                    Channel = native.ChannelId
-                };
-                if (!native.Icon.IsEmpty())
-                    notification.Android.SmallIconResourceName = native.Icon;
-
-                if (!native.Color.IsEmpty())
-                    notification.Android.ColorResourceName = native.Color;
-            }
-            return new PushNotification(message.Data, notification);
         }
     }
 }

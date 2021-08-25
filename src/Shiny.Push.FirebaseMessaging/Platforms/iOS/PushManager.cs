@@ -27,6 +27,7 @@ namespace Shiny.Push.FirebaseMessaging
             this.adapter = adapter;
             this.container = container;
             this.logger = logger;
+            this.config = config;
         }
 
 
@@ -41,8 +42,8 @@ namespace Shiny.Push.FirebaseMessaging
             if (this.CurrentRegistrationToken != null)
             {
                 try
-                { 
-                this.TryStartFirebase();
+                {
+                    this.TryStartFirebase();
                 }
                 catch (Exception ex)
                 {

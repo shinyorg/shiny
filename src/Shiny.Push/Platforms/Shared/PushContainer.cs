@@ -24,7 +24,6 @@ namespace Shiny.Push
         }
 
 
-        // TODO: I want the reg token to be the install ID on ANH - this may not work
         public async Task TryAutoStart(INativeAdapter adapter, ILogger logger)
         {
             if (this.CurrentRegistrationToken.IsEmpty())

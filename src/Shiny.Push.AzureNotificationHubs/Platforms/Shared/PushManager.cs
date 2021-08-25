@@ -34,9 +34,7 @@ namespace Shiny.Push.AzureNotificationHubs
         }
 
 
-
-
-        public void Start()
+        public async void Start()
         {
             // this only runs on Android/Firebase
             this.native.OnTokenRefreshed = async token =>
@@ -44,18 +42,20 @@ namespace Shiny.Push.AzureNotificationHubs
                 this.container.SetCurrentToken(token, false);
                 try
                 {
-                    await this.Update(token).ConfigureAwait(false); // if this fails, we should have a backup plan like a job
+                    // if this fails, we should have a backup plan like a job
+                    await this.Update(token).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    // TODO
+                    this.logger.LogError("Failed to register new native push token with Azure Notification Hubs", ex);
                 }
             };
 
             this.native.OnReceived = push => this.container.OnReceived(push);
             this.native.OnEntry = push => this.container.OnEntry(push);
-
-            // TODO: run native adapter startup
+            await this.container
+                .TryAutoStart(this.native, this.logger)
+                .ConfigureAwait(false);
         }
 
 
