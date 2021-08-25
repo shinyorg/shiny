@@ -100,14 +100,13 @@ namespace Shiny.Locations
 
         protected virtual async Task StartListenerInternal(GpsRequest request)
         {
-            var access = await this.RequestAccess(request);
-            //if (request.UseBackground && access == AccessState.Available || access == AccessState.Restricted)
-            access.Assert();
+            // TODO: permission
+            //this.locationManager.AccuracyAuthorization = CLAccuracyAuthorization.FullAccuracy;
+            (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
             this.gdelegate.Request = request;
 #if __IOS__
             this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
-            //this.locationManager.ShowsBackgroundLocationIndicator
-            //this.locationManager.AccuracyAuthorization = CLAccuracyAuthorization.FullAccuracy;
+            //this.locationManager.ShowsBackgroundLocationIndicator = request.UseBackground;
             var throttledInterval = request.ThrottledInterval?.TotalSeconds ?? 0;
             var minDistance = request.MinimumDistance?.TotalMeters ?? 0;
 
@@ -121,6 +120,7 @@ namespace Shiny.Locations
 #endif
             switch (request.Priority)
             {
+                // TODO: other accuracy values for iOS
                 case GpsPriority.Highest:
                     this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
                     break;
@@ -134,6 +134,7 @@ namespace Shiny.Locations
                     break;
             }
 
+            // TODO: other iOS config
             //this.locationManager.ShouldDisplayHeadingCalibration
             //this.locationManager.ShowsBackgroundLocationIndicator
             //this.locationManager.PausesLocationUpdatesAutomatically = false;
