@@ -6,10 +6,11 @@ using Cake.Frosting;
 using Discord;
 using Discord.WebSocket;
 using Tweetinvi;
-using Tweetinvi.Models;
 
-namespace ShinyBuild.Tasks
+
+namespace ShinyBuild.Tasks.Library
 {
+    [IsDependentOn(typeof(NugetDeployTask))]
     public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
     {
         public override bool ShouldRun(BuildContext context)
