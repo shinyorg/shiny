@@ -7,11 +7,11 @@
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
     </PropertyGroup>
 
+    <!--
     <Target Name="MBTHack"
             BeforeTargets="Secrets"
             DependsOnTargets="MobileBuildToolsInit">
     </Target>
-    <!--
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
         <UseWPF>true</UseWPF>
     </PropertyGroup>
