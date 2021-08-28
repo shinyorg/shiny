@@ -121,7 +121,7 @@ namespace Shiny.BluetoothLE
                         ob.OnError
                     );
 
-                this.Context.Gatt.DiscoverServices();
+                this.Context.Gatt!.DiscoverServices();
                 return sub;
             }));
 
