@@ -57,21 +57,21 @@ class Build : NukeBuild,
     Target Restore => _ => _
         .Executes(() =>
         {
-            MSBuild(s => s
-                .SetTargetPath(Solution)
-                .SetTargets("Restore"));
+            //MSBuild(s => s
+            //    .SetTargetPath(Solution)
+            //    .SetTargets("Restore"));
         });
 
     Target Compile => _ => _
         .DependsOn(Restore)
         .Executes(() =>
         {
-            MSBuild(s => s
-                .SetTargetPath(Solution)
-                .SetTargets("Rebuild")
-                .SetConfiguration(Configuration)
-                .SetMaxCpuCount(Environment.ProcessorCount)
-                .SetNodeReuse(IsLocalBuild));
+            //MSBuild(s => s
+            //    .SetTargetPath(Solution)
+            //    .SetTargets("Rebuild")
+            //    .SetConfiguration(Configuration)
+            //    .SetMaxCpuCount(Environment.ProcessorCount)
+            //    .SetNodeReuse(IsLocalBuild));
         });
 
     public string Message => throw new NotImplementedException();

@@ -14,18 +14,18 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
         <Compile Include="Shared\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
         <Compile Include="Shared\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.Contains('ios')) ">
         <Compile Include="Shared\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
     </ItemGroup>
 </Project>

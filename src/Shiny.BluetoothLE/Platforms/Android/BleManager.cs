@@ -33,7 +33,7 @@ namespace Shiny.BluetoothLE
                 .Take(6)
                 .ToArray();
 
-            var native = this.context.Manager.Adapter.GetRemoteDevice(address);
+            var native = this.context.Manager.Adapter!.GetRemoteDevice(address);
             if (native == null)
                 return Observable.Return<IPeripheral?>(null);
 
@@ -95,7 +95,7 @@ namespace Shiny.BluetoothLE
 
         public IObservable<IEnumerable<IPeripheral>> GetPairedPeripherals() => Observable.Return(this.context
             .Manager
-            .Adapter
+            .Adapter!
             .BondedDevices
             .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le)
             .Select(this.context.GetDevice)
@@ -105,12 +105,14 @@ namespace Shiny.BluetoothLE
         public IObservable<bool> SetAdapterState(bool enable)
         {
             var result = false;
-            if (enable && !BluetoothAdapter.DefaultAdapter.IsEnabled)
-                result = BluetoothAdapter.DefaultAdapter.Enable();
+            if (BluetoothAdapter.DefaultAdapter != null)
+            {
+                if (enable && !BluetoothAdapter.DefaultAdapter.IsEnabled)
+                    result = BluetoothAdapter.DefaultAdapter.Enable();
 
-            else if (!enable && BluetoothAdapter.DefaultAdapter.IsEnabled)
-                result = BluetoothAdapter.DefaultAdapter.Disable();
-
+                else if (!enable && BluetoothAdapter.DefaultAdapter.IsEnabled)
+                    result = BluetoothAdapter.DefaultAdapter.Disable();
+            }
             return Observable.Return(result);
         }
     }

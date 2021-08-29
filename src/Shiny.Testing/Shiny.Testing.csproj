@@ -17,8 +17,8 @@
         <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
-        <ProjectReference Include="..\Shiny.Push\Shiny.Push.csproj" />
         <ProjectReference Include="..\Shiny.Beacons\Shiny.Beacons.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
     </ItemGroup>
 </Project>
