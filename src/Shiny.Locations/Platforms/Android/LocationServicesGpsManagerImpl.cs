@@ -25,6 +25,14 @@ namespace Shiny.Locations
                 AltitudeRequired = false,
                 SpeedRequired = false
             };
+            // Accuracy - Coarse, Fine, Low, Medium, High, NoRequirement
+            //criteria.Accuracy = Accuracy.Coarse
+            //criteria.HorizontalAccuracy = Accuracy.Coarse
+            //SpeedRequired
+            //criteria.SpeedAccuracy = Accuracy.Coarse;
+            //BearingRequired
+            //criteria.BearingAccuracy = Accuracy.Coarse;
+            //criteria.VerticalAccuracy = Accuracy.Coarse
             var location = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, false));
             if (location != null)
                 return new GpsReading(location);

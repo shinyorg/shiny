@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.Logging;
+
 
 namespace Shiny.Locations
 {
@@ -31,7 +30,7 @@ namespace Shiny.Locations
             {
                 try
                 {
-                    await this.StartListener(this.CurrentListener);
+                    await this.StartListener(this.CurrentListener).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
