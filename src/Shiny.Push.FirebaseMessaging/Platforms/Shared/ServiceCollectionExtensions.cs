@@ -7,8 +7,8 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseFirebaseMessaging<TPushDelegate>(this IServiceCollection services) where TPushDelegate : class, IPushDelegate
-            => services.UseFirebaseMessaging(typeof(TPushDelegate));
+        public static bool UseFirebaseMessaging<TPushDelegate>(this IServiceCollection services, FirebaseConfiguration? config = null) where TPushDelegate : class, IPushDelegate
+            => services.UseFirebaseMessaging(typeof(TPushDelegate), config);
 
 
         public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType, FirebaseConfiguration? config = null)
