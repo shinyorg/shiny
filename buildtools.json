@@ -1,18 +1,69 @@
 {
     "$schema": "https://mobilebuildtools.com/schemas/v2/buildtools.schema.json",
     "appSettings": {
-        "Shiny.Tests.Device": [
+        "Shiny.Tests.Android": [
             {
                 "delimiter": ";",
                 "className": "Values",
                 "accessibility": "Public",
                 "namespace": "Secrets",
-                "rootNamespace": null,
+                "rootNamespace": "Shiny.Tests",
                 "properties": [
                     {
-                        "name": "AppCenterKey",
+                        "name": "AzureNotificationHubListenerConnectionString",
                         "type": "String"
                     },
+                    {
+                        "name": "AzureNotificationHubFullConnectionString",
+                        "type": "String"
+                    },
+                    {
+                        "name": "AzureNotificationHubName",
+                        "type": "String"
+                    },
+                    {
+                        "name": "GoogleCredentialProjectId",
+                        "type": "String"
+                    },
+                    {
+                        "name": "GoogleCredentialPrivateKeyId",
+                        "type": "String"
+                    },
+                    {
+                        "name": "GoogleCredentialPrivateKey",
+                        "type": "String"
+                    },
+                    {
+                        "name": "GoogleCredentialClientId",
+                        "type": "String"
+                    },
+                    {
+                        "name": "GoogleCredentialClientEmail",
+                        "type": "String"
+                    },
+                    {
+                        "name": "GoogleCredentialClientCertUrl",
+                        "type": "String"
+                    },
+                    {
+                        "name": "OneSignalRestApiKey",
+                        "type": "String"
+                    },
+                    {
+                        "name": "OneSignalAppId",
+                        "type": "String"
+                    }
+                ]
+            }
+        ],
+        "Shiny.Tests.iOS": [
+            {
+                "delimiter": ";",
+                "className": "Values",
+                "accessibility": "Public",
+                "namespace": "Secrets",
+                "rootNamespace": "Shiny.Tests",
+                "properties": [
                     {
                         "name": "AzureNotificationHubListenerConnectionString",
                         "type": "String"
@@ -67,6 +118,29 @@
                     },
                     {
                         "name": "OneSignalAppId",
+                        "type": "String"
+                    }
+                ]
+            }
+        ],
+        "Shiny.Tests.Uwp": [
+            {
+                "delimiter": ";",
+                "className": "Values",
+                "accessibility": "Public",
+                "namespace": "Secrets",
+                "rootNamespace": "Shiny.Tests",
+                "properties": [
+                    {
+                        "name": "AzureNotificationHubListenerConnectionString",
+                        "type": "String"
+                    },
+                    {
+                        "name": "AzureNotificationHubFullConnectionString",
+                        "type": "String"
+                    },
+                    {
+                        "name": "AzureNotificationHubName",
                         "type": "String"
                     }
                 ]

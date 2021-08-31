@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>92e5ed57-cc67-4e12-910a-30f957992b7b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Shiny.Tests.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ActionStartup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyAttributes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\BeaconParserTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Beacons\BeaconRegionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\BleManagerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\CharacteristicTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\Constants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BluetoothLE\PeripheralTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Helper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Infrastructure\DependencyInjectionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Infrastructure\FullService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Infrastructure\MessageBusTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Infrastructure\TestModule.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Repositories\BaseRepositoryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Repositories\FileSystemRepositoryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Repositories\SqliteRepositoryTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Serialization\BaseSerializationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Serialization\JsonSerializationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\AttributeTestBind.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\MyTestEnum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Base.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.ObjectBinder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\StoreTests.Types.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Core\Stores\TestBind.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\GpsManagerTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\DistanceTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\GeofenceRegionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\GpsGeofenceDelegateTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\MotionActivityTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Locations\PositionTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Notifications\NotificationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlatformTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\AppleNativePushTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\AzureNotificationHubTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\FirebaseTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\OneSignalTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Push\TestGoogleCredential.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TestStartup.cs" />
+  </ItemGroup>
+</Project>

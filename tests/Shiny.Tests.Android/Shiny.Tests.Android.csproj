@@ -31,7 +31,7 @@
     <DebugType>portable</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DEVICE_TESTS;__ANDROID__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
@@ -43,13 +43,16 @@
     <DebugType>portable</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEVICE_TESTS;__ANDROID__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mock|AnyCPU'">
+    <DefineConstants>DEBUG;DEVICE_TESTS;__ANDROID__</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android.Export" />
@@ -87,6 +90,15 @@
     <PackageReference Include="xunit.runner.devices" />
     <PackageReference Include="xunit" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
+    <PackageReference Include="OneSignal.net" />
+    <PackageReference Include="MartinCostello.Logging.XUnit" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="FirebaseAdmin" />
+    <PackageReference Include="Xamarin.Essentials" />
+    <PackageReference Include="Acr.UserDialogs" />
+    <PackageReference Include="Microsoft.Azure.NotificationHubs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">
@@ -127,6 +139,10 @@
       <Project>{5a0dd7a1-e497-4051-84b0-2e16b015e012}</Project>
       <Name>Shiny.Locations</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj">
+      <Project>{df1aee6a-0bda-450e-ad40-09f3ccab2d32}</Project>
+      <Name>Shiny.Push.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
       <Project>{886f6ff7-2e92-488a-9011-b5c333b6bd54}</Project>
       <Name>Shiny.Push.FirebaseMessaging</Name>
@@ -154,10 +170,6 @@
     <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
       <Name>Shiny.Notifications</Name>
       <Project>{E76DB2CB-7A95-40B0-9A50-230320554B6B}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Shiny.Tests.Device\Shiny.Tests.Device.csproj">
-      <Project>{e1e4a77d-f07a-402e-bfac-2b356b86b089}</Project>
-      <Name>Shiny.Tests.Device</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +318,7 @@
       </Generator>
     </AndroidResource>
   </ItemGroup>
+  <Import Project="..\Shiny.Tests.Shared\Shiny.Tests.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
     Other similar extension points exist, see Microsoft.Common.targets.

@@ -38,6 +38,8 @@
         <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj" />
+        <ProjectReference Include="..\..\src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
         <ProjectReference Include="..\..\src\Shiny.Testing\Shiny.Testing.csproj" />
@@ -49,7 +51,9 @@
         <Reference Include="c:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\Xamarin.iOS\v1.0\Xamarin.iOS.dll" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(OS) != 'WINDOWS_NT' ">
+    <Import Project="..\Shiny.Tests.Shared\Shiny.Tests.Shared.projitems" Label="Shared" />
 
-    </ItemGroup>
+    <!--<ItemGroup Condition=" $(OS) != 'WINDOWS_NT' ">
+
+    </ItemGroup>-->
 </Project>
