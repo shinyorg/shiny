@@ -4,7 +4,6 @@
         <Description>Shiny Push Common support lib for all push implementations</Description>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
-        <RootNamespace>Shiny.Push</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
