@@ -5,7 +5,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Shiny.BluetoothLE.Internals;
 using Android.Bluetooth;
-using Java.Util;
 using Observable = System.Reactive.Linq.Observable;
 
 

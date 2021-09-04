@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Collections.Generic;
 using Shiny.BluetoothLE.Internals;
 using Android;
@@ -50,7 +51,7 @@ namespace Shiny.BluetoothLE
             );
 
 
-        public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async () =>
+        public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
         {
             if (!this.context.Android.IsInManifest(Manifest.Permission.Bluetooth))
                 return AccessState.NotSetup;
@@ -59,7 +60,12 @@ namespace Shiny.BluetoothLE
                 return AccessState.NotSetup;
 
             var forBackground = this.context.Services.GetService(typeof(IBleDelegate)) != null;
-            var result = await this.context.Android.RequestAccess(Manifest.Permission.AccessFineLocation);
+            var result = await this.context
+                .Android
+                .RequestAccess(Manifest.Permission.AccessFineLocation)
+                .ToTask(ct)
+                .ConfigureAwait(false);
+
             if (result != AccessState.Available)
                 return result;
 

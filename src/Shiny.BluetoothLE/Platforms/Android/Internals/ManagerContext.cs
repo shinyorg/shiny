@@ -64,7 +64,9 @@ namespace Shiny.BluetoothLE.Internals
                 )
                 .Select(x => x.FromNative())
                 .Subscribe(status =>
-                    services.Services.RunDelegates<IBleDelegate>(del => del.OnAdapterStateChanged(status))
+                    services
+                        .Services
+                        .RunDelegates<IBleDelegate>(del => del.OnAdapterStateChanged(status))
                 );
         }
 
@@ -93,8 +95,11 @@ namespace Shiny.BluetoothLE.Internals
                 var peripheral = this.GetDevice(device);
 
                 if (intent.Action.Equals(BluetoothDevice.ActionAclConnected))
-                    await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
-
+                {
+                    await this.Services
+                        .RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral))
+                        .ConfigureAwait(false);
+                }
                 this.peripheralSubject.OnNext((intent, peripheral));
             }
             catch (Exception ex)
@@ -112,7 +117,10 @@ namespace Shiny.BluetoothLE.Internals
 
         public IObservable<Intent> ListenForMe(string eventName, Peripheral me) => this
             .ListenForMe(me)
-            .Where(intent => intent.Action.Equals(eventName, StringComparison.InvariantCultureIgnoreCase));
+            .Where(intent => intent.Action.Equals(
+                eventName,
+                StringComparison.InvariantCultureIgnoreCase
+            ));
 
 
         public Peripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(

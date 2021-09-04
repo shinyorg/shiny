@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -31,7 +29,6 @@ namespace Shiny.BluetoothLE.Internals
         public BluetoothGatt? Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
         public GattCallbacks Callbacks { get; }
-
         public ConnectionState Status => this
             .ManagerContext
             .Manager
@@ -70,7 +67,10 @@ namespace Shiny.BluetoothLE.Internals
 
             return Observable.FromAsync(async ct =>
             {
-                await this.semaphore.WaitAsync(ct);
+                await this.semaphore
+                    .WaitAsync(ct)
+                    .ConfigureAwait(false);
+
                 try
                 {
                     return await observable
