@@ -14,7 +14,7 @@ namespace Shiny.BluetoothLE
 {
     public class BleManager : AbstractBleManager,
                               ICanControlAdapterState,
-                              ICanSeePairedPeripherals
+                              ICanViewPairedPeripherals
     {
         readonly ManagerContext context;
         readonly Subject<bool> scanSubject;

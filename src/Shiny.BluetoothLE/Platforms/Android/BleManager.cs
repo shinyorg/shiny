@@ -11,7 +11,7 @@ namespace Shiny.BluetoothLE
 {
     public class BleManager : AbstractBleManager,
                               ICanControlAdapterState,
-                              ICanSeePairedPeripherals
+                              ICanViewPairedPeripherals
     {
         public const string BroadcastReceiverName = "com.shiny.bluetoothle.ShinyBleCentralBroadcastReceiver";
         readonly ManagerContext context;

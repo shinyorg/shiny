@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 
 
 namespace Shiny.BluetoothLE
 {
-    public interface ICanSeePairedPeripherals : IBleManager
+    public interface ICanViewPairedPeripherals : IBleManager
     {
         /// <summary>
         /// Get the list of paired peripherals
@@ -15,7 +16,7 @@ namespace Shiny.BluetoothLE
     }
 
 
-    public interface ICanPairPeripherals
+    public interface ICanPairPeripherals : IPeripheral
     {
         IObservable<bool> PairingRequest(string? pin = null);
         PairingState PairingStatus { get; }
@@ -24,8 +25,18 @@ namespace Shiny.BluetoothLE
 
     public static class FeaturePairing
     {
-        public static bool CanViewPairedPeripherals(this IBleManager centralManager) => centralManager is ICanSeePairedPeripherals;
+        public static bool CanViewPairedPeripherals(this IBleManager centralManager) => centralManager is ICanViewPairedPeripherals;
         public static bool IsPairingRequestsAvailable(this IPeripheral peripheral) => peripheral is ICanPairPeripherals;
+
+
+        public static IObservable<IEnumerable<IPeripheral>> TryGetPairedPeripherals(this IBleManager centralManager)
+        {
+            var paired = centralManager as ICanViewPairedPeripherals;
+            if (paired == null)
+                return Observable.Empty<IEnumerable<IPeripheral>>();
+
+            return paired.GetPairedPeripherals();
+        }
 
 
         public static PairingState? TryGetPairingStatus(this IPeripheral peripheral)

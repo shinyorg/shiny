@@ -5,11 +5,10 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Shiny.BluetoothLE;
-using Dialogs = Acr.UserDialogs.UserDialogs;
 using Xunit;
 using Xunit.Abstractions;
 using Microsoft.Extensions.Logging;
-
+using FluentAssertions;
 
 namespace Shiny.Tests.BluetoothLE
 {
@@ -17,10 +16,12 @@ namespace Shiny.Tests.BluetoothLE
     public class BleManagerTests
     {
         readonly IBleManager manager;
+        readonly ITestOutputHelper output;
 
 
         public BleManagerTests(ITestOutputHelper output)
         {
+            this.output = output;
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
                 BuildServices = x => x.UseBleClient(),
@@ -29,33 +30,6 @@ namespace Shiny.Tests.BluetoothLE
             this.manager = ShinyHost.Resolve<IBleManager>();
         }
 
-
-        //[Fact]
-        //public async Task Status_Monitor()
-        //{
-        //    var on = 0;
-        //    var off = 0;
-        //    this.manager
-        //        .WhenStatusChanged()
-        //        .Skip(1) // skip startwith
-        //        .Subscribe(x =>
-        //        {
-        //            switch (x)
-        //            {
-        //                case AccessState.Available:
-        //                    on++;
-        //                    break;
-
-        //                case AccessState.Disabled:
-        //                    off++;
-        //                    break;
-        //            }
-        //        });
-        //    await Dialogs.Instance.AlertAsync("Now turn the adapter off and then back on - press ok once done");
-
-        //    Assert.True(on >= 1);
-        //    Assert.True(off >= 1);
-        //}
 
 
         [Fact]
@@ -98,17 +72,21 @@ namespace Shiny.Tests.BluetoothLE
         //}
 
 
-        //[Fact]
-        //public async Task Devices_GetPaired()
-        //{
-        //    var devices = await this.manager.GetPairedPeripherals();
+#if __ANDROID__
+        [Fact]
+        public async Task Devices_GetPaired()
+        {
+            this.manager.CanViewPairedPeripherals().Should().BeTrue();
 
-        //    foreach (var device in devices)
-        //    {
-        //        this.output.WriteLine($"Paired Bluetooth Devices: Identifier={device.Name} UUID={device.Uuid} Paired={device.PairingStatus}");
-        //        Assert.True(device.PairingStatus == PairingState.Paired);
-        //    }
-        //}
+            var peripherals = await this.manager.TryGetPairedPeripherals();
+
+            foreach (ICanPairPeripherals peripheral in peripherals)
+            {
+                this.output.WriteLine($"Paired Bluetooth Devices: Identifier={peripheral.Name} UUID={peripheral.Uuid} Paired={peripheral.PairingStatus}");
+                Assert.True(peripheral.PairingStatus == PairingState.Paired);
+            }
+        }
+#endif
 
 
         //[Fact]
