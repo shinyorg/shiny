@@ -22,7 +22,6 @@ namespace Shiny.Tests.Droid
         {
             this.ShinyOnCreate();
             this.AddTestAssembly(this.GetType().Assembly);
-            this.AddTestAssembly(typeof(TestStartup).Assembly);
 
             //CrossBleAdapter.UseNewScanner = false;
             //CrossBleAdapter.PauseBeforeServiceDiscovery = TimeSpan.FromSeconds(1);
