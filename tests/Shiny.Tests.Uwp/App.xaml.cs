@@ -16,7 +16,6 @@ namespace Shiny.Tests.Uwp
         protected override void OnInitializeRunner()
         {
             this.AddTestAssembly(this.GetType().GetTypeInfo().Assembly);
-            this.AddTestAssembly(typeof(TestStartup).Assembly);
         }
     }
 }
