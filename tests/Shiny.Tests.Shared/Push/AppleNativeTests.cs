@@ -15,16 +15,14 @@ using Xunit.Abstractions;
 
 namespace Shiny.Tests.Push
 {
-    public class AppleNativePushTests
+    public class AppleNativeTests
     {
-        readonly ITestOutputHelper output;
         readonly IPushManager push;
         readonly ApnSender apnSender;
 
 
-        public AppleNativePushTests(ITestOutputHelper output)
+        public AppleNativeTests(ITestOutputHelper output)
         {
-            this.output = output;
             this.apnSender = new ApnSender(
                 new ApnSettings
                 {
@@ -63,6 +61,7 @@ namespace Shiny.Tests.Push
                 },
                 access.RegistrationToken
             );
+            response.IsSuccess.Should().BeTrue();
 
             var result = await task.ConfigureAwait(false);
             result.Notification.Should().NotBeNull("Notification is null");
