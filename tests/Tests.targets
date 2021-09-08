@@ -1,0 +1,106 @@
+<Project>
+    <ItemGroup>
+        <PackageReference Include="xunit.runner.devices" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Xamarin.Forms" />
+        <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
+        <PackageReference Include="MartinCostello.Logging.XUnit" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="Xamarin.Essentials" />
+        <PackageReference Include="Acr.UserDialogs" />
+        <PackageReference Include="Microsoft.Azure.NotificationHubs" />
+
+        <!--IOS ONLY-->
+        <PackageReference Include="CorePush" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\src\Shiny.Beacons\Shiny.Beacons.csproj">
+            <Project>{b2e9f094-425f-4899-a979-338c940a917b}</Project>
+            <Name>Shiny.Beacons</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
+            <Project>{8321bd6b-4c38-4707-8e36-4d7140557497}</Project>
+            <Name>Shiny.BluetoothLE.Common</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
+            <Project>{007465d6-5714-4e7e-929d-6f01d04e43b6}</Project>
+            <Name>Shiny.BluetoothLE</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Core\Shiny.Core.csproj">
+            <Project>{6e3adf29-8660-4ad5-a9c3-5b2b7b4f99e7}</Project>
+            <Name>Shiny.Core</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Generators\Shiny.Generators.csproj">
+            <Project>{74207658-2ba6-403b-b608-1b8b4d9fa130}</Project>
+            <Name>Shiny.Generators</Name>
+            <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+            <OutputItemType>Analyzer</OutputItemType>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Integrations.Sqlite\Shiny.Integrations.Sqlite.csproj">
+            <Project>{271e5317-66e3-4e0f-a08b-7ce89b395237}</Project>
+            <Name>Shiny.Integrations.Sqlite</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Jobs\Shiny.Jobs.csproj">
+            <Project>{38783c53-ae80-4979-b4bc-5ce5a7ef8736}</Project>
+            <Name>Shiny.Jobs</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
+            <Project>{4ee9f1ff-ee8c-4d1f-8687-7dfe368c13a4}</Project>
+            <Name>Shiny.Locations.Common</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Locations\Shiny.Locations.csproj">
+            <Project>{5a0dd7a1-e497-4051-84b0-2e16b015e012}</Project>
+            <Name>Shiny.Locations</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Notifications\Shiny.Notifications.csproj">
+            <Project>{e76db2cb-7a95-40b0-9a50-230320554b6b}</Project>
+            <Name>Shiny.Notifications</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
+            <Project>{da7ee0f6-e80e-4470-bec3-d5fee5a6073d}</Project>
+            <Name>Shiny.Push.AzureNotificationHubs</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Push.Common\Shiny.Push.Common.csproj">
+            <Project>{df1aee6a-0bda-450e-ad40-09f3ccab2d32}</Project>
+            <Name>Shiny.Push.Common</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Push\Shiny.Push.csproj">
+            <Project>{b7855e77-9363-4f36-9a0d-fc9277a88f8d}</Project>
+            <Name>Shiny.Push</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny.Testing\Shiny.Testing.csproj">
+            <Project>{204b1f42-0d9c-4349-87c5-34148e3d170a}</Project>
+            <Name>Shiny.Testing</Name>
+        </ProjectReference>
+        <ProjectReference Include="..\src\Shiny\Shiny.csproj">
+            <Project>{5b569bcc-b60c-4224-babc-77dd1f193f4b}</Project>
+            <Name>Shiny</Name>
+        </ProjectReference>
+    </ItemGroup>
+
+    <Import Project="Shiny.Tests.Shared\Shiny.Tests.Shared.projitems" Label="Shared" />
+
+    <!--<Choose>
+        <When Condition=" $(OS) == 'WINDOWS_NT' ">
+            <PropertyGroup>
+                <DefineConstants>$(DefineConstants);IOS_WINDOWS_BUILD</DefineConstants>
+            </PropertyGroup>
+        </When>
+        <Otherwise>
+            <ItemGroup>
+                <PackageReference Include="OneSignal.net" />
+                <PackageReference Include="FirebaseAdmin" />
+                <ProjectReference Include="..\src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
+                    <Project>{e2febf2f-fb6a-47ab-9b16-da0cf0d7d429}</Project>
+                    <Name>Shiny.Push.OneSignal</Name>
+                </ProjectReference>
+                <ProjectReference Include="..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
+                    <Name>Shiny.Push.FirebaseMessaging</Name>
+                    <Project>{886F6FF7-2E92-488A-9011-B5C333B6BD54}</Project>
+                </ProjectReference>
+            </ItemGroup>
+        </Otherwise>
+    </Choose>-->
+</Project>

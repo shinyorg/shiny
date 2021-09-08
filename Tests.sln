@@ -45,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C114E37
 		tests\global.json = tests\global.json
 		tests\readme.md = tests\readme.md
 		secrets.json = secrets.json
+		Tests.targets = Tests.targets
+		tests\Tests.targets = tests\Tests.targets
 		tests\xunit.runner.json = tests\xunit.runner.json
 	EndProjectSection
 EndProject
@@ -83,7 +85,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.Common", "src\Sh
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shiny.Tests.Shared", "tests\Shiny.Tests.Shared\Shiny.Tests.Shared.shproj", "{92E5ED57-CC67-4E12-910A-30F957992B7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{A54F90A3-9330-4AD3-8AA0-9B7B419FED4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Tests", "tests\Shiny.Tests\Shiny.Tests.csproj", "{A54F90A3-9330-4AD3-8AA0-9B7B419FED4D}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

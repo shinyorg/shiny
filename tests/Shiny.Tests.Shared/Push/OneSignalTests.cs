@@ -1,4 +1,4 @@
-﻿#if DEVICE_TESTS && !WINDOWS_UWP
+﻿#if !WINDOWS_BUILD && DEVICE_TESTS && !IOS_WINDOWS_BUILD
 using System;
 using System.Collections.Generic;
 using System.Linq;
