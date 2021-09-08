@@ -45,8 +45,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C114E37
 		tests\global.json = tests\global.json
 		tests\readme.md = tests\readme.md
 		secrets.json = secrets.json
-		Tests.targets = Tests.targets
-		tests\Tests.targets = tests\Tests.targets
 		tests\xunit.runner.json = tests\xunit.runner.json
 	EndProjectSection
 EndProject
@@ -65,6 +63,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6374E4D9-1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Platforms", "Platforms", "{08764824-81F8-4A4B-8E33-8F61B2C13CB4}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Tests.targets = tests\Tests.targets
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Net.Http", "src\Shiny.Net.Http\Shiny.Net.Http.csproj", "{3BF25B68-89CE-4A2B-A7B7-C91A6C1F9BC1}"
 EndProject

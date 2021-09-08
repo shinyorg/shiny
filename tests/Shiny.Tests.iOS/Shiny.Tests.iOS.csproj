@@ -20,7 +20,7 @@
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-        <DefineConstants>DEBUG;DEVICE_TESTS;__IOS__;XAMARIN_IOS</DefineConstants>
+        <DefineConstants>DEBUG;__IOS__;XAMARIN_IOS</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
         <MtouchArch>x86_64</MtouchArch>
@@ -41,14 +41,14 @@
         <CodesignKey>Apple Development: Allan Ritchie (34FQ4253P2)</CodesignKey>
         <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
         <CodesignProvision>VS: com.shiny.test Development</CodesignProvision>
-        <DefineConstants>DEVICE_TESTS;__IOS__;XAMARIN_IOS</DefineConstants>
+        <DefineConstants>__IOS__;XAMARIN_IOS</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
         <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\iPhone\Debug</OutputPath>
-        <DefineConstants>DEBUG;DEVICE_TESTS;__IOS__;XAMARIN_IOS</DefineConstants>
+        <DefineConstants>DEBUG;__IOS__;XAMARIN_IOS</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
         <MtouchArch>ARM64</MtouchArch>
@@ -73,17 +73,18 @@
         <CodesignKey>Apple Development: Allan Ritchie (34FQ4253P2)</CodesignKey>
         <MtouchLink>SdkOnly</MtouchLink>
         <CodesignProvision>VS: com.shiny.test Development</CodesignProvision>
-        <DefineConstants>DEVICE_TESTS;__IOS__;XAMARIN_IOS</DefineConstants>
+        <DefineConstants>__IOS__;XAMARIN_IOS</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
         <AppExtensionDebugBundleId />
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mock|iPhoneSimulator'">
-        <DefineConstants>DEBUG;DEVICE_TESTS;__IOS__;XAMARIN_IOS</DefineConstants>
+        <DefineConstants>DEBUG;__IOS__;XAMARIN_IOS</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mock|iPhone'">
-        <DefineConstants>DEBUG;DEVICE_TESTS;__IOS__;XAMARIN_IOS</DefineConstants>
+        <DefineConstants>DEBUG;__IOS__;XAMARIN_IOS</DefineConstants>
     </PropertyGroup>
+
     <ItemGroup>
         <Compile Include="Main.cs" />
         <Compile Include="AppDelegate.cs" />
@@ -101,40 +102,7 @@
         <Reference Include="System.Numerics" />
         <Reference Include="System.Numerics.Vectors" />
     </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="xunit.runner.devices" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="Xamarin.Forms" />
-        <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
-        <PackageReference Include="MartinCostello.Logging.XUnit" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="Xamarin.Essentials" />
-        <PackageReference Include="Acr.UserDialogs" />
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" />
-        <PackageReference Include="CorePush" />
-    </ItemGroup>
-    <Choose>
-        <When Condition=" $(OS) == 'WINDOWS_NT' ">
-            <PropertyGroup>
-                <DefineConstants>$(DefineConstants);IOS_WINDOWS_BUILD</DefineConstants>
-            </PropertyGroup>
-        </When>
-        <Otherwise>
-            <ItemGroup>
-                <PackageReference Include="OneSignal.net" />
-                <PackageReference Include="FirebaseAdmin" />
-                <ProjectReference Include="..\..\src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
-                    <Project>{e2febf2f-fb6a-47ab-9b16-da0cf0d7d429}</Project>
-                    <Name>Shiny.Push.OneSignal</Name>
-                </ProjectReference>
-                <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
-                    <Name>Shiny.Push.FirebaseMessaging</Name>
-                    <Project>{886F6FF7-2E92-488A-9011-B5C333B6BD54}</Project>
-                </ProjectReference>
-            </ItemGroup>
-        </Otherwise>
-    </Choose>
+
     <ItemGroup>
         <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json">
             <Visible>false</Visible>
@@ -249,7 +217,7 @@
     <ItemGroup>
         <BundleResource Include="GoogleService-Info.plist" />
     </ItemGroup>
-    <Import Project="..\Shiny.Tests.Shared\Shiny.Tests.Shared.projitems" Label="Shared" />
+    <Import Project="../Tests.targets" />
     <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
     <ProjectExtensions>
         <VisualStudio>
