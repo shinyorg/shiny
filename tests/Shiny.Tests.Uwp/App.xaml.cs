@@ -9,7 +9,7 @@ namespace Shiny.Tests.Uwp
     {
         public App()
         {
-            this.ShinyInit(new TestStartup());
+            //this.ShinyInit(new TestStartup());
         }
 
 

@@ -86,6 +86,7 @@
 
     <!--Samples-->
     <ItemGroup>
+        <PackageReference Update="Xamarin.AndroidX.RecyclerView" Version="1.2.1.1" />
         <PackageReference Update="Mobile.BuildTools" Version="2.0.245" />
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.2012" />
         <PackageReference Update="Xamarin.CommunityToolkit" Version="1.2.0" />
