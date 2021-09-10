@@ -3,14 +3,20 @@ description: You have found something wrong with Shiny
 title: "[Bug]: "
 labels: [bug, unverified]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for filing an issue.  Please only file issues against the latest stable version of Shiny from Nuget.  If you are a sponsor, you can discuss issues with preview releases in the SponsorConnect Discord channel
+        If you have questions, please post them in GitHub discussions
   - type: dropdown
     id: component
     attributes:
       label: Component
       description: The component you are filing against
       options:
-        - Core (Jobs, Settings, Initialization)
+        - Core (Settings, Startup)
         - Locations (GPS, Geofencing, Motion Activity)
+        - Jobs
         - HTTP Transfers
         - Notifications
         - NFC
@@ -46,9 +52,9 @@ body:
       label: Steps To Reproduce
       description: Steps to reproduce the behavior.
       placeholder: |
-        1. 
-        2. 
-        3. 
+        1.
+        2.
+        3.
   - type: textarea
     attributes:
       label: Expected Behavior
@@ -64,6 +70,11 @@ body:
     attributes:
       label: Exception or Log output
       description: Please copy and paste any relevant log output
+  - type: textarea
+    id: codesample
+    attributes:
+      label: Code Sample
+      description: Please copy/paste or attach a reproducible sample
   - type: checkboxes
     id: terms
     attributes:
