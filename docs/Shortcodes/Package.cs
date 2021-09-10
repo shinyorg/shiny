@@ -38,11 +38,11 @@ namespace Docs.Shortcodes
         public string MinVersion { get; set; } = "10";
 
         [JsonProperty("infoPlistValues")]
-        public string[] InfoPlistValues { get; set; }
+        public string[]? InfoPlistValues { get; set; }
 
         [JsonProperty("entitlementPlistValues")]
-        public Dictionary<string, string> EntitlementPlistValues { get; set; }
-        public string[] BackgroundModes { get; set; }
+        public Dictionary<string, string>? EntitlementPlistValues { get; set; }
+        public string[]? BackgroundModes { get; set; }
         public bool UsesJobs { get; set; } // will show BGTaskSchedulerPermittedIdentifiers in info.plist
         public bool UsesPush { get; set; } // will show entitlements, info.plist uibackgroundmodes, and appdelegate overrides
         public bool UsesBgTransfers { get; set; } // AppDelegate HandleEventsForBackgroundUrl
