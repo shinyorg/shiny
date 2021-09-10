@@ -85,7 +85,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "issue_template", "issue_tem
 		.github\ISSUE_TEMPLATE\bug_report.yml = .github\ISSUE_TEMPLATE\bug_report.yml
 		.github\ISSUE_TEMPLATE\config.yml = .github\ISSUE_TEMPLATE\config.yml
 		.github\ISSUE_TEMPLATE\feature_request.yml = .github\ISSUE_TEMPLATE\feature_request.yml
-		.github\ISSUE_TEMPLATE\question.yml = .github\ISSUE_TEMPLATE\question.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{BC486D39-0C78-4D1B-9BAD-20C972641835}"
