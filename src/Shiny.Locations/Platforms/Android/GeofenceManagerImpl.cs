@@ -59,10 +59,12 @@ namespace Shiny.Locations
                         }
                         else
                         {
-                            await this.services.RunDelegates<IGeofenceDelegate>(
-                                x => x.OnStatusChanged(state, region),
-                                ex => this.logger.LogError($"Error in geofence delegate - Region: {region.Identifier} State: {state}")
-                            );
+                            await this.services
+                                .RunDelegates<IGeofenceDelegate>(
+                                    x => x.OnStatusChanged(state, region),
+                                    ex => this.logger.LogError($"Error in geofence delegate - Region: {region.Identifier} State: {state}")
+                                )
+                                .ConfigureAwait(false);
                         }
                     }
                 }
@@ -82,27 +84,27 @@ namespace Shiny.Locations
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
-            (await this.RequestAccess()).Assert();
-            await this.Create(region);
-            await this.Repository.Set(region.Identifier, region);
+            (await this.RequestAccess().ConfigureAwait(false)).Assert();
+            await this.Create(region).ConfigureAwait(false);
+            await this.Repository.Set(region.Identifier, region).ConfigureAwait(false);
         }
 
 
         public override async Task StopMonitoring(string identifier)
         {
-            await this.Repository.Remove(identifier);
-            await this.client.RemoveGeofencesAsync(new List<string> { identifier });
+            await this.Repository.Remove(identifier).ConfigureAwait(false);
+            await this.client.RemoveGeofencesAsync(new List<string> { identifier }).ConfigureAwait(false);
         }
 
 
         public override async Task StopAllMonitoring()
         {
-            var regions = await this.Repository.GetAll();
+            var regions = await this.Repository.GetAll().ConfigureAwait(false);
             var regionIds = regions.Select(x => x.Identifier).ToArray();
             if (regionIds.Any())
-                await this.client.RemoveGeofencesAsync(regionIds);
+                await this.client.RemoveGeofencesAsync(regionIds).ConfigureAwait(false);
 
-            await this.Repository.Clear();
+            await this.Repository.Clear().ConfigureAwait(false);
         }
 
 
@@ -110,7 +112,8 @@ namespace Shiny.Locations
         {
             var location = await LocationServices
                 .GetFusedLocationProviderClient(this.context.AppContext)
-                .GetLastLocationAsync();
+                .GetLastLocationAsync()
+                .ConfigureAwait(false);
 
             if (location == null)
                 return GeofenceState.Unknown;
@@ -141,10 +144,12 @@ namespace Shiny.Locations
                 .AddGeofence(geofence)
                 .Build();
 
-            await this.client.AddGeofencesAsync(
-                request,
-                this.GetPendingIntent()
-            );
+            await this.client
+                .AddGeofencesAsync(
+                    request,
+                    this.GetPendingIntent()
+                )
+                .ConfigureAwait(false);
         }
 
 
@@ -176,7 +181,7 @@ namespace Shiny.Locations
                 intent,
                 PendingIntentFlags.UpdateCurrent
             );
-            return this.geofencePendingIntent;
+            return this.geofencePendingIntent!;
         }
     }
 }

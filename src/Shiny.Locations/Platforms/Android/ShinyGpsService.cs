@@ -19,14 +19,14 @@ namespace Shiny.Locations
 
         protected override void OnStart(Intent? intent)
         {
-            this.Service
+            this.Service!
                 .WhenReading()
                 .SubscribeAsync(
-                    reading => this.Delegates.RunDelegates(
+                    reading => this.Delegates!.RunDelegates(
                         x => x.OnReading(reading)
                     )
                 )
-                .DisposedBy(this.DestroyWith);
+                .DisposedBy(this.DestroyWith!);
 
             IsStarted = true;
         }

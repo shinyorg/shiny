@@ -46,14 +46,17 @@ namespace Shiny.Locations
 
         public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {
-            (await this.RequestAccess()).Assert();
+            (await this.RequestAccess().ConfigureAwait(false)).Assert();
 
             end = end ?? DateTimeOffset.UtcNow;
-            var results = await this.activityManager.QueryActivityAsync(
-                (NSDate)start.LocalDateTime,
-                (NSDate)end.Value.LocalDateTime,
-                NSOperationQueue.MainQueue
-            );
+            var results = await this.activityManager
+                .QueryActivityAsync(
+                    (NSDate)start.LocalDateTime,
+                    (NSDate)end.Value.LocalDateTime,
+                    NSOperationQueue.MainQueue
+                )
+                .ConfigureAwait(false);
+
             return results
                 .Select(x => ToEvent(x))
                 .ToList();
@@ -63,21 +66,23 @@ namespace Shiny.Locations
         public IObservable<MotionActivityEvent> WhenActivityChanged() => Observable.Create<MotionActivityEvent>(async ob =>
         {
             var started = false;
-            var access = await this.RequestAccess();
+            var access = await this.RequestAccess().ConfigureAwait(false);
             if (access != AccessState.Available)
             {
                 ob.OnError(new PermissionException("MotionActivity", access));
             }
             else
             {
-                this.activityManager.StartActivityUpdates(
-                    NSOperationQueue.CurrentQueue,
-                    target =>
-                    {
-                        var e = ToEvent(target);
-                        ob.OnNext(e);
-                    }
-                );
+                this.activityManager
+                    .StartActivityUpdates(
+                        NSOperationQueue.CurrentQueue,
+                        target =>
+                        {
+                            var e = ToEvent(target);
+                            ob.OnNext(e);
+                        }
+                    )
+                    .ConfigureAwait(false);
                 started = true;
             }
             return () =>

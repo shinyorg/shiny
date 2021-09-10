@@ -16,9 +16,12 @@ namespace Shiny.Locations
 
         public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
         {
-            (await this.RequestAccess(GpsRequest.Foreground)).Assert(null, true);
+            (await this.RequestAccess(GpsRequest.Foreground).ConfigureAwait(false)).Assert(null, true);
 
-            var location = await this.client.GetLastLocationAsync();
+            var location = await this.client
+                .GetLastLocationAsync()
+                .ConfigureAwait(false);
+
             if (location != null)
                 return new GpsReading(location);
 
@@ -26,14 +29,10 @@ namespace Shiny.Locations
         });
 
 
-        protected override async Task RequestLocationUpdates(GpsRequest request)
-        {
-            var nativeRequest = request.ToNative();
-            await this.client.RequestLocationUpdatesAsync(
-                nativeRequest,
-                this.Callback
-            );
-        }
+        protected override Task RequestLocationUpdates(GpsRequest request) => this.client.RequestLocationUpdatesAsync(
+            request.ToNative(),
+            this.Callback
+        );
 
 
         protected override Task RemoveLocationUpdates()

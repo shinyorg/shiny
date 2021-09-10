@@ -88,18 +88,22 @@ namespace Shiny.Locations
                 var confidence = ToConfidence(result.MostProbableActivity.Confidence);
                 var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                 // DELETE FROM motion_activity WHERE Timestamp < DateTimeOffset.UtcNow.AddDays(-30).Ticks
-                await this.database.ExecuteNonQuery(
-                    $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
-                );
+                await this.database
+                    .ExecuteNonQuery(
+                        $"INSERT INTO motion_activity(Event, Confidence, Timestamp) VALUES ({(int)type}, {(int)confidence}, {timestamp})"
+                    )
+                    .ConfigureAwait(false);
             };
             if (this.IsStarted)
             {
                 try
                 {
-                    await this.client.RequestActivityUpdatesAsync(
-                        Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
-                        this.GetPendingIntent()
-                    );
+                    await this.client
+                        .RequestActivityUpdatesAsync(
+                            Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
+                            this.GetPendingIntent()
+                        )
+                        .ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -118,14 +122,17 @@ namespace Shiny.Locations
                 result = await this.core
                     .Android
                     .RequestAccess(Permission.ActivityRecognition)
-                    .ToTask();
+                    .ToTask()
+                    .ConfigureAwait(false);
 
                 if (result == AccessState.Available)
                 {
-                    await this.client.RequestActivityUpdatesAsync(
-                        Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
-                        this.GetPendingIntent()
-                    );
+                    await this.client
+                        .RequestActivityUpdatesAsync(
+                            Convert.ToInt32(TimeSpanBetweenUpdates.TotalMilliseconds),
+                            this.GetPendingIntent()
+                        )
+                        .ConfigureAwait(false);
                 }
             }
             this.IsStarted = result == AccessState.Available;
@@ -136,7 +143,7 @@ namespace Shiny.Locations
 
         public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
         {
-            (await this.RequestAccess()).Assert();
+            (await this.RequestAccess().ConfigureAwait(false)).Assert();
 
             var st = start.ToUnixTimeSeconds();
             var et = (end ?? DateTimeOffset.UtcNow).ToUnixTimeSeconds();
@@ -151,22 +158,24 @@ WHERE
 ORDER BY 
     Timestamp DESC";
 
-            return await this.database.RawQuery(
-                sql,
-                cursor =>
-                {
-                    var confidence = cursor.GetInt(0);
-                    var events = cursor.GetInt(1);
-                    var epochSeconds = cursor.GetLong(2);
-                    var dt = DateTimeOffset.FromUnixTimeSeconds(epochSeconds);
+            return await this.database
+                .RawQuery(
+                    sql,
+                    cursor =>
+                    {
+                        var confidence = cursor.GetInt(0);
+                        var events = cursor.GetInt(1);
+                        var epochSeconds = cursor.GetLong(2);
+                        var dt = DateTimeOffset.FromUnixTimeSeconds(epochSeconds);
 
-                    return new MotionActivityEvent(
-                        (MotionActivityType)events,
-                        (MotionActivityConfidence)confidence,
-                        dt
-                    );
-                }
-            );
+                        return new MotionActivityEvent(
+                            (MotionActivityType)events,
+                            (MotionActivityConfidence)confidence,
+                            dt
+                        );
+                    }
+                )
+                .ConfigureAwait(false);
         }
 
         public IObservable<MotionActivityEvent> WhenActivityChanged()
