@@ -93,7 +93,10 @@ namespace Shiny.Beacons
                 return;
 
             this.logger.LogInformation("Beacon Monitoring Scan Starting");
-            var regions = await this.beaconManager.GetMonitoredRegions();
+            var regions = await this.beaconManager
+                .GetMonitoredRegions()
+                .ConfigureAwait(false);
+
             if (!regions.Any())
                 return;
 
@@ -158,9 +161,11 @@ namespace Shiny.Beacons
                             state.IsInRange = true;
                             if (state.Region.NotifyOnEntry)
                             {
-                                await this.delegates.RunDelegates(
-                                    x => x.OnStatusChanged(BeaconRegionState.Entered, state.Region)
-                                );
+                                await this.delegates
+                                    .RunDelegates(
+                                        x => x.OnStatusChanged(BeaconRegionState.Entered, state.Region)
+                                    )
+                                    .ConfigureAwait(false);
                             }
                         }
                     }
@@ -175,9 +180,14 @@ namespace Shiny.Beacons
                     state.IsInRange = false;
                     if (state.Region.NotifyOnExit)
                     {
-                        await this.delegates.RunDelegates(
-                            x => x.OnStatusChanged(BeaconRegionState.Exited, state.Region)
-                        );
+                        await this.delegates
+                            .RunDelegates(
+                                x => x.OnStatusChanged(
+                                    BeaconRegionState.Exited,
+                                    state.Region
+                                )
+                            )
+                            .ConfigureAwait(false);
                     }
                 }
             }
