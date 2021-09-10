@@ -8,24 +8,13 @@ This library deals specifically with iBeacons (Apple's beacon technology).  iBea
 
 First - install the NuGet package into your shared code project: [![NuGet](https://img.shields.io/nuget/v/Shiny.Beacons.svg?maxAge=2592000)](https://www.nuget.org/packages/Shiny.Beacons/)
 
-```cs
-using Microsoft.Extensions.DependencyInjection;
-using Shiny;
-using Shiny.Beacons;
-
-public class BeaconStartup : ShinyStartup
-{
-    public override void ConfigureServices(IServiceCollection services, IPlatform platform)
-    {
+<?! Startup ?>
         services.UseBeaconRanging();
 
-        services.UseBeaconMonitoring<BeaconMonitorDelegate>(new BeaconMonitorConfig());
+        services.UseBeaconMonitoring<BeaconMonitorDelegate>(new Shiny.Beacons.BeaconMonitorConfig());
 
         services.UseBeaconAdvertising();
-    }
-}
-
-```
+<?!/ Startup ?>
 
 
 ## Terminology
