@@ -11,14 +11,15 @@ First - install the NuGet package into your shared code project: [![NuGet](https
 ```cs
 using Microsoft.Extensions.DependencyInjection;
 using Shiny;
+using Shiny.Beacons;
 
 public class BeaconStartup : ShinyStartup
 {
-    public override void ConfigureServices(IServiceCollection services)
+    public override void ConfigureServices(IServiceCollection services, IPlatform platform)
     {
         services.UseBeaconRanging();
 
-        services.UseBeaconMonitoring<BeaconMonitorDelegate>();
+        services.UseBeaconMonitoring<BeaconMonitorDelegate>(new BeaconMonitorConfig());
 
         services.UseBeaconAdvertising();
     }
