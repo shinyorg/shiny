@@ -73,16 +73,14 @@ namespace Shiny.Locations
             }
             else
             {
-                this.activityManager
-                    .StartActivityUpdates(
-                        NSOperationQueue.CurrentQueue,
-                        target =>
-                        {
-                            var e = ToEvent(target);
-                            ob.OnNext(e);
-                        }
-                    )
-                    .ConfigureAwait(false);
+                this.activityManager.StartActivityUpdates(
+                    NSOperationQueue.CurrentQueue,
+                    target =>
+                    {
+                        var e = ToEvent(target);
+                        ob.OnNext(e);
+                    }
+                );
                 started = true;
             }
             return () =>
