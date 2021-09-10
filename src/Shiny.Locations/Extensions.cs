@@ -2,7 +2,7 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-
+using System.Threading;
 
 namespace Shiny.Locations
 {
@@ -59,22 +59,33 @@ namespace Shiny.Locations
             var iStarted = false;
             try
             {
-                var task = gpsManager.WhenReading().Take(1).ToTask(ct);
+                await currentLocSemaphore
+                    .WaitAsync(ct)
+                    .ConfigureAwait(false);
+
+                var task = gpsManager
+                    .WhenReading()
+                    .Take(1)
+                    .ToTask(ct);
                 if (!gpsManager.IsListening())
                 {
                     iStarted = true;
-                    await gpsManager.StartListener(GpsRequest.Foreground);
+                    await gpsManager
+                        .StartListener(GpsRequest.Foreground)
+                        .ConfigureAwait(false);
                 }
-
                 var reading = await task.ConfigureAwait(false);
+
                 return reading;
             }
             finally
             {
+                currentLocSemaphore.Release();
                 if (iStarted)
-                    await gpsManager.StopListener();
+                    await gpsManager.StopListener().ConfigureAwait(false);
             }
         });
+        static readonly SemaphoreSlim currentLocSemaphore = new SemaphoreSlim(1, 1);
 
 
         /// <summary>
