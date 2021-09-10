@@ -16,7 +16,21 @@ Monitoring is limited to a maximum of 20 regions on iOS.  On Android & UWP, ther
 * Monitoring beacons does not allow you to see which actual beacon was detected, only the region filter is returned to your background scan.  This is done by the OS to protect user privacy.
 
 ## Setup
-1. Create a delegate to receive background events
+1. On iOS: Add the following to `Plist.info`:
+
+```
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>Say something useful here that your users will understand</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Say something useful here that your users will understand</string>
+<key>UIBackgroundModes</key>
+<array>
+    <string>fetch</string>
+    <string>location</string>
+</array>
+```
+
+2. Create a delegate to receive background events
 ```cs
 using System.Threading.Tasks;
 using Shiny.Beacons;
@@ -30,7 +44,7 @@ public class MyBeaconMonitorDelegate : IBeaconMonitorDelegate
 }
 ```
 
-2. Add the following to your [Shiny Startup](xref:startup)
+3. Add the following to your [Shiny Startup](xref:startup)
 <?! Startup ?>
-service.UseBeaconMonitoring<MyBeaconMonitorDelegate>();
+service.UseBeaconMonitoring<MyBeaconMonitorDelegate>(new Shiny.Beacons.BeaconMonitorConfig());
 <?!/ Startup ?>
