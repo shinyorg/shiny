@@ -22,7 +22,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples.UWP", "samples\Samp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{ED578FCA-6463-48DD-AFB3-32AF4F2759C6}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\build.yml = .github\workflows\build.yml
 		src\Directory.build.props = src\Directory.build.props
 		src\global.json = src\global.json
 		readme.md = readme.md
@@ -66,7 +65,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Testing", "src\Shiny.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0631E087-CB49-44D2-B47E-C2A332F3A80F}"
 	ProjectSection(SolutionItems) = preProject
-		.github\dependabot.yml = .github\dependabot.yml
 		Directory.Build.targets = Directory.Build.targets
 		Packages.props = Packages.props
 	EndProjectSection
