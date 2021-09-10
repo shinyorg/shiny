@@ -1,33 +1,8 @@
 <Project>
     <PropertyGroup>
         <ShinyNugetVersion>2.3.0.2855-preview</ShinyNugetVersion>
-        <DefineConstants>$(DefineConstants);DEVICE_TESTS</DefineConstants>
         <UseNuget>false</UseNuget>
     </PropertyGroup>
-
-    <Choose>
-        <When Condition="$(OS) == 'WINDOWS_NT' and $(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
-            <PropertyGroup>
-                <DefineConstants>$(DefineConstants);IOS_WINDOWS_BUILD</DefineConstants>
-            </PropertyGroup>
-        </When>
-    </Choose>
-
-    <ItemGroup>
-        <PackageReference Include="xunit.runner.devices" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="Xamarin.Forms" />
-        <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
-        <PackageReference Include="MartinCostello.Logging.XUnit" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="Xamarin.Essentials" />
-        <PackageReference Include="Acr.UserDialogs" />
-        <PackageReference Include="Microsoft.Azure.NotificationHubs" />
-        <PackageReference Include="FirebaseAdmin" />
-        <PackageReference Include="OneSignal.net" />
-        <PackageReference Include="CorePush" />
-    </ItemGroup>
 
     <Choose>
         <When Condition="'$(UseNuget)' == 'true'">
@@ -35,6 +10,7 @@
                 <PackageReference Include="Shiny" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Beacons" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyNugetVersion)" />
+                <ProjectReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Integrations.Sqlite" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Jobs" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Notifications" Version="$(ShinyNugetVersion)" />
@@ -42,6 +18,10 @@
                 <PackageReference Include="Shiny.Push.AzureNotificationHubs" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Locations" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Testing" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Net.Http" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Nfc" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Sensors" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.SpeechRecognition" Version="$(ShinyNugetVersion)" />
             </ItemGroup>
         </When>
         <Otherwise>
@@ -64,10 +44,16 @@
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Push.Common\Shiny.Push.Common.csproj" />
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Push\Shiny.Push.csproj" />
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Testing\Shiny.Testing.csproj" />
+                <ProjectReference Include="$(SolutionDir)src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Net.Http\Shiny.Net.Http.csproj" />
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Nfc\Shiny.Nfc.csproj" />
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Sensors\Shiny.Sensors.csproj" />
+                <ProjectReference Include="$(SolutionDir)src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
             </ItemGroup>
         </Otherwise>
     </Choose>
 
+    <!--
     <Choose>
         <When Condition="'$(UseNuget)' == 'false' and $(OS) != 'WINDOWS_NT' and $(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
             <ItemGroup>
@@ -78,14 +64,13 @@
     </Choose>
 
     <Choose>
-        <When Condition="'$(UseNuget)' == 'false' and $(TargetFrameworkIdentifier) == 'MonoAndroid'">
+        <When Condition="'$(UseNuget)' == 'false'and $(TargetFrameworkIdentifier) == 'MonoAndroid'">
             <ItemGroup>
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj" />
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj" />
             </ItemGroup>
         </When>
     </Choose>
-    <!--
 
     <Choose>
         <When Condition="'$(UseNuget)' == 'false' and $(OS) != 'WINDOWS_NT' and $(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
