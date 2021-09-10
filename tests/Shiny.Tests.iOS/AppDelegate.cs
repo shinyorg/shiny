@@ -4,7 +4,7 @@ using UIKit;
 using Xunit.Runner;
 using Xunit.Sdk;
 
-[assembly: global::Shiny.ShinyApplication(ShinyStartupTypeName = "Shiny.Tests.TestStartup")]
+//[assembly: global::Shiny.ShinyApplication(ShinyStartupTypeName = "Shiny.Tests.TestStartup")]
 
 
 namespace Shiny.Tests.iOS
