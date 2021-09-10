@@ -31,7 +31,9 @@ namespace Shiny.Jobs.Infrastructure
             {
                 try
                 {
-                    await this.jobManager.CancelAll();
+                    await this.jobManager
+                        .CancelAll()
+                        .ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -41,11 +43,16 @@ namespace Shiny.Jobs.Infrastructure
 
             if (jobs.Count > 0)
             {
-                var access = await this.jobManager.RequestAccess();
+                var access = await this.jobManager
+                    .RequestAccess()
+                    .ConfigureAwait(false);
+
                 if (access == AccessState.Available)
                 {
                     foreach (var job in jobs)
-                        await this.jobManager.Register(job);
+                        await this.jobManager
+                            .Register(job)
+                            .ConfigureAwait(false);
                 }
                 else
                 {

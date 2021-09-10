@@ -42,7 +42,7 @@ namespace Shiny.Jobs.Infrastructure
             this.timer.Elapsed += async (sender, args) =>
             {
                 this.timer.Stop();
-                var jobs = await jobManager.GetJobs();
+                var jobs = await jobManager.GetJobs().ConfigureAwait(false);
                 var toRun = jobs.Where(this.CanRun).ToList();
 
                 foreach (var job in toRun)

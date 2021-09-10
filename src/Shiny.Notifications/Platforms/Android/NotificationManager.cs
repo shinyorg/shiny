@@ -41,15 +41,15 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task Clear()
+        public Task Clear()
         {
             this.manager.NativeManager.CancelAll();
-            await this.core.Repository.Clear<Notification>();
+            return this.core.Repository.Clear<Notification>();
         }
 
 
         public async Task<IEnumerable<Notification>> GetPending()
-            => await this.core.Repository.GetAll<Notification>();
+            => await this.core.Repository.GetAll<Notification>().ConfigureAwait(false);
 
 
         public async Task<AccessState> RequestAccess()
@@ -57,7 +57,9 @@ namespace Shiny.Notifications
             if (!this.manager.NativeManager.AreNotificationsEnabled())
                 return AccessState.Disabled;
 
-            var result = await this.jobManager.RequestAccess();
+            var result = await this.jobManager
+                .RequestAccess()
+                .ConfigureAwait(false);
             return result;
         }
 

@@ -123,7 +123,7 @@ namespace Shiny.Jobs
 
         public override async Task CancelAll()
         {
-            await base.CancelAll();
+            await base.CancelAll().ConfigureAwait(false);
             this.Instance.CancelAllWork();
         }
 

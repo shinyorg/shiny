@@ -58,7 +58,10 @@ namespace Shiny.Jobs
             JobInfo? actual = null;
             try
             {
-                var job = await this.repository.Get<PersistJobInfo>(jobName);
+                var job = await this.repository
+                    .Get<PersistJobInfo>(jobName)
+                    .ConfigureAwait(false);
+
                 if (job == null)
                     throw new ArgumentException("No job found named " + jobName);
 
@@ -77,14 +80,14 @@ namespace Shiny.Jobs
 
         public async Task<IEnumerable<JobInfo>> GetJobs()
         {
-            var jobs = await this.repository.GetAll<PersistJobInfo>();
+            var jobs = await this.repository.GetAll<PersistJobInfo>().ConfigureAwait(false);
             return jobs.Select(PersistJobInfo.FromPersist);
         }
 
 
         public async Task<JobInfo?> GetJob(string jobName)
         {
-            var job = await this.repository.Get<PersistJobInfo>(jobName);
+            var job = await this.repository.Get<PersistJobInfo>(jobName).ConfigureAwait(false);
             if (job == null)
                 return null;
 
@@ -94,24 +97,24 @@ namespace Shiny.Jobs
 
         public async Task Cancel(string jobIdentifier)
         {
-            var job = await this.repository.Get<PersistJobInfo>(jobIdentifier);
+            var job = await this.repository.Get<PersistJobInfo>(jobIdentifier).ConfigureAwait(false);
             if (job != null)
             {
                 this.CancelNative(PersistJobInfo.FromPersist(job));
-                await this.repository.Remove<PersistJobInfo>(jobIdentifier);
+                await this.repository.Remove<PersistJobInfo>(jobIdentifier).ConfigureAwait(false);
             }
         }
 
 
         public virtual async Task CancelAll()
         {
-            var jobs = await this.repository.GetAllWithKeys<PersistJobInfo>();
+            var jobs = await this.repository.GetAllWithKeys<PersistJobInfo>().ConfigureAwait(false);
             foreach (var job in jobs)
             {
                 if (!job.Value.IsSystemJob)
                 {
                     this.CancelNative(PersistJobInfo.FromPersist(job.Value));
-                    await this.repository.Remove<PersistJobInfo>(job.Key);
+                    await this.repository.Remove<PersistJobInfo>(job.Key).ConfigureAwait(false);
                 }
             }
         }

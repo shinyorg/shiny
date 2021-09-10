@@ -9,29 +9,36 @@ namespace Shiny.Notifications
 {
     public partial class NotificationManager
     {
-        public async Task AddChannel(Channel channel)
+        public Task AddChannel(Channel channel)
         {
             channel.AssertValid();
             this.CreateNativeChannel(channel);
 
-            await this.core.Repository.SetChannel(channel);
+            return this.core.Repository.SetChannel(channel);
         }
 
 
-        public async Task RemoveChannel(string channelId)
+        public Task RemoveChannel(string channelId)
         {
-            await this.core.Repository.RemoveChannel(channelId);
             this.manager.NativeManager.DeleteNotificationChannel(channelId);
+            return this.core.Repository.RemoveChannel(channelId);
         }
 
 
         public async Task ClearChannels()
         {
-            var channels = await this.core.Repository.GetChannels();
+            var channels = await this.core
+                .Repository
+                .GetChannels()
+                .ConfigureAwait(false);
+
             foreach (var channel in channels)
                 this.manager.NativeManager.DeleteNotificationChannel(channel.Identifier);
 
-            await this.core.Repository.RemoveAllChannels();
+            await this.core
+                .Repository
+                .RemoveAllChannels()
+                .ConfigureAwait(false);
         }
 
 
@@ -49,7 +56,10 @@ namespace Shiny.Notifications
             }
             else
             {
-                channel = await this.core.Repository.GetChannel(notification.Channel!);
+                channel = await this.core
+                    .Repository
+                    .GetChannel(notification.Channel!)
+                    .ConfigureAwait(false);
                 if (channel == null)
                     throw new ArgumentException($"{notification.Channel} does not exist");
             }

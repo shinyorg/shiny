@@ -23,7 +23,10 @@ namespace Shiny.Notifications
 
         public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
-            var all = await this.repository.GetAll<Notification>();
+            var all = await this.repository
+                .GetAll<Notification>()
+                .ConfigureAwait(false);
+
             var pending = all
                 .Where(x =>
                     x.ScheduleDate != null &&
@@ -34,8 +37,13 @@ namespace Shiny.Notifications
             foreach (var notification in pending)
             {
                 notification.ScheduleDate = null; // slight hack, kill schedule date as we're triggering now
-                await this.manager.Send(notification);
-                await this.repository.Remove<Notification>(notification.Id.ToString());
+                await this.manager
+                    .Send(notification)
+                    .ConfigureAwait(false);
+
+                await this.repository
+                    .Remove<Notification>(notification.Id.ToString())
+                    .ConfigureAwait(false);
             }
         }
     }

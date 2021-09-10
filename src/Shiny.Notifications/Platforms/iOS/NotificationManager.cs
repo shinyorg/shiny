@@ -41,7 +41,10 @@ namespace Shiny.Notifications
                 if (t == null || t is UNCalendarNotificationTrigger)
                 {
                     var shiny = response.FromNative();
-                    await this.services.Services.RunDelegates<INotificationDelegate>(x => x.OnEntry(shiny));
+                    await this.services
+                        .Services
+                        .RunDelegates<INotificationDelegate>(x => x.OnEntry(shiny))
+                        .ConfigureAwait(false);
                 }
             });
         }
@@ -101,7 +104,8 @@ namespace Shiny.Notifications
         {
             var requests = await UNUserNotificationCenter
                 .Current
-                .GetPendingNotificationRequestsAsync();
+                .GetPendingNotificationRequestsAsync()
+                .ConfigureAwait(false);
 
             var notifications = requests.Select(x => x.FromNative());
             return notifications;
@@ -128,7 +132,8 @@ namespace Shiny.Notifications
             );
             await UNUserNotificationCenter
                 .Current
-                .AddNotificationRequestAsync(request);
+                .AddNotificationRequestAsync(request)
+                .ConfigureAwait(false);
         }
 
 
@@ -148,15 +153,15 @@ namespace Shiny.Notifications
         public async Task AddChannel(Channel channel)
         {
             channel.AssertValid();
-            await this.services.Repository.SetChannel(channel);
-            await this.RebuildNativeCategories();
+            await this.services.Repository.SetChannel(channel).ConfigureAwait(false);
+            await this.RebuildNativeCategories().ConfigureAwait(false);
         }
 
 
         public async Task RemoveChannel(string channelId)
         {
-            await this.services.Repository.RemoveChannel(channelId);
-            await this.RebuildNativeCategories();
+            await this.services.Repository.RemoveChannel(channelId).ConfigureAwait(false);
+            await this.RebuildNativeCategories().ConfigureAwait(false);
         }
 
 
@@ -165,7 +170,11 @@ namespace Shiny.Notifications
 
         protected async Task RebuildNativeCategories()
         {
-            var channels = await this.services.Repository.GetChannels();
+            var channels = await this.services
+                .Repository
+                .GetChannels()
+                .ConfigureAwait(false);
+
             var list = channels.ToList();
             list.Add(Channel.Default);
 
@@ -186,7 +195,10 @@ namespace Shiny.Notifications
                     UNNotificationCategoryOptions.None
                 );
                 categories.Add(native);
-                await this.services.Repository.SetChannel(channel);
+                await this.services
+                    .Repository
+                    .SetChannel(channel)
+                    .ConfigureAwait(false);
             }
             var set = new NSSet<UNNotificationCategory>(categories.ToArray());
             UNUserNotificationCenter.Current.SetNotificationCategories(set);
