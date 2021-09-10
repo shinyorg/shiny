@@ -61,7 +61,7 @@
         <PackageReference Update="Cake.AndroidAppManifest" Version="1.1.2" />
         <PackageReference Update="Cake.Plist" Version="0.7.0" />
         <PackageReference Update="Cake.Git" Version="1.1.0" />
-        <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0102" />
+        <PackageReference Update="LibGit2Sharp" Version="0.27.0-preview-0116" />
         <PackageReference Update="TweetinviAPI" Version="5.0.4" />
         <PackageReference Update="Discord.Net" Version="2.4.0" />
 
@@ -75,7 +75,7 @@
     <!--Samples-->
     <ItemGroup>
         <PackageReference Update="Xamarin.AndroidX.RecyclerView" Version="1.2.1.1" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.0" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -97,7 +97,7 @@
         <PackageReference Update="DryIoc.Microsoft.DependencyInjection" Version="5.1.0" />
         <PackageReference Update="coverlet.collector" Version="3.0.3" />
         <PackageReference Update="FluentAssertions" Version="5.10.3" />
-        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.11.0" />
         <PackageReference Update="FirebaseAdmin" Version="2.2.0" />
         <PackageReference Update="Moq" Version="4.16.1" />
         <PackageReference Update="xunit" Version="2.4.1" />
