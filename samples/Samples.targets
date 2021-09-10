@@ -4,6 +4,11 @@
         <UseNuget>false</UseNuget>
     </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Xamarin.Forms" />
+        <PackageReference Include="Xamarin.Essentials" />
+    </ItemGroup>
+
     <Choose>
         <When Condition="'$(UseNuget)' == 'true'">
             <ItemGroup>
@@ -22,6 +27,8 @@
                 <PackageReference Include="Shiny.Nfc" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Sensors" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.SpeechRecognition" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Logging.AppCenter" Version="$(ShinyNugetVersion)" />
+                <!--<PackageReference Include="Shiny.Logging.Firebase" Version="$(ShinyNugetVersion)" />-->
             </ItemGroup>
         </When>
         <Otherwise>
@@ -49,6 +56,8 @@
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Nfc\Shiny.Nfc.csproj" />
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Sensors\Shiny.Sensors.csproj" />
                 <ProjectReference Include="$(SolutionDir)src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj" />
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj" />
+                <!--<ProjectReference Include="$(SolutionDir)src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj" />-->
             </ItemGroup>
         </Otherwise>
     </Choose>
@@ -89,6 +98,4 @@
             </ItemGroup>
         </When>
     </Choose>-->
-
-    <Import Project="Shiny.Tests.Shared\Shiny.Tests.Shared.projitems" Label="Shared" />
 </Project>

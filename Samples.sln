@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{3D1616
 		buildtools.json = buildtools.json
 		samples\Directory.build.props = samples\Directory.build.props
 		samples\readme.md = samples\readme.md
+		samples\Samples.targets = samples\Samples.targets
 		secrets.json = secrets.json
 	EndProjectSection
 EndProject

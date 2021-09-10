@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="..\Samples.targets" />
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -68,89 +69,12 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
-            <Project>{4273a168-9e9e-4e46-a6d6-96a3b788321f}</Project>
-            <Name>Shiny.BluetoothLE.Common</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Generators\Shiny.Generators.csproj">
-            <Project>{9fc4a830-1b20-4073-a1c4-ee3a52781dfd}</Project>
-            <Name>Shiny.Generators</Name>
-            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-            <OutputItemType>Analyzer</OutputItemType>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj">
-            <Project>{b66ad908-214e-4921-aceb-ccf80dea4a8a}</Project>
-            <Name>Shiny.Jobs</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
-            <Project>{11ec9d9d-3502-4a4a-94aa-5bdb1b20bb8e}</Project>
-            <Name>Shiny.Locations.Common</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
-            <Project>{31a8de52-ef8e-457a-bf93-109525b7d5d5}</Project>
-            <Name>Shiny.Push.AzureNotificationHubs</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
-            <Project>{130a7351-0eb6-4a17-8ea8-a392f2e4bdae}</Project>
-            <Name>Shiny.Push.FirebaseMessaging</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny\Shiny.csproj">
-            <Project>{B133232E-1A21-438D-8B40-F771D65BED1C}</Project>
-            <Name>Shiny</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Core\Shiny.Core.csproj">
-            <Project>{0C7C4C2A-9694-4BBD-A129-A41E319A7E10}</Project>
-            <Name>Shiny.Core</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Beacons\Shiny.Beacons.csproj">
-            <Project>{9D6C7510-028F-44C6-BD89-1A1B90CC7FB5}</Project>
-            <Name>Shiny.Beacons</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj">
-            <Project>{01ADE171-31D3-49B2-8223-67DCBFE8C601}</Project>
-            <Name>Shiny.BluetoothLE.Hosting</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
-            <Project>{4CD22375-09B4-474B-B93D-169652F1D386}</Project>
-            <Name>Shiny.BluetoothLE</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Locations\Shiny.Locations.csproj">
-            <Project>{BCCC351F-2277-4256-AD42-2E6C7689F803}</Project>
-            <Name>Shiny.Locations</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Net.Http\Shiny.Net.Http.csproj">
-            <Project>{63C3924A-9A4F-44CD-9150-5FF5000E388F}</Project>
-            <Name>Shiny.Net.Http</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Nfc\Shiny.Nfc.csproj">
-            <Project>{016002B1-24CC-4216-93BA-6A678A3875B6}</Project>
-            <Name>Shiny.Nfc</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Notifications\Shiny.Notifications.csproj">
-            <Project>{DC1C1265-32EC-4F2D-9484-34241298248F}</Project>
-            <Name>Shiny.Notifications</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Push\Shiny.Push.csproj">
-            <Project>{4F6F8E48-7C6D-40AE-B33A-F1B0DFB60903}</Project>
-            <Name>Shiny.Push</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.Sensors\Shiny.Sensors.csproj">
-            <Project>{32BDD88F-B1D3-4BCE-8C21-9CC81FBC0963}</Project>
-            <Name>Shiny.Sensors</Name>
-        </ProjectReference>
-        <ProjectReference Include="..\..\src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
-            <Project>{4F89D195-482E-4B5F-B97F-1647BE5C7716}</Project>
-            <Name>Shiny.SpeechRecognition</Name>
-        </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
         <PackageReference Include="Xamarin.GooglePlayServices.Basement" />
         <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime" />
+        <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.Firebase.Messaging" />
-        <PackageReference Include="Xamarin.Forms" />
-        <PackageReference Include="Xamarin.Essentials" />
         <ProjectReference Include="..\Samples\Samples.csproj">
             <Name>Samples</Name>
             <Project>{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}</Project>
