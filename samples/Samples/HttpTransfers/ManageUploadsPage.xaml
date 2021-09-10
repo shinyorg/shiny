@@ -15,16 +15,10 @@
             </Frame>
             <TableView Intent="Form">
                 <TableRoot>
-                    <TableSection Title="Database">
-                        <EntryCell Label="Records" Text="{Binding RecordsToCreate}" Keyboard="Numeric" />
-                        <TextCell Text="Create DB" Command="{Binding CreateDatabase}" />
-                        <TextCell Text="Delete DB" Command="{Binding Delete}" CommandParameter="upload.db" />
-                    </TableSection>
-
-                    <TableSection Title="Random">
+                    <TableSection>
                         <EntryCell Label="Size (MB)" Text="{Binding SizeInMegabytes}" Keyboard="Numeric" />
-                        <TextCell Text="Create Random" Command="{Binding CreateRandom}" />
-                        <TextCell Text="Delete Random" Command="{Binding Delete}" CommandParameter="upload.random" />
+                        <TextCell Text="Create Random File" Command="{Binding CreateRandom}" />
+                        <TextCell Text="Delete Random File" Command="{Binding Delete}" CommandParameter="upload.random" />
                     </TableSection>
                 </TableRoot>
             </TableView>

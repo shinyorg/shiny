@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Samples.Infrastructure;
-using Samples.SqliteGenerator;
 using Shiny;
 
 
@@ -32,14 +31,6 @@ namespace Samples.HttpTransfers
                     await dialogs.Snackbar($"{file} has been deleted");
                 }
             });
-            this.CreateDatabase = ReactiveCommand.CreateFromTask(
-                this.GenerateDatabase,
-                this.WhenAny(
-                    x => x.RecordsToCreate,
-                    x => x.GetValue() > 0
-                )
-            );
-            this.BindBusyCommand(this.CreateDatabase);
 
             this.CreateRandom = ReactiveCommand.CreateFromTask(
                 this.GenerateRandom,
@@ -53,10 +44,8 @@ namespace Samples.HttpTransfers
 
 
         public IReactiveCommand Delete { get; }
-        public IReactiveCommand CreateDatabase { get; }
         public IReactiveCommand CreateRandom { get; }
         [Reactive] public int SizeInMegabytes { get; set; } = 100;
-        [Reactive] public int RecordsToCreate { get; set; } = 50000;
 
 
         Task GenerateRandom() => Task.Run(() =>
@@ -76,12 +65,5 @@ namespace Samples.HttpTransfers
                 }
             }
         });
-
-
-        async Task GenerateDatabase()
-        {
-            var path = Path.Combine(this.platform.AppData.FullName, "upload.db");
-            await Generator.CreateSqlite(path, 50000);
-        }
     }
 }
