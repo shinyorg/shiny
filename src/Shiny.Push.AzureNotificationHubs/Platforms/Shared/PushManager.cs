@@ -16,12 +16,11 @@ namespace Shiny.Push.AzureNotificationHubs
                                IPushTagSupport,
                                IShinyStartupTask
     {
-        const string EXPIRY_DATE = nameof(EXPIRY_DATE);
         readonly INativeAdapter native;
         readonly ILogger logger;
         readonly PushContainer container;
         readonly AzureNotificationConfig config;
-        // TODO: watch push channel expiration?
+
 
         public PushManager(INativeAdapter native,
                            ILogger<PushManager> logger,
@@ -64,13 +63,6 @@ namespace Shiny.Push.AzureNotificationHubs
         public string? CurrentRegistrationToken => this.InstallationId;
         public DateTime? CurrentRegistrationTokenDate => this.container.CurrentRegistrationTokenDate;
         public string[]? RegisteredTags => this.container.RegisteredTags;
-        public DateTimeOffset? ExpiryDate
-        {
-            get => this.container.Store.Get<DateTimeOffset?>(EXPIRY_DATE);
-            private set => this.container.Store.SetOrRemove(nameof(this.ExpiryDate), value);
-        }
-
-
         public string? InstallationId
         {
             get => this.container.Store.Get<string>(nameof(this.InstallationId));
