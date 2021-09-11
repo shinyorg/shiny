@@ -40,7 +40,7 @@ namespace Shiny.Beacons
 
         public async void Start()
         {
-            var regions = await this.GetMonitoredRegions();
+            var regions = await this.GetMonitoredRegions().ConfigureAwait(false);
             if (!regions.IsEmpty())
                 this.StartService();
         }
@@ -57,13 +57,22 @@ namespace Shiny.Beacons
 
         public async Task StopMonitoring(string identifier)
         {
-            var region = await this.repository.Get<BeaconRegion>(identifier);
+            var region = await this.repository
+                .Get<BeaconRegion>(identifier)
+                .ConfigureAwait(false);
+
             if (region != null)
             {
-                await this.repository.Remove<BeaconRegion>(identifier);
+                await this.repository
+                    .Remove<BeaconRegion>(identifier)
+                    .ConfigureAwait(false);
+
                 this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Remove, region));
 
-                var regions = await this.repository.GetAll<BeaconRegion>();
+                var regions = await this.repository
+                    .GetAll<BeaconRegion>()
+                    .ConfigureAwait(false);
+
                 if (regions.Count == 0)
                     this.StopService();
             }
@@ -72,7 +81,7 @@ namespace Shiny.Beacons
 
         public async Task StopAllMonitoring()
         {
-            await this.repository.Clear<BeaconRegion>();
+            await this.repository.Clear<BeaconRegion>().ConfigureAwait(false);
             this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Clear));
             this.StopService();
         }
@@ -80,18 +89,23 @@ namespace Shiny.Beacons
 
         public async Task<AccessState> RequestAccess()
         {
-            var access = await this.bleManager.RequestAccess().ToTask();
+            var access = await this.bleManager.RequestAccess().ToTask().ConfigureAwait(false);
 #if MONOANDROID
             await this.context.RequestLocationAccess(true, true, true, false);
             if (access == AccessState.Available && this.context.IsMinApiLevel(26))
-                access = await this.context.RequestAccess(Android.Manifest.Permission.ForegroundService).ToTask();
+            {
+                access = await this.context
+                    .RequestAccess(Android.Manifest.Permission.ForegroundService)
+                    .ToTask()
+                    .ConfigureAwait(false);
+            }
 #endif
             return access;
         }
 
 
         public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
-            => await this.repository.GetAll<BeaconRegion>();
+            => await this.repository.GetAll<BeaconRegion>().ConfigureAwait(false);
 
 
         void StartService()

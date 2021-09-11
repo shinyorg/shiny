@@ -20,26 +20,19 @@ namespace Shiny.Locations
         public override async Task<AccessState> RequestAccess()
         {
             var status = await Geolocator.RequestAccessAsync();
-            switch (status)
+            return status switch
             {
-                case GeolocationAccessStatus.Denied:
-                    return AccessState.Denied;
-
-                case GeolocationAccessStatus.Allowed:
-                    return GeofenceMonitor.Current.Status.FromNative();
-
-                case GeolocationAccessStatus.Unspecified:
-                default:
-                    return AccessState.Unknown;
-            }
+                GeolocationAccessStatus.Denied => AccessState.Denied,
+                GeolocationAccessStatus.Allowed => GeofenceMonitor.Current.Status.FromNative(),
+                _ => AccessState.Unknown
+            };
         }
 
 
         public override async Task StartMonitoring(GeofenceRegion region)
         {
-            await this.Repository.Set(region.Identifier, region);
-            var native = this.ToNative(region);
-            GeofenceMonitor.Current.Geofences.Add(native);
+            await this.Repository.Set(region.Identifier, region).ConfigureAwait(false);
+            GeofenceMonitor.Current.Geofences.Add(this.ToNative(region));
 
             //this.context.RegisterBackground<GeofenceBackgroundTaskProcessor>(
             //    nameof(GeofenceBackgroundTaskProcessor),
@@ -56,7 +49,7 @@ namespace Shiny.Locations
             if (geofence != null)
                 list.Remove(geofence);
 
-            await this.Repository.Remove(identifier);
+            await this.Repository.Remove(identifier).ConfigureAwait(false);
             //if (list.Count == 0)
             //    this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>(nameof(GeofenceBackgroundTaskProcessor));
         }
@@ -64,7 +57,7 @@ namespace Shiny.Locations
 
         public override async Task StopAllMonitoring()
         {
-            await this.Repository.Clear();
+            await this.Repository.Clear().ConfigureAwait(false);
             GeofenceMonitor.Current.Geofences.Clear();
             //this.context.UnRegisterBackground<GeofenceBackgroundTaskProcessor>(nameof(GeofenceBackgroundTaskProcessor));
         }

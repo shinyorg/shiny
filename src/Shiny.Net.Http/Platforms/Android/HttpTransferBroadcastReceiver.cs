@@ -41,7 +41,9 @@ namespace Shiny.Net.Http
                     transfer = cursor.ToLib();
                     if (transfer.Value.Exception != null)
                     {
-                        await delegates.RunDelegates(x => x.OnError(transfer.Value, transfer.Value.Exception));
+                        await delegates
+                            .RunDelegates(x => x.OnError(transfer.Value, transfer.Value.Exception))
+                            .ConfigureAwait(false);
                     }
                     else
                     {
@@ -58,7 +60,9 @@ namespace Shiny.Net.Http
                             File.Move(file.FullName, to);
                         });
 
-                        await delegates.RunDelegates(x => x.OnCompleted(transfer.Value));
+                        await delegates
+                            .RunDelegates(x => x.OnCompleted(transfer.Value))
+                            .ConfigureAwait(false);
                     }
                     HttpEvents.OnNext(transfer.Value);
                 }

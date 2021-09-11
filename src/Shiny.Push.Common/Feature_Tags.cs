@@ -31,7 +31,7 @@ namespace Shiny.Push
         /// <returns></returns>
         public static async Task<PushAccessState> TryRequestAccessWithTags(this IPushManager pushManager, params string[] tags)
         {
-            var result = await pushManager.RequestAccess();
+            var result = await pushManager.RequestAccess().ConfigureAwait(false);
             if (result.Status == AccessState.Available)
                 await pushManager.TrySetTags(tags);
 
@@ -49,7 +49,7 @@ namespace Shiny.Push
         {
             if (pushManager is IPushTagSupport tagEnabled)
             {
-                await tagEnabled.SetTags(tags);
+                await tagEnabled.SetTags(tags).ConfigureAwait(false);
                 return true;
             }
             return false;

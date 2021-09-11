@@ -40,10 +40,15 @@ namespace Shiny.Beacons
 
         public async Task StopMonitoring(string identifier)
         {
-            var region = await this.repository.Get<BeaconRegion>(identifier);
+            var region = await this.repository
+                .Get<BeaconRegion>(identifier)
+                .ConfigureAwait(false);
+
             if (region != null)
             {
-                await this.repository.Remove<BeaconRegion>(region.Identifier);
+                await this.repository
+                    .Remove<BeaconRegion>(region.Identifier)
+                    .ConfigureAwait(false);
                 this.manager.StopMonitoring(region.ToNative());
             }
         }
@@ -51,7 +56,10 @@ namespace Shiny.Beacons
 
         public async Task StopAllMonitoring()
         {
-            await this.repository.Clear<BeaconRegion>();
+            await this.repository
+                .Clear<BeaconRegion>()
+                .ConfigureAwait(false);
+
             var allRegions = this
                .manager
                .MonitoredRegions
@@ -62,6 +70,6 @@ namespace Shiny.Beacons
         }
 
         public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
-            => await this.repository.GetAll<BeaconRegion>();
+            => await this.repository.GetAll<BeaconRegion>().ConfigureAwait(false);
     }
 }

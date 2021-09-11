@@ -80,17 +80,21 @@ namespace Shiny.Net.Http
         async Task<HttpTransfer> Create(HttpTransferRequest request)
         {
             var id = Guid.NewGuid().ToString();
-            await this.Services.Repository.Set(id, new HttpTransferStore
-            {
-                Id = id,
-                Uri = request.Uri,
-                IsUpload = request.IsUpload,
-                PostData = request.PostData,
-                LocalFile = request.LocalFile.FullName,
-                UseMeteredConnection = request.UseMeteredConnection,
-                HttpMethod = request.HttpMethod.ToString(),
-                Headers = request.Headers
-            });
+            await this.Services
+                .Repository
+                .Set(id, new HttpTransferStore
+                {
+                    Id = id,
+                    Uri = request.Uri,
+                    IsUpload = request.IsUpload,
+                    PostData = request.PostData,
+                    LocalFile = request.LocalFile.FullName,
+                    UseMeteredConnection = request.UseMeteredConnection,
+                    HttpMethod = request.HttpMethod.ToString(),
+                    Headers = request.Headers
+                })
+                .ConfigureAwait(false);
+
             await this.jobManager.Register(new JobInfo(typeof(TransferJob), id)
             {
                 RequiredInternetAccess = InternetAccess.Any,
@@ -122,9 +126,13 @@ namespace Shiny.Net.Http
         {
             try
             {
-                var requests = await this.Services.Repository.GetAll<HttpTransferStore>();
+                var requests = await this.Services
+                    .Repository
+                    .GetAll<HttpTransferStore>()
+                    .ConfigureAwait(false);
+
                 foreach (var request in requests)
-                    await this.jobManager.Run(request.Id);
+                    await this.jobManager.Run(request.Id).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

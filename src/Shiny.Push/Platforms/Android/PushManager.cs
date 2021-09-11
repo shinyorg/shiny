@@ -26,26 +26,39 @@ namespace Shiny.Push
             if (list.Remove(tag))
                 this.container.RegisteredTags = list.ToArray();
 
-            await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
+            await FirebaseMessaging
+                .Instance
+                .UnsubscribeFromTopic(tag)
+                .AsAsync()
+                .ConfigureAwait(false);
         }
 
 
         public async Task ClearTags()
         {
             if (this.container.RegisteredTags != null)
+            {
                 foreach (var tag in this.container.RegisteredTags)
-                    await FirebaseMessaging.Instance.UnsubscribeFromTopic(tag);
-
+                {
+                    await FirebaseMessaging
+                        .Instance
+                        .UnsubscribeFromTopic(tag)
+                        .AsAsync()
+                        .ConfigureAwait(false);
+                }
+            }
             this.container.RegisteredTags = null;
         }
 
 
         public async Task SetTags(params string[]? tags)
         {
-            await this.ClearTags();
+            await this.ClearTags().ConfigureAwait(false);
             if (tags != null)
+            {
                 foreach (var tag in tags)
-                    await this.AddTag(tag);
+                    await this.AddTag(tag).ConfigureAwait(false);
+            }
         }
     }
 }

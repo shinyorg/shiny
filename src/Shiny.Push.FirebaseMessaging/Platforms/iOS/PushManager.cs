@@ -121,7 +121,11 @@ namespace Shiny.Push.FirebaseMessaging
 
         public async Task RemoveTag(string tag)
         {
-            await Messaging.SharedInstance.UnsubscribeAsync(tag);
+            await Messaging
+                .SharedInstance
+                .UnsubscribeAsync(tag)
+                .ConfigureAwait(false);
+
             if (this.RegisteredTags != null)
             {
                 var tags = this.RegisteredTags.ToList();
@@ -134,19 +138,27 @@ namespace Shiny.Push.FirebaseMessaging
         public async Task ClearTags()
         {
             if (this.RegisteredTags != null)
+            {
                 foreach (var tag in this.RegisteredTags)
-                    await Messaging.SharedInstance.UnsubscribeAsync(tag);
-
+                {
+                    await Messaging
+                        .SharedInstance
+                        .UnsubscribeAsync(tag)
+                        .ConfigureAwait(false);
+                }
+            }
             this.container.RegisteredTags = null;
         }
 
 
         public async Task SetTags(params string[]? tags)
         {
-            await this.ClearTags();
+            await this.ClearTags().ConfigureAwait(false);
             if (tags != null)
+            {
                 foreach (var tag in tags)
-                    await this.AddTag(tag);
+                    await this.AddTag(tag).ConfigureAwait(false);
+            }
         }
     }
 }

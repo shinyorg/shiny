@@ -37,26 +37,14 @@ namespace Shiny.Locations
         }
 
 
-        public AccessState GetCurrentStatus(GpsRequest request)
+        public AccessState GetCurrentStatus(GpsRequest request) => this.geolocator.LocationStatus switch
         {
-            switch (this.geolocator.LocationStatus)
-            {
-                case PositionStatus.Disabled:
-                    return AccessState.Disabled;
-
-                case PositionStatus.NotAvailable:
-                    return AccessState.NotSupported;
-
-                //case PositionStatus.NotInitialized:
-                case PositionStatus.Ready:
-                    return AccessState.Available;
-
-                case PositionStatus.NoData:
-                case PositionStatus.Initializing:
-                default:
-                    return AccessState.Unknown;
-            }
-        }
+            PositionStatus.Disabled => AccessState.Disabled,
+            PositionStatus.NotAvailable => AccessState.NotSupported,
+            PositionStatus.Ready => AccessState.Available,
+            //PositionStatus.NoData, PositionStatus.Initializing:
+            _ => AccessState.Unknown
+        };
 
 
         public IObservable<AccessState> WhenAccessStatusChanged(GpsRequest request) => Observable.Create<AccessState>(ob =>
@@ -64,8 +52,8 @@ namespace Shiny.Locations
             var handler = new TypedEventHandler<Geolocator, StatusChangedEventArgs>((sender, args) =>
                 ob.OnNext(this.GetCurrentStatus(request))
             );
-            this.geolocator.StatusChanged += null;
-            return () => this.geolocator.StatusChanged -= null;
+            this.geolocator.StatusChanged += handler;
+            return () => this.geolocator.StatusChanged -= handler;
         });
 
 
@@ -75,7 +63,8 @@ namespace Shiny.Locations
             geolocator.AllowFallbackToConsentlessPositions();
             var location = await geolocator
                 .GetGeopositionAsync()
-                .AsTask(ct);
+                .AsTask(ct)
+                .ConfigureAwait(false);
 
             if (location?.Coordinate == null)
                 return null;
