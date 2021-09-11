@@ -19,27 +19,46 @@ namespace Shiny.Locations
             if (!CMMotionActivityManager.IsActivityAvailable)
                 return AccessState.NotSupported;
 
-            if (CMMotionActivityManager.AuthorizationStatus == CMAuthorizationStatus.Authorized)
-                return AccessState.Available;
-
-            try
-            {
-                await this.Query(DateTimeOffset.UtcNow);
-                await Task.Delay(500);
-            }
-            catch {}
-
             switch (CMMotionActivityManager.AuthorizationStatus)
             {
-                case CMAuthorizationStatus.Denied:
-                    return AccessState.Denied;
+                case CMAuthorizationStatus.Denied     : return AccessState.Denied;
+                case CMAuthorizationStatus.Restricted : return AccessState.Restricted;
+                case CMAuthorizationStatus.Authorized : return AccessState.Available;
 
-                case CMAuthorizationStatus.Restricted:
-                    return AccessState.Restricted;
-
-                case CMAuthorizationStatus.Authorized:
+                case CMAuthorizationStatus.NotDetermined:
                 default:
-                    return AccessState.Available;
+                    var tcs = new TaskCompletionSource<AccessState>();
+
+                    this.activityManager.QueryActivity(
+                        NSDate.Now,
+                        NSDate.Now,
+                        NSOperationQueue.MainQueue,
+                        (_, e) =>
+                        {
+                            if (e == null)
+                            {
+                                tcs.SetResult(AccessState.Available);
+                            }
+                            else
+                            {
+                                switch (e.Code)
+                                {
+                                    case (int)CMError.MotionActivityNotAuthorized:
+                                        tcs.SetResult(AccessState.Denied);
+                                        break;
+
+                                    case (int)CMError.MotionActivityNotAvailable:
+                                        tcs.SetResult(AccessState.NotSupported);
+                                        break;
+
+                                    case (int)CMError.MotionActivityNotEntitled:
+                                        tcs.SetResult(AccessState.NotSetup);
+                                        break;
+                                }
+                            }
+                        }
+                    );
+                    return await tcs.Task.ConfigureAwait(false);
             }
         }
 
@@ -63,32 +82,33 @@ namespace Shiny.Locations
         }
 
 
-        public IObservable<MotionActivityEvent> WhenActivityChanged() => Observable.Create<MotionActivityEvent>(async ob =>
+        IObservable<MotionActivityEvent>? activityObs;
+        public IObservable<MotionActivityEvent> WhenActivityChanged()
         {
-            var started = false;
-            var access = await this.RequestAccess().ConfigureAwait(false);
-            if (access != AccessState.Available)
-            {
-                ob.OnError(new PermissionException("MotionActivity", access));
-            }
-            else
-            {
-                this.activityManager.StartActivityUpdates(
-                    NSOperationQueue.CurrentQueue,
-                    target =>
+            this.activityObs ??= Observable
+                .Create<MotionActivityEvent>(ob =>
+                {
+                    this.RequestAccess().ContinueWith(result =>
                     {
-                        var e = ToEvent(target);
-                        ob.OnNext(e);
-                    }
-                );
-                started = true;
-            }
-            return () =>
-            {
-                if (started)
-                    this.activityManager.StopActivityUpdates();
-            };
-        });
+                        if (result.Result != AccessState.Available)
+                        {
+                            ob.OnError(new PermissionException("MotionActivity", result.Result));
+                        }
+                        else
+                        {
+                            this.activityManager.StartActivityUpdates(
+                                NSOperationQueue.CurrentQueue,
+                                e => ob.OnNext(ToEvent(e))
+                            );
+                        }
+                    });
+                    return () => this.activityManager.StopActivityUpdates();
+                })
+                .Publish()
+                .RefCount();
+
+            return this.activityObs;
+        }
 
 
         static MotionActivityEvent ToEvent(CMMotionActivity target)
