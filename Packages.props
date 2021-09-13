@@ -86,7 +86,7 @@
         <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.12" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.1.97" />
-        <PackageReference Update="ReactiveUI.Fody" Version="16.2.1" />
+        <PackageReference Update="ReactiveUI.Fody" Version="16.2.6" />
         <PackageReference Update="XF.Material" Version="1.7.8" />
     </ItemGroup>
 
