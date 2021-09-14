@@ -85,10 +85,9 @@
             </ItemGroup>
         </When>
     </Choose>
-    <!--
 
     <Choose>
-        <When Condition="'$(UseNuget)' == 'false' and $(OS) != 'WINDOWS_NT' and $(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
+        <When Condition="'$(UseNuget)' == 'true' and $(OS) != 'WINDOWS_NT' and $(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
             <ItemGroup>
                 <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
@@ -97,13 +96,13 @@
     </Choose>
 
     <Choose>
-        <When Condition="'$(UseNuget)' == 'false' and $(TargetFrameworkIdentifier) == 'MonoAndroid'">
+        <When Condition="'$(UseNuget)' == 'true' and $(TargetFrameworkIdentifier) == 'MonoAndroid'">
             <ItemGroup>
                 <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
             </ItemGroup>
         </When>
-    </Choose>-->
+    </Choose>
 
     <Import Project="Shiny.Tests.Shared\Shiny.Tests.Shared.projitems" Label="Shared" />
 </Project>

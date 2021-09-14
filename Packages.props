@@ -79,7 +79,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="Xamarin.Forms" Version="5.0.0.2038" />
+        <PackageReference Update="Xamarin.Forms" Version="5.0.0.2083" />
         <PackageReference Update="Xamarin.Essentials" Version="1.7.0" />
         <PackageReference Update="Xamarin.CommunityToolkit" Version="1.3.0-pre2" />
         <PackageReference Update="Mobile.BuildTools" Version="2.0.245" />
