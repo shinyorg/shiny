@@ -1,0 +1,150 @@
+<Project>
+    <PropertyGroup>
+        <ShinyNugetVersion>2.3.0.2855-preview</ShinyNugetVersion>
+        <UseNuget>false</UseNuget>
+    </PropertyGroup>
+
+    <Choose>
+        <When Condition="'$(UseNuget)' == 'true'">
+            <ItemGroup>
+                <PackageReference Include="Shiny" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Beacons" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.BluetoothLE" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.BluetoothLE.Hosting" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Integrations.Sqlite" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Jobs" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Notifications" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Push" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Push.AzureNotificationHubs" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Net.Http" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Logging.AppCenter" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Locations" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Nfc" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Sensors" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.SpeechRecognition" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Testing" Version="$(ShinyNugetVersion)" />
+            </ItemGroup>
+        </When>
+        <Otherwise>
+            <ItemGroup>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Generators\Shiny.Generators.csproj">
+                    <Name>Shiny.Generators</Name>
+                    <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+                    <OutputItemType>Analyzer</OutputItemType>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny\Shiny.csproj">
+                    <Name>Shiny</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Core\Shiny.Core.csproj">
+                    <Name>Shiny.Core</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Beacons\Shiny.Beacons.csproj">
+                    <Name>Shiny.Beacons</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj">
+                    <Name>Shiny.BluetoothLE</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj">
+                    <Name>Shiny.BluetoothLE.Hosting</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj">
+                    <Name>Shiny.BluetoothLE.Common</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Integrations.Sqlite\Shiny.Integrations.Sqlite.csproj">
+                    <Name>Shiny.Integrations.Sqlite</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Jobs\Shiny.Jobs.csproj">
+                    <Name>Shiny.Jobs</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Locations.Common\Shiny.Locations.Common.csproj">
+                    <Name>Shiny.Locations.Common</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Locations\Shiny.Locations.csproj">
+                    <Name>Shiny.Locations</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Logging.AppCenter\Shiny.Logging.AppCenter.csproj">
+                    <Name>Shiny.Logging.AppCenter</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Net.Http\Shiny.Net.Http.csproj">
+                    <Name>Shiny.Net.Http</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Notifications\Shiny.Notifications.csproj">
+                    <Name>Shiny.Notifications</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj">
+                    <Name>Shiny.Push.AzureNotificationHubs</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.Common\Shiny.Push.Common.csproj">
+                    <Name>Shiny.Push.Common</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push\Shiny.Push.csproj">
+                    <Name>Shiny.Push</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Nfc\Shiny.Nfc.csproj">
+                    <Name>Shiny.Nfc</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Sensors\Shiny.Sensors.csproj">
+                    <Name>Shiny.Sensors</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.SpeechRecognition\Shiny.SpeechRecognition.csproj">
+                    <Name>Shiny.SpeechRecognition</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Testing\Shiny.Testing.csproj">
+                    <Name>Shiny.Testing</Name>
+                </ProjectReference>
+            </ItemGroup>
+        </Otherwise>
+    </Choose>
+
+    <Choose>
+        <When Condition="'$(UseNuget)' == 'false' and $(OS) != 'WINDOWS_NT' and $(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
+            <ItemGroup>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
+                    <Name>Shiny.Push.OneSignal</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
+                    <Name>Shiny.Push.FirebaseMessaging</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj">
+                    <Name>Shiny.Logging.Firebase</Name>
+                </ProjectReference>
+            </ItemGroup>
+        </When>
+    </Choose>
+
+    <Choose>
+        <When Condition="'$(UseNuget)' == 'false' and $(TargetFrameworkIdentifier) == 'MonoAndroid'">
+            <ItemGroup>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
+                    <Name>Shiny.Push.OneSignal</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
+                    <Name>Shiny.Push.FirebaseMessaging</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj">
+                    <Name>Shiny.Logging.Firebase</Name>
+                </ProjectReference>
+            </ItemGroup>
+        </When>
+    </Choose>
+
+    <Choose>
+        <When Condition="'$(UseNuget)' == 'true' and $(OS) != 'WINDOWS_NT' and $(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
+            <ItemGroup>
+                <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Logging.Firebase" Version="$(ShinyNugetVersion)" />
+            </ItemGroup>
+        </When>
+    </Choose>
+
+    <Choose>
+        <When Condition="'$(UseNuget)' == 'true' and $(TargetFrameworkIdentifier) == 'MonoAndroid'">
+            <ItemGroup>
+                <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Logging.Firebase" Version="$(ShinyNugetVersion)" />
+            </ItemGroup>
+        </When>
+    </Choose>
+</Project>
