@@ -5,23 +5,14 @@
         <UseNuget>false</UseNuget>
     </PropertyGroup>
 
-    <Choose>
-        <When Condition="$(OS) == 'WINDOWS_NT' and $(TargetFrameworkIdentifier) == 'Xamarin.iOS'">
-            <PropertyGroup>
-                <DefineConstants>$(DefineConstants);IOS_WINDOWS_BUILD</DefineConstants>
-            </PropertyGroup>
-        </When>
-    </Choose>
-
     <ItemGroup>
+        <PackageReference Include="Xamarin.Forms" />
+        <PackageReference Include="Xamarin.Essentials" />
         <PackageReference Include="xunit.runner.devices" />
         <PackageReference Include="xunit" />
         <PackageReference Include="FluentAssertions" />
-        <PackageReference Include="Xamarin.Forms" />
         <PackageReference Include="Mobile.BuildTools" PrivateAssets="all" />
         <PackageReference Include="MartinCostello.Logging.XUnit" />
-        <PackageReference Include="xunit" />
-        <PackageReference Include="Xamarin.Essentials" />
         <PackageReference Include="Acr.UserDialogs" />
         <PackageReference Include="Microsoft.Azure.NotificationHubs" />
         <PackageReference Include="FirebaseAdmin" />

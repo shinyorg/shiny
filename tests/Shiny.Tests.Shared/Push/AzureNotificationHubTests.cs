@@ -89,6 +89,20 @@ namespace Shiny.Tests.Push
         });
 
 
+        [Fact(DisplayName = "Push - ANH - Tag Expression")]
+        public Task TagExpression() => this.WrapRegistration(async token =>
+        {
+            await this.pushManager.SetTags("TagExpression", token);
+            var task = this.pushManager
+                .WhenReceived()
+                .Take(1)
+                .ToTask();
+
+            await this.DoSend("TagExpression && " + token);
+            await task.WithTimeout(20);
+        });
+
+
         [Fact(DisplayName = "Push - ANH - Receive Delegate")]
         public Task ReceiveOnDelegate() => this.WrapRegistration(async token =>
         {
