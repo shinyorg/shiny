@@ -17,17 +17,20 @@ namespace Shiny.Push.FirebaseMessaging
         readonly INativeAdapter adapter;
         readonly PushContainer container;
         readonly ILogger logger;
+        readonly AppleLifecycle lifecycle;
         readonly FirebaseConfiguration? config;
 
 
         public PushManager(INativeAdapter adapter,
                            PushContainer container,
                            ILogger<PushManager> logger,
+                           AppleLifecycle lifecycle,
                            FirebaseConfiguration? config = null)
         {
             this.adapter = adapter;
             this.container = container;
             this.logger = logger;
+            this.lifecycle = lifecycle;
             this.config = config;
         }
 
@@ -54,10 +57,17 @@ namespace Shiny.Push.FirebaseMessaging
         }
 
 
+        IDisposable? lifecycleSub;
         protected virtual void TryStartFirebase()
         {
-
-            //Messaging.SharedInstance.AppDidReceiveMessage (userInfo); apple lifecycle
+            this.lifecycleSub?.Dispose();
+            //this.lifecycle.RegisterForNotificationPresentation
+            this.lifecycleSub = this.lifecycle.RegisterToReceiveRemoteNotifications(userInfo =>
+            {
+                // TODO: wait for delegate to fire?
+                Messaging.SharedInstance.AppDidReceiveMessage(userInfo);
+                return Task.CompletedTask;
+            });
             if (App.DefaultInstance == null)
             {
                 if (this.config == null)
