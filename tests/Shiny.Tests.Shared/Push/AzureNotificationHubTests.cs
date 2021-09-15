@@ -103,16 +103,19 @@ namespace Shiny.Tests.Push
         [Fact(DisplayName = "Push - ANH - Tags")]
         public Task Tags() => this.WrapRegistration(async token =>
         {
+            this.output.WriteLine("Setting 3 random tags");
             var tag1 = CreateRandomTag("1-");
             var tag2 = CreateRandomTag("2-");
             var tag3 = CreateRandomTag("3-");
             await this.pushManager.SetTags(tag1, tag2, tag3);
+            this.output.WriteLine($"Tags: {tag1}, {tag2}, {tag3}");
 
             await Task.Delay(1000); // it's like azure takes a second to propagate even though it has returned all is good
             var install = await this.hubClient.GetInstallationAsync(token);
             install.Tags.Any(x => x.Equals(tag1, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag1 not found");
             install.Tags.Any(x => x.Equals(tag2, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag2 not found");
             install.Tags.Any(x => x.Equals(tag3, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag3 not found");
+            this.output.WriteLine("Tags verified with Azure");
 
             await this.pushManager.RemoveTag(tag2);
             await Task.Delay(1000);
@@ -121,6 +124,16 @@ namespace Shiny.Tests.Push
             install.Tags.Any(x => x.Equals(tag1, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag1 not found");
             install.Tags.Any(x => x.Equals(tag2, StringComparison.InvariantCultureIgnoreCase)).Should().BeFalse("tag2 found, but should be deleted");
             install.Tags.Any(x => x.Equals(tag3, StringComparison.InvariantCultureIgnoreCase)).Should().BeTrue("tag3 not found");
+            this.output.WriteLine("Tags verified with Azure after remove");
+
+            this.output.WriteLine("Verifying send to tag");
+            var task = this.pushManager
+                .WhenReceived()
+                .Take(1)
+                .ToTask();
+            await this.DoSend(tag1);
+            await task.WithTimeout(20);
+            this.output.WriteLine("Tag send verified");
 
             await this.pushManager.ClearTags();
             await Task.Delay(1000);
@@ -150,12 +163,13 @@ namespace Shiny.Tests.Push
         }
 
 
-        async Task DoSend()
+        async Task DoSend(string? tag = null)
         {
-            //var tag = this.pushManager.CurrentRegistrationToken;
-
-            var tag = "UnitTest";
-            await this.pushManager.AddTag(tag);
+            if (tag == null)
+            {
+                tag = "UnitTest";
+                await this.pushManager.AddTag(tag);
+            }
             await Task.Delay(1000); // let azure breath
 
             //var regs = await this.hubClient.GetRegistrationsByTagAsync(tag, 5);
