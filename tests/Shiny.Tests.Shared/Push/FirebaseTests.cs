@@ -19,6 +19,7 @@ namespace Shiny.Tests.Push
 {
     public class FirebaseTests : IDisposable
     {
+        const int TIMEOUT_SECS = 20;
         readonly IPushTagSupport pushManager;
 
 
@@ -58,7 +59,7 @@ namespace Shiny.Tests.Push
             var task = this.ListenForStamp(stamp);
 
             await this.DoSend(stamp, stamp);
-            await task;
+            await task.WithTimeout(TIMEOUT_SECS);
         });
 
 
@@ -69,7 +70,7 @@ namespace Shiny.Tests.Push
             var task = this.ListenForStamp(stamp);
 
             await this.DoSend(stamp, null);
-            await task;
+            await task.WithTimeout(TIMEOUT_SECS);
         });
 
 
@@ -85,7 +86,7 @@ namespace Shiny.Tests.Push
                     tcs?.SetResult(null);
             };
             await this.DoSend(stamp, null);
-            await tcs.Task.WithTimeout(10);
+            await tcs.Task.WithTimeout(TIMEOUT_SECS);
             tcs = null;
         });
 
@@ -94,8 +95,7 @@ namespace Shiny.Tests.Push
         Task ListenForStamp(string stamp) => this.pushManager
             .WhenReceived()
             .Take(1)
-            .Where(x => x.Data.ContainsKey("stamp") && x.Data["stamp"] == stamp)
-            .Timeout(TimeSpan.FromSeconds(5))
+            .Where(x => x.Data.ContainsKey(stamp) && x.Data[stamp] == stamp)
             .ToTask();
 
 
@@ -120,7 +120,6 @@ namespace Shiny.Tests.Push
         {
             var msg = new Message
             {
-                Token = this.pushManager.CurrentRegistrationToken,
                 Data = new Dictionary<string, string>
                 {
                     { "stamp", stamp }
@@ -132,8 +131,7 @@ namespace Shiny.Tests.Push
             }
             else
             {
-                //topic = "test";
-                await this.pushManager.AddTag(topic);
+                await this.pushManager.AddTag(topic!);
                 msg.Topic = topic;
             }
             await FirebaseMessaging.DefaultInstance.SendAsync(msg);
