@@ -117,13 +117,13 @@ namespace Shiny.Push
             }
             else
             {
-                //new FirebaseOptions.Builder().SetGcmSenderId
                 var options = new FirebaseOptions.Builder()
                     .SetApplicationId(this.config.AppId)
-                    .SetProjectId(this.config.ProjectId)
+                    //.SetProjectId(this.config.ProjectId)
                     .SetApiKey(this.config.ApiKey)
+                    .SetGcmSenderId(this.config.SenderId)
                     .Build();
-                FirebaseApp.InitializeApp(this.context.AppContext, options, this.config.AppName);
+                FirebaseApp.InitializeApp(this.context.AppContext, options);
             }
 
             var task = await FirebaseMessaging.Instance.GetToken();

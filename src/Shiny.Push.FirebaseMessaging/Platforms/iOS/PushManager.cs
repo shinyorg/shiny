@@ -60,14 +60,19 @@ namespace Shiny.Push.FirebaseMessaging
                 if (this.config == null)
                 {
                     Firebase.Core.App.Configure();
+                    if (Messaging.SharedInstance == null)
+                        throw new ArgumentException("Failed to configure firebase messaging - ensure you have GoogleService-Info.plist included in your iOS project and that it is set to a BundleResource");
+
                     Messaging.SharedInstance!.AutoInitEnabled = true;
                 }
                 else
                 {
                     Firebase.Core.App.Configure(new Firebase.Core.Options(
                         this.config.AppId,
-                        this.config.ProjectId
-                    ));
+                        this.config.SenderId
+                    ) {
+                        ApiKey = this.config.ApiKey
+                    });
                 }
             }
             Messaging.SharedInstance!.Delegate = new FbMessagingDelegate

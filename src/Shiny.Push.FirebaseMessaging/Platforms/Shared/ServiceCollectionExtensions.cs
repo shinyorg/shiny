@@ -30,9 +30,8 @@ namespace Shiny
                     delegateType,
                     new FirebaseConfig(
                         config.AppId,
-                        config.ProjectId,
-                        config.ApiKey,
-                        config.AppName
+                        config.SenderId,
+                        config.ApiKey
                     )
                 );
             }
