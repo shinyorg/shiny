@@ -77,7 +77,7 @@
         <PackageReference Include="Xamarin.Firebase.Messaging" />
         <ProjectReference Include="..\Samples\Samples.csproj">
             <Name>Samples</Name>
-            <Project>{56EB33AF-1430-42A6-BCB4-21A5FCE49C96}</Project>
+            <Project>{CCF5D032-A4D1-45C2-B752-710E900F50CF}</Project>
         </ProjectReference>
     </ItemGroup>
     <ItemGroup>

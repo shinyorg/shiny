@@ -198,8 +198,12 @@
         <BundleResource Include="Resources\notification.mp3" />
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="Xamarin.Firebase.Messaging" />
+        <PackageReference Include="Com.OneSignal" />
+    </ItemGroup>
+    <ItemGroup>
         <ProjectReference Include="..\Samples\Samples.csproj">
-            <Project>{56eb33af-1430-42a6-bcb4-21a5fce49c96}</Project>
+            <Project>{CCF5D032-A4D1-45C2-B752-710E900F50CF}</Project>
             <Name>Samples</Name>
         </ProjectReference>
     </ItemGroup>
