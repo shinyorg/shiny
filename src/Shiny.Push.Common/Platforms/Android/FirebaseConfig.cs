@@ -8,7 +8,7 @@ namespace Shiny.Push
         public FirebaseConfig(string appId, string senderId, string apiKey)
         {
             this.AppId = appId ?? throw new ArgumentNullException(nameof(appId));
-            this.SenderId = appId ?? throw new ArgumentNullException(nameof(appId));
+            this.SenderId = senderId ?? throw new ArgumentNullException(nameof(senderId));
             this.ApiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
         }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Firebase.CloudMessaging;
+using Firebase.Core;
 using Firebase.InstanceID;
 using Microsoft.Extensions.Logging;
 using Shiny.Push.Infrastructure;
@@ -55,11 +56,13 @@ namespace Shiny.Push.FirebaseMessaging
 
         protected virtual void TryStartFirebase()
         {
-            if (Messaging.SharedInstance == null)
+
+            //Messaging.SharedInstance.AppDidReceiveMessage (userInfo); apple lifecycle
+            if (App.DefaultInstance == null)
             {
                 if (this.config == null)
                 {
-                    Firebase.Core.App.Configure();
+                    App.Configure();
                     if (Messaging.SharedInstance == null)
                         throw new ArgumentException("Failed to configure firebase messaging - ensure you have GoogleService-Info.plist included in your iOS project and that it is set to a BundleResource");
 
@@ -67,7 +70,7 @@ namespace Shiny.Push.FirebaseMessaging
                 }
                 else
                 {
-                    Firebase.Core.App.Configure(new Firebase.Core.Options(
+                    App.Configure(new Options(
                         this.config.AppId,
                         this.config.SenderId
                     ) {
