@@ -33,7 +33,7 @@ namespace Shiny.Push
         {
             var result = await pushManager.RequestAccess().ConfigureAwait(false);
             if (result.Status == AccessState.Available)
-                await pushManager.TrySetTags(tags);
+                await pushManager.TrySetTags(tags).ConfigureAwait(false);
 
             return result;
         }
