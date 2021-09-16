@@ -32,5 +32,7 @@
 	<string>1:29585461192:ios:fd58dc671e66c940313afd</string>
 	<key>DATABASE_URL</key>
 	<string>https://handy-cell-143420.firebaseio.com</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false></false>
 </dict>
 </plist>

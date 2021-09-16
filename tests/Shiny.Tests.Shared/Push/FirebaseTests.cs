@@ -20,20 +20,21 @@ namespace Shiny.Tests.Push
     public class FirebaseTests : IDisposable
     {
         const int TIMEOUT_SECS = 20;
+        readonly ITestOutputHelper output;
         readonly IPushTagSupport pushManager;
 
 
         public FirebaseTests(ITestOutputHelper output)
         {
+            this.output = output;
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
                 BuildServices = x => x.UseFirebaseMessaging<TestPushDelegate>(
                     new FirebaseConfiguration(
-                        "",
-                        "",
-                        ""
+                    "1:29585461192:ios:fd58dc671e66c940313afd",
+                    "29585461192",
+                    "AIzaSyBQx5SBjutEx4VQUs5_ZDEzFsXPBPnf9tw"
                     )
-
                 ),
                 BuildLogging = x => x.AddXUnit(output)
             });
@@ -130,8 +131,16 @@ namespace Shiny.Tests.Push
                 Data = new Dictionary<string, string>
                 {
                     { "stamp", stamp }
+                },
+                Apns = new ApnsConfig
+                {
+                    Aps = new Aps
+                    {
+                        ContentAvailable = true
+                    }
                 }
             };
+            
             if (topic.IsEmpty())
             {
                 msg.Token = this.pushManager.CurrentRegistrationToken;
@@ -141,7 +150,8 @@ namespace Shiny.Tests.Push
                 await this.pushManager.AddTag(topic!);
                 msg.Topic = topic;
             }
-            await FirebaseMessaging.DefaultInstance.SendAsync(msg);
+            var response = await FirebaseMessaging.DefaultInstance.SendAsync(msg);
+            this.output.WriteLine("Firebase Response: " + response);
         }
     }
 }
