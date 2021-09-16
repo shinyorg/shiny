@@ -23,9 +23,6 @@
                 <PackageReference Include="Shiny.Sensors" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.SpeechRecognition" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Testing" Version="$(ShinyNugetVersion)" />
-                <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
-                <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
-                <!--<PackageReference Include="Shiny.Logging.Firebase" Version="$(ShinyNugetVersion)" />-->
             </ItemGroup>
         </When>
         <Otherwise>
@@ -95,6 +92,23 @@
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Testing\Shiny.Testing.csproj">
                     <Name>Shiny.Testing</Name>
                 </ProjectReference>
+            </ItemGroup>
+        </Otherwise>
+    </Choose>
+
+    <Choose>
+        <When Condition="'$(UseNuget)' == 'true' and '$(OS)' != 'WINDOWS_NT'">
+            <ItemGroup>
+                <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
+                <!--<PackageReference Include="Shiny.Logging.Firebase" Version="$(ShinyNugetVersion)" />-->
+            </ItemGroup>
+        </When>
+    </Choose>
+
+    <Choose>
+        <When Condition="'$(UseNuget)' == 'false' and '$(OS)' != 'WINDOWS_NT'">
+            <ItemGroup>
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
                     <Name>Shiny.Push.OneSignal</Name>
                 </ProjectReference>
@@ -105,6 +119,7 @@
                     <Name>Shiny.Logging.Firebase</Name>
                 </ProjectReference>-->
             </ItemGroup>
-        </Otherwise>
+        </When>
     </Choose>
+
 </Project>

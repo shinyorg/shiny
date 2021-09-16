@@ -1,4 +1,4 @@
-﻿#if DEVICE_TESTS && !WINDOWS_UWP
+﻿#if DEVICE_TESTS && !WINDOWS_UWP && !HOTRESTART
 using System;
 using System.Collections.Generic;
 using System.Linq;

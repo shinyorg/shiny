@@ -1,4 +1,4 @@
-﻿#if DEVICE_TESTS && !WINDOWS_UWP
+﻿#if DEVICE_TESTS && !WINDOWS_UWP && !HOTRESTART
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
@@ -27,7 +27,14 @@ namespace Shiny.Tests.Push
         {
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
-                BuildServices = x => x.UseFirebaseMessaging<TestPushDelegate>(),
+                BuildServices = x => x.UseFirebaseMessaging<TestPushDelegate>(
+                    new FirebaseConfiguration(
+                        "",
+                        "",
+                        ""
+                    )
+
+                ),
                 BuildLogging = x => x.AddXUnit(output)
             });
 
