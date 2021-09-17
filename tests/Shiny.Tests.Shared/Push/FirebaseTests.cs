@@ -1,4 +1,4 @@
-﻿#if DEVICE_TESTS && !WINDOWS_UWP && !HOTRESTART
+﻿#if DEVICE_TESTS && !WINDOWS_UWP && !OTHER_PUSH
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
@@ -30,11 +30,11 @@ namespace Shiny.Tests.Push
             ShinyHost.Init(TestStartup.CurrentPlatform, new ActionStartup
             {
                 BuildServices = x => x.UseFirebaseMessaging<TestPushDelegate>(
-                    new FirebaseConfiguration(
-                    "1:29585461192:ios:fd58dc671e66c940313afd",
-                    "29585461192",
-                    "AIzaSyBQx5SBjutEx4VQUs5_ZDEzFsXPBPnf9tw"
-                    )
+                    //new FirebaseConfiguration(
+                        //"1:29585461192:ios:fd58dc671e66c940313afd",
+                        //"29585461192",
+                        //"AIzaSyBQx5SBjutEx4VQUs5_ZDEzFsXPBPnf9tw"
+                    //)
                 ),
                 BuildLogging = x => x.AddXUnit(output)
             });
@@ -140,7 +140,7 @@ namespace Shiny.Tests.Push
                     }
                 }
             };
-            
+
             if (topic.IsEmpty())
             {
                 msg.Token = this.pushManager.CurrentRegistrationToken;

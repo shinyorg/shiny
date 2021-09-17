@@ -2,6 +2,7 @@
     <PropertyGroup>
         <ShinyNugetVersion>2.3.0.2855-preview</ShinyNugetVersion>
         <UseNuget>false</UseNuget>
+        <UseOtherIosPush>false</UseOtherIosPush>
     </PropertyGroup>
 
     <Choose>
@@ -97,17 +98,50 @@
     </Choose>
 
     <Choose>
-        <When Condition="'$(UseNuget)' == 'true' and '$(OS)' != 'WINDOWS_NT'">
+        <When Condition="'$(UseNuget)' == 'true' and '$(UseOtherIosPush)' == 'true' and '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS'">
+            <PropertyGroup>
+                <DefineConstants>$(DefineConstants);OTHER_PUSH</DefineConstants>
+            </PropertyGroup>
+
             <ItemGroup>
                 <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
                 <!--<PackageReference Include="Shiny.Logging.Firebase" Version="$(ShinyNugetVersion)" />-->
             </ItemGroup>
         </When>
-    </Choose>
+        <When Condition="'$(UseNuget)' == 'false' and '$(UseOtherIosPush)' == 'true' and '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS'">
+            <PropertyGroup>
+                <DefineConstants>$(DefineConstants);OTHER_PUSH</DefineConstants>
+            </PropertyGroup>
 
-    <Choose>
-        <When Condition="'$(UseNuget)' == 'false' and '$(OS)' != 'WINDOWS_NT'">
+            <ItemGroup>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
+                    <Name>Shiny.Push.OneSignal</Name>
+                </ProjectReference>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
+                    <Name>Shiny.Push.FirebaseMessaging</Name>
+                </ProjectReference>
+                <!--<ProjectReference Include="$(SolutionDir)src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj">
+                    <Name>Shiny.Logging.Firebase</Name>
+                </ProjectReference>-->
+            </ItemGroup>
+        </When>
+        <When Condition="'$(UseNuget)' == 'true' and '$(TargetFrameworkIdentifier)' == 'MonoAndroid'">
+            <PropertyGroup>
+                <DefineConstants>$(DefineConstants);OTHER_PUSH</DefineConstants>
+            </PropertyGroup>
+
+            <ItemGroup>
+                <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
+                <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
+                <!--<PackageReference Include="Shiny.Logging.Firebase" Version="$(ShinyNugetVersion)" />-->
+            </ItemGroup>
+        </When>
+        <When Condition="'$(UseNuget)' == 'false' and '$(TargetFrameworkIdentifier)' == 'MonoAndroid'">
+            <PropertyGroup>
+                <DefineConstants>$(DefineConstants);OTHER_PUSH</DefineConstants>
+            </PropertyGroup>
+
             <ItemGroup>
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
                     <Name>Shiny.Push.OneSignal</Name>
@@ -121,5 +155,4 @@
             </ItemGroup>
         </When>
     </Choose>
-
 </Project>
