@@ -2,7 +2,8 @@
     <PropertyGroup>
         <ShinyNugetVersion>2.3.0.2855-preview</ShinyNugetVersion>
         <UseNuget>false</UseNuget>
-        <UseOtherIosPush>false</UseOtherIosPush>
+        <UseFirebaseIos>true</UseFirebaseIos>
+        <UseOneSignalIos>true</UseOneSignalIos>
     </PropertyGroup>
 
     <Choose>
@@ -97,33 +98,50 @@
         </Otherwise>
     </Choose>
 
+
     <Choose>
-        <When Condition="'$(UseNuget)' == 'true' and (('$(UseOtherIosPush)' == 'true' and '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS') or '$(TargetFrameworkIdentifier)' == 'MonoAndroid')">
+        <When Condition="'$(UseNuget)' == 'true' and (('$(UseFirebaseIos)' == 'true' and '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS') or '$(TargetFrameworkIdentifier)' == 'MonoAndroid')">
             <PropertyGroup>
-                <DefineConstants>$(DefineConstants);OTHER_PUSH</DefineConstants>
+                <DefineConstants>$(DefineConstants);FIREBASE</DefineConstants>
             </PropertyGroup>
 
             <ItemGroup>
-                <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
                 <PackageReference Include="Shiny.Push.FirebaseMessaging" Version="$(ShinyNugetVersion)" />
                 <!--<PackageReference Include="Shiny.Logging.Firebase" Version="$(ShinyNugetVersion)" />-->
             </ItemGroup>
         </When>
-        <When Condition="'$(UseNuget)' == 'false' and (('$(UseOtherIosPush)' == 'true' and '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS') or '$(TargetFrameworkIdentifier)' == 'MonoAndroid')">
+        <When Condition="'$(UseNuget)' == 'false' and (('$(UseFirebaseIos)' == 'true' and '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS') or '$(TargetFrameworkIdentifier)' == 'MonoAndroid')">
             <PropertyGroup>
-                <DefineConstants>$(DefineConstants);OTHER_PUSH</DefineConstants>
+                <DefineConstants>$(DefineConstants);FIREBASE</DefineConstants>
             </PropertyGroup>
 
             <ItemGroup>
-                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
-                    <Name>Shiny.Push.OneSignal</Name>
-                </ProjectReference>
                 <ProjectReference Include="$(SolutionDir)src\Shiny.Push.FirebaseMessaging\Shiny.Push.FirebaseMessaging.csproj">
                     <Name>Shiny.Push.FirebaseMessaging</Name>
                 </ProjectReference>
                 <!--<ProjectReference Include="$(SolutionDir)src\Shiny.Logging.Firebase\Shiny.Logging.Firebase.csproj">
                     <Name>Shiny.Logging.Firebase</Name>
                 </ProjectReference>-->
+            </ItemGroup>
+        </When>
+        <When Condition="'$(UseNuget)' == 'false' and (('$(UseOneSignalIos)' == 'true' and '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS') or '$(TargetFrameworkIdentifier)' == 'MonoAndroid')">
+            <PropertyGroup>
+                <DefineConstants>$(DefineConstants);ONESIGNAL</DefineConstants>
+            </PropertyGroup>
+
+            <ItemGroup>
+                <ProjectReference Include="$(SolutionDir)src\Shiny.Push.OneSignal\Shiny.Push.OneSignal.csproj">
+                    <Name>Shiny.Push.OneSignal</Name>
+                </ProjectReference>
+            </ItemGroup>
+        </When>
+        <When Condition="'$(UseNuget)' == 'true' and (('$(UseOneSignalIos)' == 'true' and '$(TargetFrameworkIdentifier)' == 'Xamarin.iOS') or '$(TargetFrameworkIdentifier)' == 'MonoAndroid')">
+            <PropertyGroup>
+                <DefineConstants>$(DefineConstants);ONESIGNAL</DefineConstants>
+            </PropertyGroup>
+
+            <ItemGroup>
+                <PackageReference Include="Shiny.Push.OneSignal" Version="$(ShinyNugetVersion)" />
             </ItemGroup>
         </When>
     </Choose>
