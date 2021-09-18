@@ -1,4 +1,4 @@
-﻿#if DEVICE_TESTS && !WINDOWS_UWP && !OTHER_PUSH
+﻿#if DEVICE_TESTS && !WINDOWS_UWP && OTHER_PUSH
 using System;
 using System.Collections.Generic;
 using System.Linq;
