@@ -4,6 +4,7 @@ using Shiny.Infrastructure;
 using Shiny.Integrations.Sqlite;
 using Shiny.Stores;
 using Shiny.Testing;
+using Xunit.Abstractions;
 
 
 namespace Shiny.Tests.Core.Stores
@@ -11,6 +12,13 @@ namespace Shiny.Tests.Core.Stores
     public partial class StoreTests : IDisposable
     {
         IKeyValueStore? currentStore;
+        readonly ITestOutputHelper output;
+
+
+        public StoreTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
 
 
         public static IEnumerable<object[]> Data

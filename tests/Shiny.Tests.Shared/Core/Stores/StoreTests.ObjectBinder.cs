@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using FluentAssertions;
+using Shiny.Logging;
 using Shiny.Stores;
 using Xunit;
 
@@ -78,7 +79,7 @@ namespace Shiny.Tests.Core.Stores
         {
             var allStores = Data.Select(x => x.First()).Cast<IKeyValueStore>().ToList();
             var factory = new KeyValueStoreFactory(allStores);
-            var binder = new ObjectStoreBinder(factory);
+            var binder = new ObjectStoreBinder(factory, null);
 
             var obj = new AttributeTestBind();
             var random = Guid.NewGuid().ToString();
@@ -98,7 +99,7 @@ namespace Shiny.Tests.Core.Stores
         {
             this.currentStore = store;
             var factory = new KeyValueStoreFactory(new [] { store });
-            var binder = new ObjectStoreBinder(factory);
+            var binder = new ObjectStoreBinder(factory, null);
 
             var obj = new T();
             binder.Bind(obj, store);

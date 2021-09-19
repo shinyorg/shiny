@@ -44,6 +44,7 @@ namespace Shiny.Stores
         public ObjectStoreBinder(IKeyValueStoreFactory factory, ILogger<ObjectStoreBinder> logger)
         {
             this.factory = factory;
+            this.logger = logger;
             this.bindings = new Dictionary<object, IKeyValueStore>();
         }
 
@@ -84,7 +85,7 @@ namespace Shiny.Stores
                     }
                     catch (Exception ex)
                     {
-                        this.logger.LogError($"Failed to bind {prop.Name} on {type.FullName}", ex);
+                        this.logger?.LogError($"Failed to bind {prop.Name} on {type.FullName}", ex);
                     }
                 }
             }
