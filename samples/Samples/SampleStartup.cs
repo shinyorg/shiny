@@ -29,7 +29,7 @@ namespace Samples
         {
             builder.AddSqliteLogging(LogLevel.Warning);
             //builder.AddFirebase(LogLevel.Warning);
-            builder.AddAppCenter(Secrets.Values.AppCenterKey, LogLevel.Warning);
+            //builder.AddAppCenter(Secrets.Values.AppCenterKey, LogLevel.Warning);
         }
 
 
@@ -88,12 +88,16 @@ namespace Samples
             });
 
             //services.UsePush<PushDelegate>();
-            //services.UseFirebaseMessaging<PushDelegate>();
-            //services.UseOneSignalPush<PushDelegate>("oneSignalAppId");
+#if ONESIGNAL
+            services.UseOneSignalPush<PushDelegate>(Secrets.Values.OneSignalAppId);
+#elif FIREBASE
+            services.UseFirebaseMessaging<PushDelegate>();
+#else
             services.UsePushAzureNotificationHubs<PushDelegate>(
                 Secrets.Values.AzureNotificationHubListenerConnectionString,
                 Secrets.Values.AzureNotificationHubName
             );
+#endif
         }
 
 

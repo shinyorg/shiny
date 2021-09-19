@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Stores
 {
@@ -35,11 +36,12 @@ namespace Shiny.Stores
 
     public class ObjectStoreBinder : IObjectStoreBinder
     {
+        readonly ILogger logger;
         readonly IDictionary<object, IKeyValueStore> bindings;
         readonly IKeyValueStoreFactory factory;
 
 
-        public ObjectStoreBinder(IKeyValueStoreFactory factory)
+        public ObjectStoreBinder(IKeyValueStoreFactory factory, ILogger<ObjectStoreBinder> logger)
         {
             this.factory = factory;
             this.bindings = new Dictionary<object, IKeyValueStore>();
@@ -76,7 +78,14 @@ namespace Shiny.Stores
                 if (store.Contains(key))
                 {
                     var value = store.Get(prop.PropertyType, key);
-                    prop.SetValue(npc, value);
+                    try
+                    {
+                        prop.SetValue(npc, value);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError($"Failed to bind {prop.Name} on {type.FullName}", ex);
+                    }
                 }
             }
             npc.PropertyChanged += this.OnPropertyChanged;
