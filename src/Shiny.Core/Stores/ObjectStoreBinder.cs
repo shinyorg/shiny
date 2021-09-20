@@ -70,27 +70,35 @@ namespace Shiny.Stores
 
         public void Bind(INotifyPropertyChanged npc, IKeyValueStore store)
         {
-            var type = npc.GetType();
-            var props = this.GetTypeProperties(type);
-
-            foreach (var prop in props)
+            try
             {
-                var key = GetBindingKey(type, prop);
-                if (store.Contains(key))
+                var type = npc.GetType();
+                var props = this.GetTypeProperties(type);
+
+                foreach (var prop in props)
                 {
-                    var value = store.Get(prop.PropertyType, key);
-                    try
+                    var key = GetBindingKey(type, prop);
+                    if (store.Contains(key))
                     {
-                        prop.SetValue(npc, value);
-                    }
-                    catch (Exception ex)
-                    {
-                        this.logger?.LogError($"Failed to bind {prop.Name} on {type.FullName}", ex);
+                        var value = store.Get(prop.PropertyType, key);
+                        try
+                        {
+                            prop.SetValue(npc, value);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.logger?.LogError($"Failed to bind {prop.Name} on {type.FullName}", ex);
+                        }
                     }
                 }
+                npc.PropertyChanged += this.OnPropertyChanged;
+                this.logger.LogInformation($"Successfully bound model: {npc.GetType().FullName} to store: {store.Alias}");
+                this.bindings.Add(npc, store);
             }
-            npc.PropertyChanged += this.OnPropertyChanged;
-            this.bindings.Add(npc, store);
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, $"Failed to bind model: {npc?.GetType().FullName ?? "Unknown"} to store: {store.Alias}");
+            }
         }
 
 

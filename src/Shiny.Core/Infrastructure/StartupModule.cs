@@ -68,17 +68,8 @@ namespace Shiny.Infrastructure
 
             foreach (var service in services)
             {
-                INotifyPropertyChanged? instance = null;
-                try
-                {
-                    instance = (INotifyPropertyChanged)this.Get(service);
-                    this.binder.Bind(instance);
-                    this.logger.LogInformation($"Successfully bound model - {instance.GetType().FullName}");
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError(ex, $"Failed to bind stateful model - {instance?.GetType().FullName ?? "Unknown"}");
-                }
+                var instance = (INotifyPropertyChanged)this.Get(service);
+                this.binder.Bind(instance);
             }
         }
 
