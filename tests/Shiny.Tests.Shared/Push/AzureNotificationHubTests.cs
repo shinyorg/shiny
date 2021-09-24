@@ -61,7 +61,7 @@ namespace Shiny.Tests.Push
             await this.pushManager.UnRegister();
             this.pushManager.CurrentRegistrationToken.Should().BeNull("Reg Token is still set");
             this.pushManager.CurrentRegistrationTokenDate.Should().BeNull("Reg Token Date is still set");
-            await Task.Delay(1000); // breath azure
+            await Task.Delay(1000); // breath azure - gives things enough time to ensure azure has cleaned up
 
             try
             {

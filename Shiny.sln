@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\build.yml = .github\workflows\build.yml
 		LICENSE.md = LICENSE.md
 		LocalOrNuget.targets = LocalOrNuget.targets
+		docs\Input\release-notes\nextrelease.md = docs\Input\release-notes\nextrelease.md
 		Packages.props = Packages.props
 		readme.md = readme.md
 	EndProjectSection

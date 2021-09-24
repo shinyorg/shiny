@@ -1,5 +1,5 @@
 Title: v2.3.0 (Preview)
-Order: 230
+Order: 1000000
 ---
 
 ### Core
@@ -28,3 +28,6 @@ Order: 230
 * [BREAKING] Channels are no longer registered within Push.  Use INotificationManager to do this.  If you need more customization over notification, send data messages and use INotificationManager
 * [Fix][Android] OnEntry now functions under all modules
 * [Fix][iOS][Native] IPushDelegate.OnTokenChanged is no longer called by RequestAccess and the proper token is returned
+
+### Push - Azure Notification Hubs
+* [Fix] ANH can often fail with "Microsoft.Azure.NotificationHubs.Messaging.MessagingEntityNotFoundException: Installation not found.TrackingId:XXXX" for rapid calls (ie. RequestAccess immediately followed by SetTags)

@@ -80,7 +80,14 @@ namespace Shiny.Push.AzureNotificationHubs
             if (access.Status == AccessState.Available)
             {
                 this.InstallationId ??= Guid.NewGuid().ToString().Replace("-", "");
-                await this.Update(access.RegistrationToken!).ConfigureAwait(false);
+                await this
+                    .Update(access.RegistrationToken!)
+                    .ConfigureAwait(false);
+
+                // this is to ensure that azure has enough time to propogate the installation ID
+                await Task
+                    .Delay(this.config.AzureAuthenticationWaitTimeMs)
+                    .ConfigureAwait(false);
 
                 access = new PushAccessState(AccessState.Available, this.InstallationId);
             }

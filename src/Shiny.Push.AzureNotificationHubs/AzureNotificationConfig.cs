@@ -14,5 +14,10 @@ namespace Shiny.Push.AzureNotificationHubs
 
         public string ListenerConnectionString { get; }
         public string HubName { get; }
+
+        /// <summary>
+        /// If you are receiving InstallationId not found - setting this timer higher can sometimes help.  Azure often takes a second a to propagate after token creation
+        /// </summary>
+        public int AzureAuthenticationWaitTimeMs { get; set; } = 1000;
     }
 }
