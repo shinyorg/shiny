@@ -51,7 +51,7 @@ namespace Shiny
 
 
         public override IBinder? OnBind(Intent? intent) => null;
-        public static string NotificationChannelId { get; set; } = "Background";
+        public static string NotificationChannelId { get; set; } = "Service";
 
 
         protected virtual void Start(Intent? intent)
@@ -114,28 +114,30 @@ namespace Shiny
 
         protected virtual void EnsureChannel()
         {
-            var nm = this.AndroidNotifications.NativeManager;
+            var nm = this.AndroidNotifications!.NativeManager;
             if (nm.GetNotificationChannel(NotificationChannelId) != null)
                 return;
 
-            nm.CreateNotificationChannel(new NotificationChannel(
+            var channel = new NotificationChannel(
                 NotificationChannelId,
-                "Background",
+                NotificationChannelId,
                 NotificationImportance.Default
-            ));
+            );
+            channel.SetShowBadge(false);
+            nm.CreateNotificationChannel(channel);
         }
 
 
         protected virtual void SendNotification()
         {
             this.builder ??= new NotificationCompat.Builder(this.Context.AppContext)
-                            .SetChannelId(NotificationChannelId)
-                            .SetSmallIcon(this.AndroidNotifications.GetSmallIconResource(null))
-                            .SetOngoing(true);
+                .SetChannelId(NotificationChannelId)
+                .SetSmallIcon(this.AndroidNotifications!.GetSmallIconResource(null))
+                .SetOngoing(true);
 
             this.builder
                 .SetProgress(
-                    this.Service.Total,
+                    this.Service!.Total,
                     this.Service.Progress,
                     this.Service.IsIndeterministic
                 )
@@ -150,7 +152,7 @@ namespace Shiny
             }
             else
             {
-                this.AndroidNotifications.NativeManager.Notify(this.notificationId.Value, this.builder.Build());
+                this.AndroidNotifications!.NativeManager.Notify(this.notificationId.Value, this.builder.Build());
             }
         }
     }

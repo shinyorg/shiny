@@ -23,6 +23,9 @@ Order: 1000000
 * [Enhancement] Foregrounding is now always available if you set your job as "RunInForeground", there is no need to call UseForegroundJobs
 * [Fix][iOS] BGTasks - Correct filters applied to all modes
 
+### Notifications
+* [Enhancement] Foreground service notifications will use channel that does not show application badge notification [GH-734](https://github.com/shinyorg/shiny/issues/734)
+
 ### Push
 * [BREAKING] IPushDelegate.OnTokenChanged is now called IPushDelegate.OnTokenRefreshed
 * [BREAKING] Channels are no longer registered within Push.  Use INotificationManager to do this.  If you need more customization over notification, send data messages and use INotificationManager
