@@ -4,4 +4,4 @@ SiteTitle: Documentation
 SubTitle: Documentation
 LinksUseHttps: true
 TwitterHandle: shinydotnet
-EditLink: => "https://github.com/shinyorg/shiny/edit/master/docs/input/" + doc.Source.GetRelativeInputPath()
+EditLink: => "https://github.com/shinyorg/shiny/edit/master/docs/Input/" + doc.Source.GetRelativeInputPath()

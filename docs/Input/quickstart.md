@@ -7,20 +7,35 @@ Order: 1
 ### WARNING: This method does require a later build of MSBuild - 16.8+ which is not yet available in most CI systems.  You can
 use a utility like boots to install the latest beta of Mono, Xamarin Android, & Xamarin iOS on macOS to build your app.
 
-1. The first thing is to install <?! NugetShield "Shiny" /?> to your application head project (ie. MyProject.iOS and MyProject.Android).  This library contains the Shiny.Core and source generators designed to plugin
+1. The first thing is to install <?! NugetShield "Shiny" /?> to your application head project (i.e. MyProject.iOS and MyProject.Android).  This library contains the Shiny.Core and source generators designed to plugin
 all of the boilerplate code you'll need.
 
-2. Add the following anywhere in each head project
+2. Add the following in some .cs file in each head project:
 
-```csharp
-// NOTE THE USE OF THE FULL TYPE NAME INCLUDING NAMESPACE
-[assembly: Shiny.ShinyApplication(
-    ShinyStartupTypeName = "YourNamespace.YourApp",
-    XamarinFormsAppTypeName = "YourNamespace.YourXamarinFormsApp"
-)]
-```  
+    ```csharp
+    // NOTE THE USE OF THE FULL TYPE NAME INCLUDING NAMESPACE
+    [assembly: Shiny.ShinyApplication(
+        ShinyStartupTypeName = "MyProject.ShinyStartupClass",
+        XamarinFormsAppTypeName = "MyProject.XamarinFormsAppClass"
+    )]
+    ```
 
-3. In your shared code project.  Create a Shiny startup file:
+    where
+    * *MyProject* is your project's root namespace
+    * *ShinyStartupClass* is the name of your Shiny startup class (see next step)
+    * *XamarinFormsAppClass* is the name of your shared project App class (usually `App`)
+
+    For example, if you create a new Visual Studio project named *MyApp*, and in step 3 below you name your Shiny
+    startup class `YourShinyStartup`, you would add the following to each head project:
+
+    ```csharp
+    [assembly: Shiny.ShinyApplication(
+        ShinyStartupTypeName = "MyApp.YourShinyStartup",
+        XamarinFormsAppTypeName = "MyApp.App"
+    )]
+    ```
+
+3. In your shared code project, install <?! NugetShield "Shiny" /?>.  Create a Shiny startup class as follows:
 
 <?! Startup ?>
 // this is where you'll load things like BLE, GPS, etc - those are covered in other sections
@@ -32,9 +47,13 @@ all of the boilerplate code you'll need.
 a build warning to manually hook the method.
 
 5. For Android, Shiny will automatically create the necessary Android application class.  For your main activity (or multiple activities),
-ensure each one is marked as partial.  Shiny will again, auto hook the necessary methods.
+ensure each one is marked as **partial**.  Shiny will again, auto hook the necessary methods. 
 
-6. Install any of the service modules Shiny has to offer and register them with your startup.  Be sure to follow any special
+6. For Android, add a reference to the `Mono.Android.Export` assembly to your Android project. 
+   See [this StackOverflow post](https://stackoverflow.com/questions/31085554/you-need-to-add-a-reference-to-mono-android-export-dll-when-you-use-exportattrib)
+   for the procedure.
+
+7. Install any of the service modules Shiny has to offer and register them with your startup.  Be sure to follow any special
 OS setup instructions in each module.
 
 ---
