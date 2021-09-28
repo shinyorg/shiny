@@ -34,3 +34,4 @@ Order: 1000000
 
 ### Push - Azure Notification Hubs
 * [Fix] ANH can often fail with "Microsoft.Azure.NotificationHubs.Messaging.MessagingEntityNotFoundException: Installation not found.TrackingId:XXXX" for rapid calls (ie. RequestAccess immediately followed by SetTags)
+* [Enhancement] You can now configure a timespan for when azure installations should expire if not used. 

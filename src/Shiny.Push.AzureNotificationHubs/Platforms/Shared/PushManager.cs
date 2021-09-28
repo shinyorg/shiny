@@ -168,19 +168,27 @@ namespace Shiny.Push.AzureNotificationHubs
         }
 
 
-        protected Installation CreateInstall(string nativeRegToken) => new Installation
+        protected Installation CreateInstall(string nativeRegToken)
         {
-            InstallationId = this.InstallationId,
-            PushChannel = nativeRegToken,
-            Tags = this.RegisteredTags?.ToList(),
+            DateTime? date = null;
+            if (this.config.ExpirationTime != null)
+                date = DateTime.Now.Add(this.config.ExpirationTime.Value);
+
+            return new Installation
+            {
+                InstallationId = this.InstallationId,
+                PushChannel = nativeRegToken,
+                ExpirationTime = date,
+                Tags = this.RegisteredTags?.ToList(),
 #if __IOS__
-            Platform = NotificationPlatform.Apns
+                Platform = NotificationPlatform.Apns
 #elif __ANDROID__
-            Platform = NotificationPlatform.Fcm
+                Platform = NotificationPlatform.Fcm
 #elif WINDOWS_UWP
-            Platform = NotificationPlatform.Wns
+                Platform = NotificationPlatform.Wns
 #endif
-        };
+            };
+        }
 
 
         protected NotificationHubClient CreateClient() => new NotificationHubClient(
