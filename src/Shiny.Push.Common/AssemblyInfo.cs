@@ -1,0 +1,1 @@
+﻿[assembly: Shiny.Attributes.StaticGeneration("Shiny.Push.IPushManager", "ShinyPush")]

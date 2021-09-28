@@ -1,4 +1,1 @@
-﻿using Shiny.Attributes;
-
-[assembly: AutoStartupWithDelegate("Shiny.Push.IPushDelegate", "UsePush", true)]
-[assembly: StaticGeneration("Shiny.Push.IPushManager", "ShinyPush")]
+﻿[assembly: Shiny.Attributes.AutoStartupWithDelegate("Shiny.Push.IPushDelegate", "UsePush", true)]
