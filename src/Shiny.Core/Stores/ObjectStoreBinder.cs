@@ -73,7 +73,14 @@ namespace Shiny.Stores
             try
             {
                 var type = npc.GetType();
-                var props = this.GetTypeProperties(type);
+                var props = this.GetTypeProperties(type).ToList();
+
+                // Skip if there are no properties to bind
+                if (props.Count == 0)
+                {
+                    this.logger.LogInformation($"Skip model bind (no public props): {npc.GetType().FullName} to store: {store.Alias}");
+                    return;
+                }
 
                 foreach (var prop in props)
                 {
