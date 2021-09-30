@@ -113,13 +113,15 @@ namespace Shiny.Stores
         public static string GetBindingKey(Type type, string propertyName)
             => $"{type.Namespace}.{type.Name}.{propertyName}";
 
-
+        /// <summary>
+        /// Get all type properties with public get and set accessors
+        /// </summary>
         protected virtual IEnumerable<PropertyInfo> GetTypeProperties(Type type) => type
             .GetTypeInfo()
             .DeclaredProperties
             .Where(x =>
-                x.CanRead &&
-                x.CanWrite
+                (x.GetGetMethod() != null) &&
+                (x.GetSetMethod() != null)
             );
 
 
