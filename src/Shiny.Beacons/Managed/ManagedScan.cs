@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-
+using System.Threading.Tasks;
 
 namespace Shiny.Beacons.Managed
 {
@@ -50,10 +50,12 @@ namespace Shiny.Beacons.Managed
             }
         }
 
-        public void Start(BeaconRegion scanRegion, IScheduler? scheduler = null)
+        public async Task Start(BeaconRegion scanRegion, IScheduler? scheduler = null)
         {
             if (this.IsScanning)
                 throw new ArgumentException("A beacon scan is already running");
+
+            (await this.beaconManager.RequestAccess()).Assert();
 
             this.scheduler = scheduler;
             this.ScanningRegion = scanRegion;
@@ -74,7 +76,7 @@ namespace Shiny.Beacons.Managed
                         var managed = this.Beacons.FirstOrDefault(x => x.Beacon.Equals(beacon));
                         if (managed == null)
                         {
-                            managed = new ManagedBeacon(beacon);
+                            managed = new ManagedBeacon(beacon, scanRegion.Identifier);
                             this.Beacons.Add(managed);
                         }
                         managed.Proximity = beacon.Proximity;
