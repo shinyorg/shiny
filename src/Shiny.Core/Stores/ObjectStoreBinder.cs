@@ -73,7 +73,14 @@ namespace Shiny.Stores
             try
             {
                 var type = npc.GetType();
-                var props = this.GetTypeProperties(type);
+                var props = this.GetTypeProperties(type).ToList();
+
+                // Skip if there are no properties to bind
+                if (props.Count == 0)
+                {
+                    this.logger?.LogInformation($"Skip model bind (no public props): {npc.GetType().FullName} to store: {store.Alias}");
+                    return;
+                }
 
                 foreach (var prop in props)
                 {
@@ -92,12 +99,12 @@ namespace Shiny.Stores
                     }
                 }
                 npc.PropertyChanged += this.OnPropertyChanged;
-                this.logger.LogInformation($"Successfully bound model: {npc.GetType().FullName} to store: {store.Alias}");
+                this.logger?.LogInformation($"Successfully bound model: {npc.GetType().FullName} to store: {store.Alias}");
                 this.bindings.Add(npc, store);
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, $"Failed to bind model: {npc?.GetType().FullName ?? "Unknown"} to store: {store.Alias}");
+                this.logger?.LogError(ex, $"Failed to bind model: {npc?.GetType().FullName ?? "Unknown"} to store: {store.Alias}");
             }
         }
 
@@ -113,13 +120,15 @@ namespace Shiny.Stores
         public static string GetBindingKey(Type type, string propertyName)
             => $"{type.Namespace}.{type.Name}.{propertyName}";
 
-
+        /// <summary>
+        /// Get all type properties with public get and set accessors
+        /// </summary>
         protected virtual IEnumerable<PropertyInfo> GetTypeProperties(Type type) => type
             .GetTypeInfo()
             .DeclaredProperties
             .Where(x =>
-                x.CanRead &&
-                x.CanWrite
+                (x.GetGetMethod() != null) &&
+                (x.GetSetMethod() != null)
             );
 
 

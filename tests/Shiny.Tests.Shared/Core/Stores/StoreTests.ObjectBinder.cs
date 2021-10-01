@@ -74,6 +74,32 @@ namespace Shiny.Tests.Core.Stores
 
 
         [Trait("Category", "ObjectBinder")]
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void Binding_ProtectedSetter(IKeyValueStore store)
+        {
+            var values = SetupBinder<TestBind>(store);
+            var key = ObjectStoreBinder.GetBindingKey(typeof(TestBind), nameof(TestBind.ProtectedSetterProperty));
+
+            values.BoundObject.SetProtectedProperty(Guid.NewGuid().ToString());
+            store.Contains(key).Should().BeFalse();
+        }
+
+
+        [Trait("Category", "ObjectBinder")]
+        [Theory]
+        [MemberData(nameof(Data))]
+        public void Binding_ProtectedGetter(IKeyValueStore store)
+        {
+            var values = SetupBinder<TestBind>(store);
+            var key = ObjectStoreBinder.GetBindingKey(typeof(TestBind), nameof(TestBind.ProtectedGetterProperty));
+
+            values.BoundObject.ProtectedGetterProperty = Guid.NewGuid().ToString();
+            store.Contains(key).Should().BeFalse();
+        }
+
+
+        [Trait("Category", "ObjectBinder")]
         [Fact]
         public void AttributeBinding()
         {
