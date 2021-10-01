@@ -31,7 +31,6 @@ namespace Shiny.BluetoothLE
         {
             this.connSubject = new Subject<ConnectionState>();
             this.Context = new PeripheralContext(centralContext, native);
-            this.WhenStatusChanged().Subscribe(x => this.status = x);
         }
 
 
