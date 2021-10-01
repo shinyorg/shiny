@@ -29,11 +29,20 @@ namespace Shiny.BluetoothLE.Internals
         public BluetoothGatt? Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
         public GattCallbacks Callbacks { get; }
-        public ConnectionState Status => this
-            .ManagerContext
-            .Manager
-            .GetConnectionState(this.NativeDevice, ProfileType.Gatt)
-            .ToStatus();
+        public ConnectionState Status
+        {
+            get
+            {
+                if (this.Gatt == null)
+                    return ConnectionState.Disconnected;
+
+                return this
+                    .ManagerContext
+                    .Manager
+                    .GetConnectionState(this.NativeDevice, ProfileType.Gatt)
+                    .ToStatus();
+            }
+        }
 
 
         public IObservable<BleException> ConnectionFailed => this.connErrorSubject;
