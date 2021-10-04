@@ -84,7 +84,7 @@
         <PackageReference Update="Xamarin.Essentials" Version="1.7.0" />
         <PackageReference Update="Xamarin.CommunityToolkit" Version="1.3.0-pre2" />
         <PackageReference Update="Mobile.BuildTools" Version="2.0.245" />
-        <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.12" />
+        <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.13" />
         <PackageReference Update="Humanizer" Version="2.8.25" />
         <PackageReference Update="Prism.DryIoc.Forms" Version="8.1.97" />
         <PackageReference Update="ReactiveUI.Fody" Version="16.2.1" />
