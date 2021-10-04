@@ -76,7 +76,7 @@
     <!--Samples-->
     <ItemGroup>
         <PackageReference Update="Xamarin.AndroidX.RecyclerView" Version="1.2.1.1" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1.1" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1.3" />
     </ItemGroup>
 
     <ItemGroup>
