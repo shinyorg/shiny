@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 
 
-namespace Shiny.Push.Common
+namespace Shiny.Push
 {
     /// <summary>
     /// If you only care about foreground push notifications or you use an appservice library like
