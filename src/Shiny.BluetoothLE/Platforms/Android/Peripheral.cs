@@ -31,15 +31,11 @@ namespace Shiny.BluetoothLE
         {
             this.connSubject = new Subject<ConnectionState>();
             this.Context = new PeripheralContext(centralContext, native);
-            this.WhenStatusChanged().Subscribe(x => this.status = x);
         }
 
 
         public BluetoothDevice Native => this.Context.NativeDevice;
-
-
-        ConnectionState? status;
-        public override ConnectionState Status => this.status ?? this.Context.Status;
+        public override ConnectionState Status => this.Context.Status;
 
 
         public override void Connect(ConnectionConfig? config)
@@ -84,7 +80,7 @@ namespace Shiny.BluetoothLE
         public override IObservable<ConnectionState> WhenStatusChanged() => Observable.Create<ConnectionState>(ob =>
         {
             var comp = new CompositeDisposable();
-            ob.OnNext(this.status ?? this.Context.Status);
+            ob.OnNext(this.Context.Status);
 
             this.Context
                 .Callbacks
@@ -109,7 +105,7 @@ namespace Shiny.BluetoothLE
                 var sub = this.Context
                     .Callbacks
                     .ServicesDiscovered
-                    .Select(x => x.Gatt?.Services)
+                    .Select(x => x.Gatt!.Services)
                     .Where(x => x != null)
                     .Select(x => x
                         .Select(native => new GattService(this, this.Context, native))
@@ -214,7 +210,7 @@ namespace Shiny.BluetoothLE
         {
             this.AssertConnection();
             var sub = this.WhenMtuChanged().Skip(1).Take(1).Subscribe(ob.Respond);
-            this.Context.Gatt.RequestMtu(size);
+            this.Context.Gatt!.RequestMtu(size);
             return sub;
         }));
 

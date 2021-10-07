@@ -12,6 +12,10 @@ Order: 1000000
 * [Fix] ManagedScan.Start is now async to expose permission issues before starting the scan [GH-698](https://github.com/shinyorg/shiny/issues/698)
 * [Fix] ManagedScan.Toggle has been moved to an extension method.,
 
+### Beacons
+* [Enhancement] Managed beacon ranging scan now has Start as async so permissions can be checked
+* [Fix] ManagedBeacon result now includes the region identifier
+
 ### Locations
 * [Enhancement] GpsManager.GetCurrentPosition will start/stop the GPS tracking only if it wasn't started before
 * [Enhancement] IGpsManager.StartAndReceive starts GPS when subscribe and turns it off when unsubscribed OR the app goes to the background
@@ -34,3 +38,4 @@ Order: 1000000
 
 ### Push - Azure Notification Hubs
 * [Fix] ANH can often fail with "Microsoft.Azure.NotificationHubs.Messaging.MessagingEntityNotFoundException: Installation not found.TrackingId:XXXX" for rapid calls (ie. RequestAccess immediately followed by SetTags)
+* [Enhancement] You can now configure a timespan for when azure installations should expire if not used. 

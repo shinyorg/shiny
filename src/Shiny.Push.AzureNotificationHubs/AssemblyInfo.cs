@@ -1,3 +1,1 @@
-﻿using Shiny.Attributes;
-
-[assembly: NoAutoStartup("You must use services.UsePushAzureNotificationHubs<YourPushDelegate>(listenerConnectionString, hubName)")]
+﻿[assembly: Shiny.Attributes.NoAutoStartup("You must use services.UsePushAzureNotificationHubs<YourPushDelegate>(listenerConnectionString, hubName)")]

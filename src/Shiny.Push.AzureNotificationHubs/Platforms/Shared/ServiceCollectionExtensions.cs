@@ -10,20 +10,26 @@ namespace Shiny
     {
         public static bool UsePushAzureNotificationHubs(this IServiceCollection services,
                                                         Type delegateType,
-                                                        string listenerConnectionString,
-                                                        string hubName)
+                                                        AzureNotificationConfig config)
         {
 #if NETSTANDARD
             return false;
 #else
-            services.AddSingleton(new AzureNotificationConfig(listenerConnectionString, hubName));
+            services.AddSingleton(config);
             services.RegisterModule(new PushModule(
-                typeof(Shiny.Push.AzureNotificationHubs.PushManager),
+                typeof(PushManager),
                 delegateType
             ));
             return true;
 #endif
         }
+
+
+        public static bool UsePushAzureNotificationHubs(this IServiceCollection services,
+                                                        Type delegateType,
+                                                        string listenerConnectionString,
+                                                        string hubName)
+            => services.UsePushAzureNotificationHubs(delegateType, new AzureNotificationConfig(listenerConnectionString, hubName));
 
 
         public static bool UsePushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services,
@@ -35,5 +41,9 @@ namespace Shiny
                 listenerConnectionString,
                 hubName
             );
+
+
+        public static bool UsePushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services, AzureNotificationConfig config)
+            => services.UsePushAzureNotificationHubs(typeof(TPushDelegate), config);
     }
 }

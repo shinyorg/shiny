@@ -29,5 +29,26 @@ namespace Shiny.Tests.Core.Stores
             get => this.intValue;
             set => this.Set(ref this.intValue, value);
         }
+
+
+        string? protectedGetterProperty;
+        public string? ProtectedGetterProperty
+        {
+            protected get => this.protectedGetterProperty;
+            set => this.Set(ref this.protectedGetterProperty, value);
+        }
+
+        
+        string? protectedSetterProperty;
+        public string? ProtectedSetterProperty
+        {
+            get => this.protectedSetterProperty;
+            protected set => this.Set(ref this.protectedSetterProperty, value);
+        }
+
+        public void SetProtectedProperty(string? value)
+        {
+            this.ProtectedSetterProperty = value;
+        }
     }
 }

@@ -5,8 +5,15 @@ namespace Shiny.Beacons.Managed
 {
     public class ManagedBeacon : NotifyPropertyChanged
     {
-        public ManagedBeacon(Beacon beacon) => this.Beacon = beacon;
+        public ManagedBeacon(Beacon beacon, string regionIdentifier)
+        {
+            this.Beacon = beacon;
+            this.RegionIdentifier = regionIdentifier;
+        }
+
+
         public Beacon Beacon { get; }
+        public string RegionIdentifier { get; }
 
 
         Proximity prox;
