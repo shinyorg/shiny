@@ -17,7 +17,6 @@ on:
     - "src/**"
 
 env:
-  DocsDeployGitHubToken: ${{ secrets.DOCS_GITHUB_TOKEN }}
   NugetApiKey: ${{secrets.NUGETAPIKEY}}
   TwitterConsumerKey: ${{secrets.TWITTER_CONSUMER_KEY}}
   TwitterConsumerSecret: ${{secrets.TWITTER_CONSUMER_SECRET}}
@@ -55,23 +54,3 @@ jobs:
         name: nugets
         path: ${{ github.workspace }}/artifacts
         retention-days: 5
-
-  #iossample:
-  #  runs-on: macos-latest
-
-  #  steps:
-  #  - uses: actions/checkout@v2
-
-  #  # pass cert/pass and provisioning profile
-  #  - name: Build
-  #    run: dotnet run --project build/ShinyBuild.csproj --target=iOSSample
-
-  #androidsample:
-  #  runs-on: macos-latest
-
-  #  steps:
-  #  - uses: actions/checkout@v2
-
-  #  # pass signing key, alias and pass
-  #  - name: Build
-  #    run: dotnet run --project build/ShinyBuild.csproj --target=AndroidSample

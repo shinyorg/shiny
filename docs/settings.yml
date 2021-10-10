@@ -1,7 +1,0 @@
-Host: shinyorg.github.io
-Title: Shiny.NET
-SiteTitle: Documentation
-SubTitle: Documentation
-LinksUseHttps: true
-TwitterHandle: shinydotnet
-EditLink: => "https://github.com/shinyorg/shiny/edit/master/docs/Input/" + doc.Source.GetRelativeInputPath()

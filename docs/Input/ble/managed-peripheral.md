@@ -1,3 +1,0 @@
-Title: Managed Peripheral
----
-# TODO

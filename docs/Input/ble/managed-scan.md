@@ -1,3 +1,0 @@
-Title: Managed Scans
----
-# TODO

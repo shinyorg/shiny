@@ -1,4 +1,0 @@
-Title: Connectivity
----
-
-# Connectivity

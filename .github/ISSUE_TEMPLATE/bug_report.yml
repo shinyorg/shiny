@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thank you for filing an issue.  Please only file issues against the latest stable version of Shiny from Nuget.  If you are a sponsor, you can discuss issues with preview releases in the SponsorConnect Discord channel
+        Thank you for filing an issue.  Please only file issues against the LATEST STABLE version of Shiny from Nuget.  If you are a sponsor, you can discuss issues with preview releases in the SponsorConnect Discord channel
         If you have questions, please post them in GitHub discussions
   - type: dropdown
     id: component
