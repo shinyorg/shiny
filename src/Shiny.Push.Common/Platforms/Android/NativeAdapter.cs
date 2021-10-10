@@ -53,12 +53,13 @@ namespace Shiny.Push
                     {
                         var pr = AndroidPushNotificationManager.FromNative(msg);
                         await this.onReceived.Invoke(pr).ConfigureAwait(false);
-                        if (pr.Notification != null)
-                        {
-                            // TODO: channel
+                        // stop sending this for now
+                        //if (pr.Notification != null)
+                        //{
+                        //    // TODO: channel
                             var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
-                            this.notifications.SendNative(0, nn);
-                        }
+                        //    this.notifications.SendNative(0, nn);
+                        //}
                     };
                 }
             }

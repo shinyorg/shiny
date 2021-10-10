@@ -76,6 +76,9 @@ namespace Shiny.Notifications
 
         public virtual void ApplyChannel(NotificationCompat.Builder builder, Notification notification, Channel channel)
         {
+            if (channel != null)
+                return;
+
             builder.SetChannelId(channel.Identifier);
             if (channel.Actions != null)
             {
@@ -149,9 +152,7 @@ namespace Shiny.Notifications
         }
 
 
-        // TODO: Broadcast Receiver Generic Type, entry intent action, and intent key all need to be changed for push
-            // TODO: how does user customize
-        // TODO: override for push - set new broadcast receiver
+
         static int counter = 100;
         protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
         {
@@ -170,7 +171,6 @@ namespace Shiny.Notifications
         }
 
 
-        // TODO: override for push - set intent notification key for broadcast receiver & onnewintent
         protected virtual void PopulateIntent(Intent intent, Notification notification)
         {
             var content = this.Services.Serializer.Serialize(notification);
