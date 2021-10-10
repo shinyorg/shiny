@@ -214,11 +214,25 @@ namespace Shiny.Generators
         }
 
 
-        void RegisterJobs() => this.RegisterTypes(
-            "Shiny.Jobs.IJob",
-            false,
-            x => this.builder.AppendLineInvariant($"services.RegisterJob(typeof({x.ToDisplayString()}));")
-        );
+        void RegisterJobs()
+        {
+            var asses = this.Context.GetAllAssemblies().ToList();
+            var jobAssembly = asses.FirstOrDefault(x => x.Name.StartsWith("Shiny.Jobs"));
+
+            if (jobAssembly != null)
+            {
+                var symbol = jobAssembly.GetTypeByMetadataName("Shiny.Jobs.IJob");
+                if (symbol == null)
+                    throw new ArgumentException("Shiny.Jobs.IJob not found in Shiny.Jobs assembly - something is very wrong");
+
+                var types = this
+                    .allSymbols
+                    .Where(x => x.Implements(symbol));
+
+                foreach (var type in types)
+                    this.builder.AppendLineInvariant($"services.RegisterJob(typeof({type.ToDisplayString()}));");
+            }
+        }
 
 
         void RegisterStartupTasks() => this.RegisterTypes(

@@ -48,6 +48,7 @@ namespace Shiny.Tests.Generators
         [Fact]
         public void JobDetection()
         {
+            this.Generator.AddReference("Shiny.Jobs");
             this.Generator.AddSource(@"
 [assembly: Shiny.ShinyApplicationAttribute]
 using System;
@@ -68,6 +69,8 @@ namespace MyTest
                 .GetTypeByMetadataName("MyTest.DetectionJob")
                 .Should()
                 .NotBeNull();
+
+            this.Compilation.AssertContent("services.RegisterJob(typeof(MyTest.DetectionJob))");
         }
 
 
@@ -116,12 +119,13 @@ namespace MyTest
 
         [Theory]
         //[InlineData("Shiny.Push.AzureNotificationHubs", CodeBlocks.PushDelegate, null)]
+        [InlineData("Shiny.Push.Push", CodeBlocks.PushDelegate, "services.UsePush<Test.TestPushDelegate>();")]
         [InlineData("Shiny.Push.FirebaseMessaging", CodeBlocks.PushDelegate, "services.UseFirebaseMessaging<Test.TestPushDelegate>();")]
         [InlineData("Shiny.Locations", CodeBlocks.GpsDelegate, "services.UseGps<Test.TestGpsDelegate>();")]
         public void DelegateDetection(string reference, string delegateCodeBlock, string findContent)
         {
             this.Generator.AddReference(reference);
-            this.Generator.AddReference("Shiny.Push");
+            this.Generator.AddReference("Shiny.Push.Common");
             this.Generator.AddSource("[assembly: Shiny.ShinyApplicationAttribute]");
             this.Generator.AddSource(delegateCodeBlock);
             this.RunGenerator();

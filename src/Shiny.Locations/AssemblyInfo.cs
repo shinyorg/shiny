@@ -8,4 +8,3 @@
 [assembly: StaticGeneration("Shiny.Locations.IMotionActivityManager", "ShinyMotionActivity")]
 [assembly: StaticGeneration("Shiny.Locations.IGpsManager", "ShinyGps")]
 [assembly: StaticGeneration("Shiny.Locations.IGeofenceManager", "ShinyGeofences")]
-
