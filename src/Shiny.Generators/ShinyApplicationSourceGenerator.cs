@@ -13,7 +13,9 @@ namespace Shiny.Generators
         List<IAssemblySymbol> shinyAssemblies = null;
         List<INamedTypeSymbol> allSymbols;
 
-        protected ShinyApplicationSourceGenerator(string osApplicationTypeName) => this.osApplicationTypeName = osApplicationTypeName;
+        protected ShinyApplicationSourceGenerator(string osApplicationTypeName)
+            => this.osApplicationTypeName = osApplicationTypeName;
+
         protected GeneratorExecutionContext Context { get; private set; }
         public ShinyApplicationValues ShinyConfig { get; set; }
 
@@ -47,6 +49,7 @@ namespace Shiny.Generators
                 .GetAllTypeSymbols()
                 .Where(x => x.Inherits(appType))
                 .ToList();
+
             this.Process(appClasses);
         }
 
@@ -148,25 +151,31 @@ namespace Shiny.Generators
                 .Where(x => x.Implements(symbol))
                 .ToList();
 
-            if (!impls.Any() && oneDelegateRequiredToInstall)
+            if (!impls.Any())
             {
-                this.Context.Log(
-                    "SHINYDELEGATE",
-                    "Required delegate missing for services." + startupRegistrationServiceExtensionMethodName,
-                    DiagnosticSeverity.Warning
-                );
-                return;
-            }
-            var registerStatement = $"services.{startupRegistrationServiceExtensionMethodName}<{impls.First().ToDisplayString()}>();";
-            this.builder.AppendLineInvariant(registerStatement);
-
-            if (impls.Count > 1)
-            {
-                var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
-                for (var i = startIndex; i < impls.Count; i++)
+                if (oneDelegateRequiredToInstall)
                 {
-                    var impl = impls[i];
-                    this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
+                    this.Context.Log(
+                        "SHINYDELEGATE",
+                        "Required delegate missing for services." + startupRegistrationServiceExtensionMethodName,
+                        DiagnosticSeverity.Warning
+                    );
+                }
+            }
+            else
+            {
+                var register = impls.First().ToDisplayString();
+                var registerStatement = $"services.{startupRegistrationServiceExtensionMethodName}<{register}>();";
+                this.builder.AppendLineInvariant(registerStatement);
+
+                if (impls.Count > 1)
+                {
+                    var startIndex = oneDelegateRequiredToInstall ? 1 : 0;
+                    for (var i = startIndex; i < impls.Count; i++)
+                    {
+                        var impl = impls[i];
+                        this.builder.AppendLineInvariant($"services.AddSingleton<{delegateTypeName}, {impl.ToDisplayString()}>();");
+                    }
                 }
             }
         });

@@ -16,7 +16,7 @@
         <PackageReference Include="LibGit2Sharp" />
         <PackageReference Include="TweetinviAPI" />
         <PackageReference Include="Discord.Net" />
-        <PackageReference Include="Octokit" />
+        <!--<PackageReference Include="Octokit" />-->
     </ItemGroup>
 
 </Project>

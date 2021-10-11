@@ -31,29 +31,70 @@ namespace MyTest
         };
 
 
-//        [Fact(Skip = "iOS Xamarin.Forms lib needs to be included")]
-//        public void XamarinFormsIntegratedOnFinishedLaunching()
-//        {
-//            this.generatorConfig.XamarinFormsAppTypeName = "Tests.MyXfApp";
-//            this.Generator.AddReference("Xamarin.Forms");
-//            this.Generator.AddSource(@"
-//[assembly: Shiny.ShinyApplicationAttribute(XamarinFormsAppTypeName = ""Tests.MyXfApp"")]
+        [Fact]
+        public void EndToEnd()
+        {
+            this.Generator.AddReference("Shiny.Beacons");
+            this.Generator.AddReference("Shiny.BluetoothLE");
+            this.Generator.AddReference("Shiny.Jobs");
+            this.Generator.AddReference("Shiny.Locations");
+            this.Generator.AddReference("Shiny.Notifications");
+            this.Generator.AddReference("Shiny.Locations");
+            this.Generator.AddReference("Shiny.Push.AzureNotificationHubs");
 
-//namespace Tests
-//{
-//    public partial void MyTestAppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
-//    {
-//    }
+            this.Generator.AddSource(@"
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Shiny.Locations;
+using Shiny.Jobs;
+using Microsoft.Extensions.DependencyInjection;
 
-//    public class MyXfApp : global::Xamarin.Forms.Application
-//    {
-//    }
-//}
-//");
-//            this.RunGenerator();
-//            this.CompilationHasContent("this.LoadApplication(new Tests.MyXfApp());", "Xamarin.Forms LoadApplication should have been applied");
-//            this.CompilationHasContent("global::Xamarin.Forms.Forms.Init();", "Xamarin.Forms.Forms.Init should have been applied");
-//        }
+namespace Sample.ShinyStuff
+{
+    public interface IMyCustomTestService
+    {
+        void Hello();
+    }
+
+
+    [ShinyService]
+    public class MyCustomTestService : IMyCustomTestService
+    {
+        public void Hello()
+        {
+        }
+    }
+
+    public class TestGeofenceDelegate : IGeofenceDelegate
+    {
+        public Task OnStatusChanged(GeofenceState newStatus, GeofenceRegion region) => Task.CompletedTask;
+    }
+
+    public class TestJob : IJob
+    {
+        public Task Run(JobInfo jobInfo, CancellationToken cancelToken) => Task.CompletedTask;
+    }
+
+    public class TestModule : ShinyModule
+    {
+        public override void Register(IServiceCollection services)
+        {
+            // modules are great ways of clumbing together groups of dependencies you may have - note, these are also auto-wired for you
+        }
+    }
+
+    public class TestStartupTask : IShinyStartupTask
+    {
+        public void Start()
+        {
+        }
+    }
+}");
+            this.Generator.AddSource(StandardAppDelegate);
+            this.RunGenerator();
+            // should not error
+        }
 
 
         [Fact]
@@ -170,3 +211,26 @@ namespace Test
             => this.Compilation.SyntaxTrees.Any(x => x.ToString().Contains(content)).Should().BeTrue(because);
     }
 }
+//        [Fact(Skip = "iOS Xamarin.Forms lib needs to be included")]
+//        public void XamarinFormsIntegratedOnFinishedLaunching()
+//        {
+//            this.generatorConfig.XamarinFormsAppTypeName = "Tests.MyXfApp";
+//            this.Generator.AddReference("Xamarin.Forms");
+//            this.Generator.AddSource(@"
+//[assembly: Shiny.ShinyApplicationAttribute(XamarinFormsAppTypeName = ""Tests.MyXfApp"")]
+
+//namespace Tests
+//{
+//    public partial void MyTestAppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
+//    {
+//    }
+
+//    public class MyXfApp : global::Xamarin.Forms.Application
+//    {
+//    }
+//}
+//");
+//            this.RunGenerator();
+//            this.CompilationHasContent("this.LoadApplication(new Tests.MyXfApp());", "Xamarin.Forms LoadApplication should have been applied");
+//            this.CompilationHasContent("global::Xamarin.Forms.Forms.Init();", "Xamarin.Forms.Forms.Init should have been applied");
+//        }
