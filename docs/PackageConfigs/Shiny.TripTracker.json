@@ -1,0 +1,14 @@
+﻿{
+    "name": "Shiny.TripTracker",
+    "description": "GPS + Motion Activity - Track walks, runs, biking, and drives.  Tracks speed, time taken, total distance, average speed, and the path your user took!",
+    "sponsors": true,
+    "services": [
+        {
+            "name": "Shiny.TripTracker.ITripTrackerManager",
+            "startup": "UseTripTracker",
+            "ios": {
+            },
+            "android": {}
+        }
+    ]
+}

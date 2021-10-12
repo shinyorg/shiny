@@ -1,0 +1,37 @@
+﻿{
+    "name": "Shiny.GeoDispatch",
+    "description": "Push + GPS - Incident management",
+    "sponsors": true,
+    "services": [
+        {
+            "name": "Shiny.GeoDispatch.IGeoDispatchManager",
+            "startup": "UseGeoDispatch",
+            "description": "You have to manually hook up Shiny.GeoDispatch.GeoDispatchPushDelegate to whatever push provider you wish to use",
+            "bgDelegate": "Shiny.GeoDispatch.IGeoDispatchDelegate",
+            "bgDelegateRequired": true,
+            "ios": {
+                "usesPush": true,
+                "infoPlistValues": [
+                    "NSLocationAlwaysUsageDescription",
+                    "NSLocationAlwaysAndWhenInUseUsageDescription",
+                    "NSLocationWhenInUseUsageDescription"
+                ]
+            },
+            "android": {
+                "manifestUsesPermissions": [
+                    "android.permission.ACCESS_COARSE_LOCATION",
+                    "android.permission.ACCESS_FINE_LOCATION",
+                    "android.permission.ACCESS_BACKGROUND_LOCATION",
+                    "android.permission.FOREGROUND_SERVICE"
+                ],
+                "manifestUsesFeatures": [
+                    "android.hardware.location.gps",
+                    "android.hardware.location.network"
+                ]
+            },
+            "uwp": {
+                "deviceCapabilities": [ "location" ]
+            }
+        }
+    ]
+}

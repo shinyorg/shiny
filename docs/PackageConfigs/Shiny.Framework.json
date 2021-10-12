@@ -1,0 +1,17 @@
+﻿{
+    "name": "Shiny.Framework",
+    "description": "Core Services for Shiny",
+    "services": [
+        {
+            "name": "Shiny.ILocalize",
+            "startup": "UseResxLocalize",
+            "ios": {},
+            "android": {},
+            "uwp": {}
+        }
+        //{
+        //    "name": "Shiny.IDialogs",
+        //    "startup":  "UseXfDialogs"
+        //}
+    ]
+}

@@ -1,0 +1,15 @@
+﻿{
+    "name": "Shiny.GeoDispatch",
+    "description": "Push + GPS - Incident management",
+    "sponsors": true,
+    "services": [
+        {
+            "name": "Shiny.GeoDispatch.IGeoDispatchManager",
+            "startup": "UseGeoDispatch",
+            "description": "You have to manually hook up Shiny.GeoDispatch.GeoDispatchPushDelegate to whatever push provider you wish to use",
+            "ios": {
+            },
+            "android": {}
+        }
+    ]
+}

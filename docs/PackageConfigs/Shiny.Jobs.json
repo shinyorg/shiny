@@ -1,0 +1,17 @@
+﻿{
+    "name": "Shiny.Jobs",
+    "description": "Background Periodic Jobs",
+    "services": [
+        {
+            "name": "Shiny.Jobs.IJobManager",
+            "startup": "UseJobs",
+            "static": "ShinyJobs",
+            "ios": {
+                "usesPush": true
+            },
+            "android": {
+            },
+            "uwp": {}
+        }
+    ]
+}

@@ -1,0 +1,17 @@
+﻿{
+    "name": "Shiny.NFC",
+    "services": [
+        {
+            "ios": {
+                //"entitlementPlistValues": {
+                //    "com.apple.developer.nfc.readersession.formats": "<array><string>NDEF</string></array>"
+                //},
+                "infoPlistValues": [ "NFCReaderUsageDescription" ]
+            },
+            "android": {
+                "manifestUsesPermissions": [ "android.permission.NFC" ],
+                "manifestUsesFeatures": [ "android.hardware.nfc" ]
+            }
+        }
+    ]
+}

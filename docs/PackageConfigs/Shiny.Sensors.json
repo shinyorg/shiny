@@ -1,0 +1,83 @@
+﻿{
+    "name": "Shiny.Sensors",
+
+    "services": [
+        {
+            "name": "Shiny.Sensors.IAccelerometer",
+            "description": "Accelerometer",
+            "static": "ShinyAccelerometer",
+            "startup": "UseAccelerometer",
+            "ios": {},
+            "android": {},
+            "uwp": {}
+        },
+        {
+            "name": "Shiny.Sensors.IAmbientLight",
+            "static": "ShinyAmbientLight",
+            "startup": "UseAmbientLight",
+            "android": {},
+            "uwp": {}
+        },
+        {
+            "name": "Shiny.Sensors.IBarometer",
+            "static": "ShinyBarometer",
+            "startup": "UseBarometer",
+            "ios": {},
+            "android": {},
+            "uwp": {}
+        },
+        {
+            "name": "Shiny.Sensors.ICompass",
+            "static": "ShinyCompass",
+            "startup": "UseCompass",
+            "ios": {},
+            "android": {},
+            "uwp": {}
+        },
+        {
+            "name": "Shiny.Sensors.IGyroscope",
+            "static": "ShinyGyroscope",
+            "startup": "UseGyroscope",
+            "ios": {},
+            "android": {},
+            "uwp": {}
+        },
+        {
+            "name": "Shiny.Sensors.IHumidity",
+            "static": "ShinyHumidity",
+            "startup": "UseHumidity",
+            "android": {}
+        },
+        {
+            "name": "Shiny.Sensors.IMagnetometer",
+            "static": "ShinyMagnetometer",
+            "startup": "UseMagnetometer",
+            "ios": {},
+            "android": {},
+            "uwp": {}
+        },
+        {
+            "name": "Shiny.Sensors.IPedometer",
+            "static": "ShinyPedometer",
+            "startup": "UsePedometer",
+            "ios": {
+                "infoPlistValues": [ "NSMotionUsageDescription" ]
+            },
+            "android": {},
+            "uwp": {}
+        },
+        {
+            "name": "Shiny.Sensors.IProximity",
+            "static": "ShinyProximity",
+            "startup": "UseProximity",
+            "ios": {},
+            "android": {}
+        },
+        {
+            "name": "Shiny.Sensors.ITemperature",
+            "static": "ShinyTemperature",
+            "startup": "UseTemperature",
+            "android": {}
+        }
+    ]
+}

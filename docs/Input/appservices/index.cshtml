@@ -1,0 +1,13 @@
+Title: App Services
+Order: 999
+---
+
+App Services are combinations of Shiny services that lead to real world business solutions.
+
+
+<ul>
+    @foreach (IDocument child in OutputPages.GetChildrenOf(Document).OrderBy(x => x.GetInt("Order", 1000)))
+    {
+        <li>@Html.DocumentLink(child)</li>
+    }
+</ul>
