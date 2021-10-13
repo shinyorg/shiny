@@ -36,9 +36,11 @@ public partial class AppDelegate
     {
         this.OnPreFinishedLaunching(app, options);
         this.ShinyFinishedLaunching(new Samples.SampleStartup());
-        this.LoadApplication(new Samples.App());        
+
         global::Xamarin.Forms.Forms.Init();
-        
+
+        this.LoadApplication(new Samples.App());
+
         global::XF.Material.iOS.Material.Init();
         this.OnPostFinishedLaunching(app, options);
         return base.FinishedLaunching(app, options);
