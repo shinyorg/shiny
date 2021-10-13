@@ -276,3 +276,6 @@ __pycache__/
 
 .ionide
 secrets.json
+/docs/cache/writecache.json
+/docs/cache/razorcache.json
+/docs/cache/razor

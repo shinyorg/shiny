@@ -119,6 +119,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{7548
 		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
 		.github\dependabot.yml = .github\dependabot.yml
 		.github\FUNDING.yml = .github\FUNDING.yml
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "issue templates", "issue templates", "{60275342-B149-46E0-B609-12F57FFB799E}"

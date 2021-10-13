@@ -11,6 +11,8 @@ on:
     branches: [ master, main, dev, preview ]
     paths:
     - "src/**"
+    - "docs/**"
+    - "build/**"
   pull_request:
     branches: [ master, main, dev ]
     paths:
