@@ -266,7 +266,14 @@ namespace Shiny.Notifications
             native.CategoryIdentifier = channel.Identifier;
             if (!channel.CustomSoundPath.IsEmpty())
             {
-                native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath);
+                if (channel.Importance == ChannelImportance.Critical)
+                {
+                    native.Sound = UNNotificationSound.GetCriticalSound(channel.CustomSoundPath);
+                }
+                else
+                {
+                    native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath);
+                }
             }
             else
             {
