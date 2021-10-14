@@ -19,6 +19,7 @@ on:
     - "src/**"
 
 env:
+  DocsDeployGitHubToken: ${{ secrets.DOCS_GITHUB_TOKEN }}
   NugetApiKey: ${{secrets.NUGETAPIKEY}}
   TwitterConsumerKey: ${{secrets.TWITTER_CONSUMER_KEY}}
   TwitterConsumerSecret: ${{secrets.TWITTER_CONSUMER_SECRET}}
