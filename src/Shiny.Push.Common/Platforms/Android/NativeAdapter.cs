@@ -57,7 +57,7 @@ namespace Shiny.Push
                         //if (pr.Notification != null)
                         //{
                         //    // TODO: channel
-                            var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
+                            //var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
                         //    this.notifications.SendNative(0, nn);
                         //}
                     };

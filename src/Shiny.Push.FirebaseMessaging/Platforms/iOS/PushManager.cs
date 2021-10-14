@@ -62,11 +62,13 @@ namespace Shiny.Push.FirebaseMessaging
         {
             this.lifecycleSub?.Dispose();
             //this.lifecycle.RegisterForNotificationPresentation
-            this.lifecycleSub = this.lifecycle.RegisterToReceiveRemoteNotifications(userInfo =>
+            this.lifecycleSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
             {
-                // TODO: wait for delegate to fire?
+                // hijacking firebase because the delegate doesn't seem to fire any longer
                 Messaging.SharedInstance.AppDidReceiveMessage(userInfo);
-                return Task.CompletedTask;
+                var dict = userInfo.FromNsDictionary();
+                var pr = new PushNotification(dict, null);
+                await this.container.OnReceived(pr).ConfigureAwait(false);
             });
             if (App.DefaultInstance == null)
             {
@@ -90,12 +92,12 @@ namespace Shiny.Push.FirebaseMessaging
             }
             Messaging.SharedInstance!.Delegate = new FbMessagingDelegate
             (
-                async msg =>
+                msg =>
                 {
                     // I can't get access to the notification here
-                    var dict = msg.AppData.FromNsDictionary();
-                    var pr = new PushNotification(dict, null);
-                    await this.container.OnReceived(pr).ConfigureAwait(false);
+                    //var dict = msg.AppData.FromNsDictionary();
+                    //var pr = new PushNotification(dict, null);
+                    //await this.container.OnReceived(pr).ConfigureAwait(false);
                 },
                 async token =>
                 {
