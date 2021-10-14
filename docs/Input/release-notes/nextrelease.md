@@ -31,6 +31,7 @@ Order: 1000000
 
 ### Notifications
 * [Enhancement] Foreground service notifications will use channel that does not show application badge notification [GH-734](https://github.com/shinyorg/shiny/issues/734)
+* [Enhancement] Custom sounds work for critical notifications [GH-757](https://github.com/shinyorg/shiny/pull/757)
 
 ### Push
 * [BREAKING] IPushDelegate.OnTokenChanged is now called IPushDelegate.OnTokenRefreshed
