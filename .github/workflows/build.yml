@@ -13,10 +13,10 @@ on:
     - "src/**"
     - "docs/**"
     - "build/**"
-  pull_request:
-    branches: [ master, main, dev ]
-    paths:
-    - "src/**"
+  #pull_request:
+  #  branches: [ master, main, dev ]
+  #  paths:
+  #  - "src/**"
 
 env:
   DocsDeployGitHubToken: ${{ secrets.DOCS_GITHUB_TOKEN }}
