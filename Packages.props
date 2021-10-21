@@ -70,24 +70,6 @@
         <PackageReference Update="Devlead.Statiq" Version="0.12.0" />
     </ItemGroup>
 
-    <!--Samples-->
-    <ItemGroup>
-        <PackageReference Update="Xamarin.AndroidX.RecyclerView" Version="1.2.1.1" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.3.1.1" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Update="Xamarin.Forms" Version="5.0.0.2125" />
-        <PackageReference Update="Xamarin.Essentials" Version="1.7.0" />
-        <PackageReference Update="Xamarin.CommunityToolkit" Version="1.3.0-pre2" />
-        <PackageReference Update="Mobile.BuildTools" Version="2.0.245" />
-        <PackageReference Update="Rg.Plugins.Popup" Version="2.0.0.12" />
-        <PackageReference Update="Humanizer" Version="2.8.25" />
-        <PackageReference Update="Prism.DryIoc.Forms" Version="8.1.97" />
-        <PackageReference Update="ReactiveUI.Fody" Version="16.2.1" />
-        <PackageReference Update="XF.Material" Version="1.7.8" />
-    </ItemGroup>
-
     <!--tests-->
     <ItemGroup>
         <PackageReference Update="OneSignal.net" Version="1.0.6" />
