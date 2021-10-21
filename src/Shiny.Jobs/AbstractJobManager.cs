@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
@@ -226,7 +225,13 @@ namespace Shiny.Jobs
 
 
         protected virtual IJob ResolveJob(JobInfo jobInfo)
-            => (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, jobInfo.Type);
+        {
+            var type = Type.GetType(jobInfo.TypeName);
+            if (type == null)
+                throw new ArgumentException($"Job '{jobInfo.Identifier}' - Job type '{jobInfo.TypeName}' not found - did you delete / move this class from your library?");
+
+            return (IJob)ActivatorUtilities.GetServiceOrCreateInstance(this.container, type);
+        }
 
 
         protected virtual void LogJob(JobState state,

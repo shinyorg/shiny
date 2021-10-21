@@ -98,6 +98,9 @@ namespace Shiny.Net.Http.Infrastructure
                 try
                 {
                     var content = new MultipartFormDataContent();
+                    if (!request.PostData.IsEmpty())
+                        content.Add(new StringContent(request.PostData));
+
                     content.Add(
                         new ProgressStreamContent(
                             file.OpenRead(),

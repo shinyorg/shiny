@@ -19,19 +19,9 @@ namespace Shiny.Jobs.Infrastructure
         public IDictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
 
 
-        public void Assert()
-        {
-            if (Type.GetType(this.TypeName) == null)
-                throw new ArgumentException(
-                    "Job type not found - did you delete/move this class from your library? Type Name: "
-                    + this.TypeName);
-        }
-
-
         public static JobInfo FromPersist(PersistJobInfo job)
         {
-            job.Assert();
-            var info = new JobInfo(Type.GetType(job.TypeName), job.Identifier)
+            var info = new JobInfo(job.TypeName!, job.Identifier!)
             {
                 IsSystemJob = job.IsSystemJob,
                 LastRunUtc = job.LastRunUtc,
@@ -51,7 +41,7 @@ namespace Shiny.Jobs.Infrastructure
         public static PersistJobInfo ToPersist(JobInfo job) => new PersistJobInfo
         {
             Identifier = job.Identifier,
-            TypeName = job.Type.AssemblyQualifiedName,
+            TypeName = job.TypeName,
             PeriodicTimeSeconds = job.PeriodicTime?.TotalSeconds,
             IsSystemJob = job.IsSystemJob,
             Repeat = job.Repeat,
