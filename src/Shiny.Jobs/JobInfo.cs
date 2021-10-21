@@ -11,10 +11,17 @@ namespace Shiny.Jobs
             if (jobType == null)
                 throw new ArgumentException("Job Type not set");
 
-            this.Identifier = identifier ?? jobType.AssemblyQualifiedName;
-            this.Type = jobType;
+            this.Identifier = identifier ?? jobType?.FullName;
+            this.TypeName = jobType.AssemblyQualifiedName;
             this.PeriodicTime = TimeSpan.FromMinutes(15);
             this.RunOnForeground = runOnForeground;
+        }
+
+
+        internal JobInfo(string typeName, string identifier)
+        {
+            this.TypeName = typeName;
+            this.Identifier = identifier;
         }
 
 
@@ -24,7 +31,7 @@ namespace Shiny.Jobs
         /// </summary>
         public TimeSpan? PeriodicTime { get; set; }
         public string Identifier { get; }
-        public Type Type { get; }
+        public string TypeName { get; }
         public bool Repeat { get; set; } = true;
         public bool DeviceCharging { get; set; }
         public bool BatteryNotLow { get; set; }
