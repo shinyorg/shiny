@@ -1,9 +1,0 @@
-<Project>
-
-    <ItemGroup>
-        <PackageReference Include="Xamarin.Forms" />
-        <PackageReference Include="Xamarin.Essentials" />
-    </ItemGroup>
-
-    <Import Project="..\LocalOrNuget.targets" />
-</Project>

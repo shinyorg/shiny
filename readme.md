@@ -20,7 +20,7 @@ things like dependency injection & logging in a structured way to your code!
 ## Links
 * [Documentation](https://shinylib.net)
 * [Change Log](https://shinylib.net/release-notes/)
-* [Samples](https://github.com/shinyorg/shiny/tree/master/samples) - Shows almost every single function point within Shiny
+* [Samples](https://samples.shinylib.net)
 * [Community Support](https://github.com/shinyorg/shiny/discussions)
 * [NuGets](https://www.nuget.org/profiles/ShinyLib)
 
