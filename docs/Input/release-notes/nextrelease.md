@@ -1,4 +1,4 @@
-Title: v2.3.0 (Preview)
+Title: v2.3.0
 Order: 1000000
 ---
 
@@ -28,6 +28,7 @@ Order: 1000000
 * [Enhancement] UsesJobs now allows you to manually register the job manager - RegisterJob will call this automatically
 * [Enhancement] Foregrounding is now always available if you set your job as "RunInForeground", there is no need to call UseForegroundJobs
 * [Fix][iOS] BGTasks - Correct filters applied to all modes
+* [Fix] Move up exception base for missing job types due to the job being deleted or renamed [GH-762](https://github.com/shinyorg/shiny/issues/762)
 
 ### Notifications
 * [Enhancement] Foreground service notifications will use channel that does not show application badge notification [GH-734](https://github.com/shinyorg/shiny/issues/734)
