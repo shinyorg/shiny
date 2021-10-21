@@ -44,5 +44,8 @@ namespace Shiny.Jobs
         public InternetAccess RequiredInternetAccess { get; set; } = InternetAccess.None;
         public DateTime? LastRunUtc { get; set; }
         public IDictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
+
+
+        public bool IsValid() => this.TypeName.IsEmpty() || Type.GetType(this.TypeName) != null;
     }
 }
