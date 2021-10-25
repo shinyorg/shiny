@@ -18,7 +18,7 @@
         <PackageReference Update="Xamarin.ShortcutBadger" Version="1.1.21" />
         <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.12" />
         <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.0" />
-        <PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
+        <PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.22000.196" />
     </ItemGroup>
 
     <ItemGroup>
