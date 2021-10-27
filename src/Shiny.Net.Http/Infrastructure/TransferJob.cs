@@ -128,9 +128,12 @@ namespace Shiny.Net.Http.Infrastructure
                     );
                     var message = this.Build(request);
                     message.Content = content;
-                    await this.httpClient
-                        .SendAsync(message, ct)
-                        .ConfigureAwait(false);
+
+                    var response = await this.httpClient
+                                               .SendAsync(message, ct)
+                                               .ConfigureAwait(false);
+
+                    response.EnsureSuccessStatusCode();
 
                     status = HttpTransferState.Completed;
                 }
