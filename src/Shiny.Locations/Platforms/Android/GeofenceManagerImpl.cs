@@ -79,7 +79,7 @@ namespace Shiny.Locations
         //    => this.context.GetCurrentLocationAccess(true, true, true, true);
 
         public override Task<AccessState> RequestAccess()
-            => this.context.RequestLocationAccess(true, true, true, true);
+            => this.context.RequestLocationAccess(true, true, true);
 
 
         public override async Task StartMonitoring(GeofenceRegion region)
@@ -171,10 +171,7 @@ namespace Shiny.Locations
             if (this.geofencePendingIntent != null)
                 return this.geofencePendingIntent;
 
-            var intent = this.context.CreateIntent<GeofenceBroadcastReceiver>(
-                IntentAction,
-                Intent.ActionBootCompleted
-            );
+            var intent = this.context.CreateIntent<GeofenceBroadcastReceiver>(IntentAction);
             this.geofencePendingIntent = PendingIntent.GetBroadcast(
                 this.context.AppContext,
                 0,

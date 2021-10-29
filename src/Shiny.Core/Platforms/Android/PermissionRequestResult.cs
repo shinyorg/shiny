@@ -28,6 +28,9 @@ namespace Shiny
         public bool IsGranted(string permission)
         {
             var index = this.Permissions.ToList().IndexOf(permission);
+            if (index == -1)
+                return false;
+
             return this.GrantResults[index] == NativePerm.Granted;
         }
     }

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Android.App;
 using Android.Content;
 using Android.Gms.Location;
-using static Android.Manifest;
 
 
 namespace Shiny.Locations
@@ -13,10 +11,6 @@ namespace Shiny.Locations
         Enabled = true,
         Exported = true
     )]
-    //[IntentFilter(new [] {
-    //    GeofenceManagerImpl.IntentAction,
-    //    Permission.ReceiveBootCompleted
-    //})]
     public class GeofenceBroadcastReceiver : ShinyBroadcastReceiver
     {
         public static Func<GeofencingEvent, Task>? Process { get; set; }

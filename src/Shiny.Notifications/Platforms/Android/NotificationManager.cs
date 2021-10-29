@@ -57,6 +57,7 @@ namespace Shiny.Notifications
             if (!this.manager.NativeManager.AreNotificationsEnabled())
                 return AccessState.Disabled;
 
+            // this is only need if there is a delegate
             var result = await this.jobManager
                 .RequestAccess()
                 .ConfigureAwait(false);

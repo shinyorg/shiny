@@ -254,8 +254,8 @@ namespace Shiny
             }
             else
             {
-                if (this.Status == PlatformState.Background)
-                    throw new ApplicationException("You cannot make permission requests while your application is in the background.  Please call RequestAccess in the Shiny library you are using while your app is in the foreground so your user can respond.  You are getting this message because your user has either not granted these permissions or has removed them.");
+                //if (this.Status == PlatformState.Background)
+                //    throw new ApplicationException("You cannot make permission requests while your application is in the background.  Please call RequestAccess in the Shiny library you are using while your app is in the foreground so your user can respond.  You are getting this message because your user has either not granted these permissions or has removed them.");
 
                 var current = Interlocked.Increment(ref this.requestCode);
                 comp.Add(this

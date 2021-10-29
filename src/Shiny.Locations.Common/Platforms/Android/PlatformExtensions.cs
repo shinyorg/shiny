@@ -46,29 +46,55 @@ namespace Shiny.Locations
         //}
 
 
-        public static async Task<AccessState> RequestLocationAccess(this IAndroidContext context, bool background, bool fineAccess, bool gpsRequired, bool networkRequired)
+        public static async Task<AccessState> RequestLocationAccess(this IAndroidContext context, bool background, bool gpsRequired, bool networkRequired)
         {
             if (!IsLocationEnabled(context, gpsRequired, networkRequired))
                 return AccessState.Disabled;
 
-            var locationPerm = fineAccess ? P.AccessFineLocation : P.AccessCoarseLocation;
             if (!context.IsMinApiLevel(29) || !background)
-                return await context.RequestAccess(locationPerm).ToTask();
+                return await context.RequestAccess(P.AccessFineLocation).ToTask();
 
+            // android 11+ requires bg check & permissions are separate - Android 12 can also return coarse even though fine was requested, so you must ask for both
             var access = await context
                 .RequestPermissions
                 (
-                    P.AccessBackgroundLocation,
                     P.ForegroundService,
-                    locationPerm
+                    P.AccessFineLocation,
+                    P.AccessCoarseLocation
                 )
                 .ToTask();
 
-            if (!access.IsGranted(locationPerm))
+            var fine = access.IsGranted(P.AccessFineLocation);
+            var coarse = access.IsGranted(P.AccessCoarseLocation);
+
+            if (!fine && !coarse)
                 return AccessState.Denied;
+
+            access = await context
+                .RequestPermissions(P.AccessBackgroundLocation)
+                .ToTask();
 
             if (!access.IsGranted(P.AccessBackgroundLocation))
                 return AccessState.Restricted;
+
+            if (!fine)
+                return AccessState.Restricted;
+
+            return AccessState.Available;
+        }
+
+
+        static async Task<AccessState> RequestBackground(this IAndroidContext context, string permission)
+        {
+            var access = await context
+                .RequestPermissions(permission)
+                .ToTask();
+
+            if (!access.IsGranted(permission))
+                return AccessState.Denied;
+
+            //if (!access.IsGranted(P.AccessBackgroundLocation))
+            //    return AccessState.Restricted;
 
             return AccessState.Available;
         }
