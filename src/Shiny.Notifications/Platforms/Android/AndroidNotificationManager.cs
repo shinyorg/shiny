@@ -76,7 +76,7 @@ namespace Shiny.Notifications
 
         public virtual void ApplyChannel(NotificationCompat.Builder builder, Notification notification, Channel channel)
         {
-            if (channel != null)
+            if (channel == null)
                 return;
 
             builder.SetChannelId(channel.Identifier);
