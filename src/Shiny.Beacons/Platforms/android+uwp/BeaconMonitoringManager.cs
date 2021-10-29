@@ -91,7 +91,7 @@ namespace Shiny.Beacons
         {
             var access = await this.bleManager.RequestAccess().ToTask().ConfigureAwait(false);
 #if MONOANDROID
-            await this.context.RequestLocationAccess(true, true, true, false);
+            await this.context.RequestLocationAccess(true, true, false);
             if (access == AccessState.Available && this.context.IsMinApiLevel(26))
             {
                 access = await this.context
