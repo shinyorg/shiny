@@ -53,6 +53,7 @@ namespace Shiny
             services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             return true;
 #elif __IOS__
+            services.TryAddSingleton(typeof(IGeofenceDelegate), delegateType);
             services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             return true;
 #else
