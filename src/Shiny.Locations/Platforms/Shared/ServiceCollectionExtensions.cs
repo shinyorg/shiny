@@ -98,9 +98,7 @@ namespace Shiny
             if (!services.UseGps<GpsGeofenceDelegate>())
                 return false;
 
-            if (delegateType != null)
-                services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
-
+            services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
             services.TryAddSingleton<IGeofenceManager, GpsGeofenceManagerImpl>();
             return true;
 #endif

@@ -24,11 +24,12 @@ namespace Shiny.Locations
 #if !MONOANDROID
             services.TryAddSingleton<IGpsManager, GpsManager>();
 #else
+            services.UseNotifications();
+
             var resultCode = GoogleApiAvailability
                 .Instance
                 .IsGooglePlayServicesAvailable(Application.Context);
 
-            services.UseNotifications();
             if (resultCode == ConnectionResult.ServiceMissing)
                 services.TryAddSingleton<IGpsManager, LocationServicesGpsManagerImpl>();
             else
