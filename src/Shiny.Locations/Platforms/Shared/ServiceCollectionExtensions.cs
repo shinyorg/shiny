@@ -37,8 +37,6 @@ namespace Shiny
         /// <returns></returns>
         public static bool UseGeofencing(this IServiceCollection services, Type delegateType)
         {
-            services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
-
 #if __ANDROID__
             var resultCode = GoogleApiAvailability
                 .Instance
@@ -47,13 +45,16 @@ namespace Shiny
             if (resultCode == ConnectionResult.ServiceMissing)
                 return services.UseGpsDirectGeofencing(delegateType);
 
+            services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
             services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             return true;
 #elif WINDOWS_UWP
+            services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
             services.TryAddSingleton<IBackgroundTaskProcessor, GeofenceBackgroundTaskProcessor>();
             services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             return true;
 #elif __IOS__
+            services.AddSingleton(typeof(IGeofenceDelegate), delegateType);
             services.TryAddSingleton<IGeofenceManager, GeofenceManagerImpl>();
             return true;
 #else
