@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Shiny.BluetoothLE.Internals;
 using Android;
 using Android.Bluetooth;
+using P = Android.Manifest.Permission;
 
 
 namespace Shiny.BluetoothLE
@@ -59,17 +60,33 @@ namespace Shiny.BluetoothLE
             if (!this.context.Android.IsInManifest(Manifest.Permission.BluetoothAdmin))
                 return AccessState.NotSetup;
 
-            var forBackground = this.context.Services.GetService(typeof(IBleDelegate)) != null;
-            var result = await this.context
+            var permissions = new List<string>() { P.AccessFineLocation };
+            if (this.context.Android.IsMinApiLevel(31))
+            {
+                permissions.Add("android.permission.BLUETOOTH_SCAN");    //Required to be able to discover and pair nearby Bluetooth devices
+                permissions.Add("android.permission.BLUETOOTH_CONNECT"); //Required to be able to connect to paired Bluetooth devices
+            }
+            var results = await this.context
                 .Android
-                .RequestAccess(Manifest.Permission.AccessFineLocation)
+                .RequestPermissions(permissions.ToArray())
                 .ToTask(ct)
                 .ConfigureAwait(false);
 
-            if (result != AccessState.Available)
-                return result;
+            return results.IsSuccess()
+                ? this.context.Status // now look at the actual device state
+                : AccessState.Denied;
 
-            return this.context.Status;
+    //< uses - permission android: name = "android.permission.BLUETOOTH"
+    //                 android: maxSdkVersion = "30" />
+
+// < uses - permission android: name = "android.permission.BLUETOOTH_ADMIN"
+//                 android: maxSdkVersion = "30" />
+            // 31
+//< uses - permission android: name = "android.permission.BLUETOOTH_SCAN"
+//                     android: usesPermissionFlags = "neverForLocation" />
+
+
+            //BLUETOOTH_ADVERTISE - hosting - 31\
         });
 
 

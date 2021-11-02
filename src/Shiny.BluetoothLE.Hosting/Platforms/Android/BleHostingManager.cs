@@ -65,8 +65,16 @@ namespace Shiny.BluetoothLE.Hosting
 
         public async Task StartAdvertising(AdvertisementOptions? options = null)
         {
-            if (!this.context.Context.IsMinApiLevel(23))
+            var android = this.context.Context;
+            if (!android.IsMinApiLevel(23))
                 throw new ApplicationException("BLE Advertiser needs API Level 23+");
+
+            if (android.IsMinApiLevel(31))
+            {
+                var access = await android.RequestAccess("android.permission.BLUETOOTH_ADVERTISE");
+                if (access != AccessState.Available)
+                    throw new ArgumentException("Insufficient permissions");
+            }
 
             options ??= new AdvertisementOptions();
             var tcs = new TaskCompletionSource<object>();

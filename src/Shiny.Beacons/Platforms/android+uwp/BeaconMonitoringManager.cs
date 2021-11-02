@@ -89,10 +89,14 @@ namespace Shiny.Beacons
 
         public async Task<AccessState> RequestAccess()
         {
-            var access = await this.bleManager.RequestAccess().ToTask().ConfigureAwait(false);
+            var access = await this.bleManager
+                .RequestAccess()
+                .ToTask()
+                .ConfigureAwait(false);
+
 #if MONOANDROID
-            await this.context.RequestLocationAccess(true, true, false);
-            if (access == AccessState.Available && this.context.IsMinApiLevel(26))
+            await this.context.RequestLocationAccess(LocationPermissionType.Fine);
+            if ((access == AccessState.Available && access == AccessState.Restricted) && this.context.IsMinApiLevel(26))
             {
                 access = await this.context
                     .RequestAccess(Android.Manifest.Permission.ForegroundService)
