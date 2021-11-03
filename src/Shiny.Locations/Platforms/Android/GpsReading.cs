@@ -36,7 +36,6 @@ namespace Shiny.Locations
         /// <inheritdoc />
         public double PositionAccuracy => this.location.Accuracy;
 
-
         /// <inheritdoc />
         public DateTime Timestamp => this.time ??= DateTimeOffset.FromUnixTimeMilliseconds(this.location.Time).UtcDateTime;
     }
