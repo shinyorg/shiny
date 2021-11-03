@@ -84,9 +84,6 @@ namespace Shiny.BluetoothLE
             // 31
 //< uses - permission android: name = "android.permission.BLUETOOTH_SCAN"
 //                     android: usesPermissionFlags = "neverForLocation" />
-
-
-            //BLUETOOTH_ADVERTISE - hosting - 31\
         });
 
 
