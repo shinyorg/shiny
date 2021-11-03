@@ -19,11 +19,6 @@ namespace Shiny.Locations
             this.logger = logger;
             this.gdelegate = new GpsManagerDelegate();
             this.locationManager = new CLLocationManager { Delegate = this.gdelegate };
-            //this.locationManager.RequestTemporaryFullAccuracyAuthorizationAsync
-            //this.locationManager.RequestTemporaryFullAccuracyAuthorization("purposeKey")
-            //this.locationManager.ActivityType = CLActivityType.AutomotiveNavigation
-            // iOS 14
-            //this.locationManager.AccuracyAuthorization == CLAccuracyAuthorization.FullAccuracy
         }
 
 
@@ -46,11 +41,11 @@ namespace Shiny.Locations
 
 
         public Task<AccessState> RequestAccess(GpsRequest request)
-            => this.locationManager.RequestAccess(request.UseBackground);
+            => this.locationManager.RequestAccess(request.BackgroundMode != GpsBackgroundMode.None);
 
 
         public AccessState GetCurrentStatus(GpsRequest request)
-            => this.locationManager.GetCurrentStatus(request.UseBackground);
+            => this.locationManager.GetCurrentStatus(request.BackgroundMode != GpsBackgroundMode.None);
 
 
         GpsRequest? request;
@@ -59,10 +54,11 @@ namespace Shiny.Locations
             get => this.request;
             set
             {
-                if (value?.UseBackground ?? true)
-                    this.Set(ref this.request, value);
+                var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
+                if (bg == GpsBackgroundMode.None)
+                    this.request = value; 
                 else
-                    this.request = value;
+                    this.Set(ref this.request, value);
             }
         }
 
@@ -100,12 +96,10 @@ namespace Shiny.Locations
 
         protected virtual async Task StartListenerInternal(GpsRequest request)
         {
-            // TODO: permission
-            //this.locationManager.AccuracyAuthorization = CLAccuracyAuthorization.FullAccuracy;
             (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
             this.gdelegate.Request = request;
 #if __IOS__
-            this.locationManager.AllowsBackgroundLocationUpdates = request.UseBackground;
+            this.locationManager.AllowsBackgroundLocationUpdates = request.BackgroundMode != GpsBackgroundMode.None;
             //this.locationManager.ShowsBackgroundLocationIndicator = request.UseBackground;
             var throttledInterval = request.ThrottledInterval?.TotalSeconds ?? 0;
             var minDistance = request.MinimumDistance?.TotalMeters ?? 0;

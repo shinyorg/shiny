@@ -13,10 +13,12 @@ namespace Shiny.Locations
     public class GpsGeofenceManagerImpl : AbstractGeofenceManager, IShinyStartupTask
     {
         readonly IGpsManager gpsManager;
+
+
         static readonly GpsRequest defaultRequest = new GpsRequest
         {
             Interval = TimeSpan.FromMinutes(1),
-            UseBackground = true
+            BackgroundMode = GpsBackgroundMode.Realtime
         };
 
 

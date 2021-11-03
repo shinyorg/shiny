@@ -50,16 +50,38 @@ namespace Shiny.Locations
             get => this.request;
             set
             {
-                if (value?.UseBackground ?? true)
-                    this.Set(ref this.request, value);
+                var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
+                if (bg == GpsBackgroundMode.None)
+                    this.request = value; 
                 else
-                    this.request = value;
+                    this.Set(ref this.request, value);
             }
         }
 
 
-        public Task<AccessState> RequestAccess(GpsRequest request)
-            => this.Context.RequestLocationAccess(LocationPermissionType.Fine);
+        public async Task<AccessState> RequestAccess(GpsRequest request)
+        {
+            var status = AccessState.Denied;
+            var type = request.Precise
+                ? LocationPermissionType.Fine
+                : LocationPermissionType.Coarse;
+
+            switch (request.BackgroundMode)
+            {
+                case GpsBackgroundMode.None:
+                    status = await this.Context.RequestLocationAccess(type);
+                    break;
+
+                case GpsBackgroundMode.Standard:
+                    status = await this.Context.RequestBackgroundLocationAccess(type);
+                    break;
+
+                case GpsBackgroundMode.Realtime:
+                    status = await this.Context.RequestBackgroundLocationAccess(LocationPermissionType.Fine);
+                    break;
+            }
+            return status;
+        }
 
 
         public virtual IObservable<IGpsReading> WhenReading()
@@ -74,7 +96,7 @@ namespace Shiny.Locations
             request ??= new GpsRequest();
             (await this.RequestAccess(request)).Assert(allowRestricted: true);
 
-            if (request.UseBackground && !ShinyGpsService.IsStarted)
+            if (request.BackgroundMode == GpsBackgroundMode.Realtime && !ShinyGpsService.IsStarted)
                 this.Context.StartService(typeof(ShinyGpsService));
 
             await this.RequestLocationUpdates(request);
@@ -88,7 +110,7 @@ namespace Shiny.Locations
                 return;
 
             await this.RemoveLocationUpdates();
-            if (this.CurrentListener.UseBackground && ShinyGpsService.IsStarted)
+            if (this.CurrentListener.BackgroundMode == GpsBackgroundMode.Realtime && ShinyGpsService.IsStarted)
                 this.Context.StopService(typeof(ShinyGpsService));
 
             this.CurrentListener = null;
