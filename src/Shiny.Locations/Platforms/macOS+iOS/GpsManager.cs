@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using CoreLocation;
 using Microsoft.Extensions.Logging;
+using UIKit;
 
 
 namespace Shiny.Locations
@@ -40,8 +41,21 @@ namespace Shiny.Locations
         }
 
 
-        public Task<AccessState> RequestAccess(GpsRequest request)
-            => this.locationManager.RequestAccess(request.BackgroundMode != GpsBackgroundMode.None);
+        public async Task<AccessState> RequestAccess(GpsRequest request)
+        {
+            var bg = request.BackgroundMode != GpsBackgroundMode.None;
+            var status = await this.locationManager.RequestAccess(bg);
+
+            if (status == AccessState.Available &&
+                request.Precise &&
+                UIDevice.CurrentDevice.CheckSystemVersion(14, 0) &&
+                this.locationManager.AccuracyAuthorization != CLAccuracyAuthorization.FullAccuracy)
+            {
+                status = AccessState.Restricted;
+            }
+
+            return status;
+        }
 
 
         public AccessState GetCurrentStatus(GpsRequest request)
@@ -56,7 +70,7 @@ namespace Shiny.Locations
             {
                 var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
                 if (bg == GpsBackgroundMode.None)
-                    this.request = value; 
+                    this.request = value;
                 else
                     this.Set(ref this.request, value);
             }
