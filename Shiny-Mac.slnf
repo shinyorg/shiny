@@ -4,9 +4,6 @@
     "projects": [
       "build\\ShinyBuild.csproj",
       "docs\\Docs.csproj",
-      "samples\\Samples.Android\\Samples.Android.csproj",
-      "samples\\Samples.iOS\\Samples.iOS.csproj",
-      "samples\\Samples\\Samples.csproj",
       "src\\Shiny.Beacons\\Shiny.Beacons.csproj",
       "src\\Shiny.BluetoothLE.Common\\Shiny.BluetoothLE.Common.csproj",
       "src\\Shiny.BluetoothLE.Hosting\\Shiny.BluetoothLE.Hosting.csproj",
