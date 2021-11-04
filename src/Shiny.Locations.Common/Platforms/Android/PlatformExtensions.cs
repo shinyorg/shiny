@@ -48,8 +48,9 @@ namespace Shiny.Locations
             if (!context.IsLocationEnabled(false, false))
                 return AccessState.Disabled;
 
-            var status = AccessState.Unknown;
+            context.AssertBackgroundInManifest();
 
+            AccessState status;
             if (context.IsMinApiLevel(30))
             {
                 // Android 11+ need to request background separately
@@ -68,7 +69,10 @@ namespace Shiny.Locations
                 if (locType != LocationPermissionType.Coarse)
                     perms.Add(P.AccessFineLocation);
 
-                var results = await context.RequestPermissions(perms.ToArray()).ToTask();
+                var results = await context
+                    .RequestPermissions(perms.ToArray())
+                    .ToTask();
+
                 status = FromResult(results, locType);
                 if (status == AccessState.Available || status == AccessState.Available)
                     status = results.IsGranted(P.AccessBackgroundLocation) ? status : AccessState.Restricted;
@@ -78,6 +82,13 @@ namespace Shiny.Locations
                 status = await context.RequestLocationAccess(locType);
             }
             return status;
+        }
+
+
+        static void AssertBackgroundInManifest(this IAndroidContext context)
+        {
+            if (context.IsMinApiLevel(29) && !context.IsInManifest(P.AccessBackgroundLocation))
+                throw new ArgumentException($"{P.AccessBackgroundLocation} is not in your manifest but is required");
         }
 
 

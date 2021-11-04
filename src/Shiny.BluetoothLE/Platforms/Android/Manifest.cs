@@ -3,7 +3,6 @@ using static Android.Manifest;
 
 [assembly: UsesPermission(Permission.AccessFineLocation)]
 [assembly: UsesPermission(Permission.AccessCoarseLocation)]
-[assembly: UsesPermission(Permission.AccessBackgroundLocation)]
 [assembly: UsesPermission(Permission.Bluetooth)]
 [assembly: UsesPermission(Permission.BluetoothAdmin)]
 [assembly: UsesPermission(Permission.BluetoothPrivileged)]
