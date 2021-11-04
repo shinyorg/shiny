@@ -118,8 +118,11 @@ namespace Shiny.Locations
             var throttledInterval = request.ThrottledInterval?.TotalSeconds ?? 0;
             var minDistance = request.MinimumDistance?.TotalMeters ?? 0;
 
-            if (throttledInterval > 0 || minDistance > 0)
+            if (request.BackgroundMode != GpsBackgroundMode.None && (throttledInterval > 0 || minDistance > 0))
             {
+                this.locationManager.DistanceFilter = CLLocationDistance.FilterNone;
+                this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
+
                 this.locationManager.AllowDeferredLocationUpdatesUntil(
                     minDistance,
                     throttledInterval
