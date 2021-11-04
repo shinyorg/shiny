@@ -62,7 +62,8 @@ namespace Shiny.Net.Http
 
         protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
-            var task = this.Session.CreateUploadTask(request.ToNative());
+            var fileUrl = new NSUrl(request.LocalFile.FullName);
+            var task = this.Session.CreateUploadTask(request.ToNative(), fileUrl);
             var taskId = TaskIdentifier.Create(request.LocalFile);
             task.TaskDescription = taskId.ToString();
             var transfer = task.FromNative();
@@ -100,7 +101,6 @@ namespace Shiny.Net.Http
 
         protected string ToTaskDescription(FileInfo file)
             => $"{Guid.NewGuid()}|{file.FullName}";
-
 
 
         //this.sessionConfig.Discretionary = true;
