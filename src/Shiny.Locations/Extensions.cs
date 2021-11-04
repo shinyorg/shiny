@@ -3,6 +3,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Shiny.Locations
 {
@@ -126,19 +127,19 @@ namespace Shiny.Locations
         }
 
 
-        ///// <summary>
-        ///// Requests access for GPS and starts listening for changes.
-        ///// </summary>
-        ///// <param name="gps">The gps manager.</param>
-        ///// <param name="request">The gps request.</param>
-        ///// <returns></returns>
-        //public static async Task<AccessState> RequestAccessAndStart(this IGpsManager gps, GpsRequest request)
-        //{
-        //    var access = await gps.RequestAccess(request);
-        //    if (access == AccessState.Available)
-        //        await gps.StartListener(request);
-
-        //    return access;
-        //}
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="gpsManager"></param>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns>Returns null if current position could not be determined - else returns true if in region, false otherwise</returns>
+        public static async Task<bool?> IsInsideRegion(this IGpsManager gpsManager, Position center, Distance radius, CancellationToken cancelToken = default)
+        {
+            var result = await gpsManager.GetCurrentPosition().ToTask(cancelToken);
+            var inside = result.Position.GetDistanceTo(center) < radius;
+            return inside;
+        }
     }
 }
