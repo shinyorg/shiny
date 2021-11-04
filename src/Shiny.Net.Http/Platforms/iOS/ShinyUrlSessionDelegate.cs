@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Subjects;
 using Foundation;
@@ -10,7 +11,7 @@ namespace Shiny.Net.Http
     public class ShinyUrlSessionDelegate : NSUrlSessionDownloadDelegate
     {
         internal static Action? CompletionHandler { get; set; }
-        //readonly Lazy<IHttpTransferDelegate> tdelegate = new Lazy<IHttpTransferDelegate>(() => ShinyHost.Resolve<IHttpTransferDelegate>());
+        readonly Lazy<IEnumerable<IHttpTransferDelegate>> shinyDelegates = ShinyHost.LazyResolve<IEnumerable<IHttpTransferDelegate>>();
         readonly Subject<HttpTransfer> onEvent;
         readonly HttpTransferManager manager;
         readonly ILogger logger;
@@ -76,11 +77,9 @@ namespace Shiny.Net.Http
             var transfer = task.FromNative();
             if (transfer.PercentComplete >= 1.0)
             {
-                await ShinyHost
-                    .ServiceProvider
-                    .RunDelegates<IHttpTransferDelegate>(
-                        x => x.OnCompleted(transfer)
-                    );
+                await this.shinyDelegates.Value.RunDelegates<IHttpTransferDelegate>(
+                    x => x.OnCompleted(transfer)
+                );
             }
             this.onEvent.OnNext(transfer);
         }
@@ -102,7 +101,7 @@ namespace Shiny.Net.Http
                 // if you are debugging, the base path tends to change, so the destination path changes too
                 File.Copy(location.Path, transfer.LocalFilePath, true);
 
-            await this.tdelegate.Value.OnCompleted(transfer);
+            await this.shinyDelegates.Value.RunDelegates(x => x.OnCompleted(transfer));
             this.onEvent.OnNext(transfer);
         }
     }
