@@ -10,7 +10,7 @@ namespace Shiny.Net.Http
     public class ShinyUrlSessionDelegate : NSUrlSessionDownloadDelegate
     {
         internal static Action? CompletionHandler { get; set; }
-        readonly Lazy<IHttpTransferDelegate> tdelegate = new Lazy<IHttpTransferDelegate>(() => ShinyHost.Resolve<IHttpTransferDelegate>());
+        //readonly Lazy<IHttpTransferDelegate> tdelegate = new Lazy<IHttpTransferDelegate>(() => ShinyHost.Resolve<IHttpTransferDelegate>());
         readonly Subject<HttpTransfer> onEvent;
         readonly HttpTransferManager manager;
         readonly ILogger logger;
@@ -61,14 +61,29 @@ namespace Shiny.Net.Http
             if (task.State != NSUrlSessionTaskState.Canceling && error != null && transfer.Exception != null)
             {
                 this.logger.LogError(transfer.Exception, "Error with HTTP transfer: " + transfer.Identifier);
-                await this.tdelegate.Value.OnError(transfer, transfer.Exception);
+                await ShinyHost
+                    .ServiceProvider
+                    .RunDelegates<IHttpTransferDelegate>(
+                        x => x.OnError(transfer, transfer.Exception)
+                    );
             }
             this.onEvent.OnNext(transfer);
         }
 
 
-        public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
-            => this.onEvent.OnNext(task.FromNative());
+        public override async void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
+        {
+            var transfer = task.FromNative();
+            if (transfer.PercentComplete >= 1.0)
+            {
+                await ShinyHost
+                    .ServiceProvider
+                    .RunDelegates<IHttpTransferDelegate>(
+                        x => x.OnCompleted(transfer)
+                    );
+            }
+            this.onEvent.OnNext(transfer);
+        }
 
 
         public override void DidWriteData(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite)
