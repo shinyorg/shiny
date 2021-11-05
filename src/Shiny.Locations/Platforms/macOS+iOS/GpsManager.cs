@@ -100,6 +100,8 @@ namespace Shiny.Locations
         {
 #if __IOS__
             this.locationManager.AllowsBackgroundLocationUpdates = false;
+            //if (this.CurrentListener.MinimumDistance != null || this.CurrentListener.ThrottledInterval != nul)
+            //this.locationManager.DisallowDeferredLocationUpdates();
 #endif
             this.locationManager.StopUpdatingLocation();
             this.CurrentListener = null;
@@ -122,11 +124,6 @@ namespace Shiny.Locations
             {
                 this.locationManager.DistanceFilter = CLLocationDistance.FilterNone;
                 this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
-
-                this.locationManager.AllowDeferredLocationUpdatesUntil(
-                    minDistance,
-                    throttledInterval
-                );
             }
 #endif
             switch (request.Priority)
