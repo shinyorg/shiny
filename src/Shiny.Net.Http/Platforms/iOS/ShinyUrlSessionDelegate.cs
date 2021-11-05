@@ -61,6 +61,9 @@ namespace Shiny.Net.Http
 
             if (task.State != NSUrlSessionTaskState.Canceling && error != null && transfer.Exception != null)
             {
+                if (transfer.IsUpload)
+                    DeleteTempUploadBodyFile(task);
+
                 this.logger.LogError(transfer.Exception, "Error with HTTP transfer: " + transfer.Identifier);
                 await ShinyHost
                     .ServiceProvider
@@ -77,6 +80,8 @@ namespace Shiny.Net.Http
             var transfer = task.FromNative();
             if (transfer.PercentComplete >= 1.0)
             {
+                DeleteTempUploadBodyFile(task);
+
                 await this.shinyDelegates.Value.RunDelegates<IHttpTransferDelegate>(
                     x => x.OnCompleted(transfer)
                 );
@@ -84,6 +89,12 @@ namespace Shiny.Net.Http
             this.onEvent.OnNext(transfer);
         }
 
+        void DeleteTempUploadBodyFile(NSUrlSessionTask task)
+        {
+            var identifier = TaskIdentifier.FromString(task.Description);
+            if (identifier.IsValid && File.Exists(identifier.File.FullName) && identifier.File.Extension.Equals(".tmp"))
+                File.Delete(identifier.File.FullName);
+        }
 
         public override void DidWriteData(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite)
             => this.onEvent.OnNext(downloadTask.FromNative());
