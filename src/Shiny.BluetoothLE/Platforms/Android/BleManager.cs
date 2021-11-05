@@ -48,6 +48,7 @@ namespace Shiny.BluetoothLE
             => Observable.Return(this.context
                 .Manager
                 .GetConnectedDevices(ProfileType.Gatt)
+                .Where(x => x.Type == BluetoothDeviceType.Dual || x.Type == BluetoothDeviceType.Le) // just in case
                 .Select(this.context.GetDevice)
             );
 
