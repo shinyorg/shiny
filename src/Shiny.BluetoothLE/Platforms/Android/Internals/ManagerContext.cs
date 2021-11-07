@@ -212,22 +212,12 @@ namespace Shiny.BluetoothLE.Internals
         }
 
 
-        protected virtual ScanMode ToNative(BleScanType scanType)
+        protected virtual ScanMode ToNative(BleScanType scanType) => scanType switch
         {
-            switch (scanType)
-            {
-                case BleScanType.LowPowered:
-                    return ScanMode.LowPower;
-
-                case BleScanType.Balanced:
-                    return ScanMode.Balanced;
-
-                case BleScanType.LowLatency:
-                    return ScanMode.LowLatency;
-
-                default:
-                    throw new ArgumentException("Invalid BleScanType");
-            }
-        }
+            BleScanType.LowPowered => ScanMode.LowPower,
+            BleScanType.Balanced   => ScanMode.Balanced,
+            BleScanType.LowLatency => ScanMode.LowLatency,
+            _                      => throw new ArgumentException("Invalid BleScanType")
+        };
     }
 }
