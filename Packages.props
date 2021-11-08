@@ -7,7 +7,7 @@
         <PackageReference Update="Com.OneSignal" Version="3.10.6" />
         <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
         <PackageReference Update="Microsoft.Extensions.Logging" Version="5.0.0" />
-        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
         <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
