@@ -5,7 +5,7 @@
         <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />
         <PackageReference Update="Com.OneSignal" Version="3.10.6" />
-        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
+        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
         <PackageReference Update="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
