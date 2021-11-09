@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -62,8 +63,27 @@ namespace Shiny.Net.Http
 
         protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
-            var fileUrl = NSUrl.CreateFileUrl(request.LocalFile.FullName, null);
-            var task = this.Session.CreateUploadTask(request.ToNative(), fileUrl);
+            //var fileUrl = NSUrl.CreateFileUrl(request.LocalFile.FullName, null);
+            var native = request.ToNative();
+
+            //NSInputStream.GetBoundStreams(8192, out var inputStream, out var outputStream);
+            //native.BodyStream = inputStream;
+
+            //var boundary = Guid.NewGuid().ToString();
+            //if (!request.PostData.IsEmpty())
+            //{
+            //    outputStream.WriteString("--" + boundary);
+            //    outputStream.WriteString("Content-Type: text/plain; charset=utf-8");
+            //    outputStream.WriteString("Content-Disposition: form-data;");
+            //    outputStream.WriteLine();
+            //    outputStream.WriteString(request.PostData!);
+            //}
+            //using (var fs = request.LocalFile.OpenRead())
+            //    await fs.CopyToAsync(outputStream);
+
+            System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
+            var task = this.Session.CreateUploadTask(native);
+
             var taskId = TaskIdentifier.Create(request.LocalFile);
             task.TaskDescription = taskId.ToString();
             var transfer = task.FromNative();

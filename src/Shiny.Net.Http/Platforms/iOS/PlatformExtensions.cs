@@ -17,6 +17,9 @@ namespace Shiny.Net.Http
                 HttpMethod = request.HttpMethod.Method,
                 AllowsCellularAccess = request.UseMeteredConnection,
             };
+            if (request.IsUpload)
+                native.BodyStream = new BodyStream(request.LocalFile);
+
             if (!request.PostData.IsEmpty())
                 native.Body = NSData.FromString(request.PostData);
 
@@ -104,23 +107,14 @@ namespace Shiny.Net.Http
         public static HttpTransferState GetTransferStatus(this NSUrlSessionTask task)
         {
             var bytes = task.BytesSent + task.BytesReceived;
-            switch (task.State)
+            return task.State switch
             {
-                case NSUrlSessionTaskState.Canceling:
-                    return HttpTransferState.Canceled;
-
-                case NSUrlSessionTaskState.Running:
-                    return bytes == 0 ? HttpTransferState.Pending : HttpTransferState.InProgress;
-
-                case NSUrlSessionTaskState.Suspended:
-                    return HttpTransferState.Paused;
-
-                case NSUrlSessionTaskState.Completed:
-                    return HttpTransferState.Completed;
-
-                default:
-                    return HttpTransferState.Unknown;
-            }
+                NSUrlSessionTaskState.Canceling => HttpTransferState.Canceled,
+                NSUrlSessionTaskState.Running => bytes == 0 ? HttpTransferState.Pending : HttpTransferState.InProgress,
+                NSUrlSessionTaskState.Suspended => HttpTransferState.Paused,
+                NSUrlSessionTaskState.Completed => HttpTransferState.Completed,
+                _ => HttpTransferState.Unknown
+            };
         }
     }
 }

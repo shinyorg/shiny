@@ -41,11 +41,18 @@ namespace Shiny.Net.Http
 
 
         public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-            => completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        {
+            //challenge.ProtectionSpace.ServerSecTrust
+            var cred = new NSUrlCredential(challenge.ProtectionSpace.ServerSecTrust);
+            completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.UseCredential, cred);
+            //completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        }
 
 
         public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-            => completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        {
+            completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        }
 
 
         public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
@@ -62,11 +69,9 @@ namespace Shiny.Net.Http
             if (task.State != NSUrlSessionTaskState.Canceling && error != null && transfer.Exception != null)
             {
                 this.logger.LogError(transfer.Exception, "Error with HTTP transfer: " + transfer.Identifier);
-                await ShinyHost
-                    .ServiceProvider
-                    .RunDelegates<IHttpTransferDelegate>(
-                        x => x.OnError(transfer, transfer.Exception)
-                    );
+                await this.shinyDelegates.Value.RunDelegates(
+                    x => x.OnError(transfer, transfer.Exception)
+                );
             }
             this.onEvent.OnNext(transfer);
         }
