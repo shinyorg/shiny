@@ -37,22 +37,21 @@ namespace Shiny.Net.Http
 
 
         // reauthorize?
-        //public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, Action<NSInputStream> completionHandler)
+        public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, Action<NSInputStream> completionHandler)
+        {
+            var transfer = task.FromNative();
+            var file = new FileInfo(transfer.LocalFilePath);
+            var stream = new BodyStream(file);
+            stream.Open();
+            completionHandler(stream);
+        }
 
 
         public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-        {
-            //challenge.ProtectionSpace.ServerSecTrust
-            var cred = new NSUrlCredential(challenge.ProtectionSpace.ServerSecTrust);
-            completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.UseCredential, cred);
-            //completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
-        }
-
+            => completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
 
         public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-        {
-            completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
-        }
+            => completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
 
 
         public override void DidFinishEventsForBackgroundSession(NSUrlSession session)

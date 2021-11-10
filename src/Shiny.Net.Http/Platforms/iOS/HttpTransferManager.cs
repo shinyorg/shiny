@@ -81,8 +81,9 @@ namespace Shiny.Net.Http
             //using (var fs = request.LocalFile.OpenRead())
             //    await fs.CopyToAsync(outputStream);
 
-            System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
+            //System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
             var task = this.Session.CreateUploadTask(native);
+            //task.SetValueForKey("", "");
 
             var taskId = TaskIdentifier.Create(request.LocalFile);
             task.TaskDescription = taskId.ToString();

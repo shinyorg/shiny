@@ -20,8 +20,9 @@ namespace Shiny.Net.Http
             if (request.IsUpload)
                 native.BodyStream = new BodyStream(request.LocalFile);
 
-            if (!request.PostData.IsEmpty())
-                native.Body = NSData.FromString(request.PostData);
+            //request.Headers.Add("Content-Length", request.LocalFile.Length.ToString());
+            //if (!request.PostData.IsEmpty())
+            //    native.Body = NSData.FromString(request.PostData);
 
             if (request.Headers.Any())
                 native.Headers = NSDictionary.FromObjectsAndKeys(
@@ -82,8 +83,11 @@ namespace Shiny.Net.Http
             var upload = task is NSUrlSessionUploadTask;
             Exception? exception = null;
             if (task.Error != null && task.State != NSUrlSessionTaskState.Canceling)
-                exception = new Exception(task.Error.LocalizedDescription);
-
+            {
+                var e = task.Error;
+                var msg = $"{e.LocalizedDescription} - {e.LocalizedFailureReason}";
+                exception = new Exception(msg);
+            }
             var taskId = TaskIdentifier.FromString(task.TaskDescription);
             return new HttpTransfer(
                 taskId.Value,

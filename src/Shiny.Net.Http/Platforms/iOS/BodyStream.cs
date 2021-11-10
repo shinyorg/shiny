@@ -16,7 +16,6 @@ namespace Shiny.Net.Http
 
         public BodyStream(FileInfo file) => this.file = file;
 
-
         public override void Open()
             => this.stream = this.file.OpenRead();
 
