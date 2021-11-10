@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Subjects;
+
+using CoreFoundation;
+
 using Foundation;
 using Microsoft.Extensions.Logging;
 
@@ -36,15 +39,15 @@ namespace Shiny.Net.Http
         }
 
 
+        // this is tough to implement due to NSInputStream & CFStream delegates
         // reauthorize?
-        public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, Action<NSInputStream> completionHandler)
-        {
-            var transfer = task.FromNative();
-            var file = new FileInfo(transfer.LocalFilePath);
-            var stream = new BodyStream(file);
-            stream.Open();
-            completionHandler(stream);
-        }
+        //public override void NeedNewBodyStream(NSUrlSession session, NSUrlSessionTask task, Action<NSInputStream> completionHandler)
+        //{
+        //    var transfer = task.FromNative();
+        //    var file = new FileInfo(transfer.LocalFilePath);
+        //    //var stream = new BodyStream(file);
+        //    //completionHandler(stream);
+        //}
 
 
         public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
@@ -65,6 +68,9 @@ namespace Shiny.Net.Http
         {
             var transfer = task.FromNative();
 
+            //if (transfer.IsUpload)
+            //    DeleteTempUploadBodyFile(task);
+
             if (task.State != NSUrlSessionTaskState.Canceling && error != null && transfer.Exception != null)
             {
                 this.logger.LogError(transfer.Exception, "Error with HTTP transfer: " + transfer.Identifier);
@@ -81,6 +87,7 @@ namespace Shiny.Net.Http
             var transfer = task.FromNative();
             if (transfer.PercentComplete >= 1.0)
             {
+                //DeleteTempUploadBodyFile(task);
                 await this.shinyDelegates.Value.RunDelegates<IHttpTransferDelegate>(
                     x => x.OnCompleted(transfer)
                 );
@@ -108,5 +115,12 @@ namespace Shiny.Net.Http
             await this.shinyDelegates.Value.RunDelegates(x => x.OnCompleted(transfer));
             this.onEvent.OnNext(transfer);
         }
+
+        //void DeleteTempUploadBodyFile(NSUrlSessionTask task)
+        //{
+        //    var identifier = TaskIdentifier.FromString(task.Description);
+        //    if (identifier.IsValid && File.Exists(identifier.File.FullName) && identifier.File.Extension.Equals(".tmp"))
+        //        File.Delete(identifier.File.FullName);
+        //}
     }
 }

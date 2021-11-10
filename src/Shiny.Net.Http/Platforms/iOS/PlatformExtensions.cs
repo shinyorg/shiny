@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Foundation;
 
@@ -9,6 +11,18 @@ namespace Shiny.Net.Http
 {
     static class PlatformExtensions
     {
+        public static void Write(this Stream stream, string value, bool includeNewLine = true)
+        {
+            stream.Write(Encoding.Default.GetBytes(value));
+            if (includeNewLine)
+                stream.WriteLine();
+        }
+
+
+        public static void WriteLine(this Stream stream)
+            => stream.Write(Encoding.Default.GetBytes(Environment.NewLine));
+
+
         public static NSUrlRequest ToNative(this HttpTransferRequest request)
         {
             var url = NSUrl.FromString(request.Uri);
@@ -17,12 +31,6 @@ namespace Shiny.Net.Http
                 HttpMethod = request.HttpMethod.Method,
                 AllowsCellularAccess = request.UseMeteredConnection,
             };
-            if (request.IsUpload)
-                native.BodyStream = new BodyStream(request.LocalFile);
-
-            //request.Headers.Add("Content-Length", request.LocalFile.Length.ToString());
-            //if (!request.PostData.IsEmpty())
-            //    native.Body = NSData.FromString(request.PostData);
 
             if (request.Headers.Any())
                 native.Headers = NSDictionary.FromObjectsAndKeys(

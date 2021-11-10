@@ -14,10 +14,16 @@ namespace Shiny.Net.Http
     {
         readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;
+        readonly IPlatform platform;
 
 
-        public HttpTransferManager(AppleLifecycle lifecycle, ILogger<IHttpTransferManager> logger, int maxConnectionsPerHost = 1)
+        public HttpTransferManager(AppleLifecycle lifecycle,
+                                  ILogger<IHttpTransferManager> logger,
+                                  IPlatform platform,
+                                  int maxConnectionsPerHost = 1)
         {
+            this.platform = platform;
+
             this.sessionDelegate = new ShinyUrlSessionDelegate(this, logger);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
@@ -63,27 +69,39 @@ namespace Shiny.Net.Http
 
         protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
-            //var fileUrl = NSUrl.CreateFileUrl(request.LocalFile.FullName, null);
+            if (request.HttpMethod != System.Net.Http.HttpMethod.Post && request.HttpMethod != System.Net.Http.HttpMethod.Put)
+                throw new ArgumentException("Invalid Upload HTTP Verb " + request.HttpMethod);
+
             var native = request.ToNative();
 
-            //NSInputStream.GetBoundStreams(8192, out var inputStream, out var outputStream);
-            //native.BodyStream = inputStream;
+            var boundary = Guid.NewGuid().ToString();
+            var tempPath = Path.Combine(this.platform.Cache.FullName, request.LocalFile.Name + ".tmp");
+            using (var fs = new FileStream(tempPath, FileMode.Create))
+            {
+                if (!request.PostData.IsEmpty())
+                {
+                    fs.Write("--" + boundary);
+                    fs.Write($"Content-Type: text/plain; charset=utf-8");
+                    fs.Write("Content-Disposition: form-data;");
+                    fs.WriteLine();
+                    fs.Write(request.PostData!);
+                    fs.WriteLine();
+                }
+            }
+            using (var fs = new FileStream(tempPath, FileMode.Append))
+            {
+                using (var uploadFile = request.LocalFile.OpenRead())
+                {
+                    fs.Write("--" + boundary);
+                    fs.Write($"Content-Type: application/octet-stream");
+                    fs.Write($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFile.Name}\"");
 
-            //var boundary = Guid.NewGuid().ToString();
-            //if (!request.PostData.IsEmpty())
-            //{
-            //    outputStream.WriteString("--" + boundary);
-            //    outputStream.WriteString("Content-Type: text/plain; charset=utf-8");
-            //    outputStream.WriteString("Content-Disposition: form-data;");
-            //    outputStream.WriteLine();
-            //    outputStream.WriteString(request.PostData!);
-            //}
-            //using (var fs = request.LocalFile.OpenRead())
-            //    await fs.CopyToAsync(outputStream);
-
-            //System.Net.ServicePointManager.ServerCertificateValidationCallback = ((sender, certificate, chain, sslPolicyErrors) => true);
-            var task = this.Session.CreateUploadTask(native);
-            //task.SetValueForKey("", "");
+                    uploadFile.CopyToAsync(fs);
+                    fs.Write($"--{boundary}--");
+                }
+            }
+            var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
+            var task = this.Session.CreateUploadTask(native, tempFileUrl);
 
             var taskId = TaskIdentifier.Create(request.LocalFile);
             task.TaskDescription = taskId.ToString();
@@ -131,7 +149,7 @@ namespace Shiny.Net.Http
         NSUrlSession? session;
         internal NSUrlSession Session => this.session ??= NSUrlSession.FromConfiguration(
             this.sessionConfig,
-            this.sessionDelegate,
+            (INSUrlSessionDownloadDelegate) this.sessionDelegate,
             new NSOperationQueue()
         );
     }
