@@ -5,10 +5,10 @@
         <PackageReference Update="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Update="System.Reactive" Version="5.0.0" />
         <PackageReference Update="Com.OneSignal" Version="3.10.6" />
-        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
-        <PackageReference Update="Microsoft.Extensions.Logging" Version="5.0.0" />
-        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" />
+        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Update="Microsoft.Extensions.Logging" Version="6.0.0" />
+        <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+        <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
         <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
         <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="3.11.0" />
@@ -18,7 +18,7 @@
         <PackageReference Update="Xamarin.ShortcutBadger" Version="1.1.21" />
         <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.12" />
         <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.1" />
-        <PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
+        <!--<PackageReference Update="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />-->
     </ItemGroup>
 
     <ItemGroup>
