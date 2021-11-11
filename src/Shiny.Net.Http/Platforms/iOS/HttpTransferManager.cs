@@ -70,7 +70,7 @@ namespace Shiny.Net.Http
         protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
             if (request.HttpMethod != System.Net.Http.HttpMethod.Post && request.HttpMethod != System.Net.Http.HttpMethod.Put)
-                throw new ArgumentException("Invalid Upload HTTP Verb " + request.HttpMethod);
+                throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
 
             var native = request.ToNative();
 
