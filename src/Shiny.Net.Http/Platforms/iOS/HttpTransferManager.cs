@@ -67,15 +67,15 @@ namespace Shiny.Net.Http
         }
 
 
-        protected override Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
+        protected override async Task<HttpTransfer> CreateUpload(HttpTransferRequest request)
         {
             if (request.HttpMethod != System.Net.Http.HttpMethod.Post && request.HttpMethod != System.Net.Http.HttpMethod.Put)
                 throw new ArgumentException("Invalid Upload HTTP Verb " + request.HttpMethod);
 
             var native = request.ToNative();
-
             var boundary = Guid.NewGuid().ToString();
             var tempPath = Path.Combine(this.platform.Cache.FullName, request.LocalFile.Name + ".tmp");
+
             using (var fs = new FileStream(tempPath, FileMode.Create))
             {
                 if (!request.PostData.IsEmpty())
@@ -96,19 +96,21 @@ namespace Shiny.Net.Http
                     fs.Write($"Content-Type: application/octet-stream");
                     fs.Write($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFile.Name}\"");
 
-                    uploadFile.CopyToAsync(fs);
+                    await uploadFile.CopyToAsync(fs);
                     fs.Write($"--{boundary}--");
                 }
             }
             var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
-            var task = this.Session.CreateUploadTask(native, tempFileUrl);
 
+            //await this.Session.CreateUploadTaskAsync(native, tempFileUrl, out var task);
+            var task = this.Session.CreateUploadTask(native, tempFileUrl);
+            
             var taskId = TaskIdentifier.Create(request.LocalFile);
             task.TaskDescription = taskId.ToString();
             var transfer = task.FromNative();
             task.Resume();
 
-            return Task.FromResult(transfer);
+            return transfer;
         }
 
 
