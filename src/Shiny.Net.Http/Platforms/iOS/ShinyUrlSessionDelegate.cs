@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
 
 using CoreFoundation;
 
@@ -18,12 +19,16 @@ namespace Shiny.Net.Http
         readonly Subject<HttpTransfer> onEvent;
         readonly HttpTransferManager manager;
         readonly ILogger logger;
+        readonly IPlatform platform;
 
 
-        public ShinyUrlSessionDelegate(HttpTransferManager manager, ILogger logger)
+        public ShinyUrlSessionDelegate(HttpTransferManager manager,
+                                       ILogger logger,
+                                       IPlatform platform)
         {
             this.manager = manager;
             this.logger = logger;
+            this.platform = platform;
             this.onEvent = new Subject<HttpTransfer>();
         }
 
@@ -33,6 +38,7 @@ namespace Shiny.Net.Http
 
         public override void DidBecomeInvalid(NSUrlSession session, NSError error)
         {
+            this.logger.LogDebug($"DidBecomeInvalid");
             this.manager.CompleteSession();
             if (error != null)
                 this.logger.LogError(new Exception(error.LocalizedDescription), "DidBecomeInvalid reported an error");
@@ -51,14 +57,21 @@ namespace Shiny.Net.Http
 
 
         public override void DidReceiveChallenge(NSUrlSession session, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-            => completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        {
+            this.logger.LogDebug($"DidReceiveChallenge");
+            completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        }
 
         public override void DidReceiveChallenge(NSUrlSession session, NSUrlSessionTask task, NSUrlAuthenticationChallenge challenge, Action<NSUrlSessionAuthChallengeDisposition, NSUrlCredential> completionHandler)
-            => completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        {
+            this.logger.LogDebug($"DidReceiveChallenge for task");
+            completionHandler.Invoke(NSUrlSessionAuthChallengeDisposition.PerformDefaultHandling, null);
+        }
 
 
         public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
         {
+            this.logger.LogDebug($"DidFinishEventsForBackgroundSession");
             this.manager.CompleteSession();
             CompletionHandler?.Invoke();
         }
@@ -66,46 +79,66 @@ namespace Shiny.Net.Http
 
         public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
         {
+            this.logger.LogDebug($"DidCompleteWithError is running");
             var transfer = task.FromNative();
 
-            //if (transfer.IsUpload)
-            //    DeleteTempUploadBodyFile(task);
-
-            if (task.State != NSUrlSessionTaskState.Canceling && error != null && transfer.Exception != null)
+            switch (task.State)
             {
-                this.logger.LogError(transfer.Exception, "Error with HTTP transfer: " + transfer.Identifier);
-                await this.shinyDelegates.Value.RunDelegates(
-                    x => x.OnError(transfer, transfer.Exception)
-                );
+                case NSUrlSessionTaskState.Completed:
+                    if (error == null)
+                    {
+                        this.logger.LogInformation($"Transfer {transfer.Identifier} completed successfully");
+                        await this.shinyDelegates.Value.RunDelegates(
+                            x => x.OnCompleted(transfer)
+                        );
+                    }
+                    else
+                    {
+                        if (error.Code == -999)
+                            this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
+                        else
+                            await this.HandleError(transfer, error);
+                    }
+                    break;
+
+                case NSUrlSessionTaskState.Canceling:
+                    this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
+                    break;
+
+                default:
+                    await this.HandleError(transfer, error);
+                    break;
             }
+            this.TryDeleteUploadTempFile(transfer);
             this.onEvent.OnNext(transfer);
         }
 
 
-        public override async void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
+        public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
         {
+            this.logger.LogDebug($"DidCompleteWithError is running");
             var transfer = task.FromNative();
-            if (transfer.PercentComplete >= 1.0)
-            {
-                //DeleteTempUploadBodyFile(task);
-                await this.shinyDelegates.Value.RunDelegates<IHttpTransferDelegate>(
-                    x => x.OnCompleted(transfer)
-                );
-            }
             this.onEvent.OnNext(transfer);
         }
 
 
         public override void DidWriteData(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long bytesWritten, long totalBytesWritten, long totalBytesExpectedToWrite)
-            => this.onEvent.OnNext(downloadTask.FromNative());
+        {
+            this.logger.LogDebug("DidWriteData");
+            this.onEvent.OnNext(downloadTask.FromNative());
+        }
 
 
         public override void DidResume(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, long resumeFileOffset, long expectedTotalBytes)
-            => this.onEvent.OnNext(downloadTask.FromNative());
+        {
+            this.logger.LogDebug("DidResume");
+            this.onEvent.OnNext(downloadTask.FromNative());
+        }
 
 
         public override async void DidFinishDownloading(NSUrlSession session, NSUrlSessionDownloadTask downloadTask, NSUrl location)
         {
+            this.logger.LogDebug("DidFinishDownloading");
             var transfer = downloadTask.FromNative();
 
             if (!transfer.LocalFilePath.IsEmpty())
@@ -116,11 +149,35 @@ namespace Shiny.Net.Http
             this.onEvent.OnNext(transfer);
         }
 
-        //void DeleteTempUploadBodyFile(NSUrlSessionTask task)
-        //{
-        //    var identifier = TaskIdentifier.FromString(task.Description);
-        //    if (identifier.IsValid && File.Exists(identifier.File.FullName) && identifier.File.Extension.Equals(".tmp"))
-        //        File.Delete(identifier.File.FullName);
-        //}
+
+        protected virtual async Task HandleError(HttpTransfer transfer, NSError error)
+        {
+            this.logger.LogError(transfer.Exception, "Error with HTTP transfer: " + transfer.Identifier);
+            await this.shinyDelegates.Value.RunDelegates(
+                x => x.OnError(transfer, transfer.Exception)
+            );
+        }
+
+
+        void TryDeleteUploadTempFile(HttpTransfer transfer)
+        {
+            if (!transfer.IsUpload)
+                return;
+
+            var path = this.platform.GetUploadTempFilePath(transfer);
+            if (File.Exists(path))
+            {
+                try
+                {
+                    // sometimes iOS will hold a file lock a bit longer than it should
+                    File.Delete(path);
+                    this.logger.LogDebug($"Temporary upload file deleted - {transfer.Identifier}");
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning($"Unable to delete temporary upload file - {transfer.Identifier}", ex);
+                }
+            }
+        }
     }
 }

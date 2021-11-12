@@ -23,6 +23,20 @@ namespace Shiny.Net.Http
             => stream.Write(Encoding.Default.GetBytes(Environment.NewLine));
 
 
+        public static string GetUploadTempFilePath(this IPlatform platform, HttpTransferRequest request)
+            => GetUploadTempFilePath(platform, request.LocalFile.Name);
+
+
+        public static string GetUploadTempFilePath(this IPlatform platform, HttpTransfer transfer)
+            => GetUploadTempFilePath(platform, transfer.LocalFilePath);
+
+
+        static string GetUploadTempFilePath(IPlatform platform, string fileName)
+        {
+            var tempPath = Path.Combine(platform.Cache.FullName, fileName + ".tmp");
+            return tempPath;
+        }
+
         public static NSUrlRequest ToNative(this HttpTransferRequest request)
         {
             var url = NSUrl.FromString(request.Uri);

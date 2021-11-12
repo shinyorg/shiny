@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Foundation;
 using Microsoft.Extensions.Logging;
@@ -14,6 +13,7 @@ namespace Shiny.Net.Http
     {
         readonly ShinyUrlSessionDelegate sessionDelegate;
         readonly NSUrlSessionConfiguration sessionConfig;
+        readonly ILogger logger;
         readonly IPlatform platform;
 
 
@@ -23,8 +23,9 @@ namespace Shiny.Net.Http
                                   int maxConnectionsPerHost = 1)
         {
             this.platform = platform;
+            this.logger = logger;
 
-            this.sessionDelegate = new ShinyUrlSessionDelegate(this, logger);
+            this.sessionDelegate = new ShinyUrlSessionDelegate(this, logger, platform);
             this.sessionConfig = NSUrlSessionConfiguration.CreateBackgroundSessionConfiguration(SessionName);
             this.sessionConfig.HttpMaximumConnectionsPerHost = maxConnectionsPerHost;
             this.sessionConfig.RequestCachePolicy = NSUrlRequestCachePolicy.ReloadIgnoringLocalAndRemoteCacheData;
@@ -57,8 +58,6 @@ namespace Shiny.Net.Http
             var task = this.Session.CreateDownloadTask(request.ToNative());
             var taskId = TaskIdentifier.Create(request.LocalFile);
             task.TaskDescription = taskId.ToString();
-            //task.Response.SuggestedFilename
-            //task.Response.ExpectedContentLength
 
             var transfer = task.FromNative();
             task.Resume();
@@ -74,7 +73,8 @@ namespace Shiny.Net.Http
 
             var native = request.ToNative();
             var boundary = Guid.NewGuid().ToString();
-            var tempPath = Path.Combine(this.platform.Cache.FullName, request.LocalFile.Name + ".tmp");
+            var tempPath = platform.GetUploadTempFilePath(request);
+            this.logger.LogInformation("Writing temp form data body to " + tempPath);
 
             using (var fs = new FileStream(tempPath, FileMode.Create))
             {
@@ -100,11 +100,11 @@ namespace Shiny.Net.Http
                     fs.Write($"--{boundary}--");
                 }
             }
+
+            this.logger.LogInformation("Form body written");
             var tempFileUrl = NSUrl.CreateFileUrl(tempPath, null);
 
-            //await this.Session.CreateUploadTaskAsync(native, tempFileUrl, out var task);
             var task = this.Session.CreateUploadTask(native, tempFileUrl);
-            
             var taskId = TaskIdentifier.Create(request.LocalFile);
             task.TaskDescription = taskId.ToString();
             var transfer = task.FromNative();
@@ -138,10 +138,6 @@ namespace Shiny.Net.Http
             if (task != null)
                 task.Cancel();
         }
-
-
-        protected string ToTaskDescription(FileInfo file)
-            => $"{Guid.NewGuid()}|{file.FullName}";
 
 
         //this.sessionConfig.Discretionary = true;
