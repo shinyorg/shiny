@@ -82,27 +82,17 @@ namespace Shiny.Net.Http
             this.logger.LogDebug($"DidCompleteWithError is running");
             var transfer = task.FromNative();
 
-            switch (task.State)
+            switch (transfer.Status)
             {
-                case NSUrlSessionTaskState.Completed:
-                    if (error == null)
-                    {
-                        this.logger.LogInformation($"Transfer {transfer.Identifier} completed successfully");
-                        await this.shinyDelegates.Value.RunDelegates(
-                            x => x.OnCompleted(transfer)
-                        );
-                    }
-                    else
-                    {
-                        if (error.Code == -999)
-                            this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
-                        else
-                            await this.HandleError(transfer, error);
-                    }
+                case HttpTransferState.Canceled:
+                    this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
                     break;
 
-                case NSUrlSessionTaskState.Canceling:
-                    this.logger.LogWarning($"Transfer {transfer.Identifier} was cancelled");
+                case HttpTransferState.Completed:
+                    this.logger.LogInformation($"Transfer {transfer.Identifier} completed successfully");
+                    await this.shinyDelegates.Value.RunDelegates(
+                        x => x.OnCompleted(transfer)
+                    );
                     break;
 
                 default:
@@ -169,6 +159,8 @@ namespace Shiny.Net.Http
             {
                 try
                 {
+                    this.logger.LogDebug($"Deleting temporary upload file - {transfer.Identifier}");
+
                     // sometimes iOS will hold a file lock a bit longer than it should
                     File.Delete(path);
                     this.logger.LogDebug($"Temporary upload file deleted - {transfer.Identifier}");

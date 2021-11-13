@@ -102,13 +102,47 @@ namespace Shiny.Net.Http
 
         public static HttpTransfer FromNative(this NSUrlSessionTask task)
         {
+            var status = HttpTransferState.Unknown;
             var upload = task is NSUrlSessionUploadTask;
             Exception? exception = null;
-            if (task.Error != null && task.State != NSUrlSessionTaskState.Canceling)
+
+            switch (task.State)
             {
-                var e = task.Error;
-                var msg = $"{e.LocalizedDescription} - {e.LocalizedFailureReason}";
-                exception = new Exception(msg);
+                case NSUrlSessionTaskState.Canceling:
+                    status = HttpTransferState.Canceled;
+                    break;
+
+                case NSUrlSessionTaskState.Completed:
+                    status = task.Error?.Code == -999
+                        ? HttpTransferState.Canceled
+                        : HttpTransferState.Completed;
+                    break;
+
+                case NSUrlSessionTaskState.Suspended:
+                    status = HttpTransferState.Paused;
+                    break;
+
+                case NSUrlSessionTaskState.Running:
+                    var bytes = task.BytesSent + task.BytesReceived;
+                    status = bytes == 0 ? HttpTransferState.Pending : HttpTransferState.InProgress;
+                    break;
+
+                default:
+                    status = HttpTransferState.Error;
+                    if (task.Error == null)
+                    {
+                        exception = new Exception("Unknown Error");
+                    }
+                    else
+                    {
+                        status = HttpTransferState.Error;
+                        var e = task.Error;
+                        var msg = $"{e.LocalizedDescription} - {e.LocalizedFailureReason}";
+                        exception = new Exception(msg);
+                    }
+
+                    break;
+
             }
             var taskId = TaskIdentifier.FromString(task.TaskDescription);
             return new HttpTransfer(
@@ -125,22 +159,8 @@ namespace Shiny.Net.Http
                     ? task.BytesSent
                     : task.BytesReceived,
 
-                task.GetTransferStatus()
+                status
             );
-        }
-
-
-        public static HttpTransferState GetTransferStatus(this NSUrlSessionTask task)
-        {
-            var bytes = task.BytesSent + task.BytesReceived;
-            return task.State switch
-            {
-                NSUrlSessionTaskState.Canceling => HttpTransferState.Canceled,
-                NSUrlSessionTaskState.Running => bytes == 0 ? HttpTransferState.Pending : HttpTransferState.InProgress,
-                NSUrlSessionTaskState.Suspended => HttpTransferState.Paused,
-                NSUrlSessionTaskState.Completed => HttpTransferState.Completed,
-                _ => HttpTransferState.Unknown
-            };
         }
     }
 }
