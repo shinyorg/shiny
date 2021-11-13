@@ -79,7 +79,7 @@ namespace Shiny.Net.Http
 
         public override async void DidCompleteWithError(NSUrlSession session, NSUrlSessionTask task, NSError error)
         {
-            this.logger.LogDebug($"DidCompleteWithError is running");
+            this.logger.LogDebug($"DidCompleteWithError");
             var transfer = task.FromNative();
 
             switch (transfer.Status)
@@ -106,7 +106,7 @@ namespace Shiny.Net.Http
 
         public override void DidSendBodyData(NSUrlSession session, NSUrlSessionTask task, long bytesSent, long totalBytesSent, long totalBytesExpectedToSend)
         {
-            this.logger.LogDebug($"DidCompleteWithError is running");
+            this.logger.LogDebug($"DidSendBodyData");
             var transfer = task.FromNative();
             this.onEvent.OnNext(transfer);
         }
