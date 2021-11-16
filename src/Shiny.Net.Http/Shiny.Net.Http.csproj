@@ -5,29 +5,14 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>$(TargetFrameworks);netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>$(TargetFrameworks);net6.0-ios13.6;net6.0-maccatalyst13.6;net6.0-android30</TargetFrameworks>
+        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(IsStandardBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsMacBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
+    <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
     </ItemGroup>

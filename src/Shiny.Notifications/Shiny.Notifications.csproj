@@ -5,38 +5,29 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>$(TargetFrameworks);netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(TargetFrameworks)</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>$(TargetFrameworks);net6.0-ios13.6;net6.0-maccatalyst13.6;net6.0-android30</TargetFrameworks>
+        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(IsStandardBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
-        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" />
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsMacBuild)' == 'true'">
+    <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
         <PackageReference Include="Xamarin.ShortcutBadger" />
         <PackageReference Include="Xamarin.AndroidX.AppCompat" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
+        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true' OR '$(IsWindowsBuild)' == 'true'">
+        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
+    </ItemGroup>
 </Project>

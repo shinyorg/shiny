@@ -5,43 +5,21 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>$(TargetFrameworks);netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(TargetFrameworks)</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>$(TargetFrameworks);net6.0-ios13.6;net6.0-maccatalyst13.6;net6.0-android30</TargetFrameworks>
+        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(IsStandardBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
-        <Compile Include="Platforms\Shared\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsMacBuild)' == 'true'">
+    <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
-        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
-        <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\Uwp\**\*.cs" />
     </ItemGroup>
 </Project>

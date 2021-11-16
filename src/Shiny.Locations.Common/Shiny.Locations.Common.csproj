@@ -2,30 +2,18 @@
 
     <PropertyGroup>
         <Description>Shiny Locations - Common components for Beacons and Locations</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(TargetFrameworks)</TargetFrameworks>
         <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
+        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
+    </PropertyGroup>
+
     <ItemGroup>
-        <Compile Remove="Platforms\**\*.cs" />
-        <None Include="Platforms\**\*.cs" />
-        <PackageReference Include="System.Reactive" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <Compile Include="Platforms\android\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 </Project>

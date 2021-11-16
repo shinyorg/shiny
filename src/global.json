@@ -5,6 +5,6 @@
     //    "allowPrerelease": false
     //},
     "msbuild-sdks": {
-        "MSBuild.Sdk.Extras": "3.0.22"
+        "MSBuild.Sdk.Extras": "3.0.38"
     }
 }
