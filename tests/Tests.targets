@@ -19,6 +19,6 @@
         <PackageReference Include="OneSignal.net" />
     </ItemGroup>
 
-    <Import Project="..\LocalOrNuget.targets" />
+    <Import Project=".\LocalOrNuget.targets" />
     <Import Project="Shiny.Tests.Shared\Shiny.Tests.Shared.projitems" Label="Shared" />
 </Project>

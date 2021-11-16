@@ -1,31 +1,23 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
         <Description>Shiny Push Integration - OneSignal</Description>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
+        <TargetFrameworks>$(TargetFrameworks);netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
+        <TargetFrameworks>$(TargetFrameworks);net6.0-ios13.6;net6.0-maccatalyst13.6;net6.0-android30</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Remove="Shared\**\*.cs" />
         <None Include="Shared\**\*.cs" />
         <PackageReference Include="Com.OneSignal" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
-        <Compile Include="Shared\**\*.cs" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <Compile Include="Shared\**\*.cs" />
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.Contains('ios')) ">
-        <Compile Include="Shared\**\*.cs" />
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Push.Common\Shiny.Push.Common.csproj" />
-    </ItemGroup>
 </Project>

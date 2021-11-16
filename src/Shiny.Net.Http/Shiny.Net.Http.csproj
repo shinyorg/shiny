@@ -2,48 +2,34 @@
 
     <PropertyGroup>
         <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
-        <!--<TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>-->
     </PropertyGroup>
 
-    <ItemGroup>
-        <Compile Remove="Platforms\**\*.cs" />
-        <None Include="Platforms\**\*.cs" />
+    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
+        <TargetFrameworks>$(TargetFrameworks);netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
+        <TargetFrameworks>$(TargetFrameworks);net6.0-ios13.6;net6.0-maccatalyst13.6;net6.0-android30</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(IsStandardBuild)' == 'true'">
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
+    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-        <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
+    <ItemGroup Condition="'$(IsMacBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-        <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.mac')) ">
+    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
         <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-        <Reference Include="netstandard" />
-        <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\*macOS*\**\*.cs" />
-    </ItemGroup>
-
-    <!--<ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-        <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\Uwp\**\*.cs" />
-    </ItemGroup>-->
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
-        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
-        <Compile Include="Platforms\Shared\**\*.cs" />
-        <Compile Include="Platforms\Android\**\*.cs" />
     </ItemGroup>
 
 </Project>

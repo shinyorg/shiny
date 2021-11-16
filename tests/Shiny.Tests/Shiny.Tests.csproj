@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Moq" />
         <PackageReference Include="FluentAssertions" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
@@ -43,10 +42,11 @@
         <ProjectReference Include="..\..\src\Shiny\Shiny.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(OS) == 'WINDOWS_NT' ">
+    <!--hmmmm-->
+    <!--<ItemGroup Condition=" $(OS) == 'WINDOWS_NT' ">
         <Reference Include="c:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\MonoAndroid\v10.0\Mono.Android.dll" />
         <Reference Include="c:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\ReferenceAssemblies\Microsoft\Framework\Xamarin.iOS\v1.0\Xamarin.iOS.dll" />
-    </ItemGroup>
+    </ItemGroup>-->
 
     <Import Project="..\Shiny.Tests.Shared\Shiny.Tests.Shared.projitems" Label="Shared" />
 

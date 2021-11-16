@@ -6,8 +6,11 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>$(TargetFrameworks);netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(BuildLegacy)' == 'true' AND $(OS) == 'WINDOWS_NT'">
+        <TargetFrameworks>$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
@@ -15,61 +18,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="**\Platforms\**\*.cs" />
-        <Compile Remove="**\Platforms\**\*.cs" />
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsStandardBuild)' == 'true'">
-        <Compile Include="**\Platforms\*netstandard*\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-    </ItemGroup>
-
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <Compile Include="**\Platforms\Android\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
     </ItemGroup>
-
-    <ItemGroup Condition="'$(IsIosBuild)' == 'true' ">
-        <Compile Include="**\Platforms\Apple\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\*iOS*\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsTvOsBuild)' == 'true' ">
-        <Compile Include="**\Platforms\Apple\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsMacBuild)' == 'true' ">
-        <Compile Include="**\Platforms\Apple\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\*macOS*\**\*.cs" />
-        <Reference Include="netstandard" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('uap')) ">
-        <Compile Include="**\Platforms\Uwp\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-    </ItemGroup>
-
-    <!--
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
-        <Compile Include="**\Platforms\Tizen\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-    </ItemGroup>
-    <ItemGroup Condition=" $(TargetFramework.Contains('watchos')) ">
-        <Compile Include="**\Platforms\Apple\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\*watchOS*\**\*.cs" />
-    </ItemGroup>
-    -->
-
 </Project>

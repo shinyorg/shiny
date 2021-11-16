@@ -16,9 +16,8 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
+    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <Compile Include="Platforms\ios\**\*.cs" />
     </ItemGroup>
 
     <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">

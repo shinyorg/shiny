@@ -2,15 +2,15 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <LangVersion>9.0</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" />
-        <PackageReference Include="Statiq.Web" />
-        <PackageReference Include="Devlead.Statiq" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Statiq.Web" Version="1.0.0-beta.33" />
+        <PackageReference Include="Devlead.Statiq" Version="0.12.0" />
     </ItemGroup>
 
 </Project>
