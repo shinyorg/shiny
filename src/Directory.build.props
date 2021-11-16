@@ -14,14 +14,46 @@
         <PackageVersion>$(ShinyVersion)</PackageVersion>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReleaseNotes>https://shinylib.net/release-notes/</PackageReleaseNotes>
-        <PackageTags>xamarin uwp ios android tvos ble bluetooth bluetoothle push notifications sensors geofences gps location backgroundjobs settings environment speech sensors</PackageTags>
+        <PackageTags>xamarin ios android ble bluetooth bluetoothle push notifications sensors geofences gps location background jobs settings speech sensors</PackageTags>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <BuildLegacy>true</BuildLegacy>
+        <BuildNet6>false</BuildNet6>
         <ExtrasUwpMetaPackageVersion>6.2.13</ExtrasUwpMetaPackageVersion>
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
         <AndroidTargetFramework>monoandroid11.0</AndroidTargetFramework>
+        <IosTargetFrameworkVersion>13.6</IosTargetFrameworkVersion>
+        <TvosTargetFrameworkVersion>13.6</TvosTargetFrameworkVersion>
+        <MacCatalystTargetFrameworkVersion>13.5</MacCatalystTargetFrameworkVersion>
+        <MacosTargetFrameworkVersion>10.14</MacosTargetFrameworkVersion>
+        <AndroidTargetFrameworkVersion>30.0</AndroidTargetFrameworkVersion>
+        <WindowsTargetFrameworkVersion>10.0.19041</WindowsTargetFrameworkVersion>
+    </PropertyGroup>
+
+    <!--Shiny should not build for net6.0 directly-->
+    <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR '$(TargetFramework)' == 'net6.0'">
+        <IsStandardBuild>true</IsStandardBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
+        <DefineConstants>$(DefineConstants);__ANDROID__</DefineConstants>
+        <IsAndroidBuild>true</IsAndroidBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.Contains('ios'))">
+        <IsIosBuild>true</IsIosBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.Contains('mac'))">
+        <IsMacBuild>true</IsMacBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.Contains('tvos'))">
+        <IsTvOsBuild>true</IsTvOsBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
