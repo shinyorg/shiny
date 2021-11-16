@@ -21,5 +21,6 @@
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
+        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
     </ItemGroup>
 </Project>
