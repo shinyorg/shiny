@@ -8,26 +8,24 @@
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
         <Description>Shiny</Description>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
+        <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.4.0</ShinyVersion>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
-        <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.4.0</ShinyVersion>
         <PackageVersion>$(ShinyVersion)</PackageVersion>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReleaseNotes>https://shinylib.net/release-notes/</PackageReleaseNotes>
         <PackageTags>xamarin uwp ios android tvos ble bluetooth bluetoothle push notifications sensors geofences gps location backgroundjobs settings environment speech sensors</PackageTags>
+        <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
-        <DefineConstants Condition=" $(TargetFramework.StartsWith('tizen')) ">$(DefineConstants);__TIZEN__</DefineConstants>
         <ExtrasUwpMetaPackageVersion>6.2.13</ExtrasUwpMetaPackageVersion>
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
-        <AndroidTargetFramework>monoandroid10.0</AndroidTargetFramework>
-        <PackageReadmeFile>readme.md</PackageReadmeFile>
-        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+        <AndroidTargetFramework>monoandroid11.0</AndroidTargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
-        <UseWPF>true</UseWPF>
+    <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'WINDOWS_NT' ">
@@ -46,10 +44,6 @@
         <None Include="$(MSBuildThisFileDirectory)nuget.txt" Pack="true" PackagePath="readme.txt" />
         <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-    </ItemGroup>
-
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
-        <PackageReference Include="Microsoft.Windows.SDK.Contracts" />
     </ItemGroup>
 
 </Project>
