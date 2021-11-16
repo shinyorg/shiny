@@ -14,33 +14,29 @@
         <PackageVersion>$(ShinyVersion)</PackageVersion>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReleaseNotes>https://shinylib.net/release-notes/</PackageReleaseNotes>
-        <PackageTags>xamarin uwp ios android tizen tvos watchos ble bluetooth bluetoothle push notifications sensors geofences gps location backgroundjobs settings environment speech sensors</PackageTags>
+        <PackageTags>xamarin uwp ios android tvos ble bluetooth bluetoothle push notifications sensors geofences gps location backgroundjobs settings environment speech sensors</PackageTags>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <!--<DebugType Condition=" $(Configuration) == 'Release' ">embedded</DebugType>
-        <DebugType Condition=" $(Configuration) == 'Debug' ">full</DebugType>-->
         <DefineConstants Condition=" $(TargetFramework.StartsWith('monoandroid')) ">$(DefineConstants);__ANDROID__</DefineConstants>
         <DefineConstants Condition=" $(TargetFramework.StartsWith('tizen')) ">$(DefineConstants);__TIZEN__</DefineConstants>
-        <ExtrasUwpMetaPackageVersion>6.2.12</ExtrasUwpMetaPackageVersion>
+        <ExtrasUwpMetaPackageVersion>6.2.13</ExtrasUwpMetaPackageVersion>
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
         <AndroidTargetFramework>monoandroid10.0</AndroidTargetFramework>
-        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
+        <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcore')) OR $(TargetFramework.StartsWith('net4')) ">
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(CI)' == 'true'">
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' AND '$(OS)' == 'WINDOWS_NT' ">
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <IncludeSymbols>True</IncludeSymbols>
+        <!--<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>-->
         <IncludeSource>True</IncludeSource>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <EmbedUntrackedSources>True</EmbedUntrackedSources>
     </PropertyGroup>
