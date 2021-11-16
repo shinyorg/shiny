@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -8,10 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="Cake.Frosting" />
-        <PackageReference Include="Cake.AppCenter" />
         <PackageReference Include="Cake.Boots" />
-        <PackageReference Include="Cake.AndroidAppManifest" />
-        <PackageReference Include="Cake.Plist" />
         <PackageReference Include="Cake.Git" />
         <PackageReference Include="LibGit2Sharp" />
         <PackageReference Include="TweetinviAPI" />

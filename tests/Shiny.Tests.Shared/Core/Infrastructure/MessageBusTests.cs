@@ -38,10 +38,10 @@ namespace Shiny.Tests.Core.Infrastructure
             var bus = new MessageBus();
             var count = 0;
 
-            bus.Listener<BusTest>("test").Subscribe(_ => count++);
-            bus.Publish("test", new BusTest { Value = "1" });
-            bus.Publish("test", new BusTest { Value = "2" });
-            bus.Publish("test", new object());
+            bus.NamedListener<BusTest>("test").Subscribe(_ => count++);
+            bus.PublishNamedMessage("test", new BusTest { Value = "1" });
+            bus.PublishNamedMessage("test", new BusTest { Value = "2" });
+            bus.PublishNamedMessage("test", new object());
             bus.Publish(new BusTest());
             await Task.Delay(1000);
             count.Should().Be(2);
