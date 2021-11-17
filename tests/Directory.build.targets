@@ -1,3 +1,22 @@
 <Project>
-    <Sdk Name="Microsoft.Build.CentralPackageVersions" Version="2.0.79" />
+    <ItemGroup>
+        <PackageReference Update="Mobile.BuildTools" Version="2.0.245" />
+        <PackageReference Update="Xamarin.Forms" Version="5.0.0.2196" />
+        <PackageReference Update="Xamarin.Essentials" Version="1.7.0" />
+        <PackageReference Update="OneSignal.net" Version="1.0.6" />
+        <PackageReference Update="Acr.UserDialogs" Version="7.2.0.534" />
+        <PackageReference Update="DryIoc.Microsoft.DependencyInjection" Version="5.1.0" />
+        <PackageReference Update="FluentAssertions" Version="6.2.0" />
+        <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+        <PackageReference Update="FirebaseAdmin" Version="2.2.0" />
+        <PackageReference Update="Moq" Version="4.16.1" />
+        <PackageReference Update="xunit" Version="2.4.1" />
+        <PackageReference Update="xunit.runner.devices" Version="2.5.25" />
+        <PackageReference Update="xunit.runner.visualstudio" Version="2.4.3" />
+        <PackageReference Update="MartinCostello.Logging.XUnit" Version="0.2.0" />
+        <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
+        <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.13" />
+        <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
+        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
+    </ItemGroup>
 </Project>
