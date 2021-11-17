@@ -44,6 +44,7 @@ body:
       - label: Android 9
       - label: Android 10
       - label: Android 11
+      - label: Android 12
       - label: UWP (Sponsors ONLY)
   - type: textarea
     validations:
