@@ -53,7 +53,8 @@ namespace Docs.Shortcodes
         //        sb.AppendLine($"|**{category}**|{value}|");
         //}
 
-
+        // TODO: generate samples
+        // TODO: show sponsor only tag
         static string RenderService(IDocument document, Package package, PackageService service)
         {
             var tabGroup = BuildTabGroup(package, service);
@@ -76,12 +77,12 @@ namespace Docs.Shortcodes
                 using (var writer = new StringWriter())
                 {
                     MarkdownHelper.RenderMarkdown(
+                        null, // TODO: IExecutionState
                         document,
                         tab.Content,
                         writer,
                         false, //prependLinkRoot
-                        "common", //configuration,
-                        null
+                        "common" //configuration
                     );
                     contentBuilder.AppendLine(writer.ToString());
                 }
@@ -143,14 +144,24 @@ namespace Docs.Shortcodes
 
 
         static string RenderGeneralTab(Package package, PackageService service)
-            => new StringBuilder()
+        {
+            var sb = new StringBuilder()
+                .AppendLine()
                 .AppendLine("|Area|Info|")
                 .AppendLine("|---|---|")
                 .AppendLine($"|Description|{service.Description}|")
-                .AppendLine($"|Service|{service.Name}")
+                .AppendLine($"|Service|{service.Name}|")
                 .AppendLine($"|NuGet|{Utils.ToNugetShield(package.Name, package.Name)}|")
-                .AppendLine($"|Static Generated Class|{service.Static}")
-                .ToString();
+                .AppendLine($"|Static Generated Class|{service.Static}|");
+
+            // samples on the service or package?  currently on package
+            //if (package != null)
+            //{
+            //    foreach (var sample )
+            //}
+
+            return sb.ToString();
+        }
 
 
         static string RenderStartup(PackageService service)

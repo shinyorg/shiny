@@ -1,5 +1,11 @@
 ﻿{
     "name": "Shiny.Notifications",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Notifications"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.Notifications.INotificationManager",

@@ -1,6 +1,16 @@
 ﻿{
     "name": "Shiny.Framework",
-    "description": "Core Services for Shiny",
+    "description": "Prism+RXUI+Shiny - Bringing the Xamarin Forces Together",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Integration-Best-Prism-RXUI"
+        },
+        {
+            "description": "Prism+RXUI+Shiny without Framework :(",
+            "urlPath": "Integration-Prism"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.ILocalize",

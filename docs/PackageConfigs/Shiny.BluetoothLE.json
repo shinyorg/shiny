@@ -1,5 +1,11 @@
 ﻿{
     "name": "Shiny.BluetoothLE",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "BluetoothLE"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.BluetoothLE.IBleManager",

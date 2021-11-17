@@ -2,6 +2,12 @@
     "name": "Shiny.GeoDispatch",
     "description": "Push + GPS - Incident management",
     "sponsors": true,
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Sponsors-GeoDispatch"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.GeoDispatch.IGeoDispatchManager",

@@ -1,6 +1,20 @@
 ﻿{
     "name": "Shiny.Locations",
     "description": "GPS, Geofencing, & Motion Activity Recogntion Services",
+    "samples": [
+        {
+            "description": "GPS",
+            "urlPath": "Locations-Gps"
+        },
+        {
+            "description": "Geofencing",
+            "urlPath": "Locations-Gps"
+        },
+        {
+            "description": "Motion Activity",
+            "urlPath": "Locations-MotionActivity"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.Locations.IGpsManager",

@@ -2,6 +2,12 @@
     "name": "Shiny.Push.FirebaseMessaging",
     "description": "Push Provider for Firebase Messaging",
     "category": "Integrations",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Push-Firebase"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.Push.IPushManager",

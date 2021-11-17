@@ -2,21 +2,26 @@
     "name": "Shiny.Core",
     "description": "Core Services for Shiny",
     "order":  1,
-
+    "samples": [
+        {
+            "description": "All Boilerplate",
+            "urlPath": "Boilerplate-NoCodeGen"
+        },
+        {
+            "description": "No Boilerplate",
+            "urlPath": "Boilerplate-All-CodeGen"
+        },
+        {
+            "description": "Stores",
+            "urlPath": "Stores"
+        }
+    ],
     "services": [
         {
-            "name": "Shiny.Jobs.IJobManager",
+            "name": "Shiny.IPlatform",
             "ios": {},
             "android": {
-                "manifestUsesPermissions": [
-                    "android.permission.ACCESS_NETWORK_STATE",
-                    "android.permission.ACCESS_WIFI_STATE",
-                    "android.permission.BATTERY_STATS",
-                    "android.permission.RECEIVE_BOOT_COMPLETED",
-                    "android.permission.WRITE_EXTERNAL_STORAGE",
-                    "android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.INTERNET"
-                ]
+
             },
             "uwp": {}
         }

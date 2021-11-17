@@ -1,5 +1,11 @@
 ﻿{
     "name": "Shiny.BluetoothLE.Hosting",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "BluetoothLE-Hosting"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.BluetoothLE.IBleHostingManager",

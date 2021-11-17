@@ -1,7 +1,12 @@
 ﻿{
     "name": "Shiny.Beacons",
     "description": "iBeacon Ranging & Background Monitoring",
-
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Beacons"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.Beacons.IBeaconRangingManager",

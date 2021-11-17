@@ -1,6 +1,11 @@
 ﻿{
     "name": "Shiny.Sensors",
-
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Sensors"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.Sensors.IAccelerometer",

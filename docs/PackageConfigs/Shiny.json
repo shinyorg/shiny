@@ -1,4 +1,11 @@
 ﻿{
     "name": "Shiny",
-    "order": 1
+    "description": "The build dev dependency that generates all the boilerplate things",
+    "order": 1,
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Boilerplate-All-CodeGen"
+        }
+    ]
 }

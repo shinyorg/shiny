@@ -1,6 +1,12 @@
 ﻿{
     "name": "Shiny.Push.OneSignal",
     "description": "Push Provider for OneSignal",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Push-OneSignal"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.Push.IPushManager",

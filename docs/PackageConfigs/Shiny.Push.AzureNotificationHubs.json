@@ -1,6 +1,12 @@
 ﻿{
     "name": "Shiny.Push.AzureNotificationHubs",
     "category": "Integrations",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Push-AzureNotificationHubs"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.Push.IPushManager",

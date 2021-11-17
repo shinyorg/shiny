@@ -1,5 +1,11 @@
 ﻿{
     "name": "Shiny.SpeechRecognition",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "SpeechRecognition"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.SpeechRecognition.ISpeechRecognizer",

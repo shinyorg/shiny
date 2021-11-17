@@ -9,9 +9,16 @@ namespace Docs.Shortcodes
         public string Name { get; set; }
         public string Description { get; set; }
         public int Order { get; set; } = 1000;
+        public PackageSample[] Samples { get; set; }
         public bool Sponsors { get; set; }
-
         public PackageService[] Services { get; set; }
+    }
+
+
+    public class PackageSample
+    {
+        public string Description { get; set; }
+        public string UrlPath { get; set; }
     }
 
 

@@ -1,6 +1,12 @@
 ﻿{
     "name": "Shiny.Push",
     "description": "Native OS Push Providers",
+    "samples": [
+        {
+            "description": "Sample",
+            "urlPath": "Push-Native"
+        }
+    ],
     "services": [
         {
             "name": "Shiny.Push.IPushManager",
