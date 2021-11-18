@@ -5,8 +5,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(TargetFrameworks)</TargetFrameworks>
-        <TargetFrameworks Condition=" $(OS) == 'WINDOWS_NT' ">$(UwpTargetFramework);$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(UwpTargetFramework)</TargetFrameworks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
