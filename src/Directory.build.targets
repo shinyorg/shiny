@@ -95,7 +95,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
-        <Compile Include="**\Platforms\Uwp\**\*.cs" />
+        <Compile Include="**\Platforms\*Uwp*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
