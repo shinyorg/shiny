@@ -23,14 +23,16 @@
 
     <PropertyGroup>
         <BuildLegacy>true</BuildLegacy>
-        <BuildNet6>false</BuildNet6>
+        <BuildNet6>true</BuildNet6>
         <AndroidTargetFramework>monoandroid11.0</AndroidTargetFramework>
-        <IosTargetFrameworkVersion>13.6</IosTargetFrameworkVersion>
-        <TvosTargetFrameworkVersion>13.6</TvosTargetFrameworkVersion>
-        <MacCatalystTargetFrameworkVersion>13.5</MacCatalystTargetFrameworkVersion>
-        <MacosTargetFrameworkVersion>10.14</MacosTargetFrameworkVersion>
-        <AndroidTargetFrameworkVersion>30.0</AndroidTargetFrameworkVersion>
-        <WindowsTargetFrameworkVersion>10.0.19041</WindowsTargetFrameworkVersion>
+
+        <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-ios'">14.2</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">14.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-android'">21.0</SupportedOSPlatformVersion>
+        <!--
+		<SupportedOSPlatformVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$(TargetFramework.Contains('-windows'))">10.0.17763.0</TargetPlatformMinVersion>
+		-->
     </PropertyGroup>
 
     <!--Shiny should not build for net6.0 directly-->
@@ -62,8 +64,6 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('ios'))">
-        <SupportedOSPlatformVersion>10.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
         <IsIosBuild>true</IsIosBuild>
     </PropertyGroup>
 
@@ -72,8 +72,6 @@
         <GenerateLibraryLayout>true</GenerateLibraryLayout>
         <DisableEmbeddedXbf>false</DisableEmbeddedXbf>
         <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
-        <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
         <IsWindowsBuild>true</IsWindowsBuild>
     </PropertyGroup>
 
