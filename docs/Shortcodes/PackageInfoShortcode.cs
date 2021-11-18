@@ -146,7 +146,6 @@ namespace Docs.Shortcodes
         static string RenderGeneralTab(Package package, PackageService service)
         {
             var sb = new StringBuilder()
-                .AppendLine()
                 .AppendLine("|Area|Info|")
                 .AppendLine("|---|---|")
                 .AppendLine($"|Description|{service.Description}|")

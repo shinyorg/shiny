@@ -23,7 +23,7 @@
 
     <PropertyGroup>
         <BuildLegacy>true</BuildLegacy>
-        <BuildNet6>true</BuildNet6>
+        <BuildNet6>false</BuildNet6>
         <AndroidTargetFramework>monoandroid11.0</AndroidTargetFramework>
 
         <SupportedOSPlatformVersion Condition="'$(TargetFramework)' == 'net6.0-ios'">14.2</SupportedOSPlatformVersion>
