@@ -1,4 +1,4 @@
-Title: v2.5.0
+Title: Next Release
 Order: 1000000
 ---
 
