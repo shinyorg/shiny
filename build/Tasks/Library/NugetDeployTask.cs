@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNetCore;
@@ -28,23 +27,12 @@ namespace ShinyBuild.Tasks.Library
 
         public override void Run(BuildContext context)
         {
-            // delete symbols for now
-            context.DeleteFiles("src/**/*.symbols.nupkg");
-
-            DoDeploy(context, context.NugetApiKey, MainNuget);
-        }
-
-
-        static void DoDeploy(BuildContext context, string apiKey, string sourceUrl)
-        {
             var settings = new DotNetCoreNuGetPushSettings
             {
-                ApiKey = apiKey,
-                Source = sourceUrl,
+                ApiKey = context.NugetApiKey,
+                Source = MainNuget,
                 SkipDuplicate = true
             };
-            // delete symbols for now
-            context.DeleteFiles("src/**/*.symbols.nupkg");
 
             var packages = context.GetFiles("src/**/*.nupkg");
             foreach (var package in packages)

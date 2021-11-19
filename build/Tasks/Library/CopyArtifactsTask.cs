@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Cake.Common.IO;
 using Cake.Frosting;
 
@@ -11,7 +10,6 @@ namespace ShinyBuild.Tasks.Library
     {
         public override void Run(BuildContext context)
         {
-            context.DeleteFiles("src/**/*.symbols.nupkg");
             var directory = context.Directory(context.ArtifactDirectory);
             if (Directory.Exists(directory.Path.FullPath))
                 context.CleanDirectory(directory);
@@ -19,6 +17,7 @@ namespace ShinyBuild.Tasks.Library
                 Directory.CreateDirectory(directory.Path.FullPath);
 
             context.CopyFiles("src/**/*.nupkg", directory);
+            context.CopyFiles("src/**/*.snupkg", directory);
         }
     }
 }
