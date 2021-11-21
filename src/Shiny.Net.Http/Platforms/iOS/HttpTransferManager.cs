@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -71,9 +71,13 @@ namespace Shiny.Net.Http
             if (request.HttpMethod != System.Net.Http.HttpMethod.Post && request.HttpMethod != System.Net.Http.HttpMethod.Put)
                 throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
 
-            var native = request.ToNative();
             var boundary = Guid.NewGuid().ToString();
+	            
+            var native = request.ToNative();
+            native["Content-Type"] = $"multipart/form-data; boundary={boundary}";
+
             var tempPath = platform.GetUploadTempFilePath(request);
+
             this.logger.LogInformation("Writing temp form data body to " + tempPath);
 
             using (var fs = new FileStream(tempPath, FileMode.Create))
