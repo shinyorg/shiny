@@ -1,5 +1,20 @@
 <Project>
     <ItemGroup>
+
+        <PackageReference Update="Xamarin.Firebase.Messaging" Version="122.0.0" />
+        <PackageReference Update="Xamarin.Google.Dagger" Version="2.37.0" />
+        <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="3.0.0" />
+        <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="3.0.0" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Basement" Version="117.6.0" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Tasks" Version="117.2.1" />
+        <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="118.0.0" />
+
+        <PackageReference Update="Xamarin.AndroidX.Core" Version="1.6.0" />
+        <PackageReference Update="Microsoft.Extensions.Logging" Version="6.0.0" />
+        <PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Update="sqlite-net-pcl" Version="1.8.116" />
+        <PackageReference Update="System.Reactive" Version="5.0.0" />
+
         <PackageReference Update="Mobile.BuildTools" Version="2.0.245" />
         <PackageReference Update="Xamarin.Forms" Version="5.0.0.2244" />
         <PackageReference Update="Xamarin.Essentials" Version="1.7.0" />
