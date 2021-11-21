@@ -37,7 +37,7 @@ namespace Shiny.Net.Http
             return tempPath;
         }
 
-        public static NSUrlRequest ToNative(this HttpTransferRequest request)
+        public static NSMutableUrlRequest ToNative(this HttpTransferRequest request)
         {
             var url = NSUrl.FromString(request.Uri);
             var native = new NSMutableUrlRequest(url)
