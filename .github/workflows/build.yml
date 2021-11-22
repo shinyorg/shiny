@@ -13,12 +13,9 @@ on:
     - "src/**"
     - "docs/**"
     - "build/**"
-  #pull_request:
-  #  branches: [ master, main, dev ]
-  #  paths:
-  #  - "src/**"
 
 env:
+  DotNetVersion: 6.0.100
   DocsDeployGitHubToken: ${{ secrets.DOCS_GITHUB_TOKEN }}
   NugetApiKey: ${{secrets.NUGETAPIKEY}}
   TwitterConsumerKey: ${{secrets.TWITTER_CONSUMER_KEY}}
@@ -40,7 +37,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.100
+        dotnet-version: ${{ env.DotNetVersion }}
 
     - name: Generate Build Number
       id: buildnumber
