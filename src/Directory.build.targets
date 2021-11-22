@@ -16,7 +16,7 @@
         <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.4.0" />
         <PackageReference Update="Xamarin.ShortcutBadger" Version="1.1.21" />
         <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.13" />
-        <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.1" />
+        <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.2" />
     </ItemGroup>
 
     <ItemGroup>
