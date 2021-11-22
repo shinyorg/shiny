@@ -82,7 +82,7 @@
     <Folder Include="Assets\" />
   </ItemGroup>
   <ItemGroup>
-        <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0" />
+        <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.2" />
         <PackageReference Include="Xamarin.Google.Dagger" Version="2.37.0" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="3.0.0" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="3.0.0" />
