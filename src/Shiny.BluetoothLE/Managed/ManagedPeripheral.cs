@@ -128,12 +128,14 @@ namespace Shiny.BluetoothLE.Managed
         public IObservable<ManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream) => this
             .GetChar(serviceUuid, characteristicUuid)
             .Select(x => x.WriteBlob(stream))
+            .Switch()
             .Select(_ => this);
 
 
         public IObservable<ManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
             .GetChar(serviceUuid, characteristicUuid)
             .Select(x => x.Write(data, withResponse))
+            .Switch()
             .Select(x =>
             {
                 this.GetInfo(serviceUuid, characteristicUuid).Value = data;
