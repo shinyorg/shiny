@@ -20,7 +20,7 @@ namespace Shiny.Net.Http
 
 
         public static void WriteLine(this Stream stream)
-            => stream.Write(Encoding.Default.GetBytes(Environment.NewLine));
+            => stream.Write(Encoding.Default.GetBytes("\r\n"));
 
 
         public static string GetUploadTempFilePath(this IPlatform platform, HttpTransferRequest request)
