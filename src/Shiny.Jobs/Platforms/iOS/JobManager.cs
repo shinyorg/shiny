@@ -61,7 +61,7 @@ namespace Shiny.Jobs
 
             var app = UIApplication.SharedApplication;
             var fetch = BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum;
-            app.SetMinimumBackgroundFetchInterval(fetch);
+            await this.platform.InvokeOnMainThreadAsync(() => app.SetMinimumBackgroundFetchInterval(fetch));
             var status = app.BackgroundRefreshStatus;
             var grantResult = AccessState.Unknown;
 
@@ -79,12 +79,6 @@ namespace Shiny.Jobs
                     grantResult = AccessState.Restricted;
                     break;
             }
-
-            await this.platform.InvokeOnMainThreadAsync(() =>
-                UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(
-                    BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum
-                )
-            );
 
             //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
 
