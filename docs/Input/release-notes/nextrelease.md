@@ -6,6 +6,9 @@ Order: 1000000
 * [Enhancement] Jobs is now included as part of Shiny codegen package
 * [Fix] GenerateStaticClasses requires a namespace - removed optional arg on it
 
+## Jobs
+* [Fix][iOS] Fallback job manager needs to requestaccess on the ui thread [GH-835](https://github.com/shinyorg/shiny/pull/835)
+
 ## Bluetooth LE
 * [Fix] Ensure write is performed for ManagedPeripheral
 
