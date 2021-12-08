@@ -59,11 +59,13 @@ namespace Shiny.Jobs
             if (!PlatformExtensions.HasBackgroundMode("fetch"))
                 return AccessState.NotSetup;
 
-            var app = UIApplication.SharedApplication;
-            var fetch = BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum;
-            await this.platform.InvokeOnMainThreadAsync(() => app.SetMinimumBackgroundFetchInterval(fetch));
-            var status = app.BackgroundRefreshStatus;
             var grantResult = AccessState.Unknown;
+            var fetch = BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum;
+            var status = await this.platform.InvokeOnMainThreadAsync(() => {
+                var app = UIApplication.SharedApplication;
+                app.SetMinimumBackgroundFetchInterval(fetch);
+                return app.BackgroundRefreshStatus;
+            });
 
             switch (status)
             {
