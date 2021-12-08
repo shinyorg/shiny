@@ -71,7 +71,7 @@ namespace Shiny.Net.Http
             if (request.HttpMethod != System.Net.Http.HttpMethod.Post && request.HttpMethod != System.Net.Http.HttpMethod.Put)
                 throw new ArgumentException($"Invalid Upload HTTP Verb {request.HttpMethod} - only PUT or POST are valid");
 
-            var boundary = Guid.NewGuid().ToString();
+            var boundary = Guid.NewGuid().ToString("N");
 	            
             var native = request.ToNative();
             native["Content-Type"] = $"multipart/form-data; boundary={boundary}";
@@ -99,8 +99,9 @@ namespace Shiny.Net.Http
                     fs.Write("--" + boundary);
                     fs.Write($"Content-Type: application/octet-stream");
                     fs.Write($"Content-Disposition: form-data; name=\"blob\"; filename=\"{request.LocalFile.Name}\"");
-
+                    fs.WriteLine();
                     await uploadFile.CopyToAsync(fs);
+                    fs.WriteLine();
                     fs.Write($"--{boundary}--");
                 }
             }
