@@ -10,25 +10,7 @@ namespace Shiny.Jobs
 {
     public class JobManager : AbstractJobManager
     {
-        static double? backgroundFetchInterval;
-
-        /// <summary>
-        /// If you don't know what this does, don't touch it :)
-        /// </summary>
-        public static double? BackgroundFetchInterval
-        {
-            get => backgroundFetchInterval;
-            set
-            {
-                backgroundFetchInterval = value;
-                if (value != null)
-                {
-                    UIApplication
-                        .SharedApplication
-                        .SetMinimumBackgroundFetchInterval(value.Value);
-                }
-            }
-        }
+        internal static double? BackgroundFetchInterval { get; set; }
         readonly IPlatform platform;
 
 
@@ -59,28 +41,9 @@ namespace Shiny.Jobs
             if (!PlatformExtensions.HasBackgroundMode("fetch"))
                 return AccessState.NotSetup;
 
-            var app = UIApplication.SharedApplication;
-            var fetch = BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum;
-            await this.platform.InvokeOnMainThreadAsync(() => app.SetMinimumBackgroundFetchInterval(fetch));
-            var status = app.BackgroundRefreshStatus;
-            var grantResult = AccessState.Unknown;
-
-            switch (status)
-            {
-                case UIBackgroundRefreshStatus.Available:
-                    grantResult = AccessState.Available;
-                    break;
-
-                case UIBackgroundRefreshStatus.Denied:
-                    grantResult = AccessState.Denied;
-                    break;
-
-                case UIBackgroundRefreshStatus.Restricted:
-                    grantResult = AccessState.Restricted;
-                    break;
-            }
-
-            //UIApplication.SharedApplication.ObserveValue(UIApplication.BackgroundRefreshStatusDidChangeNotification)
+            // this always has to be set at least once
+            await this.platform.SetBackgroundFetchInterval(BackgroundFetchInterval);
+            var grantResult = await this.platform.GetBackgroundRefreshStatus();
 
             return grantResult;
         }
