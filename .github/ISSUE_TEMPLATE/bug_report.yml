@@ -11,24 +11,25 @@ body:
   - type: dropdown
     id: component
     attributes:
-      label: Component
-      description: The component you are filing against
+      label: Component/Nuget
+      description: The component you are filing against.  If it is not listed here it means there is no support for it
       options:
-        - Core (Settings, Startup)
-        - Locations (GPS, Geofencing, Motion Activity)
-        - Jobs
-        - HTTP Transfers
-        - Notifications
-        - NFC
-        - Push - Native
-        - Push - Azure Notification Hub
-        - Push - Firebase
-        - Push - OneSignal
-        - Sensors
-        - BluetoothLE Client
-        - BluetoothLE Hosting
-        - Beacons
-        - SQLite Integration
+        - Shiny.Core (Settings, Startup)
+        - GPS, Geofencing, Motion Activity (Shiny.Locations)
+        - Jobs (Shiny.Jobs)
+        - HTTP Transfers (Shiny.Net.Http)
+        - Notifications (Shiny.Notifications)
+        - NFC (Shiny.Nfc)
+        - Push - Native (Shiny.Push)
+        - Push - Azure Notification Hub (Shiny.Push.AzureNotificationHubs)
+        - Push - Firebase (Shiny.Push.FirebaseMessaging)
+        - Push - OneSignal (Shiny.Push.OneSignal)
+        - Sensors (Shiny.Sensors)
+        - BluetoothLE Client (Shiny.BluetoothLE)
+        - BluetoothLE Hosting (Shiny.BluetoothLE.Hosting)
+        - Beacons (Shiny.Beacons)
+        - SQLite Integration (Shiny.Integrations.Sqlite)
+        - AppCenter Logging (Shiny.Logging.AppCenter)
     validations:
       required: true
   - type: checkboxes
