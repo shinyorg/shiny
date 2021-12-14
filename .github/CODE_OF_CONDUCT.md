@@ -5,7 +5,6 @@ REMEMBER - this is a free project you use - the maintainers are not here to look
 * Be respectful
 * Be concise by providing as much information as possible such as code samples, FULL stack traces, etc - stating that you've followed docs/samples/etc is just not good enough
 * Reply to questions back from the maintainer if you want your issue resolved
-* Issues are not taken for documentation, samples, tests, etc - only PRs
 * Issues are only taken for the latest STABLE version of the library - preview versions of the library can be discussed on the SponsorConnect Discord channel available to sponsors only
 * Since UWP is essentially being killed, only PR's are accepted or tier 3 sponsors can post issues for UWP.  I also don't use UWP in ANY professional applications, so the time needs to be justified
 * Just because you have an issue, doesn't mean it will be fixed right away.  The other isn't a developer for your project.  Using reasoning such as "critical, time sensitive, etc" is not fair to the developers of this project.  Don't do it and be respectful
@@ -13,5 +12,6 @@ REMEMBER - this is a free project you use - the maintainers are not here to look
 * No requests will be taken for the following
     * Library Updates
     * Documentation Updates
+    * Samples
     * Support for libraries not listed in the product selection
     * Timelines
