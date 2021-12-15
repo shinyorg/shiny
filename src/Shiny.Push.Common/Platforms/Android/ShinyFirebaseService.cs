@@ -5,7 +5,7 @@ using Firebase.Messaging;
 
 namespace Shiny.Push
 {
-    [Service]
+    [Service(Exported = true)]
     [IntentFilter(new[] { IntentAction })]
     public class ShinyFirebaseService : FirebaseMessagingService
     {
