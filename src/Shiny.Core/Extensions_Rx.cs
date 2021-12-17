@@ -26,7 +26,7 @@ namespace Shiny
     }
 
 
-    public static partial class Extensions
+    public static class RxExtensions
     {
         /// <summary>
         /// Adds a timeout to a task - make sure to trap the timeout exception

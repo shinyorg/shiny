@@ -4,7 +4,7 @@ using Windows.ApplicationModel.Background;
 
 namespace Shiny
 {
-    public static class PlatformExtensions
+    public static class UwpExtensions
     {
         public static void ShinyInit<TBgTask>(this Windows.UI.Xaml.Application app, IShinyStartup startup) where TBgTask : IBackgroundTask
         {

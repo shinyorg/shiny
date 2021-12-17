@@ -49,7 +49,7 @@ namespace Shiny.Jobs
                 var result = (
                     UIDevice.CurrentDevice.CheckSystemVersion(13, 0) &&
                     Runtime.Arch != Arch.SIMULATOR &&
-                    PlatformExtensions.HasBackgroundMode("processing")
+                    AppleExtensions.HasBackgroundMode("processing")
                 );
                 return result;
             }
@@ -90,7 +90,7 @@ namespace Shiny.Jobs
             else if (Runtime.Arch == Arch.SIMULATOR)
                 result = AccessState.NotSupported;
 
-            else if (!PlatformExtensions.HasBackgroundMode("processing"))
+            else if (!AppleExtensions.HasBackgroundMode("processing"))
                 result = AccessState.NotSetup;
 
             return Task.FromResult(result);

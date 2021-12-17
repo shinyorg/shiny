@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Shiny
 {
-    public static partial class Extensions
+    public static class GeneralExtensions
     {
         /// <summary>
         /// Extension method to String.IsNullOrWhiteSpace

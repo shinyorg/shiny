@@ -7,7 +7,7 @@ using Foundation;
 
 namespace Shiny
 {
-    public static class PlatformExtensions
+    public static class AppleExtensions
     {
 
         static DateTime reference = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);

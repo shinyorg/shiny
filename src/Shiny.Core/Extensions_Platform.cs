@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Shiny
 {
-    public static partial class Extensions
+    public static class PlatformExtensions
     {
         public static bool Is(this IPlatform platform, string platformName)
             => platform.Name.Equals(platformName);

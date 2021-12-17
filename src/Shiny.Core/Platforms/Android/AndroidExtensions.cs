@@ -3,11 +3,16 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 
-
 namespace Shiny
 {
-    public static class AndroidHooks
+    public static class AndroidExtensions
     {
+        public static IObservable<(Result Result, Intent Data)> RequestActivityResult(this IAndroidContext context, Intent intent)
+            => context.RequestActivityResult((requestCode, activity) =>
+                activity.StartActivityForResult(intent, requestCode)
+            );
+
+
         public static void ShinyOnRequestPermissionsResult(this Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
             => ShinyHost
                 .Resolve<IAndroidContext>()
@@ -26,5 +31,10 @@ namespace Shiny
 
         public static void ShinyOnNewIntent(this Activity activity, Intent? intent)
             => ShinyHost.Resolve<IAndroidContext>()?.OnNewIntent(intent);
+
+        //public static IObservable<(Result Result, Intent Data)> RequestActivityResult<TActivity>(this IAndroidContext context) where TActivity : Activity
+        //    => context.RequestActivityResult((requestCode, activity) =>
+        //        activity.StartActivityForResult(typeof(TActivity), requestCode)
+        //    );
     }
 }

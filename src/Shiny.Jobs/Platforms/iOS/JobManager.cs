@@ -38,7 +38,7 @@ namespace Shiny.Jobs
 
         public override async Task<AccessState> RequestAccess()
         {
-            if (!PlatformExtensions.HasBackgroundMode("fetch"))
+            if (!AppleExtensions.HasBackgroundMode("fetch"))
                 return AccessState.NotSetup;
 
             // this always has to be set at least once
