@@ -10,7 +10,7 @@ using Shiny.Logging;
 
 namespace Shiny
 {
-    public static partial class Extensions
+    public static class ServiceExtensions
     {
         /// <summary>
         /// Register a module (like a category) of services

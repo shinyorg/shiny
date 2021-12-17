@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using Foundation;
-
+using UIKit;
 
 namespace Shiny
 {
@@ -94,5 +94,23 @@ namespace Shiny
         public static Guid ToGuid(this NSUuid uuid) => Guid.ParseExact(uuid.AsString(), "d");
         public static NSUuid ToNSUuid(this Guid guid) => new NSUuid(guid.ToString());
 
+
+        public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null)
+            => ShinyHost.Init(new ApplePlatform(), startup);
+
+        public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult>? completionHandler)
+            => ShinyHost.Resolve<AppleLifecycle>().DidReceiveRemoteNotification(userInfo, completionHandler);
+
+        public static void ShinyRegisteredForRemoteNotifications(this UIApplicationDelegate app, NSData deviceToken)
+            => ShinyHost.Resolve<AppleLifecycle>().RegisteredForRemoteNotifications(deviceToken);
+
+        public static void ShinyFailedToRegisterForRemoteNotifications(this UIApplicationDelegate app, NSError error)
+            => ShinyHost.Resolve<AppleLifecycle>().FailedToRegisterForRemoteNotifications(error);
+
+        public static void ShinyPerformFetch(this UIApplicationDelegate app, Action<UIBackgroundFetchResult> completionHandler)
+            => ShinyHost.Resolve<AppleLifecycle>().OnPerformFetch(completionHandler);
+
+        public static void ShinyHandleEventsForBackgroundUrl(this UIApplicationDelegate app, string sessionIdentifier, Action completionHandler)
+            => ShinyHost.Resolve<AppleLifecycle>().HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
     }
 }
