@@ -11,54 +11,54 @@ namespace Shiny.BluetoothLE
 {
     public static partial class Extensions
     {
-        public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken? cancelToken = null)
+        public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken cancelToken = default)
             => peripheral
                 .WithConnectIf(config)
                 .Timeout(TimeSpan.FromSeconds(30))
-                .ToTask(cancelToken ?? CancellationToken.None);
+                .ToTask(cancelToken);
 
 
-        public static Task<IList<IGattService>> GetServicesAsync(this IPeripheral peripheral, CancellationToken? cancelToken = null)
+        public static Task<IList<IGattService>> GetServicesAsync(this IPeripheral peripheral, CancellationToken cancelToken = default)
             => peripheral
                 .GetServices()
-                .ToTask(cancelToken ?? CancellationToken.None);
+                .ToTask(cancelToken);
 
 
-        public static Task<IList<IGattCharacteristic>> GetCharacteristicsAsync(this IGattService service, CancellationToken? cancelToken = null)
+        public static Task<IList<IGattCharacteristic>> GetCharacteristicsAsync(this IGattService service, CancellationToken cancelToken = default)
             => service
                 .GetCharacteristics()
-                .ToTask(cancelToken ?? CancellationToken.None);
+                .ToTask(cancelToken);
 
 
-        public static Task<IList<IGattCharacteristic>> GetAllCharacteristicsAsync(this IPeripheral peripheral, CancellationToken? cancelToken = null)
+        public static Task<IList<IGattCharacteristic>> GetAllCharacteristicsAsync(this IPeripheral peripheral, CancellationToken cancelToken = default)
             => peripheral
                 .GetAllCharacteristics()
-                .ToTask(cancelToken ?? CancellationToken.None);
+                .ToTask(cancelToken);
 
 
-        public static Task<IGattCharacteristic> GetKnownCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken? cancelToken = null)
+        public static Task<IGattCharacteristic> GetKnownCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
             => peripheral
                 .GetKnownCharacteristic(serviceUuid, characteristicUuid)
                 .Take(1)
-                .ToTask(cancelToken ?? CancellationToken.None);
+                .ToTask(cancelToken);
 
 
-        public static Task WriteBlobAsync(this IGattCharacteristic characteristic, Stream stream, CancellationToken? cancelToken = null)
-            => characteristic.WriteBlob(stream).ToTask(cancelToken ?? CancellationToken.None);
+        public static Task WriteBlobAsync(this IGattCharacteristic characteristic, Stream stream, TimeSpan? sendPacketTimeout = null, CancellationToken cancelToken = default)
+            => characteristic.WriteBlob(stream, sendPacketTimeout).ToTask(cancelToken);
 
 
-        public static Task<GattCharacteristicResult> WriteAsync(this IGattCharacteristic characteristic, byte[] data, bool withResponse, CancellationToken? cancelToken = null)
-            => characteristic.Write(data, withResponse).ToTask(cancelToken ?? CancellationToken.None);
+        public static Task<GattCharacteristicResult> WriteAsync(this IGattCharacteristic characteristic, byte[] data, bool withResponse, CancellationToken cancelToken = default)
+            => characteristic.Write(data, withResponse).ToTask(cancelToken);
 
 
-        public static Task<GattCharacteristicResult> ReadAsync(this IGattCharacteristic characteristic, CancellationToken? cancelToken = null)
-            => characteristic.Read().ToTask(cancelToken ?? CancellationToken.None);
+        public static Task<GattCharacteristicResult> ReadAsync(this IGattCharacteristic characteristic, CancellationToken cancelToken = default)
+            => characteristic.Read().ToTask(cancelToken);
 
 
-        public static Task<GattCharacteristicResult> WriteCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true, CancellationToken? cancelToken = null)
-            => peripheral.WriteCharacteristic(serviceUuid, characteristicUuid, data, withResponse).ToTask(cancelToken ?? CancellationToken.None);
+        public static Task<GattCharacteristicResult> WriteCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true, CancellationToken cancelToken = default)
+            => peripheral.WriteCharacteristic(serviceUuid, characteristicUuid, data, withResponse).ToTask(cancelToken);
 
-        public static Task<byte[]?> ReadCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken? cancelToken = null)
-            => peripheral.ReadCharacteristic(serviceUuid, characteristicUuid).ToTask(cancelToken ?? CancellationToken.None);
+        public static Task<byte[]?> ReadCharacteristicAsync(this IPeripheral peripheral, string serviceUuid, string characteristicUuid, CancellationToken cancelToken = default)
+            => peripheral.ReadCharacteristic(serviceUuid, characteristicUuid).ToTask(cancelToken);
     }
 }
