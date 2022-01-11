@@ -30,7 +30,7 @@ namespace ShinyBuild.Tasks.Library
             context.CleanDirectories($"./src/**/bin/{context.MsBuildConfiguration}");
 
             context.MSBuild("Build.slnf", x => x
-                .WithRestore()
+                //.WithRestore()
                 .WithTarget("Clean")
                 .WithTarget("Build")
                 .WithProperty("ShinyVersion", context.NugetVersion)
