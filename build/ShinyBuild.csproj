@@ -8,7 +8,6 @@
 
     <ItemGroup>
         <PackageReference Include="Cake.Frosting" Version="1.3.0" />
-        <PackageReference Include="Cake.Boots" Version="1.0.3.556" />
         <PackageReference Include="Cake.Git" Version="2.0.0" />
         <PackageReference Include="LibGit2Sharp" Version="0.27.0-preview-0116" />
         <PackageReference Include="TweetinviAPI" Version="5.0.4" />

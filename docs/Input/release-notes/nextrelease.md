@@ -1,4 +1,4 @@
-Title: Next Release (2.5.0)
+Title: 2.4.2
 Order: 1000000
 ---
 
@@ -11,6 +11,7 @@ Order: 1000000
 
 ## Bluetooth LE
 * [Fix] Ensure write is performed for ManagedPeripheral
+* [Enhancement] Characteristic.WriteBlob now takes a timeout for individual packet sends
 
 ## HTTP Transfers
 * [Fix][iOS] Fix line endings for file upload headers
