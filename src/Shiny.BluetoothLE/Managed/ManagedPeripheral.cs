@@ -37,6 +37,7 @@ namespace Shiny.BluetoothLE.Managed
                 .WhenConnected()
                 .Do(_ => this.notifyDispose = new CompositeDisposable())
                 .Select(_ => this.RestoreNotifications())
+                .Switch()
                 .Subscribe()
                 .DisposedBy(this.coreDispose);
 
@@ -164,6 +165,9 @@ namespace Shiny.BluetoothLE.Managed
                     info.IsNotificationsEnabled = enable;
                     info.UseIndicationIfAvailable = useIndicationIfAvailable;
                 })
+                // HACK: explanation at https://github.com/shinyorg/shiny/issues/902
+                .Select(_ => RestoreNotifications())
+                .Switch()
                 .Select(_ => Unit.Default);
 
 
