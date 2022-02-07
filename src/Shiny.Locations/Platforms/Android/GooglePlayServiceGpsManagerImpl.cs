@@ -29,10 +29,10 @@ namespace Shiny.Locations
         });
 
 
-        protected override Task RequestLocationUpdates(GpsRequest request) => this.client.RequestLocationUpdatesAsync(
+        protected override Task RequestLocationUpdates(GpsRequest request) => this.Context.InvokeOnMainThreadAsync(() => this.client.RequestLocationUpdatesAsync(
             request.ToNative(),
             this.Callback
-        );
+        ));
 
 
         protected override Task RemoveLocationUpdates()
