@@ -41,9 +41,9 @@ How about some [Shiny Gear](https://www.redbubble.com/shop/ap/45038461)
 
 Branch|Status
 ------|------
-Master|![Build](https://img.shields.io/github/workflow/status/shinyorg/shiny/Build/master?style=for-the-badge)|
-Dev|![Build](https://img.shields.io/github/workflow/status/shinyorg/shiny/Build/dev?style=for-the-badge)|
-Preview|![Build](https://img.shields.io/github/workflow/status/shinyorg/shiny/Build/preview?style=for-the-badge)|
+Master|[![Build](https://github.com/shinyorg/shiny/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/shinyorg/shiny/actions/workflows/build.yml)|
+Dev|[![Build](https://github.com/shinyorg/shiny/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/shinyorg/shiny/actions/workflows/build.yml)|
+Preview|[![Build](https://github.com/shinyorg/shiny/actions/workflows/build.yml/badge.svg?branch=preview)](https://github.com/shinyorg/shiny/actions/workflows/build.yml)|
 
 ## Contributors
 * [Allan Ritchie](https://github.com/aritchie) - Project Lead
