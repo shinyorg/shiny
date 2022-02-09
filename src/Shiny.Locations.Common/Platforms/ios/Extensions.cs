@@ -19,7 +19,7 @@ namespace Shiny.Locations
             CLAuthorizationStatus.Restricted => AccessState.Restricted,
             CLAuthorizationStatus.AuthorizedWhenInUse => background ? AccessState.Restricted : AccessState.Available,
             CLAuthorizationStatus.AuthorizedAlways => AccessState.Available,
-            //CLAuthorizationStatus.NotDetermined
+            CLAuthorizationStatus.NotDetermined => AccessState.Unknown,
             _ => AccessState.Unknown
         };
 
@@ -47,7 +47,7 @@ namespace Shiny.Locations
         public static async Task<AccessState> RequestAccess(this CLLocationManager locationManager, bool background)
         {
             var status = locationManager.GetCurrentStatus(background);
-            if (status == AccessState.Available)
+            if (status != AccessState.Unknown)
                 return status;
 
             var task = locationManager
