@@ -139,15 +139,11 @@ namespace Shiny.Generators
             if (this.context.HasMobileBuildToolsConfig())
                 builder.AppendLineInvariant("global::Mobile.BuildTools.Configuration.ConfigurationManager.Init(this);");
 
-            // AiForms.SettingsView
-            if (this.context.Compilation.GetTypeByMetadataName("AiForms.Renderers.Droid.SettingsViewInit") != null)
-                builder.AppendLineInvariant("global::AiForms.Renderers.Droid.SettingsViewInit.Init();");
-
-            // XF Material
-            if (this.context.Compilation.GetTypeByMetadataName("XF.Material.Forms.Material") != null)
-                builder.AppendLineInvariant("global::XF.Material.Droid.Material.Init(this, savedInstanceState);");
-            else if (this.context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-                builder.AppendLineInvariant("global::Rg.Plugins.Popup.Popup.Init(this);");
+            foreach (var lib in Constants.AndroidActivityThirdPartyRegistrations)
+            {
+                if (this.context.Compilation.GetTypeByMetadataName(lib.Key) != null)
+                    builder.AppendLineInvariant(lib.Value);
+            }
         }
 
 

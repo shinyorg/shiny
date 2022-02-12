@@ -52,9 +52,11 @@ namespace Shiny.Generators
                 if (this.Context.HasXamarinEssentials())
                     builder.AppendLineInvariant("global::Xamarin.Essentials.Platform.Init(this);");
 
-                if (this.Context.Compilation.GetTypeByMetadataName("Acr.UserDialogs.UserDialogs") != null)
-                    builder.AppendLineInvariant("global::Acr.UserDialogs.UserDialogs.Init(this);");
-
+                foreach (var lib in Constants.AndroidApplicationThirdPartyRegistrations)
+                {
+                    if (this.Context.Compilation.GetTypeByMetadataName(lib.Key) != null)
+                        builder.AppendLineInvariant(lib.Value);
+                }
                 builder.AppendLineInvariant("base.OnCreate();");
             }
         }

@@ -243,18 +243,11 @@ namespace Shiny.Generators
             if (this.ShinyConfig.ExcludeThirdParty)
                 return;
 
-            // AiForms.SettingsView
-            if (this.Context.Compilation.GetTypeByMetadataName("AiForms.Renderers.iOS.SettingsViewInit") != null)
-                builder.AppendLineInvariant("global::AiForms.Renderers.iOS.SettingsViewInit.Init();");
-
-            // XF Material & RG Popup
-            if (this.Context.Compilation.GetTypeByMetadataName("XF.Material.iOS.Material") != null)
-                builder.AppendLineInvariant("global::XF.Material.iOS.Material.Init();");
-            else if (this.Context.Compilation.GetTypeByMetadataName("Rg.Plugins.Popup.Popup") != null)
-                builder.AppendLineInvariant("Rg.Plugins.Popup.Popup.Init();");
-
-            if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
-                builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init();");
+            foreach (var lib in Constants.IosThirdPartyRegistrations)
+            {
+                if (this.Context.Compilation.GetTypeByMetadataName(lib.Key) != null)
+                    builder.AppendLineInvariant(lib.Value);
+            }
 
             if (this.Context.HasMobileBuildToolsConfig())
                 builder.AppendLineInvariant("global::Mobile.BuildTools.Configuration.ConfigurationManager.Init();");
