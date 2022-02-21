@@ -126,19 +126,28 @@ namespace Shiny.BluetoothLE
         {
             this.AssertConnection();
 
-            return this.Context.Invoke(
-                this.Context
+            return this.Context.Invoke<int>(Observable.Create<int>(ob =>
+            {
+                var sub = this.Context
                     .Callbacks
                     .ReadRemoteRssi
                     .Take(1)
                     .Select(x =>
                     {
-                        if (x.IsSuccessful)
+                        if (!x.IsSuccessful)
                             throw new BleException("Failed to get RSSI - " + x.Status);
 
                         return x.Rssi;
                     })
-            );
+                    .Subscribe(
+                        x => ob.Respond(x),
+                        ob.OnError
+                    );
+
+                this.Context.Gatt!.ReadRemoteRssi();
+
+                return sub;
+            }));
         }
 
 
