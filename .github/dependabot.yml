@@ -9,3 +9,6 @@ updates:
   target-branch: dev
   labels:
   - dependencies
+  ignore:
+  - dependency-name: "*"
+    update_types: ["semver:patch"]
