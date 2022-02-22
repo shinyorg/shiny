@@ -40,10 +40,10 @@ indent_size = 4
 # Sort using and Import directives with System.* appearing first
 dotnet_sort_system_directives_first = true
 
-dotnet_style_qualification_for_field = true:suggestion
-dotnet_style_qualification_for_property = true:suggestion
-dotnet_style_qualification_for_method = true:suggestion
-dotnet_style_qualification_for_event = true:suggestion
+dotnet_style_qualification_for_field = true:error
+dotnet_style_qualification_for_property = true:error
+dotnet_style_qualification_for_method = true:error
+dotnet_style_qualification_for_event = true:error
 
 # Use language keywords instead of framework type names for type references
 dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
@@ -75,6 +75,19 @@ dotnet_naming_style.all_lower_case_style.capitalization = camel_case
 dotnet_naming_rule.non_public_members_must_be_lower_case.severity = warning
 dotnet_naming_rule.non_public_members_must_be_lower_case.symbols = non_public_symbols
 dotnet_naming_rule.non_public_members_must_be_lower_case.style = all_lower_case_style
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+tab_width = 4
+end_of_line = crlf
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_auto_properties = true:silent
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_return = true:silent
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+dotnet_style_prefer_compound_assignment = true:suggestion
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_namespace_match_folder = true:suggestion
 
 # CSharp code style settings:
 [*.cs]
@@ -107,3 +120,20 @@ csharp_new_line_before_catch = true
 csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
+csharp_indent_labels = one_less_than_current
+csharp_using_directive_placement = outside_namespace:silent
+csharp_prefer_simple_using_statement = true:error
+csharp_prefer_braces = when_multiline:error
+csharp_style_namespace_declarations = block_scoped:error
+csharp_style_expression_bodied_lambdas = true:silent
+csharp_style_expression_bodied_local_functions = false:silent
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_prefer_simple_default_expression = true:suggestion
+csharp_style_prefer_local_over_anonymous_function = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+csharp_style_prefer_tuple_swap = true:suggestion
+csharp_style_deconstructed_variable_declaration = true:suggestion
+csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+csharp_style_unused_value_expression_statement_preference = discard_variable:silent

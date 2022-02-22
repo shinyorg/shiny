@@ -28,7 +28,7 @@ namespace Shiny.Push
                 this.Services.Android.AppContext,
                 counter,
                 intent,
-                PendingIntentFlags.UpdateCurrent
+                PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable
             )!;
             return pendingIntent;
         }

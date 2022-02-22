@@ -176,7 +176,7 @@ namespace Shiny.Locations
                 this.context.AppContext,
                 0,
                 intent,
-                PendingIntentFlags.UpdateCurrent
+                PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable
             );
             return this.geofencePendingIntent!;
         }

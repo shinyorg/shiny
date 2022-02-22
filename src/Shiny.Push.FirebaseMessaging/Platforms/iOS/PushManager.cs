@@ -92,13 +92,6 @@ namespace Shiny.Push.FirebaseMessaging
             }
             Messaging.SharedInstance!.Delegate = new FbMessagingDelegate
             (
-                msg =>
-                {
-                    // I can't get access to the notification here
-                    //var dict = msg.AppData.FromNsDictionary();
-                    //var pr = new PushNotification(dict, null);
-                    //await this.container.OnReceived(pr).ConfigureAwait(false);
-                },
                 async token =>
                 {
                     this.container.SetCurrentToken(token, true);
@@ -112,8 +105,8 @@ namespace Shiny.Push.FirebaseMessaging
         {
             var result = await this.adapter.RequestAccess().ConfigureAwait(false);
             this.TryStartFirebase();
-            Messaging.SharedInstance.ApnsToken = result.RegistrationToken;
 
+            Messaging.SharedInstance.ApnsToken = result.RegistrationToken!;
             var fcmToken = await InstanceId.SharedInstance.GetInstanceIdAsync();
             this.container.SetCurrentToken(fcmToken.Token, false);
 

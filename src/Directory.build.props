@@ -25,7 +25,7 @@
     <PropertyGroup>
         <BuildLegacy>true</BuildLegacy>
         <BuildNet6>false</BuildNet6>
-        <AndroidTargetFramework>monoandroid11.0</AndroidTargetFramework>
+        <AndroidTargetFramework>monoandroid12.0</AndroidTargetFramework>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildLegacy)' == 'true' AND '$(OS)' == 'WINDOWS_NT'">

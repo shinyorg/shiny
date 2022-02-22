@@ -114,11 +114,11 @@ namespace Shiny.Notifications
 
             if (notification.Android.LaunchActivityType == null)
             {
-                launchIntent = this.Services
-                    .Android
-                    .AppContext
-                    .PackageManager
-                    .GetLaunchIntentForPackage(this.Services.Android.Package.PackageName)
+                launchIntent = this.Services!
+                    .Android!
+                    .AppContext!
+                    .PackageManager!
+                    .GetLaunchIntentForPackage(this.Services!.Android!.Package!.PackageName!)!
                     .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
             }
             else
@@ -142,10 +142,10 @@ namespace Shiny.Notifications
             else
             {
                 pendingIntent = PendingIntent.GetActivity(
-                    this.Services.Android.AppContext,
+                    this.Services.Android.AppContext!,
                     notification.Id,
-                    launchIntent,
-                    PendingIntentFlags.OneShot
+                    launchIntent!,
+                    PendingIntentFlags.OneShot & PendingIntentFlags.Mutable
                 );
             }
             return pendingIntent;
@@ -165,7 +165,7 @@ namespace Shiny.Notifications
                 this.Services.Android.AppContext,
                 counter,
                 intent,
-                PendingIntentFlags.UpdateCurrent
+                PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable
             )!;
             return pendingIntent;
         }
@@ -229,9 +229,6 @@ namespace Shiny.Notifications
                 .AppendPath(resources.GetResourceEntryName(resourceId))!
                 .Build()!;
         }
-
-
-
 
 
         protected virtual int GetColor(string colorResourceName)

@@ -192,7 +192,7 @@ ORDER BY
                 this.core.Android.AppContext,
                 0,
                 intent,
-                PendingIntentFlags.UpdateCurrent
+                PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable
             );
             return this.pendingIntent;
         }
