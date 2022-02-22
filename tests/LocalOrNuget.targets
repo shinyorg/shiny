@@ -1,6 +1,6 @@
 <Project>
     <PropertyGroup>
-        <ShinyNugetVersion>2.3.0.2855-preview</ShinyNugetVersion>
+        <ShinyNugetVersion>2.4.3.3003</ShinyNugetVersion>
         <UseNuget>false</UseNuget>
         <UseFirebaseIos>true</UseFirebaseIos>
         <UseOneSignalIos>true</UseOneSignalIos>
