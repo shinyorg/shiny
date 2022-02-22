@@ -89,7 +89,7 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="117.6.0" />
         <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="117.2.1" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="118.0.0" />
-        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.6.0" />
+        <PackageReference Include="Xamarin.AndroidX.Core" Version="1.6.0.5" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="sqlite-net-pcl" />
