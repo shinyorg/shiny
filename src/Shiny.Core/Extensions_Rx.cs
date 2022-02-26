@@ -43,6 +43,17 @@ namespace Shiny
         /// Adds a timeout to a task - make sure to trap the timeout exception
         /// </summary>
         /// <param name="task"></param>
+        /// <param name="milliseconds"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public static Task<T> WithTimeout<T>(this Task<T> task, int seconds, CancellationToken cancelToken = default) =>
+            task.WithTimeout(TimeSpan.FromSeconds(seconds), cancelToken);
+
+
+        /// <summary>
+        /// Adds a timeout to a task - make sure to trap the timeout exception
+        /// </summary>
+        /// <param name="task"></param>
         /// <param name="timeSpan"></param>
         /// <param name="cancelToken"></param>
         /// <returns></returns>
@@ -52,6 +63,34 @@ namespace Shiny
                 .Timeout(timeSpan)
                 .ToTask(cancelToken);
 
+
+        /// <summary>
+        /// Adds a timeout to a task - make sure to trap the timeout exception
+        /// </summary>
+        /// <param name="task"></param>
+        /// <param name="timeSpan"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        public static Task<T> WithTimeout<T>(this Task<T> task, TimeSpan timeSpan, CancellationToken cancelToken = default) =>
+            Observable
+                .FromAsync(() => task)
+                .Timeout(timeSpan)
+                .ToTask(cancelToken);
+
+
+        /// <summary>
+        /// Equivalent of switchMap in RXJS
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="current"></param>
+        /// <param name="next"></param>
+        /// <returns></returns>
+        public static IObservable<U> SwitchSelect<T, U>(this IObservable<T> current, Func<T, IObservable<U>> next) 
+            => current.Select(x => next(x)).Switch();
+
+
+        // TODO: combineLatest?
         /// <summary>
         /// Passes the last and current values from the stream
         /// </summary>
