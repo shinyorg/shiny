@@ -39,12 +39,7 @@ namespace Shiny.Notifications
 #if __ANDROID__
             services.TryAddSingleton<AndroidNotificationProcessor>();
             services.TryAddSingleton<AndroidNotificationManager>();
-
-            services.RegisterJob(new Shiny.Jobs.JobInfo(typeof(NotificationJob))
-            {
-                RunOnForeground = true,
-                IsSystemJob = true
-            });
+            services.UseJobs();
 #endif
         }
 
@@ -56,7 +51,7 @@ namespace Shiny.Notifications
             {
                 await services
                     .GetRequiredService<INotificationManager>()
-                    .SetChannels(channels);
+                    .SetChannels(this.channels);
             }
 
         }

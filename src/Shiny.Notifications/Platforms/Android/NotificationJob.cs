@@ -37,6 +37,8 @@ namespace Shiny.Notifications
             foreach (var notification in pending)
             {
                 notification.ScheduleDate = null; // slight hack, kill schedule date as we're triggering now
+                all.Remove(notification);
+
                 await this.manager
                     .Send(notification)
                     .ConfigureAwait(false);
@@ -45,6 +47,7 @@ namespace Shiny.Notifications
                     .Remove<Notification>(notification.Id.ToString())
                     .ConfigureAwait(false);
             }
+            jobInfo.Repeat = all.Any(x => x.ScheduleDate != null);
         }
     }
 }

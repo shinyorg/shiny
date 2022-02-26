@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
@@ -38,13 +39,15 @@ namespace Shiny.Notifications
         {
             this.manager.NativeManager.Cancel(id);
             await this.core.Repository.Remove<Notification>(id.ToString());
+            await this.SetNotificationJob();
         }
 
 
-        public Task Clear()
+        public async Task Clear()
         {
-            this.manager.NativeManager.CancelAll();
-            return this.core.Repository.Clear<Notification>();
+            this.manager.NativeManager.CancelAll();            
+            await this.core.Repository.Clear<Notification>();
+            await this.CancelJob();
         }
 
 
@@ -74,17 +77,41 @@ namespace Shiny.Notifications
             var channel = await this.GetChannel(notification);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
 
-            if (notification.ScheduleDate != null)
+            if (notification.ScheduleDate == null)
             {
-                await this.core.Repository.Set(notification.Id.ToString(), notification);
+                this.manager.SendNative(notification.Id, builder.Build());
+                if (notification.BadgeCount != null)
+                    this.core.SetBadgeCount(notification.BadgeCount.Value);
             }
             else
             {
-                this.manager.SendNative(notification.Id, builder.Build());
-                //if (notification.BadgeCount != null)
-                //    this.Services.SetBadgeCount(notification.BadgeCount.Value);
+                await this.core.Repository.Set(notification.Id.ToString(), notification);
+                await this.EnsureStartJob();
             }
         }
+
+
+        async Task SetNotificationJob()
+        {
+            var anyScheduled = (await this.core.Repository.GetAll<Notification>()).Any(x => x.ScheduleDate != null);
+            if (anyScheduled)
+            {
+                await this.CancelJob();
+            }
+            else
+            {
+                await this.EnsureStartJob();
+            }
+        }
+
+
+        Task CancelJob() => this.jobManager.Cancel(nameof(NotificationJob));
+
+        Task EnsureStartJob() => this.jobManager.Register(new JobInfo(typeof(NotificationJob), nameof(NotificationJob))
+        {
+            RunOnForeground = true,
+            IsSystemJob = true
+        });
 
 
         public int Badge
