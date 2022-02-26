@@ -9,6 +9,33 @@ namespace Shiny
 {
     public static class GeneralExtensions
     {
+        /// <summary>
+        /// Uses reflection to get a property value from an object by name
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static object GetValue(this object obj, string propertyName)
+        {
+            var prop = obj.GetType().GetProperty(propertyName);
+            if (prop == null)
+                throw new InvalidOperationException($"Property '{propertyName}' does not exist at '{obj.GetType().FullName}");
+
+            var result = prop.GetValue(obj, null);
+            return result;
+        }
+
+
+        /// <summary>
+        /// Gets the property info for an expression
+        /// </summary>
+        /// <typeparam name="TSender"></typeparam>
+        /// <typeparam name="TRet"></typeparam>
+        /// <param name="sender"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         public static PropertyInfo GetPropertyInfo<TSender, TRet>(this TSender sender, Expression<Func<TSender, TRet>> expression)
         {
             if (sender == null)
@@ -23,6 +50,11 @@ namespace Shiny
         }
 
 
+        /// <summary>
+        /// Gets the default value for a type
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static object? GetDefaultValue(this Type t)
         {
             if (t.IsValueType && Nullable.GetUnderlyingType(t) == null)
@@ -67,6 +99,13 @@ namespace Shiny
             => String.Concat(bytes.Select(b => b.ToString("X2")));
 
 
+        /// <summary>
+        /// Asserts that AccessState is available (or allows restricted)
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="message"></param>
+        /// <param name="allowRestricted"></param>
+        /// <exception cref="ArgumentException"></exception>
         public static void Assert(this AccessState state, string? message = null, bool allowRestricted = false)
         {
             if (state == AccessState.Available)
@@ -75,7 +114,7 @@ namespace Shiny
             if (allowRestricted && state == AccessState.Restricted)
                 return;
 
-            throw new ArgumentException(message ?? $"Invalid State " + state);
+            throw new InvalidOperationException(message ?? $"Invalid State " + state);
         }
 
 
@@ -90,9 +129,10 @@ namespace Shiny
         {
             var dict = new Dictionary<TKey, TValue>();
             if (tuples != null)
+            { 
                 foreach (var tuple in tuples)
                     dict.Add(tuple.Item1, tuple.Item2);
-
+            }
             return dict;
         }
 

@@ -8,21 +8,21 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
 
 
 namespace Shiny
 {
-    public class ItemChanged<T, TRet>
+    public class ItemChanged<T>
     {
-        public ItemChanged(T obj, TRet value)
+        public ItemChanged(T obj, string propertyName)
         {
             this.Object = obj;
-            this.Value = value;
+            this.PropertyName = propertyName;
         }
 
         public T Object { get; }
-        public TRet Value { get; }
+        public string PropertyName { get; }
+        public object GetValue() => this.Object!.GetValue(this.PropertyName);
     }
 
 
@@ -226,13 +226,25 @@ namespace Shiny
         }
 
 
-        public static IObservable<ItemChanged<TSender, string>> WhenAnyProperty<TSender>(this TSender This) where TSender : INotifyPropertyChanged
+        /// <summary>
+        /// Notifies whenever a property changes within an INotifyPropertyChanged
+        /// </summary>
+        /// <typeparam name="TSender"></typeparam>
+        /// <param name="This"></param>
+        /// <returns></returns>
+        public static IObservable<ItemChanged<TSender>> WhenAnyProperty<TSender>(this TSender This) where TSender : INotifyPropertyChanged
             => Observable
                 .FromEventPattern<PropertyChangedEventArgs>(This, nameof(INotifyPropertyChanged.PropertyChanged))
-                .Select(x => new ItemChanged<TSender, string>(This, x.EventArgs.PropertyName));
+                .Select(x => new ItemChanged<TSender>(This, x.EventArgs.PropertyName));
 
 
-
+        /// <summary>
+        /// Async Subscribe done properly
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="onNextAsync"></param>
+        /// <returns></returns>
         public static IDisposable SubscribeAsync<T>(this IObservable<T> observable, Func<T, Task> onNextAsync)
             => observable
                 .Select(x => Observable.FromAsync(() => onNextAsync(x)))
@@ -240,6 +252,14 @@ namespace Shiny
                 .Subscribe();
 
 
+        /// <summary>
+        /// Async Subscribe done properly
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="onNextAsync"></param>
+        /// <param name="onError"></param>
+        /// <returns></returns>
         public static IDisposable SubscribeAsync<T>(this IObservable<T> observable,
                                                     Func<T, Task> onNextAsync,
                                                     Action<Exception> onError)
@@ -252,6 +272,15 @@ namespace Shiny
                 );
 
 
+        /// <summary>
+        /// Async Subscribe done properly
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="onNextAsync"></param>
+        /// <param name="onError"></param>
+        /// <param name="onComplete"></param>
+        /// <returns></returns>
         public static IDisposable SubscribeAsync<T>(this IObservable<T> observable,
                                                     Func<T, Task> onNextAsync,
                                                     Action<Exception> onError,
@@ -265,6 +294,13 @@ namespace Shiny
                     onComplete
                 );
 
+        /// <summary>
+        /// Async subscribe done properly while also ensuring that only async value runs at a time
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="onNextAsync"></param>
+        /// <returns></returns>
         public static IDisposable SubscribeAsyncConcurrent<T>(this IObservable<T> observable, Func<T, Task> onNextAsync)
             => observable
                 .Select(x => Observable.FromAsync(() => onNextAsync(x)))
@@ -272,6 +308,14 @@ namespace Shiny
                 .Subscribe();
 
 
+        /// <summary>
+        /// Async subscribe done properly while also ensuring that only async value runs at a time
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="observable"></param>
+        /// <param name="onNextAsync"></param>
+        /// <param name="maxConcurrent"></param>
+        /// <returns></returns>
         public static IDisposable SubscribeAsyncConcurrent<T>(this IObservable<T> observable, Func<T, Task> onNextAsync, int maxConcurrent)
             => observable
                 .Select(x => Observable.FromAsync(() => onNextAsync(x)))
