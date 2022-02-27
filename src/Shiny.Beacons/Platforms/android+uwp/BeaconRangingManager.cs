@@ -17,7 +17,7 @@ namespace Shiny.Beacons
         {
             this.centralManager = centralManager;
             this.scanner = this.centralManager
-                .ScanForBeacons(null)
+                .ScanForBeacons(true) // TODO
                 .Publish()
                 .RefCount();
         }

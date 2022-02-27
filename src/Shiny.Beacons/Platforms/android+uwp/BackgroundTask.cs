@@ -17,14 +17,12 @@ namespace Shiny.Beacons
         readonly IMessageBus messageBus;
         readonly IEnumerable<IBeaconMonitorDelegate> delegates;
         readonly IDictionary<string, BeaconRegionStatus> states;
-        readonly BeaconMonitorConfig config;
         IDisposable? scanSub;
 
 
         public BackgroundTask(IMessageBus messageBus,
                               IBleManager centralManager,
                               IBeaconMonitoringManager beaconManager,
-                              BeaconMonitorConfig config,
                               IEnumerable<IBeaconMonitorDelegate> delegates,
                               ILogger<IBeaconMonitorDelegate> logger)
         {
@@ -32,7 +30,6 @@ namespace Shiny.Beacons
             this.bleManager = centralManager;
             this.beaconManager = beaconManager;
             this.logger = logger;
-            this.config = config;
             this.delegates = delegates;
             this.states = new Dictionary<string, BeaconRegionStatus>();
         }
@@ -106,7 +103,7 @@ namespace Shiny.Beacons
             try
             {
                 this.scanSub = this.bleManager
-                    .ScanForBeacons(this.config)
+                    .ScanForBeacons(true) // TODO
                     .Buffer(TimeSpan.FromSeconds(5))
                     .SubscribeAsyncConcurrent(this.CheckStates);
 
@@ -122,9 +119,11 @@ namespace Shiny.Beacons
         IList<BeaconRegionStatus> GetCopy()
         {
             lock (this.states)
+            { 
                 return this.states
                     .Select(x => x.Value)
                     .ToList();
+            }
         }
 
 

@@ -9,15 +9,16 @@ namespace Shiny.Beacons
 {
     public static class BleManagerExtensions
     {
-        public static IObservable<Beacon> ScanForBeacons(this IBleManager manager, BeaconMonitorConfig? config)
+        // TODO: pass multiple serviceUUIDs if scanning for different beacon types
+        public static IObservable<Beacon> ScanForBeacons(this IBleManager manager, bool forMonitoring)
         {
-            var scanType = config == null
+            var scanType = forMonitoring
                 ? BleScanType.LowLatency
                 : BleScanType.LowPowered;
 
             var cfg = new ScanConfig { ScanType = scanType };
-            if (config?.ScanServiceUuids?.Any() ?? false)
-                cfg.ServiceUuids = config.ScanServiceUuids;
+            //if (config?.ScanServiceUuids?.Any() ?? false)
+            //    cfg.ServiceUuids = config.ScanServiceUuids;
 
             return manager
                 .Scan(cfg)

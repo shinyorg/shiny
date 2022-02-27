@@ -31,6 +31,8 @@ namespace Shiny.Beacons
         }
 
 
+        //FE9A - estimote
+        //public string BleScanServiceUuid { get; }
         public string Identifier { get; }
         public Guid Uuid { get; }
         public ushort? Major { get; }
