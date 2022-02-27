@@ -48,8 +48,10 @@ namespace Shiny.Notifications
                 throw new ArgumentException("Channel identifier is required", nameof(channel.Identifier));
 
             if (channel.Actions != null)
+            { 
                 foreach (var action in channel.Actions)
                     action.AssertValid();
+            }
         }
 
 
@@ -86,15 +88,12 @@ namespace Shiny.Notifications
         internal static async Task RemoveChannel(this IRepository repository, string channelId)
         {
             await repository.Remove<Channel>(channelId);
+            var notifications = await repository.GetNotificationsByChannel(channelId);
 
-            var notifications = await repository.GetAll<Notification>();
             foreach (var notification in notifications)
             {
-                if (notification.Channel?.Equals(channelId, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                {
-                    notification.Channel = null;
-                    await repository.Set(notification.Id.ToString(), notification);
-                }
+                notification.Channel = null;
+                await repository.Set(notification.Id.ToString(), notification);
             }
         }
 
@@ -102,15 +101,12 @@ namespace Shiny.Notifications
         internal static async Task RemoveAllChannels(this IRepository repository)
         {
             await repository.Clear<Channel>();
+            var notifications = await repository.GetList<Notification>(x => !x.Channel.IsEmpty());
 
-            var notifications = await repository.GetAll<Notification>();
             foreach (var notification in notifications)
             {
-                if (!notification.Channel.IsEmpty())
-                {
-                    notification.Channel = null;
-                    await repository.Set(notification.Id.ToString(), notification);
-                }
+                notification.Channel = null;
+                await repository.Set(notification.Id.ToString(), notification);
             }
         }
 
@@ -118,20 +114,23 @@ namespace Shiny.Notifications
             => repository.Get<Channel>(channelIdentifier);
 
         internal static Task<IList<Channel>> GetChannels(this IRepository repository)
-            => repository.GetAll<Channel>();
+            => repository.GetList<Channel>();
 
 
         internal static async Task RemoveChannelFromPendingNotificationsByChannel(this IRepository repository, string channelId)
         {
-            var notifications = await repository.GetAll<Notification>();
+            var notifications = await repository.GetNotificationsByChannel(channelId);
             foreach (var notification in notifications)
             {
-                if (notification.Channel?.Equals(channelId, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                {
-                    notification.Channel = null;
-                    await repository.Set(notification.Id.ToString(), notification);
-                }
+                notification.Channel = null;
+                await repository.Set(notification.Id.ToString(), notification);
             }
         }
+
+
+        internal static Task<IList<Notification>> GetNotificationsByChannel(this IRepository repository, string channelId)
+            => repository.GetList<Notification>(x =>
+                 x.Channel != null && x.Channel.Equals(channelId, StringComparison.InvariantCultureIgnoreCase)
+            );
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 
@@ -27,15 +28,17 @@ namespace Shiny.Infrastructure
         /// Gets all entities from storage of a given type
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class;
+        Task<IDictionary<string, T>> GetListWithKeys<T>(Expression<Func<T, bool>>? expression = null) where T : class;
 
         /// <summary>
         /// Gets all entities from storage of a given type
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        Task<IList<T>> GetAll<T>() where T : class;
+        Task<IList<T>> GetList<T>(Expression<Func<T, bool>>? expression = null) where T : class;
 
         /// <summary>
         /// Returns true if updating otherwise false if new

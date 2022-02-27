@@ -79,7 +79,7 @@ namespace Shiny.Jobs
 
         public async Task<IEnumerable<JobInfo>> GetJobs()
         {
-            var jobs = await this.repository.GetAll<PersistJobInfo>().ConfigureAwait(false);
+            var jobs = await this.repository.GetList<PersistJobInfo>().ConfigureAwait(false);
             return jobs.Select(PersistJobInfo.FromPersist);
         }
 
@@ -107,7 +107,7 @@ namespace Shiny.Jobs
 
         public virtual async Task CancelAll()
         {
-            var jobs = await this.repository.GetAllWithKeys<PersistJobInfo>().ConfigureAwait(false);
+            var jobs = await this.repository.GetListWithKeys<PersistJobInfo>().ConfigureAwait(false);
             foreach (var job in jobs)
             {
                 if (!job.Value.IsSystemJob)
@@ -142,7 +142,7 @@ namespace Shiny.Jobs
                 try
                 {
                     this.IsRunning = true;
-                    var jobs = await this.repository.GetAll<PersistJobInfo>();
+                    var jobs = await this.repository.GetList<PersistJobInfo>();
                     var tasks = new List<Task<JobRunResult>>();
 
                     if (runSequentially)

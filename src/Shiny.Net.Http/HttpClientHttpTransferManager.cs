@@ -40,7 +40,7 @@ namespace Shiny.Net.Http
         {
             var stores = await this.Services
                 .Repository
-                .GetAll<HttpTransferStore>()
+                .GetList<HttpTransferStore>()
                 .ConfigureAwait(false);
 
             var query = stores
@@ -128,7 +128,7 @@ namespace Shiny.Net.Http
             {
                 var requests = await this.Services
                     .Repository
-                    .GetAll<HttpTransferStore>()
+                    .GetList<HttpTransferStore>()
                     .ConfigureAwait(false);
 
                 foreach (var request in requests)

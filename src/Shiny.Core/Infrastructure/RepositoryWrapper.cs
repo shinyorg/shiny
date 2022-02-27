@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 
@@ -43,14 +44,15 @@ namespace Shiny.Infrastructure
         }
 
 
-        public async Task<List<TArgs>> GetAll()
+        public async Task<List<TArgs>> GetAll(Expression<Func<TArgs, bool>>? expression = null)
         {
             var regions = await this.Repository
-                .GetAll<TStore>()
+                .GetList<TStore>()
                 .ConfigureAwait(false);
 
             return regions
                 .Select(this.fromStore)
+                .WhereIf(expression)
                 .ToList();
         }
     }

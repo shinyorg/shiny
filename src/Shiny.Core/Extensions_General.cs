@@ -10,6 +10,17 @@ namespace Shiny
     public static class GeneralExtensions
     {
         /// <summary>
+        /// Filters the list if the expression is not null
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="en"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> WhereIf<T>(this IEnumerable<T> en, Expression<Func<T, bool>>? expression)
+            => expression == null ? en : en.Where(expression.Compile());
+
+
+        /// <summary>
         /// Uses reflection to get a property value from an object by name
         /// </summary>
         /// <param name="obj"></param>

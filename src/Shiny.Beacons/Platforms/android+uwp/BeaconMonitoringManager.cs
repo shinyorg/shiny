@@ -70,7 +70,7 @@ namespace Shiny.Beacons
                 this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Remove, region));
 
                 var regions = await this.repository
-                    .GetAll<BeaconRegion>()
+                    .GetList<BeaconRegion>()
                     .ConfigureAwait(false);
 
                 if (regions.Count == 0)
@@ -109,7 +109,7 @@ namespace Shiny.Beacons
 
 
         public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
-            => await this.repository.GetAll<BeaconRegion>().ConfigureAwait(false);
+            => await this.repository.GetList<BeaconRegion>().ConfigureAwait(false);
 
 
         void StartService()

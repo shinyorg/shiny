@@ -24,7 +24,7 @@ namespace Shiny.Notifications
         public async Task Run(JobInfo jobInfo, CancellationToken cancelToken)
         {
             var all = await this.repository
-                .GetAll<Notification>()
+                .GetList<Notification>()
                 .ConfigureAwait(false);
 
             var pending = all

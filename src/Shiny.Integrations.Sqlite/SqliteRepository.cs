@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Models;
@@ -37,7 +38,7 @@ namespace Shiny.Integrations.Sqlite
 
         public async Task<T?> Get<T>(string key) where T : class
         {
-            var item = await GetRepoItem<T>(key);
+            var item = await this.GetRepoItem<T>(key);
             if (item == null)
                 return null;
 
@@ -46,14 +47,14 @@ namespace Shiny.Integrations.Sqlite
         }
 
 
-        public async Task<IList<T>> GetAll<T>() where T : class
+        public async Task<IList<T>> GetList<T>(Expression<Func<T, bool>>? expression = null) where T : class
         {
-            var result = await this.GetAllWithKeys<T>();
+            var result = await this.GetListWithKeys<T>();
             return new List<T>(result.Values);
         }
 
 
-        public async Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class
+        public async Task<IDictionary<string, T>> GetListWithKeys<T>(Expression<Func<T, bool>>? expression = null) where T : class
         {
             var dict = new Dictionary<string, T>();
             var items = await this.conn
@@ -61,13 +62,16 @@ namespace Shiny.Integrations.Sqlite
                 .Where(x => x.TypeName == typeof(T).AssemblyQualifiedName)
                 .ToListAsync();
 
+            var filter = expression?.Compile() ?? new Func<T, bool>(_ => true);
             foreach (var item in items)
             {
                 var obj = this.serializer.Deserialize<T>(item.Blob);
-                dict.Add(item.Key, obj);
+                if (filter(obj))
+                    dict.Add(item.Key, obj);
             }
             return dict;
         }
+
 
         public async Task<bool> Remove<T>(string key) where T : class
         {

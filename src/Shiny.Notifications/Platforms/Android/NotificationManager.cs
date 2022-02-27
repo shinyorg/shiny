@@ -52,7 +52,7 @@ namespace Shiny.Notifications
 
 
         public async Task<IEnumerable<Notification>> GetPending()
-            => await this.core.Repository.GetAll<Notification>().ConfigureAwait(false);
+            => await this.core.Repository.GetList<Notification>().ConfigureAwait(false);
 
 
         public async Task<AccessState> RequestAccess()
@@ -93,7 +93,7 @@ namespace Shiny.Notifications
 
         async Task SetNotificationJob()
         {
-            var anyScheduled = (await this.core.Repository.GetAll<Notification>()).Any(x => x.ScheduleDate != null);
+            var anyScheduled = (await this.core.Repository.GetList<Notification>()).Any(x => x.ScheduleDate != null);
             if (anyScheduled)
             {
                 await this.CancelJob();

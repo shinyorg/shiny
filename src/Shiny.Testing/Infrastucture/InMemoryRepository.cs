@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 
@@ -43,16 +44,18 @@ namespace Shiny.Testing.Infrastucture
         }
 
 
-        public Task<IList<T>> GetAll<T>() where T : class
+        public Task<IList<T>> GetList<T>(Expression<Func<T, bool>>? expression = null) where T : class
         {
-            IList<T> result = this.data[typeof(T)]?.Values.OfType<T>().ToList() ?? new List<T>();
+            IList<T> result = this.data[typeof(T)]?.Values.OfType<T>().WhereIf(expression).ToList() ?? new List<T>();
             return Task.FromResult(result);
         }
 
 
-        public Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class
+        public Task<IDictionary<string, T>> GetListWithKeys<T>(Expression<Func<T, bool>>? expression = null) where T : class
         {
-            IDictionary<string, T> result = this.data[typeof(T)]?.ToDictionary(
+            var filter = expression?.Compile() ?? new Func<T, bool>(_ => true);
+
+            IDictionary<string, T> result = this.data[typeof(T)]?.Where(x => filter((T)x.Value)).ToDictionary(
                 x => x.Key,
                 x => (T)x.Value
             ) ?? new Dictionary<string, T>();

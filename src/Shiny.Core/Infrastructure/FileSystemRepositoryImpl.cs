@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 
@@ -42,22 +43,36 @@ namespace Shiny.Infrastructure
         }
 
 
-        public async Task<IDictionary<string, T>> GetAllWithKeys<T>() where T : class
+        public async Task<IDictionary<string, T>> GetListWithKeys<T>(Expression<Func<T, bool>>? expression = null) where T : class
         {
+            var filter = expression?.Compile() ?? new Func<T, bool>(_ => true);
             var result = new Dictionary<string, T>();
+
             await this.InTransaction(typeof(T), list =>
-            {
+            {                
                 foreach (var pair in list)
-                    result.Add(pair.Key, (T)pair.Value);
+                { 
+                    var value = (T)pair.Value;
+                    if (filter(value))
+                        result.Add(pair.Key, (T)pair.Value);
+                }
             });
             return result;
         }
 
 
-        public async Task<IList<T>> GetAll<T>() where T : class
+        public async Task<IList<T>> GetList<T>(Expression<Func<T, bool>>? expression = null) where T : class
         {
             var result = new List<T>();
-            await this.InTransaction(typeof(T), list => result.AddRange(list.Values.OfType<T>()));
+            await this.InTransaction(
+                typeof(T), 
+                list => result
+                    .AddRange(list
+                        .Values
+                        .OfType<T>()
+                        .WhereIf(expression)
+                    )
+            );
             return result;
         }
 
@@ -82,7 +97,9 @@ namespace Shiny.Infrastructure
                 var path = this.GetPath(typeof(T), key);
 
                 if (!File.Exists(path))
+                { 
                     tcs.TrySetResult(false);
+                }
                 else
                 {
                     var entity = list[key];

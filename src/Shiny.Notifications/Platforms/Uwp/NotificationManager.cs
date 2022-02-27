@@ -79,7 +79,7 @@ namespace Shiny.Notifications
 
 
         public async Task<IEnumerable<Notification>> GetPending()
-            => await this.services.Repository.GetAll<Notification>();
+            => await this.services.Repository.GetList<Notification>();
 
 
         public async Task Clear()
