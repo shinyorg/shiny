@@ -1,88 +1,89 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\Tests.targets" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CFB76876-C9B0-4567-A078-1E89DF744073}</ProjectGuid>
-    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TemplateGuid>{122416d6-6b49-4ee2-a1e8-b825f31c79fe}</TemplateGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Shiny.Tests.Android</RootNamespace>
-    <AssemblyName>Shiny.Tests.Android</AssemblyName>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>True</Deterministic>
-    <AndroidApplication>True</AndroidApplication>
-    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
-    <AndroidResgenClass>Resource</AndroidResgenClass>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <TargetFrameworkVersion>v11.0</TargetFrameworkVersion>
-    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
-    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
-    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
-    <AndroidUseAapt2>true</AndroidUseAapt2>
-    <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>False</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;__ANDROID__;DEVICE_TESTS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
-    <AndroidLinkMode>None</AndroidLinkMode>
-    <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
-    <BundleAssemblies>true</BundleAssemblies>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>True</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;__ANDROID__;DEVICE_TESTS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AndroidManagedSymbols>true</AndroidManagedSymbols>
-    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
-    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
-    <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mock|AnyCPU'">
-    <DefineConstants>DEBUG;__ANDROID__;DEVICE_TESTS</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Mono.Android.Export" />
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="Mono.Android" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors" />
-    <Reference Include="System.Xml.Linq" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="MainActivity.cs" />
-    <Compile Include="Resources\Resource.designer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <GoogleServicesJson Include="google-services.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </GoogleServicesJson>
-    <None Include="Properties\AndroidManifest.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\" />
-  </ItemGroup>
-  <ItemGroup>
+    <Import Project="..\Tests.targets" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProductVersion>8.0.30703</ProductVersion>
+        <SchemaVersion>2.0</SchemaVersion>
+        <ProjectGuid>{CFB76876-C9B0-4567-A078-1E89DF744073}</ProjectGuid>
+        <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+        <TemplateGuid>{122416d6-6b49-4ee2-a1e8-b825f31c79fe}</TemplateGuid>
+        <OutputType>Library</OutputType>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <RootNamespace>Shiny.Tests.Android</RootNamespace>
+        <AssemblyName>Shiny.Tests.Android</AssemblyName>
+        <FileAlignment>512</FileAlignment>
+        <Deterministic>True</Deterministic>
+        <AndroidApplication>True</AndroidApplication>
+        <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+        <AndroidResgenClass>Resource</AndroidResgenClass>
+        <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+        <TargetFrameworkVersion>v12.0</TargetFrameworkVersion>
+        <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+        <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+        <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+        <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
+        <AndroidUseAapt2>true</AndroidUseAapt2>
+        <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <DebugSymbols>True</DebugSymbols>
+        <DebugType>portable</DebugType>
+        <Optimize>False</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>TRACE;DEBUG;__ANDROID__;DEVICE_TESTS</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <AndroidUseSharedRuntime>True</AndroidUseSharedRuntime>
+        <AndroidLinkMode>None</AndroidLinkMode>
+        <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
+        <BundleAssemblies>true</BundleAssemblies>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <DebugSymbols>True</DebugSymbols>
+        <DebugType>portable</DebugType>
+        <Optimize>True</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE;__ANDROID__;DEVICE_TESTS</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <AndroidManagedSymbols>true</AndroidManagedSymbols>
+        <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
+        <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+        <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mock|AnyCPU'">
+        <DefineConstants>DEBUG;__ANDROID__;DEVICE_TESTS</DefineConstants>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="Mono.Android.Export" />
+        <Reference Include="System" />
+        <Reference Include="System.Xml" />
+        <Reference Include="System.Core" />
+        <Reference Include="System.Data" />
+        <Reference Include="Mono.Android" />
+        <Reference Include="System.Numerics" />
+        <Reference Include="System.Numerics.Vectors" />
+        <Reference Include="System.Xml.Linq" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="MainActivity.cs" />
+        <Compile Include="Resources\Resource.designer.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <GoogleServicesJson Include="google-services.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </GoogleServicesJson>
+        <None Include="Properties\AndroidManifest.xml" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Assets\" />
+    </ItemGroup>
+    <ItemGroup>
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.4.0.2" />
         <PackageReference Include="Xamarin.Google.Dagger" Version="2.37.0" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="3.0.0" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="3.0.0" />
@@ -94,155 +95,155 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="sqlite-net-pcl" />
         <PackageReference Include="System.Reactive" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\mipmap-mdpi\icon.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-mdpi\launcher_foreground.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-hdpi\Icon.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-hdpi\launcher_foreground.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\logo.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\compass.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable\notification.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\launcher_foreground.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\layout\Tabbar.axml">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\layout\Toolbar.axml">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-xxhdpi\launcher_foreground.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\values\colors.xml">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\values\styles.xml">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable-xhdpi\arrow.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable-xxhdpi\arrow.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable-hdpi\arrow.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-xhdpi\Icon.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-xhdpi\launcher_foreground.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\drawable-xxxhdpi\arrow.png">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\raw\notification.mp3">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-anydpi-v26\icon.xml">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-    <AndroidResource Include="Resources\mipmap-anydpi-v26\icon_round.xml">
-      <SubType>
-      </SubType>
-      <Generator>
-      </Generator>
-    </AndroidResource>
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+    </ItemGroup>
+    <ItemGroup>
+        <AndroidResource Include="Resources\mipmap-mdpi\icon.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-mdpi\launcher_foreground.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-hdpi\Icon.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-hdpi\launcher_foreground.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\drawable\logo.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\drawable\compass.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\drawable\notification.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-xxxhdpi\launcher_foreground.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\layout\Tabbar.axml">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\layout\Toolbar.axml">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-xxhdpi\launcher_foreground.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\values\colors.xml">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\values\styles.xml">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\drawable-xhdpi\arrow.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\drawable-xxhdpi\arrow.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\drawable-hdpi\arrow.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-xhdpi\Icon.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-xhdpi\launcher_foreground.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\drawable-xxxhdpi\arrow.png">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\raw\notification.mp3">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-anydpi-v26\icon.xml">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+        <AndroidResource Include="Resources\mipmap-anydpi-v26\icon_round.xml">
+            <SubType>
+            </SubType>
+            <Generator>
+            </Generator>
+        </AndroidResource>
+    </ItemGroup>
+    <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+    <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
     Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
     </Target>
