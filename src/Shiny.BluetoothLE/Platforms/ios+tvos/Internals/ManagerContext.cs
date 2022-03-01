@@ -29,12 +29,12 @@ namespace Shiny.BluetoothLE.Internals
                 if (!AppleExtensions.HasPlistValue("NSBluetoothPeripheralUsageDescription"))
                     this.logger.LogCritical("NSBluetoothPeripheralUsageDescription needs to be set - you will likely experience a native crash after this log");
 
+                if (!AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
+                    this.logger.LogCritical("NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
+
                 var background = services.GetService(typeof(IBleDelegate)) != null;
                 if (!background)
                     return new CBCentralManager(this, null);
-
-                if (!AppleExtensions.HasPlistValue("NSBluetoothAlwaysUsageDescription", 13))
-                    this.logger.LogCritical("NSBluetoothAlwaysUsageDescription needs to be set - you will likely experience a native crash after this log");
 
                 var opts = new CBCentralInitOptions
                 {
