@@ -11,10 +11,10 @@ namespace Shiny.BluetoothLE
 {
     public static partial class Extensions
     {
-        public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken cancelToken = default)
+        public static Task ConnectAsync(this IPeripheral peripheral, ConnectionConfig? config = null, CancellationToken cancelToken = default, TimeSpan? timeout = null)
             => peripheral
                 .WithConnectIf(config)
-                .Timeout(TimeSpan.FromSeconds(30))
+                .Timeout(timeout ?? TimeSpan.FromSeconds(30))
                 .ToTask(cancelToken);
 
 
