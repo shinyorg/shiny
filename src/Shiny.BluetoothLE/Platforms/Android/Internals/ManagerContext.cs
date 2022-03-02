@@ -64,7 +64,7 @@ namespace Shiny.BluetoothLE.Internals
                 )
                 .Select(x => x.FromNative())
                 .Subscribe(status =>
-                    services
+                    this.services
                         .Services
                         .RunDelegates<IBleDelegate>(del => del.OnAdapterStateChanged(status))
                 );
@@ -91,10 +91,10 @@ namespace Shiny.BluetoothLE.Internals
         {
             try
             {
-                var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice);
+                var device = (BluetoothDevice)intent.GetParcelableExtra(BluetoothDevice.ExtraDevice)!;
                 var peripheral = this.GetDevice(device);
 
-                if (intent.Action.Equals(BluetoothDevice.ActionAclConnected))
+                if (intent.Action?.Equals(BluetoothDevice.ActionAclConnected) ?? false)
                 {
                     await this.Services
                         .RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral))
@@ -111,20 +111,20 @@ namespace Shiny.BluetoothLE.Internals
 
         public IObservable<Intent> ListenForMe(Peripheral me) => this
             .peripheralSubject
-            .Where(x => x.Peripheral.Native.Address.Equals(me.Native.Address))
+            .Where(x => x.Peripheral.Native.Address!.Equals(me.Native.Address))
             .Select(x => x.Intent);
 
 
         public IObservable<Intent> ListenForMe(string eventName, Peripheral me) => this
             .ListenForMe(me)
-            .Where(intent => intent.Action.Equals(
+            .Where(intent => intent.Action?.Equals(
                 eventName,
                 StringComparison.InvariantCultureIgnoreCase
-            ));
+            ) ?? false);
 
 
         public Peripheral GetDevice(BluetoothDevice btDevice) => this.devices.GetOrAdd(
-            btDevice.Address,
+            btDevice.Address!,
             x => new Peripheral(this, btDevice)
         );
 
@@ -146,7 +146,7 @@ namespace Shiny.BluetoothLE.Internals
             var connectedDevices = this.GetConnectedDevices().ToList();
             this.devices.Clear();
             foreach (var dev in connectedDevices)
-                this.devices.TryAdd(dev.Native.Address, dev);
+                this.devices.TryAdd(dev.Native.Address!, dev);
         }
 
 
@@ -157,7 +157,7 @@ namespace Shiny.BluetoothLE.Internals
             this.callbacks = new LollipopScanCallback(
                 sr =>
                 {
-                    var scanResult = this.ToScanResult(sr.Device, sr.Rssi, new AdvertisementData(sr));
+                    var scanResult = this.ToScanResult(sr.Device!, sr.Rssi, new AdvertisementData(sr));
                     ob.OnNext(scanResult);
                 },
                 errorCode => ob.OnError(new BleException("Error during scan: " + errorCode.ToString()))

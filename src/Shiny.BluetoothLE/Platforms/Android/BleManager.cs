@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Shiny.BluetoothLE.Internals;
 using Android;
 using Android.Bluetooth;
-using P = Android.Manifest.Permission;
 
 
 namespace Shiny.BluetoothLE
@@ -53,38 +52,28 @@ namespace Shiny.BluetoothLE
             );
 
 
+        static readonly AndroidPermission[] permissions = new []
+        {
+            new AndroidPermission(Manifest.Permission.Bluetooth, null, null),
+            new AndroidPermission(Manifest.Permission.BluetoothAdmin, null, null),
+            new AndroidPermission(Manifest.Permission.BluetoothScan, 31, null),
+            new AndroidPermission(Manifest.Permission.BluetoothConnect, 31, null),
+            new AndroidPermission(Manifest.Permission.AccessFineLocation, null, 31)
+        };
         public override IObservable<AccessState> RequestAccess() => Observable.FromAsync(async ct =>
         {
-            if (!this.context.Android.IsInManifest(Manifest.Permission.Bluetooth))
+            if (!this.context.Android.EnsureAllManifestEntries(permissions))
                 return AccessState.NotSetup;
 
-            if (!this.context.Android.IsInManifest(Manifest.Permission.BluetoothAdmin))
-                return AccessState.NotSetup;
-
-            var permissions = new List<string>() { P.AccessFineLocation };
-            if (this.context.Android.IsMinApiLevel(31))
-            {
-                permissions.Add("android.permission.BLUETOOTH_SCAN");    //Required to be able to discover and pair nearby Bluetooth devices
-                permissions.Add("android.permission.BLUETOOTH_CONNECT"); //Required to be able to connect to paired Bluetooth devices
-            }
             var results = await this.context
                 .Android
-                .RequestPermissions(permissions.ToArray())
+                .RequestFilteredPermissions(permissions)
                 .ToTask(ct)
                 .ConfigureAwait(false);
 
             return results.IsSuccess()
                 ? this.context.Status // now look at the actual device state
                 : AccessState.Denied;
-
-    //< uses - permission android: name = "android.permission.BLUETOOTH"
-    //                 android: maxSdkVersion = "30" />
-
-// < uses - permission android: name = "android.permission.BLUETOOTH_ADMIN"
-//                 android: maxSdkVersion = "30" />
-            // 31
-//< uses - permission android: name = "android.permission.BLUETOOTH_SCAN"
-//                     android: usesPermissionFlags = "neverForLocation" />
         });
 
 
@@ -126,14 +115,13 @@ namespace Shiny.BluetoothLE
         public IObservable<bool> SetAdapterState(bool enable)
         {
             var result = false;
-            if (BluetoothAdapter.DefaultAdapter != null)
-            {
-                if (enable && !BluetoothAdapter.DefaultAdapter.IsEnabled)
-                    result = BluetoothAdapter.DefaultAdapter.Enable();
+            var ad = this.context.Manager.Adapter!;
+            if (enable && !ad.IsEnabled)
+                result =ad.Enable();
 
-                else if (!enable && BluetoothAdapter.DefaultAdapter.IsEnabled)
-                    result = BluetoothAdapter.DefaultAdapter.Disable();
-            }
+            else if (!enable && ad.IsEnabled)
+                result = ad.Disable();
+
             return Observable.Return(result);
         }
     }

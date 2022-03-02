@@ -92,7 +92,7 @@ namespace Shiny
             if (Looper.MainLooper.IsCurrentThread)
                 action();
             else
-                handler.Post(action);
+                this.handler.Post(action);
         }
 
 
@@ -129,7 +129,9 @@ namespace Shiny
         public TValue GetSystemServiceValue<TValue, TSysType>(string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
         {
             using (var type = this.GetSystemService<TSysType>(systemTypeName))
+            { 
                 return func(type);
+            }
         }
 
 
@@ -190,19 +192,15 @@ namespace Shiny
             => serviceType?.BaseType.Name.Contains("ShinyAndroidForegroundService") ?? false;
 
 
-        public bool IsMinApiLevel(int apiLevel)
-            => (int)B.VERSION.SdkInt >= apiLevel;
-
-
         public void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResult)
             => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResult));
 
 
         public T GetIntentValue<T>(string intentAction, Func<Intent, T> transform)
         {
-            using (var filter = new IntentFilter(intentAction))
-            using (var receiver = this.AppContext.RegisterReceiver(null, filter))
-                return transform(receiver);
+            using var filter = new IntentFilter(intentAction);
+            using var receiver = this.AppContext.RegisterReceiver(null, filter);
+            return transform(receiver!);
         }
 
 
@@ -234,10 +232,18 @@ namespace Shiny
                 .Where(x => x.RequestCode == current)
                 .Subscribe(x => ob.Respond((x.Result, x.Intent)));
 
-            request(current, this.CurrentActivity);
+            request(current, this.CurrentActivity!);
 
             return sub;
         });
+
+
+        public bool IsMinApiLevel(int apiLevel)
+            => (int)B.VERSION.SdkInt >= apiLevel;
+
+
+        public IObservable<AccessState> RequestAccess(string androidPermissions)
+            => this.RequestPermissions(new[] { androidPermissions }).Select(x => x.IsSuccess() ? AccessState.Available : AccessState.Denied);
 
 
         public IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions) => Observable.Create<PermissionRequestResult>(ob =>
@@ -281,10 +287,6 @@ namespace Shiny
         });
 
 
-        public IObservable<AccessState> RequestAccess(string androidPermissions)
-            => this.RequestPermissions(new[] { androidPermissions }).Select(x => x.IsSuccess() ? AccessState.Available : AccessState.Denied);
-
-
         public Intent CreateIntent<T>(params string[] actions)
         {
             var intent = new Intent(this.AppContext, typeof(T));
@@ -306,10 +308,13 @@ namespace Shiny
                 ?.RequestedPermissions;
 
             if (permissions != null)
+            { 
                 foreach (var permission in permissions)
+                { 
                     if (permission.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase))
                         return true;
-
+                }
+            }
             //Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
             return false;
         }

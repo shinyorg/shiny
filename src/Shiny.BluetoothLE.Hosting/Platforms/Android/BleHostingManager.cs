@@ -71,7 +71,7 @@ namespace Shiny.BluetoothLE.Hosting
 
             if (android.IsMinApiLevel(31))
             {
-                var access = await android.RequestAccess("android.permission.BLUETOOTH_ADVERTISE");
+                var access = await android.RequestAccess(Android.Manifest.Permission.BluetoothAdvertise);
                 if (access != AccessState.Available)
                     throw new ArgumentException("Insufficient permissions");
             }
