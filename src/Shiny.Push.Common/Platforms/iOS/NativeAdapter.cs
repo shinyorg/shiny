@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
-using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
 using UIKit;
 using UserNotifications;
@@ -40,7 +39,7 @@ namespace Shiny.Push
                     this.onReceviedSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
                     {
                         var dict = userInfo.FromNsDictionary();
-                        var pr = new PushNotification(dict, null);
+                        var pr = new PushNotification(dict);
                         await this.onReceived.Invoke(pr).ConfigureAwait(false);
                     });
                 }
@@ -66,13 +65,13 @@ namespace Shiny.Push
                     {
                         if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                         {
-                            var shiny = response.FromNative();
-                            var pr = new PushNotificationResponse(
-                                shiny.Notification,
-                                shiny.ActionIdentifier,
-                                shiny.Text
-                            );
-                            await this.onEntry.Invoke(pr).ConfigureAwait(false);
+                            //var shiny = response.FromNative();
+                            //var pr = new PushNotificationResponse(
+                            //    shiny.Notification,
+                            //    shiny.ActionIdentifier,
+                            //    shiny.Text
+                            //);
+                            //await this.onEntry.Invoke(pr).ConfigureAwait(false);
                         }
                     });
                 }

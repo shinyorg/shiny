@@ -4,7 +4,7 @@ using System.Linq;
 using Windows.ApplicationModel.Background;
 using Windows.Networking.PushNotifications;
 using Windows.UI.Notifications;
-using Notification = Shiny.Notifications.Notification;
+//using Notification = Shiny.Notifications.Notification;
 
 
 namespace Shiny.Push

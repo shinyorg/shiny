@@ -13,16 +13,13 @@ namespace Shiny.Push
 {
     public class NativeAdapter : INativeAdapter
     {
-        readonly AndroidPushNotificationManager notifications;
         readonly IAndroidContext context;
         readonly FirebaseConfig? config;
 
 
-        public NativeAdapter(AndroidPushNotificationManager notifications,
-                             IAndroidContext context,
+        public NativeAdapter(IAndroidContext context,
                              FirebaseConfig? config = null)
         {
-            this.notifications = notifications;
             this.context = context;
             this.config = config;
         }
@@ -30,9 +27,9 @@ namespace Shiny.Push
 
         public async Task TryProcessIntent(Intent intent)
         {
-            var pr = this.notifications.FromIntent(intent);
-            if (pr != null && this.OnEntry != null)
-                await this.OnEntry.Invoke(pr.Value).ConfigureAwait(false);
+            //var pr = this.notifications.FromIntent(intent);
+            //if (pr != null && this.OnEntry != null)
+            //    await this.OnEntry.Invoke(pr.Value).ConfigureAwait(false);
         }
 
 
@@ -51,8 +48,8 @@ namespace Shiny.Push
                 {
                     ShinyFirebaseService.MessageReceived = async msg =>
                     {
-                        var pr = AndroidPushNotificationManager.FromNative(msg);
-                        await this.onReceived.Invoke(pr).ConfigureAwait(false);
+                        //var pr = AndroidPushNotificationManager.FromNative(msg);
+                        //await this.onReceived.Invoke(pr).ConfigureAwait(false);
                         // stop sending this for now
                         //if (pr.Notification != null)
                         //{
