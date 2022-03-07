@@ -77,7 +77,7 @@ body:
     id: codesample
     attributes:
       label: Code Sample
-      description: Please copy/paste or attach a reproducible sample
+      description: Please copy/paste or attach a reproducible sample (this should include your Shiny startup, any code where you start an operation, and/or the delegate you are using)
   - type: checkboxes
     id: terms
     attributes:
