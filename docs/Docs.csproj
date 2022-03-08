@@ -10,7 +10,7 @@
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Statiq.Web" Version="1.0.0-beta.34" />
-        <PackageReference Include="Devlead.Statiq" Version="0.13.1" />
+        <PackageReference Include="Devlead.Statiq" Version="0.14.0" />
     </ItemGroup>
 
 </Project>
