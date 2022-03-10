@@ -112,5 +112,8 @@ namespace Shiny
 
         public static void ShinyHandleEventsForBackgroundUrl(this UIApplicationDelegate app, string sessionIdentifier, Action completionHandler)
             => ShinyHost.Resolve<AppleLifecycle>().HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
+
+        public static bool ShinyContinueUserActivity(this UIApplicationDelegate app, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
+            => ShinyHost.Resolve<AppleLifecycle>().ContinueUserActivity(userActivity, completionHandler);
     }
 }

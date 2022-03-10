@@ -11,11 +11,23 @@ using Foundation;
 namespace Shiny.Nfc
 {
     //https://docs.microsoft.com/en-us/xamarin/ios/platform/introduction-to-ios11/corenfc
-    public class NfcManager : NFCNdefReaderSessionDelegate, INfcManager
+    public class NfcManager : NFCNdefReaderSessionDelegate, INfcManager, IShinyStartupTask
     {
         readonly Subject<NDefRecord[]> recordSubj = new Subject<NDefRecord[]>();
         readonly Subject<NSError> invalidSubj = new Subject<NSError>();
+        readonly AppleLifecycle lifecycle;
 
+        public NfcManager(AppleLifecycle lifecycle) => this.lifecycle = lifecycle;
+
+
+        public void Start()
+        {
+            this.lifecycle.RegisterContinueActivity(activity =>
+            {
+                // TODO
+                return Task.CompletedTask;
+            });
+        }
 
         public override void DidDetect(NFCNdefReaderSession session, NFCNdefMessage[] messages)
         {
