@@ -24,7 +24,7 @@ namespace ShinyBuild.Tasks.Library
                 .WithTarget("Build")
                 .WithProperty("CI", context.IsRunningInCI ? "true" : "")
                 .WithProperty("OS", context.OperatingSystemString)
-                .WithProperty("PublicRelease", context.IsMainBranch.ToString())
+                .WithProperty("PublicRelease", "true")
                 .SetConfiguration(context.MsBuildConfiguration)
             );
         }
