@@ -15,8 +15,6 @@ namespace Shiny.Nfc
     //https://docs.microsoft.com/en-us/xamarin/ios/platform/introduction-to-ios11/corenfc
     public class NfcManager : INfcManager, IShinyStartupTask
     {
-        readonly Subject<NDefRecord[]> recordSubj = new Subject<NDefRecord[]>();
-        readonly Subject<NSError> invalidSubj = new Subject<NSError>();
         readonly AppleLifecycle lifecycle;
 
 
