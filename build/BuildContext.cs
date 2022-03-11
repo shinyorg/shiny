@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
@@ -7,6 +6,7 @@ using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
 using Cake.Git;
+using Cake.GitVersioning;
 
 
 namespace ShinyBuild
@@ -27,10 +27,15 @@ namespace ShinyBuild
             }
 #endif
             this.Branch = context.GitBranchCurrent(".");
+
+            this.ReleaseVersion = this.GitVersioningGetVersion().NuGetPackageVersion;
+            this.Log.Information("NUGET PACKAGE VERSION: " + this.ReleaseVersion);
         }
 
 
-        public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
+        public string ReleaseVersion { get; }
+        //public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
+        public string GitHubSecretToken => this.ArgumentOrEnvironment<string>("GITHUB_TOKEN");
         public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(this.DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.ArgumentOrEnvironment("configuration", Constants.DefaultBuildConfiguration);

@@ -16,6 +16,7 @@ on:
 
 env:
   DotNetVersion: 6.0.100
+  GITHUB_TOKEN: {{ secrets.github_token }}
   DocsDeployGitHubToken: ${{ secrets.DOCS_GITHUB_TOKEN }}
   NugetApiKey: ${{secrets.NUGETAPIKEY}}
   TwitterConsumerKey: ${{secrets.TWITTER_CONSUMER_KEY}}

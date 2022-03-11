@@ -1,6 +1,4 @@
-﻿using System;
-
-using Cake.Common;
+﻿using Cake.Common;
 using Cake.Common.IO;
 using Cake.Common.Tools.MSBuild;
 using Cake.Frosting;
@@ -26,6 +24,7 @@ namespace ShinyBuild.Tasks.Library
                 .WithTarget("Build")
                 .WithProperty("CI", context.IsRunningInCI ? "true" : "")
                 .WithProperty("OS", context.OperatingSystemString)
+                .WithProperty("PublicRelease", context.IsMainBranch.ToString())
                 .SetConfiguration(context.MsBuildConfiguration)
             );
         }
