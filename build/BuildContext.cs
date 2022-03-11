@@ -27,26 +27,16 @@ namespace ShinyBuild
             }
 #endif
             this.Branch = context.GitBranchCurrent(".");
-
-            var version = $"{this.MajorMinorVersion}.{this.BuildNumber}";
-            if (!this.IsMainBranch)
-                version += "-preview";
-
-            this.Log.Information("Shiny Version: " + version);
-            this.NugetVersion = version;
         }
 
 
-        public string MajorMinorVersion => this.ArgumentOrEnvironment("ShinyVersion", Constants.MajorMinorVersion);
-        public int BuildNumber => this.ArgumentOrEnvironment("BuildNumber", 0);
         public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
-        public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(DocsDeployGitHubToken), null);
+        public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(this.DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.ArgumentOrEnvironment("configuration", Constants.DefaultBuildConfiguration);
         public string NugetApiKey => this.ArgumentOrEnvironment<string>("NugetApiKey");
         public bool AllowNugetUploadFailures => this.ArgumentOrEnvironment("AllowNugetUploadFailures", false);
         public GitBranch Branch { get; }
-        public string NugetVersion { get; }
 
         public T ArgumentOrEnvironment<T>(string name, T defaultValue = default)
             => this.HasArgument(name) ? this.Argument<T>(name) : this.EnvironmentVariable<T>(name, defaultValue);

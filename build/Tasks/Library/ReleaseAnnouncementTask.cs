@@ -19,7 +19,8 @@ namespace ShinyBuild.Tasks.Library
 
         public override Task RunAsync(BuildContext context)
         {
-            var message = $"Shiny v{context.NugetVersion} released! Check out the latest release notes here - https://shinylib.net/release-notes/";
+            // TODO: how to get this out of nerdbank.gitversioning?
+            var message = $"Shiny v2.5-preview released! Check out the latest release notes here - https://shinylib.net/release-notes/";
             return Task.WhenAll(
                 this.Twitter(context, message),
                 this.Discord(context, message)
