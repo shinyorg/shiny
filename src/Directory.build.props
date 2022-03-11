@@ -8,10 +8,8 @@
         <NoWarn>$(NoWarn);1591;1701;1591;1702;1705;VSX1000;NU1603</NoWarn>
         <Description>Shiny</Description>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
-        <ShinyVersion Condition=" '$(ShinyVersion)' == '' ">2.5.0</ShinyVersion>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
-        <PackageVersion>$(ShinyVersion)</PackageVersion>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReleaseNotes>https://shinylib.net/release-notes/</PackageReleaseNotes>
         <PackageTags>xamarin ios android ble bluetooth bluetoothle push notifications sensors geofences gps location background jobs settings speech sensors</PackageTags>
