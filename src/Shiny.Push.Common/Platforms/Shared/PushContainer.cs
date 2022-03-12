@@ -29,6 +29,21 @@ namespace Shiny.Push
             if (this.CurrentRegistrationToken.IsEmpty())
                 return;
 
+            #if XAMARIN_IOS
+            // TODO: can I hook these differently dynamically with selector?
+
+            //application:didReceiveRemoteNotification:fetchCompletionHandler:
+            if (AppleExtensions.HasAppDelegateHook("didReceiveRemoteNotification"))
+                logger.LogWarning("[SHINY] AppDelegate.DidReceiveRemoteNotification is not hooked - background notifications will not work without this!");
+
+            //application:didRegisterForRemoteNotificationsWithDeviceToken:"
+            AppleExtensions.AssertAppDelegateHook("didRegisterForRemoteNotificationsWithDeviceToken", "");
+
+            //application: didFailToRegisterForRemoteNotificationsWithError
+            AppleExtensions.AssertAppDelegateHook("", "");
+
+            #endif
+
             try
             {
                 logger.LogInformation("Container has active push registration token - attempting to start");
