@@ -64,7 +64,13 @@ namespace Shiny.Generators
                         "HandleEventsForBackgroundUrl",
                         "public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler) => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);"
                     );
-
+                    this.AppendMethodIf(
+                        appDelegate,
+                        builder,
+                        "Shiny.Nfc",
+                        "ContinueUserActivity",
+                        "public override bool ContinueUserActivity(UIApplication application, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler) => this.ShinyContinueUserActivity(userActivity, completionHandler);"
+                    );
                     this.AppendMethodIf(
                         appDelegate,
                         builder,

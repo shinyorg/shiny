@@ -1,5 +1,4 @@
-﻿using System;
-using Cake.Frosting;
+﻿using Cake.Frosting;
 using ShinyBuild.Tasks.Library;
 
 
@@ -10,5 +9,6 @@ namespace ShinyBuild.Tasks
     [IsDependentOn(typeof(NugetDeployTask))]
     [IsDependentOn(typeof(DocTask))]
     [IsDependentOn(typeof(ReleaseAnnouncementTask))]
+    [IsDependentOn(typeof(GitHubReleaseTask))]
     public sealed class DefaultTarget : FrostingTask<BuildContext> { }
 }

@@ -85,6 +85,15 @@ namespace Shiny
         }
 
 
+        readonly List<Func<NSUserActivity, Task>> continueList = new List<Func<NSUserActivity, Task>>();
+        public IDisposable RegisterContinueActivity(Func<NSUserActivity, Task> func)
+        {
+            this.continueList.Add(func);
+            return Disposable.Create(() => this.continueList.Remove(func));
+        }
+
+
+
         readonly List<(Action<NSData> OnSuccess, Action<NSError> OnError)> remoteReg = new List<(Action<NSData> Success, Action<NSError> Error)>();
         public IDisposable RegisterForRemoteNotificationToken(Action<NSData> onSuccess, Action<NSError> onError)
         {
@@ -108,6 +117,19 @@ namespace Shiny
                     this.logger.LogError(ex, "RegisteredForRemoteNotifications");
                 }
             }
+        }
+
+
+        internal bool ContinueUserActivity(NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
+        {
+            if (this.continueList.Count == 0)
+                return false;
+
+            foreach (var func in this.continueList)
+            {
+               func.Invoke(userActivity).ContinueWith(_ => completionHandler.Invoke(null));
+            }
+            return true;
         }
 
 

@@ -8,12 +8,12 @@
         <PackageReference Update="Microsoft.Extensions.Logging" Version="6.0.0" />
         <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+        <PackageReference Update="Microsoft.CodeAnalysis" Version="4.1.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
-        <PackageReference Update="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
         <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="4.0.1" />
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
-        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.4.0" />
-        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.4.0" />
+        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.5.0" />
+        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.5.0" />
         <PackageReference Update="Xamarin.ShortcutBadger" Version="1.1.21" />
         <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.13" />
         <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.1" />
@@ -63,6 +63,7 @@
         <None Include="$(MSBuildThisFileDirectory)nuget.txt" Pack="true" PackagePath="readme.txt" />
         <None Include="..\..\readme.md" Pack="true" PackagePath="\" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+        <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.255" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsStandardBuild)' == 'true'">

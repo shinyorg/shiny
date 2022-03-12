@@ -9,16 +9,16 @@ namespace Shiny.Locations
 {
     public class GooglePlayServiceGpsManagerImpl : AbstractGpsManager
     {
-        readonly FusedLocationProviderClient client;
-        public GooglePlayServiceGpsManagerImpl(IAndroidContext context, ILogger<GooglePlayServiceGpsManagerImpl> logger) : base(context, logger)
-            => this.client = LocationServices.GetFusedLocationProviderClient(context.AppContext);
+        FusedLocationProviderClient? listenerClient;
+        public GooglePlayServiceGpsManagerImpl(IAndroidContext context, ILogger<GooglePlayServiceGpsManagerImpl> logger) : base(context, logger) { }
 
 
         public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
         {
             (await this.RequestAccess(GpsRequest.Foreground).ConfigureAwait(false)).Assert(null, true);
 
-            var location = await this.client
+            var location = await LocationServices
+                .GetFusedLocationProviderClient(this.Context.AppContext)
                 .GetLastLocationAsync()
                 .ConfigureAwait(false);
 
@@ -29,13 +29,24 @@ namespace Shiny.Locations
         });
 
 
-        protected override Task RequestLocationUpdates(GpsRequest request) => this.Context.InvokeOnMainThreadAsync(() => this.client.RequestLocationUpdatesAsync(
-            request.ToNative(),
-            this.Callback
-        ));
+        protected override Task RequestLocationUpdates(GpsRequest request) => this.Context.InvokeOnMainThreadAsync(() => 
+        {
+            this.listenerClient ??= LocationServices.GetFusedLocationProviderClient(this.Context.AppContext);
+
+            return this.listenerClient.RequestLocationUpdatesAsync(
+                request.ToNative(),
+                this.Callback
+            );
+        });
 
 
-        protected override Task RemoveLocationUpdates()
-            => this.client.RemoveLocationUpdatesAsync(this.Callback);
+        protected override async Task RemoveLocationUpdates()
+        { 
+            if (this.listenerClient == null)
+                return;
+
+            await this.listenerClient.RemoveLocationUpdatesAsync(this.Callback);
+            this.listenerClient = null;
+        }
     }
 }

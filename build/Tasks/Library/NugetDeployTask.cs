@@ -1,8 +1,8 @@
 ﻿using System;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
-using Cake.Common.Tools.DotNetCore;
-using Cake.Common.Tools.DotNetCore.NuGet.Push;
+using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.NuGet.Push;
 using Cake.Frosting;
 
 
@@ -27,7 +27,7 @@ namespace ShinyBuild.Tasks.Library
 
         public override void Run(BuildContext context)
         {
-            var settings = new DotNetCoreNuGetPushSettings
+            var settings = new DotNetNuGetPushSettings
             {
                 ApiKey = context.NugetApiKey,
                 Source = MainNuget,
@@ -39,7 +39,7 @@ namespace ShinyBuild.Tasks.Library
             {
                 try
                 {
-                    context.DotNetCoreNuGetPush(package.FullPath, settings);
+                    context.DotNetNuGetPush(package.FullPath, settings);
                 }
                 catch (Exception ex)
                 {

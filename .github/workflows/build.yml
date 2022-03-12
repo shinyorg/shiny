@@ -32,21 +32,18 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+          fetch-depth: 0
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DotNetVersion }}
 
-    - name: Generate Build Number
-      id: buildnumber
-      uses: einaregilsson/build-number@v3
-      with:
-        token: ${{secrets.github_token}}
-
     - name: Build
-      run: dotnet run --project build/ShinyBuild.csproj --BuildNumber=${{steps.buildnumber.outputs.build_number}}
+      run: dotnet run --project build/ShinyBuild.csproj
 
     - name: Publish Artifacts
       uses: actions/upload-artifact@v2

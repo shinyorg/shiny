@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
@@ -7,6 +6,7 @@ using Cake.Core.Diagnostics;
 using Cake.Core.IO;
 using Cake.Frosting;
 using Cake.Git;
+using Cake.GitVersioning;
 
 
 namespace ShinyBuild
@@ -28,25 +28,20 @@ namespace ShinyBuild
 #endif
             this.Branch = context.GitBranchCurrent(".");
 
-            var version = $"{this.MajorMinorVersion}.{this.BuildNumber}";
-            if (!this.IsMainBranch)
-                version += "-preview";
-
-            this.Log.Information("Shiny Version: " + version);
-            this.NugetVersion = version;
+            this.ReleaseVersion = this.GitVersioningGetVersion().NuGetPackageVersion;
+            this.Log.Information("NUGET PACKAGE VERSION: " + this.ReleaseVersion);
         }
 
 
-        public string MajorMinorVersion => this.ArgumentOrEnvironment("ShinyVersion", Constants.MajorMinorVersion);
-        public int BuildNumber => this.ArgumentOrEnvironment("BuildNumber", 0);
-        public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
-        public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(DocsDeployGitHubToken), null);
+        public string ReleaseVersion { get; }
+        //public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
+        public string GitHubSecretToken => this.ArgumentOrEnvironment<string>("GITHUB_TOKEN");
+        public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(this.DocsDeployGitHubToken), null);
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.ArgumentOrEnvironment("configuration", Constants.DefaultBuildConfiguration);
         public string NugetApiKey => this.ArgumentOrEnvironment<string>("NugetApiKey");
         public bool AllowNugetUploadFailures => this.ArgumentOrEnvironment("AllowNugetUploadFailures", false);
         public GitBranch Branch { get; }
-        public string NugetVersion { get; }
 
         public T ArgumentOrEnvironment<T>(string name, T defaultValue = default)
             => this.HasArgument(name) ? this.Argument<T>(name) : this.EnvironmentVariable<T>(name, defaultValue);
