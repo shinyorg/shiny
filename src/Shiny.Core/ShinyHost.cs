@@ -16,7 +16,7 @@ namespace Shiny
             get
             {
                 if (services == null)
-                    throw new ArgumentException("ServiceProvider has not been setup - have you initialized the Platform provider using ShinyHost.Init?");
+                    throw new ArgumentException(Constants.MissingIntialization);
 
                 return services;
             }
