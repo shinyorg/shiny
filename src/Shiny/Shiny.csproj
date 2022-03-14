@@ -12,7 +12,6 @@
 
         <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
         <ProjectReference Include="..\Shiny.Generators\Shiny.Generators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>
 

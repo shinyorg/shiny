@@ -24,7 +24,7 @@ namespace Shiny
                 selector += ":";
 
             return UIApplication.SharedApplication.RespondsToSelector(new Selector(selector));
-        }
+       }
 
 
         public static void AssertAppDelegateHook(string selector, string message)
@@ -54,9 +54,10 @@ namespace Shiny
         {
             var dict = new Dictionary<string, string>();
             if (ns != null)
+            {
                 foreach (var pair in ns)
                     dict.Add(pair.Key.ToString(), pair.Value.ToString());
-
+            }
             return dict;
         }
 

@@ -28,7 +28,7 @@ namespace Shiny.Stores
         readonly KeyStore keyStore;
 
 
-        internal AndroidKeyStore(IAndroidContext context,
+        internal AndroidKeyStore(IPlatform context,
                                  IKeyValueStore clearStore,
                                  string keystoreAlias,
                                  bool alwaysUseAsymmetricKeyStorage)
@@ -38,7 +38,7 @@ namespace Shiny.Stores
             this.alias = keystoreAlias;
 
             this.clearStore = clearStore;
-            this.keyStore = KeyStore.GetInstance(androidKeyStore);
+            this.keyStore = KeyStore.GetInstance(androidKeyStore)!;
             this.keyStore.Load(null);
         }
 
@@ -49,7 +49,7 @@ namespace Shiny.Stores
             // we want to use symmetric if we are >= 23 or we didn't set it previously.
 
             // If >= API 23 we can use the KeyStore's symmetric key
-            if (!alwaysUseAsymmetricKey)
+            if (!this.alwaysUseAsymmetricKey)
                 return this.GetSymmetricKey();
 
             // NOTE: KeyStore in < API 23 can only store asymmetric keys
@@ -71,7 +71,7 @@ namespace Shiny.Stores
                 {
                     var wrappedKey = Convert.FromBase64String(existingKeyStr);
 
-                    var unwrappedKey = UnwrapKey(wrappedKey, keyPair.Private);
+                    var unwrappedKey = this.UnwrapKey(wrappedKey, keyPair.Private);
                     secretKey = unwrappedKey.JavaCast<ISecretKey>();
                 }
                 catch (InvalidKeyException ikEx)
@@ -113,7 +113,7 @@ namespace Shiny.Stores
             }
 
             var keyGenerator = KeyGenerator.GetInstance(KeyProperties.KeyAlgorithmAes, androidKeyStore);
-            var builder = new KeyGenParameterSpec.Builder(alias, KeyStorePurpose.Encrypt | KeyStorePurpose.Decrypt)
+            var builder = new KeyGenParameterSpec.Builder(this.alias, KeyStorePurpose.Encrypt | KeyStorePurpose.Decrypt)
                 .SetBlockModes(KeyProperties.BlockModeGcm)
                 .SetEncryptionPaddings(KeyProperties.EncryptionPaddingNone)
                 .SetRandomizedEncryptionRequired(false);
@@ -127,7 +127,7 @@ namespace Shiny.Stores
         KeyPair GetAsymmetricKeyPair()
         {
             // set that we generated keys on pre-m device.
-            var asymmetricAlias = $"{alias}.asymmetric";
+            var asymmetricAlias = $"{this.alias}.asymmetric";
 
             var privateKey = this.keyStore.GetKey(asymmetricAlias, null)?.JavaCast<IPrivateKey>();
             var publicKey = this.keyStore.GetCertificate(asymmetricAlias)?.PublicKey;

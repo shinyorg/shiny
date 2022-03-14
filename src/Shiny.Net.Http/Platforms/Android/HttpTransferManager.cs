@@ -32,7 +32,7 @@ namespace Shiny.Net.Http
 
         public override void Start()
         {
-            this.Services.Android.RegisterBroadcastReceiver<HttpTransferBroadcastReceiver>(
+            this.Services.Platform.RegisterBroadcastReceiver<HttpTransferBroadcastReceiver>(
                 Native.ActionDownloadComplete,
                 Intent.ActionBootCompleted
             );
@@ -43,10 +43,12 @@ namespace Shiny.Net.Http
         {
             await base.Cancel(identifier);
             if (Int64.TryParse(identifier, out var id))
+            {
                 this.Services
-                    .Android
+                    .Platform
                     .GetManager()
                     .Remove(id);
+            }
         }
 
 
@@ -70,7 +72,7 @@ namespace Shiny.Net.Http
                         .Interval(TimeSpan.FromSeconds(2))
                         .Subscribe(_ =>
                         {
-                            using (var cursor = this.Services.Android.GetManager().InvokeQuery(query))
+                            using (var cursor = this.Services.Platform.GetManager().InvokeQuery(query))
                             {
                                 while (cursor.MoveToNext())
                                 {
@@ -102,11 +104,11 @@ namespace Shiny.Net.Http
             if (request.HttpMethod != HttpMethod.Get)
                 throw new ArgumentException("Only GETs are supported for downloads on Android");
 
-            var access = await this.Services.Android.RequestAccess(Manifest.Permission.WriteExternalStorage);
+            var access = await this.Services.Platform.RequestAccess(Manifest.Permission.WriteExternalStorage);
             if (access != AccessState.Available)
                 throw new ArgumentException("Invalid access to external storage - " + access);
 
-            access = await this.Services.Android.RequestAccess(Manifest.Permission.ReadExternalStorage);
+            access = await this.Services.Platform.RequestAccess(Manifest.Permission.ReadExternalStorage);
             if (access != AccessState.Available)
                 throw new ArgumentException("Invalid access to external storage - " + access);
 
@@ -122,7 +124,7 @@ namespace Shiny.Net.Http
             foreach (var header in request.Headers)
                 native.AddRequestHeader(header.Key, header.Value);
 
-            var id = this.Services.Android.GetManager().Enqueue(native);
+            var id = this.Services.Platform.GetManager().Enqueue(native);
             return new HttpTransfer(
                 id.ToString(),
                 request.Uri,
@@ -144,7 +146,7 @@ namespace Shiny.Net.Http
         IEnumerable<HttpTransfer> GetAll(QueryFilter filter)
         {
             var query = filter.ToNative();
-            using (var cursor = this.Services.Android.GetManager().InvokeQuery(query))
+            using (var cursor = this.Services.Platform.GetManager().InvokeQuery(query))
                 while (cursor.MoveToNext())
                     yield return cursor.ToLib();
         }

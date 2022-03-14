@@ -7,11 +7,11 @@ namespace Shiny.Stores
 {
     public class SettingsKeyValueStore : IKeyValueStore
     {
-        readonly IAndroidContext context;
+        readonly IPlatform context;
         readonly ISerializer serializer;
 
 
-        public SettingsKeyValueStore(IAndroidContext context, ISerializer serializer)
+        public SettingsKeyValueStore(IPlatform context, ISerializer serializer)
         {
             this.context = context;
             this.serializer = serializer;

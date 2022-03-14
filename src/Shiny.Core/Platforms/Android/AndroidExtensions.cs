@@ -9,11 +9,11 @@ namespace Shiny
 {
     public static class AndroidExtensions
     {
-        public static IObservable<PermissionRequestResult> RequestFilteredPermissions(this IAndroidContext context, params AndroidPermission[] androidPermissions)
+        public static IObservable<PermissionRequestResult> RequestFilteredPermissions(this IPlatform context, params AndroidPermission[] androidPermissions)
         {
             var list = new List<string>();
             foreach (var p in androidPermissions)
-            { 
+            {
                 var meetsMin = p.MinSdkVersion == null || (int)Android.OS.Build.VERSION.SdkInt >= p.MinSdkVersion;
                 var meetsMax = p.MaxSdkVersion == null || (int)Android.OS.Build.VERSION.SdkInt <= p.MaxSdkVersion;
 
@@ -24,7 +24,7 @@ namespace Shiny
         }
 
 
-        public static bool EnsureAllManifestEntries(this IAndroidContext context, params AndroidPermission[] androidPermissions)
+        public static bool EnsureAllManifestEntries(this IPlatform context, params AndroidPermission[] androidPermissions)
         {
             foreach (var p in androidPermissions)
             {
@@ -41,7 +41,7 @@ namespace Shiny
         }
 
 
-        public static IObservable<(Result Result, Intent Data)> RequestActivityResult(this IAndroidContext context, Intent intent)
+        public static IObservable<(Result Result, Intent Data)> RequestActivityResult(this IPlatform context, Intent intent)
             => context.RequestActivityResult((requestCode, activity) =>
                 activity.StartActivityForResult(intent, requestCode)
             );
@@ -49,12 +49,12 @@ namespace Shiny
 
         public static void ShinyOnRequestPermissionsResult(this Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
             => ShinyHost
-                .Resolve<IAndroidContext>()
+                .Resolve<IPlatform>()
                 .OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
         public static void ShinyOnActivityResult(this Activity activity, int requestCode, Result resultCode, Intent data)
             => ShinyHost
-                .Resolve<IAndroidContext>()
+                .Resolve<IPlatform>()
                 .OnActivityResult(requestCode, resultCode, data);
 
         public static void ShinyOnCreate(this Application application, IShinyStartup? startup = null)
@@ -64,7 +64,7 @@ namespace Shiny
             => activity.ShinyOnNewIntent(activity.Intent);
 
         public static void ShinyOnNewIntent(this Activity activity, Intent? intent)
-            => ShinyHost.Resolve<IAndroidContext>()?.OnNewIntent(intent);
+            => ShinyHost.Resolve<IPlatform>()?.OnNewIntent(intent);
 
         //public static IObservable<(Result Result, Intent Data)> RequestActivityResult<TActivity>(this IAndroidContext context) where TActivity : Activity
         //    => context.RequestActivityResult((requestCode, activity) =>

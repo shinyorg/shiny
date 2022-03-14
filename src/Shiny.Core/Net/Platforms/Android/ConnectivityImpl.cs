@@ -14,12 +14,12 @@ namespace Shiny.Net
 {
     public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
     {
-        readonly IAndroidContext context;
+        readonly IPlatform context;
         readonly ILogger logger;
         IDisposable? netmon;
 
 
-        public ConnectivityImpl(IAndroidContext context, ILogger<IConnectivity> logger)
+        public ConnectivityImpl(IPlatform context, ILogger<IConnectivity> logger)
         {
             this.context = context;
             this.logger = logger;
@@ -83,7 +83,9 @@ namespace Shiny.Net
                     access = ToAccess(network.Info.Type);
 
                     if (!network.Caps.HasCapability(NetCapability.Internet))
+                    {
                         reach = NetworkReach.Local;
+                    }
                     else
                     {
                         reach = NetworkReach.Internet;

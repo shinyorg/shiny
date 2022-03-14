@@ -28,7 +28,7 @@ namespace Shiny
 
         protected TService? Service { get; private set; }
         protected IList<TDelegate>? Delegates { get; private set; }
-        protected IAndroidContext? Context { get; private set; }
+        protected IPlatform? Context { get; private set; }
         protected AndroidNotificationManager? AndroidNotifications { get; private set; }
 
 
@@ -59,7 +59,7 @@ namespace Shiny
             this.DestroyWith = new CompositeDisposable();
             this.Service = this.Resolve<TService>();
             this.Delegates = this.ResolveAll<TDelegate>().ToList();
-            this.Context = this.Resolve<IAndroidContext>();
+            this.Context = this.Resolve<IPlatform>();
             this.AndroidNotifications = this.Resolve<AndroidNotificationManager>();
 
             if (this.Context.IsMinApiLevel(26))

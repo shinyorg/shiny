@@ -36,7 +36,7 @@ namespace Shiny.Locations
             this.core = core;
             this.database = database;
             this.logger = logger;
-            this.client = ActivityRecognition.GetClient(core.Android.AppContext);
+            this.client = ActivityRecognition.GetClient(core.Platform.AppContext);
             this.eventSubj = new Subject<MotionActivityEvent>();
         }
 
@@ -51,7 +51,7 @@ namespace Shiny.Locations
 
         public async void Start()
         {
-            this.core.Android.RegisterBroadcastReceiver<MotionActivityBroadcastReceiver>(
+            this.core.Platform.RegisterBroadcastReceiver<MotionActivityBroadcastReceiver>(
                 MotionActivityManagerImpl.IntentAction,
                 Intent.ActionBootCompleted
             );
@@ -117,10 +117,10 @@ namespace Shiny.Locations
         {
             var result = AccessState.Available;
 
-            if (this.core.Android.IsMinApiLevel(29))
+            if (this.core.Platform.IsMinApiLevel(29))
             {
                 result = await this.core
-                    .Android
+                    .Platform
                     .RequestAccess(Permission.ActivityRecognition)
                     .ToTask()
                     .ConfigureAwait(false);
@@ -187,9 +187,9 @@ ORDER BY
             if (this.pendingIntent != null)
                 return this.pendingIntent;
 
-            var intent = this.core.Android.CreateIntent<MotionActivityBroadcastReceiver>(IntentAction);
+            var intent = this.core.Platform.CreateIntent<MotionActivityBroadcastReceiver>(IntentAction);
             this.pendingIntent = PendingIntent.GetBroadcast(
-                this.core.Android.AppContext,
+                this.core.Platform.AppContext,
                 0,
                 intent,
                 PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable

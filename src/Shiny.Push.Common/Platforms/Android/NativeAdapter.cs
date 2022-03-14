@@ -13,12 +13,11 @@ namespace Shiny.Push
 {
     public class NativeAdapter : INativeAdapter
     {
-        readonly IAndroidContext context;
+        readonly IPlatform context;
         readonly FirebaseConfig? config;
 
 
-        public NativeAdapter(IAndroidContext context,
-                             FirebaseConfig? config = null)
+        public NativeAdapter(IPlatform context, FirebaseConfig? config = null)
         {
             this.context = context;
             this.config = config;

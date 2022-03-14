@@ -35,13 +35,13 @@ namespace Shiny.BluetoothLE.Internals
 
             this.devices = new ConcurrentDictionary<string, Peripheral>();
             this.peripheralSubject = new Subject<(Intent Intent, Peripheral Peripheral)>();
-            this.Manager = services.Android.GetBluetooth();
+            this.Manager = services.Platform.GetBluetooth();
         }
 
 
         public void Start()
         {
-            this.services.Android.RegisterBroadcastReceiver<ShinyBleBroadcastReceiver>(
+            this.services.Platform.RegisterBroadcastReceiver<ShinyBleBroadcastReceiver>(
                 BluetoothDevice.ActionNameChanged,
                 BluetoothDevice.ActionBondStateChanged,
                 BluetoothDevice.ActionPairingRequest,
@@ -51,7 +51,7 @@ namespace Shiny.BluetoothLE.Internals
                 .WhenBleEvent()
                 .Subscribe(intent => this.DeviceEvent(intent));
 
-            this.services.Android.RegisterBroadcastReceiver<ShinyBleAdapterStateBroadcastReceiver>(
+            this.services.Platform.RegisterBroadcastReceiver<ShinyBleAdapterStateBroadcastReceiver>(
                 BluetoothAdapter.ActionStateChanged
             );
 
@@ -84,7 +84,7 @@ namespace Shiny.BluetoothLE.Internals
 
         public BleConfiguration Configuration { get; }
         public BluetoothManager Manager { get; }
-        public IAndroidContext Android => this.services.Android;
+        public IPlatform Android => this.services.Platform;
 
 
         async void DeviceEvent(Intent intent)

@@ -24,7 +24,7 @@ namespace Shiny.Notifications
             this.jobManager = jobManager;
 
             this.core
-                .Android
+                .Platform
                 .WhenIntentReceived()
                 .SubscribeAsync(x => this
                     .core
@@ -45,7 +45,7 @@ namespace Shiny.Notifications
 
         public async Task Clear()
         {
-            this.manager.NativeManager.CancelAll();            
+            this.manager.NativeManager.CancelAll();
             await this.core.Repository.Clear<Notification>();
             await this.CancelJob();
         }

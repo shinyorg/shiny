@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 
@@ -11,7 +12,7 @@ namespace Shiny.Push
             this.ActionIdentifier = actionIdentifier;
             this.Text = text;
 
-         //   this.Data = new ReadOnlyDictionary<string, string>(notification.Payload);
+            this.Data = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
         }
 
 

@@ -18,14 +18,14 @@ namespace Shiny.Locations
     {
         public const string ReceiverName = "com.shiny.locations." + nameof(GeofenceBroadcastReceiver);
         public const string IntentAction = ReceiverName + ".INTENT_ACTION";
-        readonly IAndroidContext context;
+        readonly IPlatform context;
         readonly GeofencingClient client;
         readonly IServiceProvider services;
         readonly ILogger logger;
         PendingIntent? geofencePendingIntent;
 
 
-        public GeofenceManagerImpl(IAndroidContext context,
+        public GeofenceManagerImpl(IPlatform context,
                                    IRepository repository,
                                    IServiceProvider services,
                                    ILogger<GeofenceManagerImpl> logger) : base(repository)

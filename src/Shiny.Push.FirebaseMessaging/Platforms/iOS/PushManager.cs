@@ -67,8 +67,8 @@ namespace Shiny.Push.FirebaseMessaging
                 // hijacking firebase because the delegate doesn't seem to fire any longer
                 Messaging.SharedInstance.AppDidReceiveMessage(userInfo);
                 var dict = userInfo.FromNsDictionary();
-                var pr = new PushNotification(dict, null);
-                await this.container.OnReceived(pr).ConfigureAwait(false);
+                //var pr = new PushNotification(dict, null);
+                //await this.container.OnReceived(pr).ConfigureAwait(false);
             });
             if (App.DefaultInstance == null)
             {

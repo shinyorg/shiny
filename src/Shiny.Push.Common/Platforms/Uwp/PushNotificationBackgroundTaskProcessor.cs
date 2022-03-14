@@ -25,27 +25,27 @@ namespace Shiny.Push
             var notification = new Notification();
             var fire = true;
 
-            if (taskInstance.TriggerDetails is RawNotification raw)
-            {
-                notification.Payload = raw.Headers?.ToDictionary(x => x.Key, x => x.Value);
-                notification.Channel = raw.ChannelId;
-                notification.Message = raw.Content;
-            }
-            else if (taskInstance.TriggerDetails is ToastNotification toast)
-            {
-                notification.Payload = toast.Data?.Values?.ToDictionary(x => x.Key, x => x.Value);
-            }
-            else if (taskInstance.TriggerDetails is TileNotification tile)
-            {
-            }
-            else
-            {
-                fire = false;
-            }
+            //if (taskInstance.TriggerDetails is RawNotification raw)
+            //{
+            //    notification.Payload = raw.Headers?.ToDictionary(x => x.Key, x => x.Value);
+            //    notification.Channel = raw.ChannelId;
+            //    notification.Message = raw.Content;
+            //}
+            //else if (taskInstance.TriggerDetails is ToastNotification toast)
+            //{
+            //    notification.Payload = toast.Data?.Values?.ToDictionary(x => x.Key, x => x.Value);
+            //}
+            //else if (taskInstance.TriggerDetails is TileNotification tile)
+            //{
+            //}
+            //else
+            //{
+            //    fire = false;
+            //}
 
             if (fire)
             {
-                var response = new PushNotificationResponse(notification, null, null);
+                var response = new PushNotificationResponse(null, null);
                 await this.delegates
                     .RunDelegates(x => x.OnEntry(response))
                     .ConfigureAwait(false);

@@ -11,7 +11,7 @@ namespace Shiny.Locations
     public class LocationServicesGpsManagerImpl : AbstractGpsManager
     {
         readonly LocationManager client;
-        public LocationServicesGpsManagerImpl(IAndroidContext context, ILogger<LocationServicesGpsManagerImpl> logger) : base(context, logger)
+        public LocationServicesGpsManagerImpl(IPlatform context, ILogger<LocationServicesGpsManagerImpl> logger) : base(context, logger)
             => this.client = context.GetSystemService<LocationManager>(AContext.LocationService);
 
 
