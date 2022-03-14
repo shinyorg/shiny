@@ -9,7 +9,7 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace Shiny
 {
-    public static class Extensions
+    public static class AppCenterExtensions
     {
         /// <summary>
         /// Adds AppCenter to the logging provider
