@@ -41,7 +41,7 @@ namespace Shiny.Locations
 
 
         protected override async Task RemoveLocationUpdates()
-        { 
+        {
             if (this.listenerClient == null)
                 return;
 
