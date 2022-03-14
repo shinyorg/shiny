@@ -9,7 +9,7 @@ namespace Shiny.Locations
 {
     public class GooglePlayServiceGpsManagerImpl : AbstractGpsManager
     {
-        FusedLocationProviderClient? client;
+        FusedLocationProviderClient? listenerClient;
         public GooglePlayServiceGpsManagerImpl(IAndroidContext context, ILogger<GooglePlayServiceGpsManagerImpl> logger) : base(context, logger) { }
 
 
@@ -17,8 +17,8 @@ namespace Shiny.Locations
         {
             (await this.RequestAccess(GpsRequest.Foreground).ConfigureAwait(false)).Assert(null, true);
 
-            this.client ??= LocationServices.GetFusedLocationProviderClient(this.Context.AppContext);
-            var location = await this.client
+            var location = await LocationServices
+                .GetFusedLocationProviderClient(this.Context.AppContext)
                 .GetLastLocationAsync()
                 .ConfigureAwait(false);
 
@@ -29,21 +29,24 @@ namespace Shiny.Locations
         });
 
 
-        protected override Task RequestLocationUpdates(GpsRequest request) => LocationServices
-            .GetFusedLocationProviderClient(this.Context.AppContext)
-            .RequestLocationUpdatesAsync(
+        protected override Task RequestLocationUpdates(GpsRequest request) => this.Context.InvokeOnMainThreadAsync(() =>
+        {
+            this.listenerClient ??= LocationServices.GetFusedLocationProviderClient(this.Context.AppContext);
+
+            return this.listenerClient.RequestLocationUpdatesAsync(
                 request.ToNative(),
                 this.Callback
             );
+        });
 
 
         protected override async Task RemoveLocationUpdates()
         {
-            if (this.client == null)
+            if (this.listenerClient == null)
                 return;
 
-            await this.client.RemoveLocationUpdatesAsync(this.Callback);
-            this.client = null;
+            await this.listenerClient.RemoveLocationUpdatesAsync(this.Callback);
+            this.listenerClient = null;
         }
     }
 }
