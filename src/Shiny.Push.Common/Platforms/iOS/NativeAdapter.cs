@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
@@ -39,8 +40,8 @@ namespace Shiny.Push
                     this.onReceviedSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
                     {
                         var dict = userInfo.FromNsDictionary();
-                        var pr = new PushNotification(dict);
-                        await this.onReceived.Invoke(pr).ConfigureAwait(false);
+                        var data = new PushData(dict);
+                        await this.onReceived.Invoke(data).ConfigureAwait(false);
                     });
                 }
             }
@@ -48,8 +49,8 @@ namespace Shiny.Push
 
 
         IDisposable? onEntrySub;
-        Func<PushNotificationResponse, Task>? onEntry;
-        public Func<PushNotificationResponse, Task>? OnEntry
+        Func<PushData, Task>? onEntry;
+        public Func<PushData, Task>? OnEntry
         {
             get => this.onEntry;
             set
@@ -71,7 +72,8 @@ namespace Shiny.Push
                             //    shiny.ActionIdentifier,
                             //    shiny.Text
                             //);
-                            //await this.onEntry.Invoke(pr).ConfigureAwait(false);
+                            var pushData = new PushData(new Dictionary<string, string>());
+                            await this.onEntry.Invoke(pr).ConfigureAwait(false);
                         }
                     });
                 }
