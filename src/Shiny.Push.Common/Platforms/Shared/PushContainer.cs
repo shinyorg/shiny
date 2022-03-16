@@ -66,10 +66,12 @@ namespace Shiny.Push
             return this.services.RunDelegates<IPushDelegate>(x => x.OnReceived(push));
         }
 
-        public Task OnEntry(PushNotificationResponse response)
+        public Task OnEntry(PushNotification response)
             => this.services.RunDelegates<IPushDelegate>(x => x.OnEntry(response));
 
+
         public IObservable<PushNotification> WhenReceived() => this.recvSubj;
+
 
         public IKeyValueStore Store { get; }
         public void SetCurrentToken(string token, bool fireChangeIfApplicable)

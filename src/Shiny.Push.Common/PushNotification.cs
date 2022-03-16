@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 
 namespace Shiny.Push
 {
-    public class PushData
+    public class PushNotification
     {
-        public PushData(IDictionary<string, string> data)
+        public PushNotification(IDictionary<string, string> data)
             => this.Data = new ReadOnlyDictionary<string, string>(data);
 
 

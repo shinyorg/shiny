@@ -11,7 +11,7 @@ namespace Shiny.Push
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        Task OnEntry(PushData data);
+        Task OnEntry(PushNotification data);
 
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace Shiny.Push
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        Task OnReceived(PushData data);
+        Task OnReceived(PushNotification data);
 
 
         /// <summary>
