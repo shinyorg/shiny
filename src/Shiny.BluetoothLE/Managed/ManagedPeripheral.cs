@@ -111,8 +111,8 @@ namespace Shiny.BluetoothLE.Managed
         public IObservable<byte[]> WhenNotificationReceived(string serviceUuid, string characteristicUuid) =>
             this.notifySub
                 .Where(x =>
-                    x.Characteristic.Service.Uuid.Equals(serviceUuid) &&
-                    x.Characteristic.Uuid.Equals(characteristicUuid)
+                    x.Characteristic.Service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase) &&
+                    x.Characteristic.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase)
                 )
                 .Select(x => x.Data!);
 
@@ -166,7 +166,7 @@ namespace Shiny.BluetoothLE.Managed
                     info.UseIndicationIfAvailable = useIndicationIfAvailable;
                 })
                 // HACK: explanation at https://github.com/shinyorg/shiny/issues/902
-                .Select(_ => RestoreNotifications())
+                .Select(_ => this.RestoreNotifications())
                 .Switch()
                 .Select(_ => Unit.Default);
 
