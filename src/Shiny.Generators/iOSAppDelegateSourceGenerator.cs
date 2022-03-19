@@ -68,13 +68,8 @@ namespace Shiny.Generators
                         appDelegate,
                         builder,
                         "Shiny.Nfc",
-<<<<<<< Updated upstream
                         "ContinueUserActivity",
                         "public override bool ContinueUserActivity(UIApplication application, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler) => this.ShinyContinueUserActivity(userActivity, completionHandler);"
-=======
-                        "HandleEventsForBackgroundUrl",
-                        "public override void HandleEventsForBackgroundUrl(UIApplication application, string sessionIdentifier, Action completionHandler) => this.ShinyHandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);"
->>>>>>> Stashed changes
                     );
                     this.AppendMethodIf(
                         appDelegate,
