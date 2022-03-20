@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Cake.Common.Tools.DotNetCore;
-using Cake.Common.Tools.DotNetCore.Run;
+using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.Run;
 using Cake.Core;
 using Cake.Core.Diagnostics;
 using Cake.Core.IO;
@@ -38,9 +38,9 @@ namespace ShinyBuild.Tasks
 
         static void RunIt(BuildContext context, bool deploy)
         {
-            context.DotNetCoreRestore(Project);
+            context.DotNetRestore(Project);
 
-            var settings = new DotNetCoreRunSettings
+            var settings = new DotNetRunSettings
             {
                 Configuration = context.MsBuildConfiguration,
                 EnvironmentVariables = new Dictionary<string, string>
@@ -52,7 +52,7 @@ namespace ShinyBuild.Tasks
             if (deploy)
                 args.Append("deploy");
 
-            context.DotNetCoreRun(Project, args, settings);
+            context.DotNetRun(Project, args, settings);
         }
     }
 }

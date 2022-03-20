@@ -36,7 +36,7 @@ namespace ShinyBuild
         //public string ReleaseVersion { get; }
         //public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
         public string GitHubSecretToken => this.ArgumentOrEnvironment<string>("GITHUB_TOKEN");
-        public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(this.DocsDeployGitHubToken), null);
+        public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(this.DocsDeployGitHubToken));
         public string OperatingSystemString => this.Environment.Platform.Family == PlatformFamily.Windows ? "WINDOWS_NT" : "MAC";
         public string MsBuildConfiguration => this.ArgumentOrEnvironment("configuration", Constants.DefaultBuildConfiguration);
         public string NugetApiKey => this.ArgumentOrEnvironment<string>("NugetApiKey");
