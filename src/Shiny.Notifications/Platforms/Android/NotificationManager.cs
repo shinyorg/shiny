@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Shiny.Jobs;
-
+using Shiny.Locations;
 
 namespace Shiny.Notifications
 {
@@ -12,16 +12,19 @@ namespace Shiny.Notifications
     {
         readonly ShinyCoreServices core;
         readonly AndroidNotificationManager manager;
+        readonly IGeofenceManager geofenceManager;
         readonly IJobManager jobManager;
 
 
         public NotificationManager(ShinyCoreServices core,
                                    AndroidNotificationManager manager,
+                                   IGeofenceManager geofenceManager,
                                    IJobManager jobManager)
         {
             this.core = core;
             this.manager = manager;
             this.jobManager = jobManager;
+            this.geofenceManager = geofenceManager;
 
             this.core
                 .Android
@@ -38,14 +41,24 @@ namespace Shiny.Notifications
         public async Task Cancel(int id)
         {
             this.manager.NativeManager.Cancel(id);
-            await this.core.Repository.Remove<Notification>(id.ToString());
+            var notification = await this.core.Repository.Get<Notification>(id.ToString());
+            if (notification != null)
+            {
+                if (notification.Geofence != null)
+                {
+                    var geofenceId = NotificationGeofenceDelegate.GetGeofenceId(notification);
+                    await this.geofenceManager.StopMonitoring(geofenceId);
+                }
+                await this.core.Repository.Remove<Notification>(id.ToString());
+            }
             await this.SetNotificationJob();
         }
 
 
         public async Task Clear()
         {
-            this.manager.NativeManager.CancelAll();            
+            // TODO: need to kill any associated geofences
+            this.manager.NativeManager.CancelAll();
             await this.core.Repository.Clear<Notification>();
             await this.CancelJob();
         }
@@ -76,6 +89,23 @@ namespace Shiny.Notifications
             // this is here to cause validation of the settings before firing or scheduling
             var channel = await this.GetChannel(notification);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
+
+            if (notification.ScheduleDate != null && notification.Geofence != null)
+                throw new InvalidOperationException("You cannot have a schedule date and geofence on the same notification");
+
+            // TODO: user should check geofence permissions before sending any geofence repos
+            if (notification.Geofence != null)
+            {
+                var result = await this.geofenceManager.RequestAccess();
+                if (result != AccessState.Available)
+                    throw new InvalidOperationException("User did not grant location permission for geofence based notification - " + result);
+
+                await this.geofenceManager.StartMonitoring(new GeofenceRegion(
+                    NotificationGeofenceDelegate.GetGeofenceId(notification),
+                    notification.Geofence.Center,
+                    notification.Geofence.Radius
+                ));
+            }
 
             if (notification.ScheduleDate == null)
             {

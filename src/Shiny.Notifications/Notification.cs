@@ -51,5 +51,11 @@ namespace Shiny.Notifications
         /// Options specific to android
         /// </summary>
         public AndroidOptions Android { get; set; } = new AndroidOptions();
+
+
+        /// <summary>
+        /// Set the 
+        /// </summary>
+        public Geofence? Geofence { get; set; }
     }
 }

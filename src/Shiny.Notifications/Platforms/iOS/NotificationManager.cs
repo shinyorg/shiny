@@ -7,6 +7,7 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Infrastructure;
+using CoreLocation;
 
 
 namespace Shiny.Notifications
@@ -300,7 +301,21 @@ namespace Shiny.Notifications
         protected virtual UNNotificationTrigger? GetTrigger(Notification notification)
         {
             UNNotificationTrigger? trigger = null;
-            if (notification.ScheduleDate != null)
+
+            if (notification.ScheduleDate != null && notification.Geofence != null)
+                throw new InvalidOperationException("You cannot schedule & geofence a notification");
+
+            if (notification.Geofence != null)
+            {
+                var geo = notification.Geofence;
+
+                trigger = UNLocationNotificationTrigger.CreateTrigger(new CLRegion(
+                    new CLLocationCoordinate2D(geo.Center.Latitude, geo.Center.Longitude),
+                    geo.Radius.TotalMeters,
+                    notification.Id.ToString()
+                ), geo.Repeat);
+            }
+            else if (notification.ScheduleDate != null)
             {
                 var dt = notification.ScheduleDate.Value.ToLocalTime();
                 trigger = UNCalendarNotificationTrigger.CreateTrigger(new NSDateComponents
