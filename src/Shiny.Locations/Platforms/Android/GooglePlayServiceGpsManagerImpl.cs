@@ -12,7 +12,7 @@ namespace Shiny.Locations
     public class GooglePlayServiceGpsManagerImpl : AbstractGpsManager
     {
         FusedLocationProviderClient? listenerClient;
-        public GooglePlayServiceGpsManagerImpl(IAndroidContext context, ILogger<GooglePlayServiceGpsManagerImpl> logger) : base(context, logger) { }
+        public GooglePlayServiceGpsManagerImpl(IPlatform context, ILogger<GooglePlayServiceGpsManagerImpl> logger) : base(context, logger) { }
 
 
         public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async ct =>

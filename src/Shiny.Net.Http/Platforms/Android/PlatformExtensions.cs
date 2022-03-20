@@ -20,7 +20,7 @@ namespace Shiny.Net.Http
             => cursor.GetLong(cursor.GetColumnIndex(column));
 
 
-        public static Native GetManager(this IAndroidContext context)
+        public static Native GetManager(this IPlatform context)
             => context.GetSystemService<Native>(Context.DownloadService);
 
 

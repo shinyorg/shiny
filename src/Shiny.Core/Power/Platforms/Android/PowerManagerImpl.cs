@@ -9,11 +9,11 @@ namespace Shiny.Power
 {
     public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
     {
-        readonly IAndroidContext context;
+        readonly IPlatform context;
         IDisposable? dispose;
 
 
-        public PowerManagerImpl(IAndroidContext context) => this.context = context;
+        public PowerManagerImpl(IPlatform context) => this.context = context;
 
 
         protected override void OnNpcHookChanged(bool hasSubscribers)

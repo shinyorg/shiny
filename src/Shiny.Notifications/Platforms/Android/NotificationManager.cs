@@ -27,7 +27,7 @@ namespace Shiny.Notifications
             this.geofenceManager = geofenceManager;
 
             this.core
-                .Android
+                .Platform
                 .WhenIntentReceived()
                 .SubscribeAsync(x => this
                     .core

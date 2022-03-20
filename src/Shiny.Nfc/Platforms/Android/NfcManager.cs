@@ -20,13 +20,13 @@ namespace Shiny.Nfc
                               //NfcAdapter.IOnNdefPushCompleteCallback,
                               INfcManager
     {
-        readonly IAndroidContext context;
+        readonly IPlatform context;
         readonly Subject<NDefRecord[]> recordSubj;
         //readonly Subject<PushState> publishSubj;
         //Func<NDefRecord>? recordFunc;
 
 
-        public NfcManager(IAndroidContext context)
+        public NfcManager(IPlatform context)
         {
             this.context = context;
             this.recordSubj = new Subject<NDefRecord[]>();

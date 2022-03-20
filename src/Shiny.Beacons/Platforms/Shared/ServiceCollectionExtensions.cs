@@ -44,7 +44,6 @@ namespace Shiny
 #if __ANDROID__ || WINDOWS_UWP
             services.TryAddSingleton<BackgroundTask>();
             services.UseBleClient();
-            services.UseNotifications();
 #endif
             services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
             services.TryAddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();

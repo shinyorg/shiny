@@ -38,8 +38,8 @@ namespace Shiny.BluetoothLE
         };
 
 
-        public static BluetoothManager GetBluetooth(this IAndroidContext context)
-            => (BluetoothManager)context.AppContext.GetSystemService(Context.BluetoothService);
+        public static BluetoothManager GetBluetooth(this IPlatform context)
+            => context.GetSystemService<BluetoothManager>(Context.BluetoothService);
 
 
         public static ConnectionState ToStatus(this ProfileState state) => state switch

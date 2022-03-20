@@ -14,7 +14,7 @@ namespace Shiny.Stores
 
 
         public SecureKeyValueStore(IPlatform platform,
-                                   IAndroidContext context,
+                                   IPlatform context,
                                    ISerializer serializer)
         {
 

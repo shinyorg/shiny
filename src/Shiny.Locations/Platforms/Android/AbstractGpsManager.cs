@@ -12,7 +12,7 @@ namespace Shiny.Locations
         readonly ILogger logger;
 
 
-        protected AbstractGpsManager(IAndroidContext context, ILogger logger)
+        protected AbstractGpsManager(IPlatform context, ILogger logger)
         {
             this.readingSubj = new Subject<IGpsReading>();
             this.Context = context;
@@ -41,7 +41,7 @@ namespace Shiny.Locations
 
 
         protected ShinyLocationCallback Callback { get; }
-        protected IAndroidContext Context { get; }
+        protected IPlatform Context { get; }
 
 
         GpsRequest? request;

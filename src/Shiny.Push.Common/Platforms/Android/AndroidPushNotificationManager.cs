@@ -19,13 +19,13 @@ namespace Shiny.Push
         static int counter = 10000;
         protected override PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
         {
-            var intent = this.Services.Android.CreateIntent<ShinyPushNotificationBroadcastReceiver>(ShinyPushNotificationBroadcastReceiver.EntryIntentAction);
+            var intent = this.Services.Platform.CreateIntent<ShinyPushNotificationBroadcastReceiver>(ShinyPushNotificationBroadcastReceiver.EntryIntentAction);
             this.PopulateIntent(intent, notification);
             intent.PutExtra(INTENT_KEY, action.Identifier);
 
             counter++;
             var pendingIntent = PendingIntent.GetBroadcast(
-                this.Services.Android.AppContext,
+                this.Services.Platform.AppContext,
                 counter,
                 intent,
                 PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable

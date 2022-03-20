@@ -8,7 +8,6 @@ using Android.Content;
 using Android.OS;
 using AndroidX.Core.App;
 using Microsoft.Extensions.Logging;
-using Shiny.Notifications;
 
 
 namespace Shiny
@@ -28,8 +27,6 @@ namespace Shiny
 
         protected TService? Service { get; private set; }
         protected IList<TDelegate>? Delegates { get; private set; }
-        protected IAndroidContext? Context { get; private set; }
-        protected AndroidNotificationManager? AndroidNotifications { get; private set; }
 
 
         public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
@@ -59,10 +56,8 @@ namespace Shiny
             this.DestroyWith = new CompositeDisposable();
             this.Service = this.Resolve<TService>();
             this.Delegates = this.ResolveAll<TDelegate>().ToList();
-            this.Context = this.Resolve<IAndroidContext>();
-            this.AndroidNotifications = this.Resolve<AndroidNotificationManager>();
 
-            if (this.Context.IsMinApiLevel(26))
+            if (this.Platform.IsMinApiLevel(26))
             {
                 this.Service
                     .WhenAnyProperty()
@@ -85,7 +80,7 @@ namespace Shiny
             this.DestroyWith?.Dispose();
             this.DestroyWith = null;
 
-            if (this.Context!.IsMinApiLevel(26))
+            if (this.Platform!.IsMinApiLevel(26))
                 this.StopForeground(true);
 
             this.StopSelf();
@@ -114,7 +109,7 @@ namespace Shiny
 
         protected virtual void EnsureChannel()
         {
-            var nm = this.AndroidNotifications!.NativeManager;
+            var nm = NotificationManagerCompat.From(this.Platform.AppContext); // TODO: app context
             if (nm.GetNotificationChannel(NotificationChannelId) != null)
                 return;
 
@@ -130,9 +125,9 @@ namespace Shiny
 
         protected virtual void SendNotification()
         {
-            this.builder ??= new NotificationCompat.Builder(this.Context.AppContext)
+            this.builder ??= new NotificationCompat.Builder(null, "")
                 .SetChannelId(NotificationChannelId)
-                .SetSmallIcon(this.AndroidNotifications!.GetSmallIconResource(null))
+                //.SetSmallIcon(this.AndroidNotifications!.GetSmallIconResource(null))
                 .SetOngoing(true);
 
             this.builder
@@ -152,8 +147,13 @@ namespace Shiny
             }
             else
             {
-                this.AndroidNotifications!.NativeManager.Notify(this.notificationId.Value, this.builder.Build());
+                //this.AndroidNotifications!.NativeManager.Notify(this.notificationId.Value, this.builder.Build());
             }
         }
+
+
+
+        IPlatform? platform;
+        protected IPlatform Platform => this.platform ??= this.Resolve<IPlatform>();
     }
 }

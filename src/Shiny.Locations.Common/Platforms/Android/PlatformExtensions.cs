@@ -11,7 +11,7 @@ namespace Shiny.Locations
 {
     public static class PlatformExtensions
     {
-        public static bool IsLocationEnabled(this IAndroidContext context, bool gpsRequired, bool networkRequired)
+        public static bool IsLocationEnabled(this IPlatform context, bool gpsRequired, bool networkRequired)
         {
             var lm = context.GetSystemService<LocationManager>(Context.LocationService);
 
@@ -28,7 +28,7 @@ namespace Shiny.Locations
         }
 
 
-        public static async Task<AccessState> RequestLocationAccess(this IAndroidContext context, LocationPermissionType locType)
+        public static async Task<AccessState> RequestLocationAccess(this IPlatform context, LocationPermissionType locType)
         {
             if (!context.IsLocationEnabled(false, false))
                 return AccessState.Disabled;
@@ -43,7 +43,7 @@ namespace Shiny.Locations
         }
 
 
-        public static async Task<AccessState> RequestBackgroundLocationAccess(this IAndroidContext context, LocationPermissionType locType)
+        public static async Task<AccessState> RequestBackgroundLocationAccess(this IPlatform context, LocationPermissionType locType)
         {
             if (!context.IsLocationEnabled(false, false))
                 return AccessState.Disabled;
@@ -85,7 +85,7 @@ namespace Shiny.Locations
         }
 
 
-        static void AssertBackgroundInManifest(this IAndroidContext context)
+        static void AssertBackgroundInManifest(this IPlatform context)
         {
             if (context.IsMinApiLevel(29) && !context.IsInManifest(P.AccessBackgroundLocation))
                 throw new ArgumentException($"{P.AccessBackgroundLocation} is not in your manifest but is required");

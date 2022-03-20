@@ -21,7 +21,6 @@ namespace Shiny
 {
     public class AndroidPlatform : Java.Lang.Object,
                                    ILifecycleObserver,
-                                   IAndroidContext,
                                    IPlatform,
                                    IPlatformBuilder
     {
@@ -51,7 +50,7 @@ namespace Shiny
 
         public void Register(IServiceCollection services)
         {
-            services.AddSingleton<IAndroidContext>(this);
+            services.AddSingleton<IPlatform>(this);
             services.RegisterCommonServices();
         }
 

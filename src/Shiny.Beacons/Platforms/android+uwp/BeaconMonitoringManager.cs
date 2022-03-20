@@ -17,7 +17,7 @@ namespace Shiny.Beacons
         readonly IBleManager bleManager;
         readonly IMessageBus messageBus;
 #if __ANDROID__
-        readonly IAndroidContext context;
+        readonly IPlatform context;
 #endif
 
 
@@ -25,7 +25,7 @@ namespace Shiny.Beacons
                                        IRepository repository,
                                        IMessageBus messageBus
 #if __ANDROID__
-                                       , IAndroidContext context
+                                       , IPlatform context
 #endif
                                        )
         {

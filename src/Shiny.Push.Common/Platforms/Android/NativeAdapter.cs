@@ -14,12 +14,12 @@ namespace Shiny.Push
     public class NativeAdapter : INativeAdapter
     {
         readonly AndroidPushNotificationManager notifications;
-        readonly IAndroidContext context;
+        readonly IPlatform context;
         readonly FirebaseConfig? config;
 
 
         public NativeAdapter(AndroidPushNotificationManager notifications,
-                             IAndroidContext context,
+                             IPlatform context,
                              FirebaseConfig? config = null)
         {
             this.notifications = notifications;

@@ -27,9 +27,9 @@ namespace Shiny
             core.Settings.Set(AndroidBadgeCountKey, value);
 
             if (value <= 0)
-                global::XamarinShortcutBadger.ShortcutBadger.RemoveCount(core.Android.AppContext);
+                global::XamarinShortcutBadger.ShortcutBadger.RemoveCount(core.Platform.AppContext);
             else
-                global::XamarinShortcutBadger.ShortcutBadger.ApplyCount(core.Android.AppContext, value);
+                global::XamarinShortcutBadger.ShortcutBadger.ApplyCount(core.Platform.AppContext, value);
 
         }
 
@@ -42,7 +42,7 @@ namespace Shiny
         };
 
 
-        internal static int GetColorByName(this IAndroidContext context, string colorName) => context
+        internal static int GetColorByName(this IPlatform context, string colorName) => context
             .AppContext
             .Resources
             .GetIdentifier(
@@ -51,7 +51,7 @@ namespace Shiny
                 context.AppContext.PackageName
             );
 
-        internal static int GetResourceIdByName(this IAndroidContext context, string iconName) => context
+        internal static int GetResourceIdByName(this IPlatform context, string iconName) => context
             .AppContext
             .Resources
             .GetIdentifier(
@@ -62,7 +62,7 @@ namespace Shiny
 
 
         // Expects raw resource name like "notify_sound" or "raw/notify_sound"
-        internal static int GetRawResourceIdByName(this IAndroidContext context, string rawName) => context
+        internal static int GetRawResourceIdByName(this IPlatform context, string rawName) => context
             .AppContext
             .Resources
             .GetIdentifier(

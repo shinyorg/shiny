@@ -6,20 +6,7 @@ namespace Shiny.Infrastructure
 {
     public class ShinyCoreServices
     {
-#if __ANDROID__
-        public ShinyCoreServices(IAndroidContext context,
-                                 IPlatform platform,
-                                 IKeyValueStoreFactory store,
-                                 IRepository repository,
-                                 IServiceProvider services,
-                                 ISerializer serializer,
-                                 IMessageBus bus)
-            : this(platform, store, repository, services, serializer, bus)
-        {
-            this.Android = context;
-        }
-
-#elif __IOS__
+#if __IOS__
         public ShinyCoreServices(AppleLifecycle lifecycle,
                                  IPlatform platform,
                                  IKeyValueStoreFactory store,
@@ -48,9 +35,7 @@ namespace Shiny.Infrastructure
             this.Bus = bus;
         }
 
-#if __ANDROID__
-        public IAndroidContext Android { get; }
-#elif __IOS__
+#if __IOS__
         public AppleLifecycle Lifecycle { get; }
 #endif
         public IPlatform Platform { get; }
