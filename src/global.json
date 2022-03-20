@@ -1,10 +1,10 @@
 {
-    //"sdk": {
-    //    "version": "3.1.404",
-    //    "rollForward": "latestMinor",
-    //    "allowPrerelease": false
-    //},
+    "sdk": {
+        "version": "6.0.100",
+        "rollForward": "latestMinor",
+        "allowPrerelease": false
+    },
     "msbuild-sdks": {
-        "MSBuild.Sdk.Extras": "3.0.38"
+        "MSBuild.Sdk.Extras": "3.0.44"
     }
 }

@@ -17,7 +17,6 @@
     },
     "publicReleaseRefSpec": [
         "^refs/heads/master$",
-        "^refs/heads/preview$",
         "^refs/tags/v\\d+\\.\\d+"
     ]
 }
