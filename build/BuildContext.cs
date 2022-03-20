@@ -1,12 +1,12 @@
 ﻿using System.IO;
+using Cake.Frosting;
+using Cake.Git;
 using Cake.Common;
 using Cake.Common.Build;
 using Cake.Core;
-using Cake.Core.Diagnostics;
 using Cake.Core.IO;
-using Cake.Frosting;
-using Cake.Git;
-using Cake.GitVersioning;
+//using Cake.Core.Diagnostics;
+//using Cake.GitVersioning;
 
 
 namespace ShinyBuild
@@ -28,12 +28,12 @@ namespace ShinyBuild
 #endif
             this.Branch = context.GitBranchCurrent(".");
 
-            this.ReleaseVersion = this.GitVersioningGetVersion().NuGetPackageVersion;
-            this.Log.Information("NUGET PACKAGE VERSION: " + this.ReleaseVersion);
+            //this.ReleaseVersion = this.GitVersioningGetVersion().NuGetPackageVersion;
+            //this.Log.Information("NUGET PACKAGE VERSION: " + this.ReleaseVersion);
         }
 
 
-        public string ReleaseVersion { get; }
+        //public string ReleaseVersion { get; }
         //public bool UseXamarinPreview => this.HasArgumentOrEnvironment("UseXamarinPreview");
         public string GitHubSecretToken => this.ArgumentOrEnvironment<string>("GITHUB_TOKEN");
         public string DocsDeployGitHubToken => this.ArgumentOrEnvironment<string>(nameof(this.DocsDeployGitHubToken), null);
