@@ -17,10 +17,9 @@ namespace Shiny
 
 
         const string AndroidBadgeCountKey = "AndroidBadge";
-
-
         internal static int GetBadgeCount(this ShinyCoreServices core)
             => core.Settings.Get(AndroidBadgeCountKey, 0);
+
 
         internal static void SetBadgeCount(this ShinyCoreServices core, int value)
         {
@@ -40,35 +39,5 @@ namespace Shiny
             ChannelImportance.Normal => NotificationImportance.Default,
             ChannelImportance.Low => NotificationImportance.Low
         };
-
-
-        internal static int GetColorByName(this IPlatform context, string colorName) => context
-            .AppContext
-            .Resources
-            .GetIdentifier(
-                colorName,
-                "color",
-                context.AppContext.PackageName
-            );
-
-        internal static int GetResourceIdByName(this IPlatform context, string iconName) => context
-            .AppContext
-            .Resources
-            .GetIdentifier(
-                iconName,
-                "drawable",
-                context.AppContext.PackageName
-            );
-
-
-        // Expects raw resource name like "notify_sound" or "raw/notify_sound"
-        internal static int GetRawResourceIdByName(this IPlatform context, string rawName) => context
-            .AppContext
-            .Resources
-            .GetIdentifier(
-                rawName,
-                "raw",
-                context.AppContext.PackageName
-            );
     }
 }

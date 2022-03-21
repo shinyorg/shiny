@@ -123,7 +123,7 @@ namespace Shiny
                 NotificationImportance.Default
             );
             channel.SetShowBadge(false);
-            nm.CreateNotificationChannel(channel);
+            this.NotificationManager.CreateNotificationChannel(channel);
         }
 
 
