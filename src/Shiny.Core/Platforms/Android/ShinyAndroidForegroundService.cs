@@ -21,12 +21,16 @@ namespace Shiny
         protected IEnumerable<T> ResolveAll<T>() => ShinyHost.ResolveAll<T>();
         protected Lazy<T> ResolveLazy<T>() => ShinyHost.LazyResolve<T>();
         protected CompositeDisposable? DestroyWith { get; private set; }
+        protected NotificationManagerCompat? NotificationManager { get; private set; }
 
         protected abstract void OnStart(Intent? intent);
         protected abstract void OnStop();
 
         protected TService? Service { get; private set; }
         protected IList<TDelegate>? Delegates { get; private set; }
+
+        IPlatform? platform;
+        protected IPlatform Platform => this.platform ??= this.Resolve<IPlatform>();
 
 
         public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
@@ -53,6 +57,7 @@ namespace Shiny
 
         protected virtual void Start(Intent? intent)
         {
+            this.NotificationManager = NotificationManagerCompat.From(this.Platform.AppContext);
             this.DestroyWith = new CompositeDisposable();
             this.Service = this.Resolve<TService>();
             this.Delegates = this.ResolveAll<TDelegate>().ToList();
@@ -109,8 +114,7 @@ namespace Shiny
 
         protected virtual void EnsureChannel()
         {
-            var nm = NotificationManagerCompat.From(this.Platform.AppContext); // TODO: app context
-            if (nm.GetNotificationChannel(NotificationChannelId) != null)
+            if (this.NotificationManager.GetNotificationChannel(NotificationChannelId) != null)
                 return;
 
             var channel = new NotificationChannel(
@@ -125,9 +129,8 @@ namespace Shiny
 
         protected virtual void SendNotification()
         {
-            this.builder ??= new NotificationCompat.Builder(null, "")
-                .SetChannelId(NotificationChannelId)
-                //.SetSmallIcon(this.AndroidNotifications!.GetSmallIconResource(null))
+            this.builder ??= new NotificationCompat.Builder(this.Platform.AppContext, NotificationChannelId)
+                .SetSmallIcon(this.GetNotificationIcon())
                 .SetOngoing(true);
 
             this.builder
@@ -147,13 +150,18 @@ namespace Shiny
             }
             else
             {
-                //this.AndroidNotifications!.NativeManager.Notify(this.notificationId.Value, this.builder.Build());
+                this.NotificationManager.Notify(this.notificationId.Value, this.builder.Build());
             }
         }
 
 
+        protected virtual int GetNotificationIcon()
+        {
+            var id = this.Platform.GetResourceIdByName("notification");
+            if (id > 0)
+                return id;
 
-        IPlatform? platform;
-        protected IPlatform Platform => this.platform ??= this.Resolve<IPlatform>();
+            return this.Platform.AppContext.ApplicationInfo.Icon;
+        }
     }
 }
