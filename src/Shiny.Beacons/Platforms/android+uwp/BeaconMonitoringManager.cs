@@ -16,20 +16,25 @@ namespace Shiny.Beacons
         readonly IRepository repository;
         readonly IBleManager bleManager;
         readonly IMessageBus messageBus;
+#if __ANDROID__
         readonly IPlatform context;
+#endif
 
 
-        public BeaconMonitoringManager(
-            IBleManager bleManager,
-            IRepository repository,
-            IMessageBus messageBus,
-            IPlatform context
-        )
+        public BeaconMonitoringManager(IBleManager bleManager,
+                                       IRepository repository,
+                                       IMessageBus messageBus
+#if __ANDROID__
+                                       , IPlatform context
+#endif
+                                       )
         {
             this.bleManager = bleManager;
             this.messageBus = messageBus;
             this.repository = repository;
+#if __ANDROID__
             this.context = context;
+#endif
         }
 
 

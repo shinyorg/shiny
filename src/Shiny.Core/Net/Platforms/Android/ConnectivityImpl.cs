@@ -83,7 +83,7 @@ namespace Shiny.Net
                     access = ToAccess(network.Info.Type);
 
                     if (!network.Caps.HasCapability(NetCapability.Internet))
-                    {
+                    { 
                         reach = NetworkReach.Local;
                     }
                     else

@@ -17,16 +17,15 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
+        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
         <PackageReference Include="Xamarin.ShortcutBadger" />
         <PackageReference Include="Xamarin.AndroidX.AppCompat" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
+        <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true' OR '$(IsWindowsBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
     </ItemGroup>
 </Project>

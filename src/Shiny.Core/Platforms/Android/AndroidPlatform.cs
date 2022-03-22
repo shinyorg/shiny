@@ -50,6 +50,7 @@ namespace Shiny
 
         public void Register(IServiceCollection services)
         {
+            services.AddSingleton<IPlatform>(this);
             services.RegisterCommonServices();
         }
 
@@ -127,7 +128,7 @@ namespace Shiny
         public TValue GetSystemServiceValue<TValue, TSysType>(string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
         {
             using (var type = this.GetSystemService<TSysType>(systemTypeName))
-            {
+            { 
                 return func(type);
             }
         }
@@ -306,9 +307,9 @@ namespace Shiny
                 ?.RequestedPermissions;
 
             if (permissions != null)
-            {
+            { 
                 foreach (var permission in permissions)
-                {
+                { 
                     if (permission.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase))
                         return true;
                 }

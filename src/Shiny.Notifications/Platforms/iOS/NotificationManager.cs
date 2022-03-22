@@ -7,6 +7,7 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using Shiny.Infrastructure;
+using CoreLocation;
 
 
 namespace Shiny.Notifications
@@ -38,6 +39,8 @@ namespace Shiny.Notifications
             this.services.Lifecycle.RegisterForNotificationReceived(async response =>
             {
                 var t = response.Notification?.Request?.Trigger;
+
+                // TODO
                 if (t == null || t is UNCalendarNotificationTrigger)
                 {
                     var shiny = response.FromNative();
@@ -61,13 +64,17 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<AccessState> RequestAccess()
+        public Task<AccessState> RequestAccess(AccessRequestFlags access)
         {
             var tcs = new TaskCompletionSource<AccessState>();
             var request = UNAuthorizationOptions.Alert |
                           UNAuthorizationOptions.Badge |
                           UNAuthorizationOptions.Sound;
 
+            if (access.HasFlag(AccessRequestFlags.TimeSensitivity))
+                request |= UNAuthorizationOptions.TimeSensitive;
+
+            //UNAuthorizationOptions.Announcement | UNAuthorizationOptions.CarPlay
             // https://medium.com/@shashidharyamsani/implementing-ios-critical-alerts-7d82b4bb5026
     //        {
     //“aps” : {
@@ -121,6 +128,8 @@ namespace Shiny.Notifications
 
         public async Task Send(Notification notification)
         {
+            notification.AssertValid();
+
             if (notification.Id == 0)
                 notification.Id = this.services.Settings.IncrementValue("NotificationId");
 
@@ -240,8 +249,10 @@ namespace Shiny.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message
+                Body = notification.Message,
+                ThreadIdentifier = notification.Thread
             };
+
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
 
@@ -256,11 +267,23 @@ namespace Shiny.Notifications
         protected virtual async Task ApplyChannel(Notification notification, UNMutableNotificationContent native)
         {
             var channel = Channel.Default;
+
             if (!notification.Channel.IsEmpty())
             {
                 channel = await this.services.Repository.GetChannel(notification.Channel);
                 if (channel == null)
-                    throw new ArgumentException($"{notification.Channel} does not exist");
+                    throw new InvalidOperationException($"{notification.Channel} does not exist");
+            }
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
+            {
+                native.InterruptionLevel = channel.Importance switch 
+                {
+                    ChannelImportance.Low => UNNotificationInterruptionLevel.Passive,
+                    ChannelImportance.High => UNNotificationInterruptionLevel.TimeSensitive,
+                    ChannelImportance.Critical => UNNotificationInterruptionLevel.Critical,
+                    _ => UNNotificationInterruptionLevel.Active
+                };
             }
 
             native.CategoryIdentifier = channel.Identifier;
@@ -300,7 +323,18 @@ namespace Shiny.Notifications
         protected virtual UNNotificationTrigger? GetTrigger(Notification notification)
         {
             UNNotificationTrigger? trigger = null;
-            if (notification.ScheduleDate != null)
+
+            if (notification.Geofence != null)
+            {
+                var geo = notification.Geofence!;
+
+                trigger = UNLocationNotificationTrigger.CreateTrigger(new CLRegion(
+                    new CLLocationCoordinate2D(geo.Center!.Latitude, geo.Center!.Longitude),
+                    geo.Radius!.TotalMeters,
+                    notification.Id.ToString()
+                ), geo.Repeat);
+            }
+            else if (notification.ScheduleDate != null)
             {
                 var dt = notification.ScheduleDate.Value.ToLocalTime();
                 trigger = UNCalendarNotificationTrigger.CreateTrigger(new NSDateComponents
@@ -313,6 +347,28 @@ namespace Shiny.Notifications
                     Second = dt.Second
                 }, false);
             }
+            else if (notification.RepeatInterval != null)
+            {
+                var tcfg = notification.RepeatInterval!;
+                if (tcfg.Interval != null)
+                {
+                    trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(tcfg.Interval.Value.TotalSeconds, true);
+                }
+                else
+                {
+                    var component = new NSDateComponents
+                    {
+                        Hour = tcfg.TimeOfDay!.Value.Hours,
+                        Minute = tcfg.TimeOfDay!.Value.Minutes,
+                        Second = tcfg.TimeOfDay!.Value.Seconds
+                    };
+                    if (tcfg.DayOfWeek != null)
+                        component.Weekday = (int)tcfg.DayOfWeek + 1;
+
+                    trigger = UNCalendarNotificationTrigger.CreateTrigger(component, true);
+                }
+            }
+            
             return trigger;
         }
     }

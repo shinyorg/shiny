@@ -18,7 +18,6 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true' OR '$(IsWindowsBuild)' == 'true'">
-        <ProjectReference Include="..\Shiny.Notifications\Shiny.Notifications.csproj" />
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
     </ItemGroup>
 </Project>

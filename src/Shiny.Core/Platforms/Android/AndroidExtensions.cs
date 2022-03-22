@@ -9,11 +9,41 @@ namespace Shiny
 {
     public static class AndroidExtensions
     {
+        public static int GetColorByName(this IPlatform platform, string colorName) => platform
+            .AppContext
+            .Resources
+            .GetIdentifier(
+                colorName,
+                "color",
+                platform.AppContext.PackageName
+            );
+
+        public static int GetResourceIdByName(this IPlatform platform, string iconName) => platform
+            .AppContext
+            .Resources
+            .GetIdentifier(
+                iconName,
+                "drawable",
+                platform.AppContext.PackageName
+            );
+
+
+        // Expects raw resource name like "notify_sound" or "raw/notify_sound"
+        public static int GetRawResourceIdByName(this IPlatform platform, string rawName) => platform
+            .AppContext
+            .Resources
+            .GetIdentifier(
+                rawName,
+                "raw",
+                platform.AppContext.PackageName
+            );
+
+
         public static IObservable<PermissionRequestResult> RequestFilteredPermissions(this IPlatform context, params AndroidPermission[] androidPermissions)
         {
             var list = new List<string>();
             foreach (var p in androidPermissions)
-            {
+            { 
                 var meetsMin = p.MinSdkVersion == null || (int)Android.OS.Build.VERSION.SdkInt >= p.MinSdkVersion;
                 var meetsMax = p.MaxSdkVersion == null || (int)Android.OS.Build.VERSION.SdkInt <= p.MaxSdkVersion;
 

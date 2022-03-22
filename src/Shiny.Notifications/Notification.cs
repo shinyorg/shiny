@@ -26,12 +26,7 @@ namespace Shiny.Notifications
         public string? Message { get; set; }
 
         /// <summary>
-        /// Scheduled date for notification - leave blank for immediate
-        /// </summary>
-        public DateTimeOffset? ScheduleDate { get; set; }
-
-        /// <summary>
-        ///
+        /// The channel ID
         /// </summary>
         public string? Channel { get; set; } = DefaultChannel;
 
@@ -48,8 +43,29 @@ namespace Shiny.Notifications
         public int? BadgeCount { get; set; }
 
         /// <summary>
+        /// iOS: Thread, Android: Group
+        /// </summary>
+        public string? Thread { get; set; }
+
+        /// <summary>
         /// Options specific to android
         /// </summary>
         public AndroidOptions Android { get; set; } = new AndroidOptions();
+
+
+        /// <summary>
+        /// Scheduled date for notification (cannot be mixed with repeat interval or geofence)
+        /// </summary>
+        public DateTimeOffset? ScheduleDate { get; set; }
+
+        /// <summary>
+        /// Set the location aware geofence (cannot be mixed with repeat interval or schedule date)
+        /// </summary>
+        public GeofenceTrigger? Geofence { get; set; }
+
+        /// <summary>
+        /// Set the repeating interval (cannot be mixed with geofence or schedule date)
+        /// </summary>
+        public IntervalTrigger? RepeatInterval { get; set; }
     }
 }

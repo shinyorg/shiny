@@ -49,6 +49,7 @@ namespace Shiny.Notifications
         protected async Task<Channel> GetChannel(Notification notification)
         {
             var channel = Channel.Default;
+
             if (notification.Channel.IsEmpty())
             {
                 if (this.manager.NativeManager.GetNotificationChannel(Channel.Default.Identifier) == null)
@@ -60,8 +61,9 @@ namespace Shiny.Notifications
                     .Repository
                     .GetChannel(notification.Channel!)
                     .ConfigureAwait(false);
+
                 if (channel == null)
-                    throw new ArgumentException($"{notification.Channel} does not exist");
+                    throw new InvalidOperationException($"{notification.Channel} does not exist");
             }
             return channel;
         }

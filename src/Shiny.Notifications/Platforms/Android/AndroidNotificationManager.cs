@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
@@ -24,6 +25,14 @@ namespace Shiny.Notifications
         }
 
 
+        public virtual async Task Send(Notification notification)
+        {
+            var channel = await this.Services.Repository.GetChannel(notification.Channel!);
+            var builder = this.CreateNativeBuilder(notification, channel!);
+            this.SendNative(notification.Id, builder.Build());
+        }
+
+
         public Android.App.Notification CreateNativeNotification(Notification notification, Channel channel)
             => this.CreateNativeBuilder(notification, channel).Build();
 
@@ -35,6 +44,9 @@ namespace Shiny.Notifications
                 .SetSmallIcon(this.GetSmallIconResource(notification.Android.SmallIconResourceName))
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
+
+            if (!notification.Thread.IsEmpty())
+                builder.SetGroup(notification.Thread);
 
             this.ApplyLaunchIntent(builder, notification);
             if (!notification.Android.ContentInfo.IsEmpty())

@@ -6,6 +6,7 @@ using Android.Content;
 using Android.Content.PM;
 #endif
 
+
 namespace Shiny
 {
     public enum PlatformState
@@ -37,7 +38,8 @@ namespace Shiny
         void InvokeOnMainThread(Action action);
         IObservable<PlatformState> WhenStateChanged();
 
-#if MONOANDROID
+
+        #if MONOANDROID
         Application AppContext { get; }
         Activity CurrentActivity { get; }
         PackageInfo Package { get; }
@@ -49,7 +51,6 @@ namespace Shiny
         bool IsMinApiLevel(int apiLevel);
         IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions);
         IObservable<AccessState> RequestAccess(string androidPermission);
-
 
         Intent CreateIntent<T>(params string[] actions);
         AccessState GetCurrentAccessState(string androidPermission);
@@ -64,6 +65,6 @@ namespace Shiny
         IObservable<Intent> WhenIntentReceived();
         IObservable<Intent> WhenIntentReceived(string intentAction);
         IObservable<(Result result, Intent data)> RequestActivityResult(Action<int, Activity> request);
-#endif
+        #endif
     }
 }
