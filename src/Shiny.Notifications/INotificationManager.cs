@@ -39,9 +39,9 @@ namespace Shiny.Notifications
         /// <summary>
         /// Requests/ensures appropriate platform permissions where necessary
         /// </summary>
-        /// <param name="locationAware">If you plan to use location aware notifications - pass true</param>
+        /// <param name="flags">You can request multiple types of permissions (TimeSensitive, LocationAware)</param>
         /// <returns></returns>
-        Task<AccessState> RequestAccess(bool locationAware = false);
+        Task<AccessState> RequestAccess(AccessRequestFlags flags = AccessRequestFlags.Notification);
 
 
         /// <summary>

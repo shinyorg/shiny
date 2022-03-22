@@ -23,5 +23,32 @@ namespace Shiny.Notifications
             if (this.TimeOfDay!.Value.TotalMinutes > (24 * 60))
                 throw new InvalidOperationException("TimeOfDay must be within 24 hours");
         }
+
+
+        public DateTime CalculateNextAlarm()
+        {
+            if (this.Interval != null)
+                return DateTime.UtcNow.Add(this.Interval.Value);
+
+            var now = DateTime.UtcNow;
+            var time = this.TimeOfDay!.Value;
+
+            var dt = new DateTime(
+                now.Year,
+                now.Month,
+                now.Day + 1,
+                time.Hours,
+                time.Minutes,
+                time.Seconds
+            );
+
+            if (this.DayOfWeek != null)
+            {
+                var day = this.DayOfWeek!.Value;
+                while (dt.DayOfWeek != day)
+                    dt.AddDays(1);
+            }
+            return dt;
+        }
     }
 }

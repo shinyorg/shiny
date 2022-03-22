@@ -61,18 +61,18 @@ namespace Shiny.Notifications
             => await this.core.Repository.GetList<Notification>().ConfigureAwait(false);
 
 
-        public async Task<AccessState> RequestAccess(bool locationAware)
+        public async Task<AccessState> RequestAccess(AccessRequestFlags access)
         {
             if (!this.manager.NativeManager.AreNotificationsEnabled())
                 return AccessState.Disabled;
             
-            if (locationAware)
+            if (access.HasFlag(AccessRequestFlags.LocationAware))
             {
                 var locPermission = await this.geofenceManager.RequestAccess();
                 if (locPermission != AccessState.Available)
                     return AccessState.Restricted;
             }
-            if (!this.Alarms.CanScheduleExactAlarms())
+            if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !this.Alarms.CanScheduleExactAlarms())
                 return AccessState.Restricted;
 
             return AccessState.Available;
@@ -81,27 +81,36 @@ namespace Shiny.Notifications
 
         public async Task Send(Notification notification)
         {
+            notification.AssertValid();
+
             if (notification.Id == 0)
                 notification.Id = this.core.Settings.IncrementValue("NotificationId");
-
-            notification.AssertValid();
 
             // this is here to cause validation of the settings before firing or scheduling
             var channel = await this.GetChannel(notification);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
 
+            // TODO: fix these!
+            // HACK: geofence delegate nullifies geofence coming back in for send
+            // HACK: scheduled timer clears repeated interval & schedule date
             if (notification.Geofence != null)
             {
                 await this.geofenceManager.StartMonitoring(new GeofenceRegion(
-                    NotificationGeofenceDelegate.GetGeofenceId(notification),
+                    AndroidNotificationProcessor.GetGeofenceId(notification),
                     notification.Geofence!.Center!,
                     notification.Geofence!.Radius!
                 ));
             }
+            else if (notification.RepeatInterval != null)
+            {
+                // calc first date if repeating interval
+                notification.ScheduleDate = notification.RepeatInterval!.CalculateNextAlarm();
+            }
 
-            // HACK: geofence delegate nullifies geofence coming back in for send
+            
             if (notification.ScheduleDate == null && notification.Geofence == null)
             {
+                // TODO: entry requires the notification details be shoved into the intent since it may be deleted from the repository
                 this.manager.SendNative(notification.Id, builder.Build());
                 if (notification.BadgeCount != null)
                     this.core.SetBadgeCount(notification.BadgeCount.Value);
@@ -132,7 +141,7 @@ namespace Shiny.Notifications
         {
             if (notification.Geofence != null)
             {
-                var geofenceId = NotificationGeofenceDelegate.GetGeofenceId(notification);
+                var geofenceId = AndroidNotificationProcessor.GetGeofenceId(notification);
                 await this.geofenceManager.StopMonitoring(geofenceId);
             }
             if (notification.ScheduleDate != null || notification.RepeatInterval != null)

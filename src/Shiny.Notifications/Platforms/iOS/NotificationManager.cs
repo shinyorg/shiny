@@ -64,14 +64,17 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<AccessState> RequestAccess(bool locationAware)
+        public Task<AccessState> RequestAccess(AccessRequestFlags access)
         {
             var tcs = new TaskCompletionSource<AccessState>();
             var request = UNAuthorizationOptions.Alert |
                           UNAuthorizationOptions.Badge |
                           UNAuthorizationOptions.Sound;
 
-            //UNAuthorizationOptions.Announcement | UNAuthorizationOptions.TimeSensitive | UNAuthorizationOptions.CarPlay
+            if (access.HasFlag(AccessRequestFlags.TimeSensitivity))
+                request |= UNAuthorizationOptions.TimeSensitive;
+
+            //UNAuthorizationOptions.Announcement | UNAuthorizationOptions.CarPlay
             // https://medium.com/@shashidharyamsani/implementing-ios-critical-alerts-7d82b4bb5026
     //        {
     //“aps” : {
@@ -125,10 +128,10 @@ namespace Shiny.Notifications
 
         public async Task Send(Notification notification)
         {
+            notification.AssertValid();
+
             if (notification.Id == 0)
                 notification.Id = this.services.Settings.IncrementValue("NotificationId");
-
-            notification.AssertValid();
 
             var content = await this.GetContent(notification);
             var request = UNNotificationRequest.FromIdentifier(
