@@ -243,6 +243,7 @@ namespace Shiny.Notifications
                 Title = notification.Title,
                 Body = notification.Message
             };
+
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
 
@@ -257,11 +258,23 @@ namespace Shiny.Notifications
         protected virtual async Task ApplyChannel(Notification notification, UNMutableNotificationContent native)
         {
             var channel = Channel.Default;
+
             if (!notification.Channel.IsEmpty())
             {
                 channel = await this.services.Repository.GetChannel(notification.Channel);
                 if (channel == null)
-                    throw new ArgumentException($"{notification.Channel} does not exist");
+                    throw new InvalidOperationException($"{notification.Channel} does not exist");
+            }
+
+            if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
+            {
+                native.InterruptionLevel = channel.Importance switch 
+                {
+                    ChannelImportance.Low => UNNotificationInterruptionLevel.Passive,
+                    ChannelImportance.High => UNNotificationInterruptionLevel.TimeSensitive,
+                    ChannelImportance.Critical => UNNotificationInterruptionLevel.Critical,
+                    _ => UNNotificationInterruptionLevel.Active
+                };
             }
 
             native.CategoryIdentifier = channel.Identifier;

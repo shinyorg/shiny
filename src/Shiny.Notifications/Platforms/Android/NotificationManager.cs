@@ -6,6 +6,7 @@ using Shiny.Infrastructure;
 using Shiny.Jobs;
 using Shiny.Locations;
 
+
 namespace Shiny.Notifications
 {
     public partial class NotificationManager : INotificationManager
