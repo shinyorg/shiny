@@ -8,7 +8,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Notifications
 {
-    public static class Extensions
+    public static class NotificationExtensions
     {
         /// <summary>
         /// This will overwrite all current channels - any channels that no longer exist will be blanked out on any pending local notifications
@@ -52,6 +52,29 @@ namespace Shiny.Notifications
                 foreach (var action in channel.Actions)
                     action.AssertValid();
             }
+        }
+
+
+        public static void AssertValid(this Notification notification)
+        {
+            var triggers = 0;
+            triggers += notification.ScheduleDate == null ? 0 : 1;
+            triggers += notification.Geofence == null ? 0 : 1;
+            triggers += notification.RepeatInterval == null ? 0 : 1;
+            if (triggers > 1)
+                throw new InvalidOperationException("You cannot mix scheduled date, repeated interval, and/or geofences on a notification");
+
+            if (notification.Message.IsEmpty())
+                throw new InvalidOperationException("You must have a message on your notification");
+
+            if (notification.BadgeCount < 0)
+                throw new InvalidOperationException("BadgeCount must be >= 0");
+
+            if (notification.ScheduleDate != null && notification.ScheduleDate < DateTimeOffset.UtcNow)
+                throw new InvalidOperationException("ScheduleDate must be set in the future");
+
+            notification.RepeatInterval?.AssertValid();
+            notification.Geofence?.AssertValid();
         }
 
 

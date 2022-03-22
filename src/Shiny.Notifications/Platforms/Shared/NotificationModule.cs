@@ -40,7 +40,8 @@ namespace Shiny.Notifications
             services.UseGeofencing<NotificationGeofenceDelegate>();
             services.TryAddSingleton<AndroidNotificationProcessor>();
             services.TryAddSingleton<AndroidNotificationManager>();
-            services.UseJobs();
+#elif WINDOWS_UWP
+            services.RegisterJob(new Jobs.JobInfo(typeof(NotificationJob), runOnForeground: true));
 #endif
         }
 

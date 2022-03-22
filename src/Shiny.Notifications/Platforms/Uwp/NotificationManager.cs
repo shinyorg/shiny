@@ -38,7 +38,7 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<AccessState> RequestAccess()
+        public Task<AccessState> RequestAccess(bool locationAware)
             => this.jobManager.RequestAccess();
 
 

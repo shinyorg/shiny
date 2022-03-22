@@ -39,6 +39,8 @@ namespace Shiny.Notifications
             this.services.Lifecycle.RegisterForNotificationReceived(async response =>
             {
                 var t = response.Notification?.Request?.Trigger;
+
+                // TODO
                 if (t == null || t is UNCalendarNotificationTrigger)
                 {
                     var shiny = response.FromNative();
@@ -62,13 +64,14 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<AccessState> RequestAccess()
+        public Task<AccessState> RequestAccess(bool locationAware)
         {
             var tcs = new TaskCompletionSource<AccessState>();
             var request = UNAuthorizationOptions.Alert |
                           UNAuthorizationOptions.Badge |
                           UNAuthorizationOptions.Sound;
 
+            //UNAuthorizationOptions.Announcement | UNAuthorizationOptions.TimeSensitive | UNAuthorizationOptions.CarPlay
             // https://medium.com/@shashidharyamsani/implementing-ios-critical-alerts-7d82b4bb5026
     //        {
     //“aps” : {
@@ -124,6 +127,8 @@ namespace Shiny.Notifications
         {
             if (notification.Id == 0)
                 notification.Id = this.services.Settings.IncrementValue("NotificationId");
+
+            notification.AssertValid();
 
             var content = await this.GetContent(notification);
             var request = UNNotificationRequest.FromIdentifier(
@@ -316,16 +321,13 @@ namespace Shiny.Notifications
         {
             UNNotificationTrigger? trigger = null;
 
-            if (notification.ScheduleDate != null && notification.Geofence != null)
-                throw new InvalidOperationException("You cannot schedule & geofence a notification");
-
             if (notification.Geofence != null)
             {
-                var geo = notification.Geofence;
+                var geo = notification.Geofence!;
 
                 trigger = UNLocationNotificationTrigger.CreateTrigger(new CLRegion(
-                    new CLLocationCoordinate2D(geo.Center.Latitude, geo.Center.Longitude),
-                    geo.Radius.TotalMeters,
+                    new CLLocationCoordinate2D(geo.Center!.Latitude, geo.Center!.Longitude),
+                    geo.Radius!.TotalMeters,
                     notification.Id.ToString()
                 ), geo.Repeat);
             }
@@ -342,6 +344,28 @@ namespace Shiny.Notifications
                     Second = dt.Second
                 }, false);
             }
+            else if (notification.RepeatInterval != null)
+            {
+                var tcfg = notification.RepeatInterval!;
+                if (tcfg.Interval != null)
+                {
+                    trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(tcfg.Interval.Value.TotalSeconds, true);
+                }
+                else
+                {
+                    var component = new NSDateComponents
+                    {
+                        Hour = tcfg.TimeOfDay!.Value.Hours,
+                        Minute = tcfg.TimeOfDay!.Value.Minutes,
+                        Second = tcfg.TimeOfDay!.Value.Seconds
+                    };
+                    if (tcfg.DayOfWeek != null)
+                        component.Weekday = (int)tcfg.DayOfWeek + 1;
+
+                    trigger = UNCalendarNotificationTrigger.CreateTrigger(component, true);
+                }
+            }
+            
             return trigger;
         }
     }

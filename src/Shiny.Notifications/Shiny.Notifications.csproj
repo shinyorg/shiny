@@ -22,7 +22,6 @@
         <PackageReference Include="Xamarin.AndroidX.AppCompat" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <ProjectReference Include="..\Shiny.Locations\Shiny.Locations.csproj" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
