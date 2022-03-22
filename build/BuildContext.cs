@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Cake.Frosting;
+﻿using Cake.Frosting;
 using Cake.Git;
 using Cake.Common;
 using Cake.Common.Build;
