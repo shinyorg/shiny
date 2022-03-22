@@ -36,6 +36,9 @@ namespace Shiny.Notifications
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
+            if (!notification.Thread.IsEmpty())
+                builder.SetGroup(notification.Thread);
+
             this.ApplyLaunchIntent(builder, notification);
             if (!notification.Android.ContentInfo.IsEmpty())
                 builder.SetContentInfo(notification.Android.ContentInfo);

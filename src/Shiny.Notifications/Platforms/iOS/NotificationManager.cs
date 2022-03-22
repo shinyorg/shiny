@@ -241,7 +241,8 @@ namespace Shiny.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message
+                Body = notification.Message,
+                ThreadIdentifier = notification.Thread
             };
 
             if (notification.BadgeCount != null)

@@ -31,7 +31,7 @@ namespace Shiny.Notifications
         public DateTimeOffset? ScheduleDate { get; set; }
 
         /// <summary>
-        ///
+        /// The channel ID
         /// </summary>
         public string? Channel { get; set; } = DefaultChannel;
 
@@ -46,6 +46,11 @@ namespace Shiny.Notifications
         /// iOS/UWP require you set this if you want a badge
         /// </summary>
         public int? BadgeCount { get; set; }
+
+        /// <summary>
+        /// iOS: Thread, Android: Group
+        /// </summary>
+        public string? Thread { get; set; }
 
         /// <summary>
         /// Options specific to android
