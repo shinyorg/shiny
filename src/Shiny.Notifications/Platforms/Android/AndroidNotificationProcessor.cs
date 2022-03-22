@@ -16,14 +16,14 @@ namespace Shiny.Notifications
         public const string IntentActionKey = "Action";
         public const string RemoteInputResultKey = "Result";
 
-        readonly INotificationManager notificationManager;
+        readonly AndroidNotificationManager notificationManager;
         readonly IGeofenceManager geofenceManager;
         readonly IRepository repository;
         readonly ISerializer serializer;
         readonly IEnumerable<INotificationDelegate> delegates;
 
 
-        public AndroidNotificationProcessor(INotificationManager notificationManager,
+        public AndroidNotificationProcessor(AndroidNotificationManager notificationManager,
                                             IGeofenceManager geofenceManager, 
                                             IRepository repository,
                                             ISerializer serializer, 
@@ -63,29 +63,36 @@ namespace Shiny.Notifications
 
         public async Task ProcessPending()
         {
-            // TODO: fire anything pending that missed alarms?
-            // TODO: if repeating, set next time
+            // fire any missed/pending alarms?
+            var missed = await this.repository
+                .GetList<Notification>(x => x.ScheduleDate != null && x.ScheduleDate < DateTime.UtcNow)
+                .ConfigureAwait(false);
+
+            foreach (var notification in missed)
+            {
+                await this.notificationManager.Send(notification).ConfigureAwait(false);
+                await this.DeleteOrReschedule(notification).ConfigureAwait(false);
+            }
         }
 
 
         public async Task ProcessGeofence(GeofenceState newStatus, GeofenceRegion region)
         {
-            if (newStatus == GeofenceState.Entered && region.Identifier.StartsWith(GeofenceKey))
+            // this is to match iOS behaviour
+            if (newStatus != GeofenceState.Entered || !region.Identifier.StartsWith(GeofenceKey))
+                return;
+
+            var notificationId = region.Identifier.Replace(GeofenceKey, String.Empty);
+            var notification = await this.repository.Get<Notification>(notificationId).ConfigureAwait(false);
+
+            if (notification?.Geofence != null)
             {
-                var notificationId = region.Identifier.Replace(GeofenceKey, "");
-                var notification = await this.repository.Get<Notification>(notificationId).ConfigureAwait(false);
+                await this.notificationManager.Send(notification).ConfigureAwait(false);
 
-                if (notification?.Geofence != null)
+                if (!notification.Geofence.Repeat)
                 {
-                    var repeat = notification.Geofence.Repeat;
-
-                    notification.Geofence = null; // HACK
-                    await this.notificationManager.Send(notification).ConfigureAwait(false);
-                    if (!repeat)
-                    {
-                        await this.repository.Remove<Notification>(notificationId).ConfigureAwait(false);
-                        await this.geofenceManager.StopMonitoring(region.Identifier).ConfigureAwait(false);
-                    }
+                    await this.repository.Remove<Notification>(notificationId).ConfigureAwait(false);
+                    await this.geofenceManager.StopMonitoring(region.Identifier).ConfigureAwait(false);
                 }
             }
         }
@@ -93,10 +100,34 @@ namespace Shiny.Notifications
 
         public async Task ProcessAlarm(Intent intent)
         {
-            // TODO: get notification for alarm
-            // TODO: nullify schedule date to send now
+            // get notification for alarm
+            var id = intent.GetIntExtra(IntentNotificationKey, 0);
+            if (id > 0)
+            {
+                var notification = await this.repository.Get<Notification>(id.ToString()).ConfigureAwait(false);
+                if (notification != null)
+                { 
+                    await this.notificationManager.Send(notification).ConfigureAwait(false);
+                    await this.DeleteOrReschedule(notification).ConfigureAwait(false);
+                }
+            }
+        }
 
-            // TODO: if repeating, set next time
+
+        async Task DeleteOrReschedule(Notification notification)
+        {
+            if (notification.RepeatInterval == null)
+            {
+                await this.repository
+                    .Remove<Notification>(notification.Id.ToString())
+                    .ConfigureAwait(false);
+            }
+            else
+            {
+                // if repeating, set next time
+                notification.ScheduleDate = notification.RepeatInterval.CalculateNextAlarm();
+                await this.repository.Set(notification.Id.ToString(), notification).ConfigureAwait(false);
+            }
         }
     }
 }

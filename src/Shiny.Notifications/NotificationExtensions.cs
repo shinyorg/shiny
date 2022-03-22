@@ -61,8 +61,12 @@ namespace Shiny.Notifications
             triggers += notification.ScheduleDate == null ? 0 : 1;
             triggers += notification.Geofence == null ? 0 : 1;
             triggers += notification.RepeatInterval == null ? 0 : 1;
+
             if (triggers > 1)
                 throw new InvalidOperationException("You cannot mix scheduled date, repeated interval, and/or geofences on a notification");
+
+            if (triggers > 0 && notification.BadgeCount > 0)
+                throw new InvalidOperationException("BadgeCount is not respected for triggered notifications");
 
             if (notification.Message.IsEmpty())
                 throw new InvalidOperationException("You must have a message on your notification");

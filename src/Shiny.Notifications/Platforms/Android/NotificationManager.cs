@@ -83,6 +83,7 @@ namespace Shiny.Notifications
         {
             notification.AssertValid();
 
+            // TODO: should I cancel an existing id if the user is setting it?
             if (notification.Id == 0)
                 notification.Id = this.core.Settings.IncrementValue("NotificationId");
 
@@ -90,9 +91,6 @@ namespace Shiny.Notifications
             var channel = await this.GetChannel(notification);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
 
-            // TODO: fix these!
-            // HACK: geofence delegate nullifies geofence coming back in for send
-            // HACK: scheduled timer clears repeated interval & schedule date
             if (notification.Geofence != null)
             {
                 await this.geofenceManager.StartMonitoring(new GeofenceRegion(
@@ -106,17 +104,17 @@ namespace Shiny.Notifications
                 // calc first date if repeating interval
                 notification.ScheduleDate = notification.RepeatInterval!.CalculateNextAlarm();
             }
-
             
             if (notification.ScheduleDate == null && notification.Geofence == null)
             {
-                // TODO: entry requires the notification details be shoved into the intent since it may be deleted from the repository
                 this.manager.SendNative(notification.Id, builder.Build());
                 if (notification.BadgeCount != null)
                     this.core.SetBadgeCount(notification.BadgeCount.Value);
             }
             else
             {
+                // ensure a channel is set
+                notification.Channel = channel.Identifier;
                 await this.core.Repository.Set(notification.Id.ToString(), notification);
             }
         }
@@ -155,6 +153,7 @@ namespace Shiny.Notifications
         {
             var intent = this.core.Platform.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
             intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notification.Id);
+
             var pendingIntent = PendingIntent.GetBroadcast(
                 this.core.Platform.AppContext,
                 notification.Id,

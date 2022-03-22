@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Graphics;
@@ -21,6 +22,14 @@ namespace Shiny.Notifications
         {
             this.Services = services;
             this.NativeManager = NotificationManagerCompat.From(this.Services.Platform.AppContext);
+        }
+
+
+        public virtual async Task Send(Notification notification)
+        {
+            var channel = await this.Services.Repository.GetChannel(notification.Channel!);
+            var builder = this.CreateNativeBuilder(notification, channel!);
+            this.SendNative(notification.Id, builder.Build());
         }
 
 
