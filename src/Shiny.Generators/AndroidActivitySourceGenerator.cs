@@ -121,6 +121,9 @@ namespace Shiny.Generators
                             if (this.context.Compilation.GetTypeByMetadataName("Xamarin.Forms.FormsMaterial") != null)
                                 builder.AppendLineInvariant("global::Xamarin.Forms.FormsMaterial.Init(this, savedInstanceState);");
 
+                            if (this.context.Compilation.GetTypeByMetadataName("Xamarin.FormsMaps") != null)
+                                builder.AppendLineInvariant("global::Xamarin.FormsMaps.Init(this, savedInstanceState);");
+
                             builder.AppendLineInvariant($"this.LoadApplication(new global::{this.values.XamarinFormsAppTypeName}());");
                         }
                         else
