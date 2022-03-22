@@ -2,6 +2,7 @@
 using Android.App;
 using Android.Content;
 
+using Shiny.Infrastructure;
 
 namespace Shiny.Notifications
 {
@@ -25,13 +26,11 @@ namespace Shiny.Notifications
             switch (intent?.Action)
             {
                 case Intent.ActionBootCompleted:
-                    // TODO: fire anything pending that missed alarms?
-                        // TODO: if repeating, set next time
+                    await this.ProcessPending();
                     break;
 
                 case AlarmIntentAction:
-                    // TODO: get notification for alarm
-                    // TODO: if repeating, set next time
+                    await this.ProcessAlarm(intent);
                     break;
 
                 case EntryIntentAction:
@@ -50,6 +49,23 @@ namespace Shiny.Notifications
                     //    break;
                     break;
             }
+        }
+
+
+        async Task ProcessPending()
+        {
+            // TODO: fire anything pending that missed alarms?
+            // TODO: if repeating, set next time
+        }
+
+
+        async Task ProcessAlarm(Intent intent)
+        {
+            var repo = this.Resolve<IRepository>();
+
+            // TODO: nullify scheduledate to send now
+            // TODO: get notification for alarm
+            // TODO: if repeating, set next time
         }
     }
 }

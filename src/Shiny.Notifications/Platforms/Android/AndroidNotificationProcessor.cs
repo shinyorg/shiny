@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.App;
@@ -31,7 +30,6 @@ namespace Shiny.Notifications
             if (intent == null || !this.delegates.Any())
                 return;
 
-            // push notifications won't contain this value - we don't want Shiny.Notifications to process push anyhow
             if (intent.HasExtra(IntentNotificationKey))
             {
                 var notificationString = intent.GetStringExtra(IntentNotificationKey);

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android.App;
+using Android.Content;
 using Shiny.Infrastructure;
 using Shiny.Locations;
 
@@ -36,27 +38,22 @@ namespace Shiny.Notifications
 
         public async Task Cancel(int id)
         {
-            this.manager.NativeManager.Cancel(id);
             var notification = await this.core.Repository.Get<Notification>(id.ToString());
             if (notification != null)
             {
-                if (notification.Geofence != null)
-                {
-                    var geofenceId = NotificationGeofenceDelegate.GetGeofenceId(notification);
-                    await this.geofenceManager.StopMonitoring(geofenceId);
-                }
+                await this.CancelInternal(notification);
                 await this.core.Repository.Remove<Notification>(id.ToString());
             }
-            // TODO: await this.SetNotificationJob();
         }
 
 
         public async Task Clear()
         {
-            // TODO: need to kill any associated geofences
-            this.manager.NativeManager.CancelAll();
+            var notifications = await this.core.Repository.GetList<Notification>();
+            foreach (var notification in notifications) 
+                await this.CancelInternal(notification);
+            
             await this.core.Repository.Clear<Notification>();
-            // TODO: await this.CancelJob();
         }
 
 
@@ -68,13 +65,15 @@ namespace Shiny.Notifications
         {
             if (!this.manager.NativeManager.AreNotificationsEnabled())
                 return AccessState.Disabled;
-
+            
             if (locationAware)
             {
                 var locPermission = await this.geofenceManager.RequestAccess();
                 if (locPermission != AccessState.Available)
                     return AccessState.Restricted;
             }
+            if (!this.Alarms.CanScheduleExactAlarms())
+                return AccessState.Restricted;
 
             return AccessState.Available;
         }
@@ -85,12 +84,11 @@ namespace Shiny.Notifications
             if (notification.Id == 0)
                 notification.Id = this.core.Settings.IncrementValue("NotificationId");
 
+            notification.AssertValid();
+
             // this is here to cause validation of the settings before firing or scheduling
             var channel = await this.GetChannel(notification);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
-
-            if (notification.ScheduleDate != null && notification.Geofence != null)
-                throw new InvalidOperationException("You cannot have a schedule date and geofence on the same notification");
 
             if (notification.Geofence != null)
             {
@@ -101,7 +99,8 @@ namespace Shiny.Notifications
                 ));
             }
 
-            if (notification.ScheduleDate == null)
+            // HACK: geofence delegate nullifies geofence coming back in for send
+            if (notification.ScheduleDate == null && notification.Geofence == null)
             {
                 this.manager.SendNative(notification.Id, builder.Build());
                 if (notification.BadgeCount != null)
@@ -110,10 +109,8 @@ namespace Shiny.Notifications
             else
             {
                 await this.core.Repository.Set(notification.Id.ToString(), notification);
-                // TODO: await this.EnsureStartJob();
             }
         }
-
 
 
         public int Badge
@@ -121,5 +118,45 @@ namespace Shiny.Notifications
             get => this.core.GetBadgeCount();
             set => this.core.SetBadgeCount(value);
         }
+
+
+        protected virtual void SetAlarm(Notification notification)
+        {
+            var pendingIntent = this.GetAlarmPendingIntent(notification);
+            var millis = (notification.ScheduleDate!.Value.ToUniversalTime() - DateTime.UtcNow).TotalMilliseconds;
+            this.Alarms.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, (long)millis, pendingIntent);
+        }
+
+
+        protected virtual async Task CancelInternal(Notification notification)
+        {
+            if (notification.Geofence != null)
+            {
+                var geofenceId = NotificationGeofenceDelegate.GetGeofenceId(notification);
+                await this.geofenceManager.StopMonitoring(geofenceId);
+            }
+            if (notification.ScheduleDate != null || notification.RepeatInterval != null)
+                this.Alarms.Cancel(this.GetAlarmPendingIntent(notification));
+            
+            this.manager.NativeManager.Cancel(notification.Id);
+        }
+
+
+        protected virtual PendingIntent GetAlarmPendingIntent(Notification notification)
+        {
+            var intent = this.core.Platform.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
+            intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notification.Id);
+            var pendingIntent = PendingIntent.GetBroadcast(
+                this.core.Platform.AppContext,
+                notification.Id,
+                intent,
+                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable
+            );
+            return pendingIntent!;
+        }
+
+
+        AlarmManager? alarms;
+        protected AlarmManager Alarms => this.alarms ??= this.core.Platform.GetSystemService<AlarmManager>(Context.AlarmService);
     }
 }
