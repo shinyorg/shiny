@@ -27,7 +27,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(BuildLegacy)' == 'true' AND '$(OS)' == 'WINDOWS_NT'">
-        <UwpTargetFramework>uap10.0.17763</UwpTargetFramework>
+        <UwpTargetFramework>uap10.0.19041</UwpTargetFramework>
     </PropertyGroup>
 
     <!--Shiny should not build for net6.0 directly-->
