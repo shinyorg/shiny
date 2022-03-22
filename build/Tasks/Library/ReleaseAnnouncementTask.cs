@@ -19,9 +19,9 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 
     public override Task RunAsync(BuildContext context)
     {
-        //var message = $"Shiny {context.ReleaseVersion} released! Check out the latest release notes here - https://shinylib.net/release-notes/";
-        var releaseType = context.IsMainBranch ? "" : " **PREVIEW**";
-        var message = $"New Shiny Release{releaseType} - Check out the latest release notes here - https://shinylib.net/release-notes/";
+        var message = $"Shiny {context.ReleaseVersion} released! Check out the latest release notes here - https://shinylib.net/release-notes/";
+        //var releaseType = context.IsMainBranch ? "" : " **PREVIEW**";
+        //var message = $"New Shiny Release{releaseType} - Check out the latest release notes here - https://shinylib.net/release-notes/";
         return Task.WhenAll(
             this.Twitter(context, message),
             this.Discord(context, message)

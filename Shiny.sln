@@ -51,7 +51,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6374E4D9-1
 		src\global.json = src\global.json
 		src\nuget.png = src\nuget.png
 		src\nuget.txt = src\nuget.txt
-		src\version.json = src\version.json
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Net.Http", "src\Shiny.Net.Http\Shiny.Net.Http.csproj", "{3BF25B68-89CE-4A2B-A7B7-C91A6C1F9BC1}"
