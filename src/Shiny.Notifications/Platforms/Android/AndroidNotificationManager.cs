@@ -149,7 +149,7 @@ namespace Shiny.Notifications
                 pendingIntent = AndroidX.Core.App.TaskStackBuilder
                     .Create(this.Services.Platform.AppContext)
                     .AddNextIntent(launchIntent)
-                    .GetPendingIntent(notification.Id, (int)PendingIntentFlags.OneShot);
+                    .GetPendingIntent(notification.Id, (int)(PendingIntentFlags.OneShot | PendingIntentFlags.Mutable));
             }
             else
             {
@@ -157,7 +157,7 @@ namespace Shiny.Notifications
                     this.Services.Platform.AppContext!,
                     notification.Id,
                     launchIntent!,
-                    PendingIntentFlags.OneShot & PendingIntentFlags.Mutable
+                    PendingIntentFlags.OneShot | PendingIntentFlags.Mutable
                 );
             }
             return pendingIntent;
