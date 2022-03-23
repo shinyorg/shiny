@@ -11,12 +11,12 @@ namespace Shiny.Notifications
         /// <summary>
         /// The center of the geofence
         /// </summary>
-        public Position? Center { get; }
+        public Position? Center { get; set; }
 
         /// <summary>
         /// The radius of the region.
         /// </summary>
-        public Distance? Radius { get; }
+        public Distance? Radius { get; set; }
 
 
         public void AssertValid()
