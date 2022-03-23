@@ -249,9 +249,11 @@ namespace Shiny.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message,
-                ThreadIdentifier = notification.Thread
+                Body = notification.Message
             };
+
+            if (!notification.Thread.IsEmpty())
+                content.ThreadIdentifier = notification.Thread;
 
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
