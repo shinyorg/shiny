@@ -97,14 +97,23 @@ namespace Shiny.Notifications
 
 
         const string BADGE_KEY = "ShinyNotificationBadge";
+        public Task<int> GetBadge() => Task.FromResult(this.services.Settings.Get<int>(BADGE_KEY));
+        public Task SetBadge(int? badge)
+        {
+            var value = badge ?? 0;
+            var badgeContent = new BadgeNumericContent((uint)value);
+            this.badgeUpdater.Update(new BadgeNotification(badgeContent.GetXml()));
+            this.services.Settings.Set(BADGE_KEY, value);
+            return Task.CompletedTask;
+        }
+
+
         public int Badge
         {
             get => this.services.Settings.Get<int>(BADGE_KEY);
             set
             {
-                var badge = new BadgeNumericContent((uint)value);
-                this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
-                this.services.Settings.Set(BADGE_KEY, value);
+
             }
         }
 
