@@ -15,7 +15,7 @@ namespace Shiny.Notifications
     public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         /// <summary>
-        /// This requires a special entitlement from Apple that is general disabled for anything but healt & public safety alerts
+        /// This requires a special entitlement from Apple that is general disabled for anything but health & public safety alerts
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
         readonly ShinyCoreServices services;
