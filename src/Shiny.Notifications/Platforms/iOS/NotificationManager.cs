@@ -40,8 +40,7 @@ namespace Shiny.Notifications
             {
                 var t = response.Notification?.Request?.Trigger;
 
-                // TODO
-                if (t == null || t is UNCalendarNotificationTrigger)
+                if (t == null || t is not UNPushNotificationTrigger)
                 {
                     var shiny = response.FromNative();
                     await this.services
@@ -53,15 +52,14 @@ namespace Shiny.Notifications
         }
 
 
-        public int Badge
-        {
-            get => this.services.Settings.Get<int>("Badge");
-            set => this.services.Platform.InvokeOnMainThread(() =>
-            {
-                UIApplication.SharedApplication.ApplicationIconBadgeNumber = value;
-                this.services.Settings.Set("Badge", value);
-            });
-        }
+        public Task<int> GetBadge() => this.services.Platform.InvokeOnMainThreadAsync<int>(() =>
+            (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
+        );
+
+
+        public Task SetBadge(int? badge) => this.services.Platform.InvokeOnMainThreadAsync(() =>
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0
+        );
 
 
         public Task<AccessState> RequestAccess(AccessRequestFlags access)
@@ -293,11 +291,11 @@ namespace Shiny.Notifications
             {
                 if (channel.Importance == ChannelImportance.Critical)
                 {
-                    native.Sound = UNNotificationSound.GetCriticalSound(channel.CustomSoundPath);
+                    native.Sound = UNNotificationSound.GetCriticalSound(channel.CustomSoundPath!);
                 }
                 else
                 {
-                    native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath);
+                    native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath!);
                 }
             }
             else
@@ -330,31 +328,40 @@ namespace Shiny.Notifications
             {
                 var geo = notification.Geofence!;
 
-                trigger = UNLocationNotificationTrigger.CreateTrigger(new CLRegion(
-                    new CLLocationCoordinate2D(geo.Center!.Latitude, geo.Center!.Longitude),
-                    geo.Radius!.TotalMeters,
-                    notification.Id.ToString()
-                ), geo.Repeat);
+                trigger = UNLocationNotificationTrigger.CreateTrigger(
+                    new CLRegion(
+                        new CLLocationCoordinate2D(geo.Center!.Latitude, geo.Center!.Longitude),
+                        geo.Radius!.TotalMeters,
+                        notification.Id.ToString()
+                    ),
+                    geo.Repeat
+                );
             }
             else if (notification.ScheduleDate != null)
             {
                 var dt = notification.ScheduleDate.Value.ToLocalTime();
-                trigger = UNCalendarNotificationTrigger.CreateTrigger(new NSDateComponents
-                {
-                    Year = dt.Year,
-                    Month = dt.Month,
-                    Day = dt.Day,
-                    Hour = dt.Hour,
-                    Minute = dt.Minute,
-                    Second = dt.Second
-                }, false);
+                trigger = UNCalendarNotificationTrigger.CreateTrigger(
+                    new NSDateComponents
+                    {
+                        Year = dt.Year,
+                        Month = dt.Month,
+                        Day = dt.Day,
+                        Hour = dt.Hour,
+                        Minute = dt.Minute,
+                        Second = dt.Second
+                    },
+                    false
+                );
             }
             else if (notification.RepeatInterval != null)
             {
                 var tcfg = notification.RepeatInterval!;
                 if (tcfg.Interval != null)
                 {
-                    trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(tcfg.Interval.Value.TotalSeconds, true);
+                    trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(
+                        tcfg.Interval.Value.TotalSeconds,
+                        true
+                    );
                 }
                 else
                 {

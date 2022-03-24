@@ -120,10 +120,14 @@ namespace Shiny.Notifications
         }
 
 
-        public int Badge
+        public Task<int> GetBadge()
+            => Task.FromResult(this.core.GetBadgeCount());
+
+
+        public Task SetBadge(int? badge)
         {
-            get => this.core.GetBadgeCount();
-            set => this.core.SetBadgeCount(value);
+            this.core.SetBadgeCount(badge ?? 0);
+            return Task.CompletedTask;
         }
 
 

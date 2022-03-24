@@ -75,8 +75,15 @@ namespace Shiny.Notifications
 
 
         /// <summary>
-        /// Sets the app icon badge
+        /// Get the app icon badge
         /// </summary>
-        int Badge { get; set; }
+        Task<int> GetBadge();
+
+        /// <summary>
+        /// Set the badge number
+        /// </summary>
+        /// <param name="badge">0 or null to clear</param>
+        /// <returns></returns>
+        Task SetBadge(int? badge);
     }
 }
