@@ -55,20 +55,23 @@ namespace Shiny.Notifications
         }
 
 
-        public static Task<AccessState> RequestRequiredAccess(this INotificationManager notificationManager, Notification notification)
+        public static async Task<AccessState> RequestRequiredAccess(this INotificationManager notificationManager, Notification notification)
         {
             var request = AccessRequestFlags.Notification;
             if (notification.RepeatInterval != null)
                 request |= AccessRequestFlags.TimeSensitivity;
 
-            // TODO: check channel priority
-            //if (notification.Channel && notification.ScheduleDate != null)
-            //    request |= AccessRequestFlags.TimeSensitivity;
+            var channel = await notificationManager
+                .GetChannel(notification.Channel)
+                .ConfigureAwait(false);
+             
+            if (notification.ScheduleDate != null && channel.Importance >= ChannelImportance.High)
+                request |= AccessRequestFlags.TimeSensitivity;
 
             if (notification.Geofence != null)
                 request |= AccessRequestFlags.LocationAware;
 
-            return notificationManager.RequestAccess();
+            return await notificationManager.RequestAccess(request).ConfigureAwait(false);
         }
 
         public static void AssertValid(this Notification notification)

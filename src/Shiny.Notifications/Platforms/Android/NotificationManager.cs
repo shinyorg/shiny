@@ -56,6 +56,9 @@ namespace Shiny.Notifications
             await this.core.Repository.Clear<Notification>();
         }
 
+        public Task<Notification?> GetNotification(int notificationId)
+            => this.core.Repository.Get<Notification>(notificationId.ToString());
+
 
         public async Task<IEnumerable<Notification>> GetPending()
             => await this.core.Repository.GetList<Notification>().ConfigureAwait(false);

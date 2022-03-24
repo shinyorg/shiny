@@ -45,6 +45,22 @@ namespace Shiny.Notifications
 
 
         /// <summary>
+        /// Get a channel by its identifier
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns>null if not found</returns>
+        Task<Channel?> GetChannel(string identifier);
+
+
+        /// <summary>
+        /// Get a notification by id
+        /// </summary>
+        /// <param name="notificationId"></param>
+        /// <returns>null if not found</returns>
+        Task<Notification?> GetNotification(int notificationId);
+
+
+        /// <summary>
         /// Clears all notifications
         /// </summary>
         /// <returns></returns>

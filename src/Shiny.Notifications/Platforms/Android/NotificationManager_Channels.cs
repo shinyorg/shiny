@@ -9,6 +9,10 @@ namespace Shiny.Notifications
 {
     public partial class NotificationManager
     {
+        public Task<Channel?> GetChannel(string identifier)
+            => this.core.Repository.GetChannel(identifier);
+
+
         public Task AddChannel(Channel channel)
         {
             channel.AssertValid();

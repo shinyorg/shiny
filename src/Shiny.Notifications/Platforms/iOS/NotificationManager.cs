@@ -105,6 +105,10 @@ namespace Shiny.Notifications
         }
 
 
+        public async Task<Notification?> GetNotification(int notificationId)
+            => (await this.GetPending()).FirstOrDefault(x => x.Id == notificationId);
+
+
         public Task<IEnumerable<Notification>> GetPending() => this.services.Platform.InvokeOnMainThreadAsync(async () =>
         {
             var requests = await UNUserNotificationCenter
@@ -151,6 +155,10 @@ namespace Shiny.Notifications
             UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
             UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
         });
+
+
+        public Task<Channel?> GetChannel(string identifier)
+            => this.services.Repository.GetChannel(identifier);
 
 
         public Task<IList<Channel>> GetChannels()
