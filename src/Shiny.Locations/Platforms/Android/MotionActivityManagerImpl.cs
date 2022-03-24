@@ -182,20 +182,8 @@ ORDER BY
             => this.eventSubj;
 
 
-        protected virtual PendingIntent GetPendingIntent()
-        {
-            if (this.pendingIntent != null)
-                return this.pendingIntent;
-
-            var intent = this.core.Platform.CreateIntent<MotionActivityBroadcastReceiver>(IntentAction);
-            this.pendingIntent = PendingIntent.GetBroadcast(
-                this.core.Platform.AppContext,
-                0,
-                intent,
-                PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable
-            );
-            return this.pendingIntent;
-        }
+        protected virtual PendingIntent GetPendingIntent() 
+            => this.pendingIntent ??= this.core.Platform.GetBroadcastPendingIntent<MotionActivityBroadcastReceiver>(IntentAction, PendingIntentFlags.UpdateCurrent);
 
 
         static MotionActivityConfidence ToConfidence(int value)

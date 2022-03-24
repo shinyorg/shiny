@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -11,19 +10,27 @@ namespace Shiny
 {
     public static class AndroidExtensions
     {
-        public static PendingIntent GetBroadcastPendingIntent<T>(this IPlatform platform, string intentAction, PendingIntentFlags flags, int requestCode = 0)
+        public static PendingIntent GetBroadcastPendingIntent<T>(this IPlatform platform, string intentAction, PendingIntentFlags flags, int requestCode = 0, Action<Intent>? modifyIntent = null)
         {
             var intent = platform.CreateIntent<T>(intentAction);
-            if (platform.IsMinApiLevel(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
-                flags |= PendingIntentFlags.Mutable;
+            modifyIntent?.Invoke(intent);
 
             var pendingIntent = PendingIntent.GetBroadcast(
                 platform.AppContext,
                 requestCode,
                 intent,
-                flags
+                platform.GetPendingIntentFlags(flags)
             );
             return pendingIntent!;
+        }
+
+
+        public static PendingIntentFlags GetPendingIntentFlags(this IPlatform platform, PendingIntentFlags flags)
+        {
+            if (platform.IsMinApiLevel(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
+                flags |= PendingIntentFlags.Mutable;
+
+            return flags;
         }
 
 

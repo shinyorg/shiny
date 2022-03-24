@@ -149,7 +149,10 @@ namespace Shiny.Notifications
                 pendingIntent = AndroidX.Core.App.TaskStackBuilder
                     .Create(this.Services.Platform.AppContext)
                     .AddNextIntent(launchIntent)
-                    .GetPendingIntent(notification.Id, (int)(PendingIntentFlags.OneShot | PendingIntentFlags.Mutable));
+                    .GetPendingIntent(
+                        notification.Id, 
+                        (int)this.Services.Platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
+                    );
             }
             else
             {
@@ -157,8 +160,8 @@ namespace Shiny.Notifications
                     this.Services.Platform.AppContext!,
                     notification.Id,
                     launchIntent!,
-                    PendingIntentFlags.OneShot | PendingIntentFlags.Mutable
-                );
+                    this.Services.Platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
+                )!;
             }
             return pendingIntent;
         }
@@ -168,18 +171,17 @@ namespace Shiny.Notifications
         static int counter = 100;
         protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
         {
-            var intent = this.Services.Platform.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.EntryIntentAction);
-            this.PopulateIntent(intent, notification);
-            intent.PutExtra(AndroidNotificationProcessor.IntentActionKey, action.Identifier);
-
             counter++;
-            var pendingIntent = PendingIntent.GetBroadcast(
-                this.Services.Platform.AppContext,
+            return this.Services.Platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
+                ShinyNotificationBroadcastReceiver.EntryIntentAction,
+                PendingIntentFlags.UpdateCurrent,
                 counter,
-                intent,
-                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable
-            )!;
-            return pendingIntent;
+                intent =>
+                {
+                    this.PopulateIntent(intent, notification);
+                    intent.PutExtra(AndroidNotificationProcessor.IntentActionKey, action.Identifier);
+                }
+            );
         }
 
 

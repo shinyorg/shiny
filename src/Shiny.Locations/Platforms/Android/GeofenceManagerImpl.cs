@@ -166,19 +166,7 @@ namespace Shiny.Locations
         }
 
 
-        protected virtual PendingIntent GetPendingIntent()
-        {
-            if (this.geofencePendingIntent != null)
-                return this.geofencePendingIntent;
-
-            var intent = this.context.CreateIntent<GeofenceBroadcastReceiver>(IntentAction);
-            this.geofencePendingIntent = PendingIntent.GetBroadcast(
-                this.context.AppContext,
-                0,
-                intent,
-                PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable
-            );
-            return this.geofencePendingIntent!;
-        }
+        protected virtual PendingIntent GetPendingIntent() 
+            => this.geofencePendingIntent ??= this.context.GetBroadcastPendingIntent<GeofenceBroadcastReceiver>(IntentAction, PendingIntentFlags.UpdateCurrent);
     }
 }

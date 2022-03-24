@@ -154,18 +154,12 @@ namespace Shiny.Notifications
 
 
         protected virtual PendingIntent GetAlarmPendingIntent(Notification notification)
-        {
-            var intent = this.core.Platform.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
-            intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notification.Id);
-
-            var pendingIntent = PendingIntent.GetBroadcast(
-                this.core.Platform.AppContext,
-                notification.Id,
-                intent,
-                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable
+            => this.core.Platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
+                ShinyNotificationBroadcastReceiver.AlarmIntentAction,
+                PendingIntentFlags.UpdateCurrent,
+                0,
+                intent => intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notification.Id)
             );
-            return pendingIntent!;
-        }
 
 
         AlarmManager? alarms;
