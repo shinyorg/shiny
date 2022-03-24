@@ -177,7 +177,7 @@ namespace Shiny.Notifications
                 this.Services.Platform.AppContext,
                 counter,
                 intent,
-                PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable
+                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable
             )!;
             return pendingIntent;
         }
