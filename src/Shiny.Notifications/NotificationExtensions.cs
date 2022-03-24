@@ -55,6 +55,22 @@ namespace Shiny.Notifications
         }
 
 
+        public static Task<AccessState> RequestRequiredAccess(this INotificationManager notificationManager, Notification notification)
+        {
+            var request = AccessRequestFlags.Notification;
+            if (notification.RepeatInterval != null)
+                request |= AccessRequestFlags.TimeSensitivity;
+
+            // TODO: check channel priority
+            //if (notification.Channel && notification.ScheduleDate != null)
+            //    request |= AccessRequestFlags.TimeSensitivity;
+
+            if (notification.Geofence != null)
+                request |= AccessRequestFlags.LocationAware;
+
+            return notificationManager.RequestAccess();
+        }
+
         public static void AssertValid(this Notification notification)
         {
             var triggers = 0;
