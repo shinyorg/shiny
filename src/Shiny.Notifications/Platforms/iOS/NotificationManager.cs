@@ -121,10 +121,13 @@ namespace Shiny.Notifications
         });
 
 
-        public Task Clear() => this.services.Platform.InvokeOnMainThreadAsync(() =>
+        public Task Cancel(CancelScope scope) => this.services.Platform.InvokeOnMainThreadAsync(() =>
         {
-            UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
-            UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
+            if (scope == CancelScope.All || scope == CancelScope.Pending)
+                UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
+
+            if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
+                UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
         });
 
 

@@ -61,10 +61,19 @@ namespace Shiny.Notifications
 
 
         /// <summary>
-        /// Clears all notifications
+        /// Cancels a specified notification
         /// </summary>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task Clear();
+        Task Cancel(int id);
+
+
+        /// <summary>
+        /// Cancels notifications
+        /// </summary>
+        /// <param name="cancelScope">DisplayedOnly - clears only notifications that are on the home screen.  Pending - anything that has a trigger (geofence, schedule, interval).  All - the default and does everything</param>
+        /// <returns></returns>
+        Task Cancel(CancelScope cancelScope = CancelScope.All);
 
 
         /// <summary>
@@ -72,14 +81,6 @@ namespace Shiny.Notifications
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Notification>> GetPendingNotifications();
-
-
-        /// <summary>
-        /// Cancels a specified notification
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task Cancel(int id);
 
 
         /// <summary>
@@ -94,6 +95,7 @@ namespace Shiny.Notifications
         /// Get the app icon badge
         /// </summary>
         Task<int> GetBadge();
+
 
         /// <summary>
         /// Set the badge number

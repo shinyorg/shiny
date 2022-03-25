@@ -85,10 +85,13 @@ namespace Shiny.Notifications
             => this.services.Repository.Get<Notification>(notificationId.ToString());
 
 
-        public async Task Clear()
+        public async Task Cancel(CancelScope scope)
         {
-            ToastNotificationManagerCompat.History.Clear();
-            await this.services.Repository.Clear<Notification>();
+            if (scope == CancelScope.DisplayedOnly || scope == CancelScope.All)
+                ToastNotificationManagerCompat.History.Clear();
+
+            if (scope == CancelScope.Pending || scope == CancelScope.All)
+                await this.services.Repository.Clear<Notification>();
         }
 
 

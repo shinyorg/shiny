@@ -47,14 +47,22 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task Clear()
+        public async Task Cancel(CancelScope scope = CancelScope.All)
         {
-            var notifications = await this.core.Repository.GetList<Notification>();
-            foreach (var notification in notifications) 
-                await this.CancelInternal(notification);
+            if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
+            { 
+                this.manager.NativeManager.CancelAll();
+            }
+            if (scope == CancelScope.All || scope == CancelScope.Pending)
+            { 
+                var notifications = await this.core.Repository.GetList<Notification>();
+                foreach (var notification in notifications) 
+                    await this.CancelInternal(notification);
             
-            await this.core.Repository.Clear<Notification>();
+                await this.core.Repository.Clear<Notification>();
+            }
         }
+
 
         public Task<Notification?> GetNotification(int notificationId)
             => this.core.Repository.Get<Notification>(notificationId.ToString());
