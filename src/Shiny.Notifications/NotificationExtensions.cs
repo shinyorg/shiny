@@ -61,12 +61,17 @@ namespace Shiny.Notifications
             if (notification.RepeatInterval != null)
                 request |= AccessRequestFlags.TimeSensitivity;
 
-            var channel = await notificationManager
-                .GetChannel(notification.Channel)
-                .ConfigureAwait(false);
-             
-            if (notification.ScheduleDate != null && channel.Importance >= ChannelImportance.High)
-                request |= AccessRequestFlags.TimeSensitivity;
+            if (!notification.Channel.IsEmpty())
+            {
+                var channel = await notificationManager
+                    .GetChannel(notification.Channel!)
+                    .ConfigureAwait(false);
+
+                var high = (channel?.Importance ?? ChannelImportance.Low) >= ChannelImportance.High;
+
+                if (notification.ScheduleDate != null && high)
+                    request |= AccessRequestFlags.TimeSensitivity;
+            }
 
             if (notification.Geofence != null)
                 request |= AccessRequestFlags.LocationAware;

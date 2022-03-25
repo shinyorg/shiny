@@ -259,13 +259,13 @@ namespace Shiny.Notifications
             };
 
             if (!notification.Thread.IsEmpty())
-                content.ThreadIdentifier = notification.Thread;
+                content.ThreadIdentifier = notification.Thread!;
 
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
 
-            if (!notification.Payload.IsEmpty())
-                content.UserInfo = notification.Payload.ToNsDictionary();
+            if (!notification.Payload!.IsEmpty())
+                content.UserInfo = notification.Payload!.ToNsDictionary();
 
             await this.ApplyChannel(notification, content);
             return content;
@@ -278,7 +278,7 @@ namespace Shiny.Notifications
 
             if (!notification.Channel.IsEmpty())
             {
-                channel = await this.services.Repository.GetChannel(notification.Channel);
+                channel = await this.services.Repository.GetChannel(notification.Channel!);
                 if (channel == null)
                     throw new InvalidOperationException($"{notification.Channel} does not exist");
             }

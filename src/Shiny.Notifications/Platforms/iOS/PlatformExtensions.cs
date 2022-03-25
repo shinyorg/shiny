@@ -34,15 +34,15 @@ namespace Shiny.Notifications
 
                     shiny.RepeatInterval = new IntervalTrigger
                     {
-                        Interval = new TimeSpan(
+                        TimeOfDay = new TimeSpan(
                             (int)dc.Hour,
                             (int)dc.Minute,
                             (int)dc.Second
                         )
                     };
-                    if (dc.Weekday > 0)
+                    if (dc.Weekday < 8)
                     {
-
+                        shiny.RepeatInterval.DayOfWeek = (DayOfWeek)(int)(dc.Weekday - 1);
                     }
                 }
             }
