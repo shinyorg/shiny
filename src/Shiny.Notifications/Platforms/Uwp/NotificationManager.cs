@@ -64,7 +64,7 @@ namespace Shiny.Notifications
             else
             {
                 if (notification.BadgeCount != null)
-                    this.Badge = notification.BadgeCount.Value;
+                    await this.SetBadge(notification.BadgeCount.Value);
 
                 builder.Show(new CustomizeToast(x =>
                 {
@@ -78,8 +78,11 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task<IEnumerable<Notification>> GetPending()
+        public async Task<IEnumerable<Notification>> GetPendingNotifications()
             => await this.services.Repository.GetList<Notification>();
+
+        public Task<Notification?> GetNotification(int notificationId)
+            => this.services.Repository.Get<Notification>(notificationId.ToString());
 
 
         public async Task Clear()
@@ -108,16 +111,7 @@ namespace Shiny.Notifications
         }
 
 
-        public int Badge
-        {
-            get => this.services.Settings.Get<int>(BADGE_KEY);
-            set
-            {
-
-            }
-        }
-
-
+        public Task<Channel?> GetChannel(string identifier) => this.services.Repository.GetChannel(identifier);
         public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
         public Task AddChannel(Channel channel) => this.services.Repository.SetChannel(channel);
         public Task RemoveChannel(string channelId) => this.services.Repository.RemoveChannel(channelId);

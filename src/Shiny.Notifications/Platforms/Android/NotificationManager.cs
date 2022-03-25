@@ -60,7 +60,7 @@ namespace Shiny.Notifications
             => this.core.Repository.Get<Notification>(notificationId.ToString());
 
 
-        public async Task<IEnumerable<Notification>> GetPending()
+        public async Task<IEnumerable<Notification>> GetPendingNotifications()
             => await this.core.Repository.GetList<Notification>().ConfigureAwait(false);
 
 

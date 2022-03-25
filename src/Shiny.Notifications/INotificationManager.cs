@@ -71,7 +71,7 @@ namespace Shiny.Notifications
         /// Gets all pending notifications
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Notification>> GetPending();
+        Task<IEnumerable<Notification>> GetPendingNotifications();
 
 
         /// <summary>

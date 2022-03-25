@@ -106,10 +106,10 @@ namespace Shiny.Notifications
 
 
         public async Task<Notification?> GetNotification(int notificationId)
-            => (await this.GetPending()).FirstOrDefault(x => x.Id == notificationId);
+            => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-        public Task<IEnumerable<Notification>> GetPending() => this.services.Platform.InvokeOnMainThreadAsync(async () =>
+        public Task<IEnumerable<Notification>> GetPendingNotifications() => this.services.Platform.InvokeOnMainThreadAsync(async () =>
         {
             var requests = await UNUserNotificationCenter
                 .Current
