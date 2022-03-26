@@ -11,6 +11,12 @@ namespace Shiny
         public const int KM_TO_METERS = 1000;
 
 
+        Distance() { }
+        public Distance(double totalKilometers)
+        {
+            this.TotalKilometers = totalKilometers;
+        }
+
         public double TotalMiles => this.TotalKilometers * KM_TO_MILES;
         public double TotalMeters => this.TotalKilometers * KM_TO_METERS;
         public double TotalKilometers { get; set; }

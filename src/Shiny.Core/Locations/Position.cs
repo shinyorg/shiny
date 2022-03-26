@@ -5,16 +5,16 @@ namespace Shiny.Locations
 {
     public class Position : IEquatable<Position>
     {
-        public Position(double lat, double lng)
+        public Position(double latitude, double longitude)
         {
-            if (lat < -90 || lat > 90)
-                throw new ArgumentException($"Invalid latitude value - {lat}");
+            if (latitude < -90 || latitude > 90)
+                throw new ArgumentException($"Invalid latitude value - {latitude}");
 
-            if (lng < -180 || lng > 180)
-                throw new ArgumentException($"Invalid longitude value - {lng}");
+            if (longitude < -180 || longitude > 180)
+                throw new ArgumentException($"Invalid longitude value - {longitude}");
 
-            this.Latitude = lat;
-            this.Longitude = lng;
+            this.Latitude = latitude;
+            this.Longitude = longitude;
         }
 
 
