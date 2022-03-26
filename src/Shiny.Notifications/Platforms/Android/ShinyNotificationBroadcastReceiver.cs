@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 
-using Shiny.Infrastructure;
 
 namespace Shiny.Notifications
 {
@@ -36,7 +35,7 @@ namespace Shiny.Notifications
 
                 case EntryIntentAction:
                     await this.Resolve<AndroidNotificationProcessor>().TryProcessIntent(intent);
-                    context?.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
+                    //context?.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
                     break;
             }
         }
