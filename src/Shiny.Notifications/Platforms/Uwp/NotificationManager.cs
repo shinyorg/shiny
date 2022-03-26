@@ -64,7 +64,7 @@ namespace Shiny.Notifications
             else
             {
                 if (notification.BadgeCount != null)
-                    this.Badge = notification.BadgeCount.Value;
+                    await this.SetBadge(notification.BadgeCount.Value);
 
                 builder.Show(new CustomizeToast(x =>
                 {
@@ -78,14 +78,20 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task<IEnumerable<Notification>> GetPending()
+        public async Task<IEnumerable<Notification>> GetPendingNotifications()
             => await this.services.Repository.GetList<Notification>();
 
+        public Task<Notification?> GetNotification(int notificationId)
+            => this.services.Repository.Get<Notification>(notificationId.ToString());
 
-        public async Task Clear()
+
+        public async Task Cancel(CancelScope scope)
         {
-            ToastNotificationManagerCompat.History.Clear();
-            await this.services.Repository.Clear<Notification>();
+            if (scope == CancelScope.DisplayedOnly || scope == CancelScope.All)
+                ToastNotificationManagerCompat.History.Clear();
+
+            if (scope == CancelScope.Pending || scope == CancelScope.All)
+                await this.services.Repository.Clear<Notification>();
         }
 
 
@@ -97,18 +103,18 @@ namespace Shiny.Notifications
 
 
         const string BADGE_KEY = "ShinyNotificationBadge";
-        public int Badge
+        public Task<int> GetBadge() => Task.FromResult(this.services.Settings.Get<int>(BADGE_KEY));
+        public Task SetBadge(int? badge)
         {
-            get => this.services.Settings.Get<int>(BADGE_KEY);
-            set
-            {
-                var badge = new BadgeNumericContent((uint)value);
-                this.badgeUpdater.Update(new BadgeNotification(badge.GetXml()));
-                this.services.Settings.Set(BADGE_KEY, value);
-            }
+            var value = badge ?? 0;
+            var badgeContent = new BadgeNumericContent((uint)value);
+            this.badgeUpdater.Update(new BadgeNotification(badgeContent.GetXml()));
+            this.services.Settings.Set(BADGE_KEY, value);
+            return Task.CompletedTask;
         }
 
 
+        public Task<Channel?> GetChannel(string identifier) => this.services.Repository.GetChannel(identifier);
         public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
         public Task AddChannel(Channel channel) => this.services.Repository.SetChannel(channel);
         public Task RemoveChannel(string channelId) => this.services.Repository.RemoveChannel(channelId);

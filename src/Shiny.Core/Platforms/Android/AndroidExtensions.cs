@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -9,6 +10,109 @@ namespace Shiny
 {
     public static class AndroidExtensions
     {
+        public static PendingIntent GetBroadcastPendingIntent<T>(this IPlatform platform, string intentAction, PendingIntentFlags flags, int requestCode = 0, Action<Intent>? modifyIntent = null)
+        {
+            var intent = platform.CreateIntent<T>(intentAction);
+            modifyIntent?.Invoke(intent);
+
+            var pendingIntent = PendingIntent.GetBroadcast(
+                platform.AppContext,
+                requestCode,
+                intent,
+                platform.GetPendingIntentFlags(flags)
+            );
+            return pendingIntent!;
+        }
+
+
+        public static PendingIntentFlags GetPendingIntentFlags(this IPlatform platform, PendingIntentFlags flags)
+        {
+            if (platform.IsMinApiLevel(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
+                flags |= PendingIntentFlags.Mutable;
+
+            return flags;
+        }
+
+
+        public static T GetSystemService<T>(this IPlatform platform, string key) where T : Java.Lang.Object
+            => (T)platform.AppContext.GetSystemService(key);
+
+        public static void RegisterBroadcastReceiver<T>(this IPlatform platform, params string[] actions) where T : BroadcastReceiver, new()
+        {
+            var filter = new IntentFilter();
+            foreach (var e in actions)
+                filter.AddAction(e);
+
+            platform.AppContext.RegisterReceiver(new T(), filter);
+        }
+
+
+        public static TValue GetSystemServiceValue<TValue, TSysType>(this IPlatform platform, string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
+        {
+            using (var type = platform.GetSystemService<TSysType>(systemTypeName))
+            {
+                return func(type);
+            }
+        }
+
+
+        public static Intent CreateIntent<T>(this IPlatform platform, params string[] actions)
+        {
+            var intent = new Intent(platform.AppContext, typeof(T));
+            foreach (var action in actions)
+                intent.SetAction(action);
+
+            return intent;
+        }
+
+
+        public static bool IsInManifest(this IPlatform platform, string androidPermission)
+        {
+            var permissions = platform
+                .AppContext!
+                .PackageManager!
+                .GetPackageInfo(
+                    platform.AppContext!.PackageName!,
+                    PackageInfoFlags.Permissions
+                )
+                ?.RequestedPermissions;
+
+            if (permissions != null)
+            {
+                foreach (var permission in permissions)
+                {
+                    if (permission.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase))
+                        return true;
+                }
+            }
+            //Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
+            return false;
+        }
+
+
+        public static IObservable<Intent> WhenIntentReceived(this IPlatform platform, string intentAction)
+            => Observable.Create<Intent>(ob =>
+            {
+                var filter = new IntentFilter();
+                filter.AddAction(intentAction);
+                var receiver = new ObservableBroadcastReceiver
+                {
+                    OnEvent = ob.OnNext
+                };
+                platform.AppContext.RegisterReceiver(receiver, filter);
+                return () => platform.AppContext.UnregisterReceiver(receiver);
+            });
+
+
+
+        public static T GetIntentValue<T>(this IPlatform platform, string intentAction, Func<Intent, T> transform)
+        {
+            using var filter = new IntentFilter(intentAction);
+            using var receiver = platform.AppContext.RegisterReceiver(null, filter);
+            return transform(receiver!);
+        }
+
+
         public static int GetColorByName(this IPlatform platform, string colorName) => platform
             .AppContext
             .Resources

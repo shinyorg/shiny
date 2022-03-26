@@ -109,29 +109,9 @@ namespace Shiny
         public void OnNewIntent(Intent intent) => this.intentSubject.OnNext(intent);
         public Application AppContext => this.app;
         public IObservable<Intent> WhenIntentReceived() => this.intentSubject;
-        public T GetSystemService<T>(string key) where T : Java.Lang.Object
-            => (T)this.AppContext.GetSystemService(key);
+
 
         public PlatformState Status { get; private set; } = PlatformState.Foreground;
-
-
-        public void RegisterBroadcastReceiver<T>(params string[] actions) where T : BroadcastReceiver, new()
-        {
-            var filter = new IntentFilter();
-            foreach (var e in actions)
-                filter.AddAction(e);
-
-            this.AppContext.RegisterReceiver(new T(), filter);
-        }
-
-
-        public TValue GetSystemServiceValue<TValue, TSysType>(string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
-        {
-            using (var type = this.GetSystemService<TSysType>(systemTypeName))
-            { 
-                return func(type);
-            }
-        }
 
 
         public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
@@ -150,6 +130,10 @@ namespace Shiny
             .AppContext
             .PackageManager
             .GetPackageInfo(this.AppContext.PackageName, 0);
+
+
+        public void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResult)
+            => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResult));
 
 
         public const string ActionServiceStart = "ACTION_START_FOREGROUND_SERVICE";
@@ -186,35 +170,8 @@ namespace Shiny
             }
         }
 
-
         protected bool IsShinyForegroundService(Type serviceType)
             => serviceType?.BaseType.Name.Contains("ShinyAndroidForegroundService") ?? false;
-
-
-        public void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResult)
-            => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResult));
-
-
-        public T GetIntentValue<T>(string intentAction, Func<Intent, T> transform)
-        {
-            using var filter = new IntentFilter(intentAction);
-            using var receiver = this.AppContext.RegisterReceiver(null, filter);
-            return transform(receiver!);
-        }
-
-
-        public IObservable<Intent> WhenIntentReceived(string intentAction)
-            => Observable.Create<Intent>(ob =>
-            {
-                var filter = new IntentFilter();
-                filter.AddAction(intentAction);
-                var receiver = new ObservableBroadcastReceiver
-                {
-                    OnEvent = ob.OnNext
-                };
-                this.AppContext.RegisterReceiver(receiver, filter);
-                return () => this.AppContext.UnregisterReceiver(receiver);
-            });
 
 
         public AccessState GetCurrentAccessState(string androidPermission)
@@ -284,38 +241,5 @@ namespace Shiny
 
             return comp;
         });
-
-
-        public Intent CreateIntent<T>(params string[] actions)
-        {
-            var intent = new Intent(this.AppContext, typeof(T));
-            foreach (var action in actions)
-                intent.SetAction(action);
-
-            return intent;
-        }
-
-
-        public bool IsInManifest(string androidPermission)
-        {
-            var permissions = this.AppContext
-                .PackageManager
-                .GetPackageInfo(
-                    this.AppContext.PackageName,
-                    PackageInfoFlags.Permissions
-                )
-                ?.RequestedPermissions;
-
-            if (permissions != null)
-            { 
-                foreach (var permission in permissions)
-                { 
-                    if (permission.Equals(androidPermission, StringComparison.InvariantCultureIgnoreCase))
-                        return true;
-                }
-            }
-            //Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
-            return false;
-        }
     }
 }

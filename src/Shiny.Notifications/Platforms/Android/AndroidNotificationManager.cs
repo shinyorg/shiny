@@ -7,6 +7,9 @@ using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+
+using Java.Lang;
+
 using Shiny.Infrastructure;
 
 
@@ -79,6 +82,34 @@ namespace Shiny.Notifications
         }
 
 
+        public void SetAlarm(Notification notification)
+        {
+            var pendingIntent = this.GetAlarmPendingIntent(notification);
+            var triggerTime = (notification.ScheduleDate!.Value.ToUniversalTime() - DateTime.UtcNow).TotalMilliseconds;
+            var androidTriggerTime = JavaSystem.CurrentTimeMillis() + (long)triggerTime;
+            this.Alarms.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, androidTriggerTime, pendingIntent);
+        }
+
+
+        public void CancelAlarm(Notification notification)
+        {
+            this.Alarms.Cancel(this.GetAlarmPendingIntent(notification));
+        }
+
+
+        protected virtual PendingIntent GetAlarmPendingIntent(Notification notification)
+            => this.Services.Platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
+                ShinyNotificationBroadcastReceiver.AlarmIntentAction,
+                PendingIntentFlags.UpdateCurrent,
+                0,
+                intent => intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notification.Id)
+            );
+
+
+        AlarmManager? alarms;
+        public AlarmManager Alarms => this.alarms ??= this.Services.Platform.GetSystemService<AlarmManager>(Context.AlarmService);
+
+
         public virtual void ApplyLaunchIntent(NotificationCompat.Builder builder, Notification notification)
         {
             var pendingIntent = this.GetLaunchPendingIntent(notification);
@@ -149,7 +180,10 @@ namespace Shiny.Notifications
                 pendingIntent = AndroidX.Core.App.TaskStackBuilder
                     .Create(this.Services.Platform.AppContext)
                     .AddNextIntent(launchIntent)
-                    .GetPendingIntent(notification.Id, (int)PendingIntentFlags.OneShot);
+                    .GetPendingIntent(
+                        notification.Id, 
+                        (int)this.Services.Platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
+                    );
             }
             else
             {
@@ -157,8 +191,8 @@ namespace Shiny.Notifications
                     this.Services.Platform.AppContext!,
                     notification.Id,
                     launchIntent!,
-                    PendingIntentFlags.OneShot & PendingIntentFlags.Mutable
-                );
+                    this.Services.Platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
+                )!;
             }
             return pendingIntent;
         }
@@ -168,18 +202,17 @@ namespace Shiny.Notifications
         static int counter = 100;
         protected virtual PendingIntent CreateActionIntent(Notification notification, ChannelAction action)
         {
-            var intent = this.Services.Platform.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.EntryIntentAction);
-            this.PopulateIntent(intent, notification);
-            intent.PutExtra(AndroidNotificationProcessor.IntentActionKey, action.Identifier);
-
             counter++;
-            var pendingIntent = PendingIntent.GetBroadcast(
-                this.Services.Platform.AppContext,
+            return this.Services.Platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
+                ShinyNotificationBroadcastReceiver.EntryIntentAction,
+                PendingIntentFlags.UpdateCurrent,
                 counter,
-                intent,
-                PendingIntentFlags.UpdateCurrent & PendingIntentFlags.Mutable
-            )!;
-            return pendingIntent;
+                intent =>
+                {
+                    this.PopulateIntent(intent, notification);
+                    intent.PutExtra(AndroidNotificationProcessor.IntentActionKey, action.Identifier);
+                }
+            );
         }
 
 

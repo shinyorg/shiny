@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Android.App;
-using Android.Content;
 using Shiny.Infrastructure;
 using Shiny.Locations;
 
@@ -47,17 +44,28 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task Clear()
+        public async Task Cancel(CancelScope scope = CancelScope.All)
         {
-            var notifications = await this.core.Repository.GetList<Notification>();
-            foreach (var notification in notifications) 
-                await this.CancelInternal(notification);
+            if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
+            { 
+                this.manager.NativeManager.CancelAll();
+            }
+            if (scope == CancelScope.All || scope == CancelScope.Pending)
+            { 
+                var notifications = await this.core.Repository.GetList<Notification>();
+                foreach (var notification in notifications) 
+                    await this.CancelInternal(notification);
             
-            await this.core.Repository.Clear<Notification>();
+                await this.core.Repository.Clear<Notification>();
+            }
         }
 
 
-        public async Task<IEnumerable<Notification>> GetPending()
+        public Task<Notification?> GetNotification(int notificationId)
+            => this.core.Repository.Get<Notification>(notificationId.ToString());
+
+
+        public async Task<IEnumerable<Notification>> GetPendingNotifications()
             => await this.core.Repository.GetList<Notification>().ConfigureAwait(false);
 
 
@@ -72,7 +80,7 @@ namespace Shiny.Notifications
                 if (locPermission != AccessState.Available)
                     return AccessState.Restricted;
             }
-            if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !this.Alarms.CanScheduleExactAlarms())
+            if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !this.manager.Alarms.CanScheduleExactAlarms())
                 return AccessState.Restricted;
 
             return AccessState.Available;
@@ -112,26 +120,25 @@ namespace Shiny.Notifications
                     this.core.SetBadgeCount(notification.BadgeCount.Value);
             }
             else
-            {
+            {                
                 // ensure a channel is set
                 notification.Channel = channel.Identifier;
                 await this.core.Repository.Set(notification.Id.ToString(), notification);
+
+                if (notification.ScheduleDate != null)
+                    this.manager.SetAlarm(notification);
             }
         }
 
 
-        public int Badge
-        {
-            get => this.core.GetBadgeCount();
-            set => this.core.SetBadgeCount(value);
-        }
+        public Task<int> GetBadge()
+            => Task.FromResult(this.core.GetBadgeCount());
 
 
-        protected virtual void SetAlarm(Notification notification)
+        public Task SetBadge(int? badge)
         {
-            var pendingIntent = this.GetAlarmPendingIntent(notification);
-            var millis = (notification.ScheduleDate!.Value.ToUniversalTime() - DateTime.UtcNow).TotalMilliseconds;
-            this.Alarms.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, (long)millis, pendingIntent);
+            this.core.SetBadgeCount(badge ?? 0);
+            return Task.CompletedTask;
         }
 
 
@@ -143,28 +150,9 @@ namespace Shiny.Notifications
                 await this.geofenceManager.StopMonitoring(geofenceId);
             }
             if (notification.ScheduleDate != null || notification.RepeatInterval != null)
-                this.Alarms.Cancel(this.GetAlarmPendingIntent(notification));
+                this.manager.CancelAlarm(notification);
             
             this.manager.NativeManager.Cancel(notification.Id);
         }
-
-
-        protected virtual PendingIntent GetAlarmPendingIntent(Notification notification)
-        {
-            var intent = this.core.Platform.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
-            intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notification.Id);
-
-            var pendingIntent = PendingIntent.GetBroadcast(
-                this.core.Platform.AppContext,
-                notification.Id,
-                intent,
-                PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Mutable
-            );
-            return pendingIntent!;
-        }
-
-
-        AlarmManager? alarms;
-        protected AlarmManager Alarms => this.alarms ??= this.core.Platform.GetSystemService<AlarmManager>(Context.AlarmService);
     }
 }

@@ -265,6 +265,9 @@ namespace Shiny.Generators
             {
                 // do XF stuff
                 builder.AppendLineInvariant("global::Xamarin.Forms.Forms.Init();");
+                if (this.Context.Compilation.GetTypeByMetadataName("Xamarin.FormsMaps") != null)
+                    builder.AppendLineInvariant("global::Xamarin.FormsMaps.Init();");
+
                 builder.AppendLineInvariant($"this.LoadApplication(new global::{this.ShinyConfig.XamarinFormsAppTypeName}());");
             }
         }

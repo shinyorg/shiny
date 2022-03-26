@@ -1,4 +1,5 @@
 ﻿using System;
+using Shiny.Locations;
 using UserNotifications;
 
 
@@ -22,7 +23,45 @@ namespace Shiny.Notifications
             };
 
             if (native.Trigger is UNCalendarNotificationTrigger calendar)
-                shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
+            {
+                if (!calendar.Repeats)
+                {
+                    shiny.ScheduleDate = calendar.NextTriggerDate?.ToDateTime() ?? DateTime.Now;
+                }
+                else
+                {
+                    var dc = calendar.DateComponents;
+
+                    shiny.RepeatInterval = new IntervalTrigger
+                    {
+                        TimeOfDay = new TimeSpan(
+                            (int)dc.Hour,
+                            (int)dc.Minute,
+                            (int)dc.Second
+                        )
+                    };
+                    if (dc.Weekday < 8)
+                    {
+                        shiny.RepeatInterval.DayOfWeek = (DayOfWeek)(int)(dc.Weekday - 1);
+                    }
+                }
+            }
+            else if (native.Trigger is UNTimeIntervalNotificationTrigger interval)
+            {
+                shiny.RepeatInterval = new IntervalTrigger
+                {
+                    Interval = TimeSpan.FromSeconds(interval.TimeInterval)
+                };
+                shiny.ScheduleDate = interval.NextTriggerDate!.ToDateTime();
+            }
+            else if (native.Trigger is UNLocationNotificationTrigger location)
+            {
+                shiny.Geofence = new GeofenceTrigger
+                {
+                    Center = new Position(location.Region.Center.Latitude, location.Region.Center.Longitude),
+                    Radius = Distance.FromMeters(location.Region.Radius)
+                };
+            }
 
             return shiny;
         }

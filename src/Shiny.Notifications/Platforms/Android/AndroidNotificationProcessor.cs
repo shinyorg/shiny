@@ -127,6 +127,8 @@ namespace Shiny.Notifications
                 // if repeating, set next time
                 notification.ScheduleDate = notification.RepeatInterval.CalculateNextAlarm();
                 await this.repository.Set(notification.Id.ToString(), notification).ConfigureAwait(false);
+
+                this.notificationManager.SetAlarm(notification);
             }
         }
     }

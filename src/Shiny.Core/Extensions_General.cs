@@ -158,6 +158,9 @@ namespace Shiny
         /// <returns></returns>
         public static T Get<T>(this IDictionary<string, object> dict, string key, T defaultValue = default)
         {
+            if (dict == null)
+                return defaultValue;
+
             if (!dict.ContainsKey(key))
                 return defaultValue;
 

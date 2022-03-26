@@ -15,7 +15,7 @@ namespace Shiny.Notifications
     public class NotificationManager : INotificationManager, IShinyStartupTask
     {
         /// <summary>
-        /// This requires a special entitlement from Apple that is general disabled for anything but healt & public safety alerts
+        /// This requires a special entitlement from Apple that is general disabled for anything but health & public safety alerts
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
         readonly ShinyCoreServices services;
@@ -40,8 +40,7 @@ namespace Shiny.Notifications
             {
                 var t = response.Notification?.Request?.Trigger;
 
-                // TODO
-                if (t == null || t is UNCalendarNotificationTrigger)
+                if (t == null || t is not UNPushNotificationTrigger)
                 {
                     var shiny = response.FromNative();
                     await this.services
@@ -53,15 +52,14 @@ namespace Shiny.Notifications
         }
 
 
-        public int Badge
-        {
-            get => this.services.Settings.Get<int>("Badge");
-            set => this.services.Platform.InvokeOnMainThread(() =>
-            {
-                UIApplication.SharedApplication.ApplicationIconBadgeNumber = value;
-                this.services.Settings.Set("Badge", value);
-            });
-        }
+        public Task<int> GetBadge() => this.services.Platform.InvokeOnMainThreadAsync<int>(() =>
+            (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
+        );
+
+
+        public Task SetBadge(int? badge) => this.services.Platform.InvokeOnMainThreadAsync(() =>
+            UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0
+        );
 
 
         public Task<AccessState> RequestAccess(AccessRequestFlags access)
@@ -107,7 +105,11 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<IEnumerable<Notification>> GetPending() => this.services.Platform.InvokeOnMainThreadAsync(async () =>
+        public async Task<Notification?> GetNotification(int notificationId)
+            => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
+
+
+        public Task<IEnumerable<Notification>> GetPendingNotifications() => this.services.Platform.InvokeOnMainThreadAsync(async () =>
         {
             var requests = await UNUserNotificationCenter
                 .Current
@@ -119,10 +121,13 @@ namespace Shiny.Notifications
         });
 
 
-        public Task Clear() => this.services.Platform.InvokeOnMainThreadAsync(() =>
+        public Task Cancel(CancelScope scope) => this.services.Platform.InvokeOnMainThreadAsync(() =>
         {
-            UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
-            UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
+            if (scope == CancelScope.All || scope == CancelScope.Pending)
+                UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
+
+            if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
+                UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
         });
 
 
@@ -153,6 +158,10 @@ namespace Shiny.Notifications
             UNUserNotificationCenter.Current.RemovePendingNotificationRequests(ids);
             UNUserNotificationCenter.Current.RemoveDeliveredNotifications(ids);
         });
+
+
+        public Task<Channel?> GetChannel(string identifier)
+            => this.services.Repository.GetChannel(identifier);
 
 
         public Task<IList<Channel>> GetChannels()
@@ -249,15 +258,17 @@ namespace Shiny.Notifications
             var content = new UNMutableNotificationContent
             {
                 Title = notification.Title,
-                Body = notification.Message,
-                ThreadIdentifier = notification.Thread
+                Body = notification.Message
             };
+
+            if (!notification.Thread.IsEmpty())
+                content.ThreadIdentifier = notification.Thread!;
 
             if (notification.BadgeCount != null)
                 content.Badge = notification.BadgeCount.Value;
 
-            if (!notification.Payload.IsEmpty())
-                content.UserInfo = notification.Payload.ToNsDictionary();
+            if (!notification.Payload!.IsEmpty())
+                content.UserInfo = notification.Payload!.ToNsDictionary();
 
             await this.ApplyChannel(notification, content);
             return content;
@@ -270,7 +281,7 @@ namespace Shiny.Notifications
 
             if (!notification.Channel.IsEmpty())
             {
-                channel = await this.services.Repository.GetChannel(notification.Channel);
+                channel = await this.services.Repository.GetChannel(notification.Channel!);
                 if (channel == null)
                     throw new InvalidOperationException($"{notification.Channel} does not exist");
             }
@@ -291,11 +302,11 @@ namespace Shiny.Notifications
             {
                 if (channel.Importance == ChannelImportance.Critical)
                 {
-                    native.Sound = UNNotificationSound.GetCriticalSound(channel.CustomSoundPath);
+                    native.Sound = UNNotificationSound.GetCriticalSound(channel.CustomSoundPath!);
                 }
                 else
                 {
-                    native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath);
+                    native.Sound = UNNotificationSound.GetSound(channel.CustomSoundPath!);
                 }
             }
             else
@@ -328,31 +339,40 @@ namespace Shiny.Notifications
             {
                 var geo = notification.Geofence!;
 
-                trigger = UNLocationNotificationTrigger.CreateTrigger(new CLRegion(
-                    new CLLocationCoordinate2D(geo.Center!.Latitude, geo.Center!.Longitude),
-                    geo.Radius!.TotalMeters,
-                    notification.Id.ToString()
-                ), geo.Repeat);
+                trigger = UNLocationNotificationTrigger.CreateTrigger(
+                    new CLRegion(
+                        new CLLocationCoordinate2D(geo.Center!.Latitude, geo.Center!.Longitude),
+                        geo.Radius!.TotalMeters,
+                        notification.Id.ToString()
+                    ),
+                    geo.Repeat
+                );
             }
             else if (notification.ScheduleDate != null)
             {
                 var dt = notification.ScheduleDate.Value.ToLocalTime();
-                trigger = UNCalendarNotificationTrigger.CreateTrigger(new NSDateComponents
-                {
-                    Year = dt.Year,
-                    Month = dt.Month,
-                    Day = dt.Day,
-                    Hour = dt.Hour,
-                    Minute = dt.Minute,
-                    Second = dt.Second
-                }, false);
+                trigger = UNCalendarNotificationTrigger.CreateTrigger(
+                    new NSDateComponents
+                    {
+                        Year = dt.Year,
+                        Month = dt.Month,
+                        Day = dt.Day,
+                        Hour = dt.Hour,
+                        Minute = dt.Minute,
+                        Second = dt.Second
+                    },
+                    false
+                );
             }
             else if (notification.RepeatInterval != null)
             {
                 var tcfg = notification.RepeatInterval!;
                 if (tcfg.Interval != null)
                 {
-                    trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(tcfg.Interval.Value.TotalSeconds, true);
+                    trigger = UNTimeIntervalNotificationTrigger.CreateTrigger(
+                        tcfg.Interval.Value.TotalSeconds,
+                        true
+                    );
                 }
                 else
                 {

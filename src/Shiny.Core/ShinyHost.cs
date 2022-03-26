@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 using Shiny.Logging;
 
+
 namespace Shiny
 {
     public static class ShinyHost
@@ -16,7 +17,7 @@ namespace Shiny
             get
             {
                 if (services == null)
-                    throw new ArgumentException(Constants.MissingIntialization);
+                    throw new InvalidOperationException(Constants.InitFailErrorMessage);
 
                 return services;
             }

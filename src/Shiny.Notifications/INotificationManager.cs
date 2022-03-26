@@ -45,17 +45,19 @@ namespace Shiny.Notifications
 
 
         /// <summary>
-        /// Clears all notifications
+        /// Get a channel by its identifier
         /// </summary>
-        /// <returns></returns>
-        Task Clear();
+        /// <param name="identifier"></param>
+        /// <returns>null if not found</returns>
+        Task<Channel?> GetChannel(string identifier);
 
 
         /// <summary>
-        /// Gets all pending notifications
+        /// Get a notification by id
         /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<Notification>> GetPending();
+        /// <param name="notificationId"></param>
+        /// <returns>null if not found</returns>
+        Task<Notification?> GetNotification(int notificationId);
 
 
         /// <summary>
@@ -67,6 +69,21 @@ namespace Shiny.Notifications
 
 
         /// <summary>
+        /// Cancels notifications
+        /// </summary>
+        /// <param name="cancelScope">DisplayedOnly - clears only notifications that are on the home screen.  Pending - anything that has a trigger (geofence, schedule, interval).  All - the default and does everything</param>
+        /// <returns></returns>
+        Task Cancel(CancelScope cancelScope = CancelScope.All);
+
+
+        /// <summary>
+        /// Gets all pending notifications
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<Notification>> GetPendingNotifications();
+
+
+        /// <summary>
         /// Send a notification
         /// </summary>
         /// <param name="notification"></param>
@@ -75,8 +92,16 @@ namespace Shiny.Notifications
 
 
         /// <summary>
-        /// Sets the app icon badge
+        /// Get the app icon badge
         /// </summary>
-        int Badge { get; set; }
+        Task<int> GetBadge();
+
+
+        /// <summary>
+        /// Set the badge number
+        /// </summary>
+        /// <param name="badge">0 or null to clear</param>
+        /// <returns></returns>
+        Task SetBadge(int? badge);
     }
 }

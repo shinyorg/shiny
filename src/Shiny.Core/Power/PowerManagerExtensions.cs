@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 
 namespace Shiny.Power
 {
-    public static class Extensions
+    public static class PowerManagerExtensions
     {
         /// <summary>
         /// Sets up an easy power status observable
@@ -24,6 +24,11 @@ namespace Shiny.Power
             => power.WhenAnyProperty(x => x.BatteryLevel);
 
 
+        /// <summary>
+        /// Detects when charging state has changed
+        /// </summary>
+        /// <param name="power"></param>
+        /// <returns></returns>
         public static IObservable<bool> WhenChargingChanged(this IPowerManager power)
             => power.WhenStatusChanged().Select(x =>
                 x == PowerState.Charged ||
