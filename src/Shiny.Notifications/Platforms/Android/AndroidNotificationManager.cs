@@ -7,6 +7,9 @@ using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+
+using Java.Lang;
+
 using Shiny.Infrastructure;
 
 
@@ -77,6 +80,34 @@ namespace Shiny.Notifications
             this.ApplyChannel(builder, notification, channel);
             return builder;
         }
+
+
+        public void SetAlarm(Notification notification)
+        {
+            var pendingIntent = this.GetAlarmPendingIntent(notification);
+            var triggerTime = (notification.ScheduleDate!.Value.ToUniversalTime() - DateTime.UtcNow).TotalMilliseconds;
+            var androidTriggerTime = JavaSystem.CurrentTimeMillis() + (long)triggerTime;
+            this.Alarms.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, androidTriggerTime, pendingIntent);
+        }
+
+
+        public void CancelAlarm(Notification notification)
+        {
+            this.Alarms.Cancel(this.GetAlarmPendingIntent(notification));
+        }
+
+
+        protected virtual PendingIntent GetAlarmPendingIntent(Notification notification)
+            => this.Services.Platform.GetBroadcastPendingIntent<ShinyNotificationBroadcastReceiver>(
+                ShinyNotificationBroadcastReceiver.AlarmIntentAction,
+                PendingIntentFlags.UpdateCurrent,
+                0,
+                intent => intent.PutExtra(AndroidNotificationProcessor.IntentNotificationKey, notification.Id)
+            );
+
+
+        AlarmManager? alarms;
+        public AlarmManager Alarms => this.alarms ??= this.Services.Platform.GetSystemService<AlarmManager>(Context.AlarmService);
 
 
         public virtual void ApplyLaunchIntent(NotificationCompat.Builder builder, Notification notification)
