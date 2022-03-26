@@ -121,17 +121,7 @@ namespace Shiny.Notifications
         });
 
 
-        public Task Cancel(CancelScope scope) => this.services.Platform.InvokeOnMainThreadAsync(() =>
-        {
-            if (scope == CancelScope.All || scope == CancelScope.Pending)
-                UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
-
-            if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
-                UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
-        });
-
-
-        public async Task Send(Notification notification)
+        public Task Send(Notification notification) => this.services.Platform.InvokeOnMainThreadAsync(async () =>
         {
             notification.AssertValid();
 
@@ -148,7 +138,17 @@ namespace Shiny.Notifications
                 .Current
                 .AddNotificationRequestAsync(request)
                 .ConfigureAwait(false);
-        }
+        });
+
+
+        public Task Cancel(CancelScope scope) => this.services.Platform.InvokeOnMainThreadAsync(() =>
+        {
+            if (scope == CancelScope.All || scope == CancelScope.Pending)
+                UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
+
+            if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
+                UNUserNotificationCenter.Current.RemoveAllDeliveredNotifications();
+        });
 
 
         public Task Cancel(int notificationId) => this.services.Platform.InvokeOnMainThreadAsync(() =>
