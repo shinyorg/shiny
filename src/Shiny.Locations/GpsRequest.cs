@@ -33,16 +33,16 @@ namespace Shiny.Locations
         public GpsBackgroundMode BackgroundMode { get; set; } = GpsBackgroundMode.None;
 
 
-        /// <summary>
-        /// This is the desired interval - the OS does not guarantee this time - it come sooner or later
-        /// </summary>
-        public TimeSpan Interval { get; set; } = TimeSpan.FromSeconds(10);
+        ///// <summary>
+        ///// This is the desired interval - the OS does not guarantee this time - it come sooner or later
+        ///// </summary>
+        //public TimeSpan Interval { get; set; } = TimeSpan.FromSeconds(10);
 
 
-        /// <summary>
-        /// This is a guaranteed throttle - updates cannot come faster than this value - this value MUST be lower than your interval
-        /// </summary>
-        public TimeSpan? ThrottledInterval { get; set; }
+        ///// <summary>
+        ///// This is a guaranteed throttle - updates cannot come faster than this value - this value MUST be lower than your interval
+        ///// </summary>
+        //public TimeSpan? ThrottledInterval { get; set; }
 
 
         /// <summary>

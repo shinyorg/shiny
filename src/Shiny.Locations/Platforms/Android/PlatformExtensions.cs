@@ -9,8 +9,8 @@ namespace Shiny.Locations
         public static LocationRequest ToNative(this GpsRequest request)
         {
             var nativeRequest = LocationRequest
-                .Create()
-                .SetInterval(request.Interval.ToMillis());
+                .Create();
+                //.SetInterval(request.Interval.ToMillis());
 
             switch (request.Priority)
             {
@@ -28,11 +28,11 @@ namespace Shiny.Locations
                     break;
             }
 
-            if (request.ThrottledInterval != null)
-                nativeRequest.SetFastestInterval(request.ThrottledInterval.Value.ToMillis());
+            //if (request.ThrottledInterval != null)
+            //    nativeRequest.SetFastestInterval(request.ThrottledInterval.Value.ToMillis());
 
-            if (request.MinimumDistance != null)
-                nativeRequest.SetSmallestDisplacement((float)request.MinimumDistance.TotalMeters);
+            //if (request.MinimumDistance != null)
+            //    nativeRequest.SetSmallestDisplacement((float)request.MinimumDistance.TotalMeters);
 
             return nativeRequest;
         }

@@ -114,18 +114,18 @@ namespace Shiny.Locations
         {
             (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
             this.gdelegate.Request = request;
-#if __IOS__
-            this.locationManager.AllowsBackgroundLocationUpdates = request.BackgroundMode != GpsBackgroundMode.None;
-            //this.locationManager.ShowsBackgroundLocationIndicator = request.UseBackground;
-            var throttledInterval = request.ThrottledInterval?.TotalSeconds ?? 0;
-            var minDistance = request.MinimumDistance?.TotalMeters ?? 0;
+//#if __IOS__
+//            this.locationManager.AllowsBackgroundLocationUpdates = request.BackgroundMode != GpsBackgroundMode.None;
+//            //this.locationManager.ShowsBackgroundLocationIndicator = request.UseBackground;
+//            var throttledInterval = request.ThrottledInterval?.TotalSeconds ?? 0;
+//            var minDistance = request.MinimumDistance?.TotalMeters ?? 0;
 
-            if (request.BackgroundMode != GpsBackgroundMode.None && (throttledInterval > 0 || minDistance > 0))
-            {
-                this.locationManager.DistanceFilter = CLLocationDistance.FilterNone;
-                this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
-            }
-#endif
+//            if (request.BackgroundMode != GpsBackgroundMode.None && (throttledInterval > 0 || minDistance > 0))
+//            {
+//                this.locationManager.DistanceFilter = CLLocationDistance.FilterNone;
+//                this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
+//            }
+//#endif
             switch (request.Priority)
             {
                 // TODO: other accuracy values for iOS
@@ -134,6 +134,15 @@ namespace Shiny.Locations
                     break;
 
                 case GpsPriority.Normal:
+                    //CLActivityType.Airborne
+                    //CLActivityType.AutomotiveNavigation
+                    //CLActivityType.Fitness
+                    //CLActivityType.OtherNavigation
+
+                    //CLLocation.AccurracyBestForNavigation
+                    //CLLocation.AccuracyHundredMeters;
+                    //CLLocation.AccuracyKilometer
+                    //CLLocation.AccuracyThreeKilometers
                     this.locationManager.DesiredAccuracy = CLLocation.AccuracyNearestTenMeters;
                     break;
 
