@@ -47,16 +47,35 @@ namespace Shiny.Push
                 {
                     ShinyFirebaseService.MessageReceived = async msg =>
                     {
-                        //var pr = AndroidPushNotificationManager.FromNative(msg);
-                        //await this.onReceived.Invoke(pr).ConfigureAwait(false);
-                        // stop sending this for now
-                        //if (pr.Notification != null)
-                        //{
-                        //    // TODO: channel
-                            //var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
-                        //    this.notifications.SendNative(0, nn);
-                        //}
-                    };
+                        //Notification? notification = null;
+                        var native = msg.GetNotification();
+
+                        if (native != null)
+                        {
+                        //    notification = new Notification
+                        //    {
+                        //        Title = native.Title,
+                        //        Message = native.Body,
+                        //        Channel = native.ChannelId
+                        //    };
+                        //    if (!native.Icon.IsEmpty())
+                        //        notification.Android.SmallIconResourceName = native.Icon;
+
+                            //    if (!native.Color.IsEmpty())
+                            //        notification.Android.ColorResourceName = native.Color;
+                        }
+                        //return new PushNotification(message.Data, notification);
+
+                    //var pr = AndroidPushNotificationManager.FromNative(msg);
+                    //await this.onReceived.Invoke(pr).ConfigureAwait(false);
+                    // stop sending this for now
+                    //if (pr.Notification != null)
+                    //{
+                    //    // TODO: channel
+                    //var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
+                    //    this.notifications.SendNative(0, nn);
+                    //}
+                };
                 }
             }
         }

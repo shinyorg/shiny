@@ -66,6 +66,8 @@ namespace Shiny.Push
                     {
                         if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                         {
+                            var dict = response.Notification.Request.Content.UserInfo.FromNsDictionary();
+                            var data = new PushNotification(dict);
                             //var shiny = response.FromNative();
                             //var pr = new PushNotificationResponse(
                             //    shiny.Notification,
@@ -73,7 +75,7 @@ namespace Shiny.Push
                             //    shiny.Text
                             //);
                             var pushData = new PushNotification(new Dictionary<string, string>());
-                            await this.onEntry.Invoke(pr).ConfigureAwait(false);
+                            await this.onEntry.Invoke(data).ConfigureAwait(false);
                         }
                     });
                 }
