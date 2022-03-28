@@ -45,9 +45,9 @@ namespace Shiny.Locations
         {
             var bg = request.BackgroundMode != GpsBackgroundMode.None;
             var status = await this.locationManager.RequestAccess(bg);
-
+            
             if (status == AccessState.Available &&
-                request.Precise &&
+                request.Accuracy > GpsAccuracy.Lowest &&
                 UIDevice.CurrentDevice.CheckSystemVersion(14, 0) &&
                 this.locationManager.AccuracyAuthorization != CLAccuracyAuthorization.FullAccuracy)
             {
@@ -100,8 +100,6 @@ namespace Shiny.Locations
         {
 #if __IOS__
             this.locationManager.AllowsBackgroundLocationUpdates = false;
-            //if (this.CurrentListener.MinimumDistance != null || this.CurrentListener.ThrottledInterval != nul)
-            //this.locationManager.DisallowDeferredLocationUpdates();
 #endif
             this.locationManager.StopUpdatingLocation();
             this.CurrentListener = null;
@@ -114,55 +112,36 @@ namespace Shiny.Locations
         {
             (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
             this.gdelegate.Request = request;
-//#if __IOS__
-//            this.locationManager.AllowsBackgroundLocationUpdates = request.BackgroundMode != GpsBackgroundMode.None;
-//            //this.locationManager.ShowsBackgroundLocationIndicator = request.UseBackground;
-//            var throttledInterval = request.ThrottledInterval?.TotalSeconds ?? 0;
-//            var minDistance = request.MinimumDistance?.TotalMeters ?? 0;
 
-//            if (request.BackgroundMode != GpsBackgroundMode.None && (throttledInterval > 0 || minDistance > 0))
-//            {
-//                this.locationManager.DistanceFilter = CLLocationDistance.FilterNone;
-//                this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
-//            }
-//#endif
-            switch (request.Priority)
+            switch (request.Accuracy)
             {
-                // TODO: other accuracy values for iOS
-                case GpsPriority.Highest:
+                case GpsAccuracy.Highest:
                     this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
                     break;
 
-                case GpsPriority.Normal:
-                    //CLActivityType.Airborne
-                    //CLActivityType.AutomotiveNavigation
-                    //CLActivityType.Fitness
-                    //CLActivityType.OtherNavigation
-
-                    //CLLocation.AccurracyBestForNavigation
-                    //CLLocation.AccuracyHundredMeters;
-                    //CLLocation.AccuracyKilometer
-                    //CLLocation.AccuracyThreeKilometers
+                case GpsAccuracy.High:
+                    this.locationManager.DistanceFilter = 10;
                     this.locationManager.DesiredAccuracy = CLLocation.AccuracyNearestTenMeters;
                     break;
 
-                case GpsPriority.Low:
+                case GpsAccuracy.Normal:
+                    this.locationManager.DistanceFilter = 100;
                     this.locationManager.DesiredAccuracy = CLLocation.AccuracyHundredMeters;
                     break;
-            }
 
-            // TODO: other iOS config
-            //this.locationManager.ShouldDisplayHeadingCalibration
-            //this.locationManager.ShowsBackgroundLocationIndicator
-            //this.locationManager.PausesLocationUpdatesAutomatically = false;
-            //this.locationManager.DisallowDeferredLocationUpdates
-            //this.locationManager.ActivityType = CLActivityType.Airborne;
-            //this.locationManager.LocationUpdatesPaused
-            //this.locationManager.LocationUpdatesResumed
-            //this.locationManager.Failed
-            //this.locationManager.UpdatedHeading
-            //if (CLLocationManager.HeadingAvailable)
-            //    this.locationManager.StopUpdatingHeading();
+                case GpsAccuracy.Low:
+                    this.locationManager.DistanceFilter = 1000;
+                    this.locationManager.DesiredAccuracy = CLLocation.AccuracyKilometer;
+                    break;
+
+                case GpsAccuracy.Lowest:
+                    this.locationManager.DistanceFilter = 3000;
+                    this.locationManager.DesiredAccuracy = CLLocation.AccuracyThreeKilometers;
+                    break;
+            }
+#if __IOS__
+            this.locationManager.AllowsBackgroundLocationUpdates = request.BackgroundMode != GpsBackgroundMode.None;
+#endif
             this.locationManager.StartUpdatingLocation();
             this.CurrentListener = request;
         }

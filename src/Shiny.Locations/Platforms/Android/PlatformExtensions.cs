@@ -1,5 +1,4 @@
-﻿using System;
-using Android.Gms.Location;
+﻿using Android.Gms.Location;
 
 
 namespace Shiny.Locations
@@ -8,24 +7,38 @@ namespace Shiny.Locations
     {
         public static LocationRequest ToNative(this GpsRequest request)
         {
-            var nativeRequest = LocationRequest
-                .Create();
+            var nativeRequest = LocationRequest.Create();
                 //.SetInterval(request.Interval.ToMillis());
 
-            switch (request.Priority)
+            switch (request.Accuracy)
             {
-                case GpsPriority.Low:
-                    nativeRequest.SetPriority(LocationRequest.PriorityLowPower);
-                    break;
-
-                case GpsPriority.Highest:
+                case GpsAccuracy.Lowest:
                     nativeRequest
-                        .SetPriority(LocationRequest.PriorityHighAccuracy);
+                        .SetPriority(LocationRequest.PriorityLowPower)
+                        .SetSmallestDisplacement(3000);
                     break;
 
-                case GpsPriority.Normal:
-                default:
-                    nativeRequest.SetPriority(LocationRequest.PriorityBalancedPowerAccuracy);
+                case GpsAccuracy.Low:
+                    nativeRequest
+                        .SetPriority(LocationRequest.PriorityLowPower)
+                        .SetSmallestDisplacement(1000);
+                    break;
+
+                case GpsAccuracy.Normal:
+                    nativeRequest
+                        .SetPriority(LocationRequest.PriorityBalancedPowerAccuracy)
+                        .SetSmallestDisplacement(100);
+                    break;
+
+                case GpsAccuracy.High:
+                    nativeRequest
+                        .SetPriority(LocationRequest.PriorityHighAccuracy)
+                        .SetSmallestDisplacement(10);
+                    break;
+
+                case GpsAccuracy.Highest:
+                    nativeRequest.SetPriority(LocationRequest.PriorityHighAccuracy);
+
                     break;
             }
 
@@ -39,33 +52,11 @@ namespace Shiny.Locations
         }
 
 
-                //// TODO: other accuracy values for iOS
-                //case GpsPriority.Highest:
-                //    this.locationManager.DesiredAccuracy = CLLocation.AccuracyBest;
-                //    break;
-
-                //case GpsPriority.Normal:
-                //    //CLActivityType.Airborne
-                //    //CLActivityType.AutomotiveNavigation
-                //    //CLActivityType.Fitness
-                //    //CLActivityType.OtherNavigation
-
-                //    //CLLocation.AccurracyBestForNavigation
-                //    //CLLocation.AccuracyHundredMeters;
-                //    //CLLocation.AccuracyKilometer
-                //    //CLLocation.AccuracyThreeKilometers
-                //    this.locationManager.DesiredAccuracy = CLLocation.AccuracyNearestTenMeters;
-                //    break;
-
-                //case GpsPriority.Low:
-                //    this.locationManager.DesiredAccuracy = CLLocation.AccuracyHundredMeters;
-                //    break;
-
-        internal static long ToMillis(this TimeSpan ts)
-            => Convert.ToInt64(ts.TotalMilliseconds);
+        //internal static long ToMillis(this TimeSpan ts)
+        //    => Convert.ToInt64(ts.TotalMilliseconds);
 
 
-        internal static long ToMillis(this TimeSpan? ts, long defaultValue)
-            => Convert.ToInt64(ts?.TotalMilliseconds ?? defaultValue);
+        //internal static long ToMillis(this TimeSpan? ts, long defaultValue)
+        //    => Convert.ToInt64(ts?.TotalMilliseconds ?? defaultValue);
     }
 }

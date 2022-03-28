@@ -17,8 +17,8 @@ namespace Shiny.Locations
 
         static readonly GpsRequest defaultRequest = new GpsRequest
         {
-            Interval = TimeSpan.FromMinutes(1),
-            BackgroundMode = GpsBackgroundMode.Realtime
+            BackgroundMode = GpsBackgroundMode.Realtime,
+            Accuracy = GpsAccuracy.Normal
         };
 
 

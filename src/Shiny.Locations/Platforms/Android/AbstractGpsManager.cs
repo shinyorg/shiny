@@ -62,7 +62,7 @@ namespace Shiny.Locations
         public async Task<AccessState> RequestAccess(GpsRequest request)
         {
             var status = AccessState.Denied;
-            var type = request.Precise
+            var type = request.Accuracy > GpsAccuracy.Low
                 ? LocationPermissionType.Fine
                 : LocationPermissionType.Coarse;
 
