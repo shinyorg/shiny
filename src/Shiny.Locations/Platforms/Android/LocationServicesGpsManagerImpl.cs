@@ -2,6 +2,7 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Locations;
+using Android.OS;
 using Microsoft.Extensions.Logging;
 using AContext = Android.Content.Context;
 
@@ -33,7 +34,7 @@ namespace Shiny.Locations
             //BearingRequired
             //criteria.BearingAccuracy = Accuracy.Coarse;
             //criteria.VerticalAccuracy = Accuracy.Coarse
-            var location = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, false));
+            var location = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, true));
             if (location != null)
                 return new GpsReading(location);
 
@@ -51,11 +52,18 @@ namespace Shiny.Locations
             };
 
             this.client.RequestLocationUpdates(
-                (long)request.Interval.TotalMilliseconds,
-                (float)(request.MinimumDistance?.TotalMeters ?? 0),
+                0,
+                request.Accuracy switch
+                {
+                    GpsAccuracy.Highest => 0F,
+                    GpsAccuracy.High => 10F,
+                    GpsAccuracy.Normal => 100F,
+                    GpsAccuracy.Low => 1000F,
+                    GpsAccuracy.Lowest => 3000F
+                },
                 criteria,
                 this.Callback,
-                null
+                Looper.MainLooper
             );
             return Task.CompletedTask;
         }

@@ -21,4 +21,9 @@
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="GpsAccuracy.cs">
+        <SubType></SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

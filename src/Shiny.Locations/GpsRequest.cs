@@ -7,9 +7,10 @@ namespace Shiny.Locations
     {
         public static GpsRequest Realtime(bool background) => new GpsRequest
         {
-            Priority = GpsPriority.Highest,
-            Interval = TimeSpan.FromSeconds(1),
-            Precise = true,
+            //Priority = GpsPriority.Highest,
+            //Interval = TimeSpan.FromSeconds(1),
+            Accuracy = GpsAccuracy.High,
+            //Precise = true,
             BackgroundMode = background
                 ? GpsBackgroundMode.Realtime
                 : GpsBackgroundMode.None
@@ -17,14 +18,14 @@ namespace Shiny.Locations
 
         public static GpsRequest Foreground => new GpsRequest
         {
-            Priority = GpsPriority.Normal
+            Accuracy = GpsAccuracy.Normal
         };
 
 
         /// <summary>
         /// Sets if the location should be precise or approximate b
         /// </summary>
-        public bool Precise { get; set; } = true;
+        //public bool Precise { get; set; } = true;
 
 
         /// <summary>
@@ -33,22 +34,22 @@ namespace Shiny.Locations
         public GpsBackgroundMode BackgroundMode { get; set; } = GpsBackgroundMode.None;
 
 
-        /// <summary>
-        /// This is the desired interval - the OS does not guarantee this time - it come sooner or later
-        /// </summary>
-        public TimeSpan Interval { get; set; } = TimeSpan.FromSeconds(10);
+        ///// <summary>
+        ///// This is the desired interval - the OS does not guarantee this time - it come sooner or later
+        ///// </summary>
+        //public TimeSpan Interval { get; set; } = TimeSpan.FromSeconds(10);
 
 
-        /// <summary>
-        /// This is a guaranteed throttle - updates cannot come faster than this value - this value MUST be lower than your interval
-        /// </summary>
-        public TimeSpan? ThrottledInterval { get; set; }
+        ///// <summary>
+        ///// This is a guaranteed throttle - updates cannot come faster than this value - this value MUST be lower than your interval
+        ///// </summary>
+        //public TimeSpan? ThrottledInterval { get; set; }
 
 
         /// <summary>
         /// The desired Priority/Accuracy of the GPS lock
         /// </summary>
-        public GpsPriority Priority { get; set; } = GpsPriority.Normal;
+        public GpsAccuracy Accuracy { get; set; } = GpsAccuracy.Normal;
 
 
         /// <summary>
