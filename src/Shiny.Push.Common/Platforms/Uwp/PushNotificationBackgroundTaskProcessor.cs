@@ -45,7 +45,7 @@ namespace Shiny.Push
 
             if (fire)
             {
-                var response = new PushNotificationResponse(null, null);
+                var response = new PushNotification(null);
                 await this.delegates
                     .RunDelegates(x => x.OnEntry(response))
                     .ConfigureAwait(false);

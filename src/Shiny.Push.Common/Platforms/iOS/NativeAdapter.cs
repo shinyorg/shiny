@@ -74,7 +74,6 @@ namespace Shiny.Push
                             //    shiny.ActionIdentifier,
                             //    shiny.Text
                             //);
-                            var pushData = new PushNotification(new Dictionary<string, string>());
                             await this.onEntry.Invoke(data).ConfigureAwait(false);
                         }
                     });

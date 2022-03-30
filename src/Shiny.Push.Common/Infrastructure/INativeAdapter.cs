@@ -10,7 +10,7 @@ namespace Shiny.Push.Infrastructure
         Task UnRegister();
 
         Func<PushNotification, Task>? OnReceived { get; set; }
-        Func<PushNotificationResponse, Task>? OnEntry { get; set; }
+        Func<PushNotification, Task>? OnEntry { get; set; }
         Func<string, Task>? OnTokenRefreshed { get; set; }
     }
 }

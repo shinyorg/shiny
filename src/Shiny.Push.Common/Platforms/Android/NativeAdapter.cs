@@ -50,8 +50,8 @@ namespace Shiny.Push
                         //Notification? notification = null;
                         var native = msg.GetNotification();
 
-                        if (native != null)
-                        {
+                        //if (native != null)
+                        //{
                         //    notification = new Notification
                         //    {
                         //        Title = native.Title,
@@ -63,27 +63,25 @@ namespace Shiny.Push
 
                             //    if (!native.Color.IsEmpty())
                             //        notification.Android.ColorResourceName = native.Color;
-                        }
-                        //return new PushNotification(message.Data, notification);
-
-                    //var pr = AndroidPushNotificationManager.FromNative(msg);
-                    //await this.onReceived.Invoke(pr).ConfigureAwait(false);
-                    // stop sending this for now
-                    //if (pr.Notification != null)
-                    //{
-                    //    // TODO: channel
-                    //var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
-                    //    this.notifications.SendNative(0, nn);
-                    //}
-                };
+                        //}
+                        var push = new PushNotification(msg.Data);
+                        await this.onReceived.Invoke(push).ConfigureAwait(false);
+                        // stop sending this for now
+                        //if (pr.Notification != null)
+                        //{
+                        //    // TODO: channel
+                        //var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
+                        //    this.notifications.SendNative(0, nn);
+                        //}
+                    };
                 }
             }
         }
 
 
         IDisposable? onEntrySub;
-        Func<PushNotificationResponse, Task>? onEntry;
-        public Func<PushNotificationResponse, Task>? OnEntry
+        Func<PushNotification, Task>? onEntry;
+        public Func<PushNotification, Task>? OnEntry
         {
             get => this.onEntry;
             set

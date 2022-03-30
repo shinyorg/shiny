@@ -33,7 +33,7 @@ namespace Shiny.Push
         }
 
 
-        public Func<PushNotificationResponse, Task>? OnEntry
+        public Func<PushNotification, Task>? OnEntry
         {
             get => throw new NotImplementedException();
             set => throw new NotImplementedException();
