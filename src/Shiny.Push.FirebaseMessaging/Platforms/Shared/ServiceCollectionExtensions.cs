@@ -28,11 +28,13 @@ namespace Shiny
             {
                 services.UsePush(
                     delegateType,
-                    new FirebaseConfig(
-                        config.AppId,
-                        config.SenderId,
-                        config.ApiKey
-                    )
+                    new FirebaseConfig
+                    { 
+                        AppId = config.AppId,
+                        SenderId = config.SenderId,
+                        ProjectId = config.ProjectId,
+                        ApiKey = config.ApiKey
+                    }
                 );
             }
             else

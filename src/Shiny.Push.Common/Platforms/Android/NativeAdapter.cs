@@ -19,6 +19,8 @@ namespace Shiny.Push
 
         public NativeAdapter(IPlatform context, FirebaseConfig? config = null)
         {
+            config?.AssertValid();
+
             this.context = context;
             this.config = config;
         }
@@ -26,6 +28,7 @@ namespace Shiny.Push
 
         public async Task TryProcessIntent(Intent intent)
         {
+            Console.WriteLine("NativeAdapter.TryProcessIntent");
             //var pr = this.notifications.FromIntent(intent);
             //if (pr != null && this.OnEntry != null)
             //    await this.OnEntry.Invoke(pr.Value).ConfigureAwait(false);
@@ -90,7 +93,7 @@ namespace Shiny.Push
                 if (this.onEntry == null)
                 {
                     this.onEntrySub?.Dispose();
-                    ShinyPushNotificationBroadcastReceiver.ProcessIntent = null;
+                    ShinyPushNotificationBroadcastReceiver.ProcessIntent = intent => this.TryProcessIntent(intent);
                 }
                 else
                 {
@@ -117,39 +120,42 @@ namespace Shiny.Push
                 }
                 else
                 {
-                    ShinyFirebaseService.NewToken = async token => await this.onToken.Invoke(token).ConfigureAwait(false);
+                    ShinyFirebaseService.NewToken = token => this.onToken.Invoke(token);
                 }
             }
         }
 
 
+        bool initialized = false;
         public async Task<PushAccessState> RequestAccess()
         {
-            if (this.config == null)
-            {
-                FirebaseMessaging.Instance.AutoInitEnabled = true;
-            }
-            else
-            {
-                var options = new FirebaseOptions.Builder()
-                    .SetApplicationId(this.config.AppId)
-                    //.SetProjectId(this.config.ProjectId)
-                    .SetApiKey(this.config.ApiKey)
-                    .SetGcmSenderId(this.config.SenderId)
-                    .Build();
-                FirebaseApp.InitializeApp(this.context.AppContext, options);
-            }
+            if (!this.initialized)
+            { 
+                if (this.config == null)
+                {
+                    FirebaseApp.InitializeApp(this.context.AppContext);
+                    if (FirebaseApp.Instance == null)
+                        throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
+                }
+                else
+                {
+                    var options = new FirebaseOptions.Builder()
+                        .SetApplicationId(this.config.AppId)
+                        .SetProjectId(this.config.ProjectId)
+                        .SetApiKey(this.config.ApiKey)
+                        .SetGcmSenderId(this.config.SenderId)
+                        .Build();
 
+                    FirebaseApp.InitializeApp(this.context.AppContext, options);
+                }
+                this.initialized = true;
+            }
             var task = await FirebaseMessaging.Instance.GetToken();
             var token = task.JavaCast<Java.Lang.String>().ToString();
             return new PushAccessState(AccessState.Available, token);
         }
 
 
-        public async Task UnRegister()
-        {
-            FirebaseMessaging.Instance.AutoInitEnabled = false;
-            await Task.Run(() => FirebaseMessaging.Instance.DeleteToken()).ConfigureAwait(false);
-        }
+        public Task UnRegister() => Task.Run(() => FirebaseMessaging.Instance.DeleteToken());
     }
 }
