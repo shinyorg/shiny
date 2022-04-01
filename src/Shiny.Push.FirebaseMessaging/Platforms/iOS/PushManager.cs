@@ -27,6 +27,8 @@ namespace Shiny.Push.FirebaseMessaging
                            AppleLifecycle lifecycle,
                            FirebaseConfiguration? config = null)
         {
+            config?.AssertValid();
+
             this.adapter = adapter;
             this.container = container;
             this.logger = logger;
