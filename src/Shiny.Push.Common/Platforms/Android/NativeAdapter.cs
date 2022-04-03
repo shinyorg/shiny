@@ -51,8 +51,11 @@ namespace Shiny.Push
                     ShinyFirebaseService.MessageReceived = async msg =>
                     {
                         //Notification? notification = null;
-                        var native = msg.GetNotification();
-
+                        //var native = msg.GetNotification();
+                        //if (native != null)
+                        //{
+                        //}
+                        // TODO: I have to send the notification here if in the foreground
                         //if (native != null)
                         //{
                         //    notification = new Notification
@@ -93,7 +96,7 @@ namespace Shiny.Push
                 if (this.onEntry == null)
                 {
                     this.onEntrySub?.Dispose();
-                    ShinyPushNotificationBroadcastReceiver.ProcessIntent = intent => this.TryProcessIntent(intent);
+                    ShinyPushNotificationBroadcastReceiver.ProcessIntent = null;
                 }
                 else
                 {
