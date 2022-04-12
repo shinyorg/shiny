@@ -2,25 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-
+using System.Reactive.Threading.Tasks;
 
 namespace Shiny.BluetoothLE.Managed
 {
 
-    // TODO: general purpose error subject for restore fails?
     public class ManagedPeripheral : NotifyPropertyChanged, IDisposable, IManagedPeripheral
     {
         readonly List<GattCharacteristicInfo> characteristics;
-        readonly Subject<GattCharacteristicResult> notifySub;
-        readonly Subject<(string ServiceUuid, string CharacteristicUuid)> notifyReadySub;
         CompositeDisposable npcDispose;
         CompositeDisposable coreDispose;
-        CompositeDisposable? notifyDispose;
         IDisposable? rssiSub;
 
 
@@ -28,28 +22,22 @@ namespace Shiny.BluetoothLE.Managed
         {
             this.coreDispose = new CompositeDisposable();
             this.characteristics = new List<GattCharacteristicInfo>();
-            this.notifySub = new Subject<GattCharacteristicResult>();
-            this.notifyReadySub = new Subject<(string ServiceUuid, string CharacteristicUuid)>();
             this.Peripheral = peripheral;
-
             this.CreateNpc(scheduler);
-            this.Peripheral
-                .WhenConnected()
-                .Do(_ => this.notifyDispose = new CompositeDisposable())
-                .Select(_ => this.RestoreNotifications())
-                .Switch()
-                .Subscribe()
-                .DisposedBy(this.coreDispose);
 
             this.Peripheral
                 .WhenDisconnected()
                 .Do(_ =>
                 {
-                    this.notifyDispose?.Dispose();
                     lock (this.characteristics)
                     {
                         foreach (var ch in this.characteristics)
+                        {
+                            // these will be restored by WhenConnected on each observable
+                            ch.IsNotificationsEnabled = false;
+                            ch.UseIndicationIfAvailable = false;
                             ch.Characteristic = null;
+                        }
                     }
                 })
                 .Subscribe()
@@ -63,7 +51,7 @@ namespace Shiny.BluetoothLE.Managed
         public IPeripheral Peripheral { get; }
 
 
-        public IObservable<ManagedPeripheral> ConnectWait(ConnectionConfig? config = null) => this.Peripheral
+        public IObservable<IManagedPeripheral> ConnectWait(ConnectionConfig? config = null) => this.Peripheral
             .WithConnectIf(config)
             .Select(_ => this);
 
@@ -108,32 +96,56 @@ namespace Shiny.BluetoothLE.Managed
 
         public bool IsMonitoringRssi => this.rssiSub != null;
 
-        public IObservable<byte[]> WhenNotificationReceived(string serviceUuid, string characteristicUuid) =>
-            this.notifySub
-                .Where(x =>
-                    x.Characteristic.Service.Uuid.Equals(serviceUuid, StringComparison.InvariantCultureIgnoreCase) &&
-                    x.Characteristic.Uuid.Equals(characteristicUuid, StringComparison.InvariantCultureIgnoreCase)
-                )
-                .Select(x => x.Data!);
+        // TODO: make this a hot/cold observable, so there can be multiple observers for a specific characteristic
+        public IObservable<byte[]?> WhenNotificationReceived(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvalable, Action? whenReady) =>
+            this.Peripheral
+                .WhenConnected()
+                .Select(x => this.GetChar(serviceUuid, characteristicUuid))
+                .Switch()
+                .Select(x => x.EnableNotifications(true, useIndicationsIfAvalable))
+                .Switch()
+                .Select(x =>
+                {
+                    var ch = this.GetInfo(serviceUuid, characteristicUuid);
+                    ch.IsNotificationsEnabled = true;
+                    ch.UseIndicationIfAvailable = useIndicationsIfAvalable;
 
-        public IObservable<GattCharacteristicResult> WhenAnyNotificationReceived()
-            => this.notifySub;
+                    whenReady?.Invoke();
+                    return x.WhenNotificationReceived();
+                })
+                .Switch()
+                .Select(x => x.Data)
+                .Finally(async () =>
+                {
+                    var ch = this.GetInfo(serviceUuid, characteristicUuid);
+                    ch.IsNotificationsEnabled = false;
+                    ch.UseIndicationIfAvailable = false;
 
-        public IObservable<(string ServiceUuid, string CharacteristicUuid)> WhenNotificationReady()
-            => this.notifyReadySub;
+                    if (ch.Characteristic != null)
+                    {
+                        try
+                        {
+                            await ch.Characteristic.EnableNotifications(false).ToTask();
+                        }
+                        catch (Exception ex)
+                        {
+                            // TODO: resolve logger from ShinyHost later
+                        }
+                    }
+                });
 
 
         public IReadOnlyList<GattCharacteristicInfo> Characteristics => this.characteristics.AsReadOnly();
 
 
-        public IObservable<ManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream) => this
+        public IObservable<IManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream) => this
             .GetChar(serviceUuid, characteristicUuid)
             .Select(x => x.WriteBlob(stream))
             .Switch()
             .Select(_ => this);
 
 
-        public IObservable<ManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
+        public IObservable<IManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true) => this
             .GetChar(serviceUuid, characteristicUuid)
             .Select(x => x.Write(data, withResponse))
             .Switch()
@@ -153,22 +165,6 @@ namespace Shiny.BluetoothLE.Managed
                 this.GetInfo(serviceUuid, characteristicUuid).Value = x.Data;
                 return x.Data;
             });
-
-
-        public IObservable<Unit> EnableNotifications(bool enable, string serviceUuid, string characteristicUuid, bool useIndicationIfAvailable = false) =>
-            this.GetChar(serviceUuid, characteristicUuid)
-                .Select(x => x.EnableNotifications(enable, useIndicationIfAvailable))
-                .Switch()
-                .Do(_ =>
-                {
-                    var info = this.GetInfo(serviceUuid, characteristicUuid);
-                    info.IsNotificationsEnabled = enable;
-                    info.UseIndicationIfAvailable = useIndicationIfAvailable;
-                })
-                // HACK: explanation at https://github.com/shinyorg/shiny/issues/902
-                .Select(_ => this.RestoreNotifications())
-                .Switch()
-                .Select(_ => Unit.Default);
 
 
         public bool ToggleRssi()
@@ -212,23 +208,6 @@ namespace Shiny.BluetoothLE.Managed
             })
             .Switch()!;
 
-
-        IObservable<Unit> RestoreNotifications() => this.characteristics
-            .ToObservable()
-            .Where(x => x.IsNotificationsEnabled)
-            .Select(x => this
-                .GetChar(x.ServiceUuid, x.CharacteristicUuid)
-                .Do(ch => ch
-                    .WhenNotificationReceived()
-                    .Subscribe(x => this.notifySub.OnNext(x))
-                    .DisposedBy(this.notifyDispose!)
-                )
-                .Select(y => y.EnableNotifications(true, x.UseIndicationIfAvailable))
-                .Switch()
-            )
-            .Switch()
-            .Do(x => this.notifyReadySub.OnNext((x.Service.Uuid, x.Uuid)))
-            .Select(_ => Unit.Default);
 
 
         GattCharacteristicInfo GetInfo(string serviceUuid, string characteristicUuid)

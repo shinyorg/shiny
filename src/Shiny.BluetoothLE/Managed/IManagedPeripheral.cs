@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Reactive;
 using System.Reactive.Concurrency;
 
 
@@ -19,16 +18,13 @@ namespace Shiny.BluetoothLE.Managed
         ConnectionState Status { get; }
 
         void CancelConnection();
-        IObservable<ManagedPeripheral> ConnectWait(ConnectionConfig? config = null);
-        IObservable<Unit> EnableNotifications(bool enable, string serviceUuid, string characteristicUuid, bool useIndicationIfAvailable = false);
+        IObservable<IManagedPeripheral> ConnectWait(ConnectionConfig? config = null);
         IObservable<byte[]?> Read(string serviceUuid, string characteristicUuid);
         void StartRssi();
         void StopRssi();
         bool ToggleRssi();
-        IObservable<GattCharacteristicResult> WhenAnyNotificationReceived();
-        IObservable<(string ServiceUuid, string CharacteristicUuid)> WhenNotificationReady();
-        IObservable<byte[]> WhenNotificationReceived(string serviceUuid, string characteristicUuid);
-        IObservable<ManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
-        IObservable<ManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream);
+        IObservable<byte[]?> WhenNotificationReceived(string serviceUuid, string characteristicUuid, bool useIndicationIfAvailable = false, Action? onReady = null);
+        IObservable<IManagedPeripheral> Write(string serviceUuid, string characteristicUuid, byte[] data, bool withResponse = true);
+        IObservable<IManagedPeripheral> WriteBlob(string serviceUuid, string characteristicUuid, Stream stream);
     }
 }

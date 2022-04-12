@@ -7,8 +7,8 @@ namespace Shiny.BluetoothLE.Managed
     {
         public GattCharacteristicInfo(string serviceUuid, string characteristicUuid)
         {
-            this.ServiceUuid = serviceUuid;
-            this.CharacteristicUuid = characteristicUuid;
+            this.ServiceUuid = serviceUuid ?? throw new ArgumentNullException(nameof(serviceUuid));
+            this.CharacteristicUuid = characteristicUuid ?? throw new ArgumentNullException(nameof(characteristicUuid));
         }
 
 
@@ -22,8 +22,11 @@ namespace Shiny.BluetoothLE.Managed
 
 
         public override string ToString() => $"[Service={this.ServiceUuid}, Characteristic={this.CharacteristicUuid}]";
-        public bool Equals(string serviceUuid, string characteristicUuid) => (this.ServiceUuid, this.CharacteristicUuid) == (serviceUuid, characteristicUuid);
-        public bool Equals(GattCharacteristicInfo other) => this.Equals(other?.ServiceUuid, other?.CharacteristicUuid);
+        public bool Equals(string serviceUuid, string characteristicUuid) =>
+            String.Equals(this.ServiceUuid, serviceUuid, StringComparison.CurrentCultureIgnoreCase) &&
+            String.Equals(this.CharacteristicUuid, characteristicUuid, StringComparison.CurrentCultureIgnoreCase);
+
+        public bool Equals(GattCharacteristicInfo other) => other.ServiceUuid != null && other.CharacteristicUuid != null && this.Equals(other.ServiceUuid, other.CharacteristicUuid);
         public static bool operator ==(GattCharacteristicInfo left, GattCharacteristicInfo right) => Equals(left, right);
         public static bool operator !=(GattCharacteristicInfo left, GattCharacteristicInfo right) => !Equals(left, right);
         public override bool Equals(object obj) => obj is GattCharacteristicInfo info && this.Equals(info);
