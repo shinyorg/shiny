@@ -1,8 +1,7 @@
 {
     "sdk": {
-        "version": "6.0.100",
-        "rollForward": "latestMinor",
-        "allowPrerelease": false
+        "rollForward": "latestFeature",
+        "version": "6.0.200"
     },
     "msbuild-sdks": {
         "MSBuild.Sdk.Extras": "3.0.44"
