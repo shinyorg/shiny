@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
-using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
 using UIKit;
 using UserNotifications;
@@ -40,8 +40,8 @@ namespace Shiny.Push
                     this.onReceviedSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
                     {
                         var dict = userInfo.FromNsDictionary();
-                        var pr = new PushNotification(dict, null);
-                        await this.onReceived.Invoke(pr).ConfigureAwait(false);
+                        var data = new PushNotification(dict);
+                        await this.onReceived.Invoke(data).ConfigureAwait(false);
                     });
                 }
             }
@@ -49,8 +49,8 @@ namespace Shiny.Push
 
 
         IDisposable? onEntrySub;
-        Func<PushNotificationResponse, Task>? onEntry;
-        public Func<PushNotificationResponse, Task>? OnEntry
+        Func<PushNotification, Task>? onEntry;
+        public Func<PushNotification, Task>? OnEntry
         {
             get => this.onEntry;
             set
@@ -66,13 +66,15 @@ namespace Shiny.Push
                     {
                         if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                         {
-                            var shiny = response.FromNative();
-                            var pr = new PushNotificationResponse(
-                                shiny.Notification,
-                                shiny.ActionIdentifier,
-                                shiny.Text
-                            );
-                            await this.onEntry.Invoke(pr).ConfigureAwait(false);
+                            var dict = response.Notification.Request.Content.UserInfo.FromNsDictionary();
+                            var data = new PushNotification(dict);
+                            //var shiny = response.FromNative();
+                            //var pr = new PushNotificationResponse(
+                            //    shiny.Notification,
+                            //    shiny.ActionIdentifier,
+                            //    shiny.Text
+                            //);
+                            await this.onEntry.Invoke(data).ConfigureAwait(false);
                         }
                     });
                 }

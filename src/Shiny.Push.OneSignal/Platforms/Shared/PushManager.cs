@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Com.OneSignal.Abstractions;
 using OS = global::Com.OneSignal.OneSignal;
-using Shiny.Notifications;
 
 
 namespace Shiny.Push.OneSignal
@@ -33,9 +32,9 @@ namespace Shiny.Push.OneSignal
                 .StartInit(this.config.AppId)
                 .HandleNotificationOpened(async x =>
                 {
-                    var notification = ToNotification(x.notification?.payload);
-                    var pr = new PushNotificationResponse(notification, x.action?.actionID, null);
-                    await this.container.OnEntry(pr).ConfigureAwait(false);
+                    //var notification = ToNotification(x.notification?.payload);
+                    //var pr = new PushNotificationResponse(notification, x.action?.actionID, null);
+                    //await this.container.OnEntry(pr).ConfigureAwait(false);
                 })
                 .HandleNotificationReceived(async x =>
                 {
@@ -43,14 +42,14 @@ namespace Shiny.Push.OneSignal
                     x.silentNotification = true;
 
                     // could also build channel here
-                    var notification = ToNotification(x.payload);
-                    var pn = new PushNotification(notification.Payload, notification);
-                    await this.container.OnReceived(pn).ConfigureAwait(false);
+                    //var notification = ToNotification(x.payload);
+                    //var pn = new PushNotification(notification.Payload, notification);
+                    //await this.container.OnReceived(pn).ConfigureAwait(false);
                 })
                 .Settings(new Dictionary<string, bool>
                 {
-                    { IOSSettings.kOSSettingsKeyAutoPrompt, config.iOSAutoPrompt },
-                    { IOSSettings.kOSSettingsKeyInAppLaunchURL, config.iOSInAppLaunchURL }
+                    { IOSSettings.kOSSettingsKeyAutoPrompt, this.config.iOSAutoPrompt },
+                    { IOSSettings.kOSSettingsKeyInAppLaunchURL, this.config.iOSInAppLaunchURL }
                 })
                 .InFocusDisplaying(this.config.InFocusDisplay)
                 .EndInit();
@@ -137,38 +136,32 @@ namespace Shiny.Push.OneSignal
         }
 
 
-        static Notification ToNotification(OSNotificationPayload payload)
-        {
-            var data = payload?
-                .additionalData?
-                .ToDictionary(
-                    y => y.Key,
-                    y => y.Value.ToString()
-                )
-                ?? new Dictionary<string, string>(0);
+        //static Notification ToNotification(OSNotificationPayload payload)
+        //{
+        //    var data = payload?
+        //        .additionalData?
+        //        .ToDictionary(
+        //            y => y.Key,
+        //            y => y.Value.ToString()
+        //        )
+        //        ?? new Dictionary<string, string>(0);
 
-            return new Notification
-            {
-                Title = payload?.title,
-                Message = payload?.body,
-                BadgeCount = payload?.badge,
-                Payload = data
-            };
-        }
+        //    return new Notification
+        //    {
+        //        Title = payload?.title,
+        //        Message = payload?.body,
+        //        BadgeCount = payload?.badge,
+        //        Payload = data
+        //    };
+        //}
 
 
         Dictionary<string, string>? props;
-        Dictionary<string, string> Properties
-        {
-            get
-            {
-                this.props ??= this.container
-                    .Store
-                    .Get<Dictionary<string, string>>(nameof(this.Properties))
-                    ?? new Dictionary<string, string>(0);
-                return props;
-            }
-        }
+        Dictionary<string, string> Properties =>
+            this.props ??= this.container
+                .Store
+                .Get<Dictionary<string, string>>(nameof(this.Properties))
+                ?? new Dictionary<string, string>(0);
 
 
         void WriteProps() => this.container.Store.Set(

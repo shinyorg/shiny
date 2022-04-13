@@ -5,16 +5,25 @@ namespace Shiny.Push
 {
     public class FirebaseConfig
     {
-        public FirebaseConfig(string appId, string senderId, string apiKey)
+        public void AssertValid()
         {
-            this.AppId = appId ?? throw new ArgumentNullException(nameof(appId));
-            this.SenderId = senderId ?? throw new ArgumentNullException(nameof(senderId));
-            this.ApiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+            if (this.AppId == null)
+                throw new ArgumentNullException(nameof(this.AppId));
+
+            if (this.SenderId == null)
+                throw new ArgumentNullException(nameof(this.SenderId));
+
+            if (this.ApiKey == null)
+                throw new ArgumentNullException(nameof(this.ApiKey));
+
+            if (this.ProjectId == null)
+                throw new ArgumentNullException(nameof(this.ProjectId));
         }
 
 
-        public string AppId { get; }
-        public string SenderId { get; }
-        public string ApiKey { get; }
+        public string? AppId { get; set; }
+        public string? SenderId { get; set; }
+        public string? ApiKey { get; set; }
+        public string? ProjectId { get; set; }
     }
 }

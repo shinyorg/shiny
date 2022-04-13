@@ -43,10 +43,12 @@ namespace Shiny.Net.Http
         {
             await base.Cancel(identifier);
             if (Int64.TryParse(identifier, out var id))
+            {
                 this.Services
                     .Platform
                     .GetManager()
                     .Remove(id);
+            }
         }
 
 

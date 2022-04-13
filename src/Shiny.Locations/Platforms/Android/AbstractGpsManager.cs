@@ -52,7 +52,7 @@ namespace Shiny.Locations
             {
                 var bg = value?.BackgroundMode ?? GpsBackgroundMode.None;
                 if (bg == GpsBackgroundMode.None)
-                    this.request = value; 
+                    this.request = value;
                 else
                     this.Set(ref this.request, value);
             }

@@ -38,7 +38,7 @@ namespace Shiny.Stores
             this.alias = keystoreAlias;
 
             this.clearStore = clearStore;
-            this.keyStore = KeyStore.GetInstance(androidKeyStore);
+            this.keyStore = KeyStore.GetInstance(androidKeyStore)!;
             this.keyStore.Load(null);
         }
 

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using Foundation;
 using UIKit;
+using ObjCRuntime;
+
 
 namespace Shiny
 {
@@ -11,6 +13,25 @@ namespace Shiny
     {
 
         static DateTime reference = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+
+        public static bool HasAppDelegateHook(string selector)
+        {
+            if (!selector.StartsWith("application:"))
+                selector = "application:" + selector;
+
+            if (!selector.EndsWith(":"))
+                selector += ":";
+
+            return UIApplication.SharedApplication.RespondsToSelector(new Selector(selector));
+       }
+
+
+        public static void AssertAppDelegateHook(string selector, string message)
+        {
+            if (!HasAppDelegateHook(selector))
+                throw new InvalidProgramException(message);
+        }
 
 
         public static DateTime ToDateTime(this NSDate date)
@@ -33,9 +54,10 @@ namespace Shiny
         {
             var dict = new Dictionary<string, string>();
             if (ns != null)
+            {
                 foreach (var pair in ns)
                     dict.Add(pair.Key.ToString(), pair.Value.ToString());
-
+            }
             return dict;
         }
 

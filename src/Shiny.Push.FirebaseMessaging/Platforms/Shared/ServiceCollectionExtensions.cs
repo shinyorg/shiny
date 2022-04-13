@@ -14,6 +14,7 @@ namespace Shiny
         public static bool UseFirebaseMessaging(this IServiceCollection services, Type delegateType, FirebaseConfiguration? config = null)
         {
 #if __IOS__
+            config?.AssertValid();
             if (config != null)
                 services.AddSingleton(config);
 
@@ -28,11 +29,13 @@ namespace Shiny
             {
                 services.UsePush(
                     delegateType,
-                    new FirebaseConfig(
-                        config.AppId,
-                        config.SenderId,
-                        config.ApiKey
-                    )
+                    new FirebaseConfig
+                    { 
+                        AppId = config.AppId,
+                        SenderId = config.SenderId,
+                        ProjectId = config.ProjectId,
+                        ApiKey = config.ApiKey
+                    }
                 );
             }
             else

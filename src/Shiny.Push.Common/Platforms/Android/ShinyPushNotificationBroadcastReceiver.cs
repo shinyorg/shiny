@@ -12,18 +12,14 @@ namespace Shiny.Push
     )]
     public class ShinyPushNotificationBroadcastReceiver : ShinyBroadcastReceiver
     {
-        public const string ReceiverName = "com.shiny.push." + nameof(ShinyPushNotificationBroadcastReceiver);
-        public const string EntryIntentAction = ReceiverName + ".ENTRY_ACTION";
+        public const string ReceiverName = "org.shiny.push." + nameof(ShinyPushNotificationBroadcastReceiver);
         internal static Func<Intent, Task>? ProcessIntent { get; set; }
 
 
         protected override async Task OnReceiveAsync(Context? context, Intent? intent)
         {
-            if (intent?.Action == EntryIntentAction && ProcessIntent != null)
-            {
+            if (ProcessIntent != null && intent != null)
                 await ProcessIntent.Invoke(intent).ConfigureAwait(false);
-                context?.SendBroadcast(new Intent(Intent.ActionCloseSystemDialogs));
-            }
         }
     }
 }
