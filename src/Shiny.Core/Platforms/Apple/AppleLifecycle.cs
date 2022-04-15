@@ -43,6 +43,14 @@ namespace Shiny
         }
 
 
+        readonly List<Action<NSDictionary>> finishLaunchers = new List<Action<NSDictionary>>();
+        public IDisposable RegisterForOnFinishedLaunching(Action<NSDictionary> action)
+        {
+            this.finishLaunchers.Add(action);
+            return Disposable.Create(() => this.finishLaunchers.Remove(action));
+        }
+
+
         public IDisposable RegisterForNotificationReceived(Func<UNNotificationResponse, Task> task)
         {
             this.EnsureNotificationDelegate();
@@ -64,6 +72,23 @@ namespace Shiny
             return Disposable.Create(() => this.handleEvents.Remove(task));
         }
 
+
+        internal void OnFinishedLaunching(NSDictionary options)
+        {
+            var events = this.finishLaunchers.ToList();
+
+            foreach (var handler in events)
+            {
+                try
+                {
+                    handler(options);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "OnFinishedLaunching");
+                }
+            }
+        }
 
         internal void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
         {

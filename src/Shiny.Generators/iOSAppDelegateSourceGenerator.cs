@@ -234,7 +234,7 @@ namespace Shiny.Generators
                 using (builder.BlockInvariant("public override bool FinishedLaunching(UIApplication app, NSDictionary options)"))
                 {
                     builder.AppendLineInvariant("this.OnPreFinishedLaunching(app, options);");
-                    builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new global::{this.ShinyConfig.ShinyStartupTypeName}());");
+                    builder.AppendLineInvariant($"this.ShinyFinishedLaunching(new global::{this.ShinyConfig.ShinyStartupTypeName}(), options);");
 
                     this.TryAppendThirdParty(appDelegate, builder);
                     builder.AppendLineInvariant("this.OnPostFinishedLaunching(app, options);");

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
@@ -48,7 +49,7 @@ namespace Shiny.Push
         }
 
 
-        IDisposable? onEntrySub;
+        CompositeDisposable? onEntrySub;
         Func<PushNotification, Task>? onEntry;
         public Func<PushNotification, Task>? OnEntry
         {
@@ -59,10 +60,21 @@ namespace Shiny.Push
                 if (this.onEntry == null)
                 {
                     this.onEntrySub?.Dispose();
+                    this.onEntrySub = null;
                 }
                 else
                 {
-                    this.onEntrySub = this.lifecycle.RegisterForNotificationReceived(async response =>
+                    this.onEntrySub ??= new CompositeDisposable();
+
+                    this.onEntrySub.Add(this.lifecycle.RegisterForOnFinishedLaunching(options =>
+                    {
+                        //if (options.ContainsKey() as UNPushNotificationTrigger)
+                        //{
+
+                        //}
+                    }));
+
+                    this.onEntrySub.Add(this.lifecycle.RegisterForNotificationReceived(async response =>
                     {
                         if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                         {
@@ -76,7 +88,7 @@ namespace Shiny.Push
                             //);
                             await this.onEntry.Invoke(data).ConfigureAwait(false);
                         }
-                    });
+                    }));
                 }
             }
         }
