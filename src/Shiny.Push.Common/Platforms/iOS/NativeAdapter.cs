@@ -66,12 +66,16 @@ namespace Shiny.Push
                 {
                     this.onEntrySub ??= new CompositeDisposable();
 
-                    this.onEntrySub.Add(this.lifecycle.RegisterForOnFinishedLaunching(options =>
+                    //UIApplication.SharedApplication.IsRegisteredForRemoteNotifications
+                    this.onEntrySub.Add(this.lifecycle.RegisterForOnFinishedLaunching(async options =>
                     {
-                        //if (options.ContainsKey() as UNPushNotificationTrigger)
-                        //{
-
-                        //}
+                        if (options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
+                        {
+                            var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
+                            var dict = data?.FromNsDictionary();
+                            var push = new PushNotification(dict);
+                            await this.onEntry.Invoke(push).ConfigureAwait(false);
+                        }
                     }));
 
                     this.onEntrySub.Add(this.lifecycle.RegisterForNotificationReceived(async response =>

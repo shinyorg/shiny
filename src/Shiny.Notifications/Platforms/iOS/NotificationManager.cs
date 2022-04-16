@@ -36,6 +36,14 @@ namespace Shiny.Notifications
                     this.SetChannels(x.Result.ToArray())
                 );
 
+            this.services.Lifecycle.RegisterForOnFinishedLaunching(options =>
+            {
+                if (options.ContainsKey(UIApplication.LaunchOptionsLocalNotificationKey))
+                {
+                    var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
+                }
+            });
+
             this.services.Lifecycle.RegisterForNotificationReceived(async response =>
             {
                 var t = response.Notification?.Request?.Trigger;

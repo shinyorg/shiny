@@ -28,6 +28,9 @@ namespace Shiny.Push
 
         public async Task TryProcessIntent(Intent intent)
         {
+            // if activity equals click_action?
+            // OnEntry will only be processed here
+
             Console.WriteLine("NativeAdapter.TryProcessIntent");
             //var pr = this.notifications.FromIntent(intent);
             //if (pr != null && this.OnEntry != null)
@@ -96,15 +99,12 @@ namespace Shiny.Push
                 if (this.onEntry == null)
                 {
                     this.onEntrySub?.Dispose();
-                    ShinyPushNotificationBroadcastReceiver.ProcessIntent = null;
                 }
                 else
                 {
                     this.onEntrySub = this.context
                         .WhenIntentReceived()
                         .SubscribeAsync(intent => this.TryProcessIntent(intent));
-
-                    ShinyPushNotificationBroadcastReceiver.ProcessIntent = intent => this.TryProcessIntent(intent);
                 }
             }
         }
