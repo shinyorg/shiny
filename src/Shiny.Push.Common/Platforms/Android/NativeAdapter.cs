@@ -28,7 +28,7 @@ namespace Shiny.Push
 
         public async Task TryProcessIntent(Intent intent)
         {
-            // if activity equals click_action?
+            // if activity equals click_action? or if intent has a notificationId?
             // OnEntry will only be processed here
 
             Console.WriteLine("NativeAdapter.TryProcessIntent");
