@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Content;
@@ -29,12 +30,19 @@ namespace Shiny.Push
         public async Task TryProcessIntent(Intent intent)
         {
             // if activity equals click_action? or if intent has a notificationId?
-            // OnEntry will only be processed here
-
-            Console.WriteLine("NativeAdapter.TryProcessIntent");
-            //var pr = this.notifications.FromIntent(intent);
-            //if (pr != null && this.OnEntry != null)
-            //    await this.OnEntry.Invoke(pr.Value).ConfigureAwait(false);
+            if (intent != null && intent.HasExtra("google.message_id"))
+            {
+                var dict = new Dictionary<string, string>();
+                foreach (var key in intent.Extras!.KeySet()!)
+                {
+                    var value = intent.Extras.Get(key)?.ToString();
+                    if (value != null)
+                        dict.Add(key, value);
+                }
+                var push = new PushNotification(dict);
+                if (this.onEntry != null)
+                    await this.onEntry.Invoke(push).ConfigureAwait(false);
+            }
         }
 
 
