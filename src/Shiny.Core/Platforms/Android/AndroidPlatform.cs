@@ -106,10 +106,18 @@ namespace Shiny
         public string Model => B.Model;
 
         public void OnActivityResult(int requestCode, Result resultCode, Intent data) => this.activityResultSubject.OnNext((requestCode, resultCode, data));
-        public void OnNewIntent(Intent intent) => this.intentSubject.OnNext(intent);
+        //public void OnNewIntent(Intent intent) => this.intentSubject.OnNext(intent);
         public Application AppContext => this.app;
-        public IObservable<Intent> WhenIntentReceived() => this.intentSubject;
 
+
+        //public IObservable<Intent> WhenIntentReceived() => this.intentSubject;
+        public IObservable<Intent> WhenIntentReceived() => this.WhenActivityChanged()
+            .Where(x =>
+                x.Status == ActivityState.Resumed &&
+                x.Activity.Intent != null
+            )
+            .Select(x => x.Activity.Intent!);
+            
 
         public PlatformState Status { get; private set; } = PlatformState.Foreground;
 

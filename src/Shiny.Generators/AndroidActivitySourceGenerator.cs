@@ -74,7 +74,7 @@ namespace Shiny.Generators
                 using (builder.BlockInvariant($"public partial class {activity.Name}"))
                 {
                     this.TryAppendOnCreate(activity, builder);
-                    this.TryAppendOnResume(activity, builder);
+                    //this.TryAppendOnResume(activity, builder);
                     this.TryAppendNewIntent(activity, builder);
                     this.TryAppendActivityResult(activity, builder);
                     this.TryAppendRequestPermissionResult(activity, builder);
@@ -99,7 +99,7 @@ namespace Shiny.Generators
                 builder.AppendLineInvariant("partial void OnAfterCreate(Bundle savedInstanceState);");
                 using (builder.BlockInvariant("protected override void OnCreate(Bundle savedInstanceState)"))
                 {
-                    builder.AppendLineInvariant("this.ShinyOnCreate();");
+                    //builder.AppendLineInvariant("this.ShinyOnCreate();");
                     builder.AppendLineInvariant("this.OnBeforeCreate(savedInstanceState);");
                     this.TryAppendOnCreateThirdParty(activity, builder);
 

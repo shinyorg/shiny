@@ -194,11 +194,11 @@ namespace Shiny
         public static void ShinyOnCreate(this Application application, IShinyStartup? startup = null)
             => ShinyHost.Init(new AndroidPlatform(application), startup);
 
-        public static void ShinyOnCreate(this Activity activity)
-            => activity.ShinyOnNewIntent(activity.Intent);
+        //public static void ShinyOnCreate(this Activity activity)
+        //    => activity.ShinyOnNewIntent(activity.Intent);
 
-        public static void ShinyOnNewIntent(this Activity activity, Intent? intent)
-            => ShinyHost.Resolve<IPlatform>()?.OnNewIntent(intent);
+        //public static void ShinyOnNewIntent(this Activity activity, Intent? intent)
+        //    => ShinyHost.Resolve<IPlatform>()?.OnNewIntent(intent);
 
         //public static IObservable<(Result Result, Intent Data)> RequestActivityResult<TActivity>(this IAndroidContext context) where TActivity : Activity
         //    => context.RequestActivityResult((requestCode, activity) =>
