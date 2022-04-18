@@ -1,0 +1,11 @@
+﻿<Project Sdk="Xamarin.Legacy.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
+        <!--<TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);net6.0-ios;net6.0-android</TargetFrameworks>-->
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+    </ItemGroup>
+</Project>
