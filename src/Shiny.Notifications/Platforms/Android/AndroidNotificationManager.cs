@@ -7,9 +7,7 @@ using Android.Content;
 using Android.Graphics;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
-
 using Java.Lang;
-
 using Shiny.Infrastructure;
 
 

@@ -71,9 +71,7 @@ namespace Shiny.Notifications
 
         public async Task Clear()
         {
-            var channels = await this.repository
-                .GetChannels()
-                .ConfigureAwait(false);
+            var channels = await this.GetAll().ConfigureAwait(false);
 
             foreach (var channel in channels)
             {

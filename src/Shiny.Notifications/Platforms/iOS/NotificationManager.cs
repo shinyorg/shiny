@@ -18,23 +18,21 @@ namespace Shiny.Notifications
         /// This requires a special entitlement from Apple that is general disabled for anything but health & public safety alerts
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
+        
         readonly ShinyCoreServices services;
+        readonly IChannelManager channels;
 
 
-        public NotificationManager(ShinyCoreServices services)
+        public NotificationManager(ShinyCoreServices services, IChannelManager channels)
         {
             this.services = services;
+            this.channels = channels;
         }
 
 
         public void Start()
         {
-            this.services
-                .Repository
-                .GetChannels()
-                .ContinueWith(x =>
-                    this.SetChannels(x.Result.ToArray())
-                );
+            // TODO: channel manager on iOS needs to rebuild channels
 
             this.services.Lifecycle.RegisterForOnFinishedLaunching(options =>
             {
@@ -168,99 +166,6 @@ namespace Shiny.Notifications
         });
 
 
-        public Task<Channel?> GetChannel(string identifier)
-            => this.services.Repository.GetChannel(identifier);
-
-
-        public Task<IList<Channel>> GetChannels()
-            => this.services.Repository.GetChannels();
-
-
-        public async Task AddChannel(Channel channel)
-        {
-            channel.AssertValid();
-            await this.services.Repository.SetChannel(channel).ConfigureAwait(false);
-            await this.RebuildNativeCategories().ConfigureAwait(false);
-        }
-
-
-        public async Task RemoveChannel(string channelId)
-        {
-            await this.services.Repository.RemoveChannel(channelId).ConfigureAwait(false);
-            await this.RebuildNativeCategories().ConfigureAwait(false);
-        }
-
-
-        public Task ClearChannels() => this.services.Repository.RemoveAllChannels();
-
-
-        protected async Task RebuildNativeCategories()
-        {
-            var channels = await this.services
-                .Repository
-                .GetChannels()
-                .ConfigureAwait(false);
-
-            var list = channels.ToList();
-            list.Add(Channel.Default);
-
-            var categories = new List<UNNotificationCategory>();
-            foreach (var channel in list)
-            {
-                var actions = new List<UNNotificationAction>();
-                foreach (var action in channel.Actions)
-                {
-                    var nativeAction = this.CreateAction(action);
-                    actions.Add(nativeAction);
-                }
-
-                var native = UNNotificationCategory.FromIdentifier(
-                    channel.Identifier,
-                    actions.ToArray(),
-                    new string[] { "" },
-                    UNNotificationCategoryOptions.None
-                );
-                categories.Add(native);
-                await this.services
-                    .Repository
-                    .SetChannel(channel)
-                    .ConfigureAwait(false);
-            }
-            var set = new NSSet<UNNotificationCategory>(categories.ToArray());
-            UNUserNotificationCenter.Current.SetNotificationCategories(set);
-        }
-
-
-        protected virtual UNNotificationAction CreateAction(ChannelAction action) => action.ActionType switch
-        {
-            ChannelActionType.TextReply => UNTextInputNotificationAction.FromIdentifier(
-                action.Identifier,
-                action.Title,
-                UNNotificationActionOptions.None,
-                action.Title,
-                String.Empty
-            ),
-
-            ChannelActionType.Destructive => UNNotificationAction.FromIdentifier(
-                action.Identifier,
-                action.Title,
-                UNNotificationActionOptions.Destructive
-            ),
-
-            ChannelActionType.OpenApp => UNNotificationAction.FromIdentifier(
-                action.Identifier,
-                action.Title,
-                UNNotificationActionOptions.Foreground
-            ),
-
-            ChannelActionType.None => UNNotificationAction.FromIdentifier(
-                action.Identifier,
-                action.Title,
-                UNNotificationActionOptions.None
-            )
-        };
-
-
         protected virtual async Task<UNMutableNotificationContent> GetContent(Notification notification)
         {
             var content = new UNMutableNotificationContent
@@ -289,7 +194,7 @@ namespace Shiny.Notifications
 
             if (!notification.Channel.IsEmpty())
             {
-                channel = await this.services.Repository.GetChannel(notification.Channel!);
+                channel = await this.channels.Get(notification.Channel!);
                 if (channel == null)
                     throw new InvalidOperationException($"{notification.Channel} does not exist");
             }

@@ -1,4 +1,5 @@
-﻿<Project Sdk="Xamarin.Legacy.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+<!--<Project Sdk="Xamarin.Legacy.Sdk">-->
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
