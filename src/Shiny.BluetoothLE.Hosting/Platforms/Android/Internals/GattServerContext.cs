@@ -89,11 +89,13 @@ namespace Shiny.BluetoothLE.Hosting.Internals
         //}
 
 
-        //public event EventHandler<MtuChangedEventArgs> MtuChanged;
-        //public override void OnMtuChanged(BluetoothDevice peripheral, int mtu)
-        //{
-        //    this.MtuChanged?.Invoke(this, new MtuChangedEventArgs(peripheral, mtu));
-        //}
+        public Subject<MtuChangedEventArgs> MtuChanged { get; } = new Subject<MtuChangedEventArgs>();
+        public override void OnMtuChanged(BluetoothDevice peripheral, int mtu)
+        {
+            base.OnMtuChanged(peripheral, mtu);
+
+            this.MtuChanged.OnNext(new MtuChangedEventArgs(peripheral, mtu));
+        }
 
 
         //public override void OnServiceAdded(ProfileState status, BluetoothGattService service)

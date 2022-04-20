@@ -16,5 +16,6 @@ namespace Shiny.BluetoothLE.Hosting
         public string Uuid { get; }
         public CBCentral Central { get; }
         public object Context { get; set; }
+        public int Mtu => (int)this.Central.MaximumUpdateValueLength;
     }
 }

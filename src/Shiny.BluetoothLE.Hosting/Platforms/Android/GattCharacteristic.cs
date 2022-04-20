@@ -242,6 +242,23 @@ namespace Shiny.BluetoothLE.Hosting
         }
 
 
+        void SetupMtuChanged()
+        {
+            this.context
+                .MtuChanged
+                .Subscribe(ch =>
+                {
+                    if (this.subscribers.ContainsKey(ch.Device.Address))
+                    {
+                        var peripheral = this.subscribers[ch.Device.Address] as Peripheral;
+
+                        peripheral.UpdateMtuSize(ch.Mtu);
+                    }
+                })
+                .DisposedBy(this.disposer);
+        }
+
+
         IPeripheral GetOrAdd(BluetoothDevice native)
         {
             lock (this.subscribers)

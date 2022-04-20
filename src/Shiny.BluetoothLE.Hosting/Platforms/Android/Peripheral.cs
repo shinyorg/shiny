@@ -7,6 +7,7 @@ namespace Shiny.BluetoothLE.Hosting
 {
     public class Peripheral : IPeripheral
     {
+        int mtu = 20; // Default MTU size from BLE spec
         readonly Lazy<string> deviceUuidLazy;
 
 
@@ -33,5 +34,12 @@ namespace Shiny.BluetoothLE.Hosting
         public BluetoothDevice Native { get; }
         public string Uuid => this.deviceUuidLazy.Value;
         public object Context { get; set; }
+        public int Mtu => this.mtu;
+
+
+        public void UpdateMtuSize(int size)
+        {
+            this.mtu = size;
+        }
     }
 }
