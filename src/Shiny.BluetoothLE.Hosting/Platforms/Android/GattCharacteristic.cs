@@ -5,7 +5,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Android.Bluetooth;
-using Java.Util;
 using Shiny.BluetoothLE.Hosting.Internals;
 
 
@@ -158,8 +157,9 @@ namespace Shiny.BluetoothLE.Hosting
                             this.onSubscribe(new CharacteristicSubscription(this, peripheral, false));
                     }
                     else
+                    { 
                         respond = false;
-
+                    }
                     if (respond && x.ResponseNeeded)
                     {
                         this.context.Server.SendResponse(
@@ -246,14 +246,12 @@ namespace Shiny.BluetoothLE.Hosting
         {
             this.context
                 .MtuChanged
+                .Where(x => this.subscribers.ContainsKey(x.Device.Address))
                 .Subscribe(ch =>
                 {
-                    if (this.subscribers.ContainsKey(ch.Device.Address))
-                    {
-                        var peripheral = this.subscribers[ch.Device.Address] as Peripheral;
-
-                        peripheral.UpdateMtuSize(ch.Mtu);
-                    }
+                    var peripheral = this.subscribers[ch.Device.Address] as Peripheral;
+                    if (peripheral != null)
+                        peripheral.Mtu = ch.Mtu;
                 })
                 .DisposedBy(this.disposer);
         }
