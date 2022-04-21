@@ -40,14 +40,10 @@ namespace Shiny.BluetoothLE
                 foreach (CBUUID key in data.Keys)
                 {
                     var rawKey = key.Data.ToArray();
-                    var rawValue = ((NSData)data.ObjectForKey(key)).ToArray();
-
                     Array.Reverse(rawKey);
-                    var result = new byte[rawKey.Length + rawValue.Length];
-                    Buffer.BlockCopy(rawKey, 0, result, 0, rawKey.Length);
-                    Buffer.BlockCopy(rawValue, 0, result, rawKey.Length, rawValue.Length);
 
-                    list.Add(new AdvertisementServiceData(key.ToString(), result));
+                    var rawValue = ((NSData)data.ObjectForKey(key)).ToArray();
+                    list.Add(new AdvertisementServiceData(key.ToString(), rawValue));
                 }
                 return list.ToArray();
             });
