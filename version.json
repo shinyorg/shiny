@@ -6,7 +6,10 @@
         "precision": "revision"
     },
     "publicReleaseRefSpec": [
+        "^refs/heads/main$",
         "^refs/heads/master$",
-        "^refs/tags/v\\d+\\.\\d+"
+        "^refs/heads/preview$",
+        "^refs/tags/v\\d+\\.\\d+",
+        "^refs/tags/v\\d+\\.\\d+\\.\\d+"
     ]
 }
