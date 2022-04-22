@@ -5,16 +5,6 @@
     "assemblyVersion": {
         "precision": "revision"
     },
-    "nugetPackageVersion": {
-        "semVer": 2,
-        "precision": "revision"
-    },
-    "cloudBuild": {
-        "buildNumber": {
-            "enabled": true,
-            "setVersionVariables": true
-        }
-    },
     "publicReleaseRefSpec": [
         "^refs/heads/master$",
         "^refs/tags/v\\d+\\.\\d+"
