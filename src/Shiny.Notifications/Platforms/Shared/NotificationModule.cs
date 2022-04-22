@@ -54,9 +54,9 @@ namespace Shiny.Notifications
             base.OnContainerReady(services);
             if (this.channels?.Any() ?? false)
             {
-                //await services
-                //    .GetRequiredService<INotificationManager>()
-                //    .SetChannels(this.channels);
+                var manager = services.GetRequiredService<INotificationManager>();
+                foreach (var channel in this.channels)
+                    await manager.AddChannel(channel).ConfigureAwait(false);
             }
         }
     }

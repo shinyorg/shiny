@@ -45,7 +45,7 @@ namespace Shiny.Notifications
                 throw new ArgumentException("Channel identifier is required", nameof(channel.Identifier));
 
             if (channel.Actions != null)
-            { 
+            {
                 foreach (var action in channel.Actions)
                     action.AssertValid();
             }

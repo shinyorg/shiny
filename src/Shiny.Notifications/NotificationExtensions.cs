@@ -7,7 +7,6 @@ namespace Shiny.Notifications
 {
     public static class NotificationExtensions
     {
-        // TODO
         public static async Task<AccessState> RequestRequiredAccess(this INotificationManager notificationManager, Notification notification)
         {
             var request = AccessRequestFlags.Notification;
@@ -59,12 +58,6 @@ namespace Shiny.Notifications
             notification.RepeatInterval?.AssertValid();
             notification.Geofence?.AssertValid();
         }
-
-
-        public static void SetSoundFromEmbeddedResource(this Channel channel, Assembly assembly, string resourceName)
-            => channel.CustomSoundPath = ShinyHost
-                .Resolve<IPlatform>()
-                .ResourceToFilePath(assembly, resourceName);
 
 
         public static Task Send(this INotificationManager notifications, string title, string message, string? channel = null, DateTime? scheduleDate = null)
