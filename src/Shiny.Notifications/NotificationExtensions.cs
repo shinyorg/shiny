@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Shiny.Infrastructure;
 
 
 namespace Shiny.Notifications
@@ -15,13 +17,6 @@ namespace Shiny.Notifications
 
             if (!notification.Channel.IsEmpty())
             {
-                //var channel = await notificationManager
-                //    .GetChannel(notification.Channel!)
-                //    .ConfigureAwait(false);
-
-                //var high = (channel?.Importance ?? ChannelImportance.Low) >= ChannelImportance.High;
-
-                //if (notification.ScheduleDate != null && high)
                 if (notification.ScheduleDate != null)
                     request |= AccessRequestFlags.TimeSensitivity;
             }
@@ -70,46 +65,36 @@ namespace Shiny.Notifications
             });
 
 
-        //internal static async Task RemoveChannel(this IRepository repository, string channelId)
-        //{
-        //    await repository.Remove<Channel>(channelId);
-        //    var notifications = await repository.GetNotificationsByChannel(channelId);
-
-        //    foreach (var notification in notifications)
-        //    {
-        //        notification.Channel = null;
-        //        await repository.Set(notification.Id.ToString(), notification);
-        //    }
-        //}
+        internal static Task DeleteAllChannels(this INotificationManager notificationManager, IChannelManager channelManager) => Task.WhenAll(
+            notificationManager.Cancel(CancelScope.All),
+            channelManager.Clear()
+        );
 
 
-        //internal static async Task RemoveAllChannels(this IRepository repository)
-        //{
-        //    await repository.Clear<Channel>();
-        //    var notifications = await repository.GetList<Notification>(x => !x.Channel.IsEmpty());
+        internal static async Task DeleteChannel(this INotificationManager notificationManager, IChannelManager channelManager, string channelId)
+        {
+            await channelManager
+                .Remove(channelId)
+                .ConfigureAwait(false);
 
-        //    foreach (var notification in notifications)
-        //    {
-        //        notification.Channel = null;
-        //        await repository.Set(notification.Id.ToString(), notification);
-        //    }
-        //}
+            var pending = await notificationManager
+                .GetNotificationsByChannel(channelId)
+                .ConfigureAwait(false);
 
-
-        //internal static async Task RemoveChannelFromPendingNotificationsByChannel(this IRepository repository, string channelId)
-        //{
-        //    var notifications = await repository.GetNotificationsByChannel(channelId);
-        //    foreach (var notification in notifications)
-        //    {
-        //        notification.Channel = null;
-        //        await repository.Set(notification.Id.ToString(), notification);
-        //    }
-        //}
+            foreach (var notification in pending)
+                await notificationManager.Cancel(notification.Id).ConfigureAwait(false);
+        }
 
 
-        //internal static Task<IList<Notification>> GetNotificationsByChannel(this IRepository repository, string channelId)
-        //    => repository.GetList<Notification>(x =>
-        //         x.Channel != null && x.Channel.Equals(channelId, StringComparison.InvariantCultureIgnoreCase)
-        //    );
+        internal static async Task<IList<Notification>> GetNotificationsByChannel(this INotificationManager notificationManager, string channelId)
+        {
+            var pending = await notificationManager.GetPendingNotifications().ConfigureAwait(false);
+            return pending
+                .Where(x =>
+                    x.Channel != null &&
+                    x.Channel.Equals(channelId, StringComparison.InvariantCultureIgnoreCase)
+                )
+                .ToList();
+        }
     }
 }

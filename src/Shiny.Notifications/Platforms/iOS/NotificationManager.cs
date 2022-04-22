@@ -30,13 +30,6 @@ namespace Shiny.Notifications
         }
 
 
-        // added for backwards compat
-        public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
-        public Task RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
-        public Task ClearChannels() => this.channelManager.Clear();
-        public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
-
-
         public void Start()
         {
             this.services.Lifecycle.RegisterForOnFinishedLaunching(options =>
@@ -66,6 +59,12 @@ namespace Shiny.Notifications
                 }
             });
         }
+
+
+        public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
+        public Task RemoveChannel(string channelId) => this.DeleteChannel(this.channelManager, channelId);
+        public Task ClearChannels() => this.DeleteAllChannels(this.channelManager);
+        public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
 
 
         public Task<int> GetBadge() => this.services.Platform.InvokeOnMainThreadAsync<int>(() =>

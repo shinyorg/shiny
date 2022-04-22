@@ -16,14 +16,14 @@ namespace Shiny.Notifications
 
 
         /// <summary>
-        /// Remove a specific channel - any pending notifications on this channel will have the channel removed from them
+        /// Remove a specific channel - any pending notifications on this channel will also be removed
         /// </summary>
         /// <returns></returns>
         Task RemoveChannel(string channelId);
 
 
         /// <summary>
-        /// Removes all channels - this will remove all channels from all notifications
+        /// Removes all channels and any pending notifications
         /// </summary>
         /// <returns></returns>
         Task ClearChannels();

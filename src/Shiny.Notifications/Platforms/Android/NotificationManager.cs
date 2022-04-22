@@ -15,10 +15,12 @@ namespace Shiny.Notifications
         readonly IGeofenceManager geofenceManager;
 
 
-        public NotificationManager(ShinyCoreServices core,
-                                   AndroidNotificationManager manager,
-                                   IChannelManager channelManager,
-                                   IGeofenceManager geofenceManager)
+        public NotificationManager(
+            ShinyCoreServices core,
+            AndroidNotificationManager manager,
+            IChannelManager channelManager,
+            IGeofenceManager geofenceManager
+        )
         {
             this.core = core;
             this.manager = manager;
@@ -37,10 +39,9 @@ namespace Shiny.Notifications
         }
 
 
-        // added for backwards compat
         public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
-        public Task RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
-        public Task ClearChannels() => this.channelManager.Clear();
+        public Task RemoveChannel(string channelId) => this.DeleteChannel(this.channelManager, channelId);
+        public Task ClearChannels() => this.DeleteAllChannels(this.channelManager);
         public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
 
 
