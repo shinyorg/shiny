@@ -114,18 +114,18 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<Channel?> GetChannel(string identifier) => this.services.Repository.GetChannel(identifier);
-        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetChannels();
-        public Task AddChannel(Channel channel) => this.services.Repository.SetChannel(channel);
-        public Task RemoveChannel(string channelId) => this.services.Repository.RemoveChannel(channelId);
-        public Task ClearChannels() => this.services.Repository.RemoveAllChannels();
+        public Task<Channel?> GetChannel(string identifier) => this.services.Repository.Get<Channel>(identifier);
+        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetList<Channel>();
+        public Task AddChannel(Channel channel) => this.services.Repository.Set(channel.Identifier, channel);
+        public Task RemoveChannel(string channelId) => this.services.Repository.Remove<Channel>(channelId);
+        public Task ClearChannels() => this.services.Repository.Clear<Channel>();
 
 
         protected async Task TrySetChannel(Notification notification, ToastContentBuilder builder)
         {
             Channel? channel = null;
             if (!notification.Channel.IsEmpty())
-                channel = await this.services.Repository.GetChannel(notification.Channel);
+                channel = await this.GetChannel(notification.Channel!);
 
             channel ??= Channel.Default;
 
