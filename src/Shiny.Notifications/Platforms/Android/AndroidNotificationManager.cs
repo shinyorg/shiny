@@ -42,13 +42,13 @@ namespace Shiny.Notifications
 
         public virtual NotificationCompat.Builder CreateNativeBuilder(Notification notification, Channel channel)
         {
-            var builder = new NotificationCompat.Builder(this.Services.Platform.AppContext)
+            var builder = new NotificationCompat.Builder(this.Services.Platform.AppContext, channel.Identifier)
                 .SetContentTitle(notification.Title)
                 .SetSmallIcon(this.Services.Platform.GetSmallIconResource(notification.Android.SmallIconResourceName))
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
 
-            this.Services.Platform.TrySetImage(notification.ImageUri, builder);
+            //await this.Services.Platform.TrySetImage(notification.ImageUri, builder);
 
             if (!notification.Thread.IsEmpty())
                 builder.SetGroup(notification.Thread);
@@ -69,7 +69,7 @@ namespace Shiny.Notifications
 
             if (!notification.Android.ColorResourceName.IsEmpty())
             {
-                var color = this.Services.Platform.GetColorResourceId(notification.Android.ColorResourceName);
+                var color = this.Services.Platform.GetColorResourceId(notification.Android.ColorResourceName!);
                 builder.SetColor(color);
             }
 

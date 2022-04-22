@@ -16,13 +16,15 @@ namespace Shiny.Notifications
         readonly ShinyCoreServices services;
         readonly IJobManager jobManager;
         readonly BadgeUpdater badgeUpdater;
+        readonly IChannelManager channelManager;
 
 
-        public NotificationManager(ShinyCoreServices services, IJobManager jobManager)
+        public NotificationManager(ShinyCoreServices services, IJobManager jobManager, IChannelManager channelManager)
         {
             this.badgeUpdater = BadgeUpdateManager.CreateBadgeUpdaterForApplication();
             this.services = services;
             this.jobManager = jobManager;
+            this.channelManager = channelManager;
         }
 
 
@@ -114,11 +116,11 @@ namespace Shiny.Notifications
         }
 
 
-        public Task<Channel?> GetChannel(string identifier) => this.services.Repository.Get<Channel>(identifier);
-        public Task<IList<Channel>> GetChannels() => this.services.Repository.GetList<Channel>();
-        public Task AddChannel(Channel channel) => this.services.Repository.Set(channel.Identifier, channel);
-        public Task RemoveChannel(string channelId) => this.services.Repository.Remove<Channel>(channelId);
-        public Task ClearChannels() => this.services.Repository.Clear<Channel>();
+        public Task<Channel?> GetChannel(string identifier) => this.channelManager.Get(identifier);
+        public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
+        public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
+        public Task RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
+        public Task ClearChannels() => this.channelManager.Clear();
 
 
         protected async Task TrySetChannel(Notification notification, ToastContentBuilder builder)

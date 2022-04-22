@@ -25,18 +25,17 @@ namespace Shiny.Notifications
         public void Start()
         {
             this.logger.LogInformation("Starting iOS channel manager");
-            this.RebuildNativeCategories()
-                .ContinueWith(x =>
+            this.Add(Channel.Default).ContinueWith(x =>
+            {
+                if (x.IsFaulted)
                 {
-                    if (x.IsFaulted)
-                    {
-                        this.logger.LogError("Error rebuilding category catalog", x.Exception);
-                    }
-                    else
-                    {
-                        this.logger.LogInformation("iOS channel manager started");
-                    }
-                });
+                    this.logger.LogError("Failed to create default channel", x.Exception);
+                }
+                else
+                {
+                    this.logger.LogDebug("Channel manager initialized successfully");
+                }
+            });
         }
 
 
@@ -51,7 +50,9 @@ namespace Shiny.Notifications
         public async Task Clear()
         {
             await this.repository.Clear<Channel>().ConfigureAwait(false);
-            await this.RebuildNativeCategories().ConfigureAwait(false);
+
+            // there must always be a default
+            await this.Add(Channel.Default).ConfigureAwait(false);
         }
 
 
@@ -61,6 +62,8 @@ namespace Shiny.Notifications
 
         public async Task Remove(string channelId)
         {
+            this.AssertChannelRemove(channelId);
+
             await this.repository.Remove<Channel>(channelId).ConfigureAwait(false);
             await this.RebuildNativeCategories().ConfigureAwait(false);
         }
@@ -70,7 +73,6 @@ namespace Shiny.Notifications
         {
             var channels = await this.GetAll().ConfigureAwait(false);
             var list = channels.ToList();
-            list.Add(Channel.Default);
 
             var categories = new List<UNNotificationCategory>();
             foreach (var channel in list)

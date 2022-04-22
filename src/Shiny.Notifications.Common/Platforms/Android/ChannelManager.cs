@@ -4,28 +4,54 @@ using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Media;
+using Microsoft.Extensions.Logging;
 using Shiny.Infrastructure;
 
 
 namespace Shiny.Notifications
 {
-    public class ChannelManager : IChannelManager
+    public class ChannelManager : IChannelManager, IShinyStartupTask
     {
         readonly IRepository repository;
         readonly IPlatform platform;
+        readonly ILogger logger;
         readonly NotificationManager nativeManager;
 
 
-        public ChannelManager(IRepository repository, IPlatform platform)
+        public ChannelManager(
+            IRepository repository,
+            ILogger<ChannelManager> logger,
+            IPlatform platform
+        )
         {
             this.repository = repository;
+            this.logger = logger;
             this.platform = platform;
             this.nativeManager = platform.GetSystemService<NotificationManager>(Context.NotificationService);
+        }
+
+        public void Start()
+        {
+            this.logger.LogInformation("Initializing channel manager");
+
+            this.Add(Channel.Default).ContinueWith(x =>
+            {
+                if (x.IsFaulted)
+                {
+                    this.logger.LogError("Failed to create default channel", x.Exception);
+                }
+                else
+                {
+                    this.logger.LogDebug("Channel manager initialized successfully");
+                }
+            });
         }
 
 
         public async Task Add(Channel channel)
         {
+            channel.AssertValid();
+
             var native = new NotificationChannel(
                 channel.Identifier,
                 channel.Description ?? channel.Identifier,
@@ -71,6 +97,7 @@ namespace Shiny.Notifications
                 native.SetSound(uri, attrBuilder.Build());
 
             this.nativeManager.CreateNotificationChannel(native);
+            await this.repository.Set(channel.Identifier, channel);
         }
 
 
@@ -83,6 +110,8 @@ namespace Shiny.Notifications
             await this.repository
                 .Clear<Channel>()
                 .ConfigureAwait(false);
+
+            await this.Add(Channel.Default).ConfigureAwait(false);
         }
 
 
@@ -90,6 +119,8 @@ namespace Shiny.Notifications
         public Task<IList<Channel>> GetAll() => this.repository.GetList<Channel>();
         public Task Remove(string channelId)
         {
+            this.AssertChannelRemove(channelId);
+
             this.nativeManager.DeleteNotificationChannel(channelId);
             return this.repository.Remove<Channel>(channelId);
         }

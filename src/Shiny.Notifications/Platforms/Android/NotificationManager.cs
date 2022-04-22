@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
@@ -105,9 +106,11 @@ namespace Shiny.Notifications
             if (notification.Id == 0)
                 notification.Id = this.core.Settings.IncrementValue("NotificationId");
 
-            // this is here to cause validation of the settings before firing or scheduling
-            var channel = await this.channelManager.Get(notification.Channel);
-            var builder = this.manager.CreateNativeBuilder(notification, channel);
+            var channel = await this.channelManager.Get(notification.Channel ?? Channel.Default.Identifier);
+            if (channel == null)
+                throw new InvalidProgramException("There is no default channel!!");
+
+            var builder = this.manager.CreateNativeBuilder(notification, channel!);
 
             if (notification.Geofence != null)
             {
@@ -132,7 +135,7 @@ namespace Shiny.Notifications
             else
             {
                 // ensure a channel is set
-                notification.Channel = channel.Identifier;
+                notification.Channel = channel!.Identifier;
                 await this.core.Repository.Set(notification.Id.ToString(), notification);
 
                 if (notification.ScheduleDate != null)
