@@ -17,6 +17,7 @@
       "src\\Shiny.Net.Http\\Shiny.Net.Http.csproj",
       "src\\Shiny.Nfc\\Shiny.Nfc.csproj",
       "src\\Shiny.Notifications\\Shiny.Notifications.csproj",
+      "src\\Shiny.Notifications.Common\\Shiny.Notifications.Common.csproj",
       "src\\Shiny.Push.AzureNotificationHubs\\Shiny.Push.AzureNotificationHubs.csproj",
       "src\\Shiny.Push.Common\\Shiny.Push.Common.csproj",
       "src\\Shiny.Push.FirebaseMessaging\\Shiny.Push.FirebaseMessaging.csproj",
