@@ -17,18 +17,20 @@ namespace Shiny.Notifications
     {
         protected ShinyCoreServices Services { get; }
         public NotificationManagerCompat NativeManager { get; }
+        readonly IChannelManager channelManager;
 
 
-        public AndroidNotificationManager(ShinyCoreServices services)
+        public AndroidNotificationManager(ShinyCoreServices services, IChannelManager channelManager)
         {
             this.Services = services;
             this.NativeManager = NotificationManagerCompat.From(this.Services.Platform.AppContext);
+            this.channelManager = channelManager;
         }
 
 
         public virtual async Task Send(Notification notification)
         {
-            var channel = await this.Services.Repository.GetChannel(notification.Channel!);
+            var channel = await this.channelManager.Get(notification.Channel!);
             var builder = this.CreateNativeBuilder(notification, channel!);
             this.SendNative(notification.Id, builder.Build());
         }
@@ -42,9 +44,11 @@ namespace Shiny.Notifications
         {
             var builder = new NotificationCompat.Builder(this.Services.Platform.AppContext)
                 .SetContentTitle(notification.Title)
-                .SetSmallIcon(this.GetSmallIconResource(notification.Android.SmallIconResourceName))
+                .SetSmallIcon(this.Services.Platform.GetSmallIconResource(notification.Android.SmallIconResourceName))
                 .SetAutoCancel(notification.Android.AutoCancel)
                 .SetOngoing(notification.Android.OnGoing);
+
+            this.Services.Platform.TrySetImage(notification.ImageUri, builder);
 
             if (!notification.Thread.IsEmpty())
                 builder.SetGroup(notification.Thread);
@@ -61,11 +65,11 @@ namespace Shiny.Notifications
             else
                 builder.SetContentText(notification.Message);
 
-            this.TrySetLargeIconResource(notification, builder);
+            this.Services.Platform.TrySetLargeIconResource(notification.Android.LargeIconResourceName, builder);
 
             if (!notification.Android.ColorResourceName.IsEmpty())
             {
-                var color = this.GetColor(notification.Android.ColorResourceName);
+                var color = this.Services.Platform.GetColorResourceId(notification.Android.ColorResourceName);
                 builder.SetColor(color);
             }
 
@@ -179,7 +183,7 @@ namespace Shiny.Notifications
                     .Create(this.Services.Platform.AppContext)
                     .AddNextIntent(launchIntent)
                     .GetPendingIntent(
-                        notification.Id, 
+                        notification.Id,
                         (int)this.Services.Platform.GetPendingIntentFlags(PendingIntentFlags.OneShot)
                     );
             }
@@ -250,85 +254,5 @@ namespace Shiny.Notifications
 
         public virtual void SendNative(int id, Android.App.Notification notification)
             => this.NativeManager.Notify(id, notification);
-
-
-        // Construct a raw resource path of the form
-        // "android.resource://<PKG_NAME>/raw/<RES_NAME>", e.g.
-        // "android.resource://com.shiny.sample/raw/notification"
-        public virtual Android.Net.Uri GetSoundResourceUri(string soundResourceName)
-        {
-            // Strip file extension and leading slash from resource name to allow users
-            // to specify custom sounds like "notification.mp3" or "/raw/notification.mp3"
-            if (File.Exists(soundResourceName))
-                return Android.Net.Uri.Parse("file://" + soundResourceName)!;
-
-            soundResourceName = soundResourceName.TrimStart('/').Split('.').First();
-            var resourceId = this.Services.Platform.GetRawResourceIdByName(soundResourceName);
-            var resources = this.Services.Platform.AppContext.Resources;
-            return new Android.Net.Uri.Builder()
-                .Scheme(ContentResolver.SchemeAndroidResource)!
-                .Authority(resources.GetResourcePackageName(resourceId))!
-                .AppendPath(resources.GetResourceTypeName(resourceId))!
-                .AppendPath(resources.GetResourceEntryName(resourceId))!
-                .Build()!;
-        }
-
-
-        protected virtual int GetColor(string colorResourceName)
-        {
-            var colorResourceId = this.Services.Platform.GetColorByName(colorResourceName);
-            if (colorResourceId <= 0)
-                throw new ArgumentException($"Color ResourceId for {colorResourceName} not found");
-
-            return ContextCompat.GetColor(this.Services.Platform.AppContext, colorResourceId);
-        }
-
-
-        public virtual int GetSmallIconResource(string resourceName)
-        {
-            if (resourceName.IsEmpty())
-            {
-                var id = this.Services.Platform.GetResourceIdByName("notification");
-                if (id > 0)
-                    return id;
-
-                return this.Services.Platform.AppContext.ApplicationInfo.Icon;
-            }
-            var smallIconResourceId = this.Services.Platform.GetResourceIdByName(resourceName);
-            if (smallIconResourceId <= 0)
-                throw new ArgumentException($"Icon ResourceId for {resourceName} not found");
-
-            return smallIconResourceId;
-        }
-
-
-        protected virtual void TrySetLargeIconResource(Notification notification, NotificationCompat.Builder builder)
-        {
-            if (notification.Android.LargeIconResourceName.IsEmpty())
-                return;
-
-            var iconId = this.Services.Platform.GetResourceIdByName(notification.Android.LargeIconResourceName);
-            if (iconId > 0)
-                builder.SetLargeIcon(BitmapFactory.DecodeResource(this.Services.Platform.AppContext.Resources, iconId));
-        }
-
-
-        //protected virtual void SetAlarm(Notification notification)
-        //{
-        //    var date = notification.ScheduleDate.Value.LocalDateTime;
-        //    var intent = this.services.Android.CreateIntent<ShinyNotificationBroadcastReceiver>(ShinyNotificationBroadcastReceiver.AlarmIntentAction);
-        //    intent.PutExtra("NotificationId", notification.Id);
-
-        //    var calendar = Calendar.GetInstance((Android.Icu.Util.TimeZone)null)!;
-        //    calendar.Set(date.Year, date.Month, date.Day, date.Hour, date.Minute);
-
-        //    var pendingIntent = PendingIntent.GetBroadcast(this.services.Android.AppContext, 0, intent, PendingIntentFlags.OneShot);
-        //    AlarmManagerCompat.SetExactAndAllowWhileIdle(
-        //        this.services.Android.GetSystemService<AlarmManager>(Context.AlarmService),
-        //        (int)AlarmType.RtcWakeup,
-        //        calendar.TimeInMillis,
-        //        pendingIntent
-        //    );
-        //}
     }
 }

@@ -4,6 +4,9 @@ using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
+
+using Microsoft.Extensions.Logging;
+
 using Shiny.Push.Infrastructure;
 using UIKit;
 using UserNotifications;
@@ -14,12 +17,18 @@ namespace Shiny.Push
     public class NativeAdapter : INativeAdapter
     {
         readonly AppleLifecycle lifecycle;
+        readonly ILogger logger;
         readonly IPlatform platform;
 
 
-        public NativeAdapter(IPlatform platform, AppleLifecycle lifecycle)
+        public NativeAdapter(
+            IPlatform platform,
+            ILogger<NativeAdapter> logger,
+            AppleLifecycle lifecycle
+        )
         {
             this.platform = platform;
+            this.logger = logger;
             this.lifecycle = lifecycle;
         }
 
@@ -71,8 +80,9 @@ namespace Shiny.Push
                     {
                         if (options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
                         {
+                            this.logger.LogDebug("App entry remote notification detected");
                             var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
-                            var dict = data?.FromNsDictionary();
+                            var dict = data?.FromNsDictionary() ?? new Dictionary<string, string>(0);
                             var push = new PushNotification(dict);
                             await this.onEntry.Invoke(push).ConfigureAwait(false);
                         }
@@ -82,14 +92,9 @@ namespace Shiny.Push
                     {
                         if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                         {
+                            this.logger.LogDebug("Foreground remote notification entry detected");
                             var dict = response.Notification.Request.Content.UserInfo.FromNsDictionary();
                             var data = new PushNotification(dict);
-                            //var shiny = response.FromNative();
-                            //var pr = new PushNotificationResponse(
-                            //    shiny.Notification,
-                            //    shiny.ActionIdentifier,
-                            //    shiny.Text
-                            //);
                             await this.onEntry.Invoke(data).ConfigureAwait(false);
                         }
                     }));

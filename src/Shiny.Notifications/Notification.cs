@@ -67,5 +67,10 @@ namespace Shiny.Notifications
         /// Set the repeating interval (cannot be mixed with geofence or schedule date)
         /// </summary>
         public IntervalTrigger? RepeatInterval { get; set; }
+
+        /// <summary>
+        /// Set an image uri for iOS attachment or Android bigpicture style
+        /// </summary>
+        public string? ImageUri { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.App;
+using Android.Content;
 using Android.Media;
 using Shiny.Infrastructure;
 
@@ -11,11 +12,15 @@ namespace Shiny.Notifications
     public class ChannelManager : IChannelManager
     {
         readonly IRepository repository;
+        readonly IPlatform platform;
+        readonly NotificationManager nativeManager;
 
 
-        public ChannelManager(IRepository repository)
+        public ChannelManager(IRepository repository, IPlatform platform)
         {
             this.repository = repository;
+            this.platform = platform;
+            this.nativeManager = platform.GetSystemService<NotificationManager>(Context.NotificationService);
         }
 
 
@@ -36,8 +41,8 @@ namespace Shiny.Notifications
             var attrBuilder = new AudioAttributes.Builder();
 
             Android.Net.Uri? uri = null;
-            //if (!channel.CustomSoundPath.IsEmpty())
-            //    uri = this.manager.GetSoundResourceUri(channel.CustomSoundPath!);
+            if (!channel.CustomSoundPath.IsEmpty())
+                uri = this.platform.GetSoundResourceUri(channel.CustomSoundPath!);
 
             switch (channel.Importance)
             {
@@ -65,18 +70,16 @@ namespace Shiny.Notifications
             if (uri != null)
                 native.SetSound(uri, attrBuilder.Build());
 
-            //    this.manager.NativeManager.CreateNotificationChannel(native);
+            this.nativeManager.CreateNotificationChannel(native);
         }
 
 
         public async Task Clear()
         {
             var channels = await this.GetAll().ConfigureAwait(false);
-
             foreach (var channel in channels)
-            {
+                this.nativeManager.DeleteNotificationChannel(channel.Identifier);
 
-            }
             await this.repository
                 .Clear<Channel>()
                 .ConfigureAwait(false);
@@ -85,10 +88,10 @@ namespace Shiny.Notifications
 
         public Task<Channel?> Get(string channelId) => this.repository.Get<Channel>(channelId);
         public Task<IList<Channel>> GetAll() => this.repository.GetList<Channel>();
-        public async Task Remove(string channelId)
+        public Task Remove(string channelId)
         {
-            //    this.manager.NativeManager.DeleteNotificationChannel(channelId);
-            //    return this.core.Repository.RemoveChannel(channelId);
+            this.nativeManager.DeleteNotificationChannel(channelId);
+            return this.repository.Remove<Channel>(channelId);
         }
     }
 }

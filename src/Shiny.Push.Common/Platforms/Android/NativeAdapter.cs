@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
 using Android.Runtime;
+using AndroidX.Core.App;
 using Firebase;
 using Firebase.Messaging;
+using Microsoft.Extensions.Logging;
+using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
 
 
@@ -14,15 +18,17 @@ namespace Shiny.Push
 {
     public class NativeAdapter : INativeAdapter
     {
-        readonly IPlatform context;
+        readonly IPlatform platform;
         readonly FirebaseConfig? config;
+        readonly ILogger logger;
 
 
-        public NativeAdapter(IPlatform context, FirebaseConfig? config = null)
+        public NativeAdapter(IPlatform platform, ILogger<NativeAdapter> logger, FirebaseConfig? config = null)
         {
             config?.AssertValid();
 
-            this.context = context;
+            this.platform = platform;
+            this.logger = logger;
             this.config = config;
         }
 
@@ -32,16 +38,32 @@ namespace Shiny.Push
             // if activity equals click_action? or if intent has a notificationId?
             if (intent != null && intent.HasExtra("google.message_id"))
             {
-                var dict = new Dictionary<string, string>();
-                foreach (var key in intent.Extras!.KeySet()!)
+                this.logger.LogDebug("Detected incoming remote notification intent");
+
+                if (this.onEntry == null)
                 {
-                    var value = intent.Extras.Get(key)?.ToString();
-                    if (value != null)
-                        dict.Add(key, value);
+                    this.logger.LogWarning("OnEntry is not hooked");
                 }
-                var push = new PushNotification(dict);
-                if (this.onEntry != null)
-                    await this.onEntry.Invoke(push).ConfigureAwait(false);
+                else
+                {
+                    try
+                    {
+                        var dict = new Dictionary<string, string>();
+                        foreach (var key in intent.Extras!.KeySet()!)
+                        {
+                            var value = intent.Extras.Get(key)?.ToString();
+                            if (value != null)
+                                dict.Add(key, value);
+                        }
+                        var push = new PushNotification(dict);
+
+                        await this.onEntry.Invoke(push).ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError("Error processing onEntry", ex);
+                    }
+                }
             }
         }
 
@@ -61,35 +83,9 @@ namespace Shiny.Push
                 {
                     ShinyFirebaseService.MessageReceived = async msg =>
                     {
-                        //Notification? notification = null;
-                        //var native = msg.GetNotification();
-                        //if (native != null)
-                        //{
-                        //}
-                        // TODO: I have to send the notification here if in the foreground
-                        //if (native != null)
-                        //{
-                        //    notification = new Notification
-                        //    {
-                        //        Title = native.Title,
-                        //        Message = native.Body,
-                        //        Channel = native.ChannelId
-                        //    };
-                        //    if (!native.Icon.IsEmpty())
-                        //        notification.Android.SmallIconResourceName = native.Icon;
-
-                            //    if (!native.Color.IsEmpty())
-                            //        notification.Android.ColorResourceName = native.Color;
-                        //}
+                        this.TryTriggerNotification(msg);
                         var push = new PushNotification(msg.Data);
                         await this.onReceived.Invoke(push).ConfigureAwait(false);
-                        // stop sending this for now
-                        //if (pr.Notification != null)
-                        //{
-                        //    // TODO: channel
-                        //var nn = this.notifications.CreateNativeNotification(pr.Notification, null);
-                        //    this.notifications.SendNative(0, nn);
-                        //}
                     };
                 }
             }
@@ -110,7 +106,7 @@ namespace Shiny.Push
                 }
                 else
                 {
-                    this.onEntrySub = this.context
+                    this.onEntrySub = this.platform
                         .WhenIntentReceived()
                         .SubscribeAsync(intent => this.TryProcessIntent(intent));
                 }
@@ -141,10 +137,10 @@ namespace Shiny.Push
         public async Task<PushAccessState> RequestAccess()
         {
             if (!this.initialized)
-            { 
+            {
                 if (this.config == null)
                 {
-                    FirebaseApp.InitializeApp(this.context.AppContext);
+                    FirebaseApp.InitializeApp(this.platform.AppContext);
                     if (FirebaseApp.Instance == null)
                         throw new InvalidOperationException("Firebase did not initialize.  Ensure your google.services.json is property setup.  Install the nuget package `Xamarin.GooglePlayServices.Tasks` into your Android head project, restart visual studio, and then set your google-services.json to GoogleServicesJson");
                 }
@@ -157,7 +153,7 @@ namespace Shiny.Push
                         .SetGcmSenderId(this.config.SenderId)
                         .Build();
 
-                    FirebaseApp.InitializeApp(this.context.AppContext, options);
+                    FirebaseApp.InitializeApp(this.platform.AppContext, options);
                 }
                 this.initialized = true;
             }
@@ -168,5 +164,44 @@ namespace Shiny.Push
 
 
         public Task UnRegister() => Task.Run(() => FirebaseMessaging.Instance.DeleteToken());
+
+
+        protected virtual void TryTriggerNotification(RemoteMessage message)
+        {
+            try
+            {
+                var notification = message.GetNotification();
+                if (notification == null)
+                    return;
+
+                var notificationId = Int32.Parse(message.MessageId);
+                var builder = new NotificationCompat.Builder(this.platform.AppContext, notification.ChannelId)
+                    .SetContentTitle(notification.Title);
+
+                if (!notification.Icon.IsEmpty())
+                    builder.SetSmallIcon(this.platform.GetSmallIconResource(notification.Icon));
+
+                if (!notification.Ticker.IsEmpty())
+                    builder.SetTicker(notification.Ticker);
+
+                if (!notification.Body.IsEmpty())
+                    builder.SetContentText(notification.Body);
+
+                this.platform.TrySetImage(notification.ImageUrl, builder);
+
+                if (!notification.Color.IsEmpty())
+                {
+                    var color = this.platform.GetColorResourceId(notification.Color);
+                    builder.SetColor(color);
+                }
+                this.platform
+                    .GetSystemService<NotificationManager>(Context.NotificationService)
+                    .Notify(notificationId, builder.Build());
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError("Error processing foreground remote notification", ex);
+            }
+        }
     }
 }

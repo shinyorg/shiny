@@ -24,9 +24,9 @@ namespace Shiny.Notifications
 
 
         public AndroidNotificationProcessor(AndroidNotificationManager notificationManager,
-                                            IGeofenceManager geofenceManager, 
+                                            IGeofenceManager geofenceManager,
                                             IRepository repository,
-                                            ISerializer serializer, 
+                                            ISerializer serializer,
                                             IEnumerable<INotificationDelegate> delegates)
         {
             this.notificationManager = notificationManager;
@@ -108,7 +108,7 @@ namespace Shiny.Notifications
             {
                 var notification = await this.repository.Get<Notification>(id.ToString()).ConfigureAwait(false);
                 if (notification != null)
-                { 
+                {
                     await this.notificationManager.Send(notification).ConfigureAwait(false);
                     await this.DeleteOrReschedule(notification).ConfigureAwait(false);
                 }

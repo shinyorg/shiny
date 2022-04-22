@@ -9,16 +9,19 @@ namespace Shiny.Notifications
     public partial class NotificationManager : INotificationManager
     {
         readonly ShinyCoreServices core;
+        readonly IChannelManager channelManager;
         readonly AndroidNotificationManager manager;
         readonly IGeofenceManager geofenceManager;
 
 
         public NotificationManager(ShinyCoreServices core,
                                    AndroidNotificationManager manager,
+                                   IChannelManager channelManager,
                                    IGeofenceManager geofenceManager)
         {
             this.core = core;
             this.manager = manager;
+            this.channelManager = channelManager;
             this.geofenceManager = geofenceManager;
 
             this.core
@@ -31,6 +34,13 @@ namespace Shiny.Notifications
                     .TryProcessIntent(x)
                 );
         }
+
+
+        // added for backwards compat
+        public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
+        public Task RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
+        public Task ClearChannels() => this.channelManager.Clear();
+        public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
 
 
         public async Task Cancel(int id)
@@ -47,15 +57,15 @@ namespace Shiny.Notifications
         public async Task Cancel(CancelScope scope = CancelScope.All)
         {
             if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
-            { 
+            {
                 this.manager.NativeManager.CancelAll();
             }
             if (scope == CancelScope.All || scope == CancelScope.Pending)
-            { 
+            {
                 var notifications = await this.core.Repository.GetList<Notification>();
-                foreach (var notification in notifications) 
+                foreach (var notification in notifications)
                     await this.CancelInternal(notification);
-            
+
                 await this.core.Repository.Clear<Notification>();
             }
         }
@@ -73,7 +83,7 @@ namespace Shiny.Notifications
         {
             if (!this.manager.NativeManager.AreNotificationsEnabled())
                 return AccessState.Disabled;
-            
+
             if (access.HasFlag(AccessRequestFlags.LocationAware))
             {
                 var locPermission = await this.geofenceManager.RequestAccess();
@@ -96,7 +106,7 @@ namespace Shiny.Notifications
                 notification.Id = this.core.Settings.IncrementValue("NotificationId");
 
             // this is here to cause validation of the settings before firing or scheduling
-            var channel = await this.GetChannel(notification);
+            var channel = await this.channelManager.Get(notification.Channel);
             var builder = this.manager.CreateNativeBuilder(notification, channel);
 
             if (notification.Geofence != null)
@@ -112,7 +122,7 @@ namespace Shiny.Notifications
                 // calc first date if repeating interval
                 notification.ScheduleDate = notification.RepeatInterval!.CalculateNextAlarm();
             }
-            
+
             if (notification.ScheduleDate == null && notification.Geofence == null)
             {
                 this.manager.SendNative(notification.Id, builder.Build());
@@ -120,7 +130,7 @@ namespace Shiny.Notifications
                     this.core.SetBadgeCount(notification.BadgeCount.Value);
             }
             else
-            {                
+            {
                 // ensure a channel is set
                 notification.Channel = channel.Identifier;
                 await this.core.Repository.Set(notification.Id.ToString(), notification);
@@ -151,7 +161,7 @@ namespace Shiny.Notifications
             }
             if (notification.ScheduleDate != null || notification.RepeatInterval != null)
                 this.manager.CancelAlarm(notification);
-            
+
             this.manager.NativeManager.Cancel(notification.Id);
         }
     }

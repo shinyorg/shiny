@@ -18,27 +18,37 @@ namespace Shiny.Notifications
         /// This requires a special entitlement from Apple that is general disabled for anything but health & public safety alerts
         /// </summary>
         public static bool UseCriticalAlerts { get; set; }
-        
+
         readonly ShinyCoreServices services;
-        readonly IChannelManager channels;
+        readonly IChannelManager channelManager;
 
 
-        public NotificationManager(ShinyCoreServices services, IChannelManager channels)
+        public NotificationManager(ShinyCoreServices services, IChannelManager channelManager)
         {
             this.services = services;
-            this.channels = channels;
+            this.channelManager = channelManager;
         }
+
+
+        // added for backwards compat
+        public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
+        public Task RemoveChannel(string channelId) => this.channelManager.Remove(channelId);
+        public Task ClearChannels() => this.channelManager.Clear();
+        public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
 
 
         public void Start()
         {
-            // TODO: channel manager on iOS needs to rebuild channels
-
             this.services.Lifecycle.RegisterForOnFinishedLaunching(options =>
             {
                 if (options.ContainsKey(UIApplication.LaunchOptionsLocalNotificationKey))
                 {
                     var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
+                    if (data != null)
+                    {
+                        // TODO: need to parse this back into a notification
+                        data.FromNsDictionary();
+                    }
                 }
             });
 
@@ -173,7 +183,12 @@ namespace Shiny.Notifications
                 Title = notification.Title,
                 Body = notification.Message
             };
-
+            if (!notification.ImageUri.IsEmpty())
+            {
+                var imageUri = NSUrl.FromString(notification.ImageUri!);
+                var attachment = UNNotificationAttachment.FromIdentifier("image", imageUri, new UNNotificationAttachmentOptions(), out var _);
+                content.Attachments = new [] { attachment };
+            }
             if (!notification.Thread.IsEmpty())
                 content.ThreadIdentifier = notification.Thread!;
 
@@ -194,14 +209,14 @@ namespace Shiny.Notifications
 
             if (!notification.Channel.IsEmpty())
             {
-                channel = await this.channels.Get(notification.Channel!);
+                channel = await this.channelManager.Get(notification.Channel!);
                 if (channel == null)
                     throw new InvalidOperationException($"{notification.Channel} does not exist");
             }
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(15, 0))
             {
-                native.InterruptionLevel = channel.Importance switch 
+                native.InterruptionLevel = channel.Importance switch
                 {
                     ChannelImportance.Low => UNNotificationInterruptionLevel.Passive,
                     ChannelImportance.High => UNNotificationInterruptionLevel.TimeSensitive,
@@ -301,7 +316,7 @@ namespace Shiny.Notifications
                     trigger = UNCalendarNotificationTrigger.CreateTrigger(component, true);
                 }
             }
-            
+
             return trigger;
         }
     }

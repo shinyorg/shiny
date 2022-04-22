@@ -5,15 +5,39 @@ using System.Threading.Tasks;
 using Shiny.Infrastructure;
 using Foundation;
 using UserNotifications;
-
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Notifications
 {
-    public class ChannelManager : IChannelManager
+    public class ChannelManager : IChannelManager, IShinyStartupTask
     {
         readonly IRepository repository;
-        public ChannelManager(IRepository repository)
-            => this.repository = repository;
+        readonly ILogger<ChannelManager> logger;
+
+
+        public ChannelManager(IRepository repository, ILogger<ChannelManager> logger)
+        {
+            this.repository = repository;
+            this.logger = logger;
+        }
+
+
+        public void Start()
+        {
+            this.logger.LogInformation("Starting iOS channel manager");
+            this.RebuildNativeCategories()
+                .ContinueWith(x =>
+                {
+                    if (x.IsFaulted)
+                    {
+                        this.logger.LogError("Error rebuilding category catalog", x.Exception);
+                    }
+                    else
+                    {
+                        this.logger.LogInformation("iOS channel manager started");
+                    }
+                });
+        }
 
 
         public async Task Add(Channel channel)
@@ -24,7 +48,7 @@ namespace Shiny.Notifications
         }
 
 
-        public async Task Clear() 
+        public async Task Clear()
         {
             await this.repository.Clear<Channel>().ConfigureAwait(false);
             await this.RebuildNativeCategories().ConfigureAwait(false);
@@ -97,7 +121,9 @@ namespace Shiny.Notifications
                 action.Identifier,
                 action.Title,
                 UNNotificationActionOptions.None
-            )
+            ),
+
+            _ => throw new InvalidOperationException("Invalid action type")
         };
     }
 }

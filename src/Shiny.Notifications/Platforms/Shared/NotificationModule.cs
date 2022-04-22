@@ -36,6 +36,9 @@ namespace Shiny.Notifications
                 services.AddSingleton(typeof(INotificationDelegate), this.delegateType);
 
             services.TryAddSingleton<INotificationManager, NotificationManager>();
+#if __ANDROID__ || __IOS__
+            services.AddChannelManager();
+#endif
 #if __ANDROID__
             services.UseGeofencing<NotificationGeofenceDelegate>();
             services.TryAddSingleton<AndroidNotificationProcessor>();
@@ -51,11 +54,10 @@ namespace Shiny.Notifications
             base.OnContainerReady(services);
             if (this.channels?.Any() ?? false)
             {
-                await services
-                    .GetRequiredService<INotificationManager>()
-                    .SetChannels(this.channels);
+                //await services
+                //    .GetRequiredService<INotificationManager>()
+                //    .SetChannels(this.channels);
             }
-
         }
     }
 }
