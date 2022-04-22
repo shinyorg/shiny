@@ -187,7 +187,7 @@ namespace Shiny.Push
                 if (!notification.Body.IsEmpty())
                     builder.SetContentText(notification.Body);
 
-                this.platform.TrySetImage(notification.ImageUrl, builder);
+                //this.platform.TrySetImage(notification.ImageUrl?.ToString(), builder);
 
                 if (!notification.Color.IsEmpty())
                 {
