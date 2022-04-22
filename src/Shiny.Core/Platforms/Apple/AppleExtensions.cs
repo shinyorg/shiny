@@ -24,7 +24,7 @@ namespace Shiny
                 selector += ":";
 
             return UIApplication.SharedApplication.RespondsToSelector(new Selector(selector));
-       }
+        }
 
 
         public static void AssertAppDelegateHook(string selector, string message)
@@ -118,7 +118,7 @@ namespace Shiny
 
 
         public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null, NSDictionary? options = null)
-        { 
+        {
             ShinyHost.Init(new ApplePlatform(), startup);
             if (options != null)
                 ShinyHost.Resolve<AppleLifecycle>().OnFinishedLaunching(options);
