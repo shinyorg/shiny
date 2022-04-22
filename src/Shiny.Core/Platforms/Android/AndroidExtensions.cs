@@ -147,7 +147,7 @@ namespace Shiny
         {
             var list = new List<string>();
             foreach (var p in androidPermissions)
-            { 
+            {
                 var meetsMin = p.MinSdkVersion == null || (int)Android.OS.Build.VERSION.SdkInt >= p.MinSdkVersion;
                 var meetsMax = p.MaxSdkVersion == null || (int)Android.OS.Build.VERSION.SdkInt <= p.MaxSdkVersion;
 
