@@ -66,9 +66,13 @@ namespace Shiny.Notifications
             {
                 var notifications = await this.core.Repository.GetList<Notification>();
                 foreach (var notification in notifications)
-                    await this.CancelInternal(notification);
-
-                await this.core.Repository.Clear<Notification>();
+                {
+                    await this.CancelInternal(notification).ConfigureAwait(false);
+                }
+                await this.core
+                    .Repository
+                    .Clear<Notification>()
+                    .ConfigureAwait(false);
             }
         }
 
