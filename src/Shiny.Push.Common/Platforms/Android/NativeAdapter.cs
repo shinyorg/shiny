@@ -193,6 +193,7 @@ namespace Shiny.Push
                         this.platform.AppContext,
                         notification.ChannelId ?? Channel.Default.Identifier
                     )
+                    .SetAutoCancel(true)
                     .SetSmallIcon(this.platform.GetSmallIconResource(notification.Icon))
                     .SetContentTitle(notification.Title);
 
@@ -202,7 +203,7 @@ namespace Shiny.Push
                 if (!notification.Body.IsEmpty())
                     builder.SetContentText(notification.Body);
 
-                this.platform.TrySetImage(notification.ImageUrl, builder);
+                //this.platform.TrySetImage(notification.ImageUrl, builder);
 
                 if (!notification.Color.IsEmpty())
                 {
