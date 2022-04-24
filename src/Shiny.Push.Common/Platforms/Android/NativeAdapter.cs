@@ -2,16 +2,22 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
 using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
 using Android.Runtime;
+
 using AndroidX.Core.App;
+
 using Firebase;
 using Firebase.Messaging;
+
 using Microsoft.Extensions.Logging;
+
 using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
+using Shiny.Stores;
 
 
 namespace Shiny.Push
@@ -19,16 +25,24 @@ namespace Shiny.Push
     public class NativeAdapter : INativeAdapter
     {
         readonly IPlatform platform;
-        readonly FirebaseConfig? config;
         readonly ILogger logger;
+        readonly IKeyValueStore settings;
+        readonly FirebaseConfig? config;
 
 
-        public NativeAdapter(IPlatform platform, ILogger<NativeAdapter> logger, FirebaseConfig? config = null)
+
+        public NativeAdapter(
+            IPlatform platform,
+            ILogger<NativeAdapter> logger,
+            IKeyValueStore settings,
+            FirebaseConfig? config = null
+        )
         {
             config?.AssertValid();
 
             this.platform = platform;
             this.logger = logger;
+            this.settings = settings;
             this.config = config;
         }
 
@@ -174,12 +188,13 @@ namespace Shiny.Push
                 if (notification == null)
                     return;
 
-                var notificationId = Int32.Parse(message.MessageId);
-                var builder = new NotificationCompat.Builder(this.platform.AppContext, notification.ChannelId)
+                var builder = new NotificationCompat
+                    .Builder(
+                        this.platform.AppContext,
+                        notification.ChannelId ?? Channel.Default.Identifier
+                    )
+                    .SetSmallIcon(this.platform.GetSmallIconResource(notification.Icon))
                     .SetContentTitle(notification.Title);
-
-                if (!notification.Icon.IsEmpty())
-                    builder.SetSmallIcon(this.platform.GetSmallIconResource(notification.Icon));
 
                 if (!notification.Ticker.IsEmpty())
                     builder.SetTicker(notification.Ticker);
@@ -187,13 +202,15 @@ namespace Shiny.Push
                 if (!notification.Body.IsEmpty())
                     builder.SetContentText(notification.Body);
 
-                //this.platform.TrySetImage(notification.ImageUrl?.ToString(), builder);
+                this.platform.TrySetImage(notification.ImageUrl, builder);
 
                 if (!notification.Color.IsEmpty())
                 {
                     var color = this.platform.GetColorResourceId(notification.Color);
                     builder.SetColor(color);
                 }
+
+                var notificationId = this.settings.IncrementValue("NotificationId");
                 this.platform
                     .GetSystemService<NotificationManager>(Context.NotificationService)
                     .Notify(notificationId, builder.Build());

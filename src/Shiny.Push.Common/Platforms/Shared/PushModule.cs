@@ -2,6 +2,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
 
 
@@ -22,6 +23,7 @@ namespace Shiny.Push
 
         public override void Register(IServiceCollection services)
         {
+            services.AddChannelManager();
 #if XAMARIN_IOS
             // TODO: can I hook these differently dynamically with selector?
 
