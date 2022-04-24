@@ -48,7 +48,7 @@ namespace Shiny.Push
 
         public async Task TryProcessIntent(Intent intent)
         {
-            if (intent?.Action?.Equals(Constants.ShinyIntentClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false)
+            if (intent?.Action?.Equals(ShinyIntents.NotificationClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false)
             {
                 this.logger.LogDebug("Detected incoming remote notification intent");
 
@@ -188,7 +188,7 @@ namespace Shiny.Push
                 if (notification == null)
                     return;
 
-                var intent = new Intent(notification.ClickAction ?? Constants.ShinyIntentClickAction);
+                var intent = new Intent(notification.ClickAction ?? ShinyIntents.NotificationClickAction);
                 if (message.Data != null)
                 {
                     foreach (var data in message.Data)
