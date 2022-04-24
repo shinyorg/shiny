@@ -30,7 +30,6 @@ namespace Shiny.Push
         readonly FirebaseConfig? config;
 
 
-
         public NativeAdapter(
             IPlatform platform,
             ILogger<NativeAdapter> logger,
@@ -49,8 +48,7 @@ namespace Shiny.Push
 
         public async Task TryProcessIntent(Intent intent)
         {
-            // if activity equals click_action? or if intent has a notificationId?
-            if (intent != null && intent.HasExtra("google.message_id"))
+            if (intent?.Action?.Equals(Constants.ShinyIntentClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false)
             {
                 this.logger.LogDebug("Detected incoming remote notification intent");
 
@@ -63,14 +61,16 @@ namespace Shiny.Push
                     try
                     {
                         var dict = new Dictionary<string, string>();
-                        foreach (var key in intent.Extras!.KeySet()!)
-                        {
-                            var value = intent.Extras.Get(key)?.ToString();
-                            if (value != null)
-                                dict.Add(key, value);
+                        if (intent.Extras != null)
+                        { 
+                            foreach (var key in intent.Extras!.KeySet()!)
+                            {
+                                var value = intent.Extras.Get(key)?.ToString();
+                                if (value != null)
+                                    dict.Add(key, value);
+                            }
                         }
                         var push = new PushNotification(dict);
-
                         await this.onEntry.Invoke(push).ConfigureAwait(false);
                     }
                     catch (Exception ex)
@@ -188,13 +188,24 @@ namespace Shiny.Push
                 if (notification == null)
                     return;
 
+                var intent = new Intent(notification.ClickAction ?? Constants.ShinyIntentClickAction);
+                if (message.Data != null)
+                {
+                    foreach (var data in message.Data)
+                        intent.PutExtra(data.Key, data.Value);
+                }
+
+                var pendingIntent = PendingIntent.GetActivity(this.platform.AppContext, 99, intent, PendingIntentFlags.Mutable);
+
                 var builder = new NotificationCompat
                     .Builder(
                         this.platform.AppContext,
                         notification.ChannelId ?? Channel.Default.Identifier
                     )
                     .SetAutoCancel(true)
+                    .SetSilent(false)
                     .SetSmallIcon(this.platform.GetSmallIconResource(notification.Icon))
+                    .SetContentIntent(pendingIntent)
                     .SetContentTitle(notification.Title);
 
                 if (!notification.Ticker.IsEmpty())
