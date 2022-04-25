@@ -4,9 +4,7 @@ using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
-
 using Microsoft.Extensions.Logging;
-
 using Shiny.Push.Infrastructure;
 using UIKit;
 using UserNotifications;
@@ -32,8 +30,11 @@ namespace Shiny.Push
             this.lifecycle = lifecycle;
         }
 
+        
+        public Func<string, Task>? OnTokenRefreshed { get; set; }
 
-        IDisposable? onReceviedSub;
+
+        IDisposable ? onReceviedSub;
         Func<PushNotification, Task>? onReceived;
         public Func<PushNotification, Task>? OnReceived
         {
@@ -50,7 +51,7 @@ namespace Shiny.Push
                     this.onReceviedSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
                     {
                         var dict = userInfo.FromNsDictionary();
-                        var data = new PushNotification(dict);
+                        var data = new PushNotification(dict, null);
                         await this.onReceived.Invoke(data).ConfigureAwait(false);
                     });
                 }
@@ -74,16 +75,24 @@ namespace Shiny.Push
                 else
                 {
                     this.onEntrySub ??= new CompositeDisposable();
-
-                    //UIApplication.SharedApplication.IsRegisteredForRemoteNotifications
+                    
                     this.onEntrySub.Add(this.lifecycle.RegisterForOnFinishedLaunching(async options =>
                     {
                         if (options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
                         {
                             this.logger.LogDebug("App entry remote notification detected");
                             var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
-                            var dict = data?.FromNsDictionary() ?? new Dictionary<string, string>(0);
-                            var push = new PushNotification(dict);
+
+                            Notification? notification = null;
+                            IDictionary<string, string>? dict = null;
+
+                            if (data != null)
+                            {
+                                notification = this.ToNotification(data);
+                                dict = data.FromNsDictionary();
+                                dict.Remove("aps");
+                            }
+                            var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
                             await this.onEntry.Invoke(push).ConfigureAwait(false);
                         }
                     }));
@@ -93,17 +102,21 @@ namespace Shiny.Push
                         if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
                         {
                             this.logger.LogDebug("Foreground remote notification entry detected");
-                            var dict = response.Notification.Request.Content.UserInfo.FromNsDictionary();
-                            var data = new PushNotification(dict);
+                            var c = response.Notification.Request.Content;
+
+                            var notification = new Notification(
+                                c.Title,
+                                c.Body
+                            );
+
+                            var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
+                            var data = new PushNotification(dict, notification);
                             await this.onEntry.Invoke(data).ConfigureAwait(false);
                         }
                     }));
                 }
             }
-        }
-
-
-        public Func<string, Task>? OnTokenRefreshed { get; set; }
+        }        
 
 
         public async Task<PushAccessState> RequestAccess()
@@ -152,7 +165,6 @@ namespace Shiny.Push
             IDisposable? caller = null;
             try
             {
-                //UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(UIRemoteNotificationType.Alert)
                 caller = this.lifecycle.RegisterForRemoteNotificationToken(
                     rawToken => tcs.TrySetResult(rawToken),
                     err => tcs.TrySetException(new Exception(err.LocalizedDescription))
@@ -169,6 +181,32 @@ namespace Shiny.Push
             {
                 caller?.Dispose();
             }
+        }
+
+
+        static readonly NSString apsKey = new NSString("aps");
+        static readonly NSString alertKey = new NSString("alert");
+
+        protected virtual Notification? ToNotification(NSDictionary data)
+        {
+            if (data.ContainsKey(apsKey))
+            {
+                var apsDict = data[apsKey] as NSDictionary;
+
+                if (apsDict?.ContainsKey(alertKey) ?? false)
+                {
+                    var alertDict = apsDict[alertKey] as NSDictionary;
+                    // category
+                    if (alertDict != null)
+                    {
+                        return new Notification(
+                            alertDict["title"]?.ToString(),
+                            alertDict["body"]?.ToString()
+                        );
+                    } 
+                }
+            }
+            return null;
         }
     }
 }

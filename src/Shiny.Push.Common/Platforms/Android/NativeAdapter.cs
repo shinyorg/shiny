@@ -2,19 +2,14 @@
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-
 using Android.App;
 using Android.Content;
 using Android.Gms.Extensions;
 using Android.Runtime;
-
 using AndroidX.Core.App;
-
 using Firebase;
 using Firebase.Messaging;
-
 using Microsoft.Extensions.Logging;
-
 using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
 using Shiny.Stores;
@@ -70,7 +65,8 @@ namespace Shiny.Push
                                     dict.Add(key, value);
                             }
                         }
-                        var push = new PushNotification(dict);
+                        // TODO: can I extract the notification here?
+                        var push = new PushNotification(dict, null);
                         await this.onEntry.Invoke(push).ConfigureAwait(false);
                     }
                     catch (Exception ex)
@@ -97,8 +93,20 @@ namespace Shiny.Push
                 {
                     ShinyFirebaseService.MessageReceived = async msg =>
                     {
-                        this.TryTriggerNotification(msg);
-                        var push = new PushNotification(msg.Data);
+                        Notification? notification = null;
+                        var native = msg.GetNotification();
+
+                        if (native != null)
+                        {
+                            //native.ChannelId
+                            //native.ImageUrl
+                            notification = new Notification(
+                                native.Title,
+                                native.Body
+                            );
+                            this.TryTriggerNotification(msg);
+                        }
+                        var push = new PushNotification(msg.Data, notification);
                         await this.onReceived.Invoke(push).ConfigureAwait(false);
                     };
                 }
@@ -185,10 +193,8 @@ namespace Shiny.Push
             try
             {
                 var notification = message.GetNotification();
-                if (notification == null)
-                    return;
-
                 var intent = new Intent(notification.ClickAction ?? ShinyIntents.NotificationClickAction);
+
                 if (message.Data != null)
                 {
                     foreach (var data in message.Data)
