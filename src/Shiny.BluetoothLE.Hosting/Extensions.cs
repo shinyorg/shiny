@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.BluetoothLE.Hosting
@@ -18,27 +19,27 @@ namespace Shiny.BluetoothLE.Hosting
                 {
                     sb.AddReadCharacteristic(
                         "2A24",
-                        () => Convert(deviceInfo.ModelNumber ?? "NO Model")
+                        _ => Convert(deviceInfo.ModelNumber ?? "NO Model")!
                     );
                     sb.AddReadCharacteristic(
                         "2A25",
-                        () => Convert(deviceInfo.SerialNumber ?? "NO Serial")
+                        _ => Convert(deviceInfo.SerialNumber ?? "NO Serial")!
                     );
                     sb.AddReadCharacteristic(
                         "2A26",
-                        () => Convert(deviceInfo.FirmwareRevision ?? "NO Firmware Rev")
+                        _ => Convert(deviceInfo.FirmwareRevision ?? "NO Firmware Rev")!
                     );
                     sb.AddReadCharacteristic(
                         "2A27",
-                        () => Convert(deviceInfo.HardwareRevision ?? "NO HW Rev")
+                        _ => Convert(deviceInfo.HardwareRevision ?? "NO HW Rev")!
                     );
                     sb.AddReadCharacteristic(
                         "2A28",
-                        () => Convert(deviceInfo.SoftwareRevision ?? "NO SW Rev")
+                        _ => Convert(deviceInfo.SoftwareRevision ?? "NO SW Rev")!
                     );
                     sb.AddReadCharacteristic(
                         "2A29",
-                        () => Convert(deviceInfo.ManufacturerName ?? "NO Manufacturer")
+                        _ => Convert(deviceInfo.ManufacturerName ?? "NO Manufacturer")!
                     );
                 }
             );
@@ -54,19 +55,39 @@ namespace Shiny.BluetoothLE.Hosting
             manager.AddService(
                 batteryServiceUuid ?? StandardUuids.BatteryService.ServiceUuid,
                 false,
-                sb => sb.AddReadCharacteristic(StandardUuids.BatteryService.CharacteristicUuid, () => BitConverter.GetBytes(getBattery()))
+                sb => sb.AddReadCharacteristic(StandardUuids.BatteryService.CharacteristicUuid, _ => BitConverter.GetBytes(getBattery()))
             );
 
 
-        public static IGattCharacteristic AddReadCharacteristic(this IGattServiceBuilder builder, string uuid, Func<byte[]> readRequest) =>
-            builder.AddCharacteristic(uuid, cb => cb.SetRead(request => ReadResult.Success(readRequest())));
+        public static IGattCharacteristic AddReadCharacteristic(this IGattServiceBuilder builder, string uuid, Func<IPeripheral, byte[]> readRequest) =>
+            builder.AddCharacteristic(uuid, cb => cb.SetRead(request =>
+            {
+                try
+                {
+                    var data = readRequest(request.Peripheral);
+                    return ReadResult.Success(data);
+                }
+                catch (Exception ex)
+                {
+                    ShinyHost.LoggerFactory.CreateLogger<IGattCharacteristic>().LogError("readRequest failed", ex);
+                    return ReadResult.Error(GattState.Failure);
+                }
+            }));
 
 
-        public static IGattCharacteristic AddWriteCharacteristic(this IGattServiceBuilder builder, string uuid, Action<byte[]> onWrite) =>
+        public static IGattCharacteristic AddWriteCharacteristic(this IGattServiceBuilder builder, string uuid, Action<IPeripheral, byte[]> onWrite) =>
             builder.AddCharacteristic(uuid, cb => cb.SetWrite(request =>
             {
-                onWrite(request.Data);
-                return GattState.Success;
+                try
+                {
+                    onWrite(request.Peripheral, request.Data);
+                    return GattState.Success;
+                }
+                catch (Exception ex)
+                {
+                    ShinyHost.LoggerFactory.CreateLogger<IGattCharacteristic>().LogError("onWrite failed", ex);
+                    return GattState.Failure;
+                }
             }));
 
 
@@ -79,7 +100,7 @@ namespace Shiny.BluetoothLE.Hosting
                 return Encoding.UTF8.GetBytes(s);
 
             if (obj is byte b)
-                return new [] { b };
+                return new[] { b };
 
             if (obj is DateTimeOffset dt)
                 return BitConverter.GetBytes(dt.ToUnixTimeSeconds());
