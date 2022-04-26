@@ -11,7 +11,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
-        <PackageReleaseNotes>https://shinylib.net/release-notes/</PackageReleaseNotes>
+        <PackageReleaseNotes>https://shinylib.net/releases/mobile/</PackageReleaseNotes>
         <PackageTags>xamarin ios android ble bluetooth bluetoothle push notifications sensors geofences gps location background jobs settings speech sensors</PackageTags>
         <PackageReadmeFile>readme.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
