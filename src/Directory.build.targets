@@ -13,7 +13,7 @@
         <PackageReference Update="Microsoft.CodeAnalysis" Version="4.1.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
         <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
-        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="4.0.1" />    
+        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="4.0.1" />
     </ItemGroup>
 
     <ItemGroup>
