@@ -73,9 +73,9 @@ namespace Shiny.Generators
             {
                 using (builder.BlockInvariant($"public partial class {activity.Name}"))
                 {
-                    this.TryAppendOnCreate(activity, builder);
+                    //this.TryAppendOnCreate(activity, builder);
                     //this.TryAppendOnResume(activity, builder);
-                    this.TryAppendNewIntent(activity, builder);
+                    //this.TryAppendNewIntent(activity, builder);
                     this.TryAppendActivityResult(activity, builder);
                     this.TryAppendRequestPermissionResult(activity, builder);
                 }
