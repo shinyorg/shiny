@@ -200,38 +200,38 @@ namespace Shiny.Generators
         }
 
 
-        void TryAppendNewIntent(INamedTypeSymbol activity, IndentedStringBuilder builder)
-        {
-            if (activity.HasMethod("OnNewIntent"))
-            {
-                this.context.Log(
-                    "SHINY006",
-                    $"OnNewIntent already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnNewIntent hook for this"
-                );
-            }
-            else
-            {
-                using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
-                {
-                    builder.AppendLine("base.OnNewIntent(intent);");
-                    builder.AppendLine("this.ShinyOnNewIntent(intent);");
-                    if (this.context.HasXamarinEssentials())
-                        builder.AppendLine("global::Xamarin.Essentials.Platform.OnNewIntent(intent);");
-                }
-            }
-        }
+        //void TryAppendNewIntent(INamedTypeSymbol activity, IndentedStringBuilder builder)
+        //{
+        //    if (activity.HasMethod("OnNewIntent"))
+        //    {
+        //        this.context.Log(
+        //            "SHINY006",
+        //            $"OnNewIntent already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnNewIntent hook for this"
+        //        );
+        //    }
+        //    else
+        //    {
+        //        using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
+        //        {
+        //            builder.AppendLine("base.OnNewIntent(intent);");
+        //            builder.AppendLine("this.ShinyOnNewIntent(intent);");
+        //            if (this.context.HasXamarinEssentials())
+        //                builder.AppendLine("global::Xamarin.Essentials.Platform.OnNewIntent(intent);");
+        //        }
+        //    }
+        //}
 
 
-        void TryAppendOnResume(INamedTypeSymbol activity, IndentedStringBuilder builder)
-        {
-            if (activity.HasMethod("OnResume") || !this.context.HasXamarinEssentials())
-                return;
+        //void TryAppendOnResume(INamedTypeSymbol activity, IndentedStringBuilder builder)
+        //{
+        //    if (activity.HasMethod("OnResume") || !this.context.HasXamarinEssentials())
+        //        return;
 
-            using (builder.BlockInvariant("protected override void OnResume()"))
-            {
-                builder.AppendLine("base.OnResume();");
-                builder.AppendLine("global::Xamarin.Essentials.Platform.OnResume(this);");
-            }
-        }
+        //    using (builder.BlockInvariant("protected override void OnResume()"))
+        //    {
+        //        builder.AppendLine("base.OnResume();");
+        //        builder.AppendLine("global::Xamarin.Essentials.Platform.OnResume(this);");
+        //    }
+        //}
     }
 }
