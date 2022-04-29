@@ -217,7 +217,7 @@ namespace Shiny.Generators
             {
                 this.Context.Log(
                     "SHINY001",
-                    "FinishedLaunching already exists on your appdelegate.  Make sure to call the this.ShinyFinishedLaunching(new YourStartup());",
+                    "FinishedLaunching already exists on your appdelegate.  Make sure to call the this.ShinyFinishedLaunching(new YourStartup(), options);",
                     DiagnosticSeverity.Warning,
                     appDelegate
                         .GetMembers()
