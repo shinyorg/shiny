@@ -8,6 +8,6 @@ namespace Shiny.Nfc
         public byte[] Identifier { get; set; }
         public byte[]? Payload { get; set; }
         public string? Uri { get; set; }
-        public NfcPayloadType PayloadType { get; set; }
+        public NDefPayloadType PayloadType { get; set; }
     }
 }

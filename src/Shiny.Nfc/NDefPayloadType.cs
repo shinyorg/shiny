@@ -1,9 +1,6 @@
-﻿using System;
-
-
-namespace Shiny.Nfc
+﻿namespace Shiny.Nfc
 {
-    public enum NfcPayloadType
+    public enum NDefPayloadType
     {
         Unknown,
         Empty,
