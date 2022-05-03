@@ -48,10 +48,6 @@ namespace Shiny.Nfc
                 }
                 else
                 {
-                    //NFCNdefStatus.NotSupported
-                    //NFCNdefStatus.ReadWrite;
-                    //NFCNdefStatus.ReadOnly
-
                     var records = msg
                         .Records
                         .Select(record => new NDefRecord
@@ -85,11 +81,17 @@ namespace Shiny.Nfc
             if (this.nativeTag is not INFCNdefTag writeTag)
                 throw new InvalidOperationException("Invalid Tag");
 
+            //writeTag.QueryNdefStatus((status, code, error) =>
+            //{
+            //    //status == NFCNdefStatus.ReadWrite
+            //});
+
             var tcs = new TaskCompletionSource<bool>();
             var nativeRecords = records
                 .Select(record => new NFCNdefPayload(
                     record.PayloadType switch
                     {
+                        //NDefPayloadType.Mime => NFCTypeNameFormat.Empty 
                         _ => NFCTypeNameFormat.Unknown
                     },
                     NSData.FromArray(new byte[0]), // type

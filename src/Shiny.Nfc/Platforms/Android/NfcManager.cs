@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Android;
 using Android.App;
 using Android.Content;
 using Android.Nfc;
+using Microsoft.Extensions.Logging;
 
 
 namespace Shiny.Nfc
@@ -12,20 +14,30 @@ namespace Shiny.Nfc
     public class NfcManager : Java.Lang.Object, INfcManager
     {
         readonly IPlatform platform;
+        readonly Subject<INfcTag> tagSubject;
 
 
-        public NfcManager(IPlatform platform)
+        public NfcManager(IPlatform platform, ILogger<NfcManager> logger)
         {
+            this.tagSubject = new Subject<INfcTag>();
             this.platform = platform;
+
             this.platform
                 .WhenIntentReceived()
-                // TODO: others
-                .Where(x => x.Action?.Equals(NfcAdapter.ActionNdefDiscovered, StringComparison.InvariantCultureIgnoreCase) ?? false)
-                .Subscribe(x =>
+                .Where(x => 
+                    (x.Action?.Equals(NfcAdapter.ActionNdefDiscovered, StringComparison.InvariantCultureIgnoreCase) ?? false) ||
+                    (x.Action?.Equals(NfcAdapter.ActionTagDiscovered, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                )
+                .Select(intent => intent.GetParcelableExtra(NfcAdapter.ExtraTag) as Tag)
+                .Where(tag => tag != null)
+                .Subscribe(tag =>
                 {
-                    // TODO: we should hang on to any tags discovered here if we can't push it out to a subject
+                    logger.LogDebug("Incoming NDEF Discovered action");
+                    var wrapTag = new DroidNfcTag(tag!);
+                    this.tagSubject.OnNext(wrapTag);
                 });
         }
+
 
 
         public IObservable<AccessState> RequestAccess()
@@ -43,6 +55,7 @@ namespace Shiny.Nfc
 
         public IObservable<INfcTag[]> WhenTagsDetected() => Observable.Create<INfcTag[]>(ob =>
         {
+            // TODO: hot/cold observable?
             var launchIntent = new Intent(this.platform.CurrentActivity, this.platform.CurrentActivity.GetType());
             launchIntent.AddFlags(ActivityFlags.SingleTop);
 

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using CoreFoundation;
 using CoreNFC;
 using Foundation;
+using Microsoft.Extensions.Logging;
 using UIKit;
 
 
@@ -13,13 +15,15 @@ namespace Shiny.Nfc
     public class NfcManager : NFCTagReaderSessionDelegate, INfcManager, IShinyStartupTask
     {
         readonly AppleLifecycle lifecycle;
-        readonly Subject<INFCTag[]> tagsSubject;
+        readonly ILogger logger;
+        readonly Subject<INFCTag[]?> tagsSubject;
+        
 
-
-        public NfcManager(AppleLifecycle lifecycle)
+        public NfcManager(AppleLifecycle lifecycle, ILogger<NfcManager> logger)
         {
             this.lifecycle = lifecycle;
-            this.tagsSubject = new Subject<INFCTag[]>();
+            this.logger = logger;
+            this.tagsSubject = new Subject<INFCTag[]?>();
         }
 
 
@@ -35,17 +39,28 @@ namespace Shiny.Nfc
 
         //public override void DidBecomeActive(NFCTagReaderSession session) { }
 
-        public override void DidDetectTags(NFCTagReaderSession session, INFCTag[] tags) => this.tagsSubject.OnNext(tags);
+        public override void DidDetectTags(NFCTagReaderSession session, INFCTag[] tags) 
+            => this.tagsSubject.OnNext(tags);
+
+
         public override void DidInvalidate(NFCTagReaderSession session, NSError error)
         {
-            
+            if (error == null)
+            {
+                this.logger.LogDebug("NFC session has invalided");
+            }
+            else
+            {
+                var ex = new Exception("NFC session has invalidated due to an error: " + error.LocalizedDescription);
+                this.logger.LogError(ex, "NFC session has invalidated");
+                this.tagsSubject.OnError(ex);
+            }
         }
 
 
         public IObservable<AccessState> RequestAccess()
         {
             var status = AccessState.Available;
-
             if (!NFCNdefReaderSession.ReadingAvailable)
                 status = AccessState.NotSupported;
 
@@ -66,16 +81,24 @@ namespace Shiny.Nfc
             // TODO: alert message
             session.BeginSession();
 
-            var sub = this.tagsSubject.Subscribe(tags =>
+            var sub = this.tagsSubject.Materialize().Subscribe(notification =>
             {
-                //ob.OnNext(new IosNfcTag(session, tag));
+                if (notification.Exception != null)
+                {
+                    ob.OnError(notification.Exception);
+                }
+                else
+                { 
+                    var shinyTags = notification.Value?.Select(tag => new IosNfcTag(session, tag)).ToArray() ?? Array.Empty<INfcTag>();
+                    ob.OnNext(shinyTags);
+                }
             });
 
             return () =>
             {
+                sub.Dispose();
                 session.InvalidateSession();
                 session.Dispose();
-                sub.Dispose();
             };
         });
     }
