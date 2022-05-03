@@ -37,6 +37,7 @@ namespace Shiny
         public static T GetSystemService<T>(this IPlatform platform, string key) where T : Java.Lang.Object
             => (T)platform.AppContext.GetSystemService(key);
 
+
         public static void RegisterBroadcastReceiver<T>(this IPlatform platform, params string[] actions) where T : BroadcastReceiver, new()
         {
             var filter = new IntentFilter();

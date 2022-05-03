@@ -2,4 +2,4 @@
 using Android.App;
 
 [assembly: UsesPermission(Manifest.Permission.Nfc)]
-[assembly: UsesFeature("android.hardware.nfc", Required = false)] 
+[assembly: UsesFeature("android.hardware.nfc", Required = false)]

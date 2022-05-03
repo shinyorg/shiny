@@ -6,7 +6,7 @@ namespace Shiny.Nfc
     {
         NfcTagType Type { get; }
         bool IsWriteable { get; }
-        Task Write(NDefRecord[] records, bool makeReadOnly);
-        Task<NDefRecord[]> Read();
+        Task Write(NDefRecord[] records, bool makeReadOnly = false);
+        Task<NDefRecord[]?> Read();
     }
 }

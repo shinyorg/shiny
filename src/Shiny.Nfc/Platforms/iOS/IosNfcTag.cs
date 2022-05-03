@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using CoreNFC;
+using Foundation;
 
 
 namespace Shiny.Nfc
@@ -27,21 +29,21 @@ namespace Shiny.Nfc
             _ => NfcTagType.Unknown
         };
 
-        
+
         public bool IsWriteable => this.nativeTag.Available;
 
 
-        public async Task<NDefRecord[]> Read()
+        public async Task<NDefRecord[]?> Read()
         {
             await this.session.ConnectToAsync(this.nativeTag);
-            if (this.nativeTag is not INFCNdefTag writeTag)
-                throw new InvalidOperationException("");
+            if (this.nativeTag is not INFCNdefTag readTag)
+                throw new InvalidOperationException("Tag is not readable");
 
             var tcs = new TaskCompletionSource<NDefRecord[]>();
-            writeTag.ReadNdef((msg, e) => 
+            readTag.ReadNdef((msg, e) =>
             {
                 if (e != null)
-                { 
+                {
                     tcs.SetException(new Exception(e.LocalizedDescription));
                 }
                 else
@@ -50,23 +52,27 @@ namespace Shiny.Nfc
                     //NFCNdefStatus.ReadWrite;
                     //NFCNdefStatus.ReadOnly
 
-                    //msg.Records
-                    //new NDefRecord
-                    //                {
-                    //                    Identifier = record.Identifier.ToArray(),
-                    //                    Payload = record.Payload?.ToArray(),
-                    //                    Uri = record.WellKnownTypeUriPayload?.ToString(),
-                    //                    PayloadType = record.TypeNameFormat switch
-                    //                    {
-                    //                        NFCTypeNameFormat.AbsoluteUri => NfcPayloadType.Uri,
-                    //                        NFCTypeNameFormat.Empty => NfcPayloadType.Empty,
-                    //                        NFCTypeNameFormat.NFCExternal => NfcPayloadType.External,
-                    //                        NFCTypeNameFormat.NFCWellKnown => NfcPayloadType.WellKnown,
-                    //                        NFCTypeNameFormat.Unchanged => NfcPayloadType.Unchanged,
-                    //                        //case NFCTypeNameFormat.Media: // TODO: mime?
-                    //                        _ => NfcPayloadType.Unknown
-                    //                    }
-                    //                }
+                    var records = msg
+                        .Records
+                        .Select(record => new NDefRecord
+                        {
+                            Identifier = record.Identifier.ToArray(),
+                            Payload = record.Payload?.ToArray(),
+                            Uri = record.WellKnownTypeUriPayload?.ToString(),
+                            PayloadType = record.TypeNameFormat switch
+                            {
+                                NFCTypeNameFormat.AbsoluteUri => NDefPayloadType.Uri,
+                                NFCTypeNameFormat.Empty => NDefPayloadType.Empty,
+                                NFCTypeNameFormat.NFCExternal => NDefPayloadType.External,
+                                NFCTypeNameFormat.NFCWellKnown => NDefPayloadType.WellKnown,
+                                NFCTypeNameFormat.Unchanged => NDefPayloadType.Unchanged,
+                                //case NFCTypeNameFormat.Media: // TODO: mime?
+                                _ => NDefPayloadType.Unknown
+                            }
+                        })
+                        .ToArray();
+
+                    tcs.SetResult(records);
                 }
             });
             return await tcs.Task;
@@ -77,11 +83,23 @@ namespace Shiny.Nfc
         {
             await this.session.ConnectToAsync(this.nativeTag);
             if (this.nativeTag is not INFCNdefTag writeTag)
-                throw new InvalidOperationException("");
+                throw new InvalidOperationException("Invalid Tag");
 
             var tcs = new TaskCompletionSource<bool>();
-            // TODO: build message
-            writeTag.WriteNdef(null, e =>
+            var nativeRecords = records
+                .Select(record => new NFCNdefPayload(
+                    record.PayloadType switch
+                    {
+                        _ => NFCTypeNameFormat.Unknown
+                    },
+                    NSData.FromArray(new byte[0]), // type
+                    NSData.FromArray(new byte[0]), // identifier
+                    NSData.FromArray(new byte[0])  // payload
+                ))
+                .ToArray();
+
+            var message = new NFCNdefMessage(nativeRecords);
+            writeTag.WriteNdef(message, e =>
             {
                 if (e == null)
                     tcs.SetResult(true);

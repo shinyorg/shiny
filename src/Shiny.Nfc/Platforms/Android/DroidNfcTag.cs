@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Android.Nfc;
@@ -23,14 +24,22 @@ namespace Shiny.Nfc
                 if (MifareUltralight.Get(this.nativeTag) != null)
                     return NfcTagType.Mifare;
 
-                //NfcA.Get(tag);
-                //NfcB.Get(tag);
-                //NfcF.Get(tag);
-                //NfcV.Get(tag);
-                //NdefFormatable.Get(tag);
+                if (NfcA.Get(this.nativeTag) != null)
+                    return NfcTagType.NfcA;
+
+                if (NfcB.Get(this.nativeTag) != null)
+                    return NfcTagType.NfcB;
+
+                if (NfcF.Get(this.nativeTag) != null)
+                    return NfcTagType.NfcF;
+
+                if (NfcV.Get(this.nativeTag) != null)
+                    return NfcTagType.NfcV;
+
                 return NfcTagType.Unknown;
             }
         }
+
 
         public bool IsWriteable
         {
@@ -42,33 +51,34 @@ namespace Shiny.Nfc
         }
 
 
-        public Task<NDefRecord[]> Read()
+        public Task<NDefRecord[]?> Read()
         {
             var ndef = Ndef.Get(this.nativeTag);
+            if (ndef == null)
+                return null;
 
             //ndef.ConnectAsync();
-            //ndef.CanMakeReadOnly
             var result = ndef
                 .NdefMessage?
                 .GetRecords()
-                .Select(x => new NDefRecord
+                .Select(record => new NDefRecord
                 {
-                    //            Identifier = record.GetId(),
-                    //            Uri = record.ToUri()?.ToString(),
-                    //            //MimeType => this.native.ToMimeType(); // Android only>?
-                    //            Payload = record.GetPayload(),
-                    //            PayloadType = record.Tnf switch
-                    //            {
-                    //                0x00 => NfcPayloadType.Empty,
-                    //                0x01 => NfcPayloadType.WellKnown,
-                    //                0x02 => NfcPayloadType.Mime,
-                    //                0x03 => NfcPayloadType.Uri,
-                    //                0x04 => NfcPayloadType.External,
-                    //                0x06 => NfcPayloadType.Unchanged,
-                    //                0x05 => NfcPayloadType.Unknown,
-                    //                0x07 => NfcPayloadType.Unknown,
-                    //                _ => NfcPayloadType.Unknown
-                    //            }
+                    Identifier = record.GetId(),
+                    Uri = record.ToUri()?.ToString(),
+                    //MimeType => this.native.ToMimeType(); // Android only>?
+                    Payload = record.GetPayload(),
+                    PayloadType = record.Tnf switch
+                    {
+                        0x00 => NDefPayloadType.Empty,
+                        0x01 => NDefPayloadType.WellKnown,
+                        0x02 => NDefPayloadType.Mime,
+                        0x03 => NDefPayloadType.Uri,
+                        0x04 => NDefPayloadType.External,
+                        0x06 => NDefPayloadType.Unchanged,
+                        0x05 => NDefPayloadType.Unknown,
+                        0x07 => NDefPayloadType.Unknown,
+                        _ => NDefPayloadType.Unknown
+                    }
                 })
                 .ToArray();
 
@@ -78,12 +88,31 @@ namespace Shiny.Nfc
 
         public async Task Write(NDefRecord[] records, bool makeReadOnly)
         {
-            var ndef = Ndef.Get(this.nativeTag);
+            if (!this.IsWriteable)
+                throw new InvalidOperationException("This tag is not writeable");
 
+            var nativeRecords = new List<NdefRecord>();
+            foreach (var record in records)
+            {
+                var native = record.PayloadType switch
+                {
+                    //NDefPayloadType.WellKnown => NdefRecord.CreateTextRecord()
+                    NDefPayloadType.Uri => NdefRecord.CreateUri(record.Uri),
+                    NDefPayloadType.External => NdefRecord.CreateExternal("domain", "type", new byte[0]),
+                    NDefPayloadType.Mime => NdefRecord.CreateMime("mimeType", new byte[0]),
+                    _ => throw new InvalidOperationException("")
+                };
+                nativeRecords.Add(native!);
+            }
+
+            var ndef = Ndef.Get(this.nativeTag)!;
             await ndef.ConnectAsync();
-            // TODO: build message
-            //ndef.WriteNdefMessageAsync(new NdefMessage())
-            //ndef.CanMakeReadOnly()
+            var message = new NdefMessage(nativeRecords.ToArray());
+
+            await ndef.WriteNdefMessageAsync(message);
+            if (makeReadOnly && ndef.CanMakeReadOnly())
+                await ndef.MakeReadOnlyAsync();
+
             ndef.Close();
         }
     }
