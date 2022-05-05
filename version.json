@@ -1,15 +1,14 @@
 {
-    "$schema": "https://raw.githubusercontent.com/AArnott/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
-    "version": "2.5.0-preview.{height}",
-    "buildNumberOffset": 3020,
-    "assemblyVersion": {
-        "precision": "revision"
-    },
-    "publicReleaseRefSpec": [
-        "^refs/heads/main$",
-        "^refs/heads/master$",
-        "^refs/heads/preview$",
-        "^refs/tags/v\\d+\\.\\d+",
-        "^refs/tags/v\\d+\\.\\d+\\.\\d+"
-    ]
+  "$schema": "https://raw.githubusercontent.com/dotnet/Nerdbank.GitVersioning/master/src/NerdBank.GitVersioning/version.schema.json",
+  "version": "3.0.0-alpha.{height}",
+  "assemblyVersion": {
+    "precision": "revision"
+  },
+  "publicReleaseRefSpec": [
+    "^refs/heads/main$",
+    "^refs/heads/master$",
+    "^refs/heads/preview$",
+    "^refs/tags/v\\d+\\.\\d+",
+    "^refs/tags/v\\d+\\.\\d+\\.\\d+"
+  ]
 }
