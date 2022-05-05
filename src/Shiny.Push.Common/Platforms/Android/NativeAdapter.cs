@@ -130,7 +130,7 @@ namespace Shiny.Push
                 {
                     this.onEntrySub = this.platform
                         .WhenIntentReceived()
-                        .SubscribeAsync(intent => this.TryProcessIntent(intent));
+                        .SubscribeAsync(x => this.TryProcessIntent(x.Intent));
                 }
             }
         }

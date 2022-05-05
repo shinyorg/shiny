@@ -75,7 +75,7 @@ namespace Shiny.Generators
                 {
                     //this.TryAppendOnCreate(activity, builder);
                     //this.TryAppendOnResume(activity, builder);
-                    //this.TryAppendNewIntent(activity, builder);
+                    this.TryAppendNewIntent(activity, builder);
                     this.TryAppendActivityResult(activity, builder);
                     this.TryAppendRequestPermissionResult(activity, builder);
                 }
@@ -200,26 +200,26 @@ namespace Shiny.Generators
         }
 
 
-        //void TryAppendNewIntent(INamedTypeSymbol activity, IndentedStringBuilder builder)
-        //{
-        //    if (activity.HasMethod("OnNewIntent"))
-        //    {
-        //        this.context.Log(
-        //            "SHINY006",
-        //            $"OnNewIntent already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnNewIntent hook for this"
-        //        );
-        //    }
-        //    else
-        //    {
-        //        using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
-        //        {
-        //            builder.AppendLine("base.OnNewIntent(intent);");
-        //            builder.AppendLine("this.ShinyOnNewIntent(intent);");
-        //            if (this.context.HasXamarinEssentials())
-        //                builder.AppendLine("global::Xamarin.Essentials.Platform.OnNewIntent(intent);");
-        //        }
-        //    }
-        //}
+        void TryAppendNewIntent(INamedTypeSymbol activity, IndentedStringBuilder builder)
+        {
+            if (activity.HasMethod("OnNewIntent"))
+            {
+                this.context.Log(
+                    "SHINY006",
+                    $"OnNewIntent already exists on '{activity.ToDisplayString()}', make sure you call the this.ShinyOnNewIntent hook for this"
+                );
+            }
+            else
+            {
+                using (builder.BlockInvariant("protected override void OnNewIntent(Intent intent)"))
+                {
+                    builder.AppendLine("base.OnNewIntent(intent);");
+                    builder.AppendLine("this.ShinyOnNewIntent(intent);");
+                    if (this.context.HasXamarinEssentials())
+                        builder.AppendLine("global::Xamarin.Essentials.Platform.OnNewIntent(intent);");
+                }
+            }
+        }
 
 
         //void TryAppendOnResume(INamedTypeSymbol activity, IndentedStringBuilder builder)

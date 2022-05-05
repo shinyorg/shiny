@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Shiny.Infrastructure;
@@ -34,7 +34,7 @@ namespace Shiny.Notifications
                     .core
                     .Services
                     .Resolve<AndroidNotificationProcessor>()!
-                    .TryProcessIntent(x)
+                    .TryProcessIntent(x.Intent)
                 );
         }
 
