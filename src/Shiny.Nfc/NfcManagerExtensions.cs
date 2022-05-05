@@ -12,7 +12,7 @@ namespace Shiny.Nfc
         /// </summary>
         /// <param name="nfcManager"></param>
         /// <returns></returns>
-        public static IObservable<(INfcTag, NDefRecord[]?)> WhenRecordsDetected(this INfcManager nfcManager) => nfcManager
+        public static IObservable<(INfcTag Tag, NDefRecord[]? Records)> WhenRecordsDetected(this INfcManager nfcManager) => nfcManager
             .WhenTagsDetected()
             .SelectMany(x => x.ToObservable())
             .Select(x => Observable.FromAsync(async () =>

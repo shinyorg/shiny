@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading.Tasks;
 using CoreFoundation;
 using CoreNFC;
 using Foundation;
@@ -12,28 +11,51 @@ using UIKit;
 
 namespace Shiny.Nfc
 {
-    public class NfcManager : NFCTagReaderSessionDelegate, INfcManager, IShinyStartupTask
+    public class NfcManager : NFCTagReaderSessionDelegate, INfcManager
     {
-        readonly AppleLifecycle lifecycle;
         readonly ILogger logger;
         readonly Subject<INFCTag[]?> tagsSubject;
         
 
         public NfcManager(AppleLifecycle lifecycle, ILogger<NfcManager> logger)
         {
-            this.lifecycle = lifecycle;
             this.logger = logger;
             this.tagsSubject = new Subject<INFCTag[]?>();
-        }
 
+            //lifecycle.RegisterContinueActivity(activity =>
+            //{
+            //    // TODO
+            //    return Task.CompletedTask;
+            //});
+//            func application(_ application: UIApplication,
+//                 continue userActivity: NSUserActivity,
+//                 restorationHandler: @escaping([Any] ?) -> Void) -> Bool {
 
-        public void Start()
-        {
-            this.lifecycle.RegisterContinueActivity(activity =>
-            {
-                // TODO
-                return Task.CompletedTask;
-            });
+//                guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else
+//                {
+//                    return false
+//                }
+
+//                // Confirm that the NSUserActivity object contains a valid NDEF message.
+//                let ndefMessage = userActivity.ndefMessagePayload
+//    guard ndefMessage.records.count > 0,
+//        ndefMessage.records[0].typeNameFormat != .empty else
+//                {
+//                    return false
+//    }
+
+//                // Send the message to `MessagesTableViewController` for processing.
+//                guard let navigationController = window?.rootViewController as? UINavigationController else
+//                {
+//                    return false
+//                }
+
+//                navigationController.popToRootViewController(animated: true)
+//    let messageTableViewController = navigationController.topViewController as? MessagesTableViewController
+//    messageTableViewController?.addMessage(fromUserActivity: ndefMessage)
+
+//    return true
+//}
         }
 
 
@@ -70,15 +92,18 @@ namespace Shiny.Nfc
 
         public IObservable<INfcTag[]> WhenTagsDetected() => Observable.Create<INfcTag[]>(ob =>
         {
+            // TODO: hot/cold observable
             if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
                 throw new InvalidOperationException("iOS 13+ is required");
 
-            var session = new NFCTagReaderSession(
-                NFCPollingOption.Iso14443 | NFCPollingOption.Iso15693 | NFCPollingOption.Iso18092,
-                this,
-                DispatchQueue.CurrentQueue
-            );
+            var options = NFCPollingOption.Iso14443 | NFCPollingOption.Iso15693;
+            if (AppleExtensions.HasPlistValue("com.apple.developer.nfc.readersession.felica.systemcodes"))
+                options |= NFCPollingOption.Iso18092;
+            //AppleExtensions.HasPlistValue("com.apple.developer.nfc.readersession.iso7816.select-identifiers");
+
+            var session = new NFCTagReaderSession(options, this, DispatchQueue.CurrentQueue);
             // TODO: alert message
+
             session.BeginSession();
 
             var sub = this.tagsSubject.Materialize().Subscribe(notification =>

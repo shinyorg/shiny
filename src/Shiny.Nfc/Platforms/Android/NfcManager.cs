@@ -24,11 +24,12 @@ namespace Shiny.Nfc
 
             this.platform
                 .WhenIntentReceived()
-                .Where(x => 
-                    (x.Action?.Equals(NfcAdapter.ActionNdefDiscovered, StringComparison.InvariantCultureIgnoreCase) ?? false) ||
-                    (x.Action?.Equals(NfcAdapter.ActionTagDiscovered, StringComparison.InvariantCultureIgnoreCase) ?? false)
+                .Where(x =>
+                    x.NewIntent &&
+                    //(x.Action?.Equals(NfcAdapter.ActionNdefDiscovered, StringComparison.InvariantCultureIgnoreCase) ?? false) ||
+                    (x.Intent.Action?.Equals(NfcAdapter.ActionTagDiscovered, StringComparison.InvariantCultureIgnoreCase) ?? false)
                 )
-                .Select(intent => intent.GetParcelableExtra(NfcAdapter.ExtraTag) as Tag)
+                .Select(x => x.Intent.GetParcelableExtra(NfcAdapter.ExtraTag) as Tag)
                 .Where(tag => tag != null)
                 .Subscribe(tag =>
                 {
@@ -57,7 +58,7 @@ namespace Shiny.Nfc
         {
             // TODO: hot/cold observable?
             var launchIntent = new Intent(this.platform.CurrentActivity, this.platform.CurrentActivity.GetType());
-            launchIntent.AddFlags(ActivityFlags.SingleTop);
+            //launchIntent.AddFlags(ActivityFlags.SingleTop);
 
             var pendingIntent = PendingIntent.GetActivity(
                 this.platform.AppContext,
@@ -69,17 +70,24 @@ namespace Shiny.Nfc
             var tagFilter = new IntentFilter(NfcAdapter.ActionTagDiscovered);
             tagFilter.AddCategory(Intent.CategoryDefault);
 
-            var discoverFilter = new IntentFilter(NfcAdapter.ActionNdefDiscovered);
-            discoverFilter.AddDataType("*/*");
+            //var discoverFilter = new IntentFilter(NfcAdapter.ActionNdefDiscovered);
+            //discoverFilter.AddDataType("*/*");
 
             var adapter = NfcAdapter.GetDefaultAdapter(this.platform.AppContext)!;
             adapter.EnableForegroundDispatch(
                 this.platform.CurrentActivity,
                 pendingIntent,
-                new [] { tagFilter, discoverFilter },
+                //new [] { tagFilter, discoverFilter },
+                new [] { tagFilter },
                 null
             );
-            return () => adapter.DisableForegroundDispatch(this.platform.CurrentActivity);
+            var sub = this.tagSubject.Subscribe(x => ob.OnNext(new[] { x }));
+
+            return () =>
+            {
+                sub?.Dispose();
+                adapter.DisableForegroundDispatch(this.platform.CurrentActivity);
+            };
         });
     }
 }

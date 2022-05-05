@@ -20,6 +20,24 @@ namespace Shiny.Nfc
         }
 
 
+        byte[]? identifier;
+        public byte[] Identifier
+        {
+            get
+            {
+                this.identifier ??= this.nativeTag.Type switch
+                {
+                    NFCTagType.FeliCa => this.nativeTag.GetNFCFeliCaTag()!.CurrentIdm.ToArray(),
+                    NFCTagType.Iso15693 => this.nativeTag.GetNFCIso15693Tag()!.Identifier.ToArray(),
+                    NFCTagType.Iso7816Compatible => this.nativeTag.GetNFCIso7816Tag()!.Identifier.ToArray(),
+                    NFCTagType.MiFare => this.nativeTag.GetNFCMiFareTag()!.Identifier.ToArray(),
+                    _ => throw new InvalidProgramException("Invalid tag type")
+                };
+                return this.identifier!;
+            }
+        }
+
+
         public NfcTagType Type => this.nativeTag.Type switch
         {
             NFCTagType.FeliCa => NfcTagType.FeliCa,

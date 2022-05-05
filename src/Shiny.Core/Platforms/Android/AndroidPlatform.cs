@@ -26,7 +26,7 @@ namespace Shiny
     {
         int requestCode;
         readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
-        readonly Subject<Intent> intentSubject = new Subject<Intent>();
+        readonly Subject<Intent> newIntentSubject = new Subject<Intent>();
         readonly Subject<PermissionRequestResult> permissionSubject = new Subject<PermissionRequestResult>();
         readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new Subject<(int RequestCode, Result Result, Intent Intent)>();
         readonly Application app;
@@ -106,18 +106,28 @@ namespace Shiny
         public string Model => B.Model;
 
         public void OnActivityResult(int requestCode, Result resultCode, Intent data) => this.activityResultSubject.OnNext((requestCode, resultCode, data));
-        //public void OnNewIntent(Intent intent) => this.intentSubject.OnNext(intent);
+        public void OnNewIntent(Intent intent) => this.newIntentSubject.OnNext(intent);
         public Application AppContext => this.app;
 
+        
+        public IObservable<(bool NewIntent, Intent Intent)> WhenIntentReceived() => Observable.Create<(bool NewIntent, Intent Intent)>(ob =>
+        {
+            var comp = new CompositeDisposable();
 
-        //public IObservable<Intent> WhenIntentReceived() => this.intentSubject;
-        public IObservable<Intent> WhenIntentReceived() => this.WhenActivityChanged()
-            .Where(x =>
-                x.Status == ActivityState.Resumed &&
-                x.Activity.Intent != null
-            )
-            .Select(x => x.Activity.Intent!);
-            
+            this.WhenActivityChanged()
+                .Where(x =>
+                    x.Status == ActivityState.Resumed &&
+                    x.Activity.Intent != null
+                )
+                .Subscribe(x => ob.OnNext((false, x.Activity.Intent!)))
+                .DisposedBy(comp);
+
+            this.newIntentSubject
+                .Subscribe(intent => ob.OnNext((true, intent)))
+                .DisposedBy(comp);
+
+            return comp;
+       });  
 
         public PlatformState Status { get; private set; } = PlatformState.Foreground;
 

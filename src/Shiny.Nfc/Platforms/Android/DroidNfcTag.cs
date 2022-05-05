@@ -14,6 +14,9 @@ namespace Shiny.Nfc
         public DroidNfcTag(Tag nativeTag) => this.nativeTag = nativeTag;
 
 
+        public byte[] Identifier => this.nativeTag.GetId()!;
+
+
         public NfcTagType Type
         {
             get

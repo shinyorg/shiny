@@ -44,8 +44,8 @@ namespace Shiny
         Activity CurrentActivity { get; }
         PackageInfo Package { get; }
         IObservable<ActivityChanged> WhenActivityChanged();
-        IObservable<Intent> WhenIntentReceived();
-        //void OnNewIntent(Intent? intent);
+        IObservable<(bool NewIntent, Intent Intent)> WhenIntentReceived();
+        void OnNewIntent(Intent? intent);
         void OnActivityResult(int requestCode, Result resultCode, Intent data);
 
         bool IsMinApiLevel(int apiLevel);
