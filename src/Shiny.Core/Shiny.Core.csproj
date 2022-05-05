@@ -3,14 +3,7 @@
     <PropertyGroup>
         <RootNamespace>Shiny</RootNamespace>
         <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(UwpTargetFramework)</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

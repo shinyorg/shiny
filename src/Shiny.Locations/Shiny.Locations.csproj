@@ -2,14 +2,7 @@
 
     <PropertyGroup>
         <Description>Shiny Locations - bringing geofencing and GPS to a background service near you!</Description>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(UwpTargetFramework)</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,10 +13,5 @@
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Update="GpsAccuracy.cs">
-        <SubType></SubType>
-      </Compile>
     </ItemGroup>
 </Project>

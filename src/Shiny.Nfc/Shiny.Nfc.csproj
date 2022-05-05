@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <Description>Shiny Near Field Communication (NFC)</Description>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework)</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

@@ -17,13 +17,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="Com.OneSignal" Version="3.10.6" />
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
         <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.5.0" />
         <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.5.0" />
         <PackageReference Update="Xamarin.ShortcutBadger" Version="1.1.21" />
-        <PackageReference Update="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.13" />
-        <PackageReference Update="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.1" />
     </ItemGroup>
 
 
@@ -104,7 +101,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
-        <Compile Include="**\Platforms\*Uwp*\**\*.cs" />
+        <Compile Include="**\Platforms\*Windows*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
