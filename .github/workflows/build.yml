@@ -1,4 +1,4 @@
-name: Build
+﻿name: Build
 
 on:
   workflow_dispatch:
@@ -8,11 +8,12 @@ on:
         required: true
         default: 'warning'
   push:
-    branches: [ master, main, dev, preview ]
-    paths:
-    - "src/**"
-    - "docs/**"
-    - "build/**"
+    branches:
+    - master
+    - main
+    - dev
+    - preview
+    - v*
 
 env:
   DotNetVersion: 6.0.100

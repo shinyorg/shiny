@@ -84,7 +84,7 @@ namespace ShinyBuild
                     return false;
 
                 var bn = this.Branch.FriendlyName.ToLower();
-                return bn.Equals("main") || bn.Equals("master") || bn.Equals("preview");
+                return bn.Equals("main") || bn.Equals("master") || bn.Equals("preview") || bn.StartsWith("v");
             }
         }
 
