@@ -107,8 +107,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Logging.Firebase", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Nfc", "src\Shiny.Nfc\Shiny.Nfc.csproj", "{C904374A-4D15-4EC8-B461-6ED6FE433B70}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Notifications.Common", "src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj", "{C1D4D762-F190-4EB7-B1A0-2ABF64EFDF0C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.Notifications.Common", "src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj", "{B6CDD847-90C2-461F-9F22-F932000357AD}"
 EndProject
 Global
