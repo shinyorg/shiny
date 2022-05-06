@@ -72,10 +72,10 @@ namespace Shiny
             startup?.ConfigureServices(services, platform);
             startup?.RegisterPlatformServices?.Invoke(services);
 
-            if (platform is IPlatformBuilder builder)
-                builder.Register(services);
-            else
-                services.RegisterCommonServices();
+            //if (platform is IPlatformBuilder builder)
+            //    builder.Register(services);
+            //else
+            //    services.RegisterCommonServices();
 
             ServiceProvider = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
             ServiceProvider.GetRequiredService<StartupModule>().Start(services);

@@ -54,7 +54,6 @@ namespace Shiny
         }
 
 
-        public string Name => KnownPlatforms.Android;
         public DirectoryInfo AppData { get; }
         public DirectoryInfo Cache { get; }
         public DirectoryInfo Public { get; }

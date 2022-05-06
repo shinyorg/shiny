@@ -16,7 +16,6 @@ on:
     - v*
 
 env:
-  DotNetVersion: 6.0.100
   NugetApiKey: ${{secrets.NUGETAPIKEY}}
   TwitterConsumerKey: ${{secrets.TWITTER_CONSUMER_KEY}}
   TwitterConsumerSecret: ${{secrets.TWITTER_CONSUMER_SECRET}}
@@ -40,7 +39,10 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: ${{ env.DotNetVersion }}
+          dotnet-version: '6.0.x'
+
+    - name: Add .NET 6 MAUI Workload
+      run: dotnet workload install android
 
     - name: Build
       run: dotnet run --project build/ShinyBuild.csproj

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-#if MONOANDROID
+#if ANDROID
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -18,8 +18,6 @@ namespace Shiny
 
     public interface IPlatform
     {
-        string Name { get; }
-
         PlatformState Status { get; }
         DirectoryInfo AppData { get; }
         DirectoryInfo Cache { get; }
@@ -38,8 +36,7 @@ namespace Shiny
         void InvokeOnMainThread(Action action);
         IObservable<PlatformState> WhenStateChanged();
 
-
-        #if MONOANDROID
+        #if ANDROID
         Application AppContext { get; }
         Activity CurrentActivity { get; }
         PackageInfo Package { get; }

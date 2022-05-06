@@ -18,9 +18,6 @@ namespace Shiny
         }
 
         static DirectoryInfo ToDirectory(NSSearchPathDirectory dir) => new DirectoryInfo(NSSearchPath.GetDirectories(dir, NSSearchPathDomain.User).First());
-
-
-        public string Name => KnownPlatforms.iOS; // TODO: others
         public DirectoryInfo AppData { get; }
         public DirectoryInfo Cache { get; }
         public DirectoryInfo Public { get; }

@@ -9,16 +9,6 @@ namespace Shiny
 {
     public static class PlatformExtensions
     {
-        public static bool Is(this IPlatform platform, string platformName)
-            => platform.Name.Equals(platformName);
-
-
-        public static bool IsAndroid(this IPlatform platform) => platform.Is(KnownPlatforms.Android);
-        public static bool IsIos(this IPlatform platform) => platform.Is(KnownPlatforms.iOS);
-        public static bool IsUwp(this IPlatform platform) => platform.Is(KnownPlatforms.Uwp);
-        public static bool IsNetstandard(this IPlatform platform) => platform.Is(KnownPlatforms.NetStandard);
-
-
         public static async Task<T> InvokeOnMainThreadAsync<T>(this IPlatform platform, Func<Task<T>> func, CancellationToken cancelToken = default)
         {
             var tcs = new TaskCompletionSource<T>();
