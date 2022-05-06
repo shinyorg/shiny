@@ -10,28 +10,13 @@
 
     <ItemGroup>
         <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.1.1" />
-        <PackageReference Update="Microsoft.CodeAnalysis" Version="4.1.0" />
-        <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="4.1.0" />
-        <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
-        <PackageReference Update="Microsoft.Net.Compilers.Toolset" Version="4.0.1" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
-        <PackageReference Update="Microsoft.AppCenter.Crashes" Version="4.5.0" />
-        <PackageReference Update="Microsoft.AppCenter.Analytics" Version="4.5.0" />
         <PackageReference Update="Xamarin.ShortcutBadger" Version="1.1.21" />
     </ItemGroup>
 
-
-    <ItemGroup>
-        <PackageReference Update="Xamarin.Firebase.iOS.Core" Version="8.10.0" />
-        <PackageReference Update="Xamarin.Firebase.iOS.CloudMessaging" Version="8.10.0" />
-        <PackageReference Update="Xamarin.Firebase.iOS.InstanceID" Version="4.8.0" />
-        <PackageReference Update="Xamarin.Firebase.iOS.Crashlytics" Version="8.10.0" />
-        <PackageReference Update="Xamarin.Firebase.iOS.Analytics" Version="8.10.0" />
-        <PackageReference Update="Xamarin.Firebase.iOS.Installations" Version="8.10.0" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Update="Xamarin.Firebase.Crashlytics" Version="[118.1.0, 118.2)" />
