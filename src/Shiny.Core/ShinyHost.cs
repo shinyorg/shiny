@@ -82,3 +82,60 @@ namespace Shiny
         }
     }
 }
+
+//namespace Shiny;
+
+//using Microsoft.Extensions.Logging;
+
+
+//public static class ShinyHost
+//{
+//    const string InitFailErrorMessage = "ServiceProvider is not initialized - This means you have not setup Shiny correctly!  Please follow instructions at https://shinylib.net";
+
+
+//    static IServiceProvider? serviceProvider;
+//    public static IServiceProvider ServiceProvider
+//    {
+//        get
+//        {
+//            AssertInit();
+//            return serviceProvider!;
+//        }
+//    }
+
+
+//    static ILoggerFactory? loggerFactory;
+//    public static ILoggerFactory LoggerFactory
+//    {
+//        get
+//        {
+//            AssertInit();
+//            return loggerFactory!;
+//        }
+//    }
+
+
+//    static void AssertInit()
+//    {
+//        if (serviceProvider == null)
+//            throw new InvalidOperationException(InitFailErrorMessage);
+//    }
+
+
+//    public static void Init(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+//    {
+//        if (serviceProvider != null)
+//            throw new InvalidOperationException("ShinyHost is already initialized");
+
+//        serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+//        loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+//    }
+
+
+//    public static void Clear()
+//    {
+//        serviceProvider = null;
+//        loggerFactory = null;
+//        // dispose here or some sort of manual shiny shutdown?
+//    }
+//}

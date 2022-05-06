@@ -18,4 +18,8 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
     </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Platforms\Apple\LifecycleEvents.cs" />
+    </ItemGroup>
 </Project>
