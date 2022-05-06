@@ -11,11 +11,6 @@ namespace Shiny.Infrastructure
 {
     public class StartupModule
     {
-        static readonly List<ShinyModule> modules = new List<ShinyModule>();
-        public static void AddModule(ShinyModule module)
-            => modules.Add(module);
-
-
         readonly IServiceProvider serviceProvider;
         readonly IObjectStoreBinder binder;
         readonly ILogger logger;
@@ -32,17 +27,6 @@ namespace Shiny.Infrastructure
 
 
         public async void Start(IServiceCollection services)
-        {
-            this.Bind(services);
-
-            foreach (var module in modules)
-                module.OnContainerReady(this.serviceProvider);
-
-            modules.Clear();
-        }
-
-
-        protected void Bind(IServiceCollection services)
         {
             var singletons = services
                 .Where(x =>

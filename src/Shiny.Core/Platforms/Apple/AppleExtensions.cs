@@ -117,12 +117,8 @@ namespace Shiny
         public static NSUuid ToNSUuid(this Guid guid) => new NSUuid(guid.ToString());
 
 
-        public static void ShinyFinishedLaunching(this UIApplicationDelegate app, IShinyStartup? startup = null, NSDictionary? options = null)
-        {
-            ShinyHost.Init(new ApplePlatform(), startup);
-            if (options != null)
-                ShinyHost.Resolve<AppleLifecycle>().OnFinishedLaunching(options);
-        }
+        public static void ShinyFinishedLaunching(this UIApplicationDelegate app, NSDictionary? options)
+            => ShinyHost.Resolve<AppleLifecycle>().OnFinishedLaunching(options);
 
         public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult>? completionHandler)
             => ShinyHost.Resolve<AppleLifecycle>().DidReceiveRemoteNotification(userInfo, completionHandler);

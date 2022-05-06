@@ -13,18 +13,6 @@ namespace Shiny
     public static class ServiceExtensions
     {
         /// <summary>
-        /// Register a module (like a category) of services
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="module"></param>
-        public static void RegisterModule(this IServiceCollection services, ShinyModule module)
-        {
-            module.Register(services);
-            StartupModule.AddModule(module);
-        }
-
-
-        /// <summary>
         /// Add the debug logger - this will only output if the debugger is attached
         /// </summary>
         /// <param name="builder"></param>
@@ -41,42 +29,22 @@ namespace Shiny
             => builder.AddProvider(new ConsoleLoggerProvider(logLevel));
 
         /// <summary>
-        /// Register a module (like a category) of services
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="services"></param>
-        public static void RegisterModule<T>(this IServiceCollection services)
-            where T : ShinyModule, new() => services.RegisterModule(new T());
-
-
-        /// <summary>
-        /// Get Service of Type T from the IServiceProvider
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="serviceProvider"></param>
-        /// <param name="requiredService"></param>
-        /// <returns></returns>
-        public static T? Resolve<T>(this IServiceProvider serviceProvider, bool requiredService = false)
-            => requiredService ? serviceProvider.GetRequiredService<T>() : serviceProvider.GetService<T>();
-
-
-        /// <summary>
         ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        public static async Task SafeResolveAndExecute<T>(this IServiceProvider services, Func<T, Task> execute, bool requiredService = true)
+        public static async Task SafeResolveAndExecute<T>(this IServiceProvider services, Func<T, Task> execute)
         {
             try
             {
-                var service = services.Resolve<T>(requiredService);
+                var service = services.GetService<T>();
                 if (service != null)
                     await execute.Invoke(service).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 services
-                    .Resolve<ILogger<T>>()
+                    .GetRequiredService<ILogger<T>>()
                     .LogError(ex, "Error executing delegate");
             }
         }

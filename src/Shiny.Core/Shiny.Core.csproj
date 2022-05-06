@@ -21,5 +21,11 @@
 
     <ItemGroup>
       <None Remove="Platforms\Apple\LifecycleEvents.cs" />
+      <None Remove="Platforms\Android\IAndroidPlatform.cs" />
+      <None Remove="Platforms\Android\IAndroidLifecycleBuilder.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="Platforms\Android\IAndroidPlatform.cs" />
+      <Compile Include="Platforms\Android\IAndroidLifecycleBuilder.cs" />
     </ItemGroup>
 </Project>
