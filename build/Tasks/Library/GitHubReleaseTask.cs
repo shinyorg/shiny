@@ -10,7 +10,7 @@ using Octokit;
 [IsDependentOn(typeof(NugetDeployTask))]
 public class GitHubReleaseTask : AsyncFrostingTask<BuildContext>
 {
-    public override bool ShouldRun(BuildContext context) => context.IsMainBranch && context.IsRunningInCI;
+    public override bool ShouldRun(BuildContext context) => context.IsReleaseBranch && context.IsRunningInCI;
 
 
     public override async Task RunAsync(BuildContext context)

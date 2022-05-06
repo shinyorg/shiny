@@ -21,8 +21,7 @@ namespace Shiny
 {
     public class AndroidPlatform : Java.Lang.Object,
                                    ILifecycleObserver,
-                                   IPlatform,
-                                   IPlatformBuilder
+                                   IPlatform
     {
         int requestCode;
         readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
