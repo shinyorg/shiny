@@ -106,7 +106,7 @@ namespace Shiny
 
 
 
-        public static T GetIntentValue<T>(this IPlatform platform, string intentAction, Func<Intent, T> transform)
+        public static T GetIntentValue<T>(this IAndroidPlatform platform, string intentAction, Func<Intent, T> transform)
         {
             using var filter = new IntentFilter(intentAction);
             using var receiver = platform.AppContext.RegisterReceiver(null, filter);
@@ -114,7 +114,7 @@ namespace Shiny
         }
 
 
-        public static int GetColorByName(this IPlatform platform, string colorName) => platform
+        public static int GetColorByName(this IAndroidPlatform platform, string colorName) => platform
             .AppContext
             .Resources
             .GetIdentifier(
@@ -123,7 +123,7 @@ namespace Shiny
                 platform.AppContext.PackageName
             );
 
-        public static int GetResourceIdByName(this IPlatform platform, string iconName) => platform
+        public static int GetResourceIdByName(this IAndroidPlatform platform, string iconName) => platform
             .AppContext
             .Resources
             .GetIdentifier(
@@ -134,7 +134,7 @@ namespace Shiny
 
 
         // Expects raw resource name like "notify_sound" or "raw/notify_sound"
-        public static int GetRawResourceIdByName(this IPlatform platform, string rawName) => platform
+        public static int GetRawResourceIdByName(this IAndroidPlatform platform, string rawName) => platform
             .AppContext
             .Resources
             .GetIdentifier(
@@ -144,7 +144,7 @@ namespace Shiny
             );
 
 
-        public static IObservable<PermissionRequestResult> RequestFilteredPermissions(this IPlatform context, params AndroidPermission[] androidPermissions)
+        public static IObservable<PermissionRequestResult> RequestFilteredPermissions(this IAndroidPlatform context, params AndroidPermission[] androidPermissions)
         {
             var list = new List<string>();
             foreach (var p in androidPermissions)
@@ -191,9 +191,6 @@ namespace Shiny
             => ShinyHost
                 .Resolve<IPlatform>()
                 .OnActivityResult(requestCode, resultCode, data);
-
-        public static void ShinyOnCreate(this Application application, IShinyStartup? startup = null)
-            => ShinyHost.Init(new AndroidPlatform(application), startup);
 
         // no longer used
         [Obsolete("No longer needed")]

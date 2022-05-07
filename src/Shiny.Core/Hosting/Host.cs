@@ -18,7 +18,7 @@ public class Host : IHost
 
     public static IHostBuilder CreateDefault()
     {
-        var builder = new HostBuilder();
+        var builder = new HostBuilder(null);
 
         return builder;
     }

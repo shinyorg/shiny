@@ -6,6 +6,7 @@ namespace Shiny;
 
 public interface IPlatform
 {
+    string AppIdentifier { get; }
     void InvokeOnMainThread(Action action);
 
     DirectoryInfo AppData { get; }
