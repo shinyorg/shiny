@@ -2,7 +2,6 @@
 using System.Reactive.Linq;
 using System.IO;
 using System.Linq;
-using UIKit;
 using Foundation;
 
 
@@ -31,12 +30,6 @@ namespace Shiny
         public string Manufacturer { get; } = "Apple";
         public string Model { get; } = "";
 
-        public PlatformState Status => UIApplication.SharedApplication.ApplicationState switch
-        {
-            UIApplicationState.Active => PlatformState.Foreground,
-            _ => PlatformState.Background
-        };
-
 
         public void InvokeOnMainThread(Action action)
         {
@@ -49,27 +42,5 @@ namespace Shiny
                 NSRunLoop.Main.BeginInvokeOnMainThread(action);
             }
         }
-
-
-#if __WATCHOS__
-        public IObservable<PlatformState> WhenStateChanged() => Observable.Empty<PlatformState>();
-#else
-        public IObservable<PlatformState> WhenStateChanged() => Observable.Create<PlatformState>(ob =>
-        {
-            var fg = UIApplication.Notifications.ObserveWillEnterForeground(
-                UIApplication.SharedApplication,
-                (_, __) => ob.OnNext(PlatformState.Foreground)
-            );
-            var bg = UIApplication.Notifications.ObserveDidEnterBackground(
-                UIApplication.SharedApplication,
-                (_, __) => ob.OnNext(PlatformState.Background)
-            );
-            return () =>
-            {
-                fg?.Dispose();
-                bg?.Dispose();
-            };
-        });
-#endif
     }
 }

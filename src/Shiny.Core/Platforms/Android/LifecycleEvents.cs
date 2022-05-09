@@ -1,5 +1,7 @@
 ﻿namespace Shiny;
 
+using System;
+using Android.App;
 using Android.Content;
 using Shiny.Hosting;
 
