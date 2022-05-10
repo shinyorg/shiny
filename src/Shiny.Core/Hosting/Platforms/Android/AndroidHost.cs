@@ -11,33 +11,23 @@ using Android.Content.PM;
 using Android.OS;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
-using AndroidX.Lifecycle;
 using B = global::Android.OS.Build;
-using Microsoft.Extensions.DependencyInjection;
-using Java.Interop;
 
 
 namespace Shiny
 {
-    public class AndroidPlatform : Java.Lang.Object,
-                                   ILifecycleObserver,
-                                   IPlatform
+    public class AndroidHost : Java.Lang.Object, IAndroidHost
     {
         int requestCode;
-        readonly Subject<PlatformState> stateSubj = new Subject<PlatformState>();
-        readonly Subject<Intent> newIntentSubject = new Subject<Intent>();
-        readonly Subject<PermissionRequestResult> permissionSubject = new Subject<PermissionRequestResult>();
-        readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new Subject<(int RequestCode, Result Result, Intent Intent)>();
+        readonly Subject<Intent> newIntentSubject = new();
+        readonly Subject<PermissionRequestResult> permissionSubject = new();
+        readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new();
         readonly Application app;
-        readonly ActivityLifecycleCallbacks callbacks;
 
 
-        public AndroidPlatform(Application app)
+        public AndroidHost(Application app)
         {
-            this.app = app;
-            this.callbacks = new ActivityLifecycleCallbacks();
-            this.app.RegisterActivityLifecycleCallbacks(this.callbacks);
-            ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
+           
 
             this.AppData = new DirectoryInfo(this.AppContext.FilesDir.AbsolutePath);
             this.Cache = new DirectoryInfo(this.AppContext.CacheDir.AbsolutePath);
@@ -47,40 +37,21 @@ namespace Shiny
         }
 
 
-        public void Register(IServiceCollection services)
-        {
-            services.AddSingleton<IPlatform>(this);
-            services.RegisterCommonServices();
-        }
+        //public void Register(IServiceCollection services)
+        //{
+        //    services.AddSingleton<IPlatform>(this);
+        //    services.RegisterCommonServices();
+        //}
 
 
         public DirectoryInfo AppData { get; }
         public DirectoryInfo Cache { get; }
         public DirectoryInfo Public { get; }
+
+
+        // TODO: I still need access to these lifecycle events outside of the builder OR do I?
         public Activity? CurrentActivity => this.callbacks.Activity;
         public IObservable<ActivityChanged> WhenActivityChanged() => this.callbacks.ActivitySubject;
-
-
-        [Lifecycle.Event.OnResume]
-        [Export]
-        public void OnResume()
-        {
-            this.Status = PlatformState.Foreground;
-            this.stateSubj.OnNext(PlatformState.Foreground);
-        }
-
-
-        [Lifecycle.Event.OnPause]
-        [Export]
-        public void OnPause()
-        {
-            this.Status = PlatformState.Background;
-            this.stateSubj.OnNext(PlatformState.Background);
-        }
-
-
-        public IObservable<PlatformState> WhenStateChanged()
-            => this.stateSubj.OnErrorResumeNext(Observable.Empty<PlatformState>());
 
 
         readonly Handler handler = new Handler(Looper.MainLooper);

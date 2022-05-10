@@ -8,7 +8,6 @@ namespace Shiny.Hosting
         IServiceCollection Services { get; }
         //ConfigurationManager? Configuration { get; }
         ILifecycleBuilder Lifecycle { get; }
-        IPlatform Platform { get; }
 
         IHost Build();
     }

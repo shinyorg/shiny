@@ -1,9 +1,11 @@
-﻿namespace Shiny;
+﻿using Shiny.Hosting;
 
-using System;
-using Android.App;
-using Android.Content;
-using Shiny.Hosting;
+namespace Shiny;
+
+
+public static class AndroidLifecycleExtensions
+{
+}
 
 // TODO: I have to add some of the lifecycle methods for android like the following: 
 // TODO: need a holder for current activity
@@ -39,17 +41,17 @@ public void OnPause()
 }
  */
 
-public record ActivityResult(Activity Activity, Result Result, Intent Intent);
-public record ActivityPermissionResult(Activity Activity);
+//public record ActivityResult(Activity Activity, Result Result, Intent Intent);
+//public record ActivityPermissionResult(Activity Activity);
 
 
 
-public static class AndroidLifecycleBuilderEvents
-{
-    public static ILifecycleBuilder OnActivityPermissionResult(this ILifecycleBuilder builder, Action<ActivityPermissionResult> action)
-    {
-        //builder.On(typeof(ActivityPermissionResult), action);
+//public static class AndroidLifecycleBuilderEvents
+//{
+//    public static ILifecycleBuilder OnActivityPermissionResult(this ILifecycleBuilder builder, Action<ActivityPermissionResult> action)
+//    {
+//        //builder.On(typeof(ActivityPermissionResult), action);
 
-        return builder;
-    }
+//        return builder;
+//    }
 }
