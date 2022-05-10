@@ -27,7 +27,9 @@ namespace ShinyBuild
 #endif
             this.Branch = context.GitBranchCurrent(".");
 
-            this.ReleaseVersion = this.GitVersioningGetVersion().NuGetPackageVersion;
+            var v = this.GitVersioningGetVersion();
+            v.PublicRelease = true;
+            this.ReleaseVersion = v.NuGetPackageVersion;
             this.Log.Information("NUGET PACKAGE VERSION: " + this.ReleaseVersion);
         }
 
@@ -41,7 +43,7 @@ namespace ShinyBuild
         public bool AllowNugetUploadFailures => this.ArgumentOrEnvironment("AllowNugetUploadFailures", false);
         public GitBranch Branch { get; }
 
-        public T ArgumentOrEnvironment<T>(string name, T defaultValue = default)
+        public T ArgumentOrEnvironment<T>(string name, T? defaultValue = default)
             => this.HasArgument(name) ? this.Argument<T>(name) : this.EnvironmentVariable<T>(name, defaultValue);
 
         public bool HasArgumentOrEnvironment(string name)
@@ -58,15 +60,7 @@ namespace ShinyBuild
             }
         }
 
-        public bool IsMainBranch
-        {
-            get
-            {
-                var bn = this.Branch.FriendlyName.ToLower();
-                return bn.Equals("main") || bn.Equals("master");
-            }
-        }
-
+        public bool IsReleaseBranch => this.Branch.FriendlyName.ToLower().StartsWith("v");
 
         public bool IsPullRequest =>
             this.IsRunningInCI &&

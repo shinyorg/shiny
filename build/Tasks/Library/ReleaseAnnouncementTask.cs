@@ -31,7 +31,7 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 
     async Task Twitter(BuildContext context, string message)
     {
-        if (!context.IsMainBranch)
+        if (!context.IsNugetDeployBranch)
             return;
 
         try
