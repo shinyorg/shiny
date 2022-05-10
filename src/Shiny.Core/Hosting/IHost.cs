@@ -9,6 +9,5 @@ namespace Shiny.Hosting
         IServiceProvider ServiceProvider { get; }
         //IConfiguration Configuration { get; }
         ILoggerFactory Logging { get; }
-        IPlatform Platform { get; }
     }
 }

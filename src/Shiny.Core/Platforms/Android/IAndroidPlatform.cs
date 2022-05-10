@@ -1,12 +1,22 @@
 ﻿using System;
+using System.IO;
 using Android.App;
 using Android.Content.PM;
+using Shiny.Hosting;
 
 namespace Shiny;
 
 
-public interface IAndroidPlatform : IPlatform
+public interface IAndroidHost : IHost
 {
+    string AppIdentifier { get; }
+    void InvokeOnMainThread(Action action);
+
+    DirectoryInfo AppData { get; }
+    DirectoryInfo Cache { get; }
+    DirectoryInfo Public { get; }
+
+
     Application AppContext { get; }
     Activity? CurrentActivity { get; }
     PackageInfo Package { get; }

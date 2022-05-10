@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,28 +20,31 @@ namespace Shiny.BluetoothLE.Internals
     {
         readonly ConcurrentDictionary<string, Peripheral> devices;
         readonly Subject<(Intent Intent, Peripheral Peripheral)> peripheralSubject;
-        readonly ShinyCoreServices services;
+        //readonly ShinyCoreServices services;
+
+        readonly IAndroidPlatform platform;
         readonly ILogger logger;
         LollipopScanCallback? callbacks;
 
 
-        public ManagerContext(ShinyCoreServices services,
+        public ManagerContext(IAndroidPlatform platform,
+                              IServiceProvider serviceProvider,
                               BleConfiguration config,
                               ILogger<ManagerContext> logger)
         {
             this.Configuration = config;
-            this.services = services;
+            //this.services = services;
             this.logger = logger;
 
             this.devices = new ConcurrentDictionary<string, Peripheral>();
             this.peripheralSubject = new Subject<(Intent Intent, Peripheral Peripheral)>();
-            this.Manager = services.Platform.GetBluetooth();
+            this.Manager = platform.GetBluetooth();
         }
 
 
         public void Start()
         {
-            this.services.Platform.RegisterBroadcastReceiver<ShinyBleBroadcastReceiver>(
+            this.platform.RegisterBroadcastReceiver<ShinyBleBroadcastReceiver>(
                 BluetoothDevice.ActionNameChanged,
                 BluetoothDevice.ActionBondStateChanged,
                 BluetoothDevice.ActionPairingRequest,

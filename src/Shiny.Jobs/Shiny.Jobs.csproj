@@ -16,4 +16,12 @@
         <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Net\" />
+      <None Remove="Power\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Net\" />
+      <Folder Include="Power\" />
+    </ItemGroup>
 </Project>
