@@ -71,7 +71,7 @@
         <Compile Include="**\Platforms\Shared\**\*.cs" />
         <Compile Include="**\Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
-
+    
     <ItemGroup Condition="'$(IsTvOsBuild)' == 'true' ">
         <Compile Include="**\Platforms\Apple\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />

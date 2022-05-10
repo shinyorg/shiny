@@ -53,7 +53,8 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
         <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>14.2</TargetPlatformMinVersion>
+        <TargetPlatformMinVersion>14.2</TargetPlatformMinVersion>        
+        <IsIosBuild>true</IsIosBuild>
     </PropertyGroup>
 
     <!--
