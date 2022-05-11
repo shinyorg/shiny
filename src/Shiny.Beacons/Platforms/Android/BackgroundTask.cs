@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using System.Collections.Generic;
 using Shiny.BluetoothLE;
 using Microsoft.Extensions.Logging;
-
+using Shiny.Infrastructure;
 
 namespace Shiny.Beacons
 {

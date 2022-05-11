@@ -1,7 +1,6 @@
 ﻿using System;
 
-
-namespace Shiny
+namespace Shiny.Infrastructure
 {
     public interface IMessageBus
     {

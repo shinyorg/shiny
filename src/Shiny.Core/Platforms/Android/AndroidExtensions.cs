@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Shiny.Hosting;
 
 namespace Shiny;
 

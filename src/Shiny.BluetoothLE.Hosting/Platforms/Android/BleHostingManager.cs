@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
-using Java.Util;
-using Shiny.BluetoothLE.Hosting.Internals;
 
+using Java.Util;
+
+using Shiny.BluetoothLE.Hosting.Internals;
+using Shiny.Infrastructure;
 
 namespace Shiny.BluetoothLE.Hosting
 {

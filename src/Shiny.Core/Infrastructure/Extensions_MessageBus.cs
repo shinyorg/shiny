@@ -2,8 +2,7 @@
 using System.Reactive;
 using System.Reactive.Linq;
 
-
-namespace Shiny
+namespace Shiny.Infrastructure
 {
     public static class MessageBusExtensions
     {
