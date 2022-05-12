@@ -11,7 +11,7 @@ namespace Shiny
 {
     public class ShinyUserNotificationDelegate : UNUserNotificationCenterDelegate
     {
-        readonly ILogger logger = ShinyHost.LoggerFactory.CreateLogger(nameof(ShinyUserNotificationDelegate));
+        //readonly ILogger logger = ShinyHost.LoggerFactory.CreateLogger(nameof(ShinyUserNotificationDelegate));
 
 
         readonly List<Func<UNNotificationResponse, Task>> receiveNotifications = new List<Func<UNNotificationResponse, Task>>();
@@ -42,7 +42,7 @@ namespace Shiny
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, "DidReceiveNotificationResponse");
+                    //this.logger.LogError(ex, "DidReceiveNotificationResponse");
                 }
             }
             completionHandler();
@@ -61,7 +61,7 @@ namespace Shiny
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, "WillPresentNotification");
+                    //this.logger.LogError(ex, "WillPresentNotification");
                 }
             }
             completionHandler.Invoke(UNNotificationPresentationOptions.Alert);

@@ -27,4 +27,20 @@
         <Compile Include="Platforms\Shared\**\*.cs" />
         <Compile Include="Platforms\iOS\**\*.cs" />
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="Stores\Platforms\Apple\PlistKeyValueStore.cs" />
+      <None Remove="Stores\Platforms\Apple\SecureKeyValueStore.cs" />
+      <None Remove="Stores\Platforms\Apple\SettingsKeyValueStore.cs" />
+      <None Remove="Stores\" />
+      <None Remove="Maui\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="Stores\Platforms\Apple\PlistKeyValueStore.cs" />
+      <Compile Include="Stores\Platforms\Apple\SecureKeyValueStore.cs" />
+      <Compile Include="Stores\Platforms\Apple\SettingsKeyValueStore.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Stores\" />
+      <Folder Include="Maui\" />
+    </ItemGroup>
 </Project>

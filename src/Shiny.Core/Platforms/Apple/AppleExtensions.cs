@@ -5,9 +5,9 @@ using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using ObjCRuntime;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Shiny;
+
 
 public static class AppleExtensions
 {
@@ -117,24 +117,24 @@ public static class AppleExtensions
     public static NSUuid ToNSUuid(this Guid guid) => new NSUuid(guid.ToString());
 
 
-    public static void ShinyFinishedLaunching(this UIApplicationDelegate app, NSDictionary options)
-        => ShinyHost.ServiceProvider.GetRequiredService<AppleLifecycle>().OnFinishedLaunching(options);
+    //public static void ShinyFinishedLaunching(this UIApplicationDelegate app, NSDictionary options)
+    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().OnFinishedLaunching(options);
 
-    public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult>? completionHandler)
-        => ShinyHost.ServiceProvider.GetRequiredService<AppleLifecycle>().DidReceiveRemoteNotification(userInfo, completionHandler);
+    //public static void ShinyDidReceiveRemoteNotification(this UIApplicationDelegate app, NSDictionary userInfo, Action<UIBackgroundFetchResult>? completionHandler)
+    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().DidReceiveRemoteNotification(userInfo, completionHandler);
 
-    public static void ShinyRegisteredForRemoteNotifications(this UIApplicationDelegate app, NSData deviceToken)
-        => ShinyHost.ServiceProvider.GetRequiredService<AppleLifecycle>().RegisteredForRemoteNotifications(deviceToken);
+    //public static void ShinyRegisteredForRemoteNotifications(this UIApplicationDelegate app, NSData deviceToken)
+    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().RegisteredForRemoteNotifications(deviceToken);
 
-    public static void ShinyFailedToRegisterForRemoteNotifications(this UIApplicationDelegate app, NSError error)
-        => ShinyHost.ServiceProvider.GetRequiredService<AppleLifecycle>().FailedToRegisterForRemoteNotifications(error);
+    //public static void ShinyFailedToRegisterForRemoteNotifications(this UIApplicationDelegate app, NSError error)
+    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().FailedToRegisterForRemoteNotifications(error);
 
-    public static void ShinyPerformFetch(this UIApplicationDelegate app, Action<UIBackgroundFetchResult> completionHandler)
-        => ShinyHost.ServiceProvider.GetRequiredService<AppleLifecycle>().OnPerformFetch(completionHandler);
+    //public static void ShinyPerformFetch(this UIApplicationDelegate app, Action<UIBackgroundFetchResult> completionHandler)
+    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().OnPerformFetch(completionHandler);
 
-    public static void ShinyHandleEventsForBackgroundUrl(this UIApplicationDelegate app, string sessionIdentifier, Action completionHandler)
-        => ShinyHost.ServiceProvider.GetRequiredService<AppleLifecycle>().HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
+    //public static void ShinyHandleEventsForBackgroundUrl(this UIApplicationDelegate app, string sessionIdentifier, Action completionHandler)
+    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().HandleEventsForBackgroundUrl(sessionIdentifier, completionHandler);
 
-    public static bool ShinyContinueUserActivity(this UIApplicationDelegate app, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
-        => ShinyHost.ServiceProvider.GetRequiredService<AppleLifecycle>().ContinueUserActivity(userActivity, completionHandler);
+    //public static bool ShinyContinueUserActivity(this UIApplicationDelegate app, NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
+    //    => Host.Current.ServiceProvider.GetRequiredService<AppleLifecycle>().ContinueUserActivity(userActivity, completionHandler);
 }
