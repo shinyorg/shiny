@@ -56,14 +56,4 @@
         <TargetPlatformMinVersion>14.2</TargetPlatformMinVersion>        
         <IsIosBuild>true</IsIosBuild>
     </PropertyGroup>
-
-    <!--
-    <PropertyGroup Condition="$(TargetFramework.StartsWith('uap'))">
-		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-        <GenerateLibraryLayout>true</GenerateLibraryLayout>
-        <DisableEmbeddedXbf>false</DisableEmbeddedXbf>
-        <IsWindowsBuild>true</IsWindowsBuild>
-    </PropertyGroup>
-    -->
 </Project>

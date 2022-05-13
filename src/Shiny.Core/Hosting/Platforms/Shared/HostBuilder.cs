@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
 using Shiny.Logging;
 
 namespace Shiny.Hosting;
@@ -13,35 +12,38 @@ public class HostBuilder : IHostBuilder
     public HostBuilder()
     {
         this.Services = new ServiceCollection();
-        //this.Lifecycle = new LifecycleBuilder();
-        //new ShinyLoggingBuilder(this.Services);
+        this.Lifecycle = new LifecycleBuilder();
+        this.Logging = new ShinyLoggingBuilder(this.Services);
+
+#if __ANDROID__
+#elif __IOS__
+#endif
     }
 
 
     public IServiceCollection Services { get; }
-    //public ConfigurationManager Configuration { get; private set; }
     public ILifecycleBuilder Lifecycle { get; }
-
-
-    public IHostBuilder ConfigureLogging(Action<ILoggingBuilder> builder)
-    {
-        this.Services.AddLogging(builder);
-        return this;
-    }
+    public ILoggingBuilder Logging { get; }
 
 
     public virtual IHost Build()
     {
         IHost? host = null;
-
-        //this.Services.AddSingleton(this.Configuration);
-        this.Services.AddSingleton(_ => host!);
-        
-
         //var lifecycle = this.Lifecycle.Build();
         //this.Services.AddSingleton(lifecycle);
 
+        this.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
+        this.Services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
         var serviceProvider = this.Services.BuildServiceProvider();
+
+        var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+#if __ANDROID__
+        //new AndroidHost(Application.Context)
+#elif __IOS__
+        var host = new IosHost();
+
+#else
+#endif
         //host = new Host
         //{
         //    ServiceProvider = serviceProvider,

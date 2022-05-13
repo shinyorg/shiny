@@ -17,14 +17,14 @@ public interface IAndroidHost : IHost
     DirectoryInfo Public { get; }
 
 
+    //Activity? CurrentActivity { get; }
+
     Application AppContext { get; }
-    Activity? CurrentActivity { get; }
     PackageInfo Package { get; }
 
     bool IsMinApiLevel(int apiLevel);
     IObservable<PermissionRequestResult> RequestPermissions(params string[] androidPermissions);
     IObservable<AccessState> RequestAccess(string androidPermission);
-
     AccessState GetCurrentAccessState(string androidPermission);
     
     void StartService(Type serviceType);

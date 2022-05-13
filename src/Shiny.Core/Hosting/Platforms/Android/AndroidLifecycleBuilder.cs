@@ -8,8 +8,9 @@ namespace Shiny.Hosting;
 
 
 [Preserve(AllMembers = true)]
-class ActivityLifecycleCallbacks : Java.Lang.Object, Application.IActivityLifecycleCallbacks
+public class AndroidLifecycleBuilder : Java.Lang.Object, Application.IActivityLifecycleCallbacks //, ILifecycleBuilder
 {
+    // TODO: only activity OnNewIntent & OnPermissionRequest need to be routed from the activity directly - the activity lifecycle callbacks can handle the rest
     public Subject<ActivityChanged> ActivitySubject { get; } = new();
     readonly WeakReference<Activity?> current = new(null);
 

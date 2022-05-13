@@ -1,14 +1,15 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+namespace Shiny.Hosting;
 
 
-namespace Shiny.Hosting
+public interface IHostBuilder
 {
-    public interface IHostBuilder
-    {
-        IServiceCollection Services { get; }
-        //ConfigurationManager? Configuration { get; }
-        ILifecycleBuilder Lifecycle { get; }
+    IServiceCollection Services { get; }
+    //ConfigurationManager? Configuration { get; }
+    ILifecycleBuilder Lifecycle { get; }
+    ILoggingBuilder Logging { get; }
 
-        IHost Build();
-    }
+    IHost Build();
 }

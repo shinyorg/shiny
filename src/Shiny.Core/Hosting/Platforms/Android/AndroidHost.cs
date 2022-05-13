@@ -54,8 +54,8 @@ public class AndroidHost : Java.Lang.Object, IAndroidHost
 
 
     // TODO: I still need access to these lifecycle events outside of the builder OR do I?
-    public Activity? CurrentActivity => this.callbacks.Activity;
-    public IObservable<ActivityChanged> WhenActivityChanged() => this.callbacks.ActivitySubject;
+    //public Activity? CurrentActivity => this.callbacks.Activity;
+    //public IObservable<ActivityChanged> WhenActivityChanged() => this.callbacks.ActivitySubject;
 
 
     readonly Handler handler = new Handler(Looper.MainLooper);

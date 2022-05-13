@@ -30,37 +30,16 @@ public abstract class Host : IHost
     public static bool IsInitialized => currentHost != null;
 
 
+    protected Host(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+    {
+        this.ServiceProvider = serviceProvider;
+        this.Logging = loggerFactory;
+    }
+
+
     public IServiceProvider ServiceProvider { get; init; }
-    //public IConfiguration Configuration { get; init; }
     public ILoggerFactory Logging { get; init; }
 
 
-    public static IHostBuilder CreateDefault()
-    {
-        //var builder = new HostBuilder(null);
-
-        //return builder;
-        return null;
-    }
+    public static IHostBuilder CreateDefault() => new HostBuilder();
 }
-//public static void Init(IPlatform platform)
-//{
-//    var services = new ServiceCollection();
-//    var loggingBuilder = new ShinyLoggingBuilder(services);
-
-//    services.AddSingleton<ILoggerFactory, ShinyLoggerFactory>();
-//    services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
-//    services.AddSingleton(platform);
-
-//    //startup?.ConfigureLogging(loggingBuilder, platform);
-//    //startup?.ConfigureServices(services, platform);
-//    //startup?.RegisterPlatformServices?.Invoke(services);
-
-//    ////if (platform is IPlatformBuilder builder)
-//    ////    builder.Register(services);
-//    ////else
-//    ////    services.RegisterCommonServices();
-
-//    //ServiceProvider = startup?.CreateServiceProvider(services) ?? services.BuildServiceProvider();
-//    ServiceProvider.GetRequiredService<StartupModule>().Start(services);
-//}
