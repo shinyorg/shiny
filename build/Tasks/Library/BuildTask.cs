@@ -22,8 +22,8 @@ namespace ShinyBuild.Tasks.Library
                 .WithRestore()
                 .WithTarget("Clean")
                 .WithTarget("Build")
-                .WithProperty("PublicRelease", context.IsNugetDeployBranch.ToString())
-                .WithProperty("CI", context.IsRunningInCI ? "true" : "")
+                .WithProperty("PublicRelease", "true")
+                .WithProperty("CI", context.IsRunningInCI.ToString())
                 .WithProperty("OS", context.OperatingSystemString)
                 .SetConfiguration(context.MsBuildConfiguration)
             );
