@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
@@ -15,7 +14,5 @@
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <PackageReference Include="Xamarin.AndroidX.Core" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
-        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
     </ItemGroup>
 </Project>

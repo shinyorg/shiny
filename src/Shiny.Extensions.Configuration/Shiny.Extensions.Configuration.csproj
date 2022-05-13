@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('android'))">
-		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.1.1.13" />
+		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.1" />
         <Compile Include="Platforms\Android\**\*.cs" />
         <Compile Include="Platforms\Shared\**\*.cs" />
     </ItemGroup>
@@ -33,13 +33,9 @@
       <None Remove="Stores\Platforms\Apple\SettingsKeyValueStore.cs" />
       <None Remove="Stores\" />
       <None Remove="Maui\" />
-    </ItemGroup>
-    <ItemGroup>
       <Compile Include="Stores\Platforms\Apple\PlistKeyValueStore.cs" />
       <Compile Include="Stores\Platforms\Apple\SecureKeyValueStore.cs" />
       <Compile Include="Stores\Platforms\Apple\SettingsKeyValueStore.cs" />
-    </ItemGroup>
-    <ItemGroup>
       <Folder Include="Stores\" />
       <Folder Include="Maui\" />
     </ItemGroup>
