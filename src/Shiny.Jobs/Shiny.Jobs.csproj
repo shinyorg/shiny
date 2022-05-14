@@ -7,6 +7,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Stores\Shiny.Stores.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
@@ -14,14 +15,5 @@
         <PackageReference Include="Xamarin.AndroidX.Room.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="Net\" />
-      <None Remove="Power\" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Net\" />
-      <Folder Include="Power\" />
     </ItemGroup>
 </Project>
