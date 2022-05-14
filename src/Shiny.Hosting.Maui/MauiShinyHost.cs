@@ -1,4 +1,10 @@
-﻿//namespace Shiny;
+﻿namespace Shiny.Hosting;
+
+public class MauiShinyHost
+{
+}
+
+//namespace Shiny;
 
 //using Microsoft.Extensions.Logging;
 //using Microsoft.Maui.Hosting;

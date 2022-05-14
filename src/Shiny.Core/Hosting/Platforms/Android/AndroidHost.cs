@@ -9,7 +9,6 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using B = global::Android.OS.Build;
 using Microsoft.Extensions.Logging;
@@ -25,7 +24,7 @@ public class AndroidHost : Java.Lang.Object, IAndroidHost
     readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new();
 
 
-    public AndroidHost(Application app, ILoggerFactory logging, IServiceProvider serviceProvider)
+    public AndroidHost(Application app, IServiceProvider serviceProvider, ILoggerFactory logging)
     {
         this.AppContext = app;
         this.Logging = logging;
@@ -47,6 +46,8 @@ public class AndroidHost : Java.Lang.Object, IAndroidHost
 
     public IServiceProvider ServiceProvider { get; }
     public ILoggerFactory Logging { get; }
+
+    public Activity? CurrentActivity { get; } // TODO
     public Application AppContext { get; }
     public DirectoryInfo AppData { get; }
     public DirectoryInfo Cache { get; }

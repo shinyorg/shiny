@@ -177,11 +177,8 @@ public static class AndroidExtensions
     }
 
 
-    public static IObservable<(Result Result, Intent Data)> RequestActivityResult(this IAndroidHost context, Intent intent)
-        => context.RequestActivityResult((requestCode, activity) =>
-            activity.StartActivityForResult(intent, requestCode)
-        );
-
-
-
+    //public static IObservable<(Result Result, Intent Data)> RequestActivityResult(this IAndroidHost context, Intent intent)
+    //    => context.RequestActivityResult((requestCode, activity) =>
+    //        activity.StartActivityForResult(intent, requestCode)
+    //    );
 }

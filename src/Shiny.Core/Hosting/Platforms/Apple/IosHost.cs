@@ -3,13 +3,14 @@ using System.Reactive.Linq;
 using System.IO;
 using System.Linq;
 using Foundation;
+using Microsoft.Extensions.Logging;
 
 namespace Shiny.Hosting;
 
 
 public class IosHost : Host, IIosHost
 {
-    public IosHost()
+    public IosHost(IServiceProvider serviceProvider, ILoggerFactory loggerFactory) : base(serviceProvider, loggerFactory)
     {
         this.AppData = ToDirectory(NSSearchPathDirectory.LibraryDirectory);
         this.Public = ToDirectory(NSSearchPathDirectory.DocumentDirectory);

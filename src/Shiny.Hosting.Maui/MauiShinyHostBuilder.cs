@@ -1,4 +1,10 @@
-﻿//namespace Shiny.Core.Maui;
+﻿namespace Shiny.Hosting;
+
+public class MauiShinyHostBuilder
+{
+}
+
+//namespace Shiny.Core.Maui;
 
 //internal class MauiLifecycleBuilder : ILifecycleBuilder
 //{

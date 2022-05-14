@@ -3,7 +3,7 @@
 
 namespace Shiny
 {
-    public abstract class ShinyStartupTask : NotifyPropertyChanged, IShinyStartupTask
+    public abstract class ShinyStartupTask : NotifyPropertyChanged, IShinyPersistent, IShinyStartupTask
     {
         public abstract void Start();
     }

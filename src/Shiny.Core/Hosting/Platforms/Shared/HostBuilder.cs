@@ -35,26 +35,18 @@ public class HostBuilder : IHostBuilder
         this.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
         this.Services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
         var serviceProvider = this.Services.BuildServiceProvider();
-
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-#if __ANDROID__
-        //new AndroidHost(Application.Context)
-#elif __IOS__
-        var host = new IosHost();
 
+#if __ANDROID__
+        //host = new AndroidHost((Application)Android.App.Application.Context, serviceProvider, loggerFactory);
+#elif __IOS__
+        host = new IosHost(serviceProvider, loggerFactory);
 #else
 #endif
-        //host = new Host
-        //{
-        //    ServiceProvider = serviceProvider,
-        //    //Configuration = this.Configuration,
-        //    Platform = this.Platform,
-        //    Logging = serviceProvider.GetRequiredService<ILoggerFactory>()
-        //};
 
         // TODO: push serviceprovider to static somewhere
         // TODO: maui and blazor won't use this
-        //Host.Current = host;
+        Host.Current = host;
         return host;
     }
 }
