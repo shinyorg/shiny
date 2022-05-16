@@ -7,12 +7,26 @@ namespace Shiny.Hosting;
 public record FinishedLaunching(NSDictionary Options);
 public record HandleEventsForBackgroundUrl(string SessionUrl);
 public record RegisterContinueActivity(NSUserActivity Activity);
+public record RegisterForRemoteNotification();
+
+
+//public interface IosDelegateFinishedLaunching 
+//{ 
+//    void FinishedLaunching(NSDictionary options); 
+//}
+//public interface IosDelegateRemoteNotifications
+//{
+
+//}
+
 
 
 public static class LifecycleBuilderExtensions
 {
     public static ILifecycleBuilder AddIos(this ILifecycleBuilder lifecycleBuilder, Action<IosLifecycleBuilder> builder)
     {
+        var nativeLifecycleBuiler = new IosLifecycleBuilder(lifecycleBuilder);
+        builder.Invoke(nativeLifecycleBuiler);
         return lifecycleBuilder;
     }
 }
@@ -20,8 +34,14 @@ public static class LifecycleBuilderExtensions
 
 public class IosLifecycleBuilder
 {
+    readonly ILifecycleBuilder lifecycleBuilder;
+    public IosLifecycleBuilder(ILifecycleBuilder lifecycleBuilder)
+        => this.lifecycleBuilder = lifecycleBuilder;
+
+
     public IosLifecycleBuilder OnFinishedLaunching(Action<FinishedLaunching> onLaunching)
     {
+        //lifecycleBuilder.On<FinishedLaunching>()
         return this;
     }
 
@@ -44,14 +64,6 @@ public class IosLifecycleBuilder
 //{
 //    this.ndelegate ??= new ShinyUserNotificationDelegate();
 //    UNUserNotificationCenter.Current.Delegate = this.ndelegate;
-//}
-
-
-//readonly List<Func<Task>> handleFetch = new List<Func<Task>>();
-//public IDisposable RegisterForPerformFetch(Func<Task> task)
-//{
-//    this.handleFetch.Add(task);
-//    return Disposable.Create(() => this.handleFetch.Remove(task));
 //}
 
 

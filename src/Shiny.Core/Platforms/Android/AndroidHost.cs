@@ -27,8 +27,7 @@ public class AndroidHost : IAndroidHost
     public AndroidHost(
         Application app, 
         IServiceProvider serviceProvider, 
-        ILoggerFactory logging,
-        AndroidLifecycle lifecycle
+        ILoggerFactory logging
     )
     {
         this.AppContext = app;

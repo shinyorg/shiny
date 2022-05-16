@@ -1,11 +1,10 @@
 ﻿using System;
-
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Hosting;
 
 
-public abstract class Host : IHost
+public abstract partial class Host : IHost
 {
     const string InitFailErrorMessage = "ServiceProvider is not initialized - This means you have not setup Shiny correctly!  Please follow instructions at https://shinylib.net";
 
@@ -39,7 +38,17 @@ public abstract class Host : IHost
 
     public IServiceProvider ServiceProvider { get; init; }
     public ILoggerFactory Logging { get; init; }
+}
 
 
-    public static IHostBuilder CreateDefault() => new HostBuilder();
+public partial class Host
+{
+    public static IHostBuilder CreateDefaultBuilder()
+#if ANDROID
+        => new AndroidHostBuilder();    
+#elif IOS
+        => new IosHostBuilder();
+#else
+        => throw new InvalidProgramException("Invalid Shiny Platform");
+#endif
 }

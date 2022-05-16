@@ -6,19 +6,15 @@ using Shiny.Logging;
 namespace Shiny.Hosting;
 
 
-public class HostBuilder : IHostBuilder
+public abstract class HostBuilder : IHostBuilder
 {
 
-    public HostBuilder()
+    protected HostBuilder()
     {
         this.Services = new ServiceCollection();
         //this.Lifecycle = new LifecycleBuilder();
         this.Logging = new ShinyLoggingBuilder(this.Services);
-
         this.ConfigureContainer = s => s.BuildServiceProvider();
-#if __ANDROID__
-#elif __IOS__
-#endif
     }
 
 
@@ -27,26 +23,22 @@ public class HostBuilder : IHostBuilder
     public ILoggingBuilder Logging { get; }
     public Func<IServiceCollection, IServiceProvider> ConfigureContainer { get; set; }
 
+
+    protected virtual void PreBuildPlatformHost() { }
+    protected abstract IHost BuildPlatformHost(ILoggerFactory loggerFactory, IServiceProvider serviceProvider);
+
+
     public virtual IHost Build()
     {
-        IHost? host = null;
         //var lifecycle = this.Lifecycle.Build();
         //this.Services.AddSingleton(lifecycle);
-
-        this.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
-        this.Services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
+        this.PreBuildPlatformHost();
         var serviceProvider = this.ConfigureContainer(this.Services);
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+        this.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
+        this.Services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
 
-#if __ANDROID__
-        //host = new AndroidHost((Application)Android.App.Application.Context, serviceProvider, loggerFactory);
-#elif __IOS__
-        host = new IosHost(serviceProvider, loggerFactory);
-#else
-#endif
-
-        // TODO: push serviceprovider to static somewhere
-        // TODO: maui and blazor won't use this
+        var host = this.BuildPlatformHost(loggerFactory, serviceProvider);
         Host.Current = host;
         return host;
     }

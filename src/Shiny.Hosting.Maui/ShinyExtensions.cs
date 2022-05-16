@@ -5,8 +5,9 @@ namespace Shiny.Hosting;
 
 public static class ShinyExtensions
 {
-    public static void AddShiny(this MauiAppBuilder builder)
+    public static MauiAppBuilder UseShiny(this MauiAppBuilder builder)
     {
+        // TODO: capture services here for host run
         // TODO: shinyhostbuilder?
         builder.ConfigureLifecycleEvents(events =>
         {
@@ -55,6 +56,8 @@ public static class ShinyExtensions
             );
 #endif
         });
+
+        return builder;
     }
 
     public static void RunShiny(this MauiApp app)
