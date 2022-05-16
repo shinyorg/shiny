@@ -23,7 +23,6 @@ public static class ShinyExtensions
                 //})
                 .OnPause(activity =>
                 {
-
                 })
                 .OnRequestPermissionsResult((activity, requestCode, permissions, grantResults) =>
                 {

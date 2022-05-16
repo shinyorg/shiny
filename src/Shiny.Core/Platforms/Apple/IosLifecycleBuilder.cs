@@ -1,6 +1,10 @@
 ﻿using System;
 using Foundation;
 
+using Microsoft.Extensions.DependencyInjection;
+
+using UIKit;
+
 namespace Shiny.Hosting;
 
 
@@ -10,16 +14,50 @@ public record RegisterContinueActivity(NSUserActivity Activity);
 public record RegisterForRemoteNotification();
 
 
-//public interface IosDelegateFinishedLaunching 
-//{ 
-//    void FinishedLaunching(NSDictionary options); 
-//}
-//public interface IosDelegateRemoteNotifications
-//{
 
-//}
+public interface IosLifecycle
+{ 
+    public interface OnFinishedLaunching
+    {
+        void FinishedLaunching(NSDictionary options);
+    }
 
 
+    public interface RemoteNotifications
+    {
+        void OnRegistered(NSData deviceToken);
+        void OnFailedToRegister(NSError error) { }
+        void DidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) { }
+    }
+
+    public interface HandleEventsForBackgroundUrl
+    {
+        bool Handle(string sessionUrl);
+    }
+
+
+    public interface ContinueActivity
+    {
+        bool Handle(NSUserActivity activity);
+    }
+}
+
+
+public static class LifecycleRegistration
+{
+    public static IServiceCollection AddSingletonWithLifecycle<TService, TImpl>(this IServiceCollection services)
+        where TService : class
+        where TImpl : class, TService
+    {
+        services.AddSingleton<TService, TImpl>();
+        if (typeof(TImpl).IsAssignableTo(typeof(IosLifecycle.OnFinishedLaunching))) 
+        {
+            services.AddSingleton<IosLifecycle.OnFinishedLaunching>(sp => (IosLifecycle.OnFinishedLaunching)sp.GetRequiredService<TService>());
+        }
+
+        return services;
+    }
+}
 
 public static class LifecycleBuilderExtensions
 {
