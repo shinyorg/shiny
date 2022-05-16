@@ -16,7 +16,7 @@ using Microsoft.Extensions.Logging;
 namespace Shiny.Hosting;
 
 
-public class AndroidHost : Java.Lang.Object, IAndroidHost
+public class AndroidHost : IAndroidHost
 {
     int requestCode;
     readonly Subject<Intent> newIntentSubject = new();
@@ -24,7 +24,12 @@ public class AndroidHost : Java.Lang.Object, IAndroidHost
     readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new();
 
 
-    public AndroidHost(Application app, IServiceProvider serviceProvider, ILoggerFactory logging)
+    public AndroidHost(
+        Application app, 
+        IServiceProvider serviceProvider, 
+        ILoggerFactory logging,
+        AndroidLifecycle lifecycle
+    )
     {
         this.AppContext = app;
         this.Logging = logging;
@@ -35,13 +40,6 @@ public class AndroidHost : Java.Lang.Object, IAndroidHost
         if (publicDir != null)
             this.Public = new DirectoryInfo(publicDir.AbsolutePath);
     }
-
-
-    //public void Register(IServiceCollection services)
-    //{
-    //    services.AddSingleton<IPlatform>(this);
-    //    services.RegisterCommonServices();
-    //}
 
 
     public IServiceProvider ServiceProvider { get; }

@@ -9,6 +9,5 @@ public interface IHost
     //IConfiguration Configuration { get; }
     ILoggerFactory Logging { get; }
 
-
-    void Run();
+    //void Run();
 }

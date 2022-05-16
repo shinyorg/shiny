@@ -1,9 +1,7 @@
 ﻿using System;
-
 using Foundation;
-using Shiny.Hosting;
 
-namespace Shiny;
+namespace Shiny.Hosting;
 
 
 public record FinishedLaunching(NSDictionary Options);
@@ -11,24 +9,32 @@ public record HandleEventsForBackgroundUrl(string SessionUrl);
 public record RegisterContinueActivity(NSUserActivity Activity);
 
 
-
-public static class IosLifecycleBuilderExtensions
+public static class LifecycleBuilderExtensions
 {
-    public static ILifecycleBuilder OnFinishedLaunching(this ILifecycleBuilder builder, Action<FinishedLaunching> onLaunching)
-    { 
-        return builder;
+    public static ILifecycleBuilder AddIos(this ILifecycleBuilder lifecycleBuilder, Action<IosLifecycleBuilder> builder)
+    {
+        return lifecycleBuilder;
+    }
+}
+
+
+public class IosLifecycleBuilder
+{
+    public IosLifecycleBuilder OnFinishedLaunching(Action<FinishedLaunching> onLaunching)
+    {
+        return this;
     }
 
 
-    public static ILifecycleBuilder OnHandleEventsForBackgroundUrl(this ILifecycleBuilder builder, Func<HandleEventsForBackgroundUrl, bool> onHandleEventsForBackgroundUrl)
+    public IosLifecycleBuilder OnHandleEventsForBackgroundUrl(Func<HandleEventsForBackgroundUrl, bool> onHandleEventsForBackgroundUrl)
     {
-        return builder;
+        return this;
     }
 
 
-    public static ILifecycleBuilder OnContinueActivity(this ILifecycleBuilder builder, Func<RegisterContinueActivity, bool> onContinueActivity)
+    public IosLifecycleBuilder OnContinueActivity(Func<RegisterContinueActivity, bool> onContinueActivity)
     {
-        return builder;
+        return this;
     }
 }
 
