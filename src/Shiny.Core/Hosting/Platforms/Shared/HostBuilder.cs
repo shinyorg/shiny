@@ -12,9 +12,10 @@ public class HostBuilder : IHostBuilder
     public HostBuilder()
     {
         this.Services = new ServiceCollection();
-        this.Lifecycle = new LifecycleBuilder();
+        //this.Lifecycle = new LifecycleBuilder();
         this.Logging = new ShinyLoggingBuilder(this.Services);
 
+        this.ConfigureContainer = s => s.BuildServiceProvider();
 #if __ANDROID__
 #elif __IOS__
 #endif
@@ -24,7 +25,7 @@ public class HostBuilder : IHostBuilder
     public IServiceCollection Services { get; }
     public ILifecycleBuilder Lifecycle { get; }
     public ILoggingBuilder Logging { get; }
-
+    public Func<IServiceCollection, IServiceProvider> ConfigureContainer { get; set; }
 
     public virtual IHost Build()
     {
@@ -34,7 +35,7 @@ public class HostBuilder : IHostBuilder
 
         this.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
         this.Services.AddSingleton(typeof(ILogger<>), typeof(GenericLogger<>));
-        var serviceProvider = this.Services.BuildServiceProvider();
+        var serviceProvider = this.ConfigureContainer(this.Services);
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
 
 #if __ANDROID__

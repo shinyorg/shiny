@@ -1,13 +1,14 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 
+namespace Shiny.Hosting;
 
-namespace Shiny.Hosting
+public interface IHost
 {
-    public interface IHost
-    {
-        IServiceProvider ServiceProvider { get; }
-        //IConfiguration Configuration { get; }
-        ILoggerFactory Logging { get; }
-    }
+    IServiceProvider ServiceProvider { get; }
+    //IConfiguration Configuration { get; }
+    ILoggerFactory Logging { get; }
+
+
+    void Run();
 }
