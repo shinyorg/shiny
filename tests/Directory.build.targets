@@ -17,7 +17,7 @@
         <PackageReference Update="xunit" Version="2.4.1" />
         <PackageReference Update="xunit.runner.devices" Version="2.5.25" />
         <PackageReference Update="xunit.runner.visualstudio" Version="2.4.3" />
-        <PackageReference Update="MartinCostello.Logging.XUnit" Version="0.2.0" />
+        <PackageReference Update="MartinCostello.Logging.XUnit" Version="0.2.1" />
         <PackageReference Update="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
     </ItemGroup>
 </Project>
