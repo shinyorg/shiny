@@ -5,12 +5,12 @@ using System.Linq;
 using Foundation;
 using Microsoft.Extensions.Logging;
 
-namespace Shiny.Hosting;
+namespace Shiny;
 
 
-public class IosHost : Host, IIosHost
+public class IosPlatform : IPlatform
 {
-    public IosHost(IServiceProvider serviceProvider, ILoggerFactory loggerFactory) : base(serviceProvider, loggerFactory)
+    public IosPlatform()
     {
         this.AppData = ToDirectory(NSSearchPathDirectory.LibraryDirectory);
         this.Public = ToDirectory(NSSearchPathDirectory.DocumentDirectory);

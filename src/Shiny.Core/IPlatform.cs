@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 
-namespace Shiny.Hosting;
+namespace Shiny;
 
-public interface IIosHost : IHost
+public interface IPlatform
 {
     //string AppIdentifier { get; }
     void InvokeOnMainThread(Action action);

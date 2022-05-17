@@ -12,27 +12,27 @@ using Android.OS;
 using AndroidX.Core.Content;
 using B = global::Android.OS.Build;
 using Microsoft.Extensions.Logging;
+using AndroidX.Core.App;
 
-namespace Shiny.Hosting;
+namespace Shiny;
 
 
-public class AndroidHost : IAndroidHost
+// TODO: target some of the lifecycle things for callbacks here
+public class AndroidPlatform : IPlatform
 {
     int requestCode;
+    readonly AndroidActivityLifecycle activityLifecycle;
     readonly Subject<Intent> newIntentSubject = new();
     readonly Subject<PermissionRequestResult> permissionSubject = new();
     readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new();
 
 
-    public AndroidHost(
-        Application app, 
-        IServiceProvider serviceProvider, 
-        ILoggerFactory logging
-    )
+    public AndroidPlatform()
     {
+        var app = (Application)Application.Context;
+        this.activityLifecycle = new(app);
+
         this.AppContext = app;
-        this.Logging = logging;
-        this.ServiceProvider = serviceProvider;
         this.AppData = new DirectoryInfo(this.AppContext.FilesDir.AbsolutePath);
         this.Cache = new DirectoryInfo(this.AppContext.CacheDir.AbsolutePath);
         var publicDir = this.AppContext.GetExternalFilesDir(null);
@@ -41,19 +41,14 @@ public class AndroidHost : IAndroidHost
     }
 
 
-    public IServiceProvider ServiceProvider { get; }
-    public ILoggerFactory Logging { get; }
-
-    public Activity? CurrentActivity { get; } // TODO
     public Application AppContext { get; }
     public DirectoryInfo AppData { get; }
     public DirectoryInfo Cache { get; }
     public DirectoryInfo Public { get; }
 
 
-    // TODO: I still need access to these lifecycle events outside of the builder OR do I?
-    //public Activity? CurrentActivity => this.callbacks.Activity;
-    //public IObservable<ActivityChanged> WhenActivityChanged() => this.callbacks.ActivitySubject;
+    public Activity? CurrentActivity => this.activityLifecycle.Activity;
+    public IObservable<ActivityChanged> WhenActivityChanged() => this.activityLifecycle.ActivitySubject;
 
 
     readonly Handler handler = new Handler(Looper.MainLooper);
@@ -85,32 +80,32 @@ public class AndroidHost : IAndroidHost
     {
         var comp = new CompositeDisposable();
 
-        //this.WhenActivityChanged()
-        //    .Where(x =>
-        //        x.Status == ActivityState.Resumed &&
-        //        x.Activity.Intent != null
-        //    )
-        //    .Subscribe(x => ob.OnNext((false, x.Activity.Intent!)))
-        //    .DisposedBy(comp);
+        this.WhenActivityChanged()
+            .Where(x =>
+                x.State == ActivityState.Resumed &&
+                x.Activity.Intent != null
+            )
+            .Subscribe(x => ob.OnNext((false, x.Activity.Intent!)))
+            .DisposedBy(comp);
 
         this.newIntentSubject
             .Subscribe(intent => ob.OnNext((true, intent)))
             .DisposedBy(comp);
 
         return comp;
-   }); 
+   });
 
 
-    //public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
-    //{
-    //    if (this.CurrentActivity != null)
-    //        ob.Respond(new ActivityChanged(this.CurrentActivity, ActivityState.Created, null));
+    public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>
+    {
+        if (this.CurrentActivity != null)
+            ob.Respond(new ActivityChanged(this.CurrentActivity, ActivityState.Created, null));
 
-    //    return this
-    //        .callbacks
-    //        .ActivitySubject
-    //        .Subscribe(x => ob.Respond(x));
-    //});
+        return this
+            .activityLifecycle
+            .ActivitySubject
+            .Subscribe(x => ob.Respond(x));
+    });
 
 
     public PackageInfo Package => this
@@ -213,17 +208,17 @@ public class AndroidHost : IAndroidHost
                 .Subscribe(x => ob.Respond(x))
             );
 
-            //comp.Add(this
-            //    .WhenActivityStatusChanged()
-            //    .Take(1)
-            //    .Subscribe(x =>
-            //        ActivityCompat.RequestPermissions(
-            //            x.Activity,
-            //            androidPermissions,
-            //            current
-            //        )
-            //    )
-            //);
+            comp.Add(this
+                .WhenActivityStatusChanged()
+                .Take(1)
+                .Subscribe(x =>
+                    ActivityCompat.RequestPermissions(
+                        x.Activity,
+                        androidPermissions,
+                        current
+                    )
+                )
+            );
         }
 
         return comp;

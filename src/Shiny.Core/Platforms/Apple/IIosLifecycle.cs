@@ -1,115 +1,44 @@
-﻿using System;
-using Foundation;
-
-using Microsoft.Extensions.DependencyInjection;
-
-using UIKit;
+﻿using Foundation;
 
 namespace Shiny.Hosting;
 
 
-public record FinishedLaunching(NSDictionary Options);
-public record HandleEventsForBackgroundUrl(string SessionUrl);
-public record RegisterContinueActivity(NSUserActivity Activity);
-public record RegisterForRemoteNotification();
+public interface IIosLifecycle
+{
+    //public interface IApplicationLifecycle
+    //{
+    //    void OnForeground();
+    //    void OnBackground();
+    //}
 
-
-
-public interface IosLifecycle
-{ 
-    public interface OnFinishedLaunching
+    public interface IOnFinishedLaunching
     {
-        void FinishedLaunching(NSDictionary options);
+        void Handle(NSDictionary options);
     }
 
-
-    public interface RemoteNotifications
+    public interface IRemoteNotifications
     {
         void OnRegistered(NSData deviceToken);
         void OnFailedToRegister(NSError error) { }
-        void DidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) { }
+        void DidReceive(NSDictionary userInfo) { } // completion handler is marked after all didreceives are fired (there never should be more than 1) , Action<UIBackgroundFetchResult> completionHandler
     }
 
-    public interface HandleEventsForBackgroundUrl
+    public interface IHandleEventsForBackgroundUrl
     {
         bool Handle(string sessionUrl);
     }
 
-
-    public interface ContinueActivity
+    public interface IContinueActivity
     {
         bool Handle(NSUserActivity activity);
     }
 }
-
-
-public static class LifecycleRegistration
-{
-    public static IServiceCollection AddSingletonWithLifecycle<TService, TImpl>(this IServiceCollection services)
-        where TService : class
-        where TImpl : class, TService
-    {
-        services.AddSingleton<TService, TImpl>();
-        if (typeof(TImpl).IsAssignableTo(typeof(IosLifecycle.OnFinishedLaunching))) 
-        {
-            services.AddSingleton<IosLifecycle.OnFinishedLaunching>(sp => (IosLifecycle.OnFinishedLaunching)sp.GetRequiredService<TService>());
-        }
-
-        return services;
-    }
-}
-
-public static class LifecycleBuilderExtensions
-{
-    public static ILifecycleBuilder AddIos(this ILifecycleBuilder lifecycleBuilder, Action<IosLifecycleBuilder> builder)
-    {
-        var nativeLifecycleBuiler = new IosLifecycleBuilder(lifecycleBuilder);
-        builder.Invoke(nativeLifecycleBuiler);
-        return lifecycleBuilder;
-    }
-}
-
-
-public class IosLifecycleBuilder
-{
-    readonly ILifecycleBuilder lifecycleBuilder;
-    public IosLifecycleBuilder(ILifecycleBuilder lifecycleBuilder)
-        => this.lifecycleBuilder = lifecycleBuilder;
-
-
-    public IosLifecycleBuilder OnFinishedLaunching(Action<FinishedLaunching> onLaunching)
-    {
-        //lifecycleBuilder.On<FinishedLaunching>()
-        return this;
-    }
-
-
-    public IosLifecycleBuilder OnHandleEventsForBackgroundUrl(Func<HandleEventsForBackgroundUrl, bool> onHandleEventsForBackgroundUrl)
-    {
-        return this;
-    }
-
-
-    public IosLifecycleBuilder OnContinueActivity(Func<RegisterContinueActivity, bool> onContinueActivity)
-    {
-        return this;
-    }
-}
-
 
 //ShinyUserNotificationDelegate ndelegate;
 //void EnsureNotificationDelegate()
 //{
 //    this.ndelegate ??= new ShinyUserNotificationDelegate();
 //    UNUserNotificationCenter.Current.Delegate = this.ndelegate;
-//}
-
-
-//readonly List<Action<NSDictionary>> finishLaunchers = new List<Action<NSDictionary>>();
-//public IDisposable RegisterForOnFinishedLaunching(Action<NSDictionary> action)
-//{
-//    this.finishLaunchers.Add(action);
-//    return Disposable.Create(() => this.finishLaunchers.Remove(action));
 //}
 
 
@@ -152,7 +81,7 @@ public class IosLifecycleBuilder
 //    }
 //}
 
-//internal void HandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
+//internal void HandleEventsForBackgroundUrl(string sessionIdentifier, )
 //{
 //    var events = this.handleEvents.ToList();
 

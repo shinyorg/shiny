@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Microsoft.Extensions.DependencyInjection;
 using Shiny.Hosting;
 
 namespace Shiny;
@@ -11,7 +12,33 @@ namespace Shiny;
 
 public static class AndroidExtensions
 {
-    public static PendingIntent GetBroadcastPendingIntent<T>(this IAndroidHost platform, string intentAction, PendingIntentFlags flags, int requestCode = 0, Action<Intent>? modifyIntent = null)
+    public static IHostBuilder AddAndroid(this IHostBuilder hostBuilder)
+    {
+        hostBuilder.Services.AddSingleton<IPlatform, AndroidPlatform>();
+        hostBuilder.Services.AddSingleton<AndroidLifecycleExecutor>();
+        return hostBuilder;
+    }
+
+
+    public static AndroidLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<AndroidLifecycleExecutor>();
+
+
+    public static IServiceCollection AddShinyServiceWithLifecycle<TService, TImpl>(this IServiceCollection services)
+        where TService : class
+        where TImpl : class, TService
+    {
+        services.AddShinyService<TService, TImpl>();
+
+        //services.TryMultipleAddSingleton<TService, TImpl, AndroidLifecycle.IApplicationLifecycle>();
+        services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityNewIntent>();
+        services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityRequestPermissionsResult>();
+        services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityResult>();
+
+        return services;
+    }
+
+
+    public static PendingIntent GetBroadcastPendingIntent<T>(this AndroidPlatform platform, string intentAction, PendingIntentFlags flags, int requestCode = 0, Action<Intent>? modifyIntent = null)
     {
         var intent = platform.CreateIntent<T>(intentAction);
         modifyIntent?.Invoke(intent);
@@ -26,7 +53,7 @@ public static class AndroidExtensions
     }
 
 
-    public static PendingIntentFlags GetPendingIntentFlags(this IAndroidHost platform, PendingIntentFlags flags)
+    public static PendingIntentFlags GetPendingIntentFlags(this AndroidPlatform platform, PendingIntentFlags flags)
     {
         if (platform.IsMinApiLevel(31) && !flags.HasFlag(PendingIntentFlags.Mutable))
             flags |= PendingIntentFlags.Mutable;
@@ -35,11 +62,11 @@ public static class AndroidExtensions
     }
 
 
-    public static T GetSystemService<T>(this IAndroidHost platform, string key) where T : Java.Lang.Object
+    public static T GetSystemService<T>(this AndroidPlatform platform, string key) where T : Java.Lang.Object
         => (T)platform.AppContext.GetSystemService(key);
 
 
-    public static void RegisterBroadcastReceiver<T>(this IAndroidHost platform, params string[] actions) where T : BroadcastReceiver, new()
+    public static void RegisterBroadcastReceiver<T>(this AndroidPlatform platform, params string[] actions) where T : BroadcastReceiver, new()
     {
         var filter = new IntentFilter();
         foreach (var e in actions)
@@ -49,7 +76,7 @@ public static class AndroidExtensions
     }
 
 
-    public static TValue GetSystemServiceValue<TValue, TSysType>(this IAndroidHost platform, string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
+    public static TValue GetSystemServiceValue<TValue, TSysType>(this AndroidPlatform platform, string systemTypeName, Func<TSysType, TValue> func) where TSysType : Java.Lang.Object
     {
         using (var type = platform.GetSystemService<TSysType>(systemTypeName))
         {
@@ -58,7 +85,7 @@ public static class AndroidExtensions
     }
 
 
-    public static Intent CreateIntent<T>(this IAndroidHost platform, params string[] actions)
+    public static Intent CreateIntent<T>(this AndroidPlatform platform, params string[] actions)
     {
         var intent = new Intent(platform.AppContext, typeof(T));
         foreach (var action in actions)
@@ -68,7 +95,7 @@ public static class AndroidExtensions
     }
 
 
-    public static bool IsInManifest(this IAndroidHost platform, string androidPermission)
+    public static bool IsInManifest(this AndroidPlatform platform, string androidPermission)
     {
         var permissions = platform
             .AppContext!
@@ -92,7 +119,7 @@ public static class AndroidExtensions
     }
 
 
-    public static IObservable<Intent> WhenIntentReceived(this IAndroidHost platform, string intentAction)
+    public static IObservable<Intent> WhenIntentReceived(this AndroidPlatform platform, string intentAction)
         => Observable.Create<Intent>(ob =>
         {
             var filter = new IntentFilter();
@@ -107,7 +134,7 @@ public static class AndroidExtensions
 
 
 
-    public static T GetIntentValue<T>(this IAndroidHost platform, string intentAction, Func<Intent, T> transform)
+    public static T GetIntentValue<T>(this AndroidPlatform platform, string intentAction, Func<Intent, T> transform)
     {
         using var filter = new IntentFilter(intentAction);
         using var receiver = platform.AppContext.RegisterReceiver(null, filter);
@@ -115,7 +142,7 @@ public static class AndroidExtensions
     }
 
 
-    public static int GetColorByName(this IAndroidHost platform, string colorName) => platform
+    public static int GetColorByName(this AndroidPlatform platform, string colorName) => platform
         .AppContext
         .Resources
         .GetIdentifier(
@@ -124,7 +151,7 @@ public static class AndroidExtensions
             platform.AppContext.PackageName
         );
 
-    public static int GetResourceIdByName(this IAndroidHost platform, string iconName) => platform
+    public static int GetResourceIdByName(this AndroidPlatform platform, string iconName) => platform
         .AppContext
         .Resources
         .GetIdentifier(
@@ -135,7 +162,7 @@ public static class AndroidExtensions
 
 
     // Expects raw resource name like "notify_sound" or "raw/notify_sound"
-    public static int GetRawResourceIdByName(this IAndroidHost platform, string rawName) => platform
+    public static int GetRawResourceIdByName(this AndroidPlatform platform, string rawName) => platform
         .AppContext
         .Resources
         .GetIdentifier(
@@ -145,7 +172,7 @@ public static class AndroidExtensions
         );
 
 
-    public static IObservable<PermissionRequestResult> RequestFilteredPermissions(this IAndroidHost context, params AndroidPermission[] androidPermissions)
+    public static IObservable<PermissionRequestResult> RequestFilteredPermissions(this AndroidPlatform context, params AndroidPermission[] androidPermissions)
     {
         var list = new List<string>();
         foreach (var p in androidPermissions)
@@ -160,7 +187,7 @@ public static class AndroidExtensions
     }
 
 
-    public static bool EnsureAllManifestEntries(this IAndroidHost context, params AndroidPermission[] androidPermissions)
+    public static bool EnsureAllManifestEntries(this AndroidPlatform context, params AndroidPermission[] androidPermissions)
     {
         foreach (var p in androidPermissions)
         {

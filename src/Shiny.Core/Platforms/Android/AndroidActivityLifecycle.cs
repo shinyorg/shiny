@@ -2,31 +2,25 @@
 using System.Reactive.Subjects;
 using Android.App;
 using Android.OS;
-using AndroidX.Lifecycle;
 
-namespace Shiny.Hosting;
+namespace Shiny;
 
 
-public class AndroidLifecycle : Java.Lang.Object, Application.IActivityLifecycleCallbacks, ILifecycleObserver, IDisposable
+public class AndroidActivityLifecycle : Java.Lang.Object, Application.IActivityLifecycleCallbacks, IDisposable
 {
-    public AndroidLifecycle(Application application)
+    readonly Application application;
+
+
+    public AndroidActivityLifecycle(Application application)
     {
-        application.RegisterActivityLifecycleCallbacks(this);
-        //ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);
+        this.application = application;
+        this.application.RegisterActivityLifecycleCallbacks(this);
     }
 
 
     public Subject<ActivityChanged> ActivitySubject { get; } = new();
     readonly WeakReference<Activity?> current = new(null);
 
-    //    [Lifecycle.Event.OnResume]
-    //    [Export]
-    //    public void OnResume() { }
-
-
-    //    [Lifecycle.Event.OnPause]
-    //    [Export]
-    //    public void OnPause() { }
 
     public Activity? Activity
     {
@@ -68,9 +62,9 @@ public class AndroidLifecycle : Java.Lang.Object, Application.IActivityLifecycle
     public void OnActivityStopped(Activity activity) => this.Fire(activity, ActivityState.Stopped);
 
 
-    protected override void Dispose(bool disposing)
+    protected override void Dispose(bool disposing) 
     {
+        this.application.UnregisterActivityLifecycleCallbacks(this);
         base.Dispose(disposing);
-        //ProcessLifecycleOwner.Get().Lifecycle.AddObserver(this);  // remove
     }
 }

@@ -10,8 +10,7 @@ namespace Shiny;
 
 public abstract class ShinyBroadcastReceiver : BroadcastReceiver
 {
-    protected T Resolve<T>() => Host.Current.ServiceProvider.GetRequiredService<T>()!;
-    //protected Lazy<T> ResolveLazy<T>() => ShinyHost.LazyResolve<T>();
+    protected T Resolve<T>() => Host.Current.Services.GetRequiredService<T>()!;
     protected virtual void LogError<T>(Exception exception, string message)
         => Host.Current.Logging.CreateLogger<T>().LogError(exception, message);
 
@@ -24,9 +23,9 @@ public abstract class ShinyBroadcastReceiver : BroadcastReceiver
         {
             if (x.IsFaulted)
             {
-                this.LogError<ShinyBroadcastReceiver>(x.Exception, "Error in broadcast receiver");
+                this.LogError<ShinyBroadcastReceiver>(x.Exception!, "Error in broadcast receiver");
             }
-            pendingResult.Finish();
+            pendingResult!.Finish();
         });
     }
 }

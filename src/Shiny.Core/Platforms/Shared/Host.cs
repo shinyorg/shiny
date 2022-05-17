@@ -1,10 +1,11 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Shiny.Hosting;
 
 
-public abstract partial class Host : IHost
+public class Host : IHost
 {
     const string InitFailErrorMessage = "ServiceProvider is not initialized - This means you have not setup Shiny correctly!  Please follow instructions at https://shinylib.net";
 
@@ -19,7 +20,7 @@ public abstract partial class Host : IHost
 
             return currentHost;
         }
-        internal set
+        private set
         {
             ArgumentNullException.ThrowIfNull(value);
             currentHost = value;
@@ -29,26 +30,26 @@ public abstract partial class Host : IHost
     public static bool IsInitialized => currentHost != null;
 
 
-    protected Host(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+    public Host(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
     {
-        this.ServiceProvider = serviceProvider;
+        this.Services = serviceProvider;
         this.Logging = loggerFactory;
     }
 
 
-    public IServiceProvider ServiceProvider { get; init; }
+    public IServiceProvider Services { get; init; }
     public ILoggerFactory Logging { get; init; }
-}
 
 
-public partial class Host
-{
-    public static IHostBuilder CreateDefaultBuilder()
-#if ANDROID
-        => new AndroidHostBuilder();    
-#elif IOS
-        => new IosHostBuilder();
-#else
-        => throw new InvalidProgramException("Invalid Shiny Platform");
-#endif
+    public virtual void Run()
+    {
+        var tasks = this.Services.GetServices<IShinyStartupTask>();
+
+        foreach (var task in tasks)
+        {
+            // TODO: log this
+            task.Start();
+        }
+        Host.Current = this;
+    }
 }

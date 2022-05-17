@@ -10,7 +10,6 @@ public interface IHostBuilder
     Func<IServiceCollection, IServiceProvider> ConfigureContainer { get; set; }
     IServiceCollection Services { get; }
     //ConfigurationManager? Configuration { get; }
-    ILifecycleBuilder Lifecycle { get; }
     ILoggingBuilder Logging { get; }
 
     IHost Build();

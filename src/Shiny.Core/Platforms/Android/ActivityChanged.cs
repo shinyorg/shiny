@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.OS;
 
-namespace Shiny.Hosting;
+namespace Shiny;
 
 
 public enum ActivityState

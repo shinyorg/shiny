@@ -38,8 +38,8 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-        <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>21.0</TargetPlatformMinVersion>
+        <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion>26.0</TargetPlatformMinVersion>
         <DefineConstants>$(DefineConstants);__ANDROID__;MONOANDROID</DefineConstants>
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
@@ -47,13 +47,13 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('ios'))">
-        <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <IsIosBuild>true</IsIosBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
-        <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>14.2</TargetPlatformMinVersion>        
+        <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>        
         <IsIosBuild>true</IsIosBuild>
     </PropertyGroup>
 </Project>

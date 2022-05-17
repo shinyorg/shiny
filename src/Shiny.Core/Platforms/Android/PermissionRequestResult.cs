@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using NativePerm = Android.Content.PM.Permission;
 
-namespace Shiny.Hosting;
+namespace Shiny;
 
 
 public record PermissionRequestResult(

@@ -5,12 +5,40 @@ using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 using ObjCRuntime;
+using Microsoft.Extensions.DependencyInjection;
+using Shiny.Hosting;
 
 namespace Shiny;
 
 
 public static class AppleExtensions
 {
+    public static IHostBuilder AddIos(this IHostBuilder hostBuilder)
+    {
+        hostBuilder.Services.AddSingleton<IPlatform, IosPlatform>();
+        hostBuilder.Services.AddSingleton<IosLifecycleExecutor>();
+        return hostBuilder;
+    }
+
+
+    public static IosLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<IosLifecycleExecutor>();
+
+    public static IServiceCollection AddShinyServiceWithLifecycle<TService, TImpl>(this IServiceCollection services)
+        where TService : class
+        where TImpl : class, TService
+    {
+        services.AddShinyService<TService, TImpl>();
+
+        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IOnFinishedLaunching>();
+        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IRemoteNotifications>();
+        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IHandleEventsForBackgroundUrl>();
+        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IContinueActivity>();
+        //services.TryMultipleAddSingleton<TService, TImpl, IosLifecycle.IApplicationLifecycle>();
+
+        return services;
+    }
+
+
 
     static DateTime reference = new DateTime(2001, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 
