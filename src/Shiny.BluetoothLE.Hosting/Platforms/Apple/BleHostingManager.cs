@@ -18,10 +18,10 @@ namespace Shiny.BluetoothLE.Hosting
 
         public AccessState Status => this.manager.State switch
         {
-            CBPeripheralManagerState.PoweredOff => AccessState.Disabled,
-            CBPeripheralManagerState.Unauthorized => AccessState.Denied,
-            CBPeripheralManagerState.Unsupported => AccessState.NotSupported,
-            CBPeripheralManagerState.PoweredOn => AccessState.Available,
+            CBManagerState.PoweredOff => AccessState.Disabled,
+            CBManagerState.Unauthorized => AccessState.Denied,
+            CBManagerState.Unsupported => AccessState.NotSupported,
+            CBManagerState.PoweredOn => AccessState.Available,
             //  CBPeripheralManagerState.Resetting, Unknown
             _ => AccessState.Unknown
         };

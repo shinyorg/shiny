@@ -13,27 +13,18 @@ public static class ShinyExtensions
         {
 #if ANDROID
             events.AddAndroid(android => android
-                //.OnApplicationCreate((app) =>
-                //{
-
-                //})
+                // Shiny will supply app foreground/background events
                 .OnRequestPermissionsResult((activity, requestCode, permissions, grantResults) => Host.Current.Lifecycle().OnRequestPermissionsResult(requestCode, permissions, grantResults))
                 .OnActivityResult((activity, requestCode, result, intent) => Host.Current.Lifecycle().OnActivityResult(requestCode, result, intent))
                 .OnNewIntent((activity, intent) => Host.Current.Lifecycle().OnNewIntent(intent))
             );
 #elif IOS
-            // TODO: missing push events & handle background url for http transfers
+            // Shiny will supply push events & handle background url for http transfers
             events.AddiOS(ios => ios
-                .FinishedLaunching((app, options) => Host.Current.Lifecycle().FinishedLaunching(options))
-                .ContinueUserActivity((app, activity, handler) => Host.Current.Lifecycle().OnContinueUserActivity(activity, handler))
-                //.WillEnterForeground(app =>
-                //{
-
-                //})
-                //.DidEnterBackground(app =>
-                //{
-
-                //})
+                .FinishedLaunching((_, options) => Host.Current.Lifecycle().FinishedLaunching(options))
+                .ContinueUserActivity((_, activity, handler) => Host.Current.Lifecycle().OnContinueUserActivity(activity, handler))
+                .WillEnterForeground(_ => Host.Current.Lifecycle().OnAppForegrounding())
+                .DidEnterBackground(_ => Host.Current.Lifecycle().OnAppBackgrounding())
             );
 #endif
         });

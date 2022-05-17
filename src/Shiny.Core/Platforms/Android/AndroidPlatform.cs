@@ -12,12 +12,13 @@ using Android.OS;
 using AndroidX.Core.Content;
 using B = global::Android.OS.Build;
 using AndroidX.Core.App;
+using Shiny.Hosting;
 
 namespace Shiny;
 
 
 // TODO: target some of the lifecycle things for callbacks here
-public class AndroidPlatform : IPlatform
+public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityNewIntent, IAndroidLifecycle.IOnActivityRequestPermissionsResult, IAndroidLifecycle.IOnActivityResult
 {
     int requestCode;
     readonly AndroidActivityLifecycle activityLifecycle;
@@ -38,6 +39,16 @@ public class AndroidPlatform : IPlatform
         if (publicDir != null)
             this.Public = new DirectoryInfo(publicDir.AbsolutePath);
     }
+
+    // lifecycle hooks
+    public void Handle(Activity activity, Intent intent) 
+        => this.newIntentSubject.OnNext(intent);
+
+    public void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults) 
+        => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResults));
+
+    public void Handle(Activity activity, int requestCode, Result resultCode, Intent data) 
+        => this.activityResultSubject.OnNext((requestCode, resultCode, data));
 
 
     public Application AppContext { get; }
@@ -61,6 +72,7 @@ public class AndroidPlatform : IPlatform
 
 
     public string AppIdentifier => this.AppContext.PackageName;
+
     //public string AppVersion => this.Package.VersionName;
     //public string AppBuild => this.Package.VersionCode.ToString();
 
@@ -70,11 +82,10 @@ public class AndroidPlatform : IPlatform
     //public string Manufacturer => B.Manufacturer;
     //public string Model => B.Model;
 
-    public void OnActivityResult(int requestCode, Result resultCode, Intent data) => this.activityResultSubject.OnNext((requestCode, resultCode, data));
-    public void OnNewIntent(Intent intent) => this.newIntentSubject.OnNext(intent);
-    
+    //public void OnActivityResult(int requestCode, Result resultCode, Intent data) 
 
-    
+
+
     public IObservable<(bool NewIntent, Intent Intent)> WhenIntentReceived() => Observable.Create<(bool NewIntent, Intent Intent)>(ob =>
     {
         var comp = new CompositeDisposable();
@@ -111,10 +122,6 @@ public class AndroidPlatform : IPlatform
         .AppContext
         .PackageManager
         .GetPackageInfo(this.AppContext.PackageName, 0);
-
-
-    public void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResult)
-        => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResult));
 
 
     public const string ActionServiceStart = "ACTION_START_FOREGROUND_SERVICE";
@@ -221,5 +228,5 @@ public class AndroidPlatform : IPlatform
         }
 
         return comp;
-    });
+    });    
 }

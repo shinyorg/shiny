@@ -15,7 +15,7 @@ public static class AndroidExtensions
 {
     public static IHostBuilder AddAndroid(this IHostBuilder hostBuilder)
     {
-        hostBuilder.Services.AddSingleton<IPlatform, AndroidPlatform>();
+        hostBuilder.Services.AddShinyServiceWithLifecycle<IPlatform, AndroidPlatform>();
         hostBuilder.Services.AddSingleton<AndroidLifecycleExecutor>();
         hostBuilder.Services.AddSingleton<IMessageBus, MessageBus>();
         return hostBuilder;
@@ -31,7 +31,7 @@ public static class AndroidExtensions
     {
         services.AddShinyService<TService, TImpl>();
 
-        //services.TryMultipleAddSingleton<TService, TImpl, AndroidLifecycle.IApplicationLifecycle>();
+        services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IApplicationLifecycle>();
         services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityNewIntent>();
         services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityRequestPermissionsResult>();
         services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityResult>();
@@ -116,7 +116,6 @@ public static class AndroidExtensions
                     return true;
             }
         }
-        //Log.Write("Permissions", $"You need to declare the '{androidPermission}' in your AndroidManifest.xml");
         return false;
     }
 
@@ -204,10 +203,4 @@ public static class AndroidExtensions
         }
         return true;
     }
-
-
-    //public static IObservable<(Result Result, Intent Data)> RequestActivityResult(this IAndroidHost context, Intent intent)
-    //    => context.RequestActivityResult((requestCode, activity) =>
-    //        activity.StartActivityForResult(intent, requestCode)
-    //    );
 }

@@ -10,6 +10,7 @@ namespace Shiny.Hosting;
 public class IosLifecycleExecutor
 {
     readonly ILogger logger;
+    readonly IEnumerable<IIosLifecycle.IApplicationLifecycle> appHandlers;
     readonly IEnumerable<IIosLifecycle.IOnFinishedLaunching> finishLaunchingHandlers;
     readonly IEnumerable<IIosLifecycle.IContinueActivity> activityHandlers;
     readonly IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers;
@@ -18,6 +19,7 @@ public class IosLifecycleExecutor
 
     public IosLifecycleExecutor(
         ILogger<IosLifecycleExecutor> logger,
+        IEnumerable<IIosLifecycle.IApplicationLifecycle> appHandlers,
         IEnumerable<IIosLifecycle.IOnFinishedLaunching> finishLaunchingHandlers,
         IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers,
         IEnumerable<IIosLifecycle.IContinueActivity> activityHandlers,
@@ -60,6 +62,18 @@ public class IosLifecycleExecutor
     public bool OnContinueUserActivity(NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
     {
         return true;
+    }
+
+
+    public void OnAppForegrounding()
+    {
+
+    }
+
+
+    public void OnAppBackgrounding()
+    {
+
     }
 
 

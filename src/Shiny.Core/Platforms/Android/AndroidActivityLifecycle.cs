@@ -29,7 +29,8 @@ public class AndroidActivityLifecycle : Java.Lang.Object, Application.IActivityL
     }
 
 
-    void Fire(Activity activity, ActivityState state, Bundle? bundle = null) => this.ActivitySubject.OnNext(new ActivityChanged(activity, state, bundle));
+    void Fire(Activity activity, ActivityState state, Bundle? bundle = null) 
+        => this.ActivitySubject.OnNext(new ActivityChanged(activity, state, bundle));
 
 
     public void OnActivityCreated(Activity activity, Bundle? savedInstanceState)

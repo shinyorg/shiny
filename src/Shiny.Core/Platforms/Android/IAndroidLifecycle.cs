@@ -7,11 +7,11 @@ namespace Shiny.Hosting;
 
 public interface IAndroidLifecycle
 {
-    //public interface IApplicationLifecycle
-    //{
-    //    void OnForeground();
-    //    void OnBackground();
-    //}
+    public interface IApplicationLifecycle
+    {
+        void OnForeground();
+        void OnBackground();
+    }
 
     public interface IOnActivityRequestPermissionsResult
     {

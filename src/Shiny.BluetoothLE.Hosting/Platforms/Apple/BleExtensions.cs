@@ -12,18 +12,18 @@ namespace Shiny.BluetoothLE
         {
             var handler = new EventHandler((sender, args) =>
             {
-                if (manager.State == CBPeripheralManagerState.PoweredOn)
+                if (manager.State == CBManagerState.PoweredOn)
                     ob.Respond(Unit.Default);
                 else
                     ob.OnError(new ArgumentException("Adapter state is invalid - " + manager.State));
             });
             switch (manager.State)
             {
-                case CBPeripheralManagerState.Unknown:
+                case CBManagerState.Unknown:
                     manager.StateUpdated += handler;
                     break;
 
-                case CBPeripheralManagerState.PoweredOn:
+                case CBManagerState.PoweredOn:
                     ob.Respond(Unit.Default);
                     break;
 

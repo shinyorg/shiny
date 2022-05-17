@@ -7,23 +7,6 @@ namespace Shiny;
 
 public static class ServiceExtensions
 {
-    ///// <summary>
-    ///// Add the debug logger - this will only output if the debugger is attached
-    ///// </summary>
-    ///// <param name="builder"></param>
-    //public static void AddDebug(this ILoggingBuilder builder)
-    //    => builder.AddProvider(new DebugLoggerProvider());
-
-
-    ///// <summary>
-    ///// Add the console logger - this is also used if you have not provided a logging provider to shiny
-    ///// </summary>
-    ///// <param name="builder"></param>
-    ///// <param name="logLevel"></param>
-    //public static void AddConsole(this ILoggingBuilder builder, LogLevel logLevel = LogLevel.Warning)
-    //    => builder.AddProvider(new ConsoleLoggerProvider(logLevel));
-
-
     /// <summary>
     /// This will attempt to resolve the service using standard TService, but if the TImpl implement a secondary service, it will add a registration in DI for that as well and resolve to the original main service
     /// </summary>
@@ -47,7 +30,7 @@ public static class ServiceExtensions
 
 
     /// <summary>
-    /// This will wire IShinyStartupTask and persistent storage binding (if you model implement INotifyPropertyChanged)
+    /// This will wire up IShinyStartupTask if implemented and persistent storage binding if INotifyPropertyChanged implemented
     /// </summary>
     /// <typeparam name="TService"></typeparam>
     /// <typeparam name="TImpl"></typeparam>

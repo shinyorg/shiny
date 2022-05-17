@@ -5,11 +5,11 @@ namespace Shiny.Hosting;
 
 public interface IIosLifecycle
 {
-    //public interface IApplicationLifecycle
-    //{
-    //    void OnForeground();
-    //    void OnBackground();
-    //}
+    public interface IApplicationLifecycle
+    {
+        void OnForeground();
+        void OnBackground();
+    }
 
     public interface IOnFinishedLaunching
     {

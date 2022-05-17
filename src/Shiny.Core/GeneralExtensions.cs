@@ -182,20 +182,20 @@ namespace Shiny
 
 
 
-        ///// <summary>
-        ///// Creates a new array and copies the elements from both arrays together
-        ///// </summary>
-        ///// <typeparam name="T"></typeparam>
-        ///// <param name="array"></param>
-        ///// <param name="items"></param>
-        ///// <returns></returns>
-        //public static T[] Expand<T>(this T[] array, params T[] items)
-        //{
-        //    array = array ?? new T[0];
-        //    var newArray = new T[array.Length + items.Length];
-        //    Array.Copy(array, newArray, array.Length);
-        //    Array.Copy(items, 0, newArray, array.Length, items.Length);
-        //    return newArray;
-        //}
+        /// <summary>
+        /// Creates a new array and copies the elements from both arrays together
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public static T[] Expand<T>(this T[] array, params T[] items)
+        {
+            array = array ?? new T[0];
+            var newArray = new T[array.Length + items.Length];
+            Array.Copy(array, newArray, array.Length);
+            Array.Copy(items, 0, newArray, array.Length, items.Length);
+            return newArray;
+        }
     }
 }

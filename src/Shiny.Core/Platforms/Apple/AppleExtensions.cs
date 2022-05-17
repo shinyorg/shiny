@@ -16,7 +16,7 @@ public static class AppleExtensions
 {
     public static IHostBuilder AddIos(this IHostBuilder hostBuilder)
     {
-        hostBuilder.Services.AddSingleton<IPlatform, IosPlatform>();
+        hostBuilder.Services.AddShinyServiceWithLifecycle<IPlatform, IosPlatform>();
         hostBuilder.Services.AddSingleton<IosLifecycleExecutor>();
         hostBuilder.Services.AddSingleton<IMessageBus, MessageBus>();
         return hostBuilder;
@@ -35,7 +35,7 @@ public static class AppleExtensions
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IRemoteNotifications>();
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IHandleEventsForBackgroundUrl>();
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IContinueActivity>();
-        //services.TryMultipleAddSingleton<TService, TImpl, IosLifecycle.IApplicationLifecycle>();
+        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IApplicationLifecycle>();
 
         return services;
     }
