@@ -18,6 +18,7 @@ public static class MauiProgram
             });
 
         builder.Services.AddShinyService<StartupTask>();
+        //builder.Services.AddBluetoothLE<SampleBleDelegate>();
         builder.Services.AddSpeechRecognition();
         builder.Services.AddBluetoothLeHosting();
 

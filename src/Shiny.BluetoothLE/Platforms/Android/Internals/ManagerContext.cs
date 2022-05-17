@@ -22,15 +22,17 @@ namespace Shiny.BluetoothLE.Internals
         readonly Subject<(Intent Intent, Peripheral Peripheral)> peripheralSubject;
         //readonly ShinyCoreServices services;
 
-        readonly IAndroidPlatform platform;
+        readonly AndroidPlatform platform;
         readonly ILogger logger;
         LollipopScanCallback? callbacks;
 
 
-        public ManagerContext(IAndroidPlatform platform,
-                              IServiceProvider serviceProvider,
-                              BleConfiguration config,
-                              ILogger<ManagerContext> logger)
+        public ManagerContext(
+            AndroidPlatform platform,
+            IServiceProvider serviceProvider,
+            BleConfiguration config,
+            ILogger<ManagerContext> logger
+        )
         {
             this.Configuration = config;
             //this.services = services;

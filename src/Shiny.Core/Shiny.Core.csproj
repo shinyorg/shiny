@@ -17,4 +17,10 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="Hosting\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Hosting\" />
+    </ItemGroup>
 </Project>
