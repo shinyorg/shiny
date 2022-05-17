@@ -37,11 +37,6 @@ namespace Shiny.BluetoothLE
             _ => AccessState.Unknown
         };
 
-
-        public static BluetoothManager GetBluetooth(this IPlatform context)
-            => context.GetSystemService<BluetoothManager>(Context.BluetoothService);
-
-
         public static ConnectionState ToStatus(this ProfileState state) => state switch
         {
             ProfileState.Connected => ConnectionState.Connected,

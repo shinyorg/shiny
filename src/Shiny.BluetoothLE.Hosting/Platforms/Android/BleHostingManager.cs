@@ -3,138 +3,135 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
-
 using Java.Util;
-
 using Shiny.BluetoothLE.Hosting.Internals;
 using Shiny.Infrastructure;
 
-namespace Shiny.BluetoothLE.Hosting
+namespace Shiny.BluetoothLE.Hosting;
+
+
+public class BleHostingManager : IBleHostingManager
 {
-    public class BleHostingManager : IBleHostingManager
+    readonly GattServerContext context;
+    readonly Dictionary<string, GattService> services;
+    readonly IMessageBus messageBus;
+    AdvertisementCallbacks? adCallbacks;
+
+
+    public BleHostingManager(AndroidPlatform platform, IMessageBus messageBus)
     {
-        readonly GattServerContext context;
-        readonly Dictionary<string, GattService> services;
-        readonly IMessageBus messageBus;
-        AdvertisementCallbacks? adCallbacks;
+        this.context = new GattServerContext(platform);
+        this.services = new Dictionary<string, GattService>();
+        this.messageBus = messageBus;
+    }
 
 
-        public BleHostingManager(IPlatform context, IMessageBus messageBus)
-        {
-            this.context = new GattServerContext(context);
-            this.services = new Dictionary<string, GattService>();
-            this.messageBus = messageBus;
-        }
+    public AccessState Status => this.context.Manager.GetAccessState();
+    public IObservable<AccessState> WhenStatusChanged() => this.messageBus
+        .Listener<State>()
+        .Select(x => x.FromNative())
+        .StartWith(this.Status);
+    public bool IsAdvertising => this.adCallbacks != null;
+    public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
 
 
-        public AccessState Status => this.context.Manager.GetAccessState();
-        public IObservable<AccessState> WhenStatusChanged() => this.messageBus
-            .Listener<State>()
-            .Select(x => x.FromNative())
-            .StartWith(this.Status);
-        public bool IsAdvertising => this.adCallbacks != null;
-        public IReadOnlyList<IGattService> Services => this.services.Values.Cast<IGattService>().ToArray();
+    public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
+    {
+        var service = new GattService(this.context, uuid, primary);
+        serviceBuilder(service);
+        this.context.Server.AddService(service.Native);
+        return Task.FromResult<IGattService>(service);
+    }
 
 
-        public Task<IGattService> AddService(string uuid, bool primary, Action<IGattServiceBuilder> serviceBuilder)
-        {
-            var service = new GattService(this.context, uuid, primary);
-            serviceBuilder(service);
-            this.context.Server.AddService(service.Native);
-            return Task.FromResult<IGattService>(service);
-        }
+    public void ClearServices()
+    {
+        this.services.Clear();
+        this.context.Server.ClearServices();
+        this.Cleanup();
+    }
 
 
-        public void ClearServices()
-        {
-            this.services.Clear();
-            this.context.Server.ClearServices();
+    public void RemoveService(string serviceUuid)
+    {
+        var s = this.services[serviceUuid];
+        this.context.Server.RemoveService(s.Native);
+        this.services.Remove(serviceUuid);
+        if (this.services.Count == 0)
             this.Cleanup();
+    }
+
+
+    public async Task StartAdvertising(AdvertisementOptions? options = null)
+    {
+        var android = this.context.Platform;
+        if (!android.IsMinApiLevel(23))
+            throw new ApplicationException("BLE Advertiser needs API Level 23+");
+
+        if (android.IsMinApiLevel(31))
+        {
+            var access = await android.RequestAccess(Android.Manifest.Permission.BluetoothAdvertise);
+            if (access != AccessState.Available)
+                throw new ArgumentException("Insufficient permissions");
         }
 
+        options ??= new AdvertisementOptions();
+        var tcs = new TaskCompletionSource<object>();
+        this.adCallbacks = new AdvertisementCallbacks(
+            () => tcs.SetResult(null),
+            ex => tcs.SetException(ex)
+        );
 
-        public void RemoveService(string serviceUuid)
-        {
-            var s = this.services[serviceUuid];
-            this.context.Server.RemoveService(s.Native);
-            this.services.Remove(serviceUuid);
-            if (this.services.Count == 0)
-                this.Cleanup();
-        }
+        var settings = new AdvertiseSettings.Builder()
+            .SetAdvertiseMode(AdvertiseMode.Balanced)
+            .SetConnectable(true);
 
+        var data = new AdvertiseData.Builder()
+            .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
+            .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
 
-        public async Task StartAdvertising(AdvertisementOptions? options = null)
-        {
-            var android = this.context.Context;
-            if (!android.IsMinApiLevel(23))
-                throw new ApplicationException("BLE Advertiser needs API Level 23+");
+        if (options.ManufacturerData != null)
+            data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
 
-            if (android.IsMinApiLevel(31))
-            {
-                var access = await android.RequestAccess(Android.Manifest.Permission.BluetoothAdvertise);
-                if (access != AccessState.Available)
-                    throw new ArgumentException("Insufficient permissions");
-            }
+        var serviceUuids = options.UseGattServiceUuids
+            ? this.services.Keys.ToList()
+            : options.ServiceUuids;
 
-            options ??= new AdvertisementOptions();
-            var tcs = new TaskCompletionSource<object>();
-            this.adCallbacks = new AdvertisementCallbacks(
-                () => tcs.SetResult(null),
-                ex => tcs.SetException(ex)
+        foreach (var uuid in serviceUuids)
+            data.AddServiceUuid(new Android.OS.ParcelUuid(UUID.FromString(uuid)));
+
+        this.context
+            .Manager
+            .Adapter
+            .BluetoothLeAdvertiser
+            .StartAdvertising(
+                settings.Build(),
+                data.Build(),
+                this.adCallbacks
             );
 
-            var settings = new AdvertiseSettings.Builder()
-                .SetAdvertiseMode(AdvertiseMode.Balanced)
-                .SetConnectable(true);
-
-            var data = new AdvertiseData.Builder()
-                .SetIncludeDeviceName(options.AndroidIncludeDeviceName)
-                .SetIncludeTxPowerLevel(options.AndroidIncludeTxPower);
-
-            if (options.ManufacturerData != null)
-                data.AddManufacturerData(options.ManufacturerData.CompanyId, options.ManufacturerData.Data);
-
-            var serviceUuids = options.UseGattServiceUuids
-                ? this.services.Keys.ToList()
-                : options.ServiceUuids;
-
-            foreach (var uuid in serviceUuids)
-                data.AddServiceUuid(new Android.OS.ParcelUuid(UUID.FromString(uuid)));
-
-            this.context
-                .Manager
-                .Adapter
-                .BluetoothLeAdvertiser
-                .StartAdvertising(
-                    settings.Build(),
-                    data.Build(),
-                    this.adCallbacks
-                );
-
-            await tcs.Task;
-        }
+        await tcs.Task;
+    }
 
 
-        public void StopAdvertising()
-        {
-            this.context
-                .Manager
-                .Adapter
-                .BluetoothLeAdvertiser
-                .StopAdvertising(this.adCallbacks);
-            this.adCallbacks = null;
-        }
+    public void StopAdvertising()
+    {
+        this.context
+            .Manager
+            .Adapter
+            .BluetoothLeAdvertiser
+            .StopAdvertising(this.adCallbacks);
+        this.adCallbacks = null;
+    }
 
 
-        void Cleanup()
-        {
-            foreach (var service in this.services)
-                service.Value.Dispose();
+    void Cleanup()
+    {
+        foreach (var service in this.services)
+            service.Value.Dispose();
 
-            this.context.CloseServer();
-        }
+        this.context.CloseServer();
     }
 }
