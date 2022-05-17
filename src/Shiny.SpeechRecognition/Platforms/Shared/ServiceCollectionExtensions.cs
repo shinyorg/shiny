@@ -8,21 +8,21 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseSpeechRecognition(this IServiceCollection services)
+
+        public static IServiceCollection AddSpeechRecognition(this IServiceCollection services)
         {
-#if NETSTANDARD
-            return false;
-#elif __IOS__
-            if (UIKit.UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
-            {
-                services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
-                return true;
-            }
-            return false;
-#else
+#if IOS
+            if (!UIKit.UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
+                throw new InvalidCastException("Invalid iOS version for Speech Recognition");
+
             services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
-            return true;
+#elif ANDROID
+            services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
+#else
+            throw new InvalidOperationException("This platform is not supported");
 #endif
+
+            return services;
         }
     }
 }

@@ -11,7 +11,6 @@ using Android.Content.PM;
 using Android.OS;
 using AndroidX.Core.Content;
 using B = global::Android.OS.Build;
-using Microsoft.Extensions.Logging;
 using AndroidX.Core.App;
 
 namespace Shiny;
@@ -62,14 +61,14 @@ public class AndroidPlatform : IPlatform
 
 
     public string AppIdentifier => this.AppContext.PackageName;
-    public string AppVersion => this.Package.VersionName;
-    public string AppBuild => this.Package.VersionCode.ToString();
+    //public string AppVersion => this.Package.VersionName;
+    //public string AppBuild => this.Package.VersionCode.ToString();
 
-    public string MachineName => B.GetSerial();
-    public string OperatingSystem => B.VERSION.Release;
-    public string OperatingSystemVersion => B.VERSION.Sdk;
-    public string Manufacturer => B.Manufacturer;
-    public string Model => B.Model;
+    //public string MachineName => B.GetSerial();
+    //public string OperatingSystem => B.VERSION.Release;
+    //public string OperatingSystemVersion => B.VERSION.Sdk;
+    //public string Manufacturer => B.Manufacturer;
+    //public string Model => B.Model;
 
     public void OnActivityResult(int requestCode, Result resultCode, Intent data) => this.activityResultSubject.OnNext((requestCode, resultCode, data));
     public void OnNewIntent(Intent intent) => this.newIntentSubject.OnNext(intent);
