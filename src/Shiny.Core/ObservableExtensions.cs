@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -9,8 +11,53 @@ using System.Threading.Tasks;
 namespace Shiny;
 
 
-public static class RxExtensions
+public record ItemChanged<T>(
+    T Object,
+    string? PropertyName
+)
 {
+    public object? GetValue() 
+        => this.PropertyName == null ? null : this.Object!.GetValue(this.PropertyName);
+}
+
+
+public static class ObservableExtensions
+{
+    /// <summary>
+    /// Monitors an INPC object for property changes
+    /// </summary>
+    /// <typeparam name="TSender"></typeparam>
+    /// <typeparam name="TRet"></typeparam>
+    /// <param name="This"></param>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    public static IObservable<TRet?> WhenAnyProperty<TSender, TRet>(this TSender This, Expression<Func<TSender, TRet>> expression) where TSender : INotifyPropertyChanged
+    {
+        var p = This.GetPropertyInfo(expression);
+        return Observable
+            .FromEventPattern<PropertyChangedEventArgs>(This, nameof(INotifyPropertyChanged.PropertyChanged))
+            .StartWith(new EventPattern<PropertyChangedEventArgs>(This, new PropertyChangedEventArgs(p.Name)))
+            .Where(x => x.EventArgs.PropertyName == p.Name)
+            .Select(x =>
+            {
+                var value = (TRet?)p.GetValue(This);
+                return value;
+            });
+    }
+
+
+    /// <summary>
+    /// Notifies whenever a property changes within an INotifyPropertyChanged
+    /// </summary>
+    /// <typeparam name="TSender"></typeparam>
+    /// <param name="This"></param>
+    /// <returns></returns>
+    public static IObservable<ItemChanged<TSender>> WhenAnyProperty<TSender>(this TSender This) where TSender : INotifyPropertyChanged
+        => Observable
+            .FromEventPattern<PropertyChangedEventArgs>(This, nameof(INotifyPropertyChanged.PropertyChanged))
+            .Select(x => new ItemChanged<TSender>(This, x.EventArgs.PropertyName));
+
+
     /// <summary>
     /// Equivalent of switchMap in RXJS
     /// </summary>
@@ -46,9 +93,6 @@ public static class RxExtensions
         => ob.Scan(Tuple.Create(default(T), default(T)), (acc, current) => Tuple.Create(acc.Item2, current));
 
 
-  
-
-
     /// <summary>
     /// Quick helper method to execute an async select
     /// </summary>
@@ -75,28 +119,6 @@ public static class RxExtensions
 
         return ob;
     }
-
-
-    ///// <summary>
-    ///// Warning - this will block until completed
-    ///// </summary>
-    ///// <typeparam name="T"></typeparam>
-    ///// <param name="source"></param>
-    ///// <param name="onFinally"></param>
-    ///// <param name="timeout"></param>
-    ///// <returns></returns>
-    //public static IObservable<T> DoFinally<T>(this IObservable<T> source, IObservable<Unit> onFinally, TimeSpan? timeout = null) => source.Finally(() =>
-    //{
-    //    var mre = new ManualResetEvent(false);
-    //    onFinally
-    //        .SubscribeOn(ThreadPoolScheduler.Instance) // hmmmm.... hmmmmmmmmmmmmmmmmmm...
-    //        .Subscribe(
-    //            _ => mre.Set(), // there is only one take - I don't care if it completes or not - 1 and done
-    //            _ => mre.Set()  // if erroring - also done
-    //        );
-
-    //    mre.WaitOne(timeout ?? TimeSpan.FromSeconds(5));
-    //});
 
 
     /// <summary>
@@ -202,6 +224,7 @@ public static class RxExtensions
                 onError,
                 onComplete
             );
+
 
     /// <summary>
     /// Async subscribe done properly while also ensuring that only async value runs at a time

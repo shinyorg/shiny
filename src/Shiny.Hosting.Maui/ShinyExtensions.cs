@@ -24,7 +24,7 @@ public static class ShinyExtensions
             // TODO: missing push events & handle background url for http transfers
             events.AddiOS(ios => ios
                 .FinishedLaunching((app, options) => Host.Current.Lifecycle().FinishedLaunching(options))
-                //.ContinueUserActivity((app, activity, handler) => Host.Current.Lifecycle().ContinueUserActivity(activity, handler))
+                .ContinueUserActivity((app, activity, handler) => Host.Current.Lifecycle().OnContinueUserActivity(activity, handler))
                 //.WillEnterForeground(app =>
                 //{
 

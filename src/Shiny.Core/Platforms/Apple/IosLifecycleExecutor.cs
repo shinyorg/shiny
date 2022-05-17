@@ -11,24 +11,54 @@ public class IosLifecycleExecutor
 {
     readonly ILogger logger;
     readonly IEnumerable<IIosLifecycle.IOnFinishedLaunching> finishLaunchingHandlers;
+    readonly IEnumerable<IIosLifecycle.IContinueActivity> activityHandlers;
     readonly IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers;
+    readonly IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers;
 
 
     public IosLifecycleExecutor(
         ILogger<IosLifecycleExecutor> logger,
         IEnumerable<IIosLifecycle.IOnFinishedLaunching> finishLaunchingHandlers,
-        IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers
+        IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers,
+        IEnumerable<IIosLifecycle.IContinueActivity> activityHandlers,
+        IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers
     )
     {
         this.logger = logger;
         this.finishLaunchingHandlers = finishLaunchingHandlers;
         this.bgUrlHandlers = bgUrlHandlers;
+        this.remoteHandlers = remoteHandlers;
+        this.activityHandlers = activityHandlers;
     }
 
 
     public bool FinishedLaunching(NSDictionary options)
     { 
         this.Execute(this.finishLaunchingHandlers, handler => handler.Handle(options));
+        return true;
+    }
+
+
+    public void OnRegisteredForRemoteNotifications(NSData deviceToken)
+    {
+
+    }
+
+
+    public void OnFailedToRegisterForRemoteNotifications(NSError error)
+    {
+
+    }
+
+
+    public void OnDidReceiveRemoveNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+    {
+        //completionHandler?.Invoke(UIBackgroundFetchResult.NewData);
+    }
+
+
+    public bool OnContinueUserActivity(NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
+    {
         return true;
     }
 

@@ -7,6 +7,7 @@ using UIKit;
 using ObjCRuntime;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Hosting;
+using Shiny.Infrastructure;
 
 namespace Shiny;
 
@@ -17,6 +18,7 @@ public static class AppleExtensions
     {
         hostBuilder.Services.AddSingleton<IPlatform, IosPlatform>();
         hostBuilder.Services.AddSingleton<IosLifecycleExecutor>();
+        hostBuilder.Services.AddSingleton<IMessageBus, MessageBus>();
         return hostBuilder;
     }
 

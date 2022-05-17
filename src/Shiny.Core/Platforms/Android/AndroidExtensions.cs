@@ -6,6 +6,7 @@ using Android.Content;
 using Android.Content.PM;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Hosting;
+using Shiny.Infrastructure;
 
 namespace Shiny;
 
@@ -16,6 +17,7 @@ public static class AndroidExtensions
     {
         hostBuilder.Services.AddSingleton<IPlatform, AndroidPlatform>();
         hostBuilder.Services.AddSingleton<AndroidLifecycleExecutor>();
+        hostBuilder.Services.AddSingleton<IMessageBus, MessageBus>();
         return hostBuilder;
     }
 

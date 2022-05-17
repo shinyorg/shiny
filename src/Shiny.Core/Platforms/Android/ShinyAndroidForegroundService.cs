@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -31,8 +30,10 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
     protected TService? Service { get; private set; }
     protected IList<TDelegate>? Delegates { get; private set; }
 
+
     ILogger? logger;
     protected ILogger Logger => this.logger ??= Host.Current.Logging.CreateLogger(this.GetType()!.AssemblyQualifiedName);
+
 
     AndroidPlatform ? platform;
     protected AndroidPlatform Platform => this.platform ??= this.Resolve<AndroidPlatform>();
@@ -69,13 +70,12 @@ public abstract class ShinyAndroidForegroundService<TService, TDelegate> : Servi
 
         if (this.Platform.IsMinApiLevel(26))
         {
-            // TODO
-            //this.Service
-            //    .WhenAnyProperty()
-            //    .Skip(1)
-            //    .Throttle(TimeSpan.FromMilliseconds(400))
-            //    .Subscribe(_ => this.SetNotification())
-            //    .DisposedBy(this.DestroyWith);
+            this.Service
+                .WhenAnyProperty()
+                .Skip(1)
+                .Throttle(TimeSpan.FromMilliseconds(400))
+                .Subscribe(_ => this.SetNotification())
+                .DisposedBy(this.DestroyWith);
 
             this.SetNotification();
         }
