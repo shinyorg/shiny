@@ -58,6 +58,35 @@ public static class ServiceExtensions
         return services;
     }
 
+
+    /// <summary>
+    /// This will wire up IShinyStartupTask if implemented and persistent storage binding if INotifyPropertyChanged implemented
+    /// </summary>
+    /// <typeparam name="TService"></typeparam>
+    /// <typeparam name="TImpl"></typeparam>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddShinyService<TImpl>(this IServiceCollection services) where TImpl : class
+    {
+        if (typeof(TImpl).IsAssignableTo(typeof(INotifyPropertyChanged)))
+        {
+            services.AddSingleton(sp =>
+            {
+                var instance = (TImpl)ActivatorUtilities.CreateInstance(sp, typeof(TImpl));
+                // TODO: bind object
+                return instance;
+            });
+        }
+        else
+        {
+            services.AddSingleton<TImpl>();
+        }
+        if (typeof(TImpl).IsAssignableTo(typeof(IShinyStartupTask)))
+            services.AddSingleton(typeof(IShinyStartupTask), typeof(TImpl));
+
+        return services;
+    }
+
     ///// <summary>
     /////
     ///// </summary>

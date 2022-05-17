@@ -30,7 +30,7 @@ public abstract class HostBuilder : IHostBuilder
 
 #if ANDROID
         this.AddAndroid();
-#elif IOS
+#elif IOS || MACCATALYST
         this.AddIos();
 #endif
 

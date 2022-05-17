@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.SpeechRecognition;
 
@@ -11,10 +10,7 @@ namespace Shiny
 
         public static IServiceCollection AddSpeechRecognition(this IServiceCollection services)
         {
-#if IOS
-            if (!UIKit.UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
-                throw new InvalidCastException("Invalid iOS version for Speech Recognition");
-
+#if IOS || MACCATALYST
             services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
 #elif ANDROID
             services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();

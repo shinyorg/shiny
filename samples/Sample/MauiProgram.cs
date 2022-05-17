@@ -17,7 +17,9 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        builder.Services.AddShinyService<StartupTask>();
         builder.Services.AddSpeechRecognition();
+        builder.Services.AddBluetoothLeHosting();
 
         var app = builder.Build();
         app.RunShiny();

@@ -14,14 +14,14 @@ namespace Shiny
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static bool UseBleHosting(this IServiceCollection builder)
+        public static IServiceCollection AddBluetoothLeHosting(this IServiceCollection services)
         {
-#if NETSTANDARD
-            return false;
+#if IOS || ANDROID || MACCATALYST
+            services.TryAddSingleton<IBleHostingManager, BleHostingManager>();
 #else
-            builder.TryAddSingleton<IBleHostingManager, BleHostingManager>();
-            return true;
+            throw new InvalidOperationException("This platform is not supported");            
 #endif
+            return services;
         }
     }
 }
