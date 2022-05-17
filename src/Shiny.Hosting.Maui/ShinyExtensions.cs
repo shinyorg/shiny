@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
+using Shiny.Hosting;
 
-namespace Shiny.Hosting;
+namespace Shiny;
 
 
 public static class ShinyExtensions
@@ -42,6 +43,7 @@ public static class ShinyExtensions
 
     public static void RunShiny(this MauiApp app)
     {
+        // TODO: ensure registrations?
         var host = new Host(app.Services, app.Services.GetRequiredService<ILoggerFactory>());
         host.Run();
         // TODO: run the build for shiny hooks, is it too late?
