@@ -20,7 +20,7 @@ public static class CommonExtensions
     public static IServiceCollection AddChannelManager(this IServiceCollection services)
     {
         services.TryAddRepository();
-#if !NETSTANDARD
+#if IOS || MACCATALYST || ANDROID
         services.TryAddSingleton<IChannelManager, ChannelManager>();
 #endif
         return services;

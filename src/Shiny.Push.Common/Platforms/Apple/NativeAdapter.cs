@@ -207,4 +207,6 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
     }
 
     public void OnRegistered(NSData deviceToken) => throw new NotImplementedException();
+    public void OnFailedToRegister(NSError error) => throw new NotImplementedException();
+    public void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => throw new NotImplementedException();
 }
