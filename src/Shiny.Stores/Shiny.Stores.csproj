@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <!--<TargetFramework>net6.0</TargetFramework>-->
+        <Description>Shiny Stores is used internally by Shiny and is not directly needed by your application</Description>
+        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

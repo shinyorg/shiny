@@ -22,7 +22,7 @@ public static class MauiProgram
         builder.Services.AddBluetoothLE<SampleBleDelegate>();
         builder.Services.AddBluetoothLeHosting();
         builder.Services.AddSpeechRecognition();
-        builder.Services.AddJob(typeof(SampleJob));
+        //builder.Services.AddJob(typeof(SampleJob));
 
         var app = builder.Build();
         app.RunShiny();
