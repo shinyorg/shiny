@@ -32,8 +32,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddServices(config);
         if (delegateType != null)
-            throw new NotImplementedException();
-            //services.AddShinyService(typeof(IBleDelegate), delegateType); // TODO: state restorable
+            services.AddShinyService(typeof(IBleDelegate), delegateType);
 
         return services;
     }

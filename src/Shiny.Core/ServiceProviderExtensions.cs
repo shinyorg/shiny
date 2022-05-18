@@ -29,7 +29,7 @@ public static class ServiceExtensions
         services.TryAddSingleton<TService, TImpl>();
 
         if (typeof(TImpl).IsAssignableTo(typeof(TOther)))
-            services.AddSingleton<TOther>(sp => (TOther)sp.GetRequiredService(typeof(TService)));
+            services.AddSingleton(sp => (TOther)sp.GetRequiredService(typeof(TService)));
 
         return services;
     }
@@ -45,21 +45,62 @@ public static class ServiceExtensions
     public static IServiceCollection AddShinyService<TService, TImpl>(this IServiceCollection services)
         where TService : class
         where TImpl : class, TService
+        => services.AddShinyService(typeof(TService), typeof(TImpl));
+
+
+    /// <summary>
+    /// This will wire up IShinyStartupTask if implemented and persistent storage binding if INotifyPropertyChanged implemented
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="serviceType"></param>
+    /// <param name="implementationType"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddShinyService(this IServiceCollection services, Type serviceType, Type implementationType)
     {
-        if (typeof(TImpl).IsAssignableTo(typeof(INotifyPropertyChanged)))
+        if (implementationType.IsAssignableTo(typeof(INotifyPropertyChanged)))
         {
             services.AddSingleton(sp =>
             {
-                var instance = (TService)ActivatorUtilities.CreateInstance(sp, typeof(TImpl));
+                var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, serviceType);
                 // TODO: bind object
                 return instance;
             });
         }
         else
         {
-            services.AddSingleton<TService, TImpl>();
+            services.AddSingleton(serviceType, implementationType);
         }
-        services.TryMultipleAddSingleton<TService, TImpl, IShinyStartupTask>();
+        if (implementationType.IsAssignableTo(typeof(IShinyStartupTask)))
+            services.AddSingleton(typeof(IShinyStartupTask), implementationType);
+
+        return services;
+    }
+
+
+    /// <summary>
+    /// This will wire up IShinyStartupTask if implemented and persistent storage binding if INotifyPropertyChanged implemented
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="implementationType"></param>
+    /// <returns></returns>
+    public static IServiceCollection AddShinyService(this IServiceCollection services, Type implementationType)
+    {
+
+        if (implementationType.IsAssignableTo(typeof(INotifyPropertyChanged)))
+        {
+            services.AddSingleton(sp =>
+            {
+                var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, implementationType);
+                // TODO: bind object
+                return instance;
+            });
+        }
+        else
+        {
+            services.AddSingleton(implementationType);
+        }
+        if (implementationType.IsAssignableTo(typeof(IShinyStartupTask)))
+            services.AddSingleton(typeof(IShinyStartupTask), implementationType);
 
         return services;
     }
@@ -92,28 +133,6 @@ public static class ServiceExtensions
 
         return services;
     }
-
-    ///// <summary>
-    /////
-    ///// </summary>
-    ///// <typeparam name="T"></typeparam>
-    ///// <param name="services"></param>
-    //public static async Task SafeResolveAndExecute<T>(this IServiceProvider services, Func<T, Task> execute)
-    //{
-    //    try
-    //    {
-    //        var service = services.GetService<T>();
-    //        if (service != null)
-    //            await execute.Invoke(service).ConfigureAwait(false);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        services
-    //            .GetRequiredService<ILogger<T>>()
-    //            .LogError(ex, "Error executing delegate");
-    //    }
-    //}
-
 
 
     public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)
