@@ -13,8 +13,7 @@ body:
     attributes:
       label: Component/Nuget
       description: The component you are filing against.  If it is not listed here it means there is no support for it
-      options:
-        - Shiny.Core (Settings, Startup)
+      options:        
         - GPS, Geofencing, Motion Activity (Shiny.Locations)
         - Jobs (Shiny.Jobs)
         - HTTP Transfers (Shiny.Net.Http)
@@ -22,21 +21,18 @@ body:
         - NFC (Shiny.Nfc)
         - Push - Native (Shiny.Push)
         - Push - Azure Notification Hub (Shiny.Push.AzureNotificationHubs)
-        - Push - Firebase (Shiny.Push.FirebaseMessaging)
-        - Push - OneSignal (Shiny.Push.OneSignal)
         - Sensors (Shiny.Sensors)
         - BluetoothLE Client (Shiny.BluetoothLE)
         - BluetoothLE Hosting (Shiny.BluetoothLE.Hosting)
         - Beacons (Shiny.Beacons)
-        - SQLite Integration (Shiny.Integrations.Sqlite)
-        - AppCenter Logging (Shiny.Logging.AppCenter)
+        - Other (Message Bus, Startup Task, NPC Persistence)
     validations:
       required: true
   - type: checkboxes
-    id: platforms
+    id: operatingsystems
     attributes:
-      label: What platform(s) are effected?
-      description: You may select more than one.  Only platforms and versions listed here are supported!
+      label: What operating system(s) are effected?
+      description: You may select more than one.  Only operating systems /w the corresponding versions are supported!
       options:
       - label: iOS 12
       - label: iOS 13
@@ -47,7 +43,16 @@ body:
       - label: Android 10
       - label: Android 11
       - label: Android 12
-      - label: UWP (Sponsors ONLY)
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: What platform(s) are effected?
+      description: You really should only select one of these
+      options:
+      #- label: Blazor
+      - label: MAUI
+      - label: Xamarin Native
+      - label: Xamarin Forms
   - type: textarea
     validations:
       required: true
@@ -84,5 +89,9 @@ body:
       label: Code of Conduct
       description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
       options:
+        - label: My reproducible sample is not from the Shiny samples repository
+          required: true
+        - label: I am using the latest stable version from nuget
+          required: true
         - label: I agree to follow this project's Code of Conduct
           required: true
