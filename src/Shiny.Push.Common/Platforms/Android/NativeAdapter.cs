@@ -12,23 +12,23 @@ using Firebase.Messaging;
 using Microsoft.Extensions.Logging;
 using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
-using Shiny.Stores;
 
 namespace Shiny.Push;
 
 
+// TODO
 public class NativeAdapter : INativeAdapter
 {
     readonly AndroidPlatform platform;
     readonly ILogger logger;
-    readonly IKeyValueStore settings;
+    //readonly IKeyValueStore settings;
     readonly FirebaseConfig? config;
 
 
     public NativeAdapter(
         AndroidPlatform platform,
         ILogger<NativeAdapter> logger,
-        IKeyValueStore settings,
+        //IKeyValueStore settings,
         FirebaseConfig? config = null
     )
     {
@@ -36,7 +36,7 @@ public class NativeAdapter : INativeAdapter
 
         this.platform = platform;
         this.logger = logger;
-        this.settings = settings;
+        //this.settings = settings;
         this.config = config;
     }
 
@@ -228,7 +228,7 @@ public class NativeAdapter : INativeAdapter
                 builder.SetColor(color);
             }
 
-            var notificationId = this.settings.IncrementValue("NotificationId");
+            var notificationId = 0; //this.settings.IncrementValue("NotificationId"); // TODO
             this.platform
                 .GetSystemService<NotificationManager>(Context.NotificationService)
                 .Notify(notificationId, builder.Build());
