@@ -39,7 +39,7 @@ public static class PlatformExtensions
     }
 
 
-    public static CLBeaconIdentityConstraint ToNativeIos13(this BeaconRegion region)
+    public static CLBeaconIdentityConstraint ToCLBeaconIdentityConstraint(this BeaconRegion region)
     {
         var uuid = ToNsUuid(region);
 
