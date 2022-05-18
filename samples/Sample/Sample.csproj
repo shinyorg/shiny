@@ -43,6 +43,7 @@
 	  <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
 	  <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
 	  <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+	  <ProjectReference Include="..\..\src\Shiny.Jobs\Shiny.Jobs.csproj" />
 	</ItemGroup>
 
 </Project>

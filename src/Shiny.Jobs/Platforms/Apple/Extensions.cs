@@ -6,18 +6,6 @@ namespace Shiny.Jobs
 {
     public static class Extensions
     {
-        /// <summary>
-        /// Sets the background fetch interval
-        /// </summary>
-        /// <param name="platform"></param>
-        /// <param name="BackgroundFetchInterval">Set as null to use iOS minimum value</param>
-        /// <returns></returns>
-        public static Task SetBackgroundFetchInterval(this IPlatform platform, double? BackgroundFetchInterval) => platform.InvokeOnMainThreadAsync(() =>
-        {
-            var fetch = BackgroundFetchInterval ?? UIApplication.BackgroundFetchIntervalMinimum;
-            JobManager.BackgroundFetchInterval = fetch;
-            UIApplication.SharedApplication.SetMinimumBackgroundFetchInterval(fetch);
-        });
 
 
         /// <summary>
