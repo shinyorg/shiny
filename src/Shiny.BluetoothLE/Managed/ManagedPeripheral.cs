@@ -114,7 +114,7 @@ namespace Shiny.BluetoothLE.Managed
             {
                 lock (this.observables)
                 {
-                    this.observables[key] ??= this.Peripheral
+                    this.observables[key] = this.Peripheral
                         .WhenConnected()
                         .Select(x => this.GetChar(serviceUuid, characteristicUuid))
                         .Switch()
