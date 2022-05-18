@@ -1,27 +1,18 @@
 ﻿using System;
 
 
-namespace Shiny.Beacons
+namespace Shiny.Beacons;
+
+public enum BeaconRegisterEventType
 {
-    public enum BeaconRegisterEventType
-    {
-        Add,
-        Update,
-        Remove,
-        Clear
-    }
-
-
-    public class BeaconRegisterEvent
-    {
-        public BeaconRegisterEvent(BeaconRegisterEventType eventType, BeaconRegion? region = null)
-        {
-            this.Type = eventType;
-            this.Region = region;
-        }
-
-
-        public BeaconRegisterEventType Type { get; }
-        public BeaconRegion? Region { get; }
-    }
+    Add,
+    Update,
+    Remove,
+    Clear
 }
+
+
+public record BeaconRegisterEvent(
+    BeaconRegisterEventType EventType, 
+    BeaconRegion? Region
+);

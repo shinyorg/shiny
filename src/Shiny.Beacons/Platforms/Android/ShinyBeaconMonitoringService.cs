@@ -2,31 +2,31 @@
 using Android.Content;
 using Android.Content.PM;
 
+namespace Shiny.Beacons;
 
-namespace Shiny.Beacons
+
+[Service(
+    Enabled = true,
+    Exported = true,
+    ForegroundServiceType = ForegroundService.TypeLocation
+)]
+public class ShinyBeaconMonitoringService : ShinyAndroidForegroundService<IBeaconMonitoringManager, IBeaconMonitorDelegate>
 {
-    [Service(
-        Enabled = true,
-        Exported = true,
-        ForegroundServiceType = ForegroundService.TypeLocation
-    )]
-    public class ShinyBeaconMonitoringService : ShinyAndroidForegroundService<IBeaconMonitoringManager, IBeaconMonitorDelegate>
+    public static bool IsStarted { get; private set; }
+    BackgroundTask? backgroundTask;
+
+
+    protected override void OnStart(Intent? intent)
     {
-        public static bool IsStarted { get; private set; }
-        BackgroundTask? backgroundTask;
-
-        protected override void OnStart(Intent? intent)
-        {
-            this.backgroundTask = this.Resolve<BackgroundTask>();
-            this.backgroundTask.Run();
-            IsStarted = true;
-        }
+        this.backgroundTask = this.Resolve<BackgroundTask>();
+        this.backgroundTask.Run();
+        IsStarted = true;
+    }
 
 
-        protected override void OnStop()
-        {
-            this.backgroundTask?.StopScan();
-            IsStarted = false;
-        }
+    protected override void OnStop()
+    {
+        this.backgroundTask?.StopScan();
+        IsStarted = false;
     }
 }

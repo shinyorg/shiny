@@ -4,27 +4,25 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Shiny.BluetoothLE;
 
+namespace Shiny.Beacons;
 
-namespace Shiny.Beacons
+public class BeaconRangingManager : IBeaconRangingManager
 {
-    public class BeaconRangingManager : IBeaconRangingManager
+    readonly IBleManager centralManager;
+    readonly IObservable<Beacon> scanner;
+
+
+    public BeaconRangingManager(IBleManager centralManager)
     {
-        readonly IBleManager centralManager;
-        readonly IObservable<Beacon> scanner;
-
-
-        public BeaconRangingManager(IBleManager centralManager)
-        {
-            this.centralManager = centralManager;
-            this.scanner = this.centralManager
-                .ScanForBeacons(true) // TODO
-                .Publish()
-                .RefCount();
-        }
-
-
-        public Task<AccessState> RequestAccess() => this.centralManager.RequestAccess().ToTask();
-        public IObservable<Beacon> WhenBeaconRanged(BeaconRegion region)
-            => this.scanner.Where(region.IsBeaconInRegion);
+        this.centralManager = centralManager;
+        this.scanner = this.centralManager
+            .ScanForBeacons(true) // TODO
+            .Publish()
+            .RefCount();
     }
+
+
+    public Task<AccessState> RequestAccess() => this.centralManager.RequestAccess().ToTask();
+    public IObservable<Beacon> WhenBeaconRanged(BeaconRegion region)
+        => this.scanner.Where(region.IsBeaconInRegion);
 }
