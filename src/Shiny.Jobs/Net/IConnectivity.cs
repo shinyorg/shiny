@@ -1,13 +1,10 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+namespace Shiny.Jobs.Net;
 
 
-namespace Shiny.Net
+public interface IConnectivity : INotifyPropertyChanged
 {
-    public interface IConnectivity : INotifyPropertyChanged
-    {
-        NetworkReach Reach { get; }
-        NetworkAccess Access { get; }
-        string? CellularCarrier { get; }
-    }
+    NetworkReach Reach { get; }
+    NetworkAccess Access { get; }
+    string? CellularCarrier { get; }
 }

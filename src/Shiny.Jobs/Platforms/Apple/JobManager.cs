@@ -5,9 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using BackgroundTasks;
 using UIKit;
-using ObjCRuntime;
 using Microsoft.Extensions.Logging;
-using Shiny.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny.Jobs;
 
@@ -48,7 +47,7 @@ public class JobManager : AbstractJobManager
         {
             var result = (
                 UIDevice.CurrentDevice.CheckSystemVersion(13, 0) &&
-                Runtime.Arch != Arch.SIMULATOR &&
+                //Runtime.Arch != Arch.SIMULATOR &&
                 AppleExtensions.HasBackgroundMode("processing")
             );
             return result;
@@ -62,13 +61,12 @@ public class JobManager : AbstractJobManager
         var taskId = 0;
         try
         {
-            using (var cancelSrc = new CancellationTokenSource())
-            {
-                taskId = (int)app.BeginBackgroundTask(taskName, cancelSrc.Cancel);
-                this.LogTask(JobState.Start, taskName);
-                await task(cancelSrc.Token).ConfigureAwait(false);
-                this.LogTask(JobState.Finish, taskName);
-            }
+            using var cancelSrc = new CancellationTokenSource();
+             
+            taskId = (int)app.BeginBackgroundTask(taskName, cancelSrc.Cancel);
+            this.LogTask(JobState.Start, taskName);
+            await task(cancelSrc.Token).ConfigureAwait(false);
+            this.LogTask(JobState.Finish, taskName);
         }
         catch (Exception ex)
         {
@@ -87,8 +85,8 @@ public class JobManager : AbstractJobManager
         if (!UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
             result = AccessState.NotSupported;
 
-        else if (Runtime.Arch == Arch.SIMULATOR)
-            result = AccessState.NotSupported;
+        //else if (Runtime.Arch == Arch.SIMULATOR)
+        //    result = AccessState.NotSupported;
 
         else if (!AppleExtensions.HasBackgroundMode("processing"))
             result = AccessState.NotSetup;
@@ -125,69 +123,68 @@ public class JobManager : AbstractJobManager
             null,
             async task =>
             {
-                using (var cancelSrc = new CancellationTokenSource())
+                using var cancelSrc = new CancellationTokenSource();
+                 
+                task.ExpirationHandler = cancelSrc.Cancel;
+
+                var jobs = await this.GetJobs();
+                List<JobInfo>? jobList = null;
+
+                switch (task.Identifier)
                 {
-                    task.ExpirationHandler = cancelSrc.Cancel;
+                    case "com.shiny.job":
+                        jobList = jobs
+                            .Where(x =>
+                                !x.DeviceCharging &&
+                                x.RequiredInternetAccess == InternetAccess.None
+                            )
+                            .ToList();
+                        break;
 
-                    var jobs = await this.GetJobs();
-                    List<JobInfo>? jobList = null;
+                    case "com.shiny.jobpower":
+                        jobList = jobs
+                            .Where(x =>
+                                x.DeviceCharging &&
+                                x.RequiredInternetAccess == InternetAccess.None
+                            )
+                            .ToList();
+                        break;
 
-                    switch (task.Identifier)
-                    {
-                        case "com.shiny.job":
-                            jobList = jobs
-                                .Where(x =>
-                                    !x.DeviceCharging &&
-                                    x.RequiredInternetAccess == InternetAccess.None
+                    case "com.shiny.jobnet":
+                        jobList = jobs
+                            .Where(x =>
+                                !x.DeviceCharging &&
+                                (
+                                    x.RequiredInternetAccess == InternetAccess.Any ||
+                                    x.RequiredInternetAccess == InternetAccess.Unmetered
                                 )
-                                .ToList();
-                            break;
+                            )
+                            .ToList();
+                        break;
 
-                        case "com.shiny.jobpower":
-                            jobList = jobs
-                                .Where(x =>
+                    case "com.shiny.jobpowernet":
+                        jobList = jobs
+                            .Where(x =>
+                                (
                                     x.DeviceCharging &&
-                                    x.RequiredInternetAccess == InternetAccess.None
-                                )
-                                .ToList();
-                            break;
-
-                        case "com.shiny.jobnet":
-                            jobList = jobs
-                                .Where(x =>
-                                    !x.DeviceCharging &&
                                     (
                                         x.RequiredInternetAccess == InternetAccess.Any ||
                                         x.RequiredInternetAccess == InternetAccess.Unmetered
                                     )
                                 )
-                                .ToList();
-                            break;
-
-                        case "com.shiny.jobpowernet":
-                            jobList = jobs
-                                .Where(x =>
-                                    (
-                                        x.DeviceCharging &&
-                                        (
-                                            x.RequiredInternetAccess == InternetAccess.Any ||
-                                            x.RequiredInternetAccess == InternetAccess.Unmetered
-                                        )
-                                    )
-                                    && x.DeviceCharging
-                                )
-                                .ToList();
-                            break;
-                    }
-                    if (jobList != null)
-                    {
-                        foreach (var job in jobList)
-                        {
-                            await this.Run(job.Identifier, cancelSrc.Token);
-                        }
-                    }
-                    task.SetTaskCompleted(true);
+                                && x.DeviceCharging
+                            )
+                            .ToList();
+                        break;
                 }
+                if (jobList != null)
+                {
+                    foreach (var job in jobList)
+                    {
+                        await this.Run(job.Identifier, cancelSrc.Token);
+                    }
+                }
+                task.SetTaskCompleted(true);
             }
         );
     }

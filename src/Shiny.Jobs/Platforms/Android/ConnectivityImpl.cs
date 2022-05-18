@@ -9,154 +9,150 @@ using Microsoft.Extensions.Logging;
 
 [assembly: UsesPermission(Android.Manifest.Permission.AccessNetworkState)]
 
+namespace Shiny.Jobs.Net;
 
-namespace Shiny.Net
+
+public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
 {
-    public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
+    readonly AndroidPlatform platform;
+    readonly ILogger logger;
+    IDisposable? netmon;
+
+
+    public ConnectivityImpl(AndroidPlatform platform, ILogger<IConnectivity> logger)
     {
-        readonly IPlatform context;
-        readonly ILogger logger;
-        IDisposable? netmon;
+        this.platform = platform;
+        this.logger = logger;
+    }
 
 
-        public ConnectivityImpl(IPlatform context, ILogger<IConnectivity> logger)
+    public string? CellularCarrier => this.Telephone.NetworkOperatorName;
+
+
+    NetworkReach reach;
+    public NetworkReach Reach
+    {
+        get
         {
-            this.context = context;
-            this.logger = logger;
+            this.DoDetection();
+            return this.reach;
         }
+        private set => this.Set(ref this.reach, value);
+    }
 
 
-        public string? CellularCarrier => this.Telephone.NetworkOperatorName;
-
-
-        NetworkReach reach;
-        public NetworkReach Reach
+    NetworkAccess access;
+    public NetworkAccess Access
+    {
+        get
         {
-            get
-            {
-                this.DoDetection();
-                return this.reach;
-            }
-            private set => this.Set(ref this.reach, value);
+            this.DoDetection();
+            return this.access;
         }
+        private set => this.Set(ref this.access, value);
+    }
 
 
-        NetworkAccess access;
-        public NetworkAccess Access
+    void DoDetection()
+    {
+        try
         {
-            get
+            if (!this.platform.IsInManifest(Android.Manifest.Permission.AccessNetworkState))
+                throw new ArgumentException("ACCESS_NETWORK_STATE has not been granted");
+
+            // API 26
+            //new ConnectivityManager.NetworkCallback();
+            //this.Connectivity.RegisterNetworkCallback(new NetworkRequest
+            var networks = this.Connectivity
+                .GetAllNetworks()
+                .Select(x => (
+                    Network: x,
+                    Info: this.Connectivity.GetNetworkInfo(x),
+                    Caps: this.Connectivity.GetNetworkCapabilities(x)
+                ))
+                .Where(x =>
+                    (x.Info?.IsAvailable ?? false) &&
+                    (x.Info?.IsConnectedOrConnecting ?? false)
+                );
+
+            var access = NetworkAccess.None;
+            var reach = NetworkReach.None;
+
+            foreach (var network in networks)
             {
-                this.DoDetection();
-                return this.access;
-            }
-            private set => this.Set(ref this.access, value);
-        }
+                access = ToAccess(network.Info.Type);
 
-
-        void DoDetection()
-        {
-            try
-            {
-                if (!this.context.IsInManifest(Android.Manifest.Permission.AccessNetworkState))
-                    throw new ArgumentException("ACCESS_NETWORK_STATE has not been granted");
-
-                // API 26
-                //new ConnectivityManager.NetworkCallback();
-                //this.Connectivity.RegisterNetworkCallback(new NetworkRequest
-                var networks = this.Connectivity
-                    .GetAllNetworks()
-                    .Select(x => (
-                        Network: x,
-                        Info: this.Connectivity.GetNetworkInfo(x),
-                        Caps: this.Connectivity.GetNetworkCapabilities(x)
-                    ))
-                    .Where(x =>
-                        (x.Info?.IsAvailable ?? false) &&
-                        (x.Info?.IsConnectedOrConnecting ?? false)
-                    );
-
-                var access = NetworkAccess.None;
-                var reach = NetworkReach.None;
-
-                foreach (var network in networks)
-                {
-                    access = ToAccess(network.Info.Type);
-
-                    if (!network.Caps.HasCapability(NetCapability.Internet))
-                    { 
-                        reach = NetworkReach.Local;
-                    }
-                    else
-                    {
-                        reach = NetworkReach.Internet;
-                        break;
-                    }
+                if (!network.Caps.HasCapability(NetCapability.Internet))
+                { 
+                    reach = NetworkReach.Local;
                 }
-                this.Reach = reach;
-                this.Access = access;
+                else
+                {
+                    reach = NetworkReach.Internet;
+                    break;
+                }
             }
-            catch (Exception ex)
-            {
-                this.logger.LogWarning("Connectivity implementation error - " + ex);
-            }
+            this.Reach = reach;
+            this.Access = access;
         }
-
-
-        protected override void OnNpcHookChanged(bool hasSubscribers)
+        catch (Exception ex)
         {
-            if (hasSubscribers)
-            {
-                this.netmon = this.context
-                    .WhenIntentReceived(ConnectivityManager.ConnectivityAction)
-                    .Subscribe(_ => this.DoDetection());
-            }
-            else
-            {
-                this.netmon?.Dispose();
-            }
+            this.logger.LogWarning("Connectivity implementation error - " + ex);
         }
+    }
 
 
-        static NetworkAccess ToAccess(ConnectivityType type)
+    protected override void OnNpcHookChanged(bool hasSubscribers)
+    {
+        if (hasSubscribers)
         {
-            switch (type)
-            {
-                case ConnectivityType.Ethernet    : return NetworkAccess.Ethernet;
-                case ConnectivityType.Wifi        : return NetworkAccess.WiFi;
-                case ConnectivityType.Bluetooth   : return NetworkAccess.Bluetooth;
-                case ConnectivityType.Wimax       :
-                case ConnectivityType.Mobile      :
-                case ConnectivityType.MobileDun   :
-                case ConnectivityType.MobileHipri :
-                case ConnectivityType.MobileMms   : return NetworkAccess.Cellular;
-                default                           : return NetworkAccess.Unknown;
-            }
+            this.netmon = this.platform
+                .WhenIntentReceived(ConnectivityManager.ConnectivityAction)
+                .Subscribe(_ => this.DoDetection());
         }
-
-
-        ConnectivityManager? connectivityMgr;
-        ConnectivityManager Connectivity
+        else
         {
-            get
-            {
-                if ((this.connectivityMgr?.Handle ?? IntPtr.Zero) == IntPtr.Zero)
-                    this.connectivityMgr = this.context.GetSystemService<ConnectivityManager>(Context.ConnectivityService);
-
-                return this.connectivityMgr;
-            }
+            this.netmon?.Dispose();
         }
+    }
 
 
-        TelephonyManager? telManager;
-        TelephonyManager Telephone
+    static NetworkAccess ToAccess(ConnectivityType type) => type switch
+    {
+        ConnectivityType.Ethernet    => NetworkAccess.Ethernet,
+        ConnectivityType.Wifi        => NetworkAccess.WiFi,
+        ConnectivityType.Bluetooth   => NetworkAccess.Bluetooth,
+        ConnectivityType.Wimax       => NetworkAccess.Cellular,
+        ConnectivityType.Mobile      => NetworkAccess.Cellular,
+        ConnectivityType.MobileDun   => NetworkAccess.Cellular,
+        ConnectivityType.MobileHipri => NetworkAccess.Cellular,
+        ConnectivityType.MobileMms   => NetworkAccess.Cellular,
+        _ => NetworkAccess.Unknown
+    };
+
+
+    ConnectivityManager? connectivityMgr;
+    ConnectivityManager Connectivity
+    {
+        get
         {
-            get
-            {
-                if ((this.telManager?.Handle ?? IntPtr.Zero) == IntPtr.Zero)
-                    this.telManager = this.context.GetSystemService<TelephonyManager>(Context.TelephonyService);
+            if ((this.connectivityMgr?.Handle ?? IntPtr.Zero) == IntPtr.Zero)
+                this.connectivityMgr = this.platform.GetSystemService<ConnectivityManager>(Context.ConnectivityService);
 
-                return this.telManager;
-            }
+            return this.connectivityMgr;
+        }
+    }
+
+
+    TelephonyManager? telManager;
+    TelephonyManager Telephone
+    {
+        get
+        {
+            if ((this.telManager?.Handle ?? IntPtr.Zero) == IntPtr.Zero)
+                this.telManager = this.platform.GetSystemService<TelephonyManager>(Context.TelephonyService);
+
+            return this.telManager;
         }
     }
 }

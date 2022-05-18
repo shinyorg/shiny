@@ -4,79 +4,64 @@ using System.Reactive.Linq;
 using Foundation;
 using UIKit;
 
+namespace Shiny.Jobs.Power;
 
-namespace Shiny.Power
+
+public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
 {
-    public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
+    CompositeDisposable? dispose;
+    
+    
+    public bool IsEnergySavingEnabled => NSProcessInfo.ProcessInfo.LowPowerModeEnabled;
+
+
+    protected override void OnNpcHookChanged(bool hasSubscribers)
     {
-        CompositeDisposable? dispose;
-
-
-        public bool IsEnergySavingEnabled => NSProcessInfo.ProcessInfo.LowPowerModeEnabled;
-
-
-        protected override void OnNpcHookChanged(bool hasSubscribers)
+        if (hasSubscribers)
         {
-            if (hasSubscribers)
-            {
-                this.dispose = new CompositeDisposable(
-                    this.WhenBatteryPercentageChanged()
-                        .Subscribe(_ => this.RaisePropertyChanged(nameof(this.BatteryLevel))),
+            this.dispose = new CompositeDisposable(
+                this.WhenBatteryPercentageChanged()
+                    .Subscribe(_ => this.RaisePropertyChanged(nameof(this.BatteryLevel))),
 
-                    this.WhenPowerStatusChanged()
-                        .Subscribe(_ => this.RaisePropertyChanged(nameof(this.Status)))
-                );
-            }
-            else
-            {
-                this.dispose?.Dispose();
-            }
+                this.WhenPowerStatusChanged()
+                    .Subscribe(_ => this.RaisePropertyChanged(nameof(this.Status)))
+            );
         }
-
-
-        public int BatteryLevel => Math.Abs((int)(UIDevice.CurrentDevice.BatteryLevel * 100F));
-        public PowerState Status
+        else
         {
-            get
-            {
-                switch (UIDevice.CurrentDevice.BatteryState)
-                {
-                    case UIDeviceBatteryState.Charging:
-                        return PowerState.Charging;
-
-                    case UIDeviceBatteryState.Full:
-                        return PowerState.Charged;
-
-                    case UIDeviceBatteryState.Unplugged:
-                        return PowerState.Discharging;
-
-                    case UIDeviceBatteryState.Unknown:
-                    default:
-                        return PowerState.Unknown;
-                }
-            }
+            this.dispose?.Dispose();
         }
-
-
-        IObservable<int> WhenBatteryPercentageChanged() => Observable.Create<int>(ob =>
-        {
-            UIDevice.CurrentDevice.BatteryMonitoringEnabled = true;
-            var not = UIDevice
-                .Notifications
-                .ObserveBatteryLevelDidChange((sender, args) => ob.OnNext(this.BatteryLevel));
-
-            return () =>
-            {
-                UIDevice.CurrentDevice.BatteryMonitoringEnabled = false;
-                not.Dispose();
-            };
-        });
-
-
-        IObservable<PowerState> WhenPowerStatusChanged() => Observable.Create<PowerState>(ob =>
-            UIDevice
-                .Notifications
-                .ObserveBatteryStateDidChange((sender, args) => ob.OnNext(this.Status))
-        );
     }
+
+
+    public int BatteryLevel => Math.Abs((int)(UIDevice.CurrentDevice.BatteryLevel * 100F));
+    public PowerState Status => UIDevice.CurrentDevice.BatteryState switch
+    {
+        UIDeviceBatteryState.Charging => PowerState.Charging,
+        UIDeviceBatteryState.Full => PowerState.Charged,
+        UIDeviceBatteryState.Unplugged => PowerState.Discharging,
+        _ => PowerState.Unknown
+    };
+
+
+    IObservable<int> WhenBatteryPercentageChanged() => Observable.Create<int>(ob =>
+    {
+        UIDevice.CurrentDevice.BatteryMonitoringEnabled = true;
+        var not = UIDevice
+            .Notifications
+            .ObserveBatteryLevelDidChange((sender, args) => ob.OnNext(this.BatteryLevel));
+
+        return () =>
+        {
+            UIDevice.CurrentDevice.BatteryMonitoringEnabled = false;
+            not.Dispose();
+        };
+    });
+
+
+    IObservable<PowerState> WhenPowerStatusChanged() => Observable.Create<PowerState>(ob =>
+        UIDevice
+            .Notifications
+            .ObserveBatteryStateDidChange((sender, args) => ob.OnNext(this.Status))
+    );
 }

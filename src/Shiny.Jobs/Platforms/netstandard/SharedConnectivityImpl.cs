@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-namespace Shiny.Net;
+namespace Shiny.Jobs.Net;
 
 
 public class SharedConnectivityImpl : NotifyPropertyChanged, IConnectivity

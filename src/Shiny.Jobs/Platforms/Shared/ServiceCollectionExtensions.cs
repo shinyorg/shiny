@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
-using Shiny.Net;
-using Shiny.Power;
+using Shiny.Jobs.Net;
+using Shiny.Jobs.Power;
 
 namespace Shiny;
 
@@ -15,8 +15,9 @@ public static class ServiceCollectionExtensions
         if (clearPrevJobs != null)
             JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs.Value;
 
+        services.TryAddSqliteRepository();
         services.AddShinyService<JobsStartup>();
-        services.AddShinyService<JobLifecycleTask>();
+        //services.AddShinyService<JobLifecycleTask>(); // TODO
         services.TryAddSingleton<IJobManager, JobManager>();
 
 #if IOS || ANDROID || MACCATALYST

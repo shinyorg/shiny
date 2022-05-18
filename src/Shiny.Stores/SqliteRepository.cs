@@ -41,6 +41,7 @@ public class SqliteRepository : IRepository
 
     public void CreateEntry(Type type)
     {
+        // TODO: create a map
         var sql = $@"CREATE TABLE IF NOT EXISTS {type.Name}(Id TEXT PRIMARY KEY, ";
         var properties = type.GetProperties().Where(x => x.CanRead && x.CanWrite).ToList();
 
@@ -97,7 +98,6 @@ public class SqliteRepository : IRepository
         while (reader.Read())
         {
             var obj = new T();
-
             list.Add(obj);
         }
         return list;

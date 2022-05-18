@@ -1,12 +1,12 @@
 ﻿using System;
 using CoreTelephony;
 
-namespace Shiny.Net;
+namespace Shiny.Jobs.Net;
 
 
 public class ConnectivityImpl : NotifyPropertyChanged, IConnectivity
 {
-    readonly CTTelephonyNetworkInfo cellular = new CTTelephonyNetworkInfo();
+    readonly CTTelephonyNetworkInfo cellular = new();
 
 
     public NetworkReach Reach

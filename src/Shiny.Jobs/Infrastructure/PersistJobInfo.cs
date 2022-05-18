@@ -16,7 +16,7 @@ namespace Shiny.Jobs.Infrastructure
         public double? PeriodicTimeSeconds { get; set; }
         public DateTime? LastRunUtc { get; set; }
         public InternetAccess RequiredInternetAccess { get; set; }
-        public IDictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> Parameters { get; set; } = new();
 
 
         public static JobInfo FromPersist(PersistJobInfo job)
