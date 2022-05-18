@@ -8,9 +8,9 @@ using Shiny.BluetoothLE.Internals;
 
 namespace Shiny.BluetoothLE
 {
-    internal static class iOSExtensions
+    internal static class PlatformExtensions
     {
-        public static byte[] ToByteArray(this CBDescriptor native) => (native.Value as NSData)?.ToArray();
+        public static byte[]? ToByteArray(this CBDescriptor native) => (native.Value as NSData)?.ToArray();
 
 
         public static IObservable<Unit> WhenReady(this CBCentralManager manager) => Observable.Create<Unit>(ob =>
@@ -42,16 +42,13 @@ namespace Shiny.BluetoothLE
         });
 
 
-        public static AccessState FromNative(this CBCentralManagerState state) => state switch
+        public static AccessState FromNative(this CBManagerState state) => state switch
         {
-            var x when
-                x == CBCentralManagerState.Resetting ||
-                x == CBCentralManagerState.PoweredOn
-                    => AccessState.Available,
-
-            CBCentralManagerState.PoweredOff => AccessState.Disabled,
-            CBCentralManagerState.Unauthorized => AccessState.Denied,
-            CBCentralManagerState.Unsupported => AccessState.NotSupported,
+            CBManagerState.Resetting => AccessState.Available,
+            CBManagerState.PoweredOn => AccessState.Available,
+            CBManagerState.PoweredOff => AccessState.Disabled,
+            CBManagerState.Unauthorized => AccessState.Denied,
+            CBManagerState.Unsupported => AccessState.NotSupported,
             _ => AccessState.Unknown
         };
 
@@ -61,7 +58,7 @@ namespace Shiny.BluetoothLE
             if (Object.ReferenceEquals(peripheral, other))
                 return true;
 
-            if (peripheral.UUID.Equals(other.UUID))
+            if (peripheral.Identifier.Equals(other.Identifier))
                 return true;
 
             return false;

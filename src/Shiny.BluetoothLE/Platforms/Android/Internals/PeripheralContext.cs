@@ -13,22 +13,21 @@ namespace Shiny.BluetoothLE.Internals
 {
     public class PeripheralContext
     {
-        readonly Subject<BleException> connErrorSubject;
-
-
         public PeripheralContext(ManagerContext context, BluetoothDevice device)
         {
             this.ManagerContext = context;
             this.NativeDevice = device;
-            this.connErrorSubject = new Subject<BleException>();
-            this.Callbacks = new GattCallbacks();
         }
 
+
+        readonly Subject<BleException> connErrorSubject = new();
+        public GattCallbacks Callbacks { get; } = new();
 
         public ManagerContext ManagerContext { get; }
         public BluetoothGatt? Gatt { get; private set; }
         public BluetoothDevice NativeDevice { get; }
-        public GattCallbacks Callbacks { get; }
+        
+
         public ConnectionState Status
         {
             get
@@ -98,7 +97,7 @@ namespace Shiny.BluetoothLE.Internals
         public void InvokeOnMainThread(Action action)
         {
             if (this.ManagerContext.Configuration.AndroidShouldInvokeOnMainThread)
-                handler.Post(action);
+                this.handler.Post(action);
             else
                 action();
         }
@@ -113,9 +112,9 @@ namespace Shiny.BluetoothLE.Internals
             }
             catch (Exception ex)
             {
-                ShinyHost
-                    .LoggerFactory
-                    .CreateLogger("BlePeripheral")
+                this.ManagerContext
+                    .Logging
+                    .CreateLogger("PeripheralContext")
                     .LogWarning(ex, "BLE Peripheral did not cleanly disconnect");
             }
         }

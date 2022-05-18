@@ -24,7 +24,7 @@ namespace Shiny.BluetoothLE
         public override IObservable<AccessState> RequestAccess() => Observable.Create<AccessState>(ob =>
         {
             IDisposable? disp = null;
-            if (this.context.Manager.State == CBCentralManagerState.Unknown)
+            if (this.context.Manager.State == CBManagerState.Unknown)
             {
                 disp = this.context
                     .StateUpdated

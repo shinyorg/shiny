@@ -53,10 +53,10 @@ namespace Shiny.BluetoothLE
                      ob.Respond(characteristic);
                 });
                 var nativeUuid = CBUUID.FromString(characteristicUuid);
-                this.Peripherial.DiscoveredCharacteristic += handler;
+                this.Peripherial.DiscoveredCharacteristics += handler;
                 this.Peripherial.DiscoverCharacteristics(new [] { nativeUuid }, this.Service);
 
-                return Disposable.Create(() => this.Peripherial.DiscoveredCharacteristic -= handler);
+                return Disposable.Create(() => this.Peripherial.DiscoveredCharacteristics -= handler);
             })
             .Assert(this.Uuid, characteristicUuid, throwIfNotFound);
 
@@ -82,10 +82,10 @@ namespace Shiny.BluetoothLE
 
                     ob.Respond(list);
                 });
-                this.Peripherial.DiscoveredCharacteristic += handler;
+                this.Peripherial.DiscoveredCharacteristics += handler;
                 this.Peripherial.DiscoverCharacteristics(this.Service);
 
-                return () => this.Peripherial.DiscoveredCharacteristic -= handler;
+                return () => this.Peripherial.DiscoveredCharacteristics -= handler;
             });
 
 

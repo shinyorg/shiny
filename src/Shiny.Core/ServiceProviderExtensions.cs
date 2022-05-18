@@ -1,6 +1,12 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Shiny.Hosting;
 
 namespace Shiny;
 
@@ -110,33 +116,33 @@ public static class ServiceExtensions
 
 
 
-    //public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)
-    //    => services.GetServices<T>().RunDelegates(execute, onError);
+    public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)
+        => services.GetServices<T>().RunDelegates(execute, onError);
 
 
-    //public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, Action<Exception>? onError = null)
-    //{
-    //    if (services == null)
-    //        return;
+    public static async Task RunDelegates<T>(this IEnumerable<T> services, Func<T, Task> execute, Action<Exception>? onError = null)
+    {
+        if (services == null)
+            return;
 
-    //    var logger = Host.Current.Logging.CreateLogger<T>();
-    //    var tasks = services
-    //        .Select(async x =>
-    //        {
-    //            try
-    //            {
-    //                await execute(x).ConfigureAwait(false);
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                if (onError == null)
-    //                    logger.LogError(ex, "Error executing delegate");
-    //                else
-    //                    onError(ex);
-    //            }
-    //        })
-    //        .ToList();
+        var logger = Host.Current.Logging.CreateLogger<T>();
+        var tasks = services
+            .Select(async x =>
+            {
+                try
+                {
+                    await execute(x).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    if (onError == null)
+                        logger.LogError(ex, "Error executing delegate");
+                    else
+                        onError(ex);
+                }
+            })
+            .ToList();
 
-    //    await Task.WhenAll(tasks);
-    //}
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+    }
 }

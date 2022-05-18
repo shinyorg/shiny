@@ -31,11 +31,14 @@
         <PackageReference Update="Xamarin.GooglePlayServices.Location" Version="119.0.1" />
 
         <PackageReference Update="Xamarin.AndroidX.Core" Version="1.7.0.2" />
-        <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.4.1.1" />
-        <PackageReference Update="Xamarin.AndroidX.Concurrent.Futures" Version="[1.1.0, 1.2)" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.4.1.1" />
+        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.4.1.1" />
+        <PackageReference Update="Xamarin.AndroidX.Concurrent.Futures" Version="1.1.0.8" />
+
+        <!--<PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.4.1.1" />
         <PackageReference Update="Xamarin.AndroidX.Room.Common" Version="2.4.2.1" />
         <PackageReference Update="Xamarin.AndroidX.Room.Runtime" Version="2.4.2.1" />
-        <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="[2.7.1.1, 2.8)" />
+        <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="[2.7.1.1, 2.8)" />-->
     </ItemGroup>
 
     <ItemGroup>

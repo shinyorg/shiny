@@ -12,14 +12,16 @@ namespace Shiny.BluetoothLE.Internals
 {
     public class ManagerContext : CBCentralManagerDelegate
     {
-        readonly ConcurrentDictionary<string, IPeripheral> peripherals = new ConcurrentDictionary<string, IPeripheral>();
+        readonly ConcurrentDictionary<string, IPeripheral> peripherals = new();
         readonly Lazy<CBCentralManager> managerLazy;
         readonly ILogger logger;
 
 
-        public ManagerContext(IServiceProvider services,
-                              BleConfiguration config,
-                              ILogger<IBleManager> logger)
+        public ManagerContext(
+            IServiceProvider services,
+            BleConfiguration config,
+            ILogger<IBleManager> logger
+        )
         {
             this.Services = services;
             this.logger = logger;
@@ -81,7 +83,9 @@ namespace Shiny.BluetoothLE.Internals
             {
                 var item = peripheralArray.GetItem<CBPeripheral>(i);
                 var peripheral = this.GetPeripheral(item);
-                await this.Services.RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral));
+                await this.Services
+                    .RunDelegates<IBleDelegate>(x => x.OnConnected(peripheral))
+                    .ConfigureAwait(false);
             }
             // TODO: restore scan? CBCentralManager.RestoredStateScanOptionsKey
 #endif
