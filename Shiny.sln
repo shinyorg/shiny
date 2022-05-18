@@ -62,9 +62,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{7ABDA2A1-3B8C-456D-8347-9C03C1DACC73}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build.yml = .github\workflows\build.yml
-		.github\workflows\lock.yml = .github\workflows\lock.yml
-		.github\workflows\sponsors.yml = .github\workflows\sponsors.yml
-		.github\workflows\stale.yml = .github\workflows\stale.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Extensions.Configuration", "src\Shiny.Extensions.Configuration\Shiny.Extensions.Configuration.csproj", "{2C862DC4-11BB-4BEC-991B-97EFAC7E2F7F}"
@@ -83,31 +80,31 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleBlazor", "samples\Sam
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "todo", "todo", "{0E49858F-EB5E-4211-85DE-063FAB2902AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shiny.BluetoothLE", "src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj", "{D42D37ED-B361-4741-A1C7-BF238F49ECC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.BluetoothLE", "src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj", "{D42D37ED-B361-4741-A1C7-BF238F49ECC1}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Locations", "src\Shiny.Locations\Shiny.Locations.csproj", "{F309044A-BFF6-4DE9-8AF7-F95F069C0318}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Locations", "src\Shiny.Locations\Shiny.Locations.csproj", "{F309044A-BFF6-4DE9-8AF7-F95F069C0318}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Notifications", "src\Shiny.Notifications\Shiny.Notifications.csproj", "{5F3E8379-C4DD-4D3B-A4EF-3B2EE21DBAA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Notifications", "src\Shiny.Notifications\Shiny.Notifications.csproj", "{5F3E8379-C4DD-4D3B-A4EF-3B2EE21DBAA1}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Beacons", "src\Shiny.Beacons\Shiny.Beacons.csproj", "{0D2DB30C-7F50-4D03-BC96-DF5D96F6EA3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Beacons", "src\Shiny.Beacons\Shiny.Beacons.csproj", "{0D2DB30C-7F50-4D03-BC96-DF5D96F6EA3F}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Push", "src\Shiny.Push\Shiny.Push.csproj", "{B0C5CCE1-3608-4FFE-82FA-B6CE7A38C9E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push", "src\Shiny.Push\Shiny.Push.csproj", "{B0C5CCE1-3608-4FFE-82FA-B6CE7A38C9E5}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Push.AzureNotificationHubs", "src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj", "{1BD13E56-B53C-455C-912A-787A4D428BD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.AzureNotificationHubs", "src\Shiny.Push.AzureNotificationHubs\Shiny.Push.AzureNotificationHubs.csproj", "{1BD13E56-B53C-455C-912A-787A4D428BD8}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Locations.Common", "src\Shiny.Locations.Common\Shiny.Locations.Common.csproj", "{AE209F04-9FAC-482A-A92C-56869F192921}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Locations.Common", "src\Shiny.Locations.Common\Shiny.Locations.Common.csproj", "{AE209F04-9FAC-482A-A92C-56869F192921}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Net.Http", "src\Shiny.Net.Http\Shiny.Net.Http.csproj", "{BC3FE716-B89A-4C7C-9F4F-3EFBE23066F7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Net.Http", "src\Shiny.Net.Http\Shiny.Net.Http.csproj", "{BC3FE716-B89A-4C7C-9F4F-3EFBE23066F7}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Push.Common", "src\Shiny.Push.Common\Shiny.Push.Common.csproj", "{9C72985B-3133-44F3-9F4B-8AB8EAF4494E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Push.Common", "src\Shiny.Push.Common\Shiny.Push.Common.csproj", "{9C72985B-3133-44F3-9F4B-8AB8EAF4494E}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Sensors", "src\Shiny.Sensors\Shiny.Sensors.csproj", "{5955D1A8-437D-4375-9AA6-71A4B509A5C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Sensors", "src\Shiny.Sensors\Shiny.Sensors.csproj", "{5955D1A8-437D-4375-9AA6-71A4B509A5C2}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Nfc", "src\Shiny.Nfc\Shiny.Nfc.csproj", "{611A7ABD-05EE-4F5C-A9A2-C4A96F9FAFB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Nfc", "src\Shiny.Nfc\Shiny.Nfc.csproj", "{611A7ABD-05EE-4F5C-A9A2-C4A96F9FAFB4}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Notifications.Common", "src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj", "{936875B9-27E4-40A0-AAFB-BA1B16D56681}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Notifications.Common", "src\Shiny.Notifications.Common\Shiny.Notifications.Common.csproj", "{936875B9-27E4-40A0-AAFB-BA1B16D56681}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Shiny.Jobs", "src\Shiny.Jobs\Shiny.Jobs.csproj", "{7134798A-5AB7-4FD5-870E-E09E4256FD20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shiny.Jobs", "src\Shiny.Jobs\Shiny.Jobs.csproj", "{7134798A-5AB7-4FD5-870E-E09E4256FD20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1477,7 +1474,6 @@ Global
 		{2BCD0A77-4FA1-4D29-AC53-4C2C28C0C84C} = {658598AA-7091-4EAA-8E2B-79FE532D48B2}
 		{0E49858F-EB5E-4211-85DE-063FAB2902AF} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{D42D37ED-B361-4741-A1C7-BF238F49ECC1} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
-		{7134798A-5AB7-4FD5-870E-E09E4256FD20} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 		{F309044A-BFF6-4DE9-8AF7-F95F069C0318} = {0E49858F-EB5E-4211-85DE-063FAB2902AF}
 		{5F3E8379-C4DD-4D3B-A4EF-3B2EE21DBAA1} = {0E49858F-EB5E-4211-85DE-063FAB2902AF}
 		{0D2DB30C-7F50-4D03-BC96-DF5D96F6EA3F} = {0E49858F-EB5E-4211-85DE-063FAB2902AF}
@@ -1489,6 +1485,7 @@ Global
 		{5955D1A8-437D-4375-9AA6-71A4B509A5C2} = {0E49858F-EB5E-4211-85DE-063FAB2902AF}
 		{611A7ABD-05EE-4F5C-A9A2-C4A96F9FAFB4} = {0E49858F-EB5E-4211-85DE-063FAB2902AF}
 		{936875B9-27E4-40A0-AAFB-BA1B16D56681} = {0E49858F-EB5E-4211-85DE-063FAB2902AF}
+		{7134798A-5AB7-4FD5-870E-E09E4256FD20} = {6374E4D9-1BD8-4880-B603-AFDEA8345D7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {135D86AF-4EC4-4AA0-BD06-75C410F3EA08}
