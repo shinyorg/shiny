@@ -39,49 +39,39 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, ILifecycleObserver, ID
 
     [Lifecycle.Event.OnResume]
     [Export]
-    public void OnResume()
-    {
-    }
-
+    public void OnResume() 
+        => this.Execute(this.appHandlers, x => x.OnForeground());
 
     [Lifecycle.Event.OnPause]
     [Export]
-    public void OnPause()
-    {
-    }
+    public void OnPause() 
+        => this.Execute(this.appHandlers, x => x.OnBackground());
 
+    public void OnRequestPermissionsResult(Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
+        => this.Execute(this.permissionHandlers, x => x.Handle(activity, requestCode, permissions, grantResults));
 
+    public void OnNewIntent(Activity activity, Intent? intent)
+        => this.Execute(this.newIntentHandlers, x => x.Handle(activity, intent));
 
-    public void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
-    {
-
-    }
-
-
-    public void OnNewIntent(Intent? intent)
-    {
-
-    }
-
-
-    public void OnActivityResult(int requestCode, Result result, Intent? intent)
-    {
-
-    }
-
-
-    public void OnAppForegrounding()
-    {
-
-    }
-
-    public void OnAppBackgrounding()
-    {
-
-    }
+    public void OnActivityResult(Activity activity, int requestCode, Result result, Intent? intent)
+        => this.Execute(this.activityResultHandlers, x => x.Handle(activity, requestCode, result, intent));
 
     public void Dispose()
+        => ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this);
+
+
+    void Execute<T>(IEnumerable<T> services, Action<T> action)
     {
-        ProcessLifecycleOwner.Get().Lifecycle.RemoveObserver(this);
+        foreach (var handler in services)
+        {
+            try
+            {
+                action(handler);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError("Failed to execute lifecycle call", ex);
+            }
+        }
     }
 }

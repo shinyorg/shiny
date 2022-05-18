@@ -27,6 +27,7 @@ public class IosLifecycleExecutor
     )
     {
         this.logger = logger;
+        this.appHandlers = appHandlers;
         this.finishLaunchingHandlers = finishLaunchingHandlers;
         this.bgUrlHandlers = bgUrlHandlers;
         this.remoteHandlers = remoteHandlers;
@@ -40,42 +41,47 @@ public class IosLifecycleExecutor
         return true;
     }
 
-
-    public void OnRegisteredForRemoteNotifications(NSData deviceToken)
-    {
-
-    }
-
+    public void OnRegisteredForRemoteNotifications(NSData deviceToken) 
+        => this.Execute(this.remoteHandlers, x => x.OnRegistered(deviceToken));
 
     public void OnFailedToRegisterForRemoteNotifications(NSError error)
-    {
-
-    }
-
+        => this.Execute(this.remoteHandlers, x => x.OnFailedToRegister(error));
 
     public void OnDidReceiveRemoveNotification(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
-    {
-        //completionHandler?.Invoke(UIBackgroundFetchResult.NewData);
-    }
-
+        => this.Execute(this.remoteHandlers, x => x.OnDidReceive(userInfo, completionHandler));
 
     public bool OnContinueUserActivity(NSUserActivity userActivity, UIApplicationRestorationHandler completionHandler)
-    {
-        return true;
-    }
-
+        => this.HandleExecute(this.activityHandlers, x => x.Handle(userActivity, completionHandler));
 
     public void OnAppForegrounding()
-    {
-
-    }
-
+        => this.Execute(this.appHandlers, x => x.OnForeground());
 
     public void OnAppBackgrounding()
+        => this.Execute(this.appHandlers, x => x.OnBackground());
+
+    public bool OnHandleEventsForBackgroundUrl(string sessionIdentifier, Action completionHandler)
+        => this.HandleExecute(this.bgUrlHandlers, x => x.Handle(sessionIdentifier, completionHandler));
+
+
+    bool HandleExecute<T>(IEnumerable<T> services, Func<T, bool> func)
     {
-
+        foreach (var handler in services)
+        {
+            try
+            {
+                if (func(handler))
+                {
+                    this.logger.LogDebug($"{handler!.GetType().FullName} handling lifecycle event for {typeof(T).FullName}");
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError("Failed to execute lifecycle call", ex);
+            }
+        }
+        return false;
     }
-
 
     void Execute<T>(IEnumerable<T> services, Action<T> action)
     {
