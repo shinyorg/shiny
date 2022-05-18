@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
+        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
         <Description>Shiny Push Common support lib for all push implementations</Description>
     </PropertyGroup>
 
@@ -13,9 +13,11 @@
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <PackageReference Include="Xamarin.Firebase.Messaging" />
         <PackageReference Include="Xamarin.GooglePlayServices.Tasks" />
+        <!--
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct" />
         <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime" />
         <PackageReference Include="Xamarin.Google.Dagger" />
+        -->
     </ItemGroup>
 
 </Project>

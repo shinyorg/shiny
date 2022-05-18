@@ -7,7 +7,7 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection TryAddSqliteRepository(this IServiceCollection services)
+    public static IServiceCollection TryAddRepository(this IServiceCollection services)
     {
         services.TryAddSingleton<IRepository, SqliteRepository>();
         return services;

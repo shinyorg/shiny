@@ -1,13 +1,9 @@
-﻿using System;
+﻿namespace Shiny.Notifications;
 
-
-namespace Shiny.Notifications
+public enum ChannelImportance
 {
-    public enum ChannelImportance
-    {
-        Low,
-        Normal,
-        High,
-        Critical
-    }
+    Low,
+    Normal,
+    High,
+    Critical
 }

@@ -1,15 +1,6 @@
-﻿namespace Shiny.Push
-{
-    public struct Notification
-    {
-        public Notification(string? title, string? message)
-        {
-            this.Title = title;
-            this.Message = message;
-        }
+﻿namespace Shiny.Push;
 
-
-        public string? Title { get; }
-        public string? Message { get; }
-    }
-}
+public record Notification(
+    string? Title,
+    string? Message
+);

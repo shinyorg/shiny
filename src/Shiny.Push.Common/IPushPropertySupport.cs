@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+
+namespace Shiny.Push;
 
 
-namespace Shiny.Push
+public interface IPushPropertySupport : IPushManager
 {
-    public interface IPushPropertySupport : IPushManager
-    {
-        IReadOnlyDictionary<string, string> CurrentProperties { get; }
+    IReadOnlyDictionary<string, string> CurrentProperties { get; }
 
-        void ClearProperties();
-        void RemoveProperty(string property);
-        void SetProperty(string property, string value);
-    }
+    void ClearProperties();
+    void RemoveProperty(string property);
+    void SetProperty(string property, string value);
 }

@@ -1,21 +1,15 @@
-﻿using System;
+﻿namespace Shiny.Push;
 
-
-namespace Shiny.Push
+public record PushAccessState(
+    AccessState Status,
+    string? RegistrationToken
+)
 {
-    public struct PushAccessState
+    public static PushAccessState Denied { get; } = new PushAccessState(AccessState.Denied, null);
+
+    public void Assert()
     {
-        public static PushAccessState Denied { get; } = new PushAccessState(AccessState.Denied, null);
-
-
-        public PushAccessState(AccessState status, string? registrationToken)
-        {
-            this.Status = status;
-            this.RegistrationToken = registrationToken;
-        }
-
-
-        public AccessState Status { get; }
-        public string? RegistrationToken { get; }
+        if (this.Status != AccessState.Available)
+            throw new PermissionException("Push registration fail", this.Status);
     }
 }
