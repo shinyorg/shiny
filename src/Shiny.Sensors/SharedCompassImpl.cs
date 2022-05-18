@@ -2,76 +2,76 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
-namespace Shiny.Sensors
+namespace Shiny.Sensors;
+
+
+public class SharedCompassImpl : ICompass
 {
-    public class SharedCompassImpl : ICompass
+    readonly IAccelerometer? accelerometer;
+    readonly IMagnetometer? magnetometer;
+
+
+    public SharedCompassImpl(IAccelerometer? accelerometer = null, IMagnetometer? magnetometer = null)
     {
-        readonly IAccelerometer? accelerometer;
-        readonly IMagnetometer? magnetometer;
+        this.accelerometer = accelerometer;
+        this.magnetometer = magnetometer;
+    }
 
 
-        public SharedCompassImpl(IAccelerometer? accelerometer = null, IMagnetometer? magnetometer = null)
+    public bool IsAvailable => (this.accelerometer?.IsAvailable ?? false) &&
+                               (this.magnetometer?.IsAvailable ?? false);
+
+    public IObservable<CompassReading> WhenReadingTaken()
+    {
+        if (!this.IsAvailable)
+            return Observable.Empty<CompassReading>();
+
+        return Observable.Create<CompassReading>(ob =>
         {
-            this.accelerometer = accelerometer;
-            this.magnetometer = magnetometer;
-        }
+            var comp = new CompositeDisposable();
+            var syncLock = new object();
+            MotionReading? lastAccel = null;
+            MotionReading? lastMag = null;
 
+            comp.Add(this.accelerometer
+                .WhenReadingTaken()
+                .Synchronize(syncLock)
+                .Subscribe(x =>
+                {
+                    lastAccel = x;
+                    Calc(ob, ref lastMag, ref lastAccel);
+                })
+            );
 
-        public bool IsAvailable => (this.accelerometer?.IsAvailable ?? false) &&
-                                   (this.magnetometer?.IsAvailable ?? false);
+            comp.Add(this.magnetometer
+                .WhenReadingTaken()
+                .Synchronize(syncLock)
+                .Subscribe(x =>
+                {
+                    lastMag = x;
+                    Calc(ob, ref lastMag, ref lastAccel);
+                })
+            );
 
-        public IObservable<CompassReading> WhenReadingTaken()
-        {
-            if (!this.IsAvailable)
-                return Observable.Empty<CompassReading>();
+            return comp;
+        });
+    }
 
-            return Observable.Create<CompassReading>(ob =>
-            {
-                var comp = new CompositeDisposable();
-                var syncLock = new object();
-                MotionReading? lastAccel = null;
-                MotionReading? lastMag = null;
+    static void Calc(IObserver<CompassReading> ob, ref MotionReading? lastMag, ref MotionReading? lastAccel)
+    {
+        if (lastMag == null || lastAccel == null)
+            return;
 
-                comp.Add(this.accelerometer
-                    .WhenReadingTaken()
-                    .Synchronize(syncLock)
-                    .Subscribe(x =>
-                    {
-                        lastAccel = x;
-                        Calc(ob, ref lastMag, ref lastAccel);
-                    })
-                );
+        //    SensorManager.GetRotationMatrix(this.rMatrix, null, this.lastAccel, this.lastMag);
+        //    SensorManager.GetOrientation(this.rMatrix, this.orientation);
+        //    var degrees = (Math.ToDegrees(this.orientation[0]) + 360) % 360;
 
-                comp.Add(this.magnetometer
-                    .WhenReadingTaken()
-                    .Synchronize(syncLock)
-                    .Subscribe(x =>
-                    {
-                        lastMag = x;
-                        Calc(ob, ref lastMag, ref lastAccel);
-                    })
-                );
+        // TODO: get compass accuracy
+        // TODO: calculate true north
+        //ob.OnNext(new CompassReading(CompassAccuracy.Approximate, degrees, null));
 
-                return comp;
-            });
-        }
-
-        static void Calc(IObserver<CompassReading> ob, ref MotionReading? lastMag, ref MotionReading? lastAccel)
-        {
-            if (lastMag == null || lastAccel == null)
-                return;
-
-            //    SensorManager.GetRotationMatrix(this.rMatrix, null, this.lastAccel, this.lastMag);
-            //    SensorManager.GetOrientation(this.rMatrix, this.orientation);
-            //    var degrees = (Math.ToDegrees(this.orientation[0]) + 360) % 360;
-
-            // TODO: get compass accuracy
-            // TODO: calculate true north
-            //ob.OnNext(new CompassReading(CompassAccuracy.Approximate, degrees, null));
-
-            // clear for fresh read
-            lastMag = null;
-            lastAccel = null;
-        }
+        // clear for fresh read
+        lastMag = null;
+        lastAccel = null;
     }
 }

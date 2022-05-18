@@ -8,24 +8,24 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static void UseAllSensors(this IServiceCollection services)
+        public static void AddAllSensors(this IServiceCollection services)
         {
-            services.UseAccelerometer();
-            services.UseAmbientLightSensor();
-            services.UseBarometer();
-            services.UseCompass();
-            services.UseMagnetometer();
-            services.UsePedometer();
-            services.UseProximitySensor();
-            //services.UseHeartRateMonitor();
-            services.UseTemperature();
-            services.UseHumidity();
+            services.AddAccelerometer();
+            services.AddAmbientLightSensor();
+            services.AddBarometer();
+            services.AddCompass();
+            services.AddMagnetometer();
+            services.AddPedometer();
+            services.AddProximitySensor();
+            //services.AddHeartRateMonitor();
+            services.AddTemperature();
+            services.AddHumidity();
         }
 
 
-        public static bool UseAccelerometer(this IServiceCollection services)
+        public static bool AddAccelerometer(this IServiceCollection services)
         {
-#if NETSTANDARD
+#if !IOS && !MACCATALYST && !ANDROID
             return false;
 #else
             services.TryAddSingleton<IAccelerometer, AccelerometerImpl>();
@@ -34,9 +34,9 @@ namespace Shiny
         }
 
 
-        public static bool UseAmbientLightSensor(this IServiceCollection services)
+        public static bool AddAmbientLightSensor(this IServiceCollection services)
         {
-#if NETSTANDARD || __IOS__ || __WATCHOS__
+#if !ANDROID
             return false;
 #else
             services.TryAddSingleton<IAmbientLight, AmbientLightImpl>();
@@ -45,9 +45,9 @@ namespace Shiny
         }
 
 
-        public static bool UseBarometer(this IServiceCollection services)
+        public static bool AddBarometer(this IServiceCollection services)
         {
-#if NETSTANDARD || TIZEN
+#if !IOS && !MACCATALYST && !ANDROID
             return false;
 #else
             services.TryAddSingleton<IBarometer, BarometerImpl>();
@@ -56,15 +56,10 @@ namespace Shiny
         }
 
 
-        public static bool UseCompass(this IServiceCollection services)
+        public static bool AddCompass(this IServiceCollection services)
         {
-#if NETSTANDARD
+#if !IOS && !MACCATALYST && !ANDROID
             return false;
-#elif TIZEN || __WATCHOS__
-            services.UseAccelerometer();
-            services.UseMagnetometer();
-            services.TryAddSingleton<ICompass, SharedCompassImpl>();
-            return true;
 #else
             services.TryAddSingleton<ICompass, CompassImpl>();
             return true;
@@ -72,9 +67,9 @@ namespace Shiny
         }
 
 
-        public static bool UseGyroscope(this IServiceCollection services)
+        public static bool AddGyroscope(this IServiceCollection services)
         {
-#if NETSTANDARD
+#if !IOS && !MACCATALYST && !ANDROID
             return false;
 #else
             services.TryAddSingleton<IGyroscope, GyroscopeImpl>();
@@ -83,9 +78,9 @@ namespace Shiny
         }
 
 
-        public static bool UseHumidity(this IServiceCollection services)
+        public static bool AddHumidity(this IServiceCollection services)
         {
-#if __ANDROID__ || TIZEN
+#if ANDROID
             services.TryAddSingleton<IHumidity, HumidityImpl>();
             return true;
 #else
@@ -94,9 +89,9 @@ namespace Shiny
         }
 
 
-        public static bool UseMagnetometer(this IServiceCollection services)
+        public static bool AddMagnetometer(this IServiceCollection services)
         {
-#if NETSTANDARD
+#if !IOS && !MACCATALYST && !ANDROID
             return false;
 #else
             services.TryAddSingleton<IMagnetometer, MagnetometerImpl>();
@@ -105,53 +100,53 @@ namespace Shiny
         }
 
 
-        public static bool UseProximitySensor(this IServiceCollection services)
+        public static bool AddProximitySensor(this IServiceCollection services)
         {
-#if __IOS__ || __ANDROID__
+#if !IOS && !MACCATALYST && !ANDROID
+            return false;
+#else
             services.TryAddSingleton<IProximity, ProximityImpl>();
             return true;
-#else
-            return false;
 #endif
         }
 
 
-//        public static bool UseHeartRateMonitor(this IServiceCollection services)
-//        {
-//#if __ANDROID__ || __WATCHOS__ || TIZEN
-//            services.TryAddSingleton<IHeartRateMonitor, HeartRateMonitorImpl>();
-//            return true;
-//#else
-//            return false;
-//#endif
-//        }
+        //        public static bool AddHeartRateMonitor(this IServiceCollection services)
+        //        {
+        //#if __ANDROID__ || __WATCHOS__ || TIZEN
+        //            services.TryAddSingleton<IHeartRateMonitor, HeartRateMonitorImpl>();
+        //            return true;
+        //#else
+        //            return false;
+        //#endif
+        //        }
 
 
-        public static bool UsePedometer(this IServiceCollection services)
+        public static bool AddPedometer(this IServiceCollection services)
         {
-#if __ANDROID__ || __IOS__ || __WATCHOS__ || TIZEN
+#if !IOS && !MACCATALYST && !ANDROID
+            return false;
+#else
             services.TryAddSingleton<IPedometer, PedometerImpl>();
             return true;
-#else
-            return false;
 #endif
         }
 
 
-        public static bool UseTemperature(this IServiceCollection services)
+        public static bool AddTemperature(this IServiceCollection services)
         {
-#if __ANDROID__ || TIZEN
+#if !ANDROID
+            return false;
+#else
             services.TryAddSingleton<ITemperature, TemperatureImpl>();
             return true;
-#else
-            return false;
 #endif
         }
     }
 }
-//        public static CardinalDirection GetDirection(this CompassReading reading, bool useTrueHeading = false)
+//        public static CardinalDirection GetDirection(this CompassReading reading, bool AddTrueHeading = false)
 //        {
-//            var r = useTrueHeading && reading.TrueHeading != null ? reading.TrueHeading.Value : reading.MagneticHeading;
+//            var r = AddTrueHeading && reading.TrueHeading != null ? reading.TrueHeading.Value : reading.MagneticHeading;
 
 //            return CardinalDirection.E;
 //        }
