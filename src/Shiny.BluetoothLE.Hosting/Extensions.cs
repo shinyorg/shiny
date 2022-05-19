@@ -2,6 +2,7 @@
 using System.Text;
 using Microsoft.Extensions.Logging;
 
+using Shiny.Hosting;
 
 namespace Shiny.BluetoothLE.Hosting
 {
@@ -69,7 +70,7 @@ namespace Shiny.BluetoothLE.Hosting
                 }
                 catch (Exception ex)
                 {
-                    ShinyHost.LoggerFactory.CreateLogger<IGattCharacteristic>().LogError("readRequest failed", ex);
+                    Host.Current.Logging.CreateLogger<IGattCharacteristic>().LogError("readRequest failed", ex);
                     return ReadResult.Error(GattState.Failure);
                 }
             }));
@@ -85,7 +86,7 @@ namespace Shiny.BluetoothLE.Hosting
                 }
                 catch (Exception ex)
                 {
-                    ShinyHost.LoggerFactory.CreateLogger<IGattCharacteristic>().LogError("onWrite failed", ex);
+                    Host.Current.Logging.CreateLogger<IGattCharacteristic>().LogError("onWrite failed", ex);
                     return GattState.Failure;
                 }
             }));

@@ -1,157 +1,150 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Sensors;
 
+namespace Shiny;
 
-namespace Shiny
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static void AddAllSensors(this IServiceCollection services)
     {
-        public static void UseAllSensors(this IServiceCollection services)
-        {
-            services.UseAccelerometer();
-            services.UseAmbientLightSensor();
-            services.UseBarometer();
-            services.UseCompass();
-            services.UseMagnetometer();
-            services.UsePedometer();
-            services.UseProximitySensor();
-            //services.UseHeartRateMonitor();
-            services.UseTemperature();
-            services.UseHumidity();
-        }
+        services.AddAccelerometer();
+        services.AddAmbientLightSensor();
+        services.AddBarometer();
+        services.AddCompass();
+        services.AddMagnetometer();
+        services.AddPedometer();
+        services.AddProximitySensor();
+        //services.AddHeartRateMonitor();
+        services.AddTemperature();
+        services.AddHumidity();
+    }
 
 
-        public static bool UseAccelerometer(this IServiceCollection services)
-        {
-#if NETSTANDARD
-            return false;
+    public static bool AddAccelerometer(this IServiceCollection services)
+    {
+#if !IOS && !MACCATALYST && !ANDROID
+        return false;
 #else
-            services.TryAddSingleton<IAccelerometer, AccelerometerImpl>();
-            return true;
+        services.TryAddSingleton<IAccelerometer, AccelerometerImpl>();
+        return true;
 #endif
-        }
+    }
 
 
-        public static bool UseAmbientLightSensor(this IServiceCollection services)
-        {
-#if NETSTANDARD || __IOS__ || __WATCHOS__
-            return false;
+    public static bool AddAmbientLightSensor(this IServiceCollection services)
+    {
+#if !ANDROID
+        return false;
 #else
-            services.TryAddSingleton<IAmbientLight, AmbientLightImpl>();
-            return true;
+        services.TryAddSingleton<IAmbientLight, AmbientLightImpl>();
+        return true;
 #endif
-        }
+    }
 
 
-        public static bool UseBarometer(this IServiceCollection services)
-        {
-#if NETSTANDARD || TIZEN
-            return false;
+    public static bool AddBarometer(this IServiceCollection services)
+    {
+#if !IOS && !MACCATALYST && !ANDROID
+        return false;
 #else
-            services.TryAddSingleton<IBarometer, BarometerImpl>();
-            return true;
+        services.TryAddSingleton<IBarometer, BarometerImpl>();
+        return true;
 #endif
-        }
+    }
 
 
-        public static bool UseCompass(this IServiceCollection services)
-        {
-#if NETSTANDARD
-            return false;
-#elif TIZEN || __WATCHOS__
-            services.UseAccelerometer();
-            services.UseMagnetometer();
-            services.TryAddSingleton<ICompass, SharedCompassImpl>();
-            return true;
+    public static bool AddCompass(this IServiceCollection services)
+    {
+#if !IOS && !MACCATALYST && !ANDROID
+        return false;
 #else
-            services.TryAddSingleton<ICompass, CompassImpl>();
-            return true;
+        services.TryAddSingleton<ICompass, CompassImpl>();
+        return true;
 #endif
-        }
+    }
 
 
-        public static bool UseGyroscope(this IServiceCollection services)
-        {
-#if NETSTANDARD
-            return false;
+    public static bool AddGyroscope(this IServiceCollection services)
+    {
+#if !IOS && !MACCATALYST && !ANDROID
+        return false;
 #else
-            services.TryAddSingleton<IGyroscope, GyroscopeImpl>();
-            return true;
+        services.TryAddSingleton<IGyroscope, GyroscopeImpl>();
+        return true;
 #endif
-        }
+    }
 
 
-        public static bool UseHumidity(this IServiceCollection services)
-        {
-#if __ANDROID__ || TIZEN
-            services.TryAddSingleton<IHumidity, HumidityImpl>();
-            return true;
+    public static bool AddHumidity(this IServiceCollection services)
+    {
+#if ANDROID
+        services.TryAddSingleton<IHumidity, HumidityImpl>();
+        return true;
 #else
-            return false;
+        return false;
 #endif
-        }
+    }
 
 
-        public static bool UseMagnetometer(this IServiceCollection services)
-        {
-#if NETSTANDARD
-            return false;
+    public static bool AddMagnetometer(this IServiceCollection services)
+    {
+#if !IOS && !MACCATALYST && !ANDROID
+        return false;
 #else
-            services.TryAddSingleton<IMagnetometer, MagnetometerImpl>();
-            return true;
+        services.TryAddSingleton<IMagnetometer, MagnetometerImpl>();
+        return true;
 #endif
-        }
+    }
 
 
-        public static bool UseProximitySensor(this IServiceCollection services)
-        {
-#if __IOS__ || __ANDROID__
-            services.TryAddSingleton<IProximity, ProximityImpl>();
-            return true;
+    public static bool AddProximitySensor(this IServiceCollection services)
+    {
+#if !IOS && !MACCATALYST && !ANDROID
+        return false;
 #else
-            return false;
+        services.TryAddSingleton<IProximity, ProximityImpl>();
+        return true;
 #endif
-        }
+    }
 
 
-//        public static bool UseHeartRateMonitor(this IServiceCollection services)
-//        {
-//#if __ANDROID__ || __WATCHOS__ || TIZEN
-//            services.TryAddSingleton<IHeartRateMonitor, HeartRateMonitorImpl>();
-//            return true;
-//#else
-//            return false;
-//#endif
-//        }
+    //        public static bool AddHeartRateMonitor(this IServiceCollection services)
+    //        {
+    //#if __ANDROID__ || __WATCHOS__ || TIZEN
+    //            services.TryAddSingleton<IHeartRateMonitor, HeartRateMonitorImpl>();
+    //            return true;
+    //#else
+    //            return false;
+    //#endif
+    //        }
 
 
-        public static bool UsePedometer(this IServiceCollection services)
-        {
-#if __ANDROID__ || __IOS__ || __WATCHOS__ || TIZEN
-            services.TryAddSingleton<IPedometer, PedometerImpl>();
-            return true;
+    public static bool AddPedometer(this IServiceCollection services)
+    {
+#if !IOS && !MACCATALYST && !ANDROID
+        return false;
 #else
-            return false;
+        services.TryAddSingleton<IPedometer, PedometerImpl>();
+        return true;
 #endif
-        }
+    }
 
 
-        public static bool UseTemperature(this IServiceCollection services)
-        {
-#if __ANDROID__ || TIZEN
-            services.TryAddSingleton<ITemperature, TemperatureImpl>();
-            return true;
+    public static bool AddTemperature(this IServiceCollection services)
+    {
+#if !ANDROID
+        return false;
 #else
-            return false;
+        services.TryAddSingleton<ITemperature, TemperatureImpl>();
+        return true;
 #endif
-        }
     }
 }
-//        public static CardinalDirection GetDirection(this CompassReading reading, bool useTrueHeading = false)
+//        public static CardinalDirection GetDirection(this CompassReading reading, bool AddTrueHeading = false)
 //        {
-//            var r = useTrueHeading && reading.TrueHeading != null ? reading.TrueHeading.Value : reading.MagneticHeading;
+//            var r = AddTrueHeading && reading.TrueHeading != null ? reading.TrueHeading.Value : reading.MagneticHeading;
 
 //            return CardinalDirection.E;
 //        }

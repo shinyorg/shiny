@@ -68,6 +68,7 @@ namespace Shiny.Locations
                     .WhenReading()
                     .Take(1)
                     .ToTask(ct);
+
                 if (!gpsManager.IsListening())
                 {
                     iStarted = true;

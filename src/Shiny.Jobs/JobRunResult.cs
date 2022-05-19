@@ -1,19 +1,11 @@
 ﻿using System;
+namespace Shiny.Jobs;
 
 
-namespace Shiny.Jobs
+public record JobRunResult(
+    JobInfo? JobInfo, 
+    Exception? Exception
+)
 {
-    public struct JobRunResult
-    {
-        public JobRunResult(JobInfo? jobInfo, Exception? exception)
-        {
-            this.Job = jobInfo;
-            this.Exception = exception;
-        }
-
-
-        public bool Success => this.Exception == null;
-        public JobInfo? Job { get; }
-        public Exception? Exception { get; }
-    }
-}
+    public bool Success => this.Exception == null;
+};

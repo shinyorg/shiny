@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 
-
 namespace Shiny.Infrastructure
 {
     public class MessageBus : IMessageBus

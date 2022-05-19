@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
     <PropertyGroup>
         <Authors>Allan Ritchie</Authors>
         <Owners>aritchie;shinylib</Owners>
@@ -17,20 +17,9 @@
         <RepositoryUrl>https://github.com/shinyorg/shiny</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
-        <ExtrasUwpMetaPackageVersion>6.2.13</ExtrasUwpMetaPackageVersion>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <BuildLegacy>true</BuildLegacy>
-        <BuildNet6>false</BuildNet6>
         <AndroidTargetFramework>monoandroid12.0</AndroidTargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(BuildLegacy)' == 'true' AND '$(OS)' == 'WINDOWS_NT'">
-        <UwpTargetFramework>uap10.0.19041</UwpTargetFramework>
-    </PropertyGroup>
-
-    <!--Shiny should not build for net6.0 directly-->
     <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR '$(TargetFramework)' == 'net6.0'">
         <IsStandardBuild>true</IsStandardBuild>
     </PropertyGroup>
@@ -40,7 +29,6 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <!--<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>-->
         <IncludeSource>True</IncludeSource>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -50,43 +38,22 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-        <SupportedOSPlatformVersion>21.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>21.0</TargetPlatformMinVersion>
-        <DefineConstants>$(DefineConstants);__ANDROID__</DefineConstants>
+        <SupportedOSPlatformVersion>31.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion>26.0</TargetPlatformMinVersion>
+        <DefineConstants>$(DefineConstants);__ANDROID__;MONOANDROID</DefineConstants>
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
         <IsAndroidBuild>true</IsAndroidBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('ios'))">
-        <SupportedOSPlatformVersion>14.2</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
         <IsIosBuild>true</IsIosBuild>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.StartsWith('uap'))">
-        <!--these need to be higher for net6-->
-		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-
-        <GenerateLibraryLayout>true</GenerateLibraryLayout>
-        <DisableEmbeddedXbf>false</DisableEmbeddedXbf>
-        <IsWindowsBuild>true</IsWindowsBuild>
-    </PropertyGroup>
-
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
-        <SupportedOSPlatformVersion>14</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>14</TargetPlatformMinVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="$(TargetFramework.Contains('mac'))">
-        <SupportedOSPlatformVersion>10.14</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>10.14</TargetPlatformMinVersion>
-        <IsMacBuild>true</IsMacBuild>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="$(TargetFramework.Contains('tvos'))">
-        <SupportedOSPlatformVersion>10.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
-        <IsTvOsBuild>true</IsTvOsBuild>
+        <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>        
+        <IsIosBuild>true</IsIosBuild>
     </PropertyGroup>
 </Project>

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.SpeechRecognition;
 
@@ -8,21 +7,18 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UseSpeechRecognition(this IServiceCollection services)
+
+        public static IServiceCollection AddSpeechRecognition(this IServiceCollection services)
         {
-#if NETSTANDARD
-            return false;
-#elif __IOS__
-            if (UIKit.UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
-            {
-                services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
-                return true;
-            }
-            return false;
-#else
+#if IOS || MACCATALYST
             services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
-            return true;
+#elif ANDROID
+            services.TryAddSingleton<ISpeechRecognizer, SpeechRecognizerImpl>();
+#else
+            throw new InvalidOperationException("This platform is not supported");
 #endif
+
+            return services;
         }
     }
 }

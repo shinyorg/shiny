@@ -1,16 +1,7 @@
-﻿namespace Shiny
-{
-    public struct AndroidPermission
-    {
-        public AndroidPermission(string permission, int? minSdkVersion, int? maxSdkVersion)
-        {
-            this.Permission = permission;
-            this.MinSdkVersion = minSdkVersion;
-            this.MaxSdkVersion = maxSdkVersion;
-        }
+﻿namespace Shiny;
 
-        public string Permission { get; }
-        public int? MinSdkVersion { get; }
-        public int? MaxSdkVersion { get; }
-    }
-}
+public record AndroidPermission(
+    string Permission,
+    int? MinSdkVersion,
+    int? MaxSdkVersion
+);

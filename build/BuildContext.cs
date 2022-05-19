@@ -58,14 +58,7 @@ namespace ShinyBuild
             }
         }
 
-        public bool IsMainBranch
-        {
-            get
-            {
-                var bn = this.Branch.FriendlyName.ToLower();
-                return bn.Equals("main") || bn.Equals("master");
-            }
-        }
+        public bool IsReleaseBranch => this.Branch.FriendlyName.ToLower().StartsWith("v");
 
 
         public bool IsPullRequest =>

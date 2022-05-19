@@ -1,26 +1,17 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
     <PropertyGroup>
         <Description>Shiny background jobs module</Description>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(UwpTargetFramework)</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
+        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Stores\Shiny.Stores.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
-        <PackageReference Include="Xamarin.AndroidX.Room.Common" />
-        <PackageReference Include="Xamarin.AndroidX.Room.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" />
     </ItemGroup>
-
 </Project>

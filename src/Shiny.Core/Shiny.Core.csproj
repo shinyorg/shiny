@@ -1,20 +1,12 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <RootNamespace>Shiny</RootNamespace>
+        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
         <Description>The Shiny Core Foundation where all Shiny modules are built on</Description>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(UwpTargetFramework)</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
+        <RootNamespace>Shiny</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
@@ -24,5 +16,6 @@
         <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" />
     </ItemGroup>
 </Project>

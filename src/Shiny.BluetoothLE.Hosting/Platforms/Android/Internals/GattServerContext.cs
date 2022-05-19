@@ -1,5 +1,6 @@
 ﻿using System.Reactive.Subjects;
 using Android.Bluetooth;
+using Android.Content;
 using AGattStatus = Android.Bluetooth.GattStatus;
 
 
@@ -7,14 +8,14 @@ namespace Shiny.BluetoothLE.Hosting.Internals
 {
     public class GattServerContext : BluetoothGattServerCallback
     {
-        public GattServerContext(IPlatform context)
+        public GattServerContext(AndroidPlatform platform)
         {
-            this.Context = context;
-            this.Manager = context.GetBluetooth();
+            this.Platform = platform;
+            this.Manager = platform.GetSystemService<BluetoothManager>(Context.BluetoothService);
         }
 
 
-        public IPlatform Context { get; }
+        public AndroidPlatform Platform { get; }
         public BluetoothManager Manager { get; }
 
 
@@ -23,7 +24,7 @@ namespace Shiny.BluetoothLE.Hosting.Internals
         {
             get
             {
-                this.server ??= this.Manager.OpenGattServer(this.Context.AppContext, this)!;
+                this.server ??= this.Manager.OpenGattServer(this.Platform.AppContext, this)!;
                 return this.server!;
             }
         }

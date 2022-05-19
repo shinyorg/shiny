@@ -1,15 +1,8 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
         <Description>Shiny addon for all your notification needs</Description>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(UwpTargetFramework)</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,10 +15,5 @@
         <PackageReference Include="Xamarin.ShortcutBadger" />
         <PackageReference Include="Xamarin.AndroidX.AppCompat" />
         <PackageReference Include="Xamarin.AndroidX.Core" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
-        <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" />
-        <ProjectReference Include="..\Shiny.Jobs\Shiny.Jobs.csproj" />
     </ItemGroup>
 </Project>

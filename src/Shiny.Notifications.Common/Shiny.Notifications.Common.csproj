@@ -1,13 +1,12 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
-<!--<Project Sdk="Xamarin.Legacy.Sdk">-->
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(UwpTargetFramework)</TargetFrameworks>
-        <!--<TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);net6.0-ios;net6.0-android</TargetFrameworks>-->
+        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
         <Description>Shiny common support lib for all notification libraries</Description>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
+        <ProjectReference Include="..\Shiny.Stores\Shiny.Stores.csproj" />
     </ItemGroup>
 </Project>

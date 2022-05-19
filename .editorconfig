@@ -87,7 +87,7 @@ dotnet_style_prefer_inferred_tuple_names = true:suggestion
 dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 dotnet_style_prefer_compound_assignment = true:suggestion
 dotnet_style_prefer_simplified_interpolation = true:suggestion
-dotnet_style_namespace_match_folder = true:suggestion
+dotnet_style_namespace_match_folder = true:silent
 dotnet_style_allow_statement_immediately_after_block_experimental = true:silent
 
 # CSharp code style settings:
@@ -125,7 +125,7 @@ csharp_indent_labels = one_less_than_current
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:warning
 csharp_prefer_braces = when_multiline:error
-csharp_style_namespace_declarations = block_scoped:error
+csharp_style_namespace_declarations = block_scoped:warning
 csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
 csharp_style_prefer_null_check_over_type_check = true:suggestion
@@ -138,3 +138,4 @@ csharp_style_prefer_tuple_swap = true:suggestion
 csharp_style_deconstructed_variable_declaration = true:suggestion
 csharp_style_unused_value_assignment_preference = discard_variable:suggestion
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
+csharp_style_prefer_method_group_conversion = true:silent

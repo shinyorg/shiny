@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
+namespace Shiny.Beacons;
 
 
-namespace Shiny.Beacons
+public interface IBeaconMonitorDelegate
 {
-    public interface IBeaconMonitorDelegate
-    {
-        Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region);
-    }
+    Task OnStatusChanged(BeaconRegionState newStatus, BeaconRegion region);
 }

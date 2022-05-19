@@ -1,6 +1,4 @@
-﻿namespace ShinyBuild.Tasks.Library;
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Cake.Core.Diagnostics;
@@ -8,6 +6,8 @@ using Cake.Frosting;
 using Discord;
 using Discord.WebSocket;
 using Tweetinvi;
+
+namespace ShinyBuild.Tasks.Library;
 
 
 [IsDependentOn(typeof(NugetDeployTask))]
@@ -31,7 +31,7 @@ public class ReleaseAnnouncementTask : AsyncFrostingTask<BuildContext>
 
     async Task Twitter(BuildContext context, string message)
     {
-        if (!context.IsMainBranch)
+        if (!context.IsReleaseBranch)
             return;
 
         try

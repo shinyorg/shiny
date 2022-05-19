@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
+        <ImplicitUsings>false</ImplicitUsings>
+        <Description>Xamarin Configuration Sources (Android/iOS) for Microsoft.Extensions.Configuration</Description>
+	</PropertyGroup>
+
+    <ItemGroup>
+        <None Include="Platforms\**\*.cs" />
+		<Compile Remove="Platforms\**\*.cs" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('netstandard'))">
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('android'))">
+		<PackageReference Include="Xamarin.AndroidX.Preference" Version="1.2.0.1" />
+        <Compile Include="Platforms\Android\**\*.cs" />
+        <Compile Include="Platforms\Shared\**\*.cs" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('ios')) OR $(TargetFramework.Contains('maccatalyst'))">
+        <Compile Include="Platforms\Shared\**\*.cs" />
+        <Compile Include="Platforms\iOS\**\*.cs" />
+    </ItemGroup>
+</Project>

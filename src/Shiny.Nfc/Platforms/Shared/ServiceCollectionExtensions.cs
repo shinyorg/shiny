@@ -1,27 +1,23 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Shiny.Nfc;
 
+namespace Shiny;
 
-namespace Shiny
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    /// <summary>
+    /// Attempts to register NFC services with Shiny
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns></returns>
+    public static bool UseNfc(this IServiceCollection services)
     {
-        /// <summary>
-        /// Attempts to register NFC services with Shiny
-        /// </summary>
-        /// <param name="services"></param>
-        /// <returns></returns>
-        public static bool UseNfc(this IServiceCollection services)
-        {
-#if NETSTANDARD
-            return false;
+#if IOS || MACCATALYST || ANDROID
+        services.AddShinyServiceWithLifecycle<INfcManager, NfcManager>();
+        return true;
 #else
-            services.TryAddSingleton<INfcManager, NfcManager>();
-            return true;
+        return false;
 #endif
-        }
-
     }
 }

@@ -12,21 +12,21 @@ namespace Shiny.SpeechRecognition
 {
     public class SpeechRecognizerImpl : AbstractSpeechRecognizer
     {
-        readonly IPlatform context;
+        readonly AndroidPlatform platform;
         readonly object syncLock = new object();
 
 
-        public SpeechRecognizerImpl(IPlatform context) => this.context = context;
+        public SpeechRecognizerImpl(AndroidPlatform platform) => this.platform = platform;
 
         public override async Task<AccessState> RequestAccess()
         {
-            if (!SpeechRecognizer.IsRecognitionAvailable(this.context.AppContext))
+            if (!SpeechRecognizer.IsRecognitionAvailable(this.platform.AppContext))
                 return AccessState.NotSupported;
 
-            if (!this.context.IsInManifest(Manifest.Permission.RecordAudio))
+            if (!this.platform.IsInManifest(Manifest.Permission.RecordAudio))
                 return AccessState.NotSetup;
 
-            return await this.context.RequestAccess(Manifest.Permission.RecordAudio);
+            return await this.platform.RequestAccess(Manifest.Permission.RecordAudio);
         }
 
 
@@ -57,7 +57,7 @@ namespace Shiny.SpeechRecognition
                     }
                 }
             };
-            var speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.context.AppContext);
+            var speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.platform.AppContext);
             speechRecognizer.SetRecognitionListener(listener);
             speechRecognizer.StartListening(this.CreateSpeechIntent(true, culture));
 
@@ -99,7 +99,7 @@ namespace Shiny.SpeechRecognition
                     currentIndex = 0;
                     speechRecognizer.Destroy();
 
-                    speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.context.AppContext);
+                    speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.platform.AppContext);
                     speechRecognizer.SetRecognitionListener(listener);
                     speechRecognizer.StartListening(this.CreateSpeechIntent(true, culture));
                 }
@@ -118,7 +118,7 @@ namespace Shiny.SpeechRecognition
 
                             speechRecognizer.Destroy();
 
-                            speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.context.AppContext);
+                            speechRecognizer = SpeechRecognizer.CreateSpeechRecognizer(this.platform.AppContext);
                             speechRecognizer.SetRecognitionListener(listener);
                             speechRecognizer.StartListening(this.CreateSpeechIntent(true, culture));
                         }
@@ -158,7 +158,7 @@ namespace Shiny.SpeechRecognition
                 intent.PutExtra(RecognizerIntent.ExtraLanguage, javaLocale);
             }
             intent.PutExtra(RecognizerIntent.ExtraLanguageModel, RecognizerIntent.LanguageModelFreeForm);
-            intent.PutExtra(RecognizerIntent.ExtraCallingPackage, this.context.Package.PackageName);
+            intent.PutExtra(RecognizerIntent.ExtraCallingPackage, this.platform.Package.PackageName);
             //intent.PutExtra(RecognizerIntent.ExtraMaxResults, 1);
             //intent.PutExtra(RecognizerIntent.ExtraSpeechInputCompleteSilenceLengthMillis, 1500);
             //intent.PutExtra(RecognizerIntent.ExtraSpeechInputPossiblyCompleteSilenceLengthMillis, 1500);
