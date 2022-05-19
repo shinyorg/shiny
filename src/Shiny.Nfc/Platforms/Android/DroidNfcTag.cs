@@ -43,16 +43,7 @@ public class DroidNfcTag : INfcTag
         }
     }
 
-
-    public bool IsWriteable
-    {
-        get
-        {
-            var ndef = Ndef.Get(this.nativeTag);
-            return ndef?.IsWritable ?? false;
-        }
-    }
-
+    public bool IsWriteable => Ndef.Get(this.nativeTag)?.IsWritable ?? false;
 
     public Task<NDefRecord[]?> Read()
     {
