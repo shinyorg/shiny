@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
+        <TargetFrameworks>net6.0;net6.0-ios;net6.0-maccatalyst;net6.0-android</TargetFrameworks>
         <Description>Shiny addon for adding upload and download management to your app (with metrics!)</Description>
     </PropertyGroup>
 

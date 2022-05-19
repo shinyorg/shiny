@@ -3,25 +3,23 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Net.Http;
 
+namespace Shiny;
 
-namespace Shiny
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddHttpTransfers(this IServiceCollection services, Type transferDelegateType)
     {
-        public static void UseHttpTransfers(this IServiceCollection services, Type transferDelegateType)
-        {
-            services.UseJobs();
-            services.AddSingleton(typeof(IHttpTransferDelegate), transferDelegateType);
+        services.AddJobs(); // TODO: only needed for httpclient version
+        services.AddSingleton(typeof(IHttpTransferDelegate), transferDelegateType);
 #if NETSTANDARD
-            services.TryAddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
+        services.TryAddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
 #else
-            services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
-            services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
+        services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
 #endif
-        }
-
-
-        public static void UseHttpTransfers<T>(this IServiceCollection services) where T : class, IHttpTransferDelegate
-            => services.UseHttpTransfers(typeof(T));
+        return services;
     }
+
+
+    public static IServiceCollection AddHttpTransfers<T>(this IServiceCollection services) where T : class, IHttpTransferDelegate
+        => services.AddHttpTransfers(typeof(T));
 }

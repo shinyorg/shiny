@@ -1,37 +1,34 @@
-﻿using System;
+﻿namespace Shiny.Net.Http;
 
 
-namespace Shiny.Net.Http
+public static class Extensions
 {
-    public static class Extensions
+    public static bool IsCompleted(this HttpTransferState status)
     {
-        public static bool IsCompleted(this HttpTransferState status)
+        switch (status)
         {
-            switch (status)
-            {
-                case HttpTransferState.Completed:
-                case HttpTransferState.Error:
-                case HttpTransferState.Canceled:
-                    return true;
+            case HttpTransferState.Completed:
+            case HttpTransferState.Error:
+            case HttpTransferState.Canceled:
+                return true;
 
-                default:
-                    return false;
-            }
+            default:
+                return false;
         }
+    }
 
 
-        public static bool IsPaused(this HttpTransferState status)
+    public static bool IsPaused(this HttpTransferState status)
+    {
+        switch (status)
         {
-            switch (status)
-            {
-                case HttpTransferState.Paused:
-                case HttpTransferState.PausedByCostedNetwork:
-                case HttpTransferState.PausedByNoNetwork:
-                    return true;
+            case HttpTransferState.Paused:
+            case HttpTransferState.PausedByCostedNetwork:
+            case HttpTransferState.PausedByNoNetwork:
+                return true;
 
-                default:
-                    return false;
-            }
+            default:
+                return false;
         }
     }
 }
