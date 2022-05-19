@@ -22,7 +22,7 @@ public class HttpTransferManager : HttpClientHttpTransferManager
 
     public HttpTransferManager(
         AndroidPlatform platform,
-        IRepository repository,
+        IRepository<HttpTransfer> repository,
         ILogger<IHttpTransferManager> logger
     )
     : base(

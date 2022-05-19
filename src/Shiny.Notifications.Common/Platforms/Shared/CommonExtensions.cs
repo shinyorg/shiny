@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Shiny.Notifications.Infrastructure;
 
 namespace Shiny.Notifications;
 
@@ -19,8 +20,8 @@ public static class CommonExtensions
 
     public static IServiceCollection AddChannelManager(this IServiceCollection services)
     {
-        services.TryAddRepository();
 #if IOS || MACCATALYST || ANDROID
+        services.AddRepository<ChannelStoreConverter, Channel>();
         services.TryAddSingleton<IChannelManager, ChannelManager>();
 #endif
         return services;

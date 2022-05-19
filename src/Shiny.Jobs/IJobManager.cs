@@ -71,7 +71,7 @@ public interface IJobManager
     /// Gets current registered jobs
     /// </summary>
     /// <returns></returns>
-    Task<IEnumerable<JobInfo>> GetJobs();
+    Task<IList<JobInfo>> GetJobs();
 
 
     /// <summary>

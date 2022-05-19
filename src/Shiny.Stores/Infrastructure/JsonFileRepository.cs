@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 namespace Shiny.Stores.Infrastructure;
 
 
-public class JsonFileRepository : IRepository
+public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
+    where TStoreConverter : class, IStoreConverter<TEntity>, new()
+    where TEntity : IStoreEntity
 {
-    readonly Dictionary<Type, Dictionary<string, object>> memory = new();
+    readonly TStoreConverter converter = new();
     readonly IPlatform platform;
     readonly ISerializer serializer;
 
@@ -22,78 +24,59 @@ public class JsonFileRepository : IRepository
     }
 
 
-    public Task<bool> Exists<T>(string key) where T : class
+    public Task<bool> Exists(string key)
     {
-        var path = this.GetPath(typeof(T), key);
+        var path = this.GetPath(key);
         var exists = File.Exists(path);
         return Task.FromResult(exists);
     }
 
 
-    public async Task<T?> Get<T>(string key) where T : class
+    public async Task<TEntity> Get(string key)
     {
-        T? result = null;
-        await this.InTransaction(typeof(T), list =>
+        TEntity result = default;
+        await this.InTransaction(list =>
         {
             if (list.ContainsKey(key))
-                result = (T)list[key];
+                result = list[key];
         });
         return result;
     }
 
 
-    public async Task<IDictionary<string, T>> GetListWithKeys<T>(Expression<Func<T, bool>>? expression = null) where T : class
+    public async Task<IList<TEntity>> GetList(Expression<Func<TEntity, bool>>? expression = null)
     {
-        var filter = expression?.Compile() ?? new Func<T, bool>(_ => true);
-        var result = new Dictionary<string, T>();
-
-        await this.InTransaction(typeof(T), list =>
-        {
-            foreach (var pair in list)
-            {
-                var value = (T)pair.Value;
-                if (filter(value))
-                    result.Add(pair.Key, (T)pair.Value);
-            }
-        });
-        return result;
-    }
-
-
-    public async Task<IList<T>> GetList<T>(Expression<Func<T, bool>>? expression = null) where T : class
-    {
-        var result = new List<T>();
-        await this.InTransaction(
-            typeof(T),
-            list => result
-                .AddRange(list
+        var result = new List<TEntity>();
+        await this
+            .InTransaction(
+                list => result.AddRange(list
                     .Values
-                    .OfType<T>()
                     .WhereIf(expression)
                 )
-        );
+            )
+            .ConfigureAwait(false);
         return result;
     }
 
 
-    public async Task<bool> Set(string key, object entity)
+    public async Task<bool> Set(TEntity entity)
     {
         var update = true;
-        await this.InTransaction(entity.GetType(), list =>
+        await this.InTransaction(list =>
         {
-            update = this.Write(key, entity);
-            list[key] = entity;
+            update = this.Write(entity);
+            list[entity.Identifier] = entity;
         });
         return update;
     }
 
 
-    public Task<bool> Remove<T>(string key) where T : class
+    public Task<bool> Remove(string key)
     {
         var tcs = new TaskCompletionSource<bool>();
-        this.InTransaction(typeof(T), list =>
+        this.InTransaction(list =>
         {
-            var path = this.GetPath(typeof(T), key);
+            var path = this.GetPath(key);
 
             if (!File.Exists(path))
             {
@@ -111,62 +94,67 @@ public class JsonFileRepository : IRepository
     }
 
 
-    public Task Clear<T>() where T : class => this.InTransaction(typeof(T), list =>
+    public Task Clear() => this.InTransaction(list =>
     {
         if (!list.Any())
             return;
 
         list.Clear();
-        var files = this.GetTypeFiles(typeof(T));
+        var files = this.GetFiles();
         foreach (var file in files)
-            File.Delete(file.FullName);
+            file.Delete();
     });
 
 
-    FileInfo[] GetTypeFiles(Type type) => this.platform.AppData.GetFiles($"{type.Name}_*.core");
+    FileInfo[] GetFiles() => this.platform.AppData.GetFiles($"{typeof(TEntity).Name}_*.shiny");
 
 
-    string GetPath(Type type, string key)
+    string GetPath(string key)
     {
-        var fileName = $"{type.Name}_{key}.core";
+        var fileName = $"{typeof(TEntity).Name}_{key}.shiny";
         var path = Path.Combine(this.platform.AppData.FullName, fileName);
         return path;
     }
 
 
-    bool Write(string key, object entity)
+    bool Write(TEntity entity)
     {
-        var path = this.GetPath(entity.GetType(), key);
+        var path = this.GetPath(entity.Identifier);
         var update = File.Exists(path);
-        var value = this.serializer.Serialize(entity);
+
+        var serialize = this.converter.ToStore(entity);
+        // TODO: auto add Identifier if missing?
+        var value = this.serializer.Serialize(serialize);
         File.WriteAllText(path, value);
         return update;
     }
 
 
-    Task InTransaction(Type type, Action<Dictionary<string, object>> action) => Task.Run(() =>
+    readonly object syncLock = new();
+    Dictionary<string, TEntity>? memory;
+    Task InTransaction(Action<Dictionary<string, TEntity>> action) => Task.Run(() =>
     {
-        lock (this.memory)
+        lock (this.syncLock)
         {
-            if (!this.memory.ContainsKey(type))
-            {
-                var dict = new Dictionary<string, object>();
-                var files = this.GetTypeFiles(type);
-
-                foreach (var file in files)
-                {
-                    var text = File.ReadAllText(file.FullName);
-                    var obj = this.serializer.Deserialize(type, text);
-                    var key = file
-                        .Name
-                        .Replace($"{type.Name}_", String.Empty)
-                        .Replace(".core", String.Empty);
-                    dict.Add(key, obj);
-                }
-                this.memory.Add(type, dict);
-            }
-
-            action(this.memory[type]);
+            this.memory ??= this.Load();
+            action(this.memory);
         }
     });
+
+
+    Dictionary<string, TEntity> Load()
+    {
+        var dict = new Dictionary<string, TEntity>();
+        var files = this.GetFiles();
+
+        foreach (var file in files)
+        {
+            var text = File.ReadAllText(file.FullName);
+            var dictionary = this.serializer.Deserialize<Dictionary<string, object>>(text);
+
+            var entity = this.converter.FromStore(dictionary);
+            dict.Add(entity.Identifier, entity);
+        }
+        return dict;
+    }
 }

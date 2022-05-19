@@ -12,12 +12,12 @@ namespace Shiny.Beacons;
 
 public partial class BeaconMonitoringManager : IBeaconMonitoringManager
 {
-    readonly IRepository repository;
+    readonly IRepository<BeaconRegion> repository;
     readonly CLLocationManager manager;
     readonly BeaconLocationManagerDelegate gdelegate;
 
 
-    public BeaconMonitoringManager(IServiceProvider services, IRepository repository)
+    public BeaconMonitoringManager(IServiceProvider services, IRepository<BeaconRegion> repository)
     {
         this.repository = repository;
         this.gdelegate = new BeaconLocationManagerDelegate(services);
@@ -33,7 +33,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
 
     public async Task StartMonitoring(BeaconRegion region)
     {
-        await this.repository.Set(region.Identifier, region);
+        await this.repository.Set(region).ConfigureAwait(false);
         this.manager.StartMonitoring(region.ToNative());
     }
 
@@ -41,13 +41,13 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     public async Task StopMonitoring(string identifier)
     {
         var region = await this.repository
-            .Get<BeaconRegion>(identifier)
+            .Get(identifier)
             .ConfigureAwait(false);
 
         if (region != null)
         {
             await this.repository
-                .Remove<BeaconRegion>(region.Identifier)
+                .Remove(region.Identifier)
                 .ConfigureAwait(false);
             this.manager.StopMonitoring(region.ToNative());
         }
@@ -57,7 +57,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     public async Task StopAllMonitoring()
     {
         await this.repository
-            .Clear<BeaconRegion>()
+            .Clear()
             .ConfigureAwait(false);
 
         var allRegions = this
@@ -70,5 +70,5 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager
     }
 
     public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
-        => await this.repository.GetList<BeaconRegion>().ConfigureAwait(false);
+        => await this.repository.GetList().ConfigureAwait(false);
 }

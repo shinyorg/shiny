@@ -1,5 +1,5 @@
 using System;
-
+using Shiny.Stores;
 
 namespace Shiny.Beacons;
 
@@ -11,8 +11,8 @@ public enum BeaconRegionState
     Exited
 }
 
-// TODO: to record
-public class BeaconRegion : IEquatable<BeaconRegion>
+
+public struct BeaconRegion : IStoreEntity, IEquatable<BeaconRegion>
 {
     public BeaconRegion(string identifier, Guid uuid, ushort? major = null, ushort? minor = null)
     {
@@ -23,20 +23,18 @@ public class BeaconRegion : IEquatable<BeaconRegion>
         {
             if (major < 1)
                 throw new ArgumentException("Invalid Major Value");
-
-            this.Major = major;
         }
+        this.Major = major;
 
-        if (minor != null)
+        if (minor == null)
         {
             if (major == null)
                 throw new ArgumentException("You must provide a major value if you are setting minor");
 
             if (minor < 1)
                 throw new ArgumentException("Invalid Minor Value");
-
-            this.Minor = minor;
         }
+        this.Minor = minor;
     }
 
 
@@ -51,9 +49,9 @@ public class BeaconRegion : IEquatable<BeaconRegion>
 
 
     public override string ToString() => $"[Identifier: {this.Identifier} - UUID: {this.Uuid} - Major: {this.Major ?? 0} - Minor: {this.Minor ?? 0}]";
-    public bool Equals(BeaconRegion other) => (this.Identifier, this.Uuid, this.Major, this.Minor).Equals((other?.Identifier, other?.Uuid, other?.Major, other?.Minor));
+    public bool Equals(BeaconRegion other) => (this.Identifier, this.Uuid, this.Major, this.Minor).Equals((other.Identifier, other.Uuid, other.Major, other.Minor));
     public static bool operator ==(BeaconRegion left, BeaconRegion right) => Equals(left, right);
     public static bool operator !=(BeaconRegion left, BeaconRegion right) => !Equals(left, right);
-    public override bool Equals(object obj) => obj is BeaconRegion region && this.Equals(region);
+    public override bool Equals(object? obj) => obj is BeaconRegion region && this.Equals(region);
     public override int GetHashCode() => (this.Identifier, this.Uuid, this.Major, this.Minor).GetHashCode();
 }

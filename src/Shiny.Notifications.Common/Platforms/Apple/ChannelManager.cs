@@ -12,11 +12,11 @@ namespace Shiny.Notifications;
 
 public class ChannelManager : IChannelManager, IShinyStartupTask
 {
-    readonly IRepository repository;
+    readonly IRepository<Channel> repository;
     readonly ILogger<ChannelManager> logger;
 
 
-    public ChannelManager(IRepository repository, ILogger<ChannelManager> logger)
+    public ChannelManager(IRepository<Channel> repository, ILogger<ChannelManager> logger)
     {
         this.repository = repository;
         this.logger = logger;
@@ -43,29 +43,29 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
     public async Task Add(Channel channel)
     {
         channel.AssertValid();
-        await this.repository.Set(channel.Identifier, channel).ConfigureAwait(false);
+        await this.repository.Set(channel).ConfigureAwait(false);
         await this.RebuildNativeCategories().ConfigureAwait(false);
     }
 
 
     public async Task Clear()
     {
-        await this.repository.Clear<Channel>().ConfigureAwait(false);
+        await this.repository.Clear().ConfigureAwait(false);
 
         // there must always be a default
         await this.Add(Channel.Default).ConfigureAwait(false);
     }
 
 
-    public Task<Channel?> Get(string channelId) => this.repository.Get<Channel>(channelId);
-    public Task<IList<Channel>> GetAll() => this.repository.GetList<Channel>();
+    public Task<Channel?> Get(string channelId) => this.repository.Get(channelId);
+    public Task<IList<Channel>> GetAll() => this.repository.GetList();
 
 
     public async Task Remove(string channelId)
     {
         this.AssertChannelRemove(channelId);
 
-        await this.repository.Remove<Channel>(channelId).ConfigureAwait(false);
+        await this.repository.Remove(channelId).ConfigureAwait(false);
         await this.RebuildNativeCategories().ConfigureAwait(false);
     }
 

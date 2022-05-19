@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
         if (clearPrevJobs != null)
             JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs.Value;
 
-        services.TryAddRepository();
+        services.AddRepository<JobInfoStoreConverter, JobInfo>();
         services.AddShinyService<JobsStartup>();
         //services.AddShinyService<JobLifecycleTask>(); // TODO
         services.TryAddSingleton<IJobManager, JobManager>();

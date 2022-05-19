@@ -1,0 +1,28 @@
+Shiny.Net.Http
+* Replace android http download/upload with httpclient and foreground service
+* Needs connectivity from jobs - may need a separate lib for this... could just fallback on Essentials at this point
+
+Shiny.Jobs
+* Needs foreground/background detection for foreground jobs
+
+Shiny.Stores
+* Object binder, keystore
+* IStoreEntity ToStore(IDictionary<string, object>), IDictionary<string, object> FromStore
+* Improve repository mapping so there is no need to have a "store type" vs "actual type"
+
+Core
+* Implement state binding in ServiceProviderExtensions
+
+NFC
+* Finish write
+* Add backgrounding
+
+Push
+* Awaiting keystore binder
+
+
+
+Repository Conversion
+* Beacons
+* Jobs
+* HTTP Transfers

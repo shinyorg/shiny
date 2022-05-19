@@ -10,14 +10,14 @@ namespace Shiny.Net.Http;
 
 public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShinyStartupTask
 {
-    public HttpClientHttpTransferManager(ILogger logger, IRepository repository)
+    public HttpClientHttpTransferManager(ILogger logger, IRepository<HttpTransfer> repository)
     {
         this.Logger = logger;
         this.Repository = repository;
     }
 
 
-    protected IRepository Repository { get; }
+    protected IRepository<HttpTransfer> Repository { get; }
     protected ILogger Logger { get; }
 
 
@@ -32,7 +32,7 @@ public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShiny
     async Task<IEnumerable<HttpTransfer>> Query(QueryFilter filter, bool isUpload)
     {
         var stores = await this.Repository
-            .GetList<HttpTransferStore>()
+            .GetList()
             .ConfigureAwait(false);
 
         var query = stores
@@ -57,7 +57,7 @@ public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShiny
 
     // TODO: stop foreground service if running
     public override Task Cancel(string id) => Task.WhenAll(
-        this.Repository.Remove<HttpTransferStore>(id)
+        this.Repository.Remove(id)
     );
 
     // TODO: start foreground service
@@ -71,29 +71,8 @@ public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShiny
 
     async Task<HttpTransfer> Create(HttpTransferRequest request)
     {
-        var id = Guid.NewGuid().ToString();
-        await this.Repository
-            .Set(id, new HttpTransferStore
-            {
-                Id = id,
-                Uri = request.Uri,
-                IsUpload = request.IsUpload,
-                PostData = request.PostData,
-                LocalFile = request.LocalFile.FullName,
-                UseMeteredConnection = request.UseMeteredConnection,
-                HttpMethod = request.HttpMethod.ToString(),
-                Headers = request.Headers
-            })
-            .ConfigureAwait(false);
-
-        // TODO: replace with foreground transfer service
-        //await this.jobManager.Register(new JobInfo(typeof(TransferJob), id)
-        //{
-        //    RequiredInternetAccess = InternetAccess.Any,
-        //    Repeat = true
-        //});
         var transfer = new HttpTransfer(
-            id,
+            Guid.NewGuid().ToString(),
             request.Uri,
             request.LocalFile.FullName,
             request.IsUpload,
@@ -102,9 +81,17 @@ public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShiny
             request.IsUpload ? request.LocalFile.Length : 0L,
             0,
             HttpTransferState.Pending
+        //TODO
+        //HttpMethod = request.HttpMethod.ToString(),
+        //Headers = request.Headers
         );
-        //// fire and forget
-        //this.jobManager.Run(id);
+
+        await this.Repository
+            .Set(transfer)
+            .ConfigureAwait(false);
+
+
+        // TODO: need to create a message to background service through repo or messagebus
         return transfer;
     }
 
@@ -119,7 +106,7 @@ public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShiny
         try
         {
             var requests = await this.Repository
-                .GetList<HttpTransferStore>()
+                .GetList()
                 .ConfigureAwait(false);
 
             //foreach (var request in reuests)

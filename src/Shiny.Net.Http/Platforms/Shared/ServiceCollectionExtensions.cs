@@ -10,10 +10,10 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddHttpTransfers(this IServiceCollection services, Type transferDelegateType)
     {
-        services.AddShinyService(typeof(IHttpTransferDelegate), transferDelegateType);
-        //services.TryAddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
 #if IOS || MACCATALYST || ANDROID
         services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
+        services.AddShinyService(typeof(IHttpTransferDelegate), transferDelegateType);
+        services.AddRepository<HttpTransferStoreConverter, HttpTransfer>();
 #endif
         return services;
     }

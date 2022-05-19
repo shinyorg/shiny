@@ -1,4 +1,5 @@
 ﻿using System;
+using Shiny.Stores;
 
 namespace Shiny.Net.Http;
 
@@ -13,7 +14,7 @@ public record HttpTransfer(
     long FileSize,
     long BytesTransferred,
     HttpTransferState Status
-)
+) : IStoreEntity
 {
     public double PercentComplete
     {

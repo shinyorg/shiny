@@ -8,11 +8,12 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection TryAddRepository(this IServiceCollection services)
+    public static IServiceCollection AddRepository<TStoreConverter, TEntity>(this IServiceCollection services)
+        where TStoreConverter : class, IStoreConverter<TEntity>, new()
+        where TEntity : IStoreEntity
     {
-        //services.TryAddSingleton<IRepository, SqliteRepository>();
         services.TryAddSingleton<ISerializer, DefaultSerializer>();
-        services.TryAddSingleton<IRepository, JsonFileRepository>();
+        services.AddSingleton<IRepository<TEntity>, JsonFileRepository<TStoreConverter, TEntity>>();
         return services;
     }
 }

@@ -12,14 +12,14 @@ namespace Shiny.Notifications;
 
 public class ChannelManager : IChannelManager, IShinyStartupTask
 {
-    readonly IRepository repository;
+    readonly IRepository<Channel> repository;
     readonly AndroidPlatform platform;
     readonly ILogger logger;
     readonly NotificationManager nativeManager;
 
 
     public ChannelManager(
-        IRepository repository,
+        IRepository<Channel> repository,
         ILogger<ChannelManager> logger,
         AndroidPlatform platform
     )
@@ -97,7 +97,7 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
             native.SetSound(uri, attrBuilder.Build());
 
         this.nativeManager.CreateNotificationChannel(native);
-        await this.repository.Set(channel.Identifier, channel);
+        await this.repository.Set(channel).ConfigureAwait(false);
     }
 
 
@@ -108,20 +108,20 @@ public class ChannelManager : IChannelManager, IShinyStartupTask
             this.nativeManager.DeleteNotificationChannel(channel.Identifier);
 
         await this.repository
-            .Clear<Channel>()
+            .Clear()
             .ConfigureAwait(false);
 
         await this.Add(Channel.Default).ConfigureAwait(false);
     }
 
 
-    public Task<Channel?> Get(string channelId) => this.repository.Get<Channel>(channelId);
-    public Task<IList<Channel>> GetAll() => this.repository.GetList<Channel>();
+    public Task<Channel?> Get(string channelId) => this.repository.Get(channelId);
+    public Task<IList<Channel>> GetAll() => this.repository.GetList();
     public Task Remove(string channelId)
     {
         this.AssertChannelRemove(channelId);
 
         this.nativeManager.DeleteNotificationChannel(channelId);
-        return this.repository.Remove<Channel>(channelId);
+        return this.repository.Remove(channelId);
     }
 }

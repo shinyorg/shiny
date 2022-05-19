@@ -27,7 +27,7 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
         this.logger = logger;
     }
 
-    
+
     public Func<string, Task>? OnTokenRefreshed { get; set; }
 
 
@@ -72,7 +72,7 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
             else
             {
                 this.onEntrySub ??= new CompositeDisposable();
-                
+
                 //this.onEntrySub.Add(this.lifecycle.RegisterForOnFinishedLaunching(async options =>
                 //{
                 //    if (options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
@@ -113,7 +113,7 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
                 //}));
             }
         }
-    }        
+    }
 
 
     public async Task<PushAccessState> RequestAccess()
@@ -200,7 +200,7 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
                         alertDict["title"]?.ToString(),
                         alertDict["body"]?.ToString()
                     );
-                } 
+                }
             }
         }
         return null;
