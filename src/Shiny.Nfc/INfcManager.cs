@@ -1,11 +1,10 @@
 ﻿using System;
 
+namespace Shiny.Nfc;
 
-namespace Shiny.Nfc
+
+public interface INfcManager
 {
-    public interface INfcManager
-    {
-        IObservable<AccessState> RequestAccess();
-        IObservable<INfcTag[]> WhenTagsDetected();
-    }
+    IObservable<AccessState> RequestAccess();
+    IObservable<INfcTag[]> WhenTagsDetected();
 }
