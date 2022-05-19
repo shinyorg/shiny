@@ -12,15 +12,18 @@ namespace Shiny.Locations
     public class GooglePlayServiceGpsManagerImpl : AbstractGpsManager
     {
         FusedLocationProviderClient? listenerClient;
-        public GooglePlayServiceGpsManagerImpl(IPlatform context, ILogger<GooglePlayServiceGpsManagerImpl> logger) : base(context, logger) { }
+        readonly AndroidPlatform platform;
+
+        public GooglePlayServiceGpsManagerImpl(AndroidPlatform platform, ILogger<GooglePlayServiceGpsManagerImpl> logger) : base(platform, logger)
+        { }
 
 
-        public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
+        public override IObservable<IGpsReading> GetLastReading() => Observable.FromAsync(async ct =>
         {
             (await this.RequestAccess(GpsRequest.Foreground).ConfigureAwait(false)).Assert(null, true);
 
             var location = await LocationServices
-                .GetFusedLocationProviderClient(this.Context.AppContext)
+                .GetFusedLocationProviderClient(this.Platform.AppContext)
                 .GetLastLocationAsync()
                 .ConfigureAwait(false);
 
@@ -31,9 +34,9 @@ namespace Shiny.Locations
         });
 
 
-        protected override Task RequestLocationUpdates(GpsRequest request) 
+        protected override Task RequestLocationUpdates(GpsRequest request)
         {
-            this.listenerClient ??= LocationServices.GetFusedLocationProviderClient(this.Context.AppContext);
+            this.listenerClient ??= LocationServices.GetFusedLocationProviderClient(this.Platform.AppContext);
 
             return this.listenerClient.RequestLocationUpdatesAsync(
                 request.ToNative(),

@@ -8,3 +8,11 @@ public enum AccessRequestFlags
     TimeSensitivity = 2,
     All = Notification | LocationAware | TimeSensitivity
 }
+
+
+public enum CancelScope
+{
+    DisplayedOnly,
+    Pending,
+    All,
+}
