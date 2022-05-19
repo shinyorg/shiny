@@ -12,24 +12,19 @@ public class JobInfoStoreConverter : IStoreConverter<JobInfo>
         //
         var info = new JobInfo((string)values["TypeName"], (string)values["Identifier"])
         {
-
+            IsSystemJob = (bool)values[nameof(JobInfo.IsSystemJob)],
+            RunOnForeground = (bool)values[nameof(JobInfo.RunOnForeground)],
+            Repeat = (bool)values[nameof(JobInfo.Repeat)],
         };
-        //    var info = new JobInfo(job.TypeName!, job.Identifier!)
-        //    {
-        //        IsSystemJob = job.IsSystemJob,
         //        LastRunUtc = job.LastRunUtc,
-        //        Repeat = job.Repeat,
         //        DeviceCharging = job.DeviceCharging,
         //        BatteryNotLow = job.BatteryNotLow,
         //        RequiredInternetAccess = job.RequiredInternetAccess,
         //        RunOnForeground = job.RunOnForeground,
         //        Parameters = job.Parameters
-        //    };
-        //    if (job.PeriodicTimeSeconds != null)
-        //        info.PeriodicTime = TimeSpan.FromSeconds(job.PeriodicTimeSeconds.Value);
         if (values.ContainsKey(nameof(JobInfo.PeriodicTime)))
         {
-            var time = (long)values[nameof(JobInfo.PeriodicTime)];
+            var time = (double)values[nameof(JobInfo.PeriodicTime)];
             info.PeriodicTime = TimeSpan.FromSeconds(time);
         }
 
@@ -39,13 +34,12 @@ public class JobInfoStoreConverter : IStoreConverter<JobInfo>
 
     public IEnumerable<(string Property, object value)> ToStore(JobInfo entity)
     {
+        yield return (nameof(JobInfo.TypeName), entity.TypeName);
         yield return (nameof(JobInfo.Identifier), entity.Identifier);
-
-        //    Identifier = job.Identifier,
-        //    TypeName = job.TypeName,
-        //    PeriodicTimeSeconds = job.PeriodicTime?.TotalSeconds,
-        //    IsSystemJob = job.IsSystemJob,
-        //    Repeat = job.Repeat,
+        yield return (nameof(JobInfo.IsSystemJob), entity.IsSystemJob);
+        yield return (nameof(JobInfo.Repeat), entity.Repeat);
+        yield return (nameof(JobInfo.RequiredInternetAccess), entity.RequiredInternetAccess);
+        yield return (nameof(JobInfo.RunOnForeground), entity.RunOnForeground);
         //    LastRunUtc = job.LastRunUtc,
         //    DeviceCharging = job.DeviceCharging,
         //    BatteryNotLow = job.BatteryNotLow,
