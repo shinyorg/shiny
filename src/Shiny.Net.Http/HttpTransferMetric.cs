@@ -1,21 +1,9 @@
 ﻿using System;
 
+namespace Shiny.Net.Http;
 
-namespace Shiny.Net.Http
-{
-    public struct HttpTransferMetric
-    {
-        public HttpTransferMetric(HttpTransfer transfer) : this(transfer, 0, TimeSpan.Zero) { }
-        public HttpTransferMetric(HttpTransfer transfer, long bytesPerSecond, TimeSpan estimatedTimeRemaining)
-        {
-            this.Transfer = transfer;
-            this.BytesPerSecond = bytesPerSecond;
-            this.EstimatedTimeRemaining = estimatedTimeRemaining;
-        }
-
-
-        public HttpTransfer Transfer { get; }
-        public long BytesPerSecond { get; }
-        public TimeSpan EstimatedTimeRemaining { get; }
-    }
-}
+public record HttpTransferMetric(
+    HttpTransfer Transfer,
+    long BytesPerSecond = 0,
+    TimeSpan? EstimatedTimeRemaining = null
+);

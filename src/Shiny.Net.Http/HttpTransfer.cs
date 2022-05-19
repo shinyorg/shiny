@@ -1,52 +1,29 @@
 ﻿using System;
 
+namespace Shiny.Net.Http;
 
-namespace Shiny.Net.Http
+
+public record HttpTransfer(
+    string Identifier,
+    string Uri,
+    string LocalFilePath,
+    bool IsUpload,
+    bool UseMeteredConnection,
+    Exception? Exception,
+    long FileSize,
+    long BytesTransferred,
+    HttpTransferState Status
+)
 {
-    public struct HttpTransfer
+    public double PercentComplete
     {
-        public HttpTransfer(string identifier, string uri, string localFilePath, bool isUpload, bool useMeteredConnection, Exception? exception, long fileSize, long bytesTransferred, HttpTransferState status)
+        get
         {
-            if (identifier == null)
-                throw new ArgumentNullException(nameof(identifier));
+            if (this.BytesTransferred <= 0 || this.FileSize <= 0)
+                return 0;
 
-            if (uri == null)
-                throw new ArgumentNullException(nameof(uri));
-
-            this.Identifier = identifier;
-            this.Uri = uri;
-            this.LocalFilePath = localFilePath;
-            this.IsUpload = isUpload;
-            this.UseMeteredConnection = useMeteredConnection;
-            this.Exception = exception;
-            this.FileSize = fileSize;
-            this.BytesTransferred = bytesTransferred;
-
-            this.Status = exception == null
-                ? status
-                : HttpTransferState.Error;
-        }
-
-
-        public string Identifier { get; }
-        public string Uri { get; }
-        public string LocalFilePath { get; }
-        public bool IsUpload { get; }
-        public bool UseMeteredConnection { get; }
-        public Exception? Exception { get; }
-        public long FileSize { get; }
-        public long BytesTransferred { get; }
-        public HttpTransferState Status { get; }
-        public double PercentComplete
-        {
-            get
-            {
-                if (this.BytesTransferred <= 0 || this.FileSize <= 0)
-                    return 0;
-
-                var raw = ((double)this.BytesTransferred / (double)this.FileSize);
-                return Math.Round(raw, 2);
-            }
+            var raw = ((double)this.BytesTransferred / (double)this.FileSize);
+            return Math.Round(raw, 2);
         }
     }
 }

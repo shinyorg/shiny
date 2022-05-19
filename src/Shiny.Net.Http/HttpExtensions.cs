@@ -1,7 +1,7 @@
 ﻿namespace Shiny.Net.Http;
 
 
-public static class Extensions
+public static class HttpExtensions
 {
     public static bool IsCompleted(this HttpTransferState status)
     {
