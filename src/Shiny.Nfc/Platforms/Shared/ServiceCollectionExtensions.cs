@@ -6,6 +6,9 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
+    public static INfcManager Nfc(this ShinyContainer container) => container.GetService<INfcManager>();
+
+
     /// <summary>
     /// Attempts to register NFC services with Shiny
     /// </summary>

@@ -27,4 +27,7 @@ public static class ServiceCollectionExtensions
         return true;
     }
 #endif
+
+
+    
 }

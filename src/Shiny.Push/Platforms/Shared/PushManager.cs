@@ -1,5 +1,4 @@
-﻿#if !NETSTANDARD
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -15,9 +14,11 @@ public sealed partial class PushManager : IPushManager, IShinyStartupTask
     readonly ILogger logger;
 
 
-    public PushManager(PushContainer container,
-                       INativeAdapter adapter,
-                       ILogger<PushManager> logger)
+    public PushManager(
+        PushContainer container,
+        INativeAdapter adapter,
+        ILogger<PushManager> logger
+    )
     {
         this.adapter = adapter;
         this.container = container;
@@ -64,4 +65,3 @@ public sealed partial class PushManager : IPushManager, IShinyStartupTask
         this.container.ClearRegistration();
     }
 }
-#endif

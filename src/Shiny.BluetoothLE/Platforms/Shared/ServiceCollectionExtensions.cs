@@ -9,6 +9,9 @@ namespace Shiny;
 public static class ServiceCollectionExtensions
 {
 
+    public static IBleManager BluetoothLE(this ShinyContainer container) => container.GetService<IBleManager>();
+
+
     static void AddServices(this IServiceCollection services, BleConfiguration? config)
     {
 #if IOS || MACCATALYST || ANDROID

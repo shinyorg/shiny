@@ -9,6 +9,9 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
+    public static IHttpTransferManager HttpTransfers(this ShinyContainer container) => container.GetService<IHttpTransferManager>();
+
+
     public static IServiceCollection AddHttpTransfers(this IServiceCollection services, Type transferDelegateType)
     {
 #if IOS || MACCATALYST || ANDROID
