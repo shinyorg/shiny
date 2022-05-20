@@ -22,9 +22,9 @@ public static class MauiProgram
         builder.Services.AddBeaconRanging();
         builder.Services.AddBeaconMonitoring<SampleBeaconMonitorDelegate>();
         //builder.Services.AddGpsDirectGeofencing<SampleGpsDelegate>();
-        builder.Services.AddGps<SampleGpsDelegate>();
-        builder.Services.AddGeofencing<SampleGeofenceDelegate>();
-        builder.Services.AddMotionActivity();
+        //builder.Services.AddGps<SampleGpsDelegate>();
+        //builder.Services.AddGeofencing<SampleGeofenceDelegate>();
+        //builder.Services.AddMotionActivity();
         builder.Services.AddNotifications<SampleNotificationDelegate>();
         builder.Services.AddBluetoothLE<SampleBleDelegate>();
         builder.Services.AddHttpTransfers<SampleHttpTransferDelegate>();
