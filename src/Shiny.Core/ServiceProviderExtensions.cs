@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
+using Shiny.Stores;
 
 namespace Shiny;
 
@@ -73,7 +74,7 @@ public static class ServiceExtensions
             services.AddSingleton(sp =>
             {
                 var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, serviceType);
-                // TODO: bind object
+                sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
                 return instance;
             });
         }
@@ -102,7 +103,7 @@ public static class ServiceExtensions
             services.AddSingleton(sp =>
             {
                 var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, implementationType);
-                // TODO: bind object
+                sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
                 return instance;
             });
         }
@@ -131,7 +132,7 @@ public static class ServiceExtensions
             services.AddSingleton(sp =>
             {
                 var instance = (TImpl)ActivatorUtilities.CreateInstance(sp, typeof(TImpl));
-                // TODO: bind object
+                sp.GetRequiredService<IObjectStoreBinder>().Bind((INotifyPropertyChanged)instance);
                 return instance;
             });
         }

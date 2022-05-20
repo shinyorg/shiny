@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Shiny.Infrastructure;
 
-namespace Shiny.Stores.Infrastructure;
+namespace Shiny.Stores.Impl;
 
 
 public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
@@ -79,9 +80,7 @@ public class JsonFileRepository<TStoreConverter, TEntity> : IRepository<TEntity>
             var path = this.GetPath(key);
 
             if (!File.Exists(path))
-            {
                 tcs.TrySetResult(false);
-            }
             else
             {
                 var entity = list[key];

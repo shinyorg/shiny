@@ -48,7 +48,6 @@
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Hosting\Shiny.BluetoothLE.Hosting.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE.Common\Shiny.BluetoothLE.Common.csproj" />
         <ProjectReference Include="..\..\src\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
-        <ProjectReference Include="..\..\src\Shiny.Stores\Shiny.Stores.csproj" />
 
 
         <!--These refs screw up builds at the moment-->

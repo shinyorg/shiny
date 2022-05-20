@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shiny.Stores.Infrastructure;
+namespace Shiny.Stores;
 
 
 public interface IStoreConverter<TEntity> where TEntity : IStoreEntity

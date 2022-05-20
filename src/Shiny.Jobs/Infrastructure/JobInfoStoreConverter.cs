@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shiny.Stores.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny.Jobs.Infrastructure;
 

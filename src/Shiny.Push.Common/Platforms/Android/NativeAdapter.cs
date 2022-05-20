@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
 using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny.Push;
 
@@ -22,14 +23,14 @@ public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewInt
 {
     readonly AndroidPlatform platform;
     readonly ILogger logger;
-    //readonly IKeyValueStore settings;
+    readonly IKeyValueStore settings;
     readonly FirebaseConfig? config;
 
 
     public NativeAdapter(
         AndroidPlatform platform,
         ILogger<NativeAdapter> logger,
-        //IKeyValueStore settings,
+        IKeyValueStore settings,
         FirebaseConfig? config = null
     )
     {
@@ -37,7 +38,7 @@ public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewInt
 
         this.platform = platform;
         this.logger = logger;
-        //this.settings = settings;
+        this.settings = settings;
         this.config = config;
     }
 
@@ -80,7 +81,7 @@ public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewInt
 
 
     public Func<PushNotification, Task>? OnEntry { get; set; }
-    
+
 
 
     Func<string, Task>? onToken;
@@ -175,7 +176,7 @@ public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewInt
                 builder.SetColor(color);
             }
 
-            var notificationId = 0; //this.settings.IncrementValue("NotificationId"); // TODO
+            var notificationId = this.settings.IncrementValue("NotificationId");
             this.platform
                 .GetSystemService<NotificationManager>(Context.NotificationService)
                 .Notify(notificationId, builder.Build());
@@ -192,7 +193,7 @@ public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewInt
         var clickAction = intent?.Action?.Equals(ShinyIntents.NotificationClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false;
         if (!clickAction)
             return;
-         
+
         this.logger.LogDebug("Detected incoming remote notification intent");
 
         if (this.OnEntry == null)

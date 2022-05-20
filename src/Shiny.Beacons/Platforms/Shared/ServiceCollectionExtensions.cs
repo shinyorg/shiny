@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Beacons;
 using Shiny.Beacons.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny;
 

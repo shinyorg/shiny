@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Shiny.Stores.Infrastructure;
+
+using Shiny.Stores;
 
 namespace Shiny.Beacons.Infrastructure;
+
 
 public class BeaconRegionStoreConverter : IStoreConverter<BeaconRegion>
 {

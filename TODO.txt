@@ -5,22 +5,12 @@ Shiny.Net.Http
 Shiny.Jobs
 * Needs foreground/background detection for foreground jobs
 
-Shiny.Stores
-* Object binder, keystore
-
-Core
-* Implement state binding in ServiceProviderExtensions
-
 NFC
 * Finish write
 * Add backgrounding
 
-Push
-* Awaiting keystore binder
-
 Push Common
-* iOS - NativeAdapter needs NotificationCenter registration & key/value store
-* Android - NativeAdapter needs key/value store
+* iOS - NativeAdapter needs NotificationCenter registration
 
 Repository Conversion
 * Beacons

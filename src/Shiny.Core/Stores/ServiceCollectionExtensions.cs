@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Shiny.Stores;
-using Shiny.Stores.Infrastructure;
+using Shiny.Stores.Impl;
 
-namespace Shiny;
+namespace Shiny.Stores;
 
 
 public static class ServiceCollectionExtensions
@@ -12,7 +10,6 @@ public static class ServiceCollectionExtensions
         where TStoreConverter : class, IStoreConverter<TEntity>, new()
         where TEntity : IStoreEntity
     {
-        services.TryAddSingleton<ISerializer, DefaultSerializer>();
         services.AddSingleton<IRepository<TEntity>, JsonFileRepository<TStoreConverter, TEntity>>();
         return services;
     }

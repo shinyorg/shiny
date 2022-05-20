@@ -3,6 +3,7 @@ using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Shiny.Push.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny.Push;
 
@@ -14,11 +15,11 @@ public class PushContainer : NotifyPropertyChanged
 
 
     public PushContainer(
-        //IKeyValueStoreFactory storeFactory, 
+        IKeyValueStoreFactory storeFactory,
         IServiceProvider services
     )
     {
-        //this.Store = storeFactory.DefaultStore;
+        this.Store = storeFactory.DefaultStore;
         this.services = services;
     }
 
@@ -71,9 +72,9 @@ public class PushContainer : NotifyPropertyChanged
 
 
     public IObservable<PushNotification> WhenReceived() => this.recvSubj;
+    public IKeyValueStore Store { get; }
 
 
-    //public IKeyValueStore Store { get; }
     public void SetCurrentToken(string token, bool fireChangeIfApplicable)
     {
         var fireEvent = fireChangeIfApplicable &&
@@ -96,23 +97,23 @@ public class PushContainer : NotifyPropertyChanged
     }
 
 
-    public string? CurrentRegistrationToken { get; set; }
-    //{
-    //    get => this.Store.Get<string?>(nameof(this.CurrentRegistrationToken));
-    //    set => this.Store.SetOrRemove(nameof(this.CurrentRegistrationToken), value);
-    //}
+    public string? CurrentRegistrationToken
+    {
+        get => this.Store.Get<string?>(nameof(this.CurrentRegistrationToken));
+        set => this.Store.SetOrRemove(nameof(this.CurrentRegistrationToken), value);
+    }
 
 
-    public DateTime? CurrentRegistrationTokenDate { get; set; }
-    //{
-    //    get => this.Store.Get<DateTime?>(nameof(this.CurrentRegistrationTokenDate));
-    //    set => this.Store.SetOrRemove(nameof(this.CurrentRegistrationTokenDate), value);
-    //}
+    public DateTime? CurrentRegistrationTokenDate
+    {
+        get => this.Store.Get<DateTime?>(nameof(this.CurrentRegistrationTokenDate));
+        set => this.Store.SetOrRemove(nameof(this.CurrentRegistrationTokenDate), value);
+    }
 
 
-    public string[]? RegisteredTags { get; set; }
-    //{
-    //    get => this.Store.Get<string[]?>(nameof(this.RegisteredTags));
-    //    set => this.Store.SetOrRemove(nameof(this.RegisteredTags), value);
-    //}
+    public string[]? RegisteredTags
+    {
+        get => this.Store.Get<string[]?>(nameof(this.RegisteredTags));
+        set => this.Store.SetOrRemove(nameof(this.RegisteredTags), value);
+    }
 }

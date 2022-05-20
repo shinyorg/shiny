@@ -87,7 +87,7 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching,
                     .RegisterForRemoteNotifications()
             )
             .ConfigureAwait(false);
-        
+
         var rawToken = await this.tokenSource.Task.ConfigureAwait(false);
         return rawToken;
     }
@@ -133,7 +133,7 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching,
     }
 
 
-    public async void Handle(NSDictionary options) 
+    public async void Handle(NSDictionary options)
     {
         if (this.OnEntry == null)
             return;

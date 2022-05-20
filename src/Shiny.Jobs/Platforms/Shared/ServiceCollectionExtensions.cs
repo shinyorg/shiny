@@ -4,6 +4,7 @@ using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 using Shiny.Jobs.Net;
 using Shiny.Jobs.Power;
+using Shiny.Stores;
 
 namespace Shiny;
 

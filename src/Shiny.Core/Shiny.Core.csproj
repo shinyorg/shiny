@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Include="Stores\KeyValueStoreFactory.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="System.Reactive" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
@@ -17,5 +21,9 @@
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Process" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Platforms\Shared\HostExtensions.cs" />
     </ItemGroup>
 </Project>
