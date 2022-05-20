@@ -121,7 +121,7 @@ public class HttpTransferManager : AbstractHttpTransferManager, IShinyStartupTas
         => this.sessionDelegate.WhenEventOccurs();
 
 
-    public override Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter? filter = null)
+    public override Task<IList<HttpTransfer>> GetTransfers(QueryFilter? filter = null)
         => this.Session.QueryTransfers(filter);
 
 

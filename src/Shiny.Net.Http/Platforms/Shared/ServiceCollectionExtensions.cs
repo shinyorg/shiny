@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Net.Http;
+using Shiny.Stores;
 
 namespace Shiny;
 

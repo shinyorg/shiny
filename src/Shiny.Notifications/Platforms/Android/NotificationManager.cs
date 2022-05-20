@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using Android.Content;
-
 using Shiny.Hosting;
 using Shiny.Locations;
 using Shiny.Stores;
@@ -13,31 +11,32 @@ namespace Shiny.Notifications;
 
 public partial class NotificationManager : INotificationManager, IAndroidLifecycle.IOnActivityNewIntent
 {
+    const string AndroidBadgeCountKey = "AndroidBadge";
+
+    readonly Lazy<AndroidNotificationProcessor> processor;
+    readonly AndroidPlatform platform;
     readonly IChannelManager channelManager;
     readonly AndroidNotificationManager manager;
     readonly IRepository<Notification> repository;
     readonly IGeofenceManager geofenceManager;
+    readonly IKeyValueStore settings;
 
 
     public NotificationManager(
+        IServiceProvider services,
+        AndroidPlatform platform,
         AndroidNotificationManager manager,
         IChannelManager channelManager,
-        IGeofenceManager geofenceManager
+        IGeofenceManager geofenceManager,
+        IKeyValueStoreFactory keystore
     )
     {
+        this.processor = services.GetLazyService<AndroidNotificationProcessor>();
+        this.platform = platform;
         this.manager = manager;
         this.channelManager = channelManager;
         this.geofenceManager = geofenceManager;
-
-        //this.core
-        //    .Platform
-        //    .WhenIntentReceived()
-        //    .SubscribeAsync(x => this
-        //        .core
-        //        .Services
-        //        .Resolve<AndroidNotificationProcessor>()!
-        //        .TryProcessIntent(x.Intent)
-        //    );
+        this.settings = keystore.DefaultStore;
     }
 
 
@@ -49,11 +48,11 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
 
     public async Task Cancel(int id)
     {
-        var notification = await this.core.Repository.Get<Notification>(id.ToString());
+        var notification = await this.repository.Get(id.ToString()).ConfigureAwait(false);
         if (notification != null)
         {
-            await this.CancelInternal(notification);
-            await this.core.Repository.Remove<Notification>(id.ToString());
+            await this.CancelInternal(notification).ConfigureAwait(false);
+            await this.repository.Remove(id.ToString()).ConfigureAwait(false);
         }
     }
 
@@ -66,25 +65,24 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         }
         if (scope == CancelScope.All || scope == CancelScope.Pending)
         {
-            var notifications = await this.core.Repository.GetList<Notification>();
+            var notifications = await this.repository.GetList();
             foreach (var notification in notifications)
             {
                 await this.CancelInternal(notification).ConfigureAwait(false);
             }
-            await this.core
-                .Repository
-                .Clear<Notification>()
+            await this.repository
+                .Clear()
                 .ConfigureAwait(false);
         }
     }
 
 
     public Task<Notification?> GetNotification(int notificationId)
-        => this.core.Repository.Get<Notification>(notificationId.ToString());
+        => this.repository.Get(notificationId.ToString());
 
 
     public async Task<IEnumerable<Notification>> GetPendingNotifications()
-        => await this.core.Repository.GetList<Notification>().ConfigureAwait(false);
+        => await this.repository.GetList().ConfigureAwait(false);
 
 
     public async Task<AccessState> RequestAccess(AccessRequestFlags access)
@@ -111,7 +109,7 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
 
         // TODO: should I cancel an existing id if the user is setting it?
         if (notification.Id == 0)
-            notification.Id = this.core.Settings.IncrementValue("NotificationId");
+            notification.Id = this.settings.IncrementValue("NotificationId");
 
         var channel = await this.channelManager.Get(notification.Channel ?? Channel.Default.Identifier);
         if (channel == null)
@@ -137,13 +135,13 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         {
             this.manager.SendNative(notification.Id, builder.Build());
             if (notification.BadgeCount != null)
-                this.core.SetBadgeCount(notification.BadgeCount.Value);
+                await this.SetBadge(notification.BadgeCount.Value).ConfigureAwait(false);
         }
         else
         {
             // ensure a channel is set
             notification.Channel = channel!.Identifier;
-            await this.core.Repository.Set(notification.Id.ToString(), notification);
+            await this.repository.Set(notification).ConfigureAwait(false);
 
             if (notification.ScheduleDate != null)
                 this.manager.SetAlarm(notification);
@@ -152,12 +150,19 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
 
 
     public Task<int> GetBadge()
-        => Task.FromResult(this.core.GetBadgeCount());
+        => Task.FromResult(this.settings.Get(AndroidBadgeCountKey, 0));
 
 
     public Task SetBadge(int? badge)
     {
-        this.core.SetBadgeCount(badge ?? 0);
+        var value = badge ?? 0;
+        this.settings.Set(AndroidBadgeCountKey, value);
+
+        if (badge <= 0)
+            global::XamarinShortcutBadger.ShortcutBadger.RemoveCount(this.platform.AppContext);
+        else
+            global::XamarinShortcutBadger.ShortcutBadger.ApplyCount(this.platform.AppContext, value);
+
         return Task.CompletedTask;
     }
 
@@ -175,5 +180,9 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
         this.manager.NativeManager.Cancel(notification.Id);
     }
 
-    public void Handle(Android.App.Activity activity, Intent intent) => throw new NotImplementedException();
+
+    public void Handle(Android.App.Activity activity, Intent intent)
+    {
+        this.processor.Value.TryProcessIntent(intent);
+    }
 }

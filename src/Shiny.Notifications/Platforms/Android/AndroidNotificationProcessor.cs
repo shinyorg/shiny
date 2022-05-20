@@ -24,11 +24,13 @@ public class AndroidNotificationProcessor
     readonly IEnumerable<INotificationDelegate> delegates;
 
 
-    public AndroidNotificationProcessor(AndroidNotificationManager notificationManager,
-                                        IGeofenceManager geofenceManager,
-                                        IRepository<Notification> repository,
-                                        ISerializer serializer,
-                                        IEnumerable<INotificationDelegate> delegates)
+    public AndroidNotificationProcessor(
+        AndroidNotificationManager notificationManager,
+        IGeofenceManager geofenceManager,
+        IRepository<Notification> repository,
+        ISerializer serializer,
+        IEnumerable<INotificationDelegate> delegates
+    )
     {
         this.notificationManager = notificationManager;
         this.geofenceManager = geofenceManager;
@@ -86,7 +88,7 @@ public class AndroidNotificationProcessor
             return;
 
         var notificationId = region.Identifier.Replace(GeofenceKey, String.Empty);
-        var notification = await this.repository.Get<Notification>(notificationId).ConfigureAwait(false);
+        var notification = await this.repository.Get(notificationId).ConfigureAwait(false);
 
         if (notification?.Geofence != null)
         {

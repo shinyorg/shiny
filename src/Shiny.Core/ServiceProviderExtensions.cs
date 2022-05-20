@@ -21,7 +21,7 @@ public static class ServiceExtensions
     /// <param name="services"></param>
     /// <param name="required"></param>
     /// <returns></returns>
-    public static Lazy<T> GetLazyService<T>(this IServiceProvider services, bool required = true)
+    public static Lazy<T> GetLazyService<T>(this IServiceProvider services, bool required = false)
         => new Lazy<T>(() => required ? services.GetRequiredService<T>() : services.GetService<T>());
 
 

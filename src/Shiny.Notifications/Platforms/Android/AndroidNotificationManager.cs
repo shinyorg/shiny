@@ -169,7 +169,7 @@ public class AndroidNotificationManager
                 .AppContext!
                 .PackageManager!
                 .GetLaunchIntentForPackage(this.platform!.Package!.PackageName!)!
-                .SetFlags(notification.Android.LaunchActivityFlags.ToNative());
+                .SetFlags(notification.Android.LaunchActivityFlags);
         }
         else
         {
@@ -182,7 +182,7 @@ public class AndroidNotificationManager
         this.PopulateIntent(launchIntent, notification);
 
         PendingIntent pendingIntent;
-        if ((notification.Android.LaunchActivityFlags & AndroidActivityFlags.ClearTask) != 0)
+        if ((notification.Android.LaunchActivityFlags & ActivityFlags.ClearTask) != 0)
         {
             pendingIntent = AndroidX.Core.App.TaskStackBuilder
                 .Create(this.platform.AppContext)

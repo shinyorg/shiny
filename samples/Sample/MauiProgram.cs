@@ -20,16 +20,20 @@ public static class MauiProgram
         builder.Services.AddAllSensors();
         builder.Services.AddNfc();
         builder.Services.AddBeaconRanging();
+        builder.Services.AddBeaconMonitoring<SampleBeaconMonitorDelegate>();
         //builder.Services.AddGpsDirectGeofencing<SampleGpsDelegate>();
         builder.Services.AddGps<SampleGpsDelegate>();
         builder.Services.AddGeofencing<SampleGeofenceDelegate>();
         builder.Services.AddMotionActivity();
-        builder.Services.AddBeaconMonitoring<SampleBeaconMonitorDelegate>();
-        builder.Services.AddShinyService<StartupTask>();
+        builder.Services.AddNotifications<SampleNotificationDelegate>();
         builder.Services.AddBluetoothLE<SampleBleDelegate>();
+        builder.Services.AddHttpTransfers<SampleHttpTransferDelegate>();
         builder.Services.AddBluetoothLeHosting();
         builder.Services.AddSpeechRecognition();
+
         //builder.Services.AddJob(typeof(SampleJob));
+        builder.Services.AddShinyService<StartupTask>();
+
 
         var app = builder.Build();
         app.RunShiny();

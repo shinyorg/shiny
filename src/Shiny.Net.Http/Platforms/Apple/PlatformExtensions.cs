@@ -57,10 +57,10 @@ static class PlatformExtensions
     }
 
 
-    public static async Task<IEnumerable<HttpTransfer>> QueryTransfers(this NSUrlSession session, QueryFilter? filter)
+    public static async Task<IList<HttpTransfer>> QueryTransfers(this NSUrlSession session, QueryFilter? filter)
     {
         var tasks = await session.QueryTasks(filter);
-        return tasks.Select(x => x.FromNative());
+        return tasks.Select(x => x.FromNative()).ToList();
     }
 
 

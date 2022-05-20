@@ -32,7 +32,7 @@ public class HttpTransferBroadcastReceiver : ShinyBroadcastReceiver
 
         var id = intent.GetLongExtra(Native.ExtraDownloadId, -1);
         var native = (Native)context.GetSystemService(Context.DownloadService);
-        var query = new QueryFilter().Add(id.ToString()).ToNative();
+        var query = new QueryFilter(Ids: id.ToString()).ToNative();
 
         using (var cursor = native.InvokeQuery(query))
         {

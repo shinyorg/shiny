@@ -21,38 +21,23 @@ public class HttpClientHttpTransferManager : AbstractHttpTransferManager, IShiny
     protected ILogger Logger { get; }
 
 
-    protected override Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
+    protected override Task<IList<HttpTransfer>> GetDownloads(QueryFilter filter)
         => this.Query(filter, false);
 
 
-    protected override Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
+    protected override Task<IList<HttpTransfer>> GetUploads(QueryFilter filter)
         => this.Query(filter, true);
 
 
-    async Task<IEnumerable<HttpTransfer>> Query(QueryFilter filter, bool isUpload)
-    {
-        var stores = await this.Repository
-            .GetList()
-            .ConfigureAwait(false);
-
-        var query = stores
-            .Where(x => x.IsUpload == isUpload);
-
-        if (filter.Ids.Any())
-            query = query.Where(x => filter.Ids.Any(y => x.Id == y));
-
-        return query.Select(x => new HttpTransfer(
-            x.Id,
-            x.Uri,
-            x.LocalFile,
-            isUpload,
-            x.UseMeteredConnection,
-            null,
-            0L,
-            0L,
-            HttpTransferState.Pending
-        ));
-    }
+    Task<IList<HttpTransfer>> Query(QueryFilter filter, bool isUpload) => this
+        .Repository
+        .GetList(x =>
+            x.IsUpload == isUpload &&
+            (
+                filter.Ids.Length == 0 ||
+                filter.Ids.Any(y => y == x.Identifier)
+            )
+        );
 
 
     // TODO: stop foreground service if running

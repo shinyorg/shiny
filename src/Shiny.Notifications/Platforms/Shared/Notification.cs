@@ -49,11 +49,12 @@ public class Notification : IStoreEntity
     /// </summary>
     public string? Thread { get; set; }
 
+    #if ANDROID
     ///// <summary>
     ///// Options specific to android
     ///// </summary>
-    //public AndroidOptions Android { get; set; } = new AndroidOptions();
-
+    public AndroidOptions Android { get; set; } = new AndroidOptions();
+    #endif
 
     /// <summary>
     /// Scheduled date for notification (cannot be mixed with repeat interval or geofence)

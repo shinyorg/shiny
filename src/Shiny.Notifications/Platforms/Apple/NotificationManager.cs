@@ -8,56 +8,35 @@ using UIKit;
 using UserNotifications;
 using CoreLocation;
 using Shiny.Hosting;
+using Shiny.Stores;
 
 namespace Shiny.Notifications;
 
 
-public class NotificationManager : INotificationManager, IShinyStartupTask, IIosLifecycle.INotificationHandler, IIosLifecycle.IOnFinishedLaunching
+public class NotificationManager : INotificationManager, IIosLifecycle.INotificationHandler, IIosLifecycle.IOnFinishedLaunching
 {
     /// <summary>
     /// This requires a special entitlement from Apple that is general disabled for anything but health & public safety alerts
     /// </summary>
     public static bool UseCriticalAlerts { get; set; }
 
-    readonly ShinyCoreServices services;
+    readonly Lazy<IEnumerable<INotificationDelegate>> delegates;
+    readonly IPlatform platform;
     readonly IChannelManager channelManager;
+    readonly IKeyValueStore settings;
 
 
-    public NotificationManager(ShinyCoreServices services, IChannelManager channelManager)
+    public NotificationManager(
+        IServiceProvider services,
+        IPlatform platform,
+        IChannelManager channelManager,
+        IKeyValueStoreFactory keystore
+    )
     {
-        this.services = services;
+        this.delegates = services.GetLazyService<IEnumerable<INotificationDelegate>>();
+        this.platform = platform;
         this.channelManager = channelManager;
-    }
-
-
-    public void Start()
-    {
-        this.services.Lifecycle.RegisterForOnFinishedLaunching(options =>
-        {
-            if (options.ContainsKey(UIApplication.LaunchOptionsLocalNotificationKey))
-            {
-                var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
-                if (data != null)
-                {
-                    // TODO: need to parse this back into a notification
-                    data.FromNsDictionary();
-                }
-            }
-        });
-
-        this.services.Lifecycle.RegisterForNotificationReceived(async response =>
-        {
-            var t = response.Notification?.Request?.Trigger;
-
-            if (t == null || t is not UNPushNotificationTrigger)
-            {
-                var shiny = response.FromNative();
-                await this.services
-                    .Services
-                    .RunDelegates<INotificationDelegate>(x => x.OnEntry(shiny))
-                    .ConfigureAwait(false);
-            }
-        });
+        this.settings = keystore.DefaultStore;
     }
 
 
@@ -67,12 +46,12 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
     public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
 
 
-    public Task<int> GetBadge() => this.services.Platform.InvokeOnMainThreadAsync<int>(() =>
+    public Task<int> GetBadge() => this.platform.InvokeOnMainThreadAsync<int>(() =>
         (int)UIApplication.SharedApplication.ApplicationIconBadgeNumber
     );
 
 
-    public Task SetBadge(int? badge) => this.services.Platform.InvokeOnMainThreadAsync(() =>
+    public Task SetBadge(int? badge) => this.platform.InvokeOnMainThreadAsync(() =>
         UIApplication.SharedApplication.ApplicationIconBadgeNumber = badge ?? 0
     );
 
@@ -124,7 +103,7 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
         => (await this.GetPendingNotifications()).FirstOrDefault(x => x.Id == notificationId);
 
 
-    public Task<IEnumerable<Notification>> GetPendingNotifications() => this.services.Platform.InvokeOnMainThreadAsync(async () =>
+    public Task<IEnumerable<Notification>> GetPendingNotifications() => this.platform.InvokeOnMainThreadAsync(async () =>
     {
         var requests = await UNUserNotificationCenter
             .Current
@@ -136,12 +115,12 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
     });
 
 
-    public Task Send(Notification notification) => this.services.Platform.InvokeOnMainThreadAsync(async () =>
+    public Task Send(Notification notification) => this.platform.InvokeOnMainThreadAsync(async () =>
     {
         notification.AssertValid();
 
         if (notification.Id == 0)
-            notification.Id = this.services.Settings.IncrementValue("NotificationId");
+            notification.Id = this.settings.IncrementValue("NotificationId");
 
         var content = await this.GetContent(notification);
         var request = UNNotificationRequest.FromIdentifier(
@@ -156,7 +135,7 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
     });
 
 
-    public Task Cancel(CancelScope scope) => this.services.Platform.InvokeOnMainThreadAsync(() =>
+    public Task Cancel(CancelScope scope) => this.platform.InvokeOnMainThreadAsync(() =>
     {
         if (scope == CancelScope.All || scope == CancelScope.Pending)
             UNUserNotificationCenter.Current.RemoveAllPendingNotificationRequests();
@@ -166,7 +145,7 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
     });
 
 
-    public Task Cancel(int notificationId) => this.services.Platform.InvokeOnMainThreadAsync(() =>
+    public Task Cancel(int notificationId) => this.platform.InvokeOnMainThreadAsync(() =>
     {
         var ids = new[] { notificationId.ToString() };
 
@@ -194,7 +173,7 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
         if (notification.BadgeCount != null)
             content.Badge = notification.BadgeCount.Value;
 
-        if (!notification.Payload!.IsEmpty())
+        if (notification.Payload?.Any() ?? false)
             content.UserInfo = notification.Payload!.ToNsDictionary();
 
         await this.ApplyChannel(notification, content);
@@ -264,6 +243,7 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
 
         if (notification.Geofence != null)
         {
+#if IOS
             var geo = notification.Geofence!;
 
             trigger = UNLocationNotificationTrigger.CreateTrigger(
@@ -274,6 +254,7 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
                 ),
                 geo.Repeat
             );
+#endif
         }
         else if (notification.ScheduleDate != null)
         {
@@ -319,7 +300,33 @@ public class NotificationManager : INotificationManager, IShinyStartupTask, IIos
         return trigger;
     }
 
-    public void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler) => throw new NotImplementedException();
-    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) => throw new NotImplementedException();
-    public void Handle(NSDictionary options) => throw new NotImplementedException();
+
+    public async void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler)
+    {
+        var t = response.Notification?.Request?.Trigger;
+
+        if (t == null || t is not UNPushNotificationTrigger)
+        {
+            var shiny = response.FromNative();
+            await this.delegates
+                .Value
+                .RunDelegates(x => x.OnEntry(shiny))
+                .ConfigureAwait(false);
+        }
+    }
+
+
+    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) { }
+    public void Handle(NSDictionary options)
+    {
+        if (options.ContainsKey(UIApplication.LaunchOptionsLocalNotificationKey))
+        {
+            var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
+            if (data != null)
+            {
+                // TODO: need to parse this back into a notification
+                data.FromNsDictionary();
+            }
+        }
+    }
 }

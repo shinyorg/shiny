@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Shiny.Stores.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny.Net.Http;
 

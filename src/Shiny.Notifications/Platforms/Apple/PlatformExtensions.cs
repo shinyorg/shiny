@@ -54,6 +54,7 @@ public static class PlatformExtensions
             };
             shiny.ScheduleDate = interval.NextTriggerDate!.ToDateTime();
         }
+#if IOS
         else if (native.Trigger is UNLocationNotificationTrigger location)
         {
             shiny.Geofence = new GeofenceTrigger
@@ -62,7 +63,7 @@ public static class PlatformExtensions
                 Radius = Distance.FromMeters(location.Region.Radius)
             };
         }
-
+#endif
         return shiny;
     }
 
