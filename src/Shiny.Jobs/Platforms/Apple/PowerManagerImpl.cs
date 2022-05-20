@@ -10,8 +10,8 @@ namespace Shiny.Jobs.Power;
 public class PowerManagerImpl : NotifyPropertyChanged, IPowerManager
 {
     CompositeDisposable? dispose;
-    
-    
+
+
     public bool IsEnergySavingEnabled => NSProcessInfo.ProcessInfo.LowPowerModeEnabled;
 
 
