@@ -14,3 +14,7 @@ Repository Conversion
 * Beacons
 * HTTP Transfers
 * Notifications
+
+Tests
+* New Repository
+* New Binding
