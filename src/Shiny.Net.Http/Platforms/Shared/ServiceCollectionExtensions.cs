@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Net.Http;
 using Shiny.Stores;
 
@@ -15,7 +14,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddHttpTransfers(this IServiceCollection services, Type transferDelegateType)
     {
 #if IOS || MACCATALYST || ANDROID
-        services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
+        services.AddShinyServiceWithLifecycle<IHttpTransferManager, HttpTransferManager>();
         services.AddShinyService(typeof(IHttpTransferDelegate), transferDelegateType);
         services.AddRepository<HttpTransferStoreConverter, HttpTransfer>();
 #endif

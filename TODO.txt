@@ -10,10 +10,12 @@ NFC
 * Add backgrounding
 
 Repository Conversion
-* Locations (geofences)
-* Beacons
 * HTTP Transfers
 * Notifications
+
+BLE
+* // TODO: lifecycle method for direct impl only
+    services.TryAddSingleton<Shiny.BluetoothLE.Internals.ManagerContext>();
 
 Tests
 * New Repository
