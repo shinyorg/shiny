@@ -13,7 +13,7 @@ body:
     attributes:
       label: Component/Nuget
       description: The component you are filing against.  If it is not listed here it means there is no support for it
-      options:        
+      options:
         - GPS, Geofencing, Motion Activity (Shiny.Locations)
         - Jobs (Shiny.Jobs)
         - HTTP Transfers (Shiny.Net.Http)
@@ -38,6 +38,7 @@ body:
       - label: iOS 13
       - label: iOS 14
       - label: iOS 15
+      - label: Mac Catalyst
       - label: Android 8
       - label: Android 9
       - label: Android 10
@@ -63,6 +64,11 @@ body:
         1.
         2.
         3.
+  - type: input
+    attributes:
+       label: Library Version
+    validations:
+       required: true
   - type: textarea
     attributes:
       label: Expected Behavior
@@ -91,7 +97,7 @@ body:
       options:
         - label: My reproducible sample is not from the Shiny samples repository
           required: true
-        - label: I am using the latest stable version from nuget
-          required: true
+        #- label: I am using the latest stable version from nuget
+        #  required: true
         - label: I agree to follow this project's Code of Conduct
           required: true
