@@ -7,11 +7,12 @@ using Foundation;
 using UIKit;
 using UserNotifications;
 using CoreLocation;
+using Shiny.Hosting;
 
 namespace Shiny.Notifications;
 
 
-public class NotificationManager : INotificationManager, IShinyStartupTask
+public class NotificationManager : INotificationManager, IShinyStartupTask, IIosLifecycle.INotificationHandler, IIosLifecycle.IOnFinishedLaunching
 {
     /// <summary>
     /// This requires a special entitlement from Apple that is general disabled for anything but health & public safety alerts
@@ -317,4 +318,8 @@ public class NotificationManager : INotificationManager, IShinyStartupTask
 
         return trigger;
     }
+
+    public void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler) => throw new NotImplementedException();
+    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) => throw new NotImplementedException();
+    public void Handle(NSDictionary options) => throw new NotImplementedException();
 }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Shiny.Stores;
+
 namespace Shiny.Notifications;
 
 
-public class Notification
+public class Notification : IStoreEntity
 {
     public static string? DefaultChannel { get; set; }
 
@@ -47,10 +49,10 @@ public class Notification
     /// </summary>
     public string? Thread { get; set; }
 
-    /// <summary>
-    /// Options specific to android
-    /// </summary>
-    public AndroidOptions Android { get; set; } = new AndroidOptions();
+    ///// <summary>
+    ///// Options specific to android
+    ///// </summary>
+    //public AndroidOptions Android { get; set; } = new AndroidOptions();
 
 
     /// <summary>
@@ -72,4 +74,6 @@ public class Notification
     /// Set an image uri for iOS attachment or Android bigpicture style
     /// </summary>
     public string? ImageUri { get; set; }
+
+    public string Identifier => this.Id.ToString();
 }

@@ -6,6 +6,7 @@ using Android.App;
 using Android.Content;
 using Shiny.Infrastructure;
 using Shiny.Locations;
+using Shiny.Stores;
 
 namespace Shiny.Notifications;
 
@@ -18,14 +19,14 @@ public class AndroidNotificationProcessor
 
     readonly AndroidNotificationManager notificationManager;
     readonly IGeofenceManager geofenceManager;
-    readonly IRepository repository;
+    readonly IRepository<Notification> repository;
     readonly ISerializer serializer;
     readonly IEnumerable<INotificationDelegate> delegates;
 
 
     public AndroidNotificationProcessor(AndroidNotificationManager notificationManager,
                                         IGeofenceManager geofenceManager,
-                                        IRepository repository,
+                                        IRepository<Notification> repository,
                                         ISerializer serializer,
                                         IEnumerable<INotificationDelegate> delegates)
     {
@@ -67,7 +68,7 @@ public class AndroidNotificationProcessor
     {
         // fire any missed/pending alarms?
         var missed = await this.repository
-            .GetList<Notification>(x => x.ScheduleDate != null && x.ScheduleDate < DateTime.UtcNow)
+            .GetList(x => x.ScheduleDate != null && x.ScheduleDate < DateTime.UtcNow)
             .ConfigureAwait(false);
 
         foreach (var notification in missed)
@@ -93,7 +94,7 @@ public class AndroidNotificationProcessor
 
             if (!notification.Geofence.Repeat)
             {
-                await this.repository.Remove<Notification>(notificationId).ConfigureAwait(false);
+                await this.repository.Remove(notificationId).ConfigureAwait(false);
                 await this.geofenceManager.StopMonitoring(region.Identifier).ConfigureAwait(false);
             }
         }
@@ -106,7 +107,7 @@ public class AndroidNotificationProcessor
         var id = intent.GetIntExtra(IntentNotificationKey, 0);
         if (id > 0)
         {
-            var notification = await this.repository.Get<Notification>(id.ToString()).ConfigureAwait(false);
+            var notification = await this.repository.Get(id.ToString()).ConfigureAwait(false);
             if (notification != null)
             {
                 await this.notificationManager.Send(notification).ConfigureAwait(false);
@@ -121,14 +122,14 @@ public class AndroidNotificationProcessor
         if (notification.RepeatInterval == null)
         {
             await this.repository
-                .Remove<Notification>(notification.Id.ToString())
+                .Remove(notification.Id.ToString())
                 .ConfigureAwait(false);
         }
         else
         {
             // if repeating, set next time
             notification.ScheduleDate = notification.RepeatInterval.CalculateNextAlarm();
-            await this.repository.Set(notification.Id.ToString(), notification).ConfigureAwait(false);
+            await this.repository.Set(notification).ConfigureAwait(false);
 
             this.notificationManager.SetAlarm(notification);
         }
