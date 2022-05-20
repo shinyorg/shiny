@@ -10,6 +10,7 @@ using AndroidX.Core.App;
 using Firebase;
 using Firebase.Messaging;
 using Microsoft.Extensions.Logging;
+using Shiny.Hosting;
 using Shiny.Notifications;
 using Shiny.Push.Infrastructure;
 
@@ -17,7 +18,7 @@ namespace Shiny.Push;
 
 
 // TODO
-public class NativeAdapter : INativeAdapter
+public class NativeAdapter : INativeAdapter, IAndroidLifecycle.IOnActivityNewIntent
 {
     readonly AndroidPlatform platform;
     readonly ILogger logger;
@@ -40,42 +41,6 @@ public class NativeAdapter : INativeAdapter
         this.config = config;
     }
 
-
-    public async Task TryProcessIntent(Intent intent)
-    {
-        if (intent?.Action?.Equals(ShinyIntents.NotificationClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false)
-        {
-            this.logger.LogDebug("Detected incoming remote notification intent");
-
-            if (this.onEntry == null)
-            {
-                this.logger.LogWarning("OnEntry is not hooked");
-            }
-            else
-            {
-                try
-                {
-                    var dict = new Dictionary<string, string>();
-                    if (intent.Extras != null)
-                    { 
-                        foreach (var key in intent.Extras!.KeySet()!)
-                        {
-                            var value = intent.Extras.Get(key)?.ToString();
-                            if (value != null)
-                                dict.Add(key, value);
-                        }
-                    }
-                    // TODO: can I extract the notification here?
-                    var push = new PushNotification(dict, null);
-                    await this.onEntry.Invoke(push).ConfigureAwait(false);
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError("Error processing onEntry", ex);
-                }
-            }
-        }
-    }
 
 
     Func<PushNotification, Task>? onReceived;
@@ -114,26 +79,8 @@ public class NativeAdapter : INativeAdapter
     }
 
 
-    IDisposable? onEntrySub;
-    Func<PushNotification, Task>? onEntry;
-    public Func<PushNotification, Task>? OnEntry
-    {
-        get => this.onEntry;
-        set
-        {
-            this.onEntry = value;
-            if (this.onEntry == null)
-            {
-                this.onEntrySub?.Dispose();
-            }
-            else
-            {
-                this.onEntrySub = this.platform
-                    .WhenIntentReceived()
-                    .SubscribeAsync(x => this.TryProcessIntent(x.Intent));
-            }
-        }
-    }
+    public Func<PushNotification, Task>? OnEntry { get; set; }
+    
 
 
     Func<string, Task>? onToken;
@@ -236,6 +183,44 @@ public class NativeAdapter : INativeAdapter
         catch (Exception ex)
         {
             this.logger.LogError("Error processing foreground remote notification", ex);
+        }
+    }
+
+
+    public async void Handle(Activity activity, Intent intent)
+    {
+        var clickAction = intent?.Action?.Equals(ShinyIntents.NotificationClickAction, StringComparison.InvariantCultureIgnoreCase) ?? false;
+        if (!clickAction)
+            return;
+         
+        this.logger.LogDebug("Detected incoming remote notification intent");
+
+        if (this.OnEntry == null)
+        {
+            this.logger.LogWarning("OnEntry is not hooked");
+        }
+        else
+        {
+            try
+            {
+                var dict = new Dictionary<string, string>();
+                if (intent.Extras != null)
+                {
+                    foreach (var key in intent.Extras!.KeySet()!)
+                    {
+                        var value = intent.Extras.Get(key)?.ToString();
+                        if (value != null)
+                            dict.Add(key, value);
+                    }
+                }
+                // TODO: can I extract the notification here?
+                var push = new PushNotification(dict, null);
+                await this.OnEntry.Invoke(push).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError("Error processing onEntry", ex);
+            }
         }
     }
 }

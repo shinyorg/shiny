@@ -7,8 +7,6 @@ Shiny.Jobs
 
 Shiny.Stores
 * Object binder, keystore
-* IStoreEntity ToStore(IDictionary<string, object>), IDictionary<string, object> FromStore
-* Improve repository mapping so there is no need to have a "store type" vs "actual type"
 
 Core
 * Implement state binding in ServiceProviderExtensions
@@ -20,7 +18,9 @@ NFC
 Push
 * Awaiting keystore binder
 
-
+Push Common
+* iOS - NativeAdapter needs NotificationCenter registration & key/value store
+* Android - NativeAdapter needs key/value store
 
 Repository Conversion
 * Beacons

@@ -37,7 +37,7 @@ public static class ServiceCollectionExtensions
         services.AddChannelManager();
         services.AddShinyService(typeof(IPushDelegate), delegateType);
         services.TryAddSingleton(typeof(IPushManager), pushManagerType);
-        //services.AddShinyServiceWithLifecycle<PushContainer>();
+        services.AddShinyServiceWithLifecycle<PushContainer>();
         services.AddShinyServiceWithLifecycle<INativeAdapter, NativeAdapter>();
 #endif
 

@@ -18,6 +18,9 @@ public static class MauiProgram
             });
 
         builder.Services.AddAllSensors();
+        builder.Services.AddNfc();
+        builder.Services.AddBeaconRanging();
+        builder.Services.AddBeaconMonitoring<SampleBeaconMonitorDelegate>();
         builder.Services.AddShinyService<StartupTask>();
         builder.Services.AddBluetoothLE<SampleBleDelegate>();
         builder.Services.AddBluetoothLeHosting();

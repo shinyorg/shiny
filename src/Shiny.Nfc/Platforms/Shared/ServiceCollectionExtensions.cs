@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services"></param>
     /// <returns></returns>
-    public static bool UseNfc(this IServiceCollection services)
+    public static bool AddNfc(this IServiceCollection services)
     {
 #if IOS || MACCATALYST || ANDROID
         services.AddShinyServiceWithLifecycle<INfcManager, NfcManager>();

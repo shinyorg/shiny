@@ -38,8 +38,8 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-        <SupportedOSPlatformVersion>31.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>26.0</TargetPlatformMinVersion>
+        <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion>31.0</TargetPlatformMinVersion>
         <DefineConstants>$(DefineConstants);__ANDROID__;MONOANDROID</DefineConstants>
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
