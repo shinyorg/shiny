@@ -1,6 +1,7 @@
 ﻿using System;
 using Foundation;
 using UIKit;
+using UserNotifications;
 
 namespace Shiny.Hosting;
 
@@ -23,6 +24,12 @@ public interface IIosLifecycle
         void OnRegistered(NSData deviceToken);
         void OnFailedToRegister(NSError error);
         void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler);
+    }
+
+    public interface INotificationHandler
+    {
+        void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler);
+        void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler);
     }
 
     public interface IHandleEventsForBackgroundUrl

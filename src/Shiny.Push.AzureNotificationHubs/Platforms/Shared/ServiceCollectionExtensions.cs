@@ -8,7 +8,7 @@ namespace Shiny
 {
     public static class ServiceCollectionExtensions
     {
-        public static bool UsePushAzureNotificationHubs(this IServiceCollection services,
+        public static bool AddPushAzureNotificationHubs(this IServiceCollection services,
                                                         Type delegateType,
                                                         AzureNotificationConfig config)
         {
@@ -16,34 +16,17 @@ namespace Shiny
             return false;
 #else
             services.AddSingleton(config);
-            services.RegisterModule(new PushModule(
-                typeof(PushManager),
-                delegateType
-            ));
+            services.AddPush(typeof(Shiny.Push.AzureNotificationHubs.PushManager), delegateType);
             return true;
 #endif
         }
 
 
-        public static bool UsePushAzureNotificationHubs(this IServiceCollection services,
-                                                        Type delegateType,
-                                                        string listenerConnectionString,
-                                                        string hubName)
-            => services.UsePushAzureNotificationHubs(delegateType, new AzureNotificationConfig(listenerConnectionString, hubName));
-
-
-        public static bool UsePushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services,
-                                                                       string listenerConnectionString,
-                                                                       string hubName)
+        public static bool AddPushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services, AzureNotificationConfig config)
             where TPushDelegate : class, IPushDelegate
-            => services.UsePushAzureNotificationHubs(
+            => services.AddPushAzureNotificationHubs(
                 typeof(TPushDelegate),
-                listenerConnectionString,
-                hubName
+                config
             );
-
-
-        public static bool UsePushAzureNotificationHubs<TPushDelegate>(this IServiceCollection services, AzureNotificationConfig config)
-            => services.UsePushAzureNotificationHubs(typeof(TPushDelegate), config);
     }
 }

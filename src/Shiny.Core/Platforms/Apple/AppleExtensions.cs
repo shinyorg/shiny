@@ -38,6 +38,7 @@ public static class AppleExtensions
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IHandleEventsForBackgroundUrl>();
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IContinueActivity>();
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IApplicationLifecycle>();
+        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.INotificationHandler>();
 
         return services;
     }

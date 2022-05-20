@@ -5,14 +5,14 @@ Shiny.Net.Http
 Shiny.Jobs
 * Needs foreground/background detection for foreground jobs
 
+Shiny.Locations
+* Motion activity needs SQL on droid.... new repository based on sql was to replace this
+
 NFC
 * Finish write
 * Add backgrounding
 
-Push Common
-* iOS - NativeAdapter needs NotificationCenter registration
-
 Repository Conversion
 * Beacons
-* Jobs
 * HTTP Transfers
+* Notifications

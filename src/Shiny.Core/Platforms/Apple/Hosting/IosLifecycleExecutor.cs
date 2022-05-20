@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using UIKit;
+using UserNotifications;
 
 namespace Shiny.Hosting;
 
 
-public class IosLifecycleExecutor
+public class IosLifecycleExecutor : IDisposable
 {
     readonly ILogger logger;
     readonly IEnumerable<IIosLifecycle.IApplicationLifecycle> appHandlers;
@@ -15,6 +16,7 @@ public class IosLifecycleExecutor
     readonly IEnumerable<IIosLifecycle.IContinueActivity> activityHandlers;
     readonly IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers;
     readonly IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers;
+    readonly IEnumerable<IIosLifecycle.INotificationHandler> notificationHandlers;
 
 
     public IosLifecycleExecutor(
@@ -23,7 +25,8 @@ public class IosLifecycleExecutor
         IEnumerable<IIosLifecycle.IOnFinishedLaunching> finishLaunchingHandlers,
         IEnumerable<IIosLifecycle.IHandleEventsForBackgroundUrl> bgUrlHandlers,
         IEnumerable<IIosLifecycle.IContinueActivity> activityHandlers,
-        IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers
+        IEnumerable<IIosLifecycle.IRemoteNotifications> remoteHandlers,
+        IEnumerable<IIosLifecycle.INotificationHandler> notificationHandlers
     )
     {
         this.logger = logger;
@@ -32,16 +35,22 @@ public class IosLifecycleExecutor
         this.bgUrlHandlers = bgUrlHandlers;
         this.remoteHandlers = remoteHandlers;
         this.activityHandlers = activityHandlers;
+        this.notificationHandlers = notificationHandlers;
+
+        UNUserNotificationCenter.Current.Delegate = new ShinyUNUserNotificationCenterDelegate(
+            (response, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnDidReceiveNotificationResponse(response, completionHandler)),
+            (notification, completionHandler) => this.Execute(this.notificationHandlers, x => x.OnWillPresentNotification(notification, completionHandler))
+        );
     }
 
 
     public bool FinishedLaunching(NSDictionary options)
-    { 
+    {
         this.Execute(this.finishLaunchingHandlers, handler => handler.Handle(options));
         return true;
     }
 
-    public void OnRegisteredForRemoteNotifications(NSData deviceToken) 
+    public void OnRegisteredForRemoteNotifications(NSData deviceToken)
         => this.Execute(this.remoteHandlers, x => x.OnRegistered(deviceToken));
 
     public void OnFailedToRegisterForRemoteNotifications(NSError error)
@@ -97,6 +106,8 @@ public class IosLifecycleExecutor
             }
         }
     }
+
+    public void Dispose() => UNUserNotificationCenter.Current.Delegate = null;
 
 
     //public static bool ShinyHandleEventsForBackgroundUrl(this IUIApplicationDelegate _, string sessionUrl, Action completionHandler)

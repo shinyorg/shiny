@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
@@ -13,7 +12,7 @@ using UserNotifications;
 namespace Shiny.Push;
 
 
-public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching, IIosLifecycle.IRemoteNotifications
+public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching, IIosLifecycle.IRemoteNotifications, IIosLifecycle.INotificationHandler
 {
     readonly ILogger logger;
     readonly IPlatform platform;
@@ -119,6 +118,28 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching,
     }
 
 
+    public async void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler)
+    {
+        if (this.OnEntry == null)
+            return;
+
+        if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
+        {
+            this.logger.LogDebug("Foreground remote notification entry detected");
+            var c = response.Notification.Request.Content;
+
+            var notification = new Notification(
+                c.Title,
+                c.Body
+            );
+
+            var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
+            var data = new PushNotification(dict, notification);
+            await this.OnEntry.Invoke(data).ConfigureAwait(false);
+            completionHandler();
+        }
+    }
+    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) { }
     public void OnRegistered(NSData deviceToken) => this.tokenSource?.TrySetResult(deviceToken);
     public void OnFailedToRegister(NSError error) => this.tokenSource?.TrySetException(new Exception(error.LocalizedDescription));
     public async void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
@@ -156,23 +177,4 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching,
         var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
         await this.OnEntry.Invoke(push).ConfigureAwait(false);
     }
-
-
-    //            //this.onEntrySub.Add(this.lifecycle.RegisterForNotificationReceived(async response =>
-    //            //{
-    //            //    if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
-    //            //    {
-    //            //        this.logger.LogDebug("Foreground remote notification entry detected");
-    //            //        var c = response.Notification.Request.Content;
-
-    //            //        var notification = new Notification(
-    //            //            c.Title,
-    //            //            c.Body
-    //            //        );
-
-    //            //        var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
-    //            //        var data = new PushNotification(dict, notification);
-    //            //        await this.onEntry.Invoke(data).ConfigureAwait(false);
-    //            //    }
-    //            //}));
 }

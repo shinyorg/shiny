@@ -10,7 +10,7 @@ namespace Shiny;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddPush(this IServiceCollection services, Type pushManagerType, Type delegateType)
+    public static bool AddPush(this IServiceCollection services, Type pushManagerType, Type delegateType)
     {
 #if IOS || MACCATALYST
         // TODO: can I hook these differently dynamically with selector?
@@ -39,8 +39,9 @@ public static class ServiceCollectionExtensions
         services.TryAddSingleton(typeof(IPushManager), pushManagerType);
         services.AddShinyService<PushContainer>();
         services.AddShinyServiceWithLifecycle<INativeAdapter, NativeAdapter>();
+        return true;
+#else
+        return false;
 #endif
-
-        return services;
     }
 }
