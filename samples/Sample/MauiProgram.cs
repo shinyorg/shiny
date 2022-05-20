@@ -20,6 +20,10 @@ public static class MauiProgram
         builder.Services.AddAllSensors();
         builder.Services.AddNfc();
         builder.Services.AddBeaconRanging();
+        //builder.Services.AddGpsDirectGeofencing<SampleGpsDelegate>();
+        builder.Services.AddGps<SampleGpsDelegate>();
+        builder.Services.AddGeofencing<SampleGeofenceDelegate>();
+        builder.Services.AddMotionActivity();
         builder.Services.AddBeaconMonitoring<SampleBeaconMonitorDelegate>();
         builder.Services.AddShinyService<StartupTask>();
         builder.Services.AddBluetoothLE<SampleBleDelegate>();

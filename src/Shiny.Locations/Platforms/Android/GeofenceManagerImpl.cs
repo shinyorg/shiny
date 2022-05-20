@@ -19,7 +19,7 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     readonly AndroidPlatform platform;
     readonly IServiceProvider services;
-    readonly IRepository repository;
+    readonly IRepository<GeofenceRegion> repository;
     readonly ILogger logger;
 
     readonly GeofencingClient client;
@@ -28,7 +28,7 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 
     public GeofenceManagerImpl(
         AndroidPlatform platform,
-        IRepository repository,
+        IRepository<GeofenceRegion> repository,
         IServiceProvider services,
         ILogger<GeofenceManagerImpl> logger
     )
@@ -73,24 +73,24 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
                 }
             }
         };
-        var regions = await this.repository.GetAll().ConfigureAwait(false);
+        var regions = await this.repository.GetList().ConfigureAwait(false);
         foreach (var region in regions)
             await this.Create(region);
     }
 
 
-    //public override AccessState Status
-    //    => this.context.GetCurrentLocationAccess(true, true, true, true);
-
     public Task<AccessState> RequestAccess()
         => this.platform.RequestBackgroundLocationAccess(LocationPermissionType.FineRequired);
 
+
+    public Task<IList<GeofenceRegion>> GetMonitorRegions()
+        => this.repository.GetList();
 
     public async Task StartMonitoring(GeofenceRegion region)
     {
         (await this.RequestAccess().ConfigureAwait(false)).Assert();
         await this.Create(region).ConfigureAwait(false);
-        await this.repository.Set(region.Identifier, region).ConfigureAwait(false);
+        await this.repository.Set(region).ConfigureAwait(false);
     }
 
 
@@ -101,9 +101,9 @@ public class GeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     }
 
 
-    public override async Task StopAllMonitoring()
+    public async Task StopAllMonitoring()
     {
-        var regions = await this.repository.GetAll().ConfigureAwait(false);
+        var regions = await this.repository.GetList().ConfigureAwait(false);
         var regionIds = regions.Select(x => x.Identifier).ToArray();
         if (regionIds.Any())
             await this.client.RemoveGeofencesAsync(regionIds).ConfigureAwait(false);

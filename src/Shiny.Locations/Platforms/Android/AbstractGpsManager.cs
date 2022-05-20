@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Shiny.Locations;
 
+
 public abstract partial class AbstractGpsManager : IGpsManager, IShinyStartupTask
 {
     readonly Subject<GpsReading> readingSubj;
@@ -83,7 +84,7 @@ public abstract partial class AbstractGpsManager : IGpsManager, IShinyStartupTas
     }
 
 
-    public virtual IObservable<IGpsReading> WhenReading()
+    public virtual IObservable<GpsReading> WhenReading()
         => this.readingSubj;
 
 
@@ -116,7 +117,7 @@ public abstract partial class AbstractGpsManager : IGpsManager, IShinyStartupTas
     }
 
 
-    public abstract IObservable<IGpsReading?> GetLastReading();
+    public abstract IObservable<GpsReading?> GetLastReading();
     protected abstract Task RequestLocationUpdates(GpsRequest request);
     protected abstract Task RemoveLocationUpdates();
 }

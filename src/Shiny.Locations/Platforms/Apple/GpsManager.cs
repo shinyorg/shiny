@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using CoreLocation;
+using Foundation;
 using Microsoft.Extensions.Logging;
 using UIKit;
 
@@ -10,17 +14,34 @@ namespace Shiny.Locations;
 
 public partial class GpsManager : IGpsManager, IShinyStartupTask
 {
+    readonly Subject<GpsReading> readingSubj = new();
+    readonly Lazy<IEnumerable<IGpsDelegate>> delegates;
     readonly CLLocationManager locationManager;
-    readonly GpsManagerDelegate gdelegate;
     readonly ILogger logger;
 
 
-    public GpsManager(ILogger<IGpsManager> logger)
+    public GpsManager(
+        IServiceProvider services,
+        ILogger<IGpsManager> logger
+     )
     {
+        this.delegates = services.GetLazyService<IEnumerable<IGpsDelegate>>();
         this.logger = logger;
-        this.gdelegate = new GpsManagerDelegate();
-        this.locationManager = new CLLocationManager { Delegate = this.gdelegate };
+        this.locationManager = new CLLocationManager { Delegate = new GpsManagerDelegate(this) };
     }
+
+
+    internal async void LocationsUpdated(CLLocation[] locations)
+    {
+        var reading = locations.Last().FromNative();
+        await this.delegates
+            .Value
+            .RunDelegates(x => x.OnReading(reading))
+            .ConfigureAwait(false);
+
+        this.readingSubj.OnNext(reading);
+    }
+    internal void OnFailed(NSError error) {}
 
 
     public async void Start()
@@ -32,6 +53,8 @@ public partial class GpsManager : IGpsManager, IShinyStartupTask
                 // only auto-start if auth status was changed to FULL authorized, not restricted
                 if (this.locationManager.AuthorizationStatus == CLAuthorizationStatus.Authorized)
                     await this.StartListenerInternal(this.CurrentListener);
+                else
+                    this.logger.LogInformation("User has removed location permissions");
             }
             catch (Exception ex)
             {
@@ -39,6 +62,9 @@ public partial class GpsManager : IGpsManager, IShinyStartupTask
             }
         }
     }
+
+
+    public IObservable<GpsReading> WhenReading() => this.readingSubj;
 
 
     public async Task<AccessState> RequestAccess(GpsRequest request)
@@ -98,9 +124,7 @@ public partial class GpsManager : IGpsManager, IShinyStartupTask
 
     public Task StopListener()
     {
-#if __IOS__
         this.locationManager.AllowsBackgroundLocationUpdates = false;
-#endif
         this.locationManager.StopUpdatingLocation();
         this.CurrentListener = null;
 
@@ -111,7 +135,6 @@ public partial class GpsManager : IGpsManager, IShinyStartupTask
     protected virtual async Task StartListenerInternal(GpsRequest request)
     {
         (await this.RequestAccess(request).ConfigureAwait(false)).Assert();
-        this.gdelegate.Request = request;
 
         switch (request.Accuracy)
         {
@@ -139,12 +162,8 @@ public partial class GpsManager : IGpsManager, IShinyStartupTask
                 this.locationManager.DesiredAccuracy = CLLocation.AccuracyThreeKilometers;
                 break;
         }
-#if __IOS__
         this.locationManager.AllowsBackgroundLocationUpdates = request.BackgroundMode != GpsBackgroundMode.None;
-#endif
         this.locationManager.StartUpdatingLocation();
         this.CurrentListener = request;
     }
-
-    public IObservable<GpsReading> WhenReading() => this.gdelegate.WhenGps();
 }

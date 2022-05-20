@@ -9,11 +9,12 @@
         <ProjectReference Include="..\Shiny.Core\Shiny.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsStandardBuild)' != 'true'">
+    <ItemGroup Condition="'$(IsIosBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true' OR '$(IsWindowsBuild)' == 'true'">
+    <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.BluetoothLE\Shiny.BluetoothLE.csproj" />
+        <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
     </ItemGroup>
 </Project>

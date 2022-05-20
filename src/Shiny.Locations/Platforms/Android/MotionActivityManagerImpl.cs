@@ -119,7 +119,7 @@ public class MotionActivityManagerImpl : NotifyPropertyChanged, IMotionActivityM
 
         if (this.platform.IsMinApiLevel(29))
         {
-            result = await this.plaform
+            result = await this.platform
                 .RequestAccess(Permission.ActivityRecognition)
                 .ToTask()
                 .ConfigureAwait(false);

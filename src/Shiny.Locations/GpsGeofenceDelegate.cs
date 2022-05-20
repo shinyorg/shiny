@@ -19,7 +19,7 @@ public class GpsGeofenceDelegate : NotifyPropertyChanged, IGpsDelegate
     }
 
 
-    public async Task OnReading(IGpsReading reading)
+    public async Task OnReading(GpsReading reading)
     {
         var geofences = await this.geofenceManager
             .GetMonitorRegions()

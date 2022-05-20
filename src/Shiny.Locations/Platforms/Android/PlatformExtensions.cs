@@ -1,6 +1,4 @@
 ﻿using System;
-
-using Android.Gms.Location;
 using Android.Locations;
 using LocationRequest = Android.Gms.Location.LocationRequest;
 

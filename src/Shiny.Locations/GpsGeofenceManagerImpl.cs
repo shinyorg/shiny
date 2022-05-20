@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Shiny.Stores;
 
 namespace Shiny.Locations;
 
 
 public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
 {
+    readonly IRepository<GeofenceRegion> repository;
     readonly IGpsManager gpsManager;
 
 
@@ -20,23 +23,30 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     };
 
 
-    public GpsGeofenceManagerImpl(IRepository repository, IGpsManager gpsManager) : base(repository)
-        => this.gpsManager = gpsManager;
+    public GpsGeofenceManagerImpl(IRepository<GeofenceRegion> repository, IGpsManager gpsManager)
+    {
+        this.repository = repository;
+        this.gpsManager = gpsManager;
+    }
 
 
     public async void Start()
     {
-        var restore = await this.GetMonitorRegions();
+        var restore = await this.repository.GetList().ConfigureAwait(false);
         if (restore.Any())
             await this.TryStartGps();
     }
 
 
-    public override Task<AccessState> RequestAccess()
+    public Task<AccessState> RequestAccess()
         => this.gpsManager.RequestAccess(defaultRequest);
 
 
-    public override async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
+    public Task<IList<GeofenceRegion>> GetMonitorRegions()
+        => this.repository.GetList();
+
+
+    public async Task<GeofenceState> RequestState(GeofenceRegion region, CancellationToken cancelToken = default)
     {
         var reading = await this.gpsManager!
             .GetLastReading()
@@ -54,24 +64,24 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     }
 
 
-    public override async Task StartMonitoring(GeofenceRegion region)
+    public async Task StartMonitoring(GeofenceRegion region)
     {
-        await this.TryStartGps();
-        await this.Repository.Set(region.Identifier, region);
+        await this.TryStartGps().ConfigureAwait(false);
+        await this.repository.Set(region).ConfigureAwait(false);
     }
 
 
-    public override async Task StopAllMonitoring()
+    public async Task StopAllMonitoring()
     {
-        await this.Repository.Clear();
-        await this.gpsManager.StopListener();
+        await this.repository.Clear().ConfigureAwait(false);
+        await this.gpsManager.StopListener().ConfigureAwait(false);
     }
 
 
-    public override async Task StopMonitoring(string identifier)
+    public async Task StopMonitoring(string identifier)
     {
-        await this.Repository.Remove(identifier);
-        var geofences = await this.Repository.GetAll();
+        await this.repository.Remove(identifier).ConfigureAwait(false);
+        var geofences = await this.repository.GetList().ConfigureAwait(false);
 
         if (geofences.Count == 0)
             await this.gpsManager!.StopListener();
@@ -81,6 +91,6 @@ public class GpsGeofenceManagerImpl : IGeofenceManager, IShinyStartupTask
     protected async Task TryStartGps()
     {
         if (this.gpsManager.CurrentListener == null)
-            await this.gpsManager.StartListener(defaultRequest);
+            await this.gpsManager.StartListener(defaultRequest).ConfigureAwait(false);
     }
 }

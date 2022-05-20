@@ -1,11 +1,13 @@
-﻿namespace Shiny.Locations;
+﻿using Shiny.Stores;
+
+namespace Shiny.Locations;
 
 
 public record GeofenceRegion(
     string Identifier,
     Position Center,
     Distance Radius
-)
+) : IStoreEntity
 {
     /// <summary>
     /// Determines if this region is single use.
