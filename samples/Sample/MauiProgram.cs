@@ -52,6 +52,12 @@ public static class MauiProgram
         // shiny.push
         builder.Services.AddPush<SamplePushDelegate>();
 
+        // shiny.push.azurenotificationhubs
+        //builder.Services.AddPushAzureNotificationHubs<SamplePushDelegate>(new AzureNotificationConfig(
+        //    "YourListenerConnectionString",
+        //    "HubName"
+        //));
+
         // shiny.jobs
         builder.Services.AddJob(typeof(SampleJob));
         builder.Services.AddJobs(); // not required if using above
