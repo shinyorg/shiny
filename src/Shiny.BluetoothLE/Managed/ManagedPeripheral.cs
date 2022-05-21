@@ -101,60 +101,43 @@ public class ManagedPeripheral : NotifyPropertyChanged, IDisposable, IManagedPer
 
     public bool IsMonitoringRssi => this.rssiSub != null;
 
-    // TODO: how to fire multiple whenReadys, doonce? // finally could remove whenReady?
-    public IObservable<byte[]?> WhenNotificationReceived(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvalable, Action? whenReady) =>
-        this.GetNotificationObservable(serviceUuid, characteristicUuid, useIndicationsIfAvalable);
 
-
-    readonly Dictionary<string, IObservable<byte[]?>> observables = new Dictionary<string, IObservable<byte[]?>>();
-    protected IObservable<byte[]?> GetNotificationObservable(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvalable)
-    {
-        var key = $"{serviceUuid}-{characteristicUuid}";
-        if (!this.observables.ContainsKey(key))
-        {
-            lock (this.observables)
+    public IObservable<byte[]?> WhenNotificationReceived(string serviceUuid, string characteristicUuid, bool useIndicationsIfAvalable, Action? whenReady) => this
+        .Peripheral
+            .WhenConnected()
+            .Select(x => this.GetChar(serviceUuid, characteristicUuid))
+            .Switch()
+            .Select(x => x.EnableNotifications(true, useIndicationsIfAvalable))
+            .Switch()
+            .Select(x =>
             {
-                this.observables[key] ??= this.Peripheral
-                    .WhenConnected()
-                    .Select(x => this.GetChar(serviceUuid, characteristicUuid))
-                    .Switch()
-                    .Select(x => x.EnableNotifications(true, useIndicationsIfAvalable))
-                    .Switch()
-                    .Select(x =>
-                    {
-                        var ch = this.GetInfo(serviceUuid, characteristicUuid);
-                        ch.IsNotificationsEnabled = true;
-                        ch.UseIndicationIfAvailable = useIndicationsIfAvalable;
+                var ch = this.GetInfo(serviceUuid, characteristicUuid);
+                ch.IsNotificationsEnabled = true;
+                ch.UseIndicationIfAvailable = useIndicationsIfAvalable;
 
-                        //whenReady?.Invoke();
-                        return x.WhenNotificationReceived();
-                    })
-                    .Switch()
-                    .Select(x => x.Data)
-                    .Finally(async () =>
-                    {
-                        var ch = this.GetInfo(serviceUuid, characteristicUuid);
-                        ch.IsNotificationsEnabled = false;
-                        ch.UseIndicationIfAvailable = false;
+                whenReady?.Invoke();
+                return x.WhenNotificationReceived();
+            })
+            .Switch()
+            .Select(x => x.Data)
+            .Finally(async () =>
+            {
+                var ch = this.GetInfo(serviceUuid, characteristicUuid);
+                ch.IsNotificationsEnabled = false;
+                ch.UseIndicationIfAvailable = false;
 
-                        if (ch.Characteristic != null)
-                        {
-                            try
-                            {
-                                await ch.Characteristic.EnableNotifications(false).ToTask();
-                            }
-                            catch (Exception ex)
-                            {
-                                this.logger.LogWarning("Unable to cleanly unhook peripheral", ex);
-                            }
-                        }
-                    })
-                    .Publish()
-                    .RefCount();
-            }
-        }
-        return this.observables[key];
-    }
+                if (ch.Characteristic != null)
+                {
+                    try
+                    {
+                        await ch.Characteristic.EnableNotifications(false).ToTask();
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogWarning("Unable to cleanly unhook peripheral", ex);
+                    }
+                }
+            });
 
 
     public IReadOnlyList<GattCharacteristicInfo> Characteristics => this.characteristics.AsReadOnly();

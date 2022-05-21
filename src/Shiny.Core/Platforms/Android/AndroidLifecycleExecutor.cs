@@ -39,13 +39,26 @@ public class AndroidLifecycleExecutor : Java.Lang.Object, ILifecycleObserver, ID
 
     [Lifecycle.Event.OnResume]
     [Export]
-    public void OnResume() 
-        => this.Execute(this.appHandlers, x => x.OnForeground());
+    public void OnResume()
+    {
+        this.Execute(this.appHandlers, x => x.OnForeground());
+        Console.WriteLine("LIFECYCLE: OnResume");
+    }
 
     [Lifecycle.Event.OnPause]
     [Export]
-    public void OnPause() 
-        => this.Execute(this.appHandlers, x => x.OnBackground());
+    public void OnPause()
+    {
+        this.Execute(this.appHandlers, x => x.OnBackground());
+        Console.WriteLine("LIFECYCLE: OnResume");
+    }
+
+    [Lifecycle.Event.OnDestroy]
+    [Export]
+    public void OnDestroy()
+    {
+        Console.WriteLine("LIFECYCLE: OnDestory");
+    }
 
     public void OnRequestPermissionsResult(Activity activity, int requestCode, string[] permissions, Permission[] grantResults)
         => this.Execute(this.permissionHandlers, x => x.Handle(activity, requestCode, permissions, grantResults));
