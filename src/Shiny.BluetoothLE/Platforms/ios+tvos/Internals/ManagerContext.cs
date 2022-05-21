@@ -77,6 +77,9 @@ namespace Shiny.BluetoothLE.Internals
 #if __IOS__
             //this.Manager = central;
             var peripheralArray = (NSArray)dict[CBCentralManager.RestoredStatePeripheralsKey];
+            if (peripheralArray == null)
+                return;
+                
             for (nuint i = 0; i < peripheralArray.Count; i++)
             {
                 var item = peripheralArray.GetItem<CBPeripheral>(i);
