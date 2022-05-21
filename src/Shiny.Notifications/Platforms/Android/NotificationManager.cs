@@ -1,176 +1,188 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Shiny.Infrastructure;
+using Android.Content;
+using Shiny.Hosting;
 using Shiny.Locations;
+using Shiny.Stores;
+
+namespace Shiny.Notifications;
 
 
-namespace Shiny.Notifications
+public partial class NotificationManager : INotificationManager, IAndroidLifecycle.IOnActivityNewIntent
 {
-    public partial class NotificationManager : INotificationManager
+    const string AndroidBadgeCountKey = "AndroidBadge";
+
+    readonly Lazy<AndroidNotificationProcessor> processor;
+    readonly AndroidPlatform platform;
+    readonly IChannelManager channelManager;
+    readonly AndroidNotificationManager manager;
+    readonly IRepository<Notification> repository;
+    readonly IGeofenceManager geofenceManager;
+    readonly IKeyValueStore settings;
+
+
+    public NotificationManager(
+        IServiceProvider services,
+        AndroidPlatform platform,
+        AndroidNotificationManager manager,
+        IChannelManager channelManager,
+        IGeofenceManager geofenceManager,
+        IKeyValueStoreFactory keystore
+    )
     {
-        readonly ShinyCoreServices core;
-        readonly IChannelManager channelManager;
-        readonly AndroidNotificationManager manager;
-        readonly IGeofenceManager geofenceManager;
+        this.processor = services.GetLazyService<AndroidNotificationProcessor>();
+        this.platform = platform;
+        this.manager = manager;
+        this.channelManager = channelManager;
+        this.geofenceManager = geofenceManager;
+        this.settings = keystore.DefaultStore;
+    }
 
 
-        public NotificationManager(
-            ShinyCoreServices core,
-            AndroidNotificationManager manager,
-            IChannelManager channelManager,
-            IGeofenceManager geofenceManager
-        )
+    public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
+    public Task RemoveChannel(string channelId) => this.DeleteChannel(this.channelManager, channelId);
+    public Task ClearChannels() => this.DeleteAllChannels(this.channelManager);
+    public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
+
+
+    public async Task Cancel(int id)
+    {
+        var notification = await this.repository.Get(id.ToString()).ConfigureAwait(false);
+        if (notification != null)
         {
-            this.core = core;
-            this.manager = manager;
-            this.channelManager = channelManager;
-            this.geofenceManager = geofenceManager;
-
-            this.core
-                .Platform
-                .WhenIntentReceived()
-                .SubscribeAsync(x => this
-                    .core
-                    .Services
-                    .Resolve<AndroidNotificationProcessor>()!
-                    .TryProcessIntent(x.Intent)
-                );
+            await this.CancelInternal(notification).ConfigureAwait(false);
+            await this.repository.Remove(id.ToString()).ConfigureAwait(false);
         }
+    }
 
 
-        public Task AddChannel(Channel channel) => this.channelManager.Add(channel);
-        public Task RemoveChannel(string channelId) => this.DeleteChannel(this.channelManager, channelId);
-        public Task ClearChannels() => this.DeleteAllChannels(this.channelManager);
-        public Task<IList<Channel>> GetChannels() => this.channelManager.GetAll();
-
-
-        public async Task Cancel(int id)
+    public async Task Cancel(CancelScope scope = CancelScope.All)
+    {
+        if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
         {
-            var notification = await this.core.Repository.Get<Notification>(id.ToString());
-            if (notification != null)
-            {
-                await this.CancelInternal(notification);
-                await this.core.Repository.Remove<Notification>(id.ToString());
-            }
+            this.manager.NativeManager.CancelAll();
         }
-
-
-        public async Task Cancel(CancelScope scope = CancelScope.All)
+        if (scope == CancelScope.All || scope == CancelScope.Pending)
         {
-            if (scope == CancelScope.All || scope == CancelScope.DisplayedOnly)
+            var notifications = await this.repository.GetList();
+            foreach (var notification in notifications)
             {
-                this.manager.NativeManager.CancelAll();
+                await this.CancelInternal(notification).ConfigureAwait(false);
             }
-            if (scope == CancelScope.All || scope == CancelScope.Pending)
-            {
-                var notifications = await this.core.Repository.GetList<Notification>();
-                foreach (var notification in notifications)
-                {
-                    await this.CancelInternal(notification).ConfigureAwait(false);
-                }
-                await this.core
-                    .Repository
-                    .Clear<Notification>()
-                    .ConfigureAwait(false);
-            }
+            await this.repository
+                .Clear()
+                .ConfigureAwait(false);
         }
+    }
 
 
-        public Task<Notification?> GetNotification(int notificationId)
-            => this.core.Repository.Get<Notification>(notificationId.ToString());
+    public Task<Notification?> GetNotification(int notificationId)
+        => this.repository.Get(notificationId.ToString());
 
 
-        public async Task<IEnumerable<Notification>> GetPendingNotifications()
-            => await this.core.Repository.GetList<Notification>().ConfigureAwait(false);
+    public async Task<IEnumerable<Notification>> GetPendingNotifications()
+        => await this.repository.GetList().ConfigureAwait(false);
 
 
-        public async Task<AccessState> RequestAccess(AccessRequestFlags access)
+    public async Task<AccessState> RequestAccess(AccessRequestFlags access)
+    {
+        if (!this.manager.NativeManager.AreNotificationsEnabled())
+            return AccessState.Disabled;
+
+        if (access.HasFlag(AccessRequestFlags.LocationAware))
         {
-            if (!this.manager.NativeManager.AreNotificationsEnabled())
-                return AccessState.Disabled;
-
-            if (access.HasFlag(AccessRequestFlags.LocationAware))
-            {
-                var locPermission = await this.geofenceManager.RequestAccess();
-                if (locPermission != AccessState.Available)
-                    return AccessState.Restricted;
-            }
-            if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !this.manager.Alarms.CanScheduleExactAlarms())
+            var locPermission = await this.geofenceManager.RequestAccess();
+            if (locPermission != AccessState.Available)
                 return AccessState.Restricted;
-
-            return AccessState.Available;
         }
+        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !this.manager.Alarms.CanScheduleExactAlarms())
+            return AccessState.Restricted;
+
+        return AccessState.Available;
+    }
 
 
-        public async Task Send(Notification notification)
+    public async Task Send(Notification notification)
+    {
+        notification.AssertValid();
+
+        // TODO: should I cancel an existing id if the user is setting it?
+        if (notification.Id == 0)
+            notification.Id = this.settings.IncrementValue("NotificationId");
+
+        var channel = await this.channelManager.Get(notification.Channel ?? Channel.Default.Identifier);
+        if (channel == null)
+            throw new InvalidProgramException("There is no default channel!!");
+
+        var builder = this.manager.CreateNativeBuilder(notification, channel!);
+
+        if (notification.Geofence != null)
         {
-            notification.AssertValid();
-
-            // TODO: should I cancel an existing id if the user is setting it?
-            if (notification.Id == 0)
-                notification.Id = this.core.Settings.IncrementValue("NotificationId");
-
-            var channel = await this.channelManager.Get(notification.Channel ?? Channel.Default.Identifier);
-            if (channel == null)
-                throw new InvalidProgramException("There is no default channel!!");
-
-            var builder = this.manager.CreateNativeBuilder(notification, channel!);
-
-            if (notification.Geofence != null)
-            {
-                await this.geofenceManager.StartMonitoring(new GeofenceRegion(
-                    AndroidNotificationProcessor.GetGeofenceId(notification),
-                    notification.Geofence!.Center!,
-                    notification.Geofence!.Radius!
-                ));
-            }
-            else if (notification.RepeatInterval != null)
-            {
-                // calc first date if repeating interval
-                notification.ScheduleDate = notification.RepeatInterval!.CalculateNextAlarm();
-            }
-
-            if (notification.ScheduleDate == null && notification.Geofence == null)
-            {
-                this.manager.SendNative(notification.Id, builder.Build());
-                if (notification.BadgeCount != null)
-                    this.core.SetBadgeCount(notification.BadgeCount.Value);
-            }
-            else
-            {
-                // ensure a channel is set
-                notification.Channel = channel!.Identifier;
-                await this.core.Repository.Set(notification.Id.ToString(), notification);
-
-                if (notification.ScheduleDate != null)
-                    this.manager.SetAlarm(notification);
-            }
+            await this.geofenceManager.StartMonitoring(new GeofenceRegion(
+                AndroidNotificationProcessor.GetGeofenceId(notification),
+                notification.Geofence!.Center!,
+                notification.Geofence!.Radius!
+            ));
         }
-
-
-        public Task<int> GetBadge()
-            => Task.FromResult(this.core.GetBadgeCount());
-
-
-        public Task SetBadge(int? badge)
+        else if (notification.RepeatInterval != null)
         {
-            this.core.SetBadgeCount(badge ?? 0);
-            return Task.CompletedTask;
+            // calc first date if repeating interval
+            notification.ScheduleDate = notification.RepeatInterval!.CalculateNextAlarm();
         }
 
-
-        protected virtual async Task CancelInternal(Notification notification)
+        if (notification.ScheduleDate == null && notification.Geofence == null)
         {
-            if (notification.Geofence != null)
-            {
-                var geofenceId = AndroidNotificationProcessor.GetGeofenceId(notification);
-                await this.geofenceManager.StopMonitoring(geofenceId);
-            }
-            if (notification.ScheduleDate != null || notification.RepeatInterval != null)
-                this.manager.CancelAlarm(notification);
-
-            this.manager.NativeManager.Cancel(notification.Id);
+            this.manager.SendNative(notification.Id, builder.Build());
+            if (notification.BadgeCount != null)
+                await this.SetBadge(notification.BadgeCount.Value).ConfigureAwait(false);
         }
+        else
+        {
+            // ensure a channel is set
+            notification.Channel = channel!.Identifier;
+            await this.repository.Set(notification).ConfigureAwait(false);
+
+            if (notification.ScheduleDate != null)
+                this.manager.SetAlarm(notification);
+        }
+    }
+
+
+    public Task<int> GetBadge()
+        => Task.FromResult(this.settings.Get(AndroidBadgeCountKey, 0));
+
+
+    public Task SetBadge(int? badge)
+    {
+        var value = badge ?? 0;
+        this.settings.Set(AndroidBadgeCountKey, value);
+
+        if (badge <= 0)
+            global::XamarinShortcutBadger.ShortcutBadger.RemoveCount(this.platform.AppContext);
+        else
+            global::XamarinShortcutBadger.ShortcutBadger.ApplyCount(this.platform.AppContext, value);
+
+        return Task.CompletedTask;
+    }
+
+
+    protected virtual async Task CancelInternal(Notification notification)
+    {
+        if (notification.Geofence != null)
+        {
+            var geofenceId = AndroidNotificationProcessor.GetGeofenceId(notification);
+            await this.geofenceManager.StopMonitoring(geofenceId);
+        }
+        if (notification.ScheduleDate != null || notification.RepeatInterval != null)
+            this.manager.CancelAlarm(notification);
+
+        this.manager.NativeManager.Cancel(notification.Id);
+    }
+
+
+    public void Handle(Android.App.Activity activity, Intent intent)
+    {
+        this.processor.Value.TryProcessIntent(intent);
     }
 }

@@ -2,12 +2,17 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Beacons;
+using Shiny.Beacons.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny;
 
 
 public static class ServiceCollectionExtensions
 {
+    public static IBeaconRangingManager BeaconRanging(this ShinyContainer container) => container.GetService<IBeaconRangingManager>();
+    public static IBeaconMonitoringManager BeaconMonitoring(this ShinyContainer container) => container.GetService<IBeaconMonitoringManager>();
+
     /// <summary>
     /// Register the beacon service with this if you only plan to use ranging
     /// </summary>
@@ -38,14 +43,14 @@ public static class ServiceCollectionExtensions
 #if !IOS && !MACCATALYST && !ANDROID
         return false;
 #else
-        if (delegateType == null)
-            throw new ArgumentException("You can't register monitoring regions without a delegate type");
+        ArgumentNullException.ThrowIfNull(delegateType, "You can't register monitoring regions without a delegate type");
 
 #if ANDROID
         services.TryAddSingleton<BackgroundTask>();
         services.AddBluetoothLE();
 #endif
         services.AddSingleton(typeof(IBeaconMonitorDelegate), delegateType);
+        services.AddRepository<BeaconRegionStoreConverter, BeaconRegion>();
         services.TryAddSingleton<IBeaconMonitoringManager, BeaconMonitoringManager>();
         return true;
 #endif

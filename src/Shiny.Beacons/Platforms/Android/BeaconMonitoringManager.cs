@@ -15,7 +15,7 @@ namespace Shiny.Beacons;
 
 public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyStartupTask
 {
-    readonly IRepository repository;
+    readonly IRepository<BeaconRegion> repository;
     readonly IBleManager bleManager;
     readonly IMessageBus messageBus;
 #if ANDROID
@@ -25,7 +25,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public BeaconMonitoringManager(
         IBleManager bleManager,
-        IRepository repository,
+        IRepository<BeaconRegion> repository,
         IMessageBus messageBus
 #if ANDROID
        , AndroidPlatform platform
@@ -51,7 +51,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public async Task StartMonitoring(BeaconRegion region)
     {
-        var stored = await this.repository.Set(region.Identifier, region);
+        var stored = await this.repository.Set(region).ConfigureAwait(false);
         var eventType = stored ? BeaconRegisterEventType.Add : BeaconRegisterEventType.Update;
         this.messageBus.Publish(new BeaconRegisterEvent(eventType, region));
         this.StartService();
@@ -61,19 +61,19 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
     public async Task StopMonitoring(string identifier)
     {
         var region = await this.repository
-            .Get<BeaconRegion>(identifier)
+            .Get(identifier)
             .ConfigureAwait(false);
 
         if (region != null)
         {
             await this.repository
-                .Remove<BeaconRegion>(identifier)
+                .Remove(identifier)
                 .ConfigureAwait(false);
 
             this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Remove, region));
 
             var regions = await this.repository
-                .GetList<BeaconRegion>()
+                .GetList()
                 .ConfigureAwait(false);
 
             if (regions.Count == 0)
@@ -84,7 +84,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
     public async Task StopAllMonitoring()
     {
-        await this.repository.Clear<BeaconRegion>().ConfigureAwait(false);
+        await this.repository.Clear().ConfigureAwait(false);
         this.messageBus.Publish(new BeaconRegisterEvent(BeaconRegisterEventType.Clear, null));
         this.StopService();
     }
@@ -112,7 +112,7 @@ public partial class BeaconMonitoringManager : IBeaconMonitoringManager, IShinyS
 
 
     public async Task<IEnumerable<BeaconRegion>> GetMonitoredRegions()
-        => await this.repository.GetList<BeaconRegion>().ConfigureAwait(false);
+        => await this.repository.GetList().ConfigureAwait(false);
 
 
     void StartService()

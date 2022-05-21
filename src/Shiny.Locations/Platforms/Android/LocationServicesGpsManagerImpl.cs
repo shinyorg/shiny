@@ -6,73 +6,69 @@ using Android.OS;
 using Microsoft.Extensions.Logging;
 using AContext = Android.Content.Context;
 
+namespace Shiny.Locations;
 
-namespace Shiny.Locations
+
+public class LocationServicesGpsManagerImpl : AbstractGpsManager
 {
-    public class LocationServicesGpsManagerImpl : AbstractGpsManager
+    readonly LocationManager client;
+    public LocationServicesGpsManagerImpl(AndroidPlatform platform, ILogger<LocationServicesGpsManagerImpl> logger) : base(platform, logger)
+        => this.client = platform.GetSystemService<LocationManager>(AContext.LocationService);
+
+
+    public override IObservable<GpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
     {
-        readonly LocationManager client;
-        public LocationServicesGpsManagerImpl(IPlatform context, ILogger<LocationServicesGpsManagerImpl> logger) : base(context, logger)
-            => this.client = context.GetSystemService<LocationManager>(AContext.LocationService);
+        (await this.RequestAccess(GpsRequest.Foreground)).Assert(null, true);
 
-
-        public override IObservable<IGpsReading?> GetLastReading() => Observable.FromAsync(async ct =>
+        var criteria = new Criteria
         {
-            (await this.RequestAccess(GpsRequest.Foreground)).Assert(null, true);
+            BearingRequired = false,
+            AltitudeRequired = false,
+            SpeedRequired = false
+        };
+        // Accuracy - Coarse, Fine, Low, Medium, High, NoRequirement
+        //criteria.Accuracy = Accuracy.Coarse
+        //criteria.HorizontalAccuracy = Accuracy.Coarse
+        //SpeedRequired
+        //criteria.SpeedAccuracy = Accuracy.Coarse;
+        //BearingRequired
+        //criteria.BearingAccuracy = Accuracy.Coarse;
+        //criteria.VerticalAccuracy = Accuracy.Coarse
+        var location = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, true));
+        return location?.FromNative();
+    });
 
-            var criteria = new Criteria
+
+    protected override Task RequestLocationUpdates(GpsRequest request)
+    {
+        var criteria = new Criteria
+        {
+            BearingRequired = true,
+            AltitudeRequired = true,
+            SpeedRequired = true
+        };
+
+        this.client.RequestLocationUpdates(
+            0,
+            request.Accuracy switch
             {
-                BearingRequired = false,
-                AltitudeRequired = false,
-                SpeedRequired = false
-            };
-            // Accuracy - Coarse, Fine, Low, Medium, High, NoRequirement
-            //criteria.Accuracy = Accuracy.Coarse
-            //criteria.HorizontalAccuracy = Accuracy.Coarse
-            //SpeedRequired
-            //criteria.SpeedAccuracy = Accuracy.Coarse;
-            //BearingRequired
-            //criteria.BearingAccuracy = Accuracy.Coarse;
-            //criteria.VerticalAccuracy = Accuracy.Coarse
-            var location = this.client.GetLastKnownLocation(this.client.GetBestProvider(criteria, true));
-            if (location != null)
-                return new GpsReading(location);
-
-            return null;
-        });
+                GpsAccuracy.Highest => 0F,
+                GpsAccuracy.High => 10F,
+                GpsAccuracy.Normal => 100F,
+                GpsAccuracy.Low => 1000F,
+                GpsAccuracy.Lowest => 3000F
+            },
+            criteria,
+            this.Callback,
+            Looper.MainLooper
+        );
+        return Task.CompletedTask;
+    }
 
 
-        protected override Task RequestLocationUpdates(GpsRequest request)
-        {
-            var criteria = new Criteria
-            {
-                BearingRequired = true,
-                AltitudeRequired = true,
-                SpeedRequired = true
-            };
-
-            this.client.RequestLocationUpdates(
-                0,
-                request.Accuracy switch
-                {
-                    GpsAccuracy.Highest => 0F,
-                    GpsAccuracy.High => 10F,
-                    GpsAccuracy.Normal => 100F,
-                    GpsAccuracy.Low => 1000F,
-                    GpsAccuracy.Lowest => 3000F
-                },
-                criteria,
-                this.Callback,
-                Looper.MainLooper
-            );
-            return Task.CompletedTask;
-        }
-
-
-        protected override Task RemoveLocationUpdates()
-        {
-            this.client.RemoveUpdates(this.Callback);
-            return Task.CompletedTask;
-        }
+    protected override Task RemoveLocationUpdates()
+    {
+        this.client.RemoveUpdates(this.Callback);
+        return Task.CompletedTask;
     }
 }

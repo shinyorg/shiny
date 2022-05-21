@@ -6,136 +6,135 @@ using System.Threading.Tasks;
 using CoreMotion;
 using Foundation;
 
+namespace Shiny.Locations;
 
-namespace Shiny.Locations
+
+public class MotionActivityManagerImpl : IMotionActivityManager
 {
-    public class MotionActivityManagerImpl : IMotionActivityManager
+    readonly CMMotionActivityManager activityManager = new();
+
+
+    public async Task<AccessState> RequestAccess()
     {
-        readonly CMMotionActivityManager activityManager = new CMMotionActivityManager();
+        if (!CMMotionActivityManager.IsActivityAvailable)
+            return AccessState.NotSupported;
 
-
-        public async Task<AccessState> RequestAccess()
+        switch (CMMotionActivityManager.AuthorizationStatus)
         {
-            if (!CMMotionActivityManager.IsActivityAvailable)
-                return AccessState.NotSupported;
+            case CMAuthorizationStatus.Denied     : return AccessState.Denied;
+            case CMAuthorizationStatus.Restricted : return AccessState.Restricted;
+            case CMAuthorizationStatus.Authorized : return AccessState.Available;
 
-            switch (CMMotionActivityManager.AuthorizationStatus)
-            {
-                case CMAuthorizationStatus.Denied     : return AccessState.Denied;
-                case CMAuthorizationStatus.Restricted : return AccessState.Restricted;
-                case CMAuthorizationStatus.Authorized : return AccessState.Available;
+            case CMAuthorizationStatus.NotDetermined:
+            default:
+                var tcs = new TaskCompletionSource<AccessState>();
 
-                case CMAuthorizationStatus.NotDetermined:
-                default:
-                    var tcs = new TaskCompletionSource<AccessState>();
-
-                    this.activityManager.QueryActivity(
-                        NSDate.Now,
-                        NSDate.Now,
-                        NSOperationQueue.MainQueue,
-                        (_, e) =>
-                        {
-                            if (e == null)
-                            {
-                                tcs.SetResult(AccessState.Available);
-                            }
-                            else
-                            {
-                                switch (e.Code)
-                                {
-                                    case (int)CMError.MotionActivityNotAuthorized:
-                                        tcs.SetResult(AccessState.Denied);
-                                        break;
-
-                                    case (int)CMError.MotionActivityNotAvailable:
-                                        tcs.SetResult(AccessState.NotSupported);
-                                        break;
-
-                                    case (int)CMError.MotionActivityNotEntitled:
-                                        tcs.SetResult(AccessState.NotSetup);
-                                        break;
-                                }
-                            }
-                        }
-                    );
-                    return await tcs.Task.ConfigureAwait(false);
-            }
-        }
-
-
-        public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
-        {
-            (await this.RequestAccess().ConfigureAwait(false)).Assert();
-
-            end = end ?? DateTimeOffset.UtcNow;
-            var results = await this.activityManager
-                .QueryActivityAsync(
-                    (NSDate)start.LocalDateTime,
-                    (NSDate)end.Value.LocalDateTime,
-                    NSOperationQueue.MainQueue
-                )
-                .ConfigureAwait(false);
-
-            return results
-                .Select(x => ToEvent(x))
-                .ToList();
-        }
-
-
-        IObservable<MotionActivityEvent>? activityObs;
-        public IObservable<MotionActivityEvent> WhenActivityChanged()
-        {
-            this.activityObs ??= Observable
-                .Create<MotionActivityEvent>(ob =>
-                {
-                    this.RequestAccess().ContinueWith(result =>
+                this.activityManager.QueryActivity(
+                    NSDate.Now,
+                    NSDate.Now,
+                    NSOperationQueue.MainQueue,
+                    (_, e) =>
                     {
-                        if (result.Result != AccessState.Available)
+                        if (e == null)
                         {
-                            ob.OnError(new PermissionException("MotionActivity", result.Result));
+                            tcs.SetResult(AccessState.Available);
                         }
                         else
                         {
-                            this.activityManager.StartActivityUpdates(
-                                NSOperationQueue.CurrentQueue,
-                                e => ob.OnNext(ToEvent(e))
-                            );
+                            switch (e.Code)
+                            {
+                                case (int)CMError.MotionActivityNotAuthorized:
+                                    tcs.SetResult(AccessState.Denied);
+                                    break;
+
+                                case (int)CMError.MotionActivityNotAvailable:
+                                    tcs.SetResult(AccessState.NotSupported);
+                                    break;
+
+                                case (int)CMError.MotionActivityNotEntitled:
+                                    tcs.SetResult(AccessState.NotSetup);
+                                    break;
+                            }
                         }
-                    });
-                    return () => this.activityManager.StopActivityUpdates();
-                })
-                .Publish()
-                .RefCount();
-
-            return this.activityObs;
+                    }
+                );
+                return await tcs.Task.ConfigureAwait(false);
         }
+    }
 
 
-        static MotionActivityEvent ToEvent(CMMotionActivity target)
-        {
-            var flags = MotionActivityType.Unknown;
-            if (!target.Unknown)
+    public async Task<IList<MotionActivityEvent>> Query(DateTimeOffset start, DateTimeOffset? end = null)
+    {
+        (await this.RequestAccess().ConfigureAwait(false)).Assert();
+
+        end = end ?? DateTimeOffset.UtcNow;
+        var results = await this.activityManager
+            .QueryActivityAsync(
+                (NSDate)start.LocalDateTime,
+                (NSDate)end.Value.LocalDateTime,
+                NSOperationQueue.MainQueue
+            )
+            .ConfigureAwait(false);
+
+        return results
+            .Select(x => ToEvent(x))
+            .ToList();
+    }
+
+
+    IObservable<MotionActivityEvent>? activityObs;
+    public IObservable<MotionActivityEvent> WhenActivityChanged()
+    {
+        this.activityObs ??= Observable
+            .Create<MotionActivityEvent>(ob =>
             {
-                flags &= MotionActivityType.Unknown;
-                if (target.Automotive)
-                    flags |= MotionActivityType.Automotive;
+                this.RequestAccess().ContinueWith(result =>
+                {
+                    if (result.Result != AccessState.Available)
+                    {
+                        ob.OnError(new PermissionException("MotionActivity", result.Result));
+                    }
+                    else
+                    {
+                        this.activityManager.StartActivityUpdates(
+                            NSOperationQueue.CurrentQueue,
+                            e => ob.OnNext(ToEvent(e))
+                        );
+                    }
+                });
+                return () => this.activityManager.StopActivityUpdates();
+            })
+            .Publish()
+            .RefCount();
 
-                if (target.Cycling)
-                    flags |= MotionActivityType.Cycling;
+        return this.activityObs;
+    }
 
-                if (target.Running)
-                    flags |= MotionActivityType.Running;
 
-                if (target.Stationary)
-                    flags |= MotionActivityType.Stationary;
+    static MotionActivityEvent ToEvent(CMMotionActivity target)
+    {
+        var flags = MotionActivityType.Unknown;
+        if (!target.Unknown)
+        {
+            flags &= MotionActivityType.Unknown;
+            if (target.Automotive)
+                flags |= MotionActivityType.Automotive;
 
-                if (target.Walking)
-                    flags |= MotionActivityType.Walking;
-            }
+            if (target.Cycling)
+                flags |= MotionActivityType.Cycling;
 
-            var conf = (MotionActivityConfidence)Enum.Parse(typeof(MotionActivityConfidence), target.Confidence.ToString(), true);
-            var activity = new MotionActivityEvent(flags, conf, (DateTime)target.StartDate);
-            return activity;
+            if (target.Running)
+                flags |= MotionActivityType.Running;
+
+            if (target.Stationary)
+                flags |= MotionActivityType.Stationary;
+
+            if (target.Walking)
+                flags |= MotionActivityType.Walking;
         }
+
+        var conf = (MotionActivityConfidence)Enum.Parse(typeof(MotionActivityConfidence), target.Confidence.ToString(), true);
+        var activity = new MotionActivityEvent(flags, conf, (DateTime)target.StartDate);
+        return activity;
     }
 }

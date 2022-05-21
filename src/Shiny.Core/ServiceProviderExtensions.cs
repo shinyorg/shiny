@@ -7,12 +7,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Shiny.Hosting;
+using Shiny.Stores;
 
 namespace Shiny;
 
 
 public static class ServiceExtensions
 {
+    /// <summary>
+    /// Lazily resolves a service - helps in prevent resolve loops with delegates/services internal to Shiny
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="services"></param>
+    /// <param name="required"></param>
+    /// <returns></returns>
+    public static Lazy<T> GetLazyService<T>(this IServiceProvider services, bool required = false)
+        => new Lazy<T>(() => required ? services.GetRequiredService<T>() : services.GetService<T>());
+
+
     /// <summary>
     /// This will attempt to resolve the service using standard TService, but if the TImpl implement a secondary service, it will add a registration in DI for that as well and resolve to the original main service
     /// </summary>
@@ -62,7 +74,7 @@ public static class ServiceExtensions
             services.AddSingleton(sp =>
             {
                 var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, serviceType);
-                // TODO: bind object
+                sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
                 return instance;
             });
         }
@@ -91,7 +103,7 @@ public static class ServiceExtensions
             services.AddSingleton(sp =>
             {
                 var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, implementationType);
-                // TODO: bind object
+                sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
                 return instance;
             });
         }
@@ -120,7 +132,7 @@ public static class ServiceExtensions
             services.AddSingleton(sp =>
             {
                 var instance = (TImpl)ActivatorUtilities.CreateInstance(sp, typeof(TImpl));
-                // TODO: bind object
+                sp.GetRequiredService<IObjectStoreBinder>().Bind((INotifyPropertyChanged)instance);
                 return instance;
             });
         }

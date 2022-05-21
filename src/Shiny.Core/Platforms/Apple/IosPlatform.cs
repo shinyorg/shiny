@@ -21,7 +21,8 @@ public class IosPlatform : IPlatform
     public DirectoryInfo AppData { get; }
     public DirectoryInfo Cache { get; }
     public DirectoryInfo Public { get; }
-    //public string AppIdentifier => NSBundle.MainBundle.BundleIdentifier;
+    public string AppIdentifier => NSBundle.MainBundle.BundleIdentifier;
+
     //public string AppVersion => NSBundle.MainBundle.InfoDictionary["CFBundleVersion"].ToString();
     //public string AppBuild => NSBundle.MainBundle.InfoDictionary["CFBundleShortVersionString"].ToString();
 

@@ -20,10 +20,6 @@
         <AndroidTargetFramework>monoandroid12.0</AndroidTargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR '$(TargetFramework)' == 'net6.0'">
-        <IsStandardBuild>true</IsStandardBuild>
-    </PropertyGroup>
-
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
@@ -38,12 +34,16 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('android'))">
-        <SupportedOSPlatformVersion>31.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>26.0</TargetPlatformMinVersion>
+        <SupportedOSPlatformVersion>26.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion>31.0</TargetPlatformMinVersion>
         <DefineConstants>$(DefineConstants);__ANDROID__;MONOANDROID</DefineConstants>
         <AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
         <AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
         <IsAndroidBuild>true</IsAndroidBuild>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR '$(TargetFramework)' == 'net6.0'">
+        <IsStandardBuild>true</IsStandardBuild>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('ios'))">
@@ -53,7 +53,7 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
         <SupportedOSPlatformVersion>14.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>        
+        <TargetPlatformMinVersion>14.0</TargetPlatformMinVersion>
         <IsIosBuild>true</IsIosBuild>
     </PropertyGroup>
 </Project>

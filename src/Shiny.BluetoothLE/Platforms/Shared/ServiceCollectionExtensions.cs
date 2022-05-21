@@ -9,14 +9,20 @@ namespace Shiny;
 public static class ServiceCollectionExtensions
 {
 
-    static void AddServices(this IServiceCollection services, BleConfiguration? config)
+    public static IBleManager BluetoothLE(this ShinyContainer container) => container.GetService<IBleManager>();
+
+
+    static bool AddServices(this IServiceCollection services, BleConfiguration? config)
     {
 #if IOS || MACCATALYST || ANDROID
         services.TryAddSingleton(config ?? new BleConfiguration());
+
+        // TODO: lifecycle method for direct impl only
         services.TryAddSingleton<Shiny.BluetoothLE.Internals.ManagerContext>();
-        services.TryAddSingleton<IBleManager, BleManager>();
+        services.AddShinyServiceWithLifecycle<IBleManager, BleManager>();
+        return true;
 #else
-        throw new InvalidOperationException("Platform is not supported");
+        return false;
 #endif
     }
 
@@ -28,13 +34,15 @@ public static class ServiceCollectionExtensions
     /// <param name="config"></param>
     /// <param name="delegateType"></param>
     /// <returns></returns>
-    public static IServiceCollection AddBluetoothLE(this IServiceCollection services, Type? delegateType = null, BleConfiguration? config = null)
+    public static bool AddBluetoothLE(this IServiceCollection services, Type? delegateType = null, BleConfiguration? config = null)
     {
-        services.AddServices(config);
+        if (!services.AddServices(config))
+            return false;
+
         if (delegateType != null)
             services.AddShinyService(typeof(IBleDelegate), delegateType);
 
-        return services;
+        return true;
     }
 
 
@@ -45,6 +53,6 @@ public static class ServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="config"></param>
     /// <returns></returns>
-    public static IServiceCollection AddBluetoothLE<TCentralDelegate>(this IServiceCollection services, BleConfiguration? config = null) where TCentralDelegate : class, IBleDelegate
+    public static bool AddBluetoothLE<TCentralDelegate>(this IServiceCollection services, BleConfiguration? config = null) where TCentralDelegate : class, IBleDelegate
         => services.AddBluetoothLE(typeof(TCentralDelegate), config);
 }

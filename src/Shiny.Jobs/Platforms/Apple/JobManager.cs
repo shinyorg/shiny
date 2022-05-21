@@ -17,7 +17,15 @@ public class JobManager : AbstractJobManager
     bool registeredSuccessfully = false;
 
 
-    public JobManager(IServiceProvider container, IRepository repository, ILogger<IJobManager> logger) : base(container, repository, logger)
+    public JobManager(
+        IServiceProvider container,
+        IRepository<JobInfo> repository,
+        ILogger<IJobManager> logger
+    ) : base(
+        container,
+        repository,
+        logger
+    )
     {
         try
         {
@@ -62,7 +70,7 @@ public class JobManager : AbstractJobManager
         try
         {
             using var cancelSrc = new CancellationTokenSource();
-             
+
             taskId = (int)app.BeginBackgroundTask(taskName, cancelSrc.Cancel);
             this.LogTask(JobState.Start, taskName);
             await task(cancelSrc.Token).ConfigureAwait(false);
@@ -124,7 +132,7 @@ public class JobManager : AbstractJobManager
             async task =>
             {
                 using var cancelSrc = new CancellationTokenSource();
-                 
+
                 task.ExpirationHandler = cancelSrc.Cancel;
 
                 var jobs = await this.GetJobs();

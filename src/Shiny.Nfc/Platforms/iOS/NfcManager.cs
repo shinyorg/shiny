@@ -7,61 +7,57 @@ using CoreNFC;
 using Foundation;
 using Microsoft.Extensions.Logging;
 using UIKit;
+using Shiny.Hosting;
 
 
 namespace Shiny.Nfc
 {
-    public class NfcManager : NFCTagReaderSessionDelegate, INfcManager
+    public class NfcManager : NFCTagReaderSessionDelegate, INfcManager, IIosLifecycle.IContinueActivity
     {
         readonly ILogger logger;
-        readonly Subject<INFCTag[]?> tagsSubject;
-        
-
-        public NfcManager(AppleLifecycle lifecycle, ILogger<NfcManager> logger)
-        {
-            this.logger = logger;
-            this.tagsSubject = new Subject<INFCTag[]?>();
-
-            //lifecycle.RegisterContinueActivity(activity =>
-            //{
-            //    // TODO
-            //    return Task.CompletedTask;
-            //});
-//            func application(_ application: UIApplication,
-//                 continue userActivity: NSUserActivity,
-//                 restorationHandler: @escaping([Any] ?) -> Void) -> Bool {
-
-//                guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else
-//                {
-//                    return false
-//                }
-
-//                // Confirm that the NSUserActivity object contains a valid NDEF message.
-//                let ndefMessage = userActivity.ndefMessagePayload
-//    guard ndefMessage.records.count > 0,
-//        ndefMessage.records[0].typeNameFormat != .empty else
-//                {
-//                    return false
-//    }
-
-//                // Send the message to `MessagesTableViewController` for processing.
-//                guard let navigationController = window?.rootViewController as? UINavigationController else
-//                {
-//                    return false
-//                }
-
-//                navigationController.popToRootViewController(animated: true)
-//    let messageTableViewController = navigationController.topViewController as? MessagesTableViewController
-//    messageTableViewController?.addMessage(fromUserActivity: ndefMessage)
-
-//    return true
-//}
-        }
+        readonly Subject<INFCTag[]?> tagsSubject = new();
+        public NfcManager(ILogger<NfcManager> logger) => this.logger = logger;
 
 
         //public override void DidBecomeActive(NFCTagReaderSession session) { }
 
-        public override void DidDetectTags(NFCTagReaderSession session, INFCTag[] tags) 
+        public bool Handle(NSUserActivity activity, UIApplicationRestorationHandler completionHandler)
+        {
+            //            func application(_ application: UIApplication,
+            //                 continue userActivity: NSUserActivity,
+            //                 restorationHandler: @escaping([Any] ?) -> Void) -> Bool {
+
+            //                guard userActivity.activityType == NSUserActivityTypeBrowsingWeb else
+            //                {
+            //                    return false
+            //                }
+
+            //                // Confirm that the NSUserActivity object contains a valid NDEF message.
+            //                let ndefMessage = userActivity.ndefMessagePayload
+            //    guard ndefMessage.records.count > 0,
+            //        ndefMessage.records[0].typeNameFormat != .empty else
+            //                {
+            //                    return false
+            //    }
+
+            //                // Send the message to `MessagesTableViewController` for processing.
+            //                guard let navigationController = window?.rootViewController as? UINavigationController else
+            //                {
+            //                    return false
+            //                }
+
+            //                navigationController.popToRootViewController(animated: true)
+            //    let messageTableViewController = navigationController.topViewController as? MessagesTableViewController
+            //    messageTableViewController?.addMessage(fromUserActivity: ndefMessage)
+
+            //    return true
+
+            // TODO
+            return false;
+        }
+
+
+        public override void DidDetectTags(NFCTagReaderSession session, INFCTag[] tags)
             => this.tagsSubject.OnNext(tags);
 
 
@@ -88,7 +84,7 @@ namespace Shiny.Nfc
 
             return Observable.Return(status);
         }
-        
+
 
         public IObservable<INfcTag[]> WhenTagsDetected() => Observable.Create<INfcTag[]>(ob =>
         {
@@ -113,7 +109,7 @@ namespace Shiny.Nfc
                     ob.OnError(notification.Exception);
                 }
                 else
-                { 
+                {
                     var shinyTags = notification.Value?.Select(tag => new IosNfcTag(session, tag)).ToArray() ?? Array.Empty<INfcTag>();
                     ob.OnNext(shinyTags);
                 }

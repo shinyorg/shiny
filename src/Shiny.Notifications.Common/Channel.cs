@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using Shiny.Stores;
+
 namespace Shiny.Notifications;
 
 
-public class Channel
+public class Channel : IStoreEntity
 {
     public static Channel Default { get; } = new Channel
     {

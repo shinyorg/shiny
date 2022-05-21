@@ -6,6 +6,7 @@ using Shiny.BluetoothLE;
 
 namespace Shiny.Beacons;
 
+
 public class BeaconRangingManager : IBeaconRangingManager
 {
     readonly IBleManager centralManager;
@@ -24,5 +25,5 @@ public class BeaconRangingManager : IBeaconRangingManager
 
     public Task<AccessState> RequestAccess() => this.centralManager.RequestAccess().ToTask();
     public IObservable<Beacon> WhenBeaconRanged(BeaconRegion region)
-        => this.scanner.Where(region.IsBeaconInRegion);
+        => this.scanner.Where(beacon => region.IsBeaconInRegion(beacon));
 }

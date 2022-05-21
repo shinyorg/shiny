@@ -1,27 +1,27 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Shiny.Net.Http;
+using Shiny.Stores;
+
+namespace Shiny;
 
 
-namespace Shiny
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IHttpTransferManager HttpTransfers(this ShinyContainer container) => container.GetService<IHttpTransferManager>();
+
+
+    public static IServiceCollection AddHttpTransfers(this IServiceCollection services, Type transferDelegateType)
     {
-        public static void UseHttpTransfers(this IServiceCollection services, Type transferDelegateType)
-        {
-            services.UseJobs();
-            services.AddSingleton(typeof(IHttpTransferDelegate), transferDelegateType);
-#if NETSTANDARD
-            services.TryAddSingleton<IHttpTransferManager, HttpClientHttpTransferManager>();
-#else
-            services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
-            services.TryAddSingleton<IHttpTransferManager, HttpTransferManager>();
+#if IOS || MACCATALYST || ANDROID
+        services.AddShinyServiceWithLifecycle<IHttpTransferManager, HttpTransferManager>();
+        services.AddShinyService(typeof(IHttpTransferDelegate), transferDelegateType);
+        services.AddRepository<HttpTransferStoreConverter, HttpTransfer>();
 #endif
-        }
-
-
-        public static void UseHttpTransfers<T>(this IServiceCollection services) where T : class, IHttpTransferDelegate
-            => services.UseHttpTransfers(typeof(T));
+        return services;
     }
+
+
+    public static IServiceCollection AddHttpTransfers<T>(this IServiceCollection services) where T : class, IHttpTransferDelegate
+        => services.AddHttpTransfers(typeof(T));
 }

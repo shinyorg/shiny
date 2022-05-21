@@ -34,7 +34,7 @@ public class BeaconRangingManager : IBeaconRangingManager
 
         return this.gdelegate
             .WhenBeaconRanged()
-            .Where(region.IsBeaconInRegion)
+            .Where(beacon => region.IsBeaconInRegion(beacon))
             .Finally(() =>
                 this.manager.StopRangingBeacons(native)
             );

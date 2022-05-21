@@ -13,7 +13,7 @@ namespace Shiny
         readonly object syncLock = new object();
 
 
-        public AndroidSqliteDatabase(IPlatform context) : base(context.AppContext, "shinystore.db", null, 1)
+        public AndroidSqliteDatabase(AndroidPlatform platform) : base(platform.AppContext, "shinystore.db", null, 1)
         {
         }
 

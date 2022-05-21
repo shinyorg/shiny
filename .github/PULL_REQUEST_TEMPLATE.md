@@ -32,4 +32,4 @@ None
 
 - [ ] Rebased on top of the target branch at time of PR
 - [ ] Changes adhere to coding standard
-- [ ] Sent to DEV branch
+- [ ] Sent to a v(branch) or DEV branch

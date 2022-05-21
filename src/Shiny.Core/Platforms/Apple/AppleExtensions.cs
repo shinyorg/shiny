@@ -7,7 +7,7 @@ using UIKit;
 using ObjCRuntime;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Hosting;
-using Shiny.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny;
 
@@ -16,9 +16,11 @@ public static class AppleExtensions
 {
     public static IHostBuilder AddIos(this IHostBuilder hostBuilder)
     {
+        hostBuilder.Services.AddCommon();
         hostBuilder.Services.AddShinyServiceWithLifecycle<IPlatform, IosPlatform>();
         hostBuilder.Services.AddSingleton<IosLifecycleExecutor>();
-        hostBuilder.Services.AddSingleton<IMessageBus, MessageBus>();
+        hostBuilder.Services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
+        hostBuilder.Services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
         return hostBuilder;
     }
 
@@ -36,6 +38,7 @@ public static class AppleExtensions
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IHandleEventsForBackgroundUrl>();
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IContinueActivity>();
         services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.IApplicationLifecycle>();
+        services.TryMultipleAddSingleton<TService, TImpl, IIosLifecycle.INotificationHandler>();
 
         return services;
     }

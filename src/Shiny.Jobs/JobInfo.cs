@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shiny.Stores;
 
 namespace Shiny.Jobs;
 
 
-public class JobInfo
+public class JobInfo : IStoreEntity
 {
     public JobInfo(Type jobType, string? identifier = null, bool runOnForeground = false)
     {

@@ -17,12 +17,10 @@ using Shiny.Hosting;
 namespace Shiny;
 
 
-// TODO: target some of the lifecycle things for callbacks here
-public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityNewIntent, IAndroidLifecycle.IOnActivityRequestPermissionsResult, IAndroidLifecycle.IOnActivityResult
+public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityRequestPermissionsResult, IAndroidLifecycle.IOnActivityResult
 {
     int requestCode;
     readonly AndroidActivityLifecycle activityLifecycle;
-    readonly Subject<Intent> newIntentSubject = new();
     readonly Subject<PermissionRequestResult> permissionSubject = new();
     readonly Subject<(int RequestCode, Result Result, Intent Intent)> activityResultSubject = new();
 
@@ -41,9 +39,6 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityNewIntent
     }
 
     // lifecycle hooks
-    public void Handle(Activity activity, Intent intent) 
-        => this.newIntentSubject.OnNext(intent);
-
     public void Handle(Activity activity, int requestCode, string[] permissions, Permission[] grantResults) 
         => this.permissionSubject.OnNext(new PermissionRequestResult(requestCode, permissions, grantResults));
 
@@ -90,20 +85,20 @@ public class AndroidPlatform : IPlatform, IAndroidLifecycle.IOnActivityNewIntent
     {
         var comp = new CompositeDisposable();
 
-        this.WhenActivityChanged()
-            .Where(x =>
-                x.State == ActivityState.Resumed &&
-                x.Activity.Intent != null
-            )
-            .Subscribe(x => ob.OnNext((false, x.Activity.Intent!)))
-            .DisposedBy(comp);
+        //this.WhenActivityChanged()
+        //    .Where(x =>
+        //        x.State == ActivityState.Resumed &&
+        //        x.Activity.Intent != null
+        //    )
+        //    .Subscribe(x => ob.OnNext((false, x.Activity.Intent!)))
+        //    .DisposedBy(comp);
 
-        this.newIntentSubject
-            .Subscribe(intent => ob.OnNext((true, intent)))
-            .DisposedBy(comp);
+        //this.newIntentSubject
+        //    .Subscribe(intent => ob.OnNext((true, intent)))
+        //    .DisposedBy(comp);
 
         return comp;
-   });
+    });
 
 
     public IObservable<ActivityChanged> WhenActivityStatusChanged() => Observable.Create<ActivityChanged>(ob =>

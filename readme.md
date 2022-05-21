@@ -1,7 +1,7 @@
-﻿# Shiny for Xamarin & Windows 
+﻿# Shiny for Microsoft Application UI (MAUI), Xamarin Forms, & Xamarin Native 
 <img src="https://github.com/shinyorg/shiny/raw/master/art/logo.png" width="100" /> 
 
-Shiny is a cross platform framework designed for Xamarin & UWP to make working with device services and background processes easy, testable, and consistent while bringing
+Shiny is a cross platform framework designed to make working with device services and background processes easy, testable, and consistent while bringing
 things like dependency injection & logging in a structured way to your code!
 
 ## Features
@@ -36,14 +36,6 @@ Depending on your Sponsorship Tier, you may also get access to some great benefi
 [https://sponsor.shinylib.net](https://sponsor.shinylib.net)
 
 How about some [Shiny Gear](https://www.redbubble.com/shop/ap/45038461)
-
-## Builds
-
-Branch|Status
-------|------
-Master|[![Build](https://github.com/shinyorg/shiny/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/shinyorg/shiny/actions/workflows/build.yml)|
-Dev|[![Build](https://github.com/shinyorg/shiny/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/shinyorg/shiny/actions/workflows/build.yml)|
-Preview|[![Build](https://github.com/shinyorg/shiny/actions/workflows/build.yml/badge.svg?branch=preview)](https://github.com/shinyorg/shiny/actions/workflows/build.yml)|
 
 ## Contributors
 * [Allan Ritchie](https://github.com/aritchie) - Project Lead

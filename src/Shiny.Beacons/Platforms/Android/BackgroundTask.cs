@@ -9,6 +9,7 @@ using Shiny.Infrastructure;
 
 namespace Shiny.Beacons;
 
+
 public class BackgroundTask
 {
     readonly IBleManager bleManager;
@@ -20,11 +21,13 @@ public class BackgroundTask
     IDisposable? scanSub;
 
 
-    public BackgroundTask(IMessageBus messageBus,
-                          IBleManager centralManager,
-                          IBeaconMonitoringManager beaconManager,
-                          IEnumerable<IBeaconMonitorDelegate> delegates,
-                          ILogger<IBeaconMonitorDelegate> logger)
+    public BackgroundTask(
+        IMessageBus messageBus,
+        IBleManager centralManager,
+        IBeaconMonitoringManager beaconManager,
+        IEnumerable<IBeaconMonitorDelegate> delegates,
+        ILogger<IBeaconMonitorDelegate> logger
+    )
     {
         this.messageBus = messageBus;
         this.bleManager = centralManager;
@@ -55,7 +58,7 @@ public class BackgroundTask
                         {
                             lock (this.states)
                             {
-                                this.states.Add(ev.Region.Identifier, new BeaconRegionStatus(ev.Region));
+                                this.states.Add(ev.Region!.Identifier, new BeaconRegionStatus(ev.Region));
                             }
                         }
                         break;
@@ -67,7 +70,7 @@ public class BackgroundTask
                     case BeaconRegisterEventType.Remove:
                         lock (this.states)
                         {
-                            this.states.Remove(ev.Region.Identifier);
+                            this.states.Remove(ev.Region!.Identifier);
                             if (this.states.Count == 0)
                                 this.StopScan();
                         }
@@ -119,7 +122,7 @@ public class BackgroundTask
     IList<BeaconRegionStatus> GetCopy()
     {
         lock (this.states)
-        { 
+        {
             return this.states
                 .Select(x => x.Value)
                 .ToList();

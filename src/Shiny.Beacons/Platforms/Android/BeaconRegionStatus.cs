@@ -2,6 +2,7 @@
 
 namespace Shiny.Beacons;
 
+
 public class BeaconRegionStatus
 {
     public BeaconRegionStatus(BeaconRegion region) => this.Region = region;

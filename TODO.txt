@@ -1,0 +1,22 @@
+Shiny.Net.Http
+* Replace android http download/upload with httpclient and foreground service
+* Needs connectivity from jobs - may need a separate lib for this... could just fallback on Essentials at this point
+
+Shiny.Jobs
+* Needs foreground/background detection for foreground jobs
+
+NFC
+* Finish write
+* Add backgrounding
+
+Repository Conversion
+* HTTP Transfers
+* Notifications
+
+BLE
+* // TODO: lifecycle method for direct impl only
+    services.TryAddSingleton<Shiny.BluetoothLE.Internals.ManagerContext>();
+
+Tests
+* New Repository
+* New Binding

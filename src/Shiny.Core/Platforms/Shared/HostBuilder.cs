@@ -6,10 +6,9 @@ using Shiny.Logging;
 namespace Shiny.Hosting;
 
 
-public abstract class HostBuilder : IHostBuilder
+public class HostBuilder : IHostBuilder
 {
-
-    protected HostBuilder()
+    public HostBuilder()
     {
         this.Services = new ServiceCollection();
         this.Logging = new ShinyLoggingBuilder(this.Services);

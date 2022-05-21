@@ -6,21 +6,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Shiny.Jobs.Infrastructure;
 using Shiny.Stores;
-
 
 namespace Shiny.Jobs;
 
+
 public abstract class AbstractJobManager : IJobManager
 {
-    readonly IRepository repository;
+    readonly IRepository<JobInfo> repository;
     readonly IServiceProvider container;
     readonly Subject<JobRunResult> jobFinished;
     readonly Subject<JobInfo> jobStarted;
 
 
-    protected AbstractJobManager(IServiceProvider container, IRepository repository, ILogger<IJobManager> logger)
+    protected AbstractJobManager(
+        IServiceProvider container,
+        IRepository<JobInfo> repository,
+        ILogger<IJobManager> logger
+    )
     {
         this.container = container;
         this.repository = repository;
@@ -58,14 +61,13 @@ public abstract class AbstractJobManager : IJobManager
         try
         {
             var job = await this.repository
-                .Get<PersistJobInfo>(jobName)
+                .Get(jobName)
                 .ConfigureAwait(false);
 
             if (job == null)
                 throw new ArgumentException("No job found named " + jobName);
 
-            actual = PersistJobInfo.FromPersist(job);
-            result = await this.RunJob(actual, cancelToken).ConfigureAwait(false);
+            result = await this.RunJob(job, cancelToken).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -77,45 +79,44 @@ public abstract class AbstractJobManager : IJobManager
     }
 
 
-    public async Task<IEnumerable<JobInfo>> GetJobs()
-    {
-        var jobs = await this.repository.GetList<PersistJobInfo>().ConfigureAwait(false);
-        return jobs.Select(PersistJobInfo.FromPersist);
-    }
+    public Task<IList<JobInfo>> GetJobs()
+        => this.repository.GetList();
 
 
-    public async Task<JobInfo?> GetJob(string jobName)
-    {
-        var job = await this.repository.Get<PersistJobInfo>(jobName).ConfigureAwait(false);
-        if (job == null)
-            return null;
-
-        return PersistJobInfo.FromPersist(job);
-    }
+    public Task<JobInfo?> GetJob(string jobIdentifier)
+        => this.repository.Get(jobIdentifier);
 
 
     public async Task Cancel(string jobIdentifier)
     {
-        var job = await this.repository.Get<PersistJobInfo>(jobIdentifier).ConfigureAwait(false);
+        var job = await this.repository.Get(jobIdentifier).ConfigureAwait(false);
         if (job != null)
         {
-            this.CancelNative(PersistJobInfo.FromPersist(job));
-            await this.repository.Remove<PersistJobInfo>(jobIdentifier).ConfigureAwait(false);
+            this.CancelNative(job);
+            await this.repository.Remove(jobIdentifier).ConfigureAwait(false);
         }
     }
 
 
     public virtual async Task CancelAll()
     {
-        var jobs = await this.repository.GetListWithKeys<PersistJobInfo>().ConfigureAwait(false);
+        var jobs = await this.repository.GetList().ConfigureAwait(false);
         foreach (var job in jobs)
         {
-            if (!job.Value.IsSystemJob)
+            if (!job.IsSystemJob)
             {
-                this.CancelNative(PersistJobInfo.FromPersist(job.Value));
-                await this.repository.Remove<PersistJobInfo>(job.Key).ConfigureAwait(false);
+                await this
+                    .CancelJob(job)
+                    .ConfigureAwait(false);
             }
         }
+    }
+
+
+    Task CancelJob(JobInfo job)
+    {
+        this.CancelNative(job);
+        return this.repository.Remove(job.Identifier);
     }
 
 
@@ -129,7 +130,7 @@ public abstract class AbstractJobManager : IJobManager
     {
         this.ResolveJob(jobInfo);
         this.RegisterNative(jobInfo);
-        await this.repository.Set(jobInfo.Identifier, PersistJobInfo.ToPersist(jobInfo));
+        await this.repository.Set(jobInfo).ConfigureAwait(false);
     }
 
 
@@ -142,16 +143,15 @@ public abstract class AbstractJobManager : IJobManager
             try
             {
                 this.IsRunning = true;
-                var jobs = await this.repository.GetList<PersistJobInfo>();
+                var jobs = await this.repository.GetList().ConfigureAwait(false);
                 var tasks = new List<Task<JobRunResult>>();
 
                 if (runSequentially)
                 {
                     foreach (var job in jobs)
                     {
-                        var actual = PersistJobInfo.FromPersist(job);
                         var result = await this
-                            .RunJob(actual, cancelToken)
+                            .RunJob(job, cancelToken)
                             .ConfigureAwait(false);
                         list.Add(result);
                     }
@@ -160,8 +160,7 @@ public abstract class AbstractJobManager : IJobManager
                 {
                     foreach (var job in jobs)
                     {
-                        var actual = PersistJobInfo.FromPersist(job);
-                        tasks.Add(this.RunJob(actual, cancelToken));
+                        tasks.Add(this.RunJob(job, cancelToken));
                     }
 
                     await Task
@@ -216,7 +215,7 @@ public abstract class AbstractJobManager : IJobManager
             if (!cancel)
             {
                 job.LastRunUtc = DateTime.UtcNow;
-                await this.repository.Set(job.Identifier, PersistJobInfo.ToPersist(job));
+                await this.repository.Set(job).ConfigureAwait(false);
             }
         }
         this.jobFinished.OnNext(result);

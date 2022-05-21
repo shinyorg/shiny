@@ -4,6 +4,7 @@ using Shiny.Jobs;
 using Shiny.Jobs.Infrastructure;
 using Shiny.Jobs.Net;
 using Shiny.Jobs.Power;
+using Shiny.Stores;
 
 namespace Shiny;
 
@@ -15,7 +16,7 @@ public static class ServiceCollectionExtensions
         if (clearPrevJobs != null)
             JobsStartup.ClearJobsBeforeRegistering = clearPrevJobs.Value;
 
-        services.TryAddRepository();
+        services.AddRepository<JobInfoStoreConverter, JobInfo>();
         services.AddShinyService<JobsStartup>();
         //services.AddShinyService<JobLifecycleTask>(); // TODO
         services.TryAddSingleton<IJobManager, JobManager>();

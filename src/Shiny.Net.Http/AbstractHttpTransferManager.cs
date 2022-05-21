@@ -25,12 +25,12 @@ namespace Shiny.Net.Http
 
         public virtual async Task<HttpTransfer> GetTransfer(string id)
         {
-            var transfers = await this.GetTransfers(new QueryFilter().Add(id)).ConfigureAwait(false);
+            var transfers = await this.GetTransfers(new QueryFilter(Ids: id)).ConfigureAwait(false);
             return transfers.FirstOrDefault();
         }
 
 
-        public virtual async Task<IEnumerable<HttpTransfer>> GetTransfers(QueryFilter? filter = null)
+        public virtual async Task<IList<HttpTransfer>> GetTransfers(QueryFilter? filter = null)
         {
             filter = filter ?? new QueryFilter();
             switch (filter.Direction)
@@ -45,7 +45,9 @@ namespace Shiny.Net.Http
                     var t1 = this.GetDownloads(filter);
                     var t2 = this.GetUploads(filter);
                     await Task.WhenAll(t1, t2).ConfigureAwait(false);
-                    return Enumerable.Concat(t1.Result, t2.Result);
+                    //return Enumerable.Concat(t1.Result, t2.Result);
+                    // TODO
+                    return null;
             }
         }
 
@@ -61,13 +63,13 @@ namespace Shiny.Net.Http
         }
 
 
-        protected virtual Task<IEnumerable<HttpTransfer>> GetUploads(QueryFilter filter)
+        protected virtual Task<IList<HttpTransfer>> GetUploads(QueryFilter filter)
         {
             throw new NotImplementedException();
         }
 
 
-        protected virtual Task<IEnumerable<HttpTransfer>> GetDownloads(QueryFilter filter)
+        protected virtual Task<IList<HttpTransfer>> GetDownloads(QueryFilter filter)
         {
             throw new NotImplementedException();
         }

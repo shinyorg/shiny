@@ -9,15 +9,23 @@ using P = Android.Manifest.Permission;
 
 namespace Shiny.Jobs;
 
+
 public class JobManager : AbstractJobManager
 {
     readonly AndroidPlatform platform;
 
 
-    public JobManager(AndroidPlatform platform,
-                      IServiceProvider container,
-                      IRepository repository,
-                      ILogger<IJobManager> logger) : base(container, repository, logger)
+    public JobManager(
+        AndroidPlatform platform,
+        IServiceProvider container,
+        IRepository<JobInfo> repository,
+        ILogger<IJobManager> logger
+    )
+    : base(
+        container,
+        repository,
+        logger
+    )
     {
         this.platform = platform;
     }

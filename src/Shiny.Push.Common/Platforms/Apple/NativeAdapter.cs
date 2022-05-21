@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Reactive.Disposables;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Foundation;
@@ -12,10 +12,11 @@ using UserNotifications;
 namespace Shiny.Push;
 
 
-public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
+public class NativeAdapter : INativeAdapter, IIosLifecycle.IOnFinishedLaunching, IIosLifecycle.IRemoteNotifications, IIosLifecycle.INotificationHandler
 {
     readonly ILogger logger;
     readonly IPlatform platform;
+    TaskCompletionSource<NSData>? tokenSource;
 
 
     public NativeAdapter(
@@ -27,93 +28,10 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
         this.logger = logger;
     }
 
-    
+
     public Func<string, Task>? OnTokenRefreshed { get; set; }
-
-
-    IDisposable ? onReceviedSub;
-    Func<PushNotification, Task>? onReceived;
-    public Func<PushNotification, Task>? OnReceived
-    {
-        get => this.onReceived;
-        set
-        {
-            this.onReceived = value;
-            if (this.onReceived == null)
-            {
-                this.onReceviedSub?.Dispose();
-            }
-            else
-            {
-                //this.onReceviedSub = this.lifecycle.RegisterToReceiveRemoteNotifications(async userInfo =>
-                //{
-                //    var dict = userInfo.FromNsDictionary();
-                //    var data = new PushNotification(dict, null);
-                //    await this.onReceived.Invoke(data).ConfigureAwait(false);
-                //});
-            }
-        }
-    }
-
-
-    CompositeDisposable? onEntrySub;
-    Func<PushNotification, Task>? onEntry;
-    public Func<PushNotification, Task>? OnEntry
-    {
-        get => this.onEntry;
-        set
-        {
-            this.onEntry = value;
-            if (this.onEntry == null)
-            {
-                this.onEntrySub?.Dispose();
-                this.onEntrySub = null;
-            }
-            else
-            {
-                this.onEntrySub ??= new CompositeDisposable();
-                
-                //this.onEntrySub.Add(this.lifecycle.RegisterForOnFinishedLaunching(async options =>
-                //{
-                //    if (options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
-                //    {
-                //        this.logger.LogDebug("App entry remote notification detected");
-                //        var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
-
-                //        Notification? notification = null;
-                //        IDictionary<string, string>? dict = null;
-
-                //        if (data != null)
-                //        {
-                //            notification = this.ToNotification(data);
-                //            dict = data.FromNsDictionary();
-                //            dict.Remove("aps");
-                //        }
-                //        var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
-                //        await this.onEntry.Invoke(push).ConfigureAwait(false);
-                //    }
-                //}));
-
-                //this.onEntrySub.Add(this.lifecycle.RegisterForNotificationReceived(async response =>
-                //{
-                //    if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
-                //    {
-                //        this.logger.LogDebug("Foreground remote notification entry detected");
-                //        var c = response.Notification.Request.Content;
-
-                //        var notification = new Notification(
-                //            c.Title,
-                //            c.Body
-                //        );
-
-                //        var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
-                //        var data = new PushNotification(dict, notification);
-                //        await this.onEntry.Invoke(data).ConfigureAwait(false);
-                //    }
-                //}));
-            }
-        }
-    }        
+    public Func<PushNotification, Task>? OnReceived { get; set; }
+    public Func<PushNotification, Task>? OnEntry { get; set; }
 
 
     public async Task<PushAccessState> RequestAccess()
@@ -158,26 +76,19 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
 
     public async Task<NSData> RequestRawToken(CancellationToken cancelToken = default)
     {
-        var tcs = new TaskCompletionSource<NSData>();
-        IDisposable? caller = null;
-        try
-        {
-            //caller = this.lifecycle.RegisterForRemoteNotificationToken(
-            //    rawToken => tcs.TrySetResult(rawToken),
-            //    err => tcs.TrySetException(new Exception(err.LocalizedDescription))
-            //);
-            await this.platform
-                .InvokeOnMainThreadAsync(
-                    () => UIApplication.SharedApplication.RegisterForRemoteNotifications()
-                )
-                .ConfigureAwait(false);
-            var rawToken = await tcs.Task;
-            return rawToken;
-        }
-        finally
-        {
-            caller?.Dispose();
-        }
+        this.tokenSource = new();
+        using var cancelSrc = cancelToken.Register(() => this.tokenSource.TrySetCanceled());
+
+        await this.platform
+            .InvokeOnMainThreadAsync(
+                () => UIApplication
+                    .SharedApplication
+                    .RegisterForRemoteNotifications()
+            )
+            .ConfigureAwait(false);
+
+        var rawToken = await this.tokenSource.Task.ConfigureAwait(false);
+        return rawToken;
     }
 
 
@@ -200,13 +111,70 @@ public class NativeAdapter : INativeAdapter, IIosLifecycle.IRemoteNotifications
                         alertDict["title"]?.ToString(),
                         alertDict["body"]?.ToString()
                     );
-                } 
+                }
             }
         }
         return null;
     }
 
-    public void OnRegistered(NSData deviceToken) => throw new NotImplementedException();
-    public void OnFailedToRegister(NSError error) => throw new NotImplementedException();
-    public void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) => throw new NotImplementedException();
+
+    public async void OnDidReceiveNotificationResponse(UNNotificationResponse response, Action completionHandler)
+    {
+        if (this.OnEntry == null)
+            return;
+
+        if (response.Notification?.Request?.Trigger is UNPushNotificationTrigger)
+        {
+            this.logger.LogDebug("Foreground remote notification entry detected");
+            var c = response.Notification.Request.Content;
+
+            var notification = new Notification(
+                c.Title,
+                c.Body
+            );
+
+            var dict = c.UserInfo?.FromNsDictionary() ?? new Dictionary<string, string>(0);
+            var data = new PushNotification(dict, notification);
+            await this.OnEntry.Invoke(data).ConfigureAwait(false);
+            completionHandler();
+        }
+    }
+    public void OnWillPresentNotification(UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) { }
+    public void OnRegistered(NSData deviceToken) => this.tokenSource?.TrySetResult(deviceToken);
+    public void OnFailedToRegister(NSError error) => this.tokenSource?.TrySetException(new Exception(error.LocalizedDescription));
+    public async void OnDidReceive(NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+    {
+        if (this.OnReceived == null)
+            return;
+
+        var dict = userInfo.FromNsDictionary();
+        var data = new PushNotification(dict, null);
+        await this.OnReceived.Invoke(data).ConfigureAwait(false);
+        completionHandler.Invoke(UIBackgroundFetchResult.NewData);
+    }
+
+
+    public async void Handle(NSDictionary options)
+    {
+        if (this.OnEntry == null)
+            return;
+
+        if (!options.ContainsKey(UIApplication.LaunchOptionsRemoteNotificationKey))
+            return;
+
+        this.logger.LogDebug("App entry remote notification detected");
+        var data = options[UIApplication.LaunchOptionsRemoteNotificationKey] as NSDictionary;
+
+        Notification? notification = null;
+        IDictionary<string, string>? dict = null;
+
+        if (data != null)
+        {
+            notification = this.ToNotification(data);
+            dict = data.FromNsDictionary();
+            dict.Remove("aps");
+        }
+        var push = new PushNotification(dict ?? new Dictionary<string, string>(0), notification);
+        await this.OnEntry.Invoke(push).ConfigureAwait(false);
+    }
 }

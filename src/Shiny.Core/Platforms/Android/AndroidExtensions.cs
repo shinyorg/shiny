@@ -6,7 +6,7 @@ using Android.Content;
 using Android.Content.PM;
 using Microsoft.Extensions.DependencyInjection;
 using Shiny.Hosting;
-using Shiny.Infrastructure;
+using Shiny.Stores;
 
 namespace Shiny;
 
@@ -15,9 +15,12 @@ public static class AndroidExtensions
 {
     public static IHostBuilder AddAndroid(this IHostBuilder hostBuilder)
     {
+        hostBuilder.Services.AddCommon();
         hostBuilder.Services.AddShinyServiceWithLifecycle<IPlatform, AndroidPlatform>();
         hostBuilder.Services.AddSingleton<AndroidLifecycleExecutor>();
-        hostBuilder.Services.AddSingleton<IMessageBus, MessageBus>();
+        hostBuilder.Services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
+        hostBuilder.Services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+
         return hostBuilder;
     }
 

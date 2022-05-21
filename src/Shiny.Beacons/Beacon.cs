@@ -6,7 +6,7 @@ namespace Shiny.Beacons;
 public record Beacon(
     Guid Uuid,
     ushort Major,
-    ushort Minor,    
+    ushort Minor,
     Proximity Proximity,
     int Rssi,
     double Accuracy

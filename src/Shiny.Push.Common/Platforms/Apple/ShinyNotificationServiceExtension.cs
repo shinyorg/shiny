@@ -10,7 +10,7 @@
 //    protected ShinyNotificationServiceExtension(NSObjectFlag t) : base(t) {}
 
 
-//    public override void DidReceiveNotificationRequest(UNNotificationRequest request, Action<UNNotificationContent> contentHandler) 
+//    public override void DidReceiveNotificationRequest(UNNotificationRequest request, Action<UNNotificationContent> contentHandler)
 //    {
 //    }
 //}
