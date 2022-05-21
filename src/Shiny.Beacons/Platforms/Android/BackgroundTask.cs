@@ -58,7 +58,7 @@ public class BackgroundTask
                         {
                             lock (this.states)
                             {
-                                this.states.Add(ev.Region!.Value.Identifier, new BeaconRegionStatus(ev.Region.Value));
+                                this.states.Add(ev.Region!.Identifier, new BeaconRegionStatus(ev.Region));
                             }
                         }
                         break;
@@ -70,7 +70,7 @@ public class BackgroundTask
                     case BeaconRegisterEventType.Remove:
                         lock (this.states)
                         {
-                            this.states.Remove(ev.Region!.Value.Identifier);
+                            this.states.Remove(ev.Region!.Identifier);
                             if (this.states.Count == 0)
                                 this.StopScan();
                         }

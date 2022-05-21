@@ -87,7 +87,7 @@ public class BleManager : AbstractBleManager
             .SelectMany(_ =>
             {
                 config ??= new ScanConfig();
-                if (config.ServiceUuids == null || config.ServiceUuids.Count == 0)
+                if (config.ServiceUuids == null || config.ServiceUuids.Length == 0)
                 {
                     this.context.Manager.ScanForPeripherals(null, new PeripheralScanningOptions { AllowDuplicatesKey = true });
                 }

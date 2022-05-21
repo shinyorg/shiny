@@ -166,7 +166,7 @@ public class ManagerContext : IShinyStartupTask
         builder.SetScanMode(scanMode);
 
         var scanFilters = new List<ScanFilter>();
-        if (config.ServiceUuids != null && config.ServiceUuids.Count > 0)
+        if (config.ServiceUuids != null && config.ServiceUuids.Length > 0)
         {
             foreach (var uuid in config.ServiceUuids)
             {
