@@ -17,6 +17,7 @@ public class AppDelegate : MauiUIApplicationDelegate
     public void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error) { }
 
 
+    //selector	"application:didReceiveRemoteNotification:"	
     [Export("application:didReceiveRemoteNotification:fetchCompletionHandler:")]
     public void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler) { }
 }

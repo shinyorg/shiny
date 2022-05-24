@@ -18,8 +18,9 @@ public static class MauiProgram
         builder.Services.AddAllSensors();
 
         // shiny.nfc
-        builder.Services.AddNfc();
-
+//#if !MACCATALYST
+//        builder.Services.AddNfc();
+//#endif
         // shiny.locations
         builder.Services.AddGps<SampleGpsDelegate>();
         builder.Services.AddGeofencing<SampleGeofenceDelegate>();

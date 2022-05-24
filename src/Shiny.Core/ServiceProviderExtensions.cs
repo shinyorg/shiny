@@ -71,9 +71,9 @@ public static class ServiceExtensions
     {
         if (implementationType.IsAssignableTo(typeof(INotifyPropertyChanged)))
         {
-            services.AddSingleton(sp =>
+            services.AddSingleton(serviceType, sp =>
             {
-                var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, serviceType);
+                var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, implementationType);
                 sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
                 return instance;
             });
@@ -83,7 +83,7 @@ public static class ServiceExtensions
             services.AddSingleton(serviceType, implementationType);
         }
         if (implementationType.IsAssignableTo(typeof(IShinyStartupTask)))
-            services.AddSingleton(typeof(IShinyStartupTask), implementationType);
+            services.AddSingleton<IShinyStartupTask>(sp => (IShinyStartupTask)sp.GetRequiredService(serviceType));
 
         return services;
     }
@@ -100,7 +100,7 @@ public static class ServiceExtensions
 
         if (implementationType.IsAssignableTo(typeof(INotifyPropertyChanged)))
         {
-            services.AddSingleton(sp =>
+            services.AddSingleton(implementationType, sp =>
             {
                 var instance = (INotifyPropertyChanged)ActivatorUtilities.CreateInstance(sp, implementationType);
                 sp.GetRequiredService<IObjectStoreBinder>().Bind(instance);
@@ -112,7 +112,7 @@ public static class ServiceExtensions
             services.AddSingleton(implementationType);
         }
         if (implementationType.IsAssignableTo(typeof(IShinyStartupTask)))
-            services.AddSingleton(typeof(IShinyStartupTask), implementationType);
+            services.AddSingleton<IShinyStartupTask>(sp => (IShinyStartupTask)sp.GetRequiredService(implementationType));
 
         return services;
     }
@@ -126,25 +126,8 @@ public static class ServiceExtensions
     /// <param name="services"></param>
     /// <returns></returns>
     public static IServiceCollection AddShinyService<TImpl>(this IServiceCollection services) where TImpl : class
-    {
-        if (typeof(TImpl).IsAssignableTo(typeof(INotifyPropertyChanged)))
-        {
-            services.AddSingleton(sp =>
-            {
-                var instance = (TImpl)ActivatorUtilities.CreateInstance(sp, typeof(TImpl));
-                sp.GetRequiredService<IObjectStoreBinder>().Bind((INotifyPropertyChanged)instance);
-                return instance;
-            });
-        }
-        else
-        {
-            services.AddSingleton<TImpl>();
-        }
-        if (typeof(TImpl).IsAssignableTo(typeof(IShinyStartupTask)))
-            services.AddSingleton(typeof(IShinyStartupTask), typeof(TImpl));
+        => services.AddShinyService(typeof(TImpl));
 
-        return services;
-    }
 
 
     public static Task RunDelegates<T>(this IServiceProvider services, Func<T, Task> execute, Action<Exception>? onError = null)

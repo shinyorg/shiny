@@ -15,6 +15,7 @@ public class StartupTask : NotifyPropertyChanged, IShinyStartupTask
 
     public void Start()
     {
+        this.NumberOfStarts++;
         Console.WriteLine("Startup Task - Number of starts: " + this.NumberOfStarts);
     }
 }
