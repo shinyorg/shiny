@@ -14,13 +14,24 @@ namespace Shiny;
 
 public static class AppleExtensions
 {
+    public static IServiceCollection AddIos(this IServiceCollection services)
+    {
+        services.AddShinyServiceWithLifecycle<IPlatform, IosPlatform>();
+
+        // HACK: it seems MAUI's container is built differently!?
+        services.AddSingleton<IosPlatform>(x => (IosPlatform)x.GetRequiredService<IPlatform>());
+
+        services.AddSingleton<IosLifecycleExecutor>();
+        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
+        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        services.AddCommon();
+        return services;
+    }
+
+
     public static IHostBuilder AddIos(this IHostBuilder hostBuilder)
     {
-        hostBuilder.Services.AddCommon();
-        hostBuilder.Services.AddShinyServiceWithLifecycle<IPlatform, IosPlatform>();
-        hostBuilder.Services.AddSingleton<IosLifecycleExecutor>();
-        hostBuilder.Services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-        hostBuilder.Services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        hostBuilder.Services.AddIos();
         return hostBuilder;
     }
 
@@ -51,12 +62,16 @@ public static class AppleExtensions
     public static bool HasAppDelegateHook(string selector)
     {
         if (!selector.StartsWith("application:"))
-            selector = "application:" + selector;
+             selector = "application:" + selector;
 
         if (!selector.EndsWith(":"))
             selector += ":";
 
-        return UIApplication.SharedApplication.RespondsToSelector(new Selector(selector));
+        var obj = UIApplication.SharedApplication.Delegate as NSObject;
+        if (obj == null)
+            throw new InvalidOperationException("AppDelegate is not set");
+
+        return obj.RespondsToSelector(new Selector(selector));
     }
 
 

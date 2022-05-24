@@ -9,6 +9,12 @@ public static class ShinyExtensions
     public static MauiAppBuilder UseShiny(this MauiAppBuilder builder)
     {
         builder.Services.AddSingleton<IMauiInitializeService, ShinyInitializationService>();
+#if ANDROID
+        builder.Services.AddAndroid();
+#elif IOS || MACCATALYST
+        builder.Services.AddIos();
+#endif
+
         builder.ConfigureLifecycleEvents(events =>
         {
 #if ANDROID
@@ -18,7 +24,7 @@ public static class ShinyExtensions
                 .OnActivityResult((activity, requestCode, result, intent) => Host.Current.Lifecycle().OnActivityResult(activity, requestCode, result, intent))
                 .OnNewIntent((activity, intent) => Host.Current.Lifecycle().OnNewIntent(activity, intent))
             );
-#elif IOS
+#elif IOS || MACCATALYST
             // Shiny will supply push events & handle background url for http transfers
             events.AddiOS(ios => ios
                 .FinishedLaunching((_, options) => Host.Current.Lifecycle().FinishedLaunching(options))

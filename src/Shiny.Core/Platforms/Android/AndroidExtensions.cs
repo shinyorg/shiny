@@ -13,14 +13,23 @@ namespace Shiny;
 
 public static class AndroidExtensions
 {
+    public static IServiceCollection AddAndroid(this IServiceCollection services)
+    {
+        services.AddShinyServiceWithLifecycle<IPlatform, AndroidPlatform>();
+        services.AddSingleton<AndroidPlatform>(x => (AndroidPlatform)x.GetRequiredService<IPlatform>());
+
+        services.AddSingleton<AndroidLifecycleExecutor>();
+        services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
+        services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
+        services.AddCommon();
+
+        return services;
+    }
+
+
     public static IHostBuilder AddAndroid(this IHostBuilder hostBuilder)
     {
-        hostBuilder.Services.AddCommon();
-        hostBuilder.Services.AddShinyServiceWithLifecycle<IPlatform, AndroidPlatform>();
-        hostBuilder.Services.AddSingleton<AndroidLifecycleExecutor>();
-        hostBuilder.Services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
-        hostBuilder.Services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
-
+        hostBuilder.Services.AddAndroid();
         return hostBuilder;
     }
 

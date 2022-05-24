@@ -14,21 +14,20 @@ public static class ServiceCollectionExtensions
     {
 #if IOS || MACCATALYST
         // TODO: can I hook these differently dynamically with selector?
-        // application:didReceiveRemoteNotification:"
         AppleExtensions.AssertAppDelegateHook(
-            "didReceiveRemoteNotification",
+            "application:didReceiveRemoteNotification:fetchCompletionHandler:",
             "[SHINY] AppDelegate.DidReceiveRemoteNotification is not hooked - background notifications will not work without this!"
         );
 
         // application:didRegisterForRemoteNotificationsWithDeviceToken:"
         AppleExtensions.AssertAppDelegateHook(
-            "didRegisterForRemoteNotificationsWithDeviceToken",
+            "application:didRegisterForRemoteNotificationsWithDeviceToken:",
             "[SHINY] AppDelegate.RegisteredForRemoteNotifications is not hooked. This is a necessary hook for Shiny Push"
         );
 
         //application: didFailToRegisterForRemoteNotificationsWithError
         AppleExtensions.AssertAppDelegateHook(
-            "didFailToRegisterForRemoteNotificationsWithError",
+            "application:didFailToRegisterForRemoteNotificationsWithError:",
             "[SHINY] AppDelegate.FailedToRegisterForRemoteNotifications is not hooked. This is a necessary hook for Shiny Push"
         );
 #endif
