@@ -12,12 +12,7 @@ public static class MauiProgram
 
             // THIS IS REQUIRED TO BE DONE FOR SHINY TO RUN
             .UseMauiApp<App>()
-            .UseShiny()
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-            });
+            .UseShiny();
 
         // shiny.sensors
         builder.Services.AddAllSensors();
@@ -65,10 +60,6 @@ public static class MauiProgram
         // shiny.core - startup task & persistent service registration
         builder.Services.AddShinyService<StartupTask>();
 
-        // THIS IS REQUIRED TO BE DONE FOR SHINY TO RUN
-        var app = builder.Build();
-        app.RunShiny();
-
-        return app;
+        return builder.Build();
     }
 }
