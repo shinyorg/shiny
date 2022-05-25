@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+
+using Android;
+
 using Shiny.Infrastructure;
 using Shiny.Locations;
 
@@ -96,9 +100,17 @@ namespace Shiny.Notifications
                 if (locPermission != AccessState.Available)
                     return AccessState.Restricted;
             }
-            if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !this.manager.Alarms.CanScheduleExactAlarms())
-                return AccessState.Restricted;
 
+            if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && this.core.Platform.IsMinApiLevel(31))
+            {
+                var schedulePermission = await this.core
+                    .Platform
+                    .RequestPermissions(Manifest.Permission.ScheduleExactAlarm)
+                    .ToTask();
+
+                if (!schedulePermission.IsSuccess())
+                    return AccessState.Restricted;
+            }
             return AccessState.Available;
         }
 
