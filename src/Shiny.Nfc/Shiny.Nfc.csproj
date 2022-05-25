@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 
     <PropertyGroup>
         <Description>Shiny Near Field Communication (NFC)</Description>

@@ -18,20 +18,14 @@
         <RepositoryType>git</RepositoryType>
         <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
         <ExtrasUwpMetaPackageVersion>6.2.13</ExtrasUwpMetaPackageVersion>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <BuildLegacy>true</BuildLegacy>
-        <BuildNet6>false</BuildNet6>
         <AndroidTargetFramework>monoandroid12.0</AndroidTargetFramework>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(BuildLegacy)' == 'true' AND '$(OS)' == 'WINDOWS_NT'">
+    <PropertyGroup Condition="'$(OS)' == 'WINDOWS_NT'">
         <UwpTargetFramework>uap10.0.19041</UwpTargetFramework>
     </PropertyGroup>
 
-    <!--Shiny should not build for net6.0 directly-->
-    <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR '$(TargetFramework)' == 'net6.0'">
+    <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard'))">
         <IsStandardBuild>true</IsStandardBuild>
     </PropertyGroup>
 
@@ -71,22 +65,5 @@
         <GenerateLibraryLayout>true</GenerateLibraryLayout>
         <DisableEmbeddedXbf>false</DisableEmbeddedXbf>
         <IsWindowsBuild>true</IsWindowsBuild>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="$(TargetFramework.Contains('maccatalyst'))">
-        <SupportedOSPlatformVersion>14</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>14</TargetPlatformMinVersion>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="$(TargetFramework.Contains('mac'))">
-        <SupportedOSPlatformVersion>10.14</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>10.14</TargetPlatformMinVersion>
-        <IsMacBuild>true</IsMacBuild>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="$(TargetFramework.Contains('tvos'))">
-        <SupportedOSPlatformVersion>10.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion>10.0</TargetPlatformMinVersion>
-        <IsTvOsBuild>true</IsTvOsBuild>
     </PropertyGroup>
 </Project>

@@ -1,10 +1,7 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 
     <PropertyGroup>
         <Description>Shiny Push Integration - OneSignal</Description>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
         <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);</TargetFrameworks>
     </PropertyGroup>
 

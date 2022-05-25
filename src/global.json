@@ -1,10 +1,6 @@
 {
     "sdk": {
-        "version": "6.0.2",
-        "rollForward": "disable"
-        //"allowPrerelease": false
-    },
-    "msbuild-sdks": {
-        "MSBuild.Sdk.Extras": "3.0.44"
+        "version": "6.0.0",
+        "rollForward": "latestPatch"
     }
 }

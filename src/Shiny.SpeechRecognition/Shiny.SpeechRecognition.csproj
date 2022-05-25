@@ -1,15 +1,8 @@
-﻿<Project Sdk="MSBuild.Sdk.Extras">
+﻿<Project Sdk="MSBuild.Sdk.Extras/3.0.44">
 
     <PropertyGroup>
         <Description>Shiny addon for speech recognition on mobile platforms</Description>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildLegacy)' == 'true'">
         <TargetFrameworks>netstandard2.0;xamarin.ios10;$(AndroidTargetFramework);$(UwpTargetFramework)</TargetFrameworks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(BuildNet6)' == 'true'">
-        <TargetFrameworks>net6.0-ios;net6.0-maccatalyst;net6.0-android;$(TargetFrameworks)</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

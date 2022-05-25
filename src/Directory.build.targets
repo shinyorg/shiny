@@ -90,33 +90,9 @@
         <Compile Include="**\Platforms\*iOS*\**\*.cs" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(IsTvOsBuild)' == 'true' ">
-        <Compile Include="**\Platforms\Apple\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\*tvOS*\**\*.cs" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(IsMacBuild)' == 'true' ">
-        <Compile Include="**\Platforms\Apple\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\*macOS*\**\*.cs" />
-        <Reference Include="netstandard" />
-    </ItemGroup>
-
     <ItemGroup Condition="'$(IsWindowsBuild)' == 'true'">
         <Compile Include="**\Platforms\*Uwp*\**\*.cs" />
         <Compile Include="**\Platforms\Shared\**\*.cs" />
     </ItemGroup>
 
-    <!--
-    <ItemGroup Condition=" $(TargetFramework.StartsWith('tizen')) ">
-        <Compile Include="**\Platforms\Tizen\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-    </ItemGroup>
-    <ItemGroup Condition=" $(TargetFramework.Contains('watchos')) ">
-        <Compile Include="**\Platforms\Apple\**\*.cs" />
-        <Compile Include="**\Platforms\Shared\**\*.cs" />
-        <Compile Include="**\Platforms\*watchOS*\**\*.cs" />
-    </ItemGroup>
-    -->
 </Project>
