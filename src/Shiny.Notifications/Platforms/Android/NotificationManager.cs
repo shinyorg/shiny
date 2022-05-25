@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
-
 using Android;
-
 using Shiny.Infrastructure;
 using Shiny.Locations;
 
