@@ -46,7 +46,7 @@ public class IntervalTrigger
         {
             var day = this.DayOfWeek!.Value;
             while (dt.DayOfWeek != day)
-                dt.AddDays(1);
+                dt = dt.AddDays(1);
         }
         return dt;
     }

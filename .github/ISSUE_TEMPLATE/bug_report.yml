@@ -64,11 +64,6 @@ body:
         1.
         2.
         3.
-  - type: input
-    attributes:
-       label: Library Version
-    validations:
-       required: true
   - type: textarea
     attributes:
       label: Expected Behavior
@@ -95,9 +90,9 @@ body:
       label: Code of Conduct
       description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/shinyorg/shiny/blob/master/.github/CODE_OF_CONDUCT.md)
       options:
-        - label: My reproducible sample is not from the Shiny samples repository
+        - label: My reproducible sample is NOT FROM THE SHINY SAMPLES REPOSITORY!  If you file an issue that says 'use shiny sample', YOU WILL BE BANNED FROM THE SHINY REPOS.  Read the code of conduct for why we care about this!
           required: true
-        #- label: I am using the latest stable version from nuget
-        #  required: true
+        - label: I am using the latest stable version from nuget (sponsors can discuss previews in discord)
+          required: true
         - label: I agree to follow this project's Code of Conduct
           required: true
