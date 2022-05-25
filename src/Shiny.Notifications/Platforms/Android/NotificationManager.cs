@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using Android;
 using Android.Content;
 using Shiny.Hosting;
 using Shiny.Locations;
@@ -96,8 +98,15 @@ public partial class NotificationManager : INotificationManager, IAndroidLifecyc
             if (locPermission != AccessState.Available)
                 return AccessState.Restricted;
         }
-        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && !this.manager.Alarms.CanScheduleExactAlarms())
-            return AccessState.Restricted;
+        if (access.HasFlag(AccessRequestFlags.TimeSensitivity) && this.platform.IsMinApiLevel(31))
+        {
+            var schedulePermission = await this.platform
+                .RequestPermissions(Manifest.Permission.ScheduleExactAlarm)
+                .ToTask();
+
+            if (!schedulePermission.IsSuccess())
+                return AccessState.Restricted;
+        }
 
         return AccessState.Available;
     }
