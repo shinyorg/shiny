@@ -20,8 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="Xamarin.Build.Download" Version="0.11.2" PrivateAssets="All" />
-        
         <PackageReference Update="Xamarin.Firebase.Messaging" Version="122.0.0.5" />
         
         <PackageReference Update="Xamarin.GooglePlayServices.Basement" Version="118.0.1" />
@@ -33,13 +31,16 @@
         <PackageReference Update="Xamarin.AndroidX.AppCompat" Version="1.4.1.1" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Process" Version="2.4.1.1" />
         <PackageReference Update="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.4.1.1" />
-        <PackageReference Update="Xamarin.AndroidX.Lifecycle.Common" Version="2.4.1.1" />
         <PackageReference Update="Xamarin.AndroidX.Concurrent.Futures" Version="1.1.0.8" />
         <PackageReference Update="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.3" />
-        
+
+        <!--hack additions-->
+        <PackageReference Update="Xamarin.Build.Download" Version="0.11.2" />
+        <!--
         <PackageReference Update="Xamarin.Google.Dagger" Version="2.40.5" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportBackendCct" Version="3.0.0.3" />
         <PackageReference Update="Xamarin.Google.Android.DataTransport.TransportRuntime" Version="3.0.1.3" />
+        -->
     </ItemGroup>
 
     <ItemGroup>

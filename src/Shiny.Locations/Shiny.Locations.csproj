@@ -15,8 +15,8 @@
 
     <ItemGroup Condition="'$(IsAndroidBuild)' == 'true'">
         <ProjectReference Include="..\Shiny.Locations.Common\Shiny.Locations.Common.csproj" />
-        <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" />
+        <PackageReference Include="Xamarin.AndroidX.Core" />
         <PackageReference Include="Xamarin.Build.Download" />
         <!--<PackageReference Include="Xamarin.GooglePlayServices.Base" Version="118.0.1" />
         <PackageReference Include="Xamarin.GooglePlayServices.Basement" Version="118.0.1" />
