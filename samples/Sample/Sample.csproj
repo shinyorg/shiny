@@ -45,6 +45,7 @@
         <PackageReference Include="Xamarin.GooglePlayServices.Tasks" Version="118.0.1" />
         <PackageReference Include="Xamarin.GooglePlayServices.Location" Version="119.0.1" />
         <PackageReference Include="Xamarin.AndroidX.Lifecycle.Common" Version="2.4.1.1" />
+        <PackageReference Include="Xamarin.AndroidX.Lifecycle.Runtime" Version="2.4.1.1" />
 
         <PackageReference Include="Xamarin.Firebase.Messaging" Version="122.0.0.5" />
     </ItemGroup>
