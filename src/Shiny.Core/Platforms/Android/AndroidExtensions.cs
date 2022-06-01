@@ -15,9 +15,7 @@ public static class AndroidExtensions
 {
     public static IServiceCollection AddAndroid(this IServiceCollection services)
     {
-        services.AddShinyServiceWithLifecycle<IPlatform, AndroidPlatform>();
-        services.AddSingleton<AndroidPlatform>(x => (AndroidPlatform)x.GetRequiredService<IPlatform>());
-
+        services.AddShinyService<AndroidPlatform>();
         services.AddSingleton<AndroidLifecycleExecutor>();
         services.AddSingleton<IKeyValueStore, SettingsKeyValueStore>();
         services.AddSingleton<IKeyValueStore, SecureKeyValueStore>();
@@ -35,21 +33,6 @@ public static class AndroidExtensions
 
 
     public static AndroidLifecycleExecutor Lifecycle(this IHost host) => host.Services.GetRequiredService<AndroidLifecycleExecutor>();
-
-
-    public static IServiceCollection AddShinyServiceWithLifecycle<TService, TImpl>(this IServiceCollection services)
-        where TService : class
-        where TImpl : class, TService
-    {
-        services.AddShinyService<TService, TImpl>();
-
-        services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IApplicationLifecycle>();
-        services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityNewIntent>();
-        services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityRequestPermissionsResult>();
-        services.TryMultipleAddSingleton<TService, TImpl, IAndroidLifecycle.IOnActivityResult>();
-
-        return services;
-    }
 
 
     public static PendingIntent GetBroadcastPendingIntent<T>(this AndroidPlatform platform, string intentAction, PendingIntentFlags flags, int requestCode = 0, Action<Intent>? modifyIntent = null)

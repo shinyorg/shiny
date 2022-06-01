@@ -21,7 +21,7 @@ public static class GpsServiceCollectionExtensions
     public static bool AddGps(this IServiceCollection services, Type? delegateType = null)
     {
         if (delegateType != null)
-            services.AddShinyService(typeof(IGpsDelegate), delegateType);
+            services.AddShinyService(delegateType);
 
 #if ANDROID
         var resultCode = GoogleApiAvailability
@@ -29,13 +29,13 @@ public static class GpsServiceCollectionExtensions
             .IsGooglePlayServicesAvailable(Application.Context);
 
         if (resultCode == ConnectionResult.ServiceMissing)
-            services.AddShinyService<IGpsManager, LocationServicesGpsManagerImpl>();
+            services.AddShinyService<LocationServicesGpsManagerImpl>();
         else
-            services.AddShinyService<IGpsManager, GooglePlayServiceGpsManagerImpl>();
+            services.AddShinyService<GooglePlayServiceGpsManagerImpl>();
 
         return true;
 #elif IOS || MACCATALYST
-        services.AddShinyService<IGpsManager, GpsManager>();
+        services.AddShinyService<GpsManager>();
         return true;
 #else
         return false;

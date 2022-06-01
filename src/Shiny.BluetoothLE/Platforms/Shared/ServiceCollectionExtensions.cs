@@ -17,9 +17,8 @@ public static class ServiceCollectionExtensions
 #if IOS || MACCATALYST || ANDROID
         services.TryAddSingleton(config ?? new BleConfiguration());
 
-        // TODO: lifecycle method for direct impl only
-        services.TryAddSingleton<Shiny.BluetoothLE.Internals.ManagerContext>();
-        services.AddShinyServiceWithLifecycle<IBleManager, BleManager>();
+        services.AddShinyService<Shiny.BluetoothLE.Internals.ManagerContext>();
+        services.AddShinyService<BleManager>();
         return true;
 #else
         return false;
@@ -40,7 +39,7 @@ public static class ServiceCollectionExtensions
             return false;
 
         if (delegateType != null)
-            services.AddShinyService(typeof(IBleDelegate), delegateType);
+            services.AddShinyService(delegateType);
 
         return true;
     }
